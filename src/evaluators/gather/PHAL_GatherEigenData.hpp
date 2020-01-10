@@ -7,19 +7,17 @@
 #ifndef PHAL_GATHER_EIGEN_DATA_HPP
 #define PHAL_GATHER_EIGEN_DATA_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
-#include "PHAL_Dimension.hpp"
 #include "PHAL_AlbanyTraits.hpp"
-
+#include "PHAL_Dimension.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 #include "Teuchos_ParameterList.hpp"
 
 namespace PHAL {
-/** \brief Gathers solution values from the Newton solution vector into 
+/** \brief Gathers solution values from the Newton solution vector into
     the nodal fields of the field manager
 
     Currently makes an assumption that the stride is constant for dofs
@@ -29,46 +27,48 @@ namespace PHAL {
 */
 // **************************************************************
 // Base Class with Generic Implementations: Specializations for
-// Automatic Differentiation Below 
+// Automatic Differentiation Below
 // **************************************************************
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class GatherEigenDataBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                             public PHX::EvaluatorDerived<EvalT, Traits>
-{  
-public:
-  
-  GatherEigenDataBase(const Teuchos::ParameterList& p,
-                      const Teuchos::RCP<Albany::Layouts>& dl);
-  
-  void postRegistrationSetup(typename Traits::SetupData d,
-                             PHX::FieldManager<Traits>& vm);
-  
+{
+ public:
+  GatherEigenDataBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
+
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
+
   // This function requires template specialization, in derived class below
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-protected:
-
-  typedef typename EvalT::ScalarT ScalarT;
-  std::vector< PHX::MDField<ScalarT,Cell,Node,Dim> > eigenvector_Re;
-  std::vector< PHX::MDField<ScalarT,Cell,Node,Dim> > eigenvector_Im;
-  std::vector< PHX::MDField<ScalarT> > eigenvalue_Re;
-  std::vector< PHX::MDField<ScalarT> > eigenvalue_Im;
-  std::size_t numNodes;
-  std::size_t nEigenvectors;
-
+ protected:
+  typedef typename EvalT::ScalarT                     ScalarT;
+  std::vector<PHX::MDField<ScalarT, Cell, Node, Dim>> eigenvector_Re;
+  std::vector<PHX::MDField<ScalarT, Cell, Node, Dim>> eigenvector_Im;
+  std::vector<PHX::MDField<ScalarT>>                  eigenvalue_Re;
+  std::vector<PHX::MDField<ScalarT>>                  eigenvalue_Im;
+  std::size_t                                         numNodes;
+  std::size_t                                         nEigenvectors;
 };
 
-template<typename EvalT, typename Traits>
-class GatherEigenData : public GatherEigenDataBase<EvalT, Traits>  {
+template <typename EvalT, typename Traits>
+class GatherEigenData : public GatherEigenDataBase<EvalT, Traits>
+{
+ public:
+  GatherEigenData(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  public:
-    GatherEigenData(const Teuchos::ParameterList& p,
-                    const Teuchos::RCP<Albany::Layouts>& dl);
-
-  //void evaluateFields(typename Traits::EvalData d);
-  private:
-    typedef typename EvalT::ScalarT ScalarT;
+  // void evaluateFields(typename Traits::EvalData d);
+ private:
+  typedef typename EvalT::ScalarT ScalarT;
 };
 
 // **************************************************************
@@ -77,38 +77,43 @@ class GatherEigenData : public GatherEigenDataBase<EvalT, Traits>  {
 // **************************************************************
 // **************************************************************
 
-
 // **************************************************************
 // Residual
 // **************************************************************
-template<typename Traits>
-class GatherEigenData<AlbanyTraits::Residual,Traits> : public GatherEigenDataBase<AlbanyTraits::Residual, Traits>
+template <typename Traits>
+class GatherEigenData<AlbanyTraits::Residual, Traits>
+    : public GatherEigenDataBase<AlbanyTraits::Residual, Traits>
 {
-public:
-  GatherEigenData(const Teuchos::ParameterList& p,
-                  const Teuchos::RCP<Albany::Layouts>& dl);
+ public:
+  GatherEigenData(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  //void evaluateFields(typename Traits::EvalData d);
-private:
+  // void evaluateFields(typename Traits::EvalData d);
+ private:
   typedef typename AlbanyTraits::Residual::ScalarT ScalarT;
 };
 
 // **************************************************************
 // Jacobian
 // **************************************************************
-template<typename Traits>
-class GatherEigenData<AlbanyTraits::Jacobian,Traits> : public GatherEigenDataBase<AlbanyTraits::Jacobian, Traits>
+template <typename Traits>
+class GatherEigenData<AlbanyTraits::Jacobian, Traits>
+    : public GatherEigenDataBase<AlbanyTraits::Jacobian, Traits>
 {
-public:
-  GatherEigenData(const Teuchos::ParameterList& p,
-                  const Teuchos::RCP<Albany::Layouts>& dl);
+ public:
+  GatherEigenData(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  void evaluateFields(typename Traits::EvalData d);
-private:
+  void
+  evaluateFields(typename Traits::EvalData d);
+
+ private:
   typedef typename AlbanyTraits::Jacobian::ScalarT ScalarT;
-  using GatherEigenDataBase<AlbanyTraits::Jacobian,Traits>::nEigenvectors;
+  using GatherEigenDataBase<AlbanyTraits::Jacobian, Traits>::nEigenvectors;
 };
 
-} // namespace PHAL
+}  // namespace PHAL
 
-#endif // PHAL_GATHER_EIGEN_DATA_HPP
+#endif  // PHAL_GATHER_EIGEN_DATA_HPP

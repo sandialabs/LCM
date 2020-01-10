@@ -7,10 +7,10 @@
 #ifndef PHAL_NSTAUT_HPP
 #define PHAL_NSTAUT_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element Interpolation Evaluator
@@ -19,38 +19,38 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class NSTauT : public PHX::EvaluatorWithBaseImpl<Traits>,
-		    public PHX::EvaluatorDerived<EvalT, Traits>  {
-
-public:
-
+               public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
   NSTauT(const Teuchos::ParameterList& p);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-private:
-
-  typedef typename EvalT::ScalarT ScalarT;
+ private:
+  typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  // Input: 
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> V;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> ThermalCond;
-  PHX::MDField<const MeshScalarT,Cell,QuadPoint,Dim,Dim> Gc;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> rho;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> Cp;
+  // Input:
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>          V;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>               ThermalCond;
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim, Dim> Gc;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>               rho;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>               Cp;
 
   // Output:
-  PHX::MDField<ScalarT,Cell,Node> TauT;
+  PHX::MDField<ScalarT, Cell, Node> TauT;
 
-  unsigned int numQPs, numDims, numCells;
+  unsigned int                                  numQPs, numDims, numCells;
   Kokkos::DynRankView<MeshScalarT, PHX::Device> normGc;
-
 };
-}
+}  // namespace PHAL
 
 #endif

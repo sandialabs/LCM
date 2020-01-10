@@ -4,33 +4,33 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_NOX_OBSERVER_HPP
 #define ALBANY_NOX_OBSERVER_HPP
 
 #include "NOX_Epetra_Observer.H"
 #include "Teuchos_RCP.hpp"
 
-namespace Albany
-{
+namespace Albany {
 class Application;
 class ObserverImpl;
 
 class NOXObserver : public NOX::Epetra::Observer
 {
-public:
-   NOXObserver (const Teuchos::RCP<Albany::Application> &app_);
+ public:
+  NOXObserver(const Teuchos::RCP<Albany::Application>& app_);
 
   //! Original version, for steady with no time or param info
-  void observeSolution (const Epetra_Vector& solution);
+  void
+  observeSolution(const Epetra_Vector& solution);
 
   //! Improved version with space for time or parameter value
-  void observeSolution(const Epetra_Vector& solution, double time_or_param_val);
+  void
+  observeSolution(const Epetra_Vector& solution, double time_or_param_val);
 
-private:
-   Teuchos::RCP<ObserverImpl> impl;
+ private:
+  Teuchos::RCP<ObserverImpl> impl;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_NOX_OBSERVER_HPP
+#endif  // ALBANY_NOX_OBSERVER_HPP

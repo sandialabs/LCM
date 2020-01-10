@@ -12,11 +12,10 @@
 #include <iostream>
 #include <vector>
 
+#include "Moertel_OverlapT.hpp"
 #include "Teuchos_RCP.hpp"
 #include "Teuchos_SerialDenseMatrix.hpp"
 #include "Tpetra_CrsMatrix.hpp"
-
-#include "Moertel_OverlapT.hpp"
 
 // ----------   User Defined Includes   ----------
 

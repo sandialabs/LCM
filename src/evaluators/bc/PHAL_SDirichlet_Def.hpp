@@ -7,14 +7,13 @@
 #ifndef PHAL_SDIRICHLET_DEF_HPP
 #define PHAL_SDIRICHLET_DEF_HPP
 
+#include "Albany_CombineAndScatterManager.hpp"
+#include "Albany_Macros.hpp"
+#include "Albany_ThyraUtils.hpp"
 #include "PHAL_SDirichlet.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
 #include "Teuchos_TestForException.hpp"
-
-#include "Albany_CombineAndScatterManager.hpp"
-#include "Albany_Macros.hpp"
-#include "Albany_ThyraUtils.hpp"
 
 //#define DEBUG_OUTPUT
 

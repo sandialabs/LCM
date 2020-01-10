@@ -8,9 +8,8 @@
 #define ALBANY_MODEL_EVALUATOR_HPP
 
 #include "Albany_SacadoTypes.hpp"
-#include "Albany_TpetraTypes.hpp"
 #include "Albany_ThyraTypes.hpp"
-
+#include "Albany_TpetraTypes.hpp"
 #include "Piro_TransientDecorator.hpp"
 
 namespace Albany {
@@ -19,11 +18,13 @@ namespace Albany {
 class Application;
 class DistributedParameterLibrary;
 
-class ModelEvaluator : public Piro::TransientDecorator<ST, LO, Tpetra_GO, KokkosNode> {
-public:
+class ModelEvaluator
+    : public Piro::TransientDecorator<ST, LO, Tpetra_GO, KokkosNode>
+{
+ public:
   // Constructor
   ModelEvaluator(
-      const Teuchos::RCP<Application>& app,
+      const Teuchos::RCP<Application>&            app,
       const Teuchos::RCP<Teuchos::ParameterList>& appParams);
 
   /** \name Overridden from Thyra::ModelEvaluator<ST> . */
@@ -50,28 +51,46 @@ public:
   get_p_names(int l) const;
 
   Teuchos::ArrayView<const std::string>
-  get_g_names(int /* j */) const {
+  get_g_names(int /* j */) const
+  {
     TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, "not impl'ed");
   }
 
-  Thyra_InArgs getNominalValues () const { return nominalValues; }
-  Thyra_InArgs getLowerBounds   () const { return lowerBounds; }
-  Thyra_InArgs getUpperBounds   () const { return upperBounds; }
+  Thyra_InArgs
+  getNominalValues() const
+  {
+    return nominalValues;
+  }
+  Thyra_InArgs
+  getLowerBounds() const
+  {
+    return lowerBounds;
+  }
+  Thyra_InArgs
+  getUpperBounds() const
+  {
+    return upperBounds;
+  }
 
-  Teuchos::RCP<Thyra_LinearOp>  create_W_op() const;
+  Teuchos::RCP<Thyra_LinearOp>
+  create_W_op() const;
 
   //! Create preconditioner operator
-  Teuchos::RCP<Thyra_Preconditioner> create_W_prec() const;
+  Teuchos::RCP<Thyra_Preconditioner>
+  create_W_prec() const;
 
-  Teuchos::RCP<const Thyra_LOWS_Factory>  get_W_factory() const;
+  Teuchos::RCP<const Thyra_LOWS_Factory>
+  get_W_factory() const;
 
   //! Create InArgs
-  Thyra_InArgs createInArgs() const;
+  Thyra_InArgs
+  createInArgs() const;
 
-  void reportFinalPoint(const Thyra_InArgs& finalPoint,
-                        const bool wasSolved);
+  void
+  reportFinalPoint(const Thyra_InArgs& finalPoint, const bool wasSolved);
 
-  void allocateVectors();
+  void
+  allocateVectors();
 
   //@}
 
@@ -95,7 +114,7 @@ public:
   {
     nominalValues = nv;
   }
-#endif // ALBANY_LCM
+#endif  // ALBANY_LCM
 
  protected:
   /** \name Overridden from Thyra::ModelEvaluatorDefaultBase<ST> . */
@@ -124,11 +143,11 @@ public:
   //! Evaluate model on InArgs
   void
   evalModelImpl(
-      const Thyra_InArgs& inArgs,
+      const Thyra_InArgs&                           inArgs,
       const Thyra::ModelEvaluatorBase::OutArgs<ST>& outArgs) const;
 
   //! Application object
-  Teuchos::RCP<Albany::Application> app;
+  Teuchos::RCP<Albany::Application>    app;
   Teuchos::RCP<Teuchos::ParameterList> appParams;
 
   Teuchos::RCP<Teuchos::Time> timer;
@@ -142,8 +161,8 @@ public:
   //! Whether the problem supplies its own preconditioner
   bool supplies_prec;
 
-  //! Boolean marking whether Tempus is used 
-  bool use_tempus{false}; 
+  //! Boolean marking whether Tempus is used
+  bool use_tempus{false};
 
   //@}
 
@@ -151,7 +170,8 @@ public:
   //! Number of parameter vectors
   int num_param_vecs;
 
-  Thyra_InArgs createInArgsImpl() const;
+  Thyra_InArgs
+  createInArgsImpl() const;
 
   //! Cached nominal values and lower/upper bounds
   Thyra_InArgs nominalValues;
@@ -193,9 +213,9 @@ public:
 #if defined(ALBANY_LCM)
   // This is here to have a sane way to handle time and avoid Thyra ME.
   ST current_time_{0.0};
-#endif // ALBANY_LCM
+#endif  // ALBANY_LCM
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_MODEL_EVALUATOR_HPP
+#endif  // ALBANY_MODEL_EVALUATOR_HPP

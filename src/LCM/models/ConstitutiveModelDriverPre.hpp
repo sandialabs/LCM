@@ -8,6 +8,7 @@
 #define LCM_ConstitutiveModelDriverPre_hpp
 
 #include <MiniTensor.h>
+
 #include "Albany_Layouts.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"

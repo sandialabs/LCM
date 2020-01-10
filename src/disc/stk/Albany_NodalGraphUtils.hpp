@@ -4,11 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-//IK, 9/12/14: no Epetra!
+// IK, 9/12/14: no Epetra!
 
 #ifndef ALBANY_NODALGRAPHUTILS_HPP
 #define ALBANY_NODALGRAPHUTILS_HPP
-
 
 namespace Albany {
 
@@ -17,43 +16,23 @@ namespace Albany {
  *
  */
 
-    const std::size_t hex_table[] = 
-                     {1, 3, 4,
-                      0, 2, 5,
-                      1, 3, 6,
-                      0, 2, 7,
-                      0, 5, 7,
-                      1, 4, 6,
-                      2, 5, 7,
-                      3, 4, 6};
+const std::size_t hex_table[] = {1, 3, 4, 0, 2, 5, 1, 3, 6, 0, 2, 7,
+                                 0, 5, 7, 1, 4, 6, 2, 5, 7, 3, 4, 6};
 
-    const std::size_t hex_nconnect = 3;
+const std::size_t hex_nconnect = 3;
 
-    const std::size_t tet_table[] = 
-                     {1, 2, 3,
-                      0, 2, 3,
-                      0, 1, 3,
-                      0, 1, 2};
+const std::size_t tet_table[] = {1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2};
 
-    const std::size_t tet_nconnect = 3;
+const std::size_t tet_nconnect = 3;
 
-    const std::size_t quad_table[] = 
-                     {1, 3, 
-                      0, 2,
-                      1, 3, 
-                      0, 2}; 
+const std::size_t quad_table[] = {1, 3, 0, 2, 1, 3, 0, 2};
 
-    const std::size_t quad_nconnect = 2;
+const std::size_t quad_nconnect = 2;
 
+const std::size_t tri_table[] = {1, 2, 0, 2, 0, 1};
 
-    const std::size_t tri_table[] = 
-                     {1, 2, 
-                      0, 2,
-                      0, 1}; 
+const std::size_t tri_nconnect = 2;
 
-    const std::size_t tri_nconnect = 2;
+}  // namespace Albany
 
-
-}
-
-#endif // ALBANY_NODALGRAPHUTILS_HPP
+#endif  // ALBANY_NODALGRAPHUTILS_HPP

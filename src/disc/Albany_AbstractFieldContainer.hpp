@@ -4,12 +4,11 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_ABSTRACT_FIELD_CONTAINER_HPP
 #define ALBANY_ABSTRACT_FIELD_CONTAINER_HPP
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace Albany {
 
@@ -17,15 +16,15 @@ namespace Albany {
  * \brief Abstract interface for a field container
  *
  */
-class AbstractFieldContainer {
-public:
-
+class AbstractFieldContainer
+{
+ public:
   typedef std::vector<std::string> FieldContainerRequirements;
 
   //! Destructor
   virtual ~AbstractFieldContainer() = default;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_ABSTRACT_FIELD_CONTAINER_HPP
+#endif  // ALBANY_ABSTRACT_FIELD_CONTAINER_HPP

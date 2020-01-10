@@ -4,14 +4,14 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
+#include <fstream>
+#include <iostream>
+
 #include "Moertel_IntegratorT.hpp"
 #include "Moertel_InterfaceT.hpp"
 #include "Moertel_NodeT.hpp"
 #include "Moertel_SegmentT.hpp"
 #include "Moertel_UtilsT.hpp"
-
-#include <fstream>
-#include <iostream>
 
 /*----------------------------------------------------------------------*
   |  ctor (public)                                            mwgee 07/05|

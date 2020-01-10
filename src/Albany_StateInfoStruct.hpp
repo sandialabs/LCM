@@ -16,12 +16,11 @@
 #include <string>
 #include <vector>
 
+#include "Adapt_NodalDataBase.hpp"
+#include "Albany_ScalarOrdinalTypes.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Shards_Array.hpp"
 #include "Shards_CellTopologyData.h"
-
-#include "Adapt_NodalDataBase.hpp"
-#include "Albany_ScalarOrdinalTypes.hpp"
 
 //! Container for minimal mesh specification info needed to
 //  construct an Albany Problem
@@ -68,15 +67,9 @@ struct StateStruct
   typedef std::vector<PHX::DataLayout::size_type> FieldDims;
 
   StateStruct(const std::string& name_, MeshFieldEntity ent)
-      : name(name_),
-        entity(ent),
-        responseIDtoRequire(""),
-        output(true),
-        restartDataAvailable(false),
-        saveOldState(false),
-        layered(false),
-        meshPart(""),
-        pParentStateStruct(NULL)
+      : name(name_), entity(ent), responseIDtoRequire(""), output(true),
+        restartDataAvailable(false), saveOldState(false), layered(false),
+        meshPart(""), pParentStateStruct(NULL)
   {
   }
 
@@ -87,18 +80,10 @@ struct StateStruct
       const std::string& type,
       const std::string& meshPart_ = "",
       const std::string& ebName_   = "")
-      : name(name_),
-        dim(dims),
-        entity(ent),
-        initType(type),
-        responseIDtoRequire(""),
-        output(true),
-        restartDataAvailable(false),
-        saveOldState(false),
-        layered(false),
-        meshPart(meshPart_),
-        ebName(ebName_),
-        pParentStateStruct(NULL)
+      : name(name_), dim(dims), entity(ent), initType(type),
+        responseIDtoRequire(""), output(true), restartDataAvailable(false),
+        saveOldState(false), layered(false), meshPart(meshPart_),
+        ebName(ebName_), pParentStateStruct(NULL)
   {
   }
 

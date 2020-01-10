@@ -8,6 +8,7 @@
 #define Moertel_ExplicitTemplateInstantiation_hpp
 
 #include <Kokkos_DefaultNode.hpp>
+
 #include "Moertel_config.h"
 
 // Use typedefs for ST, LO, GO, N at least for now

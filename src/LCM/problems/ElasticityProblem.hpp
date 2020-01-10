@@ -7,16 +7,13 @@
 #ifndef ELASTICITYPROBLEM_HPP
 #define ELASTICITYPROBLEM_HPP
 
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
-
+#include "AAdapt_RC_Manager.hpp"
 #include "Albany_AbstractProblem.hpp"
-
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
-
-#include "AAdapt_RC_Manager.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
@@ -138,7 +135,6 @@ class ElasticityProblem : public Albany::AbstractProblem
 #include "Albany_SolutionMaxValueResponseFunction.hpp"
 #include "Albany_SolutionTwoNormResponseFunction.hpp"
 #include "Albany_Utils.hpp"
-
 #include "DefGrad.hpp"
 #include "Density.hpp"
 #include "ElasticModulus.hpp"

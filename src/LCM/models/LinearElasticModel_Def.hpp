@@ -5,7 +5,9 @@
 //*****************************************************************//
 
 #include <MiniTensor.h>
+
 #include <typeinfo>
+
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
 namespace LCM {

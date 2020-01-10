@@ -7,110 +7,117 @@
 #ifndef ALBANY_ABSTRACT_RESPONSE_FUNCTION_HPP
 #define ALBANY_ABSTRACT_RESPONSE_FUNCTION_HPP
 
+#include "Albany_DataTypes.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 #include "Teuchos_Array.hpp"
 #include "Teuchos_RCP.hpp"
 #include "Thyra_ModelEvaluatorBase.hpp"
 
-#include "PHAL_AlbanyTraits.hpp"
-#include "Albany_DataTypes.hpp"
-
 namespace Albany {
 
+/*!
+ * \brief Abstract interface for representing a response function
+ */
+class AbstractResponseFunction
+{
+ public:
+  //! Default constructor
+  AbstractResponseFunction(){};
+
+  //! Destructor
+  virtual ~AbstractResponseFunction(){};
+
+  //! Setup response function
+  virtual void
+  setup() = 0;
+
+  //! Get the vector space associated with this response.
+  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  responseVectorSpace() const = 0;
+
   /*!
-   * \brief Abstract interface for representing a response function
+   * \brief Is this response function "scalar" valued, i.e., has a replicated
+   * local response map.
    */
-  class AbstractResponseFunction {
-  public:
+  virtual bool
+  isScalarResponse() const = 0;
 
-    //! Default constructor
-    AbstractResponseFunction() {};
+  //! Create Thyra operator for gradient (e.g., dg/dx)
+  virtual Teuchos::RCP<Thyra_LinearOp>
+  createGradientOp() const = 0;
 
-    //! Destructor
-    virtual ~AbstractResponseFunction() {};
+  //! perform post registration setup
+  virtual void
+  postRegSetup() = 0;
 
-    //! Setup response function
-    virtual void setup() = 0;
+  //! \name Deterministic evaluation functions
+  //@{
 
-    //! Get the vector space associated with this response.
-    virtual Teuchos::RCP<const Thyra_VectorSpace> responseVectorSpace() const = 0;
-
-    /*!
-     * \brief Is this response function "scalar" valued, i.e., has a replicated
-     * local response map.
-     */
-    virtual bool isScalarResponse() const = 0;
-
-    //! Create Thyra operator for gradient (e.g., dg/dx)
-    virtual Teuchos::RCP<Thyra_LinearOp> createGradientOp() const = 0;
-
-    //! perform post registration setup
-    virtual void postRegSetup() = 0;
-
-    //! \name Deterministic evaluation functions
-    //@{
-
-    //! Evaluate responses
-    virtual void evaluateResponse(
-      const double current_time,
+  //! Evaluate responses
+  virtual void
+  evaluateResponse(
+      const double                            current_time,
       const Teuchos::RCP<const Thyra_Vector>& x,
       const Teuchos::RCP<const Thyra_Vector>& xdot,
       const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-      const Teuchos::Array<ParamVec>& p,
-      const Teuchos::RCP<Thyra_Vector>& g) = 0;
+      const Teuchos::Array<ParamVec>&         p,
+      const Teuchos::RCP<Thyra_Vector>&       g) = 0;
 
-    virtual void evaluateTangent(
-      const double alpha,
-      const double beta,
-      const double omega,
-      const double current_time,
-      bool sum_derivs,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-      const Teuchos::Array<ParamVec>& p,
-      ParamVec* deriv_p,
+  virtual void
+  evaluateTangent(
+      const double                                 alpha,
+      const double                                 beta,
+      const double                                 omega,
+      const double                                 current_time,
+      bool                                         sum_derivs,
+      const Teuchos::RCP<const Thyra_Vector>&      x,
+      const Teuchos::RCP<const Thyra_Vector>&      xdot,
+      const Teuchos::RCP<const Thyra_Vector>&      xdotdot,
+      const Teuchos::Array<ParamVec>&              p,
+      ParamVec*                                    deriv_p,
       const Teuchos::RCP<const Thyra_MultiVector>& Vx,
       const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
       const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
       const Teuchos::RCP<const Thyra_MultiVector>& Vp,
-      const Teuchos::RCP<Thyra_Vector>& g,
-      const Teuchos::RCP<Thyra_MultiVector>& gx,
-      const Teuchos::RCP<Thyra_MultiVector>& gp) = 0;
+      const Teuchos::RCP<Thyra_Vector>&            g,
+      const Teuchos::RCP<Thyra_MultiVector>&       gx,
+      const Teuchos::RCP<Thyra_MultiVector>&       gp) = 0;
 
-   virtual void evaluateDerivative(
-      const double current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-      const Teuchos::Array<ParamVec>& p,
-      ParamVec* deriv_p,
-      const Teuchos::RCP<Thyra_Vector>& gT,
+  virtual void
+  evaluateDerivative(
+      const double                                     current_time,
+      const Teuchos::RCP<const Thyra_Vector>&          x,
+      const Teuchos::RCP<const Thyra_Vector>&          xdot,
+      const Teuchos::RCP<const Thyra_Vector>&          xdotdot,
+      const Teuchos::Array<ParamVec>&                  p,
+      ParamVec*                                        deriv_p,
+      const Teuchos::RCP<Thyra_Vector>&                gT,
       const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dx,
       const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdot,
       const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdotdot,
       const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dp) = 0;
 
-    //! Evaluate distributed parameter derivative dg/dp
-    virtual void evaluateDistParamDeriv(
-      const double current_time,
+  //! Evaluate distributed parameter derivative dg/dp
+  virtual void
+  evaluateDistParamDeriv(
+      const double                            current_time,
       const Teuchos::RCP<const Thyra_Vector>& x,
       const Teuchos::RCP<const Thyra_Vector>& xdot,
       const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-      const Teuchos::Array<ParamVec>& param_array,
-      const std::string& dist_param_name,
-      const Teuchos::RCP<Thyra_MultiVector>& dg_dp) = 0;
-    //@}
+      const Teuchos::Array<ParamVec>&         param_array,
+      const std::string&                      dist_param_name,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp) = 0;
+  //@}
 
-  private:
+ private:
+  //! Private to prohibit copying
+  AbstractResponseFunction(const AbstractResponseFunction&);
 
-    //! Private to prohibit copying
-    AbstractResponseFunction(const AbstractResponseFunction&);
+  //! Private to prohibit copying
+  AbstractResponseFunction&
+  operator=(const AbstractResponseFunction&);
+};
 
-    //! Private to prohibit copying
-    AbstractResponseFunction& operator=(const AbstractResponseFunction&);
+}  // namespace Albany
 
-  };
-
-} // namespace Albany
-
-#endif // ALBANY_ABSTRACT_RESPONSE_FUNCTION_HPP
+#endif  // ALBANY_ABSTRACT_RESPONSE_FUNCTION_HPP

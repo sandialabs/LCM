@@ -7,17 +7,16 @@
 #if !defined(LCM_ProjectIPtoNodalField_hpp)
 #define LCM_ProjectIPtoNodalField_hpp
 
-#include "Albany_ProblemUtils.hpp"
-#include "Albany_StateManager.hpp"
-#include "PHAL_AlbanyTraits.hpp"
-
 #include <Phalanx_DataLayout.hpp>
 #include <Phalanx_Evaluator_Derived.hpp>
 #include <Phalanx_Evaluator_WithBaseImpl.hpp>
 #include <Phalanx_MDField.hpp>
+#include <Stratimikos_DefaultLinearSolverBuilder.hpp>
 #include <Teuchos_ParameterList.hpp>
 
-#include <Stratimikos_DefaultLinearSolverBuilder.hpp>
+#include "Albany_ProblemUtils.hpp"
+#include "Albany_StateManager.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 
 // Running this test all the time is generally quite cheap, so let's do that.
 #define PROJ_INTERP_TEST
@@ -70,9 +69,9 @@ class ProjectIPtoNodalField : public ProjectIPtoNodalFieldBase<EvalT, Traits>
 {
  public:
   ProjectIPtoNodalField(
-      Teuchos::ParameterList&              /* p */,
+      Teuchos::ParameterList& /* p */,
       const Teuchos::RCP<Albany::Layouts>& dl,
-      const Albany::MeshSpecsStruct*       /* mesh_specs */)
+      const Albany::MeshSpecsStruct* /* mesh_specs */)
       : ProjectIPtoNodalFieldBase<EvalT, Traits>(dl)
   {
   }
@@ -82,20 +81,13 @@ class ProjectIPtoNodalField : public ProjectIPtoNodalFieldBase<EvalT, Traits>
       PHX::FieldManager<Traits>& /* vm */)
   {
   }
-  void
-  preEvaluate(typename Traits::PreEvalData /* d */)
-  {
-  }
-  void
-  postEvaluate(typename Traits::PostEvalData /* d */)
+  void preEvaluate(typename Traits::PreEvalData /* d */) {}
+  void postEvaluate(typename Traits::PostEvalData /* d */)
   {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true, std::logic_error, "Should never be called.");
   }
-  void
-  evaluateFields(typename Traits::EvalData /* d */)
-  {
-  }
+  void evaluateFields(typename Traits::EvalData /* d */) {}
 };
 
 class ProjectIPtoNodalFieldManager;

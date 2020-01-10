@@ -12,20 +12,19 @@
 #define stk_rebalance_GeomDecomp_hpp
 
 // STL components
-#include <vector>
-#include <string>
-#include <utility>
 #include <map>
-
 #include <percept/PerceptMesh.hpp>
 #include <percept/stk_rebalance/Partition.hpp>
-#include <stk_mesh/base/Types.hpp>
-#include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/Entity.hpp>
+#include <stk_mesh/base/Field.hpp>
+#include <stk_mesh/base/Types.hpp>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace stk {
 /** Rebalance API
-*/
+ */
 namespace rebalance {
 
 /** \addtogroup stk_rebalance_module
@@ -51,8 +50,7 @@ namespace rebalance {
  * having specialized knowledge of the derived classes.
  */
 
-
-/** \class GeomDecomp 
+/** \class GeomDecomp
  *
  * \brief Class for determining the optimal partitioning of mesh entities.
  *
@@ -69,14 +67,15 @@ namespace rebalance {
  * to partitioning packages such as \a Zoltan.
  */
 
-class GeomDecomp: public Partition {
-public:
-  typedef mesh::Field<double,mesh::Cartesian> VectorField ;
-public:
+class GeomDecomp : public Partition
+{
+ public:
+  typedef mesh::Field<double, mesh::Cartesian> VectorField;
 
-  GeomDecomp( ParallelMachine comm): Partition(comm) {}
+ public:
+  GeomDecomp(ParallelMachine comm) : Partition(comm) {}
 
-  virtual ~GeomDecomp(){}
+  virtual ~GeomDecomp() {}
 
   /** \brief Convert a single mesh entity to a single point.
    *
@@ -94,27 +93,36 @@ public:
    * a single coordinate point for it.
    *
    */
-  static void entity_to_point(stk::mesh::BulkData& bulk_data, const mesh::Entity  & entity,
-                            const VectorField   & ref,
-                            std::vector<double> & coor);
+  static void
+  entity_to_point(
+      stk::mesh::BulkData& bulk_data,
+      const mesh::Entity&  entity,
+      const VectorField&   ref,
+      std::vector<double>& coor);
 
-  /** \brief Used to return the nodal entities that \a compute_entity_centroid averages.
+  /** \brief Used to return the nodal entities that \a compute_entity_centroid
+   * averages.
    *
    * \param entity  Entity to take coordinates of, element, side, face or node.
    *
    * \param ref  Coordinate field to average, usually defined on the nodes.
    *
-   * \param coor Is the output coordinates that entity_to_point would average to 
+   * \param coor Is the output coordinates that entity_to_point would average to
    *             determine a centroid.
    *
-   * The return value is the mesh entities from which the coordinates were obtained.
+   * The return value is the mesh entities from which the coordinates were
+   * obtained.
    */
 
-  static std::vector< mesh::Entity > entity_coordinates(stk::mesh::BulkData& bulk_data, const mesh::Entity     & entity,
-                                                               const VectorField     & ref,
-                                                               std::vector<std::vector<double> >    & coordinates);
+  static std::vector<mesh::Entity>
+  entity_coordinates(
+      stk::mesh::BulkData&              bulk_data,
+      const mesh::Entity&               entity,
+      const VectorField&                ref,
+      std::vector<std::vector<double>>& coordinates);
 
-  /** \brief  Returns a vector of vectors containing the coordinates of the nodes that were used to compute the centroid.
+  /** \brief  Returns a vector of vectors containing the coordinates of the
+   * nodes that were used to compute the centroid.
    *
    * \param entity  Entity to take coordinates of, element, side, face or node.
    *
@@ -124,24 +132,27 @@ public:
    *             be large enough to hold a single coordinate.
    *             Note the maximum needed in all cases is length 3.
    *
-   * return value is the output coordinates that entity_to_point would average to 
-   *             determine a centroid.
+   * return value is the output coordinates that entity_to_point would average
+   * to determine a centroid.
    *
    */
-  static std::vector<std::vector<double> > compute_entity_centroid(stk::mesh::BulkData& bulk_data, const mesh::Entity     & entity,
-                                                               const VectorField   & ref,
-                                                               std::vector<double> & coor);
+  static std::vector<std::vector<double>>
+  compute_entity_centroid(
+      stk::mesh::BulkData& bulk_data,
+      const mesh::Entity&  entity,
+      const VectorField&   ref,
+      std::vector<double>& coor);
   /** \brief Check existence of library entry name on domain library.
    * This is a simple one line convenience function
    */
 
-  static bool confirm ( const std::string &param_set_name );
-
+  static bool
+  confirm(const std::string& param_set_name);
 };
 
 /** \} */
 
-}
-} // namespace stk
+}  // namespace rebalance
+}  // namespace stk
 
 #endif

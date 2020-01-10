@@ -7,12 +7,11 @@
 #ifndef PHAL_DOF_SIDE_TO_CELL_HPP
 #define PHAL_DOF_SIDE_TO_CELL_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element SideToCell Evaluator
@@ -21,25 +20,27 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
+template <typename EvalT, typename Traits, typename ScalarT>
 class DOFSideToCellBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                           public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  DOFSideToCellBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  DOFSideToCellBase (const Teuchos::ParameterList& p,
-                     const Teuchos::RCP<Albany::Layouts>& dl);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& vm);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields(typename Traits::EvalData d);
-
-private:
-
-  std::string                     sideSetName;
-  std::vector<std::vector<int> >  sideNodes;
-  std::vector<int>                dims;
+ private:
+  std::string                   sideSetName;
+  std::vector<std::vector<int>> sideNodes;
+  std::vector<int>              dims;
 
   // Input:
   //! Values on side
@@ -64,15 +65,17 @@ private:
 };
 
 // Some shortcut names
-template<typename EvalT, typename Traits>
-using DOFSideToCell = DOFSideToCellBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using DOFSideToCell = DOFSideToCellBase<EvalT, Traits, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFSideToCellMesh = DOFSideToCellBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using DOFSideToCellMesh =
+    DOFSideToCellBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFSideToCellParam = DOFSideToCellBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using DOFSideToCellParam =
+    DOFSideToCellBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // DOF_SIDE_TO_CELL_HPP
+#endif  // DOF_SIDE_TO_CELL_HPP

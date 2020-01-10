@@ -14,47 +14,74 @@ namespace Albany {
 // Forward declaration of a helper class, used to hide Tpetra/Epetra details
 struct TraitsImplBase;
 
-class RigidBodyModes {
-public:
+class RigidBodyModes
+{
+ public:
   //! Construct RBM object.
   RigidBodyModes(int numPDEs);
 
   //! Update the number of PDEs present.
-  void setNumPDEs(int numPDEs_) { numPDEs = numPDEs_; }
+  void
+  setNumPDEs(int numPDEs_)
+  {
+    numPDEs = numPDEs_;
+  }
 
   //! Set sizes of nullspace etc.
-  void setParameters(const int numPDEs, const int numElasticityDim,
-                     const int numScalar, const int nullSpaceDim, const bool setNonElastRBM = false);
+  void
+  setParameters(
+      const int  numPDEs,
+      const int  numElasticityDim,
+      const int  numScalar,
+      const int  nullSpaceDim,
+      const bool setNonElastRBM = false);
 
   //! Set Piro solver parameter list.
-  void setPiroPL(const Teuchos::RCP<Teuchos::ParameterList>& piroParams);
+  void
+  setPiroPL(const Teuchos::RCP<Teuchos::ParameterList>& piroParams);
 
   //! Update the parameter list.
-  void updatePL(const Teuchos::RCP<Teuchos::ParameterList>& precParams);
+  void
+  updatePL(const Teuchos::RCP<Teuchos::ParameterList>& precParams);
 
   //! Is ML used on this problem?
-  bool isMLUsed() const { return mlUsed; }
+  bool
+  isMLUsed() const
+  {
+    return mlUsed;
+  }
 
   //! Is MueLu used on this problem?
-  bool isMueLuUsed() const { return mueLuUsed; }
+  bool
+  isMueLuUsed() const
+  {
+    return mueLuUsed;
+  }
 
   //! Is FROSch used on this problem?
-  bool isFROSchUsed() const { return froschUsed; }
+  bool
+  isFROSchUsed() const
+  {
+    return froschUsed;
+  }
 
   //! Pass coordinates and, if numElasticityDim > 0, the null space to ML,
   //! MueLu or FROSch. The data accessed through getCoordArrays must have
   //! been set. soln_map must be set only if using MueLu and numElasticityDim >
   //! 0. Both maps are nonoverlapping.
-  void setCoordinatesAndNullspace(
-    const Teuchos::RCP<Thyra_MultiVector> &coordMV,
-    const Teuchos::RCP<const Thyra_VectorSpace>& soln_vs = Teuchos::null,
-    const Teuchos::RCP<const Thyra_VectorSpace>& soln_overlap_vs = Teuchos::null);
+  void
+  setCoordinatesAndNullspace(
+      const Teuchos::RCP<Thyra_MultiVector>&       coordMV,
+      const Teuchos::RCP<const Thyra_VectorSpace>& soln_vs = Teuchos::null,
+      const Teuchos::RCP<const Thyra_VectorSpace>& soln_overlap_vs =
+          Teuchos::null);
 
   //! Pass only the coordinates.
-  void setCoordinates(const Teuchos::RCP<Thyra_MultiVector> &coordMV);
+  void
+  setCoordinates(const Teuchos::RCP<Thyra_MultiVector>& coordMV);
 
-private:
-  int numPDEs, numElasticityDim, numScalar, nullSpaceDim;
+ private:
+  int  numPDEs, numElasticityDim, numScalar, nullSpaceDim;
   bool mlUsed, mueLuUsed, froschUsed, setNonElastRBM;
 
   Teuchos::RCP<Teuchos::ParameterList> plist;
@@ -64,6 +91,6 @@ private:
   Teuchos::RCP<TraitsImplBase> traits;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_NULL_SPACE_UTILS_HPP
+#endif  // ALBANY_NULL_SPACE_UTILS_HPP

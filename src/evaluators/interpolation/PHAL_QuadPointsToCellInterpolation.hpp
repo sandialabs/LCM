@@ -7,17 +7,15 @@
 #ifndef PHAL_QUAD_POINT_TO_CELL_INTERPOLATION_HPP
 #define PHAL_QUAD_POINT_TO_CELL_INTERPOLATION_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
-#include "PHAL_Utilities.hpp"
 #include "Albany_SacadoTypes.hpp"
+#include "PHAL_Utilities.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
-namespace PHAL
-{
+namespace PHAL {
 /** \brief Average from Qp to Cell
 
     This evaluator averages the quadrature points values to
@@ -25,49 +23,60 @@ namespace PHAL
 
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
-class QuadPointsToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                          public PHX::EvaluatorDerived<EvalT, Traits>
+template <typename EvalT, typename Traits, typename ScalarT>
+class QuadPointsToCellInterpolationBase
+    : public PHX::EvaluatorWithBaseImpl<Traits>,
+      public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  QuadPointsToCellInterpolationBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl,
+      const Teuchos::RCP<PHX::DataLayout>& qp_layout,
+      const Teuchos::RCP<PHX::DataLayout>& cell_layout);
 
-  QuadPointsToCellInterpolationBase (const Teuchos::ParameterList& p,
-                                     const Teuchos::RCP<Albany::Layouts>& dl,
-                                     const Teuchos::RCP<PHX::DataLayout>& qp_layout,
-                                     const Teuchos::RCP<PHX::DataLayout>& cell_layout);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& fm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& fm);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields(typename Traits::EvalData d);
-
-private:
-
+ private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT,MeshScalarT>::type OutputScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
+      OutputScalarT;
 
   std::vector<PHX::DataLayout::size_type> qp_dims;
 
   MDFieldMemoizer<Traits> memoizer;
 
   // Input:
-  PHX::MDField<const ScalarT>                     field_qp;
-  PHX::MDField<const MeshScalarT,Cell,QuadPoint>  w_measure;
+  PHX::MDField<const ScalarT>                      field_qp;
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint> w_measure;
 
   // Output:
-  PHX::MDField<OutputScalarT>                     field_cell;
+  PHX::MDField<OutputScalarT> field_cell;
 };
 
 // Some shortcut names
-template<typename EvalT, typename Traits>
-using QuadPointsToCellInterpolation = QuadPointsToCellInterpolationBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using QuadPointsToCellInterpolation =
+    QuadPointsToCellInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using QuadPointsToCellInterpolationMesh = QuadPointsToCellInterpolationBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using QuadPointsToCellInterpolationMesh = QuadPointsToCellInterpolationBase<
+    EvalT,
+    Traits,
+    typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using QuadPointsToCellInterpolationParam = QuadPointsToCellInterpolationBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using QuadPointsToCellInterpolationParam = QuadPointsToCellInterpolationBase<
+    EvalT,
+    Traits,
+    typename EvalT::ParamScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_QUAD_POINT_TO_CELL_INTERPOLATION_HPP
+#endif  // PHAL_QUAD_POINT_TO_CELL_INTERPOLATION_HPP

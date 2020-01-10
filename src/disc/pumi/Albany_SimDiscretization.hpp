@@ -4,7 +4,6 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_SIMDISCRETIZATION_HPP
 #define ALBANY_SIMDISCRETIZATION_HPP
 
@@ -13,19 +12,20 @@
 
 namespace Albany {
 
-class SimDiscretization : public APFDiscretization {
-  public:
+class SimDiscretization : public APFDiscretization
+{
+ public:
+  //! Constructor
+  SimDiscretization(
+      Teuchos::RCP<Albany::SimMeshStruct>         meshStruct_,
+      const Teuchos::RCP<const Teuchos_Comm>&     commT,
+      const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes =
+          Teuchos::null);
 
-    //! Constructor
-    SimDiscretization(
-       Teuchos::RCP<Albany::SimMeshStruct> meshStruct_,
-       const Teuchos::RCP<const Teuchos_Comm>& commT,
-       const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes = Teuchos::null);
-
-    //! Destructor
-    ~SimDiscretization();
+  //! Destructor
+  ~SimDiscretization();
 };
 
-}
+}  // namespace Albany
 
-#endif // ALBANY_SIMDISCRETIZATION_HPP
+#endif  // ALBANY_SIMDISCRETIZATION_HPP

@@ -5,12 +5,13 @@
 //*****************************************************************//
 
 #include <MiniTensor.h>
+
+#include <typeinfo>
+
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Intrepid2_RealSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
-
-#include <typeinfo>
 
 namespace LCM {
 

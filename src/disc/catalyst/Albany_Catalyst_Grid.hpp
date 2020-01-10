@@ -7,51 +7,68 @@
 #ifndef ALBANY_CATALYST_GRID
 #define ALBANY_CATALYST_GRID
 
+#include "Albany_Catalyst_Decorator.hpp"  // For decorator class
+#include "vtkMappedUnstructuredGrid.h"  // For mapped unstructured grid wrapper
 #include "vtkObject.h"
-
-#include "vtkMappedUnstructuredGrid.h" // For mapped unstructured grid wrapper
-
-#include "Albany_Catalyst_Decorator.hpp" // For decorator class
 
 namespace Albany {
 namespace Catalyst {
 
-class GridImplementation: public vtkObject
+class GridImplementation : public vtkObject
 {
-public:
-  static GridImplementation *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+ public:
+  static GridImplementation*
+  New();
+  virtual void
+  PrintSelf(ostream& os, vtkIndent indent);
   vtkTypeMacro(GridImplementation, vtkObject)
 
-  bool SetDecorator(Decorator *decorator);
+      bool SetDecorator(Decorator* decorator);
 
   // API for vtkMappedUnstructuredGrid's implementation.
-  vtkIdType GetNumberOfCells();
-  int GetCellType(vtkIdType cellId);
-  void GetCellPoints(vtkIdType cellId, vtkIdList *ptIds);
-  void GetPointCells(vtkIdType ptId, vtkIdList *cellIds);
-  int GetMaxCellSize();
-  void GetIdsOfCellsOfType(int type, vtkIdTypeArray *array);
-  int IsHomogeneous();
+  vtkIdType
+  GetNumberOfCells();
+  int
+  GetCellType(vtkIdType cellId);
+  void
+  GetCellPoints(vtkIdType cellId, vtkIdList* ptIds);
+  void
+  GetPointCells(vtkIdType ptId, vtkIdList* cellIds);
+  int
+  GetMaxCellSize();
+  void
+  GetIdsOfCellsOfType(int type, vtkIdTypeArray* array);
+  int
+  IsHomogeneous();
 
   // This container is read only -- these methods do nothing but print a
   // warning.
-  void Allocate(vtkIdType numCells, int extSize = 1000);
-  vtkIdType InsertNextCell(int type, vtkIdList *ptIds);
-  vtkIdType InsertNextCell(int type, vtkIdType npts, vtkIdType *ptIds);
-  vtkIdType InsertNextCell(int type, vtkIdType npts, vtkIdType *ptIds,
-                           vtkIdType nfaces, vtkIdType *faces);
-  void ReplaceCell(vtkIdType cellId, int npts, vtkIdType *pts);
+  void
+  Allocate(vtkIdType numCells, int extSize = 1000);
+  vtkIdType
+  InsertNextCell(int type, vtkIdList* ptIds);
+  vtkIdType
+  InsertNextCell(int type, vtkIdType npts, vtkIdType* ptIds);
+  vtkIdType
+  InsertNextCell(
+      int        type,
+      vtkIdType  npts,
+      vtkIdType* ptIds,
+      vtkIdType  nfaces,
+      vtkIdType* faces);
+  void
+  ReplaceCell(vtkIdType cellId, int npts, vtkIdType* pts);
 
-protected:
+ protected:
   GridImplementation();
   ~GridImplementation();
 
-private:
-  GridImplementation(const GridImplementation &); // Not implemented.
-  void operator=(const GridImplementation &);   // Not implemented.
+ private:
+  GridImplementation(const GridImplementation&);  // Not implemented.
+  void
+  operator=(const GridImplementation&);  // Not implemented.
 
-  const Decorator *Discretization;
+  const Decorator* Discretization;
 
   int DegreesOfFreedom;
 
@@ -60,23 +77,27 @@ private:
   Conn NodeLookup;
 
   // Map of all elements, global element id -> struct { int ws, int lid }
-  const WsLIDList *ElementsWsLid;
+  const WsLIDList* ElementsWsLid;
 
   // Offset of the keys in ElementsWsLid:
   int ElementOffset;
 
   // Indexed by workset:
-  std::vector<const CellTopologyData *> TopologyLookup;
-  std::vector<VTKCellType> CellTypeLookup;
-  static VTKCellType TopologyToCellType(const CellTopologyData *ctd);
-  static vtkIdType GetCellSize(VTKCellType cellType);
-  void GetWorksetFromCellId(vtkIdType cellId, int &ws, int &lid);
-  VTKCellType GetCellTypeFromWorkset(int ws);
+  std::vector<const CellTopologyData*> TopologyLookup;
+  std::vector<VTKCellType>             CellTypeLookup;
+  static VTKCellType
+  TopologyToCellType(const CellTopologyData* ctd);
+  static vtkIdType
+  GetCellSize(VTKCellType cellType);
+  void
+  GetWorksetFromCellId(vtkIdType cellId, int& ws, int& lid);
+  VTKCellType
+  GetCellTypeFromWorkset(int ws);
 };
 
 vtkMakeMappedUnstructuredGrid(Grid, GridImplementation)
 
-} // end namespace Catalyst
-} // end namespace Albany
+}  // end namespace Catalyst
+}  // end namespace Albany
 
-#endif // ALBANY_CATALYST_GRID
+#endif  // ALBANY_CATALYST_GRID

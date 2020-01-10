@@ -8,6 +8,7 @@
 #define ALBANY_CATALYST_ADAPTER
 
 #include <string>
+
 #include "Teuchos_ParameterList.hpp"
 
 class Epetra_Vector;
@@ -19,39 +20,50 @@ class Decorator;
 
 class Adapter
 {
-public:
+ public:
   //! Singleton management: @{
-  static Adapter * initialize(const Teuchos::RCP<Teuchos::ParameterList> &catalystParams);
-  static Adapter * get();
-  static void cleanup();
+  static Adapter*
+  initialize(const Teuchos::RCP<Teuchos::ParameterList>& catalystParams);
+  static Adapter*
+  get();
+  static void
+  cleanup();
   //! @}
 
   //! Add a python script that specifies a coprocessing pipeline.
-  bool addPythonScriptPipeline(const std::string &filename);
+  bool
+  addPythonScriptPipeline(const std::string& filename);
 
   //! Add a vtkCPPipeline coprocessing pipeline.
-  bool addPipeline(vtkCPPipeline *pipeline);
+  bool
+  addPipeline(vtkCPPipeline* pipeline);
 
   //! Update catalyst
-  void update(int timeStep, double time, Decorator &decorator,
-              const Epetra_Vector &soln);
+  void
+  update(
+      int                  timeStep,
+      double               time,
+      Decorator&           decorator,
+      const Epetra_Vector& soln);
 
   //! Validate parameter list
-  static Teuchos::RCP<const Teuchos::ParameterList> getValidAdapterParameters();
+  static Teuchos::RCP<const Teuchos::ParameterList>
+  getValidAdapterParameters();
 
-private:
-  static Adapter *instance;
+ private:
+  static Adapter* instance;
   Adapter();
   ~Adapter();
 
-  Adapter(const Adapter &); // Not implemented.
-  void operator=(const Adapter &);   // Not implemented.
+  Adapter(const Adapter&);  // Not implemented.
+  void
+  operator=(const Adapter&);  // Not implemented.
 
   class Private;
-  Private * const d;
+  Private* const d;
 };
 
-} // end namespace Catalyst
-} // end namespace Albany
+}  // end namespace Catalyst
+}  // end namespace Albany
 
-#endif // ALBANY_CATALYST_ADAPTER
+#endif  // ALBANY_CATALYST_ADAPTER

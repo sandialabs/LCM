@@ -4,7 +4,6 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_PUMIMESHSTRUCT_HPP
 #define ALBANY_PUMIMESHSTRUCT_HPP
 
@@ -12,32 +11,39 @@
 
 namespace Albany {
 
-class PUMIMeshStruct : public APFMeshStruct {
+class PUMIMeshStruct : public APFMeshStruct
+{
+ public:
+  PUMIMeshStruct(
+      const Teuchos::RCP<Teuchos::ParameterList>& params,
+      const Teuchos::RCP<const Teuchos_Comm>&     commT);
 
-  public:
+  ~PUMIMeshStruct();
 
-    PUMIMeshStruct(
-                  const Teuchos::RCP<Teuchos::ParameterList>& params,
-                  const Teuchos::RCP<const Teuchos_Comm>& commT);
+  msType
+  meshSpecsType();
 
-    ~PUMIMeshStruct();
+  // For RC: Recoverable.
+  void
+  setMesh(apf::Mesh2* new_mesh);
 
-    msType meshSpecsType();
+  virtual apf::Field*
+  createNodalField(char const* name, int valueType);
 
-    // For RC: Recoverable.
-    void setMesh(apf::Mesh2* new_mesh);
+ private:
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidDiscretizationParameters() const;
 
-    virtual apf::Field* createNodalField(char const* name, int valueType);
-
-private:
-
-    Teuchos::RCP<const Teuchos::ParameterList>
-      getValidDiscretizationParameters() const;
-
-    void buildBoxMesh(int nex, int ney, int nez,
-        double wx, double wy, double wz, bool is);
-
+  void
+  buildBoxMesh(
+      int    nex,
+      int    ney,
+      int    nez,
+      double wx,
+      double wy,
+      double wz,
+      bool   is);
 };
 
-}
+}  // namespace Albany
 #endif

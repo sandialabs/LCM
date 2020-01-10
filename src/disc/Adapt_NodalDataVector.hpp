@@ -7,88 +7,128 @@
 #ifndef ADAPT_NODAL_DATA_VECTOR_HPP
 #define ADAPT_NODAL_DATA_VECTOR_HPP
 
-#include "Teuchos_RCP.hpp"
-#include "Phalanx_DataLayout.hpp"
-
-#include "Albany_ThyraTypes.hpp"
-#include "Albany_ThyraUtils.hpp"
+#include "Adapt_NodalFieldUtils.hpp"
 #include "Albany_AbstractNodeFieldContainer.hpp"
 #include "Albany_CombineAndScatterManager.hpp"
-#include "Adapt_NodalFieldUtils.hpp"
+#include "Albany_ThyraTypes.hpp"
+#include "Albany_ThyraUtils.hpp"
+#include "Phalanx_DataLayout.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Adapt {
 
 /*!
- * \brief This is a container class that deals with managing data values at the nodes of a mesh.
+ * \brief This is a container class that deals with managing data values at the
+ * nodes of a mesh.
  *
  */
 class NodalDataVector
 {
-public:
-
-  NodalDataVector(const Teuchos::RCP<Albany::NodeFieldContainer>& nodeContainer,
-                  NodeFieldSizeVector& nodeVectorLayout,
-                  NodeFieldSizeMap& nodeVectorMap, LO& vectorsize);
+ public:
+  NodalDataVector(
+      const Teuchos::RCP<Albany::NodeFieldContainer>& nodeContainer,
+      NodeFieldSizeVector&                            nodeVectorLayout,
+      NodeFieldSizeMap&                               nodeVectorMap,
+      LO&                                             vectorsize);
 
   //! Destructor
-  virtual ~NodalDataVector()  = default;
+  virtual ~NodalDataVector() = default;
 
   // Methods to (re)build/replace vector spaces
-  void replaceOwnedVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
-  void replaceOwnedVectorSpace(const Teuchos::Array<GO>& owned_nodeGIDs,
-                               const Teuchos::RCP<const Teuchos_Comm>& comm_);
+  void
+  replaceOwnedVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+  void
+  replaceOwnedVectorSpace(
+      const Teuchos::Array<GO>&               owned_nodeGIDs,
+      const Teuchos::RCP<const Teuchos_Comm>& comm_);
 
-  void replaceOverlapVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
-  void replaceOverlapVectorSpace(const Teuchos::Array<GO>& overlap_nodeGIDs,
-                                 const Teuchos::RCP<const Teuchos_Comm>& comm_);
+  void
+  replaceOverlapVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+  void
+  replaceOverlapVectorSpace(
+      const Teuchos::Array<GO>&               overlap_nodeGIDs,
+      const Teuchos::RCP<const Teuchos_Comm>& comm_);
 
   // Methods to get multivectors (or their data)
-  const Teuchos::RCP<Thyra_MultiVector>& getOwnedNodeVector() const {
+  const Teuchos::RCP<Thyra_MultiVector>&
+  getOwnedNodeVector() const
+  {
     return owned_node_vec;
   }
-  const Teuchos::RCP<Thyra_MultiVector>& getOverlapNodeVector() const {
+  const Teuchos::RCP<Thyra_MultiVector>&
+  getOverlapNodeVector() const
+  {
     return overlap_node_vec;
   }
 
-  Teuchos::ArrayRCP<ST> getOwnedNodeView(std::size_t i) {
+  Teuchos::ArrayRCP<ST>
+  getOwnedNodeView(std::size_t i)
+  {
     return Albany::getNonconstLocalData(owned_node_vec->col(i));
   }
-  Teuchos::ArrayRCP<ST> getOverlapNodeView(std::size_t i) {
+  Teuchos::ArrayRCP<ST>
+  getOverlapNodeView(std::size_t i)
+  {
     return Albany::getNonconstLocalData(overlap_node_vec->col(i));
   }
 
-  Teuchos::ArrayRCP<const ST> getOwnedNodeConstView(std::size_t i) const {
+  Teuchos::ArrayRCP<const ST>
+  getOwnedNodeConstView(std::size_t i) const
+  {
     return Albany::getLocalData(owned_node_vec->col(i).getConst());
   }
-  Teuchos::ArrayRCP<const ST> getOverlapNodeConstView(std::size_t i) const {
+  Teuchos::ArrayRCP<const ST>
+  getOverlapNodeConstView(std::size_t i) const
+  {
     return Albany::getLocalData(overlap_node_vec->col(i).getConst());
   }
 
-  Teuchos::RCP<const Thyra_VectorSpace> getOverlappedVectorSpace() const { return overlap_node_vs; }
-  Teuchos::RCP<const Thyra_VectorSpace> getOwnedVectorSpace()      const { return owned_node_vs;   }
+  Teuchos::RCP<const Thyra_VectorSpace>
+  getOverlappedVectorSpace() const
+  {
+    return overlap_node_vs;
+  }
+  Teuchos::RCP<const Thyra_VectorSpace>
+  getOwnedVectorSpace() const
+  {
+    return owned_node_vs;
+  }
 
-  void initializeVectors (ST value);
+  void
+  initializeVectors(ST value);
 
-  Teuchos::RCP<const Albany::CombineAndScatterManager> initializeCASManager ();
+  Teuchos::RCP<const Albany::CombineAndScatterManager>
+  initializeCASManager();
 
-  void exportAddNodalDataVector();
+  void
+  exportAddNodalDataVector();
 
-  void saveNodalDataState() const;
+  void
+  saveNodalDataState() const;
   // In this version, mv may have fewer columns than there are vectors in the
   // database. start_col indicates the offset into the database.
-  void saveNodalDataState(const Teuchos::RCP<const Thyra_MultiVector>& mv,
-                          const int start_col) const;
+  void
+  saveNodalDataState(
+      const Teuchos::RCP<const Thyra_MultiVector>& mv,
+      const int                                    start_col) const;
 
-  void saveNodalDataVector(const std::string& name,
-                           const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec,
-                           const int offset) const;
+  void
+  saveNodalDataVector(
+      const std::string&                           name,
+      const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec,
+      const int                                    offset) const;
 
-  void getNDofsAndOffset(const std::string &stateName, int& offset, int& ndofs) const;
+  void
+  getNDofsAndOffset(const std::string& stateName, int& offset, int& ndofs)
+      const;
 
-  LO getVecSize() { return vectorsize; }
+  LO
+  getVecSize()
+  {
+    return vectorsize;
+  }
 
-private:
-
+ private:
   NodalDataVector();
 
   Teuchos::RCP<const Thyra_VectorSpace> overlap_node_vs;
@@ -102,7 +142,7 @@ private:
   Teuchos::RCP<Albany::NodeFieldContainer> nodeContainer;
 
   NodeFieldSizeVector& nodeVectorLayout;
-  NodeFieldSizeMap& nodeVectorMap;
+  NodeFieldSizeMap&    nodeVectorMap;
 
   LO& vectorsize;
 
@@ -111,6 +151,6 @@ private:
   int num_preeval_calls, num_posteval_calls;
 };
 
-} // namespace Adapt
+}  // namespace Adapt
 
-#endif // ADAPT_NODAL_DATA_VECTOR_HPP
+#endif  // ADAPT_NODAL_DATA_VECTOR_HPP

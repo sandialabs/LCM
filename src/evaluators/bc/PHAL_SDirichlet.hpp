@@ -7,6 +7,7 @@
 #if !defined(PHAL_SDirichlet_hpp)
 #define PHAL_SDirichlet_hpp
 
+#include "Albany_ThyraTypes.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dirichlet.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
@@ -15,8 +16,6 @@
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_ParameterList.hpp"
-
-#include "Albany_ThyraTypes.hpp"
 
 namespace PHAL {
 

@@ -7,15 +7,14 @@
 #ifndef PHAL_DOF_CELL_TO_SIDE_QP_HPP
 #define PHAL_DOF_CELL_TO_SIDE_QP_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
 #include "Albany_ScalarOrdinalTypes.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Utilities.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element CellToSideQP Evaluator
@@ -24,33 +23,35 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
+template <typename EvalT, typename Traits, typename ScalarT>
 class DOFCellToSideQPBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                          public PHX::EvaluatorDerived<EvalT, Traits>
+                            public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  DOFCellToSideQPBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  DOFCellToSideQPBase (const Teuchos::ParameterList& p,
-                     const Teuchos::RCP<Albany::Layouts>& dl);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& vm);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields(typename Traits::EvalData d);
-
-private:
-
-  std::string                     sideSetName;
-  std::vector<std::vector<int> >  sideNodes;
-  std::vector<int>                dims_side;
-  int                             num_side_nodes;
+ private:
+  std::string                   sideSetName;
+  std::vector<std::vector<int>> sideNodes;
+  std::vector<int>              dims_side;
+  int                           num_side_nodes;
 
   // Input:
-  PHX::MDField<const ScalarT>                           val_cell;
-  PHX::MDField<const RealType,Cell,Side,Node,QuadPoint> BF;
+  PHX::MDField<const ScalarT>                               val_cell;
+  PHX::MDField<const RealType, Cell, Side, Node, QuadPoint> BF;
 
   // Output:
-  PHX::MDField<ScalarT>                                 val_side_qp;
+  PHX::MDField<ScalarT> val_side_qp;
 
   enum LayoutType
   {
@@ -68,16 +69,18 @@ private:
 };
 
 // Some shortcut names
-template<typename EvalT, typename Traits>
-using DOFCellToSideQP = DOFCellToSideQPBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using DOFCellToSideQP =
+    DOFCellToSideQPBase<EvalT, Traits, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFCellToSideQPMesh = DOFCellToSideQPBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using DOFCellToSideQPMesh =
+    DOFCellToSideQPBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFCellToSideQPParam = DOFCellToSideQPBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using DOFCellToSideQPParam =
+    DOFCellToSideQPBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // DOF_CELL_TO_SIDE_HPP
-
+#endif  // DOF_CELL_TO_SIDE_HPP

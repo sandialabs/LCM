@@ -7,14 +7,12 @@
 #if !defined(LCM_ConstitutiveDriverProblem_hpp)
 #define LCM_ConstitutiveDriverProblem_hpp
 
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
-
 #include "Albany_AbstractProblem.hpp"
-
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
@@ -195,13 +193,11 @@ class ConstitutiveDriverProblem : public Albany::AbstractProblem
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
-
 #include "FieldNameMap.hpp"
 #include "PHAL_NSMaterialProperty.hpp"
 #include "PHAL_SaveStateField.hpp"
 #include "PHAL_ScatterResidual.hpp"
 #include "PHAL_Source.hpp"
-
 #include "Time.hpp"
 
 // Constitutive Model Interface and parameters

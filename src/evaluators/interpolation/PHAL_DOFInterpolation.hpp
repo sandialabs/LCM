@@ -7,13 +7,12 @@
 #ifndef PHAL_DOF_INTERPOLATION_HPP
 #define PHAL_DOF_INTERPOLATION_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
 #include "PHAL_Utilities.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element Interpolation Evaluator
@@ -22,58 +21,66 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
+template <typename EvalT, typename Traits, typename ScalarT>
 class DOFInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                             public PHX::EvaluatorDerived<EvalT, Traits>  {
+                             public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
+  DOFInterpolationBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-public:
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  DOFInterpolationBase (const Teuchos::ParameterList& p,
-                        const Teuchos::RCP<Albany::Layouts>& dl);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& vm);
-
-  void evaluateFields(typename Traits::EvalData d);
-
-private:
-
+ private:
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT,Cell,Node> val_node;
+  PHX::MDField<const ScalarT, Cell, Node> val_node;
   //! Basis Functions
-  PHX::MDField<const RealType,Cell,Node,QuadPoint> BF;
+  PHX::MDField<const RealType, Cell, Node, QuadPoint> BF;
 
   // Output:
   //! Values at quadrature points
-  PHX::MDField<ScalarT,Cell,QuadPoint> val_qp;
+  PHX::MDField<ScalarT, Cell, QuadPoint> val_qp;
 
   std::size_t numNodes;
   std::size_t numQPs;
 
   MDFieldMemoizer<Traits> memoizer;
 
-public:
-
+ public:
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
-  struct DOFInterpolationBase_Tag{};
+  struct DOFInterpolationBase_Tag
+  {
+  };
 
-  typedef Kokkos::RangePolicy<ExecutionSpace, DOFInterpolationBase_Tag> DOFInterpolationBase_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, DOFInterpolationBase_Tag>
+      DOFInterpolationBase_Policy;
 
   KOKKOS_INLINE_FUNCTION
-  void operator() (const DOFInterpolationBase_Tag& tag, const int& cell) const;
+  void
+  operator()(const DOFInterpolationBase_Tag& tag, const int& cell) const;
 };
 
 // Some shortcut names
-template<typename EvalT, typename Traits>
-using DOFInterpolation = DOFInterpolationBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using DOFInterpolation =
+    DOFInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFInterpolationMesh = DOFInterpolationBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using DOFInterpolationMesh =
+    DOFInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFInterpolationParam = DOFInterpolationBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using DOFInterpolationParam =
+    DOFInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_DOF_INTERPOLATION_HPP
+#endif  // PHAL_DOF_INTERPOLATION_HPP

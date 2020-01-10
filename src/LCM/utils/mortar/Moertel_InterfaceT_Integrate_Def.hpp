@@ -11,10 +11,8 @@
 #include "Moertel_InterfaceT.hpp"
 #include "Moertel_PnodeT.hpp"
 #include "Moertel_SegmentT.hpp"
-#include "Moertel_UtilsT.hpp"
-
 #include "Moertel_Tolerances.hpp"
-
+#include "Moertel_UtilsT.hpp"
 #include "Teuchos_SerialDenseMatrix.hpp"
 #include "Teuchos_Time.hpp"
 

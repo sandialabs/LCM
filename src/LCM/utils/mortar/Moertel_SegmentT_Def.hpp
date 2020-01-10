@@ -5,7 +5,6 @@
 //*****************************************************************//
 
 #include "Moertel_ExplicitTemplateInstantiation.hpp"
-
 #include "Moertel_InterfaceT.hpp"
 #include "Moertel_SegmentT.hpp"
 #include "Moertel_UtilsT.hpp"

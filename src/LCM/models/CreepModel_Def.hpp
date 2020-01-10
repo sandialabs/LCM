@@ -6,6 +6,7 @@
 
 #define DEBUG_FREQ 100000000000
 #include <MiniTensor.h>
+
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
@@ -35,7 +36,8 @@ CreepModel<EvalT, Traits>::CreepModel(
       // Maximum allowable attempts for the return mapping algorithm
       max_return_map_count(p->get<int>("Max Return Mapping Attempts", 100)),
       // Tolerance on the return mapping algorithm
-      return_map_tolerance(p->get<RealType>("Return Mapping Tolerance", 1.0e-10))
+      return_map_tolerance(
+          p->get<RealType>("Return Mapping Tolerance", 1.0e-10))
 
 {
   // retrive appropriate field name strings
@@ -228,13 +230,13 @@ CreepModel<EvalT, Traits>::computeState(
       if (f <= 0.0) {
         if (a0 > 1.0E-12) {
           // return mapping algorithm
-          bool      converged     = false;
-          ScalarT   alpha         = 0.0;
-          ScalarT   res           = 0.0;
-          ScalarT   res_norm      = 1.0;
-          ScalarT   original_res  = 1.0;
-          int       count         = 0;
-          int const max_count     = max_return_map_count;
+          bool      converged    = false;
+          ScalarT   alpha        = 0.0;
+          ScalarT   res          = 0.0;
+          ScalarT   res_norm     = 1.0;
+          ScalarT   original_res = 1.0;
+          int       count        = 0;
+          int const max_count    = max_return_map_count;
           // ScalarT H = 0.0;
           dgam = 0.0;
           ScalarT debug_X[max_count + 1];
@@ -320,7 +322,7 @@ CreepModel<EvalT, Traits>::computeState(
 
             res              = std::abs(F[0]);
             debug_res[count] = res;
-            res_norm         = res/original_res;
+            res_norm         = res / original_res;
             if (res_norm < return_map_tolerance) { converged = true; }
 
             if (count == max_count) {

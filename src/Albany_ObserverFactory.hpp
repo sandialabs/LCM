@@ -7,50 +7,55 @@
 #define ALBANY_OBSERVERFACTORY_HPP
 
 #include "Albany_config.h"
-
 #include "NOX_Epetra_Observer.H"
 #if defined(ALBANY_EPETRA) && defined(ALBANY_RYTHMOS)
 #include "Rythmos_IntegrationObserverBase.hpp"
 #endif
-#include "Teuchos_RCP.hpp"
 #include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
 class Application;
 
-class NOXObserverFactory {
-public:
-  explicit NOXObserverFactory(const Teuchos::RCP<Application> &app);
+class NOXObserverFactory
+{
+ public:
+  explicit NOXObserverFactory(const Teuchos::RCP<Application>& app);
 
-  Teuchos::RCP<NOX::Epetra::Observer> createInstance();
+  Teuchos::RCP<NOX::Epetra::Observer>
+  createInstance();
 
-private:
+ private:
   Teuchos::RCP<Application> app_;
 };
 
-class NOXStatelessObserverFactory {
-public:
-  explicit NOXStatelessObserverFactory(const Teuchos::RCP<Application> &app);
+class NOXStatelessObserverFactory
+{
+ public:
+  explicit NOXStatelessObserverFactory(const Teuchos::RCP<Application>& app);
 
-  Teuchos::RCP<NOX::Epetra::Observer> createInstance();
+  Teuchos::RCP<NOX::Epetra::Observer>
+  createInstance();
 
-private:
+ private:
   Teuchos::RCP<Application> app_;
 };
 
 #if defined(ALBANY_EPETRA) && defined(ALBANY_RYTHMOS)
-class RythmosObserverFactory {
-public:
-  explicit RythmosObserverFactory(const Teuchos::RCP<Application> &app);
+class RythmosObserverFactory
+{
+ public:
+  explicit RythmosObserverFactory(const Teuchos::RCP<Application>& app);
 
-  Teuchos::RCP<Rythmos::IntegrationObserverBase<double> > createInstance();
+  Teuchos::RCP<Rythmos::IntegrationObserverBase<double>>
+  createInstance();
 
-private:
+ private:
   Teuchos::RCP<Application> app_;
 };
 #endif
 
-} // namespace Albany
+}  // namespace Albany
 
 #endif /* ALBANY_OBSERVERFACTORY_HPP */

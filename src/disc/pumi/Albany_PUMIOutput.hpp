@@ -4,24 +4,28 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_PUMIOUTPUT_HPP
 #define ALBANY_PUMIOUTPUT_HPP
 
-#include "Teuchos_RCP.hpp"
 #include "Albany_APFMeshStruct.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
-class PUMIOutput {
-  public:
-    virtual ~PUMIOutput();
-    virtual void writeFile(const double time) = 0;
-    virtual void setFileName(const std::string& fname) = 0;
-    static PUMIOutput* create(const Teuchos::RCP<APFMeshStruct>& meshStruct,
-        const Teuchos::RCP<const Teuchos_Comm>& comm);
+class PUMIOutput
+{
+ public:
+  virtual ~PUMIOutput();
+  virtual void
+  writeFile(const double time) = 0;
+  virtual void
+  setFileName(const std::string& fname) = 0;
+  static PUMIOutput*
+  create(
+      const Teuchos::RCP<APFMeshStruct>&      meshStruct,
+      const Teuchos::RCP<const Teuchos_Comm>& comm);
 };
 
-}
+}  // namespace Albany
 
 #endif

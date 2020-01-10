@@ -8,6 +8,7 @@
 #define CrystalPlasticityCore_hpp
 
 #include <MiniNonlinearSolver.h>
+
 #include "CrystalPlasticityFwd.hpp"
 #include "FlowRule.hpp"
 #include "HardeningLaw.hpp"

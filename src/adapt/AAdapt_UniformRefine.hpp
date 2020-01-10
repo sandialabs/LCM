@@ -4,39 +4,47 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef AADAPT_UNIFORMREFINE_HPP
 #define AADAPT_UNIFORMREFINE_HPP
 
-#include "Albany_APFDiscretization.hpp"
 #include <ma.h>
-#include "Albany_StateManager.hpp"
+
 #include "AAdapt_MeshAdaptMethod.hpp"
+#include "Albany_APFDiscretization.hpp"
+#include "Albany_StateManager.hpp"
 
 namespace AAdapt {
 
-class UniformRefine : public MeshAdaptMethod {
+class UniformRefine : public MeshAdaptMethod
+{
+ public:
+  UniformRefine(const Teuchos::RCP<Albany::APFDiscretization>& disc);
 
-  public:
-    UniformRefine(const Teuchos::RCP<Albany::APFDiscretization>& disc);
+  ~UniformRefine();
 
-    ~UniformRefine();
+  void
+  adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_);
 
-    void adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_);
+  void
+  setParams(const Teuchos::RCP<Teuchos::ParameterList>& p);
 
-    void setParams(const Teuchos::RCP<Teuchos::ParameterList>& p);
+  void
+  preProcessShrunkenMesh();
 
-    void preProcessShrunkenMesh();
+  void
+  preProcessOriginalMesh();
+  void
+  postProcessFinalMesh()
+  {
+  }
+  void
+  postProcessShrunkenMesh()
+  {
+  }
 
-    void preProcessOriginalMesh();
-    void postProcessFinalMesh() {}
-    void postProcessShrunkenMesh() {}
-
-  private:
-
+ private:
 };
 
-}
+}  // namespace AAdapt
 
 #endif
-

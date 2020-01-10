@@ -4,33 +4,34 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Teuchos_TestForException.hpp"
-#include "Phalanx_DataLayout.hpp"
-
 #include "Intrepid2_FunctionSpaceTools.hpp"
-
+#include "Phalanx_DataLayout.hpp"
+#include "Teuchos_TestForException.hpp"
 
 //**********************************************************************
-template<typename EvalT, typename Traits>
-PNP::ConcentrationResid<EvalT, Traits>::
-ConcentrationResid(const Teuchos::ParameterList& p,
-                 const Teuchos::RCP<Albany::Layouts>& dl) :
-  wBF         (p.get<std::string>  ("Weighted BF Name"), dl->node_qp_scalar),
-  wGradBF     (p.get<std::string>  ("Weighted Gradient BF Name"), dl->node_qp_gradient),
-  Concentration     ("Concentration", dl->qp_vector),
-  Concentration_dot ("Concentration_dot", dl->qp_vector),
-  ConcentrationGrad ("Concentration Gradient", dl->qp_vecgradient),
-  PotentialGrad     ("Potential Gradient", dl->qp_gradient),
-  ConcentrationResidual ("Concentration Residual",  dl->node_vector )
+template <typename EvalT, typename Traits>
+PNP::ConcentrationResid<EvalT, Traits>::ConcentrationResid(
+    const Teuchos::ParameterList&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
+    : wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
+      wGradBF(
+          p.get<std::string>("Weighted Gradient BF Name"),
+          dl->node_qp_gradient),
+      Concentration("Concentration", dl->qp_vector),
+      Concentration_dot("Concentration_dot", dl->qp_vector),
+      ConcentrationGrad("Concentration Gradient", dl->qp_vecgradient),
+      PotentialGrad("Potential Gradient", dl->qp_gradient),
+      ConcentrationResidual("Concentration Residual", dl->node_vector)
 {
   if (p.isType<bool>("Disable Transient"))
     enableTransient = !p.get<bool>("Disable Transient");
-  else enableTransient = true;
+  else
+    enableTransient = true;
 
   this->addDependentField(wBF.fieldTag());
   this->addDependentField(wGradBF.fieldTag());
   this->addDependentField(Concentration.fieldTag());
-  if (enableTransient)  this->addDependentField(Concentration_dot.fieldTag());
+  if (enableTransient) this->addDependentField(Concentration_dot.fieldTag());
   this->addDependentField(ConcentrationGrad.fieldTag());
   this->addDependentField(PotentialGrad.fieldTag());
 
@@ -46,59 +47,63 @@ ConcentrationResid(const Teuchos::ParameterList& p,
 
   // Placeholder for properties
   beta.resize(numSpecies);
-  beta[0] =  1.0;
+  beta[0] = 1.0;
   beta[1] = -1.0;
   D.resize(numSpecies);
-  D[0] =  1.0;
-  D[1] =  2.0;
+  D[0] = 1.0;
+  D[1] = 2.0;
 
-  this->setName("ConcentrationResid" );
+  this->setName("ConcentrationResid");
 }
 
 //**********************************************************************
-template<typename EvalT, typename Traits>
-void PNP::ConcentrationResid<EvalT, Traits>::
-postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& fm)
+template <typename EvalT, typename Traits>
+void
+PNP::ConcentrationResid<EvalT, Traits>::postRegistrationSetup(
+    typename Traits::SetupData d,
+    PHX::FieldManager<Traits>& fm)
 {
-  this->utils.setFieldData(wBF,fm);
-  this->utils.setFieldData(wGradBF,fm);
-  this->utils.setFieldData(Concentration,fm);
-  if (enableTransient) this->utils.setFieldData(Concentration_dot,fm);
-  this->utils.setFieldData(ConcentrationGrad,fm);
-  this->utils.setFieldData(PotentialGrad,fm);
+  this->utils.setFieldData(wBF, fm);
+  this->utils.setFieldData(wGradBF, fm);
+  this->utils.setFieldData(Concentration, fm);
+  if (enableTransient) this->utils.setFieldData(Concentration_dot, fm);
+  this->utils.setFieldData(ConcentrationGrad, fm);
+  this->utils.setFieldData(PotentialGrad, fm);
 
-  this->utils.setFieldData(ConcentrationResidual,fm);
+  this->utils.setFieldData(ConcentrationResidual, fm);
 }
 
 //**********************************************************************
-template<typename EvalT, typename Traits>
-void PNP::ConcentrationResid<EvalT, Traits>::
-evaluateFields(typename Traits::EvalData workset)
+template <typename EvalT, typename Traits>
+void
+PNP::ConcentrationResid<EvalT, Traits>::evaluateFields(
+    typename Traits::EvalData workset)
 {
   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
 
-    for (std::size_t cell=0; cell < workset.numCells; ++cell) {
-      for (std::size_t node=0; node < numNodes; ++node) {          
-          for (std::size_t j=0; j < numSpecies; ++j) { 
-            ConcentrationResidual(cell,node,j) = 0.0;
-    } } }
+  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
+    for (std::size_t node = 0; node < numNodes; ++node) {
+      for (std::size_t j = 0; j < numSpecies; ++j) {
+        ConcentrationResidual(cell, node, j) = 0.0;
+      }
+    }
+  }
 
-    for (std::size_t cell=0; cell < workset.numCells; ++cell) {
-      for (std::size_t node=0; node < numNodes; ++node) {          
-        for (std::size_t qp=0; qp < numQPs; ++qp) {           
-          for (std::size_t j=0; j < numSpecies; ++j) { 
-            for (std::size_t dim=0; dim < numDims; ++dim) { 
-              ConcentrationResidual(cell,node,j) += 
-                D[j]*(ConcentrationGrad(cell,qp,j,dim)
-                      + beta[j]*Concentration(cell,qp,j)*PotentialGrad(cell,qp,dim))
-                *wGradBF(cell,node,qp,dim);
-            }  
-          }  
+  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
+    for (std::size_t node = 0; node < numNodes; ++node) {
+      for (std::size_t qp = 0; qp < numQPs; ++qp) {
+        for (std::size_t j = 0; j < numSpecies; ++j) {
+          for (std::size_t dim = 0; dim < numDims; ++dim) {
+            ConcentrationResidual(cell, node, j) +=
+                D[j] *
+                (ConcentrationGrad(cell, qp, j, dim) +
+                 beta[j] * Concentration(cell, qp, j) *
+                     PotentialGrad(cell, qp, dim)) *
+                wGradBF(cell, node, qp, dim);
+          }
         }
       }
     }
-
+  }
 }
 //**********************************************************************
-

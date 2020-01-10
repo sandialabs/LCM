@@ -3,12 +3,12 @@
 //    This Software is released under the BSD license detailed     //
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
+#include <MiniNonlinearSolver.h>
 #include <MiniTensor.h>
+
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
-
-#include <MiniNonlinearSolver.h>
 
 namespace FM {
 

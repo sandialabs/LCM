@@ -3,26 +3,23 @@
 //    This Software is released under the BSD license detailed     //
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
+#include "ACETemperatureResidual.hpp"
 #include "Albany_Application.hpp"
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_Utils.hpp"
-
+#include "AnalyticMassResidual.hpp"
+#include "BodyForce.hpp"
+#include "CurrentCoords.hpp"
+#include "FieldNameMap.hpp"
+#include "MechanicsResidual.hpp"
+#include "MeshSizeField.hpp"
 #include "PHAL_NSMaterialProperty.hpp"
 #include "PHAL_ReadStateField.hpp"
 #include "PHAL_SaveStateField.hpp"
 #include "PHAL_Source.hpp"
-
-#include "FieldNameMap.hpp"
-
-#include "ACETemperatureResidual.hpp"
-#include "AnalyticMassResidual.hpp"
-#include "BodyForce.hpp"
-#include "CurrentCoords.hpp"
-#include "MechanicsResidual.hpp"
-#include "MeshSizeField.hpp"
 #include "SurfaceBasis.hpp"
 #include "SurfaceScalarGradientOperatorHydroStress.hpp"
 #include "SurfaceScalarGradientOperatorPorePressure.hpp"

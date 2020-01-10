@@ -4,6 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
+#include <Teuchos_SerialDenseMatrix.hpp>
+#include <Teuchos_SerialDenseSolver.hpp>
+#include <TpetraExt_MatrixMatrix_def.hpp>
 #include <sstream>
 #include <string>
 
@@ -13,10 +16,6 @@
 #include "Moertel_Segment_bilineartri.H"
 #include "Moertel_Segment_linear1D.H"
 #include "Moertel_UtilsT.hpp"
-
-#include <Teuchos_SerialDenseMatrix.hpp>
-#include <Teuchos_SerialDenseSolver.hpp>
-#include <TpetraExt_MatrixMatrix_def.hpp>
 
 /*----------------------------------------------------------------------*
   | do 3x3 solve                                              mwgee 10/05|

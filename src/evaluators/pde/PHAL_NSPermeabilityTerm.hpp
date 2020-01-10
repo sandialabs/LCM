@@ -7,10 +7,10 @@
 #ifndef PHAL_NSPERMEABILITYTERM_HPP
 #define PHAL_NSPERMEABILITYTERM_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 /** \brief Finite Element Interpolation Evaluator
 
@@ -19,40 +19,39 @@
 */
 namespace PHAL {
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class NSPermeabilityTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
-	     public PHX::EvaluatorDerived<EvalT, Traits> {
-
-public:
-
+                           public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
   typedef typename EvalT::ScalarT ScalarT;
 
   NSPermeabilityTerm(const Teuchos::ParameterList& p);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-
-private:
- 
+ private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> V;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> mu;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> phi;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> K;
-  
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> V;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>      mu;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>      phi;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>      K;
+
   // Output:
-  PHX::MDField<ScalarT,Cell,QuadPoint,Dim> permTerm;
+  PHX::MDField<ScalarT, Cell, QuadPoint, Dim> permTerm;
 
   unsigned int numQPs, numDims, numNodes;
-  bool enableTransient;
-  bool haveHeat;
- 
+  bool         enableTransient;
+  bool         haveHeat;
 };
-}
+}  // namespace PHAL
 
 #endif

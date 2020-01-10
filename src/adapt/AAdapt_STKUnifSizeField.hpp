@@ -12,37 +12,52 @@
 
 namespace AAdapt {
 
-class STKUnifRefineField : public stk::percept::ElementOp {
-public:
+class STKUnifRefineField : public stk::percept::ElementOp
+{
+ public:
+  STKUnifRefineField(stk::percept::PerceptMesh& eMesh) : m_eMesh(eMesh) {}
 
-  STKUnifRefineField(stk::percept::PerceptMesh& eMesh) : m_eMesh(eMesh) {
+  virtual bool
+  operator()(
+      stk::mesh::Entity          element,
+      stk::mesh::FieldBase*      field,
+      const stk::mesh::BulkData& bulkData);
+  virtual void
+  init_elementOp()
+  {
+  }
+  virtual void
+  fini_elementOp()
+  {
   }
 
-  virtual bool operator()(stk::mesh::Entity element,
-                          stk::mesh::FieldBase* field,  const stk::mesh::BulkData& bulkData);
-  virtual void init_elementOp() {}
-  virtual void fini_elementOp() {}
-
-private:
+ private:
   stk::percept::PerceptMesh& m_eMesh;
 };
 
-class STKUnifUnrefineField : public stk::percept::ElementOp {
+class STKUnifUnrefineField : public stk::percept::ElementOp
+{
+ public:
+  STKUnifUnrefineField(stk::percept::PerceptMesh& eMesh) : m_eMesh(eMesh) {}
 
-public:
-
-  STKUnifUnrefineField(stk::percept::PerceptMesh& eMesh) : m_eMesh(eMesh) {
+  virtual bool
+  operator()(
+      stk::mesh::Entity          element,
+      stk::mesh::FieldBase*      field,
+      const stk::mesh::BulkData& bulkData);
+  virtual void
+  init_elementOp()
+  {
+  }
+  virtual void
+  fini_elementOp()
+  {
   }
 
-  virtual bool operator()(stk::mesh::Entity element,
-                          stk::mesh::FieldBase* field,  const stk::mesh::BulkData& bulkData);
-  virtual void init_elementOp() {}
-  virtual void fini_elementOp() {}
-
-private:
+ private:
   stk::percept::PerceptMesh& m_eMesh;
 };
 
-} // namespace AAdapt
+}  // namespace AAdapt
 
-#endif // AADAPT_STK_UNIF_SIZE_FIELD_HPP
+#endif  // AADAPT_STK_UNIF_SIZE_FIELD_HPP

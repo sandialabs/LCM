@@ -11,42 +11,53 @@
 
 namespace AAdapt {
 
-class ConstantSizeField : public MeshAdaptMethod {
+class ConstantSizeField : public MeshAdaptMethod
+{
+ public:
+  ConstantSizeField(const Teuchos::RCP<Albany::APFDiscretization>& disc);
 
-  public:
+  ~ConstantSizeField();
 
-    ConstantSizeField(const Teuchos::RCP<Albany::APFDiscretization>& disc);
+  void
+  adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_);
 
-    ~ConstantSizeField();
+  void
+  setParams(const Teuchos::RCP<Teuchos::ParameterList>& p);
 
-    void adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_);
+  void
+  preProcessShrunkenMesh();
 
-    void setParams(const Teuchos::RCP<Teuchos::ParameterList>& p);
+  void
+  preProcessOriginalMesh()
+  {
+  }
+  void
+  postProcessFinalMesh()
+  {
+  }
+  void
+  postProcessShrunkenMesh()
+  {
+  }
 
-    void preProcessShrunkenMesh();
-
-    void preProcessOriginalMesh() {}
-    void postProcessFinalMesh() {}
-    void postProcessShrunkenMesh() {}
-
-    class ConstantIsoFunc : public ma::IsotropicFunction
-    {
-      public:
-        virtual ~ConstantIsoFunc(){}
+  class ConstantIsoFunc : public ma::IsotropicFunction
+  {
+   public:
+    virtual ~ConstantIsoFunc() {}
 
     /** \brief get the desired element size at this vertex */
 
-        virtual double getValue(ma::Entity* vert){
-           return value_;
-        } 
+    virtual double
+    getValue(ma::Entity* vert)
+    {
+      return value_;
+    }
 
-        double value_;
+    double value_;
 
-    } constantIsoFunc;
-
+  } constantIsoFunc;
 };
 
-}
+}  // namespace AAdapt
 
 #endif
-

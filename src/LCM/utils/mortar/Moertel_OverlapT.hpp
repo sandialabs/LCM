@@ -7,16 +7,14 @@
 #ifndef MOERTEL_OVERLAPT_HPP
 #define MOERTEL_OVERLAPT_HPP
 
-#include "Moertel_config.h"
-
 #include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <map>
 
-#include "Teuchos_RCP.hpp"
-
 #include "Moertel_PointT.hpp"
+#include "Moertel_config.h"
+#include "Teuchos_RCP.hpp"
 
 // ----------   User Defined Includes   ----------
 

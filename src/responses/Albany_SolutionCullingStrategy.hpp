@@ -7,31 +7,36 @@
 #ifndef ALBANY_SOLUTION_CULLING_STRATEGY_HPP
 #define ALBANY_SOLUTION_CULLING_STRATEGY_HPP
 
+#include "Albany_CommTypes.hpp"
+#include "Albany_ThyraTypes.hpp"
 #include "Teuchos_Array.hpp"
-#include "Teuchos_RCP.hpp"
 #include "Teuchos_ParameterList.hpp"
-
-#include "Albany_ThyraTypes.hpp" 
-#include "Albany_CommTypes.hpp" 
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
-class SolutionCullingStrategyBase {
-public:
-  virtual void setup () {}
+class SolutionCullingStrategyBase
+{
+ public:
+  virtual void
+  setup()
+  {
+  }
 
-  virtual Teuchos::Array<GO> selectedGIDs (const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const = 0;
+  virtual Teuchos::Array<GO>
+  selectedGIDs(const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const = 0;
 
-  virtual ~SolutionCullingStrategyBase()  = default;
+  virtual ~SolutionCullingStrategyBase() = default;
 };
 
-class Application; // Forward declaration
+class Application;  // Forward declaration
 
 //! Factory function
 Teuchos::RCP<SolutionCullingStrategyBase>
-createSolutionCullingStrategy(const Teuchos::RCP<const Application> &app,
-                              Teuchos::ParameterList &params);
+createSolutionCullingStrategy(
+    const Teuchos::RCP<const Application>& app,
+    Teuchos::ParameterList&                params);
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_SOLUTION_CULLING_STRATEGY_HPP
+#endif  // ALBANY_SOLUTION_CULLING_STRATEGY_HPP

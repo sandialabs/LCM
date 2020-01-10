@@ -6,9 +6,10 @@
 
 #include <Teuchos_TestForException.hpp>
 #include <fstream>
+
 #include "Adapt_NodalDataVector.hpp"
-#include "Albany_Utils.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
+#include "Albany_Utils.hpp"
 
 namespace LCM {
 class IPtoNodalFieldManager : public Adapt::NodalDataBase::Manager
@@ -306,8 +307,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < num_nodes; ++node) {
       const GO global_row = wsElNodeID[cell][node];
-      if (!local_node_indexer->isLocallyOwnedElement(global_row))
-        continue;
+      if (!local_node_indexer->isLocallyOwnedElement(global_row)) continue;
       const LO local_row = local_node_indexer->getLocalElement(global_row);
       for (int pt = 0; pt < num_pts; ++pt) {
         data_nonconstView[node_weight_offset][local_row] +=
@@ -327,8 +327,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int node = 0; node < num_nodes; ++node) {
         const GO global_row = wsElNodeID[cell][node];
-        if (!local_node_indexer->isLocallyOwnedElement(global_row))
-          continue;
+        if (!local_node_indexer->isLocallyOwnedElement(global_row)) continue;
         const LO local_row = local_node_indexer->getLocalElement(global_row);
         for (int pt = 0; pt < num_pts; ++pt) {
           if (this->ip_field_layouts_[field] == "Scalar") {

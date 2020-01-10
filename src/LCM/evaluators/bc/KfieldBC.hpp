@@ -7,17 +7,16 @@
 #ifndef KFIELDBC_HPP
 #define KFIELDBC_HPP
 
+#include <vector>
+
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_Dirichlet.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-
-#include "Teuchos_ParameterList.hpp"
-
-#include <vector>
-#include "PHAL_AlbanyTraits.hpp"
-#include "PHAL_Dirichlet.hpp"
 #include "Sacado_ParameterAccessor.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace LCM {
 /** \brief KfieldBC Dirichlet evaluator

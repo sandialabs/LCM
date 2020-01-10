@@ -7,10 +7,10 @@
 #ifndef PHAL_NSRM_HPP
 #define PHAL_NSRM_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element Interpolation Evaluator
@@ -19,47 +19,46 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class NSRm : public PHX::EvaluatorWithBaseImpl<Traits>,
-	     public PHX::EvaluatorDerived<EvalT, Traits> {
-
-public:
-
+             public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
   typedef typename EvalT::ScalarT ScalarT;
 
   NSRm(const Teuchos::ParameterList& p);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-
-private:
- 
+ private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> pGrad;
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim,Dim> VGrad;
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> V;
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> V_Dot;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> T;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> rho;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> phi;
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> force;  
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> permTerm;
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> ForchTerm;
-  
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      pGrad;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> VGrad;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      V;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      V_Dot;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>           T;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>           rho;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>           phi;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      force;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      permTerm;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      ForchTerm;
+
   // Output:
-  PHX::MDField<ScalarT,Cell,QuadPoint,Dim> Rm;
+  PHX::MDField<ScalarT, Cell, QuadPoint, Dim> Rm;
 
   unsigned int numQPs, numDims, numNodes;
-  bool enableTransient;
-  bool haveHeat;
-  bool porousMedia;
- 
+  bool         enableTransient;
+  bool         haveHeat;
+  bool         porousMedia;
 };
-}
+}  // namespace PHAL
 
 #endif

@@ -5,10 +5,10 @@
 //*****************************************************************//
 
 #include <MiniTensor.h>
-#include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
 
 #include "LocalNonlinearSolver.hpp"
+#include "Phalanx_DataLayout.hpp"
+#include "Teuchos_TestForException.hpp"
 
 namespace LCM {
 

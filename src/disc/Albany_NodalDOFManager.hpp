@@ -11,31 +11,51 @@
 
 namespace Albany {
 
-class NodalDOFManager {
-public:
-  NodalDOFManager() :
-    _numComponents(0), _numLocalDOF(0), _numGlobalDOF(0), _interleaved(true){};
+class NodalDOFManager
+{
+ public:
+  NodalDOFManager()
+      : _numComponents(0), _numLocalDOF(0), _numGlobalDOF(0),
+        _interleaved(true){};
 
-  void setup(int numComponents, LO numLocalDOF, GO numGlobalDOF, bool interleaved=true) {
+  void
+  setup(
+      int  numComponents,
+      LO   numLocalDOF,
+      GO   numGlobalDOF,
+      bool interleaved = true)
+  {
     _numComponents = numComponents;
-    _numLocalDOF = numLocalDOF;
-    _numGlobalDOF = numGlobalDOF;
-    _interleaved = interleaved;
+    _numLocalDOF   = numLocalDOF;
+    _numGlobalDOF  = numGlobalDOF;
+    _interleaved   = interleaved;
   }
 
-  inline LO getLocalDOF(LO inode, int icomp) const
-    { return (_interleaved) ? inode*_numComponents + icomp : inode + _numLocalDOF*icomp; }
-  inline GO getGlobalDOF(GO node, int icomp) const
-    { return (_interleaved) ? node *_numComponents + icomp : node + _numGlobalDOF*icomp; }
-  int numComponents() const {return _numComponents;}
+  inline LO
+  getLocalDOF(LO inode, int icomp) const
+  {
+    return (_interleaved) ? inode * _numComponents + icomp :
+                            inode + _numLocalDOF * icomp;
+  }
+  inline GO
+  getGlobalDOF(GO node, int icomp) const
+  {
+    return (_interleaved) ? node * _numComponents + icomp :
+                            node + _numGlobalDOF * icomp;
+  }
+  int
+  numComponents() const
+  {
+    return _numComponents;
+  }
 
-private:
-  int _numComponents;
-  LO  _numLocalDOF;
-  GO  _numGlobalDOF;
+ private:
+  int  _numComponents;
+  LO   _numLocalDOF;
+  GO   _numGlobalDOF;
   bool _interleaved;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_NODAL_DOF_MANAGER_HPP
+#endif  // ALBANY_NODAL_DOF_MANAGER_HPP

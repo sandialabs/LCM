@@ -4,36 +4,43 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef AADAPT_EXTRUDEDADAPT_HPP
 #define AADAPT_EXTRUDEDADAPT_HPP
 
-#include "AAdapt_MeshAdaptMethod.hpp"
 #include <maExtrude.h>
+
+#include "AAdapt_MeshAdaptMethod.hpp"
 
 namespace AAdapt {
 
-class ExtrudedAdapt : public MeshAdaptMethod {
-  public:
-    ExtrudedAdapt(const Teuchos::RCP<Albany::APFDiscretization>& disc);
+class ExtrudedAdapt : public MeshAdaptMethod
+{
+ public:
+  ExtrudedAdapt(const Teuchos::RCP<Albany::APFDiscretization>& disc);
 
-    ~ExtrudedAdapt();
+  ~ExtrudedAdapt();
 
-    void setParams(const Teuchos::RCP<Teuchos::ParameterList>& p);
+  void
+  setParams(const Teuchos::RCP<Teuchos::ParameterList>& p);
 
-    void preProcessOriginalMesh();
-    void preProcessShrunkenMesh();
-    void adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_);
-    void postProcessShrunkenMesh();
-    void postProcessFinalMesh();
+  void
+  preProcessOriginalMesh();
+  void
+  preProcessShrunkenMesh();
+  void
+  adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_);
+  void
+  postProcessShrunkenMesh();
+  void
+  postProcessFinalMesh();
 
-  private:
-    MeshAdaptMethod* helper;
-    ma::Mesh* mesh;
-    ma::ModelExtrusions model_extrusions;
-    size_t nlayers;
+ private:
+  MeshAdaptMethod*    helper;
+  ma::Mesh*           mesh;
+  ma::ModelExtrusions model_extrusions;
+  size_t              nlayers;
 };
 
-}
+}  // namespace AAdapt
 
 #endif

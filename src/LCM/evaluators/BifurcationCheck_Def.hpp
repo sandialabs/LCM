@@ -7,11 +7,10 @@
 #include <random>
 #include <typeinfo>
 
-#include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
-
 #include "LocalNonlinearSolver.hpp"
 #include "MiniTensor.h"
+#include "Phalanx_DataLayout.hpp"
+#include "Teuchos_TestForException.hpp"
 
 namespace LCM {
 
@@ -173,7 +172,8 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::spherical_sweep(
+typename EvalT::ScalarT
+BifurcationCheck<EvalT, Traits>::spherical_sweep(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        arg_minimum,
     minitensor::Vector<ScalarT, 3>&        direction,
@@ -247,7 +247,8 @@ typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::spherical_sweep(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::stereographic_sweep(
+typename EvalT::ScalarT
+BifurcationCheck<EvalT, Traits>::stereographic_sweep(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        arg_minimum,
     minitensor::Vector<ScalarT, 3>&        direction,
@@ -323,7 +324,8 @@ typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::stereographic_sweep(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::projective_sweep(
+typename EvalT::ScalarT
+BifurcationCheck<EvalT, Traits>::projective_sweep(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 3>&        arg_minimum,
     minitensor::Vector<ScalarT, 3>&        direction,
@@ -403,7 +405,8 @@ typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::projective_sweep(
 }
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::tangent_sweep(
+typename EvalT::ScalarT
+BifurcationCheck<EvalT, Traits>::tangent_sweep(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        arg_minimum,
     minitensor::Vector<ScalarT, 3>&        direction,
@@ -476,7 +479,8 @@ typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::tangent_sweep(
 }
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::cartesian_sweep(
+typename EvalT::ScalarT
+BifurcationCheck<EvalT, Traits>::cartesian_sweep(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        arg_minimum,
     int                                    surface_index,
@@ -619,7 +623,8 @@ typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::cartesian_sweep(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-void BifurcationCheck<EvalT, Traits>::spherical_newton_raphson(
+void
+BifurcationCheck<EvalT, Traits>::spherical_newton_raphson(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        parameters,
     minitensor::Vector<ScalarT, 3>&        direction,
@@ -723,7 +728,8 @@ void BifurcationCheck<EvalT, Traits>::spherical_newton_raphson(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-void BifurcationCheck<EvalT, Traits>::stereographic_newton_raphson(
+void
+BifurcationCheck<EvalT, Traits>::stereographic_newton_raphson(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        parameters,
     minitensor::Vector<ScalarT, 3>&        direction,
@@ -827,7 +833,8 @@ void BifurcationCheck<EvalT, Traits>::stereographic_newton_raphson(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-void BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
+void
+BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 3>&        parameters,
     minitensor::Vector<ScalarT, 3>&        direction,
@@ -943,7 +950,8 @@ void BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-void BifurcationCheck<EvalT, Traits>::tangent_newton_raphson(
+void
+BifurcationCheck<EvalT, Traits>::tangent_newton_raphson(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        parameters,
     minitensor::Vector<ScalarT, 3>&        direction,
@@ -1047,7 +1055,8 @@ void BifurcationCheck<EvalT, Traits>::tangent_newton_raphson(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-void BifurcationCheck<EvalT, Traits>::cartesian_newton_raphson(
+void
+BifurcationCheck<EvalT, Traits>::cartesian_newton_raphson(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        parameters,
     int                                    surface_index,
@@ -1160,7 +1169,8 @@ void BifurcationCheck<EvalT, Traits>::cartesian_newton_raphson(
 
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::stereographic_pso(
+typename EvalT::ScalarT
+BifurcationCheck<EvalT, Traits>::stereographic_pso(
     minitensor::Tensor4<ScalarT, 3> const& tangent,
     minitensor::Vector<ScalarT, 2>&        arg_minimum,
     minitensor::Vector<ScalarT, 3>&        direction)
@@ -1278,8 +1288,8 @@ typename EvalT::ScalarT BifurcationCheck<EvalT, Traits>::stereographic_pso(
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-    BifurcationCheck<EvalT, Traits>::spherical_get_normal(
-        minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::spherical_get_normal(
+    minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(
       sin(parameters[0]) * cos(parameters[1]),
@@ -1292,8 +1302,8 @@ minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-    BifurcationCheck<EvalT, Traits>::stereographic_get_normal(
-        minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::stereographic_get_normal(
+    minitensor::Vector<D2FadType, 2>& parameters)
 {
   D2FadType r2 = parameters[0] * parameters[0] + parameters[1] * parameters[1];
 
@@ -1307,8 +1317,8 @@ minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-    BifurcationCheck<EvalT, Traits>::projective_get_normal(
-        minitensor::Vector<D2FadType, 3>& parameters)
+BifurcationCheck<EvalT, Traits>::projective_get_normal(
+    minitensor::Vector<D2FadType, 3>& parameters)
 {
   minitensor::Vector<D2FadType, 3>& normal = parameters;
 
@@ -1335,8 +1345,8 @@ minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-    BifurcationCheck<EvalT, Traits>::tangent_get_normal(
-        minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::tangent_get_normal(
+    minitensor::Vector<D2FadType, 2>& parameters)
 {
   D2FadType const r =
       sqrt(parameters[0] * parameters[0] + parameters[1] * parameters[1]);
@@ -1359,8 +1369,8 @@ minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-    BifurcationCheck<EvalT, Traits>::cartesian_get_normal1(
-        minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::cartesian_get_normal1(
+    minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(
       D2FadType(1), parameters[0], parameters[1]);
@@ -1370,8 +1380,8 @@ minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-    BifurcationCheck<EvalT, Traits>::cartesian_get_normal2(
-        minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::cartesian_get_normal2(
+    minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(
       parameters[0], D2FadType(1), parameters[1]);
@@ -1381,8 +1391,8 @@ minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-    BifurcationCheck<EvalT, Traits>::cartesian_get_normal3(
-        minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::cartesian_get_normal3(
+    minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(
       parameters[0], parameters[1], D2FadType(1));

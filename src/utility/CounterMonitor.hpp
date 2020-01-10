@@ -11,26 +11,25 @@
 
 /**
  *  \file CounterMonitor.hpp
- *  
- *  \brief 
+ *
+ *  \brief
  */
 
-#include "MonitorBase.hpp"
 #include "Counter.hpp"
+#include "MonitorBase.hpp"
 
 namespace util {
 
-  class CounterMonitor : public MonitorBase<Counter>
-  {
-  public:
-    
-    CounterMonitor();
-    virtual ~CounterMonitor() {};
-    
-  protected:
-    virtual string        getStringValue(const monitored_type& val) override;
-    
-  };
-}
+class CounterMonitor : public MonitorBase<Counter>
+{
+ public:
+  CounterMonitor();
+  virtual ~CounterMonitor(){};
+
+ protected:
+  virtual string
+  getStringValue(const monitored_type& val) override;
+};
+}  // namespace util
 
 #endif  // UTIL_COUNTERMONITOR_HPP

@@ -7,15 +7,14 @@
 #ifndef PHAL_DOF_GRAD_INTERPOLATION_SIDE_HPP
 #define PHAL_DOF_GRAD_INTERPOLATION_SIDE_HPP 1
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
+#include "Albany_SacadoTypes.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Utilities.hpp"
-#include "Albany_SacadoTypes.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element InterpolationSide Evaluator
@@ -24,36 +23,39 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
+template <typename EvalT, typename Traits, typename ScalarT>
 class DOFGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  DOFGradInterpolationSideBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl_side);
 
-  DOFGradInterpolationSideBase (const Teuchos::ParameterList& p,
-                                const Teuchos::RCP<Albany::Layouts>& dl_side);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& vm);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields (typename Traits::EvalData d);
-
-private:
-
+ private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT,MeshScalarT>::type OutputScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
+      OutputScalarT;
 
   std::string sideSetName;
 
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT,Cell,Side,Node> val_node;
+  PHX::MDField<const ScalarT, Cell, Side, Node> val_node;
   //! Basis Functions
-  PHX::MDField<const MeshScalarT,Cell,Side,Node,QuadPoint,Dim> gradBF;
+  PHX::MDField<const MeshScalarT, Cell, Side, Node, QuadPoint, Dim> gradBF;
 
   // Output:
   //! Values at quadrature points
-  PHX::MDField<OutputScalarT,Cell,Side,QuadPoint,Dim> grad_qp;
+  PHX::MDField<OutputScalarT, Cell, Side, QuadPoint, Dim> grad_qp;
 
   int numSideNodes;
   int numSideQPs;
@@ -63,15 +65,18 @@ private:
 };
 
 // Some shortcut names
-template<typename EvalT, typename Traits>
-using DOFGradInterpolationSide = DOFGradInterpolationSideBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using DOFGradInterpolationSide =
+    DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFGradInterpolationSideMesh = DOFGradInterpolationSideBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using DOFGradInterpolationSideMesh =
+    DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFGradInterpolationSideParam = DOFGradInterpolationSideBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using DOFGradInterpolationSideParam =
+    DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_DOF_GRAD_INTERPOLATION_SIDE_HPP
+#endif  // PHAL_DOF_GRAD_INTERPOLATION_SIDE_HPP

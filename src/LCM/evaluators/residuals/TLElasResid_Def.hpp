@@ -4,12 +4,11 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
-
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Intrepid2_RealSpaceTools.hpp"
+#include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
+#include "Teuchos_TestForException.hpp"
 
 namespace LCM {
 

@@ -7,6 +7,7 @@
 // Author: Mario J. Juha (juham@rpi.edu)
 
 #include <cmath>
+
 #include "MiniTensor.h"
 #include "MiniTensor_Definitions.h"
 #include "Phalanx_DataLayout.hpp"

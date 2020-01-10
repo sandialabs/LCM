@@ -4,24 +4,22 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_APFMESHSTRUCT_HPP
 #define ALBANY_APFMESHSTRUCT_HPP
 
 #include "Albany_AbstractMeshStruct.hpp"
-#include "Albany_PUMIQPData.hpp"
 #include "Albany_PUMINodeData.hpp"
-
-#include "Teuchos_RCP.hpp"
-#include "Teuchos_ParameterList.hpp"
+#include "Albany_PUMIQPData.hpp"
 #include "Albany_StateInfoStruct.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 #ifdef ALBANY_EPETRA
 #include "EpetraExt_MultiComm.h"
 #endif
-#include <PHAL_Dimension.hpp>
-
 #include <apf.h>
 #include <apfMesh2.h>
+
+#include <PHAL_Dimension.hpp>
 #if defined(ALBANY_STK) && defined(ALBANY_SEACAS)
 #include <apfSTK.h>
 #else
@@ -31,145 +29,214 @@
 
 namespace Albany {
 
-class SolutionLayout {
-  public:
+class SolutionLayout
+{
+ public:
+  Teuchos::Array<std::string>&
+  getDerivNames(int i)
+  {
+    return solNames[i];
+  }
+  const Teuchos::Array<std::string>&
+  getDerivNames(int i) const
+  {
+    return solNames[i];
+  }
 
- Teuchos::Array<std::string>& getDerivNames(int i){ return solNames[i]; }
- const Teuchos::Array<std::string>& getDerivNames(int i) const { return solNames[i]; }
+  Teuchos::Array<int>&
+  getDerivSizes(int i)
+  {
+    return solSizes[i];
+  }
+  const Teuchos::Array<int>&
+  getDerivSizes(int i) const
+  {
+    return solSizes[i];
+  }
 
- Teuchos::Array<int>& getDerivSizes(int i){ return solSizes[i]; }
- const Teuchos::Array<int>& getDerivSizes(int i) const { return solSizes[i]; }
+  SolutionLayout*
+  setDeriv(int i)
+  {
+    td_val = i;
+    return this;
+  }
 
- SolutionLayout* setDeriv(int i){ td_val = i; return this; }
+  std::string&
+  getName(int i)
+  {
+    return solNames[td_val][i];
+  }
 
- std::string& getName(int i){ return solNames[td_val][i]; }
+  int&
+  getSize(int i)
+  {
+    return solSizes[td_val][i];
+  }
 
- int& getSize(int i){ return solSizes[td_val][i]; }
+  void
+  resize(size_t size)
+  {
+    solNames.resize(size);
+    solSizes.resize(size);
+  }
 
- void resize(size_t size){ solNames.resize(size); solSizes.resize(size); }
+  int
+  getNumSolFields()
+  {
+    return solNames[0].size();
+  }
 
- int getNumSolFields() { return solNames[0].size(); }
+  Teuchos::Array<Teuchos::Array<std::string>> solNames;
+  Teuchos::Array<Teuchos::Array<int>>
+      solSizes;  // solSizes[time_deriv_vector][DOF_component]
 
- Teuchos::Array<Teuchos::Array<std::string> > solNames;
- Teuchos::Array<Teuchos::Array<int> > solSizes; // solSizes[time_deriv_vector][DOF_component]
-
- int td_val;
-
+  int td_val;
 };
 
-class APFMeshStruct : public Albany::AbstractMeshStruct {
+class APFMeshStruct : public Albany::AbstractMeshStruct
+{
+ public:
+  void
+  init(
+      const Teuchos::RCP<Teuchos::ParameterList>& params,
+      const Teuchos::RCP<const Teuchos_Comm>&     commT);
 
-  public:
+  virtual ~APFMeshStruct();
 
-    void init(const Teuchos::RCP<Teuchos::ParameterList>& params,
-              const Teuchos::RCP<const Teuchos_Comm>& commT);
+  void
+  setFieldAndBulkData(
+      const Teuchos::RCP<const Teuchos_Comm>&                           commT,
+      const Teuchos::RCP<Teuchos::ParameterList>&                       params,
+      const unsigned int                                                neq_,
+      const Albany::AbstractFieldContainer::FieldContainerRequirements& req,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                      sis,
+      const unsigned int worksetSize,
+      const std::map<
+          std::string,
+          Teuchos::RCP<Albany::StateInfoStruct>>& /*side_set_sis*/
+      = {},
+      const std::map<
+          std::string,
+          AbstractFieldContainer::FieldContainerRequirements>& /*side_set_req*/
+      = {});
 
-    virtual ~APFMeshStruct();
+  void
+  splitFields(Teuchos::Array<Teuchos::Array<std::string>>& fieldLayout);
 
-    void setFieldAndBulkData(
-                  const Teuchos::RCP<const Teuchos_Comm>& commT,
-                  const Teuchos::RCP<Teuchos::ParameterList>& params,
-                  const unsigned int neq_,
-                  const Albany::AbstractFieldContainer::FieldContainerRequirements& req,
-                  const Teuchos::RCP<Albany::StateInfoStruct>& sis,
-                  const unsigned int worksetSize,
-                  const std::map<std::string,Teuchos::RCP<Albany::StateInfoStruct> >& /*side_set_sis*/ = {},
-                  const std::map<std::string,AbstractFieldContainer::FieldContainerRequirements>& /*side_set_req*/ = {});
+  Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>&
+  getMeshSpecs();
+  const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>&
+  getMeshSpecs() const;
 
+  std::vector<Teuchos::RCP<PUMIQPData<double, 1>>> scalarValue_states;
+  std::vector<Teuchos::RCP<PUMIQPData<double, 2>>> qpscalar_states;
+  std::vector<Teuchos::RCP<PUMIQPData<double, 3>>> qpvector_states;
+  std::vector<Teuchos::RCP<PUMIQPData<double, 4>>> qptensor_states;
 
-    void splitFields(Teuchos::Array<Teuchos::Array<std::string> >& fieldLayout);
+  /* only for LandIce problems */
+  std::vector<Teuchos::RCP<PUMIQPData<double, 2>>> elemnodescalar_states;
 
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct> >& getMeshSpecs();
-    const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct> >& getMeshSpecs() const;
+  std::vector<std::string> nsNames;
+  std::vector<std::string> ssNames;
 
+  apf::Mesh2*
+  getMesh()
+  {
+    return mesh;
+  }
+  gmi_model*
+  getMdl()
+  {
+    return model;
+  }
+  apf::StkModels&
+  getSets()
+  {
+    return sets;
+  }
 
-    std::vector<Teuchos::RCP<PUMIQPData<double, 1> > > scalarValue_states;
-    std::vector<Teuchos::RCP<PUMIQPData<double, 2> > > qpscalar_states;
-    std::vector<Teuchos::RCP<PUMIQPData<double, 3> > > qpvector_states;
-    std::vector<Teuchos::RCP<PUMIQPData<double, 4> > > qptensor_states;
+  // Solution history
+  int solutionFieldHistoryDepth;
+  void
+  loadSolutionFieldHistory(int step);
 
-    /* only for LandIce problems */
-    std::vector<Teuchos::RCP<PUMIQPData<double, 2> > > elemnodescalar_states;
+  bool
+  useCompositeTet()
+  {
+    return compositeTet;
+  }
 
-    std::vector<std::string> nsNames;
-    std::vector<std::string> ssNames;
+  //! returns true iff the field was found
+  bool
+  findOrCreateNodalField(char const* name, int value_type);
+  virtual apf::Field*
+  createNodalField(char const* name, int valueType) = 0;
 
-    apf::Mesh2* getMesh() { return mesh; }
-    gmi_model* getMdl() { return model; }
-    apf::StkModels& getSets() { return sets; }
+  bool   hasRestartSolution;
+  double restartDataTime;
+  int    restartWriteStep;
 
-    // Solution history
-    int solutionFieldHistoryDepth;
-    void loadSolutionFieldHistory(int step);
+  bool shouldLoadLandIceData;
+  bool shouldWriteAsciiVtk;
 
-    bool useCompositeTet(){ return compositeTet; }
+  int neq;  //! number of equations (components) per node in the solution and
+            //! residual
+  int  numDim;      //! mesh element dimensionality
+  int  problemDim;  //! (hackish) problem dimensionality, for < 3D problems
+  int  cubatureDegree;
+  bool interleavedOrdering;
+  bool solutionInitialized;
+  bool residualInitialized;
 
-    //! returns true iff the field was found
-    bool findOrCreateNodalField(char const* name, int value_type);
-    virtual apf::Field* createNodalField(char const* name, int valueType) = 0;
+  Teuchos::Array<Teuchos::Array<std::string>> solVectorLayout;
 
-    bool hasRestartSolution;
-    double restartDataTime;
-    int restartWriteStep;
+  double time;
 
-    bool shouldLoadLandIceData;
-    bool shouldWriteAsciiVtk;
+  // Info to map element block to physics set
+  bool                       allElementBlocksHaveSamePhysics;
+  std::map<std::string, int> ebNameToIndex;
 
-    int neq; //! number of equations (components) per node in the solution and residual
-    int numDim; //! mesh element dimensionality
-    int problemDim; //! (hackish) problem dimensionality, for < 3D problems
-    int cubatureDegree;
-    bool interleavedOrdering;
-    bool solutionInitialized;
-    bool residualInitialized;
+  int worksetSize;
 
-    Teuchos::Array<Teuchos::Array<std::string> > solVectorLayout;
+  std::string outputFileName;
+  int         outputInterval;
+  bool        useNullspaceTranslationOnly;
+  bool        useTemperatureHack;
+  bool        useDOFOffsetHack;
 
-    double time;
+  bool saveStabilizedStress;
 
-    // Info to map element block to physics set
-    bool allElementBlocksHaveSamePhysics;
-    std::map<std::string, int> ebNameToIndex;
+  // Number of distinct solution vectors handled (<=3)
+  int num_time_deriv;
 
-    int worksetSize;
+  static const char* solution_name[3];
+  static const char* residual_name;
 
-    std::string outputFileName;
-    int outputInterval;
-    bool useNullspaceTranslationOnly;
-    bool useTemperatureHack;
-    bool useDOFOffsetHack;
+  static void
+  initialize_libraries(int* pargc, char*** pargv);
+  static void
+  finalize_libraries();
 
-    bool saveStabilizedStress;
+ protected:
+  Teuchos::RCP<Teuchos::ParameterList>
+  getValidDiscretizationParameters() const;
 
-    // Number of distinct solution vectors handled (<=3)
-    int num_time_deriv;
+  //! Utility function that uses some integer arithmetic to choose a good
+  //! worksetSize
+  int
+  computeWorksetSize(const int worksetSizeMax, const int ebSizeMax) const;
 
-    static const char* solution_name[3];
-    static const char* residual_name;
+  Teuchos::RCP<Teuchos::FancyOStream> out;
 
-    static void initialize_libraries(int* pargc, char*** pargv);
-    static void finalize_libraries();
+  Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs;
 
-protected:
+  apf::Mesh2*    mesh;
+  gmi_model*     model;
+  apf::StkModels sets;
 
-    Teuchos::RCP<Teuchos::ParameterList>
-      getValidDiscretizationParameters() const;
-
-    //! Utility function that uses some integer arithmetic to choose a good worksetSize
-    int computeWorksetSize(const int worksetSizeMax, const int ebSizeMax) const;
-
-    Teuchos::RCP<Teuchos::FancyOStream> out;
-
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct> > meshSpecs;
-
-    apf::Mesh2* mesh;
-    gmi_model* model;
-    apf::StkModels sets;
-
-    bool compositeTet;
-
+  bool compositeTet;
 };
 
-}
+}  // namespace Albany
 
 #endif

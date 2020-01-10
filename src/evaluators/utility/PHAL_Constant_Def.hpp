@@ -9,32 +9,36 @@
 namespace PHAL {
 
 //**********************************************************************
-template<typename EvalT, typename Traits>
-Constant<EvalT, Traits>::Constant(Teuchos::ParameterList& p) :
-  value( p.get<RealType>("Value") ),
-  constant( p.get<std::string>("Name"), 
-	    p.get< Teuchos::RCP<PHX::DataLayout> >("Data Layout") )
+template <typename EvalT, typename Traits>
+Constant<EvalT, Traits>::Constant(Teuchos::ParameterList& p)
+    : value(p.get<RealType>("Value")),
+      constant(
+          p.get<std::string>("Name"),
+          p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"))
 {
   this->addEvaluatedField(constant);
-  
+
   std::string n = "Constant Provider: " + constant.fieldTag().name();
   this->setName(n + PHX::print<EvalT>());
 }
 
 //**********************************************************************
-template<typename EvalT, typename Traits>
-void Constant<EvalT, Traits>::
-postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm)
+template <typename EvalT, typename Traits>
+void
+Constant<EvalT, Traits>::postRegistrationSetup(
+    typename Traits::SetupData d,
+    PHX::FieldManager<Traits>& vm)
 {
-  this->utils.setFieldData(constant,vm);
+  this->utils.setFieldData(constant, vm);
   PHAL::set(constant, value);
 }
 
 //**********************************************************************
-template<typename EvalT, typename Traits>
-void Constant<EvalT, Traits>::evaluateFields(typename Traits::EvalData d)
-{ }
+template <typename EvalT, typename Traits>
+void
+Constant<EvalT, Traits>::evaluateFields(typename Traits::EvalData d)
+{
+}
 
 //**********************************************************************
-}
+}  // namespace PHAL

@@ -11,77 +11,98 @@
 
 /**
  *  \file Counter.hpp
- *  
- *  \brief 
+ *
+ *  \brief
  */
 
 #include <string>
 
 namespace util {
 
-class Counter {
-public:
-  
+class Counter
+{
+ public:
   typedef size_t counter_type;
 
   /**
    *  \brief Construct a performance counter
-   *  
+   *
    *  Constructs a performance counter with the specified name and starting
    *  value.
-   *  
+   *
    *  \param name [in]  Name of the counter.
    *  \param start [in] Starting value of the counter (defaults to 0).
    */
-  explicit Counter (const std::string& name, counter_type start = 0);
+  explicit Counter(const std::string& name, counter_type start = 0);
 
-  Counter& set (counter_type val) {
+  Counter&
+  set(counter_type val)
+  {
     value_ = val;
     return *this;
   }
-  Counter& increment () {
+  Counter&
+  increment()
+  {
     ++value_;
     return *this;
   }
-  Counter& decrement () {
+  Counter&
+  decrement()
+  {
     --value_;
     return *this;
   }
-  Counter& add (counter_type val) {
+  Counter&
+  add(counter_type val)
+  {
     value_ += val;
     return *this;
   }
-  Counter& subtract (counter_type val) {
+  Counter&
+  subtract(counter_type val)
+  {
     value_ -= val;
     return *this;
   }
-  
-  Counter& operator= (counter_type val) {
+
+  Counter&
+  operator=(counter_type val)
+  {
     return set(val);
   }
-  Counter& operator++ () {
+  Counter&
+  operator++()
+  {
     return increment();
   }
-  Counter& operator-- () {
+  Counter&
+  operator--()
+  {
     return decrement();
   }
-  Counter& operator+= (counter_type val) {
+  Counter&
+  operator+=(counter_type val)
+  {
     return add(val);
   }
-  Counter& operator-= (counter_type val) {
+  Counter&
+  operator-=(counter_type val)
+  {
     return subtract(val);
   }
-  
-  counter_type value () const {
+
+  counter_type
+  value() const
+  {
     return value_;
   }
-  
-protected:
-  
-  std::string name_;
+
+ protected:
+  std::string  name_;
   counter_type value_;
 };
 
-}
+}  // namespace util
 
 #endif  // UTIL_COUNTER_HPP

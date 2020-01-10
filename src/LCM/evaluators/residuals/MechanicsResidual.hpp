@@ -12,6 +12,7 @@
 #include <Phalanx_MDField.hpp>
 #include <Phalanx_config.hpp>
 #include <Sacado_ParameterAccessor.hpp>
+
 #include "AAdapt_RC_Field.hpp"
 #include "Albany_Layouts.hpp"
 

@@ -9,10 +9,10 @@
 
 #include <functional>
 #include <memory>
-#include "ConstitutiveModel.hpp"
-#include "NOX_StatusTest_ModelEvaluatorFlag.h"
 
 #include "Albany_Layouts.hpp"
+#include "ConstitutiveModel.hpp"
+#include "NOX_StatusTest_ModelEvaluatorFlag.h"
 
 namespace LCM {
 

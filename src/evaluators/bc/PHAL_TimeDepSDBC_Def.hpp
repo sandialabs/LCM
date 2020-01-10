@@ -5,10 +5,9 @@
 //*****************************************************************//
 
 #include "Albany_Utils.hpp"
+#include "PHAL_SDirichlet_Def.hpp"
 #include "PHAL_TimeDepSDBC.hpp"
 #include "Phalanx_DataLayout.hpp"
-
-#include "PHAL_SDirichlet_Def.hpp"
 
 //#define DEBUG_OUTPUT
 

@@ -42,14 +42,12 @@
 #include <stdexcept>
 
 // STL components
-#include <vector>
-#include <utility>
 #include <percept/PerceptMesh.hpp>
-
-
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/Types.hpp>
+#include <utility>
+#include <vector>
 // AGS: had to add this!
 #include <stk_mesh/base/CoordinateSystems.hpp>
 //#include <stk_mesh/fem/TopologyDimensions.hpp>
@@ -57,9 +55,8 @@
 namespace stk {
 namespace rebalance {
 
-typedef mesh::Field<double, mesh::Cartesian>  VectorField ;
-typedef mesh::Field<double>                   ScalarField ;
-
+typedef mesh::Field<double, mesh::Cartesian> VectorField;
+typedef mesh::Field<double>                  ScalarField;
 
 /** @class Partition for keeping track of a mesh entity partition.
  *
@@ -81,16 +78,16 @@ typedef mesh::Field<double>                   ScalarField ;
  * are beyond the scope of this class.
  */
 
-class Partition {
-
-public:
-
+class Partition
+{
+ public:
   /** \brief Constructors.  */
   Partition(stk::ParallelMachine comm);
-private:
-  Partition(const Partition &p);
-public:
 
+ private:
+  Partition(const Partition& p);
+
+ public:
   /** \brief Define mesh entities to balance.
    *
    * \param mesh_entities    Vector of mesh entities to rebalance
@@ -98,27 +95,34 @@ public:
    * \param nodal_coord_ref  Nodal coordinate field to determine new partition
    *                         if using geometric based partitioning.
    *
-   * \param elem_weight_ref  Weighting of elements used in defining 
+   * \param elem_weight_ref  Weighting of elements used in defining
    *                         the new partition. If used, the total element
-   *                         weight will be balanced across all of the 
+   *                         weight will be balanced across all of the
    *                         processors. Can be NULL.
    */
-  virtual void set_mesh_info ( const std::vector<mesh::Entity > &mesh_entities,
-                               const VectorField   * nodal_coord_ref,
-                               const ScalarField   * elem_weight_ref=NULL) = 0;
+  virtual void
+  set_mesh_info(
+      const std::vector<mesh::Entity>& mesh_entities,
+      const VectorField*               nodal_coord_ref,
+      const ScalarField*               elem_weight_ref = NULL) = 0;
 
   /** \brief Destructor. */
   virtual ~Partition();
 
   /** \brief Return the parallel communicator for this partition entity.*/
-  ParallelMachine parallel() const { return comm_; }
+  ParallelMachine
+  parallel() const
+  {
+    return comm_;
+  }
 
   /** \brief Return the total number of mesh entities in all lists. */
-  virtual unsigned num_elems() const = 0;
+  virtual unsigned
+  num_elems() const = 0;
 
   /** \brief determine New Partition.
-   * 
-   * \param RebalancingNeeded  If true, then a new partition 
+   *
+   * \param RebalancingNeeded  If true, then a new partition
    *                           has been defined.  If false, the
    *                           new partition is the same as the old
    *                           one and no rebalancing is needed.
@@ -128,7 +132,8 @@ public:
    * the new partition.  \a RebalancingNeeded is set if the new
    * partition is different than the old one.
    */
-  virtual void determine_new_partition(bool &RebalancingNeeded) = 0;
+  virtual void
+  determine_new_partition(bool& RebalancingNeeded) = 0;
 
   /** \brief Perform communication to create new partition.
    *
@@ -144,20 +149,21 @@ public:
    * mesh entities before rebalancing is performed
    * again.
    */
-  virtual int get_new_partition(stk::mesh::EntityProcVec &new_partition) = 0;
+  virtual int
+  get_new_partition(stk::mesh::EntityProcVec& new_partition) = 0;
 
-  /** \brief Query whether element dependents need to be rebalanced outside this Partition. */
-  virtual bool partition_dependents_needed() const = 0;
+  /** \brief Query whether element dependents need to be rebalanced outside this
+   * Partition. */
+  virtual bool
+  partition_dependents_needed() const = 0;
 
-
-protected:
-
+ protected:
   const stk::ParallelMachine comm_;
 };
 
 /** \} */
 
-}
-} // namespace stk
+}  // namespace rebalance
+}  // namespace stk
 
 #endif

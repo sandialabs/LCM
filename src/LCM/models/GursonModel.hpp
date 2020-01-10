@@ -8,6 +8,7 @@
 #define GursonModel_hpp
 
 #include <MiniTensor.h>
+
 #include "Albany_Layouts.hpp"
 #include "LCM/models/ConstitutiveModel.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"

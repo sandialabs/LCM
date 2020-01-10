@@ -6,6 +6,7 @@
 
 #include <MiniTensor.h>
 #include <MiniTensor_Mechanics.h>
+
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>
 #include <Teuchos_TestForException.hpp>

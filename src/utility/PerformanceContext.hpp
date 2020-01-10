@@ -11,44 +11,53 @@
 
 /**
  *  \file PerformanceContext.hpp
- *  
- *  \brief 
+ *
+ *  \brief
  */
 
-#include "TimeMonitor.hpp"
 #include "CounterMonitor.hpp"
+#include "TimeMonitor.hpp"
 #include "VariableMonitor.hpp"
 
 namespace util {
-class PerformanceContext {
-public:
-  
-  static PerformanceContext& instance();
-  
-  void summarizeAll (Teuchos::Ptr<const Teuchos::Comm<int> > comm,
-                     std::ostream &out = std::cout);
-  void summarizeAll (std::ostream &out = std::cout);
+class PerformanceContext
+{
+ public:
+  static PerformanceContext&
+  instance();
 
-  TimeMonitor& timeMonitor () {
+  void
+  summarizeAll(
+      Teuchos::Ptr<const Teuchos::Comm<int>> comm,
+      std::ostream&                          out = std::cout);
+  void
+  summarizeAll(std::ostream& out = std::cout);
+
+  TimeMonitor&
+  timeMonitor()
+  {
     return timeMonitor_;
   }
-  
-  CounterMonitor& counterMonitor () {
+
+  CounterMonitor&
+  counterMonitor()
+  {
     return counterMonitor_;
   }
-  
-  VariableMonitor& variableMonitor () {
+
+  VariableMonitor&
+  variableMonitor()
+  {
     return variableMonitor_;
   }
-  
-private:
-  
+
+ private:
   static PerformanceContext instance_;
-  
+
   TimeMonitor     timeMonitor_;
   CounterMonitor  counterMonitor_;
   VariableMonitor variableMonitor_;
 };
-}
+}  // namespace util
 
 #endif  // UTIL_PERFORMANCECONTEXT_HPP

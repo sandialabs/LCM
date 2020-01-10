@@ -11,9 +11,8 @@
 #include "Moertel_ProjectorT.hpp"
 #include "Moertel_SegmentT.hpp"
 #include "Moertel_Segment_bilineartri.H"
-#include "Moertel_UtilsT.hpp"
-
 #include "Moertel_Tolerances.hpp"
+#include "Moertel_UtilsT.hpp"
 
 /*----------------------------------------------------------------------*
   |  ctor (public)                                            mwgee 10/05|

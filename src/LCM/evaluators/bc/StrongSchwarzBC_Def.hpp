@@ -4,17 +4,18 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Albany_Application.hpp"
-#include "Albany_GenericSTKMeshStruct.hpp"
-#include "Albany_STKDiscretization.hpp"
-#include "Albany_ThyraUtils.hpp"
-#include "Albany_GlobalLocalIndexer.hpp"
-#include "StrongSchwarzBC.hpp"
-
 #include <MiniTensor.h>
+
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>
 #include <Teuchos_TestForException.hpp>
+
+#include "Albany_Application.hpp"
+#include "Albany_GenericSTKMeshStruct.hpp"
+#include "Albany_GlobalLocalIndexer.hpp"
+#include "Albany_STKDiscretization.hpp"
+#include "Albany_ThyraUtils.hpp"
+#include "StrongSchwarzBC.hpp"
 
 namespace LCM {
 
@@ -247,7 +248,8 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
 
   bool found = false;
 
-  auto coupled_ov_node_vs_indexer = Albany::createGlobalLocalIndexer(coupled_overlap_node_vs);
+  auto coupled_ov_node_vs_indexer =
+      Albany::createGlobalLocalIndexer(coupled_overlap_node_vs);
   for (auto workset = 0; workset < ws_elem_to_node_id.size(); ++workset) {
     std::string const& coupled_element_block = coupled_ws_eb_names[workset];
 
@@ -567,7 +569,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
 
   bool const has_acce = const_acce != Teuchos::null;
 
-  ALBANY_ASSERT(has_disp == true,"");
+  ALBANY_ASSERT(has_disp == true, "");
 
   // Displacement
   Teuchos::RCP<Thyra_Vector> disp =
@@ -821,9 +823,8 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::StrongSchwarzBC(
 //
 //
 template <typename Traits>
-void
-StrongSchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::
-evaluateFields(typename Traits::EvalData /* dirichlet_workset */)
+void StrongSchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
+    typename Traits::EvalData /* dirichlet_workset */)
 {
   return;
 }
@@ -832,9 +833,9 @@ evaluateFields(typename Traits::EvalData /* dirichlet_workset */)
 // Specialization: DistParamDeriv
 //
 template <typename Traits>
-StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
-StrongSchwarzBC(Teuchos::ParameterList& p)
- : StrongSchwarzBC_Base<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p)
+StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::StrongSchwarzBC(
+    Teuchos::ParameterList& p)
+    : StrongSchwarzBC_Base<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p)
 {
   return;
 }
@@ -844,8 +845,8 @@ StrongSchwarzBC(Teuchos::ParameterList& p)
 //
 template <typename Traits>
 void
-StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
-evaluateFields(typename Traits::EvalData /* dirichlet_workset */)
+    StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
+        typename Traits::EvalData /* dirichlet_workset */)
 {
   return;
 }

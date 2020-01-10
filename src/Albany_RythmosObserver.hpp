@@ -7,48 +7,51 @@
 #ifndef ALBANY_RYTHMOS_OBSERVER_HPP
 #define ALBANY_RYTHMOS_OBSERVER_HPP
 
-#include "Rythmos_IntegrationObserverBase.hpp"
 #include "Albany_ScalarOrdinalTypes.hpp"
+#include "Rythmos_IntegrationObserverBase.hpp"
 
-namespace Albany
-{
+namespace Albany {
 class Application;
 class ObserverImpl;
 
 class RythmosObserver : public Rythmos::IntegrationObserverBase<RealType>
 {
-public:
-   RythmosObserver (const Teuchos::RCP<Application> &app_);
+ public:
+  RythmosObserver(const Teuchos::RCP<Application>& app_);
 
-   ~RythmosObserver () = default;
+  ~RythmosObserver() = default;
 
   typedef RealType ScalarType;
 
-  Teuchos::RCP<Rythmos::IntegrationObserverBase<ScalarType> >
-  cloneIntegrationObserver() const {  TEUCHOS_TEST_FOR_EXCEPT(true);}
+  Teuchos::RCP<Rythmos::IntegrationObserverBase<ScalarType>>
+  cloneIntegrationObserver() const
+  {
+    TEUCHOS_TEST_FOR_EXCEPT(true);
+  }
 
-  void resetIntegrationObserver(const Rythmos::TimeRange<ScalarType>& /* integrationTimeDomain */)
-  { };
+  void
+  resetIntegrationObserver(
+      const Rythmos::TimeRange<ScalarType>& /* integrationTimeDomain */){};
 
   // Print initial condition
-  void observeStartTimeStep(
-    const Rythmos::StepperBase<ScalarType> &stepper,
-    const Rythmos::StepControlInfo<ScalarType> &stepCtrlInfo,
-    const int timeStepIter
-    );
+  void
+  observeStartTimeStep(
+      const Rythmos::StepperBase<ScalarType>&     stepper,
+      const Rythmos::StepControlInfo<ScalarType>& stepCtrlInfo,
+      const int                                   timeStepIter);
 
-  void observeCompletedTimeStep(
-    const Rythmos::StepperBase<ScalarType> &stepper,
-    const Rythmos::StepControlInfo<ScalarType> &stepCtrlInfo,
-    const int timeStepIter
-    );
+  void
+  observeCompletedTimeStep(
+      const Rythmos::StepperBase<ScalarType>&     stepper,
+      const Rythmos::StepControlInfo<ScalarType>& stepCtrlInfo,
+      const int                                   timeStepIter);
 
-private:
-   Teuchos::RCP<ObserverImpl> impl;
+ private:
+  Teuchos::RCP<ObserverImpl> impl;
 
-   bool initial_step;
+  bool initial_step;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_RYTHMOS_OBSERVER_HPP
+#endif  // ALBANY_RYTHMOS_OBSERVER_HPP

@@ -7,14 +7,12 @@
 #ifndef LAMEPROBLEM_HPP
 #define LAMEPROBLEM_HPP
 
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
-
 #include "Albany_AbstractProblem.hpp"
-
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
@@ -109,7 +107,6 @@ class LameProblem : public Albany::AbstractProblem
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
-
 #include "DefGrad.hpp"
 #include "PHAL_Source.hpp"
 #include "Strain.hpp"

@@ -18,13 +18,10 @@
 #if defined(ALBANY_LCM)
 #include <set>
 #endif
-#include "PHAL_Setup.hpp"
-
 #include "Albany_DiscretizationUtils.hpp"
 #include "Albany_StateInfoStruct.hpp"
-
 #include "Kokkos_ViewFactory.hpp"
-
+#include "PHAL_Setup.hpp"
 #include "Teuchos_Comm.hpp"
 #include "Teuchos_RCP.hpp"
 
@@ -81,8 +78,8 @@ struct Workset
   Teuchos::RCP<Thyra_MultiVector> fpV;
   Teuchos::RCP<Thyra_MultiVector> Vp_bc;
 
-  Albany::DeviceView1d<ST>        f_kokkos;
-  Albany::DeviceLocalMatrix<ST>   Jac_kokkos;
+  Albany::DeviceView1d<ST>      f_kokkos;
+  Albany::DeviceLocalMatrix<ST> Jac_kokkos;
 
   Teuchos::RCP<const Albany::NodeSetList>      nodeSets;
   Teuchos::RCP<const Albany::NodeSetCoordList> nodeSetCoords;

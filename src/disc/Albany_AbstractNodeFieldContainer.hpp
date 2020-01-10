@@ -7,10 +7,10 @@
 #ifndef ALBANY_ABSTRACT_NODE_FIELD_CONTAINER_HPP
 #define ALBANY_ABSTRACT_NODE_FIELD_CONTAINER_HPP
 
-#include "Albany_ThyraTypes.hpp"
-
-#include "Teuchos_RCP.hpp"
 #include <map>
+
+#include "Albany_ThyraTypes.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
@@ -21,17 +21,20 @@ namespace Albany {
 
 class AbstractNodeFieldContainer
 {
-public:
-
-  AbstractNodeFieldContainer () = default;
-  virtual ~AbstractNodeFieldContainer () = default;
+ public:
+  AbstractNodeFieldContainer()          = default;
+  virtual ~AbstractNodeFieldContainer() = default;
 
   // MV version
-  virtual void saveFieldVector(const Teuchos::RCP<const Thyra_MultiVector>& mv, int offset) = 0;
+  virtual void
+  saveFieldVector(
+      const Teuchos::RCP<const Thyra_MultiVector>& mv,
+      int                                          offset) = 0;
 };
 
-typedef std::map<std::string, Teuchos::RCP<AbstractNodeFieldContainer> > NodeFieldContainer;
+typedef std::map<std::string, Teuchos::RCP<AbstractNodeFieldContainer>>
+    NodeFieldContainer;
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_ABSTRACT_NODE_FIELD_CONTAINER_HPP
+#endif  // ALBANY_ABSTRACT_NODE_FIELD_CONTAINER_HPP

@@ -7,14 +7,12 @@
 #ifndef TIME_HPP
 #define TIME_HPP
 
-#include "Teuchos_Array.hpp"
-
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-
 #include "Sacado_ParameterAccessor.hpp"
+#include "Teuchos_Array.hpp"
 #include "Teuchos_ParameterList.hpp"
 #ifdef ALBANY_STOKHOS
 #include "Stokhos_KL_ExponentialRandomField.hpp"

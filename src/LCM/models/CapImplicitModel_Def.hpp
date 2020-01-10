@@ -4,6 +4,7 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include <MiniTensor.h>
+
 #include <Intrepid2_FunctionSpaceTools.hpp>
 #include <Phalanx_DataLayout.hpp>
 #include <Teuchos_TestForException.hpp>

@@ -9,12 +9,11 @@
 
 #include <iostream>
 
-#include "Teuchos_Comm.hpp"
-#include "Teuchos_RCP.hpp"
-
 #include "Albany_Application.hpp"
 #include "Albany_DataTypes.hpp"
 #include "MiniTensor.h"
+#include "Teuchos_Comm.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace LCM {
 

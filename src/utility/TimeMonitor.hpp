@@ -11,25 +11,25 @@
 
 /**
  *  \file TimeMonitor.hpp
- *  
- *  \brief 
+ *
+ *  \brief
  */
 
-#include "MonitorBase.hpp"
 #include <Teuchos_Time.hpp>
 
+#include "MonitorBase.hpp"
+
 namespace util {
-  class TimeMonitor : public MonitorBase<Teuchos::Time>
-  {
-  public:
-    
-    TimeMonitor();
-    virtual ~TimeMonitor() {};
-    
-  protected:
-    virtual string        getStringValue(const monitored_type& val) override;
-    
-  };
-}
+class TimeMonitor : public MonitorBase<Teuchos::Time>
+{
+ public:
+  TimeMonitor();
+  virtual ~TimeMonitor(){};
+
+ protected:
+  virtual string
+  getStringValue(const monitored_type& val) override;
+};
+}  // namespace util
 
 #endif  // UTIL_TIMEMONITOR_HPP

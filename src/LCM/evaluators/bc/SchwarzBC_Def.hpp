@@ -4,17 +4,18 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Albany_Application.hpp"
-#include "Albany_GenericSTKMeshStruct.hpp"
-#include "Albany_STKDiscretization.hpp"
-#include "Albany_ThyraUtils.hpp"
-#include "Albany_GlobalLocalIndexer.hpp"
-#include "SchwarzBC.hpp"
-
 #include <MiniTensor.h>
+
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>
 #include <Teuchos_TestForException.hpp>
+
+#include "Albany_Application.hpp"
+#include "Albany_GenericSTKMeshStruct.hpp"
+#include "Albany_GlobalLocalIndexer.hpp"
+#include "Albany_STKDiscretization.hpp"
+#include "Albany_ThyraUtils.hpp"
+#include "SchwarzBC.hpp"
 
 //
 // Generic Template Code for Constructor and PostRegistrationSetup
@@ -250,7 +251,8 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
 
   bool found = false;
 
-  auto coupled_ov_node_vs_indexer = Albany::createGlobalLocalIndexer(coupled_overlap_node_vs);
+  auto coupled_ov_node_vs_indexer =
+      Albany::createGlobalLocalIndexer(coupled_overlap_node_vs);
   for (auto workset = 0; workset < ws_elem_to_node_id.size(); ++workset) {
     std::string const& coupled_element_block = coupled_ws_eb_names[workset];
 

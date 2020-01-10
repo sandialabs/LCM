@@ -7,10 +7,10 @@
 #ifndef PHAL_CAHNHILLWRESID_HPP
 #define PHAL_CAHNHILLWRESID_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 
@@ -20,41 +20,41 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class CahnHillWResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-		    public PHX::EvaluatorDerived<EvalT, Traits>  {
-
-public:
-
+                       public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
   CahnHillWResid(const Teuchos::ParameterList& p);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-private:
-
-  typedef typename EvalT::ScalarT ScalarT;
+ private:
+  typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const MeshScalarT,Cell,Node,QuadPoint> wBF;
-  PHX::MDField<const RealType,Cell,Node,QuadPoint> BF;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> rhoDot;
-  PHX::MDField<const ScalarT,Cell,Node> rhoDotNode;
-  PHX::MDField<const MeshScalarT,Cell,Node,QuadPoint,Dim> wGradBF;
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> wGrad;
+  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
+  PHX::MDField<const RealType, Cell, Node, QuadPoint>         BF;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>                rhoDot;
+  PHX::MDField<const ScalarT, Cell, Node>                     rhoDotNode;
+  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           wGrad;
 
   // Output:
-  PHX::MDField<ScalarT,Cell,Node> wResidual;
+  PHX::MDField<ScalarT, Cell, Node> wResidual;
 
   unsigned int numQPs, numDims, numNodes, worksetSize;
 
   // lump mass matrix
   bool lump;
-
 };
-}
+}  // namespace PHAL
 
 #endif

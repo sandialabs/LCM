@@ -11,54 +11,57 @@
 
 /**
  *  \file VariableMonitor.hpp
- *  
- *  \brief 
+ *
+ *  \brief
  */
+
+#include <list>
 
 #include "MonitorBase.hpp"
 #include "string.hpp"
-#include <list>
 
 namespace util {
 
-class VariableHistory {
-public:
-  
-  VariableHistory (const string &name)
-      : m_name { name } {
-  }
-  
-  template<typename T>
-  void addValue (T&& val);
+class VariableHistory
+{
+ public:
+  VariableHistory(const string& name) : m_name{name} {}
 
-  const std::list<string>& getHistory () const {
+  template <typename T>
+  void
+  addValue(T&& val);
+
+  const std::list<string>&
+  getHistory() const
+  {
     return m_history;
   }
-  
-private:
-  
-  string m_name;
+
+ private:
+  string            m_name;
   std::list<string> m_history;
 };
 
-class VariableMonitor: public MonitorBase<VariableHistory> {
-public:
-  
-  VariableMonitor ();
-  virtual ~VariableMonitor () {
-  }
-  
-protected:
-  
-  virtual string getStringValue (const monitored_type& val) override;
+class VariableMonitor : public MonitorBase<VariableHistory>
+{
+ public:
+  VariableMonitor();
+  virtual ~VariableMonitor() {}
+
+ protected:
+  virtual string
+  getStringValue(const monitored_type& val) override;
 };
 
-template<typename T>
-inline void VariableHistory::addValue (T&& val) {
-  //TODO, when compiler allows, replace following with this for performance: m_history.emplace_back(to_string(std::forward<T>(val)));
+template <typename T>
+inline void
+VariableHistory::addValue(T&& val)
+{
+  // TODO, when compiler allows, replace following with this for performance:
+  // m_history.emplace_back(to_string(std::forward<T>(val)));
   m_history.push_back(to_string(std::forward<T>(val)));
 }
 
-}
+}  // namespace util
 
 #endif  // VARIABLEMONITOR_HPP_

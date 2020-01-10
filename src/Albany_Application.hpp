@@ -7,32 +7,28 @@
 #ifndef ALBANY_APPLICATION_HPP
 #define ALBANY_APPLICATION_HPP
 
-#include "Albany_config.h"
+#include <set>
 
+#include "AAdapt_AdaptiveSolutionManager.hpp"
+#include "Albany_AbstractDiscretization.hpp"
+#include "Albany_AbstractProblem.hpp"
+#include "Albany_AbstractResponseFunction.hpp"
+#include "Albany_DiscretizationFactory.hpp"
+#include "Albany_StateManager.hpp"
+#include "Albany_config.h"
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_Setup.hpp"
+#include "PHAL_Workset.hpp"
+#include "Sacado_ParameterAccessor.hpp"
+#include "Sacado_ParameterRegistration.hpp"
+#include "Sacado_ScalarParameterLibrary.hpp"
+#include "Sacado_ScalarParameterVector.hpp"
 #include "Teuchos_ArrayRCP.hpp"
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
 #include "Teuchos_SerialDenseMatrix.hpp"
 #include "Teuchos_TimeMonitor.hpp"
 #include "Teuchos_VerboseObject.hpp"
-
-#include "Albany_AbstractDiscretization.hpp"
-#include "Albany_AbstractProblem.hpp"
-#include "Albany_AbstractResponseFunction.hpp"
-#include "Albany_StateManager.hpp"
-
-#include "AAdapt_AdaptiveSolutionManager.hpp"
-#include "Albany_DiscretizationFactory.hpp"
-
-#include "Sacado_ParameterAccessor.hpp"
-#include "Sacado_ParameterRegistration.hpp"
-#include "Sacado_ScalarParameterLibrary.hpp"
-#include "Sacado_ScalarParameterVector.hpp"
-
-#include <set>
-#include "PHAL_AlbanyTraits.hpp"
-#include "PHAL_Setup.hpp"
-#include "PHAL_Workset.hpp"
 
 // Forward declarations.
 namespace AAdapt {
@@ -440,7 +436,9 @@ class Application
   //! Routine to get workset (bucket) size info needed by all Evaluation types
   template <typename EvalT>
   void
-  loadWorksetBucketInfo(PHAL::Workset& workset, const int& ws,
+  loadWorksetBucketInfo(
+      PHAL::Workset&     workset,
+      const int&         ws,
       const std::string& evalName);
 
   void
@@ -516,8 +514,10 @@ class Application
 
   template <typename EvalT>
   void
-  writePhalanxGraph(Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm,
-      const std::string& evalName, const int& phxGraphVisDetail);
+  writePhalanxGraph(
+      Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm,
+      const std::string&                                  evalName,
+      const int&                                          phxGraphVisDetail);
 
  public:
 #if defined(ALBANY_LCM)
@@ -553,7 +553,7 @@ class Application
   void
   setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params);
 
-  #if defined(ALBANY_LCM)
+#if defined(ALBANY_LCM)
   // Needed for coupled Schwarz
 
   void
@@ -858,7 +858,9 @@ class Application
 
 template <typename EvalT>
 void
-Application::loadWorksetBucketInfo(PHAL::Workset& workset, const int& ws,
+Application::loadWorksetBucketInfo(
+    PHAL::Workset&     workset,
+    const int&         ws,
     const std::string& evalName)
 {
   auto const& wsElNodeEqID       = disc->getWsElNodeEqID();
@@ -878,10 +880,10 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, const int& ws,
   workset.wsSphereVolume       = sphereVolume[ws];
   workset.wsLatticeOrientation = latticeOrientation[ws];
 #ifdef ALBANY_LCM
-  workset.boundary_indicator   = boundary_indicator[ws];
+  workset.boundary_indicator = boundary_indicator[ws];
 #endif
-  workset.EBName               = wsEBNames[ws];
-  workset.wsIndex              = ws;
+  workset.EBName  = wsEBNames[ws];
+  workset.wsIndex = ws;
 
   workset.local_Vp.resize(workset.numCells);
 

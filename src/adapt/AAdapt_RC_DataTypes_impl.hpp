@@ -20,43 +20,39 @@ namespace rc {
  *  and arg2 is a user's argument.
  */
 #ifdef ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE
-#define aadapt_rc_apply_to_all_ad_types(macro, arg2)    \
-  macro(RealType, arg2)                                 \
-  macro(FadType, arg2)                                  \
-  macro(TanFadType, arg2)
+#define aadapt_rc_apply_to_all_ad_types(macro, arg2) \
+  macro(RealType, arg2) macro(FadType, arg2) macro(TanFadType, arg2)
 #else
-#define aadapt_rc_apply_to_all_ad_types(macro, arg2)    \
-  macro(RealType, arg2)                                 \
-  macro(FadType, arg2)
+#define aadapt_rc_apply_to_all_ad_types(macro, arg2) \
+  macro(RealType, arg2) macro(FadType, arg2)
 #endif
 
 /*! aadapt_rc_apply_to_all_eval_types(macro) applies a macro to every evaluation
  *  type PHAL::AlbanyTraits defines.
  *
- * Note that we do not need to ETI PHAL::AlbanyTraits::Residual, as it is already a specialization in
- * AAdapt_RC_Manager.cpp (Indeed - doing so will cause an error) GAH
- * If this changes - need "macro(PHAL::AlbanyTraits::Residual)                   \"
+ * Note that we do not need to ETI PHAL::AlbanyTraits::Residual, as it is
+ * already a specialization in AAdapt_RC_Manager.cpp (Indeed - doing so will
+ * cause an error) GAH If this changes - need
+ * "macro(PHAL::AlbanyTraits::Residual)                   \"
  */
-#define aadapt_rc_apply_to_all_eval_types(macro)        \
-  macro(PHAL::AlbanyTraits::Jacobian)                   \
-  macro(PHAL::AlbanyTraits::Tangent)                    \
-  macro(PHAL::AlbanyTraits::DistParamDeriv)
+#define aadapt_rc_apply_to_all_eval_types(macro)                         \
+  macro(PHAL::AlbanyTraits::Jacobian) macro(PHAL::AlbanyTraits::Tangent) \
+      macro(PHAL::AlbanyTraits::DistParamDeriv)
 
 /*! Perform ETI for a class \code template<int rank> Class \endcode.
  */
-#define aadapt_rc_eti_class(Class)              \
-  template class Class<0>;                      \
-  template class Class<1>;                      \
+#define aadapt_rc_eti_class(Class) \
+  template class Class<0>;         \
+  template class Class<1>;         \
   template class Class<2>;
 /*! Apply \code aadapt_rc_apply_to_all_ad_types(eti, rank) \endcode to each \c
  *  rank.
  */
-#define aadapt_rc_apply_to_all_ad_types_all_ranks(macro)        \
-  aadapt_rc_apply_to_all_ad_types(macro, 0)                     \
-  aadapt_rc_apply_to_all_ad_types(macro, 1)                     \
-  aadapt_rc_apply_to_all_ad_types(macro, 2)
+#define aadapt_rc_apply_to_all_ad_types_all_ranks(macro)                     \
+  aadapt_rc_apply_to_all_ad_types(macro, 0) aadapt_rc_apply_to_all_ad_types( \
+      macro, 1) aadapt_rc_apply_to_all_ad_types(macro, 2)
 
-} // namespace rc
-} // namespace AAdapt
+}  // namespace rc
+}  // namespace AAdapt
 
-#endif // AADAPT_RC_DATATYPES_IMPL
+#endif  // AADAPT_RC_DATATYPES_IMPL

@@ -7,48 +7,57 @@
 #ifndef ALBANY_CONTACT_MANAGER_HPP
 #define ALBANY_CONTACT_MANAGER_HPP
 
-#include "Teuchos_RCP.hpp"
-#include "Albany_DataTypes.hpp"
 #include "Albany_AbstractDiscretization.hpp"
+#include "Albany_DataTypes.hpp"
 #include "Phalanx_DataLayout.hpp"
+#include "Teuchos_RCP.hpp"
 
 // Moertel-specific
+#include <fstream>
+#include <iostream>
+
 #include "Moertel_ManagerT.hpp"
 
-#include <iostream>
-#include <fstream>
+/** \brief This class implements the Mortar contact algorithm. Here is the
+   overall sketch of how things work:
 
+   General context: A workset of elements are processed to assemble local finite
+   element residual contributions that the opposite contacting surface will
+   impose on the current workset of elements.
 
-/** \brief This class implements the Mortar contact algorithm. Here is the overall sketch of how things work:
+   1. Fill in the master and slave contact surfaces from the discretization into
+   the Moertel Interface object.
 
-   General context: A workset of elements are processed to assemble local finite element residual contributions that
-   the opposite contacting surface will impose on the current workset of elements.
+   2. Work with Moertel to perform the nonlinear inequality constrained
+   optimization problem:
 
-   1. Fill in the master and slave contact surfaces from the discretization into the Moertel Interface object.
+      a) Do a global search to find all the slave segments that can potentially
+   intersect the master segments that this processor owns. The active set that
+   contribute to the mortar finite elements will change as the gap function G(x)
+   >= 0 changes each Newton iteration.
 
-   2. Work with Moertel to perform the nonlinear inequality constrained optimization problem:
+      b) For the elements in the mortar space, find the element surfaces that
+   are master surface segments. Do a local search to find the slave segments
+   that potentially intersect each master segment. Note that the master and
+   slave elements that contribute to each mortar element will change each Newton
+   iteration.
 
-      a) Do a global search to find all the slave segments that can potentially intersect the
-      master segments that this processor owns. The active set that contribute to the mortar finite elements
-      will change as the gap function G(x) >= 0 changes each Newton iteration.
+      c) Form the mortar integration space and assemble all the slave constraint
+   contributions into the master side locations residual and gap vectors. These
+   contributions are the M and D matrices that change each iteration of the
+   solve process.
 
-      b) For the elements in the mortar space, find the element surfaces that are master surface segments. Do a local
-         search to find the slave segments that potentially intersect each master segment. Note that the master and slave
-         elements that contribute to each mortar element will change each Newton iteration.
+    3. The feed a nonlinear solver like a Newton method by adding the M and D to
+   the rest of the nonlinear system. Need to employ something like
+   pseudotransient continuation - feasible direction, conditional gradient,
+   gradient projection or some such as G(x) >= 0 and x_k + d_k is not always
+   feasible.
 
-      c) Form the mortar integration space and assemble all the slave constraint contributions into the master side
-         locations residual and gap vectors. These contributions are the M and D matrices that change each iteration
-         of the solve process.
-
-    3. The feed a nonlinear solver like a Newton method by adding the M and D to the rest of the nonlinear system.
-       Need to employ something like pseudotransient continuation - feasible direction, conditional gradient, gradient
-       projection or some such as G(x) >= 0 and x_k + d_k is not always feasible.
-
-    4. Go back to 2 until convergence of the nonlinear inequality constrained problem is achieved.
+    4. Go back to 2 until convergence of the nonlinear inequality constrained
+   problem is achieved.
 
 
 */
-
 
 namespace Albany {
 
@@ -56,58 +65,65 @@ namespace Albany {
  * \brief This is a container class that implements mortar contact using Moertel
  *
  */
-class ContactManager {
+class ContactManager
+{
+ public:
+  ContactManager(
+      const Teuchos::RCP<Teuchos::ParameterList>& params,
+      const Albany::AbstractDiscretization&       disc,
+      const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>&
+          meshSpecs);
 
-  public:
+  //! Destructor
+  virtual ~ContactManager() {}
 
-    ContactManager(const Teuchos::RCP<Teuchos::ParameterList>& params,
-				const Albany::AbstractDiscretization& disc,
-				const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct> >& meshSpecs);
+  void
+  fillInMortarResidual(const int, Teuchos::ArrayRCP<ST>&);
 
-    //! Destructor
-    virtual ~ContactManager() {}
+ private:
+  ContactManager();
 
-    void fillInMortarResidual(const int, Teuchos::ArrayRCP<ST>&);
+  typedef Teuchos::Array<Teuchos::Array<GO>> WorksetContactNodes;
 
-  private:
+  WorksetContactNodes masterNodeGIDs;
+  WorksetContactNodes slaveNodeGIDs;
 
-    ContactManager();
+  void
+  processSS(
+      const int          ctr,
+      const std::string& sideSetName,
+      int                s_or_mortar,
+      int                mortarside,
+      WorksetContactNodes&,
+      std::ofstream& stream);
 
-    typedef Teuchos::Array<Teuchos::Array<GO> > WorksetContactNodes;
+  Teuchos::RCP<Teuchos::ParameterList> params;
 
-    WorksetContactNodes masterNodeGIDs;
-    WorksetContactNodes slaveNodeGIDs;
+  // Is this a contact problem?
+  bool have_contact;
 
-    void processSS(const int ctr, const std::string& sideSetName, int s_or_mortar,
-         int mortarside, WorksetContactNodes&, std::ofstream& stream );
+  Teuchos::Array<std::string>
+                              masterSideNames;  // master (non-mortar) side names
+  Teuchos::Array<std::string> slaveSideNames;   // slave (mortar) side names
+  Teuchos::Array<std::string> sideSetIDs;       // sideset ids
+  Teuchos::Array<std::string>
+      constrainedFields;  // names of fields to be constrained
 
-    Teuchos::RCP<Teuchos::ParameterList> params;
+  const Teuchos::ArrayRCP<double>&                                coordArray;
+  const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>& meshSpecs;
+  const Albany::AbstractDiscretization&                           disc;
 
-    // Is this a contact problem?
-    bool have_contact;
+  int probDim;
 
-    Teuchos::Array<std::string> masterSideNames;   // master (non-mortar) side names
-    Teuchos::Array<std::string> slaveSideNames;    // slave (mortar) side names
-    Teuchos::Array<std::string> sideSetIDs;        // sideset ids
-    Teuchos::Array<std::string> constrainedFields; // names of fields to be constrained
+  // Moertel-specific library data
+  Teuchos::RCP<MoertelT::ManagerT<ST, LO, Tpetra_GO, KokkosNode>>
+      moertelManager;
 
-    const Teuchos::ArrayRCP<double>& coordArray;
-    const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct> >& meshSpecs;
-    const Albany::AbstractDiscretization& disc;
+  std::ofstream sfile, mfile;
 
-    int probDim;
-
-
-    // Moertel-specific library data
-    Teuchos::RCP<MoertelT::ManagerT<ST, LO, Tpetra_GO, KokkosNode> > moertelManager;
-
-    std::ofstream sfile, mfile;
-
-    bool oneD;
-
-
+  bool oneD;
 };
 
-}
+}  // namespace Albany
 
-#endif // ALBANY_CONTACT_MANAGER_HPP
+#endif  // ALBANY_CONTACT_MANAGER_HPP

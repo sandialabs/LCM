@@ -12,28 +12,33 @@
 
 namespace Albany {
 
-class ObserverImpl : public StatelessObserverImpl {
-public:
+class ObserverImpl : public StatelessObserverImpl
+{
+ public:
   explicit ObserverImpl(const Teuchos::RCP<Application>& app);
 
-// #if defined(ALBANY_EPETRA)
-//   virtual void observeSolution(
-//     double stamp, const Epetra_Vector& nonOverlappedSolution,
-//     const Teuchos::Ptr<const Epetra_Vector>& nonOverlappedSolutionDot);
-// #endif
+  // #if defined(ALBANY_EPETRA)
+  //   virtual void observeSolution(
+  //     double stamp, const Epetra_Vector& nonOverlappedSolution,
+  //     const Teuchos::Ptr<const Epetra_Vector>& nonOverlappedSolutionDot);
+  // #endif
 
-  void observeSolution(
-    double stamp, const Thyra_Vector& nonOverlappedSolution,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDotDot) override;
+  void
+  observeSolution(
+      double                                  stamp,
+      const Thyra_Vector&                     nonOverlappedSolution,
+      const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot,
+      const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDotDot)
+      override;
 
-  void observeSolution(
-      double stamp, const Thyra_MultiVector& nonOverlappedSolution) override;
+  void
+  observeSolution(double stamp, const Thyra_MultiVector& nonOverlappedSolution)
+      override;
 
-  void parameterChanged(
-      const std::string& param);
+  void
+  parameterChanged(const std::string& param);
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_OBSERVER_IMPL_HPP
+#endif  // ALBANY_OBSERVER_IMPL_HPP

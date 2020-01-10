@@ -10,43 +10,44 @@
 #include <string>
 #include <vector>
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "PHAL_Dimension.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 #include "Sacado_Traits.hpp"
 
 namespace PHAL {
 
 //! Common area for standard source terms.
-namespace Source_Functions { template <typename EvalT, typename Traits> class Source_Base; }
+namespace Source_Functions {
+template <typename EvalT, typename Traits>
+class Source_Base;
+}
 
-template<typename EvalT, typename Traits>
-class Source :
-  public PHX::EvaluatorWithBaseImpl<Traits>,
-  public PHX::EvaluatorDerived<EvalT, Traits> {
-
-  typedef typename EvalT::ScalarT ScalarT;
+template <typename EvalT, typename Traits>
+class Source : public PHX::EvaluatorWithBaseImpl<Traits>,
+               public PHX::EvaluatorDerived<EvalT, Traits>
+{
+  typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-public:
-
+ public:
   // Phalanx evaluator methods
   Source(Teuchos::ParameterList& p);
   ~Source();
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData ud);
+  void
+  evaluateFields(typename Traits::EvalData ud);
 
-private:
-
-  std::vector<Source_Functions::Source_Base<EvalT,Traits>*> m_sources;
-
+ private:
+  std::vector<Source_Functions::Source_Base<EvalT, Traits>*> m_sources;
 };
-}
+}  // namespace PHAL
 
 #endif

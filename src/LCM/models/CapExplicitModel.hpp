@@ -7,6 +7,7 @@
 #define CapExplicitModel_hpp
 
 #include <MiniTensor.h>
+
 #include "Albany_Layouts.hpp"
 #include "ConstitutiveModel.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"

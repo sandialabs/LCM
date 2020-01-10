@@ -3,8 +3,7 @@
 
 #include <string>
 
-namespace Albany
-{
+namespace Albany {
 
 // Hard coding names for some fields that are used in many evaluators
 
@@ -24,6 +23,6 @@ static const std::string metric_det_name       = "Metric Det";
 static const std::string metric_inv_name       = "Metric Inv";
 static const std::string normal_name           = "Normal";
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_GENERAL_PURPOSE_FIELDS_NAMES_HPP
+#endif  // ALBANY_GENERAL_PURPOSE_FIELDS_NAMES_HPP

@@ -9,6 +9,7 @@
 
 #include <Sacado.hpp>
 #include <Teuchos_LAPACK.hpp>
+
 #include "PHAL_AlbanyTraits.hpp"
 
 namespace LCM {

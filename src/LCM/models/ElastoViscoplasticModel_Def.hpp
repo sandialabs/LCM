@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include <MiniTensor.h>
+
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"

@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include <MiniTensor.h>
+
 #include "Albany_MaterialDatabase.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"

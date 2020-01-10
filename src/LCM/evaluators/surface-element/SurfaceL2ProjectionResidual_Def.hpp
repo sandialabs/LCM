@@ -4,10 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
+#include <MiniTensor.h>
+
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
-
-#include <MiniTensor.h>
 
 // THESE NEED TO BE REMOVED!!!
 #include "Intrepid2_FunctionSpaceTools.hpp"

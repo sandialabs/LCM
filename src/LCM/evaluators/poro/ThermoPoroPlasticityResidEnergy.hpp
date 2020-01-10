@@ -7,13 +7,12 @@
 #ifndef THERMOPOROPLASTICITYRESIDENERGY_HPP
 #define THERMOPOROPLASTICITYRESIDENERGY_HPP
 
+#include "Intrepid2_CellTools.hpp"
+#include "Intrepid2_Cubature.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-
-#include "Intrepid2_CellTools.hpp"
-#include "Intrepid2_Cubature.hpp"
 
 namespace LCM {
 /** \brief

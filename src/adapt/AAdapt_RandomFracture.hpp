@@ -7,11 +7,10 @@
 #ifndef AADAPT_RANDOM_FRACTURE_HPP
 #define AADAPT_RANDOM_FRACTURE_HPP
 
-#include <Teuchos_ParameterList.hpp>
-#include <Teuchos_RCP.hpp>
-
 #include <PHAL_Dimension.hpp>
 #include <PHAL_Workset.hpp>
+#include <Teuchos_ParameterList.hpp>
+#include <Teuchos_RCP.hpp>
 
 #include "AAdapt_AbstractAdapter.hpp"
 
@@ -21,7 +20,7 @@
 
 // Forward declaration(s)
 namespace Albany {
-  class STKDiscretization;
+class STKDiscretization;
 }
 
 namespace AAdapt {
@@ -49,29 +48,32 @@ class RandomFracture : public AbstractAdapter
   ///
   /// Disallow copy and assignment and default
   ///
-  RandomFracture() = delete;
+  RandomFracture()                      = delete;
   RandomFracture(const RandomFracture&) = delete;
-  RandomFracture& operator=(const RandomFracture&) = delete;
+  RandomFracture&
+  operator=(const RandomFracture&) = delete;
 
   ///
   /// Check adaptation criteria to determine if the mesh needs
   /// adapting
   ///
-  bool queryAdaptationCriteria(int iteration) override;
+  bool
+  queryAdaptationCriteria(int iteration) override;
 
   ///
   /// Apply adaptation method to mesh and problem. Returns true if
   /// adaptation is performed successfully.
   ///
-  bool adaptMesh() override;
+  bool
+  adaptMesh() override;
 
   ///
   /// Each adapter must generate it's list of valid parameters
   ///
-  Teuchos::RCP<const Teuchos::ParameterList> getValidAdapterParameters() const override;
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidAdapterParameters() const override;
 
  private:
-
   void
   showTopLevelRelations();
 
@@ -151,4 +153,4 @@ class RandomFracture : public AbstractAdapter
 
 }  // namespace AAdapt
 
-#endif // AADAPT_RANDOM_FRACTURE_HPP
+#endif  // AADAPT_RANDOM_FRACTURE_HPP

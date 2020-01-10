@@ -7,12 +7,11 @@
 #ifndef HMCPROBLEM_HPP
 #define HMCPROBLEM_HPP
 
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
-
 #include "Albany_AbstractProblem.hpp"
 #include "Albany_MaterialDatabase.hpp"
 #include "ConstitutiveModelInterface.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 #ifdef ALBANY_ATO
 #include "ATO_OptimizationProblem.hpp"
@@ -173,13 +172,12 @@ class HMCProblem :
 #include "Albany_SolutionMaxValueResponseFunction.hpp"
 #include "Albany_SolutionTwoNormResponseFunction.hpp"
 #include "Albany_Utils.hpp"
-#include "FieldNameMap.hpp"
-#include "HMC_StrainDifference.hpp"
-#include "HMC_TotalStress.hpp"
-
 #include "DefGrad.hpp"
 #include "ElasticityResid.hpp"
+#include "FieldNameMap.hpp"
 #include "HMC_MicroResidual.hpp"
+#include "HMC_StrainDifference.hpp"
+#include "HMC_TotalStress.hpp"
 #include "PHAL_SaveCellStateField.hpp"
 #include "PHAL_SaveStateField.hpp"
 #include "Strain.hpp"
@@ -189,10 +187,10 @@ class HMCProblem :
 #include "ATO_TopologyWeighting.hpp"
 #endif
 
+#include <sstream>
+
 #include "ConstitutiveModelParameters.hpp"
 #include "Time.hpp"
-
-#include <sstream>
 
 template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>

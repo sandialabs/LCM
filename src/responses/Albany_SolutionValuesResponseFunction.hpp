@@ -9,7 +9,6 @@
 
 #include "Albany_SamplingBasedScalarResponseFunction.hpp"
 #include "Albany_Utils.hpp"
-
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
 
@@ -22,85 +21,95 @@ class CombineAndScatterManager;
 /*!
  * \brief Reponse function representing the average of the solution values
  */
-class SolutionValuesResponseFunction : public SamplingBasedScalarResponseFunction
+class SolutionValuesResponseFunction
+    : public SamplingBasedScalarResponseFunction
 {
-public:
-
+ public:
   //! Constructor
-  SolutionValuesResponseFunction(const Teuchos::RCP<const Application>& app,
-                                 Teuchos::ParameterList& responseParams);
+  SolutionValuesResponseFunction(
+      const Teuchos::RCP<const Application>& app,
+      Teuchos::ParameterList&                responseParams);
 
   //! Get the number of responses
-  unsigned int numResponses() const;
+  unsigned int
+  numResponses() const;
 
   //! Setup response function
-  void setup();
+  void
+  setup();
 
   //! Evaluate responses
-  void evaluateResponse(const double current_time,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& xdot,
-    const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-    const Teuchos::Array<ParamVec>& p,
-    const Teuchos::RCP<Thyra_Vector>& g);
+  void
+  evaluateResponse(
+      const double                            current_time,
+      const Teuchos::RCP<const Thyra_Vector>& x,
+      const Teuchos::RCP<const Thyra_Vector>& xdot,
+      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      const Teuchos::Array<ParamVec>&         p,
+      const Teuchos::RCP<Thyra_Vector>&       g);
 
   //! Evaluate tangent = dg/dx*dx/dp + dg/dxdot*dxdot/dp + dg/dp
-  void evaluateTangent(const double alpha,
-    const double beta,
-    const double omega,
-    const double current_time,
-    bool sum_derivs,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& xdot,
-    const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-    const Teuchos::Array<ParamVec>& p,
-    ParamVec* deriv_p,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vp,
-    const Teuchos::RCP<Thyra_Vector>& g,
-    const Teuchos::RCP<Thyra_MultiVector>& gx,
-    const Teuchos::RCP<Thyra_MultiVector>& gp);
+  void
+  evaluateTangent(
+      const double                                 alpha,
+      const double                                 beta,
+      const double                                 omega,
+      const double                                 current_time,
+      bool                                         sum_derivs,
+      const Teuchos::RCP<const Thyra_Vector>&      x,
+      const Teuchos::RCP<const Thyra_Vector>&      xdot,
+      const Teuchos::RCP<const Thyra_Vector>&      xdotdot,
+      const Teuchos::Array<ParamVec>&              p,
+      ParamVec*                                    deriv_p,
+      const Teuchos::RCP<const Thyra_MultiVector>& Vx,
+      const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
+      const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
+      const Teuchos::RCP<const Thyra_MultiVector>& Vp,
+      const Teuchos::RCP<Thyra_Vector>&            g,
+      const Teuchos::RCP<Thyra_MultiVector>&       gx,
+      const Teuchos::RCP<Thyra_MultiVector>&       gp);
 
   //! Evaluate gradient = dg/dx, dg/dxdot, dg/dp
-  void evaluateGradient(const double current_time,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& xdot,
-    const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-    const Teuchos::Array<ParamVec>& p,
-    ParamVec* deriv_p,
-    const Teuchos::RCP<Thyra_Vector>& g,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dx,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dxdot,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dxdotdot,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dp);
+  void
+  evaluateGradient(
+      const double                            current_time,
+      const Teuchos::RCP<const Thyra_Vector>& x,
+      const Teuchos::RCP<const Thyra_Vector>& xdot,
+      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      const Teuchos::Array<ParamVec>&         p,
+      ParamVec*                               deriv_p,
+      const Teuchos::RCP<Thyra_Vector>&       g,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dx,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdot,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdotdot,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp);
 
   //! Evaluate distributed parameter derivative dg/dp
-  void evaluateDistParamDeriv(
-    const double current_time,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& xdot,
-    const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-    const Teuchos::Array<ParamVec>& param_array,
-    const std::string& dist_param_name,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dp);
+  void
+  evaluateDistParamDeriv(
+      const double                            current_time,
+      const Teuchos::RCP<const Thyra_Vector>& x,
+      const Teuchos::RCP<const Thyra_Vector>& xdot,
+      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      const Teuchos::Array<ParamVec>&         param_array,
+      const std::string&                      dist_param_name,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp);
 
-private:
-
+ private:
   Teuchos::RCP<const Application> app_;
 
   Teuchos::RCP<SolutionCullingStrategyBase> cullingStrategy_;
 
-  Teuchos::RCP<Thyra_Vector>              culledVec;
-  Teuchos::RCP<CombineAndScatterManager>  cas_manager;
+  Teuchos::RCP<Thyra_Vector>             culledVec;
+  Teuchos::RCP<CombineAndScatterManager> cas_manager;
 
   class SolutionPrinter;
   Teuchos::RCP<SolutionPrinter> sol_printer_;
 
-  void updateCASManager();
+  void
+  updateCASManager();
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_SOLUTION_VALUES_RESPONSE_FUNCTION_HPP
+#endif  // ALBANY_SOLUTION_VALUES_RESPONSE_FUNCTION_HPP

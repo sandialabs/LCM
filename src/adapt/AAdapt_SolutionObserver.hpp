@@ -12,29 +12,31 @@
 
 namespace AAdapt {
 
-class SolutionObserver : public Piro::SolutionObserverBase<ST, const Thyra::VectorBase<ST> > {
-
-public:
-
+class SolutionObserver
+    : public Piro::SolutionObserverBase<ST, const Thyra::VectorBase<ST>>
+{
+ public:
   SolutionObserver() {}
 
-  void observeResponse(
-      int j,
-      const Teuchos::RCP<Thyra::ModelEvaluatorBase::OutArgs<ST> >& outArgs,
-      const Teuchos::RCP<Teuchos::Array<Teuchos::RCP<const Thyra::VectorBase<ST> > > > &responses,
-      const Teuchos::RCP<const Thyra::VectorBase<ST> > &g);
+  void
+  observeResponse(
+      int                                                         j,
+      const Teuchos::RCP<Thyra::ModelEvaluatorBase::OutArgs<ST>>& outArgs,
+      const Teuchos::RCP<
+          Teuchos::Array<Teuchos::RCP<const Thyra::VectorBase<ST>>>>& responses,
+      const Teuchos::RCP<const Thyra::VectorBase<ST>>&                g);
 
-  void set_g_vector(int j, const Teuchos::RCP<Thyra::VectorBase<ST> >& g_j);
+  void
+  set_g_vector(int j, const Teuchos::RCP<Thyra::VectorBase<ST>>& g_j);
 
   virtual ~SolutionObserver() {}
 
-private:
-
-    Teuchos::RCP<Thyra::ModelEvaluatorBase::OutArgs<ST> > outArgs;
-    Teuchos::RCP<Teuchos::Array<Teuchos::RCP<const Thyra::VectorBase<ST> > > > responses;
-
+ private:
+  Teuchos::RCP<Thyra::ModelEvaluatorBase::OutArgs<ST>> outArgs;
+  Teuchos::RCP<Teuchos::Array<Teuchos::RCP<const Thyra::VectorBase<ST>>>>
+      responses;
 };
 
-} // namespace Adapt
+}  // namespace AAdapt
 
 #endif /* AADAPT_SOLUTIONOBSERVER_HPP */

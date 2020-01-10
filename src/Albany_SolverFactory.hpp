@@ -8,18 +8,13 @@
 #define ALBANY_SOLVER_FACTORY_HPP
 
 #include "Albany_Application.hpp"
-
-#include "Thyra_ModelEvaluator.hpp"
-#include "Thyra_VectorBase.hpp"
-
 #include "Piro_ObserverBase.hpp"
-#include "Teuchos_SerialDenseVector.hpp"
-#include "Thyra_ModelEvaluator.hpp"
-#include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
-
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
 #include "Teuchos_SerialDenseVector.hpp"
+#include "Thyra_ModelEvaluator.hpp"
+#include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
+#include "Thyra_VectorBase.hpp"
 
 //! Albany driver code, problems, discretizations, and responses
 namespace Albany {
@@ -27,8 +22,9 @@ namespace Albany {
 /*!
  * \brief A factory class to instantiate AbstractSolver objects
  */
-class SolverFactory {
-public:
+class SolverFactory
+{
+ public:
   //! Default constructor
   SolverFactory(
       const std::string&                      inputfile,
@@ -39,28 +35,31 @@ public:
       const Teuchos::RCP<const Teuchos_Comm>&     comm);
 
   //! Destructor
-  virtual ~SolverFactory () = default;
+  virtual ~SolverFactory() = default;
 
   // Thyra version of above
   virtual Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
-  create (const Teuchos::RCP<const Teuchos_Comm>&  appComm,
-          const Teuchos::RCP<const Teuchos_Comm>&  solverComm,
-          const Teuchos::RCP<const Thyra_Vector>& initial_guess = Teuchos::null);
+  create(
+      const Teuchos::RCP<const Teuchos_Comm>& appComm,
+      const Teuchos::RCP<const Teuchos_Comm>& solverComm,
+      const Teuchos::RCP<const Thyra_Vector>& initial_guess = Teuchos::null);
 
   // Thyra version of above
   Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
-  createAndGetAlbanyApp (Teuchos::RCP<Application>&              albanyApp,
-                         const Teuchos::RCP<const Teuchos_Comm>& appComm,
-                         const Teuchos::RCP<const Teuchos_Comm>& solverComm,
-                         const Teuchos::RCP<const Thyra_Vector>& initial_guess   = Teuchos::null,
-                         bool                                    createAlbanyApp = true);
+  createAndGetAlbanyApp(
+      Teuchos::RCP<Application>&              albanyApp,
+      const Teuchos::RCP<const Teuchos_Comm>& appComm,
+      const Teuchos::RCP<const Teuchos_Comm>& solverComm,
+      const Teuchos::RCP<const Thyra_Vector>& initial_guess   = Teuchos::null,
+      bool                                    createAlbanyApp = true);
 
   // Thyra version of above
   Teuchos::RCP<Thyra::ModelEvaluator<ST>>
-  createAlbanyAppAndModel (Teuchos::RCP<Application>&              albanyApp,
-                           const Teuchos::RCP<const Teuchos_Comm>& appComm,
-                           const Teuchos::RCP<const Thyra_Vector>& initial_guess   = Teuchos::null,
-                           const bool                              createAlbanyApp = true);
+  createAlbanyAppAndModel(
+      Teuchos::RCP<Application>&              albanyApp,
+      const Teuchos::RCP<const Teuchos_Comm>& appComm,
+      const Teuchos::RCP<const Thyra_Vector>& initial_guess   = Teuchos::null,
+      const bool                              createAlbanyApp = true);
 
   Teuchos::ParameterList&
   getAnalysisParameters() const
@@ -80,20 +79,25 @@ public:
     is_schwarz_ = schwarz;
   }
 
-public:
+ public:
   // Functions to generate reference parameter lists for validation
   //  EGN 9/2013: made these three functions public, as they pertain to valid
   //    parameter lists for Albany::Application objects, which may get created
   //    apart from Albany::SolverFactory.  It may be better to relocate these
   //    to the Application class, or as functions "related to"
   //    Albany::Application.
-  Teuchos::RCP<const Teuchos::ParameterList>  getValidAppParameters()       const;
-  Teuchos::RCP<const Teuchos::ParameterList>  getValidDebugParameters()     const; 
-  Teuchos::RCP<const Teuchos::ParameterList>  getValidScalingParameters()   const; 
-  Teuchos::RCP<const Teuchos::ParameterList>  getValidParameterParameters() const;
-  Teuchos::RCP<const Teuchos::ParameterList>  getValidResponseParameters()  const;
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidAppParameters() const;
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidDebugParameters() const;
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidScalingParameters() const;
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidParameterParameters() const;
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidResponseParameters() const;
 
-private:
+ private:
   // Private functions to set default parameter values
   void
   setSolverParamDefaults(Teuchos::ParameterList* appParams, int myRank);
@@ -101,20 +105,23 @@ private:
   Teuchos::RCP<const Teuchos::ParameterList>
   getValidRegressionResultsParameters() const;
 
-public:
-  int checkSolveTestResults(
-      int                                           response_index,
-      int                                           parameter_index,
-      const Teuchos::RCP<const Thyra_Vector>&       g,
-      const Teuchos::RCP<const Thyra_MultiVector>&  dgdp) const;
+ public:
+  int
+  checkSolveTestResults(
+      int                                          response_index,
+      int                                          parameter_index,
+      const Teuchos::RCP<const Thyra_Vector>&      g,
+      const Teuchos::RCP<const Thyra_MultiVector>& dgdp) const;
 
   /** \brief Function that does regression testing for Dakota runs. */
-  int checkDakotaTestResults(
+  int
+  checkDakotaTestResults(
       int                                            response_index,
       const Teuchos::SerialDenseVector<int, double>* drdv) const;
 
   /** \brief Function that does regression testing for Analysis runs. */
-  int checkAnalysisTestResults(
+  int
+  checkAnalysisTestResults(
       int                                            response_index,
       const Teuchos::RCP<Thyra::VectorBase<double>>& tvec) const;
 
@@ -130,25 +137,30 @@ public:
     return observer_;
   };
 
-private:
+ private:
   /** \brief Testing utility that compares two numbers using two tolerances */
-  bool scaledCompare (double             x1,
-                      double             x2,
-                      double             relTol,
-                      double             absTol,
-                      std::string const& name) const;
+  bool
+  scaledCompare(
+      double             x1,
+      double             x2,
+      double             relTol,
+      double             absTol,
+      std::string const& name) const;
 
-  Teuchos::ParameterList*   getTestParameters(int response_index) const;
+  Teuchos::ParameterList*
+  getTestParameters(int response_index) const;
 
-  void storeTestResults (Teuchos::ParameterList* testParams,
-                         int                     failures,
-                         int                     comparisons) const;
+  void
+  storeTestResults(
+      Teuchos::ParameterList* testParams,
+      int                     failures,
+      int                     comparisons) const;
 
   Teuchos::RCP<Thyra::ModelEvaluator<ST>> model_;
 
   Teuchos::RCP<Piro::ObserverBase<double>> observer_;
 
-protected:
+ protected:
   //! Parameter list specifying what solver to create
   Teuchos::RCP<Teuchos::ParameterList> appParams;
 
@@ -159,4 +171,4 @@ protected:
 
 }  // namespace Albany
 
-#endif // ALBANY_SOLVER_FACTORY_HPP
+#endif  // ALBANY_SOLVER_FACTORY_HPP

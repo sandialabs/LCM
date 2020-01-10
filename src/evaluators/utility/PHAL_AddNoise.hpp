@@ -7,39 +7,40 @@
 #ifndef PHAL_ADD_NOISE_HPP
 #define PHAL_ADD_NOISE_HPP 1
 
-#include <memory> // std::unique_ptr
+#include <memory>  // std::unique_ptr
 #include <random>
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
-namespace PHAL
-{
+namespace PHAL {
 
 /** \brief Field Norm Evaluator
 
     This evaluator evaluates the norm of a field
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
+template <typename EvalT, typename Traits, typename ScalarT>
 class AddNoiseBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  AddNoiseBase(const Teuchos::ParameterList& p);
 
-  AddNoiseBase (const Teuchos::ParameterList& p);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& fm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& fm);
+  void
+  preEvaluate(typename Traits::PreEvalData d);
 
-  void preEvaluate(typename Traits::PreEvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields(typename Traits::EvalData d);
-
-private:
-
+ private:
   // Input:
   PHX::MDField<const ScalarT> field;
 
@@ -47,7 +48,11 @@ private:
   PHX::MDField<ScalarT> noisy_field;
   PHX::MDField<ScalarT> field_eval;
 
-  enum PDFType {UNIFORM, NORMAL};
+  enum PDFType
+  {
+    UNIFORM,
+    NORMAL
+  };
   PDFType pdf_type;
 
   std::default_random_engine                              generator;
@@ -57,7 +62,7 @@ private:
   double rel_noise;
   double abs_noise;
 
-  int seed;
+  int  seed;
   bool reset_seed_pre_eval;
   bool noise_free;
 
@@ -65,14 +70,14 @@ private:
 };
 
 // Some shortcut names
-template<typename EvalT, typename Traits>
-using AddNoise = AddNoiseBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using AddNoise = AddNoiseBase<EvalT, Traits, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using AddNoiseMesh = AddNoiseBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using AddNoiseMesh = AddNoiseBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using AddNoiseParam = AddNoiseBase<EvalT,Traits,typename EvalT::ParamScalarT>;
-} // Namespace PHAL
+template <typename EvalT, typename Traits>
+using AddNoiseParam = AddNoiseBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+}  // Namespace PHAL
 
-#endif // PHAL_ADD_NOISE_HPP
+#endif  // PHAL_ADD_NOISE_HPP

@@ -7,16 +7,14 @@
 #ifndef PHAL_SIDE_QUAD_POINT_TO_SIDE_INTERPOLATION_HPP
 #define PHAL_SIDE_QUAD_POINT_TO_SIDE_INTERPOLATION_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
 #include "Albany_SacadoTypes.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
-namespace PHAL
-{
+namespace PHAL {
 /** \brief Average from Qp to Side
 
     This evaluator averages the quadrature points values to
@@ -24,48 +22,63 @@ namespace PHAL
 
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
-class SideQuadPointsToSideInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                              public PHX::EvaluatorDerived<EvalT, Traits>
+template <typename EvalT, typename Traits, typename ScalarT>
+class SideQuadPointsToSideInterpolationBase
+    : public PHX::EvaluatorWithBaseImpl<Traits>,
+      public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  SideQuadPointsToSideInterpolationBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl_side);
 
-  SideQuadPointsToSideInterpolationBase (const Teuchos::ParameterList& p,
-                                         const Teuchos::RCP<Albany::Layouts>& dl_side);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& fm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& fm);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields(typename Traits::EvalData d);
-
-private:
-
+ private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT,MeshScalarT>::type OutputScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
+      OutputScalarT;
 
-  int fieldDim;
+  int              fieldDim;
   std::vector<int> dims;
 
   std::string sideSetName;
 
   // Input:
-  PHX::MDField<const ScalarT>                         field_qp;
-  PHX::MDField<const MeshScalarT,Cell,Side,QuadPoint> w_measure;
+  PHX::MDField<const ScalarT>                            field_qp;
+  PHX::MDField<const MeshScalarT, Cell, Side, QuadPoint> w_measure;
 
   // Output:
-  PHX::MDField<OutputScalarT>                         field_side;
+  PHX::MDField<OutputScalarT> field_side;
 };
 
 // Some shortcut names
-template<typename EvalT, typename Traits>
-using SideQuadPointsToSideInterpolation = SideQuadPointsToSideInterpolationBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using SideQuadPointsToSideInterpolation = SideQuadPointsToSideInterpolationBase<
+    EvalT,
+    Traits,
+    typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using SideQuadPointsToSideInterpolationMesh = SideQuadPointsToSideInterpolationBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using SideQuadPointsToSideInterpolationMesh =
+    SideQuadPointsToSideInterpolationBase<
+        EvalT,
+        Traits,
+        typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using SideQuadPointsToSideInterpolationParam = SideQuadPointsToSideInterpolationBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using SideQuadPointsToSideInterpolationParam =
+    SideQuadPointsToSideInterpolationBase<
+        EvalT,
+        Traits,
+        typename EvalT::ParamScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_SIDE_QUAD_POINT_TO_SIDE_INTERPOLATION_HPP
+#endif  // PHAL_SIDE_QUAD_POINT_TO_SIDE_INTERPOLATION_HPP

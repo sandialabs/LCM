@@ -7,36 +7,35 @@
 #ifndef PHAL_LOAD_SIDE_SET_STATE_FIELD_HPP
 #define PHAL_LOAD_SIDE_SET_STATE_FIELD_HPP 1
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "PHAL_Utilities.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 #include "Teuchos_ParameterList.hpp"
 
-namespace PHAL
-{
+namespace PHAL {
 /** \brief LoadSideSetStatField
 
 */
 
-template<typename EvalT, typename Traits, typename ScalarType>
+template <typename EvalT, typename Traits, typename ScalarType>
 class LoadSideSetStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                   public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  LoadSideSetStateFieldBase(const Teuchos::ParameterList& p);
 
-  LoadSideSetStateFieldBase (const Teuchos::ParameterList& p);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& fm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& fm);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields (typename Traits::EvalData d);
-
-private:
-
-  PHX::MDField<ScalarType>              field;
+ private:
+  PHX::MDField<ScalarType> field;
 
   std::string sideSetName;
   std::string fieldName;
@@ -45,22 +44,27 @@ private:
   MDFieldMemoizer<Traits> memoizer;
 };
 
-template<typename EvalT, typename Traits>
-using LoadSideSetStateFieldST = LoadSideSetStateFieldBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using LoadSideSetStateFieldST =
+    LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using LoadSideSetStateFieldPST = LoadSideSetStateFieldBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using LoadSideSetStateFieldPST =
+    LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
-template<typename EvalT, typename Traits>
-using LoadSideSetStateFieldMST = LoadSideSetStateFieldBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using LoadSideSetStateFieldMST =
+    LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using LoadSideSetStateFieldRT = LoadSideSetStateFieldBase<EvalT,Traits,RealType>;
+template <typename EvalT, typename Traits>
+using LoadSideSetStateFieldRT =
+    LoadSideSetStateFieldBase<EvalT, Traits, RealType>;
 
 // The default is the ParamScalarT
-template<typename EvalT, typename Traits>
-using LoadSideSetStateField = LoadSideSetStateFieldBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using LoadSideSetStateField =
+    LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_LOAD_SIDE_SET_STATE_FIELD_HPP
+#endif  // PHAL_LOAD_SIDE_SET_STATE_FIELD_HPP

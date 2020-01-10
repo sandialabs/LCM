@@ -7,17 +7,16 @@
 #ifndef PHAL_LANGEVINNOISETERM_HPP
 #define PHAL_LANGEVINNOISETERM_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
-
+#include "Phalanx_config.hpp"
 #include "QCAD_EvaluatorTools.hpp"
 
 // Random and Gaussian number distribution
 #include <boost/random.hpp>
-#include <boost/random/normal_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
+#include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
 /** \brief Finite Element Interpolation Evaluator
@@ -27,51 +26,55 @@
 */
 namespace PHAL {
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
-	     public PHX::EvaluatorDerived<EvalT, Traits>,
-       public QCAD::EvaluatorTools<EvalT, Traits>
+                          public PHX::EvaluatorDerived<EvalT, Traits>,
+                          public QCAD::EvaluatorTools<EvalT, Traits>
 {
-
-public:
-
+ public:
   typedef typename EvalT::ScalarT ScalarT;
 
   LangevinNoiseTerm(const Teuchos::ParameterList& p);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  ScalarT& getValue(const std::string &n);
+  ScalarT&
+  getValue(const std::string& n);
 
-
-private:
- 
+ private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT,Cell,QuadPoint> rho;
-  
+  PHX::MDField<const ScalarT, Cell, QuadPoint> rho;
+
   // Output:
-  PHX::MDField<ScalarT,Cell,QuadPoint> noiseTerm;
+  PHX::MDField<ScalarT, Cell, QuadPoint> noiseTerm;
 
   unsigned int numQPs, numDims, numNodes;
 
-  ScalarT sd;
+  ScalarT             sd;
   Teuchos::Array<int> duration;
 
-  boost::mt19937 rng;
-  Teuchos::RCP<boost::normal_distribution<double> > nd;
-  Teuchos::RCP<boost::variate_generator<boost::mt19937&, boost::normal_distribution<double> > > var_nor;
-//  Teuchos::RCP<boost::normal_distribution<ScalarT> > nd;
-//  Teuchos::RCP<boost::variate_generator<boost::mt19937&, boost::normal_distribution<ScalarT> > > var_nor;
+  boost::mt19937                                   rng;
+  Teuchos::RCP<boost::normal_distribution<double>> nd;
+  Teuchos::RCP<boost::variate_generator<
+      boost::mt19937&,
+      boost::normal_distribution<double>>>
+      var_nor;
+  //  Teuchos::RCP<boost::normal_distribution<ScalarT> > nd;
+  //  Teuchos::RCP<boost::variate_generator<boost::mt19937&,
+  //  boost::normal_distribution<ScalarT> > > var_nor;
 
   // generate seed convenience function
-  long seedgen();
-
+  long
+  seedgen();
 };
-}
+}  // namespace PHAL
 
 #endif

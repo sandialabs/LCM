@@ -4,7 +4,6 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_SIMMESHSTRUCT_HPP
 #define ALBANY_SIMMESHSTRUCT_HPP
 
@@ -12,27 +11,25 @@
 
 namespace Albany {
 
-class SimMeshStruct : public APFMeshStruct {
+class SimMeshStruct : public APFMeshStruct
+{
+ public:
+  SimMeshStruct(
+      const Teuchos::RCP<Teuchos::ParameterList>& params,
+      const Teuchos::RCP<const Teuchos_Comm>&     commT);
 
-  public:
+  ~SimMeshStruct();
 
-    SimMeshStruct(
-                  const Teuchos::RCP<Teuchos::ParameterList>& params,
-                  const Teuchos::RCP<const Teuchos_Comm>& commT);
+  msType
+  meshSpecsType();
 
-    ~SimMeshStruct();
+  virtual apf::Field*
+  createNodalField(char const* name, int valueType);
 
-    msType meshSpecsType();
-
-    virtual apf::Field* createNodalField(char const* name, int valueType);
-
-private:
-
-    Teuchos::RCP<const Teuchos::ParameterList>
-      getValidDiscretizationParameters() const;
-
+ private:
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidDiscretizationParameters() const;
 };
 
-}
+}  // namespace Albany
 #endif
-

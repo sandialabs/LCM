@@ -11,31 +11,43 @@
 
 namespace AAdapt {
 
-class ScaledSizeField : public MeshAdaptMethod {
-public:
-
+class ScaledSizeField : public MeshAdaptMethod
+{
+ public:
   ScaledSizeField(const Teuchos::RCP<Albany::APFDiscretization>& disc);
 
   ~ScaledSizeField() = default;
 
-  void adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_);
+  void
+  adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_);
 
-  void setParams(const Teuchos::RCP<Teuchos::ParameterList>& p);
+  void
+  setParams(const Teuchos::RCP<Teuchos::ParameterList>& p);
 
-  void preProcessShrunkenMesh();
+  void
+  preProcessShrunkenMesh();
 
-  void preProcessOriginalMesh();
-  void postProcessFinalMesh() {}
-  void postProcessShrunkenMesh() {}
+  void
+  preProcessOriginalMesh();
+  void
+  postProcessFinalMesh()
+  {
+  }
+  void
+  postProcessShrunkenMesh()
+  {
+  }
 
   class ScaledIsoFunc : public ma::IsotropicFunction
   {
-  public:
+   public:
     virtual ~ScaledIsoFunc() = default;
 
-/** \brief get the desired element size at this vertex */
+    /** \brief get the desired element size at this vertex */
 
-    virtual double getValue(ma::Entity* /* vert */){
+    virtual double
+    getValue(ma::Entity* /* vert */)
+    {
       return factor_ * averageEdgeLength_;
     }
 
@@ -45,7 +57,6 @@ public:
   } scaledIsoFunc;
 };
 
-} // namespace AAdapt
+}  // namespace AAdapt
 
-#endif // AADAPT_SCALED_SIZE_FIELD_HPP
-
+#endif  // AADAPT_SCALED_SIZE_FIELD_HPP

@@ -7,12 +7,11 @@
 #ifndef CURRENTCOORDS_HPP
 #define CURRENTCOORDS_HPP
 
+#include "Albany_Layouts.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-
-#include "Albany_Layouts.hpp"
 
 namespace LCM {
 /** \brief

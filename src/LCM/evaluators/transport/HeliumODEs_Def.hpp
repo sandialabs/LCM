@@ -4,11 +4,12 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include <MiniTensor.h>
+
 #include <Phalanx_DataLayout.hpp>
 #include <Teuchos_TestForException.hpp>
-#include "Albany_MaterialDatabase.hpp"
-
 #include <cmath>
+
+#include "Albany_MaterialDatabase.hpp"
 
 namespace LCM {
 

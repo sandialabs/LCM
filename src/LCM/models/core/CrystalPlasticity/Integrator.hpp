@@ -8,6 +8,7 @@
 #define Core_Integrator_hpp
 
 #include <ROL_MiniTensor_MiniSolver.hpp>
+
 #include "CrystalPlasticityFwd.hpp"
 #include "NOX_StatusTest_ModelEvaluatorFlag.h"
 #include "NonlinearSolver.hpp"

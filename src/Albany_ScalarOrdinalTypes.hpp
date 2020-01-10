@@ -9,9 +9,9 @@
 
 #include <cstdint>
 
-typedef double        RealType;
-typedef RealType      ST;
-typedef std::int64_t  GO;
-typedef std::int32_t  LO;
+typedef double       RealType;
+typedef RealType     ST;
+typedef std::int64_t GO;
+typedef std::int32_t LO;
 
-#endif // ALBANY_SCALAR_ORDINAL_TYPES_HPP
+#endif  // ALBANY_SCALAR_ORDINAL_TYPES_HPP

@@ -4,10 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
+#include <Phalanx_Evaluator_Factory.hpp>
+
 #include "Albany_BCUtils.hpp"
 #include "Albany_Macros.hpp"
-
-#include <Phalanx_Evaluator_Factory.hpp>
 
 namespace {
 const char decorator[] = "Evaluator for ";

@@ -7,13 +7,12 @@
 #ifndef PHAL_DOFTENSORGRAD_INTERPOLATION_HPP
 #define PHAL_DOFTENSORGRAD_INTERPOLATION_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
 #include "Albany_SacadoTypes.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element InterpolationBase Evaluator
@@ -23,34 +22,38 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
-class DOFTensorGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                       public PHX::EvaluatorDerived<EvalT, Traits>
+template <typename EvalT, typename Traits, typename ScalarT>
+class DOFTensorGradInterpolationBase
+    : public PHX::EvaluatorWithBaseImpl<Traits>,
+      public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  DOFTensorGradInterpolationBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  DOFTensorGradInterpolationBase(const Teuchos::ParameterList& p,
-                                 const Teuchos::RCP<Albany::Layouts>& dl);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                             PHX::FieldManager<Traits>& vm);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields(typename Traits::EvalData d);
-
-protected:
-
+ protected:
   typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT,MeshScalarT>::type OutputScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
+      OutputScalarT;
 
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT,Cell,Node,VecDim,VecDim> val_node;
+  PHX::MDField<const ScalarT, Cell, Node, VecDim, VecDim> val_node;
   //! Basis Functions
-  PHX::MDField<const MeshScalarT,Cell,Node,QuadPoint,Dim> GradBF;
+  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> GradBF;
 
   // Output:
   //! Values at quadrature points
-  PHX::MDField<OutputScalarT,Cell,QuadPoint,VecDim,VecDim,Dim> grad_val_qp;
+  PHX::MDField<OutputScalarT, Cell, QuadPoint, VecDim, VecDim, Dim> grad_val_qp;
 
   std::size_t numNodes;
   std::size_t numQPs;
@@ -60,59 +63,88 @@ protected:
 
 /** \brief Fast Finite Element Interpolation Evaluator
 
-    This evaluator interpolates nodal DOF values to their gradients at quad points.
-    It is an optimized version of DOFTensorGradInterpolationBase that exploits the sparsity pattern of the derivatives in the Jacobian evaluation
-    WARNING: it does not work for general fields: it works when the field to be interpolated is the solution
-             or a part (a few contiguous components) of the solution
-             It does not work when the mesh coordinates are of type ScalarT
+    This evaluator interpolates nodal DOF values to their gradients at quad
+   points. It is an optimized version of DOFTensorGradInterpolationBase that
+   exploits the sparsity pattern of the derivatives in the Jacobian evaluation
+    WARNING: it does not work for general fields: it works when the field to be
+   interpolated is the solution or a part (a few contiguous components) of the
+   solution It does not work when the mesh coordinates are of type ScalarT
 */
 
-template<typename EvalT, typename Traits, typename ScalarT>
-class FastSolutionTensorGradInterpolationBase : public DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>
+template <typename EvalT, typename Traits, typename ScalarT>
+class FastSolutionTensorGradInterpolationBase
+    : public DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>
 {
-public:
-
-  FastSolutionTensorGradInterpolationBase(const Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
-    : DOFTensorGradInterpolationBase<EvalT, Traits,  ScalarT>(p, dl) {
-    this->setName("FastSolutionTensorGradInterpolationBase"+PHX::print<EvalT>());
+ public:
+  FastSolutionTensorGradInterpolationBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl)
+      : DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>(p, dl)
+  {
+    this->setName(
+        "FastSolutionTensorGradInterpolationBase" + PHX::print<EvalT>());
   };
 
-  void postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm) {
-    DOFTensorGradInterpolationBase<EvalT, Traits,  ScalarT>::postRegistrationSetup(d, vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm)
+  {
+    DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::
+        postRegistrationSetup(d, vm);
   }
 
-  void evaluateFields(typename Traits::EvalData d) {
-    DOFTensorGradInterpolationBase<EvalT, Traits,  ScalarT>::evaluateFields(d);
+  void
+  evaluateFields(typename Traits::EvalData d)
+  {
+    DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(d);
   }
 };
 
-
 //! Specialization for Jacobian evaluation taking advantage of known sparsity
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
-template<typename Traits>
-class FastSolutionTensorGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
-  : public DOFTensorGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+template <typename Traits>
+class FastSolutionTensorGradInterpolationBase<
+    PHAL::AlbanyTraits::Jacobian,
+    Traits,
+    typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+    : public DOFTensorGradInterpolationBase<
+          PHAL::AlbanyTraits::Jacobian,
+          Traits,
+          typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
-public:
-
-  FastSolutionTensorGradInterpolationBase(const Teuchos::ParameterList& p,
-                              const Teuchos::RCP<Albany::Layouts>& dl)
-    : DOFTensorGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits,  typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl) {
-    this->setName("FastSolutionTensorGradInterpolationBase"+PHX::print<PHAL::AlbanyTraits::Jacobian>());
+ public:
+  FastSolutionTensorGradInterpolationBase(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl)
+      : DOFTensorGradInterpolationBase<
+            PHAL::AlbanyTraits::Jacobian,
+            Traits,
+            typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
+  {
+    this->setName(
+        "FastSolutionTensorGradInterpolationBase" +
+        PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
   };
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm) {
-    DOFTensorGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits,  typename PHAL::AlbanyTraits::Jacobian::ScalarT>
-      ::postRegistrationSetup(d, vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm)
+  {
+    DOFTensorGradInterpolationBase<
+        PHAL::AlbanyTraits::Jacobian,
+        Traits,
+        typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
+        postRegistrationSetup(d, vm);
   }
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-private:
-
-  typedef PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
+ private:
+  typedef PHAL::AlbanyTraits::Jacobian::ScalarT     ScalarT;
   typedef PHAL::AlbanyTraits::Jacobian::MeshScalarT MeshScalarT;
 
   std::size_t offset;
@@ -120,18 +152,25 @@ private:
 #endif
 
 // Some shortcut names
-template<typename EvalT, typename Traits>
-using DOFTensorGradInterpolation = DOFTensorGradInterpolationBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using DOFTensorGradInterpolation =
+    DOFTensorGradInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFTensorGradInterpolationMesh = DOFTensorGradInterpolationBase<EvalT,Traits,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using DOFTensorGradInterpolationMesh =
+    DOFTensorGradInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using DOFTensorGradInterpolationParam = DOFTensorGradInterpolationBase<EvalT,Traits,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using DOFTensorGradInterpolationParam =
+    DOFTensorGradInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
-template<typename EvalT, typename Traits>
-using FastSolutionTensorGradInterpolation = FastSolutionTensorGradInterpolationBase<EvalT,Traits,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using FastSolutionTensorGradInterpolation =
+    FastSolutionTensorGradInterpolationBase<
+        EvalT,
+        Traits,
+        typename EvalT::ScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_DOFTENSORGRAD_INTERPOLATION_HPP
+#endif  // PHAL_DOFTENSORGRAD_INTERPOLATION_HPP

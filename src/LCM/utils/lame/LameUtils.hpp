@@ -6,10 +6,9 @@
 #ifndef LAME_UTILS_HPP
 #define LAME_UTILS_HPP
 
+#include "Albany_config.h"
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
-
-#include "Albany_config.h"
 
 // LAME material model base class
 #ifdef ALBANY_LAME
@@ -20,6 +19,7 @@ typedef lame::matParams LameMatParams;
 #endif
 #ifdef ALBANY_LAMENT
 #include <models/Lament_Material.h>
+
 #include "models/Lament_ElasticNew.h"
 #include "models/Lament_Neohookean.h"
 typedef lament::MatProps         LameMatProps;

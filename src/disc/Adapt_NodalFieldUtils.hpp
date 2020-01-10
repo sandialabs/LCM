@@ -12,15 +12,16 @@
 
 namespace Adapt {
 
-struct NodeFieldSize {
+struct NodeFieldSize
+{
   std::string name;
-  int offset;
-  int ndofs;
+  int         offset;
+  int         ndofs;
 };
 
-typedef std::vector<NodeFieldSize> NodeFieldSizeVector;
+typedef std::vector<NodeFieldSize>               NodeFieldSizeVector;
 typedef std::map<const std::string, std::size_t> NodeFieldSizeMap;
 
-}
+}  // namespace Adapt
 
-#endif // ADAPT_NODAL_FIELD_UTILS_HPP
+#endif  // ADAPT_NODAL_FIELD_UTILS_HPP

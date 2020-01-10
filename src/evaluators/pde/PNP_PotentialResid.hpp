@@ -7,12 +7,11 @@
 #ifndef PNP_POISSONRESID_HPP
 #define PNP_POISSONRESID_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PNP {
 /** \brief Finite Element Interpolation Evaluator
@@ -21,38 +20,40 @@ namespace PNP {
 
 */
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class PotentialResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-		    public PHX::EvaluatorDerived<EvalT, Traits>  {
+                       public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
+  PotentialResid(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-public:
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  PotentialResid(const Teuchos::ParameterList& p,
-                 const Teuchos::RCP<Albany::Layouts>& dl);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
-
-  void evaluateFields(typename Traits::EvalData d);
-
-private:
-
-  typedef typename EvalT::ScalarT ScalarT;
+ private:
+  typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const MeshScalarT,Cell,Node,QuadPoint> wBF;
-  PHX::MDField<const MeshScalarT,Cell,Node,QuadPoint,Dim> wGradBF;
-  PHX::MDField<const ScalarT,Cell,QuadPoint,Dim> PotentialGrad;
-  PHX::MDField<const ScalarT,Cell,QuadPoint,VecDim> Concentration;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> Permittivity;
+  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
+  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           PotentialGrad;
+  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim>        Concentration;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>                Permittivity;
 
   // Output:
-  PHX::MDField<ScalarT,Cell,Node> PotentialResidual;
+  PHX::MDField<ScalarT, Cell, Node> PotentialResidual;
 
-  int numNodes, numQPs, numSpecies;
-  std::vector<double> q; // Placeholder for charges
+  int                 numNodes, numQPs, numSpecies;
+  std::vector<double> q;  // Placeholder for charges
 };
-}
+}  // namespace PNP
 
 #endif

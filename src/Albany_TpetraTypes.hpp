@@ -23,14 +23,14 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #include "TpetraCore_config.h"
-#include "Tpetra_Map.hpp"
 #include "Tpetra_CrsGraph.hpp"
 #include "Tpetra_CrsMatrix.hpp"
 #include "Tpetra_DistObject.hpp"
-#include "Tpetra_Operator.hpp"
-#include "Tpetra_Import.hpp"
 #include "Tpetra_Export.hpp"
+#include "Tpetra_Import.hpp"
+#include "Tpetra_Map.hpp"
 #include "Tpetra_MultiVector.hpp"
+#include "Tpetra_Operator.hpp"
 #if defined(ALBANY_LCM)
 #pragma GCC diagnostic pop
 #endif
@@ -40,28 +40,34 @@
 #endif
 
 typedef int Tpetra_LO;
-#if defined( HAVE_TPETRA_INST_INT_LONG_LONG )
+#if defined(HAVE_TPETRA_INST_INT_LONG_LONG)
 typedef long long Tpetra_GO;
-#elif defined( HAVE_TPETRA_INST_INT_LONG )
-static_assert(sizeof(long) == sizeof(GO),
+#elif defined(HAVE_TPETRA_INST_INT_LONG)
+static_assert(
+    sizeof(long) == sizeof(GO),
     "Tpetra's biggest enabled GlobalOrdinal is long but thats not 64 bit");
 typedef long Tpetra_GO;
-#elif defined( HAVE_TPETRA_INST_INT_UNSIGNED_LONG )
-static_assert(sizeof(unsigned long) == sizeof(GO),
-    "Tpetra's biggest enabled GlobalOrdinal is unsigned long but thats not 64 bit");
+#elif defined(HAVE_TPETRA_INST_INT_UNSIGNED_LONG)
+static_assert(
+    sizeof(unsigned long) == sizeof(GO),
+    "Tpetra's biggest enabled GlobalOrdinal is unsigned long but thats not 64 "
+    "bit");
 typedef unsigned long Tpetra_GO;
 #else
 #error "Albany needs a 64-bit GlobalOrdinal enabled in Tpetra"
 #endif
 
-typedef Tpetra::Map<Tpetra_LO, Tpetra_GO, KokkosNode>                 Tpetra_Map;
-typedef Tpetra::Export<Tpetra_LO, Tpetra_GO, KokkosNode>              Tpetra_Export;
-typedef Tpetra::Import<Tpetra_LO, Tpetra_GO, KokkosNode>              Tpetra_Import;
-typedef Tpetra::CrsGraph<Tpetra_LO, Tpetra_GO, KokkosNode>            Tpetra_CrsGraph;
-typedef Tpetra::CrsMatrix<ST, Tpetra_LO, Tpetra_GO, KokkosNode>       Tpetra_CrsMatrix;
-typedef Tpetra::RowMatrix<ST, Tpetra_LO, Tpetra_GO, KokkosNode>       Tpetra_RowMatrix;
-typedef Tpetra::Operator<ST, Tpetra_LO, Tpetra_GO, KokkosNode>        Tpetra_Operator;
-typedef Tpetra::Vector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>          Tpetra_Vector;
-typedef Tpetra::MultiVector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>     Tpetra_MultiVector;
+typedef Tpetra::Map<Tpetra_LO, Tpetra_GO, KokkosNode>      Tpetra_Map;
+typedef Tpetra::Export<Tpetra_LO, Tpetra_GO, KokkosNode>   Tpetra_Export;
+typedef Tpetra::Import<Tpetra_LO, Tpetra_GO, KokkosNode>   Tpetra_Import;
+typedef Tpetra::CrsGraph<Tpetra_LO, Tpetra_GO, KokkosNode> Tpetra_CrsGraph;
+typedef Tpetra::CrsMatrix<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
+    Tpetra_CrsMatrix;
+typedef Tpetra::RowMatrix<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
+                                                               Tpetra_RowMatrix;
+typedef Tpetra::Operator<ST, Tpetra_LO, Tpetra_GO, KokkosNode> Tpetra_Operator;
+typedef Tpetra::Vector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>   Tpetra_Vector;
+typedef Tpetra::MultiVector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
+    Tpetra_MultiVector;
 
-#endif // ALBANY_TPETRA_TYPES_HPP
+#endif  // ALBANY_TPETRA_TYPES_HPP

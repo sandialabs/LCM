@@ -5,7 +5,9 @@
 //*****************************************************************//
 
 #include <MiniTensor.h>
+
 #include <PHAL_Utilities.hpp>
+
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
 #ifdef ALBANY_TIMER

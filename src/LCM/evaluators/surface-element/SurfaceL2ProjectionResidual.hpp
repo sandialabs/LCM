@@ -7,14 +7,13 @@
 #ifndef SURFACE_L2_PROJECTION_RESIDUAL_HPP
 #define SURFACE_L2_PROJECTION_RESIDUAL_HPP
 
+#include "Albany_Layouts.hpp"
 #include "Intrepid2_CellTools.hpp"
 #include "Intrepid2_Cubature.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-
-#include "Albany_Layouts.hpp"
 
 namespace LCM {
 /** \brief

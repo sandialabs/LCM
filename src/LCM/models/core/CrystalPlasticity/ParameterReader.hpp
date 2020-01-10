@@ -8,7 +8,9 @@
 #define LCM_CrystalPlasticityModel_ParameterReader_hpp
 
 #include <MiniTensor_Solvers.h>
+
 #include <Teuchos_ParameterList.hpp>
+
 #include "../../../../utility/ParameterEnum.hpp"
 #include "../../../../utility/StaticAllocator.hpp"
 #include "CrystalPlasticityFwd.hpp"

@@ -12,11 +12,13 @@
 #ifdef ALBANY_DAKOTA
 
 /** \brief Main routine to drive ModelEvaluator application with Dakota */
-int Albany_Dakota(int argc, char *argv[]);
+int
+Albany_Dakota(int argc, char* argv[]);
 
-#else // ALBANY_DAKOTA
+#else  // ALBANY_DAKOTA
 #include <stdio.h>
-int Albany_Dakota(int /* argc */, char * /*argv*/[])
+int
+Albany_Dakota(int /* argc */, char* /*argv*/[])
 {
   printf("\nDakota requested but not compiled in!\n");
   return 999;
@@ -24,4 +26,4 @@ int Albany_Dakota(int /* argc */, char * /*argv*/[])
 
 #endif  // ALBANY_DAKOTA
 
-#endif //ALBANY_DAKOTA_HPP
+#endif  // ALBANY_DAKOTA_HPP

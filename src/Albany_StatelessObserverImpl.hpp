@@ -9,10 +9,8 @@
 
 #include "Albany_Application.hpp"
 #include "Albany_DataTypes.hpp"
-
-#include "Teuchos_RCP.hpp"
 #include "Teuchos_Ptr.hpp"
-
+#include "Teuchos_RCP.hpp"
 #include "Teuchos_Time.hpp"
 
 namespace Albany {
@@ -48,35 +46,38 @@ namespace Albany {
  * eigendata saver), and NOXObserver will continue to behave as it always has.
  */
 
-class StatelessObserverImpl {
-public:
-  explicit StatelessObserverImpl(const Teuchos::RCP<Application> &app);
+class StatelessObserverImpl
+{
+ public:
+  explicit StatelessObserverImpl(const Teuchos::RCP<Application>& app);
 
-  RealType getTimeParamValueOrDefault(RealType defaultValue) const;
+  RealType
+  getTimeParamValueOrDefault(RealType defaultValue) const;
 
-  Teuchos::RCP<const Thyra_VectorSpace> getNonOverlappedVectorSpace() const;
+  Teuchos::RCP<const Thyra_VectorSpace>
+  getNonOverlappedVectorSpace() const;
 
-  virtual void observeSolution (
-    double stamp,
-    const Thyra_Vector& nonOverlappedSolution,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDotDot);
+  virtual void
+  observeSolution(
+      double                                  stamp,
+      const Thyra_Vector&                     nonOverlappedSolution,
+      const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot,
+      const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDotDot);
 
+  virtual void
+  observeSolution(
+      double                                  stamp,
+      const Thyra_Vector&                     nonOverlappedSolution,
+      const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot);
 
-  virtual void observeSolution (
-    double stamp,
-    const Thyra_Vector& nonOverlappedSolution,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot);
+  virtual void
+  observeSolution(double stamp, const Thyra_MultiVector& nonOverlappedSolution);
 
-  virtual void observeSolution (
-    double stamp,
-    const Thyra_MultiVector& nonOverlappedSolution);
-
-protected:
-  Teuchos::RCP<Application> app_;
+ protected:
+  Teuchos::RCP<Application>   app_;
   Teuchos::RCP<Teuchos::Time> solOutTime_;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_STATELESS_OBSERVER_IMPL_HPP
+#endif  // ALBANY_STATELESS_OBSERVER_IMPL_HPP

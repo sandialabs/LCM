@@ -8,6 +8,7 @@
 #define Core_NonlinearSolver_hpp
 
 #include <MiniNonlinearSolver.h>
+
 #include "CrystalPlasticityCore.hpp"
 
 namespace CP {

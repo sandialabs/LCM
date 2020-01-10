@@ -7,17 +7,14 @@
 #ifndef ELECTROMECHANICSPROBLEM_HPP
 #define ELECTROMECHANICSPROBLEM_HPP
 
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
-
+#include "AAdapt_RC_Manager.hpp"
 #include "Albany_AbstractProblem.hpp"
 #include "ConstitutiveModelInterface.hpp"
-
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
-
-#include "AAdapt_RC_Manager.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
@@ -198,16 +195,13 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
-
+#include "CurrentCoords.hpp"
+#include "ElectrostaticResidual.hpp"
+#include "FieldNameMap.hpp"
+#include "MechanicsResidual.hpp"
 #include "PHAL_NSMaterialProperty.hpp"
 #include "PHAL_SaveCellStateField.hpp"
 #include "PHAL_SaveStateField.hpp"
-
-#include "FieldNameMap.hpp"
-
-#include "CurrentCoords.hpp"
-#include "ElectrostaticResidual.hpp"
-#include "MechanicsResidual.hpp"
 #include "Time.hpp"
 
 // Constitutive Model Interface and parameters

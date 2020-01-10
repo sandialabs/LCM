@@ -12,10 +12,10 @@
 #include <stk_mesh/base/BulkData.hpp>
 
 namespace Albany {
-  void fix_node_sharing(stk::mesh::BulkData& bulk_data);
+void
+fix_node_sharing(stk::mesh::BulkData& bulk_data);
 }
 
 //----------------------------------------------------------------------
 
-#endif 
-
+#endif

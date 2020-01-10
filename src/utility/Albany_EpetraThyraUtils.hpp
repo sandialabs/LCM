@@ -2,22 +2,19 @@
 #define ALBANY_EPETRA_THYRA_UTILS_HPP
 
 #include "Albany_ThyraTypes.hpp"
-
-#include "Epetra_Comm.h"
 #include "Epetra_BlockMap.h"
-#include "Epetra_Map.h"
-#include "Epetra_Vector.h"
-#include "Epetra_MultiVector.h"
+#include "Epetra_Comm.h"
 #include "Epetra_CrsMatrix.h"
+#include "Epetra_Map.h"
+#include "Epetra_MultiVector.h"
+#include "Epetra_Vector.h"
 
 // The type of an Epetra global id.
-// Epetra uses long long for their 64 bits integers and int for their 32 bits integers.
-// NOTE: Epetra64 is not reliable. Stick with int for Epetra, for now.
+// Epetra uses long long for their 64 bits integers and int for their 32 bits
+// integers. NOTE: Epetra64 is not reliable. Stick with int for Epetra, for now.
 using Epetra_GO = int;
 
-
-namespace Albany
-{
+namespace Albany {
 
 // The wrappers in thyra throw if the input Thyra/Epetra pointer is null
 // These routines are here to handle that case, and simply return a
@@ -27,67 +24,77 @@ namespace Albany
 // ============ Epetra->Thyra conversion routines ============ //
 
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
-createThyraVectorSpace (const Teuchos::RCP<const Epetra_BlockMap> map);
+createThyraVectorSpace(const Teuchos::RCP<const Epetra_BlockMap> map);
 
 Teuchos::RCP<Thyra_Vector>
-createThyraVector (const Teuchos::RCP<Epetra_Vector>& v);
+createThyraVector(const Teuchos::RCP<Epetra_Vector>& v);
 
 Teuchos::RCP<const Thyra_Vector>
-createConstThyraVector (const Teuchos::RCP<const Epetra_Vector>& v);
+createConstThyraVector(const Teuchos::RCP<const Epetra_Vector>& v);
 
 Teuchos::RCP<Thyra_MultiVector>
-createThyraMultiVector (const Teuchos::RCP<Epetra_MultiVector>& mv);
+createThyraMultiVector(const Teuchos::RCP<Epetra_MultiVector>& mv);
 
 Teuchos::RCP<const Thyra_MultiVector>
-createConstThyraMultiVector (const Teuchos::RCP<const Epetra_MultiVector>& mv);
+createConstThyraMultiVector(const Teuchos::RCP<const Epetra_MultiVector>& mv);
 
 Teuchos::RCP<Thyra_LinearOp>
-createThyraLinearOp (const Teuchos::RCP<Epetra_Operator>& op);
+createThyraLinearOp(const Teuchos::RCP<Epetra_Operator>& op);
 
 Teuchos::RCP<const Thyra_LinearOp>
-createConstThyraLinearOp (const Teuchos::RCP<const Epetra_Operator>& op);
+createConstThyraLinearOp(const Teuchos::RCP<const Epetra_Operator>& op);
 
 // ============ Thyra->Epetra conversion routines ============ //
 
 Teuchos::RCP<const Epetra_BlockMap>
-getEpetraBlockMap (const Teuchos::RCP<const Thyra_VectorSpace>& vs,
-                   const bool throw_if_not_epetra = true);
+getEpetraBlockMap(
+    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    const bool                                   throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_Map>
-getEpetraMap (const Teuchos::RCP<const Thyra_VectorSpace>& vs,
-              const bool throw_if_not_epetra = true);
+getEpetraMap(
+    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    const bool                                   throw_if_not_epetra = true);
 
 Teuchos::RCP<Epetra_Vector>
-getEpetraVector (const Teuchos::RCP<Thyra_Vector>& v,
-                 const bool throw_if_not_epetra = true);
+getEpetraVector(
+    const Teuchos::RCP<Thyra_Vector>& v,
+    const bool                        throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_Vector>
-getConstEpetraVector (const Teuchos::RCP<const Thyra_Vector>& v,
-                      const bool throw_if_not_epetra = true);
+getConstEpetraVector(
+    const Teuchos::RCP<const Thyra_Vector>& v,
+    const bool                              throw_if_not_epetra = true);
 
 Teuchos::RCP<Epetra_MultiVector>
-getEpetraMultiVector (const Teuchos::RCP<Thyra_MultiVector>& mv,
-                      const bool throw_if_not_epetra = true);
+getEpetraMultiVector(
+    const Teuchos::RCP<Thyra_MultiVector>& mv,
+    const bool                             throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_MultiVector>
-getConstEpetraMultiVector (const Teuchos::RCP<const Thyra_MultiVector>& mv,
-                           const bool throw_if_not_epetra = true);
+getConstEpetraMultiVector(
+    const Teuchos::RCP<const Thyra_MultiVector>& mv,
+    const bool                                   throw_if_not_epetra = true);
 
 Teuchos::RCP<Epetra_Operator>
-getEpetraOperator (const Teuchos::RCP<Thyra_LinearOp>& lop,
-                   const bool throw_if_not_epetra = true);
+getEpetraOperator(
+    const Teuchos::RCP<Thyra_LinearOp>& lop,
+    const bool                          throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_Operator>
-getConstEpetraOperator (const Teuchos::RCP<const Thyra_LinearOp>& lop,
-                        const bool throw_if_not_epetra = true);
+getConstEpetraOperator(
+    const Teuchos::RCP<const Thyra_LinearOp>& lop,
+    const bool                                throw_if_not_epetra = true);
 
 Teuchos::RCP<Epetra_CrsMatrix>
-getEpetraMatrix (const Teuchos::RCP<Thyra_LinearOp>& lop,
-                 const bool throw_if_not_epetra = true);
+getEpetraMatrix(
+    const Teuchos::RCP<Thyra_LinearOp>& lop,
+    const bool                          throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_CrsMatrix>
-getConstEpetraMatrix (const Teuchos::RCP<const Thyra_LinearOp>& lop,
-                      const bool throw_if_not_epetra = true);
+getConstEpetraMatrix(
+    const Teuchos::RCP<const Thyra_LinearOp>& lop,
+    const bool                                throw_if_not_epetra = true);
 
 // --- Conversion from references rather than RCPs --- //
 // Note: return pointers cause we want to allow failure,
@@ -116,37 +123,39 @@ getConstEpetraMatrix (const Teuchos::RCP<const Thyra_LinearOp>& lop,
 //       We therefore return an RCP.
 
 Teuchos::RCP<Epetra_Vector>
-getEpetraVector (Thyra_Vector& v,
-                 const bool throw_if_not_epetra = true);
+getEpetraVector(Thyra_Vector& v, const bool throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_Vector>
-getConstEpetraVector (const Thyra_Vector& v,
-                      const bool throw_if_not_epetra = true);
+getConstEpetraVector(
+    const Thyra_Vector& v,
+    const bool          throw_if_not_epetra = true);
 
 Teuchos::RCP<Epetra_MultiVector>
-getEpetraMultiVector (Thyra_MultiVector& mv,
-                      const bool throw_if_not_epetra = true);
+getEpetraMultiVector(
+    Thyra_MultiVector& mv,
+    const bool         throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_MultiVector>
-getConstEpetraMultiVector (const Thyra_MultiVector& mv,
-                           const bool throw_if_not_epetra = true);
+getConstEpetraMultiVector(
+    const Thyra_MultiVector& mv,
+    const bool               throw_if_not_epetra = true);
 
 Teuchos::RCP<Epetra_Operator>
-getEpetraOperator (Thyra_LinearOp& lop,
-                   const bool throw_if_not_epetra = true);
+getEpetraOperator(Thyra_LinearOp& lop, const bool throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_Operator>
-getConstEpetraOperator (const Thyra_LinearOp& lop,
-                        const bool throw_if_not_epetra = true);
+getConstEpetraOperator(
+    const Thyra_LinearOp& lop,
+    const bool            throw_if_not_epetra = true);
 
 Teuchos::RCP<Epetra_CrsMatrix>
-getEpetraMatrix (Thyra_LinearOp& lop,
-                 const bool throw_if_not_epetra = true);
+getEpetraMatrix(Thyra_LinearOp& lop, const bool throw_if_not_epetra = true);
 
 Teuchos::RCP<const Epetra_CrsMatrix>
-getConstEpetraMatrix (const Thyra_LinearOp& lop,
-                      const bool throw_if_not_epetra = true);
+getConstEpetraMatrix(
+    const Thyra_LinearOp& lop,
+    const bool            throw_if_not_epetra = true);
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_EPETRA_THYRA_UTILS_HPP
+#endif  // ALBANY_EPETRA_THYRA_UTILS_HPP

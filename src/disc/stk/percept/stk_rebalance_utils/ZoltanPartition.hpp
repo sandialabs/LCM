@@ -18,24 +18,23 @@
 #ifndef stk_rebalance_ZoltanPartition_hpp
 #define stk_rebalance_ZoltanPartition_hpp
 
+#include <Teuchos_ParameterList.hpp>
+#include <percept/PerceptMesh.hpp>
+#include <percept/stk_rebalance/GeomDecomp.hpp>
+#include <stk_mesh/base/Types.hpp>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
-#include <percept/PerceptMesh.hpp>
 
-
-#include <Teuchos_ParameterList.hpp>
-#include <stk_mesh/base/Types.hpp>
-#include <percept/stk_rebalance/GeomDecomp.hpp>
-
-//Forward declaration for pointer to a Zoltan structrue.
+// Forward declaration for pointer to a Zoltan structrue.
 struct Zoltan_Struct;
 
 /** \addtogroup stk_rebalance_module
  *  \{
  */
 
-/** \file ZoltanPartition.hpp derived from \a Partition to implement Zoltan based rebalancing.
+/** \file ZoltanPartition.hpp derived from \a Partition to implement Zoltan
+ * based rebalancing.
  *
  * \class Zoltan
  *
@@ -52,10 +51,9 @@ namespace rebalance {
 
 typedef Teuchos::ParameterList Parameters;
 
-class Zoltan : public GeomDecomp {
-
-public:
-
+class Zoltan : public GeomDecomp
+{
+ public:
   /** \struct MeshInfo
    *
    *  \brief A structure to organize the mesh entity data.
@@ -88,17 +86,19 @@ public:
    * should form a unique global identification across all
    * processors.
    */
-  struct MeshInfo {
-    stk::mesh::BulkData * m_bulk;
-    std::vector<mesh::Entity >      mesh_entities;
-    const VectorField              * nodal_coord_ref ;
-    const ScalarField              * elem_weight_ref;
-    std::vector<unsigned>            dest_proc_ids ;
+  struct MeshInfo
+  {
+    stk::mesh::BulkData*      m_bulk;
+    std::vector<mesh::Entity> mesh_entities;
+    const VectorField*        nodal_coord_ref;
+    const ScalarField*        elem_weight_ref;
+    std::vector<unsigned>     dest_proc_ids;
 
     /** \brief Default Constructor. */
-    MeshInfo(stk::mesh::BulkData* bulk): m_bulk(bulk),
-      nodal_coord_ref(NULL),
-      elem_weight_ref(NULL) {}
+    MeshInfo(stk::mesh::BulkData* bulk)
+        : m_bulk(bulk), nodal_coord_ref(NULL), elem_weight_ref(NULL)
+    {
+    }
 
     /** \brief Destructor. */
     ~MeshInfo() {}
@@ -117,9 +117,11 @@ public:
    *                         processors. Can be NULL.
    */
 
-  virtual void set_mesh_info ( const std::vector<mesh::Entity > &mesh_entities,
-                               const VectorField   * nodal_coord_ref,
-                               const ScalarField   * elem_weight_ref=NULL);
+  virtual void
+  set_mesh_info(
+      const std::vector<mesh::Entity>& mesh_entities,
+      const VectorField*               nodal_coord_ref,
+      const ScalarField*               elem_weight_ref = NULL);
 
   /** \brief Reset owning processor.
    *
@@ -128,14 +130,16 @@ public:
    *  The length of the dest_proc_ids vector is the same
    *  length as the mesh_entities vector.
    */
-  void reset_dest_proc_data ();
+  void
+  reset_dest_proc_data();
 
   /** \brief Return name of Zoltan parameter block being used. */
-  static const std::string zoltan_parameters_name();
+  static const std::string
+  zoltan_parameters_name();
 
   /** \brief Return name of default Zoltan parameter block being used. */
-  static const std::string default_parameters_name();
-
+  static const std::string
+  default_parameters_name();
 
   /** \brief Constructor
    *
@@ -143,24 +147,25 @@ public:
    *
    * \param ndim   The spatial dimention of the mesh being balanced.
    *
-   * \param rebal_region_parameters  This is a hierarchial map of strings to strings
-   *                                 that defines the parameters used to
-   *                                 initialize \a Zoltan. See the
+   * \param rebal_region_parameters  This is a hierarchial map of strings to
+   * strings that defines the parameters used to initialize \a Zoltan. See the
    *                                 \a fill_default_values function
    *                                 for a list of valid parameter names.
    *
-   * \param parameters_name  The subset of parameter in \a rebal_region_parameters
-   *                         to use.  The default name is \a 'DEFAULT".
+   * \param parameters_name  The subset of parameter in \a
+   * rebal_region_parameters to use.  The default name is \a 'DEFAULT".
    *
    * There are many parameters that effect the wrokings of Zoltan and more are
    * added with each release.  Examine the source code, ZoltanPartition.cpp for
    * a list of the latest releaseed and supported parameters.
    */
 
-  explicit Zoltan(stk::mesh::BulkData& bulk, ParallelMachine pm,
-                  const unsigned ndim,
-                  Teuchos::ParameterList & rebal_region_parameters,
-                  std::string parameters_name=default_parameters_name());
+  explicit Zoltan(
+      stk::mesh::BulkData&    bulk,
+      ParallelMachine         pm,
+      const unsigned          ndim,
+      Teuchos::ParameterList& rebal_region_parameters,
+      std::string             parameters_name = default_parameters_name());
 
   /**
    * \brief Destructor
@@ -169,34 +174,49 @@ public:
   virtual ~Zoltan();
 
   /** \brief Return the total number of mesh entities in all lists. */
-  unsigned num_elems() const { return m_total_number_entities_ ; }
+  unsigned
+  num_elems() const
+  {
+    return m_total_number_entities_;
+  }
 
   /** \brief Return the owning processor.*/
-  double entity_weight(const unsigned moid) const;
+  double
+  entity_weight(const unsigned moid) const;
 
   /** \brief Set the owning processor.*/
-  void set_destination_proc(const unsigned moid,
-                            const unsigned proc );
+  void
+  set_destination_proc(const unsigned moid, const unsigned proc);
 
   /** \brief Various data access functions.
    */
-  int globalID         (const unsigned moid) const
-  { return m_mesh_information_.m_bulk->identifier(m_mesh_information_.mesh_entities[ moid ]); }
+  int
+  globalID(const unsigned moid) const
+  {
+    return m_mesh_information_.m_bulk->identifier(
+        m_mesh_information_.mesh_entities[moid]);
+  }
 
-  /** \brief Return the number of local ids per global ids (entities per region).*/
-  unsigned num_moid() const;
+  /** \brief Return the number of local ids per global ids (entities per
+   * region).*/
+  unsigned
+  num_moid() const;
 
   /** \brief Find the local ID of a given mesh entity. */
-  bool find_mesh_entity(const mesh::Entity  entity, unsigned & moid) const;
+  bool
+  find_mesh_entity(const mesh::Entity entity, unsigned& moid) const;
 
   /** \brief Return a mesh entity pointer. */
-  mesh::Entity mesh_entity(const unsigned moid ) const;
+  mesh::Entity
+  mesh_entity(const unsigned moid) const;
 
   /** \brief Return the Field points to the entity coordinates.*/
-  const VectorField * entity_coord_ref () const;
+  const VectorField*
+  entity_coord_ref() const;
 
   /** \brief Return the Field points to the entity coordinates.*/
-  const ScalarField * entity_weight_ref () const;
+  const ScalarField*
+  entity_weight_ref() const;
 
   ////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////
@@ -209,17 +229,20 @@ public:
    * functions do that.  Merge_Default_Values should be called
    * first because it merges with the long names.
    */
-  static void merge_default_values   (const Teuchos::ParameterList &from,
-                                      Teuchos::ParameterList &to);
+  static void
+  merge_default_values(
+      const Teuchos::ParameterList& from,
+      Teuchos::ParameterList&       to);
 
   /** \brief Name Conversion Functions.
    * \a Convert_Names_and_Values
    * should then be called after \a merge_default_values
    *  to convert long names to short names.
    */
-  static void convert_names_and_values (const Teuchos::ParameterList &from,
-                                        Teuchos::ParameterList &to);
-
+  static void
+  convert_names_and_values(
+      const Teuchos::ParameterList& from,
+      Teuchos::ParameterList&       to);
 
   /** \brief determine New Partition.
    *
@@ -234,7 +257,8 @@ public:
    * partition is different than the old one.
    */
 
-  virtual void determine_new_partition (bool & RebalancingNeeded);
+  virtual void
+  determine_new_partition(bool& RebalancingNeeded);
 
   /** \brief Perform communication to create new partition.
    *
@@ -250,11 +274,17 @@ public:
    * mesh entities before rebalancing is performed
    * again.
    */
-  virtual int get_new_partition(stk::mesh::EntityProcVec &new_partition);
+  virtual int
+  get_new_partition(stk::mesh::EntityProcVec& new_partition);
 
-  /** \brief Query whether element dependents need to be rebalanced outside this Partition. */
-  bool partition_dependents_needed() const
-  { return true; /* Zoltan partitions elements and leaves the rest to someone else */ }
+  /** \brief Query whether element dependents need to be rebalanced outside this
+   * Partition. */
+  bool
+  partition_dependents_needed() const
+  {
+    return true; /* Zoltan partitions elements and leaves the rest to someone
+                    else */
+  }
 
   /**
    * \brief Evaluate the performance/quality of dynamic load rebalancing
@@ -269,7 +299,8 @@ public:
    *
    * \param cut_wgt       Not sure about this one.
    *
-   * \param nboundary     Maybe the number of entities on the processor boundary.
+   * \param nboundary     Maybe the number of entities on the processor
+   * boundary.
    *
    * \param nadj          Not sure about this one.
    *
@@ -278,47 +309,56 @@ public:
    * to return some information about the Zoltan defined partition.
    *
    */
-  int evaluate ( int      print_stats,
-                 int     *nentity,
-                 double  *entity_wgt,
-                 int     *ncuts,
-                 double  *cut_wgt,
-                 int     *nboundary,
-                 int     *nadj  );
+  int
+  evaluate(
+      int     print_stats,
+      int*    nentity,
+      double* entity_wgt,
+      int*    ncuts,
+      double* cut_wgt,
+      int*    nboundary,
+      int*    nadj);
 
   /** \brief Return version of Zoltan linked into executable */
-  double zoltan_version()  const;
+  double
+  zoltan_version() const;
 
   /** \brief Return the parameter list that is being used for this partition. */
-  const std::string & parameter_entry_name() const;
+  const std::string&
+  parameter_entry_name() const;
 
   /** \brief Zoltan_Struct is an internal Zoltan handle. */
-  Zoltan_Struct * zoltan() {
+  Zoltan_Struct*
+  zoltan()
+  {
     return m_zoltan_id_;
   }
 
   /** \brief Zoltan_Struct is an internal Zoltan handle. */
-  const Zoltan_Struct * zoltan() const {
+  const Zoltan_Struct*
+  zoltan() const
+  {
     return m_zoltan_id_;
   }
 
   /** \brief Return the spatial dimention of the entities being rebalanced. */
-  unsigned spatial_dimension() const {
+  unsigned
+  spatial_dimension() const
+  {
     return m_spatial_dimension_;
   }
 
   stk::mesh::BulkData& m_bulk;
 
-private:
-
+ private:
   /** Zoltan load balancing struct       */
-  struct    Zoltan_Struct *m_zoltan_id_;
+  struct Zoltan_Struct* m_zoltan_id_;
 
-  const     unsigned       m_spatial_dimension_;
+  const unsigned m_spatial_dimension_;
   /** Name that was used to initialize this Zoltan_Struct
    * if the parameter constructor was used.
    */
-  std::string              m_parameter_entry_name_;
+  std::string m_parameter_entry_name_;
 
   static const std::string m_zoltanparametersname_;
   static const std::string m_defaultparametersname_;
@@ -326,23 +366,26 @@ private:
   MeshInfo                 m_mesh_information_;
   unsigned                 m_total_number_entities_;
 
-  void init_default_parameters();
-  void init(const std::vector< std::pair<std::string, std::string> >
-            &dynamicLoadRebalancingParameters);
-  static double init_zoltan_library();
+  void
+  init_default_parameters();
+  void
+  init(const std::vector<std::pair<std::string, std::string>>&
+           dynamicLoadRebalancingParameters);
+  static double
+  init_zoltan_library();
 
   /** \brief Return the owning processor.*/
-  unsigned destination_proc(const unsigned moid) const;
+  unsigned
+  destination_proc(const unsigned moid) const;
 
   /** \brief Register SIERRA Framework Zoltan call-back functions */
-  int register_callbacks();
-
-
+  int
+  register_callbacks();
 };
 
 /** \} */
 
-}
-} // namespace stk
+}  // namespace rebalance
+}  // namespace stk
 
 #endif

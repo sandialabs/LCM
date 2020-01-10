@@ -4,123 +4,142 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Teuchos_TestForException.hpp"
-#include "Phalanx_DataLayout.hpp"
-
-#include "PHAL_GatherScalarNodalParameter.hpp"
-#include "Albany_ThyraUtils.hpp"
-#include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_AbstractDiscretization.hpp"
+#include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
+#include "Albany_ThyraUtils.hpp"
+#include "PHAL_GatherScalarNodalParameter.hpp"
+#include "Phalanx_DataLayout.hpp"
+#include "Teuchos_TestForException.hpp"
 
 namespace PHAL {
 
-template<typename EvalT, typename Traits>
-GatherScalarNodalParameterBase<EvalT,Traits>::
-GatherScalarNodalParameterBase(const Teuchos::ParameterList& p,
-                               const Teuchos::RCP<Albany::Layouts>& dl) :
-    numNodes(dl->node_scalar->extent(1)),
-    param_name(p.get<std::string>("Parameter Name"))
+template <typename EvalT, typename Traits>
+GatherScalarNodalParameterBase<EvalT, Traits>::GatherScalarNodalParameterBase(
+    const Teuchos::ParameterList&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
+    : numNodes(dl->node_scalar->extent(1)),
+      param_name(p.get<std::string>("Parameter Name"))
 {
-  std::string field_name = p.isParameter("Field Name") ? p.get<std::string>("Field Name") : param_name;
-  val = PHX::MDField<ParamScalarT,Cell,Node>(field_name,dl->node_scalar);
+  std::string field_name = p.isParameter("Field Name") ?
+                               p.get<std::string>("Field Name") :
+                               param_name;
+  val = PHX::MDField<ParamScalarT, Cell, Node>(field_name, dl->node_scalar);
 
   this->addEvaluatedField(val);
 }
 
 // **********************************************************************
-template<typename EvalT, typename Traits>
-void GatherScalarNodalParameterBase<EvalT,Traits>::
-postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& fm)
+template <typename EvalT, typename Traits>
+void
+GatherScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(
+    typename Traits::SetupData d,
+    PHX::FieldManager<Traits>& fm)
 {
-  this->utils.setFieldData(val,fm);
-  d.fill_field_dependencies(this->dependentFields(),this->evaluatedFields(),d.memoizer_for_params_active());
+  this->utils.setFieldData(val, fm);
+  d.fill_field_dependencies(
+      this->dependentFields(),
+      this->evaluatedFields(),
+      d.memoizer_for_params_active());
   if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 // **********************************************************************
-template<typename EvalT, typename Traits>
-GatherScalarNodalParameter<EvalT, Traits>::
-GatherScalarNodalParameter(const Teuchos::ParameterList& p,
-                           const Teuchos::RCP<Albany::Layouts>& dl) :
-  GatherScalarNodalParameterBase<EvalT, Traits>(p,dl)
+template <typename EvalT, typename Traits>
+GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(
+    const Teuchos::ParameterList&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
+    : GatherScalarNodalParameterBase<EvalT, Traits>(p, dl)
 {
-  this->setName("GatherNodalParameter("+this->param_name+")"+PHX::print<EvalT>());
+  this->setName(
+      "GatherNodalParameter(" + this->param_name + ")" + PHX::print<EvalT>());
 }
 
 // **********************************************************************
-template<typename EvalT, typename Traits>
-GatherScalarNodalParameter<EvalT, Traits>::
-GatherScalarNodalParameter(const Teuchos::ParameterList& p) :
-  GatherScalarNodalParameterBase<EvalT, Traits>(p,p.get<Teuchos::RCP<Albany::Layouts> >("Layouts Struct"))
+template <typename EvalT, typename Traits>
+GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(
+    const Teuchos::ParameterList& p)
+    : GatherScalarNodalParameterBase<EvalT, Traits>(
+          p,
+          p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct"))
 {
-  this->setName("GatherNodalParameter("+this->param_name+")"+PHX::print<EvalT>());
+  this->setName(
+      "GatherNodalParameter(" + this->param_name + ")" + PHX::print<EvalT>());
 }
 
 // **********************************************************************
-template<typename EvalT, typename Traits>
-void GatherScalarNodalParameter<EvalT, Traits>::
-evaluateFields(typename Traits::EvalData workset)
+template <typename EvalT, typename Traits>
+void
+GatherScalarNodalParameter<EvalT, Traits>::evaluateFields(
+    typename Traits::EvalData workset)
 {
-  if (this->memoizer.have_saved_data(workset,this->evaluatedFields())) return;
+  if (this->memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
-  Teuchos::RCP<const Thyra_Vector> pvec = workset.distParamLib->get(this->param_name)->overlapped_vector();
+  Teuchos::RCP<const Thyra_Vector> pvec =
+      workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
 
-  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)->workset_elem_dofs()[workset.wsIndex];
+  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)
+                                        ->workset_elem_dofs()[workset.wsIndex];
 
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t node = 0; node < this->numNodes; ++node) {
-      const LO lid = wsElDofs((int)cell,(int)node,0);
-      (this->val)(cell,node) = (lid >= 0 ) ? pvec_constView[lid] : 0;
+      const LO lid            = wsElDofs((int)cell, (int)node, 0);
+      (this->val)(cell, node) = (lid >= 0) ? pvec_constView[lid] : 0;
     }
   }
 }
 
 // **********************************************************************
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 GatherScalarExtruded2DNodalParameter<EvalT, Traits>::
-GatherScalarExtruded2DNodalParameter(const Teuchos::ParameterList& p,
-                                     const Teuchos::RCP<Albany::Layouts>& dl) :
-    GatherScalarNodalParameterBase<EvalT, Traits>(p, dl),
-    fieldLevel(p.get<int>("Field Level"))
+    GatherScalarExtruded2DNodalParameter(
+        const Teuchos::ParameterList&        p,
+        const Teuchos::RCP<Albany::Layouts>& dl)
+    : GatherScalarNodalParameterBase<EvalT, Traits>(p, dl),
+      fieldLevel(p.get<int>("Field Level"))
 {
-  this->setName("GatherScalarExtruded2DNodalParameter("+this->param_name+")"+PHX::print<EvalT>());
+  this->setName(
+      "GatherScalarExtruded2DNodalParameter(" + this->param_name + ")" +
+      PHX::print<EvalT>());
 }
 
 // **********************************************************************
-template<typename EvalT, typename Traits>
-void GatherScalarExtruded2DNodalParameter<EvalT, Traits>::
-evaluateFields(typename Traits::EvalData workset)
+template <typename EvalT, typename Traits>
+void
+GatherScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
+    typename Traits::EvalData workset)
 {
-  if (this->memoizer.have_saved_data(workset,this->evaluatedFields())) return;
+  if (this->memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
-  // TODO: find a way to abstract away from the map concept. Perhaps using Panzer::ConnManager?
-  Teuchos::RCP<const Thyra_Vector> pvec = workset.distParamLib->get(this->param_name)->overlapped_vector();
+  // TODO: find a way to abstract away from the map concept. Perhaps using
+  // Panzer::ConnManager?
+  Teuchos::RCP<const Thyra_Vector> pvec =
+      workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
 
-  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering = *workset.disc->getLayeredMeshNumbering();
+  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering =
+      *workset.disc->getLayeredMeshNumbering();
 
-  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO> >& wsElNodeID  = workset.disc->getWsElNodeID()[workset.wsIndex];
+  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID =
+      workset.disc->getWsElNodeID()[workset.wsIndex];
 
-  auto overlapNodeVS = workset.disc->getOverlapNodeVectorSpace();
+  auto overlapNodeVS   = workset.disc->getOverlapNodeVectorSpace();
   auto ov_node_indexer = Albany::createGlobalLocalIndexer(overlapNodeVS);
-  auto pspace_indexer = Albany::createGlobalLocalIndexer(pvec->space());
-  for (std::size_t cell=0; cell < workset.numCells; ++cell ) {
+  auto pspace_indexer  = Albany::createGlobalLocalIndexer(pvec->space());
+  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     const Teuchos::ArrayRCP<GO>& elNodeID = wsElNodeID[cell];
     for (std::size_t node = 0; node < this->numNodes; ++node) {
       const LO lnodeId = ov_node_indexer->getLocalElement(elNodeID[node]);
-      LO base_id, ilayer;
+      LO       base_id, ilayer;
       layeredMeshNumbering.getIndices(lnodeId, base_id, ilayer);
-      const LO inode = layeredMeshNumbering.getId(base_id, fieldLevel);
-      const GO ginode = ov_node_indexer->getGlobalElement(inode);
-      const LO p_lid= pspace_indexer->getLocalElement(ginode);
-      (this->val)(cell,node) = ( p_lid >= 0) ? pvec_constView[p_lid] : 0;
+      const LO inode          = layeredMeshNumbering.getId(base_id, fieldLevel);
+      const GO ginode         = ov_node_indexer->getGlobalElement(inode);
+      const LO p_lid          = pspace_indexer->getLocalElement(ginode);
+      (this->val)(cell, node) = (p_lid >= 0) ? pvec_constView[p_lid] : 0;
     }
   }
 }
-
 
 // **************************************************************
 // **************************************************************
@@ -128,89 +147,98 @@ evaluateFields(typename Traits::EvalData workset)
 // **************************************************************
 // **************************************************************A
 
-
 // **********************************************************************
 // Specialization: DistParamDeriv
 // **********************************************************************
-template<typename Traits>
+template <typename Traits>
 GatherScalarNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
-GatherScalarNodalParameter(const Teuchos::ParameterList& p,
-                           const Teuchos::RCP<Albany::Layouts>& dl) :
-  GatherScalarNodalParameterBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p,dl)
+    GatherScalarNodalParameter(
+        const Teuchos::ParameterList&        p,
+        const Teuchos::RCP<Albany::Layouts>& dl)
+    : GatherScalarNodalParameterBase<
+          PHAL::AlbanyTraits::DistParamDeriv,
+          Traits>(p, dl)
 {
-  this->setName("GatherNodalParameter("+this->param_name+")"+PHX::print<PHAL::AlbanyTraits::DistParamDeriv>());
+  this->setName(
+      "GatherNodalParameter(" + this->param_name + ")" +
+      PHX::print<PHAL::AlbanyTraits::DistParamDeriv>());
 }
 
 // **********************************************************************
-template<typename Traits>
+template <typename Traits>
 GatherScalarNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
-GatherScalarNodalParameter(const Teuchos::ParameterList& p) :
-  GatherScalarNodalParameterBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p,p.get<Teuchos::RCP<Albany::Layouts> >("Layouts Struct"))
+    GatherScalarNodalParameter(const Teuchos::ParameterList& p)
+    : GatherScalarNodalParameterBase<
+          PHAL::AlbanyTraits::DistParamDeriv,
+          Traits>(p, p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct"))
 {
-  this->setName("GatherNodalParameter("+this->param_name+")"+PHX::print<PHAL::AlbanyTraits::DistParamDeriv>());
+  this->setName(
+      "GatherNodalParameter(" + this->param_name + ")" +
+      PHX::print<PHAL::AlbanyTraits::DistParamDeriv>());
 }
 
 // **********************************************************************
-template<typename Traits>
-void GatherScalarNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
-evaluateFields(typename Traits::EvalData workset)
+template <typename Traits>
+void
+GatherScalarNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
+    evaluateFields(typename Traits::EvalData workset)
 {
-  if (this->memoizer.have_saved_data(workset,this->evaluatedFields())) return;
+  if (this->memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   // Distributed parameter vector
-  Teuchos::RCP<const Thyra_Vector> pvec = workset.distParamLib->get(this->param_name)->overlapped_vector();
+  Teuchos::RCP<const Thyra_Vector> pvec =
+      workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
 
-  Teuchos::RCP<const Thyra_MultiVector> Vp = workset.Vp;
+  Teuchos::RCP<const Thyra_MultiVector>          Vp = workset.Vp;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> Vp_data;
-  if (!Vp.is_null()) {
-    Vp_data = Albany::getLocalData(workset.Vp);
-  }
+  if (!Vp.is_null()) { Vp_data = Albany::getLocalData(workset.Vp); }
 
-  auto nodeID = workset.wsElNodeEqID;
-  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)->workset_elem_dofs()[workset.wsIndex];
+  auto                   nodeID   = workset.wsElNodeEqID;
+  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)
+                                        ->workset_elem_dofs()[workset.wsIndex];
 
   // Are we differentiating w.r.t. this parameter?
   bool is_active = (workset.dist_param_deriv_name == this->param_name);
 
   // If active, intialize data needed for differentiation
   if (is_active) {
-    const int num_deriv = this->numNodes;
+    const int num_deriv     = this->numNodes;
     const int num_nodes_res = this->numNodes;
-    bool trans = workset.transpose_dist_param_deriv;
-    for (std::size_t cell=0; cell < workset.numCells; ++cell ) {
+    bool      trans         = workset.transpose_dist_param_deriv;
+    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t node = 0; node < num_deriv; ++node) {
-
         // Initialize Fad type for parameter value
-        const LO id = wsElDofs((int)cell,(int)node,0);
-        double pvec_id = (id >= 0) ? pvec_constView[id] : 0;
+        const LO     id      = wsElDofs((int)cell, (int)node, 0);
+        double       pvec_id = (id >= 0) ? pvec_constView[id] : 0;
         ParamScalarT v(num_deriv, node, pvec_id);
         v.setUpdateValue(!workset.ignore_residual);
-        (this->val)(cell,node) = v;
+        (this->val)(cell, node) = v;
       }
 
       if (workset.Vp != Teuchos::null) {
         const int num_cols = Vp->domain()->dim();
 
-        Teuchos::ArrayRCP<Teuchos::ArrayRCP<double> >& local_Vp = workset.local_Vp[cell];
+        Teuchos::ArrayRCP<Teuchos::ArrayRCP<double>>& local_Vp =
+            workset.local_Vp[cell];
 
         if (trans) {
-          local_Vp.resize(num_nodes_res*workset.numEqs);
+          local_Vp.resize(num_nodes_res * workset.numEqs);
           for (std::size_t node = 0; node < num_nodes_res; ++node) {
             // Store Vp entries
             for (std::size_t eq = 0; eq < workset.numEqs; eq++) {
-              local_Vp[node*workset.numEqs+eq].resize(num_cols);
-              const LO id = nodeID(cell,node,eq);
-              for (int col=0; col<num_cols; ++col)
-                local_Vp[node*workset.numEqs+eq][col] = Vp_data[col][id];
+              local_Vp[node * workset.numEqs + eq].resize(num_cols);
+              const LO id = nodeID(cell, node, eq);
+              for (int col = 0; col < num_cols; ++col)
+                local_Vp[node * workset.numEqs + eq][col] = Vp_data[col][id];
             }
           }
         } else {
           local_Vp.resize(num_deriv);
-          for (int node=0; node<num_deriv; ++node) {
-            const LO id = wsElDofs((int)cell,node,0);
+          for (int node = 0; node < num_deriv; ++node) {
+            const LO id = wsElDofs((int)cell, node, 0);
             local_Vp[node].resize(num_cols);
-            for (int col=0; col<num_cols; ++col)
+            for (int col = 0; col < num_cols; ++col)
               local_Vp[node][col] = (id >= 0) ? Vp_data[col][id] : 0;
           }
         }
@@ -218,101 +246,112 @@ evaluateFields(typename Traits::EvalData workset)
     }
   } else {
     // If not active, just set the parameter value in the phalanx field
-    for (std::size_t cell=0; cell < workset.numCells; ++cell ) {
+    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t node = 0; node < this->numNodes; ++node) {
-        const LO lid = wsElDofs((int)cell,(int)node,0);
-        (this->val)(cell,node) = (lid >= 0) ? pvec_constView[lid] : 0;
+        const LO lid            = wsElDofs((int)cell, (int)node, 0);
+        (this->val)(cell, node) = (lid >= 0) ? pvec_constView[lid] : 0;
       }
     }
   }
 }
 
 // **********************************************************************
-template<typename Traits>
-GatherScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
-GatherScalarExtruded2DNodalParameter(const Teuchos::ParameterList& p,
-                                     const Teuchos::RCP<Albany::Layouts>& dl) :
-  GatherScalarNodalParameterBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p, dl),
-  fieldLevel(p.get<int>("Field Level"))
+template <typename Traits>
+GatherScalarExtruded2DNodalParameter<
+    PHAL::AlbanyTraits::DistParamDeriv,
+    Traits>::
+    GatherScalarExtruded2DNodalParameter(
+        const Teuchos::ParameterList&        p,
+        const Teuchos::RCP<Albany::Layouts>& dl)
+    : GatherScalarNodalParameterBase<
+          PHAL::AlbanyTraits::DistParamDeriv,
+          Traits>(p, dl),
+      fieldLevel(p.get<int>("Field Level"))
 {
-  this->setName("GatherExtruded2DNodalParameter("+this->param_name+")"+
+  this->setName(
+      "GatherExtruded2DNodalParameter(" + this->param_name + ")" +
       PHX::print<PHAL::AlbanyTraits::DistParamDeriv>());
 }
 
 // **********************************************************************
-template<typename Traits>
-void GatherScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
-evaluateFields(typename Traits::EvalData workset)
+template <typename Traits>
+void
+GatherScalarExtruded2DNodalParameter<
+    PHAL::AlbanyTraits::DistParamDeriv,
+    Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  if (this->memoizer.have_saved_data(workset,this->evaluatedFields())) return;
+  if (this->memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
-  // TODO: find a way to abstract away from the map concept. Perhaps using Panzer::ConnManager?
-  Teuchos::RCP<const Thyra_Vector> pvec = workset.distParamLib->get(this->param_name)->overlapped_vector();
+  // TODO: find a way to abstract away from the map concept. Perhaps using
+  // Panzer::ConnManager?
+  Teuchos::RCP<const Thyra_Vector> pvec =
+      workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
 
   // Are we differentiating w.r.t. this parameter?
   bool is_active = (workset.dist_param_deriv_name == this->param_name);
 
-  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering = *workset.disc->getLayeredMeshNumbering();
+  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering =
+      *workset.disc->getLayeredMeshNumbering();
 
-  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO> >& wsElNodeID  = workset.disc->getWsElNodeID()[workset.wsIndex];
+  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID =
+      workset.disc->getWsElNodeID()[workset.wsIndex];
   auto nodeID = workset.wsElNodeEqID;
 
   // If active, intialize data needed for differentiation
-  auto overlapNodeVS = workset.disc->getOverlapNodeVectorSpace();
+  auto overlapNodeVS   = workset.disc->getOverlapNodeVectorSpace();
   auto ov_node_indexer = Albany::createGlobalLocalIndexer(overlapNodeVS);
-  auto p_indexer = Albany::createGlobalLocalIndexer(pvec->space());
+  auto p_indexer       = Albany::createGlobalLocalIndexer(pvec->space());
   if (is_active) {
-    const int num_deriv = this->numNodes;
+    const int num_deriv     = this->numNodes;
     const int num_nodes_res = this->numNodes;
-    bool trans = workset.transpose_dist_param_deriv;
-    for (std::size_t cell=0; cell < workset.numCells; ++cell ) {
+    bool      trans         = workset.transpose_dist_param_deriv;
+    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       const Teuchos::ArrayRCP<GO>& elNodeID = wsElNodeID[cell];
       for (std::size_t node = 0; node < num_deriv; ++node) {
         const LO lnodeId = ov_node_indexer->getLocalElement(elNodeID[node]);
-        LO base_id, ilayer;
+        LO       base_id, ilayer;
         layeredMeshNumbering.getIndices(lnodeId, base_id, ilayer);
-        const LO inode = layeredMeshNumbering.getId(base_id, fieldLevel);
-        const GO ginode = ov_node_indexer->getGlobalElement(inode);
-        const LO p_lid= p_indexer->getLocalElement(ginode);
-        double pvec_id = ( p_lid >= 0) ? pvec_constView[p_lid] : 0;
+        const LO inode   = layeredMeshNumbering.getId(base_id, fieldLevel);
+        const GO ginode  = ov_node_indexer->getGlobalElement(inode);
+        const LO p_lid   = p_indexer->getLocalElement(ginode);
+        double   pvec_id = (p_lid >= 0) ? pvec_constView[p_lid] : 0;
 
         ParamScalarT v(num_deriv, node, pvec_id);
         v.setUpdateValue(!workset.ignore_residual);
-        if(p_lid < 0) {
-          v.fastAccessDx(node) = 0;
-        }
-        (this->val)(cell,node) = v;
+        if (p_lid < 0) { v.fastAccessDx(node) = 0; }
+        (this->val)(cell, node) = v;
       }
 
       if (workset.Vp != Teuchos::null) {
         const std::size_t num_cols = workset.Vp->domain()->dim();
-        auto Vp_data = Albany::getLocalData(workset.Vp);
+        auto              Vp_data  = Albany::getLocalData(workset.Vp);
 
-        Teuchos::ArrayRCP<Teuchos::ArrayRCP<double> >& local_Vp = workset.local_Vp[cell];
+        Teuchos::ArrayRCP<Teuchos::ArrayRCP<double>>& local_Vp =
+            workset.local_Vp[cell];
 
         if (trans) {
-          local_Vp.resize(num_nodes_res*workset.numEqs);
+          local_Vp.resize(num_nodes_res * workset.numEqs);
           for (std::size_t node = 0; node < num_nodes_res; ++node) {
             // Store Vp entries
             for (std::size_t eq = 0; eq < workset.numEqs; eq++) {
-              local_Vp[node*workset.numEqs+eq].resize(num_cols);
-              const LO id = nodeID(cell,node,eq);
-              for (std::size_t col=0; col<num_cols; ++col)
-                local_Vp[node*workset.numEqs+eq][col] = Vp_data[col][id];
+              local_Vp[node * workset.numEqs + eq].resize(num_cols);
+              const LO id = nodeID(cell, node, eq);
+              for (std::size_t col = 0; col < num_cols; ++col)
+                local_Vp[node * workset.numEqs + eq][col] = Vp_data[col][id];
             }
           }
         } else {
           local_Vp.resize(num_deriv);
           for (std::size_t node = 0; node < num_deriv; ++node) {
             const LO lnodeId = ov_node_indexer->getLocalElement(elNodeID[node]);
-            LO base_id, ilayer;
+            LO       base_id, ilayer;
             layeredMeshNumbering.getIndices(lnodeId, base_id, ilayer);
-            const LO inode = layeredMeshNumbering.getId(base_id, fieldLevel);
+            const LO inode  = layeredMeshNumbering.getId(base_id, fieldLevel);
             const GO ginode = ov_node_indexer->getGlobalElement(inode);
-            const LO id = p_indexer->getLocalElement(ginode);
+            const LO id     = p_indexer->getLocalElement(ginode);
             local_Vp[node].resize(num_cols);
-            for (std::size_t col=0; col<num_cols; ++col) {
+            for (std::size_t col = 0; col < num_cols; ++col) {
               local_Vp[node][col] = (id >= 0) ? Vp_data[col][id] : 0;
             }
           }
@@ -321,19 +360,19 @@ evaluateFields(typename Traits::EvalData workset)
     }
   } else {
     // If not active, just set the parameter value in the phalanx field
-    for (std::size_t cell=0; cell < workset.numCells; ++cell ) {
+    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       const Teuchos::ArrayRCP<GO>& elNodeID = wsElNodeID[cell];
       for (std::size_t node = 0; node < this->numNodes; ++node) {
         const LO lnodeId = ov_node_indexer->getLocalElement(elNodeID[node]);
-        LO base_id, ilayer;
+        LO       base_id, ilayer;
         layeredMeshNumbering.getIndices(lnodeId, base_id, ilayer);
-        const LO inode = layeredMeshNumbering.getId(base_id, fieldLevel);
+        const LO inode  = layeredMeshNumbering.getId(base_id, fieldLevel);
         const GO ginode = ov_node_indexer->getGlobalElement(inode);
-        const LO p_lid= p_indexer->getLocalElement(ginode);
-        (this->val)(cell,node) = ( p_lid >= 0) ? pvec_constView[p_lid] : 0;
+        const LO p_lid  = p_indexer->getLocalElement(ginode);
+        (this->val)(cell, node) = (p_lid >= 0) ? pvec_constView[p_lid] : 0;
       }
     }
   }
 }
 
-} // namespace PHAL
+}  // namespace PHAL

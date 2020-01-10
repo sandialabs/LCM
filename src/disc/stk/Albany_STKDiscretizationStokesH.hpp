@@ -7,32 +7,32 @@
 #ifndef ALBANY_STK_DISCRETIZATION_STOKES_H_HPP
 #define ALBANY_STK_DISCRETIZATION_STOKES_H_HPP
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "Albany_STKDiscretization.hpp"
 
 namespace Albany {
 
-class STKDiscretizationStokesH : public STKDiscretization {
-public:
-
+class STKDiscretizationStokesH : public STKDiscretization
+{
+ public:
   //! Constructor
   STKDiscretizationStokesH(
-     const Teuchos::RCP<Teuchos::ParameterList>& discParams,
-     Teuchos::RCP<AbstractSTKMeshStruct>& stkMeshStruct,
-     const Teuchos::RCP<const Teuchos_Comm>& commT,
-     const Teuchos::RCP<RigidBodyModes>& rigidBodyModes = Teuchos::null);
-
+      const Teuchos::RCP<Teuchos::ParameterList>& discParams,
+      Teuchos::RCP<AbstractSTKMeshStruct>&        stkMeshStruct,
+      const Teuchos::RCP<const Teuchos_Comm>&     commT,
+      const Teuchos::RCP<RigidBodyModes>& rigidBodyModes = Teuchos::null);
 
   //! Destructor
   ~STKDiscretizationStokesH() = default;
 
-private:
+ private:
   //! Process STK mesh for CRS Graphs
-  void computeGraphs();
+  void
+  computeGraphs();
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_STK_DISCRETIZATION_STOKESH_H_HPP
+#endif  // ALBANY_STK_DISCRETIZATION_STOKESH_H_HPP

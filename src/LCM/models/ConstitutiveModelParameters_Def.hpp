@@ -8,6 +8,7 @@
 #endif
 
 #include <PHAL_Utilities.hpp>
+
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"

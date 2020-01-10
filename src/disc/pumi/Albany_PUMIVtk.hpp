@@ -11,39 +11,42 @@
 
 namespace Albany {
 
-class PUMIVtk : public PUMIOutput {
+class PUMIVtk : public PUMIOutput
+{
+ public:
+  PUMIVtk(
+      const Teuchos::RCP<APFMeshStruct>&      meshStruct,
+      const Teuchos::RCP<const Teuchos_Comm>& commT_);
 
-  public:
+  ~PUMIVtk();
 
-    PUMIVtk(const Teuchos::RCP<APFMeshStruct>& meshStruct,
-            const Teuchos::RCP<const Teuchos_Comm>& commT_);
+  void
+  writeFile(const double time);
+  void
+  setFileName(const std::string& fname)
+  {
+    outputFileName = fname;
+  }
 
-    ~PUMIVtk();
+ private:
+  void
+  callAPFWrite(std::string const& path);
 
-    void writeFile(const double time);
-    void setFileName(const std::string& fname){ outputFileName = fname; }
+  std::fstream vtu_collection_file;
 
-  private:
+  Teuchos::RCP<APFMeshStruct> mesh_struct;
 
-    void callAPFWrite(std::string const& path);
+  bool        doCollection;
+  std::string outputFileName;
 
-    std::fstream vtu_collection_file;
+  int remeshFileIndex;
 
-    Teuchos::RCP<APFMeshStruct> mesh_struct;
+  long ofilepos;
 
-    bool doCollection;
-    std::string outputFileName;
-
-    int remeshFileIndex;
-
-    long ofilepos;
-
-    //! Epetra communicator
-    Teuchos::RCP<const Teuchos_Comm> commT;
-
+  //! Epetra communicator
+  Teuchos::RCP<const Teuchos_Comm> commT;
 };
 
-}
+}  // namespace Albany
 
 #endif
-

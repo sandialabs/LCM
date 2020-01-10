@@ -10,136 +10,155 @@
 #include <map>
 #include <string>
 
-#include "Teuchos_RCP.hpp"
 #include "Phalanx_DataLayout.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
+/*!
+ * \brief Struct to construct and hold DataLayouts
+ */
+struct Layouts
+{
+  Layouts(
+      int worksetSize,
+      int numVertices,
+      int numNodes,
+      int numQPts,
+      int numCellDim,
+      int vecDim  = -1,
+      int numFace = 0);
+  Layouts(
+      int worksetSize,
+      int numVertices,
+      int numNodes,
+      int numQPts,
+      int numSideDim,
+      int numSpaceDim,
+      int numSides,
+      int vecDim);
+
+  //! Data Layout for scalar quantity that lives at nodes
+  Teuchos::RCP<PHX::DataLayout> node_scalar;
+  //! Data Layout for scalar quantity that lives at quad points
+  Teuchos::RCP<PHX::DataLayout> qp_scalar;
+  //! Data Layout for scalar quantity that lives on a cell
+  Teuchos::RCP<PHX::DataLayout> cell_scalar;
+  //! Data Layout for scalar quantity that lives on a cell
+  Teuchos::RCP<PHX::DataLayout> cell_scalar2;
+  //! Data Layout for scalar quantity that lives on a face
+  Teuchos::RCP<PHX::DataLayout> face_scalar;
+  //! Data Layout for vector quantity that lives at nodes
+  Teuchos::RCP<PHX::DataLayout> node_vector;
+  //! Data Layout for vector quantity that lives at quad points
+  Teuchos::RCP<PHX::DataLayout> qp_vector;
+  //! Data Layout for vector quantity that lives on a cell
+  Teuchos::RCP<PHX::DataLayout> cell_vector;
+  //! Data Layout for vector quantity that lives on a face
+  Teuchos::RCP<PHX::DataLayout> face_vector;
+  //! Data Layout for gradient quantity that lives at nodes
+  Teuchos::RCP<PHX::DataLayout> node_gradient;
+  //! Data Layout for gradient quantity that lives at quad points
+  Teuchos::RCP<PHX::DataLayout> qp_gradient;
+  //! Data Layout for vector quantity that lives at quad points, with dimension
+  //! of the ambient space
+  Teuchos::RCP<PHX::DataLayout> qp_vector_spacedim;
+  //! Data Layout for gradient quantity that lives on a cell
+  Teuchos::RCP<PHX::DataLayout> cell_gradient;
+  //! Data Layout for gradient quantity that lives on a face
+  Teuchos::RCP<PHX::DataLayout> face_gradient;
+  //! Data Layout for tensor quantity that lives at nodes
+  Teuchos::RCP<PHX::DataLayout> node_tensor;
+  //! Data Layout for tensor quantity that lives at quad points
+  Teuchos::RCP<PHX::DataLayout> qp_tensor;
+  //! Data Layout for tensor quantity (cellDim x sideDim) that lives at quad
+  //! points.
+  Teuchos::RCP<PHX::DataLayout> qp_tensor_cd_sd;
+  //! Data Layout for tensor quantity that lives on a cell
+  Teuchos::RCP<PHX::DataLayout> cell_tensor;
+  //! Data Layout for tensor quantity that lives on a face
+  Teuchos::RCP<PHX::DataLayout> face_tensor;
+  //! Data Layout for tensor gradient quantity that lives at quad points
+  Teuchos::RCP<PHX::DataLayout> qp_tensorgradient;
+  //! Data Layout for vector gradient quantity that lives at nodes
+  Teuchos::RCP<PHX::DataLayout> node_vecgradient;
+  //! Data Layout for vector gradient quantity that lives at quad points
+  Teuchos::RCP<PHX::DataLayout> qp_vecgradient;
+  //! Data Layout for vector gradient quantity that lives on a cell
+  Teuchos::RCP<PHX::DataLayout> cell_vecgradient;
+  //! Data Layout for vector gradient quantity that lives on a face
+  Teuchos::RCP<PHX::DataLayout> face_vecgradient;
+  //! Data Layout for third order tensor quantity that lives at nodes
+  Teuchos::RCP<PHX::DataLayout> node_tensor3;
+  //! Data Layout for third order tensor quantity that lives at quad points
+  Teuchos::RCP<PHX::DataLayout> qp_tensor3;
+  //! Data Layout for third order tensor quantity that lives on a cell
+  Teuchos::RCP<PHX::DataLayout> cell_tensor3;
+  //! Data Layout for third order tensor quantity that lives on a face
+  Teuchos::RCP<PHX::DataLayout> face_tensor3;
+  //! Data Layout for fourth order tensor quantity that lives at nodes
+  Teuchos::RCP<PHX::DataLayout> node_tensor4;
+  //! Data Layout for fourth order tensor quantity that lives at quad points
+  Teuchos::RCP<PHX::DataLayout> qp_tensor4;
+  //! Data Layout for fourth order tensor quantity that lives on a cell
+  Teuchos::RCP<PHX::DataLayout> cell_tensor4;
+  //! Data Layout for fourth order tensor quantity that lives on a face
+  Teuchos::RCP<PHX::DataLayout> face_tensor4;
+  //! Data Layout for vector quantity that lives at vertices (coordinates)
+  //! //FIXME: dont oords live at nodes, not vertices?
+  Teuchos::RCP<PHX::DataLayout> vertices_vector;
+  Teuchos::RCP<PHX::DataLayout> qp_coords;
+  //! Data Layout for length 3 quantity  that lives at nodes (shell coordinates)
+  Teuchos::RCP<PHX::DataLayout> node_3vector;
+
+  //! Data Layout for scalar basis functions
+  Teuchos::RCP<PHX::DataLayout> node_qp_scalar;
+  //! Data Layout for gradient basis functions
+  Teuchos::RCP<PHX::DataLayout> node_qp_gradient;
+  Teuchos::RCP<PHX::DataLayout> node_qp_vector;  // Old, but incorrect name
+
+  //! Data Layout for scalar quantity on workset
+  Teuchos::RCP<PHX::DataLayout> workset_scalar;
+  //! Data Layout for vector quantity on workset
+  Teuchos::RCP<PHX::DataLayout> workset_vector;
+  //! Data Layout for gradient quantity on workset
+  Teuchos::RCP<PHX::DataLayout> workset_gradient;
+  //! Data Layout for tensor quantity on workset
+  Teuchos::RCP<PHX::DataLayout> workset_tensor;
+  //! Data Layout for vector gradient quantity on workset
+  Teuchos::RCP<PHX::DataLayout> workset_vecgradient;
+
+  //! Data Layout for scalar quantity that is hosted by nodes
+  Teuchos::RCP<PHX::DataLayout> node_node_scalar;
+  //! Data Layout for vector quantity that is hosted by nodes
+  Teuchos::RCP<PHX::DataLayout> node_node_vector;
+  //! Data Layout for tensor quantity that is hosted by nodes
+  Teuchos::RCP<PHX::DataLayout> node_node_tensor;
   /*!
-   * \brief Struct to construct and hold DataLayouts
+   * \brief Dummy Data Layout where one is needed but not accessed
+   * For instance, the action of scattering residual data from a
+   * Field into the residual vector in the workset struct needs an
+   * evaluator, but the evaluator has no natural Field that it computes.
+   * So, it computes the Scatter field with this (empty) Dummy layout.
+   * Requesting this Dummy Field then activates this evaluator so
+   * the action is performed.
    */
-  struct Layouts {
+  Teuchos::RCP<PHX::DataLayout> shared_param;
+  Teuchos::RCP<PHX::DataLayout>
+                                shared_param_vec;  // same length as other vectors
+  Teuchos::RCP<PHX::DataLayout> dummy;
 
-    Layouts (int worksetSize, int numVertices, int numNodes, int numQPts, int numCellDim, int vecDim=-1, int numFace=0);
-    Layouts (int worksetSize, int numVertices, int numNodes, int numQPts, int numSideDim, int numSpaceDim, int numSides, int vecDim);
+  // For backward compatibility, and simplicitiy, we want to check if
+  // the vector length is the same as the spatial dimension. This
+  // assumption is hardwired in mechanics problems and we want to
+  // test that it is a valide assumption with this bool.
+  bool vectorAndGradientLayoutsAreEquivalent;
 
-    //! Data Layout for scalar quantity that lives at nodes
-    Teuchos::RCP<PHX::DataLayout> node_scalar;
-    //! Data Layout for scalar quantity that lives at quad points
-    Teuchos::RCP<PHX::DataLayout> qp_scalar;
-    //! Data Layout for scalar quantity that lives on a cell
-    Teuchos::RCP<PHX::DataLayout> cell_scalar;
-    //! Data Layout for scalar quantity that lives on a cell
-    Teuchos::RCP<PHX::DataLayout> cell_scalar2;
-    //! Data Layout for scalar quantity that lives on a face
-    Teuchos::RCP<PHX::DataLayout> face_scalar;
-    //! Data Layout for vector quantity that lives at nodes
-    Teuchos::RCP<PHX::DataLayout> node_vector;
-    //! Data Layout for vector quantity that lives at quad points
-    Teuchos::RCP<PHX::DataLayout> qp_vector;
-    //! Data Layout for vector quantity that lives on a cell
-    Teuchos::RCP<PHX::DataLayout> cell_vector;
-    //! Data Layout for vector quantity that lives on a face
-    Teuchos::RCP<PHX::DataLayout> face_vector;
-    //! Data Layout for gradient quantity that lives at nodes
-    Teuchos::RCP<PHX::DataLayout> node_gradient;
-    //! Data Layout for gradient quantity that lives at quad points
-    Teuchos::RCP<PHX::DataLayout> qp_gradient;
-    //! Data Layout for vector quantity that lives at quad points, with dimension of the ambient space
-    Teuchos::RCP<PHX::DataLayout> qp_vector_spacedim;
-    //! Data Layout for gradient quantity that lives on a cell
-    Teuchos::RCP<PHX::DataLayout> cell_gradient;
-    //! Data Layout for gradient quantity that lives on a face
-    Teuchos::RCP<PHX::DataLayout> face_gradient;
-    //! Data Layout for tensor quantity that lives at nodes
-    Teuchos::RCP<PHX::DataLayout> node_tensor;
-    //! Data Layout for tensor quantity that lives at quad points
-    Teuchos::RCP<PHX::DataLayout> qp_tensor;
-    //! Data Layout for tensor quantity (cellDim x sideDim) that lives at quad points.
-    Teuchos::RCP<PHX::DataLayout> qp_tensor_cd_sd;
-    //! Data Layout for tensor quantity that lives on a cell
-    Teuchos::RCP<PHX::DataLayout> cell_tensor;
-    //! Data Layout for tensor quantity that lives on a face
-    Teuchos::RCP<PHX::DataLayout> face_tensor;
-    //! Data Layout for tensor gradient quantity that lives at quad points
-    Teuchos::RCP<PHX::DataLayout> qp_tensorgradient;
-    //! Data Layout for vector gradient quantity that lives at nodes
-    Teuchos::RCP<PHX::DataLayout> node_vecgradient;
-    //! Data Layout for vector gradient quantity that lives at quad points
-    Teuchos::RCP<PHX::DataLayout> qp_vecgradient;
-    //! Data Layout for vector gradient quantity that lives on a cell
-    Teuchos::RCP<PHX::DataLayout> cell_vecgradient;
-    //! Data Layout for vector gradient quantity that lives on a face
-    Teuchos::RCP<PHX::DataLayout> face_vecgradient;
-    //! Data Layout for third order tensor quantity that lives at nodes
-    Teuchos::RCP<PHX::DataLayout> node_tensor3;
-    //! Data Layout for third order tensor quantity that lives at quad points
-    Teuchos::RCP<PHX::DataLayout> qp_tensor3;
-    //! Data Layout for third order tensor quantity that lives on a cell
-    Teuchos::RCP<PHX::DataLayout> cell_tensor3;
-    //! Data Layout for third order tensor quantity that lives on a face
-    Teuchos::RCP<PHX::DataLayout> face_tensor3;
-    //! Data Layout for fourth order tensor quantity that lives at nodes
-    Teuchos::RCP<PHX::DataLayout> node_tensor4;
-    //! Data Layout for fourth order tensor quantity that lives at quad points
-    Teuchos::RCP<PHX::DataLayout> qp_tensor4;
-    //! Data Layout for fourth order tensor quantity that lives on a cell
-    Teuchos::RCP<PHX::DataLayout> cell_tensor4;
-    //! Data Layout for fourth order tensor quantity that lives on a face
-    Teuchos::RCP<PHX::DataLayout> face_tensor4;
-    //! Data Layout for vector quantity that lives at vertices (coordinates) //FIXME: dont oords live at nodes, not vertices?
-    Teuchos::RCP<PHX::DataLayout> vertices_vector;
-    Teuchos::RCP<PHX::DataLayout> qp_coords;
-    //! Data Layout for length 3 quantity  that lives at nodes (shell coordinates)
-    Teuchos::RCP<PHX::DataLayout> node_3vector;
+  // A flag to check whether this layouts structure belongs to a sideset
+  bool isSideLayouts;
 
-    //! Data Layout for scalar basis functions
-    Teuchos::RCP<PHX::DataLayout> node_qp_scalar;
-    //! Data Layout for gradient basis functions
-    Teuchos::RCP<PHX::DataLayout> node_qp_gradient;
-    Teuchos::RCP<PHX::DataLayout> node_qp_vector; // Old, but incorrect name
+  std::map<std::string, Teuchos::RCP<Layouts>> side_layouts;
+};
 
-    //! Data Layout for scalar quantity on workset
-    Teuchos::RCP<PHX::DataLayout> workset_scalar;
-    //! Data Layout for vector quantity on workset
-    Teuchos::RCP<PHX::DataLayout> workset_vector;
-    //! Data Layout for gradient quantity on workset
-    Teuchos::RCP<PHX::DataLayout> workset_gradient;
-    //! Data Layout for tensor quantity on workset
-    Teuchos::RCP<PHX::DataLayout> workset_tensor;
-    //! Data Layout for vector gradient quantity on workset
-    Teuchos::RCP<PHX::DataLayout> workset_vecgradient;
+}  // namespace Albany
 
-    //! Data Layout for scalar quantity that is hosted by nodes
-    Teuchos::RCP<PHX::DataLayout> node_node_scalar;
-    //! Data Layout for vector quantity that is hosted by nodes
-    Teuchos::RCP<PHX::DataLayout> node_node_vector;
-    //! Data Layout for tensor quantity that is hosted by nodes
-    Teuchos::RCP<PHX::DataLayout> node_node_tensor;
-    /*!
-     * \brief Dummy Data Layout where one is needed but not accessed
-     * For instance, the action of scattering residual data from a
-     * Field into the residual vector in the workset struct needs an
-     * evaluator, but the evaluator has no natural Field that it computes.
-     * So, it computes the Scatter field with this (empty) Dummy layout.
-     * Requesting this Dummy Field then activates this evaluator so
-     * the action is performed.
-     */
-    Teuchos::RCP<PHX::DataLayout> shared_param;
-    Teuchos::RCP<PHX::DataLayout> shared_param_vec; // same length as other vectors
-    Teuchos::RCP<PHX::DataLayout> dummy;
-
-    // For backward compatibility, and simplicitiy, we want to check if
-    // the vector length is the same as the spatial dimension. This
-    // assumption is hardwired in mechanics problems and we want to
-    // test that it is a valide assumption with this bool.
-    bool vectorAndGradientLayoutsAreEquivalent;
-
-    // A flag to check whether this layouts structure belongs to a sideset
-    bool isSideLayouts;
-
-    std::map<std::string,Teuchos::RCP<Layouts>> side_layouts;
-  };
-
-} // namespace Albany
-
-#endif // ALBANY_LAYOUTS_HPP
+#endif  // ALBANY_LAYOUTS_HPP

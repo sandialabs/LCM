@@ -8,7 +8,6 @@
 #define RIGIDCONTACTBC_HPP
 
 #include "PHAL_Neumann.hpp"
-
 #include "Teuchos_TwoDArray.hpp"
 
 namespace LCM {

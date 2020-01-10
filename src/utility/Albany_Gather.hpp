@@ -7,9 +7,9 @@
 #ifndef ALBANY_GATHER_HPP
 #define ALBANY_GATHER_HPP
 
-#include "Teuchos_Array.hpp"
 #include "Albany_CommTypes.hpp"
 #include "Albany_ScalarOrdinalTypes.hpp"
+#include "Teuchos_Array.hpp"
 
 namespace Albany {
 
@@ -19,9 +19,11 @@ namespace Albany {
 // does not allow the local arrays too have different lengths
 // across ranks. If Teuchos end up implementing it, you can remove
 // this routine (or turn it into a wrapper of Teuchos routines).
-void gatherAllV(const Teuchos::RCP<const Teuchos_Comm>& comm,
-                const Teuchos::ArrayView<const GO>& myVals,
-                Teuchos::Array<GO>& allVals);
+void
+gatherAllV(
+    const Teuchos::RCP<const Teuchos_Comm>& comm,
+    const Teuchos::ArrayView<const GO>&     myVals,
+    Teuchos::Array<GO>&                     allVals);
 
 // This free function gathers all values on the root rank.
 // The reason for the existence of this routine rather than
@@ -30,10 +32,13 @@ void gatherAllV(const Teuchos::RCP<const Teuchos_Comm>& comm,
 // the Ordinal type of the communicator, which is not the
 // case for Albany (the global count is GO, and the comm
 // ordinal is LO).
-void gatherV(const Teuchos::RCP<const Teuchos_Comm>& comm,
-             const Teuchos::ArrayView<const GO>& myVals,
-             Teuchos::Array<GO>& allVals, const LO root_rank);
+void
+gatherV(
+    const Teuchos::RCP<const Teuchos_Comm>& comm,
+    const Teuchos::ArrayView<const GO>&     myVals,
+    Teuchos::Array<GO>&                     allVals,
+    const LO                                root_rank);
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_GATHER_HPP
+#endif  // ALBANY_GATHER_HPP

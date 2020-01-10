@@ -7,63 +7,66 @@
 #ifndef ALBANY_PROBLEMFACTORY_HPP
 #define ALBANY_PROBLEMFACTORY_HPP
 
+#include "Albany_AbstractProblem.hpp"
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
 
-#include "Albany_AbstractProblem.hpp"
-
 // Forward declarations.
-namespace AAdapt { namespace rc { class Manager; } }
+namespace AAdapt {
+namespace rc {
+class Manager;
+}
+}  // namespace AAdapt
 
 namespace Albany {
 
-  /*!
-   * \brief A factory class to instantiate AbstractProblem objects
-   */
-  class ProblemFactory {
-  public:
+/*!
+ * \brief A factory class to instantiate AbstractProblem objects
+ */
+class ProblemFactory
+{
+ public:
+  //! Default constructor
+  ProblemFactory(
+      const Teuchos::RCP<Teuchos::ParameterList>&   topLevelParams,
+      const Teuchos::RCP<ParamLib>&                 paramLib,
+      const Teuchos::RCP<const Teuchos::Comm<int>>& commT_);
 
-    //! Default constructor
-    ProblemFactory(const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
-                   const Teuchos::RCP<ParamLib>& paramLib,
-                   const Teuchos::RCP<const Teuchos::Comm<int> >& commT_);
+  //! Destructor
+  virtual ~ProblemFactory() {}
 
-    //! Destructor
-    virtual ~ProblemFactory() {}
+  virtual Teuchos::RCP<Albany::AbstractProblem>
+  create();
 
-    virtual Teuchos::RCP<Albany::AbstractProblem>
-    create();
-
-    //! Set the ref config manager for use in certain problems.
-    void setReferenceConfigurationManager(
+  //! Set the ref config manager for use in certain problems.
+  void
+  setReferenceConfigurationManager(
       const Teuchos::RCP<AAdapt::rc::Manager>& rc_mgr);
 
-  private:
+ private:
+  //! Private to prohibit copying
+  ProblemFactory(const ProblemFactory&);
 
-    //! Private to prohibit copying
-    ProblemFactory(const ProblemFactory&);
+  //! Private to prohibit copying
+  ProblemFactory&
+  operator=(const ProblemFactory&);
 
-    //! Private to prohibit copying
-    ProblemFactory& operator=(const ProblemFactory&);
+ protected:
+  //! Parameter list specifying what problem to create
+  Teuchos::RCP<Teuchos::ParameterList> problemParams;
 
-  protected:
+  //! Parameter list specifying what discretization to use.
+  Teuchos::RCP<Teuchos::ParameterList> discretizationParams;
 
-    //! Parameter list specifying what problem to create
-    Teuchos::RCP<Teuchos::ParameterList> problemParams;
+  //! Parameter library
+  Teuchos::RCP<ParamLib> paramLib;
 
-    //! Parameter list specifying what discretization to use.
-    Teuchos::RCP<Teuchos::ParameterList> discretizationParams;
+  //! MPI Communicator
+  Teuchos::RCP<const Teuchos::Comm<int>> commT;
 
-    //! Parameter library
-    Teuchos::RCP<ParamLib> paramLib;
+  Teuchos::RCP<AAdapt::rc::Manager> rc_mgr;
+};
 
-    //! MPI Communicator
-    Teuchos::RCP<const Teuchos::Comm<int> > commT;
+}  // namespace Albany
 
-    Teuchos::RCP<AAdapt::rc::Manager> rc_mgr;
-
-  };
-
-}
-
-#endif // ALBANY_PROBLEMFACTORY_HPP
+#endif  // ALBANY_PROBLEMFACTORY_HPP

@@ -7,17 +7,15 @@
 #ifndef THERMOELASTICITYPROBLEM_HPP
 #define THERMOELASTICITYPROBLEM_HPP
 
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
-
 #include "Albany_AbstractProblem.hpp"
-
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
@@ -121,17 +119,15 @@ class ThermoElasticityProblem : public Albany::AbstractProblem
 };
 }  // namespace Albany
 
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
-
 #include "Albany_AbstractProblem.hpp"
-
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 // Explicity add evaluators defined in the model below
 #include "ElasticModulus.hpp"

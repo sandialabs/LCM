@@ -7,20 +7,17 @@
 #ifndef ALBANY_BCUTILS_HPP
 #define ALBANY_BCUTILS_HPP
 
+#include <Phalanx_Evaluator_TemplateManager.hpp>
+#include <Teuchos_ParameterList.hpp>
+#include <Teuchos_RCP.hpp>
 #include <string>
 #include <vector>
 
-#include <Teuchos_ParameterList.hpp>
-#include <Teuchos_RCP.hpp>
-
-#include <Phalanx_Evaluator_TemplateManager.hpp>
-
 #include "Albany_DataTypes.hpp"
-#include "PHAL_AlbanyTraits.hpp"
-#include "PHAL_FactoryTraits.hpp"
-
 #include "Albany_MaterialDatabase.hpp"
 #include "Albany_MeshSpecs.hpp"
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_FactoryTraits.hpp"
 
 namespace Albany {
 

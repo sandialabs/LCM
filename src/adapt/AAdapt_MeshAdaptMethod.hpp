@@ -16,32 +16,37 @@ namespace AAdapt {
 
 /*! \brief Encapsulates the different uses of MeshAdapt in Albany
  */
-struct MeshAdaptMethod {
-
+struct MeshAdaptMethod
+{
   MeshAdaptMethod(const Teuchos::RCP<Albany::APFDiscretization>& disc);
 
-  virtual ~MeshAdaptMethod(){}
+  virtual ~MeshAdaptMethod() {}
 
-  virtual void setParams(const Teuchos::RCP<Teuchos::ParameterList>& p) = 0;
+  virtual void
+  setParams(const Teuchos::RCP<Teuchos::ParameterList>& p) = 0;
 
-  virtual void preProcessOriginalMesh() = 0;
-  virtual void preProcessShrunkenMesh() = 0;
-  virtual void adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_) = 0;
-  virtual void postProcessShrunkenMesh() = 0;
-  virtual void postProcessFinalMesh() = 0;
+  virtual void
+  preProcessOriginalMesh() = 0;
+  virtual void
+  preProcessShrunkenMesh() = 0;
+  virtual void
+  adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_) = 0;
+  virtual void
+  postProcessShrunkenMesh() = 0;
+  virtual void
+  postProcessFinalMesh() = 0;
 
-protected:
-
+ protected:
   Teuchos::RCP<Albany::APFDiscretization> apf_disc;
-  Teuchos::RCP<Albany::APFMeshStruct> mesh_struct;
-  Teuchos::RCP<const Teuchos_Comm> commT;
+  Teuchos::RCP<Albany::APFMeshStruct>     mesh_struct;
+  Teuchos::RCP<const Teuchos_Comm>        commT;
 
-  void setCommonMeshAdaptOptions(
+  void
+  setCommonMeshAdaptOptions(
       const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_,
-      ma::Input *in);
-
+      ma::Input*                                  in);
 };
 
-}
+}  // namespace AAdapt
 
 #endif

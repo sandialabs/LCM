@@ -8,7 +8,9 @@
 #define LCM_ParallelNeohookeanModel_Def_hpp
 
 #include <MiniTensor.h>
+
 #include <iostream>
+
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
 #include "utility/math/Tensor.hpp"

@@ -53,11 +53,11 @@ class SolutionSniffer : public NOX::Abstract::PrePostOperator
 
  private:
   Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> status_test_{Teuchos::null};
-  Teuchos::RCP<NOX::Abstract::Vector> soln_init_{Teuchos::null};
-  Teuchos::RCP<NOX::Abstract::Vector> last_soln_{Teuchos::null};
-  ST norm_init_{0.0};
-  ST norm_final_{0.0};
-  ST norm_diff_{0.0};
+  Teuchos::RCP<NOX::Abstract::Vector>               soln_init_{Teuchos::null};
+  Teuchos::RCP<NOX::Abstract::Vector>               last_soln_{Teuchos::null};
+  ST                                                norm_init_{0.0};
+  ST                                                norm_final_{0.0};
+  ST                                                norm_diff_{0.0};
 };
 
 }  // namespace LCM

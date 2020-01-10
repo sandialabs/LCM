@@ -8,7 +8,6 @@
 #define ALBANY_GENERIC_STK_FIELD_CONTAINER_HPP
 
 #include "Albany_AbstractSTKFieldContainer.hpp"
-
 #include "Teuchos_ParameterList.hpp"
 
 // Forward declaration is enough
@@ -16,37 +15,37 @@ namespace stk {
 namespace mesh {
 class BulkData;
 class MetaData;
-} // namespace stk
-} // namespace mesh
+}  // namespace mesh
+}  // namespace stk
 
 namespace Albany {
 
-template<bool Interleaved>
+template <bool Interleaved>
 class GenericSTKFieldContainer : public AbstractSTKFieldContainer
 {
-public:
-
-  GenericSTKFieldContainer(const Teuchos::RCP<Teuchos::ParameterList>& params_,
-                           const Teuchos::RCP<stk::mesh::MetaData>& metaData_,
-                           const Teuchos::RCP<stk::mesh::BulkData>& bulkData_,
-                           const int neq_,
-                           const int numDim_);
+ public:
+  GenericSTKFieldContainer(
+      const Teuchos::RCP<Teuchos::ParameterList>& params_,
+      const Teuchos::RCP<stk::mesh::MetaData>&    metaData_,
+      const Teuchos::RCP<stk::mesh::BulkData>&    bulkData_,
+      const int                                   neq_,
+      const int                                   numDim_);
 
   virtual ~GenericSTKFieldContainer() = default;
 
   // Add StateStructs to the list of stored ones
-  void addStateStructs(const Teuchos::RCP<Albany::StateInfoStruct>& sis);
+  void
+  addStateStructs(const Teuchos::RCP<Albany::StateInfoStruct>& sis);
 
-protected:
-
-  Teuchos::RCP<stk::mesh::MetaData> metaData;
-  Teuchos::RCP<stk::mesh::BulkData> bulkData;
+ protected:
+  Teuchos::RCP<stk::mesh::MetaData>    metaData;
+  Teuchos::RCP<stk::mesh::BulkData>    bulkData;
   Teuchos::RCP<Teuchos::ParameterList> params;
 
   int neq;
   int numDim;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_GENERIC_STK_FIELD_CONTAINER_HPP
+#endif  // ALBANY_GENERIC_STK_FIELD_CONTAINER_HPP

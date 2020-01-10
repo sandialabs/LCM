@@ -7,16 +7,14 @@
 #ifndef ALBANY_ABSTRACT_DISCRETIZATION_HPP
 #define ALBANY_ABSTRACT_DISCRETIZATION_HPP
 
-#include "Albany_config.h"
-
 #include "Albany_AbstractMeshStruct.hpp"
 #include "Albany_DiscretizationUtils.hpp"
 #include "Albany_NodalDOFManager.hpp"
 #include "Albany_StateInfoStruct.hpp"
+#include "Albany_ThyraTypes.hpp"
+#include "Albany_config.h"
 #include "Shards_Array.hpp"
 #include "Shards_CellTopologyData.h"
-
-#include "Albany_ThyraTypes.hpp"
 
 namespace Albany {
 

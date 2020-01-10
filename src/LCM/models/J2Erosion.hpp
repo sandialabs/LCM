@@ -98,7 +98,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType              current_time_{0.0};
 
   std::map<std::pair<int, int>, GO> elemWsLIDGIDMap_;
-  int ws_index_{0};
+  int                               ws_index_{0};
 
   void
   init(

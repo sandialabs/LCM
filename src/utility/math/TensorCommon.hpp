@@ -11,14 +11,12 @@
 
 /**
  *  \file Common.hpp
- *  
- *  \brief 
+ *
+ *  \brief
  */
 
-namespace util
-{
-  using index_t = int;
+namespace util {
+using index_t = int;
 }
-
 
 #endif  // UTIL_COMMONMATH_HPP

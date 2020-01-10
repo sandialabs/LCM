@@ -7,8 +7,8 @@
 #ifndef ALBANY_MEMORY_HPP
 #define ALBANY_MEMORY_HPP
 
-#include <iostream>
 #include <Teuchos_Comm.hpp>
+#include <iostream>
 
 namespace Albany {
 /*! \brief Depending on configuration, report min, median, and max values over
@@ -47,8 +47,10 @@ namespace Albany {
  *  the routine was not enabled; or, if it was enabled, the routine on that
  *  system does not provide a value for that field, which is common.
  */
-void printMemoryAnalysis(
-  std::ostream& os, const Teuchos::RCP< const Teuchos::Comm<int> >& comm);
-}
+void
+printMemoryAnalysis(
+    std::ostream&                                 os,
+    const Teuchos::RCP<const Teuchos::Comm<int>>& comm);
+}  // namespace Albany
 
-#endif // ALBANY_MEMORY_HPP
+#endif  // ALBANY_MEMORY_HPP

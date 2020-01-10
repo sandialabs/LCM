@@ -7,22 +7,26 @@
 #ifndef AADAPT_INITIAL_CONDITION_HPP
 #define AADAPT_INITIAL_CONDITION_HPP
 
+#include <string>
+
 #include "Albany_DataTypes.hpp"
 #include "Albany_DiscretizationUtils.hpp"
-
-#include <string>
 #include "Teuchos_ParameterList.hpp"
 
 namespace AAdapt {
 
-void InitialConditions (const Teuchos::RCP<Thyra_Vector>& solnT,
-                       const Albany::Conn& wsElNodeEqID,
-                       const Teuchos::ArrayRCP<std::string>& wsEBNames,
-                       const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*> > > coords,
-                       const int neq, const int numDim,
-                       Teuchos::ParameterList& icParams,
-                       const bool gasRestartSolution = false);
+void
+InitialConditions(
+    const Teuchos::RCP<Thyra_Vector>&     solnT,
+    const Albany::Conn&                   wsElNodeEqID,
+    const Teuchos::ArrayRCP<std::string>& wsEBNames,
+    const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>
+                            coords,
+    const int               neq,
+    const int               numDim,
+    Teuchos::ParameterList& icParams,
+    const bool              gasRestartSolution = false);
 
-} // namespace AAdapt
+}  // namespace AAdapt
 
-#endif // AADAPT_INITIAL_CONDITION_HPP
+#endif  // AADAPT_INITIAL_CONDITION_HPP

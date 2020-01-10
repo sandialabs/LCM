@@ -10,47 +10,54 @@
 #include "PHAL_SeparableScatterScalarResponse.hpp"
 
 namespace PHAL {
-/** 
+/**
  * \brief Response Description
  */
-  template<typename EvalT, typename Traits>
-  class ResponseFieldIntegral : 
-    public PHAL::SeparableScatterScalarResponse<EvalT,Traits>
-  {
-  public:
-    typedef typename EvalT::ScalarT ScalarT;
-    typedef typename EvalT::MeshScalarT MeshScalarT;
+template <typename EvalT, typename Traits>
+class ResponseFieldIntegral
+    : public PHAL::SeparableScatterScalarResponse<EvalT, Traits>
+{
+ public:
+  typedef typename EvalT::ScalarT     ScalarT;
+  typedef typename EvalT::MeshScalarT MeshScalarT;
 
-    ResponseFieldIntegral(Teuchos::ParameterList& p,
-			  const Teuchos::RCP<Albany::Layouts>& dl);
-  
-    void postRegistrationSetup(typename Traits::SetupData d,
-			       PHX::FieldManager<Traits>& vm);
+  ResponseFieldIntegral(
+      Teuchos::ParameterList&              p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-    void preEvaluate(typename Traits::PreEvalData d);
-  
-    void evaluateFields(typename Traits::EvalData d);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-    void postEvaluate(typename Traits::PostEvalData d);
-	  
-  private:
-    Teuchos::RCP<const Teuchos::ParameterList> getValidResponseParameters() const;
+  void
+  preEvaluate(typename Traits::PreEvalData d);
 
-    PHX::MDField<const ScalarT> field;
-    PHX::MDField<const MeshScalarT> coordVec;
-    PHX::MDField<const MeshScalarT> weights;
-    PHX::index_size_type field_rank;
-    std::vector<PHX::DataLayout::size_type> field_dims;
-    Teuchos::Array<int> field_components;
-    std::size_t numQPs;
-    std::size_t numDims;
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-    std::vector<std::string> ebNames;    
-    double scaling;
-    bool limitX, limitY, limitZ;
-    double xmin, xmax, ymin, ymax, zmin, zmax;
-  };
-	
-}
+  void
+  postEvaluate(typename Traits::PostEvalData d);
+
+ private:
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidResponseParameters() const;
+
+  PHX::MDField<const ScalarT>             field;
+  PHX::MDField<const MeshScalarT>         coordVec;
+  PHX::MDField<const MeshScalarT>         weights;
+  PHX::index_size_type                    field_rank;
+  std::vector<PHX::DataLayout::size_type> field_dims;
+  Teuchos::Array<int>                     field_components;
+  std::size_t                             numQPs;
+  std::size_t                             numDims;
+
+  std::vector<std::string> ebNames;
+  double                   scaling;
+  bool                     limitX, limitY, limitZ;
+  double                   xmin, xmax, ymin, ymax, zmin, zmax;
+};
+
+}  // namespace PHAL
 
 #endif

@@ -8,16 +8,13 @@
 #define LCM_StrongSchwarzBC_hpp
 
 #include "Albany_config.h"
-
+#include "PHAL_AlbanyTraits.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-
-#include "Teuchos_ParameterList.hpp"
-
-#include "PHAL_AlbanyTraits.hpp"
 #include "Sacado_ParameterAccessor.hpp"
+#include "Teuchos_ParameterList.hpp"
 //#include "PHAL_Dirichlet.hpp"
 #include "PHAL_SDirichlet.hpp"
 

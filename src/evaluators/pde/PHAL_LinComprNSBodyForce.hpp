@@ -7,10 +7,10 @@
 #ifndef PHAL_LINCOMPRNSBODYFORCE_HPP
 #define PHAL_LINCOMPRNSBODYFORCE_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element Interpolation Evaluator
@@ -19,42 +19,47 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class LinComprNSBodyForce : public PHX::EvaluatorWithBaseImpl<Traits>,
-		    public PHX::EvaluatorDerived<EvalT, Traits> {
-
-public:
-
+                            public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
   typedef typename EvalT::ScalarT ScalarT;
 
   LinComprNSBodyForce(const Teuchos::ParameterList& p);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-
-private:
- 
+ private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  // Input:  
-  PHX::MDField<const MeshScalarT,Cell,QuadPoint, Dim> coordVec;
-  Teuchos::Array<double> gravity;
-  
-  // Output:
-  PHX::MDField<ScalarT,Cell,QuadPoint,VecDim> force;
+  // Input:
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordVec;
+  Teuchos::Array<double>                                gravity;
 
-   //Force types
-  enum BFTYPE {NONE, STEADYEUL, UNSTEADYEULMMS, DRIVENPULSE};
+  // Output:
+  PHX::MDField<ScalarT, Cell, QuadPoint, VecDim> force;
+
+  // Force types
+  enum BFTYPE
+  {
+    NONE,
+    STEADYEUL,
+    UNSTEADYEULMMS,
+    DRIVENPULSE
+  };
   BFTYPE bf_type;
 
   std::size_t numQPs;
   std::size_t numDims;
   std::size_t vecDim;
-
 };
-}
+}  // namespace PHAL
 
 #endif

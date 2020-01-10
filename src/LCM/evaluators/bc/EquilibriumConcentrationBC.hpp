@@ -11,12 +11,11 @@
 #include <Phalanx_Evaluator_WithBaseImpl.hpp>
 #include <Phalanx_MDField.hpp>
 #include <Phalanx_config.hpp>
-
-#include "Teuchos_ParameterList.hpp"
-
 #include <vector>
+
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dirichlet.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace LCM {
 /** \brief Equilibrium Concentration BC Dirichlet evaluator

@@ -7,23 +7,26 @@
 #ifndef ALBANY_STATELESS_NOX_OBSERVER_HPP
 #define ALBANY_STATELESS_NOX_OBSERVER_HPP
 
-#include "NOX_Epetra_Observer.H"
-
 #include "Albany_Application.hpp"
+#include "NOX_Epetra_Observer.H"
 
 namespace Albany {
 class StatelessObserverImpl;
 
-class NOXStatelessObserver : public NOX::Epetra::Observer {
-public:
-  NOXStatelessObserver(const Teuchos::RCP<Application> &app);
+class NOXStatelessObserver : public NOX::Epetra::Observer
+{
+ public:
+  NOXStatelessObserver(const Teuchos::RCP<Application>& app);
 
-  void observeSolution(const Epetra_Vector& solution);
-  void observeSolution(const Epetra_Vector& solution, double time_or_param_val);
-private:
+  void
+  observeSolution(const Epetra_Vector& solution);
+  void
+  observeSolution(const Epetra_Vector& solution, double time_or_param_val);
+
+ private:
   Teuchos::RCP<StatelessObserverImpl> impl;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_STATELESS_NOX_OBSERVER_HPP
+#endif  // ALBANY_STATELESS_NOX_OBSERVER_HPP

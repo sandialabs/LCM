@@ -14,28 +14,26 @@
 
 /**
  *  \file TimeGuard.hpp
- *  
- *  \brief 
+ *
+ *  \brief
  */
 
 namespace util {
 
-class TimeGuard {
-public:
-
-  TimeGuard (Teuchos::RCP<Teuchos::Time> timer, bool reset = false)
-      : timer_(timer) {
+class TimeGuard
+{
+ public:
+  TimeGuard(Teuchos::RCP<Teuchos::Time> timer, bool reset = false)
+      : timer_(timer)
+  {
     timer_->start(reset);
   }
 
-  ~TimeGuard () {
-    timer_->stop();
-  }
+  ~TimeGuard() { timer_->stop(); }
 
-private:
-
+ private:
   Teuchos::RCP<Teuchos::Time> timer_;
 };
-}
+}  // namespace util
 
 #endif  // TIMEGUARD_HPP_

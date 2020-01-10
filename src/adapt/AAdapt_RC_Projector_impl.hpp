@@ -21,12 +21,13 @@ namespace rc {
 
 //! Solve A x = b using preconditioner P. Construct P if it is null on input.
 Teuchos::RCP<Thyra_MultiVector>
-solve(const Teuchos::RCP<const Thyra_LinearOp>& A,
-      Teuchos::RCP<Thyra_LinearOp>& P,
-      const Teuchos::RCP<const Thyra_MultiVector>& b,
-      Teuchos::ParameterList& belos_pl);
+solve(
+    const Teuchos::RCP<const Thyra_LinearOp>&    A,
+    Teuchos::RCP<Thyra_LinearOp>&                P,
+    const Teuchos::RCP<const Thyra_MultiVector>& b,
+    Teuchos::ParameterList&                      belos_pl);
 
-} // namespace rc
-} // namespace AAdapt
+}  // namespace rc
+}  // namespace AAdapt
 
-#endif // AADAPT_RC_PROJECTOR_IMPL_HPP
+#endif  // AADAPT_RC_PROJECTOR_IMPL_HPP

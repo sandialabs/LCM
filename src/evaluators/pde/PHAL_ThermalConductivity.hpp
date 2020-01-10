@@ -8,20 +8,17 @@
 #define PHAL_THERMAL_CONDUCTIVITY_HPP
 
 #include "Albany_config.h"
-
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
-
-#include "Teuchos_ParameterList.hpp"
+#include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
+#include "Teuchos_ParameterList.hpp"
 #ifdef ALBANY_STOKHOS
 #include "Stokhos_KL_ExponentialRandomField.hpp"
 #endif
-#include "Teuchos_Array.hpp"
-
 #include "Albany_MaterialDatabase.hpp"
+#include "Teuchos_Array.hpp"
 
 namespace PHAL {
 /**
@@ -30,59 +27,69 @@ namespace PHAL {
 
 This class may be used in two ways.
 
-1. The simplest is to use a constant thermal conductivity across the entire domain (one element block,
-one material), say with a value of 5.0. In this case, one would declare at the "Problem" level, that a
-constant thermal conductivity was being used, and its value was 5.0:
+1. The simplest is to use a constant thermal conductivity across the entire
+domain (one element block, one material), say with a value of 5.0. In this case,
+one would declare at the "Problem" level, that a constant thermal conductivity
+was being used, and its value was 5.0:
 
 <ParameterList name="Problem">
    ...
     <ParameterList name="ThermalConductivity">
-       <Parameter name="ThermalConductivity Type" type="string" value="Constant"/>
-       <Parameter name="Value" type="double" value="5.0"/>
+       <Parameter name="ThermalConductivity Type" type="string"
+value="Constant"/> <Parameter name="Value" type="double" value="5.0"/>
     </ParameterList>
 </ParameterList>
 
 An example of this is test problem is SteadyHeat2DInternalNeumann
 
-2. The other extreme is to have a multiple element block problem, say 3, with each element block corresponding
-to a material. Each element block has its own field manager, and different evaluators are used in each element
-block. See the test problem Heat2DMMCylWithSource for an example of this use case.
+2. The other extreme is to have a multiple element block problem, say 3, with
+each element block corresponding to a material. Each element block has its own
+field manager, and different evaluators are used in each element block. See the
+test problem Heat2DMMCylWithSource for an example of this use case.
 
  */
 
-template<typename EvalT, typename Traits>
-class ThermalConductivity :
-  public PHX::EvaluatorWithBaseImpl<Traits>,
-  public PHX::EvaluatorDerived<EvalT, Traits>,
-  public Sacado::ParameterAccessor<EvalT, SPL_Traits> {
-
-public:
-  typedef typename EvalT::ScalarT ScalarT;
+template <typename EvalT, typename Traits>
+class ThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
+                            public PHX::EvaluatorDerived<EvalT, Traits>,
+                            public Sacado::ParameterAccessor<EvalT, SPL_Traits>
+{
+ public:
+  typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  enum SG_RF {CONSTANT, UNIFORM, LOGNORMAL};
+  enum SG_RF
+  {
+    CONSTANT,
+    UNIFORM,
+    LOGNORMAL
+  };
 
   ThermalConductivity(Teuchos::ParameterList& p);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-           PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  ScalarT& getValue(const std::string &n);
+  ScalarT&
+  getValue(const std::string& n);
 
-private:
-
-//! Validate the name strings under "ThermalConductivity" section in xml input file,
+ private:
+  //! Validate the name strings under "ThermalConductivity" section in xml input
+  //! file,
   Teuchos::RCP<const Teuchos::ParameterList>
-               getValidThermalCondParameters() const;
+  getValidThermalCondParameters() const;
 
   bool is_constant;
 
-  std::size_t numQPs;
-  std::size_t numDims;
-  PHX::MDField<const MeshScalarT,Cell,QuadPoint,Dim> coordVec;
-  PHX::MDField<ScalarT,Cell,QuadPoint> thermalCond;
+  std::size_t                                           numQPs;
+  std::size_t                                           numDims;
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordVec;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                thermalCond;
 
   //! Conductivity type
   std::string type;
@@ -92,7 +99,7 @@ private:
 
 #ifdef ALBANY_STOKHOS
   //! Exponential random field
-  Teuchos::RCP< Stokhos::KL::ExponentialRandomField<RealType> > exp_rf_kl;
+  Teuchos::RCP<Stokhos::KL::ExponentialRandomField<RealType>> exp_rf_kl;
 #endif
 
   //! Values of the random variables
@@ -102,15 +109,19 @@ private:
   Teuchos::RCP<Albany::MaterialDatabase> materialDB;
 
   //! Convenience function to initialize constant thermal conductivity
-  void init_constant(ScalarT value, Teuchos::ParameterList& p);
+  void
+  init_constant(ScalarT value, Teuchos::ParameterList& p);
 
   //! Convenience function to initialize thermal conductivity based on
   //  Truncated KL Expansion || Log Normal RF
-  void init_KL_RF(std::string &type, Teuchos::ParameterList& subList, Teuchos::ParameterList& p);
+  void
+  init_KL_RF(
+      std::string&            type,
+      Teuchos::ParameterList& subList,
+      Teuchos::ParameterList& p);
 
   SG_RF randField;
-
 };
-}
+}  // namespace PHAL
 
 #endif

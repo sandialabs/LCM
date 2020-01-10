@@ -9,8 +9,6 @@
 #include "PHAL_AlbanyTraits.hpp"
 #include "Phalanx_MDField.hpp"
 
-
-
 namespace AAdapt {
 namespace rc {
 
@@ -20,33 +18,59 @@ namespace rc {
 /*! Define Tensor<ad_type, rank> Tensor<ad_type, rank>::type is the
  *  corresponding MDField type, and Tensor<ad_type, rank>::rank gives the rank.
  */
-template<typename ad_type, int rank> struct Tensor;
-template<typename ad_type> struct Tensor<ad_type, 0> {
-  enum { rank = 0 };
+template <typename ad_type, int rank>
+struct Tensor;
+template <typename ad_type>
+struct Tensor<ad_type, 0>
+{
+  enum
+  {
+    rank = 0
+  };
   typedef PHX::MDField<ad_type, Cell, QuadPoint> type;
 };
-template<typename ad_type> struct Tensor<ad_type, 1> {
-  enum { rank = 1 };
+template <typename ad_type>
+struct Tensor<ad_type, 1>
+{
+  enum
+  {
+    rank = 1
+  };
   typedef PHX::MDField<ad_type, Cell, QuadPoint, Dim> type;
 };
-template<typename ad_type> struct Tensor<ad_type, 2> {
-  enum { rank = 2 };
+template <typename ad_type>
+struct Tensor<ad_type, 2>
+{
+  enum
+  {
+    rank = 2
+  };
   typedef PHX::MDField<ad_type, Cell, QuadPoint, Dim, Dim> type;
 };
 /*! For convenience, define RTensor<rank> as shorthand for Tensor<RealType,
  *  rank>.
  */
-template<int rank> struct RTensor : public Tensor<RealType, rank> {};
+template <int rank>
+struct RTensor : public Tensor<RealType, rank>
+{
+};
 
 /*! Initial value of an accumulated quantity.
  */
-struct Init {
-  enum Enum { zero, identity };
+struct Init
+{
+  enum Enum
+  {
+    zero,
+    identity
+  };
 };
 /*! Transformation to apply before and after projection and interpolation.
  */
-struct Transformation {
-  enum Enum {
+struct Transformation
+{
+  enum Enum
+  {
     none,
     //! Compute F = R S, where R is a rotation and S is the stretch, then do
     //  log/exp for R and S.
@@ -54,7 +78,7 @@ struct Transformation {
   };
 };
 
-} // namespace rc
-} // namespace AAdapt
+}  // namespace rc
+}  // namespace AAdapt
 
-#endif // AADAPT_RC_DATATYPES
+#endif  // AADAPT_RC_DATATYPES

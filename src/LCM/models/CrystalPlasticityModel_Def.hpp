@@ -7,18 +7,18 @@
 #include "Teuchos_TestForException.hpp"
 /*
 #include <Tsqr_Matrix.hpp>
+
 #include "Teuchos_LAPACK.hpp"
 //*/
-#include "Albany_Utils.hpp"
-#include "Phalanx_DataLayout.hpp"
-
 #include <MiniLinearSolver.h>
 
 #include <Sacado_Traits.hpp>
 #include <iostream>
+#include <type_traits>
 #include <typeinfo>
 
-#include <type_traits>
+#include "Albany_Utils.hpp"
+#include "Phalanx_DataLayout.hpp"
 #include "core/CrystalPlasticity/ParameterReader.hpp"
 
 namespace {

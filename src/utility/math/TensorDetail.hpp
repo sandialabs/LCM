@@ -13,62 +13,73 @@
 
 /**
  *  \file TensorDetail.hpp
- *  
- *  \brief 
+ *
+ *  \brief
  */
 namespace util {
 namespace detail {
 const index_t DYNAMIC_SIZE = 0;
 
-template<int P>
+template <int P>
 struct static_pow
 {
-  template<typename T>
-  static constexpr KOKKOS_INLINE_FUNCTION T value (T val) {
+  template <typename T>
+  static constexpr KOKKOS_INLINE_FUNCTION T
+  value(T val)
+  {
     return val * static_pow<P - 1>::value(val);
   }
 };
 
-template<>
+template <>
 struct static_pow<0>
 {
-  template<typename T>
-  static constexpr KOKKOS_INLINE_FUNCTION T value (T) {
+  template <typename T>
+  static constexpr KOKKOS_INLINE_FUNCTION T value(T)
+  {
     return T(1);
   }
 };
 
 constexpr KOKKOS_INLINE_FUNCTION int
-arg_count() {
+arg_count()
+{
   return 0;
 }
 
-template<typename T, typename... Args>
+template <typename T, typename... Args>
 constexpr KOKKOS_INLINE_FUNCTION int
-arg_count(T first, Args... args) {
+arg_count(T first, Args... args)
+{
   return 1 + arg_count(args...);
 }
 
-template<typename T>
-KOKKOS_INLINE_FUNCTION T power_series (T& coeff, T x, T last) {
+template <typename T>
+KOKKOS_INLINE_FUNCTION T
+power_series(T& coeff, T x, T last)
+{
   coeff = 1;
-  return last;// * static_pow<0>::value(x);
+  return last;  // * static_pow<0>::value(x);
 }
 
-template<typename T, typename... Coefficients>
-KOKKOS_INLINE_FUNCTION T power_series (T& coeff, T x, T first, Coefficients... rest) {
-  T rem = power_series(coeff,x,rest...);
+template <typename T, typename... Coefficients>
+KOKKOS_INLINE_FUNCTION T
+power_series(T& coeff, T x, T first, Coefficients... rest)
+{
+  T rem = power_series(coeff, x, rest...);
   coeff *= x;
   return first * coeff + rem;
 }
 
-template<typename T, typename... Coefficients>
-KOKKOS_INLINE_FUNCTION T power_series (T x, Coefficients... rest) {
+template <typename T, typename... Coefficients>
+KOKKOS_INLINE_FUNCTION T
+power_series(T x, Coefficients... rest)
+{
   T coeff = 1;
   return power_series(coeff, x, rest...);
 }
 
-}
-}
+}  // namespace detail
+}  // namespace util
 
 #endif  // UTIL_TENSORDETAIL_HPP

@@ -7,71 +7,76 @@
 #ifndef PHAL_SAVE_SIDE_SET_STATE_FIELD_HPP
 #define PHAL_SAVE_SIDE_SET_STATE_FIELD_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Albany_Layouts.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 #include "Teuchos_ParameterList.hpp"
 
-#include "PHAL_AlbanyTraits.hpp"
-#include "Albany_Layouts.hpp"
-
-namespace PHAL
-{
+namespace PHAL {
 /** \brief SaveSideSetStatField
 
 */
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class SaveSideSetStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
                               public PHX::EvaluatorDerived<EvalT, Traits>
 {
-public:
+ public:
+  SaveSideSetStateField(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  SaveSideSetStateField (const Teuchos::ParameterList& p,
-                         const Teuchos::RCP<Albany::Layouts>& dl);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& fm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& fm);
-
-  void evaluateFields(typename Traits::EvalData workset);
+  void
+  evaluateFields(typename Traits::EvalData workset);
 };
 
 // =========================== SPECIALIZATION ========================= //
 
-template<typename Traits>
+template <typename Traits>
 class SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>
-                    : public PHX::EvaluatorWithBaseImpl<Traits>,
-                      public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
+    : public PHX::EvaluatorWithBaseImpl<Traits>,
+      public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
 {
-public:
+ public:
+  SaveSideSetStateField(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  SaveSideSetStateField (const Teuchos::ParameterList& p,
-                         const Teuchos::RCP<Albany::Layouts>& dl);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& fm);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& fm);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void evaluateFields (typename Traits::EvalData d);
-
-private:
-
-  void saveElemState (typename Traits::EvalData d);
-  void saveNodeState (typename Traits::EvalData d);
+ private:
+  void
+  saveElemState(typename Traits::EvalData d);
+  void
+  saveNodeState(typename Traits::EvalData d);
 
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
 
   Teuchos::RCP<PHX::FieldTag> savestate_operation;
-  PHX::MDField<const ScalarT>       field;
+  PHX::MDField<const ScalarT> field;
 
   std::string sideSetName;
   std::string fieldName;
   std::string stateName;
 
-  bool nodalState;
-  std::vector<std::vector<int> >  sideNodes;
+  bool                          nodalState;
+  std::vector<std::vector<int>> sideNodes;
 };
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_SAVE_SIDE_SET_STATE_FIELD_HPP
+#endif  // PHAL_SAVE_SIDE_SET_STATE_FIELD_HPP

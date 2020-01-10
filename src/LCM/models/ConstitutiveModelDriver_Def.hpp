@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include <MiniTensor.h>
+
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_RCP.hpp"
 #include "Teuchos_TestForException.hpp"

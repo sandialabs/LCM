@@ -8,10 +8,9 @@
 // 1.  Implement 1D and 2D.
 
 #include "Albany_Utils.hpp"
+#include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
-
-#include "Intrepid2_FunctionSpaceTools.hpp"
 
 namespace HMC {
 

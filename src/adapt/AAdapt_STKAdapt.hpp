@@ -4,60 +4,63 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef AADAPT_STKADAPTT_HPP
 #define AADAPT_STKADAPTT_HPP
-
-#include "Teuchos_RCP.hpp"
-#include "Teuchos_ParameterList.hpp"
 
 #include "AAdapt_AbstractAdapter.hpp"
 #include "Albany_GenericSTKMeshStruct.hpp"
 #include "Albany_STKDiscretization.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 #ifdef ALBANY_LANDICE
 #include "Albany_STKDiscretizationStokesH.hpp"
 #endif
 
-#include "PHAL_Workset.hpp"
 #include "PHAL_Dimension.hpp"
-
+#include "PHAL_Workset.hpp"
 #include "UniformRefinerPattern.hpp"
 
 namespace AAdapt {
 
-template<class SizeField>
-class STKAdapt : public AbstractAdapter {
-public:
-
-  STKAdapt(const Teuchos::RCP<Teuchos::ParameterList>& params_,
-            const Teuchos::RCP<ParamLib>& paramLib_,
-            const Albany::StateManager& StateMgr_,
-            const Teuchos::RCP<const Teuchos_Comm>& comm_);
+template <class SizeField>
+class STKAdapt : public AbstractAdapter
+{
+ public:
+  STKAdapt(
+      const Teuchos::RCP<Teuchos::ParameterList>& params_,
+      const Teuchos::RCP<ParamLib>&               paramLib_,
+      const Albany::StateManager&                 StateMgr_,
+      const Teuchos::RCP<const Teuchos_Comm>&     comm_);
   //! Destructor
   ~STKAdapt() = delete;
 
   //! Check adaptation criteria to determine if the mesh needs adapting
-  virtual bool queryAdaptationCriteria(int iteration);
+  virtual bool
+  queryAdaptationCriteria(int iteration);
 
-  //! Apply adaptation method to mesh and problem. Returns true if adaptation is performed successfully.
-  virtual bool adaptMesh(const Teuchos::RCP<const Tpetra_Vector>& solution,
-                         const Teuchos::RCP<const Tpetra_Vector>& ovlp_solution);
+  //! Apply adaptation method to mesh and problem. Returns true if adaptation is
+  //! performed successfully.
+  virtual bool
+  adaptMesh(
+      const Teuchos::RCP<const Tpetra_Vector>& solution,
+      const Teuchos::RCP<const Tpetra_Vector>& ovlp_solution);
 
   //! Each adapter must generate it's list of valid parameters
-  Teuchos::RCP<const Teuchos::ParameterList> getValidAdapterParameters() const;
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidAdapterParameters() const;
 
-private:
-
+ private:
   // Disallow copy and assignment
   STKAdapt(const STKAdapt&);
-  STKAdapt& operator=(const STKAdapt&);
+  STKAdapt&
+  operator=(const STKAdapt&);
 
-  void printElementData();
+  void
+  printElementData();
 
-  int numDim;
-  int remeshFileIndex;
+  int         numDim;
+  int         remeshFileIndex;
   std::string base_exo_filename;
-
 
   Teuchos::RCP<Albany::GenericSTKMeshStruct> genericMeshStruct;
 
@@ -65,17 +68,16 @@ private:
 
   Albany::STKDiscretization* stk_discretization;
 
-  Teuchos::RCP<stk::percept::PerceptMesh> eMesh;
+  Teuchos::RCP<stk::percept::PerceptMesh>             eMesh;
   Teuchos::RCP<stk::adapt::UniformRefinerPatternBase> refinerPattern;
 
   int num_iterations;
 
   const Teuchos::RCP<const Tpetra_Vector> solution;
   const Teuchos::RCP<const Tpetra_Vector> ovlp_solution;
-
 };
 
-} // namespace AAdapt
+}  // namespace AAdapt
 
 // Define macros for explicit template instantiation
 #define STKADAPTT_INSTANTIATE_TEMPLATE_CLASS_UNIFREFINE(name) \
@@ -84,5 +86,4 @@ private:
 #define STKADAPTT_INSTANTIATE_TEMPLATE_CLASS(name) \
   STKADAPTT_INSTANTIATE_TEMPLATE_CLASS_UNIFREFINE(name)
 
-
-#endif // ALBANY_STK_ADAPT_HPP
+#endif  // ALBANY_STK_ADAPT_HPP

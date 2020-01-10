@@ -15,25 +15,28 @@ class MeshSIM;
 
 namespace Albany {
 
-class SimOutput : public PUMIOutput {
-public:
-
-  SimOutput(const Teuchos::RCP<APFMeshStruct>& meshStruct_,
-            const Teuchos::RCP<const Teuchos_Comm>& comm_);
+class SimOutput : public PUMIOutput
+{
+ public:
+  SimOutput(
+      const Teuchos::RCP<APFMeshStruct>&      meshStruct_,
+      const Teuchos::RCP<const Teuchos_Comm>& comm_);
 
   ~SimOutput() = default;
 
-  void writeFile(const double time);
-  void setFileName(const std::string& fname);
+  void
+  writeFile(const double time);
+  void
+  setFileName(const std::string& fname);
 
-private:
+ private:
   //! Communicator
   Teuchos::RCP<const Teuchos_Comm> comm;
-  apf::MeshSIM* mesh;
-  std::string filename;
-  int index;
+  apf::MeshSIM*                    mesh;
+  std::string                      filename;
+  int                              index;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_SIM_OUTPUT_HPP
+#endif  // ALBANY_SIM_OUTPUT_HPP

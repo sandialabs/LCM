@@ -48,47 +48,72 @@ namespace rc {
  *                   = det(dx[n-1]/dr) / det(F[n-1,0]).
  * This third calculation is performed by transformWeightedGradientBF.
  */
-template<int rank> class Field {
-public:
+template <int rank>
+class Field
+{
+ public:
   Field();
 
-  bool init(const Teuchos::ParameterList& p, const std::string& name);
+  bool
+  init(const Teuchos::ParameterList& p, const std::string& name);
 
   //! \c init has been called.
   operator bool() const;
 
-  typename Tensor<const RealType, rank>::type& operator() () { return f_; }
-  const typename Tensor<const RealType, rank>::type& operator() () const { return f_; }
+  typename Tensor<const RealType, rank>::type&
+  operator()()
+  {
+    return f_;
+  }
+  const typename Tensor<const RealType, rank>::type&
+  operator()() const
+  {
+    return f_;
+  }
 
   //! f_incr = f_incr * f_accum. Call as \code f_rc.multiplyInto<typename
   //  EvalT::ScalarT>(f, cell, qp); \endcode inside loops over workset.numCells
   //  and number of quadrature points.
-  template<typename ad_type>
-  void multiplyInto(typename Tensor<ad_type, 2>::type& f_incr) const;
+  template <typename ad_type>
+  void
+  multiplyInto(typename Tensor<ad_type, 2>::type& f_incr) const;
   //! f_incr = f_incr * f_accum.
-  template<typename ad_type>
-  void multiplyInto(typename Tensor<ad_type, 2>::type& f_incr,
-                    const std::size_t cell, const std::size_t qp) const;
+  template <typename ad_type>
+  void
+  multiplyInto(
+      typename Tensor<ad_type, 2>::type& f_incr,
+      const std::size_t                  cell,
+      const std::size_t                  qp) const;
 
   //! f_incr += f_accum.
-  template<typename ad_type>
-  void addTo(typename Tensor<ad_type, rank>::type& f_incr) const;
+  template <typename ad_type>
+  void
+  addTo(typename Tensor<ad_type, rank>::type& f_incr) const;
   //! f_incr += f_accum.
-  template<typename ad_type>
-  void addTo(typename Tensor<ad_type, rank>::type& f_incr,
-             const std::size_t cell, const std::size_t qp) const;
+  template <typename ad_type>
+  void
+  addTo(
+      typename Tensor<ad_type, rank>::type& f_incr,
+      const std::size_t                     cell,
+      const std::size_t                     qp) const;
 
-private:
+ private:
   typename Tensor<const RealType, rank>::type f_;
-  bool valid_;
+  bool                                        valid_;
 };
 
 //! Transform \c w_grad_bf using F[n-1,0].
-template<typename MeshScalarType>
-void transformWeightedGradientBF(
-  const Field<2>& F, const RealType& det_F,
-  const PHX::MDField<MeshScalarType const, Cell, Node, QuadPoint, Dim>& w_grad_bf,
-  const int cell, const int pt, const int node, MeshScalarType w[3])
+template <typename MeshScalarType>
+void
+transformWeightedGradientBF(
+    const Field<2>& F,
+    const RealType& det_F,
+    const PHX::MDField<MeshScalarType const, Cell, Node, QuadPoint, Dim>&
+                   w_grad_bf,
+    const int      cell,
+    const int      pt,
+    const int      node,
+    MeshScalarType w[3])
 {
   const int nd = w_grad_bf.extent(3);
   for (int k = 0; k < nd; ++k) {
@@ -99,8 +124,7 @@ void transformWeightedGradientBF(
   }
 }
 
+}  // namespace rc
+}  // namespace AAdapt
 
-} // namespace rc
-} // namespace AAdapt
-
-#endif // AADAPT_RC_FIELD
+#endif  // AADAPT_RC_FIELD

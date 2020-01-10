@@ -4,17 +4,15 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "ProjectIPtoNodalField.hpp"
-
-#include "Albany_config.h"
-
 #include "Adapt_NodalDataVector.hpp"
+#include "Albany_config.h"
+#include "ProjectIPtoNodalField.hpp"
 // #include "Albany_ProblemUtils.hpp"
-#include "Albany_Utils.hpp"
-#include "Albany_ThyraUtils.hpp"
-#include "Albany_GlobalLocalIndexer.hpp"
-
 #include <Teuchos_AbstractFactoryStd.hpp>
+
+#include "Albany_GlobalLocalIndexer.hpp"
+#include "Albany_ThyraUtils.hpp"
+#include "Albany_Utils.hpp"
 // #include <Teuchos_TestForException.hpp>
 
 #ifdef ALBANY_IFPACK2
@@ -93,7 +91,7 @@ class ProjectIPtoNodalFieldQuadrature
   typedef PHAL::AlbanyTraits::Residual::MeshScalarT      MeshScalarT;
   PHX::MDField<RealType, Cell, Node, QuadPoint>          bf_;
   PHX::MDField<const RealType, Cell, Node, QuadPoint>    bf_const_;
-  PHX::MDField<      MeshScalarT, Cell, Node, QuadPoint> wbf_;
+  PHX::MDField<MeshScalarT, Cell, Node, QuadPoint>       wbf_;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint> wbf_const_;
 
   Teuchos::RCP<Intrepid2Basis>               intrepid_basis_;
@@ -544,11 +542,11 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
   output_to_exodus_ = plist->get<bool>("Output to File", true);
 
   // Number of quad points per cell and dimension.
-  const Teuchos::RCP<PHX::DataLayout>& vector_dl      = dl->qp_vector;
-  const Teuchos::RCP<PHX::DataLayout>& node_dl        = dl->node_qp_vector;
-  num_pts_                                            = vector_dl->extent(1);
-  num_dims_                                           = vector_dl->extent(2);
-  num_nodes_                                          = node_dl->extent(1);
+  const Teuchos::RCP<PHX::DataLayout>& vector_dl = dl->qp_vector;
+  const Teuchos::RCP<PHX::DataLayout>& node_dl   = dl->node_qp_vector;
+  num_pts_                                       = vector_dl->extent(1);
+  num_dims_                                      = vector_dl->extent(2);
+  num_nodes_                                     = node_dl->extent(1);
 
   // Number of Fields is read from the input file; this is the number of named
   // fields (scalar, vector, or tensor) to transfer.
@@ -696,8 +694,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
 }
 
 template <typename Traits>
-void
-ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
+void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     typename Traits::PreEvalData /* workset */)
 {
   const int  ctr      = mgr_->incrPreCounter();
@@ -728,8 +725,8 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     // Enough for first-order hex, but only a hint.
     const size_t                                max_num_entries = 27;
     Teuchos::RCP<Albany::ThyraCrsMatrixFactory> ovl_graph_factory_nonconst =
-        Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(
-            ovl_vs, ovl_vs, max_num_entries));
+        Teuchos::rcp(
+            new Albany::ThyraCrsMatrixFactory(ovl_vs, ovl_vs, max_num_entries));
     ovl_graph_factory_nonconst->fillComplete();
     mgr_->ovl_graph_factory =
         Teuchos::rcp_dynamic_cast<const Albany::ThyraCrsMatrixFactory>(
@@ -774,8 +771,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(
     for (unsigned int cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t node = 0; node < num_nodes_; ++node) {
         const GO global_row = wsElNodeID[cell][node];
-        const LO local_row =
-            ip_field_vs_indexer->getLocalElement(global_row);
+        const LO local_row  = ip_field_vs_indexer->getLocalElement(global_row);
         for (std::size_t qp = 0; qp < num_pts_; ++qp) {
           switch (ip_field_layouts_[field]) {
             case EFieldLayout::scalar:
@@ -840,8 +836,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 }
 
 template <typename Traits>
-void
-ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
+void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
     typename Traits::PostEvalData /* workset */)
 {
   const int  ctr     = mgr_->incrPostCounter();

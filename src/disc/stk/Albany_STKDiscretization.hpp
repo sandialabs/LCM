@@ -13,10 +13,9 @@
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_DataTypes.hpp"
+#include "Albany_NullSpaceUtils.hpp"
 #include "utility/Albany_ThyraCrsMatrixFactory.hpp"
 #include "utility/Albany_ThyraUtils.hpp"
-
-#include "Albany_NullSpaceUtils.hpp"
 
 // Start of STK stuff
 #include <stk_mesh/base/BulkData.hpp>

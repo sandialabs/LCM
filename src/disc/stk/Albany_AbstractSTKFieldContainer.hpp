@@ -8,22 +8,20 @@
 #define ALBANY_ABSTRACT_STK_FIELD_CONTAINER_HPP
 
 #include "Albany_config.h"
-
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
 
 // This include is added in Tpetra branch to get all the necessary
 // Tpetra includes (e.g., Tpetra_Vector.hpp, Tpetra_Map.hpp, etc.)
-#include "Albany_DataTypes.hpp"
-
-#include "Albany_AbstractFieldContainer.hpp"
-#include "Albany_NodalDOFManager.hpp"
-#include "Albany_StateInfoStruct.hpp"
-#include "Albany_Utils.hpp"
-
 #include <stk_mesh/base/CoordinateSystems.hpp>
 #include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/FieldTraits.hpp>
+
+#include "Albany_AbstractFieldContainer.hpp"
+#include "Albany_DataTypes.hpp"
+#include "Albany_NodalDOFManager.hpp"
+#include "Albany_StateInfoStruct.hpp"
+#include "Albany_Utils.hpp"
 
 namespace Albany {
 
@@ -285,7 +283,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   IntScalarFieldType* proc_rank_field;
   IntScalarFieldType* refine_field;
 #if defined(ALBANY_LCM)
-  IntScalarFieldType* failure_state[stk::topology::ELEMENT_RANK + 1];
+  IntScalarFieldType*   failure_state[stk::topology::ELEMENT_RANK + 1];
   stk::mesh::FieldBase* boundary_indicator;
 #endif  // ALBANY_LCM
 

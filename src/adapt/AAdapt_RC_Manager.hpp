@@ -7,13 +7,22 @@
 #ifndef AADAPT_RC_MANAGER_HPP
 #define AADAPT_RC_MANAGER_HPP
 
-#include "Albany_DataTypes.hpp"
 #include "AAdapt_RC_DataTypes.hpp"
+#include "Albany_DataTypes.hpp"
 
 // Forward declarations.
-namespace Albany { class StateManager; class Layouts; }
-namespace PHAL { struct AlbanyTraits; struct Workset; }
-namespace PHX { template<typename T> class FieldManager; }
+namespace Albany {
+class StateManager;
+class Layouts;
+}  // namespace Albany
+namespace PHAL {
+struct AlbanyTraits;
+struct Workset;
+}  // namespace PHAL
+namespace PHX {
+template <typename T>
+class FieldManager;
+}
 
 namespace AAdapt {
 
@@ -53,61 +62,78 @@ namespace rc {
  *     </ParameterList>
  * \endcode
  */
-class Manager {
-public:
+class Manager
+{
+ public:
   /* Methods to set up the RCU framework. */
 
   //! Static constructor that may return Teuchos::null depending on the contents
   //  of the parameter list.
-  static Teuchos::RCP<Manager> create(
-    const Teuchos::RCP<Albany::StateManager>& state_mgr,
-    Teuchos::ParameterList& problem_params);
+  static Teuchos::RCP<Manager>
+  create(
+      const Teuchos::RCP<Albany::StateManager>& state_mgr,
+      Teuchos::ParameterList&                   problem_params);
 
-  void setSolutionManager(const Teuchos::RCP<AdaptiveSolutionManager>& sol_mgr);
+  void
+  setSolutionManager(const Teuchos::RCP<AdaptiveSolutionManager>& sol_mgr);
 
   //! Fill valid_pl with valid parameters for this class.
-  static void getValidParameters(
-    Teuchos::RCP<Teuchos::ParameterList>& valid_pl);
+  static void
+  getValidParameters(Teuchos::RCP<Teuchos::ParameterList>& valid_pl);
 
   /* Methods to maintain accumulated displacement, in part for use in the BC
    * evaluators. */
 
   //! Nonconst x getter.
-  Teuchos::RCP<Thyra_Vector>& get_x();
+  Teuchos::RCP<Thyra_Vector>&
+  get_x();
   //! Initialize x_accum using this nonoverlapping map if x_accum has not
   //  already been initialized.
-  void init_x_if_not(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+  void
+  init_x_if_not(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
   //! x += soln, where soln is nonoverlapping.
-  void update_x(const Thyra_Vector& soln_nol);
+  void
+  update_x(const Thyra_Vector& soln_nol);
   //! Return x + a for nonoverlapping a.
-  Teuchos::RCP<const Thyra_Vector> add_x(const Teuchos::RCP<const Thyra_Vector>& a) const;
+  Teuchos::RCP<const Thyra_Vector>
+  add_x(const Teuchos::RCP<const Thyra_Vector>& a) const;
 
   /* Problems use these methods to set up RCU. */
 
   //! The problem registers the field.
-  void registerField(
-    const std::string& name, const Teuchos::RCP<PHX::DataLayout>& dl,
-    const Init::Enum init, const Transformation::Enum transformation,
-    const Teuchos::RCP<Teuchos::ParameterList>& p);
+  void
+  registerField(
+      const std::string&                          name,
+      const Teuchos::RCP<PHX::DataLayout>&        dl,
+      const Init::Enum                            init,
+      const Transformation::Enum                  transformation,
+      const Teuchos::RCP<Teuchos::ParameterList>& p);
   //! The problem creates the evaluators associated with RCU.
-  template<typename EvalT>
-  void createEvaluators(PHX::FieldManager<PHAL::AlbanyTraits>& fm,
-                        const Teuchos::RCP<Albany::Layouts>& dl);
+  template <typename EvalT>
+  void
+  createEvaluators(
+      PHX::FieldManager<PHAL::AlbanyTraits>& fm,
+      const Teuchos::RCP<Albany::Layouts>&   dl);
 
   /* rc::Reader, rc::Writer, and AAdapt::MeshAdapt use these methods to read and
    * write data. */
 
   //! Append a decoration to the name indicating this is an RCU field.
-  static inline std::string decorate(const std::string& name) {
+  static inline std::string
+  decorate(const std::string& name)
+  {
     return name + "_RC";
   }
   //! Remove the decoration from the end of the name. (No error checking.)
-  static inline std::string undecorate(const std::string& name_dec) {
+  static inline std::string
+  undecorate(const std::string& name_dec)
+  {
     return name_dec.substr(0, name_dec.size() - 3);
   }
 
-  struct Field {
-    typedef std::vector< Teuchos::RCP<Field> >::iterator iterator;
+  struct Field
+  {
+    typedef std::vector<Teuchos::RCP<Field>>::iterator iterator;
     //! Field name, undecorated.
     std::string name;
     //! Field layout.
@@ -115,71 +141,101 @@ public:
     //! Number of g (Lie algebra) components used to represent this field.
     int num_g_fields;
     //! Get decorated name for i'th g component field.
-    std::string get_g_name (const int i) const;
+    std::string
+    get_g_name(const int i) const;
     // Opaque internal data for use by the implementation.
     struct Data;
     Teuchos::RCP<Data> data_;
   };
 
-  Field::iterator fieldsBegin();
-  Field::iterator fieldsEnd();
+  Field::iterator
+  fieldsBegin();
+  Field::iterator
+  fieldsEnd();
 
-  typedef PHX::MDField<const RealType,Cell,Node,QuadPoint> BasisField;
+  typedef PHX::MDField<const RealType, Cell, Node, QuadPoint> BasisField;
   //! Reader<EvalT> uses these methods to load the data.
-  void beginQpInterp();
-  void interpQpField(PHX::MDField<RealType>& f, const PHAL::Workset& workset,
-                     const BasisField& bf);
-  void endQpInterp();
-  void readQpField(PHX::MDField<RealType>& f,
-                   const PHAL::Workset& workset);
+  void
+  beginQpInterp();
+  void
+  interpQpField(
+      PHX::MDField<RealType>& f,
+      const PHAL::Workset&    workset,
+      const BasisField&       bf);
+  void
+  endQpInterp();
+  void
+  readQpField(PHX::MDField<RealType>& f, const PHAL::Workset& workset);
   //! Writer<Residual> uses these methods to record the data.
-  void beginQpWrite(const PHAL::Workset& workset,
-                    const BasisField& bf, const BasisField& wbf);
-  void writeQpField(const PHX::MDField<const RealType>& f,
-                    const PHAL::Workset& workset, const BasisField& wbf);
-  void endQpWrite();
-  void testProjector(
-    const PHAL::Workset& workset, const BasisField& bf, const BasisField& wbf,
-    const PHX::MDField<RealType,Cell,Vertex,Dim>& coord_vert,
-    const PHX::MDField<RealType,Cell,QuadPoint,Dim>& coord_qp);
+  void
+  beginQpWrite(
+      const PHAL::Workset& workset,
+      const BasisField&    bf,
+      const BasisField&    wbf);
+  void
+  writeQpField(
+      const PHX::MDField<const RealType>& f,
+      const PHAL::Workset&                workset,
+      const BasisField&                   wbf);
+  void
+  endQpWrite();
+  void
+  testProjector(
+      const PHAL::Workset&                                workset,
+      const BasisField&                                   bf,
+      const BasisField&                                   wbf,
+      const PHX::MDField<RealType, Cell, Vertex, Dim>&    coord_vert,
+      const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp);
   //! MeshAdapt uses this method to read and write nodal data from the mesh
   // database before and after adaptation.
-  const Teuchos::RCP<Thyra_MultiVector>& getNodalField(
-    const Field& f, const int g_idx, const bool overlapped) const;
+  const Teuchos::RCP<Thyra_MultiVector>&
+  getNodalField(const Field& f, const int g_idx, const bool overlapped) const;
   //! MeshAdapt does this if usingProjection(). In the future, I may switch to
   //  keeping an RCP<AbstractDiscretization>, and then this call would be
   //  unnecessary.
-  void initProjector(const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-                     const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs);
+  void
+  initProjector(
+      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
+      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs);
 
   /* Methods to inform Manager of what is happening. */
 
   //! Albany is building the state field manager.
-  void beginBuildingSfm();
+  void
+  beginBuildingSfm();
   //! Albany is done building the state field manager.
-  void endBuildingSfm();
+  void
+  endBuildingSfm();
   //! Albany is evaluating the state field manager.
-  void beginEvaluatingSfm();
+  void
+  beginEvaluatingSfm();
   //! Albany is done evaluating the state field manager.
-  void endEvaluatingSfm();
+  void
+  endEvaluatingSfm();
   //! The mesh is about to adapt.
-  void beginAdapt();
+  void
+  beginAdapt();
   //! The mesh was just adapted. The maps are needed only if usingProjection().
-  void endAdapt(const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-                const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs);
+  void
+  endAdapt(
+      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
+      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs);
 
   /* Methods to inform others of what is happening. */
-  bool usingProjection() const;
+  bool
+  usingProjection() const;
 
-private:
+ private:
   struct Impl;
   Teuchos::RCP<Impl> impl_;
 
-  Manager(const Teuchos::RCP<Albany::StateManager>& state_mgr,
-          const bool use_projection, const bool do_transform);
+  Manager(
+      const Teuchos::RCP<Albany::StateManager>& state_mgr,
+      const bool                                use_projection,
+      const bool                                do_transform);
 };
 
-} // namespace rc
-} // namespace AAdapt
+}  // namespace rc
+}  // namespace AAdapt
 
-#endif // AADAPT_RC_MANAGER_HPP
+#endif  // AADAPT_RC_MANAGER_HPP

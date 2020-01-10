@@ -14,7 +14,6 @@
 
 #include "Teuchos_Comm.hpp"
 #include "Teuchos_ParameterList.hpp"
-
 #include "Tpetra_CrsMatrix.hpp"
 
 // mrtr includes

@@ -8,16 +8,15 @@
 #define FM_AlbanyInterface_hpp
 
 #include <MiniTensor.h>
+
 #include "Albany_Layouts.hpp"
+#include "FerroicModel.hpp"
 #include "LCM/models/ConstitutiveModel.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-
 #include "Sacado.hpp"
-
-#include "FerroicModel.hpp"
 
 namespace LCM {
 

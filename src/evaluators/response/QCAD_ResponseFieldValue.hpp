@@ -7,178 +7,226 @@
 #ifndef QCAD_RESPONSEFIELDVALUE_HPP
 #define QCAD_RESPONSEFIELDVALUE_HPP
 
-#include "QCAD_MeshRegion.hpp"
 #include "Albany_MaterialDatabase.hpp"
 #include "PHAL_ScatterScalarResponse.hpp"
+#include "QCAD_MeshRegion.hpp"
 
 namespace QCAD {
 
-  template<typename EvalT, typename Traits>
-  class FieldValueScatterScalarResponse :
-    public PHAL::ScatterScalarResponse<EvalT,Traits>  {
+template <typename EvalT, typename Traits>
+class FieldValueScatterScalarResponse
+    : public PHAL::ScatterScalarResponse<EvalT, Traits>
+{
+ public:
+  FieldValueScatterScalarResponse(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl)
+      : PHAL::ScatterScalarResponse<EvalT, Traits>(p, dl)
+  {
+  }
 
-  public:
+ protected:
+  // Default constructor for child classes
+  FieldValueScatterScalarResponse()
+      : PHAL::ScatterScalarResponse<EvalT, Traits>()
+  {
+  }
 
-    FieldValueScatterScalarResponse(const Teuchos::ParameterList& p,
-                              const Teuchos::RCP<Albany::Layouts>& dl) :
-      PHAL::ScatterScalarResponse<EvalT,Traits>(p,dl) {}
+  // Child classes should call setup once p is filled out
+  void
+  setup(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl)
+  {
+    PHAL::ScatterScalarResponse<EvalT, Traits>::setup(p, dl);
+  }
 
-  protected:
+  // Set NodeID structure for cell corrsponding to max/min
+  void
+  setMaxCell(const int)
+  {
+  }
 
-    // Default constructor for child classes
-    FieldValueScatterScalarResponse() :
-      PHAL::ScatterScalarResponse<EvalT,Traits>() {}
+  Teuchos::Array<int> field_components;
+};
 
-    // Child classes should call setup once p is filled out
-    void setup(const Teuchos::ParameterList& p,
-               const Teuchos::RCP<Albany::Layouts>& dl) {
-      PHAL::ScatterScalarResponse<EvalT,Traits>::setup(p,dl);
-    }
+template <typename Traits>
+class FieldValueScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>
+    : public PHAL::
+          ScatterScalarResponseBase<PHAL::AlbanyTraits::Jacobian, Traits>
+{
+ public:
+  typedef PHAL::AlbanyTraits::Jacobian EvalT;
+  typedef typename EvalT::ScalarT      ScalarT;
 
-    // Set NodeID structure for cell corrsponding to max/min
-    void setMaxCell(const int) {}
+  FieldValueScatterScalarResponse(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl)
+      : PHAL::ScatterScalarResponseBase<EvalT, Traits>(p, dl)
+  {
+  }
 
-    Teuchos::Array<int> field_components;
-  };
+  void
+  preEvaluate(typename Traits::PreEvalData d)
+  {
+  }
+  void
+  evaluateFields(typename Traits::EvalData d)
+  {
+  }
+  void
+  postEvaluate(typename Traits::PostEvalData d);
 
+ protected:
+  // Default constructor for child classes
+  FieldValueScatterScalarResponse()
+      : PHAL::ScatterScalarResponseBase<EvalT, Traits>()
+  {
+  }
 
-  template<typename Traits>
-  class FieldValueScatterScalarResponse<PHAL::AlbanyTraits::Jacobian,Traits> :
-    public PHAL::ScatterScalarResponseBase<PHAL::AlbanyTraits::Jacobian,Traits> {
+  // Child classes should call setup once p is filled out
+  void
+  setup(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl)
+  {
+    PHAL::ScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);
+    numNodes = dl->node_scalar->extent(1);
+  }
 
-  public:
-    typedef PHAL::AlbanyTraits::Jacobian EvalT;
-    typedef typename EvalT::ScalarT ScalarT;
+  // Set NodeID structure for cell corrsponding to max/min
+  void
+  setMaxCell(const int max_cell_)
+  {
+    max_cell = max_cell_;
+  }
 
-    FieldValueScatterScalarResponse(const Teuchos::ParameterList& p,
-                              const Teuchos::RCP<Albany::Layouts>& dl) :
-      PHAL::ScatterScalarResponseBase<EvalT,Traits>(p,dl) {}
+  Teuchos::Array<int> field_components;
 
-    void preEvaluate(typename Traits::PreEvalData d) {}
-    void evaluateFields(typename Traits::EvalData d) {}
-    void postEvaluate(typename Traits::PostEvalData d);
+ private:
+  int max_cell = -1;
+  int numNodes;
+};
 
-  protected:
+template <typename Traits>
+class FieldValueScatterScalarResponse<
+    PHAL::AlbanyTraits::DistParamDeriv,
+    Traits>
+    : public PHAL::
+          ScatterScalarResponseBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>
+{
+ public:
+  typedef PHAL::AlbanyTraits::DistParamDeriv EvalT;
+  typedef typename EvalT::ScalarT            ScalarT;
 
-    // Default constructor for child classes
-    FieldValueScatterScalarResponse() :
-      PHAL::ScatterScalarResponseBase<EvalT,Traits>() {}
+  FieldValueScatterScalarResponse(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl)
+      : PHAL::ScatterScalarResponseBase<EvalT, Traits>(p, dl)
+  {
+  }
 
-    // Child classes should call setup once p is filled out
-    void setup(const Teuchos::ParameterList& p,
-               const Teuchos::RCP<Albany::Layouts>& dl) {
-      PHAL::ScatterScalarResponseBase<EvalT,Traits>::setup(p,dl);
-      numNodes = dl->node_scalar->extent(1);
-    }
+  void
+  preEvaluate(typename Traits::PreEvalData d)
+  {
+  }
+  void
+  evaluateFields(typename Traits::EvalData d)
+  {
+  }
+  void
+  postEvaluate(typename Traits::PostEvalData d);
 
-    // Set NodeID structure for cell corrsponding to max/min
-    void setMaxCell(const int max_cell_) {
-      max_cell = max_cell_;
-    }
+ protected:
+  // Default constructor for child classes
+  FieldValueScatterScalarResponse()
+      : PHAL::ScatterScalarResponseBase<EvalT, Traits>()
+  {
+  }
 
-    Teuchos::Array<int> field_components;
+  // Child classes should call setup once p is filled out
+  void
+  setup(
+      const Teuchos::ParameterList&        p,
+      const Teuchos::RCP<Albany::Layouts>& dl)
+  {
+    PHAL::ScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);
+    numNodes = dl->node_scalar->extent(1);
+  }
 
-  private:
+  // Set NodeID structure for cell corrsponding to max/min
+  void
+  setMaxCell(const int max_cell_)
+  {
+    max_cell = max_cell_;
+  }
 
-    int max_cell = -1;
-    int numNodes;
-  };
+  Teuchos::Array<int> field_components;
 
-  template<typename Traits>
-  class FieldValueScatterScalarResponse<PHAL::AlbanyTraits::DistParamDeriv,Traits> :
-    public PHAL::ScatterScalarResponseBase<PHAL::AlbanyTraits::DistParamDeriv,Traits> {
-
-  public:
-    typedef PHAL::AlbanyTraits::DistParamDeriv EvalT;
-    typedef typename EvalT::ScalarT ScalarT;
-
-    FieldValueScatterScalarResponse(const Teuchos::ParameterList& p,
-                              const Teuchos::RCP<Albany::Layouts>& dl) :
-      PHAL::ScatterScalarResponseBase<EvalT,Traits>(p,dl) {}
-
-    void preEvaluate(typename Traits::PreEvalData d) {}
-    void evaluateFields(typename Traits::EvalData d) {}
-    void postEvaluate(typename Traits::PostEvalData d);
-
-  protected:
-
-    // Default constructor for child classes
-    FieldValueScatterScalarResponse() :
-      PHAL::ScatterScalarResponseBase<EvalT,Traits>() {}
-
-    // Child classes should call setup once p is filled out
-    void setup(const Teuchos::ParameterList& p,
-               const Teuchos::RCP<Albany::Layouts>& dl) {
-      PHAL::ScatterScalarResponseBase<EvalT,Traits>::setup(p,dl);
-      numNodes = dl->node_scalar->extent(1);
-    }
-
-    // Set NodeID structure for cell corrsponding to max/min
-    void setMaxCell(const int max_cell_) {
-      max_cell = max_cell_;
-    }
-
-    Teuchos::Array<int> field_components;
-
-  private:
-
-    int max_cell = -1;
-    int numNodes;
-  };
+ private:
+  int max_cell = -1;
+  int numNodes;
+};
 
 /**
  * \brief Response Description
  */
-  template<typename EvalT, typename Traits>
-  class ResponseFieldValue :
-    public FieldValueScatterScalarResponse<EvalT, Traits>
-  {
-  public:
-    typedef typename EvalT::ScalarT ScalarT;
-    typedef typename EvalT::MeshScalarT MeshScalarT;
+template <typename EvalT, typename Traits>
+class ResponseFieldValue : public FieldValueScatterScalarResponse<EvalT, Traits>
+{
+ public:
+  typedef typename EvalT::ScalarT     ScalarT;
+  typedef typename EvalT::MeshScalarT MeshScalarT;
 
-    ResponseFieldValue(Teuchos::ParameterList& p,
-                       const Teuchos::RCP<Albany::Layouts>& dl);
+  ResponseFieldValue(
+      Teuchos::ParameterList&              p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-    void postRegistrationSetup(typename Traits::SetupData d,
-                               PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-    void preEvaluate(typename Traits::PreEvalData d);
+  void
+  preEvaluate(typename Traits::PreEvalData d);
 
-    void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-    void postEvaluate(typename Traits::PostEvalData d);
+  void
+  postEvaluate(typename Traits::PostEvalData d);
 
-  private:
-    Teuchos::RCP<const Teuchos::ParameterList> getValidResponseParameters() const;
+ private:
+  Teuchos::RCP<const Teuchos::ParameterList>
+  getValidResponseParameters() const;
 
-    std::size_t numQPs;
-    std::size_t numDims;
+  std::size_t numQPs;
+  std::size_t numDims;
 
-    PHX::MDField<const ScalarT> opField;
-    PHX::MDField<const ScalarT> retField;
-    PHX::MDField<const MeshScalarT,Cell,QuadPoint,Dim> coordVec;
-    PHX::MDField<const MeshScalarT,Cell,QuadPoint> weights;
-    int max_cell;
-    //Teuchos::Array<int> field_components;
+  PHX::MDField<const ScalarT>                           opField;
+  PHX::MDField<const ScalarT>                           retField;
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordVec;
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint>      weights;
+  int                                                   max_cell;
+  // Teuchos::Array<int> field_components;
 
-    bool bOpFieldIsVector, bRetFieldIsVector;
+  bool bOpFieldIsVector, bRetFieldIsVector;
 
-    std::string operation;
-    std::string opFieldName;
-    std::string retFieldName;
+  std::string operation;
+  std::string opFieldName;
+  std::string retFieldName;
 
-    bool bReturnOpField;
-    bool opX, opY, opZ;
+  bool bReturnOpField;
+  bool opX, opY, opZ;
 
-    Teuchos::RCP< MeshRegion<EvalT, Traits> > opRegion;
+  Teuchos::RCP<MeshRegion<EvalT, Traits>> opRegion;
 
-    Teuchos::Array<double> initVals;
+  Teuchos::Array<double> initVals;
 
-    //! Material database
-    Teuchos::RCP<Albany::MaterialDatabase> materialDB;
-  };
+  //! Material database
+  Teuchos::RCP<Albany::MaterialDatabase> materialDB;
+};
 
-}
+}  // namespace QCAD
 
 #endif

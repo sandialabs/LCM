@@ -4,7 +4,6 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_SCALAR_RESPONSE_FUNCTION_HPP
 #define ALBANY_SCALAR_RESPONSE_FUNCTION_HPP
 
@@ -22,11 +21,10 @@ namespace Albany {
  */
 class ScalarResponseFunction : public AbstractResponseFunction
 {
-public:
-
+ public:
   //! Default constructor
-  ScalarResponseFunction(const Teuchos::RCP<const Teuchos_Comm>& comm_) :
-    comm(comm_)
+  ScalarResponseFunction(const Teuchos::RCP<const Teuchos_Comm>& comm_)
+      : comm(comm_)
   {
     // Nothing to be done here
   }
@@ -35,72 +33,87 @@ public:
   virtual ~ScalarResponseFunction() = default;
 
   //! Get the number of responses
-  virtual unsigned int numResponses() const = 0;
+  virtual unsigned int
+  numResponses() const = 0;
 
   //! Performs post registration setup
-  void postRegSetup() override {}
-  
+  void
+  postRegSetup() override
+  {
+  }
+
   //! Get the comm
-  Teuchos::RCP<const Teuchos_Comm> getComm() const {
+  Teuchos::RCP<const Teuchos_Comm>
+  getComm() const
+  {
     return comm;
   }
 
   //! Evaluate gradient = dg/dx, dg/dxdot, dg/dp
-  virtual void evaluateGradient(
-    const double current_time,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& xdot,
-    const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-    const Teuchos::Array<ParamVec>& p,
-    ParamVec* deriv_p,
-    const Teuchos::RCP<Thyra_Vector>& g,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dx,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dxdot,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dxdotdot,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dp) = 0;
-
+  virtual void
+  evaluateGradient(
+      const double                            current_time,
+      const Teuchos::RCP<const Thyra_Vector>& x,
+      const Teuchos::RCP<const Thyra_Vector>& xdot,
+      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      const Teuchos::Array<ParamVec>&         p,
+      ParamVec*                               deriv_p,
+      const Teuchos::RCP<Thyra_Vector>&       g,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dx,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdot,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdotdot,
+      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp) = 0;
 
   //! \name Implementation of AbstractResponseFunction virtual methods
   //@{
 
   //! Setup response function
-  void setup() override {}
+  void
+  setup() override
+  {
+  }
 
-  /*! 
+  /*!
    * \brief Is this response function "scalar" valued, i.e., has a replicated
    * local response map.
    */
-  bool isScalarResponse() const override { return true; }
-  
+  bool
+  isScalarResponse() const override
+  {
+    return true;
+  }
+
   //! Create operator for gradient
   /*!
    * Here we just throw an error.  We could actually support this a coupled
    * of ways if we wanted to.
    */
-  Teuchos::RCP<Thyra_LinearOp> createGradientOp() const override;
-  
+  Teuchos::RCP<Thyra_LinearOp>
+  createGradientOp() const override;
+
   //! Get the map associate with this response
-  Teuchos::RCP<const Thyra_VectorSpace> responseVectorSpace() const override;
+  Teuchos::RCP<const Thyra_VectorSpace>
+  responseVectorSpace() const override;
 
-  void evaluateDerivative(
-    const double current_time,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& xdot,
-    const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-    const Teuchos::Array<ParamVec>& p,
-    ParamVec* deriv_p,
-    const Teuchos::RCP<Thyra_Vector>& g,
-    const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dx,
-    const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdot,
-    const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdotdot,
-    const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dp) override;
+  void
+  evaluateDerivative(
+      const double                                     current_time,
+      const Teuchos::RCP<const Thyra_Vector>&          x,
+      const Teuchos::RCP<const Thyra_Vector>&          xdot,
+      const Teuchos::RCP<const Thyra_Vector>&          xdotdot,
+      const Teuchos::Array<ParamVec>&                  p,
+      ParamVec*                                        deriv_p,
+      const Teuchos::RCP<Thyra_Vector>&                g,
+      const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dx,
+      const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdot,
+      const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdotdot,
+      const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dp) override;
 
-protected:
-
+ protected:
   //! Comm for forming response map
   Teuchos::RCP<const Teuchos_Comm> comm;
 };
 
-} // namespace Albany
+}  // namespace Albany
 
-#endif // ALBANY_SCALAR_RESPONSE_FUNCTION_HPP
+#endif  // ALBANY_SCALAR_RESPONSE_FUNCTION_HPP

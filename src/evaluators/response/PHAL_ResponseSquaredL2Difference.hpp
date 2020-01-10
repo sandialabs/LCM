@@ -13,75 +13,125 @@ namespace PHAL {
 /**
  * \brief Response Description
  */
-template<typename EvalT, typename Traits, typename SourceScalarT, typename TargetScalarT>
-class ResponseSquaredL2DifferenceBase : public PHAL::SeparableScatterScalarResponse<EvalT,Traits>
+template <
+    typename EvalT,
+    typename Traits,
+    typename SourceScalarT,
+    typename TargetScalarT>
+class ResponseSquaredL2DifferenceBase
+    : public PHAL::SeparableScatterScalarResponse<EvalT, Traits>
 {
-public:
-  ResponseSquaredL2DifferenceBase (Teuchos::ParameterList& p,
-                              const Teuchos::RCP<Albany::Layouts>& dl);
+ public:
+  ResponseSquaredL2DifferenceBase(
+      Teuchos::ParameterList&              p,
+      const Teuchos::RCP<Albany::Layouts>& dl);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void preEvaluate (typename Traits::PreEvalData d);
+  void
+  preEvaluate(typename Traits::PreEvalData d);
 
-  void evaluateFields (typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void postEvaluate (typename Traits::PostEvalData d);
+  void
+  postEvaluate(typename Traits::PostEvalData d);
 
-private:
-
+ private:
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  int getLayout (const Teuchos::RCP<Albany::Layouts>& dl, const std::string& rank, Teuchos::RCP<PHX::DataLayout>& layout);
+  int
+  getLayout(
+      const Teuchos::RCP<Albany::Layouts>& dl,
+      const std::string&                   rank,
+      Teuchos::RCP<PHX::DataLayout>&       layout);
 
-  int numQPs;
-  int fieldDim;
+  int                                 numQPs;
+  int                                 fieldDim;
   std::vector<PHX::Device::size_type> dims;
 
-  bool target_value;
+  bool          target_value;
   TargetScalarT target_value_val;
-  RealType scaling;
+  RealType      scaling;
 
-  PHX::MDField<const SourceScalarT>             sourceField;
-  PHX::MDField<const TargetScalarT>             targetField;
+  PHX::MDField<const SourceScalarT> sourceField;
+  PHX::MDField<const TargetScalarT> targetField;
 
-  PHX::MDField<const MeshScalarT,Cell,QuadPoint>   w_measure;
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint> w_measure;
 };
 
 // Some shortcut names
 
 //-- SourceScalarT = ScalarT
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSST_TST  = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::ScalarT,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSST_TST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::ScalarT,
+    typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSST_TMST = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::ScalarT,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSST_TMST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::ScalarT,
+    typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSST_TPST = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::ScalarT,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSST_TPST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::ScalarT,
+    typename EvalT::ParamScalarT>;
 
 //-- SourceScalarT = ParamScalarT
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSPST_TST  = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::ParamScalarT,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSPST_TST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::ParamScalarT,
+    typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSPST_TMST = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::ParamScalarT,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSPST_TMST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::ParamScalarT,
+    typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSPST_TPST = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::ParamScalarT,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSPST_TPST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::ParamScalarT,
+    typename EvalT::ParamScalarT>;
 
 //-- SourceScalarT = MeshScalarT
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSMST_TST  = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::MeshScalarT,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSMST_TST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::MeshScalarT,
+    typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSMST_TMST = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::MeshScalarT,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSMST_TMST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::MeshScalarT,
+    typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSMST_TPST = ResponseSquaredL2DifferenceBase<EvalT,Traits,typename EvalT::MeshScalarT,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using ResponseSquaredL2DifferenceSMST_TPST = ResponseSquaredL2DifferenceBase<
+    EvalT,
+    Traits,
+    typename EvalT::MeshScalarT,
+    typename EvalT::ParamScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_RESPONSE_SQUARED_L2_DIFFERENCE_HPP
+#endif  // PHAL_RESPONSE_SQUARED_L2_DIFFERENCE_HPP

@@ -8,8 +8,6 @@
 #define ALBANY_UTILS_H
 
 // Get Albany configuration macros
-#include "Albany_config.h"
-
 #include <sstream>
 
 #include "Albany_CommUtils.hpp"
@@ -17,6 +15,7 @@
 #include "Albany_StateManager.hpp"
 #include "Albany_ThyraTypes.hpp"
 #include "Albany_TpetraTypes.hpp"
+#include "Albany_config.h"
 #include "Teuchos_RCP.hpp"
 
 namespace Albany {

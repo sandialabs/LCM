@@ -4,10 +4,6 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Phalanx_DataLayout.hpp"
-#include "Teuchos_RCP.hpp"
-#include "Teuchos_TestForException.hpp"
-
 #include "AAAModel.hpp"
 #include "ACEice.hpp"
 #include "ACEpermafrost.hpp"
@@ -40,8 +36,11 @@
 #include "NewtonianFluidModel.hpp"
 #include "OrtizPandolfiModel.hpp"
 #include "ParallelNeohookeanModel.hpp"
+#include "Phalanx_DataLayout.hpp"
 #include "RIHMRModel.hpp"
 #include "StVenantKirchhoffModel.hpp"
+#include "Teuchos_RCP.hpp"
+#include "Teuchos_TestForException.hpp"
 #include "TvergaardHutchinsonModel.hpp"
 #include "ViscoElasticModel.hpp"
 

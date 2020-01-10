@@ -7,12 +7,11 @@
 #ifndef PHAL_CONVERTFIELDTYPE_HPP
 #define PHAL_CONVERTFIELDTYPE_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
 #include "Albany_Layouts.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace PHAL {
 /** \brief Finite Element Interpolation Evaluator
@@ -21,45 +20,65 @@ namespace PHAL {
 
 */
 
-template<typename EvalT, typename Traits, typename InputType, typename OutputType>
+template <
+    typename EvalT,
+    typename Traits,
+    typename InputType,
+    typename OutputType>
 class ConvertFieldType : public PHX::EvaluatorWithBaseImpl<Traits>,
-                             public PHX::EvaluatorDerived<EvalT, Traits>  {
+                         public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
+  ConvertFieldType(const Teuchos::ParameterList& p);
 
-public:
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  ConvertFieldType (const Teuchos::ParameterList& p);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  void postRegistrationSetup (typename Traits::SetupData d,
-                              PHX::FieldManager<Traits>& vm);
-
-  void evaluateFields(typename Traits::EvalData d);
-
-private:
-
+ private:
   // Input:
   PHX::MDField<const InputType> in_field;
   // Output:
   PHX::MDField<OutputType> out_field;
 };
 
-template<typename EvalT, typename Traits>
-using ConvertFieldTypeRTtoMST = ConvertFieldType<EvalT,Traits,RealType,typename EvalT::MeshScalarT>;
+template <typename EvalT, typename Traits>
+using ConvertFieldTypeRTtoMST =
+    ConvertFieldType<EvalT, Traits, RealType, typename EvalT::MeshScalarT>;
 
-template<typename EvalT, typename Traits>
-using ConvertFieldTypeRTtoPST = ConvertFieldType<EvalT,Traits,RealType,typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using ConvertFieldTypeRTtoPST =
+    ConvertFieldType<EvalT, Traits, RealType, typename EvalT::ParamScalarT>;
 
-template<typename EvalT, typename Traits>
-using ConvertFieldTypeRTtoST = ConvertFieldType<EvalT,Traits,RealType,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using ConvertFieldTypeRTtoST =
+    ConvertFieldType<EvalT, Traits, RealType, typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using ConvertFieldTypeMSTtoPST = ConvertFieldType<EvalT,Traits,typename EvalT::MeshScalarT, typename EvalT::ParamScalarT>;
+template <typename EvalT, typename Traits>
+using ConvertFieldTypeMSTtoPST = ConvertFieldType<
+    EvalT,
+    Traits,
+    typename EvalT::MeshScalarT,
+    typename EvalT::ParamScalarT>;
 
-template<typename EvalT, typename Traits>
-using ConvertFieldTypeMSTtoST = ConvertFieldType<EvalT,Traits,typename EvalT::MeshScalarT,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using ConvertFieldTypeMSTtoST = ConvertFieldType<
+    EvalT,
+    Traits,
+    typename EvalT::MeshScalarT,
+    typename EvalT::ScalarT>;
 
-template<typename EvalT, typename Traits>
-using ConvertFieldTypePSTtoST = ConvertFieldType<EvalT,Traits,typename EvalT::ParamScalarT,typename EvalT::ScalarT>;
+template <typename EvalT, typename Traits>
+using ConvertFieldTypePSTtoST = ConvertFieldType<
+    EvalT,
+    Traits,
+    typename EvalT::ParamScalarT,
+    typename EvalT::ScalarT>;
 
-} // Namespace PHAL
+}  // Namespace PHAL
 
-#endif // PHAL_DOF_INTERPOLATION_HPP
+#endif  // PHAL_DOF_INTERPOLATION_HPP

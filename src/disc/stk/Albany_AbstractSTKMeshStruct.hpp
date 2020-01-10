@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "Albany_AbstractMeshStruct.hpp"
-
 #include "Albany_AbstractSTKFieldContainer.hpp"
 
 // Start of STK stuff
@@ -54,7 +53,7 @@ struct AbstractSTKMeshStruct : public AbstractMeshStruct
   Teuchos::RCP<stk::mesh::MetaData> metaData;
   Teuchos::RCP<stk::mesh::BulkData> bulkData;
 
-  std::map<int, stk::mesh::Part*> partVec;            // Element blocks
+  std::map<int, stk::mesh::Part*>         partVec;    // Element blocks
   std::map<std::string, stk::mesh::Part*> nsPartVec;  // Node Sets
   std::map<std::string, stk::mesh::Part*> ssPartVec;  // Side Sets
 

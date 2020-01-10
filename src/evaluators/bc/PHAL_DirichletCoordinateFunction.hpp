@@ -7,24 +7,20 @@
 #ifndef PHAL_DIRICHLET_COORDFUNC_HPP
 #define PHAL_DIRICHLET_COORDFUNC_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
-#include "Phalanx_Evaluator_Derived.hpp"
-#include "Phalanx_MDField.hpp"
-
-#include "Teuchos_ParameterList.hpp"
-
-#include "Sacado_ParameterAccessor.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dirichlet.hpp"
-
 #include "PHAL_IdentityCoordinateFunctionTraits.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
+#include "Sacado_ParameterAccessor.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace PHAL {
 /** \brief BC Dirichlet evaluator for general coordinate functions
 
 */
-
 
 // **************************************************************
 // **************************************************************
@@ -44,56 +40,74 @@ template<typename EvalT, typename Traits/*, typename cfunc_traits = PHAL::Identi
 class DirichletCoordFunction;
 
 template <typename EvalT, typename Traits/*, typename cfunc_traits = PHAL::IdentityCoordFunctionTraits<EvalT>*/ >
-class DirichletCoordFunction_Base : public PHAL::DirichletBase<EvalT, Traits> {
-  public:
-    typedef typename EvalT::ScalarT ScalarT;
-    DirichletCoordFunction_Base(Teuchos::ParameterList& p);
+class DirichletCoordFunction_Base : public PHAL::DirichletBase<EvalT, Traits>
+{
+ public:
+  typedef typename EvalT::ScalarT ScalarT;
+  DirichletCoordFunction_Base(Teuchos::ParameterList& p);
 
-    //! Type of traits class being used
-    //typedef cfunc_traits cfunc_traits_type;
-    typedef PHAL::IdentityCoordFunctionTraits<EvalT> cfunc_traits_type;
+  //! Type of traits class being used
+  // typedef cfunc_traits cfunc_traits_type;
+  typedef PHAL::IdentityCoordFunctionTraits<EvalT> cfunc_traits_type;
 
-    cfunc_traits_type func;
-
+  cfunc_traits_type func;
 };
 
 // **************************************************************
 // Residual
 // **************************************************************
 
-template<typename Traits/*, typename cfunc_traits*/ >
-class DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits/*, cfunc_traits*/>
-    : public DirichletCoordFunction_Base<PHAL::AlbanyTraits::Residual, Traits/*, cfunc_traits*/> {
-  public:
-    DirichletCoordFunction(Teuchos::ParameterList& p);
-    typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
-    void evaluateFields(typename Traits::EvalData d);
+template <typename Traits /*, typename cfunc_traits*/>
+class DirichletCoordFunction<
+    PHAL::AlbanyTraits::Residual,
+    Traits /*, cfunc_traits*/>
+    : public DirichletCoordFunction_Base<
+          PHAL::AlbanyTraits::Residual,
+          Traits /*, cfunc_traits*/>
+{
+ public:
+  DirichletCoordFunction(Teuchos::ParameterList& p);
+  typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
+  void
+  evaluateFields(typename Traits::EvalData d);
 };
 
 // **************************************************************
 // Jacobian
 // **************************************************************
 
-template<typename Traits/*, typename cfunc_traits*/>
-class DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits/*, cfunc_traits*/>
-    : public DirichletCoordFunction_Base<PHAL::AlbanyTraits::Jacobian, Traits/*, cfunc_traits*/> {
-  public:
-    DirichletCoordFunction(Teuchos::ParameterList& p);
-    typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
-    void evaluateFields(typename Traits::EvalData d);
+template <typename Traits /*, typename cfunc_traits*/>
+class DirichletCoordFunction<
+    PHAL::AlbanyTraits::Jacobian,
+    Traits /*, cfunc_traits*/>
+    : public DirichletCoordFunction_Base<
+          PHAL::AlbanyTraits::Jacobian,
+          Traits /*, cfunc_traits*/>
+{
+ public:
+  DirichletCoordFunction(Teuchos::ParameterList& p);
+  typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
+  void
+  evaluateFields(typename Traits::EvalData d);
 };
 
 // **************************************************************
 // Tangent
 // **************************************************************
 
-template<typename Traits/*, typename cfunc_traits*/>
-class DirichletCoordFunction<PHAL::AlbanyTraits::Tangent, Traits/*, cfunc_traits*/>
-    : public DirichletCoordFunction_Base<PHAL::AlbanyTraits::Tangent, Traits/*, cfunc_traits*/> {
-  public:
-    DirichletCoordFunction(Teuchos::ParameterList& p);
-    typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-    void evaluateFields(typename Traits::EvalData d);
+template <typename Traits /*, typename cfunc_traits*/>
+class DirichletCoordFunction<
+    PHAL::AlbanyTraits::Tangent,
+    Traits /*, cfunc_traits*/>
+    : public DirichletCoordFunction_Base<
+          PHAL::AlbanyTraits::Tangent,
+          Traits /*, cfunc_traits*/>
+{
+ public:
+  DirichletCoordFunction(Teuchos::ParameterList& p);
+  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
+  void
+  evaluateFields(typename Traits::EvalData d);
 };
 
 // **************************************************************
@@ -101,15 +115,21 @@ class DirichletCoordFunction<PHAL::AlbanyTraits::Tangent, Traits/*, cfunc_traits
 //  -- Currently assuming no parameter derivative
 // **************************************************************
 
-template<typename Traits/*, typename cfunc_traits*/>
-class DirichletCoordFunction<PHAL::AlbanyTraits::DistParamDeriv, Traits/*, cfunc_traits*/>
-    : public DirichletCoordFunction_Base<PHAL::AlbanyTraits::DistParamDeriv, Traits/*, cfunc_traits*/> {
-  public:
-    DirichletCoordFunction(Teuchos::ParameterList& p);
-    typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
-    void evaluateFields(typename Traits::EvalData d);
+template <typename Traits /*, typename cfunc_traits*/>
+class DirichletCoordFunction<
+    PHAL::AlbanyTraits::DistParamDeriv,
+    Traits /*, cfunc_traits*/>
+    : public DirichletCoordFunction_Base<
+          PHAL::AlbanyTraits::DistParamDeriv,
+          Traits /*, cfunc_traits*/>
+{
+ public:
+  DirichletCoordFunction(Teuchos::ParameterList& p);
+  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
+  void
+  evaluateFields(typename Traits::EvalData d);
 };
 
-}
+}  // namespace PHAL
 
 #endif

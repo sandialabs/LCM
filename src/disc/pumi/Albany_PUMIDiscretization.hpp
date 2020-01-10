@@ -4,7 +4,6 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #ifndef ALBANY_PUMIDISCRETIZATION_HPP
 #define ALBANY_PUMIDISCRETIZATION_HPP
 
@@ -13,37 +12,41 @@
 
 namespace Albany {
 
-class PUMIDiscretization : public APFDiscretization {
-  public:
+class PUMIDiscretization : public APFDiscretization
+{
+ public:
+  //! Constructor
+  PUMIDiscretization(
+      Teuchos::RCP<Albany::PUMIMeshStruct>        pumiMeshStruct,
+      const Teuchos::RCP<const Teuchos_Comm>&     commT,
+      const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes =
+          Teuchos::null);
 
-    //! Constructor
-    PUMIDiscretization(
-       Teuchos::RCP<Albany::PUMIMeshStruct> pumiMeshStruct,
-       const Teuchos::RCP<const Teuchos_Comm>& commT,
-       const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes = Teuchos::null);
+  //! Destructor
+  ~PUMIDiscretization();
 
-    //! Destructor
-    ~PUMIDiscretization();
+  //! Retrieve mesh struct
+  Teuchos::RCP<Albany::PUMIMeshStruct>
+  getPUMIMeshStruct()
+  {
+    return pumiMeshStruct;
+  }
 
-    //! Retrieve mesh struct
-    Teuchos::RCP<Albany::PUMIMeshStruct> getPUMIMeshStruct() {return pumiMeshStruct;}
+  //! Set restart data
+  void
+  setRestartData();
 
-    //! Set restart data
-    void setRestartData();
+  //! Set data for LandIce problems
+  void
+  setLandIceData();
 
-    //! Set data for LandIce problems
-    void setLandIceData();
+  void
+  printWsElNodeID(std::ostream& os) const {};
 
-    void
-    printWsElNodeID(std::ostream& os) const {}; 
-
-  private:
-
-    Teuchos::RCP<Albany::PUMIMeshStruct> pumiMeshStruct;
-
-
+ private:
+  Teuchos::RCP<Albany::PUMIMeshStruct> pumiMeshStruct;
 };
 
-}
+}  // namespace Albany
 
-#endif // ALBANY_PUMIDISCRETIZATION_HPP
+#endif  // ALBANY_PUMIDISCRETIZATION_HPP

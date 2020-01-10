@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include <MiniTensor.h>
+
 #include <PHAL_Utilities.hpp>
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>

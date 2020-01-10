@@ -10,17 +10,16 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "Phalanx_DataLayout.hpp"
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
 
 #include "Adapt_NodalDataBase.hpp"
-
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_EigendataInfoStructT.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_StateInfoStruct.hpp"
 #include "Albany_TpetraTypes.hpp"
+#include "Phalanx_DataLayout.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 #if defined(ALBANY_EPETRA)
 #include "Albany_EigendataInfoStruct.hpp"

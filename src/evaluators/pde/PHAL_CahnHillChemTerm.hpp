@@ -7,10 +7,10 @@
 #ifndef PHAL_CAHNHILLCHEMTERM_HPP
 #define PHAL_CAHNHILLCHEMTERM_HPP
 
-#include "Phalanx_config.hpp"
-#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 /** \brief Finite Element Interpolation Evaluator
 
@@ -19,40 +19,40 @@
 */
 namespace PHAL {
 
-template<typename EvalT, typename Traits>
+template <typename EvalT, typename Traits>
 class CahnHillChemTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
-	     public PHX::EvaluatorDerived<EvalT, Traits> {
-
-public:
-
+                         public PHX::EvaluatorDerived<EvalT, Traits>
+{
+ public:
   typedef typename EvalT::ScalarT ScalarT;
 
   CahnHillChemTerm(const Teuchos::ParameterList& p);
 
-  void postRegistrationSetup(typename Traits::SetupData d,
-                      PHX::FieldManager<Traits>& vm);
+  void
+  postRegistrationSetup(
+      typename Traits::SetupData d,
+      PHX::FieldManager<Traits>& vm);
 
-  void evaluateFields(typename Traits::EvalData d);
+  void
+  evaluateFields(typename Traits::EvalData d);
 
-  ScalarT& getValue(const std::string &n);
+  ScalarT&
+  getValue(const std::string& n);
 
-
-private:
- 
+ private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT,Cell,QuadPoint> rho;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> w;
-  
+  PHX::MDField<const ScalarT, Cell, QuadPoint> rho;
+  PHX::MDField<const ScalarT, Cell, QuadPoint> w;
+
   // Output:
-  PHX::MDField<ScalarT,Cell,QuadPoint> chemTerm;
+  PHX::MDField<ScalarT, Cell, QuadPoint> chemTerm;
 
   unsigned int numQPs, numDims, numNodes;
 
   ScalarT b;
- 
 };
-}
+}  // namespace PHAL
 
 #endif

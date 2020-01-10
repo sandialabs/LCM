@@ -6,9 +6,9 @@
 
 // Author: Mario J. Juha (juham@rpi.edu)
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "ViscoElasticModel.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "ViscoElasticModel_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::ViscoElasticModel)

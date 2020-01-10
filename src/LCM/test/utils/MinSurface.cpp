@@ -5,10 +5,6 @@
 //*****************************************************************//
 
 #include <stdio.h>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
 
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -16,6 +12,10 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 #include "topology/Topology.h"
 

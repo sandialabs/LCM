@@ -4,10 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
+#include "Albany_ResponseUtilities.hpp"
+
+#include "Albany_ResponseUtilities_Def.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 
-#include "Albany_ResponseUtilities.hpp"
-#include "Albany_ResponseUtilities_Def.hpp"
-
 PHAL_INSTANTIATE_TEMPLATE_CLASS(Albany::ResponseUtilities)
-

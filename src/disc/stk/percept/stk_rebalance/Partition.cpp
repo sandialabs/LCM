@@ -8,17 +8,13 @@
 
 // Copyright 2001, 2002 Sandia Corporation, Albuquerque, NM.
 
-#include <stdexcept>
-
 #include <percept/stk_rebalance/Partition.hpp>
+#include <stdexcept>
 
 using namespace stk;
 namespace stk {
-  using namespace rebalance;
+using namespace rebalance;
 }
 
-Partition::Partition(ParallelMachine comm) : comm_(comm) { }
-Partition::~Partition() { }
-
-
-
+Partition::Partition(ParallelMachine comm) : comm_(comm) {}
+Partition::~Partition() {}

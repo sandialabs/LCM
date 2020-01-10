@@ -7,9 +7,11 @@
 #if !defined(LCM_ConstitutiveModelDriverPre_hpp)
 #define LCM_ConstitutiveModelDriverPre_hpp
 
-#include <MiniTensor.h>
-
 #include "Albany_Layouts.hpp"
+#include "Albany_SacadoTypes.hpp"
+#include "MiniTensor.h"
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

@@ -5,17 +5,16 @@
 //*****************************************************************//
 
 #include "Albany_SimDiscretization.hpp"
+
 #include <apfSIM.h>
 
 Albany::SimDiscretization::SimDiscretization(
-    Teuchos::RCP<Albany::SimMeshStruct> meshStruct_,
-    const Teuchos::RCP<const Teuchos_Comm>& commT_,
-    const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes_):
-  APFDiscretization(meshStruct_, commT_, rigidBodyModes_)
+    Teuchos::RCP<Albany::SimMeshStruct>         meshStruct_,
+    const Teuchos::RCP<const Teuchos_Comm>&     commT_,
+    const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes_)
+    : APFDiscretization(meshStruct_, commT_, rigidBodyModes_)
 {
   init();
 }
 
-Albany::SimDiscretization::~SimDiscretization()
-{
-}
+Albany::SimDiscretization::~SimDiscretization() {}

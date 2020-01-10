@@ -5,12 +5,15 @@
 //*****************************************************************//
 
 #include "Albany_STKFieldContainerHelper.hpp"
-#include "Albany_STKFieldContainerHelper_Def.hpp"
+
 #include "Albany_AbstractSTKFieldContainer.hpp"
+#include "Albany_STKFieldContainerHelper_Def.hpp"
 
 namespace Albany {
 
-template struct STKFieldContainerHelper<Albany::AbstractSTKFieldContainer::ScalarFieldType>;
-template struct STKFieldContainerHelper<Albany::AbstractSTKFieldContainer::VectorFieldType>;
+template struct STKFieldContainerHelper<
+    Albany::AbstractSTKFieldContainer::ScalarFieldType>;
+template struct STKFieldContainerHelper<
+    Albany::AbstractSTKFieldContainer::VectorFieldType>;
 
-} // namespace Albany
+}  // namespace Albany

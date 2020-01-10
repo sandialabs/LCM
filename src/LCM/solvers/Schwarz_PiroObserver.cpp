@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "Schwarz_PiroObserver.hpp"
+
 #include "PHAL_AlbanyTraits.hpp"
 #include "Teuchos_ScalarTraits.hpp"
 

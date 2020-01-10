@@ -15,19 +15,10 @@
  */
 //---------------------------------------------------------------------------//
 
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-#include <iostream>
-#include <sstream>
-#include <vector>
+#include <Ionit_Initializer.h>
+#include <Ioss_SubSystem.h>
 
-#include "DTK_MapOperatorFactory.hpp"
-#include "DTK_STKMeshHelpers.hpp"
-#include "DTK_STKMeshManager.hpp"
-
+#include <Intrepid_FieldContainer.hpp>
 #include <Teuchos_Array.hpp>
 #include <Teuchos_ArrayRCP.hpp>
 #include <Teuchos_CommHelpers.hpp>
@@ -40,17 +31,16 @@
 #include <Teuchos_TimeMonitor.hpp>
 #include <Teuchos_TypeTraits.hpp>
 #include <Teuchos_VerboseObject.hpp>
-#include "Teuchos_CommandLineProcessor.hpp"
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_XMLParameterListCoreHelpers.hpp"
-#include "Teuchos_YamlParameterListCoreHelpers.hpp"
-
 #include <Tpetra_MultiVector.hpp>
-
-#include <Intrepid_FieldContainer.hpp>
-
-#include <stk_util/parallel/Parallel.hpp>
-
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#include <stk_io/IossBridge.hpp>
+#include <stk_io/StkMeshIoBroker.hpp>
 #include <stk_mesh/base/BulkData.hpp>
 #include <stk_mesh/base/CoordinateSystems.hpp>
 #include <stk_mesh/base/Field.hpp>
@@ -60,12 +50,16 @@
 #include <stk_mesh/base/Selector.hpp>
 #include <stk_mesh/base/Types.hpp>
 #include <stk_topology/topology.hpp>
+#include <stk_util/parallel/Parallel.hpp>
+#include <vector>
 
-#include <stk_io/IossBridge.hpp>
-#include <stk_io/StkMeshIoBroker.hpp>
-
-#include <Ionit_Initializer.h>
-#include <Ioss_SubSystem.h>
+#include "DTK_MapOperatorFactory.hpp"
+#include "DTK_STKMeshHelpers.hpp"
+#include "DTK_STKMeshManager.hpp"
+#include "Teuchos_CommandLineProcessor.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_XMLParameterListCoreHelpers.hpp"
+#include "Teuchos_YamlParameterListCoreHelpers.hpp"
 
 template <typename FieldType>
 void

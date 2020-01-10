@@ -4,6 +4,7 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include "ElectroMechanicsProblem.hpp"
+
 #include "Albany_BCUtils.hpp"
 #include "Albany_MaterialDatabase.hpp"
 #include "Albany_ProblemUtils.hpp"

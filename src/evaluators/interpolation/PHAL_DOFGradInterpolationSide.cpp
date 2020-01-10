@@ -4,9 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "PHAL_DOFGradInterpolationSide.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_DOFGradInterpolationSide_Def.hpp"
 
-PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(PHAL::DOFGradInterpolationSideBase)
+PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(
+    PHAL::DOFGradInterpolationSideBase)

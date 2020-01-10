@@ -4,16 +4,14 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Albany_config.h"
-
 #include <Teuchos_ParameterList.hpp>
 #include <Teuchos_UnitTestHarness.hpp>
+
+#include "Albany_config.h"
 #ifdef ALBANY_EPETRA
 #include <Epetra_MpiComm.h>
 #endif
 #include <MiniTensor.h>
-#include "Intrepid2_DefaultCubatureFactory.hpp"
-#include "Phalanx_DataLayout_MDALayout.hpp"
 
 #include "Albany_Layouts.hpp"
 #include "Albany_STKDiscretization.hpp"
@@ -21,8 +19,10 @@
 #include "Albany_TmplSTKMeshStruct.hpp"
 #include "Albany_Utils.hpp"
 #include "HeliumODEs.hpp"
+#include "Intrepid2_DefaultCubatureFactory.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_SaveStateField.hpp"
+#include "Phalanx_DataLayout_MDALayout.hpp"
 #include "SetField.hpp"
 //#include "ConstitutiveModelInterface.hpp"
 //#include "ConstitutiveModelParameters.hpp"

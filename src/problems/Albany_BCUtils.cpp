@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "Albany_BCUtils.hpp"
+
 #include "Albany_BCUtils_Def.hpp"
 
 // Initialize statics

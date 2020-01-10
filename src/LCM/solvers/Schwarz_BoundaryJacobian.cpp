@@ -4,13 +4,14 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include "Schwarz_BoundaryJacobian.hpp"
-#include "Albany_GenericSTKMeshStruct.hpp"
-#include "Albany_STKDiscretization.hpp"
-#include "Albany_Utils.hpp"
-#include "Albany_GlobalLocalIndexer.hpp"
 
 #include <Teuchos_ParameterListExceptions.hpp>
 #include <Teuchos_TestForException.hpp>
+
+#include "Albany_GenericSTKMeshStruct.hpp"
+#include "Albany_GlobalLocalIndexer.hpp"
+#include "Albany_STKDiscretization.hpp"
+#include "Albany_Utils.hpp"
 
 namespace LCM {
 
@@ -23,12 +24,12 @@ Schwarz_BoundaryJacobian::Schwarz_BoundaryJacobian(
     Teuchos::Array<Teuchos::RCP<Thyra_LinearOp>>                jacs,
     int const                                                   this_app_index,
     int const coupled_app_index)
-    : coupled_apps_(ca)
-    , jacs_(jacs)
-    , this_app_index_(this_app_index)
-    , coupled_app_index_(coupled_app_index)
-    , comm_(comm)
-    , n_models_(0)
+    : coupled_apps_(ca),
+      jacs_(jacs),
+      this_app_index_(this_app_index),
+      coupled_app_index_(coupled_app_index),
+      comm_(comm),
+      n_models_(0)
 {
   ALBANY_EXPECT(0 <= this_app_index && this_app_index < ca.size());
   ALBANY_EXPECT(0 <= coupled_app_index && coupled_app_index < ca.size());
@@ -72,11 +73,11 @@ Schwarz_BoundaryJacobian::getExplicitOperator() const
 //
 void
 Schwarz_BoundaryJacobian::applyImpl(
-    const Thyra::EOpTransp                 /* M_trans */,
-    const Thyra_MultiVector&               /* X */,
+    const Thyra::EOpTransp /* M_trans */,
+    const Thyra_MultiVector& /* X */,
     const Teuchos::Ptr<Thyra_MultiVector>& Y,
-    const ST                               /* alpha */,
-    const ST                               /* beta */) const
+    const ST /* alpha */,
+    const ST /* beta */) const
 {
   auto const zero = Teuchos::ScalarTraits<ST>::zero();
 

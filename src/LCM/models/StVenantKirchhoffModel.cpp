@@ -4,9 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "StVenantKirchhoffModel.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "StVenantKirchhoffModel_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::StVenantKirchhoffModel)

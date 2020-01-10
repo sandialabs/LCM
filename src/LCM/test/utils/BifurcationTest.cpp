@@ -6,18 +6,8 @@
 // Simple mesh partitioning program
 //
 
-#include <iomanip>
-#include <iostream>
-#include <random>
-
-#include <Teuchos_CommandLineProcessor.hpp>
-#include <Teuchos_GlobalMPISession.hpp>
-#include <Teuchos_ParameterList.hpp>
-#include <Teuchos_RCP.hpp>
-#include <Teuchos_TestForException.hpp>
-#include <Teuchos_as.hpp>
-
 #include <MiniTensor.h>
+
 #include <Albany_Layouts.hpp>
 #include <Albany_STKDiscretization.hpp>
 #include <Albany_StateManager.hpp>
@@ -25,17 +15,25 @@
 #include <Albany_Utils.hpp>
 #include <PHAL_AlbanyTraits.hpp>
 #include <PHAL_SaveStateField.hpp>
+#include <Teuchos_CommandLineProcessor.hpp>
+#include <Teuchos_GlobalMPISession.hpp>
+#include <Teuchos_ParameterList.hpp>
+#include <Teuchos_RCP.hpp>
+#include <Teuchos_TestForException.hpp>
+#include <Teuchos_as.hpp>
+#include <iomanip>
+#include <iostream>
+#include <random>
 #include <typeinfo>
 
 #include "Albany_Layouts.hpp"
 #include "Albany_MaterialDatabase.hpp"
+#include "LocalNonlinearSolver.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado.hpp"
-
-#include "LocalNonlinearSolver.hpp"
 
 typedef PHAL::AlbanyTraits::Residual                Residual;
 typedef PHAL::AlbanyTraits::Residual::ScalarT       ScalarT;
@@ -333,8 +331,8 @@ cartesian_sweep(minitensor::Tensor4<double, 3> const& CC)
 }
 
 //----------------------------------------------------------------------------
-minitensor::Vector<D2FadType, 3> spherical_get_normal(
-    minitensor::Vector<D2FadType, 2>& parameters)
+minitensor::Vector<D2FadType, 3>
+spherical_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(
       sin(parameters[0]) * sin(parameters[1]),
@@ -345,8 +343,8 @@ minitensor::Vector<D2FadType, 3> spherical_get_normal(
 }
 
 //----------------------------------------------------------------------------
-minitensor::Vector<D2FadType, 3> stereographic_get_normal(
-    minitensor::Vector<D2FadType, 2>& parameters)
+minitensor::Vector<D2FadType, 3>
+stereographic_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
   D2FadType r2 = parameters[0] * parameters[0] + parameters[1] * parameters[1];
 
@@ -358,8 +356,8 @@ minitensor::Vector<D2FadType, 3> stereographic_get_normal(
 }
 
 //----------------------------------------------------------------------------
-minitensor::Vector<D2FadType, 3> projective_get_normal(
-    minitensor::Vector<D2FadType, 3>& parameters)
+minitensor::Vector<D2FadType, 3>
+projective_get_normal(minitensor::Vector<D2FadType, 3>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(
       parameters[0], parameters[1], parameters[2]);
@@ -385,8 +383,8 @@ minitensor::Vector<D2FadType, 3> projective_get_normal(
 }
 
 //----------------------------------------------------------------------------
-minitensor::Vector<D2FadType, 3> tangent_get_normal(
-    minitensor::Vector<D2FadType, 2>& parameters)
+minitensor::Vector<D2FadType, 3>
+tangent_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
   D2FadType const r =
       sqrt(parameters[0] * parameters[0] + parameters[1] * parameters[1]);
@@ -407,24 +405,24 @@ minitensor::Vector<D2FadType, 3> tangent_get_normal(
 }
 
 //----------------------------------------------------------------------------
-minitensor::Vector<D2FadType, 3> cartesian_get_normal1(
-    minitensor::Vector<D2FadType, 2>& parameters)
+minitensor::Vector<D2FadType, 3>
+cartesian_get_normal1(minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(1, parameters[0], parameters[1]);
 
   return normal;
 }
 
-minitensor::Vector<D2FadType, 3> cartesian_get_normal2(
-    minitensor::Vector<D2FadType, 2>& parameters)
+minitensor::Vector<D2FadType, 3>
+cartesian_get_normal2(minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(parameters[0], 1, parameters[1]);
 
   return normal;
 }
 
-minitensor::Vector<D2FadType, 3> cartesian_get_normal3(
-    minitensor::Vector<D2FadType, 2>& parameters)
+minitensor::Vector<D2FadType, 3>
+cartesian_get_normal3(minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(parameters[0], parameters[1], 1);
 
@@ -432,7 +430,8 @@ minitensor::Vector<D2FadType, 3> cartesian_get_normal3(
 }
 
 //----------------------------------------------------------------------------//
-void spherical_newton_raphson(
+void
+spherical_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,
     minitensor::Vector<ScalarT, 2>&  parameters,
     minitensor::Vector<ScalarT>&     direction,
@@ -535,7 +534,8 @@ void spherical_newton_raphson(
 }  // Function end
 
 //----------------------------------------------------------------------------
-void stereographic_newton_raphson(
+void
+stereographic_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,
     minitensor::Vector<ScalarT, 2>&  parameters,
     minitensor::Vector<ScalarT>&     direction,
@@ -638,7 +638,8 @@ void stereographic_newton_raphson(
 }  // Function end
 
 //----------------------------------------------------------------------------
-void projective_newton_raphson(
+void
+projective_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,
     minitensor::Vector<ScalarT, 3>&  parameters,
     minitensor::Vector<ScalarT>&     direction,
@@ -753,7 +754,8 @@ void projective_newton_raphson(
 }  // Function end
 
 //----------------------------------------------------------------------------
-void tangent_newton_raphson(
+void
+tangent_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,
     minitensor::Vector<ScalarT, 2>&  parameters,
     minitensor::Vector<ScalarT>&     direction,
@@ -856,7 +858,8 @@ void tangent_newton_raphson(
 }  // Function end
 
 //----------------------------------------------------------------------------
-void cartesian_newton_raphson(
+void
+cartesian_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,
     minitensor::Vector<ScalarT, 2>&  parameters,
     int                              surface_index,

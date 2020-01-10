@@ -4,9 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "ElasticityResid.hpp"
+
 #include "ElasticityResid_Def.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::ElasticityResid)

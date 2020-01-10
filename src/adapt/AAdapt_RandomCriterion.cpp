@@ -4,11 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include <cassert>
+#include "AAdapt_RandomCriterion.hpp"
 
 #include <Teuchos_ScalarTraits.hpp>
-
-#include "AAdapt_RandomCriterion.hpp"
+#include <cassert>
 
 namespace AAdapt {
 

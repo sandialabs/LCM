@@ -4,9 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "PHAL_AddNoise.hpp"
+
 #include "PHAL_AddNoise_Def.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(PHAL::AddNoiseBase)

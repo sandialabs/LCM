@@ -26,11 +26,9 @@
 #include "Albany_APFDiscretization.hpp"
 #endif
 #include "AAdapt_RC_Manager.hpp"
-
 #include "Albany_CombineAndScatterManager.hpp"
 #include "Albany_ModelEvaluator.hpp"
 #include "PHAL_AlbanyTraits.hpp"
-
 #include "Thyra_ModelEvaluatorDelegatorBase.hpp"
 
 namespace AAdapt {

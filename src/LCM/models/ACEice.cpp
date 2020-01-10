@@ -4,10 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "ACEice.hpp"
+
 #include "ACEice_Def.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 #include "ParallelConstitutiveModel_Def.hpp"
 
 template <typename EvalT, typename Traits>

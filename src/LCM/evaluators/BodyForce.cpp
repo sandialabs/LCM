@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "BodyForce.hpp"
+
 #include "BodyForce_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::BodyForce)

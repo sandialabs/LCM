@@ -5,7 +5,7 @@
 //*****************************************************************//
 
 #include "PHAL_DirichletOffNodeSet.hpp"
+
 #include "PHAL_DirichletOffNodeSet_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(PHAL::DirichletOffNodeSet)
-

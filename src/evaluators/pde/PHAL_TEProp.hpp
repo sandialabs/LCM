@@ -7,6 +7,8 @@
 #ifndef PHAL_TEPROP_HPP
 #define PHAL_TEPROP_HPP
 
+#include "Albany_SacadoTypes.hpp"
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

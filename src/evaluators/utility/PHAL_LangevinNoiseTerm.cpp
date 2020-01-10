@@ -4,10 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "PHAL_LangevinNoiseTerm.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_LangevinNoiseTerm_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(PHAL::LangevinNoiseTerm)
-

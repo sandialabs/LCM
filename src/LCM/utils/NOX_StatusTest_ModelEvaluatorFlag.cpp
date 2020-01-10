@@ -5,7 +5,9 @@
 //*****************************************************************//
 
 #include "NOX_StatusTest_ModelEvaluatorFlag.h"
+
 #include <vector>
+
 #include "Albany_Utils.hpp"
 
 NOX::StatusTest::ModelEvaluatorFlag::ModelEvaluatorFlag() : status_(Unevaluated)
@@ -16,7 +18,7 @@ NOX::StatusTest::ModelEvaluatorFlag::~ModelEvaluatorFlag() {}
 
 NOX::StatusTest::StatusType
 NOX::StatusTest::ModelEvaluatorFlag::checkStatus(
-    const Solver::Generic&     /* problem */,
+    const Solver::Generic& /* problem */,
     NOX::StatusTest::CheckType checkType)
 {
   syncFlag();

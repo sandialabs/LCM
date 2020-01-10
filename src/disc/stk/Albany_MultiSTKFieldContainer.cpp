@@ -4,6 +4,7 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include "Albany_MultiSTKFieldContainer.hpp"
+
 #include "Albany_MultiSTKFieldContainer_Def.hpp"
 
 MULTISTKFIELDCONTAINER_INSTANTIATE_TEMPLATE_CLASS(

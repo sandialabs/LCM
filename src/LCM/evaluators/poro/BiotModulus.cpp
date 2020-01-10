@@ -4,9 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "BiotModulus.hpp"
+
 #include "BiotModulus_Def.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::BiotModulus)

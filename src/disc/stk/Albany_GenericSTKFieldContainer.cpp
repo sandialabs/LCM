@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "Albany_GenericSTKFieldContainer.hpp"
+
 #include "Albany_GenericSTKFieldContainer_Def.hpp"
 
 namespace Albany {
@@ -12,4 +13,4 @@ namespace Albany {
 template class GenericSTKFieldContainer<true>;
 template class GenericSTKFieldContainer<false>;
 
-} // namespace Albany
+}  // namespace Albany

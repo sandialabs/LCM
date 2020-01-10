@@ -5,7 +5,9 @@
 //*****************************************************************//
 
 #include <gtest/gtest.h>
+
 #include <iostream>
+
 #include "../../../utility/StaticAllocator.hpp"
 
 using namespace utility;

@@ -4,14 +4,15 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Albany_config.h"
-
 #include <Teuchos_ParameterList.hpp>
 #include <Teuchos_UnitTestHarness.hpp>
+
+#include "Albany_config.h"
 #ifdef ALBANY_EPETRA
 #include <Epetra_MpiComm.h>
 #endif
 #include <MiniTensor.h>
+
 #include "Albany_Layouts.hpp"
 #include "Albany_Utils.hpp"
 #include "ConstitutiveModelInterface.hpp"

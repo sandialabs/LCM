@@ -7,6 +7,7 @@
 #ifndef PHAL_NSTAUM_HPP
 #define PHAL_NSTAUM_HPP
 
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

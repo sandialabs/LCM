@@ -6,9 +6,9 @@
 
 // Author: Mario J. Juha (juham@rpi.edu)
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "ElasticCrystalModel.hpp"
+
 #include "ElasticCrystalModel_Def.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::ElasticCrystalModel)

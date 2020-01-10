@@ -5,12 +5,13 @@
 //*****************************************************************//
 
 #include "Albany_SolverFactory.hpp"
-#include "Albany_PiroObserver.hpp"
-#include "Albany_ModelEvaluator.hpp"
+
 #include "Albany_Application.hpp"
-#include "Albany_Utils.hpp"
-#include "Albany_ThyraUtils.hpp"
 #include "Albany_Macros.hpp"
+#include "Albany_ModelEvaluator.hpp"
+#include "Albany_PiroObserver.hpp"
+#include "Albany_ThyraUtils.hpp"
+#include "Albany_Utils.hpp"
 
 #ifdef ALBANY_ATO
 #include "ATO_Solver.hpp"
@@ -26,11 +27,10 @@
 #include "Aeras/Aeras_HVDecorator.hpp"
 #endif
 
-#include "Piro_ProviderBase.hpp"
 #include "Piro_NOXSolver.hpp"
+#include "Piro_ProviderBase.hpp"
 #include "Piro_SolverFactory.hpp"
 #include "Piro_StratimikosUtils.hpp"
-
 #include "Stratimikos_DefaultLinearSolverBuilder.hpp"
 
 #ifdef ALBANY_IFPACK2
@@ -50,12 +50,11 @@
 #include "Teko_StratimikosFactory.hpp"
 #endif
 
-#include "Thyra_DefaultModelEvaluatorWithSolveFactory.hpp"
-#include "Thyra_DetachedVectorView.hpp"
-
 #include "Teuchos_TestForException.hpp"
 #include "Teuchos_XMLParameterListHelpers.hpp"
 #include "Teuchos_YamlParameterListHelpers.hpp"
+#include "Thyra_DefaultModelEvaluatorWithSolveFactory.hpp"
+#include "Thyra_DetachedVectorView.hpp"
 
 #if defined(ALBANY_RYTHMOS)
 #include "Rythmos_IntegrationObserverBase.hpp"
@@ -75,8 +74,7 @@ enableIfpack2(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 }
 
 void
-enableMueLu(
-    Stratimikos::DefaultLinearSolverBuilder&    linearSolverBuilder)
+enableMueLu(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 {
 #ifdef ALBANY_MUELU
   Stratimikos::enableMueLu<LO, Tpetra_GO, KokkosNode>(linearSolverBuilder);
@@ -84,21 +82,20 @@ enableMueLu(
 }
 
 void
-enableFROSch(Stratimikos::DefaultLinearSolverBuilder&    linearSolverBuilder)
+enableFROSch(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 {
 #ifdef ALBANY_FROSCH
-    Stratimikos::enableFROSch<LO,Tpetra_GO, KokkosNode>(linearSolverBuilder);
+  Stratimikos::enableFROSch<LO, Tpetra_GO, KokkosNode>(linearSolverBuilder);
 #endif
 }
 }  // namespace
 
-namespace Albany
-{
+namespace Albany {
 
-SolverFactory::
-SolverFactory(const std::string&                      inputFile,
-              const Teuchos::RCP<const Teuchos_Comm>& comm)
- : out(Teuchos::VerboseObjectBase::getDefaultOStream())
+SolverFactory::SolverFactory(
+    const std::string&                      inputFile,
+    const Teuchos::RCP<const Teuchos_Comm>& comm)
+    : out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   // Set up application parameters: read and broadcast XML file, and set
   // defaults
@@ -120,37 +117,51 @@ SolverFactory(const std::string&                      inputFile,
   std::string solution_method =
       appParams->sublist("Problem").get("Solution Method", "Steady");
   if (solution_method != "ATO Problem") {
-    Teuchos::RCP<Teuchos::ParameterList> defaultSolverParams = rcp(new Teuchos::ParameterList());
+    Teuchos::RCP<Teuchos::ParameterList> defaultSolverParams =
+        rcp(new Teuchos::ParameterList());
     setSolverParamDefaults(defaultSolverParams.get(), comm->getRank());
     appParams->setParametersNotAlreadySet(*defaultSolverParams);
   }
 
   if (!appParams->isParameter("Build Type")) {
-    if (comm->getRank()==0) {
-      *out << "\nWARNING! You have not set the entry 'Build Type' in the input file. This will cause Albany to *assume* a Tpetra build.\n"
-           << "         If that's not ok, and you specified Epetra-based solvers/preconditioners, you will get an dynamic cast error like this:\n"
+    if (comm->getRank() == 0) {
+      *out << "\nWARNING! You have not set the entry 'Build Type' in the input "
+              "file. This will cause Albany to *assume* a Tpetra build.\n"
+           << "         If that's not ok, and you specified Epetra-based "
+              "solvers/preconditioners, you will get an dynamic cast error "
+              "like this:\n"
            << "\n"
-           << "           dyn_cast<Thyra::EpetraLinearOpBase>(Thyra::LinearOpBase<double>) : Error, the object with the concrete type 'Thyra::TpetraLinearOp<[Some Template Args]>' (passed in through the interface type 'Thyra::LinearOpBase<double>')  does not support the interface 'Thyra::EpetraLinearOpBase' and the dynamic cast failed!\n"
+           << "           "
+              "dyn_cast<Thyra::EpetraLinearOpBase>(Thyra::LinearOpBase<double>)"
+              " : Error, the object with the concrete type "
+              "'Thyra::TpetraLinearOp<[Some Template Args]>' (passed in "
+              "through the interface type 'Thyra::LinearOpBase<double>')  does "
+              "not support the interface 'Thyra::EpetraLinearOpBase' and the "
+              "dynamic cast failed!\n"
            << "\n"
-           << "         If that happens, all you have to do is to set 'Build Type: Epetra' in the main level of your input yaml file.\n\n";
+           << "         If that happens, all you have to do is to set 'Build "
+              "Type: Epetra' in the main level of your input yaml file.\n\n";
     }
   }
   appParams->validateParametersAndSetDefaults(*getValidAppParameters(), 0);
   if (appParams->isSublist("Debug Output")) {
-    Teuchos::RCP<Teuchos::ParameterList> debugPL = Teuchos::rcpFromRef(appParams->sublist("Debug Output", false)); 
+    Teuchos::RCP<Teuchos::ParameterList> debugPL =
+        Teuchos::rcpFromRef(appParams->sublist("Debug Output", false));
     debugPL->validateParametersAndSetDefaults(*getValidDebugParameters(), 0);
   }
   if (appParams->isSublist("Scaling")) {
-    Teuchos::RCP<Teuchos::ParameterList> scalingPL = Teuchos::rcpFromRef(appParams->sublist("Scaling", false)); 
-    scalingPL->validateParametersAndSetDefaults(*getValidScalingParameters(), 0);
+    Teuchos::RCP<Teuchos::ParameterList> scalingPL =
+        Teuchos::rcpFromRef(appParams->sublist("Scaling", false));
+    scalingPL->validateParametersAndSetDefaults(
+        *getValidScalingParameters(), 0);
   }
 }
 
-SolverFactory::
-SolverFactory(const Teuchos::RCP<Teuchos::ParameterList>& input_appParams,
-              const Teuchos::RCP<const Teuchos_Comm>&     comm)
- : appParams(input_appParams)
- , out(Teuchos::VerboseObjectBase::getDefaultOStream())
+SolverFactory::SolverFactory(
+    const Teuchos::RCP<Teuchos::ParameterList>& input_appParams,
+    const Teuchos::RCP<const Teuchos_Comm>&     comm)
+    : appParams(input_appParams),
+      out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   // do not set default solver parameters for ATO::Solver
   // problems,
@@ -158,24 +169,37 @@ SolverFactory(const Teuchos::RCP<Teuchos::ParameterList>& input_appParams,
   std::string solution_method =
       appParams->sublist("Problem").get("Solution Method", "Steady");
   if (solution_method != "ATO Problem") {
-    Teuchos::RCP<Teuchos::ParameterList> defaultSolverParams = rcp(new Teuchos::ParameterList());
+    Teuchos::RCP<Teuchos::ParameterList> defaultSolverParams =
+        rcp(new Teuchos::ParameterList());
     setSolverParamDefaults(defaultSolverParams.get(), comm->getRank());
     appParams->setParametersNotAlreadySet(*defaultSolverParams);
   }
 
   if (!appParams->isParameter("Build Type")) {
-    if (comm->getRank()==0) {
-      *out << "\nWARNING! You have not set the entry 'Build Type' in the input parameter list. This will cause Albany to *assume* a Tpetra build.\n"
-           << "         If that's not ok, and you specified Epetra-based solvers/preconditioners, you will get an dynamic cast error like this:\n"
+    if (comm->getRank() == 0) {
+      *out << "\nWARNING! You have not set the entry 'Build Type' in the input "
+              "parameter list. This will cause Albany to *assume* a Tpetra "
+              "build.\n"
+           << "         If that's not ok, and you specified Epetra-based "
+              "solvers/preconditioners, you will get an dynamic cast error "
+              "like this:\n"
            << "\n"
-           << "           dyn_cast<Thyra::EpetraLinearOpBase>(Thyra::LinearOpBase<double>) : Error, the object with the concrete type 'Thyra::TpetraLinearOp<[Some Template Args]>' (passed in through the interface type 'Thyra::LinearOpBase<double>')  does not support the interface 'Thyra::EpetraLinearOpBase' and the dynamic cast failed!\n"
+           << "           "
+              "dyn_cast<Thyra::EpetraLinearOpBase>(Thyra::LinearOpBase<double>)"
+              " : Error, the object with the concrete type "
+              "'Thyra::TpetraLinearOp<[Some Template Args]>' (passed in "
+              "through the interface type 'Thyra::LinearOpBase<double>')  does "
+              "not support the interface 'Thyra::EpetraLinearOpBase' and the "
+              "dynamic cast failed!\n"
            << "\n"
-           << "         If that happens, all you have to do is to set 'Build Type: Epetra' in the main level of your parameter list.\n\n";
+           << "         If that happens, all you have to do is to set 'Build "
+              "Type: Epetra' in the main level of your parameter list.\n\n";
     }
   }
   appParams->validateParametersAndSetDefaults(*getValidAppParameters(), 0);
   if (appParams->isSublist("Debug Output")) {
-    Teuchos::RCP<Teuchos::ParameterList> debugPL = Teuchos::rcpFromRef(appParams->sublist("Debug Output", false)); 
+    Teuchos::RCP<Teuchos::ParameterList> debugPL =
+        Teuchos::rcpFromRef(appParams->sublist("Debug Output", false));
     debugPL->validateParametersAndSetDefaults(*getValidDebugParameters(), 0);
   }
 }
@@ -187,7 +211,8 @@ SolverFactory::create(
     const Teuchos::RCP<const Thyra_Vector>& initial_guess)
 {
   Teuchos::RCP<Application> dummyAlbanyApp;
-  return createAndGetAlbanyApp(dummyAlbanyApp, appComm, solverComm, initial_guess);
+  return createAndGetAlbanyApp(
+      dummyAlbanyApp, appComm, solverComm, initial_guess);
 }
 
 Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
@@ -198,8 +223,10 @@ SolverFactory::createAndGetAlbanyApp(
     const Teuchos::RCP<const Thyra_Vector>& initial_guess,
     bool                                    createAlbanyApp)
 {
-  const Teuchos::RCP<Teuchos::ParameterList> problemParams = Teuchos::sublist(appParams, "Problem");
-  const std::string solutionMethod = problemParams->get("Solution Method", "Steady");
+  const Teuchos::RCP<Teuchos::ParameterList> problemParams =
+      Teuchos::sublist(appParams, "Problem");
+  const std::string solutionMethod =
+      problemParams->get("Solution Method", "Steady");
 
   if (solutionMethod == "ATO Problem") {
 #ifdef ALBANY_ATO
@@ -264,7 +291,8 @@ SolverFactory::createAndGetAlbanyApp(
 
     if ((useExplHyperviscosity) && (tau != 0.0)) {
       ///// make a solver, repeated code
-      const Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(appParams, "Piro");
+      const Teuchos::RCP<Teuchos::ParameterList> piroParams =
+          Teuchos::sublist(appParams, "Piro");
       const Teuchos::RCP<Teuchos::ParameterList> stratList =
           Piro::extractStratimikosParams(piroParams);
       // Create and setup the Piro solver factory
@@ -274,16 +302,21 @@ SolverFactory::createAndGetAlbanyApp(
       enableIfpack2(linearSolverBuilder);
       enableMueLu(linearSolverBuilder);
       linearSolverBuilder.setParameterList(stratList);
-      const Teuchos::RCP<Thyra_LOWS_Factory> lowsFactory = createLinearSolveStrategy(linearSolverBuilder);
+      const Teuchos::RCP<Thyra_LOWS_Factory> lowsFactory =
+          createLinearSolveStrategy(linearSolverBuilder);
 
       ///// create an app and a model evaluator
 
-      albanyApp = Teuchos::rcp (new Application(appComm, appParams, initial_guess, is_schwarz_));
-      Teuchos::RCP<Thyra_ModelEvaluator> modelHV(new Aeras::HVDecorator(albanyApp, appParams));
+      albanyApp = Teuchos::rcp(
+          new Application(appComm, appParams, initial_guess, is_schwarz_));
+      Teuchos::RCP<Thyra_ModelEvaluator> modelHV(
+          new Aeras::HVDecorator(albanyApp, appParams));
 
       Teuchos::RCP<Thyra_ModelEvaluator> modelWithSolve;
 
-      modelWithSolve = Teuchos::rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(modelHV, lowsFactory));
+      modelWithSolve =
+          Teuchos::rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(
+              modelHV, lowsFactory));
 
       observer_ = Teuchos::rcp(new PiroObserver(albanyApp, modelWithSolve));
 
@@ -296,7 +329,7 @@ SolverFactory::createAndGetAlbanyApp(
   }  // if Aeras HyperViscosity
 #endif
 
-#if defined(ALBANY_LCM) && defined(ALBANY_STK) 
+#if defined(ALBANY_LCM) && defined(ALBANY_STK)
   bool const is_schwarz = solutionMethod == "Coupled Schwarz" ||
                           solutionMethod == "Schwarz Alternating";
 
@@ -309,7 +342,8 @@ SolverFactory::createAndGetAlbanyApp(
     // IKT: We are assuming the "Piro" list will come from the main coupled
     // Schwarz input file (not the sub-input
     // files for each model).
-    const Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(appParams, "Piro");
+    const Teuchos::RCP<Teuchos::ParameterList> piroParams =
+        Teuchos::sublist(appParams, "Piro");
 
     const Teuchos::RCP<Teuchos::ParameterList> stratList =
         Piro::extractStratimikosParams(piroParams);
@@ -332,7 +366,8 @@ SolverFactory::createAndGetAlbanyApp(
         Teuchos::rcp(new LCM::SchwarzCoupled(
             appParams, solverComm, initial_guess, lowsFactory));
 
-    observer_ = Teuchos::rcp(new LCM::Schwarz_PiroObserver(coupled_model_with_solve));
+    observer_ =
+        Teuchos::rcp(new LCM::Schwarz_PiroObserver(coupled_model_with_solve));
 
     // WARNING: Coupled Schwarz does not contain a primary Application
     // instance and so albanyApp is null.
@@ -345,9 +380,11 @@ SolverFactory::createAndGetAlbanyApp(
   }
 #endif /* LCM */
 
-  model_ = createAlbanyAppAndModel(albanyApp, appComm, initial_guess, createAlbanyApp);
+  model_ = createAlbanyAppAndModel(
+      albanyApp, appComm, initial_guess, createAlbanyApp);
 
-  const Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(appParams, "Piro");
+  const Teuchos::RCP<Teuchos::ParameterList> piroParams =
+      Teuchos::sublist(appParams, "Piro");
   const Teuchos::RCP<Teuchos::ParameterList> stratList =
       Piro::extractStratimikosParams(piroParams);
 
@@ -382,7 +419,8 @@ SolverFactory::createAndGetAlbanyApp(
     const Teuchos::RCP<Thyra_LOWS_Factory> lowsFactory =
         createLinearSolveStrategy(linearSolverBuilder);
 
-    modelWithSolve = rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(model_, lowsFactory));
+    modelWithSolve = rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(
+        model_, lowsFactory));
   }
 
   const auto solMgr = albanyApp->getAdaptSolMgr();
@@ -403,34 +441,36 @@ SolverFactory::createAndGetAlbanyApp(
           << "\n");
 
   // Silence compiler warning in case it wasn't used (due to ifdef logic)
-  (void) solverComm;
+  (void)solverComm;
 
   return Teuchos::null;
 }
 
 Teuchos::RCP<Thyra_ModelEvaluator>
 SolverFactory::createAlbanyAppAndModel(
-    Teuchos::RCP<Application>&      albanyApp,
+    Teuchos::RCP<Application>&              albanyApp,
     const Teuchos::RCP<const Teuchos_Comm>& appComm,
     const Teuchos::RCP<const Thyra_Vector>& initial_guess,
     const bool                              createAlbanyApp)
 {
   if (createAlbanyApp) {
     // Create application
-    albanyApp = Teuchos::rcp(new Application(
-        appComm, appParams, initial_guess, is_schwarz_));
+    albanyApp = Teuchos::rcp(
+        new Application(appComm, appParams, initial_guess, is_schwarz_));
     //  albanyApp = rcp(new ApplicationT(appComm, appParams,
     //  initial_guess));
   }
 
   // Validate Response list: may move inside individual Problem class
-  Teuchos::RCP<Teuchos::ParameterList> problemParams = Teuchos::sublist(appParams, "Problem");
+  Teuchos::RCP<Teuchos::ParameterList> problemParams =
+      Teuchos::sublist(appParams, "Problem");
   problemParams->sublist("Response Functions")
       .validateParameters(*getValidResponseParameters(), 0);
 
   // If not explicitly specified, determine which Piro solver to use from the
   // problem parameters
-  const Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(appParams, "Piro");
+  const Teuchos::RCP<Teuchos::ParameterList> piroParams =
+      Teuchos::sublist(appParams, "Piro");
   if (!piroParams->getPtr<std::string>("Solver Type")) {
     const std::string solutionMethod =
         problemParams->get("Solution Method", "Steady");
@@ -469,16 +509,15 @@ SolverFactory::createAlbanyAppAndModel(
   }
 
   // Create model evaluator
-  return Teuchos::rcp(new ModelEvaluator(albanyApp,appParams));
+  return Teuchos::rcp(new ModelEvaluator(albanyApp, appParams));
 }
 
 int
-SolverFactory::
-checkSolveTestResults(
-    int                                           response_index,
-    int                                           parameter_index,
-    const Teuchos::RCP<const Thyra_Vector>&       g,
-    const Teuchos::RCP<const Thyra_MultiVector>&  dgdp) const
+SolverFactory::checkSolveTestResults(
+    int                                          response_index,
+    int                                          parameter_index,
+    const Teuchos::RCP<const Thyra_Vector>&      g,
+    const Teuchos::RCP<const Thyra_MultiVector>& dgdp) const
 {
   Teuchos::ParameterList* testParams = getTestParameters(response_index);
 
@@ -541,12 +580,12 @@ checkSolveTestResults(
             << dgdp->range()->dim() << ") !");
   }
   for (int i = 0; i < numSensTests; i++) {
-    const int numVecs = dgdp->domain()->dim();
+    const int              numVecs = dgdp->domain()->dim();
     Teuchos::Array<double> testSensValues =
         sensitivityParams->get<Teuchos::Array<double>>(
             strint("Sensitivity Test Values", i));
     ALBANY_ASSERT(
-        numVecs== testSensValues.size(),
+        numVecs == testSensValues.size(),
         "Number of Sensitivity Test Values ("
             << testSensValues.size() << " != number of sensitivity vectors ("
             << numVecs << ") !");
@@ -554,8 +593,8 @@ checkSolveTestResults(
     for (int jvec = 0; jvec < numVecs; jvec++) {
       auto s = std::string("Sensitivity Test ") + std::to_string(i) + "," +
                std::to_string(jvec);
-      failures +=
-          scaledCompare(dgdp_view[jvec][i], testSensValues[jvec], relTol, absTol, s);
+      failures += scaledCompare(
+          dgdp_view[jvec][i], testSensValues[jvec], relTol, absTol, s);
       comparisons++;
     }
   }
@@ -628,13 +667,13 @@ SolverFactory::checkAnalysisTestResults(
         testParams->get<Teuchos::Array<double>>("Piro Analysis Test Values");
 
     TEUCHOS_TEST_FOR_EXCEPT(numPiroTests != testValues.size());
-    if (testParams->get<bool>("Piro Analysis Test Two Norm",false)) {
+    if (testParams->get<bool>("Piro Analysis Test Two Norm", false)) {
       const auto norm = tvec->norm_2();
       *out << "Parameter Vector Two Norm: " << norm << std::endl;
-      failures += scaledCompare(norm, testValues[0], relTol, absTol, "Piro Analysis Test Two Norm");
+      failures += scaledCompare(
+          norm, testValues[0], relTol, absTol, "Piro Analysis Test Two Norm");
       comparisons++;
-    }
-    else {
+    } else {
       for (int i = 0; i < numPiroTests; i++) {
         auto s = std::string("Piro Analysis Test ") + std::to_string(i);
         failures += scaledCompare(p[i], testValues[i], relTol, absTol, s);
@@ -656,8 +695,8 @@ SolverFactory::getTestParameters(int response_index) const
   if (response_index == 0 && appParams->isSublist("Regression Results")) {
     result = &(appParams->sublist("Regression Results"));
   } else {
-    result = &(appParams->sublist(
-        strint("Regression Results", response_index)));
+    result =
+        &(appParams->sublist(strint("Regression Results", response_index)));
   }
 
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -673,8 +712,8 @@ SolverFactory::getTestParameters(int response_index) const
 void
 SolverFactory::storeTestResults(
     Teuchos::ParameterList* testParams,
-    int            failures,
-    int            comparisons) const
+    int                     failures,
+    int                     comparisons) const
 {
   // Store failures in param list (this requires mutable appParams!)
   testParams->set("Number of Failures", failures);
@@ -706,7 +745,7 @@ SolverFactory::scaledCompare(
 void
 SolverFactory::setSolverParamDefaults(
     Teuchos::ParameterList* appParams_,
-    int            myRank)
+    int                     myRank)
 {
   // Set the nonlinear solver method
   Teuchos::ParameterList& piroParams = appParams_->sublist("Piro");
@@ -758,9 +797,11 @@ SolverFactory::setSolverParamDefaults(
 Teuchos::RCP<const Teuchos::ParameterList>
 SolverFactory::getValidAppParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("ValidAppParams"));
+  Teuchos::RCP<Teuchos::ParameterList> validPL =
+      rcp(new Teuchos::ParameterList("ValidAppParams"));
 
-  validPL->set("Build Type", "Tpetra", "The type of run (e.g., Epetra, Tpetra)");
+  validPL->set(
+      "Build Type", "Tpetra", "The type of run (e.g., Epetra, Tpetra)");
 
   validPL->sublist("Problem", false, "Problem sublist");
   validPL->sublist("Debug Output", false, "Debug Output sublist");
@@ -793,39 +834,70 @@ SolverFactory::getValidAppParameters() const
   return validPL;
 }
 
-
 Teuchos::RCP<const Teuchos::ParameterList>
 SolverFactory::getValidDebugParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("ValidDebugParams"));
-  validPL->set<int>("Write Jacobian to MatrixMarket", 0, "Jacobian Number to Dump to MatrixMarket");
-  validPL->set<int>("Compute Jacobian Condition Number", 0, "Jacobian Condition Number to Compute");
-  validPL->set<int>("Write Residual to MatrixMarket", 0, "Residual Number to Dump to MatrixMarket");
-  validPL->set<int>("Write Jacobian to Standard Output", 0, "Jacobian Number to Dump to Standard Output");
-  validPL->set<int>("Write Residual to Standard Output", 0, "Residual Number to Dump to Standard Output");
+  Teuchos::RCP<Teuchos::ParameterList> validPL =
+      rcp(new Teuchos::ParameterList("ValidDebugParams"));
+  validPL->set<int>(
+      "Write Jacobian to MatrixMarket",
+      0,
+      "Jacobian Number to Dump to MatrixMarket");
+  validPL->set<int>(
+      "Compute Jacobian Condition Number",
+      0,
+      "Jacobian Condition Number to Compute");
+  validPL->set<int>(
+      "Write Residual to MatrixMarket",
+      0,
+      "Residual Number to Dump to MatrixMarket");
+  validPL->set<int>(
+      "Write Jacobian to Standard Output",
+      0,
+      "Jacobian Number to Dump to Standard Output");
+  validPL->set<int>(
+      "Write Residual to Standard Output",
+      0,
+      "Residual Number to Dump to Standard Output");
   validPL->set<int>("Derivative Check", 0, "Derivative check");
-  validPL->set<bool>("Write Solution to MatrixMarket", false, "Flag to Write Solution to MatrixMarket"); 
-  validPL->set<bool>("Write Distributed Solution and Map to MatrixMarket", false, "Flag to Write Distributed Solution and Map to MatrixMarket"); 
-  validPL->set<bool>("Write Solution to Standard Output", false, "Flag to Write Sotion to Standard Output");
+  validPL->set<bool>(
+      "Write Solution to MatrixMarket",
+      false,
+      "Flag to Write Solution to MatrixMarket");
+  validPL->set<bool>(
+      "Write Distributed Solution and Map to MatrixMarket",
+      false,
+      "Flag to Write Distributed Solution and Map to MatrixMarket");
+  validPL->set<bool>(
+      "Write Solution to Standard Output",
+      false,
+      "Flag to Write Sotion to Standard Output");
   validPL->set<bool>("Analyze Memory", false, "Flag to Analyze Memory");
-  return validPL; 
+  return validPL;
 }
 
 Teuchos::RCP<const Teuchos::ParameterList>
 SolverFactory::getValidScalingParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("ValidScalingParams"));
-  validPL->set<double>("Scale", 0.0, "Value of Scaling to Apply to Jacobian/Residual");
-  validPL->set<bool>("Scale BC Dofs", false, "Flag to Scale Jacobian/Residual Rows Corresponding to DBC Dofs");
-  validPL->set<std::string>("Type", "Constant", "Scaling Type (Constant, Diagonal, AbsRowSum)"); 
-  return validPL; 
+  Teuchos::RCP<Teuchos::ParameterList> validPL =
+      rcp(new Teuchos::ParameterList("ValidScalingParams"));
+  validPL->set<double>(
+      "Scale", 0.0, "Value of Scaling to Apply to Jacobian/Residual");
+  validPL->set<bool>(
+      "Scale BC Dofs",
+      false,
+      "Flag to Scale Jacobian/Residual Rows Corresponding to DBC Dofs");
+  validPL->set<std::string>(
+      "Type", "Constant", "Scaling Type (Constant, Diagonal, AbsRowSum)");
+  return validPL;
 }
 
 Teuchos::RCP<const Teuchos::ParameterList>
 SolverFactory::getValidRegressionResultsParameters() const
 {
   using Teuchos::Array;
-  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("ValidRegressionParams"));
+  Teuchos::RCP<Teuchos::ParameterList> validPL =
+      rcp(new Teuchos::ParameterList("ValidRegressionParams"));
   ;
   Array<double> ta;
   ;  // std::string to be converted to teuchos array
@@ -937,7 +1009,8 @@ SolverFactory::getValidRegressionResultsParameters() const
 Teuchos::RCP<const Teuchos::ParameterList>
 SolverFactory::getValidParameterParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("ValidParameterParams"));
+  Teuchos::RCP<Teuchos::ParameterList> validPL =
+      rcp(new Teuchos::ParameterList("ValidParameterParams"));
   ;
 
   validPL->set<int>("Number", 0);
@@ -951,7 +1024,8 @@ SolverFactory::getValidParameterParameters() const
 Teuchos::RCP<const Teuchos::ParameterList>
 SolverFactory::getValidResponseParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("ValidResponseParams"));
+  Teuchos::RCP<Teuchos::ParameterList> validPL =
+      rcp(new Teuchos::ParameterList("ValidResponseParams"));
   ;
   validPL->set<std::string>("Collection Method", "Sum Responses");
   validPL->set<int>("Number of Response Vectors", 0);
@@ -974,4 +1048,4 @@ SolverFactory::getValidResponseParameters() const
   return validPL;
 }
 
-} // namespace Albany
+}  // namespace Albany

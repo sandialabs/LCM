@@ -4,10 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "QCAD_ResponseFieldValue.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "QCAD_ResponseFieldValue_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(QCAD::ResponseFieldValue)
-

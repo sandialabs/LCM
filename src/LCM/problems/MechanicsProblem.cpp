@@ -4,6 +4,7 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include "MechanicsProblem.hpp"
+
 #include "MechanicsProblem_Def.hpp"
 
 namespace Albany {

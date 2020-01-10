@@ -5,19 +5,20 @@
 //*****************************************************************//
 
 #include "Albany_PUMIOutput.hpp"
+
 #include "Albany_PUMIVtk.hpp"
 #if defined(ALBANY_STK)
 #include "Albany_PUMIExodus.hpp"
 #endif
 
-Albany::PUMIOutput::~PUMIOutput() {
-}
+Albany::PUMIOutput::~PUMIOutput() {}
 
-Albany::PUMIOutput* Albany::PUMIOutput::create(
-  const Teuchos::RCP<APFMeshStruct>& meshStruct,
-  const Teuchos::RCP<const Teuchos_Comm>& comm) {
-  if (meshStruct->outputFileName.empty())
-    return 0;
+Albany::PUMIOutput*
+Albany::PUMIOutput::create(
+    const Teuchos::RCP<APFMeshStruct>&      meshStruct,
+    const Teuchos::RCP<const Teuchos_Comm>& comm)
+{
+  if (meshStruct->outputFileName.empty()) return 0;
 #if defined(ALBANY_STK)
   if (meshStruct->outputFileName.find("exo") != std::string::npos)
     return new PUMIExodus(meshStruct, comm);
@@ -26,7 +27,9 @@ Albany::PUMIOutput* Albany::PUMIOutput::create(
     return new PUMIVtk(meshStruct, comm);
   if (meshStruct->outputFileName.find("vtkascii") != std::string::npos)
     return new PUMIVtk(meshStruct, comm);
-  TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error,
-      "PUMIDiscretization: Output should be .exo or .vtk, have "<<
-      meshStruct->outputFileName << '\n');
+  TEUCHOS_TEST_FOR_EXCEPTION(
+      true,
+      std::logic_error,
+      "PUMIDiscretization: Output should be .exo or .vtk, have "
+          << meshStruct->outputFileName << '\n');
 }

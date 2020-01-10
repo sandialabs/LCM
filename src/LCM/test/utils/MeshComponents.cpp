@@ -7,10 +7,10 @@
 //
 // Find connected components in a mesh by using the dual graph
 //
+#include <LCMPartition.h>
+
 #include <Teuchos_CommandLineProcessor.hpp>
 #include <iomanip>
-
-#include <LCMPartition.h>
 
 int
 main(int ac, char* av[])

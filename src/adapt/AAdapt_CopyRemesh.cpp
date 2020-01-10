@@ -10,24 +10,23 @@
 
 namespace AAdapt {
 
-typedef stk::mesh::Entity Entity;
-typedef stk::mesh::EntityRank EntityRank;
+typedef stk::mesh::Entity             Entity;
+typedef stk::mesh::EntityRank         EntityRank;
 typedef stk::mesh::RelationIdentifier EdgeId;
-typedef stk::mesh::EntityKey EntityKey;
+typedef stk::mesh::EntityKey          EntityKey;
 
 //----------------------------------------------------------------------------
-CopyRemesh::
-CopyRemesh(Teuchos::RCP<Teuchos::ParameterList> const & params,
-           Teuchos::RCP<ParamLib>               const & param_lib,
-           Albany::StateManager                 const & state_mgr,
-           Teuchos::RCP<Teuchos_Comm const>     const & comm)
- : AbstractAdapter(params, param_lib, state_mgr, comm)
- , remesh_file_index_(1)
+CopyRemesh::CopyRemesh(
+    Teuchos::RCP<Teuchos::ParameterList> const& params,
+    Teuchos::RCP<ParamLib> const&               param_lib,
+    Albany::StateManager const&                 state_mgr,
+    Teuchos::RCP<Teuchos_Comm const> const&     comm)
+    : AbstractAdapter(params, param_lib, state_mgr, comm), remesh_file_index_(1)
 {
   discretization_ = state_mgr_.getDiscretization();
 
   stk_discretization_ =
-    static_cast<Albany::STKDiscretization*>(discretization_.get());
+      static_cast<Albany::STKDiscretization*>(discretization_.get());
 
   stk_mesh_struct_ = stk_discretization_->getSTKMeshStruct();
 
@@ -41,31 +40,32 @@ CopyRemesh(Teuchos::RCP<Teuchos::ParameterList> const & params,
 }
 
 //----------------------------------------------------------------------------
-bool CopyRemesh::queryAdaptationCriteria(int iter) {
-
-  if(adapt_params_->get<std::string>("Remesh Strategy", "None").compare("Continuous") == 0){
-
-    if(iter > 1) {
+bool
+CopyRemesh::queryAdaptationCriteria(int iter)
+{
+  if (adapt_params_->get<std::string>("Remesh Strategy", "None")
+          .compare("Continuous") == 0) {
+    if (iter > 1) {
       return true;
     } else {
       return false;
     }
   }
 
-  Teuchos::Array<int> remesh_iter = adapt_params_->get<Teuchos::Array<int> >("Remesh Step Number");
+  Teuchos::Array<int> remesh_iter =
+      adapt_params_->get<Teuchos::Array<int>>("Remesh Step Number");
 
-  for(int i = 0; i < remesh_iter.size(); i++) {
-    if(iter == remesh_iter[i]) {
-      return true;
-    }
+  for (int i = 0; i < remesh_iter.size(); i++) {
+    if (iter == remesh_iter[i]) { return true; }
   }
 
   return false;
 }
 
 //----------------------------------------------------------------------------
-bool CopyRemesh::adaptMesh(){
-
+bool
+CopyRemesh::adaptMesh()
+{
   std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
   std::cout << "Adapting mesh using CopyRemesh method       \n";
   std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
@@ -76,7 +76,7 @@ bool CopyRemesh::adaptMesh(){
   // remeshFileIndex ahead of the period
 
   std::ostringstream ss;
-  std::string str = base_exo_filename_;
+  std::string        str = base_exo_filename_;
   ss << "_" << remesh_file_index_ << ".";
   str.replace(str.find('.'), 1, ss.str());
 
@@ -99,17 +99,24 @@ bool CopyRemesh::adaptMesh(){
 
 //----------------------------------------------------------------------------
 Teuchos::RCP<const Teuchos::ParameterList>
-CopyRemesh::getValidAdapterParameters() const {
+CopyRemesh::getValidAdapterParameters() const
+{
   Teuchos::RCP<Teuchos::ParameterList> validPL =
-    this->getGenericAdapterParams("ValidCopyRemeshParameters");
+      this->getGenericAdapterParams("ValidCopyRemeshParameters");
 
   Teuchos::Array<int> defaultArgs;
 
-  validPL->set<Teuchos::Array<int> >("Remesh Step Number", defaultArgs, "Iteration step at which to remesh the problem");
-  validPL->set<std::string>("Remesh Strategy", "", "Strategy to use when remeshing: Continuous - remesh every step.");
+  validPL->set<Teuchos::Array<int>>(
+      "Remesh Step Number",
+      defaultArgs,
+      "Iteration step at which to remesh the problem");
+  validPL->set<std::string>(
+      "Remesh Strategy",
+      "",
+      "Strategy to use when remeshing: Continuous - remesh every step.");
 
   return validPL;
 }
 //----------------------------------------------------------------------------
 
-} // namespace AAdapt
+}  // namespace AAdapt

@@ -4,7 +4,11 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
+#include "LCMPartition.h"
+
 #include <algorithm>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/connected_components.hpp>
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
@@ -12,11 +16,7 @@
 #include <sstream>
 #include <string>
 
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/connected_components.hpp>
-
 #include "Albany_Utils.hpp"
-#include "LCMPartition.h"
 
 namespace LCM {
 

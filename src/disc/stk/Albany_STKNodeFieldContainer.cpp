@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "Albany_STKNodeFieldContainer.hpp"
+
 #include "Albany_STKNodeFieldContainer_Def.hpp"
 
 namespace Albany {
@@ -13,4 +14,4 @@ template class STKNodeField<double, 1>;
 template class STKNodeField<double, 2>;
 template class STKNodeField<double, 3>;
 
-} // namespace Albany
+}  // namespace Albany

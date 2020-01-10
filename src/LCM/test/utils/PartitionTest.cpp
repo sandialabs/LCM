@@ -7,12 +7,12 @@
 //
 // Simple mesh partitioning program
 //
+#include <LCMPartition.h>
+
+#include <Teuchos_CommandLineProcessor.hpp>
 #include <algorithm>
 #include <chrono>
 #include <iomanip>
-
-#include <LCMPartition.h>
-#include <Teuchos_CommandLineProcessor.hpp>
 
 int
 main(int ac, char* av[])

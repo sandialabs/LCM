@@ -5,15 +5,13 @@
 //*****************************************************************//
 
 #include "AAdapt_STKAdapt.hpp"
-#include "AAdapt_STKAdapt_Def.hpp"
 
+#include "AAdapt_STKAdapt_Def.hpp"
 #include "AAdapt_STKUnifSizeField.hpp"
 
-namespace AAdapt
-{
+namespace AAdapt {
 
 // Explicit instantiations
 template class STKAdapt<STKUnifRefineField>;
 
-
-} // namespace AAdapt
+}  // namespace AAdapt

@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "SolutionSniffer.hpp"
+
 #include "NOX_Abstract_Group.H"
 #include "NOX_Solver_Generic.H"
 #include "Teuchos_VerboseObject.hpp"
@@ -16,10 +17,14 @@ SolutionSniffer::SolutionSniffer() {}
 SolutionSniffer::~SolutionSniffer() {}
 
 void
-SolutionSniffer::runPreIterate(NOX::Solver::Generic const&) {}
+SolutionSniffer::runPreIterate(NOX::Solver::Generic const&)
+{
+}
 
 void
-SolutionSniffer::runPostIterate(NOX::Solver::Generic const&) {}
+SolutionSniffer::runPostIterate(NOX::Solver::Generic const&)
+{
+}
 
 void
 SolutionSniffer::runPreSolve(NOX::Solver::Generic const& solver)

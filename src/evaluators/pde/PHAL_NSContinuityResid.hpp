@@ -7,6 +7,7 @@
 #ifndef PHAL_NSCONTINUITYRESID_HPP
 #define PHAL_NSCONTINUITYRESID_HPP
 
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

@@ -4,9 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "PHAL_DOFCellToSideQP.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_DOFCellToSideQP_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(PHAL::DOFCellToSideQPBase)

@@ -4,9 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "ThermoPoroPlasticityResidMass.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "ThermoPoroPlasticityResidMass_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::ThermoPoroPlasticityResidMass)

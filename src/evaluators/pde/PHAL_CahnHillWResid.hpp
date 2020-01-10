@@ -7,6 +7,8 @@
 #ifndef PHAL_CAHNHILLWRESID_HPP
 #define PHAL_CAHNHILLWRESID_HPP
 
+#include "Albany_ScalarOrdinalTypes.hpp"
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

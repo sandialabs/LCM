@@ -4,9 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "PHAL_ResponseThermalEnergy.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_ResponseThermalEnergy_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(PHAL::ResponseThermalEnergy)

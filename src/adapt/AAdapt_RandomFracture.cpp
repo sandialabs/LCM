@@ -5,10 +5,12 @@
 //*****************************************************************//
 
 #include "AAdapt_RandomFracture.hpp"
+
 #include <stk_util/parallel/ParallelReduce.hpp>
+
 #include "AAdapt_RandomCriterion.hpp"
-#include "Teuchos_TimeMonitor.hpp"
 #include "Albany_STKDiscretization.hpp"
+#include "Teuchos_TimeMonitor.hpp"
 
 using stk::mesh::Entity;
 using stk::mesh::EntityKey;
@@ -21,15 +23,15 @@ typedef stk::mesh::RelationIdentifier EdgeId;
 typedef stk::mesh::EntityKey          EntityKey;
 
 //----------------------------------------------------------------------------
-RandomFracture::
-RandomFracture(const Teuchos::RCP<Teuchos::ParameterList>& params,
-               const Teuchos::RCP<ParamLib>&               param_lib,
-               Albany::StateManager&                       state_mgr,
-               const Teuchos::RCP<const Teuchos_Comm>&     commT)
- : AbstractAdapter(params, param_lib, state_mgr, commT)
- , remesh_file_index_(1)
- , fracture_interval_(params->get<int>("Adaptivity Step Interval", 1))
- , fracture_probability_(params->get<double>("Fracture Probability", 1.0))
+RandomFracture::RandomFracture(
+    const Teuchos::RCP<Teuchos::ParameterList>& params,
+    const Teuchos::RCP<ParamLib>&               param_lib,
+    Albany::StateManager&                       state_mgr,
+    const Teuchos::RCP<const Teuchos_Comm>&     commT)
+    : AbstractAdapter(params, param_lib, state_mgr, commT),
+      remesh_file_index_(1),
+      fracture_interval_(params->get<int>("Adaptivity Step Interval", 1)),
+      fracture_probability_(params->get<double>("Fracture Probability", 1.0))
 {
   discretization_ = state_mgr_.getDiscretization();
 
@@ -41,8 +43,8 @@ RandomFracture(const Teuchos::RCP<Teuchos::ParameterList>& params,
   bulk_data_ = stk_mesh_struct_->bulkData;
   meta_data_ = stk_mesh_struct_->metaData;
 
-  failure_criterion_ = Teuchos::rcp(new RandomCriterion(
-      num_dim_, element_rank_, *stk_discretization_));
+  failure_criterion_ = Teuchos::rcp(
+      new RandomCriterion(num_dim_, element_rank_, *stk_discretization_));
 
   num_dim_ = stk_mesh_struct_->numDim;
 
@@ -106,7 +108,8 @@ RandomFracture::queryAdaptationCriteria()
 }
 
 //----------------------------------------------------------------------------
-bool RandomFracture::adaptMesh()
+bool
+RandomFracture::adaptMesh()
 {
   *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
                   << std::endl;
@@ -367,6 +370,6 @@ RandomFracture::getGlobalOpenList(
 {
   global_entity_open = local_entity_open;
 }
-#endif // ALBANY_MPI
+#endif  // ALBANY_MPI
 
 }  // namespace AAdapt

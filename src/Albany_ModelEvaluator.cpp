@@ -6,14 +6,12 @@
 
 #include "Albany_ModelEvaluator.hpp"
 
-#include "Albany_DistributedParameterLibrary.hpp"
+#include "Albany_Application.hpp"
 #include "Albany_DistributedParameterDerivativeOp.hpp"
+#include "Albany_DistributedParameterLibrary.hpp"
+#include "Albany_ThyraUtils.hpp"
 #include "Teuchos_ScalarTraits.hpp"
 #include "Teuchos_TestForException.hpp"
-
-#include "Albany_ThyraUtils.hpp"
-
-#include "Albany_Application.hpp"
 
 // uncomment the following to write stuff out to matrix market to debug
 //#define WRITE_TO_MATRIX_MARKET
@@ -30,7 +28,8 @@ static int mm_counter_jac = 0;
 //#define WRITE_MASS_MATRIX_TO_MM_FILE
 
 namespace {
-void sanitize_nans(const Thyra_Derivative& v)
+void
+sanitize_nans(const Thyra_Derivative& v)
 {
   if (!v.isEmpty() && Teuchos::nonnull(v.getMultiVector())) {
     v.getMultiVector()->assign(0.0);
@@ -38,17 +37,16 @@ void sanitize_nans(const Thyra_Derivative& v)
 }
 }  // namespace
 
-namespace Albany
-{
+namespace Albany {
 
-ModelEvaluator::
-ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
-                const Teuchos::RCP<Teuchos::ParameterList>& appParams_)
- : app(app_)
- , appParams(appParams_)
- , supplies_prec(app_->suppliesPreconditioner())
- , supports_xdot(false)
- , supports_xdotdot(false)
+ModelEvaluator::ModelEvaluator(
+    const Teuchos::RCP<Albany::Application>&    app_,
+    const Teuchos::RCP<Teuchos::ParameterList>& appParams_)
+    : app(app_),
+      appParams(appParams_),
+      supplies_prec(app_->suppliesPreconditioner()),
+      supports_xdot(false),
+      supports_xdotdot(false)
 {
   Teuchos::RCP<Teuchos::FancyOStream> out =
       Teuchos::VerboseObjectBase::getDefaultOStream();
@@ -57,10 +55,9 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
   Teuchos::ParameterList& problemParams   = appParams->sublist("Problem");
   Teuchos::ParameterList& parameterParams = problemParams.sublist("Parameters");
 
-  const std::string soln_method = problemParams.get("Solution Method", "Steady"); 
-  if (soln_method == "Transient Tempus") {
-    use_tempus = true; 
-  }
+  const std::string soln_method =
+      problemParams.get("Solution Method", "Steady");
+  if (soln_method == "Transient Tempus") { use_tempus = true; }
 
   num_param_vecs = parameterParams.get("Number of Parameter Vectors", 0);
   bool using_old_parameter_list = false;
@@ -102,9 +99,7 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  In Albany::ModelEvaluator constructor:  "
-            << "Parameter vector "
-            << l
-            << " has zero parameters!"
+            << "Parameter vector " << l << " has zero parameters!"
             << std::endl);
 
     param_names[l] =
@@ -135,9 +130,7 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
           Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error!  In Albany::ModelEvaluator constructor:  "
-              << "Response vector "
-              << l
-              << " has zero parameters!"
+              << "Response vector " << l << " has zero parameters!"
               << std::endl);
 
       response_names[l] =
@@ -179,7 +172,8 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
     }
 
     // Create vector space for parameter vector
-    param_vss[l] = createLocallyReplicatedVectorSpace(sacado_param_vec[l].size(), commT);
+    param_vss[l] =
+        createLocallyReplicatedVectorSpace(sacado_param_vec[l].size(), commT);
 
     // Create Thyra vector for parameters
     param_vecs[l] = Thyra::createMember(param_vss[l]);
@@ -188,34 +182,38 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
     if (using_old_parameter_list) {
       pList = &parameterParams;
     } else {
-      pList = &(parameterParams.sublist(strint("Parameter Vector",l)));
+      pList = &(parameterParams.sublist(strint("Parameter Vector", l)));
     }
 
     int numParameters = param_vss[l]->dim();
 
     // Loading lower bounds (if any)
-    if (pList->isParameter("Lower Bounds"))
-    {
-      param_lower_bds[l] = Thyra::createMember(param_vss[l]);
+    if (pList->isParameter("Lower Bounds")) {
+      param_lower_bds[l]    = Thyra::createMember(param_vss[l]);
       Teuchos::Array<ST> lb = pList->get<Teuchos::Array<ST>>("Lower Bounds");
-      TEUCHOS_TEST_FOR_EXCEPTION (lb.size()!=numParameters, Teuchos::Exceptions::InvalidParameter,
-                                  "Error! Input lower bounds array has the wrong dimension.\n");
+      TEUCHOS_TEST_FOR_EXCEPTION(
+          lb.size() != numParameters,
+          Teuchos::Exceptions::InvalidParameter,
+          "Error! Input lower bounds array has the wrong dimension.\n");
 
-      auto param_lower_bd_nonConstView = getNonconstLocalData(param_lower_bds[l]);
+      auto param_lower_bd_nonConstView =
+          getNonconstLocalData(param_lower_bds[l]);
       for (int k = 0; k < numParameters; ++k) {
         param_lower_bd_nonConstView[k] = lb[k];
       }
     }
 
     // Loading upper bounds (if any)
-    if (pList->isParameter("Upper Bounds"))
-    {
-      param_upper_bds[l] = Thyra::createMember(param_vss[l]);
+    if (pList->isParameter("Upper Bounds")) {
+      param_upper_bds[l]    = Thyra::createMember(param_vss[l]);
       Teuchos::Array<ST> ub = pList->get<Teuchos::Array<ST>>("Upper Bounds");
-      TEUCHOS_TEST_FOR_EXCEPTION (ub.size()!=numParameters, Teuchos::Exceptions::InvalidParameter,
-                                  "Error! Input upper bounds array has the wrong dimension.\n");
+      TEUCHOS_TEST_FOR_EXCEPTION(
+          ub.size() != numParameters,
+          Teuchos::Exceptions::InvalidParameter,
+          "Error! Input upper bounds array has the wrong dimension.\n");
 
-      auto param_upper_bd_nonConstView = getNonconstLocalData(param_upper_bds[l]);
+      auto param_upper_bd_nonConstView =
+          getNonconstLocalData(param_upper_bds[l]);
       for (int k = 0; k < numParameters; ++k) {
         param_upper_bd_nonConstView[k] = ub[k];
       }
@@ -223,11 +221,13 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
 
     // Loading nominal values (if any)
     auto param_vec_nonConstView = getNonconstLocalData(param_vecs[l]);
-    if (pList->isParameter("Nominal Values"))
-    {
-      Teuchos::Array<ST> nvals = pList->get<Teuchos::Array<ST>>("Nominal Values");
-      TEUCHOS_TEST_FOR_EXCEPTION (nvals.size()!=numParameters, Teuchos::Exceptions::InvalidParameter,
-                                  "Error! Input nominal values array has the wrong dimension.\n");
+    if (pList->isParameter("Nominal Values")) {
+      Teuchos::Array<ST> nvals =
+          pList->get<Teuchos::Array<ST>>("Nominal Values");
+      TEUCHOS_TEST_FOR_EXCEPTION(
+          nvals.size() != numParameters,
+          Teuchos::Exceptions::InvalidParameter,
+          "Error! Input nominal values array has the wrong dimension.\n");
 
       for (int k = 0; k < numParameters; ++k) {
         sacado_param_vec[l][k].baseValue = param_vec_nonConstView[k] = nvals[k];
@@ -257,7 +257,8 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
                      &distParameterParams.sublist(p_sublist_name) :
                      NULL;
 
-    p_name_ptr = &distParameterParams.get<std::string>(strint("Parameter", i), emptyString);
+    p_name_ptr = &distParameterParams.get<std::string>(
+        strint("Parameter", i), emptyString);
 
     if (param_list != NULL) {
       const std::string& name_from_list =
@@ -272,10 +273,7 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
               << "Error!  In Albany::ModelEvaluator constructor:  Provided "
                  "two different names for same parameter in Distributed "
                  "Parameters list: \""
-              << *p_name_ptr
-              << "\" and \""
-              << name_from_list
-              << "\""
+              << *p_name_ptr << "\" and \"" << name_from_list << "\""
               << std::endl);
     }
 
@@ -284,15 +282,14 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  In Albany::ModelEvaluator constructor:  "
-            << "Invalid distributed parameter name \""
-            << *p_name_ptr
-            << "\""
+            << "Invalid distributed parameter name \"" << *p_name_ptr << "\""
             << std::endl);
 
     dist_param_names[i] = *p_name_ptr;
     // set parameters bonuds
     if (param_list) {
-      Teuchos::RCP<const DistributedParameter> distParam = distParamLib->get(*p_name_ptr);
+      Teuchos::RCP<const DistributedParameter> distParam =
+          distParamLib->get(*p_name_ptr);
       if (param_list->isParameter("Lower Bound") &&
           (distParam->lower_bounds_vector() != Teuchos::null))
         distParam->lower_bounds_vector()->assign(
@@ -310,11 +307,13 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
 
   for (int l = 0; l < app->getNumResponses(); ++l) {
     // Create Thyra vector for responses
-    thyra_response_vec[l] = Thyra::createMember(app->getResponse(l)->responseVectorSpace());
+    thyra_response_vec[l] =
+        Thyra::createMember(app->getResponse(l)->responseVectorSpace());
   }
 
   // Determine the number of solution vectors (x, xdot, xdotdot)
-  int num_sol_vectors = app->getAdaptSolMgr()->getInitialSolution()->domain()->dim();
+  int num_sol_vectors =
+      app->getAdaptSolMgr()->getInitialSolution()->domain()->dim();
 
   if (num_sol_vectors > 1) {  // have x dot
     supports_xdot = true;
@@ -324,8 +323,8 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
 
   // Setup nominal values, lower and upper bounds, and final point
   nominalValues = this->createInArgsImpl();
-  lowerBounds = this->createInArgsImpl();
-  upperBounds = this->createInArgsImpl();
+  lowerBounds   = this->createInArgsImpl();
+  upperBounds   = this->createInArgsImpl();
 
   // All the ME vectors are unallocated here
   allocateVectors();
@@ -333,37 +332,46 @@ ModelEvaluator (const Teuchos::RCP<Albany::Application>&    app_,
   // TODO: Check if correct nominal values for parameters
   for (int l = 0; l < num_param_vecs; ++l) {
     nominalValues.set_p(l, param_vecs[l]);
-    if(Teuchos::nonnull(param_lower_bds[l])) {
+    if (Teuchos::nonnull(param_lower_bds[l])) {
       lowerBounds.set_p(l, param_lower_bds[l]);
     }
-    if(Teuchos::nonnull(param_upper_bds[l])) {
+    if (Teuchos::nonnull(param_upper_bds[l])) {
       upperBounds.set_p(l, param_upper_bds[l]);
     }
   }
   for (int l = 0; l < num_dist_param_vecs; ++l) {
-    nominalValues.set_p(l+num_param_vecs, distParamLib->get(dist_param_names[l])->vector());
-    lowerBounds.set_p(l+num_param_vecs, distParamLib->get(dist_param_names[l])->lower_bounds_vector());
-    upperBounds.set_p(l+num_param_vecs, distParamLib->get(dist_param_names[l])->upper_bounds_vector());
+    nominalValues.set_p(
+        l + num_param_vecs, distParamLib->get(dist_param_names[l])->vector());
+    lowerBounds.set_p(
+        l + num_param_vecs,
+        distParamLib->get(dist_param_names[l])->lower_bounds_vector());
+    upperBounds.set_p(
+        l + num_param_vecs,
+        distParamLib->get(dist_param_names[l])->upper_bounds_vector());
   }
 
-  overwriteNominalValuesWithFinalPoint = appParams->get("Overwrite Nominal Values With Final Point",false);
+  overwriteNominalValuesWithFinalPoint =
+      appParams->get("Overwrite Nominal Values With Final Point", false);
 
   timer = Teuchos::TimeMonitor::getNewTimer("Albany: Total Fill Time");
 }
 
-void ModelEvaluator::allocateVectors()
+void
+ModelEvaluator::allocateVectors()
 {
-  const Teuchos::RCP<const Thyra_MultiVector>   xMV  = app->getAdaptSolMgr()->getCurrentSolution();
+  const Teuchos::RCP<const Thyra_MultiVector> xMV =
+      app->getAdaptSolMgr()->getCurrentSolution();
 
   // Create non-const versions of x_init [and x_dot_init [and x_dotdot_init]]
-  const Teuchos::RCP<const Thyra_Vector> x_init = xMV->col(0);
-  const Teuchos::RCP<Thyra_Vector> x_init_nonconst = x_init->clone_v();
+  const Teuchos::RCP<const Thyra_Vector> x_init          = xMV->col(0);
+  const Teuchos::RCP<Thyra_Vector>       x_init_nonconst = x_init->clone_v();
   nominalValues.set_x(x_init_nonconst);
 
   // Have xdot
   if (xMV->domain()->dim() > 1) {
     const Teuchos::RCP<const Thyra_Vector> x_dot_init = xMV->col(1);
-    const Teuchos::RCP<Thyra_Vector>       x_dot_init_nonconst = x_dot_init->clone_v();
+    const Teuchos::RCP<Thyra_Vector>       x_dot_init_nonconst =
+        x_dot_init->clone_v();
     nominalValues.set_x_dot(x_dot_init_nonconst);
   }
 
@@ -374,7 +382,8 @@ void ModelEvaluator::allocateVectors()
     // GAH set x_dotdot for transient simulations. Note that xDotDot is a member
     // of Piro::TransientDecorator<ST, LO, GO, KokkosNode>
     const Teuchos::RCP<const Thyra_Vector> x_dotdot_init = xMV->col(2);
-    const Teuchos::RCP<Thyra_Vector>       x_dotdot_init_nonconst = x_dotdot_init->clone_v();
+    const Teuchos::RCP<Thyra_Vector>       x_dotdot_init_nonconst =
+        x_dotdot_init->clone_v();
     // IKT, 3/30/17: set x_dotdot in nominalValues for Tempus, now that
     // it is available in Thyra::ModelEvaluator
     this->xDotDot = x_dotdot_init_nonconst;
@@ -406,14 +415,13 @@ ModelEvaluator::get_p_space(int l) const
       Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::get_p_space():  "
-          << "Invalid parameter index l = "
-          << l
-          << std::endl);
+          << "Invalid parameter index l = " << l << std::endl);
   Teuchos::RCP<const Thyra_VectorSpace> vs;
   if (l < num_param_vecs) {
     vs = param_vss[l];
   } else {
-    vs = distParamLib->get(dist_param_names[l-num_param_vecs])->vector_space();
+    vs =
+        distParamLib->get(dist_param_names[l - num_param_vecs])->vector_space();
   }
   return vs;
 }
@@ -426,9 +434,7 @@ ModelEvaluator::get_g_space(int l) const
       Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::get_g_space():  "
-          << "Invalid response index l = "
-          << l
-          << std::endl);
+          << "Invalid response index l = " << l << std::endl);
 
   return app->getResponse(l)->responseVectorSpace();
 }
@@ -441,9 +447,7 @@ ModelEvaluator::get_p_names(int l) const
       Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::get_p_names():  "
-          << "Invalid parameter index l = "
-          << l
-          << std::endl);
+          << "Invalid parameter index l = " << l << std::endl);
 
   if (l < num_param_vecs) return param_names[l];
   return Teuchos::rcp(
@@ -459,8 +463,9 @@ ModelEvaluator::create_W_op() const
 Teuchos::RCP<Thyra_Preconditioner>
 ModelEvaluator::create_W_prec() const
 {
-  Teuchos::RCP<Thyra::DefaultPreconditioner<ST>> W_prec  = Teuchos::rcp(new Thyra::DefaultPreconditioner<ST>);
-  Teuchos::RCP<Thyra_LinearOp>                   precOp  = app->getPreconditioner();
+  Teuchos::RCP<Thyra::DefaultPreconditioner<ST>> W_prec =
+      Teuchos::rcp(new Thyra::DefaultPreconditioner<ST>);
+  Teuchos::RCP<Thyra_LinearOp> precOp = app->getPreconditioner();
 
   W_prec->initializeRight(precOp);
   return W_prec;
@@ -474,11 +479,10 @@ ModelEvaluator::create_DfDp_op_impl(int j) const
       Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::create_DfDp_op_impl():  "
-          << "Invalid parameter index j = "
-          << j
-          << std::endl);
+          << "Invalid parameter index j = " << j << std::endl);
 
-  return Teuchos::rcp( new DistributedParameterDerivativeOp(app, dist_param_names[j - num_param_vecs]) );
+  return Teuchos::rcp(new DistributedParameterDerivativeOp(
+      app, dist_param_names[j - num_param_vecs]));
 }
 
 Teuchos::RCP<const Thyra_LOWS_Factory>
@@ -512,9 +516,7 @@ ModelEvaluator::create_DgDx_op_impl(int j) const
       Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::create_DgDx_op_impl():  "
-          << "Invalid response index j = "
-          << j
-          << std::endl);
+          << "Invalid response index j = " << j << std::endl);
 
   return app->getResponse(j)->createGradientOp();
 }
@@ -528,9 +530,7 @@ ModelEvaluator::create_DgDx_dotdot_op_impl(int j) const
       Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::create_DgDx_dotdot_op():  "
-          << "Invalid response index j = "
-          << j
-          << std::endl);
+          << "Invalid response index j = " << j << std::endl);
 
   return app->getResponse(j)->createGradientOp();
 }
@@ -543,14 +543,13 @@ ModelEvaluator::create_DgDx_dot_op_impl(int j) const
       Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::create_DgDx_dot_op_impl():  "
-          << "Invalid response index j = "
-          << j
-          << std::endl);
+          << "Invalid response index j = " << j << std::endl);
 
   return app->getResponse(j)->createGradientOp();
 }
 
-Thyra_OutArgs ModelEvaluator::createOutArgsImpl() const
+Thyra_OutArgs
+ModelEvaluator::createOutArgsImpl() const
 {
   Thyra_ModelEvaluator::OutArgsSetup<ST> result;
   result.setModelEvalDescription(this->description());
@@ -589,8 +588,7 @@ Thyra_OutArgs ModelEvaluator::createOutArgsImpl() const
       dgdx_support = Thyra_ModelEvaluator::DERIV_LINEAR_OP;
     }
 
-    result.setSupports(
-        Thyra_ModelEvaluator::OUT_ARG_DgDx, i, dgdx_support);
+    result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DgDx, i, dgdx_support);
     if (supports_xdot) {
       result.setSupports(
           Thyra_ModelEvaluator::OUT_ARG_DgDx_dot, i, dgdx_support);
@@ -627,9 +625,10 @@ Thyra_OutArgs ModelEvaluator::createOutArgsImpl() const
   return static_cast<Thyra_OutArgs>(result);
 }
 
-void ModelEvaluator::
-evalModelImpl(const Thyra_InArgs&  inArgs,
-              const Thyra_OutArgs& outArgs) const
+void
+ModelEvaluator::evalModelImpl(
+    const Thyra_InArgs&  inArgs,
+    const Thyra_OutArgs& outArgs) const
 {
 #ifdef OUTPUT_TO_SCREEN
   std::cout << "DEBUG: " << __PRETTY_FUNCTION__ << "\n";
@@ -641,14 +640,17 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
   //
 
   //! If a parameter has changed in value, saved/unsaved fields must be updated
-  auto out = Teuchos::VerboseObjectBase::getDefaultOStream();
+  auto out            = Teuchos::VerboseObjectBase::getDefaultOStream();
   auto analysisParams = appParams->sublist("Piro").sublist("Analysis");
-  if(analysisParams.isSublist("Optimization Status")) {
+  if (analysisParams.isSublist("Optimization Status")) {
     auto& opt_paramList = analysisParams.sublist("Optimization Status");
-    if(opt_paramList.isParameter("Optimization Variables Changed") && opt_paramList.get<bool>("Optimization Variables Changed")) {
-      if(opt_paramList.isParameter("Parameter Names")) {
-        auto& param_names = *opt_paramList.get<Teuchos::RCP<std::vector<std::string>>>("Parameter Names");
-        for (int k=0; k < param_names.size(); ++k) {
+    if (opt_paramList.isParameter("Optimization Variables Changed") &&
+        opt_paramList.get<bool>("Optimization Variables Changed")) {
+      if (opt_paramList.isParameter("Parameter Names")) {
+        auto& param_names =
+            *opt_paramList.get<Teuchos::RCP<std::vector<std::string>>>(
+                "Parameter Names");
+        for (int k = 0; k < param_names.size(); ++k) {
           *out << param_names[k] << " has changed!" << std::endl;
           app->getPhxSetup()->init_unsaved_param(param_names[k]);
         }
@@ -656,20 +658,23 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
       opt_paramList.set("Optimization Variables Changed", false);
     }
 
-    // When using the Old Reduced Space ROL Interface, the solution printing is 
+    // When using the Old Reduced Space ROL Interface, the solution printing is
     // handled in Piro using observers. Otherwise we take care of printing here.
-    if(analysisParams.isSublist("ROL") && !analysisParams.sublist("ROL").get("Use Old Reduced Space Interface", false)) {
-      int iter = opt_paramList.get("Optimizer Iteration Number", -1);
-      static int iteration = -1;
-      int write_interval = analysisParams.get("Write Interval",1);
-      if((iter >= 0) && (iter != iteration) && (iteration%write_interval == 0))
-      {
-        Teuchos::TimeMonitor timer(*Teuchos::TimeMonitor::getNewTimer("Albany: Output to File"));
+    if (analysisParams.isSublist("ROL") &&
+        !analysisParams.sublist("ROL").get(
+            "Use Old Reduced Space Interface", false)) {
+      int        iter = opt_paramList.get("Optimizer Iteration Number", -1);
+      static int iteration      = -1;
+      int        write_interval = analysisParams.get("Write Interval", 1);
+      if ((iter >= 0) && (iter != iteration) &&
+          (iteration % write_interval == 0)) {
+        Teuchos::TimeMonitor timer(
+            *Teuchos::TimeMonitor::getNewTimer("Albany: Output to File"));
         const Teuchos::RCP<const Thyra_Vector> x = inArgs.get_x();
         const Teuchos::RCP<const Thyra_Vector> overlappedSolution =
-          app->getAdaptSolMgr()->updateAndReturnOverlapSolution(*x);
+            app->getAdaptSolMgr()->updateAndReturnOverlapSolution(*x);
         app->getDiscretization()->writeSolution(
-          *overlappedSolution, iter, /*overlapped =*/ true);
+            *overlappedSolution, iter, /*overlapped =*/true);
         iteration = iter;
       }
     }
@@ -683,34 +688,33 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
   // IKT, 3/30/17: the following logic is meant to support both the Thyra
   // time-integrators in Piro
   //(e.g., trapezoidal rule) and the second order time-integrators in Tempus.
-  Teuchos::RCP<const Thyra_Vector> x_dotdot; 
-  ST                          omega = 0.0;
+  Teuchos::RCP<const Thyra_Vector> x_dotdot;
+  ST                               omega = 0.0;
   if (supports_xdotdot == true) {
-    if (use_tempus == true) 
-      omega = inArgs.get_W_x_dot_dot_coeff();
+    if (use_tempus == true) omega = inArgs.get_W_x_dot_dot_coeff();
     // The following case is to support second order time-integrators in Piro
     if (std::abs(omega) < 1.0e-14) {
       if (Teuchos::nonnull(this->get_x_dotdot())) {
-        x_dotdot  =  this->get_x_dotdot(); 
-        omega     = this->get_omega();
+        x_dotdot = this->get_x_dotdot();
+        omega    = this->get_omega();
       } else {
-        x_dotdot  = Teuchos::null; 
-        omega     = 0.0;
+        x_dotdot = Teuchos::null;
+        omega    = 0.0;
       }
     }
     // The following case is for second-order time-integrators in Tempus
     else {
       if (inArgs.supports(Thyra_ModelEvaluator::IN_ARG_x_dot_dot)) {
-        //x_dotdot = inArgs.get_x_dot_dot(); 
+        // x_dotdot = inArgs.get_x_dot_dot();
         x_dotdot = inArgs.get_x_dot_dot();
       } else {
-        x_dotdot  = Teuchos::null; 
-        omega     = 0.0;
+        x_dotdot = Teuchos::null;
+        omega    = 0.0;
       }
     }
   } else {
-    x_dotdot  = Teuchos::null; 
-    omega     = 0.0;
+    x_dotdot = Teuchos::null;
+    omega    = 0.0;
   }
 
   const ST alpha = (Teuchos::nonnull(x_dot) || Teuchos::nonnull(x_dotdot)) ?
@@ -720,34 +724,31 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
                       inArgs.get_beta() :
                       1.0;
 
-  bool const is_dynamic =
-      Teuchos::nonnull(x_dot) || Teuchos::nonnull(x_dotdot);
+  bool const is_dynamic = Teuchos::nonnull(x_dot) || Teuchos::nonnull(x_dotdot);
 
 #if defined(ALBANY_LCM)
   ST const curr_time = is_dynamic == true ? inArgs.get_t() : getCurrentTime();
 #else
-  const ST curr_time =
-      (Teuchos::nonnull(x_dot) || Teuchos::nonnull(x_dotdot)) ?
-          inArgs.get_t() :
-          0.0;
+  const ST curr_time = (Teuchos::nonnull(x_dot) || Teuchos::nonnull(x_dotdot)) ?
+                           inArgs.get_t() :
+                           0.0;
 #endif  // ALBANY_LCM
 
-  double dt = 0.0; //time step 
-  if (is_dynamic == true) {
-    dt = inArgs.get_step_size(); 
-  }
+  double dt = 0.0;  // time step
+  if (is_dynamic == true) { dt = inArgs.get_step_size(); }
 
-  for (int l = 0; l < num_param_vecs+num_dist_param_vecs; ++l) {
+  for (int l = 0; l < num_param_vecs + num_dist_param_vecs; ++l) {
     const Teuchos::RCP<const Thyra_Vector> p = inArgs.get_p(l);
     if (Teuchos::nonnull(p)) {
-
-      if(l<num_param_vecs){
-        auto p_constView = getLocalData(p);
+      if (l < num_param_vecs) {
+        auto      p_constView         = getLocalData(p);
         ParamVec& sacado_param_vector = sacado_param_vec[l];
         for (unsigned int k = 0; k < sacado_param_vector.size(); ++k)
           sacado_param_vector[k].baseValue = p_constView[k];
       } else {
-        distParamLib->get(dist_param_names[l-num_param_vecs])->vector()->assign(*p);
+        distParamLib->get(dist_param_names[l - num_param_vecs])
+            ->vector()
+            ->assign(*p);
       }
     }
   }
@@ -766,39 +767,53 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
   app->getPhxSetup()->pre_eval();
 
 #ifdef WRITE_STIFFNESS_MATRIX_TO_MM_FILE
-    // IK, 4/24/15: write stiffness matrix to matrix market file
-    // Warning: to read this in to MATLAB correctly, code must be run in serial.
-    // Otherwise Mass will have a distributed Map which would also need to be
-    // read in to MATLAB for proper reading in of Mass.
-    // IMPORTANT NOTE: keep this call BEFORE the computation of the actual jacobian,
-    //                 so you don't overwrite the jacobian.
-    app->computeGlobalJacobian(
-        0.0, 1.0, 0.0, curr_time,
-        x, x_dot, x_dotdot,
-        sacado_param_vec,
-        Teuchos::null, W_op_out);
+  // IK, 4/24/15: write stiffness matrix to matrix market file
+  // Warning: to read this in to MATLAB correctly, code must be run in serial.
+  // Otherwise Mass will have a distributed Map which would also need to be
+  // read in to MATLAB for proper reading in of Mass.
+  // IMPORTANT NOTE: keep this call BEFORE the computation of the actual
+  // jacobian,
+  //                 so you don't overwrite the jacobian.
+  app->computeGlobalJacobian(
+      0.0,
+      1.0,
+      0.0,
+      curr_time,
+      x,
+      x_dot,
+      x_dotdot,
+      sacado_param_vec,
+      Teuchos::null,
+      W_op_out);
 
-    writeMatrixMarket(W_op_out,"stiffness.mm");
-    writeMatrixMarket(W_op_out->range(),"range_space.mm");
-    writeMatrixMarket(W_op_out->domain(),"domain_space.mm");
+  writeMatrixMarket(W_op_out, "stiffness.mm");
+  writeMatrixMarket(W_op_out->range(), "range_space.mm");
+  writeMatrixMarket(W_op_out->domain(), "domain_space.mm");
 #endif
 
 #ifdef WRITE_MASS_MATRIX_TO_MM_FILE
-    // IK, 4/24/15: write mass matrix to matrix market file
-    // Warning: to read this in to MATLAB correctly, code must be run in serial.
-    // Otherwise Mass will have a distributed Map which would also need to be
-    // read in to MATLAB for proper reading in of Mass.
-    // IMPORTANT NOTE: keep this call BEFORE the computation of the actual jacobian,
-    //                 so you don't overwrite the jacobian.
-    app->computeGlobalJacobian(
-        1.0, 0.0, 0.0, curr_time,
-        x, x_dot, x_dotdot,
-        sacado_param_vec,
-        Teuchos::null, W_op_out);
+  // IK, 4/24/15: write mass matrix to matrix market file
+  // Warning: to read this in to MATLAB correctly, code must be run in serial.
+  // Otherwise Mass will have a distributed Map which would also need to be
+  // read in to MATLAB for proper reading in of Mass.
+  // IMPORTANT NOTE: keep this call BEFORE the computation of the actual
+  // jacobian,
+  //                 so you don't overwrite the jacobian.
+  app->computeGlobalJacobian(
+      1.0,
+      0.0,
+      0.0,
+      curr_time,
+      x,
+      x_dot,
+      x_dotdot,
+      sacado_param_vec,
+      Teuchos::null,
+      W_op_out);
 
-    writeMatrixMarket(W_op_out,"mass.mm");
-    writeMatrixMarket(W_op_out->range(),"range_space.mm");
-    writeMatrixMarket(W_op_out->domain(),"domain_space.mm");
+  writeMatrixMarket(W_op_out, "mass.mm");
+  writeMatrixMarket(W_op_out->range(), "range_space.mm");
+  writeMatrixMarket(W_op_out->domain(), "domain_space.mm");
 #endif
 
   bool f_already_computed = false;
@@ -806,10 +821,17 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
   // W matrix
   if (Teuchos::nonnull(W_op_out)) {
     app->computeGlobalJacobian(
-        alpha, beta, omega, curr_time,
-        x, x_dot, x_dotdot,
+        alpha,
+        beta,
+        omega,
+        curr_time,
+        x,
+        x_dot,
+        x_dotdot,
         sacado_param_vec,
-        f_out, W_op_out, dt);
+        f_out,
+        W_op_out,
+        dt);
     f_already_computed = true;
   }
 
@@ -823,36 +845,58 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
           Teuchos::rcpFromRef(sacado_param_vec[l]);
 
       app->computeGlobalTangent(
-          0.0, 0.0, 0.0, curr_time, false,
-          x, x_dot, x_dotdot, sacado_param_vec, p_vec.get(),
-          Teuchos::null, Teuchos::null, Teuchos::null, Teuchos::null,
-          f_out, Teuchos::null, dfdp_out);
+          0.0,
+          0.0,
+          0.0,
+          curr_time,
+          false,
+          x,
+          x_dot,
+          x_dotdot,
+          sacado_param_vec,
+          p_vec.get(),
+          Teuchos::null,
+          Teuchos::null,
+          Teuchos::null,
+          Teuchos::null,
+          f_out,
+          Teuchos::null,
+          dfdp_out);
 
       f_already_computed = true;
     }
   }
 
   // distributed df/dp
-  for (int i=0; i<num_dist_param_vecs; i++) {
-	  const Teuchos::RCP<Thyra_LinearOp> dfdp_out = outArgs.get_DfDp(i+num_param_vecs).getLinearOp();
+  for (int i = 0; i < num_dist_param_vecs; i++) {
+    const Teuchos::RCP<Thyra_LinearOp> dfdp_out =
+        outArgs.get_DfDp(i + num_param_vecs).getLinearOp();
     if (dfdp_out != Teuchos::null) {
       Teuchos::RCP<DistributedParameterDerivativeOp> dfdp_op =
-        Teuchos::rcp_dynamic_cast<DistributedParameterDerivativeOp>(dfdp_out);
-      dfdp_op->set(curr_time, x, x_dot, x_dotdot,
-                   Teuchos::rcp(&sacado_param_vec,false));
+          Teuchos::rcp_dynamic_cast<DistributedParameterDerivativeOp>(dfdp_out);
+      dfdp_op->set(
+          curr_time,
+          x,
+          x_dot,
+          x_dotdot,
+          Teuchos::rcp(&sacado_param_vec, false));
     }
   }
 
   // f
   if (app->is_adjoint) {
-    const Thyra_Derivative f_deriv(outArgs.get_f(), Thyra_ModelEvaluator::DERIV_TRANS_MV_BY_ROW);
+    const Thyra_Derivative f_deriv(
+        outArgs.get_f(), Thyra_ModelEvaluator::DERIV_TRANS_MV_BY_ROW);
 
     const Thyra_Derivative dummy_deriv;
 
     const int response_index = 0;  // need to add capability for sending this in
     app->evaluateResponseDerivative(
-        response_index, curr_time,
-        x, x_dot, x_dotdot,
+        response_index,
+        curr_time,
+        x,
+        x_dot,
+        x_dotdot,
         sacado_param_vec,
         NULL,
         Teuchos::null,
@@ -862,11 +906,7 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
         dummy_deriv);
   } else if (Teuchos::nonnull(f_out) && !f_already_computed) {
     app->computeGlobalResidual(
-        curr_time,
-        x, x_dot, x_dotdot,
-        sacado_param_vec,
-        f_out,
-        dt);
+        curr_time, x, x_dot, x_dotdot, sacado_param_vec, f_out, dt);
   }
 
   // Response functions
@@ -874,11 +914,9 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
     Teuchos::RCP<Thyra_Vector> g_out = outArgs.get_g(j);
 
     const Thyra_Derivative dgdx_out = outArgs.get_DgDx(j);
-    Thyra_Derivative dgdxdot_out;
+    Thyra_Derivative       dgdxdot_out;
 
-    if (supports_xdot) {
-      dgdxdot_out = outArgs.get_DgDx_dot(j);
-    }
+    if (supports_xdot) { dgdxdot_out = outArgs.get_DgDx_dot(j); }
 
     const Thyra_Derivative dgdxdotdot_out;
 
@@ -890,7 +928,11 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
     if (!dgdx_out.isEmpty() || !dgdxdot_out.isEmpty()) {
       const Thyra_Derivative dummy_deriv;
       app->evaluateResponseDerivative(
-          j, curr_time, x, x_dot, x_dotdot,
+          j,
+          curr_time,
+          x,
+          x_dot,
+          x_dotdot,
           sacado_param_vec,
           NULL,
           g_out,
@@ -904,16 +946,32 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
 
     // dg/dp
     for (int l = 0; l < num_param_vecs; ++l) {
-      const Teuchos::RCP<Thyra_MultiVector> dgdp_out = outArgs.get_DgDp(j, l).getMultiVector();
+      const Teuchos::RCP<Thyra_MultiVector> dgdp_out =
+          outArgs.get_DgDp(j, l).getMultiVector();
 
       if (Teuchos::nonnull(dgdp_out)) {
-        const Teuchos::RCP<ParamVec> p_vec = Teuchos::rcpFromRef(sacado_param_vec[l]);
+        const Teuchos::RCP<ParamVec> p_vec =
+            Teuchos::rcpFromRef(sacado_param_vec[l]);
 
         app->evaluateResponseTangent(
-            j, alpha, beta, omega, curr_time, false,
-            x, x_dot, x_dotdot, sacado_param_vec, p_vec.get(),
-            Teuchos::null, Teuchos::null, Teuchos::null, Teuchos::null,
-            g_out, Teuchos::null, dgdp_out);
+            j,
+            alpha,
+            beta,
+            omega,
+            curr_time,
+            false,
+            x,
+            x_dot,
+            x_dotdot,
+            sacado_param_vec,
+            p_vec.get(),
+            Teuchos::null,
+            Teuchos::null,
+            Teuchos::null,
+            Teuchos::null,
+            g_out,
+            Teuchos::null,
+            dgdp_out);
         // Set g_out to null to indicate that g_out was evaluated.
         g_out = Teuchos::null;
       }
@@ -921,12 +979,17 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
 
     // Need to handle dg/dp for distributed p
     for (int l = 0; l < num_dist_param_vecs; l++) {
-      const Teuchos::RCP<Thyra_MultiVector> dgdp_out = outArgs.get_DgDp(j, l + num_param_vecs).getMultiVector();
+      const Teuchos::RCP<Thyra_MultiVector> dgdp_out =
+          outArgs.get_DgDp(j, l + num_param_vecs).getMultiVector();
 
       if (Teuchos::nonnull(dgdp_out)) {
         dgdp_out->assign(0.);
         app->evaluateResponseDistParamDeriv(
-            j, curr_time, x, x_dot, x_dotdot,
+            j,
+            curr_time,
+            x,
+            x_dot,
+            x_dotdot,
             sacado_param_vec,
             dist_param_names[l],
             dgdp_out);
@@ -934,7 +997,8 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
     }
 
     if (Teuchos::nonnull(g_out)) {
-      app->evaluateResponse(j, curr_time, x, x_dot, x_dotdot, sacado_param_vec, g_out);
+      app->evaluateResponse(
+          j, curr_time, x, x_dot, x_dotdot, sacado_param_vec, g_out);
     }
   }
 
@@ -954,7 +1018,8 @@ evalModelImpl(const Thyra_InArgs&  inArgs,
 #endif
 }
 
-Thyra_InArgs ModelEvaluator::createInArgsImpl() const
+Thyra_InArgs
+ModelEvaluator::createInArgsImpl() const
 {
   Thyra::ModelEvaluatorBase::InArgsSetup<ST> result;
   result.setModelEvalDescription(this->description());
@@ -976,12 +1041,11 @@ Thyra_InArgs ModelEvaluator::createInArgsImpl() const
 
   if (supports_xdotdot) {
     result.setSupports(Thyra_ModelEvaluator::IN_ARG_x_dot_dot, true);
-    result.setSupports(
-        Thyra_ModelEvaluator::IN_ARG_W_x_dot_dot_coeff, true);
+    result.setSupports(Thyra_ModelEvaluator::IN_ARG_W_x_dot_dot_coeff, true);
   }
   result.set_Np(num_param_vecs + num_dist_param_vecs);
 
   return static_cast<Thyra_InArgs>(result);
 }
 
-} // namespace Albany
+}  // namespace Albany

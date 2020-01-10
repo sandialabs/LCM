@@ -5,11 +5,12 @@
 //*****************************************************************//
 
 #include "Albany_SolutionFileResponseFunction.hpp"
+
 #include "Albany_SolutionFileResponseFunction_Def.hpp"
 
-namespace Albany{
+namespace Albany {
 
 template class SolutionFileResponseFunction<Albany::NormTwo>;
 template class SolutionFileResponseFunction<Albany::NormInf>;
 
-} // namespace Albany
+}  // namespace Albany

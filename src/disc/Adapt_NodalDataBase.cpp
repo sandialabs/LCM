@@ -8,38 +8,41 @@
 
 #include "Adapt_NodalDataVector.hpp"
 
-namespace Adapt
-{
+namespace Adapt {
 
-NodalDataBase::NodalDataBase() :
-  nodeContainer(Teuchos::rcp(new Albany::NodeFieldContainer)),
-  vectorsize(0),
-  initialized(false)
+NodalDataBase::NodalDataBase()
+    : nodeContainer(Teuchos::rcp(new Albany::NodeFieldContainer)),
+      vectorsize(0),
+      initialized(false)
 {
   // Nothing to be done here
 }
 
-void NodalDataBase::
-updateNodalGraph(const Teuchos::RCP<const Albany::ThyraCrsMatrixFactory>& crsOpFactory)
+void
+NodalDataBase::updateNodalGraph(
+    const Teuchos::RCP<const Albany::ThyraCrsMatrixFactory>& crsOpFactory)
 {
   nodalOpFactory = crsOpFactory;
 }
 
-void NodalDataBase::
-registerVectorState(const std::string &stateName, int ndofs) {
+void
+NodalDataBase::registerVectorState(const std::string& stateName, int ndofs)
+{
   // Save the nodal data field names and lengths in order of allocation which
   // implies access order.
   auto it = nodeVectorMap.find(stateName);
 
   TEUCHOS_TEST_FOR_EXCEPTION(
-    (it != nodeVectorMap.end()), std::logic_error,
-    std::endl << "Error: found duplicate entry " << stateName
-    << " in NodalDataVector");
+      (it != nodeVectorMap.end()),
+      std::logic_error,
+      std::endl
+          << "Error: found duplicate entry " << stateName
+          << " in NodalDataVector");
 
   NodeFieldSize size;
-  size.name = stateName;
+  size.name   = stateName;
   size.offset = vectorsize;
-  size.ndofs = ndofs;
+  size.ndofs  = ndofs;
 
   nodeVectorMap[stateName] = nodeVectorLayout.size();
   nodeVectorLayout.push_back(size);
@@ -47,22 +50,22 @@ registerVectorState(const std::string &stateName, int ndofs) {
   vectorsize += ndofs;
 }
 
-void NodalDataBase::initialize() {
-  if (initialized) {
-    return;
-  }
+void
+NodalDataBase::initialize()
+{
+  if (initialized) { return; }
 
   if (vectorsize > 0) {
-    nodal_data_vector = Teuchos::rcp(
-      new NodalDataVector(nodeContainer, nodeVectorLayout, nodeVectorMap,
-                                 vectorsize));
+    nodal_data_vector = Teuchos::rcp(new NodalDataVector(
+        nodeContainer, nodeVectorLayout, nodeVectorMap, vectorsize));
   }
 
   initialized = true;
 }
 
-void NodalDataBase::
-replaceOverlapVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+void
+NodalDataBase::replaceOverlapVectorSpace(
+    const Teuchos::RCP<const Thyra_VectorSpace>& vs)
 {
   initialize();
 
@@ -70,8 +73,9 @@ replaceOverlapVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
     nodal_data_vector->replaceOverlapVectorSpace(vs);
 }
 
-void NodalDataBase::
-replaceOwnedVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+void
+NodalDataBase::replaceOwnedVectorSpace(
+    const Teuchos::RCP<const Thyra_VectorSpace>& vs)
 {
   initialize();
 
@@ -80,9 +84,11 @@ replaceOwnedVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
   }
 }
 
-void NodalDataBase::
-replaceOverlapVectorSpace(const Teuchos::Array<GO>& overlap_nodeGIDs,
-                          const Teuchos::RCP<const Teuchos_Comm>& comm_) {
+void
+NodalDataBase::replaceOverlapVectorSpace(
+    const Teuchos::Array<GO>&               overlap_nodeGIDs,
+    const Teuchos::RCP<const Teuchos_Comm>& comm_)
+{
   initialize();
 
   if (Teuchos::nonnull(nodal_data_vector)) {
@@ -90,9 +96,11 @@ replaceOverlapVectorSpace(const Teuchos::Array<GO>& overlap_nodeGIDs,
   }
 }
 
-void NodalDataBase::
-replaceOwnedVectorSpace(const Teuchos::Array<GO>& local_nodeGIDs,
-                        const Teuchos::RCP<const Teuchos_Comm>& comm_) {
+void
+NodalDataBase::replaceOwnedVectorSpace(
+    const Teuchos::Array<GO>&               local_nodeGIDs,
+    const Teuchos::RCP<const Teuchos_Comm>& comm_)
+{
   initialize();
 
   if (Teuchos::nonnull(nodal_data_vector)) {
@@ -100,25 +108,33 @@ replaceOwnedVectorSpace(const Teuchos::Array<GO>& local_nodeGIDs,
   }
 }
 
-void NodalDataBase::
-registerManager (const std::string& key,
-                 const Teuchos::RCP<NodalDataBase::Manager>& manager) {
+void
+NodalDataBase::registerManager(
+    const std::string&                          key,
+    const Teuchos::RCP<NodalDataBase::Manager>& manager)
+{
   TEUCHOS_TEST_FOR_EXCEPTION(
-    isManagerRegistered(key), std::logic_error,
-    "A manager is already registered with key " << key);
+      isManagerRegistered(key),
+      std::logic_error,
+      "A manager is already registered with key " << key);
   mgr_map[key] = manager;
 }
 
-bool NodalDataBase::isManagerRegistered (const std::string& key) const {
+bool
+NodalDataBase::isManagerRegistered(const std::string& key) const
+{
   return mgr_map.find(key) != mgr_map.end();
 }
 
-const Teuchos::RCP<NodalDataBase::Manager>& NodalDataBase::
-getManager(const std::string& key) const {
+const Teuchos::RCP<NodalDataBase::Manager>&
+NodalDataBase::getManager(const std::string& key) const
+{
   ManagerMap::const_iterator it = mgr_map.find(key);
-  TEUCHOS_TEST_FOR_EXCEPTION(it == mgr_map.end(), std::logic_error,
-                             "There is no manager with key " << key);
+  TEUCHOS_TEST_FOR_EXCEPTION(
+      it == mgr_map.end(),
+      std::logic_error,
+      "There is no manager with key " << key);
   return it->second;
 }
 
-} // namespace Adapt
+}  // namespace Adapt

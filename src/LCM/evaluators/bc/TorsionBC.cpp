@@ -4,9 +4,9 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "TorsionBC.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "TorsionBC_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::TorsionBC)

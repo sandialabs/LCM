@@ -4,39 +4,36 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include <limits>
+#include "Albany_STKDiscretization.hpp"
 
 #include <Albany_CommUtils.hpp>
 #include <Albany_ThyraUtils.hpp>
+#include <limits>
+
 #include "Albany_BucketArray.hpp"
+#include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_NodalGraphUtils.hpp"
-#include "Albany_STKDiscretization.hpp"
 #include "Albany_STKNodeFieldContainer.hpp"
 #include "Albany_Utils.hpp"
-#include "Albany_GlobalLocalIndexer.hpp"
 
 #ifdef ALBANY_CONTACT
 #include "Albany_ContactManager.hpp"
 #endif
 
-#include <fstream>
-#include <iostream>
-#include <string>
-
-#include <Shards_BasicTopologies.hpp>
-
 #include <Intrepid2_Basis.hpp>
 #include <Intrepid2_CellTools.hpp>
 #include <Intrepid2_HGRAD_QUAD_Cn_FEM.hpp>
-
-#include <stk_util/parallel/Parallel.hpp>
-
+#include <Shards_BasicTopologies.hpp>
+#include <fstream>
+#include <iostream>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/FEMHelpers.hpp>
 #include <stk_mesh/base/GetBuckets.hpp>
 #include <stk_mesh/base/GetEntities.hpp>
 #include <stk_mesh/base/Selector.hpp>
+#include <stk_util/parallel/Parallel.hpp>
+#include <string>
 
 #ifdef ALBANY_SEACAS
 #include <Ionit_Initializer.h>
@@ -49,9 +46,8 @@ extern "C" {
 #endif
 #endif  // ALBANY_SEACAS
 
-#include <algorithm>
-
 #include <PHAL_Dimension.hpp>
+#include <algorithm>
 
 // Uncomment the following line if you want debug output to be printed to screen
 // #define OUTPUT_TO_SCREEN
@@ -542,8 +538,8 @@ STKDiscretization::getCoordinates() const
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field =
       stkMeshStruct->getCoordinatesField();
 
-  const int meshDim = stkMeshStruct->numDim;
-  auto ov_node_indexer = createGlobalLocalIndexer(m_overlap_node_vs);
+  const int meshDim         = stkMeshStruct->numDim;
+  auto      ov_node_indexer = createGlobalLocalIndexer(m_overlap_node_vs);
   for (int i = 0; i < numOverlapNodes; i++) {
     GO  node_gid = gid(overlapnodes[i]);
     int node_lid = ov_node_indexer->getLocalElement(node_gid);
@@ -917,7 +913,10 @@ void
 STKDiscretization::setupMLCoords()
 {
   if (rigidBodyModes.is_null()) { return; }
-  if (!rigidBodyModes->isMLUsed() && !rigidBodyModes->isMueLuUsed() && !rigidBodyModes->isFROSchUsed()) { return; }
+  if (!rigidBodyModes->isMLUsed() && !rigidBodyModes->isMueLuUsed() &&
+      !rigidBodyModes->isFROSchUsed()) {
+    return;
+  }
 
   const int                                   numDim = stkMeshStruct->numDim;
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field =
@@ -945,7 +944,8 @@ STKDiscretization::writeCoordsToMatrixMarket() const
 {
   // if user wants to write the coordinates to matrix market file, write them to
   // matrix market file
-  if ((rigidBodyModes->isMLUsed() || rigidBodyModes->isMueLuUsed() || rigidBodyModes->isFROSchUsed()) &&
+  if ((rigidBodyModes->isMLUsed() || rigidBodyModes->isMueLuUsed() ||
+       rigidBodyModes->isFROSchUsed()) &&
       stkMeshStruct->writeCoordsToMMFile) {
     if (comm->getRank() == 0) {
       std::cout << "Writing mesh coordinates to Matrix Market file."
@@ -1665,12 +1665,15 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
 
       // Create the Global-Local indexers
       if (overlapped) {
-        dofs_struct->overlap_node_vs_indexer = createGlobalLocalIndexer(dofs_struct->overlap_node_vs);
-        dofs_struct->overlap_vs_indexer = createGlobalLocalIndexer(dofs_struct->overlap_vs);
+        dofs_struct->overlap_node_vs_indexer =
+            createGlobalLocalIndexer(dofs_struct->overlap_node_vs);
+        dofs_struct->overlap_vs_indexer =
+            createGlobalLocalIndexer(dofs_struct->overlap_vs);
 
       } else {
-        dofs_struct->node_vs_indexer = createGlobalLocalIndexer(dofs_struct->node_vs);
-        dofs_struct->vs_indexer      = createGlobalLocalIndexer(dofs_struct->vs);
+        dofs_struct->node_vs_indexer =
+            createGlobalLocalIndexer(dofs_struct->node_vs);
+        dofs_struct->vs_indexer = createGlobalLocalIndexer(dofs_struct->vs);
       }
     }
   }
@@ -1738,7 +1741,8 @@ void
 STKDiscretization::computeGraphsUpToFillComplete()
 {
   std::map<int, stk::mesh::Part*>::iterator pv = stkMeshStruct->partVec.begin();
-  const auto& topo = stk::mesh::get_cell_topology(metaData.get_topology(*pv->second));
+  const auto&                               topo =
+      stk::mesh::get_cell_topology(metaData.get_topology(*pv->second));
   int nodes_per_element = topo.getNodeCount();
 
   // Loads member data:  overlap_graph, numOverlapodes, overlap_node_map,
@@ -2110,10 +2114,10 @@ STKDiscretization::computeWorksetInfo()
 
       for (auto it = mapOfDOFsStructs.begin(); it != mapOfDOFsStructs.end();
            ++it) {
-        const auto& ov_indexer = it->second.overlap_vs_indexer;
-        IDArray&  wsElNodeEqID_array = it->second.wsElNodeEqID[b];
-        GIDArray& wsElNodeID_array   = it->second.wsElNodeID[b];
-        int       nComp              = it->first.second;
+        const auto& ov_indexer         = it->second.overlap_vs_indexer;
+        IDArray&    wsElNodeEqID_array = it->second.wsElNodeEqID[b];
+        GIDArray&   wsElNodeID_array   = it->second.wsElNodeID[b];
+        int         nComp              = it->first.second;
         for (int j = 0; j < nodes_per_element; j++) {
           stk::mesh::Entity node      = node_rels[j];
           wsElNodeID_array((int)i, j) = gid(node);
@@ -2618,8 +2622,9 @@ STKDiscretization::setupExodusOutput()
     mesh_data = Teuchos::rcp(
         new stk::io::StkMeshIoBroker(getMpiCommFromTeuchosComm(comm)));
     mesh_data->set_bulk_data(bulkData);
-    //IKT, 8/16/19: The following is needed to get correct output file for Schwarz problems
-    //Please see: https://github.com/trilinos/Trilinos/issues/5479
+    // IKT, 8/16/19: The following is needed to get correct output file for
+    // Schwarz problems Please see:
+    // https://github.com/trilinos/Trilinos/issues/5479
     mesh_data->property_add(Ioss::Property("FLUSH_INTERVAL", 1));
     outputFileIdx = mesh_data->create_output_mesh(str, stk::io::WRITE_RESULTS);
 
@@ -3007,7 +3012,7 @@ STKDiscretization::printVertexConnectivity()
   if (Teuchos::is_null(nodalMatrixFactory)) { return; }
 
   auto ov_node_indexer = createGlobalLocalIndexer(m_overlap_node_vs);
-  auto dummy_op = nodalMatrixFactory->createOp();
+  auto dummy_op        = nodalMatrixFactory->createOp();
   Teuchos::Array<LO> indices;
   Teuchos::Array<ST> vals;
   for (int i = 0; i < numOverlapNodes; ++i) {
@@ -3148,7 +3153,7 @@ STKDiscretization::updateMesh()
   computeNodalVectorSpaces(true);
 
   computeOverlapNodesAndUnknowns();
-    
+
   setupMLCoords();
 
   transformMesh();

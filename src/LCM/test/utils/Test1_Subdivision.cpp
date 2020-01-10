@@ -9,7 +9,6 @@
 //
 
 #include "time.h"
-
 #include "topology/Topology.h"
 #include "topology/Topology_Utils.h"
 

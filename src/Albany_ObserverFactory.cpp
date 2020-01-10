@@ -13,15 +13,16 @@
 #include "Albany_RythmosObserver.hpp"
 #endif
 
-#include "Teuchos_ParameterList.hpp"
-
 #include <string>
+
+#include "Teuchos_ParameterList.hpp"
 
 namespace Albany {
 
-NOXObserverFactory::NOXObserverFactory(const Teuchos::RCP<Application> &app) :
-  app_(app)
-{}
+NOXObserverFactory::NOXObserverFactory(const Teuchos::RCP<Application>& app)
+    : app_(app)
+{
+}
 
 #if defined(ALBANY_EPETRA)
 Teuchos::RCP<NOX::Epetra::Observer>
@@ -31,29 +32,34 @@ NOXObserverFactory::createInstance()
   return result;
 }
 
-NOXStatelessObserverFactory::
-NOXStatelessObserverFactory (const Teuchos::RCP<Application> &app)
-  : app_(app)
-{}
+NOXStatelessObserverFactory::NOXStatelessObserverFactory(
+    const Teuchos::RCP<Application>& app)
+    : app_(app)
+{
+}
 
 Teuchos::RCP<NOX::Epetra::Observer>
-NOXStatelessObserverFactory::createInstance () {
+NOXStatelessObserverFactory::createInstance()
+{
   Teuchos::RCP<NOX::Epetra::Observer> result(new NOXStatelessObserver(app_));
   return result;
 }
 #endif
 
 #if defined(ALBANY_EPETRA) && defined(ALBANY_RYTHMOS)
-RythmosObserverFactory::RythmosObserverFactory(const Teuchos::RCP<Application> &app) :
-  app_(app)
-{}
+RythmosObserverFactory::RythmosObserverFactory(
+    const Teuchos::RCP<Application>& app)
+    : app_(app)
+{
+}
 
-Teuchos::RCP<Rythmos::IntegrationObserverBase<double> >
+Teuchos::RCP<Rythmos::IntegrationObserverBase<double>>
 RythmosObserverFactory::createInstance()
 {
-  Teuchos::RCP<Rythmos::IntegrationObserverBase<double> > result(new RythmosObserver(app_));
+  Teuchos::RCP<Rythmos::IntegrationObserverBase<double>> result(
+      new RythmosObserver(app_));
   return result;
 }
 #endif
 
-} // namespace Albany
+}  // namespace Albany

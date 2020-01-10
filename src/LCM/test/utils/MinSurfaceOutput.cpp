@@ -5,14 +5,15 @@
 //*****************************************************************//
 
 //#include "Topology.h"
-#include "topology/Topology.h"
-
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#include "topology/Topology.h"
 typedef stk::mesh::Entity Entity;
 
 int

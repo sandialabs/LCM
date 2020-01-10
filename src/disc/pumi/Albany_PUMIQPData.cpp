@@ -5,7 +5,7 @@
 //*****************************************************************//
 
 #include "Albany_PUMIQPData.hpp"
+
 #include "Albany_PUMIQPData_Def.hpp"
 
 PUMIQPDATA_INSTANTIATE_TEMPLATE_CLASS(Albany::PUMIQPData)
-

@@ -8,8 +8,11 @@
 #define LCM_MeshSizeField_hpp
 
 #include "Albany_Layouts.hpp"
-#include "Intrepid2_Basis.hpp"
+#include "Albany_SacadoTypes.hpp"
+#include "Intrepid2_CellTools.hpp"
 #include "Intrepid2_Cubature.hpp"
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

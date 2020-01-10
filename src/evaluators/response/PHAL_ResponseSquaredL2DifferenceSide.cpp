@@ -4,9 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "PHAL_ResponseSquaredL2DifferenceSide.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_ResponseSquaredL2DifferenceSide_Def.hpp"
 
-PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES(PHAL::ResponseSquaredL2DifferenceSideBase)
+PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES(
+    PHAL::ResponseSquaredL2DifferenceSideBase)

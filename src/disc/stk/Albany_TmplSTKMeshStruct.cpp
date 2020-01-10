@@ -4,7 +4,7 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include "Albany_TmplSTKMeshStruct.hpp"
+
 #include "Albany_TmplSTKMeshStruct_Def.hpp"
 
 TMPLSTK_INSTANTIATE_TEMPLATE_CLASS(Albany::TmplSTKMeshStruct)
-

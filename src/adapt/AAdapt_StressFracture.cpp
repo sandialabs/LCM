@@ -7,6 +7,7 @@
 #include "AAdapt_StressFracture.hpp"
 
 #include <cassert>
+
 #include "Teuchos_ScalarTraits.hpp"
 
 namespace AAdapt {

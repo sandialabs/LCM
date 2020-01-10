@@ -11,33 +11,31 @@
 namespace AAdapt {
 
 //----------------------------------------------------------------------------
-AbstractAdapter::
-AbstractAdapter (const Teuchos::RCP<Teuchos::ParameterList>& params,
-                 const Teuchos::RCP<ParamLib>& param_lib,
-                 const Albany::StateManager& state_mgr,
-                 const Teuchos::RCP<const Teuchos_Comm>& comm)
- : output_stream_(Teuchos::VerboseObjectBase::getDefaultOStream())
- , adapt_params_(params)
- , param_lib_(param_lib)
- , state_mgr_(state_mgr)
- , teuchos_comm_(comm)
+AbstractAdapter::AbstractAdapter(
+    const Teuchos::RCP<Teuchos::ParameterList>& params,
+    const Teuchos::RCP<ParamLib>&               param_lib,
+    const Albany::StateManager&                 state_mgr,
+    const Teuchos::RCP<const Teuchos_Comm>&     comm)
+    : output_stream_(Teuchos::VerboseObjectBase::getDefaultOStream()),
+      adapt_params_(params),
+      param_lib_(param_lib),
+      state_mgr_(state_mgr),
+      teuchos_comm_(comm)
 {
   // Nothing to do here
 }
 
 //----------------------------------------------------------------------------
 Teuchos::RCP<Teuchos::ParameterList>
-AbstractAdapter::
-getGenericAdapterParams(std::string listname) const {
+AbstractAdapter::getGenericAdapterParams(std::string listname) const
+{
   Teuchos::RCP<Teuchos::ParameterList> valid_pl =
-    Teuchos::rcp(new Teuchos::ParameterList(listname));
+      Teuchos::rcp(new Teuchos::ParameterList(listname));
 
-  valid_pl->set<std::string>("Method",
-                             "",
-                             "String to designate adapter class");
+  valid_pl->set<std::string>("Method", "", "String to designate adapter class");
 
   return valid_pl;
 }
 //----------------------------------------------------------------------------
 
-} // namespace AAdapt
+}  // namespace AAdapt

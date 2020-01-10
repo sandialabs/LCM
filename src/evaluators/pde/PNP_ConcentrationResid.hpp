@@ -8,6 +8,7 @@
 #define PNP_CONCENTRATIONRESID_HPP
 
 #include "Albany_Layouts.hpp"
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

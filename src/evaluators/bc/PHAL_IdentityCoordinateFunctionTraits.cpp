@@ -5,7 +5,7 @@
 //*****************************************************************//
 
 #include "PHAL_IdentityCoordinateFunctionTraits.hpp"
+
 #include "PHAL_IdentityCoordinateFunctionTraits_Def.hpp"
 
 COORD_FUNC_INSTANTIATE_TEMPLATE_CLASS(PHAL::IdentityCoordFunctionTraits)
-

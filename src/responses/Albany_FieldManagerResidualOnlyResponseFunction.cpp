@@ -4,22 +4,27 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #include "Albany_FieldManagerResidualOnlyResponseFunction.hpp"
 
 Albany::FieldManagerResidualOnlyResponseFunction::
-FieldManagerResidualOnlyResponseFunction (
-  const Teuchos::RCP<Albany::Application>& application_,
-  const Teuchos::RCP<Albany::AbstractProblem>& problem_,
-  const Teuchos::RCP<Albany::MeshSpecsStruct>&  meshSpecs_,
-  const Teuchos::RCP<Albany::StateManager>& stateMgr_,
-  Teuchos::ParameterList& responseParams) :
-  FieldManagerScalarResponseFunction(application_, problem_, meshSpecs_, stateMgr_,
-                                     responseParams)
-{}
+    FieldManagerResidualOnlyResponseFunction(
+        const Teuchos::RCP<Albany::Application>&     application_,
+        const Teuchos::RCP<Albany::AbstractProblem>& problem_,
+        const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs_,
+        const Teuchos::RCP<Albany::StateManager>&    stateMgr_,
+        Teuchos::ParameterList&                      responseParams)
+    : FieldManagerScalarResponseFunction(
+          application_,
+          problem_,
+          meshSpecs_,
+          stateMgr_,
+          responseParams)
+{
+}
 
-void Albany::FieldManagerResidualOnlyResponseFunction::
-evaluateTangent(const double /*alpha*/, 
+void
+Albany::FieldManagerResidualOnlyResponseFunction::evaluateTangent(
+    const double /*alpha*/,
     const double /*beta*/,
     const double /*omega*/,
     const double current_time,
@@ -27,7 +32,7 @@ evaluateTangent(const double /*alpha*/,
     const Teuchos::RCP<const Thyra_Vector>& x,
     const Teuchos::RCP<const Thyra_Vector>& xdot,
     const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-    const Teuchos::Array<ParamVec>& p,
+    const Teuchos::Array<ParamVec>&         p,
     ParamVec* /*deriv_p*/,
     const Teuchos::RCP<const Thyra_MultiVector>& /*Vx*/,
     const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdot*/,
@@ -43,12 +48,13 @@ evaluateTangent(const double /*alpha*/,
   }
 }
 
-void Albany::FieldManagerResidualOnlyResponseFunction::
-evaluateGradient(const double current_time,
+void
+Albany::FieldManagerResidualOnlyResponseFunction::evaluateGradient(
+    const double                            current_time,
     const Teuchos::RCP<const Thyra_Vector>& x,
     const Teuchos::RCP<const Thyra_Vector>& xdot,
     const Teuchos::RCP<const Thyra_Vector>& xdotdot,
-    const Teuchos::Array<ParamVec>& p,
+    const Teuchos::Array<ParamVec>&         p,
     ParamVec* /*deriv_p*/,
     const Teuchos::RCP<Thyra_Vector>& g,
     const Teuchos::RCP<Thyra_MultiVector>& /*dg_dx*/,
@@ -61,8 +67,8 @@ evaluateGradient(const double current_time,
   }
 }
 
-void Albany::FieldManagerResidualOnlyResponseFunction::
-evaluateDistParamDeriv(
+void
+Albany::FieldManagerResidualOnlyResponseFunction::evaluateDistParamDeriv(
     const double /*current_time*/,
     const Teuchos::RCP<const Thyra_Vector>& /*x*/,
     const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,

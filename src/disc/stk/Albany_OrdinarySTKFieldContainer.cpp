@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "Albany_OrdinarySTKFieldContainer.hpp"
+
 #include "Albany_OrdinarySTKFieldContainer_Def.hpp"
 
 namespace Albany {

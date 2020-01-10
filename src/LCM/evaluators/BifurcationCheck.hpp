@@ -7,11 +7,13 @@
 #if !defined(LCM_BifurcationCheck_hpp)
 #define LCM_BifurcationCheck_hpp
 
-#include <MiniTensor.h>
-
 #include <iostream>
 
 #include "Albany_Layouts.hpp"
+#include "Albany_SacadoTypes.hpp"
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_Dimension.hpp"
+#include "MiniTensor.h"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

@@ -4,8 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include "LameUtils.hpp"
+
 #include <algorithm>
 #include <string>
+
 #include "Teuchos_TestForException.hpp"
 
 // LAME material models

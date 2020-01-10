@@ -8,6 +8,10 @@
 #define PHAL_NSMATERIAL_PROPERTY_HPP
 
 #include "Albany_config.h"
+#include "Albany_Layouts.hpp"
+#include "Albany_SacadoTypes.hpp"
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

@@ -7,8 +7,10 @@
 #ifndef PHAL_NSCONTRAVARIENTMETRICTENSOR_HPP
 #define PHAL_NSCONTRAVARIENTMETRICTENSOR_HPP
 
+#include "Albany_ScalarOrdinalTypes.hpp"
 #include "Intrepid2_CellTools.hpp"
 #include "Intrepid2_Cubature.hpp"
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

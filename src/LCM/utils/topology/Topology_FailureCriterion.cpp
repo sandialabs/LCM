@@ -5,9 +5,9 @@
 //*****************************************************************//
 
 #include "Topology_FailureCriterion.h"
-#include "Topology.h"
 
 #include "Albany_GlobalLocalIndexer.hpp"
+#include "Topology.h"
 
 namespace LCM {
 
@@ -166,7 +166,8 @@ FractureCriterionTraction::computeNormals()
   // functions for entity ids from the Topology class as the local
   // element mapping functions expect the former.
 
-  auto node_vs_indexer = Albany::createGlobalLocalIndexer(get_stk_discretization().getNodeVectorSpace());
+  auto node_vs_indexer = Albany::createGlobalLocalIndexer(
+      get_stk_discretization().getNodeVectorSpace());
   for (EntityVectorIndex i = 0; i < number_normals; ++i) {
     stk::mesh::Entity face = faces[i];
 
@@ -262,7 +263,7 @@ BulkFailureCriterion::BulkFailureCriterion(
 bool
 BulkFailureCriterion::check(
     stk::mesh::BulkData& /* bulk_data */,
-    stk::mesh::Entity    element)
+    stk::mesh::Entity element)
 {
   double const failure_state = *stk::mesh::field_data(*failure_state_, element);
   return failure_state > 0.0;

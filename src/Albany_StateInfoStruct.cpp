@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "Albany_StateInfoStruct.hpp"
+
 #include "Albany_Utils.hpp"
 
 namespace Albany {

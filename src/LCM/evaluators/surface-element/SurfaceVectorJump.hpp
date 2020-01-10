@@ -8,8 +8,10 @@
 #define SURFACEVECTORJUMP_HPP
 
 #include "Albany_Layouts.hpp"
+#include "Albany_ScalarOrdinalTypes.hpp"
 #include "Intrepid2_CellTools.hpp"
 #include "Intrepid2_Cubature.hpp"
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
@@ -56,26 +58,17 @@ class SurfaceVectorJump : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Reference Cell Views
   Kokkos::DynRankView<RealType, PHX::Device> ref_values_;
-
   Kokkos::DynRankView<RealType, PHX::Device> ref_grads_;
-
   Kokkos::DynRankView<RealType, PHX::Device> ref_points_;
-
   Kokkos::DynRankView<RealType, PHX::Device> ref_weights_;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> jump_;
-
   unsigned int workset_size_;
-
   unsigned int num_nodes_;
-
   unsigned int num_qps_;
-
   unsigned int num_dims_;
-
   unsigned int num_plane_nodes_;
-
   unsigned int num_plane_dims_;
 };
 }  // namespace LCM

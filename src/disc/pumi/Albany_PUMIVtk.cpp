@@ -6,58 +6,57 @@
 
 #include "Albany_PUMIVtk.hpp"
 
-Albany::PUMIVtk::
-PUMIVtk(const Teuchos::RCP<APFMeshStruct>& meshStruct,
-        const Teuchos::RCP<const Teuchos_Comm>& commT_) :
-  commT(commT_),
-  doCollection(false),
-  mesh_struct(meshStruct),
-  remeshFileIndex(1),
-  ofilepos(0),
-  outputFileName(meshStruct->outputFileName) {
-
+Albany::PUMIVtk::PUMIVtk(
+    const Teuchos::RCP<APFMeshStruct>&      meshStruct,
+    const Teuchos::RCP<const Teuchos_Comm>& commT_)
+    : commT(commT_),
+      doCollection(false),
+      mesh_struct(meshStruct),
+      remeshFileIndex(1),
+      ofilepos(0),
+      outputFileName(meshStruct->outputFileName)
+{
   // Create a remeshed output file naming convention by adding the
   // remeshFileIndex ahead of the period
-  std::string str = outputFileName;
-  size_t found = str.find("vtk");
+  std::string str   = outputFileName;
+  size_t      found = str.find("vtk");
 
   if (found != std::string::npos) {
     doCollection = true;
-    if (commT->getRank() == 0) { // Only PE 0 writes the collection file
+    if (commT->getRank() == 0) {  // Only PE 0 writes the collection file
       str.replace(found, 3, "pvd");
       const char* cstr = str.c_str();
       vtu_collection_file.open(cstr, std::ios::out);
       vtu_collection_file << "<\?xml version=\"1.0\"\?>" << std::endl
-                      << "  <VTKFile type=\"Collection\" version=\"0.1\">" << std::endl
-                      << "    <Collection>" << std::endl;
+                          << "  <VTKFile type=\"Collection\" version=\"0.1\">"
+                          << std::endl
+                          << "    <Collection>" << std::endl;
       ofilepos = vtu_collection_file.tellp();
-      // Write the trailer and close the file in case Albany exits before finalizing the file
+      // Write the trailer and close the file in case Albany exits before
+      // finalizing the file
       vtu_collection_file << "  </Collection>" << std::endl
-                      << "</VTKFile>" << std::endl;
+                          << "</VTKFile>" << std::endl;
       vtu_collection_file.close();
     }
   }
 }
 
-Albany::PUMIVtk::
-~PUMIVtk() {
-}
+Albany::PUMIVtk::~PUMIVtk() {}
 
 void
-Albany::PUMIVtk::
-writeFile(const double time_value){
+Albany::PUMIVtk::writeFile(const double time_value)
+{
+  if (doCollection) {
+    if (commT->getRank() == 0) {  // Only PE 0 writes the collection file
 
-  if(doCollection){
-    if(commT->getRank() == 0){ // Only PE 0 writes the collection file
-
-      std::string vtu_filename = outputFileName;
+      std::string vtu_filename  = outputFileName;
       std::string vtu_directory = outputFileName;
-      std::string str = outputFileName;
-      size_t found = str.find("vtk");
+      std::string str           = outputFileName;
+      size_t      found         = str.find("vtk");
       str.replace(found, 3, "pvd");
       const char* cstr = str.c_str();
       vtu_collection_file.open(cstr, std::ios::out | std::ios::in);
-      vtu_collection_file.seekp (ofilepos);
+      vtu_collection_file.seekp(ofilepos);
 
       std::ostringstream vtu_ss;
       vtu_ss << "_" << remeshFileIndex << ".pvtu";
@@ -65,19 +64,20 @@ writeFile(const double time_value){
       std::ostringstream vtu_dir_ss;
       vtu_dir_ss << "_" << remeshFileIndex;
       vtu_directory.replace(vtu_directory.find(".vtk"), 4, vtu_dir_ss.str());
-      vtu_collection_file << "      <DataSet timestep=\"" << time_value << "\" group=\"\" part=\"0\" file=\""
-                          <<  vtu_directory << "/" << vtu_filename << "\"/>" << std::endl;
+      vtu_collection_file << "      <DataSet timestep=\"" << time_value
+                          << "\" group=\"\" part=\"0\" file=\"" << vtu_directory
+                          << "/" << vtu_filename << "\"/>" << std::endl;
 
       ofilepos = vtu_collection_file.tellp();
-      // Write the trailer and close the file in case Albany exits before finalizing the file
+      // Write the trailer and close the file in case Albany exits before
+      // finalizing the file
       vtu_collection_file << "  </Collection>" << std::endl
-                      << "</VTKFile>" << std::endl;
+                          << "</VTKFile>" << std::endl;
       vtu_collection_file.close();
-
     }
 
-    std::string filename = outputFileName;
-    std::string vtk_filename = outputFileName;
+    std::string        filename     = outputFileName;
+    std::string        vtk_filename = outputFileName;
     std::ostringstream vtk_ss;
     vtk_ss << "_" << remeshFileIndex;
     vtk_filename.replace(vtk_filename.find(".vtk"), 4, vtk_ss.str());
@@ -91,8 +91,8 @@ writeFile(const double time_value){
 }
 
 void
-Albany::PUMIVtk::
-callAPFWrite(std::string const& path) {
+Albany::PUMIVtk::callAPFWrite(std::string const& path)
+{
   if (mesh_struct->shouldWriteAsciiVtk)
     apf::writeASCIIVtkFiles(path.c_str(), mesh_struct->getMesh());
   else

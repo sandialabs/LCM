@@ -6,23 +6,22 @@
 //#define DEBUG
 
 #include "Albany_Application.hpp"
+
+#include <string>
+
 #include "AAdapt_RC_Manager.hpp"
+#include "Albany_DataTypes.hpp"
 #include "Albany_DiscretizationFactory.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
+#include "Albany_DummyParameterAccessor.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ProblemFactory.hpp"
 #include "Albany_ResponseFactory.hpp"
 #include "Albany_ThyraUtils.hpp"
+#include "Teuchos_TimeMonitor.hpp"
 #include "Thyra_MultiVectorStdOps.hpp"
 #include "Thyra_VectorBase.hpp"
 #include "Thyra_VectorStdOps.hpp"
-
-#include "Teuchos_TimeMonitor.hpp"
-
-#include <string>
-#include "Albany_DataTypes.hpp"
-
-#include "Albany_DummyParameterAccessor.hpp"
 
 #ifdef ALBANY_TEKO
 #include "Teko_InverseFactoryOperator.hpp"
@@ -337,8 +336,8 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     bool const have_solver_opts = nox_params.isSublist("Solver Options");
     ALBANY_ASSERT(have_solver_opts == true);
     Teuchos::ParameterList& solver_opts = nox_params.sublist("Solver Options");
-    std::string const ppo_str{"User Defined Pre/Post Operator"};
-    bool const have_ppo = solver_opts.isParameter(ppo_str);
+    std::string const       ppo_str{"User Defined Pre/Post Operator"};
+    bool const              have_ppo = solver_opts.isParameter(ppo_str);
     Teuchos::RCP<NOX::Abstract::PrePostOperator> ppo{Teuchos::null};
 
     if (have_ppo == true) {
@@ -659,9 +658,7 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
   scaleBCdofs           = scalingParams->get<bool>("Scale BC Dofs", false);
   std::string scaleType = scalingParams->get<std::string>("Type", "Constant");
 
-  if (scale == 0.0) {
-    scale = 1.0;
-  }
+  if (scale == 0.0) { scale = 1.0; }
 
   if (scaleType == "Constant") {
     scale_type = CONSTANT;
@@ -1139,11 +1136,11 @@ Application::postRegSetup<PHAL::AlbanyTraits::Residual>()
 {
   using EvalT = PHAL::AlbanyTraits::Residual;
 
-  std::string evalName = PHAL::evalName<EvalT>("FM",0);
+  std::string evalName = PHAL::evalName<EvalT>("FM", 0);
   if (phxSetup->contain_eval(evalName)) return;
 
   for (int ps = 0; ps < fm.size(); ps++) {
-    evalName = PHAL::evalName<EvalT>("FM",ps);
+    evalName = PHAL::evalName<EvalT>("FM", ps);
     phxSetup->insert_eval(evalName);
 
     fm[ps]->postRegistrationSetupForType<EvalT>(*phxSetup);
@@ -1152,10 +1149,10 @@ Application::postRegSetup<PHAL::AlbanyTraits::Residual>()
     phxSetup->check_fields(fm[ps]->getFieldTagsForSizing<EvalT>());
     phxSetup->update_fields();
 
-    writePhalanxGraph<EvalT>(fm[ps],evalName,phxGraphVisDetail);
+    writePhalanxGraph<EvalT>(fm[ps], evalName, phxGraphVisDetail);
   }
   if (dfm != Teuchos::null) {
-    evalName = PHAL::evalName<EvalT>("DFM",0);
+    evalName = PHAL::evalName<EvalT>("DFM", 0);
     phxSetup->insert_eval(evalName);
 
     dfm->postRegistrationSetupForType<EvalT>(*phxSetup);
@@ -1164,11 +1161,11 @@ Application::postRegSetup<PHAL::AlbanyTraits::Residual>()
     phxSetup->check_fields(dfm->getFieldTagsForSizing<EvalT>());
     phxSetup->update_fields();
 
-    writePhalanxGraph<EvalT>(dfm,evalName,phxGraphVisDetail);
+    writePhalanxGraph<EvalT>(dfm, evalName, phxGraphVisDetail);
   }
   if (nfm != Teuchos::null)
     for (int ps = 0; ps < nfm.size(); ps++) {
-      evalName = PHAL::evalName<EvalT>("NFM",ps);
+      evalName = PHAL::evalName<EvalT>("NFM", ps);
       phxSetup->insert_eval(evalName);
 
       nfm[ps]->postRegistrationSetupForType<EvalT>(*phxSetup);
@@ -1177,7 +1174,7 @@ Application::postRegSetup<PHAL::AlbanyTraits::Residual>()
       phxSetup->check_fields(nfm[ps]->getFieldTagsForSizing<EvalT>());
       phxSetup->update_fields();
 
-      writePhalanxGraph<EvalT>(nfm[ps],evalName,phxGraphVisDetail);
+      writePhalanxGraph<EvalT>(nfm[ps], evalName, phxGraphVisDetail);
     }
 }
 
@@ -1206,11 +1203,11 @@ template <typename EvalT>
 void
 Application::postRegSetupDImpl()
 {
-  std::string evalName = PHAL::evalName<EvalT>("FM",0);
+  std::string evalName = PHAL::evalName<EvalT>("FM", 0);
   if (phxSetup->contain_eval(evalName)) return;
 
   for (int ps = 0; ps < fm.size(); ps++) {
-    evalName = PHAL::evalName<EvalT>("FM",ps);
+    evalName = PHAL::evalName<EvalT>("FM", ps);
     phxSetup->insert_eval(evalName);
 
     std::vector<PHX::index_size_type> derivative_dimensions;
@@ -1223,24 +1220,25 @@ Application::postRegSetupDImpl()
     phxSetup->check_fields(fm[ps]->getFieldTagsForSizing<EvalT>());
     phxSetup->update_fields();
 
-    writePhalanxGraph<EvalT>(fm[ps],evalName,phxGraphVisDetail);
+    writePhalanxGraph<EvalT>(fm[ps], evalName, phxGraphVisDetail);
 
     if (nfm != Teuchos::null && ps < nfm.size()) {
-      evalName = PHAL::evalName<EvalT>("NFM",ps);
+      evalName = PHAL::evalName<EvalT>("NFM", ps);
       phxSetup->insert_eval(evalName);
 
-      nfm[ps]->setKokkosExtendedDataTypeDimensions<EvalT>(derivative_dimensions);
+      nfm[ps]->setKokkosExtendedDataTypeDimensions<EvalT>(
+          derivative_dimensions);
       nfm[ps]->postRegistrationSetupForType<EvalT>(*phxSetup);
 
       // Update phalanx saved/unsaved fields based on field dependencies
       phxSetup->check_fields(nfm[ps]->getFieldTagsForSizing<EvalT>());
       phxSetup->update_fields();
 
-      writePhalanxGraph<EvalT>(nfm[ps],evalName,phxGraphVisDetail);
+      writePhalanxGraph<EvalT>(nfm[ps], evalName, phxGraphVisDetail);
     }
   }
   if (dfm != Teuchos::null) {
-    evalName = PHAL::evalName<EvalT>("DFM",0);
+    evalName = PHAL::evalName<EvalT>("DFM", 0);
     phxSetup->insert_eval(evalName);
 
     // amb Need to look into this. What happens with DBCs in meshes having
@@ -1255,7 +1253,7 @@ Application::postRegSetupDImpl()
     phxSetup->check_fields(dfm->getFieldTagsForSizing<EvalT>());
     phxSetup->update_fields();
 
-    writePhalanxGraph<EvalT>(dfm,evalName,phxGraphVisDetail);
+    writePhalanxGraph<EvalT>(dfm, evalName, phxGraphVisDetail);
   }
 }
 
@@ -1263,12 +1261,13 @@ template <typename EvalT>
 void
 Application::writePhalanxGraph(
     Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm,
-    const std::string& evalName, const int& phxGraphVisDetail)
+    const std::string&                                  evalName,
+    const int&                                          phxGraphVisDetail)
 {
   if (phxGraphVisDetail > 0) {
     const bool detail = (phxGraphVisDetail > 1) ? true : false;
-    *out << "Phalanx writing graphviz file for graph of " << evalName << " (detail = "
-        << phxGraphVisDetail << ")" << std::endl;
+    *out << "Phalanx writing graphviz file for graph of " << evalName
+         << " (detail = " << phxGraphVisDetail << ")" << std::endl;
     const std::string graphName = "phalanxGraph" + evalName;
     *out << "Process using 'dot -Tpng -O " << graphName << std::endl;
     fm->writeGraphvizFile<EvalT>(graphName, detail, detail);
@@ -1277,7 +1276,6 @@ Application::writePhalanxGraph(
     phxSetup->print(*out);
   }
 }
-
 
 void
 Application::computeGlobalResidualImpl(
@@ -1388,8 +1386,7 @@ Application::computeGlobalResidualImpl(
 #endif
 
       if (nfm != Teuchos::null) {
-        deref_nfm(nfm, wsPhysIndex, ws)
-            ->evaluateFields<EvalT>(workset);
+        deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
       }
     }
   }
@@ -1586,8 +1583,7 @@ Application::computeGlobalJacobianImpl(
     for (int ps = 0; ps < fm.size(); ps++) {
       (workset.Jacobian_deriv_dims)
           .push_back(
-              PHAL::getDerivativeDimensions<EvalT>(
-                  this, ps, explicit_scheme));
+              PHAL::getDerivativeDimensions<EvalT>(this, ps, explicit_scheme));
     }
 
 #ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
@@ -1605,8 +1601,7 @@ Application::computeGlobalJacobianImpl(
       // FillType template argument used to specialize Sacado
       fm[wsPhysIndex[ws]]->evaluateFields<EvalT>(workset);
       if (Teuchos::nonnull(nfm))
-        deref_nfm(nfm, wsPhysIndex, ws)
-            ->evaluateFields<EvalT>(workset);
+        deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
     }
   }
 
@@ -1635,9 +1630,7 @@ Application::computeGlobalJacobianImpl(
     fillComplete(jac);
 #ifdef WRITE_TO_MATRIX_MARKET
     writeMatrixMarket(jac, "jacUnscaled", countScale);
-    if (f != Teuchos::null) {
-      writeMatrixMarket(f, "resUnscaled", countScale);
-    }
+    if (f != Teuchos::null) { writeMatrixMarket(f, "resUnscaled", countScale); }
 #endif
     // set the scaling
     setScale(jac);
@@ -1984,15 +1977,13 @@ Application::computeGlobalTangent(
       // FillType template argument used to specialize Sacado
       fm[wsPhysIndex[ws]]->evaluateFields<EvalT>(workset);
       if (nfm != Teuchos::null)
-        deref_nfm(nfm, wsPhysIndex, ws)
-            ->evaluateFields<EvalT>(workset);
+        deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
     }
 
     // fill Tangent derivative dimensions
     for (int ps = 0; ps < fm.size(); ps++) {
       (workset.Tangent_deriv_dims)
-          .push_back(PHAL::getDerivativeDimensions<EvalT>(
-              this, ps));
+          .push_back(PHAL::getDerivativeDimensions<EvalT>(this, ps));
     }
   }
 
@@ -2137,13 +2128,15 @@ Application::applyGlobalDistParamDerivImpl(
     const auto& vs = distParamLib->get(dist_param_name)->overlap_vector_space();
     overlapped_V   = Thyra::createMembers(vs, V_bc->domain()->dim());
     overlapped_V->assign(0.0);
-    distParamLib->get(dist_param_name)->get_cas_manager()
+    distParamLib->get(dist_param_name)
+        ->get_cas_manager()
         ->scatter(V_bc, overlapped_V, CombineMode::INSERT);
   }
 
   // Set data in Workset struct, and perform fill via field manager
   {
-    TEUCHOS_FUNC_TIME_MONITOR("Albany Distributed Parameter Derivative Fill: Evaluate");
+    TEUCHOS_FUNC_TIME_MONITOR(
+        "Albany Distributed Parameter Derivative Fill: Evaluate");
 
     PHAL::Workset workset;
 
@@ -2163,8 +2156,7 @@ Application::applyGlobalDistParamDerivImpl(
       // FillType template argument used to specialize Sacado
       fm[wsPhysIndex[ws]]->evaluateFields<EvalT>(workset);
       if (nfm != Teuchos::null)
-        deref_nfm(nfm, wsPhysIndex, ws)
-            ->evaluateFields<EvalT>(workset);
+        deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
     }
   }
 
@@ -2226,8 +2218,7 @@ Application::evaluateResponse(
     const Teuchos::Array<ParamVec>&         p,
     const Teuchos::RCP<Thyra_Vector>&       g)
 {
-  TEUCHOS_FUNC_TIME_MONITOR(
-      "Albany Fill: Response");
+  TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response");
   double const this_time = fixTime(current_time);
   responses[response_index]->evaluateResponse(
       this_time, x, xdot, xdotdot, p, g);
@@ -2254,8 +2245,7 @@ Application::evaluateResponseTangent(
     const Teuchos::RCP<Thyra_MultiVector>&       gx,
     const Teuchos::RCP<Thyra_MultiVector>&       gp)
 {
-  TEUCHOS_FUNC_TIME_MONITOR(
-      "Albany Fill: Response Tangent");
+  TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response Tangent");
   double const this_time = fixTime(current_time);
   responses[response_index]->evaluateTangent(
       alpha,
@@ -2292,8 +2282,7 @@ Application::evaluateResponseDerivative(
     const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdotdot,
     const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dp)
 {
-  TEUCHOS_FUNC_TIME_MONITOR(
-      "Albany Fill: Response Derivative");
+  TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response Derivative");
   double const this_time = fixTime(current_time);
 
   responses[response_index]->evaluateDerivative(
@@ -2371,10 +2360,11 @@ Application::evaluateStateFieldManager(
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: State Residual");
   {
-    std::string evalName = PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM",0);
+    std::string evalName =
+        PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", 0);
     if (!phxSetup->contain_eval(evalName)) {
       for (int ps = 0; ps < sfm.size(); ++ps) {
-        evalName = PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM",ps);
+        evalName = PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", ps);
         phxSetup->insert_eval(evalName);
 
         std::vector<PHX::index_size_type> derivative_dimensions;
@@ -2391,8 +2381,8 @@ Application::evaluateStateFieldManager(
             sfm[ps]->getFieldTagsForSizing<PHAL::AlbanyTraits::Residual>());
         phxSetup->update_fields();
 
-        writePhalanxGraph<PHAL::AlbanyTraits::Residual>(sfm[ps], evalName,
-            stateGraphVisDetail);
+        writePhalanxGraph<PHAL::AlbanyTraits::Residual>(
+            sfm[ps], evalName, stateGraphVisDetail);
       }
     }
   }
@@ -2419,8 +2409,8 @@ Application::evaluateStateFieldManager(
   // Perform fill via field manager
   if (Teuchos::nonnull(rc_mgr)) rc_mgr->beginEvaluatingSfm();
   for (int ws = 0; ws < numWorksets; ws++) {
-    const std::string evalName = PHAL::evalName<PHAL::AlbanyTraits::Residual>(
-        "SFM", wsPhysIndex[ws]);
+    const std::string evalName =
+        PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", wsPhysIndex[ws]);
     loadWorksetBucketInfo<PHAL::AlbanyTraits::Residual>(workset, ws, evalName);
     sfm[wsPhysIndex[ws]]->evaluateFields<PHAL::AlbanyTraits::Residual>(workset);
   }
@@ -2631,8 +2621,8 @@ Application::setScaleBCDofs(
   if (jac == Teuchos::null) { return; }
 
   // For diagonal or abs row sum scaling, set the scale equal to the maximum
-  // magnitude value of the diagonal / abs row sum (inf-norm).  This way, scaling
-  // adjusts throughout the simulation based on the Jacobian.
+  // magnitude value of the diagonal / abs row sum (inf-norm).  This way,
+  // scaling adjusts throughout the simulation based on the Jacobian.
   Teuchos::RCP<Thyra_Vector> tmp = Thyra::createMember(scaleVec_->space());
   if (scale_type == DIAG) {
     getDiagonalCopy(jac, tmp);

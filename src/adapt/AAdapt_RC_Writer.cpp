@@ -4,10 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "AAdapt_RC_Writer.hpp"
+
 #include "AAdapt_RC_Writer_Def.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(AAdapt::rc::WriterBase)
 PHAL_INSTANTIATE_TEMPLATE_CLASS(AAdapt::rc::Writer)

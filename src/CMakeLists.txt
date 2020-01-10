@@ -72,6 +72,7 @@ SET(HEADERS
   Albany_TpetraThyraTypes.hpp
   Albany_TpetraTypes.hpp
   Albany_ThyraTypes.hpp
+  Albany_Types.hpp
   Albany_Utils.hpp
   PHAL_AlbanyTraits.hpp
   PHAL_Dimension.hpp

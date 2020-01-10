@@ -7,19 +7,22 @@
 // @HEADER
 
 #include "TimeMonitor.hpp"
+
 #include "string.hpp"
 
 namespace util {
 
-TimeMonitor::TimeMonitor () {
-  title_ = "TimeMonitor";
-  itemTypeLabel_ = "Timer";
+TimeMonitor::TimeMonitor()
+{
+  title_          = "TimeMonitor";
+  itemTypeLabel_  = "Timer";
   itemValueLabel_ = "Time (s)";
 }
 
-string TimeMonitor::getStringValue (const monitored_type& val) {
+string
+TimeMonitor::getStringValue(const monitored_type& val)
+{
   return to_string(static_cast<long double>(val.totalElapsedTime()));
 }
 
-}
-
+}  // namespace util

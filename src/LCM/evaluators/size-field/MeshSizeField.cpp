@@ -4,10 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "MeshSizeField.hpp"
+
 #include "MeshSizeField_Def.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::IsoMeshSizeField)
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::AnisoMeshSizeField)

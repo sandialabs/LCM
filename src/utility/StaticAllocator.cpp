@@ -9,19 +9,14 @@
 using namespace utility;
 
 StaticAllocator::StaticAllocator(std::size_t size)
-  : size_(size), buffer_(new unsigned char[size]), ptr_(buffer_)
+    : size_(size), buffer_(new unsigned char[size]), ptr_(buffer_)
 {
-  
 }
 
-StaticAllocator::~StaticAllocator()
-{
-  delete[] buffer_;
-}
+StaticAllocator::~StaticAllocator() { delete[] buffer_; }
 
 void
 StaticAllocator::clear()
 {
   ptr_ = buffer_;
 }
-

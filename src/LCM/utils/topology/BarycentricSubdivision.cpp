@@ -4,12 +4,11 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "Albany_config.h"
-
-#include <stk_mesh/base/FieldBase.hpp>
-#include "Topology.h"
-
 #include <Albany_STKNodeSharing.hpp>
+#include <stk_mesh/base/FieldBase.hpp>
+
+#include "Albany_config.h"
+#include "Topology.h"
 
 // FIXME: need to extract Topology member functions specific to
 // Barycentric subdivision and move into their own header!

@@ -7,13 +7,15 @@
 #ifndef LCM_AnalyticMass_RESIDUAL_HPP
 #define LCM_AnalyticMass_RESIDUAL_HPP
 
-#include <Phalanx_Evaluator_Derived.hpp>
-#include <Phalanx_Evaluator_WithBaseImpl.hpp>
-#include <Phalanx_MDField.hpp>
-#include <Phalanx_config.hpp>
-#include <Sacado_ParameterAccessor.hpp>
-
 #include "Albany_Layouts.hpp"
+#include "Albany_SacadoTypes.hpp"
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_Dimension.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
+#include "Sacado_ParameterAccessor.hpp"
 
 namespace LCM {
 /** \brief This evaluator computes the residual and Jacobian contributions

@@ -11,12 +11,7 @@
 #include <iostream>
 //#include <</span>sys/time.h>
 
-#include <Teuchos_CommandLineProcessor.hpp>
-#include <Teuchos_GlobalMPISession.hpp>
-#include <Teuchos_ParameterList.hpp>
-#include <Teuchos_RCP.hpp>
-#include <Teuchos_TestForException.hpp>
-#include <Teuchos_as.hpp>
+#include <MiniTensor.h>
 
 #include <Albany_Layouts.hpp>
 #include <Albany_STKDiscretization.hpp>
@@ -25,24 +20,23 @@
 #include <Albany_Utils.hpp>
 #include <PHAL_AlbanyTraits.hpp>
 #include <PHAL_SaveStateField.hpp>
-
-#include <MiniTensor.h>
-
 #include <Phalanx_DataLayout_MDALayout.hpp>
-
-#include "FieldNameMap.hpp"
-
-#include "ParallelSetField.hpp"
-#include "SetField.hpp"
+#include <Teuchos_CommandLineProcessor.hpp>
+#include <Teuchos_GlobalMPISession.hpp>
+#include <Teuchos_ParameterList.hpp>
+#include <Teuchos_RCP.hpp>
+#include <Teuchos_TestForException.hpp>
+#include <Teuchos_as.hpp>
+#include <fstream>
 
 #include "Albany_MaterialDatabase.hpp"
 #include "BifurcationCheck.hpp"
 #include "ConstitutiveModelInterface.hpp"
 #include "ConstitutiveModelParameters.hpp"
-
+#include "FieldNameMap.hpp"
 #include "Kokkos_Core.hpp"
-
-#include <fstream>
+#include "ParallelSetField.hpp"
+#include "SetField.hpp"
 #include "utility/CounterMonitor.hpp"
 #include "utility/PerformanceContext.hpp"
 #include "utility/TimeGuard.hpp"

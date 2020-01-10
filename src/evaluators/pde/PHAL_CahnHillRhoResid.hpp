@@ -7,6 +7,7 @@
 #ifndef PHAL_CAHNHILLRHORESID_HPP
 #define PHAL_CAHNHILLRHORESID_HPP
 
+#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

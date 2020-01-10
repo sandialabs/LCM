@@ -4,10 +4,10 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "IPtoNodalField.hpp"
+
 #include "IPtoNodalField_Def.hpp"
+#include "PHAL_AlbanyTraits.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::IPtoNodalField)
 PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::IPtoNodalFieldBase)

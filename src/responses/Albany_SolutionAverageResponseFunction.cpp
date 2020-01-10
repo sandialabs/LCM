@@ -4,127 +4,111 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-
 #include "Albany_SolutionAverageResponseFunction.hpp"
 
 #include "Albany_ThyraUtils.hpp"
 
-namespace Albany
-{
+namespace Albany {
 
-SolutionAverageResponseFunction::
-SolutionAverageResponseFunction(const Teuchos::RCP<const Teuchos_Comm>& comm) :
-  ScalarResponseFunction(comm)
+SolutionAverageResponseFunction::SolutionAverageResponseFunction(
+    const Teuchos::RCP<const Teuchos_Comm>& comm)
+    : ScalarResponseFunction(comm)
 {
   // Nothing to be done here
 }
 
-void SolutionAverageResponseFunction::
-evaluateResponse(const double /*current_time*/,
+void
+SolutionAverageResponseFunction::evaluateResponse(
+    const double /*current_time*/,
     const Teuchos::RCP<const Thyra_Vector>& x,
     const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,
     const Teuchos::RCP<const Thyra_Vector>& /*xdotdot*/,
-		const Teuchos::Array<ParamVec>& /*p*/,
-		const Teuchos::RCP<Thyra_Vector>& g)
+    const Teuchos::Array<ParamVec>& /*p*/,
+    const Teuchos::RCP<Thyra_Vector>& g)
 {
-  evaluateResponseImpl(*x,*g);
+  evaluateResponseImpl(*x, *g);
 }
 
-void SolutionAverageResponseFunction::
-evaluateTangent(const double alpha, 
-		const double /* beta */,
-		const double /*omega*/,
-		const double /*current_time*/,
-		bool /*sum_derivs*/,
+void
+SolutionAverageResponseFunction::evaluateTangent(
+    const double alpha,
+    const double /* beta */,
+    const double /*omega*/,
+    const double /*current_time*/,
+    bool /*sum_derivs*/,
     const Teuchos::RCP<const Thyra_Vector>& x,
     const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,
     const Teuchos::RCP<const Thyra_Vector>& /*xdotdot*/,
-		const Teuchos::Array<ParamVec>& /*p*/,
-		ParamVec* /*deriv_p*/,
+    const Teuchos::Array<ParamVec>& /*p*/,
+    ParamVec* /*deriv_p*/,
     const Teuchos::RCP<const Thyra_MultiVector>& Vx,
     const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdot*/,
     const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdotdot*/,
     const Teuchos::RCP<const Thyra_MultiVector>& /*Vp*/,
-		const Teuchos::RCP<Thyra_Vector>& g,
-		const Teuchos::RCP<Thyra_MultiVector>& gx,
-		const Teuchos::RCP<Thyra_MultiVector>& gp)
+    const Teuchos::RCP<Thyra_Vector>&      g,
+    const Teuchos::RCP<Thyra_MultiVector>& gx,
+    const Teuchos::RCP<Thyra_MultiVector>& gp)
 {
   // Evaluate response g
-  if (!g.is_null()) {
-    evaluateResponseImpl(*x,*g);
-  }
+  if (!g.is_null()) { evaluateResponseImpl(*x, *g); }
 
   // Evaluate tangent of g: dg/dx*Vx + dg/dxdot*Vxdot + dg/dp*Vp
   //                      =    gx    +       0        +    gp
   // If Vx is null, Vx is the identity
   if (!gx.is_null()) {
     if (!Vx.is_null()) {
-      if (ones.is_null() || !sameAs(ones->domain(),Vx->domain())) {
+      if (ones.is_null() || !sameAs(ones->domain(), Vx->domain())) {
         ones = Thyra::createMembers(Vx->range(), Vx->domain()->dim());
         ones->assign(1.0);
       }
-      Teuchos::Array<ST> means; 
+      Teuchos::Array<ST> means;
       means.resize(Vx->domain()->dim());
-      Vx->dots(*ones,means());
-      for (auto& mean : means) {
-        mean /= Vx->domain()->dim();
-      }
-      for (int j=0; j<Vx->domain()->dim(); j++) {  
+      Vx->dots(*ones, means());
+      for (auto& mean : means) { mean /= Vx->domain()->dim(); }
+      for (int j = 0; j < Vx->domain()->dim(); j++) {
         gx->col(j)->assign(means[j]);
       }
-    }
-    else {
-      gx->assign(1.0/x->space()->dim());
+    } else {
+      gx->assign(1.0 / x->space()->dim());
     }
     gx->scale(alpha);
   }
-  
-  if (!gp.is_null()) {
-    gp->assign(0.0);
-  }
+
+  if (!gp.is_null()) { gp->assign(0.0); }
 }
 
-void SolutionAverageResponseFunction::
-evaluateGradient(const double /* current_time */,
+void
+SolutionAverageResponseFunction::evaluateGradient(
+    const double /* current_time */,
     const Teuchos::RCP<const Thyra_Vector>& x,
     const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,
     const Teuchos::RCP<const Thyra_Vector>& /*xdotdot*/,
-		const Teuchos::Array<ParamVec>& /* p */,
-		ParamVec* /* deriv_p */,
-		const Teuchos::RCP<Thyra_Vector>& g,
-		const Teuchos::RCP<Thyra_MultiVector>& dg_dx,
-		const Teuchos::RCP<Thyra_MultiVector>& dg_dxdot,
-		const Teuchos::RCP<Thyra_MultiVector>& dg_dxdotdot,
-		const Teuchos::RCP<Thyra_MultiVector>& dg_dp)
+    const Teuchos::Array<ParamVec>& /* p */,
+    ParamVec* /* deriv_p */,
+    const Teuchos::RCP<Thyra_Vector>&      g,
+    const Teuchos::RCP<Thyra_MultiVector>& dg_dx,
+    const Teuchos::RCP<Thyra_MultiVector>& dg_dxdot,
+    const Teuchos::RCP<Thyra_MultiVector>& dg_dxdotdot,
+    const Teuchos::RCP<Thyra_MultiVector>& dg_dp)
 {
   // Evaluate response g
-  if (!g.is_null()) {
-    evaluateResponseImpl(*x,*g);
-  }
+  if (!g.is_null()) { evaluateResponseImpl(*x, *g); }
 
   // Evaluate dg/dx
-  if (!dg_dx.is_null()) {
-    dg_dx->assign(1.0 / x->space()->dim());
-  }
+  if (!dg_dx.is_null()) { dg_dx->assign(1.0 / x->space()->dim()); }
 
   // Evaluate dg/dxdot
-  if (!dg_dxdot.is_null()) {
-    dg_dxdot->assign(0.0);
-  }
+  if (!dg_dxdot.is_null()) { dg_dxdot->assign(0.0); }
 
   // Evaluate dg/dxdotdot
-  if (!dg_dxdotdot.is_null()) {
-    dg_dxdotdot->assign(0.0);
-  }
+  if (!dg_dxdotdot.is_null()) { dg_dxdotdot->assign(0.0); }
 
   // Evaluate dg/dp
-  if (!dg_dp.is_null()) {
-    dg_dp->assign(0.0);
-  }
+  if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
 }
 
-void SolutionAverageResponseFunction::
-evaluateDistParamDeriv(
+void
+SolutionAverageResponseFunction::evaluateDistParamDeriv(
     const double /*current_time*/,
     const Teuchos::RCP<const Thyra_Vector>& /*x*/,
     const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,
@@ -134,17 +118,15 @@ evaluateDistParamDeriv(
     const Teuchos::RCP<Thyra_MultiVector>& dg_dp)
 {
   // Evaluate response derivative dg_dp
-  if (!dg_dp.is_null()) {
-    dg_dp->assign(0.0);
-  }
+  if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
 }
 
-void SolutionAverageResponseFunction::
-evaluateResponseImpl (
+void
+SolutionAverageResponseFunction::evaluateResponseImpl(
     const Thyra_Vector& x,
-		Thyra_Vector& g)
+    Thyra_Vector&       g)
 {
-  if (one.is_null() || !sameAs(one->range(),x.range())) {
+  if (one.is_null() || !sameAs(one->range(), x.range())) {
     one = Thyra::createMember(x.space());
     one->assign(1.0);
   }
@@ -152,4 +134,4 @@ evaluateResponseImpl (
   g.assign(mean);
 }
 
-} // namespace Albany
+}  // namespace Albany

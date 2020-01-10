@@ -5,10 +5,9 @@
 //*****************************************************************//
 //#include "Kokkos_Core.hpp"
 
-#include "PHAL_AlbanyTraits.hpp"
-
 #include "PHAL_SaveSideSetStateField.hpp"
+
+#include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_SaveSideSetStateField_Def.hpp"
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(PHAL::SaveSideSetStateField)
-

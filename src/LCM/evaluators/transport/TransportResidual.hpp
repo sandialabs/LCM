@@ -7,12 +7,14 @@
 #if !defined(LCM_TransportResidual_hpp)
 #define LCM_TransportResidual_hpp
 
-#include <Phalanx_Evaluator_Derived.hpp>
-#include <Phalanx_Evaluator_WithBaseImpl.hpp>
-#include <Phalanx_MDField.hpp>
-#include <Phalanx_config.hpp>
-
 #include "Albany_Layouts.hpp"
+#include "Albany_SacadoTypes.hpp"
+#include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_Dimension.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
 
 namespace LCM {
 /// \brief

@@ -5,29 +5,33 @@
 //*****************************************************************//
 
 #include "Albany_NOXObserver.hpp"
-#include "Albany_ObserverImpl.hpp"
-#include "Albany_EpetraThyraUtils.hpp"
 
-namespace Albany
-{
+#include "Albany_EpetraThyraUtils.hpp"
+#include "Albany_ObserverImpl.hpp"
+
+namespace Albany {
 
 NOXObserver::NOXObserver(const Teuchos::RCP<Albany::Application>& app_)
- : impl(new ObserverImpl(app_))
+    : impl(new ObserverImpl(app_))
 {
-   // Nothing to do
+  // Nothing to do
 }
 
-void NOXObserver::observeSolution(const Epetra_Vector& solution)
+void
+NOXObserver::observeSolution(const Epetra_Vector& solution)
 {
   this->observeSolution(solution, impl->getTimeParamValueOrDefault(0.0));
 }
 
-void NOXObserver::observeSolution(const Epetra_Vector& solution,
-                                  double time_or_param_val)
+void
+NOXObserver::observeSolution(
+    const Epetra_Vector& solution,
+    double               time_or_param_val)
 {
-  auto solution_ptr = Teuchos::rcpFromRef(solution);
+  auto solution_ptr   = Teuchos::rcpFromRef(solution);
   auto solution_thyra = createConstThyraVector(solution_ptr);
-  impl->observeSolution(time_or_param_val, *solution_thyra, Teuchos::null, Teuchos::null);
+  impl->observeSolution(
+      time_or_param_val, *solution_thyra, Teuchos::null, Teuchos::null);
 }
 
-} // namespace Albany
+}  // namespace Albany

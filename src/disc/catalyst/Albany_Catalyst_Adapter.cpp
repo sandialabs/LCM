@@ -6,70 +6,66 @@
 
 #include "Albany_Catalyst_Adapter.hpp"
 
-#include "Albany_Catalyst_EpetraDataArray.hpp"
-#include "Albany_Catalyst_Grid.hpp"
-
-#include "Teuchos_Array.hpp"
-#include "Teuchos_TestForException.hpp"
-
-#include <vtkClientServerInterpreter.h>
-#include <vtkClientServerInterpreterInitializer.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
+#include <vtkClientServerInterpreter.h>
+#include <vtkClientServerInterpreterInitializer.h>
 #include <vtkNew.h>
-#include <vtkPointData.h>
 #include <vtkPVInstantiator.h>
+#include <vtkPointData.h>
 
 #include <iostream>
+
+#include "Albany_Catalyst_EpetraDataArray.hpp"
+#include "Albany_Catalyst_Grid.hpp"
+#include "Teuchos_Array.hpp"
+#include "Teuchos_TestForException.hpp"
 
 namespace Albany {
 namespace Catalyst {
 
-Adapter * Adapter::instance = NULL;
+Adapter* Adapter::instance = NULL;
 
 class Adapter::Private
 {
-public:
+ public:
   // Used by Catalyst to create a dummy grid object:
-  static vtkObjectBase* MakeGrid(void*) { return Grid::New(); }
+  static vtkObjectBase*
+  MakeGrid(void*)
+  {
+    return Grid::New();
+  }
   Private() { processor->Initialize(); }
   ~Private() { processor->Finalize(); }
   vtkNew<vtkCPProcessor> processor;
 };
 
-Adapter::Adapter()
-  : d(new Private)
-{
-}
+Adapter::Adapter() : d(new Private) {}
 
-Adapter::~Adapter()
-{
-  delete d;
-}
+Adapter::~Adapter() { delete d; }
 
-Adapter *
+Adapter*
 Adapter::initialize(const Teuchos::RCP<Teuchos::ParameterList>& catalystParams)
 {
   // Validate parameters against list for this specific class
-  catalystParams->validateParameters(*getValidAdapterParameters(),0);
+  catalystParams->validateParameters(*getValidAdapterParameters(), 0);
 
-  if (Adapter::instance)
-    delete Adapter::instance;
+  if (Adapter::instance) delete Adapter::instance;
   Adapter::instance = new Adapter();
 
   // Register our Grid class with Catalyst so that it can be used in a pipeline.
-  if (vtkClientServerInterpreterInitializer *intInit =
-      vtkClientServerInterpreterInitializer::GetInitializer()) {
-    if (vtkClientServerInterpreter *interp = intInit->GetGlobalInterpreter()) {
+  if (vtkClientServerInterpreterInitializer* intInit =
+          vtkClientServerInterpreterInitializer::GetInitializer()) {
+    if (vtkClientServerInterpreter* interp = intInit->GetGlobalInterpreter()) {
       interp->AddNewInstanceFunction("Grid", Private::MakeGrid);
     }
   }
 
   // Load pipeline file
   Teuchos::Array<std::string> files =
-      catalystParams->get<Teuchos::Array<std::string> >("Pipeline Files");
+      catalystParams->get<Teuchos::Array<std::string>>("Pipeline Files");
   typedef Teuchos::Array<std::string>::const_iterator FileIterT;
   for (FileIterT it = files.begin(), itEnd = files.end(); it != itEnd; ++it)
     Adapter::instance->addPythonScriptPipeline(*it);
@@ -77,34 +73,45 @@ Adapter::initialize(const Teuchos::RCP<Teuchos::ParameterList>& catalystParams)
   return Adapter::instance;
 }
 
-Adapter * Adapter::get()
+Adapter*
+Adapter::get()
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(!Adapter::instance, std::runtime_error,
-                             "Albany::Catalyst::Adapter::get() called before "
-                             "initialize()!" << std::endl);
+  TEUCHOS_TEST_FOR_EXCEPTION(
+      !Adapter::instance,
+      std::runtime_error,
+      "Albany::Catalyst::Adapter::get() called before "
+      "initialize()!"
+          << std::endl);
   return Adapter::instance;
 }
 
-void Adapter::cleanup()
+void
+Adapter::cleanup()
 {
   delete Adapter::instance;
   Adapter::instance = NULL;
 }
 
-bool Adapter::addPythonScriptPipeline(const std::string &filename)
+bool
+Adapter::addPythonScriptPipeline(const std::string& filename)
 {
   vtkNew<vtkCPPythonScriptPipeline> pipeline;
   return pipeline->Initialize(filename.c_str()) != 0 &&
-      this->addPipeline(pipeline.GetPointer());
+         this->addPipeline(pipeline.GetPointer());
 }
 
-bool Adapter::addPipeline(vtkCPPipeline *pipeline)
+bool
+Adapter::addPipeline(vtkCPPipeline* pipeline)
 {
   return d->processor->AddPipeline(pipeline) != 0;
 }
 
-void Adapter::update(int timeStep, double time, Decorator &decorator,
-                     const Epetra_Vector &soln)
+void
+Adapter::update(
+    int                  timeStep,
+    double               time,
+    Decorator&           decorator,
+    const Epetra_Vector& soln)
 {
   vtkNew<vtkCPDataDescription> desc;
   desc->AddInput("input");
@@ -130,14 +137,15 @@ Adapter::getValidAdapterParameters()
   Teuchos::RCP<Teuchos::ParameterList> validPL =
       rcp(new Teuchos::ParameterList("ValidCatalystAdapterParams"));
 
-  validPL->set<bool>("Interface Activated", false,
-                     "Activates Catalyst if set to true");
-  validPL->set<Teuchos::Array<std::string> >(
-        "Pipeline Files", Teuchos::Array<std::string>(),
-        "Filenames that contains Catalyst pipeline commands.");
+  validPL->set<bool>(
+      "Interface Activated", false, "Activates Catalyst if set to true");
+  validPL->set<Teuchos::Array<std::string>>(
+      "Pipeline Files",
+      Teuchos::Array<std::string>(),
+      "Filenames that contains Catalyst pipeline commands.");
 
   return validPL;
 }
 
-} // namespace Catalyst
-} // namespace Albany
+}  // namespace Catalyst
+}  // namespace Albany

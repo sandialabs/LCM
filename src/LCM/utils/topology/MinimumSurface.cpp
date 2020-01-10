@@ -10,16 +10,10 @@
 #if defined(ALBANY_LCM)
 
 #include <stk_mesh/base/FieldBase.hpp>
+
 #include "Topology.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <cmath>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
 
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -30,6 +24,13 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/property_map/property_map.hpp>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 // typedef std::pair<int, int> Edge;
 
 namespace LCM {

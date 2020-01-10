@@ -700,85 +700,6 @@ include_directories (${ALBANY_PUMI_INCLUDE_DIRS}
 
 link_directories (${Trilinos_LIBRARY_DIRS} ${Trilinos_TPL_LIBRARY_DIRS})
 
-IF ( ENABLE_ISOLIB )
-  include_directories (${ISOLIB_INCLUDE_DIR_MAIN})
-  include_directories (${ISOLIB_INCLUDE_DIR_UTIL})
-  link_directories (${ISOLIB_LIBRARY_DIR})
-  set(ISOLIB_LIB iso)
-ELSE()
-  set(ISOLIB_LIB )
-ENDIF()
-
-IF ( ENABLE_NLopt )
-  include_directories (${NLopt_INCLUDE_DIR})
-  link_directories (${NLopt_LIBRARY_DIR})
-  set(NLOPT_LIB nlopt)
-ELSE()
-  set(NLOPT_LIB )
-ENDIF()
-
-IF ( ENABLE_Cogent )
-  include_directories (${PlatoEngine_INSTALL_DIR}/include)
-  set(Cogent_LIB ${PlatoEngine_INSTALL_DIR}/lib/libPlatoGeometryCogent.a)
-ELSE()
-  set(Cogent_LIB )
-ENDIF()
-
-IF ( ENABLE_MPMD )
-  include_directories (${PlatoEngine_INSTALL_DIR}/include)
-  set(PlatoEngine_LIB
-      ${PlatoEngine_INSTALL_DIR}/lib/libPlatoDataLayer.a
-      ${PlatoEngine_INSTALL_DIR}/lib/libPlatoInterface.a
-      ${PlatoEngine_INSTALL_DIR}/lib/libPlatoAnalyze.a
-      ${PlatoEngine_INSTALL_DIR}/lib/libPlatoParser.a
-      ${PlatoEngine_INSTALL_DIR}/lib/libPlatoExceptions.a)
-  ADD_DEFINITIONS(-DCODE_MP)
-ELSE()
-  set(PlatoEngine_LIB )
-ENDIF()
-
-# LAME
-IF(ALBANY_LAME)
-  include_directories (${LAME_INCLUDE_DIR})
-  link_directories (${LAME_LIBRARY_DIR})
-  set(LAME_LIB lame ${LAME_LIBRARIES})
-  include_directories (${MATH_TOOLKIT_INCLUDE_DIR})
-  link_directories (${MATH_TOOLKIT_LIBRARY_DIR})
-  set(MATH_TOOLKIT_LIB math_toolkit)
-ELSE()
-  set(LAME_LIB )
-  set(MATH_TOOLKIT_LIB )
-ENDIF()
-
-# LAMENT
-IF(ALBANY_LAMENT)
-  include_directories (${LAMENT_INCLUDE_DIR})
-  link_directories (${LAMENT_LIBRARY_DIR})
-  set(LAMENT_LIB lament)
-ELSE()
-  set(LAMENT_LIB )
-ENDIF()
-
-# RPI APF mesh interface
-IF(ALBANY_APF)
-  SET(ALBANY_PUMI_INCLUDE_DIRS ./disc/pumi)
-  include_directories (${ALBANY_PUMI_INCLUDE_DIRS})
-ELSE()
-  SET(ALBANY_PUMI_INCLUDE_DIRS )
-ENDIF()
-
-IF (ALBANY_AMP)
-  add_subdirectory(AMP)
-  SET(ALBANY_LIBRARIES ${ALBANY_LIBRARIES} AMP)
-ENDIF()
-
-# Catalyst CoProcessing
-if(ALBANY_CATALYST)
-  set(ALBANY_CATALYST_INCLUDE_DIRS ./disc/catalyst)
-  include_directories(${ALBANY_CATALYST_INCLUDE_DIRS})
-endif()
-
-
 # Now build executables from this library, tailored main()s, and Trilinos
 IF (NOT ALBANY_LIBRARIES_ONLY)
 
@@ -810,15 +731,7 @@ ENDIF (NOT ALBANY_LIBRARIES_ONLY)
 # Note: Albany_EXTRA_LIBRARIES is to allow users to specify
 # libraries that one cannot get out of Trilinos directly.
 set(ALL_LIBRARIES
-  ${ALBANY_CI_LIB}
-  ${PlatoEngine_LIB}
-  ${PlatoEngine_LIB}
-  ${Cogent_LIB}
   ${ALB_TRILINOS_LIBS}
-  ${LAME_LIB}
-  ${MATH_TOOLKIT_LIB}
-  ${NLOPT_LIB}
-  ${LAMENT_LIB}
   ${Trilinos_EXTRA_LD_FLAGS}
   ${Albany_EXTRA_LIBRARIES}
   ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES}

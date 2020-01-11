@@ -13,7 +13,10 @@ Albany::PUMIQPData<DataType, Dim, traits>::PUMIQPData(
     const std::string&                             name_,
     const std::vector<PHX::DataLayout::size_type>& dim,
     const bool                                     output_)
-    : name(name_), output(output_), dims(dim), nfield_dofs(1),
+    : name(name_),
+      output(output_),
+      dims(dim),
+      nfield_dofs(1),
       beginning_index(0)
 {
   for (std::size_t i = 1; i < dims.size();

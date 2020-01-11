@@ -15,7 +15,9 @@ class NodalDOFManager
 {
  public:
   NodalDOFManager()
-      : _numComponents(0), _numLocalDOF(0), _numGlobalDOF(0),
+      : _numComponents(0),
+        _numLocalDOF(0),
+        _numGlobalDOF(0),
         _interleaved(true){};
 
   void

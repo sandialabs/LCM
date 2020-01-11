@@ -132,9 +132,9 @@ ComprNSViscosity<EvalT, Traits>::evaluateFields(
   if (visc_type == CONSTANT) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
-        mu(cell, qp)    = 1.0;
-        kappa(cell, qp) = mu(cell, qp) * Cp / Pr / kapparef;
-        mu(cell, qp) = 1.0 / muref;                    // non-dimensionalize mu
+        mu(cell, qp)     = 1.0;
+        kappa(cell, qp)  = mu(cell, qp) * Cp / Pr / kapparef;
+        mu(cell, qp)     = 1.0 / muref;                // non-dimensionalize mu
         lambda(cell, qp) = -2.0 / 3.0 * mu(cell, qp);  // Stokes' hypothesis
       }
     }
@@ -145,8 +145,8 @@ ComprNSViscosity<EvalT, Traits>::evaluateFields(
             qFluct(cell, qp, vecDim - 1) * Tref;  // temperature (dimensional)
         mu(cell, qp) = (1.458e-6) * sqrt(T * T * T) /
                        (T + 110.4);  // mu = (1.458e-6)*T^(1/5)/(T + 110.4)
-        kappa(cell, qp) = mu(cell, qp) * Cp / Pr / kapparef;
-        mu(cell, qp) = mu(cell, qp) / muref;           // non-dimensionalize mu
+        kappa(cell, qp)  = mu(cell, qp) * Cp / Pr / kapparef;
+        mu(cell, qp)     = mu(cell, qp) / muref;       // non-dimensionalize mu
         lambda(cell, qp) = -2.0 / 3.0 * mu(cell, qp);  // Stokes' hypothesis
       }
     }

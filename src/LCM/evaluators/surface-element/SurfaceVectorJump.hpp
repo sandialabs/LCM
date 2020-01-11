@@ -64,12 +64,12 @@ class SurfaceVectorJump : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> jump_;
-  unsigned int workset_size_;
-  unsigned int num_nodes_;
-  unsigned int num_qps_;
-  unsigned int num_dims_;
-  unsigned int num_plane_nodes_;
-  unsigned int num_plane_dims_;
+  unsigned int                                workset_size_;
+  unsigned int                                num_nodes_;
+  unsigned int                                num_qps_;
+  unsigned int                                num_dims_;
+  unsigned int                                num_plane_nodes_;
+  unsigned int                                num_plane_dims_;
 };
 }  // namespace LCM
 

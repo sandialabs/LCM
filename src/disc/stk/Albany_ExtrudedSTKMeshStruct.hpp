@@ -145,10 +145,10 @@ ExtrudedSTKMeshStruct::tetrasFromPrismStructured(
                                                   {{0, 2}, {0, 1}, {1, 2}}};
   int tetraFaceIdOnPrismLateralFace[2][3][2]   = {{{0, 0}, {1, 1}, {2, 2}},
                                                 {{0, 0}, {1, 1}, {2, 2}}};
-  int tetraAdjacentToBottomFace = 0;  // does not depend on type;
-  int tetraAdjacentToUpperFace = 2;   // does not depend on type;
-  int tetraFaceIdOnBottomFace = 3;    // does not depend on type;
-  int tetraFaceIdOnUpperFace = 0;     // does not depend on type;
+  int tetraAdjacentToBottomFace                = 0;  // does not depend on type;
+  int tetraAdjacentToUpperFace                 = 2;  // does not depend on type;
+  int tetraFaceIdOnBottomFace                  = 3;  // does not depend on type;
+  int tetraFaceIdOnUpperFace                   = 0;  // does not depend on type;
 
   int minIndex;
   int prismType = this->prismType(prismVertexMpasIds, minIndex);

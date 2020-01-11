@@ -59,7 +59,8 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
           bulkData_,
           neq_,
           numDim_),
-      haveResidual(false), buildSphereVolume(false),
+      haveResidual(false),
+      buildSphereVolume(false),
       buildLatticeOrientation(false)
 {
   typedef typename AbstractSTKFieldContainer::VectorFieldType       VFT;

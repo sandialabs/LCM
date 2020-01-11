@@ -465,8 +465,8 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(
                         qp);  // rhobar*ubar*du'/dx + rhobar*vbar*du'/dy +
                               // rhobar*R*dT'/dx + R*Tbar*drho'/dx +
                               // 1/Re*(d/dx((2*mu+lambda)*du'/dx +
-                              // lambda*dv'/dy) + d/dy*(mu*dv'/dx + mu*du'/dy)) +
-                              // f0
+                              // lambda*dv'/dy) + d/dy*(mu*dv'/dx + mu*du'/dy))
+                              // + f0
             Residual(cell, node, 1) +=
                 rhobar * ubar * qFluctGrad(cell, qp, 1, 0) *
                     wBF(cell, node, qp) +
@@ -577,7 +577,8 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(
                               // rhobar*wbar*du'/dz + rhobar*R*dT'/dx +
                               // R*Tbar*drho'/dx +
                               // 1/Re*(d/dx((2*mu+lambda)*du'/dx + lambda*dv'/dy
-                              // + lambda*dw'/dz) + d/dy*(mu*dv'/dx + mu*du'/dy))
+                              // + lambda*dw'/dz) + d/dy*(mu*dv'/dx +
+                              // mu*du'/dy))
                               // + d/dz(mu*dw'/dx + mu*du'/dz)) + f0
             Residual(cell, node, 1) +=
                 rhobar * ubar * qFluctGrad(cell, qp, 1, 0) *
@@ -611,7 +612,8 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(
                               // rhobar*wbar*dv'/dz + rhobar*R*dT'/dy +
                               // R*Tbar*drho'/dy + 1/Re*(d/dx(mu*dv'/dx +
                               // mu*du'/dy) + d/dy(lambda*du'/dx + (2*mu +
-                              // lambda)*dv'/dy + lambda*dw'/dz) + d/dz(mu*dw'/dy
+                              // lambda)*dv'/dy + lambda*dw'/dz) +
+                              // d/dz(mu*dw'/dy
                               // + mu*dv'/dz)) + f1
             Residual(cell, node, 2) +=
                 rhobar * ubar * qFluctGrad(cell, qp, 2, 0) *

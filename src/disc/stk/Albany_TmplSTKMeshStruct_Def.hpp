@@ -37,7 +37,8 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
     : GenericSTKMeshStruct(params, adaptParams_, traits_type::size),
       periodic_x(params->get("Periodic_x BC", false)),
       periodic_y(params->get("Periodic_y BC", false)),
-      periodic_z(params->get("Periodic_z BC", false)), triangles(false)
+      periodic_z(params->get("Periodic_z BC", false)),
+      triangles(false)
 {
   /*
     There are two use cases of interest here.
@@ -306,10 +307,10 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
   transformType = params->get(
       "Transform Type", "None");  // get the type of transformation of STK mesh
   felixAlpha = params->get("LandIce alpha", 0.0);  // for LandIce problems
-  felixL = params->get("LandIce L", 1.0);          // for LandIce problems
-  xShift            = params->get("x-shift", 0.0);
-  yShift            = params->get("y-shift", 0.0);
-  zShift            = params->get("z-shift", 0.0);
+  felixL     = params->get("LandIce L", 1.0);      // for LandIce problems
+  xShift     = params->get("x-shift", 0.0);
+  yShift     = params->get("y-shift", 0.0);
+  zShift     = params->get("z-shift", 0.0);
   betas_BLtransform = params->get<Teuchos::Array<double>>(
       "Betas BL Transform", Teuchos::tuple<double>(0.0, 0.0, 0.0));
 

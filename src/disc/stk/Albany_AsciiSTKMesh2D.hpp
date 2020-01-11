@@ -87,15 +87,15 @@ class AsciiSTKMesh2D : public GenericSTKMeshStruct
   Teuchos::RCP<const Teuchos::ParameterList>
   getValidDiscretizationParameters() const;
 
-  bool                       periodic;
-  int                        NumElemNodes;  // number of nodes per element (e.g. 3 for Triangles)
-  int                        NumNodes;    // number of nodes
-  int                        NumElems;    // number of elements
-  int                        NumBdEdges;  // number of faces on basal boundary
-  std::map<int, std::string> bdTagToNodeSetName;
-  std::map<int, std::string> bdTagToSideSetName;
-  std::vector<int>           coord_Ids, ele_Ids, be_Ids;
-  std::vector<int>           coord_flags;
+  bool periodic;
+  int  NumElemNodes;  // number of nodes per element (e.g. 3 for Triangles)
+  int  NumNodes;      // number of nodes
+  int  NumElems;      // number of elements
+  int  NumBdEdges;    // number of faces on basal boundary
+  std::map<int, std::string>       bdTagToNodeSetName;
+  std::map<int, std::string>       bdTagToSideSetName;
+  std::vector<int>                 coord_Ids, ele_Ids, be_Ids;
+  std::vector<int>                 coord_flags;
   std::vector<std::vector<double>> coords;
   std::vector<std::vector<int>>    elems;
   std::vector<std::vector<int>>    bdEdges;

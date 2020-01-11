@@ -7,9 +7,9 @@
 #ifndef PHAL_NSMATERIAL_PROPERTY_HPP
 #define PHAL_NSMATERIAL_PROPERTY_HPP
 
-#include "Albany_config.h"
 #include "Albany_Layouts.hpp"
 #include "Albany_Types.hpp"
+#include "Albany_config.h"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

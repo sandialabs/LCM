@@ -7,4 +7,4 @@
 #include "Albany_SacadoTypes.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
-#endif // Albany_Types
+#endif  // Albany_Types

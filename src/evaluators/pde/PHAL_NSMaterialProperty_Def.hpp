@@ -17,7 +17,9 @@ template <typename EvalT, typename Traits>
 NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     : name_mp(p.get<std::string>("Material Property Name")),
       layout(p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout")),
-      matprop(name_mp, layout), rank(layout->rank()), dims(),
+      matprop(name_mp, layout),
+      rank(layout->rank()),
+      dims(),
       matPropType(SCALAR_CONSTANT)
 {
   layout->dimensions(dims);

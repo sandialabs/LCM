@@ -7,8 +7,8 @@
 #ifndef PHAL_PERMITTIVITY_HPP
 #define PHAL_PERMITTIVITY_HPP
 
-#include "Albany_config.h"
 #include "Albany_SacadoTypes.hpp"
+#include "Albany_config.h"
 #include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"

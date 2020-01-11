@@ -81,7 +81,7 @@ class SpectralOutputSTKMeshStruct : public Albany::GenericSTKMeshStruct
   Teuchos::RCP<Teuchos::FancyOStream> out;
   bool                                periodic;
   double                              scale;
-  bool                                contigIDs;  // boolean specifying if node / element / face IDs are
+  bool contigIDs;  // boolean specifying if node / element / face IDs are
                    // contiguous; only relevant for 1 processor run
   const int numDim;
   const int points_per_edge;

@@ -88,7 +88,7 @@ ComprNSBodyForce<EvalT, Traits>::evaluateFields(
     const double   gamma_gas = 1.4;
     const double   kappa     = 1.0;
     const double   mu        = 1.0 / Re;
-    const double   Rgas = 0.714285733;  // non-dimensional gas constant
+    const double   Rgas      = 0.714285733;  // non-dimensional gas constant
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
         MeshScalarT x2pi   = 2.0 * pi * coordVec(cell, qp, 0);

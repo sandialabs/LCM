@@ -35,7 +35,8 @@ HelmholtzResid<EvalT, Traits>::HelmholtzResid(const Teuchos::ParameterList& p)
       VSource(
           p.get<std::string>("V Pressure Source Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      haveSource(p.get<bool>("Have Source")), ksqr(p.get<double>("Ksqr")),
+      haveSource(p.get<bool>("Have Source")),
+      ksqr(p.get<double>("Ksqr")),
       UResidual(
           p.get<std::string>("U Residual Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),

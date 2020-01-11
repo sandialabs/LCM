@@ -19,7 +19,8 @@ LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(
       noiseTerm(
           p.get<std::string>("Langevin Noise Term"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      duration(2), rng(seedgen())  // seed the rng
+      duration(2),
+      rng(seedgen())  // seed the rng
 
 {
   sd       = p.get<double>("SD Value");

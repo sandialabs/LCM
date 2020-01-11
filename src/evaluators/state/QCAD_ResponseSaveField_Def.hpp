@@ -357,7 +357,7 @@ ResponseSaveField<EvalT, Traits>::evaluateFields(
         node_data->getOwnedNodeVector();
     auto data = Albany::getNonconstLocalData(node_data_vector);
     if (!isVectorField) {
-      int  size         = 2;  // HACK - size always == 2 now since we assume Cell,Node
+      int  size = 2;  // HACK - size always == 2 now since we assume Cell,Node
       auto node_indexer = Albany::createGlobalLocalIndexer(owned_node_vs);
       switch (size) {  // Note: size should always == 2 now: node_scalar type or
                        // cell_scalar state registered

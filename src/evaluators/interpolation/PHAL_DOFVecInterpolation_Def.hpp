@@ -73,8 +73,12 @@ class VecInterpolation
       int           numQPs,
       int           numNodes,
       int           vecDims)
-      : BF_(BF), val_node_(val_node), U_(U), numQPs_(numQPs),
-        numNodes_(numNodes), vecDims_(vecDims)
+      : BF_(BF),
+        val_node_(val_node),
+        U_(U),
+        numQPs_(numQPs),
+        numNodes_(numNodes),
+        vecDims_(vecDims)
   {
   }
 
@@ -175,8 +179,14 @@ class VecInterpolationJacob
       int              vecDims,
       int              num_dof,
       int              offset)
-      : BF_(BF), val_node_(val_node), U_(U), numNodes_(numNodes),
-        numQPs_(numQPs), vecDims_(vecDims), num_dof_(num_dof), offset_(offset)
+      : BF_(BF),
+        val_node_(val_node),
+        U_(U),
+        numNodes_(numNodes),
+        numQPs_(numQPs),
+        vecDims_(vecDims),
+        num_dof_(num_dof),
+        offset_(offset)
   {
   }
 

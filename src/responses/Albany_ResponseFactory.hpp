@@ -30,7 +30,9 @@ class ResponseFactory
       const Teuchos::RCP<Albany::AbstractProblem>& problem,
       const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>& ms,
       const Teuchos::RCP<Albany::StateManager>& state_manager)
-      : app(application), prob(problem), meshSpecs(ms),
+      : app(application),
+        prob(problem),
+        meshSpecs(ms),
         stateMgr(state_manager){};
 
   //! Destructor

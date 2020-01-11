@@ -50,8 +50,8 @@ class ComprNSViscosity : public PHX::EvaluatorWithBaseImpl<Traits>,
   double kapparef;
   double Tref;  // reference temperature -- needed for Sutherland's viscosity
                 // law
-  double Pr;  // Prandtl number
-  double Cp;  // specific heat at constant pressure
+  double Pr;    // Prandtl number
+  double Cp;    // specific heat at constant pressure
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint> mu;

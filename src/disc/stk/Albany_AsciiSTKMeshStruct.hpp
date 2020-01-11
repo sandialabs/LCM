@@ -58,10 +58,10 @@ class AsciiSTKMeshStruct : public GenericSTKMeshStruct
 
   Teuchos::RCP<Teuchos::FancyOStream> out;
   bool                                periodic;
-  bool                                contigIDs;  // boolean specifying if node / element / face IDs are
-                   // contiguous; only relevant for 1 processor run
-  Tpetra_GO NumNodes;       // number of nodes
-  Tpetra_GO NumEles;        // number of elements
+  bool contigIDs;      // boolean specifying if node / element / face IDs are
+                       // contiguous; only relevant for 1 processor run
+  Tpetra_GO NumNodes;  // number of nodes
+  Tpetra_GO NumEles;   // number of elements
   Tpetra_GO NumBasalFaces;  // number of faces on basal boundary
   double (*xyz)[3];         // hard-coded for 3D for now
   double*                   sh;

@@ -26,7 +26,10 @@ GenericSTKFieldContainer<Interleaved>::GenericSTKFieldContainer(
     const Teuchos::RCP<stk::mesh::BulkData>&    bulkData_,
     const int                                   neq_,
     const int                                   numDim_)
-    : metaData(metaData_), bulkData(bulkData_), params(params_), neq(neq_),
+    : metaData(metaData_),
+      bulkData(bulkData_),
+      params(params_),
+      neq(neq_),
       numDim(numDim_)
 {
 }

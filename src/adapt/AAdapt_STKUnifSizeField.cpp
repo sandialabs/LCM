@@ -73,17 +73,6 @@ plane_dot_product(
   return dot;
 }
 
-#if 0
-static void project_point_to_plane(double plane_point[3], double plane_normal[3], double point[3], double projected_point[3]) {
-  double normal[3] = {0, 0, 0};
-  normalize(plane_normal, normal);
-  double dot = plane_dot_product(plane_point, plane_normal, point);
-
-  for(int i = 0; i < 3; i++) {
-    projected_point[i] = plane_point[i] + (point[i] - dot * normal[i]);
-  }
-}
-#endif
 }  // anonymous namespace
 
 namespace AAdapt
@@ -143,7 +132,6 @@ namespace AAdapt
 
   return false;  // don't terminate the loop
 }  // namespace
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
    // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
 
 bool

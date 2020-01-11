@@ -40,7 +40,8 @@ NSThermalEqResid<EvalT, Traits>::NSThermalEqResid(
           p.get<std::string>("Residual Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       haveSource(p.get<bool>("Have Source")),
-      haveFlow(p.get<bool>("Have Flow")), haveSUPG(p.get<bool>("Have SUPG"))
+      haveFlow(p.get<bool>("Have Flow")),
+      haveSUPG(p.get<bool>("Have SUPG"))
 {
   if (p.isType<bool>("Disable Transient"))
     enableTransient = !p.get<bool>("Disable Transient");

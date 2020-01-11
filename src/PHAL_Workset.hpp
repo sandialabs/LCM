@@ -130,7 +130,7 @@ struct Workset
 
   int spatial_dimension_{0};
 
-  Albany::StateArray* stateArrayPtr;
+  Albany::StateArray*              stateArrayPtr;
   Teuchos::RCP<Tpetra_MultiVector> auxDataPtrT;
 
   bool transientTerms;

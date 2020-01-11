@@ -82,14 +82,14 @@ ThyraCrsMatrixFactory::fillComplete()
   // insert indices from the temporary local graph,
   // and call fill complete.
   Teuchos::ArrayRCP<size_t> nonzeros_per_row_array(
-    t_range->getNodeNumElements());
+      t_range->getNodeNumElements());
 
   for (int lrow = 0; lrow < nonzeros_per_row_array.size(); ++lrow) {
     nonzeros_per_row_array[lrow] = t_local_graph[lrow].size();
   }
 
   m_graph->t_graph =
-    Teuchos::rcp(new Tpetra_CrsGraph(t_range, nonzeros_per_row_array()));
+      Teuchos::rcp(new Tpetra_CrsGraph(t_range, nonzeros_per_row_array()));
 
   for (int lrow = 0; lrow < nonzeros_per_row_array.size(); ++lrow) {
     auto& row_indices = t_local_graph[lrow];
@@ -119,9 +119,9 @@ ThyraCrsMatrixFactory::createOp() const
       std::logic_error,
       "Error! Cannot create a linear operator if the graph is not filled.\n");
 
-  Teuchos::RCP<Thyra_LinearOp> op;
+  Teuchos::RCP<Thyra_LinearOp>   op;
   Teuchos::RCP<Tpetra_CrsMatrix> mat =
-    Teuchos::rcp(new Tpetra_CrsMatrix(m_graph->t_graph));
+      Teuchos::rcp(new Tpetra_CrsMatrix(m_graph->t_graph));
   auto const zero = Teuchos::ScalarTraits<ST>::zero();
   mat->resumeFill();
   mat->setAllToScalar(zero);

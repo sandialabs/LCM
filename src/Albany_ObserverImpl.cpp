@@ -3,9 +3,10 @@
 //    This Software is released under the BSD license detailed     //
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
+#include "Albany_ObserverImpl.hpp"
+
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
-#include "Albany_ObserverImpl.hpp"
 
 namespace Albany {
 

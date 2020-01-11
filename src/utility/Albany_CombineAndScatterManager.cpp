@@ -4,7 +4,6 @@
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Albany_TpetraThyraUtils.hpp"
-#include "Albany_TpetraThyraUtils.hpp"
 
 namespace Albany {
 
@@ -72,7 +71,7 @@ createCombineAndScatterManager(
     manager =
         Teuchos::rcp(new CombineAndScatterManagerTpetra(owned, overlapped));
   }
-  
+
   TEUCHOS_TEST_FOR_EXCEPTION(
       manager.is_null(),
       std::logic_error,

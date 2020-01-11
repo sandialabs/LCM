@@ -15,7 +15,7 @@ createGlobalLocalIndexer(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
   if (!tmap.is_null()) {
     indexer = Teuchos::rcp(new GlobalLocalIndexerTpetra(vs, tmap));
   }
-  
+
   TEUCHOS_TEST_FOR_EXCEPTION(
       indexer.is_null(),
       std::runtime_error,

@@ -47,16 +47,16 @@ template <typename EvalT, typename Traits>
 void
 GatherAuxData<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto nodeID = workset.wsElNodeEqID;
-    Teuchos::RCP<const Tpetra_Vector> vT =
-        (workset.auxDataPtrT)->getVector(auxDataIndex);
-    Teuchos::ArrayRCP<ST const> vT_constView = vT->get1dView();
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < this->numNodes; ++node) {
-        int offsetIntoVec = nodeID(cell, node, 0);  // neq==1 hardwired
-        this->vector_data(cell, node) = vT_constView[offsetIntoVec];
-      }
+  auto                              nodeID = workset.wsElNodeEqID;
+  Teuchos::RCP<const Tpetra_Vector> vT =
+      (workset.auxDataPtrT)->getVector(auxDataIndex);
+  Teuchos::ArrayRCP<ST const> vT_constView = vT->get1dView();
+  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
+    for (std::size_t node = 0; node < this->numNodes; ++node) {
+      int offsetIntoVec = nodeID(cell, node, 0);  // neq==1 hardwired
+      this->vector_data(cell, node) = vT_constView[offsetIntoVec];
     }
+  }
 }
 
 // **********************************************************************

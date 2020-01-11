@@ -3,10 +3,11 @@
 //    This Software is released under the BSD license detailed     //
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
+#include "Albany_StatelessObserverImpl.hpp"
+
 #include <string>
 
 #include "Albany_AbstractDiscretization.hpp"
-#include "Albany_StatelessObserverImpl.hpp"
 #include "Teuchos_TimeMonitor.hpp"
 
 namespace Albany {

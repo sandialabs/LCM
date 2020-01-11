@@ -5,6 +5,7 @@
 //*****************************************************************//
 
 #include "AAdapt_RC_Projector_impl.hpp"
+
 #include "Albany_TpetraThyraUtils.hpp"
 #include "Albany_Utils.hpp"
 #include "BelosBlockCGSolMgr.hpp"
@@ -29,8 +30,7 @@ solve(
     Teuchos::ParameterList pl_;
     pl_.set<int>("fact: iluk level-of-fill", 0);
     Teuchos::RCP<Ifpack2::RILUK<Tpetra_RowMatrix>> prec;
-    Teuchos::RCP<const Tpetra_CrsMatrix>           tA =
-        Albany::getConstTpetraMatrix(A);
+    Teuchos::RCP<const Tpetra_CrsMatrix> tA = Albany::getConstTpetraMatrix(A);
     prec = Teuchos::rcp(new Ifpack2::RILUK<Tpetra_RowMatrix>(tA));
     prec->setParameters(pl_);
     prec->initialize();

@@ -3,15 +3,6 @@
 #    This Software is released under the BSD license detailed     //
 #    in the file "license.txt" in the top-level Albany directory  //
 #*****************************************************************//
-
-IF(ALBANY_APF)
-  add_subdirectory(pumi)
-ENDIF()
-
-if(ALBANY_CATALYST)
-  add_subdirectory(catalyst)
-endif()
-
 IF(ALBANY_STK)
   add_subdirectory(stk)
 ENDIF()

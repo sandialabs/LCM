@@ -721,11 +721,6 @@ ENDIF ()
 add_executable(AlbanyAnalysis Main_Analysis.cpp)
 SET(ALBANY_EXECUTABLES ${ALBANY_EXECUTABLES} AlbanyAnalysis)
 
-IF (ALBANY_MESHDB_TOOLS)
-  add_executable(exopumiconvert disc/tools/exopumiconvert.cpp)
-  SET(ALBANY_EXECUTABLES ${ALBANY_EXECUTABLES} exopumiconvert)
-ENDIF()
-
 ENDIF (NOT ALBANY_LIBRARIES_ONLY)
 # End declaration of executables
 

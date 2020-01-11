@@ -3,7 +3,6 @@
 
 #include <set>
 
-#include "Albany_EpetraThyraUtils.hpp"
 #include "Albany_ThyraTypes.hpp"
 #include "Albany_TpetraThyraUtils.hpp"
 #include "Teuchos_RCP.hpp"
@@ -84,11 +83,6 @@ struct ThyraCrsMatrixFactory
 
   Teuchos::RCP<const Thyra_VectorSpace> m_domain_vs;
   Teuchos::RCP<const Thyra_VectorSpace> m_range_vs;
-
-#ifdef ALBANY_EPETRA
-  std::vector<std::set<Epetra_GO>>    e_local_graph;
-  Teuchos::RCP<const Epetra_BlockMap> e_range;
-#endif
 
   std::vector<std::set<Tpetra_GO>> t_local_graph;
   Teuchos::RCP<const Tpetra_Map>   t_range;

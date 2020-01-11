@@ -13,15 +13,6 @@
 #include "Thyra_DefaultSpmdVectorSpace.hpp"
 #include "Thyra_VectorStdOps.hpp"
 
-#if defined(ALBANY_EPETRA)
-#include <type_traits>
-
-#include "Albany_EpetraThyraUtils.hpp"
-#include "AztecOO_ConditionNumber.h"
-#include "Epetra_LocalMap.h"
-#include "Thyra_EpetraLinearOp.hpp"
-#endif
-
 namespace Albany {
 
 // ========= Vector Spaces utilities ========= //
@@ -31,30 +22,9 @@ createLocallyReplicatedVectorSpace(
     const int                              size,
     const Teuchos::RCP<const Teuchos_Comm> comm)
 {
-  auto bt = build_type();
-  switch (bt) {
-#ifdef ALBANY_EPETRA
-    case BuildType::Epetra: {
-      Teuchos::RCP<const Epetra_BlockMap> emap(
-          new Epetra_LocalMap(size, 0, *createEpetraCommFromTeuchosComm(comm)));
-      return createThyraVectorSpace(emap);
-      break;
-    }
-#endif
-    case BuildType::Tpetra: {
-      Teuchos::RCP<const Tpetra_Map> tmap(new Tpetra_Map(
-          size, 0, comm, Tpetra::LocalGlobal::LocallyReplicated));
-      return createThyraVectorSpace(tmap);
-      break;
-    }
-    default: {
-      auto comm_thyra = createThyraCommFromTeuchosComm(comm);
-      return Thyra::locallyReplicatedDefaultSpmdVectorSpace<ST>(
-          comm_thyra, size);
-    }
-  }
-
-  TEUCHOS_UNREACHABLE_RETURN(Teuchos::null);
+  Teuchos::RCP<const Tpetra_Map> tmap(
+      new Tpetra_Map(size, 0, comm, Tpetra::LocalGlobal::LocallyReplicated));
+  return createThyraVectorSpace(tmap);
 }
 
 Teuchos::RCP<const Teuchos_Comm>
@@ -63,11 +33,6 @@ getComm(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
   if (!tmap.is_null()) { return tmap->getComm(); }
-#if defined(ALBANY_EPETRA)
-  auto emap = getEpetraBlockMap(vs, false);
-  if (!emap.is_null()) { return createTeuchosCommFromEpetraComm(emap->Comm()); }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -82,10 +47,6 @@ getMaxAllGlobalIndex(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
   if (!tmap.is_null()) { return tmap->getMaxAllGlobalIndex(); }
-#if defined(ALBANY_EPETRA)
-  auto emap = getEpetraBlockMap(vs, false);
-  if (!emap.is_null()) { return static_cast<GO>(emap->MaxElementSize()); }
-#endif
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -161,14 +122,6 @@ sameAs(
     auto tmap2 = getTpetraMap(vs2, true);
     return tmap1->isSameAs(*tmap2);
   }
-#if defined(ALBANY_EPETRA)
-  auto emap1 = getEpetraBlockMap(vs1, false);
-  if (!emap1.is_null()) {
-    // We don't allow two vs with different linear algebra back ends
-    auto emap2 = getEpetraBlockMap(vs2, true);
-    return emap2->SameAs(*emap1);
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -216,36 +169,6 @@ removeComponents(
     return createThyraVectorSpace(reduced_map);
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emap = getEpetraBlockMap(vs, false);
-  if (!emap.is_null()) {
-    const LO num_node_lids         = emap->NumMyElements();
-    const LO num_reduced_node_lids = num_node_lids - local_components.size();
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        num_reduced_node_lids < 0,
-        std::logic_error,
-        "Error in removeComponents! Cannot remove more components than are "
-        "actually present.\n");
-    Teuchos::Array<Epetra_GO> reduced_gids(num_reduced_node_lids);
-    for (LO lid = 0, k = 0; lid < num_node_lids; ++lid) {
-      if (std::find(local_components.begin(), local_components.end(), lid) ==
-          local_components.end()) {
-        reduced_gids[k] = emap->GID(lid);
-        ++k;
-      }
-    }
-
-    Teuchos::RCP<const Epetra_BlockMap> reduced_map(new Epetra_BlockMap(
-        -1,
-        reduced_gids().size(),
-        reduced_gids.getRawPtr(),
-        1,
-        emap->IndexBase(),
-        emap->Comm()));
-    return createThyraVectorSpace(reduced_map);
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -283,27 +206,6 @@ createSubspace(
     return createThyraVectorSpace(reduced_map);
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emap = getEpetraBlockMap(vs, false);
-  if (!emap.is_null()) {
-    Teuchos::Array<Epetra_GO> subspace_gids(subspace_components.size());
-    int                       k = 0;
-    for (auto lid : subspace_components) {
-      subspace_gids[k] = emap->GID(lid);
-      ++k;
-    }
-
-    Teuchos::RCP<const Epetra_BlockMap> reduced_map(new Epetra_BlockMap(
-        -1,
-        subspace_gids().size(),
-        subspace_gids.getRawPtr(),
-        1,
-        emap->IndexBase(),
-        emap->Comm()));
-    return createThyraVectorSpace(reduced_map);
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -322,58 +224,15 @@ createVectorSpace(
     const Teuchos::ArrayView<const GO>&     gids,
     const GO                                globalDim)
 {
-  auto     bt      = build_type();
   const GO invalid = Teuchos::OrdinalTraits<GO>::invalid();
-  if (bt == BuildType::Epetra) {
-#ifdef ALBANY_EPETRA
-    auto ecomm = createEpetraCommFromTeuchosComm(comm);
-    Teuchos::RCP<const Epetra_BlockMap> emap;
-    const Epetra_GO                     numGlobalElements =
-        (globalDim == invalid) ? -1 : static_cast<Epetra_GO>(globalDim);
-    if (sizeof(GO) == sizeof(Epetra_GO)) {
-      // Same size, different type names. A reinterpret_cast is safe
-      const Epetra_GO* egids =
-          reinterpret_cast<const Epetra_GO*>(gids.getRawPtr());
-      emap = Teuchos::rcp(new Epetra_BlockMap(
-          numGlobalElements, gids.size(), egids, 1, 0, *ecomm));
-    } else {
-      // The types have a different size. Need to copy GO's into Epetra_GO's
-      Teuchos::Array<Epetra_GO> egids(gids.size());
-      const GO                  max_safe_gid =
-          static_cast<GO>(Teuchos::OrdinalTraits<Epetra_GO>::max());
-      for (int i = 0; i < gids.size(); ++i) {
-        ALBANY_EXPECT(
-            gids[i] <= max_safe_gid,
-            "Error in createVectorSpace! Input gids exceed Epetra_GO "
-            "ranges.\n");
-        egids[i] = static_cast<Epetra_GO>(gids[i]);
-      }
-      (void)max_safe_gid;
-      emap = Teuchos::rcp(new Epetra_BlockMap(
-          numGlobalElements, gids.size(), egids.getRawPtr(), 1, 0, *ecomm));
-    }
-    return createThyraVectorSpace(emap);
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        std::runtime_error,
-        "Error in createVectorSpace! Epetra build not supported.\n");
-#endif
-  } else if (bt == BuildType::Tpetra) {
-    auto gsi = Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid();
-    const decltype(gsi) numGlobalElements =
-        (globalDim == invalid) ? gsi : static_cast<Tpetra_GO>(globalDim);
-    Teuchos::ArrayView<const Tpetra_GO> tgids(
-        reinterpret_cast<const Tpetra_GO*>(gids.getRawPtr()), gids.size());
-    Teuchos::RCP<const Tpetra_Map> tmap =
-        Teuchos::rcp(new Tpetra_Map(numGlobalElements, tgids, 0, comm));
-    return createThyraVectorSpace(tmap);
-  } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        std::runtime_error,
-        "Error in createVectorSpace! Invalid or unsupported build type.\n");
-  }
+  auto     gsi     = Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid();
+  const decltype(gsi) numGlobalElements =
+      (globalDim == invalid) ? gsi : static_cast<Tpetra_GO>(globalDim);
+  Teuchos::ArrayView<const Tpetra_GO> tgids(
+      reinterpret_cast<const Tpetra_GO*>(gids.getRawPtr()), gids.size());
+  Teuchos::RCP<const Tpetra_Map> tmap =
+      Teuchos::rcp(new Tpetra_Map(numGlobalElements, tgids, 0, comm));
+  return createThyraVectorSpace(tmap);
 }
 
 Teuchos::RCP<const Thyra_VectorSpace>
@@ -428,15 +287,6 @@ getColumnSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   auto tmat = getConstTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return createThyraVectorSpace(tmat->getColMap()); }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    Teuchos::RCP<const Epetra_BlockMap> col_map =
-        Teuchos::rcpFromRef(emat->ColMap());
-    return createThyraVectorSpace(col_map);
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -454,15 +304,6 @@ getRowSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return createThyraVectorSpace(tmat->getRowMap()); }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    Teuchos::RCP<const Epetra_BlockMap> row_map =
-        Teuchos::rcpFromRef(emat->RowMap());
-    return createThyraVectorSpace(row_map);
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -484,11 +325,6 @@ getNumEntriesInLocalRow(
   auto tmat = getConstTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return tmat->getNumEntriesInLocalRow(lrow); }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) { return emat->NumMyEntries(lrow); }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -507,11 +343,6 @@ isFillActive(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   auto tmat = getConstTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return tmat->isFillActive(); }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) { return !emat->Filled(); }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -529,11 +360,6 @@ isFillComplete(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return tmat->isFillComplete(); }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) { return emat->Filled(); }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -556,15 +382,6 @@ resumeFill(const Teuchos::RCP<Thyra_LinearOp>& lop)
     return;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    // Nothing to do in Epetra. As long as you only need to change the values
-    // (not the graph), Epetra already let's you do it on a filled matrix
-    return;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -582,16 +399,6 @@ fillComplete(const Teuchos::RCP<Thyra_LinearOp>& lop)
     tmat->fillComplete();
     return;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    emat->FillComplete();
-    emat->OptimizeStorage();  // This allows to extract data with
-                              // 'ExtractCrsDataPointers
-    return;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -620,14 +427,6 @@ assign(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST value)
 
     return;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    emat->PutScalar(value);
-    return;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -662,14 +461,6 @@ getDiagonalCopy(
     return;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    emat->ExtractDiagonalCopy(*Albany::getEpetraVector(diag, true));
-    return;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -687,13 +478,6 @@ scale(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST val)
     tmat->scale(val);
     return;
   }
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    emat->Scale(val);
-    return;
-  }
-#endif
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -717,18 +501,6 @@ getLocalRowValues(
     tmat->getLocalRowCopy(lrow, indices, values, numEntries);
     return;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    auto numEntries = emat->NumMyEntries(lrow);
-    indices.resize(numEntries);
-    values.resize(numEntries);
-    emat->ExtractMyRowCopy(
-        lrow, numEntries, numEntries, values.getRawPtr(), indices.getRawPtr());
-    return;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -767,18 +539,6 @@ addToLocalRowValues(
     return integer_error_code;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    // Epetra's ReplaceMyValues routine returns integer error code, set to 0 if
-    // successful, set to 1 if one or more indices are not associated with the
-    // calling processor.  We can just return that value for the Epetra case.
-    integer_error_code = emat->SumIntoMyValues(
-        lrow, indices.size(), values.getRawPtr(), indices.getRawPtr());
-    return integer_error_code;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -803,38 +563,6 @@ insertGlobalValues(
     tmat->insertGlobalValues(tgrow, tcols, values);
     return;
   }
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    const Epetra_GO egrow = grow;
-    if (sizeof(GO) == sizeof(Epetra_GO)) {
-      Teuchos::ArrayView<const Epetra_GO> ecols(
-          reinterpret_cast<const Epetra_GO*>(ecols.getRawPtr()), ecols.size());
-      emat->InsertGlobalValues(
-          egrow, ecols.size(), values.getRawPtr(), ecols.getRawPtr());
-    } else {
-      // Cannot reinterpret cast. Need to copy gids into Epetra_GO array
-      Teuchos::Array<Epetra_GO> ecols(cols.size());
-      const GO                  max_safe_col =
-          static_cast<GO>(Teuchos::OrdinalTraits<Epetra_GO>::max());
-      for (int i = 0; i < cols.size(); ++i) {
-        ALBANY_EXPECT(
-            cols[i] <= max_safe_col,
-            "Error in insertGlobalValues! Input cols exceed Epetra_GO "
-            "ranges.\n");
-        ecols[i] = static_cast<Epetra_GO>(cols[i]);
-      }
-      ALBANY_EXPECT(
-          grow <= max_safe_col,
-          "Error in insertGlobalValues! Input grow exceeds Epetra_GO "
-          "ranges.\n");
-      (void)max_safe_col;
-      emat->InsertGlobalValues(
-          egrow, ecols.size(), values.getRawPtr(), ecols.getRawPtr());
-    }
-    return;
-  }
-#endif
 }
 
 void
@@ -854,40 +582,6 @@ replaceGlobalValues(
     tmat->replaceGlobalValues(tgid, tindices, values);
     return;
   }
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    const Epetra_GO egid = gid;
-    if (sizeof(GO) == sizeof(Epetra_GO)) {
-      Teuchos::ArrayView<const Epetra_GO> eindices(
-          reinterpret_cast<const Epetra_GO*>(indices.getRawPtr()),
-          indices.size());
-      emat->ReplaceGlobalValues(
-          egid, eindices.size(), values.getRawPtr(), eindices.getRawPtr());
-    } else {
-      // Cannot reinterpret cast. Need to copy gids into Epetra_GO array
-      Teuchos::Array<Epetra_GO> eindices(indices.size());
-      const GO                  max_safe_index =
-          static_cast<GO>(Teuchos::OrdinalTraits<Epetra_GO>::max());
-      for (int i = 0; i < indices.size(); ++i) {
-        ALBANY_EXPECT(
-            indices[i] <= max_safe_index,
-            "Error in replaceGlobalValues! Input indices exceed Epetra_GO "
-            "ranges.\n");
-        eindices[i] = static_cast<Epetra_GO>(indices[i]);
-      }
-      ALBANY_EXPECT(
-          gid <= max_safe_index,
-          "Error in replaceGlobalValues! Input grow exceeds Epetra_GO "
-          "ranges.\n");
-      (void)max_safe_index;
-      emat->ReplaceGlobalValues(
-          egid, eindices.size(), values.getRawPtr(), eindices.getRawPtr());
-    }
-    return;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -929,44 +623,6 @@ addToGlobalRowValues(
     return integer_error_code;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    // Epetra's ReplaceGlobalValues routine returns integer error code, set to 0
-    // if successful, set to 1 if one or more indices are not associated with
-    // the calling processor.  We can just return that value for the Epetra
-    // case.
-    const Epetra_GO egrow = grow;
-    if (sizeof(GO) == sizeof(Epetra_GO)) {
-      Teuchos::ArrayView<const Epetra_GO> eindices(
-          reinterpret_cast<const Epetra_GO*>(indices.getRawPtr()),
-          indices.size());
-      integer_error_code = emat->SumIntoGlobalValues(
-          egrow, eindices.size(), values.getRawPtr(), eindices.getRawPtr());
-    } else {
-      // Cannot reinterpret cast. Need to copy gids into Epetra_GO array
-      Teuchos::Array<Epetra_GO> eindices(indices.size());
-      const GO                  max_safe_index =
-          static_cast<GO>(Teuchos::OrdinalTraits<Epetra_GO>::max());
-      for (int i = 0; i < indices.size(); ++i) {
-        ALBANY_EXPECT(
-            indices[i] <= max_safe_index,
-            "Error in addToGlobalRowValues! Input indices exceed Epetra_GO "
-            "ranges.\n");
-        eindices[i] = static_cast<Epetra_GO>(indices[i]);
-      }
-      ALBANY_EXPECT(
-          grow <= max_safe_index,
-          "Error in addToGlobalRowValues! Input grow exceeds Epetra_GO "
-          "ranges.\n");
-      (void)max_safe_index;
-      integer_error_code = emat->SumIntoGlobalValues(
-          egrow, eindices.size(), values.getRawPtr(), eindices.getRawPtr());
-    }
-    return integer_error_code;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -988,15 +644,6 @@ setLocalRowValues(
     tmat->replaceLocalValues(lrow, indices, values);
     return;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    emat->ReplaceMyValues(
-        lrow, indices.size(), values.getRawPtr(), indices.getRawPtr());
-    return;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -1027,23 +674,6 @@ setLocalRowValues(
     return;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    int  numIndices;
-    int* indices;
-    emat->Graph().ExtractMyRowView(lrow, numIndices, indices);
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        numIndices != values.size(),
-        std::logic_error,
-        "Error! This routine is meant for setting *all* values in a row, "
-        "but the length of the input values array does not match the number of "
-        "indices in the local row.\n");
-    emat->ReplaceMyValues(lrow, numIndices, values.getRawPtr(), indices);
-    return;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1062,14 +692,6 @@ getGlobalMaxNumRowEntries(const Teuchos::RCP<const Thyra_LinearOp>& lop)
     return return_value;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    auto return_value = emat->GlobalMaxNumEntries();
-    return return_value;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1084,11 +706,6 @@ isStaticGraph(const Teuchos::RCP<Thyra_LinearOp>& lop)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return tmat->isStaticGraph(); }
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) { return emat->StaticGraph(); }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1103,15 +720,6 @@ isStaticGraph(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return tmat->isStaticGraph(); }
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    ALBANY_ASSERT(
-        true,
-        "Error: isStaticGraph with const input not implemented for Epetra!\n");
-    return false;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -1132,15 +740,6 @@ createOneToOneVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace> vs)
     const Teuchos::RCP<const Tpetra_Map> map = Tpetra::createOneToOne(tmap);
     return createThyraVectorSpace(map);
   }
-#if defined(ALBANY_EPETRA)
-  auto emap = getEpetraMap(vs, false);
-  if (!emap.is_null()) {
-    const auto map = Epetra_Util::Create_OneToOne_Map(*emap);
-    const Teuchos::RCP<const Epetra_BlockMap> map_rcp =
-        Teuchos::rcpFromRef(map);
-    return createThyraVectorSpace(map_rcp);
-  }
-#endif
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1211,52 +810,6 @@ double
 computeConditionNumber(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 {
   double condest = std::numeric_limits<double>::quiet_NaN();
-
-#ifdef ALBANY_EPETRA
-  // Allow failure, since we don't know what the underlying linear algebra is
-  Teuchos::RCP<const Epetra_CrsMatrix> emat;
-  auto                                 tmat = getConstTpetraMatrix(lop, false);
-  if (!tmat.is_null()) {
-    Petra::Converter converter(tmat->getComm());
-
-    emat = Petra::TpetraCrsMatrix_To_EpetraCrsMatrix(tmat, converter.commE_);
-  }
-
-  // Try epetra if tpetra didn't work
-  if (emat.is_null()) { emat = getConstEpetraMatrix(lop, false); }
-
-  if (emat.is_null()) {
-    // If all the tries above are unsuccessful, throw an error.
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        std::runtime_error,
-        "Error in computeConditionNumber! Could not cast Thyra_LinearOp to any "
-        "of the supported concrete types.\n");
-  } else {
-    AztecOOConditionNumber conditionEstimator;
-    conditionEstimator.initialize(*emat);
-    int    maxIters = 40000;
-    double tol      = 1e-10;
-    int    status   = conditionEstimator.computeConditionNumber(maxIters, tol);
-    if (status != 0) {
-      auto out = Teuchos::VerboseObjectBase::getDefaultOStream();
-      *out << "WARNING: AztecOO::ConditionNumber::computeConditionNumber "
-              "returned "
-           << "non-zero status = " << status
-           << ".  Condition number estimate may be wrong!\n";
-    }
-    condest = conditionEstimator.getConditionNumber();
-    return condest;
-  }
-#else
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      true,
-      std::runtime_error,
-      "Error! Condition number estimation requires ALBANY_EPETRA.\n");
-  // Suppress compiler warning for unused argument
-  (void)lop;
-#endif
-
   // Dummy return value to silence compiler warning
   return condest;
 }
@@ -1271,79 +824,6 @@ getDeviceData(Teuchos::RCP<const Thyra_LinearOp>& lop)
     DeviceLocalMatrix<const ST> data = tmat->getLocalMatrix();
     return data;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        (!std::is_same<PHX::Device::memory_space, Kokkos::HostSpace>::value),
-        std::logic_error,
-        "Error in getDeviceData! Cannot use Epetra if the memory space of "
-        "PHX::Device is not the HostSpace.\n");
-
-    // If you want the output DeviceLocalMatrix to have view semantic on the
-    // matrix values, you need to use the constructor that 'views' the input
-    // arrays. So we need to create views unmanaged, which need to view the
-    // matrix data. WARNING: This is *highly* relying on Epetra_CrsMatrix
-    // internal storage.
-    //          More precisely, I'm not even sure this routine could be fixed
-    //          if Epetra_CrsMatrix changes the internal storage scheme.
-
-    using StaticGraphType = DeviceLocalMatrix<ST>::staticcrsgraph_type;
-    using size_type       = StaticGraphType::size_type;
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        sizeof(size_type) != sizeof(LO),
-        std::runtime_error,
-        "Error in getDeviceData! Extracting local data from an "
-        "Epetra_CrsMatrix is safe only as long as "
-        "the size of Kokkos::HostSpace::size_type equals sizeof(LO).\n");
-
-    // Some data from the matrix
-    const int numMyRows     = emat->NumMyRows();
-    const int numMyCols     = emat->NumMyCols();
-    const int numMyNonzeros = emat->NumMyNonzeros();
-
-    // Grab the data
-    LO* row_map;
-    LO* indices;
-    ST* values;
-    int err_code = emat->ExtractCrsDataPointers(row_map, indices, values);
-    ALBANY_EXPECT(
-        err_code == 0,
-        "Error in getDeviceData! Something went wrong while extracting "
-        "Epetra_CrsMatrix local data pointers.\n");
-    (void)err_code;
-    Teuchos::ArrayRCP<size_type> row_map_size_type(numMyRows + 1);
-    for (int i = 0; i < numMyRows + 1; ++i) {
-      row_map_size_type[i] = static_cast<size_type>(row_map[i]);
-    }
-    // Attach the temporary to the input RCP, to prolong its life time. Last
-    // arg=false, so we replace possibly existing data without throwing.
-    Teuchos::set_extra_data(
-        row_map_size_type,
-        "row_map as size_type",
-        Teuchos::outArg(lop),
-        Teuchos::POST_DESTROY,
-        false);
-
-    // Create unmanaged views
-    DeviceLocalMatrix<ST>::row_map_type row_map_view(
-        row_map_size_type.getRawPtr(), numMyRows + 1);
-    DeviceLocalMatrix<ST>::index_type  indices_view(indices, numMyNonzeros);
-    DeviceLocalMatrix<ST>::values_type values_view(values, numMyNonzeros);
-
-    // Build the matrix.
-    DeviceLocalMatrix<ST> data(
-        "Epetra device data",
-        numMyRows,
-        numMyCols,
-        numMyNonzeros,
-        values_view,
-        row_map_view,
-        indices_view);
-    return data;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -1371,76 +851,6 @@ getNonconstDeviceData(Teuchos::RCP<Thyra_LinearOp>& lop)
     DeviceLocalMatrix<ST> data = tmat->getLocalMatrix();
     return data;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getEpetraMatrix(lop, false);
-  if (!emat.is_null()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        (!std::is_same<PHX::Device::memory_space, Kokkos::HostSpace>::value),
-        std::logic_error,
-        "Error in getNonconstDeviceData! Cannot use Epetra if the memory space "
-        "of PHX::Device is not the HostSpace.\n");
-
-    // If you want the output DeviceLocalMatrix to have view semantic on the
-    // matrix values, you need to use the constructor that 'views' the input
-    // arrays. So we need to create views unmanaged, which need to view the
-    // matrix data. If it's not possible to view the matrix data, we need to
-    // create temporaries, and view those. If that's the case, we need to attach
-    // the temporaries to the input RCP, so that they live as long as the input
-    // LinearOp. WARNING: This is *highly* relying on Epetra_CrsMatrix internal
-    // storage.
-    //          More precisely, I'm not even sure this routine could be fixed
-    //          if Epetra_CrsMatrix changes the internal storage scheme.
-
-    using StaticGraphType = DeviceLocalMatrix<ST>::staticcrsgraph_type;
-    using size_type       = StaticGraphType::size_type;
-
-    // Some data from the matrix
-    const int numMyRows     = emat->NumMyRows();
-    const int numMyCols     = emat->NumMyCols();
-    const int numMyNonzeros = emat->NumMyNonzeros();
-
-    // Grab the data
-    LO* row_map;
-    LO* indices;
-    ST* values;
-    int err_code = emat->ExtractCrsDataPointers(row_map, indices, values);
-    ALBANY_EXPECT(
-        err_code == 0,
-        "Error in getNonconstDeviceData! Something went wrong while extracting "
-        "Epetra_CrsMatrix local data pointers.\n");
-    (void)err_code;
-    Teuchos::ArrayRCP<size_type> row_map_size_type(numMyRows + 1);
-    for (int i = 0; i < numMyRows + 1; ++i) {
-      row_map_size_type[i] = static_cast<size_type>(row_map[i]);
-    }
-    // Attach the temporary to the input RCP, to prolong its life time. Last
-    // arg=false, so we replace possibly existing data without throwing.
-    Teuchos::set_extra_data(
-        row_map_size_type,
-        "row_map as size_type",
-        Teuchos::outArg(lop),
-        Teuchos::POST_DESTROY,
-        false);
-
-    // Create unmanaged views
-    DeviceLocalMatrix<ST>::row_map_type row_map_view(
-        row_map_size_type.getRawPtr(), numMyRows + 1);
-    DeviceLocalMatrix<ST>::index_type  indices_view(indices, numMyNonzeros);
-    DeviceLocalMatrix<ST>::values_type values_view(values, numMyNonzeros);
-
-    // Build the matrix.
-    DeviceLocalMatrix<ST> data(
-        "Epetra device data",
-        numMyRows,
-        numMyCols,
-        numMyNonzeros,
-        values_view,
-        row_map_view,
-        indices_view);
-    return data;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -1521,10 +931,6 @@ getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv)
 {
   auto tv = getConstTpetraMultiVector(mv, false);
   if (!tv.is_null()) { return tv->getNumVectors(); }
-#if defined(ALBANY_EPETRA)
-  auto ev = getConstEpetraMultiVector(mv, false);
-  if (!ev.is_null()) { return ev->NumVectors(); }
-#endif
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1648,19 +1054,6 @@ getDeviceData(const Teuchos::RCP<const Thyra_Vector>& v)
     return data;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto evec = getConstEpetraVector(v, false);
-  if (!evec.is_null()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        (!std::is_same<PHX::Device::memory_space, Kokkos::HostSpace>::value),
-        std::logic_error,
-        "Error in getDeviceData! Cannot use Epetra if the memory space of "
-        "PHX::Device is not the HostSpace.\n");
-    DeviceView1d<const ST> data(evec->Values(), evec->MyLength());
-    return data;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1683,19 +1076,6 @@ getNonconstDeviceData(const Teuchos::RCP<Thyra_Vector>& v)
     DeviceView1d<ST> data   = Kokkos::subview(data2d, Kokkos::ALL(), 0);
     return data;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto evec = getEpetraVector(v, false);
-  if (!evec.is_null()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        (!std::is_same<PHX::Device::memory_space, Kokkos::HostSpace>::value),
-        std::logic_error,
-        "Error in getNonconstDeviceData! Cannot use Epetra if the memory space "
-        "of PHX::Device is not the HostSpace.\n");
-    DeviceView1d<ST> data(evec->Values(), evec->MyLength());
-    return data;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -1751,14 +1131,6 @@ describe<Thyra_VectorSpace>(
     return;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto evs = getEpetraBlockMap(vs, false);
-  if (!evs.is_null()) {
-    evs->Print(*out.getOStream());
-    return;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1781,14 +1153,6 @@ describe<Thyra_Vector>(
     return;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto ev = getConstEpetraVector(v, false);
-  if (!ev.is_null()) {
-    ev->Print(*out.getOStream());
-    return;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1810,14 +1174,6 @@ describe<Thyra_LinearOp>(
     top->describe(out, verbLevel);
     return;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto emat = getConstEpetraMatrix(op, false);
-  if (!emat.is_null()) {
-    emat->Print(*out.getOStream());
-    return;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -1845,17 +1201,6 @@ writeMatrixMarket<const Thyra_Vector>(
     writeMatrixMarket(tv, prefix, counter);
     return;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto ev = getConstEpetraVector(v, false);
-  if (!ev.is_null()) {
-    // TODO: avoid petra conversion, and call EpetraExt I/O directly
-    tv = Petra::EpetraVector_To_TpetraVectorConst(
-        *ev, createTeuchosCommFromEpetraComm(ev->Comm()));
-    writeMatrixMarket(tv, prefix, counter);
-    return;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -1889,17 +1234,6 @@ writeMatrixMarket<const Thyra_MultiVector>(
     return;
   }
 
-#if defined(ALBANY_EPETRA)
-  auto emv = getConstEpetraMultiVector(mv, false);
-  if (!emv.is_null()) {
-    // TODO: avoid petra conversion, and call EpetraExt I/O directly
-    tmv = Petra::EpetraMultiVector_To_TpetraMultiVector(
-        *emv, createTeuchosCommFromEpetraComm(emv->Comm()));
-    writeMatrixMarket(tmv, prefix, counter);
-    return;
-  }
-#endif
-
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
@@ -1931,35 +1265,6 @@ writeMatrixMarket<const Thyra_LinearOp>(
     writeMatrixMarket(tA, prefix, counter);
     return;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto eA = getConstEpetraMatrix(A, false);
-  if (!eA.is_null()) {
-    // TODO: avoid petra conversion, and call EpetraExt I/O directly
-    tA = Petra::EpetraCrsMatrix_To_TpetraCrsMatrix(
-        *eA, createTeuchosCommFromEpetraComm(eA->Comm()));
-    writeMatrixMarket(tA, prefix, counter);
-    return;
-  } else {
-    // It may be a Thyra::EpetraLinearOp. Try to extract the op
-    auto eLop = Teuchos::rcp_dynamic_cast<const Thyra::EpetraLinearOp>(A);
-    if (!eLop.is_null()) {
-      auto eMat =
-          Teuchos::rcp_dynamic_cast<const Epetra_CrsMatrix>(eLop->epetra_op());
-      TEUCHOS_TEST_FOR_EXCEPTION(
-          eMat.is_null(),
-          std::logic_error,
-          "Error in writeMatrixMarket! The thyra linear op is of type "
-          "Thyra::EpetraLinearOp, "
-          "but the stored Epetra_Operator rcp is either null or not of "
-          "concrete type Epetra_CrsMatrix.\n");
-      tA = Petra::EpetraCrsMatrix_To_TpetraCrsMatrix(
-          *eMat, createTeuchosCommFromEpetraComm(eMat->Comm()));
-      writeMatrixMarket(tA, prefix, counter);
-      return;
-    }
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(
@@ -1994,17 +1299,6 @@ writeMatrixMarket<const Thyra_VectorSpace>(
     writeMatrixMarket(tm, prefix, counter);
     return;
   }
-
-#if defined(ALBANY_EPETRA)
-  auto em = getEpetraBlockMap(vs, false);
-  if (!em.is_null()) {
-    // TODO: avoid petra conversion, and call EpetraExt I/O directly
-    tm = Petra::EpetraMap_To_TpetraMap(
-        *em, createTeuchosCommFromEpetraComm(em->Comm()));
-    writeMatrixMarket(tm, prefix, counter);
-    return;
-  }
-#endif
 
   // If all the tries above are unsuccessful, throw an error.
   TEUCHOS_TEST_FOR_EXCEPTION(

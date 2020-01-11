@@ -6,7 +6,6 @@
 #include "Albany_ThyraCrsMatrixFactory.hpp"
 #include "Albany_TpetraThyraUtils.hpp"
 #include "Albany_Utils.hpp"
-#include "Petra_Converters.hpp"
 #include "Teuchos_CompilerCodeTweakMacros.hpp"
 #include "Teuchos_RCP.hpp"
 #include "Thyra_DefaultSpmdVector.hpp"

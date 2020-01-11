@@ -34,22 +34,6 @@ SET(SOURCES
   PHAL_Utilities.cpp
   )
 
-IF (ALBANY_EPETRA)
-  SET(SOURCES ${SOURCES} Albany_ObserverFactory.cpp)
-  SET(SOURCES ${SOURCES} Petra_Converters_64.cpp)
-ENDIF()
-
-
-IF(ALBANY_EPETRA)
-  SET(SOURCES ${SOURCES}
-    Albany_NOXObserver.cpp
-    Albany_NOXStatelessObserver.cpp
-  )
-  IF(ALBANY_RYTHMOS)
-    SET(SOURCES ${SOURCES} Albany_RythmosObserver.cpp)
-  ENDIF()
-ENDIF()
-
 SET(HEADERS
   Albany_Application.hpp
   Albany_DataTypes.hpp
@@ -83,19 +67,6 @@ SET(HEADERS
   PHAL_Utilities_Def.hpp
   PHAL_Workset.hpp
   )
-
-IF(ALBANY_EPETRA)
-  SET(HEADERS ${HEADERS}
-    Albany_EigendataInfoStruct.hpp
-    Albany_NOXObserver.hpp
-    Albany_NOXStatelessObserver.hpp
-    Albany_ObserverFactory.hpp
-    Petra_Converters.hpp
-  )
-  IF(ALBANY_RYTHMOS)
-    SET(SOURCES ${SOURCES} Albany_RythmosObserver.hpp)
-  ENDIF()
-ENDIF()
 
 #utility
 SET(SOURCES ${SOURCES}
@@ -140,18 +111,6 @@ SET(HEADERS ${HEADERS}
   utility/math/TensorDetail.hpp
   utility/math/TensorImpl.hpp
   )
-
-IF (ALBANY_EPETRA)
-  SET(SOURCES ${SOURCES}
-    utility/Albany_EpetraThyraUtils.cpp
-    utility/Albany_CombineAndScatterManagerEpetra.cpp
-  )
-  SET(HEADERS ${HEADERS}
-    utility/Albany_EpetraThyraUtils.hpp
-    utility/Albany_CombineAndScatterManagerEpetra.hpp
-    utility/Albany_GlobalLocalIndexerEpetra.hpp
-  )
-ENDIF()
 
 add_executable(xml2yaml utility/xml2yaml.cpp)
 add_executable(yaml2xml utility/yaml2xml.cpp)
@@ -540,18 +499,6 @@ IF (ALBANY_STK)
   SET(HEADERS ${HEADERS}
     evaluators/state/PHAL_SaveSideSetStateField.hpp
     evaluators/state/PHAL_SaveSideSetStateField_Def.hpp)
-ENDIF()
-
-
-IF (ALBANY_EPETRA)
-  SET(HEADERS ${HEADERS}
-    evaluators/gather/PHAL_GatherEigenvectors.hpp
-    evaluators/gather/PHAL_GatherEigenvectors_Def.hpp
-    evaluators/gather/PHAL_GatherEigenData.hpp
-    evaluators/gather/PHAL_GatherEigenData_Def.hpp
-    evaluators/scatter/PHAL_SeparableScatterScalarResponse.hpp
-    evaluators/scatter/PHAL_SeparableScatterScalarResponse_Def.hpp
-  )
 ENDIF()
 
 SET(PDE_HDRS ${PDE_HDRS}

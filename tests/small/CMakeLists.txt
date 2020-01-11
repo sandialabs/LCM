@@ -42,10 +42,6 @@ IF(ALBANY_STK) # STK is needed for all these
   add_subdirectory(Utils)
 ENDIF(ALBANY_STK)
 
-IF(ALBANY_SCOREC)
-  add_subdirectory(Heat3DPUMI)
-ENDIF()
-
 IF(ALBANY_STK)
   # DEMO PDES ###############
   IF(ALBANY_DEMO_PDES)
@@ -82,24 +78,4 @@ ENDIF(ALBANY_STK)
 IF(ALBANY_LCM)
    add_subdirectory(LCM)
 ENDIF()
-
-IF(ALBANY_STK)
-
-  # ATO ##################
-  IF(ALBANY_ATO)
-    add_subdirectory(ATO)
-  ENDIF()
-
-  # LandIce ##################
-  IF(ALBANY_LANDICE AND ALBANY_SEACAS )
-    add_subdirectory(LandIce)
-  ENDIF()
-
-  # LandIce ##################
-  IF(ALBANY_TSUNAMI AND ALBANY_SEACAS )
-    # add_subdirectory(Tsunami)
-  ENDIF()
-
-ENDIF()
-
 ###################

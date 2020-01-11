@@ -21,40 +21,4 @@ set(performanceTestScript_2
 
 # Heat Transfer Problems ###############
 add_subdirectory(SteadyHeat2D)
-IF(ALBANY_SEACAS)
-  #add_subdirectory(SteadyHeat2DSS)
-ENDIF()
-
-# LCM ###############
-IF(ALBANY_LCM)
-
-  IF(ALBANY_SCOREC)
-# Not sure if this runs for anyone...
-  #  add_subdirectory(Necking3D)
-  ENDIF()
-
-  IF(ALBANY_HYDRIDE)
-    #add_subdirectory(LaplaceBeltrami)
-  ENDIF()
-
-ENDIF(ALBANY_LCM)
-
-# QCAD ##################
-
-IF(ALBANY_QCAD)
-  add_subdirectory(Poisson)
-ENDIF()
-
-# FELIX ##################
-
-IF(ALBANY_FELIX )
-  add_subdirectory(FELIX_FO_MMS)
-ENDIF()
-
-# MOR   ##################
-
-IF(ALBANY_MOR)
-  #add_subdirectory(MOR)
-ENDIF()
-
 ###################

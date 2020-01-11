@@ -1,2 +1,0 @@
-00 04 * * 1-5  cd /home/ikalash/nightlyAlbanyCDash; bash -l -c "bash nightly_cron_script_albany.sh; bash nightly_cron_script_cismAlbany.sh"; bash process_results.sh; bash send_email.sh; bash process_results_cismAlbany.sh; bash send_email_cismAlbany.sh
-

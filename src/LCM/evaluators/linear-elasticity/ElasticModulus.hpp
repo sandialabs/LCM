@@ -8,6 +8,7 @@
 #define ELASTIC_MOUDULS_HPP
 
 #include "Albany_config.h"
+#include "Albany_Types.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

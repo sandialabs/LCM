@@ -8,9 +8,7 @@
 #define SURFACESCALARGRADIENT_HPP
 
 #include "Albany_Layouts.hpp"
-#include "Albany_SacadoTypes.hpp"
-#include "PHAL_AlbanyTraits.hpp"
-#include "PHAL_Dimension.hpp"
+#include "Albany_Types.hpp"
 #include "Intrepid2_CellTools.hpp"
 #include "Intrepid2_Cubature.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"

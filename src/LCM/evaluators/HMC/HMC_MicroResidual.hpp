@@ -7,9 +7,7 @@
 #ifndef HMC_ELASTICITYRESID_HPP
 #define HMC_ELASTICITYRESID_HPP
 
-#include "Albany_SacadoTypes.hpp"
-#include "PHAL_AlbanyTraits.hpp"
-#include "PHAL_Dimension.hpp"
+#include "Albany_Types.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

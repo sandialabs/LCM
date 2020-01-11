@@ -9,9 +9,7 @@
 
 #include "Albany_Layouts.hpp"
 #include "Albany_MaterialDatabase.hpp"
-#include "Albany_SacadoTypes.hpp"
-#include "PHAL_AlbanyTraits.hpp"
-#include "PHAL_Dimension.hpp"
+#include "Albany_Types.hpp"
 #include "Phalanx_Evaluator_Utilities.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_FieldManager.hpp"

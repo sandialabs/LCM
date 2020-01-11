@@ -7,6 +7,7 @@
 #ifndef DEFGRAD_HPP
 #define DEFGRAD_HPP
 
+#include "Albany_Types.hpp"
 #include "Intrepid2_CellTools.hpp"
 #include "Intrepid2_Cubature.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"

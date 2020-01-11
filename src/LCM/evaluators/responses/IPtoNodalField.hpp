@@ -7,14 +7,14 @@
 #if !defined(LCM_IPtoNodalField_hpp)
 #define LCM_IPtoNodalField_hpp
 
-#include <Phalanx_DataLayout.hpp>
-#include <Phalanx_Evaluator_Derived.hpp>
-#include <Phalanx_Evaluator_WithBaseImpl.hpp>
-#include <Phalanx_MDField.hpp>
-#include <Teuchos_ParameterList.hpp>
-
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_StateManager.hpp"
+#include "Albany_Types.hpp"
+#include "Phalanx_DataLayout.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace LCM {
 class IPtoNodalFieldManager;

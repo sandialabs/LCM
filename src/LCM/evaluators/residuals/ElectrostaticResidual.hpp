@@ -7,13 +7,13 @@
 #if !defined(LCM_Electrostatic_Residual_hpp)
 #define LCM_Electrostatic_Residual_hpp
 
-#include <Phalanx_Evaluator_Derived.hpp>
-#include <Phalanx_Evaluator_WithBaseImpl.hpp>
-#include <Phalanx_MDField.hpp>
-#include <Phalanx_config.hpp>
-#include <Sacado_ParameterAccessor.hpp>
-
 #include "Albany_Layouts.hpp"
+#include "Albany_Types.hpp"
+#include "Phalanx_Evaluator_Derived.hpp"
+#include "Phalanx_Evaluator_WithBaseImpl.hpp"
+#include "Phalanx_MDField.hpp"
+#include "Phalanx_config.hpp"
+#include "Sacado_ParameterAccessor.hpp"
 
 namespace LCM {
 ///

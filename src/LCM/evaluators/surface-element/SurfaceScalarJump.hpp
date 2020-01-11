@@ -8,11 +8,9 @@
 #define SURFACESCALARJUMP_HPP
 
 #include "Albany_Layouts.hpp"
-#include "Albany_SacadoTypes.hpp"
+#include "Albany_Types.hpp"
 #include "Intrepid2_CellTools.hpp"
 #include "Intrepid2_Cubature.hpp"
-#include "PHAL_AlbanyTraits.hpp"
-#include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"

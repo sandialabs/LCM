@@ -168,10 +168,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   comm->Barrier();
 #endif
 
-#if !defined(ALBANY_EPETRA)
-  removeEpetraRelatedPLs(params);
-#endif
-
   // Create problem object
   problemParams = Teuchos::sublist(params, "Problem", true);
 
@@ -1760,33 +1756,11 @@ Application::computeGlobalJacobian(
   }
   if (computeJacCondNum !=
       0) {  // If requesting computation of condition number
-#if defined(ALBANY_EPETRA)
-    if (computeJacCondNum == -1) {
-      // cout jacobian condition # every time it arises
-      double condNum = computeConditionNumber(jac);
-      *out << "Jacobian #" << countJac << " condition number = " << condNum
-           << "\n";
-    } else if (countJac == computeJacCondNum) {
-      // cout jacobian condition # only at requested count#
-      double condNum = computeConditionNumber(jac);
-      *out << "Jacobian #" << countJac << " condition number = " << condNum
-           << "\n";
-    }
-#else
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         std::logic_error,
-        "Error in Albany::Application: Compute Jacobian Condition Number debug "
-        "option "
-        "currently relies on an Epetra-based routine in AztecOO.\n To use this "
-        "option, please "
-        "rebuild Albany with ENABLE_ALBANY_EPETRA=ON.\nYou will then be able "
-        "to have Albany "
-        "output the Jacobian condition number when running either the Tpetra "
-        "or Epetra stack.\n"
-        "Notice that ENABLE_ALBANY_EPETRA is ON by default, so you must have "
-        "disabled it explicitly.\n");
-#endif
+        "Error in Albany::Application: Compute Jacobian Condition Number debug"
+        "option currently relies on an Epetra-based routine in AztecOO.\n");
   }
   if (writeToMatrixMarketJac != 0 || writeToCoutJac != 0 ||
       computeJacCondNum != 0) {

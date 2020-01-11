@@ -366,13 +366,6 @@ IF (ALBANY_STK)
    evaluators/state/PHAL_SaveSideSetStateField.cpp)
 ENDIF()
 
-IF (ALBANY_EPETRA)
-  SET(SOURCES ${SOURCES}
-    evaluators/gather/PHAL_GatherEigenData.cpp
-    evaluators/gather/PHAL_GatherEigenvectors.cpp
-  )
-ENDIF()
-
 SET(PDE_SRCS ${PDE_SRCS}
   evaluators/pde/PHAL_AdvDiffResid.cpp
   evaluators/pde/PHAL_ReactDiffSystemResid.cpp

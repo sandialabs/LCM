@@ -745,29 +745,6 @@ IF (LCM_TEST_EXES)
 ENDIF()
 
 IF (LCM_TEST_EXES AND (ALBANY_LAME OR ALBANY_LAMENT))
-  IF(ALBANY_EPETRA)
-    add_executable(utLameStress_elastic
-      ${Albany_SOURCE_DIR}/src/PHAL_Dimension.cpp
-      ${Albany_SOURCE_DIR}/src/PHAL_AlbanyTraits.cpp
-      ${Albany_SOURCE_DIR}/src/Albany_Utils.cpp
-      ${Albany_SOURCE_DIR}/src/Albany_StateManager.cpp
-      ${Albany_SOURCE_DIR}/src/Petra_Converters_64.cpp
-      ${Albany_SOURCE_DIR}/src/disc/stk/Albany_GenericSTKMeshStruct.cpp
-      ${Albany_SOURCE_DIR}/src/disc/stk/Albany_GenericSTKFieldContainer.cpp
-      ${Albany_SOURCE_DIR}/src/disc/stk/Albany_MultiSTKFieldContainer.cpp
-      ${Albany_SOURCE_DIR}/src/disc/stk/Albany_OrdinarySTKFieldContainer.cpp
-      ${Albany_SOURCE_DIR}/src/disc/stk/Albany_TmplSTKMeshStruct.cpp
-      ${Albany_SOURCE_DIR}/src/disc/stk/Albany_STKNodeSharing.cpp
-      ${Albany_SOURCE_DIR}/src/disc/stk/Albany_STKDiscretization.cpp
-      ${Albany_SOURCE_DIR}/src/disc/stk/Albany_STKNodeFieldContainer.cpp
-      ${Albany_SOURCE_DIR}/src/LCM/utils/MaterialDatabase.cpp
-      utils/lame/LameUtils.cpp
-      evaluators/lame/LameStress.cpp
-      evaluators/SetField.cpp
-      test/unit_tests/StandardUnitTestMain.cpp
-      test/unit_tests/utLameStress_elastic.cpp
-      )
-  ELSE()
     add_executable(utLameStress_elastic
       ${Albany_SOURCE_DIR}/src/PHAL_Dimension.cpp
       ${Albany_SOURCE_DIR}/src/PHAL_AlbanyTraits.cpp
@@ -788,7 +765,6 @@ IF (LCM_TEST_EXES AND (ALBANY_LAME OR ALBANY_LAMENT))
       test/unit_tests/StandardUnitTestMain.cpp
       test/unit_tests/utLameStress_elastic.cpp
       )
-  ENDIF()
 
   IF(ALBANY_STK_REBALANCE)
     target_link_libraries(utLameStress_elastic albanySTKRebalance albanyLib ${LAME_LIB} ${LAMENT_LIB} ${MATH_TOOLKIT_LIB} ${ALB_TRILINOS_LIBS} ${Trilinos_EXTRA_LD_FLAGS})

@@ -48,19 +48,6 @@ void
 GatherAuxData<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   auto nodeID = workset.wsElNodeEqID;
-#ifdef ALBANY_EPETRA
-  if (workset.auxDataPtr !=
-      Teuchos::null) {  // Epetra case: check if workset.auxDataPtr is null.
-    const Epetra_Vector& v = *((*(workset.auxDataPtr))(auxDataIndex));
-
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < this->numNodes; ++node) {
-        int offsetIntoVec = nodeID(cell, node, 0);  // neq==1 hardwired
-        this->vector_data(cell, node) = v[offsetIntoVec];
-      }
-    }
-  } else {  // Tpetra case
-#endif
     Teuchos::RCP<const Tpetra_Vector> vT =
         (workset.auxDataPtrT)->getVector(auxDataIndex);
     Teuchos::ArrayRCP<ST const> vT_constView = vT->get1dView();
@@ -70,9 +57,6 @@ GatherAuxData<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         this->vector_data(cell, node) = vT_constView[offsetIntoVec];
       }
     }
-#ifdef ALBANY_EPETRA
-  }
-#endif
 }
 
 // **********************************************************************

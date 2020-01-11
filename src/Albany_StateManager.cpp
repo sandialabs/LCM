@@ -4,7 +4,6 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 #include "Albany_StateManager.hpp"
-
 #include "Albany_Utils.hpp"
 #include "Teuchos_TestForException.hpp"
 #include "Teuchos_VerboseObject.hpp"
@@ -904,41 +903,6 @@ Albany::StateManager::updateStates()
     }
   }
 }
-
-#if defined(ALBANY_EPETRA)
-Teuchos::RCP<Albany::EigendataStruct>
-Albany::StateManager::getEigenData()
-{
-  return eigenData;
-}
-
-void
-Albany::StateManager::setEigenData(
-    const Teuchos::RCP<Albany::EigendataStruct>& eigdata)
-{
-  eigenData = eigdata;
-}
-
-Teuchos::RCP<Epetra_MultiVector>
-Albany::StateManager::getAuxData()
-{
-  return auxData;
-}
-
-Teuchos::RCP<Tpetra_MultiVector>
-Albany::StateManager::getAuxDataT()
-{
-  return auxDataT;
-}
-
-void
-Albany::StateManager::setAuxData(
-    const Teuchos::RCP<Epetra_MultiVector>& aux_data)
-{
-  auxData = aux_data;
-}
-
-#endif
 
 void
 Albany::StateManager::setAuxDataT(

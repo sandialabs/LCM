@@ -11,15 +11,11 @@
 #include <set>
 #include <string>
 
+#include "Albany_DiscretizationUtils.hpp"
 #include "Albany_SacadoTypes.hpp"
+#include "Albany_StateInfoStruct.hpp"
 #include "Albany_ThyraTypes.hpp"
 #include "Albany_TpetraTypes.hpp"
-
-#if defined(ALBANY_LCM)
-#include <set>
-#endif
-#include "Albany_DiscretizationUtils.hpp"
-#include "Albany_StateInfoStruct.hpp"
 #include "Kokkos_ViewFactory.hpp"
 #include "PHAL_Setup.hpp"
 #include "Teuchos_Comm.hpp"
@@ -34,13 +30,7 @@ class DistributedParameterLibrary;
 // Forward declaration needed for Schwarz coupling
 class Application;
 #endif
-#if defined(ALBANY_EPETRA)
-struct EigendataStruct;
-#endif
 }  // namespace Albany
-#if defined(ALBANY_EPETRA)
-class Epetra_MultiVector;
-#endif
 
 namespace PHAL {
 
@@ -141,11 +131,6 @@ struct Workset
   int spatial_dimension_{0};
 
   Albany::StateArray* stateArrayPtr;
-#if defined(ALBANY_EPETRA)
-  Teuchos::RCP<Albany::EigendataStruct> eigenDataPtr;
-  Teuchos::RCP<Epetra_MultiVector>      auxDataPtr;
-#endif
-  // Teuchos::RCP<Albany::EigendataStructT> eigenDataPtrT;
   Teuchos::RCP<Tpetra_MultiVector> auxDataPtrT;
 
   bool transientTerms;

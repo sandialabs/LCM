@@ -4,21 +4,14 @@
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
 
-#include <Teuchos_ParameterList.hpp>
-#include <Teuchos_UnitTestHarness.hpp>
-
-#include "Albany_config.h"
-#ifdef ALBANY_EPETRA
-#include <Epetra_MpiComm.h>
-#endif
-#include <MiniTensor.h>
-
 #include "Albany_Layouts.hpp"
 #include "Albany_Utils.hpp"
+#include "Albany_config.h"
 #include "ConstitutiveModelInterface.hpp"
 #include "ConstitutiveModelParameters.hpp"
 #include "FieldNameMap.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
+#include "MiniTensor.h"
 #include "PHAL_AlbanyTraits.hpp"
 #include "SetField.hpp"
 #include "SurfaceBasis.hpp"
@@ -30,6 +23,8 @@
 #include "SurfaceVectorGradient.hpp"
 #include "SurfaceVectorJump.hpp"
 #include "SurfaceVectorResidual.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_UnitTestHarness.hpp"
 
 namespace {
 

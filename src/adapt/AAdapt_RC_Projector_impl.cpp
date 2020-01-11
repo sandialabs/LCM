@@ -5,23 +5,12 @@
 //*****************************************************************//
 
 #include "AAdapt_RC_Projector_impl.hpp"
-
-#include <BelosBlockCGSolMgr.hpp>
-#include <BelosThyraAdapter.hpp>
-#include <BelosTpetraAdapter.hpp>
-#include <Ifpack2_RILUK.hpp>
-
 #include "Albany_TpetraThyraUtils.hpp"
 #include "Albany_Utils.hpp"
-
-#ifdef ALBANY_EPETRA
-#include <Ifpack_ILU.h>
-
-#include "Albany_EpetraThyraUtils.hpp"
-#ifdef ALBANY_BELOS_EPETRA
-#include <BelosEpetraAdapter.hpp>
-#endif
-#endif
+#include "BelosBlockCGSolMgr.hpp"
+#include "BelosThyraAdapter.hpp"
+#include "BelosTpetraAdapter.hpp"
+#include "Ifpack2_RILUK.hpp"
 
 namespace AAdapt {
 namespace rc {
@@ -54,24 +43,11 @@ solve(
         break;
       }
       case Albany::BuildType::Epetra: {
-#ifdef ALBANY_EPETRA
-        pl_.set<int>("fact: level-of-fill", 0);
-        Teuchos::RCP<Epetra_CrsMatrix> eA =
-            Teuchos::rcp_const_cast<Epetra_CrsMatrix>(
-                Albany::getConstEpetraMatrix(A));
-        Teuchos::RCP<Ifpack_ILU> prec(new Ifpack_ILU(eA.get()));
-        prec->SetParameters(pl_);
-        prec->Initialize();
-        prec->Compute();
-        P = Albany::createThyraLinearOp(
-            Teuchos::rcp_implicit_cast<Epetra_Operator>(prec));
-#else
         TEUCHOS_TEST_FOR_EXCEPTION(
             true,
             std::logic_error,
             "Error! Albany build type is Epetra, but ALBANY_EPETRA is not "
             "defined.\n");
-#endif
         break;
       }
       default:

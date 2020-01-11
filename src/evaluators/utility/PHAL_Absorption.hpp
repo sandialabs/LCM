@@ -3,8 +3,6 @@
 //    This Software is released under the BSD license detailed     //
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
-
-// IK, 9/12/14: no Epetra
 #ifndef PHAL_ABSORPTION_HPP
 #define PHAL_ABSORPTION_HPP
 
@@ -13,10 +11,6 @@
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-#if defined(ALBANY_EPETRA)
-#include "Epetra_Vector.h"
-#endif
-
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_ParameterList.hpp"
 #ifdef ALBANY_STOKHOS

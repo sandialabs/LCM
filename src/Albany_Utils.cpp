@@ -3,29 +3,11 @@
 //    This Software is released under the BSD license detailed     //
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
-
-#include "Albany_Utils.hpp"
-
-#include "Albany_Macros.hpp"
-#include "Albany_ThyraUtils.hpp"
-
-// Include the concrete Epetra Comm's, if needed
-#if defined(ALBANY_EPETRA)
-#ifdef ALBANY_MPI
-#include "Epetra_MpiComm.h"
-#else
-#include "Epetra_SerialComm.h"
-#endif
-#endif
-
-#include <time.h>
-
+#include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
-
-#include "Kokkos_Macros.hpp"
-#include "MatrixMarket_Tpetra.hpp"
-#include "Teuchos_TestForException.hpp"
+#include <time.h>
 
 // For vtune
 #include <sys/types.h>
@@ -34,8 +16,12 @@
 // For stack trace
 #include <execinfo.h>
 
-#include <cstdarg>
-#include <cstdio>
+#include "Albany_Macros.hpp"
+#include "Albany_ThyraUtils.hpp"
+#include "Albany_Utils.hpp"
+#include "Kokkos_Macros.hpp"
+#include "MatrixMarket_Tpetra.hpp"
+#include "Teuchos_TestForException.hpp"
 
 namespace Albany {
 

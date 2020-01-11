@@ -3,16 +3,10 @@
 //    This Software is released under the BSD license detailed     //
 //    in the file "license.txt" in the top-level Albany directory  //
 //*****************************************************************//
-
-// IK, 9/12/14: no Epetra!
-
 #ifndef PHAL_FACTORY_TRAITS_HPP
 #define PHAL_FACTORY_TRAITS_HPP
 
-// Pull in all Albany configuration macros
 #include "Albany_config.h"
-
-// User Defined Evaluator Types
 
 #if defined(ALBANY_LCM)
 #include "LCM/evaluators/Time.hpp"
@@ -39,11 +33,6 @@
 #include "PHAL_SDirichlet.hpp"
 #include "PHAL_TimeDepDBC.hpp"
 #include "PHAL_TimeDepSDBC.hpp"
-
-#if defined(ALBANY_EPETRA)
-#include "PHAL_GatherAuxData.hpp"
-#endif
-
 #include "Sacado_mpl_placeholders.hpp"
 
 // \cond  Have doxygern ignore this namespace

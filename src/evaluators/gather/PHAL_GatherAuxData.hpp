@@ -14,9 +14,6 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Teuchos_ParameterList.hpp"
-#ifdef ALBANY_EPETRA
-#include "Epetra_Vector.h"
-#endif
 
 namespace PHAL {
 /** \brief Gathers auxilliary values from a workset \e auxData vector into

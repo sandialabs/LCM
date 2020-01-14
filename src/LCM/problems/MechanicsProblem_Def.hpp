@@ -625,15 +625,15 @@ MechanicsProblem::constructEvaluators(
       fm0.template registerEvaluator<EvalT>(
           evalUtils.constructDOFInterpolationEvaluator(dof_names[0], offset));
 
+      fm0.template registerEvaluator<EvalT>(
+          evalUtils.constructDOFGradInterpolationEvaluator(
+              dof_names[0], offset));
+
       if (SolutionType == SolutionMethodType::Transient) {
         fm0.template registerEvaluator<EvalT>(
             evalUtils.constructDOFInterpolationEvaluator(
                 dof_names_dot[0], offset));
       }
-
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructDOFGradInterpolationEvaluator(
-              dof_names[0], offset));
     }
 
     fm0.template registerEvaluator<EvalT>(

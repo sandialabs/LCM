@@ -36,14 +36,11 @@ namespace PHAL {
 
 struct Workset
 {
-  Workset()
-      : transientTerms(false), accelerationTerms(false), ignore_residual(false)
-  {
-  }
+  Workset() {}
 
-  unsigned int numCells;
-  unsigned int wsIndex;
-  unsigned int numEqs;
+  unsigned int numCells{0};
+  unsigned int wsIndex{0};
+  unsigned int numEqs{0};
 
   // Solution vector (and time derivatives)
   Teuchos::RCP<const Thyra_Vector> x;
@@ -77,30 +74,27 @@ struct Workset
   Teuchos::RCP<const Albany::SideSetList> sideSets;
 
   // jacobian and mass matrix coefficients for matrix fill
-  double j_coeff;
-  double m_coeff;  // d(x_dot)/dx_{new}
-  double n_coeff;  // d(x_dotdot)/dx_{new}
+  double j_coeff{0.0};
+  double m_coeff{0.0};  // d(x_dot)/dx_{new}
+  double n_coeff{0.0};  // d(x_dotdot)/dx_{new}
 
-  // Current Time as defined by Rythmos
-  double current_time;
-  // amb Nowhere set. We should either set it or remove it.
-  double previous_time;
-
-  double time_step;
+  double current_time{0.0};
+  double time_step{0.0};
 
   // flag indicating whether to sum tangent derivatives, i.e.,
   // compute alpha*df/dxdot*Vxdot + beta*df/dx*Vx + omega*df/dxddotot*Vxdotdot +
   // df/dp*Vp or compute alpha*df/dxdot*Vxdot + beta*df/dx*Vx +
   // omega*df/dxdotdot*Vxdotdot and df/dp*Vp separately
-  int num_cols_x;
-  int num_cols_p;
-  int param_offset;
+  int num_cols_x{0};
+  int num_cols_p{0};
+  int param_offset{0};
 
   // Distributed parameter derivatives
-  Teuchos::RCP<Albany::DistributedParameterLibrary> distParamLib;
-  std::string                                       dist_param_deriv_name;
-  bool                                              transpose_dist_param_deriv;
+  Teuchos::RCP<Albany::DistributedParameterLibrary>               distParamLib;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double>>> local_Vp;
+
+  std::string dist_param_deriv_name{""};
+  bool        transpose_dist_param_deriv{false};
 
   std::vector<PHX::index_size_type> Jacobian_deriv_dims;
   std::vector<PHX::index_size_type> Tangent_deriv_dims;
@@ -110,43 +104,40 @@ struct Workset
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>> wsCoords;
   Teuchos::ArrayRCP<double>                     wsSphereVolume;
   Teuchos::ArrayRCP<double*>                    wsLatticeOrientation;
-  std::string                                   EBName;
+  std::string                                   EBName{""};
 
   // Needed for Schwarz coupling and for dirichlet conditions based on dist
   // parameters.
   Teuchos::RCP<Albany::AbstractDiscretization> disc;
+
 #if defined(ALBANY_LCM)
   // Needed for Schwarz coupling
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> apps_;
-
-  Teuchos::RCP<Albany::Application> current_app_;
-
-  std::set<int> fixed_dofs_;
-
-  bool is_schwarz_bc_{false};
-
-  Teuchos::ArrayRCP<double*> boundary_indicator;
+  Teuchos::RCP<Albany::Application>                    current_app_;
+  Teuchos::ArrayRCP<double*>                           boundary_indicator;
+  std::set<int>                                        fixed_dofs_;
+  bool                                                 is_schwarz_bc_{false};
 #endif
 
   int spatial_dimension_{0};
 
-  Albany::StateArray*              stateArrayPtr;
+  Albany::StateArray*              stateArrayPtr{nullptr};
   Teuchos::RCP<Tpetra_MultiVector> auxDataPtrT;
 
-  bool transientTerms;
-  bool accelerationTerms;
+  bool transientTerms{false};
+  bool accelerationTerms{false};
 
   // Flag indicating whether to ignore residual calculations in the
   // Jacobian calculation.  This only works for some problems where the
   // the calculation of the Jacobian doesn't require calculation of the
   // residual (such as linear problems), but if it does work it can
   // significantly reduce Jacobian calculation cost.
-  bool ignore_residual;
+  bool ignore_residual{false};
 
   // Flag indicated whether we are solving the adjoint operator or the
   // forward operator.  This is used in the Albany application when
   // either the Jacobian or the transpose of the Jacobian is scattered.
-  bool is_adjoint;
+  bool is_adjoint{false};
 
   // New field manager response stuff
   Teuchos::RCP<const Teuchos::Comm<int>> comm;
@@ -208,7 +199,7 @@ struct Workset
       for (unsigned int j = 0; j < wsElNodeEqID.extent(1); j++)
         for (unsigned int k = 0; k < wsElNodeEqID.extent(2); k++)
           os << "\t\twsElNodeEqID(" << i << "," << j << "," << k
-             << ") = " << wsElNodeEqID(i, j, k) << std::endl;
+             << ") = " << wsElNodeEqID(i, j, k) << '\n';
     os << "\twsCoords : " << std::endl;
     for (int i = 0; i < wsCoords.size(); i++)
       for (int j = 0; j < wsCoords[i].size(); j++)

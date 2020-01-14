@@ -251,8 +251,6 @@ MESSAGE("End of compiler details\n")
 ## Check for some required Trilinos package dependencies (Piro, Phalanx) ##
 MESSAGE("Checking Trilinos build for required and optional packages")
 
-OPTION(ENABLE_ALBANY_EPETRA "Flag to turn on building of code depending on Epetra" ON)
-
 ###############################
 ### Check REQUIRED packages ###
 ###############################
@@ -403,15 +401,6 @@ ELSE()
   SET(ALBANY_STK_REBALANCE FALSE)
 ENDIF()
 
-# set optional dependency on Belos's Epetra subpackage
-IF (EXISTS "${Trilinos_INCLUDE_DIRS}/BelosEpetraAdapter.hpp")
-  MESSAGE("-- Looking for BelosEpetra:          Found.")
-  SET(ALBANY_BELOS_EPETRA TRUE)
-ELSE ()
-  MESSAGE("-- Looking for BelosEpetra:          NOT found.")
-  SET(ALBANY_BELOS_EPETRA FALSE)
-ENDIF()
-
 # set optional dependency on Amesos2, for solving and preconditioning
 LIST(FIND Trilinos_PACKAGE_LIST Amesos2 Amesos2_List_ID)
 IF (Amesos2_List_ID GREATER -1)
@@ -520,39 +509,8 @@ ELSE()
   SET(ALBANY_TEMPUS FALSE)
 ENDIF()
 
-# Set optional build of code depending on Epetra.
-# Be default, it will be on, so both Tpetra and Epetra capabilities are built.
-# Ideally, one should not need Epetra though, since the Tpetra stack in
-# Trilinos *should* be a superset of the Epetra one (in terms of capabilities,
-# not structures, obviously).
-
-IF (ENABLE_ALBANY_EPETRA)
-  MESSAGE("\n-- ALBANY_EPETRA is Enabled. Checking for additional Trilinos packages")
-  SET(ALBANY_EPETRA TRUE)
-
-  LIST(FIND Trilinos_PACKAGE_LIST ThyraEpetraAdapters ThyraEpetraAdapters_ID)
-  IF (ThyraEpetraAdapters_ID GREATER -1)
-    MESSAGE("-- Looking for ThyraEpetraAdapters:  Found.")
-  ELSE()
-    MESSAGE("-- Looking for ThyraEpetraAdapters:  NOT found.")
-    MESSAGE (FATAL_ERROR "ENABLE_ALBANY_EPETRA=ON requires ThyraEpetraAdapters in Trilinos.\n")
-  ENDIF()
-
-  # DAKOTA uses Epetra currently
-  LIST(FIND Trilinos_PACKAGE_LIST TriKota TriKota_List_ID)
-  IF (TriKota_List_ID GREATER -1)
-    MESSAGE("-- Looking for Dakota via TriKota:   Found.")
-    SET(ALBANY_DAKOTA TRUE)
-  ELSE()
-    MESSAGE("-- Looking for Dakota via TriKota:   NOT found.")
-    SET(ALBANY_DAKOTA FALSE)
-  ENDIF()
-
-ELSE()
-  MESSAGE("-- ALBANY_EPETRA     is NOT Enabled.")
-  SET(ALBANY_EPETRA FALSE)
-  SET(ALBANY_DAKOTA FALSE)
-ENDIF()
+SET(ALBANY_EPETRA FALSE)
+SET(ALBANY_DAKOTA FALSE)
 
 #################################################
 ### Check for optional physics sets in Albany ###
@@ -1011,9 +969,6 @@ ENDIF()
 
 # Optional CUDA settings
 IF(ALBANY_ENABLE_CUDA)
-  IF (ENABLE_ALBANY_EPETRA)
-    MESSAGE(FATAL_ERROR "\nError: Albany with Epetra is not supported with CUDA KokkosNode!  Please re-configure w/o Epetra (ENABLE_ALBANY_EPETRA=OFF).")
-  ENDIF()
   IF (ENABLE_LCM) 
     MESSAGE(FATAL_ERROR "\nError: LCM does not work with a CUDA KokkosNode!  Recompile with LCM off.")
   ENDIF()
@@ -1171,14 +1126,6 @@ IF (ENABLE_MESHDB_TOOLS)
   MESSAGE("-- Mesh database tools       are Enabled.")
   SET(ALBANY_MESHDB_TOOLS TRUE)
 ENDIF()
-
-# Repeat this warning.
-
-IF (TriKota_List_ID GREATER -1 AND NOT ENABLE_ALBANY_EPETRA)
-  MESSAGE(FATAL_ERROR "\nError:  TriKota option does not work with
-ENABLE_ALBANY_EPETRA turned off!  Turn on ENABLE_ALBANY_EPETRA if you
-want to useTriKota.")
-ENDIF (TriKota_List_ID GREATER -1 AND NOT ENABLE_ALBANY_EPETRA)
 
 # add a target to generate API documentation with Doxygen
 IF( NOT DISABLE_DOXYGEN )

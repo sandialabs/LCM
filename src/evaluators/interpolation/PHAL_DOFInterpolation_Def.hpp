@@ -44,7 +44,6 @@ DOFInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   this->utils.setFieldData(val_qp, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 // *********************************************************************
@@ -69,15 +68,9 @@ void
 DOFInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
-
-    // Intrepid2 version:
-    // for (int i=0; i < val_qp.size() ; i++) val_qp[i] = 0.0;
-    // Intrepid2::FunctionSpaceTools:: evaluate<ScalarT>(val_qp, val_node, BF);
 #ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
-      // ScalarT& vqp = val_qp(cell,qp);
       val_qp(cell, qp) = val_node(cell, 0) * BF(cell, 0, qp);
       for (std::size_t node = 1; node < numNodes; ++node) {
         val_qp(cell, qp) += val_node(cell, node) * BF(cell, node, qp);

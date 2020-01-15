@@ -115,7 +115,6 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
       }
     }
   }
-//  Intrepid2::FunctionSpaceTools::evaluate<ScalarT>(val_qp, val_node, BF);
 #else
 
 #ifdef ALBANY_TIMER

@@ -52,8 +52,6 @@ class DOFInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::size_t numNodes;
   std::size_t numQPs;
 
-  MDFieldMemoizer<Traits> memoizer;
-
  public:
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
   struct DOFInterpolationBase_Tag

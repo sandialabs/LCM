@@ -61,7 +61,6 @@ class DOFGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   int numSideQPs;
   int numDims;
 
-  MDFieldMemoizer<Traits> memoizer;
 };
 
 // Some shortcut names

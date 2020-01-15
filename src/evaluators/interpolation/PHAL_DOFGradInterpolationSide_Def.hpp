@@ -56,7 +56,6 @@ DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   this->utils.setFieldData(grad_qp, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 //**********************************************************************
@@ -66,7 +65,6 @@ DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   const std::vector<Albany::SideStruct>& sideSet =
       workset.sideSets->at(sideSetName);

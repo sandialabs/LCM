@@ -94,7 +94,6 @@ ComputeBasisFunctions<EvalT, Traits>::postRegistrationSetup(
       grad_at_cub_points, refPoints, Intrepid2::OPERATOR_GRAD);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 //**********************************************************************
@@ -103,7 +102,6 @@ void
 ComputeBasisFunctions<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   /** The allocated size of the Field Containers must currently
     * match the full workset size of the allocated PHX Fields,

@@ -46,7 +46,6 @@ QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::
   this->utils.setFieldData(field_cell, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 //**********************************************************************
@@ -55,7 +54,6 @@ void
 QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   MeshScalarT meas;
   int         numQPs = qp_dims[1];

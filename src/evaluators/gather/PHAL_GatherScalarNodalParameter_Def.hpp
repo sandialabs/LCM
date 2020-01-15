@@ -41,7 +41,6 @@ GatherScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(
       this->dependentFields(),
       this->evaluatedFields(),
       d.memoizer_for_params_active());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 // **********************************************************************
@@ -73,7 +72,6 @@ void
 GatherScalarNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (this->memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   Teuchos::RCP<const Thyra_Vector> pvec =
       workset.distParamLib->get(this->param_name)->overlapped_vector();
@@ -110,7 +108,6 @@ void
 GatherScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (this->memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?
@@ -183,7 +180,6 @@ void
 GatherScalarNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
     evaluateFields(typename Traits::EvalData workset)
 {
-  if (this->memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   // Distributed parameter vector
   Teuchos::RCP<const Thyra_Vector> pvec =
@@ -280,7 +276,6 @@ GatherScalarExtruded2DNodalParameter<
     PHAL::AlbanyTraits::DistParamDeriv,
     Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  if (this->memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?

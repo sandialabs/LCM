@@ -57,7 +57,6 @@ MapToPhysicalFrame<EvalT, Traits>::postRegistrationSetup(
   cubature->getCubature(refPoints, refWeights);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 //**********************************************************************
 template <typename EvalT, typename Traits>
@@ -65,7 +64,6 @@ void
 MapToPhysicalFrame<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   if (intrepidBasis != Teuchos::null) {
     Intrepid2::CellTools<PHX::Device>::mapToPhysicalFrame(

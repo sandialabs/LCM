@@ -59,7 +59,6 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::size_t numQPs;
   std::size_t numDims;
 
-  MDFieldMemoizer<Traits> memoizer;
 
 #ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:

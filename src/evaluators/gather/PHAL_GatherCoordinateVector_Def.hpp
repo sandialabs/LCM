@@ -76,7 +76,6 @@ GatherCoordinateVector<EvalT, Traits>::postRegistrationSetup(
   numDim      = dims[2];
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 // **********************************************************************
@@ -85,7 +84,6 @@ void
 GatherCoordinateVector<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   unsigned int                                  numCells = workset.numCells;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>> wsCoords = workset.wsCoords;

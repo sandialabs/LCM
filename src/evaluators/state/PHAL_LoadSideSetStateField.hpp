@@ -41,7 +41,6 @@ class LoadSideSetStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::string fieldName;
   std::string stateName;
 
-  MDFieldMemoizer<Traits> memoizer;
 };
 
 template <typename EvalT, typename Traits>

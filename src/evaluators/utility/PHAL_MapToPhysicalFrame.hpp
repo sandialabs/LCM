@@ -49,7 +49,6 @@ class MapToPhysicalFrame : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   int numQPs, numDim;
 
-  MDFieldMemoizer<Traits> memoizer;
 
   // Input:
   Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;

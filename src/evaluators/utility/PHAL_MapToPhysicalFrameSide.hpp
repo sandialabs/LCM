@@ -55,7 +55,6 @@ class MapToPhysicalFrameSide : public PHX::EvaluatorWithBaseImpl<Traits>,
   int         numSideQPs;
   std::string sideSetName;
 
-  MDFieldMemoizer<Traits> memoizer;
 
   // Input:
   //! Values at vertices

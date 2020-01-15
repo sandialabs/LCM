@@ -42,7 +42,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::postRegistrationSetup(
   this->utils.setFieldData(field, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 template <typename EvalT, typename Traits, typename ScalarType>
@@ -50,7 +49,6 @@ void
 LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   TEUCHOS_TEST_FOR_EXCEPTION(
       workset.sideSets == Teuchos::null,

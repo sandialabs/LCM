@@ -111,7 +111,6 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   val_side_qp.dimensions(dims_side);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 //**********************************************************************
@@ -124,7 +123,6 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
     return;
   }
 
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   const std::vector<Albany::SideStruct>& sideSet =
       workset.sideSets->at(sideSetName);

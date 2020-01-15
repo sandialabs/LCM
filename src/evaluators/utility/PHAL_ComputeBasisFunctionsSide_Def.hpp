@@ -153,7 +153,6 @@ ComputeBasisFunctionsSide<EvalT, Traits>::postRegistrationSetup(
         Kokkos::DynRankView<int, PHX::Device>("cellOnSide_i", numCells);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 //**********************************************************************
@@ -162,7 +161,6 @@ void
 ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   // TODO: use Intrepid routines as much as possible
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;

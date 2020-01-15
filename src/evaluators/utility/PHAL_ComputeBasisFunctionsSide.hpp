@@ -43,7 +43,6 @@ class ComputeBasisFunctionsSide : public PHX::EvaluatorWithBaseImpl<Traits>,
  private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
   int numSides, numSideNodes, numSideQPs, numCellDims, numSideDims, numNodes;
-  MDFieldMemoizer<Traits> memoizer;
 
   //! The side set where to compute the Basis Functions
   std::string sideSetName;

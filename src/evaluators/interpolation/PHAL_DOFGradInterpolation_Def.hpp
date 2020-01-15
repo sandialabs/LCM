@@ -51,7 +51,6 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   this->utils.setFieldData(grad_val_qp, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 // *********************************************************************
@@ -123,7 +122,6 @@ void
 DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
     // Intrepid2 Version:
     // for (int i=0; i < grad_val_qp.size() ; i++) grad_val_qp[i] = 0.0;

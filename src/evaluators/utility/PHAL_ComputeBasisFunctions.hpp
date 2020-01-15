@@ -43,7 +43,6 @@ class ComputeBasisFunctions : public PHX::EvaluatorWithBaseImpl<Traits>,
  private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
   int                     numVertices, numDims, numNodes, numQPs, numCells;
-  MDFieldMemoizer<Traits> memoizer;
 
   // Input:
   //! Coordinate vector at vertices

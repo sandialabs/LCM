@@ -84,7 +84,6 @@ MapToPhysicalFrameSide<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(coords_side_qp, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 template <typename EvalT, typename Traits>
@@ -96,7 +95,6 @@ MapToPhysicalFrameSide<EvalT, Traits>::evaluateFields(
     return;
   }
 
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   const std::vector<Albany::SideStruct>& sideSet =
       workset.sideSets->at(sideSetName);

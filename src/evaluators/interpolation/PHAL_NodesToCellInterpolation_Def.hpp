@@ -59,7 +59,6 @@ NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   this->utils.setFieldData(field_cell, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 //**********************************************************************
@@ -68,7 +67,6 @@ void
 NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   MeshScalarT meas;
   ScalarT     field_qp;

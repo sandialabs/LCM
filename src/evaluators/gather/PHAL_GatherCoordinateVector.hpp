@@ -56,7 +56,6 @@ class GatherCoordinateVector : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::size_t numVertices;
   std::size_t numDim;
 
-  MDFieldMemoizer<Traits> memoizer;
 };
 
 }  // namespace PHAL

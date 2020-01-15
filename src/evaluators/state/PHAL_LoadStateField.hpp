@@ -40,7 +40,6 @@ class LoadStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::string              fieldName;
   std::string              stateName;
 
-  MDFieldMemoizer<Traits> memoizer;
 };
 
 template <typename EvalT, typename Traits>
@@ -65,7 +64,6 @@ class LoadStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::string                fieldName;
   std::string                stateName;
 
-  MDFieldMemoizer<Traits> memoizer;
 };
 
 // Shortcut names

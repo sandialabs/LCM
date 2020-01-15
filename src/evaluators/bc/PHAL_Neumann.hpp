@@ -203,7 +203,6 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   std::vector<ScalarT> matScaling;
 
-  MDFieldMemoizer<Traits> memoizer;
 };
 
 template <typename EvalT, typename Traits>

@@ -65,7 +65,6 @@ class DOFCellToSideQPBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   LayoutType layout;
 
-  MDFieldMemoizer<Traits> memoizer;
 };
 
 // Some shortcut names

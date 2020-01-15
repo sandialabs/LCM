@@ -59,7 +59,6 @@ class GatherScalarNodalParameterBase
   // Output:
   PHX::MDField<ParamScalarT, Cell, Node> val;
 
-  MDFieldMemoizer<Traits> memoizer;
 };
 
 // General version for most evaluation types

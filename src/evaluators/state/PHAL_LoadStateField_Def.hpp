@@ -39,7 +39,6 @@ LoadStateFieldBase<EvalT, Traits, ScalarType>::postRegistrationSetup(
   this->utils.setFieldData(data, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 // **********************************************************************
@@ -48,7 +47,6 @@ void
 LoadStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   // cout << "LoadStateFieldBase importing state " << stateName << " to field "
   //     << fieldName << " with size " << data.size() << endl;
@@ -84,7 +82,6 @@ LoadStateField<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(data, fm);
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 // **********************************************************************
@@ -92,7 +89,6 @@ template <typename EvalT, typename Traits>
 void
 LoadStateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   // cout << "LoadStateField importing state " << stateName << " to field "
   //     << fieldName << " with size " << data.size() << endl;

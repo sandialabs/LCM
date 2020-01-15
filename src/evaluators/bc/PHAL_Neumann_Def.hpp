@@ -273,7 +273,6 @@ NeumannBase<EvalT, Traits>::postRegistrationSetup(
   }
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
-  if (d.memoizer_active()) memoizer.enable_memoizer();
 }
 
 template <typename EvalT, typename Traits>
@@ -281,7 +280,6 @@ void
 NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
     typename Traits::EvalData workset)
 {
-  if (memoizer.have_saved_data(workset, this->evaluatedFields())) return;
 
   // setJacobian only needs to be RealType since the data type is only
   //  used internally for Basis Fns on reference elements, which are

@@ -23,7 +23,9 @@ if { [is-loaded lcm-cuda] } {
 }
 
 if { [is-loaded lcm-fedora] } {
-  setenv CXXFLAGS "-Wno-terminate -Wno-deprecated-declarations"
+  setenv CXXFLAGS "-std=c++17 -Wno-terminate -Wno-deprecated-declarations"
+} else {
+  setenv CXXFLAGS "-std=c++17"
 }
 
 setenv FC [exec which gfortran]

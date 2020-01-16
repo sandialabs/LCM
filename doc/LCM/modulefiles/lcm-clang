@@ -13,5 +13,7 @@ setenv CXX [exec which clang++]
 setenv FC [exec which gfortran]
 
 if { [is-loaded lcm-fedora] } {
-  setenv CXXFLAGS "-Wno-deprecated-declarations"
+  setenv CXXFLAGS "-std=c++17 -Wno-deprecated-declarations"
+} else {
+  setenv CXXFLAGS "-std=c++17"
 }

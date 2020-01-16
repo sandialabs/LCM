@@ -15,3 +15,6 @@ setenv TOOL_CHAIN intel
 setenv CC [exec which icc]
 setenv CXX [exec which icpc]
 setenv FC [exec which ifort]
+
+setenv CXXFLAGS "-std=c++17"
+

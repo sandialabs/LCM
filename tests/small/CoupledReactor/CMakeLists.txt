@@ -1,4 +1,4 @@
-if (ALBANY_EPETRA) 
+if(ALBANY_EPETRA)
   # Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
@@ -7,6 +7,6 @@ if (ALBANY_EPETRA)
 
   # Create the test
   add_test(${testName}_Epetra ${Albany.exe} input_domain_coupled.yaml)
-  set_tests_properties(${testName}_Epetra PROPERTIES LABELS "Demo;Epetra;Forward")
+  set_tests_properties(${testName}_Epetra PROPERTIES LABELS
+                                                     "Demo;Epetra;Forward")
 endif()
-

@@ -1,4 +1,4 @@
-if (ALBANY_EPETRA) 
+if(ALBANY_EPETRA)
   # Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 

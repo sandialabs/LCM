@@ -1,4 +1,4 @@
-if (ALBANY_EPETRA) 
+if(ALBANY_EPETRA)
   # Copy Input file from source to binary dir
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputA.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/inputA.yaml COPYONLY)
@@ -13,7 +13,7 @@ if (ALBANY_EPETRA)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
 
-  # 2. Name the test with the directory name
+  # 1. Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
   add_test(${testName}_A ${Albany.exe} inputA.yaml)

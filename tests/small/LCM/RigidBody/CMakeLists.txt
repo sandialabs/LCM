@@ -1,6 +1,6 @@
 # Create a symbolic link for exodiff
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-                ${SEACAS_EXODIFF} ${CMAKE_CURRENT_BINARY_DIR}/exodiff)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SEACAS_EXODIFF}
+                        ${CMAKE_CURRENT_BINARY_DIR}/exodiff)
 
 # Copy Input files from source to binary dir
 
@@ -23,14 +23,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/RigidRotation.gold.exo
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
 if(ALBANY_IFPACK2)
- SET(OUTFILE "RigidRotation.exo")
- SET(REF_FILE "RigidRotation.gold.exo")
- add_test(NAME ${testName}
-          COMMAND ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-          -DTEST_NAME=RigidRotation -DTEST_ARGS=RigidRotation.yaml -DMPIMNP=1
-          -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-          -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE}
-          -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P runtest.cmake)
-set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
+  set(OUTFILE "RigidRotation.exo")
+  set(REF_FILE "RigidRotation.gold.exo")
+  add_test(
+    NAME ${testName}
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+      -DTEST_NAME=RigidRotation -DTEST_ARGS=RigidRotation.yaml -DMPIMNP=1
+      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+      runtest.cmake)
+  set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
 
 endif()

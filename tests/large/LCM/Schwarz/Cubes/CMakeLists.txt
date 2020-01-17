@@ -1,8 +1,8 @@
-##*****************************************************************//
-##    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-##    This Software is released under the BSD license detailed     //
-##    in the file "license.txt" in the top-level Albany directory  //
-##*****************************************************************//
+# *****************************************************************//
+# Albany 3.0:  Copyright 2016 Sandia Corporation               // This Software
+# is released under the BSD license detailed     // in the file "license.txt" in
+# the top-level Albany directory  //
+# *****************************************************************//
 
 # Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube0.e
@@ -28,21 +28,22 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube-single.yaml
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/check_comparisons.py
                ${CMAKE_CURRENT_BINARY_DIR}/check_comparisons.py COPYONLY)
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${runtest.cmake} ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake)
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${AlbanyPath} ${CMAKE_CURRENT_BINARY_DIR}/Albany)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest.cmake}
+                        ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
+                        ${CMAKE_CURRENT_BINARY_DIR}/Albany)
 
-#add_test(NAME Schwarz_${testName} COMMAND "python" "runtestT.py")
+# add_test(NAME Schwarz_${testName} COMMAND "python" "runtestT.py")
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-#test 1 - Cubes DBC 
-SET(OUTFILE "Cubes_DBC.log")
-SET(PYTHON_FILE "check_comparisons.py") 
-add_test(NAME Schwarz_${testName}
-        COMMAND ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-        -DTEST_NAME=Cubes -DTEST_ARGS=cubes.yaml -DMPIMNP=1
-        -DLOGFILE=${OUTFILE} -DPY_FILE=${PYTHON_FILE}
-        -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${runtest.cmake})
+# test 1 - Cubes DBC
+set(OUTFILE "Cubes_DBC.log")
+set(PYTHON_FILE "check_comparisons.py")
+add_test(
+  NAME Schwarz_${testName}
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=Cubes
+    -DTEST_ARGS=cubes.yaml -DMPIMNP=1 -DLOGFILE=${OUTFILE}
+    -DPY_FILE=${PYTHON_FILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
 set_tests_properties(Schwarz_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
-

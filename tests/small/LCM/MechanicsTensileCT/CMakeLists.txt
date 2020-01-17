@@ -1,8 +1,8 @@
-##*****************************************************************//
-##    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-##    This Software is released under the BSD license detailed     //
-##    in the file "license.txt" in the top-level Albany directory  //
-##*****************************************************************//
+# *****************************************************************//
+# Albany 3.0:  Copyright 2016 Sandia Corporation               // This Software
+# is released under the BSD license detailed     // in the file "license.txt" in
+# the top-level Albany directory  //
+# *****************************************************************//
 
 # Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/NotchedTensileCT.yaml
@@ -24,7 +24,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/notched_tensile.g.4.3
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 # Create the test with this name and standard executable
-IF (ALBANY_MUELU_EXAMPLES)
+if(ALBANY_MUELU_EXAMPLES)
   add_test(${testName} ${Albany.exe} NotchedTensileCT.yaml)
   set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
-ENDIF()
+endif()

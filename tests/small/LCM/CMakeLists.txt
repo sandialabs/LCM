@@ -1,8 +1,8 @@
-##*****************************************************************//
-##    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-##    This Software is released under the BSD license detailed     //
-##    in the file "license.txt" in the top-level Albany directory  //
-##*****************************************************************//
+# *****************************************************************//
+# Albany 3.0:  Copyright 2016 Sandia Corporation               // This Software
+# is released under the BSD license detailed     // in the file "license.txt" in
+# the top-level Albany directory  //
+# *****************************************************************//
 
 add_subdirectory(CapModelPlasticity3D)
 add_subdirectory(DomainTear2D)
@@ -21,11 +21,11 @@ add_subdirectory(UnitTests)
 # amota: Deactivating Catalyst as it is unclear who owns it
 # add_subdirectory(Catalyst)
 
-IF(ALBANY_STK)
-  IF(ALBANY_SEACAS)
-    IF (NOT ALBANY_ENABLE_OPENMP) 
+if(ALBANY_STK)
+  if(ALBANY_SEACAS)
+    if(NOT ALBANY_ENABLE_OPENMP)
       add_subdirectory(ACE)
-    ENDIF(NOT ALBANY_ENABLE_OPENMP) 
+    endif(NOT ALBANY_ENABLE_OPENMP)
     add_subdirectory(BoreDemo)
     add_subdirectory(CohesiveElement)
     add_subdirectory(Dynamics)
@@ -59,30 +59,29 @@ IF(ALBANY_STK)
     add_subdirectory(ThermoMechanicalContact)
     add_subdirectory(TimeDependentSDBC)
     add_subdirectory(TorsionBC)
-    # JTO 8/1/2015
-    # deactivating HeliumDamage until model robustness issues are resolved
-    # add_subdirectory(HeliumDamage)
-  ENDIF(ALBANY_SEACAS)
-ENDIF(ALBANY_STK)
+    # JTO 8/1/2015 deactivating HeliumDamage until model robustness issues are
+    # resolved add_subdirectory(HeliumDamage)
+  endif(ALBANY_SEACAS)
+endif(ALBANY_STK)
 
-IF(ALBANY_LAME)
+if(ALBANY_LAME)
   add_subdirectory(LameStaticElasticity3D)
   add_subdirectory(LameMultiMaterials)
-ENDIF()
+endif()
 
-IF(ALBANY_LAMENT)
+if(ALBANY_LAMENT)
   add_subdirectory(LamentStaticElasticity3D)
-ENDIF()
+endif()
 
-IF(ALBANY_SCOREC)
-  IF(NOT ALBANY_SEACAS)
-    IF (NOT ALBANY_ENABLE_OPENMP) 
+if(ALBANY_SCOREC)
+  if(NOT ALBANY_SEACAS)
+    if(NOT ALBANY_ENABLE_OPENMP)
       add_subdirectory(MechanicsTensileCT)
-    ENDIF()
-  ENDIF()
+    endif()
+  endif()
   add_subdirectory(SCOREC)
-ENDIF()
+endif()
 
-IF(ALBANY_STK_PERCEPT)
+if(ALBANY_STK_PERCEPT)
   add_subdirectory(Necking3DSTKAdapt)
-ENDIF()
+endif()

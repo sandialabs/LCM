@@ -1,4 +1,4 @@
-IF (ALBANY_IFPACK2)
+if(ALBANY_IFPACK2)
   # Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
@@ -9,4 +9,4 @@ IF (ALBANY_IFPACK2)
   # Create the test with this name and standard executable
   add_test(${testName} ${Albany.exe} inputT.yaml)
   set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
-ENDIF()
+endif()

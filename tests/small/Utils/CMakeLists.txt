@@ -5,9 +5,10 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dummy_field.ascii
                ${CMAKE_CURRENT_BINARY_DIR}/dummy_field.ascii COPYONLY)
 
-if (ALBANY_PANZER_EXPR_EVAL)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_populate_mesh_expr_eval.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/input_populate_mesh_expr_eval.yaml COPYONLY)
+if(ALBANY_PANZER_EXPR_EVAL)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/input_populate_mesh_expr_eval.yaml
+    ${CMAKE_CURRENT_BINARY_DIR}/input_populate_mesh_expr_eval.yaml COPYONLY)
 
   add_test(${testName} ${Albany.exe} input_populate_mesh_expr_eval.yaml)
 else()

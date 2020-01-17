@@ -13,22 +13,24 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/quad_tri.exo.4.2
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/quad_tri.exo.4.3
                ${CMAKE_CURRENT_BINARY_DIR}/quad_tri.exo.4.3 COPYONLY)
 
-####################################
-###          Main tests          ###
-####################################
+# ##############################################################################
+# Main tests          ###
+# ##############################################################################
 
-if (ALBANY_EPETRA) 
+if(ALBANY_EPETRA)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 
   add_test(${testName}_Epetra ${Albany.exe} input.yaml)
-  set_tests_properties(${testName}_Epetra PROPERTIES LABELS "Basic;Epetra;Forward")
+  set_tests_properties(${testName}_Epetra PROPERTIES LABELS
+                                                     "Basic;Epetra;Forward")
 endif()
 
-if (ALBANY_IFPACK2)
+if(ALBANY_IFPACK2)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputT.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/inputT.yaml COPYONLY)
 
   add_test(${testName}_Tpetra ${Albany.exe} inputT.yaml)
-  set_tests_properties(${testName}_Tpetra PROPERTIES LABELS "Basic;Tpetra;Forward")
-endif ()
+  set_tests_properties(${testName}_Tpetra PROPERTIES LABELS
+                                                     "Basic;Tpetra;Forward")
+endif()

@@ -1,10 +1,10 @@
-##*****************************************************************//
-##    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-##    This Software is released under the BSD license detailed     //
-##    in the file "license.txt" in the top-level Albany directory  //
-##*****************************************************************//
+# *****************************************************************//
+# Albany 3.0:  Copyright 2016 Sandia Corporation               // This Software
+# is released under the BSD license detailed     // in the file "license.txt" in
+# the top-level Albany directory  //
+# *****************************************************************//
 
-IF(ALBANY_STK) # STK is needed for all these
+if(ALBANY_STK) # STK is needed for all these
 
   # Heat Transfer Problems ###############
   add_subdirectory(SteadyHeat1D)
@@ -22,12 +22,13 @@ IF(ALBANY_STK) # STK is needed for all these
   add_subdirectory(TransientHeat1D)
   add_subdirectory(TransientHeat2D)
   add_subdirectory(HeatEigenvalues)
-  add_subdirectory(SideSetLaplacian) # Not 100% sure this requires STK, but I think so
+  add_subdirectory(SideSetLaplacian) # Not 100% sure this requires STK, but I
+                                     # think so
 
-  IF(ALBANY_SEACAS)
-    IF(ALBANY_PAMGEN)
+  if(ALBANY_SEACAS)
+    if(ALBANY_PAMGEN)
       add_subdirectory(Heat3DPamgen)
-    ENDIF()
+    endif()
     add_subdirectory(Heat2DMMCylWithSource)
     add_subdirectory(HeatQuadTri)
     add_subdirectory(TransientHeat2DTableSource)
@@ -37,14 +38,14 @@ IF(ALBANY_STK) # STK is needed for all these
     add_subdirectory(SteadyHeat2DInternalNeumann)
     add_subdirectory(SteadyHeat2DRobin)
     add_subdirectory(SteadyHeat2DSS)
-  ENDIF(ALBANY_SEACAS)
+  endif(ALBANY_SEACAS)
 
   add_subdirectory(Utils)
-ENDIF(ALBANY_STK)
+endif(ALBANY_STK)
 
-IF(ALBANY_STK)
+if(ALBANY_STK)
   # DEMO PDES ###############
-  IF(ALBANY_DEMO_PDES)
+  if(ALBANY_DEMO_PDES)
     add_subdirectory(Helmholtz2D)
     add_subdirectory(LinComprNS)
     add_subdirectory(AdvDiff)
@@ -55,27 +56,27 @@ IF(ALBANY_STK)
     # add_subdirectory(TekoPrec)
 
     # These require exodus, Ioss, stk_io, to read meshes
-    IF(ALBANY_SEACAS)
+    if(ALBANY_SEACAS)
       add_subdirectory(CahnHillElast2D)
       add_subdirectory(NSPoiseuille2D)
       add_subdirectory(NSRayleighBernard2D)
-      IF(NOT ALBANY_ENABLE_CUDA) # Currently takes too long to run on Ride
+      if(NOT ALBANY_ENABLE_CUDA) # Currently takes too long to run on Ride
         add_subdirectory(NSVortexShedding2D)
-      ENDIF()
+      endif()
       add_subdirectory(PNP)
-    ENDIF()
+    endif()
 
-    if (ALBANY_ASCR)
+    if(ALBANY_ASCR)
       add_subdirectory(CoupledReactor)
       add_subdirectory(NSReactor)
     endif()
 
-  ENDIF(ALBANY_DEMO_PDES)
+  endif(ALBANY_DEMO_PDES)
 
-ENDIF(ALBANY_STK)
+endif(ALBANY_STK)
 
 # LCM ###############
-IF(ALBANY_LCM)
-   add_subdirectory(LCM)
-ENDIF()
-###################
+if(ALBANY_LCM)
+  add_subdirectory(LCM)
+endif()
+# ##############################################################################

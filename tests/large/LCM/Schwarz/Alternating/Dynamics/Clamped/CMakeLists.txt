@@ -1,8 +1,8 @@
-##*****************************************************************//
-##    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-##    This Software is released under the BSD license detailed     //
-##    in the file "license.txt" in the top-level Albany directory  //
-##*****************************************************************//
+# *****************************************************************//
+# Albany 3.0:  Copyright 2016 Sandia Corporation               // This Software
+# is released under the BSD license detailed     // in the file "license.txt" in
+# the top-level Albany directory  //
+# *****************************************************************//
 
 # Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.yaml
@@ -18,20 +18,23 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material_01.yaml
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/check_convergence.py
                ${CMAKE_CURRENT_BINARY_DIR}/check_convergence.py COPYONLY)
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${AlbanyPath} ${CMAKE_CURRENT_BINARY_DIR}/Albany)
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${runtest.cmake} ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
+                        ${CMAKE_CURRENT_BINARY_DIR}/Albany)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest.cmake}
+                        ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake)
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-IF(ALBANY_DTK)
-SET(OUTFILE "clamped_parallel.log")
-SET(PYTHON_FILE "check_convergence.py") 
-add_test(NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
-        COMMAND ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}"
-        -DTEST_NAME=Clamped -DTEST_ARGS=clamped.yaml -DMPIMNP=4
-        -DLOGFILE=${OUTFILE} -DPY_FILE=${PYTHON_FILE}
-        -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${runtest.cmake})
-set_tests_properties(Schwarz_Alternating_Dynamics_${testName}_Parallel PROPERTIES LABELS "LCM;Tpetra;Forward")
+if(ALBANY_DTK)
+  set(OUTFILE "clamped_parallel.log")
+  set(PYTHON_FILE "check_convergence.py")
+  add_test(
+    NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=Clamped
+      -DTEST_ARGS=clamped.yaml -DMPIMNP=4 -DLOGFILE=${OUTFILE}
+      -DPY_FILE=${PYTHON_FILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+      ${runtest.cmake})
+  set_tests_properties(Schwarz_Alternating_Dynamics_${testName}_Parallel
+                       PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-ENDIF()
+endif()

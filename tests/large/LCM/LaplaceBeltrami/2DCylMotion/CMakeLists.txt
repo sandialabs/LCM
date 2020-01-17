@@ -1,4 +1,3 @@
-
 # 1. Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputDTPS.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/inputDTPS.yaml COPYONLY)
@@ -9,13 +8,14 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputDLB.yaml
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cyl.exo
                ${CMAKE_CURRENT_BINARY_DIR}/cyl.exo COPYONLY)
 
-# 4. Name the test with the directory name
+# 1. Name the test with the directory name
 get_filename_component(testDirName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-# 5. Create the test with this name and standard executable
+# 1. Create the test with this name and standard executable
 set(testName ${testDirName})
 
-if (ALBANY_EPETRA)
-add_test(LaplaceBeltrami:${testName}_DTPS ${Albany.exe} inputDTPS.yaml)
-set_tests_properties(LaplaceBeltrami:${testName}_DTPS PROPERTIES LABELS "LCM;Epetra;Forward")
+if(ALBANY_EPETRA)
+  add_test(LaplaceBeltrami:${testName}_DTPS ${Albany.exe} inputDTPS.yaml)
+  set_tests_properties(LaplaceBeltrami:${testName}_DTPS
+                       PROPERTIES LABELS "LCM;Epetra;Forward")
 endif()

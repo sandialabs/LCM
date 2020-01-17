@@ -1,8 +1,8 @@
-#*****************************************************************//
-#    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-#    This Software is released under the BSD license detailed     //
-#    in the file "license.txt" in the top-level Albany directory  //
-#*****************************************************************//
+# *****************************************************************//
+# Albany 3.0:  Copyright 2016 Sandia Corporation               // This Software
+# is released under the BSD license detailed     // in the file "license.txt" in
+# the top-level Albany directory  //
+# *****************************************************************//
 
 # 1. Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/two_bars.dmg
@@ -24,16 +24,23 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputRestartFromFileT.yaml
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
 
-# 2. Name the test with the directory name, prepended by SCOREC_
+# 1. Name the test with the directory name, prepended by SCOREC_
 get_filename_component(testRoot ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 set(testName "SCOREC_${testRoot}")
 
-# 3. Create the test with this name and standard executable
-IF(ALBANY_IFPACK2)
-  add_test(NAME ${testName}_NoRestartT COMMAND ${Albany.exe} inputNoRestartT.yaml)
-  set_tests_properties(${testName}_NoRestartT PROPERTIES LABELS "LCM;Tpetra;Forward;SCOREC")
-  add_test(NAME ${testName}_WriteRestartT COMMAND ${Albany.exe} inputWriteRestartT.yaml)
-  set_tests_properties(${testName}_WriteRestartT PROPERTIES LABELS "LCM;Tpetra;Forward;SCOREC")
-  add_test(NAME ${testName}_RestartFromFileT COMMAND ${Albany.exe} inputRestartFromFileT.yaml)
-  set_tests_properties(${testName}_RestartFromFileT PROPERTIES LABELS "LCM;Tpetra;Forward;SCOREC" DEPENDS ${testName}_WriteRestartT)
-ENDIF()
+# 1. Create the test with this name and standard executable
+if(ALBANY_IFPACK2)
+  add_test(NAME ${testName}_NoRestartT COMMAND ${Albany.exe}
+                                               inputNoRestartT.yaml)
+  set_tests_properties(${testName}_NoRestartT
+                       PROPERTIES LABELS "LCM;Tpetra;Forward;SCOREC")
+  add_test(NAME ${testName}_WriteRestartT COMMAND ${Albany.exe}
+                                                  inputWriteRestartT.yaml)
+  set_tests_properties(${testName}_WriteRestartT
+                       PROPERTIES LABELS "LCM;Tpetra;Forward;SCOREC")
+  add_test(NAME ${testName}_RestartFromFileT COMMAND ${Albany.exe}
+                                                     inputRestartFromFileT.yaml)
+  set_tests_properties(
+    ${testName}_RestartFromFileT PROPERTIES LABELS "LCM;Tpetra;Forward;SCOREC"
+                                            DEPENDS ${testName}_WriteRestartT)
+endif()

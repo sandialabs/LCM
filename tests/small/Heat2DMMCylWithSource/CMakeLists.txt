@@ -17,38 +17,42 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/fuel_volume.exo.4.2
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/fuel_volume.exo.4.3
                ${CMAKE_CURRENT_BINARY_DIR}/fuel_volume.exo.4.3 COPYONLY)
 
-# Create the the data for the test
-# CylHeatProfile executable needs the ncdump file for mesh coordinates
+# Create the the data for the test CylHeatProfile executable needs the ncdump
+# file for mesh coordinates
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/fuel_volume.ncdump
                ${CMAKE_CURRENT_BINARY_DIR}/fuel_volume.ncdump COPYONLY)
 
 add_executable(CylHeatProfile CylHeatProfile.cpp)
-target_link_libraries(CylHeatProfile  ${Trilinos_EXTRA_LD_FLAGS})
+target_link_libraries(CylHeatProfile ${Trilinos_EXTRA_LD_FLAGS})
 
-if (ALBANY_EPETRA) 
+if(ALBANY_EPETRA)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 
-  add_test(NAME ${testName}_Epetra
-       COMMAND ${CMAKE_COMMAND}  "-DTEST_PROG=${Albany.exe}"
-       "-DTEST_ARGS=input.yaml"
-       "-DAUX_ENV=${ALBANY_PRETEST_EXEC}"
-       "-DAUX_PROG=${CMAKE_CURRENT_BINARY_DIR}/CylHeatProfile" -P
-       ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
-       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  set_tests_properties(${testName}_Epetra PROPERTIES LABELS "Basic;Epetra;Forward")
+  add_test(
+    NAME ${testName}_Epetra
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" "-DTEST_ARGS=input.yaml"
+      "-DAUX_ENV=${ALBANY_PRETEST_EXEC}"
+      "-DAUX_PROG=${CMAKE_CURRENT_BINARY_DIR}/CylHeatProfile" -P
+      ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set_tests_properties(${testName}_Epetra PROPERTIES LABELS
+                                                     "Basic;Epetra;Forward")
 endif()
 
-if (ALBANY_IFPACK2)
+if(ALBANY_IFPACK2)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputT.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/inputT.yaml COPYONLY)
 
-  add_test(NAME ${testName}_Tpetra
-       COMMAND ${CMAKE_COMMAND}  "-DTEST_PROG=${Albany.exe}"
-       "-DTEST_ARGS=inputT.yaml"
-       "-DAUX_ENV=${ALBANY_PRETEST_EXEC}"
-       "-DAUX_PROG=${CMAKE_CURRENT_BINARY_DIR}/CylHeatProfile" -P
-       ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
-       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  set_tests_properties(${testName}_Tpetra PROPERTIES LABELS "Basic;Tpetra;Forward")
-endif ()
+  add_test(
+    NAME ${testName}_Tpetra
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" "-DTEST_ARGS=inputT.yaml"
+      "-DAUX_ENV=${ALBANY_PRETEST_EXEC}"
+      "-DAUX_PROG=${CMAKE_CURRENT_BINARY_DIR}/CylHeatProfile" -P
+      ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set_tests_properties(${testName}_Tpetra PROPERTIES LABELS
+                                                     "Basic;Tpetra;Forward")
+endif()

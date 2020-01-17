@@ -1,4 +1,4 @@
-IF(NOT ALBANY_PARALLEL_ONLY AND ALBANY_IFPACK2)
+if(NOT ALBANY_PARALLEL_ONLY AND ALBANY_IFPACK2)
   # Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
@@ -8,5 +8,6 @@ IF(NOT ALBANY_PARALLEL_ONLY AND ALBANY_IFPACK2)
 
   # Create the test with this name and standard executable
   add_test(${testName} ${SerialAlbany.exe} inputT.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward;Serial")
-ENDIF ()
+  set_tests_properties(${testName} PROPERTIES LABELS
+                                              "Demo;Tpetra;Forward;Serial")
+endif()

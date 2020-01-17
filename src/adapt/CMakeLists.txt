@@ -1,13 +1,12 @@
-##*****************************************************************//
-##    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-##    This Software is released under the BSD license detailed     //
-##    in the file "license.txt" in the top-level Albany directory  //
-##*****************************************************************//
-
+# *****************************************************************//
+# Albany 3.0:  Copyright 2016 Sandia Corporation               // This Software
+# is released under the BSD license detailed     // in the file "license.txt" in
+# the top-level Albany directory  //
+# *****************************************************************//
 
 # Adaptation
 
-SET(SOURCES
+set(SOURCES
     AAdapt_AbstractAdapter.cpp
     AAdapt_AdaptiveSolutionManager.cpp
     AAdapt_InitialCondition.cpp
@@ -18,10 +17,9 @@ SET(SOURCES
     AAdapt_RC_Field.cpp
     AAdapt_RC_Reader.cpp
     AAdapt_RC_Writer.cpp
-    AAdapt_RC_Projector_impl.cpp
-   )
+    AAdapt_RC_Projector_impl.cpp)
 
-SET(HEADERS
+set(HEADERS
     AAdapt_AbstractAdapter.hpp
     AAdapt_AdaptiveSolutionManager.hpp
     AAdapt_InitialCondition.hpp
@@ -31,67 +29,45 @@ SET(HEADERS
     AAdapt_RC_Field.hpp
     AAdapt_RC_Reader.hpp
     AAdapt_RC_Writer.hpp
-    AAdapt_RC_Projector_impl.hpp
-   )
+    AAdapt_RC_Projector_impl.hpp)
 
-IF(ALBANY_STK)
-  SET(SOURCES ${SOURCES}
-    AAdapt_CopyRemesh.cpp
-  )
-  SET(HEADERS ${HEADERS}
-    AAdapt_CopyRemesh.hpp
-  )
-ENDIF()
+if(ALBANY_STK)
+  set(SOURCES ${SOURCES} AAdapt_CopyRemesh.cpp)
+  set(HEADERS ${HEADERS} AAdapt_CopyRemesh.hpp)
+endif()
 
-# Random Criterion & Stress Fracture depend on LCM
-# Speculative features and code, currently
-IF(ALBANY_LCM AND ALBANY_STK)
-  IF(LCM_SPECULATIVE)
-    SET(SOURCES ${SOURCES}
-        AAdapt_RandomCriterion.cpp
-        AAdapt_RandomFracture.cpp
-        AAdapt_StressFracture.cpp
-       )
+# Random Criterion & Stress Fracture depend on LCM Speculative features and
+# code, currently
+if(ALBANY_LCM AND ALBANY_STK)
+  if(LCM_SPECULATIVE)
+    set(SOURCES ${SOURCES} AAdapt_RandomCriterion.cpp AAdapt_RandomFracture.cpp
+                AAdapt_StressFracture.cpp)
 
-    SET(HEADERS ${HEADERS}
-        AAdapt_RandomCriterion.hpp
-        AAdapt_RandomFracture.hpp
-        AAdapt_StressFracture.hpp
-       )
-  ENDIF()
+    set(HEADERS ${HEADERS} AAdapt_RandomCriterion.hpp AAdapt_RandomFracture.hpp
+                AAdapt_StressFracture.hpp)
+  endif()
 
   # Topology Modification depends on LCM and STK
-  IF(ALBANY_BGL)
-    SET(SOURCES ${SOURCES}
-        AAdapt_Erosion.cpp
-        AAdapt_TopologyModification.cpp
-       )
+  if(ALBANY_BGL)
+    set(SOURCES ${SOURCES} AAdapt_Erosion.cpp AAdapt_TopologyModification.cpp)
 
-    SET(HEADERS ${HEADERS}
-        AAdapt_Erosion.hpp
-        AAdapt_TopologyModification.hpp
-       )
-  ENDIF()
+    set(HEADERS ${HEADERS} AAdapt_Erosion.hpp AAdapt_TopologyModification.hpp)
+  endif()
 
-  IF(ALBANY_STK_PERCEPT)
-    SET(SOURCES ${SOURCES}
-        AAdapt_STKAdapt.cpp
-        AAdapt_STKConstantSizeField.cpp
-       )
+  if(ALBANY_STK_PERCEPT)
+    set(SOURCES ${SOURCES} AAdapt_STKAdapt.cpp AAdapt_STKConstantSizeField.cpp)
 
-    SET(HEADERS ${HEADERS}
-        AAdapt_STKAdapt.hpp
-        AAdapt_STKAdapt_Def.hpp
-        AAdapt_STKConstantSizeField.hpp
-       )
+    set(HEADERS ${HEADERS} AAdapt_STKAdapt.hpp AAdapt_STKAdapt_Def.hpp
+                AAdapt_STKConstantSizeField.hpp)
 
-  ENDIF()
-ENDIF()
+  endif()
+endif()
 
 # Mesh Adapt depends on SCOREC tools and PUMI
-IF(ALBANY_SCOREC)
+if(ALBANY_SCOREC)
 
-  SET(SOURCES ${SOURCES}
+  set(SOURCES
+      ${SOURCES}
       AAdapt_MeshAdapt.cpp
       AAdapt_MeshAdaptMethod.cpp
       AAdapt_ConstantSizeField.cpp
@@ -99,10 +75,10 @@ IF(ALBANY_SCOREC)
       AAdapt_UniformRefine.cpp
       AAdapt_AlbanySizeField.cpp
       AAdapt_ExtrudedAdapt.cpp
-      AAdapt_SPRSizeField.cpp
-  )
+      AAdapt_SPRSizeField.cpp)
 
-  SET(HEADERS ${HEADERS}
+  set(HEADERS
+      ${HEADERS}
       AAdapt_MeshAdaptMethod.hpp
       AAdapt_MeshAdapt.hpp
       AAdapt_ConstantSizeField.hpp
@@ -110,26 +86,75 @@ IF(ALBANY_SCOREC)
       AAdapt_UniformRefine.hpp
       AAdapt_AlbanySizeField.hpp
       AAdapt_ExtrudedAdapt.hpp
-      AAdapt_SPRSizeField.hpp
-  )
+      AAdapt_SPRSizeField.hpp)
 
-  IF(ALBANY_OMEGA_H)
-    SET(SOURCES ${SOURCES} AAdapt_MeshAdapt_Omega_h.cpp)
-    SET(HEADERS ${HEADERS} AAdapt_MeshAdapt_Omega_h.hpp)
-  ENDIF()
+  if(ALBANY_OMEGA_H)
+    set(SOURCES ${SOURCES} AAdapt_MeshAdapt_Omega_h.cpp)
+    set(HEADERS ${HEADERS} AAdapt_MeshAdapt_Omega_h.hpp)
+  endif()
 
   include_directories(${ALBANY_PUMI_INCLUDE_DIRS} ${PUMI_INCLUDE_DIR})
 
-ENDIF()
+endif()
 
-include_directories(${Trilinos_INCLUDE_DIRS}  ${Trilinos_TPL_INCLUDE_DIRS}
-                    ${Albany_SOURCE_DIR} / src ${Albany_SOURCE_DIR} / src / evaluators
-                    ${Albany_SOURCE_DIR} / src / problems ${Albany_SOURCE_DIR} / src / responses
-                    ${Albany_SOURCE_DIR} / src / disc
-                    ${Albany_SOURCE_DIR} / src / utility 
-                    ${Albany_SOURCE_DIR} / src / disc / stk ${Albany_SOURCE_DIR} / src / LCM /
-                    ${Albany_SOURCE_DIR} / src / LCM / evaluators ${Albany_SOURCE_DIR} / src / LCM / utils
-                   )
+include_directories(
+  ${Trilinos_INCLUDE_DIRS}
+  ${Trilinos_TPL_INCLUDE_DIRS}
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  evaluators
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  problems
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  responses
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  disc
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  utility
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  disc
+  /
+  stk
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  LCM
+  /
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  LCM
+  /
+  evaluators
+  ${Albany_SOURCE_DIR}
+  /
+  src
+  /
+  LCM
+  /
+  utils)
 
 add_library(albanyAdapt ${Albany_LIBRARY_TYPE} ${SOURCES} ${HEADERS})
 
@@ -137,13 +162,15 @@ set_target_properties(albanyAdapt PROPERTIES PUBLIC_HEADER "${HEADERS}")
 
 target_link_libraries(albanyAdapt ${SCOREC_LIB})
 
-IF(ALBANY_OMEGA_H)
+if(ALBANY_OMEGA_H)
   target_link_libraries(albanyAdapt Omega_h::omega_h)
-ENDIF()
+endif()
 
-IF(INSTALL_ALBANY)
-install(TARGETS albanyAdapt EXPORT albany-export
-        LIBRARY DESTINATION "${LIB_INSTALL_DIR}/"
-        ARCHIVE DESTINATION "${LIB_INSTALL_DIR}/"
-        PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}")
-ENDIF()
+if(INSTALL_ALBANY)
+  install(
+    TARGETS albanyAdapt
+    EXPORT albany-export
+    LIBRARY DESTINATION "${LIB_INSTALL_DIR}/"
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}/"
+    PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}")
+endif()

@@ -3,11 +3,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputP.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/inputP.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dakota.in
-               ${CMAKE_CURRENT_BINARY_DIR}/dakota.in COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dakota_nls.data
-               ${CMAKE_CURRENT_BINARY_DIR}/dakota_nls.data COPYONLY)
-
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
@@ -21,13 +16,3 @@ if (ALBANY_IFPACK2)
   add_test(${testName}_Ifpack2 ${Albany.exe} inputP.yaml)
   set_tests_properties(${testName}_Ifpack2 PROPERTIES LABELS "LCM;Tpetra;Forward")
 endif()
-
-# Repeat process for Analysis problems if "inputAnalysis.yaml" exists
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/inputAnalysis.yaml AND ALBANY_IFPACK2 AND ALBANY_DAKOTA)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputAnalysis.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/inputAnalysis.yaml COPYONLY)
-
-  get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR}_Analysis NAME)
-  add_test(${testName} ${AlbanyAnalysis.exe} inputAnalysis.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Analysis")
-endif ()

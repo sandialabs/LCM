@@ -10,7 +10,7 @@
 #include "Albany_Macros.hpp"
 
 namespace {
-const char decorator[] = "Evaluator for ";
+std::string const decorator = "Evaluator for ";
 
 // Name decorator.
 inline std::string
@@ -28,7 +28,7 @@ plName(const std::string& name)
 {
   const std::size_t pos = name.find(decorator);
   if (pos == std::string::npos) return name;
-  return name.substr(pos + sizeof(decorator) - 1);
+  return name.substr(pos + decorator.length());
 }
 
 // DBCs do not depend on each other. However, BCs are not always compatible at
@@ -467,13 +467,12 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
           buffer << file.rdbuf();
           file.close();
           std::istringstream       iss(buffer.str());
-          Teuchos::Array<RealType> time_values;
-          iss >> time_values;
-          p->set<Teuchos::Array<RealType>>("Time Values", time_values);
+          Teuchos::Array<RealType> times;
+          iss >> times;
+          p->set<Teuchos::Array<RealType>>("Time Values", times);
         } else {
-          p->set<Teuchos::Array<RealType>>(
-              "Time Values",
-              sub_list.get<Teuchos::Array<RealType>>("Time Values"));
+          auto&& times = sub_list.get<Teuchos::Array<RealType>>("Time Values");
+          p->set<Teuchos::Array<RealType>>("Time Values", times);
         }
 
         // Extract the BC values into a vector
@@ -485,12 +484,12 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
           buffer << file.rdbuf();
           file.close();
           std::istringstream       iss(buffer.str());
-          Teuchos::Array<RealType> bc_values;
-          iss >> bc_values;
-          p->set<Teuchos::Array<RealType>>("BC Values", bc_values);
+          Teuchos::Array<RealType> bcs;
+          iss >> bcs;
+          p->set<Teuchos::Array<RealType>>("BC Values", bcs);
         } else {
-          p->set<Teuchos::Array<RealType>>(
-              "BC Values", sub_list.get<Teuchos::Array<RealType>>("BC Values"));
+          auto&& bcs = sub_list.get<Teuchos::Array<RealType>>("BC Values");
+          p->set<Teuchos::Array<RealType>>("BC Values", bcs);
         }
 
         p->set<bool>("Mesh Deforms", sub_list.get<bool>("Mesh Deforms", false));
@@ -544,12 +543,12 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
           file.close();
           std::istringstream       iss(buffer.str());
           Teuchos::Array<RealType> time_values;
-          iss >> time_values;
-          p->set<Teuchos::Array<RealType>>("Time Values", time_values);
+          Teuchos::Array<RealType> times;
+          iss >> times;
+          p->set<Teuchos::Array<RealType>>("Time Values", times);
         } else {
-          p->set<Teuchos::Array<RealType>>(
-              "Time Values",
-              sub_list.get<Teuchos::Array<RealType>>("Time Values"));
+          auto&& times = sub_list.get<Teuchos::Array<RealType>>("Time Values");
+          p->set<Teuchos::Array<RealType>>("Time Values", times);
         }
 
         // Extract the BC values into a vector
@@ -561,12 +560,12 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
           buffer << file.rdbuf();
           file.close();
           std::istringstream       iss(buffer.str());
-          Teuchos::Array<RealType> bc_values;
-          iss >> bc_values;
-          p->set<Teuchos::Array<RealType>>("BC Values", bc_values);
+          Teuchos::Array<RealType> bcs;
+          iss >> bcs;
+          p->set<Teuchos::Array<RealType>>("BC Values", bcs);
         } else {
-          p->set<Teuchos::Array<RealType>>(
-              "BC Values", sub_list.get<Teuchos::Array<RealType>>("BC Values"));
+          auto&& bcs = sub_list.get<Teuchos::Array<RealType>>("BC Values");
+          p->set<Teuchos::Array<RealType>>("BC Values", bcs);
         }
 
         p->set<bool>("Mesh Deforms", sub_list.get<bool>("Mesh Deforms", false));

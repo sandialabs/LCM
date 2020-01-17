@@ -9,8 +9,6 @@
 #include "PHAL_TimeDepSDBC.hpp"
 #include "Phalanx_DataLayout.hpp"
 
-//#define DEBUG_OUTPUT
-
 namespace PHAL {
 
 //
@@ -18,8 +16,9 @@ namespace PHAL {
 //
 template <typename EvalT, typename Traits>
 TimeDepSDBC_Base<EvalT, Traits>::TimeDepSDBC_Base(Teuchos::ParameterList& p)
-    : offset_(p.get<int>("Equation Offset")), PHAL::SDirichlet<EvalT, Traits>(p)
+    : PHAL::SDirichlet<EvalT, Traits>(p)
 {
+  offset_ = p.get<int>("Equation Offset");
   times_  = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
   values_ = p.get<Teuchos::Array<RealType>>("BC Values").toVector();
 
@@ -35,22 +34,20 @@ template <typename EvalT, typename Traits>
 typename TimeDepSDBC_Base<EvalT, Traits>::ScalarT
 TimeDepSDBC_Base<EvalT, Traits>::computeVal(RealType time)
 {
-  ScalarT value{0.0};
+  auto const n = times_.size();
+  if (time <= times_[0]) return values_[0];
+  if (time >= times_[n - 1]) return values_[n - 1];
 
-  size_t index{0};
-
-  while (times_[index] < time) index++;
-
-  if (index == 0) {
-    value = values_[index];
-  } else {
-    RealType const slope = (values_[index] - values_[index - 1]) /
-                           (times_[index] - times_[index - 1]);
-
-    value = values_[index - 1] + slope * (time - times_[index - 1]);
+  for (auto i = 1; i < n; ++i) {
+    if (time < times_[i]) {
+      RealType const dv    = values_[i] - values_[i - 1];
+      RealType const dt    = times_[i] - times_[i - 1];
+      RealType const slope = dv / dt;
+      ScalarT        value = values_[i - 1] + slope * (time - times_[i - 1]);
+      return value;
+    }
   }
-
-  return value;
+  return 0.0;
 }
 
 //
@@ -69,11 +66,6 @@ template <typename EvalT, typename Traits>
 void
 TimeDepSDBC<EvalT, Traits>::preEvaluate(typename Traits::EvalData workset)
 {
-#ifdef DEBUG_OUTPUT
-  Teuchos::RCP<Teuchos::FancyOStream> out =
-      Teuchos::VerboseObjectBase::getDefaultOStream();
-  *out << "IKT TimeDepSDBC preEvaluate Residual\n";
-#endif
   this->value = this->computeVal(workset.current_time);
   PHAL::SDirichlet<EvalT, Traits>::preEvaluate(workset);
 }

@@ -29,10 +29,8 @@ class TimeDepSDBC_Base : public PHAL::SDirichlet<EvalT, Traits>
   computeVal(RealType time);
 
  protected:
-  int const offset_;
-
+  int                   offset_{0};
   std::vector<RealType> times_;
-
   std::vector<RealType> values_;
 };
 

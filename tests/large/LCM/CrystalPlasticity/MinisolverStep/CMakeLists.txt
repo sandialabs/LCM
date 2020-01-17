@@ -89,8 +89,7 @@ if(ALBANY_IFPACK2)
   # MinisolverStep_ConjugateGradient.yaml)
   # add_test(CrystalPlasticity_MinisolverStep_LineSearchRegularized python
   # ../run_exodiff_test.py "${SerialAlbany.exe}"
-  # MinisolverStep_LineSearchRegularized.yaml)
-  # test 1 - Newton
+  # MinisolverStep_LineSearchRegularized.yaml) test 1 - Newton
   set(OUTFILE "MinisolverStep_Newton.exo")
   set(REF_FILE "MinisolverStep_Newton.gold.exo")
   add_test(

@@ -1,7 +1,7 @@
 //
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
-// in the file license.txt in the top-level Albany directory
+// in the file license.txt in the top-level Albany directory.
 //
 // Test 1 of barycentric subdivision. Input file has to be specified.
 // Checks the proper operation of the barycentric_subdivision() function.

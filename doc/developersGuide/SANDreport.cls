@@ -648,7 +648,7 @@
 	    \selectfont
 
 	    Issued by Sandia National Laboratories, operated for the
-	    United States Department of Energy by Sandia Corporation.
+	    United States Department of Energy by National Technology & Engineering Solutions of Sandia, LLC (NTESS)
 	    \vspace{\baselineskip}
 
             % Removed \fontsize{11}{13} to make NOTICE simply bold, to match official SAND covers better, MJK - 1/12/07

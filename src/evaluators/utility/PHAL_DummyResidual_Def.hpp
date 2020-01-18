@@ -1,15 +1,14 @@
-//*****************************************************************//
-//    Albany 2.0:  Copyright 2012 Sandia Corporation               //
-//    This Software is released under the BSD license detailed     //
-//    in the file "license.txt" in the top-level Albany directory  //
-//*****************************************************************//
+//
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory.
+//
 
 #include "Phalanx_DataLayout.hpp"
 #include "Phalanx_Print.hpp"
 
 namespace PHAL {
 
-//**********************************************************************
 template <typename EvalT, typename Traits>
 DummyResidual<EvalT, Traits>::DummyResidual(
     const Teuchos::ParameterList&        p,
@@ -23,7 +22,6 @@ DummyResidual<EvalT, Traits>::DummyResidual(
   this->setName("DummyResidual" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
 template <typename EvalT, typename Traits>
 void
 DummyResidual<EvalT, Traits>::postRegistrationSetup(
@@ -34,7 +32,6 @@ DummyResidual<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(residual, fm);
 }
 
-//**********************************************************************
 template <typename EvalT, typename Traits>
 void DummyResidual<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData /*workset*/)

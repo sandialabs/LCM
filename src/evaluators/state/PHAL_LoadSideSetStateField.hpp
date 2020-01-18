@@ -1,11 +1,11 @@
-//*****************************************************************//
-//    Albany 2.0:  Copyright 2012 Sandia Corporation               //
-//    This Software is released under the BSD license detailed     //
-//    in the file "license.txt" in the top-level Albany directory  //
-//*****************************************************************//
+//
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory.
+//
 
 #ifndef PHAL_LOAD_SIDE_SET_STATE_FIELD_HPP
-#define PHAL_LOAD_SIDE_SET_STATE_FIELD_HPP 1
+#define PHAL_LOAD_SIDE_SET_STATE_FIELD_HPP
 
 #include "PHAL_Utilities.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"

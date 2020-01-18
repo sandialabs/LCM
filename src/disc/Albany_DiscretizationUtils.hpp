@@ -1,8 +1,8 @@
-//*****************************************************************//
-//    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-//    This Software is released under the BSD license detailed     //
-//    in the file "license.txt" in the top-level Albany directory  //
-//*****************************************************************//
+//*****************************************************************
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory
+//*****************************************************************
 
 #ifndef ALBANY_DISCRETIZATION_UTILS_HPP
 #define ALBANY_DISCRETIZATION_UTILS_HPP

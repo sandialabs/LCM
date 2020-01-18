@@ -1,8 +1,8 @@
-//*****************************************************************//
-//    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-//    This Software is released under the BSD license detailed     //
-//    in the file "license.txt" in the top-level Albany directory  //
-//*****************************************************************//
+//*****************************************************************
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory
+//*****************************************************************
 
 #ifdef ALBANY_TIMER
 #include <chrono>
@@ -122,11 +122,10 @@ void
 DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
-    // Intrepid2 Version:
-    // for (int i=0; i < grad_val_qp.size() ; i++) grad_val_qp[i] = 0.0;
-    // Intrepid2::FunctionSpaceTools:: evaluate<ScalarT>(grad_val_qp, val_node,
-    // GradBF);
+  // Intrepid2 Version:
+  // for (int i=0; i < grad_val_qp.size() ; i++) grad_val_qp[i] = 0.0;
+  // Intrepid2::FunctionSpaceTools:: evaluate<ScalarT>(grad_val_qp, val_node,
+  // GradBF);
 #ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {

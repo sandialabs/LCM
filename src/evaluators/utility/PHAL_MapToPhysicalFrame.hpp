@@ -1,8 +1,8 @@
-//*****************************************************************//
-//    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-//    This Software is released under the BSD license detailed     //
-//    in the file "license.txt" in the top-level Albany directory  //
-//*****************************************************************//
+//*****************************************************************
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory
+//*****************************************************************
 
 #ifndef PHAL_MAPTOPHYSICALFRAME_HPP
 #define PHAL_MAPTOPHYSICALFRAME_HPP
@@ -48,7 +48,6 @@ class MapToPhysicalFrame : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   int numQPs, numDim;
-
 
   // Input:
   Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;

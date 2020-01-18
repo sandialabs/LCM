@@ -1,8 +1,8 @@
-//*****************************************************************//
-//    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-//    This Software is released under the BSD license detailed     //
-//    in the file "license.txt" in the top-level Albany directory  //
-//*****************************************************************//
+//*****************************************************************
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory
+//*****************************************************************
 
 #include "AAdapt_STKUnifSizeField.hpp"
 
@@ -132,6 +132,7 @@ namespace AAdapt
 
   return false;  // don't terminate the loop
 }  // namespace
+   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
    // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
    // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
 

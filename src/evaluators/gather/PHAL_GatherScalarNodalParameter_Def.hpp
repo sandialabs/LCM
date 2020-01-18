@@ -1,8 +1,8 @@
-//*****************************************************************//
-//    Albany 3.0:  Copyright 2016 Sandia Corporation               //
-//    This Software is released under the BSD license detailed     //
-//    in the file "license.txt" in the top-level Albany directory  //
-//*****************************************************************//
+//*****************************************************************
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory
+//*****************************************************************
 
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
@@ -72,7 +72,6 @@ void
 GatherScalarNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
   Teuchos::RCP<const Thyra_Vector> pvec =
       workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
@@ -108,7 +107,6 @@ void
 GatherScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?
   Teuchos::RCP<const Thyra_Vector> pvec =
@@ -180,7 +178,6 @@ void
 GatherScalarNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
     evaluateFields(typename Traits::EvalData workset)
 {
-
   // Distributed parameter vector
   Teuchos::RCP<const Thyra_Vector> pvec =
       workset.distParamLib->get(this->param_name)->overlapped_vector();
@@ -276,7 +273,6 @@ GatherScalarExtruded2DNodalParameter<
     PHAL::AlbanyTraits::DistParamDeriv,
     Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?
   Teuchos::RCP<const Thyra_Vector> pvec =

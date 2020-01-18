@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
@@ -123,7 +123,7 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
   }
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 LinComprNSResid<EvalT, Traits>::postRegistrationSetup(
@@ -140,7 +140,7 @@ LinComprNSResid<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(Residual, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 LinComprNSResid<EvalT, Traits>::evaluateFields(
@@ -691,5 +691,5 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

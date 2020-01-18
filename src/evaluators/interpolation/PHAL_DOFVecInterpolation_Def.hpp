@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 #ifdef ALBANY_TIMER
 #include <chrono>
 #endif
@@ -12,7 +12,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 DOFVecInterpolationBase<EvalT, Traits, ScalarT>::DOFVecInterpolationBase(
     const Teuchos::ParameterList&        p,
@@ -35,7 +35,7 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::DOFVecInterpolationBase(
   vecDim = dims[2];
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 DOFVecInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
@@ -47,7 +47,7 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   this->utils.setFieldData(val_qp, fm);
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
 }
-//**********************************************************************
+//*****
 // Kokkos kernel for Residual
 template <
     class DeviceType,
@@ -97,7 +97,7 @@ class VecInterpolation
   }
 };
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
@@ -144,7 +144,7 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
 }
 
 // Specialization for Jacobian evaluation taking advantage of known sparsity
-//**********************************************************************
+//*****
 
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 
@@ -212,7 +212,7 @@ class VecInterpolationJacob
   }
 };
 
-//**********************************************************************
+//*****
 template <typename Traits>
 void
 FastSolutionVecInterpolationBase<

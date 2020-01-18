@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "PHAL_Utilities.hpp"
@@ -11,7 +11,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 HeatEqResid<EvalT, Traits>::HeatEqResid(const Teuchos::ParameterList& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
@@ -91,7 +91,7 @@ HeatEqResid<EvalT, Traits>::HeatEqResid(const Teuchos::ParameterList& p)
   this->setName("HeatEqResid");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 HeatEqResid<EvalT, Traits>::postRegistrationSetup(
@@ -123,7 +123,7 @@ HeatEqResid<EvalT, Traits>::postRegistrationSetup(
         Temperature.get_view(), "XXX", worksetSize, numQPs);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 HeatEqResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -191,5 +191,5 @@ HeatEqResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   // TResidual.print(std::cout, true);
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

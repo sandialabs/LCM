@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <typeinfo>
 
@@ -14,7 +14,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 DefGrad<EvalT, Traits>::DefGrad(const Teuchos::ParameterList& p)
     : GradU(
@@ -54,7 +54,7 @@ DefGrad<EvalT, Traits>::DefGrad(const Teuchos::ParameterList& p)
   this->setName("DefGrad" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 DefGrad<EvalT, Traits>::postRegistrationSetup(
@@ -66,7 +66,7 @@ DefGrad<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(J, fm);
   this->utils.setFieldData(GradU, fm);
 }
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 DefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -121,5 +121,5 @@ DefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace LCM

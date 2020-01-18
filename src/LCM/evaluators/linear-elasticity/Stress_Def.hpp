@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 Stress<EvalT, Traits>::Stress(const Teuchos::ParameterList& p)
     : strain(
@@ -44,7 +44,7 @@ Stress<EvalT, Traits>::Stress(const Teuchos::ParameterList& p)
   this->setName("Stress" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 Stress<EvalT, Traits>::postRegistrationSetup(
@@ -57,7 +57,7 @@ Stress<EvalT, Traits>::postRegistrationSetup(
   if (numDims > 1) this->utils.setFieldData(poissonsRatio, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 Stress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -120,5 +120,5 @@ Stress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace LCM

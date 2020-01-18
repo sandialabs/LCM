@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <MiniTensor.h>
 
@@ -11,7 +11,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 SurfaceScalarGradientOperatorPorePressure<EvalT, Traits>::
     SurfaceScalarGradientOperatorPorePressure(
@@ -71,7 +71,7 @@ SurfaceScalarGradientOperatorPorePressure<EvalT, Traits>::
 #endif
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceScalarGradientOperatorPorePressure<EvalT, Traits>::postRegistrationSetup(
@@ -99,7 +99,7 @@ SurfaceScalarGradientOperatorPorePressure<EvalT, Traits>::postRegistrationSetup(
   intrepidBasis->getValues(refGrads, refPoints, Intrepid2::OPERATOR_GRAD);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceScalarGradientOperatorPorePressure<EvalT, Traits>::evaluateFields(
@@ -160,5 +160,5 @@ SurfaceScalarGradientOperatorPorePressure<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

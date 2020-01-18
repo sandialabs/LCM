@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 //
 // TODO:
 // 1.  Implement 1D and 2D.
@@ -14,7 +14,7 @@
 
 namespace HMC {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 Stresses<EvalT, Traits>::Stresses(const Teuchos::ParameterList& p)
     : strain(
@@ -91,7 +91,7 @@ Stresses<EvalT, Traits>::Stresses(const Teuchos::ParameterList& p)
   this->setName("Stresses" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 Stresses<EvalT, Traits>::postRegistrationSetup(
@@ -110,7 +110,7 @@ Stresses<EvalT, Traits>::postRegistrationSetup(
   }
 }
 
-//**********************************************************************
+//*****
 /*\begin{text}
    This function computes the stresses assuming a linear elastic response
    \begin{equation}
@@ -262,6 +262,6 @@ Stresses<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     }
   */
 }
-//**********************************************************************
+//*****
 
 }  // namespace HMC

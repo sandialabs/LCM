@@ -1,14 +1,14 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 PNP::ConcentrationResid<EvalT, Traits>::ConcentrationResid(
     const Teuchos::ParameterList&        p,
@@ -56,7 +56,7 @@ PNP::ConcentrationResid<EvalT, Traits>::ConcentrationResid(
   this->setName("ConcentrationResid");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 PNP::ConcentrationResid<EvalT, Traits>::postRegistrationSetup(
@@ -73,7 +73,7 @@ PNP::ConcentrationResid<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(ConcentrationResidual, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 PNP::ConcentrationResid<EvalT, Traits>::evaluateFields(
@@ -106,4 +106,4 @@ PNP::ConcentrationResid<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****

@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "PHAL_Utilities.hpp"
@@ -11,7 +11,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 HelmholtzResid<EvalT, Traits>::HelmholtzResid(const Teuchos::ParameterList& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
@@ -66,7 +66,7 @@ HelmholtzResid<EvalT, Traits>::HelmholtzResid(const Teuchos::ParameterList& p)
   this->registerSacadoParameter("Ksqr", paramLib);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 HelmholtzResid<EvalT, Traits>::postRegistrationSetup(
@@ -87,7 +87,7 @@ HelmholtzResid<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(VResidual, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 HelmholtzResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -139,5 +139,5 @@ HelmholtzResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   */
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

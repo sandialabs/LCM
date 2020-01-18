@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Phalanx_DataLayout.hpp"
 #include "Phalanx_Print.hpp"
@@ -12,7 +12,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
     const Teuchos::ParameterList&        p,
@@ -159,7 +159,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
       "FieldFrobeniusNormBase(" + fieldNormName + ")" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
@@ -175,7 +175,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(

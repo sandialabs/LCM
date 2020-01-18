@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <string>
 
@@ -11,7 +11,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 TimeTracBC_Base<EvalT, Traits>::TimeTracBC_Base(Teuchos::ParameterList& p)
     : PHAL::Neumann<EvalT, Traits>(p)
@@ -32,7 +32,7 @@ TimeTracBC_Base<EvalT, Traits>::TimeTracBC_Base(Teuchos::ParameterList& p)
       "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 TimeTracBC_Base<EvalT, Traits>::computeVal(RealType time)

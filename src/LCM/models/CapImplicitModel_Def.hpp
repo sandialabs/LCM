@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 #include <MiniTensor.h>
 
 #include <Intrepid2_FunctionSpaceTools.hpp>
@@ -14,7 +14,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 CapImplicitModel<EvalT, Traits>::CapImplicitModel(
     Teuchos::ParameterList*              p,
@@ -126,7 +126,7 @@ CapImplicitModel<EvalT, Traits>::CapImplicitModel(
   this->state_var_output_flags_.push_back(true);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 CapImplicitModel<EvalT, Traits>::computeState(

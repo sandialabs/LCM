@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <typeinfo>
 
@@ -12,7 +12,7 @@
 #include "Teuchos_TestForException.hpp"
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(
     Teuchos::ParameterList& p)
@@ -153,7 +153,7 @@ TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(
   this->setName("TLPoroPlasticityResidMass" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 TLPoroPlasticityResidMass<EvalT, Traits>::postRegistrationSetup(
@@ -217,7 +217,7 @@ TLPoroPlasticityResidMass<EvalT, Traits>::postRegistrationSetup(
         Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 TLPoroPlasticityResidMass<EvalT, Traits>::evaluateFields(
@@ -358,5 +358,5 @@ TLPoroPlasticityResidMass<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

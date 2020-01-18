@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::
     DOFTensorGradInterpolationBase(
@@ -38,7 +38,7 @@ DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::
   vecDim = dims[2];
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
@@ -50,7 +50,7 @@ DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   this->utils.setFieldData(grad_val_qp, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
@@ -79,7 +79,7 @@ DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
 // Specialization for Jacobian evaluation taking advantage of the sparsity of
 // the derivatives
 
-//**********************************************************************
+//*****
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 template <typename Traits>
 void

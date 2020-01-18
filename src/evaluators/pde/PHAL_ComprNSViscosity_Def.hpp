@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 #include "Teuchos_TestForException.hpp"
 
 namespace PHAL {
-//**********************************************************************
+//*****
 
 template <typename EvalT, typename Traits>
 ComprNSViscosity<EvalT, Traits>::ComprNSViscosity(
@@ -101,7 +101,7 @@ ComprNSViscosity<EvalT, Traits>::ComprNSViscosity(
   this->setName("ComprNSViscosity");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ComprNSViscosity<EvalT, Traits>::postRegistrationSetup(
@@ -122,7 +122,7 @@ ComprNSViscosity<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(tau33, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ComprNSViscosity<EvalT, Traits>::evaluateFields(

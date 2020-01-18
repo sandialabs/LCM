@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 CahnHillRhoResid<EvalT, Traits>::CahnHillRhoResid(
     const Teuchos::ParameterList& p)
@@ -58,7 +58,7 @@ CahnHillRhoResid<EvalT, Traits>::CahnHillRhoResid(
   this->setName("CahnHillRhoResid");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 CahnHillRhoResid<EvalT, Traits>::postRegistrationSetup(
@@ -77,7 +77,7 @@ CahnHillRhoResid<EvalT, Traits>::postRegistrationSetup(
       rhoGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 CahnHillRhoResid<EvalT, Traits>::evaluateFields(
@@ -133,5 +133,5 @@ CahnHillRhoResid<EvalT, Traits>::getValue(const std::string& n)
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

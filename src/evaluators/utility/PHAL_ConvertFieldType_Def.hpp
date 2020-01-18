@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -13,7 +13,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <
     typename EvalT,
     typename Traits,
@@ -42,7 +42,7 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(
   this->setName("ConvertFieldType");
 }
 
-//**********************************************************************
+//*****
 template <
     typename EvalT,
     typename Traits,
@@ -57,7 +57,7 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::postRegistrationSetup(
   this->utils.setFieldData(out_field, fm);
 }
 
-//**********************************************************************
+//*****
 template <
     typename EvalT,
     typename Traits,
@@ -118,6 +118,6 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::evaluateFields(
   //  all the switch above might be substituted in the future with the simple
   //  line: Kokkos::deep_copy(out_field.get_view(),in_field.get_view());
 }
-//**********************************************************************
+//*****
 
 }  // namespace PHAL

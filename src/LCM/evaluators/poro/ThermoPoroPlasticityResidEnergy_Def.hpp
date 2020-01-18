@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <typeinfo>
 
@@ -13,7 +13,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 ThermoPoroPlasticityResidEnergy<EvalT, Traits>::ThermoPoroPlasticityResidEnergy(
     const Teuchos::ParameterList& p)
@@ -196,7 +196,7 @@ ThermoPoroPlasticityResidEnergy<EvalT, Traits>::ThermoPoroPlasticityResidEnergy(
   this->setName("ThermoPoroPlasticityResidEnergy" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ThermoPoroPlasticityResidEnergy<EvalT, Traits>::postRegistrationSetup(
@@ -264,7 +264,7 @@ ThermoPoroPlasticityResidEnergy<EvalT, Traits>::postRegistrationSetup(
     aterm = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ThermoPoroPlasticityResidEnergy<EvalT, Traits>::evaluateFields(
@@ -417,5 +417,5 @@ ThermoPoroPlasticityResidEnergy<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

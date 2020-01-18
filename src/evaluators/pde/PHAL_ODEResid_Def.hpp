@@ -1,12 +1,12 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 ODEResid<EvalT, Traits>::ODEResid(Teuchos::ParameterList& p)
     : X(p.get<std::string>("Variable Name"),
@@ -37,7 +37,7 @@ ODEResid<EvalT, Traits>::ODEResid(Teuchos::ParameterList& p)
   this->setName(n + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ODEResid<EvalT, Traits>::postRegistrationSetup(
@@ -52,7 +52,7 @@ ODEResid<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(Yoderesid, vm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ODEResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -64,5 +64,5 @@ ODEResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   if (workset.transientTerms) Yoderesid(0, 0) += Y_dot(0, 0);
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

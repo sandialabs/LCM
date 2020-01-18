@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 #include <MiniTensor.h>
 
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(
     const Teuchos::ParameterList&        p,
@@ -53,7 +53,7 @@ SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(
 #endif
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceVectorJump<EvalT, Traits>::postRegistrationSetup(
@@ -79,7 +79,7 @@ SurfaceVectorJump<EvalT, Traits>::postRegistrationSetup(
   intrepid_basis_->getValues(ref_grads_, ref_points_, Intrepid2::OPERATOR_GRAD);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceVectorJump<EvalT, Traits>::evaluateFields(
@@ -110,5 +110,5 @@ SurfaceVectorJump<EvalT, Traits>::evaluateFields(
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace LCM

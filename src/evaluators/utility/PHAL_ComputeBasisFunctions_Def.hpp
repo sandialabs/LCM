@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -57,7 +57,7 @@ ComputeBasisFunctions<EvalT, Traits>::ComputeBasisFunctions(
   this->setName("ComputeBasisFunctions" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ComputeBasisFunctions<EvalT, Traits>::postRegistrationSetup(
@@ -96,7 +96,7 @@ ComputeBasisFunctions<EvalT, Traits>::postRegistrationSetup(
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ComputeBasisFunctions<EvalT, Traits>::evaluateFields(
@@ -129,5 +129,5 @@ ComputeBasisFunctions<EvalT, Traits>::evaluateFields(
   (void)isJacobianDetNegative;
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

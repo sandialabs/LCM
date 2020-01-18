@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Intrepid2_RealSpaceTools.hpp"
@@ -11,7 +11,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 TLPoroPlasticityResidMomentum<EvalT, Traits>::TLPoroPlasticityResidMomentum(
     const Teuchos::ParameterList& p)
@@ -67,7 +67,7 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::TLPoroPlasticityResidMomentum(
   worksetSize = dims[0];
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 TLPoroPlasticityResidMomentum<EvalT, Traits>::postRegistrationSetup(
@@ -92,7 +92,7 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::postRegistrationSetup(
       J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 TLPoroPlasticityResidMomentum<EvalT, Traits>::evaluateFields(
@@ -135,5 +135,5 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::evaluateFields(
   //   wGradBF.get_view(), false); // "false" overwrites
 }
 
-//**********************************************************************
+//*****
 }  // namespace LCM

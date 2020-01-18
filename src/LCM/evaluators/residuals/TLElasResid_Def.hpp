@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Intrepid2_RealSpaceTools.hpp"
@@ -12,7 +12,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 TLElasResid<EvalT, Traits>::TLElasResid(const Teuchos::ParameterList& p)
     : stress(
@@ -58,7 +58,7 @@ TLElasResid<EvalT, Traits>::TLElasResid(const Teuchos::ParameterList& p)
   this->registerSacadoParameter("zGrav", paramLib);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 TLElasResid<EvalT, Traits>::postRegistrationSetup(
@@ -84,7 +84,7 @@ TLElasResid<EvalT, Traits>::postRegistrationSetup(
       J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 TLElasResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -145,5 +145,5 @@ TLElasResid<EvalT, Traits>::getValue(const std::string& n)
   return zGrav;
 }
 
-//**********************************************************************
+//*****
 }  // namespace LCM

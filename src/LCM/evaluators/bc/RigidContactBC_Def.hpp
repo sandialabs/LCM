@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <string>
 
@@ -11,7 +11,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 RigidContactBC_Base<EvalT, Traits>::RigidContactBC_Base(
     Teuchos::ParameterList& p)
@@ -33,7 +33,7 @@ RigidContactBC_Base<EvalT, Traits>::RigidContactBC_Base(
       "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 RigidContactBC_Base<EvalT, Traits>::computeVal(RealType time)

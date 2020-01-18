@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #ifdef ALBANY_TIMER
 #include <chrono>
@@ -16,7 +16,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 DOFGradInterpolationBase<EvalT, Traits, ScalarT>::DOFGradInterpolationBase(
     const Teuchos::ParameterList&        p,
@@ -39,7 +39,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::DOFGradInterpolationBase(
   numDims  = dims[3];
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 DOFGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
@@ -213,7 +213,7 @@ operator()(
   }
 }
 #endif
-//**********************************************************************
+//*****
 
 template <typename Traits>
 void
@@ -283,6 +283,6 @@ FastSolutionGradInterpolationBase<
 }
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 
-//**********************************************************************
+//*****
 
 }  // Namespace PHAL

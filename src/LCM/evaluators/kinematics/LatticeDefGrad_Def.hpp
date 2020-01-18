@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Intrepid2_RealSpaceTools.hpp"
@@ -11,7 +11,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(const Teuchos::ParameterList& p)
     : weights(
@@ -68,7 +68,7 @@ LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(const Teuchos::ParameterList& p)
   this->setName("Lattice Deformation Gradient" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 LatticeDefGrad<EvalT, Traits>::postRegistrationSetup(
@@ -86,7 +86,7 @@ LatticeDefGrad<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(latticeDefGrad, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -151,5 +151,5 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

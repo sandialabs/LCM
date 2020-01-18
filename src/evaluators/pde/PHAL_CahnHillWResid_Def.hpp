@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 CahnHillWResid<EvalT, Traits>::CahnHillWResid(const Teuchos::ParameterList& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
@@ -55,7 +55,7 @@ CahnHillWResid<EvalT, Traits>::CahnHillWResid(const Teuchos::ParameterList& p)
   this->setName("CahnHillWResid");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 CahnHillWResid<EvalT, Traits>::postRegistrationSetup(
@@ -119,5 +119,5 @@ CahnHillWResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

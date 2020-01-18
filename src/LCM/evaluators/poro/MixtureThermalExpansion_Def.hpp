@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(
     const Teuchos::ParameterList& p)
@@ -49,7 +49,7 @@ MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(
   numQPs = dims[1];
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 MixtureThermalExpansion<EvalT, Traits>::postRegistrationSetup(
@@ -64,7 +64,7 @@ MixtureThermalExpansion<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(alphaPoreFluid, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 MixtureThermalExpansion<EvalT, Traits>::evaluateFields(
@@ -81,5 +81,5 @@ MixtureThermalExpansion<EvalT, Traits>::evaluateFields(
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace LCM

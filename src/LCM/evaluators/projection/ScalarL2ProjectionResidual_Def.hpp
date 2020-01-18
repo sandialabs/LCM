@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <MiniTensor.h>
 
@@ -16,7 +16,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 ScalarL2ProjectionResidual<EvalT, Traits>::ScalarL2ProjectionResidual(
     const Teuchos::ParameterList& p)
@@ -66,7 +66,7 @@ ScalarL2ProjectionResidual<EvalT, Traits>::ScalarL2ProjectionResidual(
   this->setName("ScalarL2ProjectionResidual" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ScalarL2ProjectionResidual<EvalT, Traits>::postRegistrationSetup(
@@ -88,7 +88,7 @@ ScalarL2ProjectionResidual<EvalT, Traits>::postRegistrationSetup(
       projectedStress.get_view(), "XXX", worksetSize, numQPs);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ScalarL2ProjectionResidual<EvalT, Traits>::evaluateFields(
@@ -121,5 +121,5 @@ ScalarL2ProjectionResidual<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

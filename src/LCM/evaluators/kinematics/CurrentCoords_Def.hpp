@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 CurrentCoords<EvalT, Traits>::CurrentCoords(
     const Teuchos::ParameterList&        p,
@@ -37,7 +37,7 @@ CurrentCoords<EvalT, Traits>::CurrentCoords(
   numDims     = dims[2];
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 CurrentCoords<EvalT, Traits>::postRegistrationSetup(
@@ -49,7 +49,7 @@ CurrentCoords<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(currentCoords, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 CurrentCoords<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -61,5 +61,5 @@ CurrentCoords<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
             refCoords(cell, node, dim) + displacement(cell, node, dim);
 }
 
-//**********************************************************************
+//*****
 }  // namespace LCM

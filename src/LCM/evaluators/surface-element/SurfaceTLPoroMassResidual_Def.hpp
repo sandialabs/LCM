@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <MiniTensor.h>
 
@@ -13,7 +13,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
     const Teuchos::ParameterList&        p,
@@ -104,7 +104,7 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
   if (haveMech) JName = "surf_J_old";
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceTLPoroMassResidual<EvalT, Traits>::postRegistrationSetup(
@@ -166,7 +166,7 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::postRegistrationSetup(
   intrepidBasis->getValues(refGrads, refPoints, Intrepid2::OPERATOR_GRAD);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(
@@ -257,5 +257,5 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

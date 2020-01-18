@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <MiniTensor.h>
 
@@ -11,7 +11,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 SurfaceCohesiveResidual<EvalT, Traits>::SurfaceCohesiveResidual(
     const Teuchos::ParameterList&        p,
@@ -52,7 +52,7 @@ SurfaceCohesiveResidual<EvalT, Traits>::SurfaceCohesiveResidual(
   num_surf_dims_  = num_dims_ - 1;
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceCohesiveResidual<EvalT, Traits>::postRegistrationSetup(
@@ -80,7 +80,7 @@ SurfaceCohesiveResidual<EvalT, Traits>::postRegistrationSetup(
   intrepid_basis_->getValues(ref_grads_, ref_points_, Intrepid2::OPERATOR_GRAD);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceCohesiveResidual<EvalT, Traits>::evaluateFields(
@@ -118,5 +118,5 @@ SurfaceCohesiveResidual<EvalT, Traits>::evaluateFields(
     }  // end of planeNode loop
   }    // end of cell loop
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

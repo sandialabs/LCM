@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(
     const Teuchos::ParameterList& p)
@@ -38,7 +38,7 @@ NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(
   this->setName("NSContravarientMetricTensor");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSContravarientMetricTensor<EvalT, Traits>::postRegistrationSetup(
@@ -60,7 +60,7 @@ NSContravarientMetricTensor<EvalT, Traits>::postRegistrationSetup(
       Gc.get_view(), "XXX", numCells, numQPs, numDims, numDims);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSContravarientMetricTensor<EvalT, Traits>::evaluateFields(
@@ -93,5 +93,5 @@ NSContravarientMetricTensor<EvalT, Traits>::evaluateFields(
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

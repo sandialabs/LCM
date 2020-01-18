@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 // Test of barycentric subdivision.
 // Reads in a mesh and applies the barycentric subdivision algorithm
 // to it. Restricted to simplicial complexes.

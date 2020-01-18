@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -17,7 +17,7 @@ Sqr(const ScalarT& num)
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 CahnHillChemTerm<EvalT, Traits>::CahnHillChemTerm(
     const Teuchos::ParameterList& p)
@@ -47,7 +47,7 @@ CahnHillChemTerm<EvalT, Traits>::CahnHillChemTerm(
   this->setName("CahnHillChemTerm");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 CahnHillChemTerm<EvalT, Traits>::postRegistrationSetup(
@@ -60,7 +60,7 @@ CahnHillChemTerm<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(chemTerm, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 CahnHillChemTerm<EvalT, Traits>::evaluateFields(

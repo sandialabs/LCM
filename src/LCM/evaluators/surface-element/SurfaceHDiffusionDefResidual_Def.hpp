@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <MiniTensor.h>
 
@@ -16,7 +16,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
     const Teuchos::ParameterList&        p,
@@ -121,7 +121,7 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
   if (haveMech) eqpsName = p.get<std::string>("eqps Name") + "_old";
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceHDiffusionDefResidual<EvalT, Traits>::postRegistrationSetup(
@@ -177,7 +177,7 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::postRegistrationSetup(
   intrepidBasis->getValues(refGrads, refPoints, Intrepid2::OPERATOR_GRAD);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
@@ -384,5 +384,5 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

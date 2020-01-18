@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 #ifdef ALBANY_TIMER
 #include <chrono>
 #endif
@@ -13,7 +13,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::
     DOFVecGradInterpolationBase(
@@ -41,7 +41,7 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::
   vecDim = dims[2];
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
@@ -54,7 +54,7 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
 }
 
-//*********************************************************************
+//****
 // KOKKOS functor Residual
 
 #ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
@@ -135,7 +135,7 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
 }
 
 // Specialization for Jacobian evaluation taking advantage of known sparsity
-//**********************************************************************
+//*****
 // Kokkos functor Jacobian
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 #ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
@@ -174,7 +174,7 @@ operator()(
   }
 }
 #endif
-//**********************************************************************
+//*****
 template <typename Traits>
 void
 FastSolutionVecGradInterpolationBase<

@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "PHAL_MapToPhysicalFrame.hpp"
@@ -11,7 +11,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 MapToPhysicalFrame<EvalT, Traits>::MapToPhysicalFrame(
     const Teuchos::ParameterList&        p,
@@ -41,7 +41,7 @@ MapToPhysicalFrame<EvalT, Traits>::MapToPhysicalFrame(
   this->setName("MapToPhysicalFrame" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 MapToPhysicalFrame<EvalT, Traits>::postRegistrationSetup(
@@ -58,7 +58,7 @@ MapToPhysicalFrame<EvalT, Traits>::postRegistrationSetup(
 
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
 }
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 MapToPhysicalFrame<EvalT, Traits>::evaluateFields(
@@ -76,5 +76,5 @@ MapToPhysicalFrame<EvalT, Traits>::evaluateFields(
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace HMC {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 MicroResidual<EvalT, Traits>::MicroResidual(const Teuchos::ParameterList& p)
     : microStress(
@@ -58,7 +58,7 @@ MicroResidual<EvalT, Traits>::MicroResidual(const Teuchos::ParameterList& p)
   numDims  = dims[3];
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 MicroResidual<EvalT, Traits>::postRegistrationSetup(
@@ -75,7 +75,7 @@ MicroResidual<EvalT, Traits>::postRegistrationSetup(
   if (enableTransient) this->utils.setFieldData(epsDotDot, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 MicroResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -117,5 +117,5 @@ MicroResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     }
 }
 
-//**********************************************************************
+//*****
 }  // namespace HMC

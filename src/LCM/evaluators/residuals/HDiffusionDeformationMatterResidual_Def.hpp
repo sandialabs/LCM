@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <Intrepid2_FunctionSpaceTools.hpp>
 #include <Phalanx_DataLayout.hpp>
@@ -14,7 +14,7 @@
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 HDiffusionDeformationMatterResidual<EvalT, Traits>::
     HDiffusionDeformationMatterResidual(
@@ -117,7 +117,7 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::
   // std::cout << "End of Hdiff ctor" << std::endl;
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 HDiffusionDeformationMatterResidual<EvalT, Traits>::postRegistrationSetup(
@@ -173,7 +173,7 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::postRegistrationSetup(
       DL.get_view(), "XXX", worksetSize, numQPs, numDims);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(
@@ -342,5 +342,5 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

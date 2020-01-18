@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -11,7 +11,7 @@
 
 namespace PHAL {
 const double pi = 3.1415926535897932385;
-//**********************************************************************
+//*****
 
 template <typename EvalT, typename Traits>
 LinComprNSBodyForce<EvalT, Traits>::LinComprNSBodyForce(
@@ -62,7 +62,7 @@ LinComprNSBodyForce<EvalT, Traits>::LinComprNSBodyForce(
   this->setName("LinComprNSBodyForce");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 LinComprNSBodyForce<EvalT, Traits>::postRegistrationSetup(
@@ -77,7 +77,7 @@ LinComprNSBodyForce<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(force, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 LinComprNSBodyForce<EvalT, Traits>::evaluateFields(

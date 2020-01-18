@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 NSTauT<EvalT, Traits>::NSTauT(const Teuchos::ParameterList& p)
     : V(p.get<std::string>("Velocity QP Variable Name"),
@@ -48,7 +48,7 @@ NSTauT<EvalT, Traits>::NSTauT(const Teuchos::ParameterList& p)
   this->setName("NSTauT");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSTauT<EvalT, Traits>::postRegistrationSetup(
@@ -67,7 +67,7 @@ NSTauT<EvalT, Traits>::postRegistrationSetup(
   normGc = Kokkos::createDynRankView(Gc.get_view(), "YYY", numCells, numQPs);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSTauT<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -91,5 +91,5 @@ NSTauT<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

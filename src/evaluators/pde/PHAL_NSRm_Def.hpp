@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 NSRm<EvalT, Traits>::NSRm(const Teuchos::ParameterList& p)
     : pGrad(
@@ -71,7 +71,7 @@ NSRm<EvalT, Traits>::NSRm(const Teuchos::ParameterList& p)
   this->setName("NSRm");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSRm<EvalT, Traits>::postRegistrationSetup(
@@ -93,7 +93,7 @@ NSRm<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(Rm, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSRm<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)

@@ -1,15 +1,15 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Phalanx_DataLayout.hpp"
 #include "Teuchos_TestForException.hpp"
 
 namespace LCM {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 SurfaceDiffusionResidual<EvalT, Traits>::SurfaceDiffusionResidual(
     const Teuchos::ParameterList&        p,
@@ -56,7 +56,7 @@ SurfaceDiffusionResidual<EvalT, Traits>::SurfaceDiffusionResidual(
   numPlaneDims  = numDims - 1;
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceDiffusionResidual<EvalT, Traits>::postRegistrationSetup(
@@ -86,7 +86,7 @@ SurfaceDiffusionResidual<EvalT, Traits>::postRegistrationSetup(
   intrepidBasis->getValues(refGrads, refPoints, Intrepid2::OPERATOR_GRAD);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 SurfaceDiffusionResidual<EvalT, Traits>::evaluateFields(
@@ -103,5 +103,5 @@ SurfaceDiffusionResidual<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//**********************************************************************
+//*****
 }  // namespace LCM

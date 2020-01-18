@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 NSBodyForce<EvalT, Traits>::NSBodyForce(const Teuchos::ParameterList& p)
     : force(
@@ -72,7 +72,7 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(const Teuchos::ParameterList& p)
   this->setName("NSBodyForce");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSBodyForce<EvalT, Traits>::postRegistrationSetup(
@@ -90,7 +90,7 @@ NSBodyForce<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(force, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSBodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)

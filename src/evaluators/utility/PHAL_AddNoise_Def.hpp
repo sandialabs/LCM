@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include <time.h>
 
@@ -17,7 +17,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
     const Teuchos::ParameterList& p)
@@ -85,7 +85,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
   this->setName("AddNoiseBase" + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 AddNoiseBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
@@ -107,7 +107,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::preEvaluate(
   if (reset_seed_pre_eval) generator.seed(seed);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
 AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(

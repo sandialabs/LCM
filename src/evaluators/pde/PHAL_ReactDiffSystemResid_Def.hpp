@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
     const Teuchos::ParameterList& p)
@@ -108,7 +108,7 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
   *out << " numDims = " << numDims << "\n";
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ReactDiffSystemResid<EvalT, Traits>::postRegistrationSetup(
@@ -123,7 +123,7 @@ ReactDiffSystemResid<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(Residual, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 ReactDiffSystemResid<EvalT, Traits>::evaluateFields(
@@ -167,5 +167,5 @@ ReactDiffSystemResid<EvalT, Traits>::evaluateFields(
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

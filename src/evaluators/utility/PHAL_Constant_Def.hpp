@@ -1,14 +1,14 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "PHAL_Utilities.hpp"
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 Constant<EvalT, Traits>::Constant(Teuchos::ParameterList& p)
     : value(p.get<RealType>("Value")),
@@ -22,7 +22,7 @@ Constant<EvalT, Traits>::Constant(Teuchos::ParameterList& p)
   this->setName(n + PHX::print<EvalT>());
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 Constant<EvalT, Traits>::postRegistrationSetup(
@@ -33,12 +33,12 @@ Constant<EvalT, Traits>::postRegistrationSetup(
   PHAL::set(constant, value);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 Constant<EvalT, Traits>::evaluateFields(typename Traits::EvalData d)
 {
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

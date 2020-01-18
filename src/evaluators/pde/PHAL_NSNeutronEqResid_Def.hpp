@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(
     const Teuchos::ParameterList& p)
@@ -70,7 +70,7 @@ NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(
   this->setName("NSNeutronEqResid");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSNeutronEqResid<EvalT, Traits>::postRegistrationSetup(
@@ -96,7 +96,7 @@ NSNeutronEqResid<EvalT, Traits>::postRegistrationSetup(
       Kokkos::createDynRankView(Neutron.get_view(), "XXX", numCells, numQPs);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSNeutronEqResid<EvalT, Traits>::evaluateFields(
@@ -128,5 +128,5 @@ NSNeutronEqResid<EvalT, Traits>::evaluateFields(
       true);  // "true" sums into
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

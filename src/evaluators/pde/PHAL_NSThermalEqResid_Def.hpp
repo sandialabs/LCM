@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 NSThermalEqResid<EvalT, Traits>::NSThermalEqResid(
     const Teuchos::ParameterList& p)
@@ -97,7 +97,7 @@ NSThermalEqResid<EvalT, Traits>::NSThermalEqResid(
   this->setName("NSThermalEqResid");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSThermalEqResid<EvalT, Traits>::postRegistrationSetup(
@@ -125,7 +125,7 @@ NSThermalEqResid<EvalT, Traits>::postRegistrationSetup(
       Temperature.get_view(), "XXX", numCells, numQPs);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 NSThermalEqResid<EvalT, Traits>::evaluateFields(
@@ -178,5 +178,5 @@ NSThermalEqResid<EvalT, Traits>::evaluateFields(
   }
 }
 
-//**********************************************************************
+//*****
 }  // namespace PHAL

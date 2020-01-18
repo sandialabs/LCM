@@ -1,8 +1,8 @@
-//*****************************************************************
+//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory
-//*****************************************************************
+//
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -10,7 +10,7 @@
 
 namespace PHAL {
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(
     const Teuchos::ParameterList& p)
@@ -50,7 +50,7 @@ LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(
   this->setName("LangevinNoiseTerm");
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 LangevinNoiseTerm<EvalT, Traits>::postRegistrationSetup(
@@ -62,7 +62,7 @@ LangevinNoiseTerm<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(noiseTerm, fm);
 }
 
-//**********************************************************************
+//*****
 template <typename EvalT, typename Traits>
 void
 LangevinNoiseTerm<EvalT, Traits>::evaluateFields(

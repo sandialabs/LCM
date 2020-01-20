@@ -632,20 +632,6 @@ if(NOT ALBANY_LIBRARIES_ONLY)
 
   set(ALBANY_EXECUTABLES Albany)
 
-  if(ALBANY_MPMD)
-    add_executable(AlbanyMPMD Main_Solve_MPMD.cpp)
-    set(ALBANY_EXECUTABLES ${ALBANY_EXECUTABLES} AlbanyMPMD)
-  endif()
-
-  if(ALBANY_DAKOTA)
-    add_executable(AlbanyDakota Main_Dakota.cpp Albany_Dakota.cpp
-                                Albany_Dakota.hpp)
-    set(ALBANY_EXECUTABLES ${ALBANY_EXECUTABLES} AlbanyDakota)
-  endif()
-
-  add_executable(AlbanyAnalysis Main_Analysis.cpp)
-  set(ALBANY_EXECUTABLES ${ALBANY_EXECUTABLES} AlbanyAnalysis)
-
 endif(NOT ALBANY_LIBRARIES_ONLY)
 # End declaration of executables
 

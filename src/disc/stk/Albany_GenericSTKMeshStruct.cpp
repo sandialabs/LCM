@@ -714,20 +714,12 @@ GenericSTKMeshStruct::rebalanceAdaptedMeshT(
 
   Teuchos::ParameterList graph_options;
 
-  // graph_options.sublist(stk::rebalance::Zoltan::default_parameters_name()).set("LOAD
-  // BALANCING METHOD"      , "4");
-  // graph_options.sublist(stk::rebalance::Zoltan::default_parameters_name()).set("ZOLTAN
-  // DEBUG LEVEL"      , "10");
-
   if (params_->isSublist("Rebalance Options")) {
     const Teuchos::RCP<Teuchos::ParameterList>& load_balance_method =
         Teuchos::sublist(params_, "Rebalance Options");
 
     // Set the desired parameters. The options are shown in
     // TRILINOS_ROOT/packages/stk/stk_rebalance/ZontanPartition.cpp
-
-    //      load_balance_method.set("LOAD BALANCING METHOD"      , "4");
-    //      load_balance_method.set("ZOLTAN DEBUG LEVEL"      , "10");
 
     graph_options.sublist(stk::rebalance::Zoltan::default_parameters_name()) =
         *load_balance_method;
@@ -747,39 +739,6 @@ GenericSTKMeshStruct::rebalanceAdaptedMeshT(
   if (comm->getRank() == 0)
     std::cout << "After rebalance: Imbalance threshold is = " << imbalance
               << endl;
-
-#if 0  // Other experiments at rebalancing
-
-    // Configure Zoltan to use graph-based partitioning
-    Teuchos::ParameterList graph;
-    Teuchos::ParameterList lb_method;
-    lb_method.set("LOAD BALANCING METHOD"      , "4");
-    graph.sublist(stk::rebalance::Zoltan::default_parameters_name()) = lb_method;
-
-    stk::rebalance::Zoltan zoltan_partitiona(getMpiCommFromEpetraComm(*comm), numDim, graph);
-
-    *out << "Universal part " << comm->MyPID() << "  " <<
-      stk::mesh::count_selected_entities(selector, bulkData->buckets(metaData->element_rank())) << endl;
-    *out << "Owned part " << comm->MyPID() << "  " <<
-      stk::mesh::count_selected_entities(owned_selector, bulkData->buckets(metaData->element_rank())) << endl;
-
-    stk::rebalance::rebalance(*bulkData, owned_selector, coordinates_field, NULL, zoltan_partitiona);
-
-    *out << "After rebal " << comm->MyPID() << "  " <<
-      stk::mesh::count_selected_entities(owned_selector, bulkData->buckets(metaData->node_rank())) << endl;
-    *out << "After rebal nelements " << comm->MyPID() << "  " <<
-      stk::mesh::count_selected_entities(owned_selector, bulkData->buckets(metaData->element_rank())) << endl;
-
-
-    imbalance = stk::rebalance::check_balance(*bulkData, NULL,
-      metaData->node_rank(), &selector);
-
-    if(comm->MyPID() == 0){
-
-      *out << "Before second rebal: Imbalance threshold is = " << imbalance << endl;
-
-    }
-#endif
 
 #else
   // Silence compiler warnings

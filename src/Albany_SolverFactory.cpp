@@ -13,18 +13,10 @@
 #include "Albany_ThyraUtils.hpp"
 #include "Albany_Utils.hpp"
 
-#ifdef ALBANY_ATO
-#include "ATO_Solver.hpp"
-#endif
-
 #if defined(ALBANY_LCM) && defined(ALBANY_STK)
 #include "Schwarz_Alternating.hpp"
 #include "Schwarz_Coupled.hpp"
 #include "Schwarz_PiroObserver.hpp"
-#endif
-
-#ifdef ALBANY_AERAS
-#include "Aeras/Aeras_HVDecorator.hpp"
 #endif
 
 #include "Piro_NOXSolver.hpp"
@@ -55,10 +47,6 @@
 #include "Teuchos_YamlParameterListHelpers.hpp"
 #include "Thyra_DefaultModelEvaluatorWithSolveFactory.hpp"
 #include "Thyra_DetachedVectorView.hpp"
-
-#if defined(ALBANY_RYTHMOS)
-#include "Rythmos_IntegrationObserverBase.hpp"
-#endif
 
 namespace {
 
@@ -122,27 +110,6 @@ SolverFactory::SolverFactory(
     setSolverParamDefaults(defaultSolverParams.get(), comm->getRank());
     appParams->setParametersNotAlreadySet(*defaultSolverParams);
   }
-
-  if (!appParams->isParameter("Build Type")) {
-    if (comm->getRank() == 0) {
-      *out << "\nWARNING! You have not set the entry 'Build Type' in the input "
-              "file. This will cause Albany to *assume* a Tpetra build.\n"
-           << "         If that's not ok, and you specified Epetra-based "
-              "solvers/preconditioners, you will get an dynamic cast error "
-              "like this:\n"
-           << "\n"
-           << "           "
-              "dyn_cast<Thyra::EpetraLinearOpBase>(Thyra::LinearOpBase<double>)"
-              " : Error, the object with the concrete type "
-              "'Thyra::TpetraLinearOp<[Some Template Args]>' (passed in "
-              "through the interface type 'Thyra::LinearOpBase<double>')  does "
-              "not support the interface 'Thyra::EpetraLinearOpBase' and the "
-              "dynamic cast failed!\n"
-           << "\n"
-           << "         If that happens, all you have to do is to set 'Build "
-              "Type: Epetra' in the main level of your input yaml file.\n\n";
-    }
-  }
   appParams->validateParametersAndSetDefaults(*getValidAppParameters(), 0);
   if (appParams->isSublist("Debug Output")) {
     Teuchos::RCP<Teuchos::ParameterList> debugPL =
@@ -173,28 +140,6 @@ SolverFactory::SolverFactory(
         rcp(new Teuchos::ParameterList());
     setSolverParamDefaults(defaultSolverParams.get(), comm->getRank());
     appParams->setParametersNotAlreadySet(*defaultSolverParams);
-  }
-
-  if (!appParams->isParameter("Build Type")) {
-    if (comm->getRank() == 0) {
-      *out << "\nWARNING! You have not set the entry 'Build Type' in the input "
-              "parameter list. This will cause Albany to *assume* a Tpetra "
-              "build.\n"
-           << "         If that's not ok, and you specified Epetra-based "
-              "solvers/preconditioners, you will get an dynamic cast error "
-              "like this:\n"
-           << "\n"
-           << "           "
-              "dyn_cast<Thyra::EpetraLinearOpBase>(Thyra::LinearOpBase<double>)"
-              " : Error, the object with the concrete type "
-              "'Thyra::TpetraLinearOp<[Some Template Args]>' (passed in "
-              "through the interface type 'Thyra::LinearOpBase<double>')  does "
-              "not support the interface 'Thyra::EpetraLinearOpBase' and the "
-              "dynamic cast failed!\n"
-           << "\n"
-           << "         If that happens, all you have to do is to set 'Build "
-              "Type: Epetra' in the main level of your parameter list.\n\n";
-    }
   }
   appParams->validateParametersAndSetDefaults(*getValidAppParameters(), 0);
   if (appParams->isSublist("Debug Output")) {
@@ -799,9 +744,6 @@ SolverFactory::getValidAppParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
       rcp(new Teuchos::ParameterList("ValidAppParams"));
-
-  validPL->set(
-      "Build Type", "Tpetra", "The type of run (e.g., Epetra, Tpetra)");
 
   validPL->sublist("Problem", false, "Problem sublist");
   validPL->sublist("Debug Output", false, "Debug Output sublist");

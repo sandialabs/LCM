@@ -281,7 +281,6 @@ class StateManager
       sideSetStatesToStore;
 
   /// Discretization object which allows StateManager to perform input/output
-  /// with exodus and Epetra vectors
   Teuchos::RCP<Albany::AbstractDiscretization> disc;
 
   /// NEW WAY

@@ -31,8 +31,6 @@ namespace Albany {
  * saved using this stateless observer impl, so updateStates is not called. The
  * order in LOCA at present follows:
  *     solve;
- *     optionally compute and save (Epetra only) eigendata: no side effect
- *       except writing files;
  *     postProcessContinuationStep: eval RF;
  *     printSolution: eval sfm, updateStates, write to exo file.
  * Problems remain in how LOCA::AdaptiveStepper and Albany interact, but I think

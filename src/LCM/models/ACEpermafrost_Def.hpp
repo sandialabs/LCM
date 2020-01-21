@@ -46,32 +46,31 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   soil_yield_strength_  = p->get<RealType>("ACE Soil Yield Strength", 0.0);
 
   if (p->isParameter("ACE Time File") == true) {
-    std::string const filename = p->get<std::string>("ACE Time File");
-    time_                      = vectorFromFile(filename);
+    auto const filename = p->get<std::string>("ACE Time File");
+    time_               = vectorFromFile(filename);
   }
   if (p->isParameter("ACE Sea Level File") == true) {
-    std::string const filename = p->get<std::string>("ACE Sea Level File");
-    sea_level_                 = vectorFromFile(filename);
+    auto const filename = p->get<std::string>("ACE Sea Level File");
+    sea_level_          = vectorFromFile(filename);
   }
   if (p->isParameter("ACE Z Depth File") == true) {
-    std::string const filename = p->get<std::string>("ACE Z Depth File");
-    z_above_mean_sea_level_    = vectorFromFile(filename);
+    auto const filename     = p->get<std::string>("ACE Z Depth File");
+    z_above_mean_sea_level_ = vectorFromFile(filename);
   }
   if (p->isParameter("ACE Salinity File") == true) {
-    std::string const filename = p->get<std::string>("ACE Salinity File");
-    salinity_                  = vectorFromFile(filename);
+    auto const filename = p->get<std::string>("ACE Salinity File");
+    salinity_           = vectorFromFile(filename);
   }
   if (p->isParameter("ACE Air Saturation File") == true) {
-    std::string const filename = p->get<std::string>("ACE Air Saturation File");
-    air_saturation_            = vectorFromFile(filename);
+    auto const filename = p->get<std::string>("ACE Air Saturation File");
+    air_saturation_     = vectorFromFile(filename);
   }
   if (p->isParameter("ACE Porosity File") == true) {
-    std::string const filename = p->get<std::string>("ACE Porosity File");
-    porosity_from_file_        = vectorFromFile(filename);
+    auto const filename = p->get<std::string>("ACE Porosity File");
+    porosity_from_file_ = vectorFromFile(filename);
   }
   if (p->isParameter("ACE Freezing Curve Width File") == true) {
-    std::string const filename =
-        p->get<std::string>("ACE Freezing Curve Width File");
+    auto const filename = p->get<std::string>("ACE Freezing Curve Width File");
     freezing_curve_width_ = vectorFromFile(filename);
   }
   ALBANY_ASSERT(
@@ -96,12 +95,12 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
       "ACE Freezing Curve Width File must match.");
 
   // retrieve appropriate field name strings
-  std::string const cauchy_string       = field_name_map_["Cauchy_Stress"];
-  std::string const Fp_string           = field_name_map_["Fp"];
-  std::string const eqps_string         = field_name_map_["eqps"];
-  std::string const yieldSurface_string = field_name_map_["Yield_Surface"];
-  std::string const F_string            = field_name_map_["F"];
-  std::string const J_string            = field_name_map_["J"];
+  auto const cauchy_string       = field_name_map_["Cauchy_Stress"];
+  auto const Fp_string           = field_name_map_["Fp"];
+  auto const eqps_string         = field_name_map_["eqps"];
+  auto const yieldSurface_string = field_name_map_["Yield_Surface"];
+  auto const F_string            = field_name_map_["F"];
+  auto const J_string            = field_name_map_["J"];
 
   // define the dependent fields
   setDependentField(F_string, dl->qp_tensor);
@@ -267,12 +266,12 @@ ACEpermafrostMiniKernel<EvalT, Traits>::init(
     FieldMap<const ScalarT>& input_fields,
     FieldMap<ScalarT>&       output_fields)
 {
-  std::string cauchy_string       = field_name_map_["Cauchy_Stress"];
-  std::string Fp_string           = field_name_map_["Fp"];
-  std::string eqps_string         = field_name_map_["eqps"];
-  std::string yieldSurface_string = field_name_map_["Yield_Surface"];
-  std::string F_string            = field_name_map_["F"];
-  std::string J_string            = field_name_map_["J"];
+  auto const cauchy_string       = field_name_map_["Cauchy_Stress"];
+  auto const Fp_string           = field_name_map_["Fp"];
+  auto const eqps_string         = field_name_map_["eqps"];
+  auto const yieldSurface_string = field_name_map_["Yield_Surface"];
+  auto const F_string            = field_name_map_["F"];
+  auto const J_string            = field_name_map_["J"];
 
   def_grad_          = *input_fields[F_string];
   J_                 = *input_fields[J_string];
@@ -332,25 +331,24 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Tensor       F(num_dims_);
   Tensor       sigma(num_dims_);
 
-  auto const coords       = this->model_.getCoordVecField();
-  auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
-  auto const current_time = current_time_;
+  ScalarT const& E     = elastic_modulus_(cell, pt);
+  ScalarT const& nu    = poissons_ratio_(cell, pt);
+  ScalarT const& K     = hardening_modulus_(cell, pt);
+  ScalarT const& J1    = J_(cell, pt);
+  ScalarT const& Tcurr = temperature_(cell, pt);
+  ScalarT const  Jm23  = 1.0 / std::cbrt(J1 * J1);
+  ScalarT const  kappa = E / (3.0 * (1.0 - 2.0 * nu));
+  ScalarT const  mu    = E / (2.0 * (1.0 + nu));
+  ScalarT        Y     = yield_strength_(cell, pt);
 
-  ScalarT const E     = elastic_modulus_(cell, pt);
-  ScalarT const nu    = poissons_ratio_(cell, pt);
-  ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
-  ScalarT const mu    = E / (2.0 * (1.0 + nu));
-  ScalarT const K     = hardening_modulus_(cell, pt);
-  ScalarT const J1    = J_(cell, pt);
-  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
-  ScalarT const Tcurr = temperature_(cell, pt);
-  auto const&   Told  = T_old_(cell, pt);
-  auto const&   iold  = ice_saturation_old_(cell, pt);
-  ScalarT       Y     = yield_strength_(cell, pt);
-
-  auto&& delta_time    = delta_time_(0);
-  auto&& failed        = failed_(cell, 0);
-  auto&& exposure_time = exposure_time_(cell, pt);
+  auto const  coords        = this->model_.getCoordVecField();
+  auto const  height        = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
+  auto const  current_time  = current_time_;
+  auto const& Told          = T_old_(cell, pt);
+  auto const& iold          = ice_saturation_old_(cell, pt);
+  auto&&      delta_time    = delta_time_(0);
+  auto&&      failed        = failed_(cell, 0);
+  auto&&      exposure_time = exposure_time_(cell, pt);
 
   // Determine if erosion has occurred.
   auto const erosion_rate = erosion_rate_;

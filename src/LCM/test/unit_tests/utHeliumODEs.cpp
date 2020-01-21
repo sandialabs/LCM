@@ -40,7 +40,6 @@ using Teuchos::rcp;
 
 TEUCHOS_UNIT_TEST(HeliumODEs, test1)
 {
-  Albany::build_type(Albany::BuildType::Tpetra);
   // A mpi object must be instantiated
   Teuchos::GlobalMPISession        mpi_session(void);
   Teuchos::RCP<const Teuchos_Comm> commT =

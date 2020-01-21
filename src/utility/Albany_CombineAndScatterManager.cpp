@@ -52,8 +52,7 @@ CombineAndScatterManager::create_aura_vss() const
       createVectorSpacesIntersection(shared_aura_vs, owned_vs, comm);
 }
 
-// Utility function that returns a concrete manager, depending on the return
-// value of Albany::build_type().
+// Utility function that returns a concrete manager.
 Teuchos::RCP<CombineAndScatterManager>
 createCombineAndScatterManager(
     const Teuchos::RCP<const Thyra_VectorSpace>& owned,

@@ -104,24 +104,6 @@ main(int argc, char* argv[])
 
     Albany::SolverFactory slvrfctry(cmd.yaml_filename, comm);
 
-    auto const& bt =
-        slvrfctry.getParameters().get<std::string>("Build Type", "NONE");
-
-    if (bt == "Tpetra") {
-      // Set the static variable that denotes this as a Tpetra run
-      static_cast<void>(Albany::build_type(Albany::BuildType::Tpetra));
-    } else if (bt == "Epetra") {
-      // Set the static variable that denotes this as a Epetra run
-      static_cast<void>(Albany::build_type(Albany::BuildType::Epetra));
-    } else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
-          true,
-          Teuchos::Exceptions::InvalidArgument,
-          "Error! Invalid choice (" + bt +
-              ") for 'BuildType'.\n"
-              "       Valid choices are 'Epetra', 'Tpetra'.\n");
-    }
-
     RCP<Albany::Application>                             app;
     const RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
         slvrfctry.createAndGetAlbanyApp(app, comm, comm);

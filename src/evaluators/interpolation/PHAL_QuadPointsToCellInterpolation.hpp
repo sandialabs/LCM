@@ -50,7 +50,6 @@ class QuadPointsToCellInterpolationBase
 
   std::vector<PHX::DataLayout::size_type> qp_dims;
 
-
   // Input:
   PHX::MDField<const ScalarT>                      field_qp;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> w_measure;

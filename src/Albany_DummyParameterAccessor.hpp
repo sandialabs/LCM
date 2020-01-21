@@ -4,7 +4,6 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-
 #ifndef ALBANY_DUMMYPARAMETERACCESSOR_H
 #define ALBANY_DUMMYPARAMETERACCESSOR_H
 

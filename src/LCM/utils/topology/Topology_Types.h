@@ -34,13 +34,13 @@
 #include <Shards_CellTopology.hpp>
 
 // Teuchos includes
+#include <MiniTensor.h>
+
 #include <Teuchos_ArrayRCP.hpp>
 #include <Teuchos_CommandLineProcessor.hpp>
 #include <Teuchos_ParameterList.hpp>
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_ScalarTraits.hpp>
-
-#include <MiniTensor.h>
 
 // Albany includes
 #include "Albany_AbstractDiscretization.hpp"

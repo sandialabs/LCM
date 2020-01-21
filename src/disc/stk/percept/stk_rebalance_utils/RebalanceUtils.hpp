@@ -1,11 +1,7 @@
-/*------------------------------------------------------------------------*/
-/*                 Copyright 2010 National Technology & Engineering Solutions of Sandia, LLC (NTESS)                     */
-/*  Under terms of Contract DE-AC04-94AL85000, there is a non-exclusive   */
-/*  license for use of this work by or on behalf of the U.S. Government.  */
-/*  Export of this program may require a license from the                 */
-/*  United States Government.                                             */
-/*------------------------------------------------------------------------*/
-
+//
+// Copyright 2001, 2002, 2010 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS)
+//
 #include <percept/PerceptMesh.hpp>
 #include <stk_mesh/base/Selector.hpp>
 #include <stk_mesh/base/Types.hpp>

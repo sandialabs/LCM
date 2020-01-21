@@ -134,9 +134,7 @@ MoertelT::StripZeros(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, double eps)
 {
   Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> out =
       Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(A.getRowMap(), 10));
-  for (size_t lrow = 0; lrow < A.getNodeNumRows();
-       ++lrow)
-  {
+  for (size_t lrow = 0; lrow < A.getNodeNumRows(); ++lrow) {
     GO grow = A.getRowMap()->getGlobalElement(lrow);
     if (grow < 0) {
       std::cout

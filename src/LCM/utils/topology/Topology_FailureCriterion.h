@@ -13,7 +13,6 @@
 #define LCM_Topology_FailureCriterion_h
 
 #include <cassert>
-
 #include <stk_mesh/base/FieldBase.hpp>
 
 #include "Teuchos_ScalarTraits.hpp"

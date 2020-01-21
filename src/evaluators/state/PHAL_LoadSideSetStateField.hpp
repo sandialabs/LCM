@@ -40,7 +40,6 @@ class LoadSideSetStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::string sideSetName;
   std::string fieldName;
   std::string stateName;
-
 };
 
 template <typename EvalT, typename Traits>

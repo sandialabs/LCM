@@ -55,7 +55,6 @@ class DOFInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   int numSideNodes;
   int numSideQPs;
-
 };
 
 // Some shortcut names

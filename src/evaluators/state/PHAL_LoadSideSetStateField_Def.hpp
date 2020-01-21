@@ -49,7 +49,6 @@ void
 LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
   TEUCHOS_TEST_FOR_EXCEPTION(
       workset.sideSets == Teuchos::null,
       std::logic_error,

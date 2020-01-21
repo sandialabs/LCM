@@ -4,7 +4,6 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-
 #ifndef PHAL_TYPE_KEY_MAP_HPP
 #define PHAL_TYPE_KEY_MAP_HPP
 

@@ -4,7 +4,6 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-
 #ifndef ALBANY_ABSTRACTPROBLEM_HPP
 #define ALBANY_ABSTRACTPROBLEM_HPP
 

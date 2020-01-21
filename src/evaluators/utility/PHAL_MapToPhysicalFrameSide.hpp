@@ -55,7 +55,6 @@ class MapToPhysicalFrameSide : public PHX::EvaluatorWithBaseImpl<Traits>,
   int         numSideQPs;
   std::string sideSetName;
 
-
   // Input:
   //! Values at vertices
   PHX::MDField<const MeshScalarT, Cell, Side, Vertex, Dim> coords_side_vertices;

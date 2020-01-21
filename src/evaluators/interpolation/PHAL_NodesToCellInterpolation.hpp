@@ -51,7 +51,6 @@ class NodesToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   bool isVectorField;
 
-
   // Input:
   PHX::MDField<const ScalarT>                         field_node;
   PHX::MDField<const RealType, Cell, Node, QuadPoint> BF;

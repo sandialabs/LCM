@@ -54,7 +54,6 @@ void
 QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
   MeshScalarT meas;
   int         numQPs = qp_dims[1];
 

@@ -4,7 +4,6 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-
 #ifndef PHAL_DIMENSION_HPP
 #define PHAL_DIMENSION_HPP
 

@@ -66,7 +66,6 @@ class DOFCellToSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   };
 
   LayoutType layout;
-
 };
 
 // Some shortcut names

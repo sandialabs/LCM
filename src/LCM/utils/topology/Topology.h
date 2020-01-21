@@ -794,9 +794,10 @@ class Topology
   shards::CellTopology
   get_cell_topology()
   {
-    stk::topology stk_topo_data = get_meta_data().get_topology(get_bulk_part() );
-    shards::CellTopology shards_ctd = stk::mesh::get_cell_topology(stk_topo_data);
-    return shards_ctd; 
+    stk::topology stk_topo_data = get_meta_data().get_topology(get_bulk_part());
+    shards::CellTopology shards_ctd =
+        stk::mesh::get_cell_topology(stk_topo_data);
+    return shards_ctd;
   }
 
   stk::mesh::Part&

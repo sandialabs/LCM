@@ -60,7 +60,6 @@ class DOFGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   int numSideNodes;
   int numSideQPs;
   int numDims;
-
 };
 
 // Some shortcut names

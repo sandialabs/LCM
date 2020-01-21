@@ -8,20 +8,19 @@
 #if !defined(LCM_Partition_h)
 #define LCM_Partition_h
 
+#include <MiniTensor_Geometry.h>
+#include <zoltan_cpp.h>
+
+#include <Albany_AbstractDiscretization.hpp>
+#include <Albany_DiscretizationFactory.hpp>
+#include <Albany_STKDiscretization.hpp>
+#include <Albany_Utils.hpp>
 #include <iostream>
 #include <iterator>
 #include <map>
 #include <memory>
 #include <set>
 #include <vector>
-
-#include <zoltan_cpp.h>
-
-#include <MiniTensor_Geometry.h>
-#include <Albany_AbstractDiscretization.hpp>
-#include <Albany_DiscretizationFactory.hpp>
-#include <Albany_STKDiscretization.hpp>
-#include <Albany_Utils.hpp>
 
 namespace LCM {
 

@@ -4,7 +4,6 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-
 #ifndef ALBANY_NODALGRAPHUTILS_HPP
 #define ALBANY_NODALGRAPHUTILS_HPP
 

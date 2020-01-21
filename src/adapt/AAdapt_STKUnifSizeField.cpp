@@ -131,10 +131,7 @@ namespace AAdapt
   }
 
   return false;  // don't terminate the loop
-}  // namespace
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
+}  // namespace AAdaptboolSTKUnifRefineField::operator()
 
 bool
 STKUnifUnrefineField::operator()(

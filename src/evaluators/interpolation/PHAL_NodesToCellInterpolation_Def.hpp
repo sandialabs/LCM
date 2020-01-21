@@ -67,7 +67,6 @@ void
 NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
   MeshScalarT meas;
   ScalarT     field_qp;
 

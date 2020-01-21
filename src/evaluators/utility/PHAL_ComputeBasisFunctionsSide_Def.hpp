@@ -161,7 +161,6 @@ void
 ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
   // TODO: use Intrepid routines as much as possible
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
 

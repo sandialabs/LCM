@@ -190,32 +190,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
 
     // create the local communicator
     lcomm_ = gcomm_->split(color, key);
-
-#if 0
-    // test this stuff on the mpi level
-    int grank,lrank;
-    MPI_Comm_rank(mpi_global_comm,&grank);
-    if (*mpi_local_comm != MPI_COMM_NULL)
-      MPI_Comm_rank(*mpi_local_comm,&lrank);
-    else
-      lrank = -1;
-    for (int proc=0; proc<gcomm_->NumProc(); ++proc)
-    {
-      if (proc==gcomm_->MyPID())
-      std::cout << "using mpi    comms: I am global rank " << grank << " and local rank " << lrank << std::endl;
-      gcomm_->Barrier();
-    }
-    // test this stuff on the epetra level
-    if (lComm())
-      for (int proc=0; proc<lcomm_->NumProc(); ++proc)
-      {
-        if (proc==lcomm_->MyPID())
-        std::cout << "using epetra comms: I am global rank " << gcomm_->MyPID() << " and local rank " << lcomm_->MyPID() << std::endl;
-        lcomm_->Barrier();
-      }
-    gcomm_->Barrier();
-#endif
-
 #else   // the easy serial case
     const Teuchos::SerialComm<LO>* serialcomm =
         dynamic_cast<const Teuchos::SerialComm<LO>*>(gcomm_.get());

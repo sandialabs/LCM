@@ -3,7 +3,6 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#include <Epetra_MpiComm.h>
 #include <MiniTensor.h>
 
 #include <Teuchos_ParameterList.hpp>

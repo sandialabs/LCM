@@ -53,12 +53,6 @@ MoertelT::solve33T(const double A[][3], double* x, const double* b)
   return true;
 }
 
-/*----------------------------------------------------------------------*
-  |                                                                 08/05|
-  |  modified version of the epetraext matrixmatrixadd                   |
-  |  NOTE:                                                               |
-  |  - A has to be FillComplete, B must NOT be FillComplete()            |
- *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 int
 MoertelT::MatrixMatrixAdd(
@@ -140,11 +134,10 @@ MoertelT::StripZeros(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, double eps)
 {
   Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> out =
       Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(A.getRowMap(), 10));
-  // Same as Epetra RowMap()
   for (size_t lrow = 0; lrow < A.getNodeNumRows();
-       ++lrow)  // Same as Epetra NumMyRows()
+       ++lrow)
   {
-    GO grow = A.getRowMap()->getGlobalElement(lrow);  // Same as Epetra GRID()
+    GO grow = A.getRowMap()->getGlobalElement(lrow);
     if (grow < 0) {
       std::cout
           << "***ERR*** MoertelT::StripZeros:\n"

@@ -7,11 +7,11 @@
 #ifndef PHAL_LANGEVINNOISETERM_HPP
 #define PHAL_LANGEVINNOISETERM_HPP
 
+#include "Albany_Types.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-#include "QCAD_EvaluatorTools.hpp"
 
 // Random and Gaussian number distribution
 #include <boost/random.hpp>
@@ -28,8 +28,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
-                          public PHX::EvaluatorDerived<EvalT, Traits>,
-                          public QCAD::EvaluatorTools<EvalT, Traits>
+                          public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT ScalarT;

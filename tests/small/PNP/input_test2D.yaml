@@ -1,7 +1,6 @@
 %YAML 1.1
 ---
 ANONYMOUS:
-  Build Type: Epetra
   Problem: 
     Name: PNP 2D
     Solution Method: Steady

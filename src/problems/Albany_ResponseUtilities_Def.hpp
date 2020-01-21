@@ -11,33 +11,9 @@
 #include "PHAL_ResponseSquaredL2DifferenceSide.hpp"
 #include "PHAL_ResponseThermalEnergy.hpp"
 #include "PHAL_SaveNodalField.hpp"
-#include "QCAD_ResponseCenterOfMass.hpp"
-#include "QCAD_ResponseFieldAverage.hpp"
-#include "QCAD_ResponseFieldIntegral.hpp"
-#include "QCAD_ResponseFieldValue.hpp"
-#include "QCAD_ResponseSaveField.hpp"
-#ifdef ALBANY_LANDICE
-#include "LandIce_ResponseBoundarySquaredL2Norm.hpp"
-#include "LandIce_ResponseGLFlux.hpp"
-#include "LandIce_ResponseSMBMismatch.hpp"
-#include "LandIce_ResponseSurfaceVelocityMismatch.hpp"
-#endif
 #if defined(ALBANY_LCM)
 #include "IPtoNodalField.hpp"
 #include "ProjectIPtoNodalField.hpp"
-#endif
-#ifdef ALBANY_ATO
-#include "ATO_HomogenizedConstantsResponse.hpp"
-#include "ATO_InterfaceEnergy.hpp"
-#include "ATO_InternalEnergyResponse.hpp"
-#include "ATO_ModalObjective.hpp"
-#include "ATO_StiffnessObjective.hpp"
-#include "ATO_TensorAverageResponse.hpp"
-#include "ATO_TensorPNormResponse.hpp"
-#endif
-#ifdef ALBANY_AERAS
-#include "Aeras_ShallowWaterResponseL2Error.hpp"
-#include "Aeras_ShallowWaterResponseL2Norm.hpp"
 #endif
 
 template <typename EvalT, typename Traits>
@@ -67,13 +43,7 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
   p->set<RCP<ParameterList>>("Parameters From Problem", paramsFromProblem);
   RCP<PHX::Evaluator<Traits>> res_ev;
 
-  if (responseName == "Field Integral") {
-    res_ev = rcp(new QCAD::ResponseFieldIntegral<EvalT, Traits>(*p, dl));
-  } else if (responseName == "Field Value") {
-    res_ev = rcp(new QCAD::ResponseFieldValue<EvalT, Traits>(*p, dl));
-  } else if (responseName == "Field Average") {
-    res_ev = rcp(new QCAD::ResponseFieldAverage<EvalT, Traits>(*p, dl));
-  } else if (responseName == "Squared L2 Difference Source ST Target ST") {
+  if (responseName == "Squared L2 Difference Source ST Target ST") {
     res_ev = rcp(
         new PHAL::ResponseSquaredL2DifferenceSST_TST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source ST Target MST") {
@@ -144,75 +114,11 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
       responseName == "Squared L2 Difference Side Source MST Target PST") {
     res_ev = rcp(
         new PHAL::ResponseSquaredL2DifferenceSMST_TPST<EvalT, Traits>(*p, dl));
-  }
-#ifdef ALBANY_LANDICE
-  else if (responseName == "Surface Velocity Mismatch") {
-    res_ev = rcp(
-        new LandIce::ResponseSurfaceVelocityMismatch<EvalT, Traits>(*p, dl));
-  } else if (responseName == "Surface Mass Balance Mismatch") {
-    auto thickness_st = paramsFromProblem->get<std::string>(
-        "Ice Thickness Scalar Type", "Real");
-    if (thickness_st == "Scalar") {
-      res_ev =
-          rcp(new LandIce::
-                  ResponseSMBMismatch<EvalT, Traits, typename EvalT::ScalarT>(
-                      *p, dl));
-    } else if (thickness_st == "MeshScalar") {
-      res_ev = rcp(
-          new LandIce::
-              ResponseSMBMismatch<EvalT, Traits, typename EvalT::MeshScalarT>(
-                  *p, dl));
-    } else if (thickness_st == "ParamScalar") {
-      res_ev = rcp(
-          new LandIce::
-              ResponseSMBMismatch<EvalT, Traits, typename EvalT::ParamScalarT>(
-                  *p, dl));
-    } else if (thickness_st == "Real") {
-      res_ev = rcp(
-          new LandIce::ResponseSMBMismatch<EvalT, Traits, RealType>(*p, dl));
-    } else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
-          true,
-          std::runtime_error,
-          "Error! Invalid scalar type for Ice Thickness.\n");
-    }
-  } else if (responseName == "Grounding Line Flux") {
-    res_ev = rcp(new LandIce::ResponseGLFlux<EvalT, Traits>(*p, dl));
-  } else if (responseName == "Boundary Squared L2 Norm") {
-    res_ev =
-        rcp(new LandIce::ResponseBoundarySquaredL2Norm<EvalT, Traits>(*p, dl));
-  }
-#endif
-  else if (responseName == "Center Of Mass") {
-    res_ev = rcp(new QCAD::ResponseCenterOfMass<EvalT, Traits>(*p, dl));
-  } else if (responseName == "Save Field") {
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-
-    res_ev = rcp(new QCAD::ResponseSaveField<EvalT, Traits>(*p, dl));
   } else if (responseName == "PHAL Field Integral") {
-    res_ev = rcp(new PHAL::ResponseFieldIntegral<EvalT, Traits>(*p, dl));
-  } else if (responseName == "PHAL Field IntegralT") {
-    // Leave this for backward compatibility
-    std::cout << "WARNING: 'PHAL Field IntegralT' is deprecated. You can just "
-                 "use 'PHAL Field Integral' (no T at the end).\n";
     res_ev = rcp(new PHAL::ResponseFieldIntegral<EvalT, Traits>(*p, dl));
   } else if (responseName == "PHAL Thermal Energy") {
     res_ev = rcp(new PHAL::ResponseThermalEnergy<EvalT, Traits>(*p, dl));
-  } else if (responseName == "PHAL Thermal EnergyT") {
-    // Leave this for backward compatibility
-    std::cout << "WARNING: 'PHAL Thermal EnergyT' is deprecated. You can just "
-                 "use 'PHAL Thermal Energy' (no T at the end).\n";
-    res_ev = rcp(new PHAL::ResponseThermalEnergy<EvalT, Traits>(*p, dl));
-  }
-#ifdef ALBANY_AERAS
-  else if (responseName == "Aeras Shallow Water L2 Error") {
-    res_ev = rcp(new Aeras::ShallowWaterResponseL2Error<EvalT, Traits>(*p, dl));
-  } else if (responseName == "Aeras Shallow Water L2 Norm") {
-    res_ev = rcp(new Aeras::ShallowWaterResponseL2Norm<EvalT, Traits>(*p, dl));
-  }
-#endif
-
-  else if (responseName == "Element Size Field") {
+  } else if (responseName == "Element Size Field") {
     p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
     p->set<RCP<DataLayout>>("Dummy Data Layout", dl->dummy);
     p->set<std::string>("Coordinate Vector Name", "Coord Vec");
@@ -223,121 +129,11 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
     p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
 
     res_ev = rcp(new PHAL::SaveNodalField<EvalT, Traits>(*p, dl));
-  } else if (responseName == "Modal Objective") {
-#ifdef ALBANY_ATO
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-
-    res_ev = rcp(new ATO::ModalObjective<EvalT, Traits>(*p, dl));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        Teuchos::Exceptions::InvalidParameter,
-        std::endl
-            << "Error!  Response function " << responseName << " not available!"
-            << std::endl
-            << "Albany/ATO not enabled." << std::endl);
-#endif
-  }
-
-  else if (responseName == "Stiffness Objective") {
-#ifdef ALBANY_ATO
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-    res_ev = rcp(new ATO::StiffnessObjective<EvalT, Traits>(*p, dl, meshSpecs));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        Teuchos::Exceptions::InvalidParameter,
-        std::endl
-            << "Error!  Response function " << responseName << " not available!"
-            << std::endl
-            << "Albany/ATO not enabled." << std::endl);
-#endif
-  }
-
-  else if (responseName == "Interface Energy") {
-#ifdef ALBANY_ATO
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-    res_ev = rcp(new ATO::InterfaceEnergy<EvalT, Traits>(*p, dl, meshSpecs));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        Teuchos::Exceptions::InvalidParameter,
-        std::endl
-            << "Error!  Response function " << responseName << " not available!"
-            << std::endl
-            << "Albany/ATO not enabled." << std::endl);
-#endif
-  }
-
-  else if (responseName == "Tensor PNorm Objective") {
-#ifdef ALBANY_ATO
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-    res_ev =
-        rcp(new ATO::TensorPNormResponse<EvalT, Traits>(*p, dl, meshSpecs));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        Teuchos::Exceptions::InvalidParameter,
-        std::endl
-            << "Error!  Response function " << responseName << " not available!"
-            << std::endl
-            << "Albany/ATO not enabled." << std::endl);
-#endif
-  }
-
-  else if (responseName == "Tensor Average Response") {
-#ifdef ALBANY_ATO
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-    res_ev = rcp(new ATO::TensorAverageResponse<EvalT, Traits>(*p, dl));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        Teuchos::Exceptions::InvalidParameter,
-        std::endl
-            << "Error!  Response function " << responseName << " not available!"
-            << std::endl
-            << "Albany/ATO not enabled." << std::endl);
-#endif
-  }
-
-  else if (responseName == "Homogenized Constants Response") {
-#ifdef ALBANY_ATO
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-    res_ev = rcp(new ATO::HomogenizedConstantsResponse<EvalT, Traits>(*p, dl));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        Teuchos::Exceptions::InvalidParameter,
-        std::endl
-            << "Error!  Response function " << responseName << " not available!"
-            << std::endl
-            << "Albany/ATO not enabled." << std::endl);
-#endif
-  }
-
-  else if (responseName == "Internal Energy Objective") {
-#ifdef ALBANY_ATO
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-
-    res_ev =
-        rcp(new ATO::InternalEnergyResponse<EvalT, Traits>(*p, dl, meshSpecs));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        Teuchos::Exceptions::InvalidParameter,
-        std::endl
-            << "Error!  Response function " << responseName << " not available!"
-            << std::endl
-            << "Albany/ATO not enabled." << std::endl);
-#endif
   }
 #if defined(ALBANY_LCM)
   else if (responseName == "IP to Nodal Field") {
     p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
     p->set<RCP<DataLayout>>("Dummy Data Layout", dl->dummy);
-    // p->set<std::string>("Stress Name", "Cauchy_Stress");
-    // p->set<std::string>("Weights Name",  "Weights");
-
     res_ev = rcp(new LCM::IPtoNodalField<EvalT, Traits>(*p, dl, meshSpecs));
   } else if (responseName == "Project IP to Nodal Field") {
     p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);

@@ -275,10 +275,6 @@ set(SOURCES
     evaluators/response/PHAL_ResponseSquaredL2Difference.cpp
     evaluators/response/PHAL_ResponseSquaredL2DifferenceSide.cpp
     evaluators/response/PHAL_ResponseThermalEnergy.cpp
-    evaluators/response/QCAD_ResponseCenterOfMass.cpp
-    evaluators/response/QCAD_ResponseFieldAverage.cpp
-    evaluators/response/QCAD_ResponseFieldIntegral.cpp
-    evaluators/response/QCAD_ResponseFieldValue.cpp
     evaluators/scatter/PHAL_ScatterResidual.cpp
     evaluators/scatter/PHAL_ScatterScalarNodalParameter.cpp
     evaluators/scatter/PHAL_ScatterScalarResponse.cpp
@@ -289,7 +285,6 @@ set(SOURCES
     evaluators/state/PHAL_SaveCellStateField.cpp
     evaluators/state/PHAL_SaveNodalField.cpp
     evaluators/state/PHAL_SaveStateField.cpp
-    evaluators/state/QCAD_ResponseSaveField.cpp
     evaluators/utility/Adapt_ElementSizeField.cpp
     evaluators/utility/PHAL_Absorption.cpp
     evaluators/utility/PHAL_AddNoise.cpp
@@ -303,10 +298,7 @@ set(SOURCES
     evaluators/utility/PHAL_MapToPhysicalFrame.cpp
     evaluators/utility/PHAL_MapToPhysicalFrameSide.cpp
     evaluators/utility/PHAL_SharedParameter.cpp
-    evaluators/utility/PHAL_Source.cpp
-    evaluators/utility/QCAD_EvaluatorTools.cpp
-    evaluators/utility/QCAD_MathVector.cpp
-    evaluators/utility/QCAD_MeshRegion.cpp)
+    evaluators/utility/PHAL_Source.cpp)
 
 if(ALBANY_STK)
   set(SOURCES ${SOURCES} evaluators/state/PHAL_SaveSideSetStateField.cpp)
@@ -420,14 +412,6 @@ set(HEADERS
     evaluators/response/PHAL_ResponseSquaredL2Difference_Def.hpp
     evaluators/response/PHAL_ResponseThermalEnergy.hpp
     evaluators/response/PHAL_ResponseThermalEnergy_Def.hpp
-    evaluators/response/QCAD_ResponseCenterOfMass.hpp
-    evaluators/response/QCAD_ResponseCenterOfMass_Def.hpp
-    evaluators/response/QCAD_ResponseFieldAverage.hpp
-    evaluators/response/QCAD_ResponseFieldAverage_Def.hpp
-    evaluators/response/QCAD_ResponseFieldIntegral.hpp
-    evaluators/response/QCAD_ResponseFieldIntegral_Def.hpp
-    evaluators/response/QCAD_ResponseFieldValue.hpp
-    evaluators/response/QCAD_ResponseFieldValue_Def.hpp
     evaluators/scatter/PHAL_ScatterResidual.hpp
     evaluators/scatter/PHAL_ScatterResidual_Def.hpp
     evaluators/scatter/PHAL_ScatterScalarNodalParameter.hpp
@@ -446,8 +430,6 @@ set(HEADERS
     evaluators/state/PHAL_SaveNodalField_Def.hpp
     evaluators/state/PHAL_SaveStateField.hpp
     evaluators/state/PHAL_SaveStateField_Def.hpp
-    evaluators/state/QCAD_ResponseSaveField.hpp
-    evaluators/state/QCAD_ResponseSaveField_Def.hpp
     evaluators/utility/Adapt_ElementSizeField.hpp
     evaluators/utility/Adapt_ElementSizeField_Def.hpp
     evaluators/utility/PHAL_Absorption.hpp
@@ -475,12 +457,7 @@ set(HEADERS
     evaluators/utility/PHAL_SharedParameter.hpp
     evaluators/utility/PHAL_SharedParameter_Def.hpp
     evaluators/utility/PHAL_Source.hpp
-    evaluators/utility/PHAL_Source_Def.hpp
-    evaluators/utility/QCAD_EvaluatorTools.hpp
-    evaluators/utility/QCAD_EvaluatorTools_Def.hpp
-    evaluators/utility/QCAD_MathVector.hpp
-    evaluators/utility/QCAD_MeshRegion.hpp
-    evaluators/utility/QCAD_MeshRegion_Def.hpp)
+    evaluators/utility/PHAL_Source_Def.hpp)
 
 if(ALBANY_STK)
   set(HEADERS ${HEADERS} evaluators/state/PHAL_SaveSideSetStateField.hpp

@@ -1,7 +1,6 @@
 %YAML 1.1
 ---
 ANONYMOUS:
-  Build Type: Epetra
   Problem: 
     Solution Method: Transient
     Phalanx Graph Visualization Detail: 0

@@ -23,8 +23,10 @@ LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(
       rng(seedgen())  // seed the rng
 
 {
-  sd       = p.get<double>("SD Value");
-  duration = p.get<Teuchos::Array<int>>("Langevin Noise Time Period");
+  using ScalarT     = typename EvalT::ScalarT;
+  sd                = p.get<double>("SD Value");
+  auto const sd_val = Sacado::Value<ScalarT>::eval(sd);
+  duration          = p.get<Teuchos::Array<int>>("Langevin Noise Time Period");
 
   Teuchos::RCP<PHX::DataLayout> vector_dl =
       p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
@@ -33,20 +35,12 @@ LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(
   numQPs  = dims[1];
   numDims = dims[2];
 
-  //  nd = Teuchos::rcp(new boost::normal_distribution<ScalarT>(0.0, sd));
-  //  nd = Teuchos::rcp(new boost::normal_distribution<double>(0.0, sd.val()));
-  nd      = Teuchos::rcp(new boost::normal_distribution<double>(
-      0.0, QCAD::EvaluatorTools<EvalT, Traits>::getDoubleValue(sd)));
+  nd      = Teuchos::rcp(new boost::normal_distribution<double>(0.0, sd_val));
   var_nor = Teuchos::rcp(new boost::variate_generator<
                          boost::mt19937&,
                          boost::normal_distribution<double>>(rng, *nd));
-  //      boost::variate_generator<boost::mt19937&,
-  //      boost::normal_distribution<ScalarT> >(rng, *nd));
-
   this->addDependentField(rho.fieldTag());
-
   this->addEvaluatedField(noiseTerm);
-
   this->setName("LangevinNoiseTerm");
 }
 

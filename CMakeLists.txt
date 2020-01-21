@@ -296,8 +296,7 @@ else()
     "-- Looking for Piro (required) in Trilinos ...                NOT Found!")
   message(
     FATAL_ERROR
-      "Albany REQUIRES Piro. See file trilinos-cmake in doc directory."
-  )
+      "Albany REQUIRES Piro. See file trilinos-cmake in doc directory.")
 endif()
 
 # Phalanx
@@ -310,8 +309,7 @@ else()
     "-- Looking for Phalanx (required) in Trilinos ...             NOT Found!")
   message(
     FATAL_ERROR
-      "Albany REQUIRES Phalanx. See file trilinos-cmake in doc directory."
-  )
+      "Albany REQUIRES Phalanx. See file trilinos-cmake in doc directory.")
 endif()
 
 # NOX
@@ -323,8 +321,7 @@ else()
   message(
     "-- Looking for NOX (required) in Trilinos ...                 NOT Found!")
   message(
-    FATAL_ERROR
-      "Albany REQUIRES NOX. See file trilinos-cmake in doc directory."
+    FATAL_ERROR "Albany REQUIRES NOX. See file trilinos-cmake in doc directory."
   )
 endif()
 
@@ -352,8 +349,7 @@ else()
     "-- Looking for Intrepid2 (required) in Trilinos ...           NOT Found!")
   message(
     FATAL_ERROR
-      "Albany REQUIRES Intrepid2. See file trilinos-cmake in doc directory."
-  )
+      "Albany REQUIRES Intrepid2. See file trilinos-cmake in doc directory.")
 endif()
 
 # MiniTensor
@@ -366,8 +362,7 @@ else()
     "-- Looking for MiniTensor (required) in Trilinos ...          NOT Found!")
   message(
     FATAL_ERROR
-      "Albany REQUIRES MiniTensor. See file trilinos-cmake in doc directory."
-  )
+      "Albany REQUIRES MiniTensor. See file trilinos-cmake in doc directory.")
 endif()
 
 # ##############################################################################

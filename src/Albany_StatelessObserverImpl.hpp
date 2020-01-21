@@ -42,8 +42,8 @@ namespace Albany {
  * It probably would have been a better design to make a StatefulObserver
  * subclassed from an (assumed, as NOX/LOCA do) stateless one. However, that
  * would change the name of a class already in wide use, which I don't want to
- * do. Instead, NOXStatelessObserver will start with just one user (Epetra
- * eigendata saver), and NOXObserver will continue to behave as it always has.
+ * do. Instead, NOXStatelessObserver will start with just one user and
+ * NOXObserver will continue to behave as it always has.
  */
 
 class StatelessObserverImpl

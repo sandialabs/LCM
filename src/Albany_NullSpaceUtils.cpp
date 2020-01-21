@@ -281,8 +281,8 @@ struct Tpetra_NullSpace_Traits
 
 // The base structure is empty. The derived one, stores an array,
 // of the type specified by the Traits
-// This struct allows us to hide tpetra/epetra info from the header file.
-// When we decide what to use (ML or MueLu) we create a TraitsImpl
+// This struct allows us to hide tpetra info from the header file.
+// When we decide what to use (MueLu) we create a TraitsImpl
 // templated on the 'actual' traits, and we grab the array.
 // This way the null space stores a persistent array (being stored inside
 // the class makes sure the array does not disappear like it would

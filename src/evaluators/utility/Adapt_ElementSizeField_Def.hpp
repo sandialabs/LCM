@@ -187,8 +187,7 @@ void ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     typename Traits::PreEvalData /* workset */)
 {
   // Note that we only need to initialize the vectors when dealing with node
-  // data, as we assume the vectors are initialized to zero for Epetra_Export
-  // "ADD" operation Zero data for accumulation here
+  // data, as we assume the vectors are initialized to zero
   if (this->outputNodeData) {
     Teuchos::RCP<NodalDataVector> node_data =
         this->pStateMgr->getStateInfoStruct()

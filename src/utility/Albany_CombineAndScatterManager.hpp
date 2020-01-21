@@ -5,7 +5,7 @@
 
 namespace Albany {
 
-// An Albany-owned combine mode enum, so we don't stick to either  or Epetra
+// An Albany-owned combine mode enum
 // (note:: it would be nice if Teuchos provided such enumeration)
 enum class CombineMode
 {

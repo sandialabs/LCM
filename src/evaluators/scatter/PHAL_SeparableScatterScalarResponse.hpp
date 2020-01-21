@@ -12,8 +12,7 @@
 
 namespace PHAL {
 
-/** \brief Handles scattering of separable scalar response functions into epetra
- * data structures.
+/** \brief Handles scattering of separable scalar response functions
  *
  * Base implementation useable by specializations below
  */
@@ -51,8 +50,7 @@ class SeparableScatterScalarResponseBase
   PHX::MDField<ScalarT>           local_response_eval;
 };
 
-/** \brief Handles scattering of separable scalar response functions into epetra
- * data structures.
+/** \brief Handles scattering of separable scalar response functions
  *
  * A separable response function is one that is a sum of respones across cells.
  * In this case we can compute the Jacobian in a generic fashion.

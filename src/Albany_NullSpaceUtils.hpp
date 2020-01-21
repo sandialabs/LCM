@@ -11,7 +11,7 @@
 
 namespace Albany {
 
-// Forward declaration of a helper class, used to hide Tpetra/Epetra details
+// Forward declaration of a helper class, used to hide Tpetra details
 struct TraitsImplBase;
 
 class RigidBodyModes
@@ -44,13 +44,6 @@ class RigidBodyModes
   void
   updatePL(const Teuchos::RCP<Teuchos::ParameterList>& precParams);
 
-  //! Is ML used on this problem?
-  bool
-  isMLUsed() const
-  {
-    return mlUsed;
-  }
-
   //! Is MueLu used on this problem?
   bool
   isMueLuUsed() const
@@ -82,7 +75,7 @@ class RigidBodyModes
 
  private:
   int  numPDEs, numElasticityDim, numScalar, nullSpaceDim;
-  bool mlUsed, mueLuUsed, froschUsed, setNonElastRBM;
+  bool mueLuUsed, froschUsed, setNonElastRBM;
 
   Teuchos::RCP<Teuchos::ParameterList> plist;
 

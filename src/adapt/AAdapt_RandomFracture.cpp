@@ -60,7 +60,6 @@ RandomFracture::RandomFracture(
 bool
 RandomFracture::queryAdaptationCriteria()
 {
-  // iter is a member variable elsewhere, NOX::Epetra::AdaptManager.H
   if (iter % fracture_interval_ == 0) {
     // Get a vector containing the face set of the mesh where
     // fractures can occur

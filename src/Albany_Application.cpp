@@ -428,7 +428,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
       Teuchos::sublist(params, "Debug Output", true);
   writeToMatrixMarketJac =
       debugParams->get("Write Jacobian to MatrixMarket", 0);
-  computeJacCondNum = debugParams->get("Compute Jacobian Condition Number", 0);
   writeToMatrixMarketRes =
       debugParams->get("Write Residual to MatrixMarket", 0);
   writeToCoutJac     = debugParams->get("Write Jacobian to Standard Output", 0);
@@ -472,16 +471,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
         std::endl
             << "Error in Albany::Application constructor:  "
             << "Invalid Parameter Write Residual to Standard Output.  "
-               "Acceptable values are -1, 0, 1, 2, ... "
-            << std::endl);
-  }
-  if (computeJacCondNum < -1) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        Teuchos::Exceptions::InvalidParameter,
-        std::endl
-            << "Error in Albany::Application constructor:  "
-            << "Invalid Parameter Compute Jacobian Condition Number.  "
                "Acceptable values are -1, 0, 1, 2, ... "
             << std::endl);
   }
@@ -964,7 +953,6 @@ dfm_set(
 // solution, but convergence to the solution is not quadratic.
 //   A complementary method to check for errors in the Jacobian is to use
 //     Piro -> Jacobian Operator = Matrix-Free,
-// which works for Epetra-based problems.
 //   Enable this check using the debug block:
 //     <ParameterList>
 //       <ParameterList name="Debug Output">
@@ -1754,16 +1742,7 @@ Application::computeGlobalJacobian(
       describe(jac.getConst(), *out, Teuchos::VERB_EXTREME);
     }
   }
-  if (computeJacCondNum !=
-      0) {  // If requesting computation of condition number
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        std::logic_error,
-        "Error in Albany::Application: Compute Jacobian Condition Number debug"
-        "option currently relies on an Epetra-based routine in AztecOO.\n");
-  }
-  if (writeToMatrixMarketJac != 0 || writeToCoutJac != 0 ||
-      computeJacCondNum != 0) {
+  if (writeToMatrixMarketJac != 0 || writeToCoutJac != 0) {
     countJac++;  // increment Jacobian counter
   }
 }
@@ -2840,56 +2819,6 @@ Application::setupTangentWorksetInfo(
   workset.num_cols_x   = num_cols_x;
   workset.num_cols_p   = num_cols_p;
   workset.param_offset = param_offset;
-}
-
-void
-Application::removeEpetraRelatedPLs(
-    const Teuchos::RCP<Teuchos::ParameterList>& params)
-{
-  if (params->isSublist("Piro")) {
-    Teuchos::ParameterList& piroPL = params->sublist("Piro", true);
-    if (piroPL.isSublist("Rythmos")) {
-      Teuchos::ParameterList& rytPL = piroPL.sublist("Rythmos", true);
-      if (rytPL.isSublist("Stratimikos")) {
-        Teuchos::ParameterList& strataPL = rytPL.sublist("Stratimikos", true);
-        if (strataPL.isSublist("Linear Solver Types")) {
-          Teuchos::ParameterList& lsPL =
-              strataPL.sublist("Linear Solver Types", true);
-          if (lsPL.isSublist("AztecOO")) { lsPL.remove("AztecOO", true); }
-          if (strataPL.isSublist("Preconditioner Types")) {
-            Teuchos::ParameterList& precPL =
-                strataPL.sublist("Preconditioner Types", true);
-            if (precPL.isSublist("ML")) { precPL.remove("ML", true); }
-          }
-        }
-      }
-    }
-    if (piroPL.isSublist("NOX")) {
-      Teuchos::ParameterList& noxPL = piroPL.sublist("NOX", true);
-      if (noxPL.isSublist("Direction")) {
-        Teuchos::ParameterList& dirPL = noxPL.sublist("Direction", true);
-        if (dirPL.isSublist("Newton")) {
-          Teuchos::ParameterList& newPL = dirPL.sublist("Newton", true);
-          if (newPL.isSublist("Stratimikos Linear Solver")) {
-            Teuchos::ParameterList& stratPL =
-                newPL.sublist("Stratimikos Linear Solver", true);
-            if (stratPL.isSublist("Stratimikos")) {
-              Teuchos::ParameterList& strataPL =
-                  stratPL.sublist("Stratimikos", true);
-              if (strataPL.isSublist("AztecOO")) {
-                strataPL.remove("AztecOO", true);
-              }
-              if (strataPL.isSublist("Linear Solver Types")) {
-                Teuchos::ParameterList& lsPL =
-                    strataPL.sublist("Linear Solver Types", true);
-                if (lsPL.isSublist("AztecOO")) { lsPL.remove("AztecOO", true); }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 }
 
 #if defined(ALBANY_LCM)

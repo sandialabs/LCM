@@ -303,7 +303,7 @@ class NodeT
   double vector so it can be send easily using MPI. The method \ref
   Unpack(double* pack) is then used to unpack the information into an empty Node
   instance on the receiving side. It is used to provide processes that are
-  member of an interface-local Epetra_Comm a redundant map of nodes on that
+  member of an interface-local MPI_Comm a redundant map of nodes on that
   interface.
 
   \param size : Returns the length of the double vector in size

@@ -200,33 +200,12 @@ AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
 #endif
 #endif
 
-#if 0
-#if defined(ALBANY_LCM) && defined(LCM_SPECULATIVE)
-  if (method == "Random") {
-    strategy = rcp(new RandomFracture(adaptParams_,
-            param_lib_,
-            state_mgr_,
-            epetra_comm_));
-  } else
-#endif
-#endif
-      if (first_three_chars == "RPI") {
-#ifdef ALBANY_SCOREC
-    adapter_ = Teuchos::rcp(
-        new MeshAdapt(adaptParams_, paramLib_, stateMgr_, rc_mgr, comm_));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true, std::runtime_error, "Error! 'RPI' adaptation requires SCOREC.\n");
-    (void)rc_mgr;
-#endif
-  } else
 #if defined(ALBANY_LCM) && defined(ALBANY_STK_PERCEPT)
       if (method == "Unif Size") {
     adapter_ = Teuchos::rcp(new STKAdaptT<STKUnifRefineField>(
         adaptParams_, paramLib_, stateMgr_, comm_));
   } else
 #endif
-
   {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,

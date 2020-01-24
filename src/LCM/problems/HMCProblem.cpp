@@ -9,9 +9,6 @@
 #include "Albany_BCUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_Utils.hpp"
-#ifdef ALBANY_ATO
-#include "ATO_TopoTools.hpp"
-#endif
 
 Albany::HMCProblem::HMCProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
@@ -19,12 +16,6 @@ Albany::HMCProblem::HMCProblem(
     const int                                   numDim_,
     Teuchos::RCP<const Teuchos::Comm<int>>&     commT)
     :
-#ifdef ALBANY_ATO
-      ATO::OptimizationProblem(
-          params_,
-          paramLib_,
-          numDim_ + params_->get("Additional Scales", 1) * numDim_ * numDim_),
-#endif
       Albany::AbstractProblem(
           params_,
           paramLib_,
@@ -94,11 +85,6 @@ Albany::HMCProblem::buildProblem(
       0)  // Build a sideset evaluator if sidesets are present
 
     constructNeumannEvaluators(meshSpecs[0]);
-
-#ifdef ALBANY_ATO
-  if (params->isType<Teuchos::RCP<ATO::Topology>>("Topology"))
-    setupTopOpt(meshSpecs, stateMgr);
-#endif
 }
 
 Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -227,12 +213,6 @@ Albany::HMCProblem::getValidProblemParameters() const
       "materials.xml",
       "Filename of material database xml file");
   validPL->sublist("Hierarchical Elasticity Model", false, "");
-
-#ifdef ALBANY_ATO
-  Teuchos::RCP<ATO::Topology> emptyTopo;
-  emptyTopo = Teuchos::null;
-  validPL->set<Teuchos::RCP<ATO::Topology>>("Topology", emptyTopo);
-#endif
   validPL->sublist("Topology Parameters", false, "");
   validPL->sublist("Objective Aggregator", false, "");
   validPL->sublist("Apply Topology Weight Functions", false, "");

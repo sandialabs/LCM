@@ -160,17 +160,7 @@ Albany::ProblemFactory::create()
   }
 #endif
 #if defined(ALBANY_LCM)
-  else if (method == "LAME" || method == "Lame" || method == "lame") {
-#if defined(ALBANY_LAME) || defined(ALBANY_LAMENT)
-    strategy = rcp(new Albany::LameProblem(problemParams, paramLib, 3, commT));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        std::runtime_error,
-        " **** LAME materials not enabled, recompile with -DENABLE_LAME or "
-        "-DENABLE_LAMENT ****\n");
-#endif
-  } else if (getName(method) == "Mechanics") {
+  else if (getName(method) == "Mechanics") {
     strategy = rcp(new Albany::MechanicsProblem(
         problemParams, paramLib, getNumDim(method), rc_mgr, commT));
   } else if (getName(method) == "Elasticity") {
@@ -203,77 +193,6 @@ Albany::ProblemFactory::create()
   } else if (method == "Electromechanics 3D") {
     strategy = rcp(
         new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
-  }
-#endif
-#ifdef ALBANY_ATO
-  else if (method == "LinearElasticity 1D") {
-    strategy =
-        rcp(new Albany::LinearElasticityProblem(problemParams, paramLib, 1));
-  } else if (method == "LinearElasticity 2D") {
-    strategy =
-        rcp(new Albany::LinearElasticityProblem(problemParams, paramLib, 2));
-  } else if (method == "LinearElasticity 3D") {
-    strategy =
-        rcp(new Albany::LinearElasticityProblem(problemParams, paramLib, 3));
-  } else if (method == "Poissons Equation 1D") {
-    strategy =
-        rcp(new Albany::PoissonsEquationProblem(problemParams, paramLib, 1));
-  } else if (method == "Poissons Equation 2D") {
-    strategy =
-        rcp(new Albany::PoissonsEquationProblem(problemParams, paramLib, 2));
-  } else if (method == "Poissons Equation 3D") {
-    strategy =
-        rcp(new Albany::PoissonsEquationProblem(problemParams, paramLib, 3));
-  } else if (method == "LinearElasticityModal 1D") {
-    strategy = rcp(
-        new Albany::LinearElasticityModalProblem(problemParams, paramLib, 1));
-  } else if (method == "LinearElasticityModal 2D") {
-    strategy = rcp(
-        new Albany::LinearElasticityModalProblem(problemParams, paramLib, 2));
-  } else if (method == "LinearElasticityModal 3D") {
-    strategy = rcp(
-        new Albany::LinearElasticityModalProblem(problemParams, paramLib, 3));
-  }
-#endif
-#ifdef ALBANY_LANDICE
-  else if (LandIce::ProblemFactory::hasProblem(method)) {
-    LandIce::ProblemFactory felix_factory(
-        problemParams, discretizationParams, paramLib);
-    strategy = felix_factory.create();
-  }
-#endif
-#ifdef ALBANY_AERAS
-  else if (method == "Aeras Shallow Water") {
-    strategy = rcp(new Aeras::ShallowWaterProblem(problemParams, paramLib, 2));
-  } else if (method == "Aeras Shallow Water 3D") {
-    strategy = rcp(new Aeras::ShallowWaterProblem(problemParams, paramLib, 3));
-  } else if (method == "Aeras Shallow Water No AD 3D") {
-    strategy =
-        rcp(new Aeras::ShallowWaterProblemNoAD(problemParams, paramLib, 3));
-  } else if (method == "Aeras XZ Scalar Advection") {
-    strategy =
-        rcp(new Aeras::XZScalarAdvectionProblem(problemParams, paramLib, 2));
-  } else if (method == "Aeras X Scalar Advection") {
-    strategy =
-        rcp(new Aeras::XScalarAdvectionProblem(problemParams, paramLib, 1));
-  } else if (method == "Aeras XZ Hydrostatic") {
-    strategy = rcp(new Aeras::XZHydrostaticProblem(problemParams, paramLib, 1));
-  } else if (method == "Aeras Hydrostatic") {
-    strategy = rcp(new Aeras::HydrostaticProblem(problemParams, paramLib, 2));
-  }
-#endif
-#ifdef ALBANY_TSUNAMI
-  else if (method == "Tsunami Steady Stokes 2D") {
-    strategy = rcp(
-        new Tsunami::NavierStokes(problemParams, paramLib, 2, false, false));
-  } else if (method == "Tsunami Navier Stokes 2D") {
-    strategy = rcp(new Tsunami::NavierStokes(problemParams, paramLib, 2));
-  } else if (method == "Tsunami Navier Stokes 3D") {
-    strategy = rcp(new Tsunami::NavierStokes(problemParams, paramLib, 3));
-  } else if (method == "Tsunami Boussinesq 1D") {
-    strategy = rcp(new Tsunami::Boussinesq(problemParams, paramLib, 1));
-  } else if (method == "Tsunami Boussinesq 2D") {
-    strategy = rcp(new Tsunami::Boussinesq(problemParams, paramLib, 2));
   }
 #endif
   else {

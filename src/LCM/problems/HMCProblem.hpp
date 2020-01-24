@@ -12,12 +12,6 @@
 #include "ConstitutiveModelInterface.hpp"
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
-
-#ifdef ALBANY_ATO
-#include "ATO_OptimizationProblem.hpp"
-#include "ATO_Utils.hpp"
-#endif
-
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
@@ -42,9 +36,6 @@ namespace Albany {
  * problem.
  */
 class HMCProblem :
-#ifdef ALBANY_ATO
-    public ATO::OptimizationProblem,
-#endif
     public virtual Albany::AbstractProblem
 {
  public:
@@ -182,10 +173,6 @@ class HMCProblem :
 #include "PHAL_SaveStateField.hpp"
 #include "Strain.hpp"
 #include "UpdateField.hpp"
-#ifdef ALBANY_ATO
-#include "ATO_TopologyFieldWeighting.hpp"
-#include "ATO_TopologyWeighting.hpp"
-#endif
 
 #include <sstream>
 
@@ -263,9 +250,6 @@ Albany::HMCProblem::constructEvaluators(
       "Data Layout Usage in Mechanics problems assume vecDim = numDim");
 
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
-#ifdef ALBANY_ATO
-  ATO::Utils<EvalT, PHAL::AlbanyTraits> atoUtils(dl, numDim);
-#endif
 
   // independent variables
   std::string strDisplacement("Displacement");
@@ -1036,156 +1020,11 @@ Albany::HMCProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
-#ifdef ALBANY_ATO
-  /******************************************************************************/
-  /** Begin topology weighting
-   * **************************************************/
-  /******************************************************************************/
-  if (params->isType<Teuchos::RCP<ATO::Topology>>("Topology")) {
-    Teuchos::RCP<ATO::Topology> topology =
-        params->get<Teuchos::RCP<ATO::Topology>>("Topology");
-
-    if (topology->getEntityType() == "Distributed Parameter") {
-      RCP<ParameterList> p = rcp(new ParameterList("Distributed Parameter"));
-      p->set<std::string>("Parameter Name", topology->getName());
-      ev = rcp(
-          new PHAL::GatherScalarNodalParameter<EvalT, AlbanyTraits>(*p, dl));
-      fm0.template registerEvaluator<EvalT>(ev);
-    }
-
-    // macro
-    RCP<ParameterList> p = rcp(new ParameterList("TopologyWeighting"));
-
-    p->set<Teuchos::RCP<ATO::Topology>>("Topology", topology);
-
-    Teuchos::ParameterList& wfParams =
-        params->sublist("Apply Topology Weight Functions");
-
-    p->set<std::string>("BF Name", "BF");
-    p->set<std::string>("Unweighted Variable Name", macroKinematicFieldName);
-    p->set<std::string>(
-        "Weighted Variable Name", macroKinematicFieldName + "_Weighted");
-    p->set<std::string>("Variable Layout", "QP Tensor");
-    p->set<int>("Function Index", wfParams.get<int>(macroKinematicFieldName));
-
-    if (topology->getEntityType() == "Distributed Parameter")
-      ev = rcp(new ATO::TopologyFieldWeighting<EvalT, AlbanyTraits>(*p, dl));
-    else
-      ev = rcp(new ATO::TopologyWeighting<EvalT, AlbanyTraits>(*p, dl));
-
-    fm0.template registerEvaluator<EvalT>(ev);
-
-    // if(some input stuff)
-    atoUtils.SaveCellStateField(
-        fm0,
-        stateMgr,
-        macroKinematicFieldName + "_Weighted",
-        eb_name,
-        dl->qp_tensor);
-
-    // microscales
-    for (int i = 0; i < numMicroScales; i++) {
-      RCP<ParameterList> p = rcp(new ParameterList("TopologyWeighting"));
-
-      Teuchos::RCP<ATO::Topology> topology =
-          params->get<Teuchos::RCP<ATO::Topology>>("Topology");
-      p->set<Teuchos::RCP<ATO::Topology>>("Topology", topology);
-
-      Teuchos::ParameterList& wfParams =
-          params->sublist("Apply Topology Weight Functions");
-
-      p->set<std::string>("BF Name", "BF");
-      std::string ms = Albany::strint("Micro Stress", i);
-      p->set<std::string>("Unweighted Variable Name", ms);
-      p->set<std::string>("Weighted Variable Name", ms + "_Weighted");
-      p->set<std::string>("Variable Layout", "QP Tensor");
-      p->set<int>("Function Index", wfParams.get<int>("Micro Stress"));
-
-      if (topology->getEntityType() == "Distributed Parameter")
-        ev = rcp(new ATO::TopologyFieldWeighting<EvalT, AlbanyTraits>(*p, dl));
-      else
-        ev = rcp(new ATO::TopologyWeighting<EvalT, AlbanyTraits>(*p, dl));
-
-      fm0.template registerEvaluator<EvalT>(ev);
-
-      // if(some input stuff)
-      atoUtils.SaveCellStateField(
-          fm0, stateMgr, ms + "_Weighted", eb_name, dl->qp_tensor);
-    }
-    for (int i = 0; i < numMicroScales; i++) {
-      RCP<ParameterList> p = rcp(new ParameterList("TopologyWeighting"));
-
-      Teuchos::RCP<ATO::Topology> topology =
-          params->get<Teuchos::RCP<ATO::Topology>>("Topology");
-      p->set<Teuchos::RCP<ATO::Topology>>("Topology", topology);
-
-      Teuchos::ParameterList& wfParams =
-          params->sublist("Apply Topology Weight Functions");
-
-      p->set<std::string>("BF Name", "BF");
-      std::string ds = Albany::strint("Double Stress", i);
-      p->set<std::string>("Unweighted Variable Name", ds);
-      p->set<std::string>("Weighted Variable Name", ds + "_Weighted");
-      p->set<std::string>("Variable Layout", "QP Tensor3");
-      p->set<int>("Function Index", wfParams.get<int>("Double Stress"));
-
-      if (topology->getEntityType() == "Distributed Parameter")
-        ev = rcp(new ATO::TopologyFieldWeighting<EvalT, AlbanyTraits>(*p, dl));
-      else
-        ev = rcp(new ATO::TopologyWeighting<EvalT, AlbanyTraits>(*p, dl));
-
-      fm0.template registerEvaluator<EvalT>(ev);
-
-      // if(some input stuff)
-      atoUtils.SaveCellStateField(
-          fm0, stateMgr, ds + "_Weighted", eb_name, dl->qp_tensor3);
-    }
-  }
-  /******************************************************************************/
-  /** End topology weighting
-   * ****************************************************/
-  /******************************************************************************/
-#endif
-
-  // Compute macro residual
-  /*\begin{text}
-     Register new evaluator:
-    \begin{align*}
-      f_{Ii} = \sum_p
-      \frac{\partial N_I (\mathbf{x}_p)}{\partial \xi_k} J^{-1}_{kj}
-  det\left(\frac{\partial x_{ip}}{\partial \xi_j}\right) \omega_p
-  \sigma^{tp}_{ij}
-     + \sum_p N_I(\mathbf{x}_p)\ det\left(\frac{\partial x_{ip}}{\partial
-  \xi_j}\right) \omega_p a^p_i \end{align*}
-     \textbf{DEPENDENT FIELDS:} \\
-     \begin{tabular}{l l l l}
-       $\sigma^{tp}_{ij}$ & Total stress &  "Total Stress" & dims(cell, p=nQPs,
-  i=vecDim, j=spcDim) \\
-       $\frac{\partial N_I (\mathbf{x}_p)}{\partial \xi_k} J^{-1}_{kj}
-  det\left(\frac{\partial x_{ip}}{\partial \xi_j}\right) \omega_p$ &
-       Weighted Gradient matrix wrt current config & "wGrad BF" & dims(cell,
-  I=nNodes, p=nQPs, i=spcDim)\\
-       $a^p_i$ & Acceleration at quadrature points & "Displacement\_dotdot" &
-  dims(cell, p=nQPs, i=vecDim)\\ $N_I(\mathbf{x}_p)\ det\left(\frac{\partial
-  x_{ip}}{\partial \xi_j}\right) \omega_p$ &
-       Weighted BF &  "wBF"  & dims(cell, I=nNodes, p=nQPs)\\
-     \end{tabular} \\
-    \textbf{EVALUATED FIELDS:} \\
-    \begin{tabular}{l l l l}
-       $f_{Ii}$ & Macroscale Residual  & "Displacement Residual"  & dims(cell,
-  I=nNodes, i=spcDim)\\
-    \end{tabular} \\
-  \end{text}*/
   {
     RCP<ParameterList> p = rcp(new ParameterList("Displacement Resid"));
 
     // Input
-#ifdef ALBANY_ATO
-    if (params->isType<Teuchos::RCP<ATO::Topology>>("Topology"))
-      p->set<std::string>("Stress Name", macroKinematicFieldName + "_Weighted");
-    else
-#endif
-      p->set<std::string>("Stress Name", macroKinematicFieldName);
+    p->set<std::string>("Stress Name", macroKinematicFieldName);
 
     p->set<RCP<DataLayout>>("QP Tensor Data Layout", dl->qp_tensor);
 
@@ -1206,61 +1045,17 @@ Albany::HMCProblem::constructEvaluators(
     ev = rcp(new LCM::ElasticityResid<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
-  // Compute micro residuals
-  /*\begin{text}
-     Register new evaluator:
-    \begin{align*}
-      f^n_{Iij} = \sum_p
-      \frac{\partial N_I (\mathbf{x}_p)}{\partial \xi_l} J^{-1}_{lk}
-  \bar{\bar{\beta}}^{np}_{ijk}\} det\left(\frac{\partial x_{ip}}{\partial
-  \xi_j}\right) \omega_p
-     + \sum_p N_I(\mathbf{x}_p) \bar{\beta}^{np}_{ij}
-        \det\left(\frac{\partial x_{ip}}{\partial \xi_j}\right) \omega_p
-     + \sum_p N_I(\mathbf{x}_p) \ddot{\epsilon}^{np}_{ij}
-        \det\left(\frac{\partial x_{ip}}{\partial \xi_j}\right) \omega_p
-    \end{align*}
-     \textbf{DEPENDENT FIELDS:} \\
-     \begin{tabular}{l l l l}
-       $\bar{beta}^{np}_{ij}$         & Micro stress 'n'         & "Micro Stress
-  n"         & dims(cell, p=nQPs, i=vecDim, j=spcDim) \\
-       $\bar{\bar{beta}}^{np}_{ijk}$  & Double stress 'n'        & "Double
-  Stress n"        & dims(cell, p=nQPs, i=vecDim, j=spcDim, k=spcDim) \\
-       $\ddot{\epsilon}^n_{Iij}$      & micro accel at scale 'n' &
-  "Microstrain\_n\_dotdot" & dims(cell,I=nNodes,i=vecDim,j=vecDim) \\
-       $\frac{\partial N_I (\mathbf{x}_p)}{\partial \xi_l} J^{-1}_{lk}
-  det\left(\frac{\partial x_{ip}}{\partial \xi_j}\right) \omega_p$ &
-       Weighted Gradient matrix wrt current config & "wGrad BF" & dims(cell,
-  I=nNodes, p=nQPs, i=spcDim)\\ $N_I(\mathbf{x}_p)\ det\left(\frac{\partial
-  x_{ip}}{\partial \xi_j}\right) \omega_p$ &
-       Weighted BF &  "wBF"  & dims(cell, I=nNodes, p=nQPs)\\
-     \end{tabular} \\
-    \textbf{EVALUATED FIELDS:} \\
-    \begin{tabular}{l l l l}
-       $f^n_{Iij}$  & Residual at scale 'n'  & "Microstrain\_n Residual"  &
-  dims(cell, I=nNodes, i=vecDim, j=vecDim)\\
-    \end{tabular} \\
-  \end{text}*/
   for (int i = 0; i < numMicroScales; i++) {
     RCP<ParameterList> p = rcp(new ParameterList("Microstrain Resid"));
 
     // Input: Micro stresses
     std::string ms = Albany::strint("Micro Stress", i);
 
-#ifdef ALBANY_ATO
-    if (params->isType<Teuchos::RCP<ATO::Topology>>("Topology"))
-      p->set<std::string>("Micro Stress Name", ms + "_Weighted");
-    else
-#endif
-      p->set<std::string>("Micro Stress Name", ms);
+    p->set<std::string>("Micro Stress Name", ms);
     p->set<RCP<DataLayout>>("QP Tensor Data Layout", dl->qp_tensor);
 
     std::string ds = Albany::strint("Double Stress", i);
-#ifdef ALBANY_ATO
-    if (params->isType<Teuchos::RCP<ATO::Topology>>("Topology"))
-      p->set<std::string>("Double Stress Name", ds + "_Weighted");
-    else
-#endif
-      p->set<std::string>("Double Stress Name", ds);
+    p->set<std::string>("Double Stress Name", ds);
     p->set<RCP<DataLayout>>("QP 3Tensor Data Layout", dl->qp_tensor3);
 
     p->set<std::string>("Weighted Gradient BF Name", "wGrad BF");
@@ -1282,34 +1077,10 @@ Albany::HMCProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
-  // Scatter macroscale forces
-  /*\begin{text}
-     Register new evaluator: Scatter the nodal forces from grid based structures
-  to solver data structures.\\
-     \textbf{DEPENDENT FIELDS:} \\
-     \begin{tabular}{l l l l}
-       $f_{Ii}$ & Macroscale Residual  & "Displacement Residual"  & dims(cell,
-  I=nNodes, i=vecDim) \\
-     \end{tabular} \\
-    \textbf{EVALUATED FIELDS:} \\
-       None. \\
-  \end{text}*/
   fm0.template registerEvaluator<EvalT>(
       evalUtils.constructScatterResidualEvaluator(
           vectorRank, macro_resid_names));
 
-  // Scatter microscale forces
-  /*\begin{text}
-     Register new evaluator: Scatter the nodal forces from grid based structures
-  to solver data structures.\\
-     \textbf{DEPENDENT FIELDS:} \\
-     \begin{tabular}{l l l l}
-       $f^n_{Iij}$ & Microscale Residual  & "Microstrain\_n Residual"  &
-  dims(cell, I=nNodes, i=vecDim, j=vecDim) \\
-     \end{tabular} \\
-    \textbf{EVALUATED FIELDS:} \\
-       None. \\
-  \end{text}*/
   int numTensorFields = numDim * numDim;
   int dofOffset       = numDim;
   for (int i = 0; i < numMicroScales; i++) {  // Micro forces

@@ -12,18 +12,9 @@
 #include "AAdapt_Erosion.hpp"
 #include "AAdapt_TopologyModification.hpp"
 #endif
-#if defined(ALBANY_LCM) && defined(LCM_SPECULATIVE)
-//#include "AAdapt_RandomFracture.hpp"
-#endif
 #if defined(ALBANY_LCM) && defined(ALBANY_STK_PERCEPT)
 #include "AAdapt_STKAdaptT.hpp"
 #endif
-#endif
-#ifdef ALBANY_SCOREC
-#include "AAdapt_MeshAdapt.hpp"
-#endif
-#if defined(ALBANY_SCOREC)
-#include "Albany_APFDiscretization.hpp"
 #endif
 #include "AAdapt_RC_Manager.hpp"
 #include "Albany_CombineAndScatterManager.hpp"
@@ -168,14 +159,6 @@ AdaptiveSolutionManager::AdaptiveSolutionManager(
           Albany::CombineMode::INSERT);
     }
   }
-#if defined(ALBANY_SCOREC)
-  const Teuchos::RCP<Albany::APFDiscretization> apf_disc =
-      Teuchos::rcp_dynamic_cast<Albany::APFDiscretization>(disc_);
-  if (!apf_disc.is_null()) {
-    apf_disc->writeSolutionMVToMeshDatabase(*overlapped_soln, 0, true);
-    apf_disc->initTemperatureHack();
-  }
-#endif
 }
 
 void
@@ -297,19 +280,8 @@ AdaptiveSolutionManager::resizeMeshDataArrays(
   auto overlapped_vs = disc->getOverlapVectorSpace();
 
   overlapped_soln = Thyra::createMembers(overlapped_vs, num_time_deriv + 1);
-
-  // TODO: ditch the overlapped_*T and keep only overlapped_*.
-  //       You need to figure out how to pass the graph in a Tpetra-free way
-  //       though...
   overlapped_f = Thyra::createMember(overlapped_vs);
-#ifdef ALBANY_AERAS
-  // IKT, 1/20/15: the following is needed to ensure Laplace matrix is
-  // non-diagonal for Aeras problems that have hyperviscosity and are integrated
-  // using an explicit time integration scheme.
-  overlapped_jac = disc->createImplicitOverlapJacobianOp();
-#else
   overlapped_jac = disc->createOverlapJacobianOp();
-#endif
 
   // This call allocates the non-overlapped MV
   current_soln = disc_->getSolutionMV();

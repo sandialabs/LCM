@@ -156,35 +156,6 @@ AAdapt::StepX::compute(double* x, const double* X)
   }
 }
 //************
-#ifdef ALBANY_TSUNAMI
-AAdapt::TsunamiBoussinesq1DSolitaryWave::TsunamiBoussinesq1DSolitaryWave(
-    int                    neq_,
-    int                    numDim_,
-    Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
-{
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      (neq != 3 || numDim != 1 || data.size() != 3),  // ZW changed from 5 to 3
-      std::logic_error,
-      "Error! Invalid call of TsunamiBoussinesq1DSolitaryWave with "
-          << neq << " " << numDim << " " << data.size() << "!\n");
-}
-// ZW: only need A1 and c
-void
-AAdapt::TsunamiBoussinesq1DSolitaryWave::compute(double* x, const double* X)
-{
-  double A1  = data[0];
-  double c   = data[1];
-  double X_0 = data[2];
-
-  // Coordinate x is given by X[0]
-  // FIXME, FILL IN for Zhiheng and Xiaoshu!
-  x[0] = A1 * exp(-0.5 * (X[0] - X_0) * (X[0] - X_0));   // initial eta
-  x[1] = A1 * exp(-0.25 * (X[0] - X_0) * (X[0] - X_0));  // initial ualpha
-  x[2] = 0.25 * A1 * exp(-0.25 * (X[0] - X_0) * (X[0] - X_0)) *
-         ((X[0] - X_0) * (X[0] - X_0) - 2);  // initial E1
-}
-#endif
 
 //************
 AAdapt::TemperatureStep::TemperatureStep(

@@ -84,9 +84,6 @@ struct AbstractMeshStruct
   enum msType
   {
     STK_MS,
-#ifdef ALBANY_SCOREC
-    PUMI_MS,
-#endif
   };
 
   virtual void

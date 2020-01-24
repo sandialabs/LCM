@@ -63,40 +63,6 @@ if(ALBANY_LCM AND ALBANY_STK)
   endif()
 endif()
 
-# Mesh Adapt depends on SCOREC tools and PUMI
-if(ALBANY_SCOREC)
-
-  set(SOURCES
-      ${SOURCES}
-      AAdapt_MeshAdapt.cpp
-      AAdapt_MeshAdaptMethod.cpp
-      AAdapt_ConstantSizeField.cpp
-      AAdapt_ScaledSizeField.cpp
-      AAdapt_UniformRefine.cpp
-      AAdapt_AlbanySizeField.cpp
-      AAdapt_ExtrudedAdapt.cpp
-      AAdapt_SPRSizeField.cpp)
-
-  set(HEADERS
-      ${HEADERS}
-      AAdapt_MeshAdaptMethod.hpp
-      AAdapt_MeshAdapt.hpp
-      AAdapt_ConstantSizeField.hpp
-      AAdapt_ScaledSizeField.hpp
-      AAdapt_UniformRefine.hpp
-      AAdapt_AlbanySizeField.hpp
-      AAdapt_ExtrudedAdapt.hpp
-      AAdapt_SPRSizeField.hpp)
-
-  if(ALBANY_OMEGA_H)
-    set(SOURCES ${SOURCES} AAdapt_MeshAdapt_Omega_h.cpp)
-    set(HEADERS ${HEADERS} AAdapt_MeshAdapt_Omega_h.hpp)
-  endif()
-
-  include_directories(${ALBANY_PUMI_INCLUDE_DIRS} ${PUMI_INCLUDE_DIR})
-
-endif()
-
 include_directories(
   ${Trilinos_INCLUDE_DIRS}
   ${Trilinos_TPL_INCLUDE_DIRS}

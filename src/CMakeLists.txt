@@ -525,12 +525,8 @@ set(PDE_HDRS
     evaluators/pde/PNP_PotentialResid.hpp
     evaluators/pde/PNP_PotentialResid_Def.hpp)
 
-if(ALBANY_SCOREC_STANDALONE)
-  set(SCOREC_LIB SCOREC::core)
-endif()
-
 add_library(albanyLib ${Albany_LIBRARY_TYPE} ${SOURCES} ${HEADERS})
-target_link_libraries(albanyLib ${SCOREC_LIB} ${Trilinos_LIBRARIES})
+target_link_libraries(albanyLib ${Trilinos_LIBRARIES})
 
 # Add Albany external libraries
 

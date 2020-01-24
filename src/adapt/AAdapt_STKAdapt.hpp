@@ -12,9 +12,6 @@
 #include "Albany_STKDiscretization.hpp"
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
-#ifdef ALBANY_LANDICE
-#include "Albany_STKDiscretizationStokesH.hpp"
-#endif
 
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"

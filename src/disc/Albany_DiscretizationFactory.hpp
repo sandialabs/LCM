@@ -135,11 +135,11 @@ class DiscretizationFactory
   Teuchos::RCP<const Teuchos_Comm> commT;
 
   // The following are for Aeras hydrostatic problems
-  int numLevels;
-  int numTracers;
+  int numLevels{0};
+  int numTracers{0};
 
   // Flag for explicit time-integration scheme, used in Aeras
-  bool explicit_scheme;
+  bool explicit_scheme{false};
 
   Teuchos::RCP<Albany::AbstractMeshStruct> meshStruct;
 };

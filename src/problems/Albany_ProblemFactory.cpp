@@ -26,12 +26,6 @@
 #include "Albany_ThermoElectrostaticsProblem.hpp"
 #endif
 
-#ifdef ALBANY_ATO
-#include "ATO/problems/LinearElasticityModalProblem.hpp"
-#include "ATO/problems/LinearElasticityProblem.hpp"
-#include "ATO/problems/PoissonsEquation.hpp"
-#endif
-
 #if defined(ALBANY_LCM)
 #include "LCM/problems/ConstitutiveDriverProblem.hpp"
 #include "LCM/problems/ElasticityProblem.hpp"
@@ -39,27 +33,6 @@
 #include "LCM/problems/HMCProblem.hpp"
 #include "LCM/problems/MechanicsProblem.hpp"
 #include "LCM/problems/ThermoElasticityProblem.hpp"
-#if defined(ALBANY_LAME) || defined(ALBANY_LAMENT)
-#include "LCM/problems/lame/LameProblem.hpp"
-#endif
-#endif
-
-#ifdef ALBANY_AERAS
-#include "Aeras/problems/Aeras_HydrostaticProblem.hpp"
-#include "Aeras/problems/Aeras_ShallowWaterProblem.hpp"
-#include "Aeras/problems/Aeras_ShallowWaterProblemNoAD.hpp"
-#include "Aeras/problems/Aeras_XScalarAdvectionProblem.hpp"
-#include "Aeras/problems/Aeras_XZHydrostaticProblem.hpp"
-#include "Aeras/problems/Aeras_XZScalarAdvectionProblem.hpp"
-#endif
-
-#ifdef ALBANY_LANDICE
-#include "LandIce/problems/LandIce_ProblemFactory.hpp"
-#endif
-
-#ifdef ALBANY_TSUNAMI
-#include "Tsunami/problems/Tsunami_Boussinesq.hpp"
-#include "Tsunami/problems/Tsunami_NavierStokes.hpp"
 #endif
 
 Albany::ProblemFactory::ProblemFactory(

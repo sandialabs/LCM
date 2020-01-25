@@ -108,7 +108,6 @@ cmake \
  -D Trilinos_ENABLE_ROL:BOOL=ON \
  -D Trilinos_ENABLE_Rythmos:BOOL=ON \
  -D Trilinos_ENABLE_SEACAS:BOOL=ON \
- -D Trilinos_ENABLE_STKClassic:BOOL=OFF \
  -D Trilinos_ENABLE_STKIO:BOOL=ON \
  -D Trilinos_ENABLE_STKMesh:BOOL=ON \
  -D Trilinos_ENABLE_Sacado:BOOL=ON \
@@ -119,7 +118,6 @@ cmake \
  -D Trilinos_ENABLE_Teko:BOOL=ON \
  -D Trilinos_ENABLE_Tempus:BOOL=ON \
  -D Trilinos_ENABLE_Teuchos:BOOL=ON \
- -D Trilinos_ENABLE_ThreadPool:BOOL=ON \
  -D Trilinos_ENABLE_Thyra:BOOL=ON \
  -D Trilinos_ENABLE_Tpetra:BOOL=ON \
  -D Trilinos_ENABLE_Zoltan2:BOOL=ON \

@@ -52,7 +52,9 @@ main(int argc, char* argv[])
   int  status  = 0;  // 0 = pass, failures are incremented
   bool success = true;
 
-  Teuchos::GlobalMPISession mpiSession(&argc, &argv);
+  // Don't want annoying Teuchos output
+  std::ostringstream black_hole;
+  Teuchos::GlobalMPISession mpiSession(&argc, &argv, &black_hole);
   Kokkos::initialize(argc, argv);
 
 #if defined(ALBANY_FLUSH_DENORMALS)

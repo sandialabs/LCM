@@ -168,7 +168,7 @@ MechanicsProblem::MechanicsProblem(
        << variableTypeToString(mech_type_) << '\n'
        << "\tTemperature variables         : "
        << variableTypeToString(temperature_type_) << '\n'
-       << "\tDislocation Density variables         : "
+       << "\tDislocation Density variables : "
        << variableTypeToString(dislocation_density_type_) << '\n'
        << "\tPore Pressure variables       : "
        << variableTypeToString(pore_pressure_type_) << '\n'

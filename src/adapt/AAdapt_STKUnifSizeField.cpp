@@ -131,7 +131,8 @@ namespace AAdapt
   }
 
   return false;  // don't terminate the loop
-}  // namespace AAdaptboolSTKUnifRefineField::operator()
+}  // namespace
+   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
 
 bool
 STKUnifUnrefineField::operator()(

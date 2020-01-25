@@ -10,11 +10,11 @@
 #include "Albany_AbstractProblem.hpp"
 #include "Albany_MaterialDatabase.hpp"
 #include "ConstitutiveModelInterface.hpp"
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 
 // To do:
 // --  Add multiblock support (See mechanics example problem)
@@ -35,8 +35,7 @@ namespace Albany {
  * \brief Abstract interface for representing a 2-D finite element
  * problem.
  */
-class HMCProblem :
-    public virtual Albany::AbstractProblem
+class HMCProblem : public virtual Albany::AbstractProblem
 {
  public:
   //! Default constructor
@@ -156,6 +155,8 @@ class HMCProblem :
 
 }  // namespace Albany
 
+#include <sstream>
+
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
@@ -163,6 +164,7 @@ class HMCProblem :
 #include "Albany_SolutionMaxValueResponseFunction.hpp"
 #include "Albany_SolutionTwoNormResponseFunction.hpp"
 #include "Albany_Utils.hpp"
+#include "ConstitutiveModelParameters.hpp"
 #include "DefGrad.hpp"
 #include "ElasticityResid.hpp"
 #include "FieldNameMap.hpp"
@@ -172,12 +174,8 @@ class HMCProblem :
 #include "PHAL_SaveCellStateField.hpp"
 #include "PHAL_SaveStateField.hpp"
 #include "Strain.hpp"
-#include "UpdateField.hpp"
-
-#include <sstream>
-
-#include "ConstitutiveModelParameters.hpp"
 #include "Time.hpp"
+#include "UpdateField.hpp"
 
 template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>

@@ -15,8 +15,7 @@ Albany::HMCProblem::HMCProblem(
     const Teuchos::RCP<ParamLib>&               paramLib_,
     const int                                   numDim_,
     Teuchos::RCP<const Teuchos::Comm<int>>&     commT)
-    :
-      Albany::AbstractProblem(
+    : Albany::AbstractProblem(
           params_,
           paramLib_,
           numDim_ + params_->get("Additional Scales", 1) * numDim_ * numDim_),

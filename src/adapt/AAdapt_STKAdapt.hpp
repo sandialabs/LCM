@@ -10,11 +10,10 @@
 #include "AAdapt_AbstractAdapter.hpp"
 #include "Albany_GenericSTKMeshStruct.hpp"
 #include "Albany_STKDiscretization.hpp"
-#include "Teuchos_ParameterList.hpp"
-#include "Teuchos_RCP.hpp"
-
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
 #include "UniformRefinerPattern.hpp"
 
 namespace AAdapt {

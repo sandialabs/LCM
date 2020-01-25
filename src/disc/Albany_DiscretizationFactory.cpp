@@ -8,9 +8,9 @@
 
 #include "Teuchos_TestForException.hpp"
 #if defined(ALBANY_STK)
-#include "Albany_STKDiscretization.hpp"
 #include "Albany_GenericSTKMeshStruct.hpp"
 #include "Albany_STK3DPointStruct.hpp"
+#include "Albany_STKDiscretization.hpp"
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "Albany_TmplSTKMeshStruct.hpp"
 
@@ -179,7 +179,7 @@ Albany::DiscretizationFactory::createMeshSpecs()
   // will fail if the underlying meshStruct is not based on STK.
   createInterfaceParts(adaptParams, meshStruct);
 #endif  // ALBANY_LCM
-    return meshStruct->getMeshSpecs();
+  return meshStruct->getMeshSpecs();
 }
 
 Teuchos::RCP<Albany::AbstractMeshStruct>
@@ -250,22 +250,23 @@ Albany::DiscretizationFactory::createMeshStruct(
 #endif  // ALBANY_SEACAS
   } else if (method == "Gmsh") {
     return Teuchos::rcp(new Albany::GmshSTKMeshStruct(disc_params, comm));
-  }
-  else
+  } else
 #endif  // ALBANY_STK
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      true,
-      Teuchos::Exceptions::InvalidParameter,
-      std::endl
-          << "Error!  Unknown discretization method in DiscretizationFactory: "
-          << method << "!" << std::endl
-          << "Supplied parameter list is " << std::endl
-          << *disc_params
-          << "\nValid Methods are: STK1D, STK2D, STK3D, STK3DPoint, Ioss, Ioss "
-             "Aeras,"
-          << " Exodus, Exodus Aeras, PUMI, PUMI Hierarchic, Sim, Ascii,"
-          << " Ascii2D, Extruded" << std::endl);
+    TEUCHOS_TEST_FOR_EXCEPTION(
+        true,
+        Teuchos::Exceptions::InvalidParameter,
+        std::endl
+            << "Error!  Unknown discretization method in "
+               "DiscretizationFactory: "
+            << method << "!" << std::endl
+            << "Supplied parameter list is " << std::endl
+            << *disc_params
+            << "\nValid Methods are: STK1D, STK2D, STK3D, STK3DPoint, Ioss, "
+               "Ioss "
+               "Aeras,"
+            << " Exodus, Exodus Aeras, PUMI, PUMI Hierarchic, Sim, Ascii,"
+            << " Ascii2D, Extruded" << std::endl);
   return Teuchos::null;
 }
 
@@ -378,8 +379,12 @@ Albany::DiscretizationFactory::createDiscretizationFromInternalMeshStruct(
   if (!piroParams.is_null() && !rigidBodyModes.is_null()) {
     rigidBodyModes->setPiroPL(piroParams);
   }
-  std::string& method = discParams->get("Method", "STK1D");
-  return Teuchos::null;
+  auto ms =
+      Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(meshStruct);
+  auto disc = Teuchos::rcp(new Albany::STKDiscretization(
+      discParams, ms, commT, rigidBodyModes, sideSetEquations));
+  disc->updateMesh();
+  return disc;
 }
 
 /* This function overwrite previous discretization parameter list */

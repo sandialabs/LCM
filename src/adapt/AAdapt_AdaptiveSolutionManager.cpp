@@ -280,8 +280,8 @@ AdaptiveSolutionManager::resizeMeshDataArrays(
   auto overlapped_vs = disc->getOverlapVectorSpace();
 
   overlapped_soln = Thyra::createMembers(overlapped_vs, num_time_deriv + 1);
-  overlapped_f = Thyra::createMember(overlapped_vs);
-  overlapped_jac = disc->createOverlapJacobianOp();
+  overlapped_f    = Thyra::createMember(overlapped_vs);
+  overlapped_jac  = disc->createOverlapJacobianOp();
 
   // This call allocates the non-overlapped MV
   current_soln = disc_->getSolutionMV();

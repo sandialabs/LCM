@@ -884,8 +884,7 @@ STKDiscretization::transformMesh()
       x[1] = b * (1 - x[1]) + s * x[1];
       *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
     }
-  }
-  else {
+  } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         std::logic_error,

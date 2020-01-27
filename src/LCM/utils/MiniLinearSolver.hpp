@@ -113,6 +113,6 @@ class MiniLinearSolver<PHAL::AlbanyTraits::DistParamDeriv, N>
 
 }  // namespace LCM
 
-#include "MiniLinearSolver.t.h"
+#include "MiniLinearSolver.t.hpp"
 
 #endif  // LCM_MiniLinearSolver_h

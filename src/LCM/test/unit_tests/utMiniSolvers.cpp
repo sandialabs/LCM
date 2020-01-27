@@ -3,7 +3,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#include "MiniLinearSolver.h"
+#include "MiniLinearSolver.hpp"
 #include "MiniNonlinearSolver.h"
 #include "MiniSolvers.h"
 #include "gtest/gtest.h"

@@ -10,7 +10,7 @@
 
 #include "Teuchos_LAPACK.hpp"
 //*/
-#include <MiniLinearSolver.h>
+#include <MiniLinearSolver.hpp>
 
 #include <Sacado_Traits.hpp>
 #include <iostream>

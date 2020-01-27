@@ -502,8 +502,8 @@ if(ALBANY_STK)
   set(utils-headers
       ${utils-headers}
       "${LCM_DIR}/utils/LCMPartition.h"
-      "${LCM_DIR}/utils/MiniLinearSolver.h"
-      "${LCM_DIR}/utils/MiniLinearSolver.t.h"
+      "${LCM_DIR}/utils/MiniLinearSolver.hpp"
+      "${LCM_DIR}/utils/MiniLinearSolver.t.hpp"
       "${LCM_DIR}/utils/MiniNonlinearSolver.h"
       "${LCM_DIR}/utils/MiniNonlinearSolver.t.h"
       "${LCM_DIR}/utils/MiniSolvers.h")

@@ -3,7 +3,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#include "Subgraph.h"
+#include "Subgraph.hpp"
 
 #include "Topology.hpp"
 #include "Topology_Utils.hpp"

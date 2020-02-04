@@ -13,7 +13,7 @@
 #include <stk_mesh/base/SkinMesh.hpp>
 #include <stk_util/parallel/ParallelReduce.hpp>
 
-#include "Subgraph.h"
+#include "Subgraph.hpp"
 #include "Topology_FailureCriterion.hpp"
 #include "Topology_Utils.hpp"
 

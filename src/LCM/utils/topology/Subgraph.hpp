@@ -9,7 +9,7 @@
 
 #include <stk_mesh/base/FieldBase.hpp>
 
-#include "Topology_Types.h"
+#include "Topology_Types.hpp"
 
 namespace LCM {
 

@@ -7,7 +7,7 @@
 #if !defined(LCM_Topology_Utils_h)
 #define LCM_Topology_Utils_h
 
-#include "Topology_Types.h"
+#include "Topology_Types.hpp"
 
 namespace LCM {
 

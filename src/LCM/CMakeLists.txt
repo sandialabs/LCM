@@ -519,10 +519,10 @@ if(ALBANY_STK)
       "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp"
       "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
   set(topology-headers
-      "${LCM_DIR}/utils/topology/Subgraph.h"
+      "${LCM_DIR}/utils/topology/Subgraph.hpp"
       "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
       "${LCM_DIR}/utils/topology/Topology.hpp"
-      "${LCM_DIR}/utils/topology/Topology_Types.h"
+      "${LCM_DIR}/utils/topology/Topology_Types.hpp"
       "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
 endif()
 

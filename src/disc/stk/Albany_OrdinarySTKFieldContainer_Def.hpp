@@ -170,18 +170,19 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
 #if defined(ALBANY_LCM) && defined(ALBANY_SEACAS)
 
-  bool has_boundary_indicator =
-      (std::find(req.begin(), req.end(), "boundary_indicator") != req.end());
-  if (has_boundary_indicator) {
+  bool has_cell_boundary_indicator =
+      (std::find(req.begin(), req.end(), "cell_boundary_indicator") !=
+       req.end());
+  if (has_cell_boundary_indicator) {
     // STK says that attributes are of type Field<double,anonymous>[ name:
     // "extra_attribute_3" , #states: 1 ]
-    this->boundary_indicator =
+    this->cell_boundary_indicator =
         metaData_->template get_field<stk::mesh::FieldBase>(
             stk::topology::ELEMENT_RANK, "extra_attribute_1");
-    if (this->boundary_indicator != nullptr) {
-      build_boundary_indicator = true;
+    if (this->cell_boundary_indicator != nullptr) {
+      build_cell_boundary_indicator = true;
       stk::io::set_field_role(
-          *this->boundary_indicator, Ioss::Field::INFORMATION);
+          *this->cell_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
 #endif
@@ -219,10 +220,13 @@ OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
         *this->failure_state[rank], this->metaData->universal_part(), nullptr);
 
     // Boundary indicator
-    this->boundary_indicator = &this->metaData->template declare_field<SFT>(
-        stk::topology::ELEMENT_RANK, "boundary_indicator");
+    this->cell_boundary_indicator =
+        &this->metaData->template declare_field<SFT>(
+            stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
     stk::mesh::put_field_on_mesh(
-        *this->boundary_indicator, this->metaData->universal_part(), nullptr);
+        *this->cell_boundary_indicator,
+        this->metaData->universal_part(),
+        nullptr);
   }
 #endif  // ALBANY_LCM
 

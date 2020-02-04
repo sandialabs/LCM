@@ -116,10 +116,10 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
     return failure_state[rank];
   }
   stk::mesh::FieldBase*
-  getBoundaryIndicator()
+  getCellBoundaryIndicator()
   {
-    ALBANY_ASSERT(boundary_indicator != nullptr);
-    return boundary_indicator;
+    ALBANY_ASSERT(cell_boundary_indicator != nullptr);
+    return cell_boundary_indicator;
   }
 #endif  // ALBANY_LCM
   SphereVolumeFieldType*
@@ -208,7 +208,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
 
 #if defined(ALBANY_LCM)
   virtual bool
-  hasBoundaryIndicatorField() const = 0;
+  hasCellBoundaryIndicatorField() const = 0;
 #endif
 
   std::map<std::string, double>&
@@ -284,7 +284,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   IntScalarFieldType* refine_field;
 #if defined(ALBANY_LCM)
   IntScalarFieldType*   failure_state[stk::topology::ELEMENT_RANK + 1];
-  stk::mesh::FieldBase* boundary_indicator;
+  stk::mesh::FieldBase* cell_boundary_indicator;
 #endif  // ALBANY_LCM
 
   // Required for Peridynamics in LCM

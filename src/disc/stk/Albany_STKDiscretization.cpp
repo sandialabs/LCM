@@ -1891,10 +1891,10 @@ STKDiscretization::computeWorksetInfo()
   }
 
 #if defined(ALBANY_LCM)
-  stk::mesh::FieldBase* boundary_indicator_field{nullptr};
-  if (stkMeshStruct->getFieldContainer()->hasBoundaryIndicatorField()) {
-    boundary_indicator_field =
-        stkMeshStruct->getFieldContainer()->getBoundaryIndicator();
+  stk::mesh::FieldBase* cell_boundary_indicator_field{nullptr};
+  if (stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField()) {
+    cell_boundary_indicator_field =
+        stkMeshStruct->getFieldContainer()->getCellBoundaryIndicator();
   }
 #endif
 
@@ -1930,7 +1930,7 @@ STKDiscretization::computeWorksetInfo()
   sphereVolume.resize(numBuckets);
   latticeOrientation.resize(numBuckets);
 #if defined(ALBANY_LCM)
-  boundary_indicator.resize(numBuckets);
+  cell_boundary_indicator.resize(numBuckets);
 #endif
 
   nodesOnElemStateVec.resize(numBuckets);
@@ -2053,8 +2053,8 @@ STKDiscretization::computeWorksetInfo()
     if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
       latticeOrientation[b].resize(buck.size());
     }
-    if (stkMeshStruct->getFieldContainer()->hasBoundaryIndicatorField()) {
-      boundary_indicator[b].resize(buck.size());
+    if (stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField()) {
+      cell_boundary_indicator[b].resize(buck.size());
     }
 #endif
 
@@ -2123,9 +2123,9 @@ STKDiscretization::computeWorksetInfo()
         latticeOrientation[b][i] = static_cast<double*>(
             stk::mesh::field_data(*latticeOrientation_field, element));
       }
-      if (stkMeshStruct->getFieldContainer()->hasBoundaryIndicatorField()) {
-        boundary_indicator[b][i] = static_cast<double*>(
-            stk::mesh::field_data(*boundary_indicator_field, element));
+      if (stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField()) {
+        cell_boundary_indicator[b][i] = static_cast<double*>(
+            stk::mesh::field_data(*cell_boundary_indicator_field, element));
       }
 #endif
 

@@ -90,8 +90,8 @@ struct ACEpermafrostMiniKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray T_old_;
   Albany::MDArray ice_saturation_old_;
 
-  bool                       have_boundary_indicator_{false};
-  Teuchos::ArrayRCP<double*> boundary_indicator_;
+  bool                       have_cell_boundary_indicator_{false};
+  Teuchos::ArrayRCP<double*> cell_boundary_indicator_;
 
   // Baseline constants
   RealType ice_density_{0.0};

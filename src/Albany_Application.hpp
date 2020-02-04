@@ -866,7 +866,7 @@ Application::loadWorksetBucketInfo(
   auto const& sphereVolume       = disc->getSphereVolume();
   auto const& latticeOrientation = disc->getLatticeOrientation();
 #ifdef ALBANY_LCM
-  auto const& boundary_indicator = disc->getBoundaryIndicator();
+  auto const& cell_boundary_indicator = disc->getCellBoundaryIndicator();
 #endif
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);
@@ -876,7 +876,7 @@ Application::loadWorksetBucketInfo(
   workset.wsSphereVolume       = sphereVolume[ws];
   workset.wsLatticeOrientation = latticeOrientation[ws];
 #ifdef ALBANY_LCM
-  workset.boundary_indicator = boundary_indicator[ws];
+  workset.cell_boundary_indicator = cell_boundary_indicator[ws];
 #endif
   workset.EBName  = wsEBNames[ws];
   workset.wsIndex = ws;

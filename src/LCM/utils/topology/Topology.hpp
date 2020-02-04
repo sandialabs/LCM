@@ -609,7 +609,7 @@ class Topology
   /// Setting boundary indicator
   ///
   void
-  setBoundaryIndicator();
+  setCellBoundaryIndicator();
 
   ///
   ///
@@ -758,11 +758,11 @@ class Topology
   }
 
   stk::mesh::FieldBase&
-  get_boundary_indicator_field()
+  get_cell_boundary_indicator_field()
   {
     auto& asms = get_stk_mesh_struct();
     auto  asfc = asms->getFieldContainer();
-    auto* psfb = asfc->getBoundaryIndicator();
+    auto* psfb = asfc->getCellBoundaryIndicator();
     assert(psfb != nullptr);
     return (*psfb);
   }
@@ -883,13 +883,13 @@ class Topology
   // Set boundary indicator.
   //
   void
-  set_boundary_indicator(stk::mesh::Entity e, BoundaryIndicator const bi);
+  set_cell_boundary_indicator(stk::mesh::Entity e, BoundaryIndicator const bi);
 
   //
   // Get boundary indicator.
   //
   BoundaryIndicator
-  get_boundary_indicator(stk::mesh::Entity e);
+  get_cell_boundary_indicator(stk::mesh::Entity e);
 
   bool
   is_internal(stk::mesh::Entity e);

@@ -44,9 +44,9 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
 
 #if defined(ALBANY_LCM)
   bool
-  hasBoundaryIndicatorField() const
+  hasCellBoundaryIndicatorField() const
   {
-    return build_boundary_indicator;
+    return build_cell_boundary_indicator;
   }
 #endif
 
@@ -161,7 +161,7 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   bool buildSphereVolume;
 
 #if defined(ALBANY_LCM)
-  bool build_boundary_indicator{false};
+  bool build_cell_boundary_indicator{false};
 #endif
 
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field;

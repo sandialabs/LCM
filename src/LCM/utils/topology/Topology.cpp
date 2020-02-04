@@ -180,7 +180,7 @@ Topology::initializeCellFailureState()
 // For now meaningful for elements only
 //
 void
-Topology::setBoundaryIndicator()
+Topology::setCellBoundaryIndicator()
 {
   auto&                   bulk_data = get_bulk_data();
   auto const              cell_rank = stk::topology::ELEMENT_RANK;
@@ -189,7 +189,7 @@ Topology::setBoundaryIndicator()
 
   for (auto cell : cells) {
     auto const bi = is_boundary_cell(cell) == true ? EXTERIOR : INTERIOR;
-    set_boundary_indicator(cell, bi);
+    set_cell_boundary_indicator(cell, bi);
   }
 }
 
@@ -333,7 +333,7 @@ Topology::graphInitialization()
   set_output_type(UNIDIRECTIONAL_MULTILEVEL);
   createAllLevelsRelations();
   initializeCellFailureState();
-  setBoundaryIndicator();
+  setCellBoundaryIndicator();
   Albany::fix_node_sharing(bulk_data);
   get_stk_discretization().updateMesh();
   initializeTopologies();
@@ -1375,7 +1375,7 @@ Topology::erodeFailedElements()
   Albany::fix_node_sharing(bulk_data);
   initializeCellFailureState();
   createBoundary();
-  setBoundaryIndicator();
+  setCellBoundaryIndicator();
 
   return eroded_volume;
 }
@@ -1844,30 +1844,30 @@ Topology::get_failure_state(stk::mesh::Entity e)
 // Set boundary indicator.
 //
 void
-Topology::set_boundary_indicator(
+Topology::set_cell_boundary_indicator(
     stk::mesh::Entity       e,
     BoundaryIndicator const bi)
 {
-  auto& bulk_data          = get_bulk_data();
-  auto& boundary_field     = get_boundary_indicator_field();
-  auto* pbi                = stk::mesh::field_data(boundary_field, e);
-  auto* boundary_indicator = static_cast<double*>(pbi);
-  ALBANY_ASSERT(boundary_indicator != nullptr);
-  *boundary_indicator = static_cast<double>(bi);
+  auto& bulk_data               = get_bulk_data();
+  auto& boundary_field          = get_cell_boundary_indicator_field();
+  auto* pbi                     = stk::mesh::field_data(boundary_field, e);
+  auto* cell_boundary_indicator = static_cast<double*>(pbi);
+  ALBANY_ASSERT(cell_boundary_indicator != nullptr);
+  *cell_boundary_indicator = static_cast<double>(bi);
 }
 
 //
 // Get boundary indicator.
 //
 BoundaryIndicator
-Topology::get_boundary_indicator(stk::mesh::Entity e)
+Topology::get_cell_boundary_indicator(stk::mesh::Entity e)
 {
-  auto& bulk_data          = get_bulk_data();
-  auto& boundary_field     = get_boundary_indicator_field();
-  auto* pbi                = stk::mesh::field_data(boundary_field, e);
-  auto* boundary_indicator = static_cast<double*>(pbi);
-  ALBANY_ASSERT(boundary_indicator != nullptr);
-  return static_cast<BoundaryIndicator>(*boundary_indicator);
+  auto& bulk_data               = get_bulk_data();
+  auto& boundary_field          = get_cell_boundary_indicator_field();
+  auto* pbi                     = stk::mesh::field_data(boundary_field, e);
+  auto* cell_boundary_indicator = static_cast<double*>(pbi);
+  ALBANY_ASSERT(cell_boundary_indicator != nullptr);
+  return static_cast<BoundaryIndicator>(*cell_boundary_indicator);
 }
 
 bool
@@ -1969,7 +1969,7 @@ Topology::erodeElements()
   Albany::fix_node_sharing(bulk_data);
   initializeCellFailureState();
   createBoundary();
-  setBoundaryIndicator();
+  setCellBoundaryIndicator();
   return eroded_volume;
 }
 

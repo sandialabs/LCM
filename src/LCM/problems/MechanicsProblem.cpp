@@ -289,7 +289,9 @@ MechanicsProblem::MechanicsProblem(
   if (requireLatticeOrientationOnMesh == true) {
     requirements.push_back("Lattice_Orientation");
   }
-  if (have_erosion == true) { requirements.push_back("boundary_indicator"); }
+  if (have_erosion == true) {
+    requirements.push_back("cell_boundary_indicator");
+  }
 }  // MechanicsProblem
 
 //------------------------------------------------------------------------------

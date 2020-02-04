@@ -47,9 +47,9 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
 
 #if defined(ALBANY_LCM)
   bool
-  hasBoundaryIndicatorField() const
+  hasCellBoundaryIndicatorField() const
   {
-    return build_boundary_indicator;
+    return build_cell_boundary_indicator;
   }
 #endif
 
@@ -136,7 +136,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   bool buildLatticeOrientation;
 
 #if defined(ALBANY_LCM)
-  bool build_boundary_indicator{false};
+  bool build_cell_boundary_indicator{false};
 #endif
 
   // Containers for residual and solution

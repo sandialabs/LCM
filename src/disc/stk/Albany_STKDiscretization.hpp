@@ -278,10 +278,10 @@ class STKDiscretization : public AbstractDiscretization
 
 #if defined(ALBANY_LCM)
   WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getBoundaryIndicator() const
+  getCellBoundaryIndicator() const
   {
-    ALBANY_ASSERT(boundary_indicator.is_null() == false);
-    return boundary_indicator;
+    ALBANY_ASSERT(cell_boundary_indicator.is_null() == false);
+    return cell_boundary_indicator;
   }
 
   void
@@ -670,7 +670,7 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<Teuchos::ArrayRCP<double*>>::type latticeOrientation;
 
 #if defined(ALBANY_LCM)
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type boundary_indicator;
+  WorksetArray<Teuchos::ArrayRCP<double*>>::type cell_boundary_indicator;
 #endif
 
 #ifdef ALBANY_CONTACT

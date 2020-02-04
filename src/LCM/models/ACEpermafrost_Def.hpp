@@ -303,15 +303,15 @@ ACEpermafrostMiniKernel<EvalT, Traits>::init(
   T_old_              = (*workset.stateArrayPtr)["ACE Temperature_old"];
   ice_saturation_old_ = (*workset.stateArrayPtr)["ACE Ice Saturation_old"];
 
-  auto& disc               = *workset.disc;
-  auto& stk_disc           = dynamic_cast<Albany::STKDiscretization&>(disc);
-  auto& mesh_struct        = *(stk_disc.getSTKMeshStruct());
-  auto& field_cont         = *(mesh_struct.getFieldContainer());
-  have_boundary_indicator_ = field_cont.hasBoundaryIndicatorField();
+  auto& disc        = *workset.disc;
+  auto& stk_disc    = dynamic_cast<Albany::STKDiscretization&>(disc);
+  auto& mesh_struct = *(stk_disc.getSTKMeshStruct());
+  auto& field_cont  = *(mesh_struct.getFieldContainer());
+  have_cell_boundary_indicator_ = field_cont.hasCellBoundaryIndicatorField();
 
-  if (have_boundary_indicator_ == true) {
-    boundary_indicator_ = workset.boundary_indicator;
-    ALBANY_ASSERT(boundary_indicator_.is_null() == false);
+  if (have_cell_boundary_indicator_ == true) {
+    cell_boundary_indicator_ = workset.cell_boundary_indicator;
+    ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
   }
 
   current_time_ = workset.current_time;
@@ -363,8 +363,8 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
           0.0;
   bool const is_exposed_to_water = (height <= sea_level);
   bool const is_at_boundary =
-      have_boundary_indicator_ == true ?
-          static_cast<bool>(*(boundary_indicator_[cell])) :
+      have_cell_boundary_indicator_ == true ?
+          static_cast<bool>(*(cell_boundary_indicator_[cell])) :
           false;
 
   bool const is_erodible_at_boundary = is_erodible && is_at_boundary;

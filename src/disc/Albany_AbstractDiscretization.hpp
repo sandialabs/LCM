@@ -143,7 +143,7 @@ class AbstractDiscretization
 #if defined(ALBANY_LCM)
   WorksetArray<Teuchos::ArrayRCP<double*>>::type dummy;
   virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getBoundaryIndicator() const
+  getCellBoundaryIndicator() const
   {
     return dummy;
   }

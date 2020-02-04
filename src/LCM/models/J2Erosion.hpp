@@ -81,8 +81,8 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray Fp_old_;
   Albany::MDArray eqps_old_;
 
-  bool                       have_boundary_indicator_{false};
-  Teuchos::ArrayRCP<double*> boundary_indicator_;
+  bool                       have_cell_boundary_indicator_{false};
+  Teuchos::ArrayRCP<double*> cell_boundary_indicator_;
 
   // Baseline constants
   RealType sat_mod_{0.0};

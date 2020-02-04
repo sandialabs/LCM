@@ -363,18 +363,18 @@ MechanicsProblem::constructEvaluators(
         &entity);
   }
 
-  // Have to register boundary_indicator in the mesh before the discretization
-  // is built
-  auto find_boundary_indicator = std::find(
+  // Have to register cell_boundary_indicator in the mesh before the
+  // discretization is built
+  auto find_cell_boundary_indicator = std::find(
       this->requirements.begin(),
       this->requirements.end(),
-      "boundary_indicator");
+      "cell_boundary_indicator");
 
-  if (find_boundary_indicator != this->requirements.end()) {
+  if (find_cell_boundary_indicator != this->requirements.end()) {
     auto entity = StateStruct::ElemData;
 
     stateMgr.registerStateVariable(
-        "boundary_indicator",
+        "cell_boundary_indicator",
         dl_->cell_scalar,
         meshSpecs.ebName,
         false,

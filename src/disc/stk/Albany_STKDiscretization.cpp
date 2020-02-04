@@ -1892,9 +1892,24 @@ STKDiscretization::computeWorksetInfo()
 
 #if defined(ALBANY_LCM)
   stk::mesh::FieldBase* cell_boundary_indicator_field{nullptr};
+  stk::mesh::FieldBase* face_boundary_indicator_field{nullptr};
+  stk::mesh::FieldBase* edge_boundary_indicator_field{nullptr};
+  stk::mesh::FieldBase* node_boundary_indicator_field{nullptr};
   if (stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField()) {
     cell_boundary_indicator_field =
         stkMeshStruct->getFieldContainer()->getCellBoundaryIndicator();
+  }
+  if (stkMeshStruct->getFieldContainer()->hasFaceBoundaryIndicatorField()) {
+    face_boundary_indicator_field =
+        stkMeshStruct->getFieldContainer()->getFaceBoundaryIndicator();
+  }
+  if (stkMeshStruct->getFieldContainer()->hasEdgeBoundaryIndicatorField()) {
+    edge_boundary_indicator_field =
+        stkMeshStruct->getFieldContainer()->getEdgeBoundaryIndicator();
+  }
+  if (stkMeshStruct->getFieldContainer()->hasNodeBoundaryIndicatorField()) {
+    node_boundary_indicator_field =
+        stkMeshStruct->getFieldContainer()->getNodeBoundaryIndicator();
   }
 #endif
 
@@ -1931,6 +1946,9 @@ STKDiscretization::computeWorksetInfo()
   latticeOrientation.resize(numBuckets);
 #if defined(ALBANY_LCM)
   cell_boundary_indicator.resize(numBuckets);
+  face_boundary_indicator.resize(numBuckets);
+  edge_boundary_indicator.resize(numBuckets);
+  node_boundary_indicator.resize(numBuckets);
 #endif
 
   nodesOnElemStateVec.resize(numBuckets);

@@ -148,6 +148,24 @@ class AbstractDiscretization
     return dummy;
   }
 
+  virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
+  getFaceBoundaryIndicator() const
+  {
+    return dummy;
+  }
+
+  virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
+  getEdgeBoundaryIndicator() const
+  {
+    return dummy;
+  }
+
+  virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
+  getNodeBoundaryIndicator() const
+  {
+    return dummy;
+  }
+
   virtual void
   printElemGIDws() const
   {

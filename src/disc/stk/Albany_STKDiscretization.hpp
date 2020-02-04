@@ -284,6 +284,27 @@ class STKDiscretization : public AbstractDiscretization
     return cell_boundary_indicator;
   }
 
+  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
+  getFaceBoundaryIndicator() const
+  {
+    ALBANY_ASSERT(face_boundary_indicator.is_null() == false);
+    return face_boundary_indicator;
+  }
+
+  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
+  getEdgeBoundaryIndicator() const
+  {
+    ALBANY_ASSERT(edge_boundary_indicator.is_null() == false);
+    return edge_boundary_indicator;
+  }
+
+  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
+  getNodeBoundaryIndicator() const
+  {
+    ALBANY_ASSERT(node_boundary_indicator.is_null() == false);
+    return node_boundary_indicator;
+  }
+
   void
   printElemGIDws() const;
 
@@ -671,6 +692,9 @@ class STKDiscretization : public AbstractDiscretization
 
 #if defined(ALBANY_LCM)
   WorksetArray<Teuchos::ArrayRCP<double*>>::type cell_boundary_indicator;
+  WorksetArray<Teuchos::ArrayRCP<double*>>::type face_boundary_indicator;
+  WorksetArray<Teuchos::ArrayRCP<double*>>::type edge_boundary_indicator;
+  WorksetArray<Teuchos::ArrayRCP<double*>>::type node_boundary_indicator;
 #endif
 
 #ifdef ALBANY_CONTACT

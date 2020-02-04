@@ -115,6 +115,9 @@ struct Workset
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> apps_;
   Teuchos::RCP<Albany::Application>                    current_app_;
   Teuchos::ArrayRCP<double*>                           cell_boundary_indicator;
+  Teuchos::ArrayRCP<double*>                           face_boundary_indicator;
+  Teuchos::ArrayRCP<double*>                           edge_boundary_indicator;
+  Teuchos::ArrayRCP<double*>                           node_boundary_indicator;
   std::set<int>                                        fixed_dofs_;
   bool                                                 is_schwarz_bc_{false};
 #endif

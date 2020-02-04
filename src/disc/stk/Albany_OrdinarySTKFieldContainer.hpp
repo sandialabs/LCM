@@ -48,6 +48,21 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   {
     return build_cell_boundary_indicator;
   }
+  bool
+  hasFaceBoundaryIndicatorField() const
+  {
+    return build_face_boundary_indicator;
+  }
+  bool
+  hasEdgeBoundaryIndicatorField() const
+  {
+    return build_edge_boundary_indicator;
+  }
+  bool
+  hasNodeBoundaryIndicatorField() const
+  {
+    return build_node_boundary_indicator;
+  }
 #endif
 
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>
@@ -162,6 +177,9 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
 
 #if defined(ALBANY_LCM)
   bool build_cell_boundary_indicator{false};
+  bool build_face_boundary_indicator{false};
+  bool build_edge_boundary_indicator{false};
+  bool build_node_boundary_indicator{false};
 #endif
 
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field;

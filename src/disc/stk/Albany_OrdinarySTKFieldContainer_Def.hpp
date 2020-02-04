@@ -173,6 +173,15 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   bool has_cell_boundary_indicator =
       (std::find(req.begin(), req.end(), "cell_boundary_indicator") !=
        req.end());
+  bool has_face_boundary_indicator =
+      (std::find(req.begin(), req.end(), "face_boundary_indicator") !=
+       req.end());
+  bool has_edge_boundary_indicator =
+      (std::find(req.begin(), req.end(), "edge_boundary_indicator") !=
+       req.end());
+  bool has_node_boundary_indicator =
+      (std::find(req.begin(), req.end(), "node_boundary_indicator") !=
+       req.end());
   if (has_cell_boundary_indicator) {
     // STK says that attributes are of type Field<double,anonymous>[ name:
     // "extra_attribute_3" , #states: 1 ]
@@ -183,6 +192,42 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
       build_cell_boundary_indicator = true;
       stk::io::set_field_role(
           *this->cell_boundary_indicator, Ioss::Field::INFORMATION);
+    }
+  }
+  if (has_face_boundary_indicator) {
+    // STK says that attributes are of type Field<double,anonymous>[ name:
+    // "extra_attribute_3" , #states: 1 ]
+    this->face_boundary_indicator =
+        metaData_->template get_field<stk::mesh::FieldBase>(
+            stk::topology::FACE_RANK, "extra_attribute_2");
+    if (this->face_boundary_indicator != nullptr) {
+      build_face_boundary_indicator = true;
+      stk::io::set_field_role(
+          *this->face_boundary_indicator, Ioss::Field::INFORMATION);
+    }
+  }
+  if (has_edge_boundary_indicator) {
+    // STK says that attributes are of type Field<double,anonymous>[ name:
+    // "extra_attribute_3" , #states: 1 ]
+    this->edge_boundary_indicator =
+        metaData_->template get_field<stk::mesh::FieldBase>(
+            stk::topology::EDGE_RANK, "extra_attribute_3");
+    if (this->edge_boundary_indicator != nullptr) {
+      build_edge_boundary_indicator = true;
+      stk::io::set_field_role(
+          *this->edge_boundary_indicator, Ioss::Field::INFORMATION);
+    }
+  }
+  if (has_node_boundary_indicator) {
+    // STK says that attributes are of type Field<double,anonymous>[ name:
+    // "extra_attribute_3" , #states: 1 ]
+    this->node_boundary_indicator =
+        metaData_->template get_field<stk::mesh::FieldBase>(
+            stk::topology::NODE_RANK, "extra_attribute_4");
+    if (this->node_boundary_indicator != nullptr) {
+      build_node_boundary_indicator = true;
+      stk::io::set_field_role(
+          *this->node_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
 #endif

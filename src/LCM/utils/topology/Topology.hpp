@@ -767,6 +767,36 @@ class Topology
     return (*psfb);
   }
 
+  stk::mesh::FieldBase&
+  get_face_boundary_indicator_field()
+  {
+    auto& asms = get_stk_mesh_struct();
+    auto  asfc = asms->getFieldContainer();
+    auto* psfb = asfc->getFaceBoundaryIndicator();
+    assert(psfb != nullptr);
+    return (*psfb);
+  }
+
+  stk::mesh::FieldBase&
+  get_edge_boundary_indicator_field()
+  {
+    auto& asms = get_stk_mesh_struct();
+    auto  asfc = asms->getFieldContainer();
+    auto* psfb = asfc->getEdgeBoundaryIndicator();
+    assert(psfb != nullptr);
+    return (*psfb);
+  }
+
+  stk::mesh::FieldBase&
+  get_node_boundary_indicator_field()
+  {
+    auto& asms = get_stk_mesh_struct();
+    auto  asfc = asms->getFieldContainer();
+    auto* psfb = asfc->getNodeBoundaryIndicator();
+    assert(psfb != nullptr);
+    return (*psfb);
+  }
+
   void
   set_failure_criterion(Teuchos::RCP<AbstractFailureCriterion> const& fc)
   {

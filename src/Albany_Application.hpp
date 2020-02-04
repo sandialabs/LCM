@@ -867,6 +867,9 @@ Application::loadWorksetBucketInfo(
   auto const& latticeOrientation = disc->getLatticeOrientation();
 #ifdef ALBANY_LCM
   auto const& cell_boundary_indicator = disc->getCellBoundaryIndicator();
+  auto const& face_boundary_indicator = disc->getFaceBoundaryIndicator();
+  auto const& edge_boundary_indicator = disc->getEdgeBoundaryIndicator();
+  auto const& node_boundary_indicator = disc->getNodeBoundaryIndicator();
 #endif
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);
@@ -877,6 +880,9 @@ Application::loadWorksetBucketInfo(
   workset.wsLatticeOrientation = latticeOrientation[ws];
 #ifdef ALBANY_LCM
   workset.cell_boundary_indicator = cell_boundary_indicator[ws];
+  workset.face_boundary_indicator = face_boundary_indicator[ws];
+  workset.edge_boundary_indicator = edge_boundary_indicator[ws];
+  workset.node_boundary_indicator = node_boundary_indicator[ws];
 #endif
   workset.EBName  = wsEBNames[ws];
   workset.wsIndex = ws;

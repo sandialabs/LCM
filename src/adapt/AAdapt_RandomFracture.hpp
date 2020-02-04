@@ -16,7 +16,7 @@
 
 // Uses LCM Topology util class
 // Note that all topology functions are in Albany::LCM namespace
-#include "Topology.h"
+#include "Topology.hpp"
 
 // Forward declaration(s)
 namespace Albany {

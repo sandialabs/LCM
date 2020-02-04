@@ -4,9 +4,9 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#include "Topology_Utils.h"
+#include "Topology_Utils.hpp"
 
-#include "Topology.h"
+#include "Topology.hpp"
 
 namespace LCM {
 

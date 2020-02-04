@@ -4,7 +4,7 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#include "LCMPartition.h"
+#include "LCMPartition.hpp"
 
 #include <algorithm>
 #include <boost/graph/adjacency_list.hpp>

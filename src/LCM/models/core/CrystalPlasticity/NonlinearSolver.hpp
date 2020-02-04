@@ -7,7 +7,7 @@
 #if !defined(Core_NonlinearSolver_hpp)
 #define Core_NonlinearSolver_hpp
 
-#include <MiniNonlinearSolver.h>
+#include <MiniNonlinearSolver.hpp>
 
 #include "CrystalPlasticityCore.hpp"
 

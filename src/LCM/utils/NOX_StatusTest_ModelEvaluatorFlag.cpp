@@ -4,7 +4,7 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#include "NOX_StatusTest_ModelEvaluatorFlag.h"
+#include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
 
 #include <vector>
 

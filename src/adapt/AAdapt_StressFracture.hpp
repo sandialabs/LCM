@@ -8,7 +8,7 @@
 #define AAdapt_StressFracture_hpp
 
 #include "Albany_STKDiscretization.hpp"
-#include "Topology_FailureCriterion.h"
+#include "Topology_FailureCriterion.hpp"
 
 namespace AAdapt {
 

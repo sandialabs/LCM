@@ -4,10 +4,10 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#include "Topology_FailureCriterion.h"
+#include "Topology_FailureCriterion.hpp"
 
 #include "Albany_GlobalLocalIndexer.hpp"
-#include "Topology.h"
+#include "Topology.hpp"
 
 namespace LCM {
 

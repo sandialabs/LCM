@@ -16,9 +16,9 @@
 #include <stk_mesh/base/FieldBase.hpp>
 
 #include "Teuchos_ScalarTraits.hpp"
-#include "Topology.h"
+#include "Topology.hpp"
 #include "Topology_Types.h"
-#include "Topology_Utils.h"
+#include "Topology_Utils.hpp"
 
 namespace LCM {
 

@@ -7,7 +7,7 @@
 #include <Kokkos_Core.hpp>
 
 #include "Albany_Utils.hpp"
-#include "NOX_StatusTest_ModelEvaluatorFlag.h"
+#include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
 #include "ParallelConstitutiveModel.hpp"
 #include "utility/Memory.hpp"
 #include "utility/PerformanceContext.hpp"

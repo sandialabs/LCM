@@ -7,7 +7,7 @@
 #if !defined(ElastoViscoplasticCore_hpp)
 #define ElastoViscoplasticCore_hpp
 
-#include <MiniNonlinearSolver.h>
+#include <MiniNonlinearSolver.hpp>
 
 namespace EV {
 

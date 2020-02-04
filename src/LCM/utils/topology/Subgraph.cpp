@@ -5,8 +5,8 @@
 //
 #include "Subgraph.h"
 
-#include "Topology.h"
-#include "Topology_Utils.h"
+#include "Topology.hpp"
+#include "Topology_Utils.hpp"
 
 namespace LCM {
 

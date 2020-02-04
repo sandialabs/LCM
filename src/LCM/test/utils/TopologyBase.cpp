@@ -7,9 +7,9 @@
 //
 // Test of topology manipulation.
 //
-#include "topology/Topology.h"
-#include "topology/Topology_FailureCriterion.h"
-#include "topology/Topology_Utils.h"
+#include "topology/Topology.hpp"
+#include "topology/Topology_FailureCriterion.hpp"
+#include "topology/Topology_Utils.hpp"
 
 int
 main(int ac, char* av[])

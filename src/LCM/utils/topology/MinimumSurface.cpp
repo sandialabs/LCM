@@ -11,7 +11,7 @@
 
 #include <stk_mesh/base/FieldBase.hpp>
 
-#include "Topology.h"
+#include "Topology.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
 

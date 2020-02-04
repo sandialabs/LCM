@@ -9,7 +9,7 @@
 #include <Teuchos_TimeMonitor.hpp>
 
 #include "StateVarUtils.hpp"
-#include "Topology_FailureCriterion.h"
+#include "Topology_FailureCriterion.hpp"
 
 namespace AAdapt {
 //

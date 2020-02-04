@@ -8,7 +8,7 @@
 #define LCM_CrystalPlasticityModel_hpp
 
 #include "../../utility/StaticAllocator.hpp"
-#include "NOX_StatusTest_ModelEvaluatorFlag.h"
+#include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
 #include "ParallelConstitutiveModel.hpp"
 #include "core/CrystalPlasticity/CrystalPlasticityCore.hpp"
 #include "core/CrystalPlasticity/Integrator.hpp"

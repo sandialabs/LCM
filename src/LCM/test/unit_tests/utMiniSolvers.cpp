@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 #include "MiniLinearSolver.hpp"
-#include "MiniNonlinearSolver.h"
-#include "MiniSolvers.h"
+#include "MiniNonlinearSolver.hpp"
+#include "MiniSolvers.hpp"
 #include "gtest/gtest.h"
 
 int

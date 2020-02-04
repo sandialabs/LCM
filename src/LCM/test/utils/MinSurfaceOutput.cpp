@@ -4,7 +4,7 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-//#include "Topology.h"
+//#include "Topology.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,7 +13,7 @@
 #include <sstream>
 #include <string>
 
-#include "topology/Topology.h"
+#include "topology/Topology.hpp"
 typedef stk::mesh::Entity Entity;
 
 int

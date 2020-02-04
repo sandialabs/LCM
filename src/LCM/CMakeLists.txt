@@ -490,7 +490,7 @@ set(utils-sources
 set(utils-headers
     "${LCM_DIR}/utils/LocalNonlinearSolver.hpp"
     "${LCM_DIR}/utils/LocalNonlinearSolver_Def.hpp"
-    "${LCM_DIR}/utils/NOX_StatusTest_ModelEvaluatorFlag.h"
+    "${LCM_DIR}/utils/NOX_StatusTest_ModelEvaluatorFlag.hpp"
     "${LCM_DIR}/utils/Projection.hpp"
     "${LCM_DIR}/utils/SolutionSniffer.hpp"
     "${LCM_DIR}/utils/StateVarUtils.hpp")
@@ -501,12 +501,12 @@ if(ALBANY_STK)
       "${LCM_DIR}/utils/MiniNonlinearSolver.cpp")
   set(utils-headers
       ${utils-headers}
-      "${LCM_DIR}/utils/LCMPartition.h"
+      "${LCM_DIR}/utils/LCMPartition.hpp"
       "${LCM_DIR}/utils/MiniLinearSolver.hpp"
       "${LCM_DIR}/utils/MiniLinearSolver.t.hpp"
-      "${LCM_DIR}/utils/MiniNonlinearSolver.h"
-      "${LCM_DIR}/utils/MiniNonlinearSolver.t.h"
-      "${LCM_DIR}/utils/MiniSolvers.h")
+      "${LCM_DIR}/utils/MiniNonlinearSolver.hpp"
+      "${LCM_DIR}/utils/MiniNonlinearSolver_Def.hpp"
+      "${LCM_DIR}/utils/MiniSolvers.hpp")
 endif(ALBANY_STK)
 
 # LCM utils / topology
@@ -520,10 +520,10 @@ if(ALBANY_STK)
       "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
   set(topology-headers
       "${LCM_DIR}/utils/topology/Subgraph.h"
-      "${LCM_DIR}/utils/topology/Topology_FailureCriterion.h"
-      "${LCM_DIR}/utils/topology/Topology.h"
+      "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
+      "${LCM_DIR}/utils/topology/Topology.hpp"
       "${LCM_DIR}/utils/topology/Topology_Types.h"
-      "${LCM_DIR}/utils/topology/Topology_Utils.h")
+      "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
 endif()
 
 set(SOURCES

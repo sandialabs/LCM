@@ -9,8 +9,8 @@
 //
 
 #include "time.h"
-#include "topology/Topology.h"
-#include "topology/Topology_Utils.h"
+#include "topology/Topology.hpp"
+#include "topology/Topology_Utils.hpp"
 
 typedef stk::mesh::Entity Entity;
 

@@ -3,7 +3,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#include "Topology.h"
+#include "Topology.hpp"
 
 #include <Albany_CommUtils.hpp>
 #include <Albany_STKNodeSharing.hpp>
@@ -14,8 +14,8 @@
 #include <stk_util/parallel/ParallelReduce.hpp>
 
 #include "Subgraph.h"
-#include "Topology_FailureCriterion.h"
-#include "Topology_Utils.h"
+#include "Topology_FailureCriterion.hpp"
+#include "Topology_Utils.hpp"
 
 namespace LCM {
 

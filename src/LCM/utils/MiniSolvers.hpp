@@ -6,7 +6,7 @@
 #if !defined(LCM_MiniSolvers_h)
 #define LCM_MiniSolvers_h
 
-#include "MiniNonlinearSolver.h"
+#include "MiniNonlinearSolver.hpp"
 #include "MiniTensor_Solvers.h"
 
 //

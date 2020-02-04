@@ -12,7 +12,7 @@
 
 #include "Albany_Layouts.hpp"
 #include "ConstitutiveModel.hpp"
-#include "NOX_StatusTest_ModelEvaluatorFlag.h"
+#include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
 
 namespace LCM {
 

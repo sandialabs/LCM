@@ -7,7 +7,7 @@
 //
 // Simple mesh partitioning program
 //
-#include <LCMPartition.h>
+#include <LCMPartition.hpp>
 
 #include <Teuchos_CommandLineProcessor.hpp>
 #include <algorithm>

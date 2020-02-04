@@ -23,7 +23,7 @@
 #endif
 
 #if defined(ALBANY_LCM) && defined(ALBANY_STK)
-#include "Topology_Utils.h"
+#include "Topology_Utils.hpp"
 #endif  // ALBANY_LCM
 
 Albany::DiscretizationFactory::DiscretizationFactory(

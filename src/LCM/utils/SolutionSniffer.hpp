@@ -10,7 +10,7 @@
 #include "Albany_DataTypes.hpp"
 #include "NOX_Abstract_PrePostOperator.H"
 #include "NOX_Abstract_Vector.H"
-#include "NOX_StatusTest_ModelEvaluatorFlag.h"
+#include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
 
 namespace LCM {
 

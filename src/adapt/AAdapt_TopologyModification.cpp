@@ -9,7 +9,7 @@
 #include <Teuchos_TimeMonitor.hpp>
 #include <stk_util/parallel/ParallelReduce.hpp>
 
-#include "LCM/utils/topology/Topology_FailureCriterion.h"
+#include "LCM/utils/topology/Topology_FailureCriterion.hpp"
 
 namespace AAdapt {
 

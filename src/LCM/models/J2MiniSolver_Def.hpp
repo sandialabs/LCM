@@ -5,7 +5,7 @@
 //
 #include "Albany_Utils.hpp"
 #include "J2MiniSolver.hpp"
-#include "MiniNonlinearSolver.h"
+#include "MiniNonlinearSolver.hpp"
 
 namespace LCM {
 

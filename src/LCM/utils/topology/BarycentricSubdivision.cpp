@@ -8,7 +8,7 @@
 #include <stk_mesh/base/FieldBase.hpp>
 
 #include "Albany_config.h"
-#include "Topology.h"
+#include "Topology.hpp"
 
 // FIXME: need to extract Topology member functions specific to
 // Barycentric subdivision and move into their own header!

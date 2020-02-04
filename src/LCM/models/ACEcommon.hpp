@@ -7,7 +7,7 @@
 #define LCM_ACEcommon_hpp
 
 #include "Albany_Utils.hpp"
-#include "MiniNonlinearSolver.h"
+#include "MiniNonlinearSolver.hpp"
 
 namespace LCM {
 

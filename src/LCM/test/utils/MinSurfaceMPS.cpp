@@ -11,7 +11,7 @@
 #include <sstream>
 #include <string>
 
-#include "topology/Topology.h"
+#include "topology/Topology.hpp"
 
 typedef stk::mesh::Entity Entity;
 

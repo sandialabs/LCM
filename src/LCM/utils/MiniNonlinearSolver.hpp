@@ -664,6 +664,6 @@ struct peel_tensor4
 
 }  // namespace LCM
 
-#include "MiniNonlinearSolver.t.h"
+#include "MiniNonlinearSolver_Def.hpp"
 
 #endif  // LCM_MiniNonlinearSolver_h

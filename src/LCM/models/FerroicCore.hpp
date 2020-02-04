@@ -1,8 +1,9 @@
 #if !defined(FerroicCore_hpp)
 #define FerroicCore_hpp
 
-#include <MiniNonlinearSolver.hpp>
 #include <MiniTensor.h>
+
+#include <MiniNonlinearSolver.hpp>
 
 namespace FM {
 

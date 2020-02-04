@@ -29,7 +29,6 @@ namespace Albany {
 void
 PrintHeader(std::ostream& os)
 {
-
   os << std::endl;
   os << "   ###    ##       ########     ###    ##    ## ##    ##" << '\n';
   os << "  ## ##   ##       ##     ##   ## ##   ###   ##  ##  ## " << '\n';

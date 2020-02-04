@@ -3,8 +3,9 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#include <MiniNonlinearSolver.hpp>
 #include <MiniTensor.h>
+
+#include <MiniNonlinearSolver.hpp>
 
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"

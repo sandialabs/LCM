@@ -53,7 +53,7 @@ main(int argc, char* argv[])
   bool success = true;
 
   // Don't want annoying Teuchos output
-  std::ostringstream black_hole;
+  std::ostringstream        black_hole;
   Teuchos::GlobalMPISession mpiSession(&argc, &argv, &black_hole);
   Kokkos::initialize(argc, argv);
 

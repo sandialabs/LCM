@@ -8,7 +8,6 @@
 // Simple mesh partitioning program
 //
 #include <LCMPartition.hpp>
-
 #include <Teuchos_CommandLineProcessor.hpp>
 #include <algorithm>
 #include <chrono>

@@ -123,38 +123,11 @@ if(INSTALL_ALBANY)
   include(CMakePackageConfigHelpers)
 endif()
 
-option(ENABLE_CROSS_COMPILE "Flag to turn on cross-compiling tools" OFF)
-if(ENABLE_CROSS_COMPILE)
-  set(Albany_CROSS_COMPILE ON)
-  message("Building with cross-compiling tools.")
-else()
-  set(Albany_CROSS_COMPILE OFF)
-endif()
-
 if(SET_COMPILERS_AUTOMATICALLY)
   message("Setting and checking of compilers:")
-  if(Albany_CROSS_COMPILE)
-    # Force the compilers to be the same as Trilinos (GAH experimental) This
-    # syntax is needed when cross compiling or the compilers get checked again
-    # by the Albany configure, and will probably fail, because the options won't
-    # be right and the exes won't run on the host.
-    include(CMakeForceCompiler)
-    set(CMAKE_SYSTEM_NAME Generic)
-    cmake_force_cxx_compiler(${Trilinos_CXX_COMPILER} Generic)
-    cmake_force_c_compiler(${Trilinos_C_COMPILER} Generic)
-    cmake_force_fortran_compiler(${Trilinos_Fortran_COMPILER} Generic)
-    # SET(CMAKE_SYSTEM_NAME ${Trilinos_SYSTEM_NAME})
-    # CMAKE_FORCE_CXX_COMPILER(${Trilinos_CXX_COMPILER}
-    # ${Trilinos_CXX_COMPILER_ID}) CMAKE_FORCE_C_COMPILER(${Trilinos_C_COMPILER}
-    # ${Trilinos_C_COMPILER_ID})
-    # CMAKE_FORCE_Fortran_COMPILER(${Trilinos_Fortran_COMPILER}
-    # ${Trilinos_Fortran_COMPILER_ID}) SET(CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES
-    # ${Trilinos_Fortran_IMPLICIT_LINK_LIBRARIES})
-  else()
-    set(CMAKE_CXX_COMPILER ${Trilinos_CXX_COMPILER})
-    set(CMAKE_C_COMPILER ${Trilinos_C_COMPILER})
-    set(CMAKE_Fortran_COMPILER ${Trilinos_Fortran_COMPILER})
-  endif()
+  set(CMAKE_CXX_COMPILER ${Trilinos_CXX_COMPILER})
+  set(CMAKE_C_COMPILER ${Trilinos_C_COMPILER})
+  set(CMAKE_Fortran_COMPILER ${Trilinos_Fortran_COMPILER})
 else()
   # Make sure the compilers match.
   message("Checking compilers:")
@@ -217,15 +190,6 @@ endif()
 # CTestConfig.cmake file for Cdash info.
 enable_testing()
 include(CTest)
-
-set(ALBANY_ENABLE_FORTRAN
-    ON
-    CACHE BOOL "enable fortran")
-
-if(CMAKE_Fortran_COMPILER AND ALBANY_ENABLE_FORTRAN) # Enable Fortran if it is
-                                                     # enabled in Trilinos.
-  enable_language(Fortran)
-endif()
 
 # Make Albany inherit Trilinos compiler flags. The most important are the
 # presence or absence of -NDEBUG (which can affect linking for complicated

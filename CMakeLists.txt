@@ -255,13 +255,11 @@ message("-- ALBANY_CXX_COMPILER_VERSION = ${ALBANY_CXX_COMPILER_VERSION}")
 if(EXISTS "${Trilinos_INCLUDE_DIRS}/KokkosCore_config.h")
   file(READ "${Trilinos_INCLUDE_DIRS}/KokkosCore_config.h"
        KOKKOS_CORE_CONFIG_FILE)
-  string(REGEX MATCH "KOKKOS_ENABLE_OPENMP" ALBANY_ENABLE_OPENMP
-               ${KOKKOS_CORE_CONFIG_FILE})
+  set(ALBANY_ENABLE_OPENMP OFF)
   if(ALBANY_ENABLE_OPENMP)
     message("-- Kokkos is configured to use OpenMP, Albany will also.")
   endif()
-  string(REGEX MATCH "KOKKOS_ENABLE_CUDA" ALBANY_ENABLE_CUDA
-               ${KOKKOS_CORE_CONFIG_FILE})
+  set(ALBANY_ENABLE_CUDA OFF)
   if(ALBANY_ENABLE_CUDA)
     message("-- Kokkos is configured to use CUDA, Albany will also.")
     string(REGEX MATCH "KOKKOS_COMPILER_CUDA_VERSION ([0-9]*)" _

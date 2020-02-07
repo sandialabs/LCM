@@ -614,7 +614,6 @@ set(INCLUDE_DIRS
     ${LCM_DIR}/utils
     ${LCM_DIR}/utils/topology
     ${LCM_DIR}/utils/dtk_interp_and_error
-    ${ALBANY_PUMI_INCLUDE_DIRS}
     ${Trilinos_TPL_INCLUDE_DIRS})
 
 # message("include dirs - ${INCLUDE_DIRS}")

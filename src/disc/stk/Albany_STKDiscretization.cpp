@@ -553,8 +553,7 @@ STKDiscretization::getCoordinates() const
   return coordinates;
 }
 
-// These methods were added to support mesh adaptation, which is currently
-// limited to PUMIDiscretization.
+// These methods were added to support mesh adaptation
 void
 STKDiscretization::setCoordinates(
     const Teuchos::ArrayRCP<const double>& /* c */)

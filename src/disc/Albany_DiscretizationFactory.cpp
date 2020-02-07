@@ -263,9 +263,7 @@ Albany::DiscretizationFactory::createMeshStruct(
             << "Supplied parameter list is " << std::endl
             << *disc_params
             << "\nValid Methods are: STK1D, STK2D, STK3D, STK3DPoint, Ioss, "
-               "Ioss "
-               "Aeras,"
-            << " Exodus, Exodus Aeras, PUMI, PUMI Hierarchic, Sim, Ascii,"
+            << " Exodus, Sim, Ascii,"
             << " Ascii2D, Extruded" << std::endl);
   return Teuchos::null;
 }

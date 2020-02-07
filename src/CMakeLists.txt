@@ -541,7 +541,6 @@ else()
 endif()
 
 include_directories(
-  ${ALBANY_PUMI_INCLUDE_DIRS}
   ./
   ./evaluators
   ./evaluators/bc

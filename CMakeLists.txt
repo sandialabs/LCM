@@ -834,47 +834,6 @@ else()
   set(ALBANY_AMP FALSE)
 endif()
 
-# Set optional dependency on SCOREC PUMI,  optional adaptivity
-option(ENABLE_SCOREC "Flag to turn on SCOREC dependency" OFF)
-set(ALBANY_SCOREC_DIR
-    ""
-    CACHE PATH "Path to standalone SCOREC installation")
-if(ENABLE_SCOREC)
-  # Check whether SCOREC was built as part of Trilinos
-  list(FIND Trilinos_PACKAGE_LIST SCOREC SCOREC_List_ID)
-  if(SCOREC_List_ID GREATER -1)
-    # It was built in Trilinos
-    list(FIND Trilinos_TPL_LIST SimModel SimModel_List_ID)
-    # Check whether Simmetrix is also used
-    if(SimModel_List_ID GREATER -1)
-      message(STATUS "Simmetrix SimModel is a Trilinos TPL")
-      set(ALBANY_SCOREC_SIMMODEL ON)
-    endif()
-    set(ALBANY_SCOREC_STANDALONE FALSE)
-  else()
-    # Not built in Trilinos, try to find standalone build in SCOREC_PREFIX
-    find_package(SCOREC 2.0.0 PATHS "${ALBANY_SCOREC_DIR}")
-    if(NOT SCOREC_FOUND)
-      message(FATAL_ERROR "\nError: can't find either SCOREC package\n")
-    endif()
-    message(STATUS "SCOREC Found at ${SCOREC_CONFIG}")
-    set(ALBANY_SCOREC_STANDALONE TRUE)
-  endif()
-  set(ALBANY_APF TRUE)
-  message("-- SCOREC                          is enabled")
-  set(ALBANY_SCOREC TRUE)
-else()
-  message("-- SCOREC                          is NOT Enabled.")
-  set(ALBANY_SCOREC FALSE)
-endif()
-
-# RPI APF mesh interface
-if(ALBANY_APF)
-  message("-- APF                             is Enabled")
-else()
-  message("-- APF                             is NOT Enabled.")
-endif()
-
 option(ENABLE_OMEGA_H "Enable Omega_h dependency for adaptation" OFF)
 set(ALBANY_OMEGA_H_DIR
     ""
@@ -883,17 +842,6 @@ if(ENABLE_OMEGA_H)
   find_package(Omega_h 9.0.0 REQUIRED PATHS "${ALBANY_OMEGA_H_DIR}")
   message(STATUS "Omega_h found at ${Omega_h_CONFIG}")
   set(ALBANY_OMEGA_H TRUE)
-endif()
-
-# ParaView's Catalyst CoProcessing package
-option(ENABLE_CATALYST
-       "Flag to turn on support for the Catalyst CoProcessing library" OFF)
-if(ENABLE_CATALYST)
-  message("-- Catalyst                        is Enabled")
-  set(ALBANY_CATALYST TRUE)
-else()
-  message("-- Catalyst                        is NOT Enabled.")
-  set(ALBANY_CATALYST FALSE)
 endif()
 
 # Add option for CONTACT work, defaults to disabled
@@ -908,17 +856,6 @@ endif()
 
 # Other Albany Template Options here:
 message("\nAlbany Templated Data Type Options:")
-
-# Throw error if using ENABLE_FAST_FELIX
-if(ENABLE_FAST_FELIX)
-  message(
-    FATAL_ERROR
-      "\nError: ENABLE_FAST_FELIX has been removed! Use ENABLE_FAD_TYPE instead.
-  Example for a tetrahedral mesh in LandIce:
-    -D ENABLE_FAD_TYPE:STRING=SFad
-    -D ALBANY_SFAD_SIZE=8
-  For a hexahedral mesh, use ALBANY_SFAD_SIZE=16")
-endif()
 
 # Set FAD data type
 set(ENABLE_FAD_TYPE

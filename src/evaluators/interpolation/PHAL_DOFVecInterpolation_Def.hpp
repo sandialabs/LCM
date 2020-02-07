@@ -103,19 +103,6 @@ void
 DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    for (std::size_t qp = 0; qp < numQPs; ++qp) {
-      for (std::size_t i = 0; i < vecDim; i++) {
-        // Zero out for node==0; then += for node = 1 to numNodes
-        val_qp(cell, qp, i) = val_node(cell, 0, i) * BF(cell, 0, qp);
-        for (std::size_t node = 1; node < numNodes; ++node) {
-          val_qp(cell, qp, i) += val_node(cell, node, i) * BF(cell, node, qp);
-        }
-      }
-    }
-  }
-#else
 
 #ifdef ALBANY_TIMER
   auto start = std::chrono::high_resolution_clock::now();
@@ -140,7 +127,6 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
             << microseconds << std::endl;
 #endif
 
-#endif
 }
 
 // Specialization for Jacobian evaluation taking advantage of known sparsity
@@ -222,31 +208,6 @@ FastSolutionVecInterpolationBase<
     evaluateFields(typename Traits::EvalData workset)
 {
   int num_dof = this->val_node(0, 0, 0).size();
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  const int neq = workset.wsElNodeEqID.extent(2);
-
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    for (std::size_t qp = 0; qp < this->numQPs; ++qp) {
-      for (std::size_t i = 0; i < this->vecDim; i++) {
-        // Zero out for node==0; then += for node = 1 to numNodes
-        this->val_qp(cell, qp, i) = ScalarT(
-            num_dof, this->val_node(cell, 0, i).val() * this->BF(cell, 0, qp));
-        (this->val_qp(cell, qp, i)).fastAccessDx(offset + i) =
-            this->val_node(cell, 0, i).fastAccessDx(offset + i) *
-            this->BF(cell, 0, qp);
-        for (std::size_t node = 1; node < this->numNodes; ++node) {
-          (this->val_qp(cell, qp, i)).val() +=
-              this->val_node(cell, node, i).val() * this->BF(cell, node, qp);
-          (this->val_qp(cell, qp, i)).fastAccessDx(neq * node + offset + i) +=
-              this->val_node(cell, node, i)
-                  .fastAccessDx(neq * node + offset + i) *
-              this->BF(cell, node, qp);
-        }
-      }
-    }
-  }
-// Intrepid2::FunctionSpaceTools::evaluate<ScalarT>(val_qp, val_node, BF);
-#else
   Kokkos::parallel_for(
       workset.numCells,
       VecInterpolationJacob<
@@ -263,7 +224,6 @@ FastSolutionVecInterpolationBase<
           this->vecDim,
           num_dof,
           offset));
-#endif
 }
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

@@ -1138,17 +1138,6 @@ else()
   set(ALBANY_FLUSH_DENORMALS FALSE)
 endif()
 
-# amb Default to on until the merge.
-option(ENABLE_KOKKOS_UNDER_DEVELOPMENT
-       "Flag to turn on Kokkos experimental code in Albany" ON)
-if(ENABLE_KOKKOS_UNDER_DEVELOPMENT)
-  message("-- Kokkos development        is Enabled")
-  set(ALBANY_KOKKOS_UNDER_DEVELOPMENT TRUE)
-else()
-  message("-- Kokkos development        is NOT Enabled.")
-  set(ALBANY_KOKKOS_UNDER_DEVELOPMENT FALSE)
-endif()
-
 option(ENABLE_ALBANY_VERBOSE "Flag to turn on verbose output" OFF)
 if(NOT ENABLE_ALBANY_VERBOSE)
   message("-- Verbose printing          is NOT Enabled")

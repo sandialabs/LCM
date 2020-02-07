@@ -14,9 +14,7 @@
 #include "Phalanx_config.hpp"
 #include "Teuchos_ParameterList.hpp"
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 #include "Kokkos_Vector.hpp"
-#endif
 
 namespace PHAL {
 /** \brief Scatters Lagrange Multipliers from the residual fields into the
@@ -56,14 +54,12 @@ class MortarContactResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::size_t numFieldsBase;  // Number of fields gathered in this call
   std::size_t offset;  // Offset of first DOF being gathered when numFields<neq
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  protected:
   Albany::AbstractDiscretization::WorksetConn nodeID;
   Albany::DeviceView1d<ST>                    f_kokkos;
   Kokkos::vector<Kokkos::DynRankView<const ScalarT, PHX::Device>, PHX::Device>
       val_kokkos;
 
-#endif
 };
 
 template <typename EvalT, typename Traits>
@@ -95,7 +91,6 @@ class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>
  private:
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   struct PHAL_MortarContactResRank0_Tag
   {
@@ -133,7 +128,6 @@ class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank2_Tag>
       PHAL_MortarContactResRank2_Policy;
 
-#endif
 };
 
 // **************************************************************
@@ -156,7 +150,6 @@ class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>
  private:
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   struct PHAL_MortarContactResRank0_Tag
   {
@@ -251,7 +244,6 @@ class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank2_Tag>
       PHAL_MortarContactJacRank2_Policy;
 
-#endif
 };
 
 // **************************************************************

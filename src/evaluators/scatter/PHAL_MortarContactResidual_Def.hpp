@@ -36,9 +36,7 @@ MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(
     this->addDependentField(val[eq]);
   }
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
   val_kokkos.resize(numFieldsBase);
-#endif
 
   if (p.isType<int>("Offset of First DOF"))
     offset = p.get<int>("Offset of First DOF");
@@ -79,7 +77,6 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::
 
 // **********************************************************************
 // Kokkos kernels
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
@@ -120,7 +117,6 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
             &f_kokkos(id), this->valTensor(cell, node, i, j));
       }
 }
-#endif
 
 // **********************************************************************
 template <typename Traits>
@@ -128,17 +124,6 @@ void
 MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  Teuchos::RCP<Thyra_Vector>                 f = workset.f;
-  Teuchos::RCP<const Albany::ContactManager> contactManager =
-      workset.disc->getContactManager();
-
-  // get nonconst (read and write) view of f
-  Teuchos::ArrayRCP<ST> f_nonconstView = Albany::getNonconstLocalData(f);
-
-  contactManager->fillInMortarResidual(workset.wsIndex, f_nonconstView);
-
-#else
 #ifdef ALBANY_TIMER
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -167,7 +152,6 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   std::cout << "Mortar Contact Residual time = " << millisec << "  "
             << microseconds << std::endl;
 #endif
-#endif
 }
 
 // **********************************************************************
@@ -188,7 +172,6 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::
 
 // **********************************************************************
 // Kokkos kernels
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
@@ -447,7 +430,6 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     }
   }
 }
-#endif
 
 // **********************************************************************
 template <typename Traits>
@@ -455,53 +437,6 @@ void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  auto                           nodeID    = workset.wsElNodeEqID;
-  Teuchos::RCP<Tpetra_Vector>    fT        = workset.fT;
-  Teuchos::RCP<Tpetra_CrsMatrix> JacT      = workset.JacT;
-  const bool                     loadResid = Teuchos::nonnull(fT);
-  Teuchos::Array<LO>             colT;
-  const int                      neq  = nodeID.extent(2);
-  const int                      nunk = neq * this->numNodes;
-  colT.resize(nunk);
-  int numDims = 0;
-
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    // Local Unks: Loop over nodes in element, Loop over equations per node
-    for (unsigned int node_col = 0, i = 0; node_col < this->numNodes;
-         node_col++) {
-      for (unsigned int eq_col = 0; eq_col < neq; eq_col++) {
-        colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-      }
-    }
-    for (std::size_t node = 0; node < this->numNodes; ++node) {
-      for (std::size_t eq = 0; eq < numFields; eq++) {
-        typename PHAL::Ref<ScalarT const>::type valptr =
-            this->val[eq](cell, node);
-        const LO rowT = nodeID(cell, node, this->offset + eq);
-        if (loadResid) fT->sumIntoLocalValue(rowT, valptr.val());
-        // Check derivative array is nonzero
-        if (valptr.hasFastAccess()) {
-          if (workset.is_adjoint) {
-            // Sum Jacobian transposed
-            for (unsigned int lunk = 0; lunk < nunk; lunk++)
-              JacT->sumIntoLocalValues(
-                  colT[lunk],
-                  Teuchos::arrayView(&rowT, 1),
-                  Teuchos::arrayView(&(valptr.fastAccessDx(lunk)), 1));
-          } else {
-            // Sum Jacobian entries all at once
-            JacT->sumIntoLocalValues(
-                rowT,
-                colT,
-                Teuchos::arrayView(&(valptr.fastAccessDx(0)), nunk));
-          }
-        }  // has fast access
-      }
-    }
-  }
-
-#else
 #ifdef ALBANY_TIMER
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -545,7 +480,6 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
       std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
   std::cout << "Mortar Contact Jacobian time = " << millisec << "  "
             << microseconds << std::endl;
-#endif
 #endif
 }
 

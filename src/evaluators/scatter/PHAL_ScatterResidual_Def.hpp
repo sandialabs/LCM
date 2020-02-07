@@ -76,9 +76,7 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
     numFieldsBase = (dl->node_tensor->extent(2)) * (dl->node_tensor->extent(3));
   }
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
   if (tensorRank == 0) { val_kokkos.resize(numFieldsBase); }
-#endif
 
   if (p.isType<int>("Offset of First DOF")) {
     offset = p.get<int>("Offset of First DOF");
@@ -128,7 +126,6 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::ScatterResidual(
 
 // **********************************************************************
 // Kokkos kernels
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
@@ -169,7 +166,6 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
             &f_kokkos(id), this->valTensor(cell, node, i, j));
       }
 }
-#endif
 
 // **********************************************************************
 template <typename Traits>
@@ -179,39 +175,6 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 {
   Teuchos::RCP<Thyra_Vector> f = workset.f;
 
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  auto nodeID = workset.wsElNodeEqID;
-
-  // get nonconst (read and write) view of f
-  Teuchos::ArrayRCP<ST> f_nonconstView = Albany::getNonconstLocalData(f);
-
-  if (this->tensorRank == 0) {
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < this->numNodes; ++node)
-        for (std::size_t eq = 0; eq < numFields; eq++)
-          f_nonconstView[nodeID(cell, node, this->offset + eq)] +=
-              (this->val[eq])(cell, node);
-    }
-  } else if (this->tensorRank == 1) {
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < this->numNodes; ++node)
-        for (std::size_t eq = 0; eq < numFields; eq++)
-          f_nonconstView[nodeID(cell, node, this->offset + eq)] +=
-              (this->valVec)(cell, node, eq);
-    }
-  } else if (this->tensorRank == 2) {
-    int numDims = this->valTensor.extent(2);
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < this->numNodes; ++node)
-        for (std::size_t i = 0; i < numDims; i++)
-          for (std::size_t j = 0; j < numDims; j++)
-            f_nonconstView[nodeID(
-                cell, node, this->offset + i * numDims + j)] +=
-                (this->valTensor)(cell, node, i, j);
-    }
-  }
-
-#else
 #ifdef ALBANY_TIMER
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -249,7 +212,6 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   std::cout << "Scatter Residual time = " << millisec << "  " << microseconds
             << std::endl;
 #endif
-#endif
 }
 
 // **********************************************************************
@@ -268,7 +230,6 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::ScatterResidual(
 
 // **********************************************************************
 // Kokkos kernels
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
@@ -511,7 +472,6 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     }
   }
 }
-#endif  // ALBANY_KOKKOS_UNDER_DEVELOPMENT
 
 // **********************************************************************
 template <typename Traits>
@@ -519,63 +479,6 @@ void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  Teuchos::RCP<Thyra_Vector>   f   = workset.f;
-  Teuchos::RCP<Thyra_LinearOp> Jac = workset.Jac;
-
-  auto               nodeID    = workset.wsElNodeEqID;
-  const bool         loadResid = Teuchos::nonnull(f);
-  Teuchos::Array<LO> col;
-  const int          neq  = nodeID.extent(2);
-  const int          nunk = neq * this->numNodes;
-  col.resize(nunk);
-  int numDims = 0;
-  if (this->tensorRank == 2) { numDims = this->valTensor.extent(2); }
-  Teuchos::ArrayRCP<ST> f_nonconstView;
-  if (loadResid) { f_nonconstView = Albany::getNonconstLocalData(f); }
-
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    // Local Unks: Loop over nodes in element, Loop over equations per node
-    for (unsigned int node_col = 0, i = 0; node_col < this->numNodes;
-         node_col++) {
-      for (unsigned int eq_col = 0; eq_col < neq; eq_col++) {
-        col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-      }
-    }
-    for (std::size_t node = 0; node < this->numNodes; ++node) {
-      for (std::size_t eq = 0; eq < numFields; eq++) {
-        typename PHAL::Ref<ScalarT const>::type valptr =
-            (this->tensorRank == 0 ?
-                 this->val[eq](cell, node) :
-                 this->tensorRank == 1 ?
-                 this->valVec(cell, node, eq) :
-                 this->valTensor(cell, node, eq / numDims, eq % numDims));
-        const LO row = nodeID(cell, node, this->offset + eq);
-        if (loadResid) { f_nonconstView[row] += valptr.val(); }
-        // Check derivative array is nonzero
-        if (valptr.hasFastAccess()) {
-          if (workset.is_adjoint) {
-            // Sum Jacobian transposed
-            for (unsigned int lunk = 0; lunk < nunk; lunk++)
-              Albany::addToLocalRowValues(
-                  Jac,
-                  col[lunk],
-                  Teuchos::arrayView(&row, 1),
-                  Teuchos::arrayView(&(valptr.fastAccessDx(lunk)), 1));
-          } else {
-            // Sum Jacobian entries all at once
-            Albany::addToLocalRowValues(
-                Jac,
-                row,
-                col,
-                Teuchos::arrayView(&(valptr.fastAccessDx(0)), nunk));
-          }
-        }  // has fast access
-      }
-    }
-  }
-
-#else
 #ifdef ALBANY_TIMER
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -654,7 +557,6 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
       std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
   std::cout << "Scatter Jacobian time = " << millisec << "  " << microseconds
             << std::endl;
-#endif
 #endif
 }
 

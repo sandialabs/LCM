@@ -68,18 +68,7 @@ void
 DOFInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    for (std::size_t qp = 0; qp < numQPs; ++qp) {
-      val_qp(cell, qp) = val_node(cell, 0) * BF(cell, 0, qp);
-      for (std::size_t node = 1; node < numNodes; ++node) {
-        val_qp(cell, qp) += val_node(cell, node) * BF(cell, node, qp);
-      }
-    }
-  }
-#else
   Kokkos::parallel_for(DOFInterpolationBase_Policy(0, workset.numCells), *this);
-#endif
 }
 
 }  // namespace PHAL

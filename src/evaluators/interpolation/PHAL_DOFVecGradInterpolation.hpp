@@ -59,7 +59,6 @@ class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::size_t numDims;
   std::size_t vecDim;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
   struct DOFVecGradInterpolationBase_Residual_Tag
@@ -75,7 +74,6 @@ class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       const DOFVecGradInterpolationBase_Residual_Tag& tag,
       const int&                                      cell) const;
 
-#endif
 };
 
 /** \brief Fast Finite Element Interpolation Evaluator
@@ -165,7 +163,6 @@ class FastSolutionVecGradInterpolationBase<
   std::size_t offset;
 
   // KOKKOS:
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
   struct FastSolutionVecGradInterpolationBase_Jacobian_Tag
@@ -184,7 +181,6 @@ class FastSolutionVecGradInterpolationBase<
 
   int num_dof, neq;
 
-#endif
 };
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

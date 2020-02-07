@@ -18,9 +18,7 @@
 #include "Phalanx_config.hpp"
 #include "Teuchos_ParameterList.hpp"
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 #include "Kokkos_Vector.hpp"
-#endif
 
 namespace PHAL {
 /** \brief Scatters result from the residual fields into the global data
@@ -61,14 +59,12 @@ class ScatterResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   unsigned short int tensorRank;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  protected:
   Albany::WorksetConn      nodeID;
   Albany::DeviceView1d<ST> f_kokkos;
   Kokkos::vector<Kokkos::DynRankView<const ScalarT, PHX::Device>, PHX::Device>
       val_kokkos;
 
-#endif
 };
 
 template <typename EvalT, typename Traits>
@@ -132,7 +128,6 @@ class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>
  private:
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   struct PHAL_ScatterResRank0_Tag
   {
@@ -170,7 +165,6 @@ class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank2_Tag>
       PHAL_ScatterResRank2_Policy;
 
-#endif
 };
 
 // **************************************************************
@@ -193,7 +187,6 @@ class ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>
  private:
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   struct PHAL_ScatterResRank0_Tag
   {
@@ -282,7 +275,6 @@ class ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank2_Tag>
       PHAL_ScatterJacRank2_Policy;
 
-#endif
 };
 
 // **************************************************************

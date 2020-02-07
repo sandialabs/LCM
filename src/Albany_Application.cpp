@@ -1533,14 +1533,10 @@ Application::computeGlobalJacobianImpl(
   resumeFill(jac);
   assign(jac, 0.0);
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
   if (!isFillActive(overlapped_jac)) { resumeFill(overlapped_jac); }
-#endif
   assign(overlapped_jac, 0.0);
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
   if (isFillActive(overlapped_jac)) { fillComplete(overlapped_jac); }
   if (!isFillActive(overlapped_jac)) { resumeFill(overlapped_jac); }
-#endif
 
   // Set data in Workset struct, and perform fill via field manager
   {
@@ -1570,14 +1566,12 @@ Application::computeGlobalJacobianImpl(
               PHAL::getDerivativeDimensions<EvalT>(this, ps, explicit_scheme));
     }
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
     if (!workset.f.is_null()) {
       workset.f_kokkos = getNonconstDeviceData(workset.f);
     }
     if (!workset.Jac.is_null()) {
       workset.Jac_kokkos = getNonconstDeviceData(workset.Jac);
     }
-#endif
     for (int ws = 0; ws < numWorksets; ws++) {
       const std::string evalName = PHAL::evalName<EvalT>("FM", wsPhysIndex[ws]);
       loadWorksetBucketInfo<EvalT>(workset, ws, evalName);
@@ -1692,12 +1686,10 @@ if (scaleBCdofs == true) {
   jac_scaled_lop->scaleLeft(*scaleVec_);
 }
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 if (isFillActive(overlapped_jac)) {
   // Makes getLocalMatrix() valid.
   fillComplete(overlapped_jac);
 }
-#endif
 if (derivatives_check_ > 0) {
   checkDerivatives(
       *this, current_time, x, xdot, xdotdot, p, f, jac, derivatives_check_);

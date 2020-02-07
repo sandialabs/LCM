@@ -141,13 +141,11 @@ GatherSolutionBase<EvalT, Traits>::GatherSolutionBase(
     numFieldsBase = (dl->node_tensor->extent(2)) * (dl->node_tensor->extent(3));
   }
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
   if (tensorRank == 0) {
     val_kokkos.resize(numFieldsBase);
     if (enableTransient) val_dot_kokkos.resize(numFieldsBase);
     if (enableAcceleration) val_dotdot_kokkos.resize(numFieldsBase);
   }
-#endif
 
   if (p.isType<int>("Offset of First DOF"))
     offset = p.get<int>("Offset of First DOF");
@@ -220,7 +218,6 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::GatherSolution(
 
 // ********************************************************************
 // Kokkos functors for Residual
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::operator()(
@@ -329,7 +326,6 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::operator()(
           xdotdot_constView(nodeID(cell, node, this->offset + eq));
 }
 
-#endif
 
 // **********************************************************************
 template <typename Traits>
@@ -341,71 +337,6 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   const auto& xdot    = workset.xdot;
   const auto& xdotdot = workset.xdotdot;
 
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  auto                        nodeID = workset.wsElNodeEqID;
-  Teuchos::ArrayRCP<const ST> x_constView, xdot_constView, xdotdot_constView;
-  x_constView = Albany::getLocalData(x);
-  if (!xdot.is_null()) { xdot_constView = Albany::getLocalData(xdot); }
-  if (!xdotdot.is_null()) { xdotdot_constView = Albany::getLocalData(xdotdot); }
-
-  if (this->tensorRank == 1) {
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < this->numNodes; ++node) {
-        for (std::size_t eq = 0; eq < numFields; eq++)
-          (this->valVec)(cell, node, eq) =
-              x_constView[nodeID(cell, node, this->offset + eq)];
-        if (workset.transientTerms && this->enableTransient) {
-          for (std::size_t eq = 0; eq < numFields; eq++)
-            (this->valVec_dot)(cell, node, eq) =
-                xdot_constView[nodeID(cell, node, this->offset + eq)];
-        }
-        if (workset.accelerationTerms && this->enableAcceleration) {
-          for (std::size_t eq = 0; eq < numFields; eq++)
-            (this->valVec_dotdot)(cell, node, eq) =
-                xdotdot_constView[nodeID(cell, node, this->offset + eq)];
-        }
-      }
-    }
-  } else if (this->tensorRank == 2) {
-    int numDim = this->valTensor.extent(2);
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < this->numNodes; ++node) {
-        for (std::size_t eq = 0; eq < numFields; eq++)
-          (this->valTensor)(cell, node, eq / numDim, eq % numDim) =
-              x_constView[nodeID(cell, node, this->offset + eq)];
-        if (workset.transientTerms && this->enableTransient) {
-          for (std::size_t eq = 0; eq < numFields; eq++)
-            (this->valTensor_dot)(cell, node, eq / numDim, eq % numDim) =
-                xdot_constView[nodeID(cell, node, this->offset + eq)];
-        }
-        if (workset.accelerationTerms && this->enableAcceleration) {
-          for (std::size_t eq = 0; eq < numFields; eq++)
-            (this->valTensor_dotdot)(cell, node, eq / numDim, eq % numDim) =
-                xdotdot_constView[nodeID(cell, node, this->offset + eq)];
-        }
-      }
-    }
-  } else {
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < this->numNodes; ++node) {
-        for (std::size_t eq = 0; eq < numFields; eq++)
-          (this->val[eq])(cell, node) =
-              x_constView[nodeID(cell, node, this->offset + eq)];
-        if (workset.transientTerms && this->enableTransient) {
-          for (std::size_t eq = 0; eq < numFields; eq++)
-            (this->val_dot[eq])(cell, node) =
-                xdot_constView[nodeID(cell, node, this->offset + eq)];
-        }
-        if (workset.accelerationTerms && this->enableAcceleration) {
-          for (std::size_t eq = 0; eq < numFields; eq++)
-            (this->val_dotdot[eq])(cell, node) =
-                xdotdot_constView[nodeID(cell, node, this->offset + eq)];
-        }
-      }
-    }
-  }
-
-#else
 #ifdef ALBANY_TIMER
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -505,7 +436,6 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   std::cout << "GaTher Solution Residual time = " << millisec << "  "
             << microseconds << std::endl;
 #endif
-#endif
 }
 
 // **********************************************************************
@@ -535,7 +465,6 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::GatherSolution(
 
 //***
 ////Kokkos functors for Jacobian
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
@@ -697,7 +626,6 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   }
 }
 
-#endif
 
 // **********************************************************************
 template <typename Traits>
@@ -709,68 +637,6 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   const auto& xdot    = workset.xdot;
   const auto& xdotdot = workset.xdotdot;
 
-#ifndef ALBANY_KOKKOS_UNDER_DEVELOPMENT
-  auto                        nodeID = workset.wsElNodeEqID;
-  Teuchos::ArrayRCP<const ST> x_constView, xdot_constView, xdotdot_constView;
-  x_constView = Albany::getLocalData(x);
-  if (!xdot.is_null()) { xdot_constView = Albany::getLocalData(xdot); }
-  if (!xdotdot.is_null()) { xdot_constView = Albany::getLocalData(xdot); }
-
-  int numDim = 0;
-  if (this->tensorRank == 2)
-    numDim = this->valTensor.extent(2);  // only needed for tensor fields
-
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    const int         neq     = nodeID.extent(2);
-    const std::size_t num_dof = neq * this->numNodes;
-
-    for (std::size_t node = 0; node < this->numNodes; ++node) {
-      int firstunk = neq * node + this->offset;
-      for (std::size_t eq = 0; eq < numFields; eq++) {
-        typename PHAL::Ref<ScalarT>::type valref =
-            (this->tensorRank == 0 ?
-                 this->val[eq](cell, node) :
-                 this->tensorRank == 1 ?
-                 this->valVec(cell, node, eq) :
-                 this->valTensor(cell, node, eq / numDim, eq % numDim));
-        valref = FadType(
-            valref.size(), x_constView[nodeID(cell, node, this->offset + eq)]);
-        // valref.setUpdateValue(!workset.ignore_residual); Not used anymore
-        valref.fastAccessDx(firstunk + eq) = workset.j_coeff;
-      }
-      if (workset.transientTerms && this->enableTransient) {
-        for (std::size_t eq = 0; eq < numFields; eq++) {
-          typename PHAL::Ref<ScalarT>::type valref =
-              (this->tensorRank == 0 ?
-                   this->val_dot[eq](cell, node) :
-                   this->tensorRank == 1 ?
-                   this->valVec_dot(cell, node, eq) :
-                   this->valTensor_dot(cell, node, eq / numDim, eq % numDim));
-          valref = FadType(
-              valref.size(),
-              xdot_constView[nodeID(cell, node, this->offset + eq)]);
-          valref.fastAccessDx(firstunk + eq) = workset.m_coeff;
-        }
-      }
-      if (workset.accelerationTerms && this->enableAcceleration) {
-        for (std::size_t eq = 0; eq < numFields; eq++) {
-          typename PHAL::Ref<ScalarT>::type valref =
-              (this->tensorRank == 0 ?
-                   this->val_dotdot[eq](cell, node) :
-                   this->tensorRank == 1 ?
-                   this->valVec_dotdot(cell, node, eq) :
-                   this->valTensor_dotdot(
-                       cell, node, eq / numDim, eq % numDim));
-          valref = FadType(
-              valref.size(),
-              xdotdot_constView[nodeID(cell, node, this->offset + eq)]);
-          valref.fastAccessDx(firstunk + eq) = workset.n_coeff;
-        }
-      }
-    }
-  }
-
-#else
 #ifdef ALBANY_TIMER
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -877,7 +743,6 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
       std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
   std::cout << "GaTher Solution Jacobian time = " << millisec << "  "
             << microseconds << std::endl;
-#endif
 #endif
 }
 

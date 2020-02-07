@@ -68,7 +68,6 @@ class GatherSolutionBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   bool               enableTransient;
   bool               enableAcceleration;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  protected:
   Albany::WorksetConn            nodeID;
   Albany::DeviceView1d<const ST> x_constView, xdot_constView, xdotdot_constView;
@@ -78,7 +77,6 @@ class GatherSolutionBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   KV                 val_kokkos, val_dot_kokkos, val_dotdot_kokkos;
   typename KV::t_dev d_val, d_val_dot, d_val_dotdot;
 
-#endif
 };
 
 template <typename EvalT, typename Traits>
@@ -110,7 +108,6 @@ class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
   const int                                              numFields;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   struct PHAL_GatherSolRank2_Tag
   {
@@ -213,7 +210,6 @@ class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
       RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Acceleration_Tag>
           PHAL_GatherSolRank0_Acceleration_Policy;
 
-#endif
 };
 
 // **************************************************************
@@ -235,7 +231,6 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
   const int                                              numFields;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   struct PHAL_GatherJacRank2_Tag
   {
@@ -339,7 +334,6 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
       RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Acceleration_Tag>
           PHAL_GatherJacRank0_Acceleration_Policy;
 
-#endif
 };
 
 // **************************************************************

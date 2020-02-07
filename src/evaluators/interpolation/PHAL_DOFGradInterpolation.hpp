@@ -59,7 +59,6 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::size_t numQPs;
   std::size_t numDims;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
   struct DOFGradInterpolationBase_Residual_Tag
@@ -86,7 +85,6 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   void
   operator()(const DOFGradInterpolationBase_Residual_Tag& tag, const int& cell)
       const;
-#endif
 #endif
 };
 
@@ -175,7 +173,6 @@ class FastSolutionGradInterpolationBase<
   typedef PHAL::AlbanyTraits::Jacobian::MeshScalarT MeshScalarT;
   std::size_t                                       offset;
 
-#ifdef ALBANY_KOKKOS_UNDER_DEVELOPMENT
  public:
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
   struct FastSolutionGradInterpolationBase_Jacobian_Tag
@@ -195,7 +192,6 @@ class FastSolutionGradInterpolationBase<
       const FastSolutionGradInterpolationBase_Jacobian_Tag& tag,
       const int&                                            cell) const;
 
-#endif
 };
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

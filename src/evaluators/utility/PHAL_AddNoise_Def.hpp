@@ -113,18 +113,6 @@ void
 AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  // Mauro: for some reason deep copy is not working when evaluation type is MP
-  // Jacobian, and the kokkos views are
-  // Kokkos::Experimental::View<Sacado::Fad::DFad<Sacado::MP::Vector<Stokhos::StaticFixedStorage<int,
-  // double, 16, Kokkos::Serial> > >*******, Kokkos::Serial>::array_type,
-
-  /*  if (noise_free)
-    {
-      noisy_field.deep_copy(field);
-      return;
-    }
-  */
-
   PHAL::MDFieldIterator<const ScalarT> in(field);
   PHAL::MDFieldIterator<ScalarT>       out(noisy_field);
 

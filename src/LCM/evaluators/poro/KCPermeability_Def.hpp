@@ -113,12 +113,6 @@ typename KCPermeability<EvalT, Traits>::ScalarT&
 KCPermeability<EvalT, Traits>::getValue(const std::string& n)
 {
   if (n == "Kozeny-Carman Permeability") return constant_value;
-#ifdef ALBAY_STOKHOS
-  for (int i = 0; i < rv.size(); i++) {
-    if (n == Albany::strint("Kozeny-Carman Permeability KL Random Variable", i))
-      return rv[i];
-  }
-#endif
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
       Teuchos::Exceptions::InvalidParameter,

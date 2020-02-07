@@ -223,14 +223,6 @@ if(EXISTS "${Trilinos_INCLUDE_DIRS}/KokkosCore_config.h")
   if(ALBANY_ENABLE_OPENMP)
     message("-- Kokkos is configured to use OpenMP, Albany will also.")
   endif()
-  set(ALBANY_ENABLE_CUDA OFF)
-  if(ALBANY_ENABLE_CUDA)
-    message("-- Kokkos is configured to use CUDA, Albany will also.")
-    string(REGEX MATCH "KOKKOS_COMPILER_CUDA_VERSION ([0-9]*)" _
-                 ${KOKKOS_CORE_CONFIG_FILE})
-    set(ALBANY_CUDA_COMPILER_VERSION "${CMAKE_MATCH_1}")
-    message("-- ALBANY_CUDA_COMPILER_VERSION = ${ALBANY_CUDA_COMPILER_VERSION}")
-  endif()
 else()
   message(
     FATAL_ERROR
@@ -1040,34 +1032,6 @@ if(ALBANY_ENABLE_OPENMP)
       "---> LCM WARNING: turning off ACE tests since KokkosNode = OpenMP (see issue #501)!"
     )
   endif(ENABLE_LCM)
-endif()
-
-# Optional CUDA settings
-if(ALBANY_ENABLE_CUDA)
-  if(ENABLE_LCM)
-    message(
-      FATAL_ERROR
-        "\nError: LCM does not work with a CUDA KokkosNode!  Recompile with LCM off."
-    )
-  endif()
-  set(NUM_GPUS_PER_NODE
-      4
-      CACHE INT "set Number of GPUs per Node")
-  message("-- NUM_GPUS_PER_NODE=${NUM_GPUS_PER_NODE}")
-  set(KOKKOS_NDEVICES "--kokkos-ndevices=${NUM_GPUS_PER_NODE}")
-  if(ENABLE_CUDA_ERROR_CHECK)
-    set(ALBANY_CUDA_ERROR_CHECK ON)
-    message("-- CUDA Error Check        is Enabled")
-  else()
-    message("-- CUDA Error Check        is NOT Enabled.")
-  endif()
-  if(ENABLE_CUDA_NVTX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lnvToolsExt")
-    set(ALBANY_CUDA_NVTX ON)
-    message("-- CUDA NVTX               is Enabled")
-  else()
-    message("-- CUDA NVTX               is NOT Enabled.")
-  endif()
 endif()
 
 # set optional dependency on the BGL, defaults to Enabled This option is added

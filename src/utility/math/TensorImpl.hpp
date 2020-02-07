@@ -9,15 +9,9 @@
 #ifndef UTIL_TENSORIMPL_HPP
 #define UTIL_TENSORIMPL_HPP
 
-#ifdef __CUDACC__
-#include <thrust/copy.h>
-#include <thrust/swap.h>
-namespace alg = thrust;
-#else  // cpp
 #include <algorithm>
 #include <iostream>
 namespace alg = std;
-#endif
 #include <cassert>
 
 /**

@@ -16,16 +16,10 @@ setenv TOOL_CHAIN gcc
 
 setenv CC [exec which gcc]
 
-if { [is-loaded lcm-cuda] } {
-  setenv CXX $lcm_dir/Trilinos/packages/kokkos/config/nvcc_wrapper
-} else {
-  setenv CXX [exec which g++]
-}
+setenv CXX [exec which g++]
 
 if { [is-loaded lcm-fedora] } {
   setenv CXXFLAGS "-std=c++17 -Wno-terminate -Wno-deprecated-declarations"
 } else {
   setenv CXXFLAGS "-std=c++17"
 }
-
-setenv FC [exec which gfortran]

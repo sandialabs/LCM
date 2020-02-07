@@ -106,19 +106,6 @@ BiotModulus<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       }
     }
   }
-#ifdef ABANY_STOKHOS
-  else {
-    for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) {
-        Teuchos::Array<MeshScalarT> point(numDims);
-        for (int i = 0; i < numDims; i++)
-          point[i] =
-              Sacado::ScalarValue<MeshScalarT>::eval(coordVec(cell, qp, i));
-        biotModulus(cell, qp) = exp_rf_kl->evaluate(point, rv);
-      }
-    }
-  }
-#endif
   if (isPoroElastic) {
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {

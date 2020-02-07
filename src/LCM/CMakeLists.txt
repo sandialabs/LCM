@@ -456,7 +456,6 @@ set(models-headers
     "${LCM_DIR}/parallel_models/ParallelConstitutiveModel.hpp"
     "${LCM_DIR}/parallel_models/ParallelNeohookeanModel_Def.hpp"
     "${LCM_DIR}/parallel_models/ParallelNeohookeanModel.hpp")
-if(NOT ALBANY_ENABLE_CUDA)
   set(models-sources
       ${models-sources}
       "${LCM_DIR}/models/CrystalPlasticityModel.cpp"
@@ -478,7 +477,6 @@ if(NOT ALBANY_ENABLE_CUDA)
       "${LCM_DIR}/models/GursonHMRModel_Def.hpp"
       "${LCM_DIR}/models/GursonModel.hpp"
       "${LCM_DIR}/models/GursonModel_Def.hpp")
-endif(NOT ALBANY_ENABLE_CUDA)
 
 # LCM utils
 set(utils-sources

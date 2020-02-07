@@ -10,10 +10,8 @@
 #include <algorithm>
 #include <cstddef>
 #include <type_traits>
-#ifndef KOKKOS_ENABLE_CUDA
 #include <iostream>
 #include <new>
-#endif
 
 namespace utility {
 // Using a unique_ptr deleter would be much nicer but there are CUDA
@@ -219,16 +217,12 @@ StaticPointer<T>
 StaticAllocator::create(Args&&... args)
 {
   if (ptr_ + sizeof(T) > buffer_ + size_) {
-#ifdef KOKKOS_ENABLE_CUDA
-    return nullptr;
-#else
     std::cerr << "Static Allocator bad alloc"
               << "\n";
     std::cerr << "Current allocated: " << ptr_ - buffer_ << "\n";
     std::cerr << "Need to allocate: " << sizeof(T) << "\n";
     std::cerr << "Space remaining: " << size_ - (ptr_ - buffer_) << "\n";
     throw std::bad_alloc();
-#endif
   }
 
   unsigned char* ret = ptr_;
@@ -255,16 +249,12 @@ StaticPointer<T>
 StaticStackAllocator<Size>::create(Args&&... args)
 {
   if (ptr_ + sizeof(T) > buffer_ + Size) {
-#ifdef KOKKOS_ENABLE_CUDA
-    return nullptr;
-#else
     std::cerr << "Static Stack Allocator bad alloc"
               << "\n";
     std::cerr << "Current allocated: " << ptr_ - buffer_ << "\n";
     std::cerr << "Need to allocate: " << sizeof(T) << "\n";
     std::cerr << "Space remaining: " << Size - (ptr_ - buffer_) << "\n";
     throw std::bad_alloc();
-#endif
   }
 
   unsigned char* ret = ptr_;

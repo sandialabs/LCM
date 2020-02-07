@@ -64,21 +64,9 @@ if(ALBANY_MPI)
   else(DEFINED MPIMNP)
     set(MAX_MPI_RANKS 4)
   endif(DEFINED MPIMNP)
-  if(ALBANY_ENABLE_CUDA)
-    set(Albany.exe ${PARALLEL_CALL} ${AlbanyPath} ${KOKKOS_NDEVICES})
-    set(Albany8.exe
-        ${MPIEX}
-        ${MPIPRE}
-        ${MPINPF}
-        ${MAX_MPI_RANKS}
-        ${MPIPOST}
-        ${AlbanyPath}
-        ${KOKKOS_NDEVICES})
-  else()
-    set(Albany.exe ${PARALLEL_CALL} ${AlbanyPath})
-    set(Albany8.exe ${MPIEX} ${MPIPRE} ${MPINPF} ${MAX_MPI_RANKS} ${MPIPOST}
-                    ${AlbanyPath})
-  endif()
+  set(Albany.exe ${PARALLEL_CALL} ${AlbanyPath})
+  set(Albany8.exe ${MPIEX} ${MPIPRE} ${MPINPF} ${MAX_MPI_RANKS} ${MPIPOST}
+    ${AlbanyPath})
 else()
   set(SerialAlbany.exe ${AlbanyPath})
   set(Albany.exe ${AlbanyPath})

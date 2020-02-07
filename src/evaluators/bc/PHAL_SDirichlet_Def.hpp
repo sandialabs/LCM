@@ -15,8 +15,6 @@
 #include "Sacado_ParameterRegistration.hpp"
 #include "Teuchos_TestForException.hpp"
 
-//#define DEBUG_OUTPUT
-
 namespace PHAL {
 
 //

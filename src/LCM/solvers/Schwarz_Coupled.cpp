@@ -17,14 +17,7 @@
 #include "SolutionSniffer.hpp"
 
 // uncomment the following to write stuff out to matrix market to debug
-//#define WRITE_TO_MATRIX_MARKET
 
-#ifdef WRITE_TO_MATRIX_MARKET
-static int mm_counter_sol = 0;
-static int mm_counter_res = 0;
-static int mm_counter_pre = 0;
-static int mm_counter_jac = 0;
-#endif  // WRITE_TO_MATRIX_MARKET
 
 namespace LCM {
 
@@ -1119,25 +1112,9 @@ SchwarzCoupled::evalModelImpl(
     }
   }
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  Albany::writeMatrixMarket(xs, "sol", mm_counter_sol);
-  ++mm_counter_sol;
-#endif
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  Albany::writeMatrixMarket(fs_out, "res", mm_counter_res);
-  ++mm_counter_res;
-#endif
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  Albany::writeMatrixMarket(jacs_, "jac", mm_counter_jac);
-  ++mm_counter_jac;
-#endif
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  Albany::writeMatrixMarket(precs_, "pre", mm_counter_pre);
-  ++mm_counter_pre;
-#endif
   // Responses / sensitivities
   // FIXME: need to implement DgDx, DgDp, etc for sensitivity analysis!
   // Response functions

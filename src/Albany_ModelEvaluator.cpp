@@ -14,13 +14,7 @@
 #include "Teuchos_TestForException.hpp"
 
 // uncomment the following to write stuff out to matrix market to debug
-//#define WRITE_TO_MATRIX_MARKET
 
-#ifdef WRITE_TO_MATRIX_MARKET
-static int mm_counter_sol = 0;
-static int mm_counter_res = 0;
-static int mm_counter_jac = 0;
-#endif  // WRITE_TO_MATRIX_MARKET
 
 // IK, 4/24/15: adding option to write the mass matrix to matrix market file,
 // which is needed
@@ -1002,20 +996,8 @@ ModelEvaluator::evalModelImpl(
     }
   }
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  Albany::writeMatrixMarket(x, "sol", mm_counter_sol);
-  ++mm_counter_sol;
-#endif
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  Albany::writeMatrixMarket(f_out, "res", mm_counter_res);
-  ++mm_counter_res;
-#endif
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  Albany::writeMatrixMarket(W_op_out, "jac", mm_counter_jac);
-  ++mm_counter_jac;
-#endif
 }
 
 Thyra_InArgs

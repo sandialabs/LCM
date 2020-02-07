@@ -12,11 +12,7 @@
 #include "Teuchos_VerboseObject.hpp"
 #include "Thyra_DefaultBlockedLinearOp.hpp"
 
-//#define WRITE_TO_MATRIX_MARKET
 
-#ifdef WRITE_TO_MATRIX_MARKET
-static int mm_counter = 0;
-#endif  // WRITE_TO_MATRIX_MARKET
 
 using Thyra::PhysicallyBlockedLinearOpBase;
 
@@ -42,17 +38,6 @@ Schwarz_CoupledJacobian::getThyraCoupledJacobian(
 {
   auto const block_dim = jacs.size();
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  char name[5];  // create string for file name
-  for (auto i = 0; i < block_dim; ++i) {
-    sprintf(name, "Jac%02d", i);
-    std::string name_string;
-    name_string.assign(name_string, 5);
-    auto jac = jacs[i];
-    Albany::writeMatrixMarket(jac, name_string, mm_counter);
-  }
-  mm_counter++;
-#endif  // WRITE_TO_MATRIX_MARKET
 
   // get the block dimension
   // this operator will be square

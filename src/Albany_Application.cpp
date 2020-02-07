@@ -3,12 +3,9 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-//#define DEBUG
 
 #include "Albany_Application.hpp"
-
 #include <string>
-
 #include "AAdapt_RC_Manager.hpp"
 #include "Albany_DataTypes.hpp"
 #include "Albany_DiscretizationFactory.hpp"
@@ -33,9 +30,6 @@
 #if defined(ALBANY_LCM)
 #include "SolutionSniffer.hpp"
 #endif  // ALBANY_LCM
-
-//#define WRITE_TO_MATRIX_MARKET
-//#define DEBUG_OUTPUT
 
 using Teuchos::ArrayRCP;
 using Teuchos::getFancyOStream;
@@ -1085,9 +1079,6 @@ Application::set_dfm_workset(
 
   if (scaleBCdofs == true) {
     setScaleBCDofs(workset);
-#ifdef WRITE_TO_MATRIX_MARKET
-    writeMatrixMarket(scaleVec_, scale, countScale);
-#endif
     countScale++;
   }
 
@@ -1269,8 +1260,6 @@ Application::computeGlobalResidualImpl(
     const Teuchos::RCP<Thyra_Vector>&      f,
     double                                 dt)
 {
-  //#define DEBUG_OUTPUT
-
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Residual");
   using EvalT = PHAL::AlbanyTraits::Residual;
   postRegSetup<EvalT>();
@@ -1333,21 +1322,11 @@ Application::computeGlobalResidualImpl(
 
     Teuchos::RCP<Thyra_Vector> x_post_SDBCs;
     if ((dfm != Teuchos::null) && (problem->useSDBCs() == true)) {
-#ifdef DEBUG_OUTPUT
-      *out << "IKT before preEvaluate countRes = " << countRes
-           << ", computeGlobalResid workset.x = \n ";
-      describe(workset.x.getConst(), *out, Teuchos::VERB_EXTREME);
-#endif
       workset = set_dfm_workset(current_time, x, x_dot, x_dotdot, f);
 
       // FillType template argument used to specialize Sacado
       dfm->preEvaluate<EvalT>(workset);
       x_post_SDBCs = workset.x->clone_v();
-#ifdef DEBUG_OUTPUT
-      *out << "IKT after preEvaluate countRes = " << countRes
-           << ", computeGlobalResid workset.x = \n ";
-      describe(workset.x.getConst(), *out, Teuchos::VERB_EXTREME);
-#endif
       loadBasicWorksetInfoSDBCs(workset, x_post_SDBCs, this_time);
     }
 
@@ -1361,11 +1340,6 @@ Application::computeGlobalResidualImpl(
 
       // FillType template argument used to specialize Sacado
       fm[wsPhysIndex[ws]]->evaluateFields<EvalT>(workset);
-#ifdef DEBUG_OUTPUT
-      *out << "IKT after fm evaluateFields countRes = " << countRes
-           << ", computeGlobalResid workset.x = \n ";
-      describe(workset.x.getConst(), *out, Teuchos::VERB_EXTREME);
-#endif
 
       if (nfm != Teuchos::null) {
         deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
@@ -1398,21 +1372,11 @@ Application::computeGlobalResidualImpl(
   ALBANY_ASSERT(scale == 1.0, "non-unity scale implementation requires MPI!");
 #endif
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  char nameResUnscaled[100];  // create string for file name
-  sprintf(nameResUnscaled, "resUnscaled%i_residual", countScale);
-  writeMatrixMarket(f, nameResUnscaled);
-#endif
 
   if (scaleBCdofs == false && scale != 1.0) {
     Thyra::ele_wise_scale<ST>(*scaleVec_, f.ptr());
   }
 
-#ifdef WRITE_TO_MATRIX_MARKET
-  char nameResScaled[100];  // create string for file name
-  sprintf(nameResScaled, "resScaled%i_residual", countScale);
-  writeMatrixMarket(f, nameResScaled);
-#endif
 
 #if defined(ALBANY_LCM)
   // Push the assembled residual values back into the overlap vector
@@ -1547,11 +1511,6 @@ Application::computeGlobalJacobianImpl(
 
     workset.time_step = dt;
 
-#ifdef DEBUG_OUTPUT
-    *out << "IKT countJac = " << countJac
-         << ", computeGlobalJacobian workset.x = \n";
-    describe(workset.x.getConst(), *out, Teuchos::VERB_EXTREME);
-#endif
 
     workset.f   = overlapped_f;
     workset.Jac = overlapped_jac;
@@ -1604,10 +1563,6 @@ Application::computeGlobalJacobianImpl(
   // scale Jacobian
   if (scaleBCdofs == false && scale != 1.0) {
     fillComplete(jac);
-#ifdef WRITE_TO_MATRIX_MARKET
-    writeMatrixMarket(jac, "jacUnscaled", countScale);
-    if (f != Teuchos::null) { writeMatrixMarket(f, "resUnscaled", countScale); }
-#endif
     // set the scaling
     setScale(jac);
 
@@ -1622,11 +1577,6 @@ Application::computeGlobalJacobianImpl(
     /*IKTif (Teuchos::nonnull(f)) {
       Thyra::ele_wise_scale<ST>(*scaleVec_,f.ptr());
     }*/
-#ifdef WRITE_TO_MATRIX_MARKET
-    writeMatrixMarket(jac, "jacScaled", countScale);
-    if (f != Teuchos::null) { writeMatrixMarket(f, "resScaled", countScale); }
-    writeMatrixMarket(scaeleVec_, "scale", countScale);
-#endif
     countScale++;
   }
 
@@ -1653,10 +1603,6 @@ Application::computeGlobalJacobianImpl(
 
     if (scaleBCdofs == true) {
       setScaleBCDofs(workset, jac);
-#ifdef WRITE_TO_MATRIX_MARKET
-      writeMatrixMarket(scaleVec_, scale, countScale);
-    }
-#endif
     countScale++;
   }
 

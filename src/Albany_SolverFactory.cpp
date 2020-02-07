@@ -332,10 +332,6 @@ SolverFactory::createAlbanyAppAndModel(
     std::string piroSolverToken;
     if (solutionMethod == "Steady") {
       piroSolverToken = "NOX";
-#ifdef ALBANY_RYTHMOS
-    } else if (solutionMethod == "Transient") {
-      piroSolverToken = "Rythmos";
-#endif
 #ifdef ALBANY_TEMPUS
     } else if (solutionMethod == "Transient Tempus") {
       piroSolverToken = "Tempus";

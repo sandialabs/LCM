@@ -122,9 +122,6 @@ interpolate(
 
   // Get number of time steps in source mesh
   int timestep_count = io_region->get_property("state_count").get_int();
-#ifdef DEBUG_OUTPUT
-  *out << "   timestep_count in source mesh: " << timestep_count << std::endl;
-#endif
   int step = src_snap_no;
   if (step > timestep_count)
     TEUCHOS_TEST_FOR_EXCEPTION(
@@ -157,16 +154,6 @@ interpolate(
     }
   }
 
-#ifdef DEBUG_OUTPUT
-  // Print which fields are found
-  const Ioss::ElementBlockContainer& elem_blocks =
-      io_region->get_element_blocks();
-  Ioss::NameList exo_fld_names;
-  elem_blocks[0]->field_describe(&exo_fld_names);
-  for (std::size_t i = 0; i < exo_fld_names.size(); i++)
-    *out << "   Found field \"" << exo_fld_names[i]
-         << "\" in source exodus file" << std::endl;
-#endif
 
   // DEFINE PARTS/SELECTOR
   // ----------------
@@ -208,9 +195,6 @@ interpolate(
             << " NOT found in source mesh file!" << std::endl);
 
   int neq = source_field->max_size(stk::topology::NODE_RANK);
-#ifdef DEBUG_OUTPUT
-  *out << "   Source field has " << neq << " dofs/node." << std::endl;
-#endif
 
   // Put fields on target mesh
   // Add a nodal field to the interpolated target part.
@@ -252,9 +236,6 @@ interpolate(
 
   // Get number of time steps in source mesh
   timestep_count = io_region->get_property("state_count").get_int();
-#ifdef DEBUG_OUTPUT
-  *out << "   timestep_count in target mesh: " << timestep_count << std::endl;
-#endif
   step = tgt_snap_no;
   if (step > timestep_count)
     TEUCHOS_TEST_FOR_EXCEPTION(
@@ -308,21 +289,6 @@ interpolate(
       tgt_vector = tgt_manager.createFieldMultiVector<FieldType>(
           Teuchos::ptr(&target_interp_field), neq);
 
-#ifdef DEBUG_OUTPUT
-  // Print out source mesh info.
-  Teuchos::RCP<Teuchos::Describable> src_describe =
-      src_manager.functionSpace()->entitySet();
-  *out << "   Source Mesh: " << std::endl;
-  src_describe->describe(*out, Teuchos::VERB_HIGH);
-  *out << std::endl;
-
-  // Print out target mesh info.
-  Teuchos::RCP<Teuchos::Describable> tgt_describe =
-      tgt_manager.functionSpace()->entitySet();
-  *out << "   Target Mesh: " << std::endl;
-  tgt_describe->describe(*out, Teuchos::VERB_HIGH);
-  *out << std::endl;
-#endif
 
   // SOLUTION TRANSFER
   // -----------------
@@ -341,12 +307,6 @@ interpolate(
   // to the other.
   map_op->apply(*src_vector, *tgt_vector);
 
-#ifdef DEBUG_OUTPUT
-  *out << "   src_vector: \n ";
-  src_vector->describe(*out, Teuchos::VERB_EXTREME);
-  *out << "   tgt_vector: \n ";
-  tgt_vector->describe(*out, Teuchos::VERB_EXTREME);
-#endif
 
   double* tgt_field_data;
   // Copy interpolated solution on the Schwarz nodeset onto the target
@@ -359,20 +319,12 @@ interpolate(
       tgt_stk_selector, tgt_part_buckets, tgt_part_nodes);
   int num_tgt_part_nodes =
       tgt_part_nodes.size();  // number nodes (owned + overlap)
-#ifdef DEBUG_OUTPUT
-  std::cout << "   proc #: " << comm->getRank()
-            << ", num_tgt_part_nodes = " << num_tgt_part_nodes << std::endl;
-#endif
 
   for (int component = 0; component < neq; component++) {
     for (int n = 0; n < num_tgt_part_nodes; ++n) {
       gold_value =
           stk::mesh::field_data(target_interp_field, tgt_part_nodes[n]);
       tgt_field_data = stk::mesh::field_data(*target_field, tgt_part_nodes[n]);
-#ifdef DEBUG_OUTPUT
-      *out << "      tgt_field_data, gold_value: " << tgt_field_data[component]
-           << ", " << gold_value[component] << std::endl;
-#endif
       tgt_field_data[component] = gold_value[component];
     }
   }
@@ -388,10 +340,6 @@ interpolate(
         tgt_all_stk_selector, tgt_all_buckets, tgt_all_nodes);
     int num_tgt_all_nodes =
         tgt_all_nodes.size();  // number nodes (owned + overlap)
-#ifdef DEBUG_OUTPUT
-    std::cout << "   proc #: " << comm->getRank()
-              << ", tgt_all_nodes = " << tgt_all_nodes << std::endl;
-#endif
     for (int component = 0; component < neq; component++) {
       for (int n = 0; n < num_tgt_all_nodes; ++n) {
         tgt_field_data = stk::mesh::field_data(*target_field, tgt_all_nodes[n]);

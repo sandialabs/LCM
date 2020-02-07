@@ -152,10 +152,6 @@ interp_and_calc_error(
   // Get number of time steps in source mesh
   int src_timestep_count = src_io_region->get_property("state_count").get_int();
 
-#ifdef DEBUG_OUTPUT
-  *out << "   timestep_count in source mesh: " << src_timestep_count
-       << std::endl;
-#endif
 
   // Get source_field from source mesh
   FieldType* source_field = src_broker.meta_data().get_field<FieldType>(
@@ -174,9 +170,6 @@ interp_and_calc_error(
   }
 
   int neq = source_field->max_size(stk::topology::NODE_RANK);
-#ifdef DEBUG_OUTPUT
-  *out << "   Source field has " << neq << " dofs/node." << std::endl;
-#endif
 
   // TARGET MESH READ
   // ----------------
@@ -252,10 +245,6 @@ interp_and_calc_error(
   // Get number of time steps in source mesh
   int tgt_timestep_count = tgt_io_region->get_property("state_count").get_int();
 
-#ifdef DEBUG_OUTPUT
-  *out << "   tgt_timestep_count in target mesh: " << tgt_timestep_count
-       << std::endl;
-#endif
 
   if (src_timestep_count < 1) {
     TEUCHOS_TEST_FOR_EXCEPTION(true,
@@ -437,23 +426,6 @@ interp_and_calc_error(
         tgt_vector = tgt_manager.createFieldMultiVector<FieldType>(
             Teuchos::ptr(&target_interp_field), neq);
 
-#ifdef DEBUG_OUTPUT
-    // Print out source mesh info.
-    Teuchos::RCP<Teuchos::Describable> src_describe =
-        src_manager.functionSpace()->entitySet();
-
-    *out << "   Source Mesh: " << std::endl;
-    src_describe->describe(*out, Teuchos::VERB_HIGH);
-    *out << std::endl;
-
-    // Print out target mesh info.
-    Teuchos::RCP<Teuchos::Describable> tgt_describe =
-        tgt_manager.functionSpace()->entitySet();
-
-    *out << "   Target Mesh: " << std::endl;
-    tgt_describe->describe(*out, Teuchos::VERB_HIGH);
-    *out << std::endl;
-#endif
 
     // SOLUTION TRANSFER
     // -----------------
@@ -473,12 +445,6 @@ interp_and_calc_error(
     // to the other.
     map_op->apply(*src_vector, *tgt_vector);
 
-#ifdef DEBUG_OUTPUT
-    *out << "   src_vector: \n ";
-    src_vector->describe(*out, Teuchos::VERB_EXTREME);
-    *out << "   tgt_vector: \n ";
-    tgt_vector->describe(*out, Teuchos::VERB_EXTREME);
-#endif
 
     // COMPUTE THE SOLUTION ERROR
     // --------------------------
@@ -517,10 +483,6 @@ interp_and_calc_error(
     int num_tgt_part_nodes =
         tgt_part_nodes.size();  // number nodes (owned + overlap)
 
-#ifdef DEBUG_OUTPUT
-    std::cout << "   proc #: " << comm->getRank() << ", tgt_num_owned_nodes = ";
-    std::cout << tgt_num_owned_nodes << std::endl;
-#endif
 
     double error_l2_norm_global_vec{0.0};
     double rel_error_l2_norm_global_vec{0.0};
@@ -559,12 +521,6 @@ interp_and_calc_error(
           rel_err_field_data[component] /= std::abs(gold_value[component]);
         }*/
 
-#ifdef DEBUG_OUTPUT
-        *out << "      tgt_field_data, gold_value, abs_err, rel_err: "
-             << tgt_field_data[component] << ", " << gold_value[component]
-             << ", " << abs_err_field_data[component] << ", "
-             << rel_err_field_data[component] << std::endl;
-#endif
 
         error_l2_norm_sq +=
             abs_err_field_data[component] * abs_err_field_data[component];
@@ -675,10 +631,6 @@ interp_and_calc_error(
     }
     double state_time =
         tgt_io_region->get_state_time(tgt_time_step_indices[index]);
-#ifdef DEBUG_OUTPUT
-    *out << "tgt_output_index, time = " << tgt_output_index << ", "
-         << state_time << std::endl;
-#endif
     // Write step
     tgt_broker.begin_output_step(tgt_output_index, state_time);
     tgt_broker.write_defined_output_fields(tgt_output_index);

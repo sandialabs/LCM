@@ -6,3 +6,4 @@ setenv("TOOL_CHAIN", "gcc")
 
 setenv("CC", "gcc")
 setenv("CXX", "g++")
+setenv("FC", "gfortran")

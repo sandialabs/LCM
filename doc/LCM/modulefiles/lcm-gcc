@@ -15,7 +15,6 @@ if { [is-loaded lcm-cluster] } {
 setenv TOOL_CHAIN gcc
 
 setenv CC [exec which gcc]
-
 setenv CXX [exec which g++]
 
 if { [is-loaded lcm-fedora] } {
@@ -23,3 +22,5 @@ if { [is-loaded lcm-fedora] } {
 } else {
   setenv CXXFLAGS "-std=c++17"
 }
+
+setenv FC [exec which gfortran]

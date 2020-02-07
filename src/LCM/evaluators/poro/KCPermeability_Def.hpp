@@ -42,27 +42,6 @@ KCPermeability<EvalT, Traits>::KCPermeability(Teuchos::ParameterList& p)
     // Add Kozeny-Carman Permeability as a Sacado-ized parameter
     this->registerSacadoParameter("Kozeny-Carman Permeability", paramLib);
   }
-#ifdef ALBANY_STOKHOS
-  else if (type == "Truncated KL Expansion") {
-    is_constant = false;
-    coordVec    = decltype(coordVec)(
-        p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
-    this->addDependentField(coordVec);
-
-    exp_rf_kl = Teuchos::rcp(
-        new Stokhos::KL::ExponentialRandomField<RealType>(*elmd_list));
-    int num_KL = exp_rf_kl->stochasticDimension();
-
-    // Add KL random variables as Sacado-ized parameters
-    rv.resize(num_KL);
-    for (int i = 0; i < num_KL; i++) {
-      std::string ss =
-          Albany::strint("Kozeny-Carman Permeability KL Random Variable", i);
-      this->registerSacadoParameter(ss, paramLib);
-      rv[i] = elmd_list->get(ss, 0.0);
-    }
-  }
-#endif
   else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
@@ -115,19 +94,6 @@ KCPermeability<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       }
     }
   }
-#ifdef ALBANY_STOKHOS
-  else {
-    for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) {
-        Teuchos::Array<MeshScalarT> point(numDims);
-        for (int i = 0; i < numDims; i++)
-          point[i] =
-              Sacado::ScalarValue<MeshScalarT>::eval(coordVec(cell, qp, i));
-        kcPermeability(cell, qp) = exp_rf_kl->evaluate(point, rv);
-      }
-    }
-  }
-#endif
   if (isPoroElastic) {
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {

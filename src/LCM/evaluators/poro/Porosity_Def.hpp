@@ -46,26 +46,6 @@ Porosity<EvalT, Traits>::Porosity(
     // Add Porosity as a Sacado-ized parameter
     this->registerSacadoParameter("Porosity", paramLib);
   }
-#ifdef ALBANY_STOKHOS
-  else if (type == "Truncated KL Expansion") {
-    is_constant = false;
-    coordVec    = decltype(coordVec)(
-        p.get<std::string>("QP Coordinate Vector Name"), dl->qp_vector);
-    this->addDependentField(coordVec);
-
-    exp_rf_kl = Teuchos::rcp(
-        new Stokhos::KL::ExponentialRandomField<RealType>(*porosity_list));
-    int num_KL = exp_rf_kl->stochasticDimension();
-
-    // Add KL random variables as Sacado-ized parameters
-    rv.resize(num_KL);
-    for (int i = 0; i < num_KL; i++) {
-      std::string ss = Albany::strint("Porosity KL Random Variable", i);
-      this->registerSacadoParameter(ss, paramLib);
-      rv[i] = porosity_list->get(ss, 0.0);
-    }
-  }
-#endif
   else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
@@ -179,19 +159,6 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       }
     }
   }
-#ifdef ALBANY_STOKHOS
-  else {
-    for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) {
-        Teuchos::Array<MeshScalarT> point(numDims);
-        for (int i = 0; i < numDims; i++)
-          point[i] =
-              Sacado::ScalarValue<MeshScalarT>::eval(coordVec(cell, qp, i));
-        porosity(cell, qp) = exp_rf_kl->evaluate(point, rv);
-      }
-    }
-  }
-#endif
 
   // if the porous media is deforming
   if ((isPoroElastic) && (isCompressibleSolidPhase) &&
@@ -296,11 +263,6 @@ Porosity<EvalT, Traits>::getValue(const std::string& n)
     return initialPorosityValue;
   else if (n == "Grain Bulk Modulus Value")
     return GrainBulkModulus;
-#ifdef ALBANY_STOKHOS
-  for (int i = 0; i < rv.size(); i++) {
-    if (n == Albany::strint("Porosity KL Random Variable", i)) return rv[i];
-  }
-#endif
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
       Teuchos::Exceptions::InvalidParameter,

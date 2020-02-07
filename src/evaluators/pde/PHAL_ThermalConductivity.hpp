@@ -15,9 +15,6 @@
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_ParameterList.hpp"
-#ifdef ALBANY_STOKHOS
-#include "Stokhos_KL_ExponentialRandomField.hpp"
-#endif
 #include "Albany_MaterialDatabase.hpp"
 #include "Teuchos_Array.hpp"
 
@@ -98,10 +95,6 @@ class ThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Constant value
   ScalarT constant_value;
 
-#ifdef ALBANY_STOKHOS
-  //! Exponential random field
-  Teuchos::RCP<Stokhos::KL::ExponentialRandomField<RealType>> exp_rf_kl;
-#endif
 
   //! Values of the random variables
   Teuchos::Array<ScalarT> rv;

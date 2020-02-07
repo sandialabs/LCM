@@ -181,10 +181,6 @@ ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
   for (auto& pair : field_map_) {
-#ifdef ALBANY_STOKHOS
-    Stokhos::KL::ExponentialRandomField<RealType>* exp_rf_kl =
-        exp_rf_kl_map_[pair.first].get();
-#endif
     ScalarT constant_value = constant_value_map_[pair.first];
     if (is_constant_map_[pair.first]) {
       for (int cell(0); cell < workset.numCells; ++cell) {
@@ -199,10 +195,6 @@ ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(
           for (int i(0); i < num_dims_; ++i)
             point[i] =
                 Sacado::ScalarValue<MeshScalarT>::eval(coord_vec_(cell, pt, i));
-#ifdef ALBANY_STOKHOS
-          pair.second(cell, pt) =
-              exp_rf_kl_map_[pair.first]->evaluate(point, rv_map_[pair.first]);
-#endif
         }
       }
     }
@@ -288,27 +280,6 @@ ConstitutiveModelParameters<EvalT, Traits>::parseParameters(
       }
     }
   }
-#ifdef ALBANY_STOKHOS
-  else if (type == "Truncated KL Expansion") {
-    is_constant_map_.insert(std::make_pair(n, false));
-    coord_vec_ = decltype(coord_vec_)(
-        p.get<std::string>("QP Coordinate Vector Name"), dl_->qp_vector);
-    this->addDependentField(coord_vec_);
-
-    exp_rf_kl_map_.insert(std::make_pair(
-        n,
-        Teuchos::rcp(new Stokhos::KL::ExponentialRandomField<RealType>(pl))));
-    int num_KL = exp_rf_kl_map_[n]->stochasticDimension();
-
-    // Add KL random variables as Sacado-ized parameters
-    rv_map_.insert(std::make_pair(n, Teuchos::Array<ScalarT>(num_KL)));
-    for (int i(0); i < num_KL; ++i) {
-      std::string ss = Albany::strint(n + " KL Random Variable", i);
-      this->registerSacadoParameter(ss, paramLib);
-      rv_map_[n][i] = pl.get(ss, 0.0);
-    }
-  }
-#endif
 }
 //------------------------------------------------------------------------------
 }  // namespace LCM

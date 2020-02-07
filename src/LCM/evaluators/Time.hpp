@@ -15,9 +15,6 @@
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_Array.hpp"
 #include "Teuchos_ParameterList.hpp"
-#ifdef ALBANY_STOKHOS
-#include "Stokhos_KL_ExponentialRandomField.hpp"
-#endif
 
 namespace LCM {
 /**

@@ -15,9 +15,6 @@
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_ParameterList.hpp"
-#ifdef ALBANY_STOKHOS
-#include "Stokhos_KL_ExponentialRandomField.hpp"
-#endif
 #include "Albany_Layouts.hpp"
 #include "Teuchos_Array.hpp"
 
@@ -149,13 +146,6 @@ class ConstitutiveModelParameters
   std::map<std::string, RealType>              pre_exp_map_;
   std::map<std::string, RealType>              exp_param_map_;
 
-#ifdef ALBANY_STOKHOS
-  //! map of strings to exponential random fields
-  std::map<
-      std::string,
-      Teuchos::RCP<Stokhos::KL::ExponentialRandomField<RealType>>>
-      exp_rf_kl_map_;
-#endif
 
   //! map of strings to Arrays of values of the random variables
   std::map<std::string, Teuchos::Array<ScalarT>> rv_map_;

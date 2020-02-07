@@ -62,13 +62,6 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
     init_constant(value, p);
 
   }
-#ifdef ALBANY_STOKHOS
-  else if (type == "Truncated KL Expansion" || type == "Log Normal RF") {
-
-    init_KL_RF(type, *cond_list, p);
-
-  }
-#endif
 
   else if (type == "Block Dependent") {
     // We have a multiple material problem and need to map element blocks to
@@ -99,12 +92,6 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
       init_constant(value, p);
 
     }
-#ifdef ALBANY_STOKHOS
-    else if (typ == "Truncated KL Expansion" || typ == "Log Normal RF") {
-
-      init_KL_RF(typ, subList, p);
-    }
-#endif
   }  // Block dependent
 
   else {
@@ -137,46 +124,6 @@ ThermalConductivity<EvalT, Traits>::init_constant(
 
 }  // init_constant
 
-#ifdef ALBANY_STOKHOS
-template <typename EvalT, typename Traits>
-void
-ThermalConductivity<EvalT, Traits>::init_KL_RF(
-    std::string&            type,
-    Teuchos::ParameterList& sublist,
-    Teuchos::ParameterList& p)
-{
-  is_constant = false;
-
-  if (type == "Truncated KL Expansion")
-    randField = UNIFORM;
-  else if (type == "Log Normal RF")
-    randField = LOGNORMAL;
-
-  Teuchos::RCP<PHX::DataLayout> scalar_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
-  coordVec = decltype(coordVec)(
-      p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
-  this->addDependentField(coordVec);
-
-  exp_rf_kl =
-      Teuchos::rcp(new Stokhos::KL::ExponentialRandomField<RealType>(sublist));
-  int num_KL = exp_rf_kl->stochasticDimension();
-
-  // Add KL random variables as Sacado-ized parameters
-  rv.resize(num_KL);
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
-  for (int i = 0; i < num_KL; i++) {
-    std::string ss =
-        Albany::strint("ThermalConductivity KL Random Variable", i);
-    this->registerSacadoParameter(ss, paramLib);
-    rv[i] = sublist.get(ss, 0.0);
-  }
-
-}  // (type == "Truncated KL Expansion" || type == "Log Normal RF")
-#endif
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
@@ -202,22 +149,6 @@ ThermalConductivity<EvalT, Traits>::evaluateFields(
       }
     }
   }
-#ifdef ALBANY_STOKHOS
-  else {
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t qp = 0; qp < numQPs; ++qp) {
-        Teuchos::Array<MeshScalarT> point(numDims);
-        for (std::size_t i = 0; i < numDims; i++)
-          point[i] =
-              Sacado::ScalarValue<MeshScalarT>::eval(coordVec(cell, qp, i));
-        if (randField == UNIFORM)
-          thermalCond(cell, qp) = exp_rf_kl->evaluate(point, rv);
-        else if (randField == LOGNORMAL)
-          thermalCond(cell, qp) = std::exp(exp_rf_kl->evaluate(point, rv));
-      }
-    }
-  }
-#endif
 }
 
 // **********************************************************************
@@ -226,12 +157,6 @@ typename ThermalConductivity<EvalT, Traits>::ScalarT&
 ThermalConductivity<EvalT, Traits>::getValue(const std::string& n)
 {
   if (is_constant) { return constant_value; }
-#ifdef ALBANY_STOKHOS
-  for (int i = 0; i < rv.size(); i++) {
-    if (n == Albany::strint("ThermalConductivity KL Random Variable", i))
-      return rv[i];
-  }
-#endif
   TEUCHOS_TEST_FOR_EXCEPTION(
       true,
       Teuchos::Exceptions::InvalidParameter,

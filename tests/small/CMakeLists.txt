@@ -18,7 +18,6 @@ if(ALBANY_STK) # STK is needed for all these
   add_subdirectory(Heat1DPeriodic)
   add_subdirectory(Heat2DTriangles)
   add_subdirectory(Heat1DWithSource)
-  add_subdirectory(MPNIQuad2D)
   add_subdirectory(TransientHeat1D)
   add_subdirectory(TransientHeat2D)
   add_subdirectory(HeatEigenvalues)

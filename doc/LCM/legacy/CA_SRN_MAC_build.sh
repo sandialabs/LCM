@@ -324,7 +324,6 @@ cmake  \\
     -D Trilinos_ENABLE_Thyra:BOOL=ON \\
     -D Trilinos_ENABLE_Rythmos:BOOL=ON \\
     -D Trilinos_ENABLE_MOOCHO:BOOL=ON \\
-    -D Trilinos_ENABLE_Stokhos:BOOL=ON \\
     -D Trilinos_ENABLE_Piro:BOOL=ON \\
     -D Trilinos_ENABLE_STK:BOOL=ON \\
     -D Trilinos_ENABLE_Teko:BOOL=ON \\

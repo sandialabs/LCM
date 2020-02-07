@@ -13,9 +13,6 @@
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_ParameterList.hpp"
-#ifdef ALBANY_STOKHOS
-#include "Stokhos_KL_ExponentialRandomField.hpp"
-#endif
 #include "Teuchos_Array.hpp"
 
 namespace PHAL {
@@ -56,10 +53,6 @@ class Absorption : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Constant value
   ScalarT constant_value;
 
-#ifdef ALBANY_STOKHOS
-  //! Exponential random field
-  Teuchos::RCP<Stokhos::KL::ExponentialRandomField<RealType>> exp_rf_kl;
-#endif
 
   //! Values of the random variables
   Teuchos::Array<ScalarT> rv;

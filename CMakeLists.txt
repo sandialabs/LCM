@@ -1015,20 +1015,6 @@ else()
   message("-- FAD_TYPE is not TAN_FAD_TYPE")
 endif()
 
-# optionally disable the use of the Trilinos stokhos package
-option(ENABLE_STOKHOS "Flag to enable / disable the use of Stokhos in Albany"
-       OFF)
-if(ENABLE_STOKHOS)
-  message("-- Stokhos   is Enabled")
-  set(ALBANY_STOKHOS TRUE)
-  list(FIND Trilinos_PACKAGE_LIST Stokhos STOKHOS_List_ID)
-  if(NOT STOKHOS_List_ID GREATER -1)
-    message(FATAL_ERROR "\nError: STOKHOS option requires Stokhos\n")
-  endif()
-else()
-  set(ALBANY_STOKHOS FALSE)
-endif()
-
 # Disable the RTC capability if Trilinos is not built with Pamgen
 list(FIND Trilinos_PACKAGE_LIST Pamgen PAMGEN_List_ID)
 if(NOT PAMGEN_List_ID GREATER -1)

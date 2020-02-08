@@ -122,7 +122,7 @@ interpolate(
 
   // Get number of time steps in source mesh
   int timestep_count = io_region->get_property("state_count").get_int();
-  int step = src_snap_no;
+  int step           = src_snap_no;
   if (step > timestep_count)
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
@@ -153,7 +153,6 @@ interpolate(
       src_broker.read_defined_input_fields(time);
     }
   }
-
 
   // DEFINE PARTS/SELECTOR
   // ----------------
@@ -236,7 +235,7 @@ interpolate(
 
   // Get number of time steps in source mesh
   timestep_count = io_region->get_property("state_count").get_int();
-  step = tgt_snap_no;
+  step           = tgt_snap_no;
   if (step > timestep_count)
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
@@ -289,7 +288,6 @@ interpolate(
       tgt_vector = tgt_manager.createFieldMultiVector<FieldType>(
           Teuchos::ptr(&target_interp_field), neq);
 
-
   // SOLUTION TRANSFER
   // -----------------
 
@@ -306,7 +304,6 @@ interpolate(
   // Apply the map operator. This interpolates the data from one STK field
   // to the other.
   map_op->apply(*src_vector, *tgt_vector);
-
 
   double* tgt_field_data;
   // Copy interpolated solution on the Schwarz nodeset onto the target

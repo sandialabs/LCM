@@ -6,7 +6,14 @@
 
 #include "Albany_GenericSTKMeshStruct.hpp"
 
+#include <Albany_CombineAndScatterManager.hpp>
+#include <Albany_GlobalLocalIndexer.hpp>
+#include <Albany_STKNodeSharing.hpp>
+#include <Albany_ThyraUtils.hpp>
 #include <iostream>
+#include <stk_io/IossBridge.hpp>
+#include <stk_mesh/base/CreateAdjacentEntities.hpp>
+#include <stk_mesh/base/GetEntities.hpp>
 
 #include "Albany_DiscretizationFactory.hpp"
 #include "Albany_Gather.hpp"
@@ -14,18 +21,8 @@
 #include "Albany_MultiSTKFieldContainer.hpp"
 #include "Albany_OrdinarySTKFieldContainer.hpp"
 #include "Albany_SideSetSTKMeshStruct.hpp"
-#include "Teuchos_VerboseObject.hpp"
-
-#include <stk_io/IossBridge.hpp>
-
-#include <Albany_CombineAndScatterManager.hpp>
-#include <Albany_GlobalLocalIndexer.hpp>
-#include <Albany_STKNodeSharing.hpp>
-#include <Albany_ThyraUtils.hpp>
-#include <stk_mesh/base/CreateAdjacentEntities.hpp>
-#include <stk_mesh/base/GetEntities.hpp>
-
 #include "Albany_Utils.hpp"
+#include "Teuchos_VerboseObject.hpp"
 
 // Expression reading
 #ifdef ALBANY_PANZER_EXPR_EVAL

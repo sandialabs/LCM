@@ -38,10 +38,10 @@ set(HEADERS ${HEADERS} AAdapt_CopyRemesh.hpp)
 # code, currently
 if(LCM_SPECULATIVE)
   set(SOURCES ${SOURCES} AAdapt_RandomCriterion.cpp AAdapt_RandomFracture.cpp
-    AAdapt_StressFracture.cpp)
+              AAdapt_StressFracture.cpp)
 
   set(HEADERS ${HEADERS} AAdapt_RandomCriterion.hpp AAdapt_RandomFracture.hpp
-    AAdapt_StressFracture.hpp)
+              AAdapt_StressFracture.hpp)
 endif()
 
 # Topology Modification depends on LCM and STK
@@ -55,7 +55,7 @@ if(ALBANY_STK_PERCEPT)
   set(SOURCES ${SOURCES} AAdapt_STKAdapt.cpp AAdapt_STKConstantSizeField.cpp)
 
   set(HEADERS ${HEADERS} AAdapt_STKAdapt.hpp AAdapt_STKAdapt_Def.hpp
-    AAdapt_STKConstantSizeField.hpp)
+              AAdapt_STKConstantSizeField.hpp)
 
 endif()
 

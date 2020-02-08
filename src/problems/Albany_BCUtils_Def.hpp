@@ -680,7 +680,6 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
     }
   }
 
-
   ///
   /// SDBC (S = "Symmetric", f.k.a. "Strong")
   ///
@@ -1088,7 +1087,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
     }
   }
 
-
   ///
   /// Time dependent BC specific
   ///
@@ -1184,7 +1182,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
       }
     }
   }
-
 
   // Build evaluator for Gather Coordinate Vector
   string NeuGCV = "Evaluator for Gather Coordinate Vector";

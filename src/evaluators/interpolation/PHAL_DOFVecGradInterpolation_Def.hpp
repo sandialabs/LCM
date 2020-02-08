@@ -89,7 +89,6 @@ void
 DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
 #ifdef ALBANY_TIMER
   PHX::Device::fence();
   auto start = std::chrono::high_resolution_clock::now();
@@ -108,7 +107,6 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
   std::cout << "DOFVecGradInterpolationBase Residual time = " << millisec
             << "  " << microseconds << std::endl;
 #endif
-
 }
 
 // Specialization for Jacobian evaluation taking advantage of known sparsity
@@ -179,7 +177,6 @@ FastSolutionVecGradInterpolationBase<
   std::cout << "FastSolutionVecGradInterpolationBase Jacobian time = "
             << millisec << "  " << microseconds << std::endl;
 #endif
-
 }
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

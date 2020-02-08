@@ -1,22 +1,28 @@
-#include <iostream>
-#include <fstream>
 #include <cmath>
 #include <cstring>
+#include <fstream>
+#include <iostream>
 
 /*
- * This code calculates a solution of the heat equation as described in MMHeatExample.tex
+ * This code calculates a solution of the heat equation as described in
+ * MMHeatExample.tex
  *
  */
 
-double sqr(double x){ return x * x;}
+double
+sqr(double x)
+{
+  return x * x;
+}
 
 using namespace std;
 
-int main(){
-
+int
+main()
+{
   double max = -1000;
   double value;
-  double q = 20095; // W / m^3
+  double q = 20095;  // W / m^3
 
   // problem constants
 
@@ -30,178 +36,164 @@ int main(){
 
   double T3 = 313.15;
 
-  double T1 = (q * sqr(r1) / 2.0) * (log(r2/r1) / k2 +
-          log(r3/r2) / k3) + T3;
+  double T1 =
+      (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
 
-  double T2 = (q * sqr(r1) / 2.0) * (log(r3/r2) / k3) + T3;
+  double T2 = (q * sqr(r1) / 2.0) * (log(r3 / r2) / k3) + T3;
 
   // Read the ncdump file to get the x locations of the nodes in the mesh.
 
-  FILE *ifp = fopen("fuel_volume.ncdump", "r");
-  char word[BUFSIZ];
-  int num_nodes;
+  FILE* ifp = fopen("fuel_volume.ncdump", "r");
+  char  word[BUFSIZ];
+  int   num_nodes;
 
-  if(ifp == NULL) perror("Cannot open ncdump input file");
+  if (ifp == NULL) perror("Cannot open ncdump input file");
 
   // Gobble the file, one word at a time
 
-  while( fscanf(ifp, "%s", word) == 1){
-
+  while (fscanf(ifp, "%s", word) == 1) {
     // Look for the word num_nodes
 
-    if(strcmp(word, "num_nodes") == 0){
-
-      if(fscanf(ifp, "%*s%d", &num_nodes) != 1){
+    if (strcmp(word, "num_nodes") == 0) {
+      if (fscanf(ifp, "%*s%d", &num_nodes) != 1) {
         cout << "Error" << endl;
         return -1;
       }
 
       break;
-
     }
   }
 
-  double *x = new double[num_nodes];
-  double *y = new double[num_nodes];
+  double* x = new double[num_nodes];
+  double* y = new double[num_nodes];
 
-  while( fscanf(ifp, "%s", word) == 1){
-
+  while (fscanf(ifp, "%s", word) == 1) {
     // Look for the word coord
 
-    if(strcmp(word, "coord") == 0){
-
-      if(fscanf(ifp, "%*s") != 0) { // gobble the equal sign
+    if (strcmp(word, "coord") == 0) {
+      if (fscanf(ifp, "%*s") != 0) {  // gobble the equal sign
         cout << "Error" << endl;
         return -1;
       }
 
-      for(int i = 0; i < num_nodes; i++) // grab the x coordinate values
+      for (int i = 0; i < num_nodes; i++)  // grab the x coordinate values
 
-        if(fscanf(ifp, "%lf,", &x[i]) != 1){
+        if (fscanf(ifp, "%lf,", &x[i]) != 1) {
           cout << "Error" << endl;
           return -1;
         }
 
-      for(int i = 0; i < num_nodes - 1; i++) // grab the y coordinate values (all but the last one)
+      for (int i = 0; i < num_nodes - 1;
+           i++)  // grab the y coordinate values (all but the last one)
 
-        if(fscanf(ifp, "%lf,", &y[i]) != 1){ // comma follows
+        if (fscanf(ifp, "%lf,", &y[i]) != 1) {  // comma follows
           cout << "Error" << endl;
           return -1;
         }
 
-      if(fscanf(ifp, "%lf", &y[num_nodes - 1]) != 1){ // Get the last one
+      if (fscanf(ifp, "%lf", &y[num_nodes - 1]) != 1) {  // Get the last one
         cout << "Error" << endl;
         return -1;
       }
 
       break;
-
     }
   }
 
   fclose(ifp);
 
-	ofstream out;
+  ofstream out;
 
-	out.open("reference_solution.dat", ios::out);
+  out.open("reference_solution.dat", ios::out);
   out.precision(10);
 
-	out << "%%MatrixMarket matrix array real general" << endl;
+  out << "%%MatrixMarket matrix array real general" << endl;
 
-	out << "% Steady 2D Heat Equation, multimaterial, cylindrical geometry" << endl;
+  out << "% Steady 2D Heat Equation, multimaterial, cylindrical geometry"
+      << endl;
 
-	out << num_nodes << " 1" << endl; // Write M and N values
+  out << num_nodes << " 1" << endl;  // Write M and N values
 
   double rad;
 
-	for(int i = 0; i < num_nodes; i++){
-
+  for (int i = 0; i < num_nodes; i++) {
     rad = sqrt(sqr(x[i]) + sqr(y[i]));
 
-  // Three regions, fuel, clad, and cask
+    // Three regions, fuel, clad, and cask
 
-    if(rad <= r1){
+    if (rad <= r1) {
+      value = (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) +
+              (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) +
+              T3;
 
-      value = (q / (4.0 * k1))*(sqr(r1) - sqr(rad)) + (q * sqr(r1) / 2.0) * (log(r2/r1) / k2 +
-          log(r3/r2) / k3) + T3;
+    } else if (rad <= r2) {
+      value = (T1 - T2) / log(r1 / r2) * log(rad / r2) + T2;
 
-    }
-    else if(rad <= r2){
-
-      value = (T1 -T2) / log(r1/r2) * log(rad / r2) + T2;
-
-    }
-    else {
-
-      value = (T2 -T3) / log(r2/r3) * log(rad / r3) + T3;
-
+    } else {
+      value = (T2 - T3) / log(r2 / r3) * log(rad / r3) + T3;
     }
 
-		out << value << endl;
+    out << value << endl;
 
-    if(value > max) max = value;
-
-
+    if (value > max) max = value;
   }
 
-	out.close();
+  out.close();
 
   cout << "Solution Max Value = " << max << endl;
 
-// Write out a gnuplot file to look at the temperature profile in 1D
+  // Write out a gnuplot file to look at the temperature profile in 1D
 
-  int num_gplot_nodes = 100;
-	ofstream output;
+  int      num_gplot_nodes = 100;
+  ofstream output;
 
-	// Write the Gnuplot driver file
+  // Write the Gnuplot driver file
 
-	output.open("HeatProfile.plt", std::ios::out);
+  output.open("HeatProfile.plt", std::ios::out);
   output.precision(10);
 
-	output <<
+  output <<
 
-	       "set ylabel \"Temperature (K)\"				" << endl <<
-	       "set ytics nomirror						" << endl <<
-	       "										" << endl <<
-	       "set xtics nomirror						" << endl <<
-	       "set xlabel \"Radius (m)\"						" << endl <<
-	       "										" << endl <<
-	       "plot 'HeatProfile.dat' with lines title \"Temp Profile\" " << endl;
+      "set ylabel \"Temperature (K)\"				" << endl
+         << "set ytics nomirror						"
+         << endl
+         << "								"
+            "		"
+         << endl
+         << "set xtics nomirror						"
+         << endl
+         << "set xlabel \"Radius (m)\"					"
+            "	"
+         << endl
+         << "								"
+            "		"
+         << endl
+         << "plot 'HeatProfile.dat' with lines title \"Temp Profile\" " << endl;
 
-	output.close();
-	output.open("HeatProfile.dat", std::ios::out);
+  output.close();
+  output.open("HeatProfile.dat", std::ios::out);
 
-	for(int i = 0; i <= num_gplot_nodes; i++){
-
+  for (int i = 0; i <= num_gplot_nodes; i++) {
     rad = i * r3 / (double)num_gplot_nodes;
 
-  // Three regions, fuel, clad, and cask
+    // Three regions, fuel, clad, and cask
 
-    if(rad <= r1){
+    if (rad <= r1) {
+      value = (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) +
+              (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) +
+              T3;
 
-      value = (q / (4.0 * k1))*(sqr(r1) - sqr(rad)) + (q * sqr(r1) / 2.0) * (log(r2/r1) / k2 +
-          log(r3/r2) / k3) + T3;
+    } else if (rad <= r2) {
+      value = (T1 - T2) / log(r1 / r2) * log(rad / r2) + T2;
 
-    }
-    else if(rad <= r2){
-
-      value = (T1 -T2) / log(r1/r2) * log(rad / r2) + T2;
-
-    }
-    else {
-
-      value = (T2 -T3) / log(r2/r3) * log(rad / r3) + T3;
-
+    } else {
+      value = (T2 - T3) / log(r2 / r3) * log(rad / r3) + T3;
     }
 
-		output << rad << " " << value << endl;
-
+    output << rad << " " << value << endl;
   }
 
-	output.close();
+  output.close();
 
   return 0;
-
 }
-
-	

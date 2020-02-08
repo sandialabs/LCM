@@ -39,8 +39,7 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
 
     // Add Biot Modulus as a Sacado-ized parameter
     this->registerSacadoParameter("Biot Modulus", paramLib);
-  }
-  else {
+  } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         Teuchos::Exceptions::InvalidParameter,

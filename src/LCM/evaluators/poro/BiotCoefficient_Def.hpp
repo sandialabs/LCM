@@ -40,8 +40,7 @@ BiotCoefficient<EvalT, Traits>::BiotCoefficient(Teuchos::ParameterList& p)
 
     // Add Biot Coefficient as a Sacado-ized parameter
     this->registerSacadoParameter("Biot Coefficient", paramLib);
-  }
-  else {
+  } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         Teuchos::Exceptions::InvalidParameter,

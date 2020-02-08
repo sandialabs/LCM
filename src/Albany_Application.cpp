@@ -5,7 +5,9 @@
 //
 
 #include "Albany_Application.hpp"
+
 #include <string>
+
 #include "AAdapt_RC_Manager.hpp"
 #include "Albany_DataTypes.hpp"
 #include "Albany_DiscretizationFactory.hpp"
@@ -26,7 +28,6 @@
 
 #include "Albany_ScalarResponseFunction.hpp"
 #include "PHAL_Utilities.hpp"
-
 #include "SolutionSniffer.hpp"
 
 using Teuchos::ArrayRCP;
@@ -1362,11 +1363,9 @@ Application::computeGlobalResidualImpl(
   ALBANY_ASSERT(scale == 1.0, "non-unity scale implementation requires MPI!");
 #endif
 
-
   if (scaleBCdofs == false && scale != 1.0) {
     Thyra::ele_wise_scale<ST>(*scaleVec_, f.ptr());
   }
-
 
   // Push the assembled residual values back into the overlap vector
   cas_manager->scatter(f, overlapped_f, CombineMode::INSERT);
@@ -1499,7 +1498,6 @@ Application::computeGlobalJacobianImpl(
 
     workset.time_step = dt;
 
-
     workset.f   = overlapped_f;
     workset.Jac = overlapped_jac;
     loadWorksetJacobianInfo(workset, alpha, beta, omega);
@@ -1591,39 +1589,39 @@ Application::computeGlobalJacobianImpl(
 
     if (scaleBCdofs == true) {
       setScaleBCDofs(workset, jac);
-    countScale++;
+      countScale++;
+    }
+
+    workset.distParamLib = distParamLib;
+    workset.disc         = disc;
+
+    // Needed for more specialized Dirichlet BCs (e.g. Schwarz coupling)
+    workset.apps_        = apps_;
+    workset.current_app_ = Teuchos::rcp(this, false);
+
+    // FillType template argument used to specialize Sacado
+    dfm->evaluateFields<EvalT>(workset);
+  }
+  fillComplete(jac);
+
+  // Apply scaling to residual and Jacobian
+  if (scaleBCdofs == true) {
+    if (Teuchos::nonnull(f)) { Thyra::ele_wise_scale<ST>(*scaleVec_, f.ptr()); }
+    // We MUST be able to cast jac to ScaledLinearOpBase in order to left scale
+    // it.
+    auto jac_scaled_lop =
+        Teuchos::rcp_dynamic_cast<Thyra::ScaledLinearOpBase<ST>>(jac, true);
+    jac_scaled_lop->scaleLeft(*scaleVec_);
   }
 
-  workset.distParamLib = distParamLib;
-  workset.disc         = disc;
-
-  // Needed for more specialized Dirichlet BCs (e.g. Schwarz coupling)
-  workset.apps_        = apps_;
-  workset.current_app_ = Teuchos::rcp(this, false);
-
-  // FillType template argument used to specialize Sacado
-  dfm->evaluateFields<EvalT>(workset);
-}
-fillComplete(jac);
-
-// Apply scaling to residual and Jacobian
-if (scaleBCdofs == true) {
-  if (Teuchos::nonnull(f)) { Thyra::ele_wise_scale<ST>(*scaleVec_, f.ptr()); }
-  // We MUST be able to cast jac to ScaledLinearOpBase in order to left scale
-  // it.
-  auto jac_scaled_lop =
-      Teuchos::rcp_dynamic_cast<Thyra::ScaledLinearOpBase<ST>>(jac, true);
-  jac_scaled_lop->scaleLeft(*scaleVec_);
-}
-
-if (isFillActive(overlapped_jac)) {
-  // Makes getLocalMatrix() valid.
-  fillComplete(overlapped_jac);
-}
-if (derivatives_check_ > 0) {
-  checkDerivatives(
-      *this, current_time, x, xdot, xdotdot, p, f, jac, derivatives_check_);
-}
+  if (isFillActive(overlapped_jac)) {
+    // Makes getLocalMatrix() valid.
+    fillComplete(overlapped_jac);
+  }
+  if (derivatives_check_ > 0) {
+    checkDerivatives(
+        *this, current_time, x, xdot, xdotdot, p, f, jac, derivatives_check_);
+  }
 }  // namespace Albany
 
 void

@@ -91,8 +91,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
           "Invalid material property rank "
               << rank << ".  Acceptable values are 2 (scalar), "
               << "3 (vector), or 4 (tensor)");
-  }
-  else if (type == "SQRT Temperature Dependent") {
+  } else if (type == "SQRT Temperature Dependent") {
     matPropType           = SQRT_TEMP;
     scalar_constant_value = mp_list->get("Reference Value", default_value);
     ref_temp = mp_list->get("Reference Temperature", default_value);

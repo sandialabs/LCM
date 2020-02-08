@@ -6,12 +6,12 @@
 #include "Adapt_ElementSizeField.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
+#include "IPtoNodalField.hpp"
 #include "PHAL_ResponseFieldIntegral.hpp"
 #include "PHAL_ResponseSquaredL2Difference.hpp"
 #include "PHAL_ResponseSquaredL2DifferenceSide.hpp"
 #include "PHAL_ResponseThermalEnergy.hpp"
 #include "PHAL_SaveNodalField.hpp"
-#include "IPtoNodalField.hpp"
 #include "ProjectIPtoNodalField.hpp"
 
 template <typename EvalT, typename Traits>
@@ -127,8 +127,7 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
     p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
 
     res_ev = rcp(new PHAL::SaveNodalField<EvalT, Traits>(*p, dl));
-  }
-  else if (responseName == "IP to Nodal Field") {
+  } else if (responseName == "IP to Nodal Field") {
     p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
     p->set<RCP<DataLayout>>("Dummy Data Layout", dl->dummy);
     res_ev = rcp(new LCM::IPtoNodalField<EvalT, Traits>(*p, dl, meshSpecs));

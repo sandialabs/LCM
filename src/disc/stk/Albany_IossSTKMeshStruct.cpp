@@ -6,7 +6,6 @@
 
 #include "Albany_IossSTKMeshStruct.hpp"
 
-
 #include <Ioss_SubSystem.h>
 
 #include <Shards_BasicTopologies.hpp>
@@ -719,4 +718,3 @@ Albany::IossSTKMeshStruct::getValidDiscretizationParameters() const
 
   return validPL;
 }
-

@@ -14,8 +14,8 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
-#include "Teuchos_ParameterList.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace LCM {
 /**
@@ -66,7 +66,6 @@ class ElasticModulus : public PHX::EvaluatorWithBaseImpl<Traits>,
   // ! Optional dependence on porosity (E = E_const *(sqrt(1- porosity))
   PHX::MDField<const ScalarT, Cell, QuadPoint> porosity;
   bool                                         isPoroElastic;
-
 
   //! Values of the random variables
   Teuchos::Array<ScalarT> rv;

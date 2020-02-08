@@ -14,8 +14,8 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
-#include "Teuchos_ParameterList.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace LCM {
 /**
@@ -65,7 +65,6 @@ class BiotCoefficient : public PHX::EvaluatorWithBaseImpl<Traits>,
   bool    isPoroElastic;
   ScalarT Kskeleton_value;
   ScalarT Kgrain_value;
-
 
   //! Values of the random variables
   Teuchos::Array<ScalarT> rv;

@@ -4,16 +4,14 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#include "Albany_STKNodeFieldContainer.hpp"
-
 #include <stk_io/IossBridge.hpp>
-
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/GetBuckets.hpp>
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Types.hpp>
 #include <stk_util/parallel/Parallel.hpp>
 
+#include "Albany_STKNodeFieldContainer.hpp"
 #include "Shards_Array.hpp"
 
 namespace Albany {

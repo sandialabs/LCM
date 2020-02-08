@@ -23,6 +23,5 @@ if(ALBANY_IFPACK2)
       "-DAUX_PROG=${CMAKE_CURRENT_BINARY_DIR}/HeatProfile" -P
       ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  set_tests_properties(${testName} PROPERTIES LABELS
-                                                     "Basic;Tpetra;Forward")
+  set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 endif()

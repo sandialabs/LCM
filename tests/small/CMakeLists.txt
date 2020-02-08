@@ -49,7 +49,7 @@ if(ALBANY_DEMO_PDES)
   add_subdirectory(NSPoiseuille2D)
   add_subdirectory(NSRayleighBernard2D)
   add_subdirectory(NSVortexShedding2D)
-  add_subdirectory(PNP)  
+  add_subdirectory(PNP)
 endif(ALBANY_DEMO_PDES)
 
 add_subdirectory(LCM)

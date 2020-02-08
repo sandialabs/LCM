@@ -12,8 +12,6 @@
 #include "Teuchos_VerboseObject.hpp"
 #include "Thyra_DefaultBlockedLinearOp.hpp"
 
-
-
 using Thyra::PhysicallyBlockedLinearOpBase;
 
 namespace LCM {
@@ -37,7 +35,6 @@ Schwarz_CoupledJacobian::getThyraCoupledJacobian(
     Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> const& ca) const
 {
   auto const block_dim = jacs.size();
-
 
   // get the block dimension
   // this operator will be square

@@ -7,6 +7,7 @@
 #if !defined(LCM_ConstitutiveModelParameters_hpp)
 #define LCM_ConstitutiveModelParameters_hpp
 
+#include "Albany_Layouts.hpp"
 #include "Albany_Types.hpp"
 #include "Albany_config.h"
 #include "Phalanx_Evaluator_Derived.hpp"
@@ -14,9 +15,8 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
-#include "Teuchos_ParameterList.hpp"
-#include "Albany_Layouts.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace LCM {
 ///
@@ -145,7 +145,6 @@ class ConstitutiveModelParameters
   std::map<std::string, RealType>              ref_temp_map_;
   std::map<std::string, RealType>              pre_exp_map_;
   std::map<std::string, RealType>              exp_param_map_;
-
 
   //! map of strings to Arrays of values of the random variables
   std::map<std::string, Teuchos::Array<ScalarT>> rv_map_;

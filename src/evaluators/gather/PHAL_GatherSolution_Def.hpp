@@ -326,7 +326,6 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::operator()(
           xdotdot_constView(nodeID(cell, node, this->offset + eq));
 }
 
-
 // **********************************************************************
 template <typename Traits>
 void
@@ -625,7 +624,6 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     }
   }
 }
-
 
 // **********************************************************************
 template <typename Traits>

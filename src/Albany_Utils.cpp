@@ -45,7 +45,6 @@ PrintHeader(std::ostream& os)
   os << R"(** Albany cxx compiler ---- )" << ALBANY_CXX_COMPILER_ID << " "
      << ALBANY_CXX_COMPILER_VERSION << std::endl;
 
-
   // Print start time
   time_t rawtime;
   time(&rawtime);

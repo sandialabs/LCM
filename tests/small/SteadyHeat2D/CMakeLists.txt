@@ -9,8 +9,7 @@ if(ALBANY_IFPACK2)
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 
   add_test(${testName} ${Albany.exe} input.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS
-                                                     "Basic;Tpetra;Forward")
+  set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 
   add_test(${testName}_SERIAL ${SerialAlbany.exe} input.yaml)
   set_tests_properties(${testName}_SERIAL PROPERTIES LABELS

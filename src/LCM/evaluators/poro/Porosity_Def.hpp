@@ -45,8 +45,7 @@ Porosity<EvalT, Traits>::Porosity(
     constant_value = porosity_list->get("Value", 0.0);
     // Add Porosity as a Sacado-ized parameter
     this->registerSacadoParameter("Porosity", paramLib);
-  }
-  else {
+  } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         Teuchos::Exceptions::InvalidParameter,

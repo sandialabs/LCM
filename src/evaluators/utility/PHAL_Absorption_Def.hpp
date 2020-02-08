@@ -37,8 +37,7 @@ Absorption<EvalT, Traits>::Absorption(Teuchos::ParameterList& p)
     Teuchos::RCP<ParamLib> paramLib =
         p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
     this->registerSacadoParameter("Absorption", paramLib);
-  }
-  else {
+  } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         Teuchos::Exceptions::InvalidParameter,

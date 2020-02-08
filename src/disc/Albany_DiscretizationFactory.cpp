@@ -6,18 +6,16 @@
 
 #include "Albany_DiscretizationFactory.hpp"
 
-#include "Teuchos_TestForException.hpp"
+#include "Albany_AsciiSTKMesh2D.hpp"
+#include "Albany_AsciiSTKMeshStruct.hpp"
 #include "Albany_GenericSTKMeshStruct.hpp"
+#include "Albany_GmshSTKMeshStruct.hpp"
+#include "Albany_IossSTKMeshStruct.hpp"
 #include "Albany_STK3DPointStruct.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "Albany_TmplSTKMeshStruct.hpp"
-
-#include "Albany_IossSTKMeshStruct.hpp"
-#include "Albany_AsciiSTKMesh2D.hpp"
-#include "Albany_AsciiSTKMeshStruct.hpp"
-#include "Albany_GmshSTKMeshStruct.hpp"
-
+#include "Teuchos_TestForException.hpp"
 #include "Topology_Utils.hpp"
 
 Albany::DiscretizationFactory::DiscretizationFactory(
@@ -45,7 +43,6 @@ Albany::DiscretizationFactory::DiscretizationFactory(
       catalystParams = Teuchos::sublist(problemParams, "Catalyst", true);
   }
 }
-
 
 namespace {
 
@@ -154,7 +151,6 @@ createInterfaceParts(
 }
 
 }  // anonymous namespace
-
 
 Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>
 Albany::DiscretizationFactory::createMeshSpecs()

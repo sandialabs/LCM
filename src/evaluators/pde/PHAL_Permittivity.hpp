@@ -7,6 +7,7 @@
 #ifndef PHAL_PERMITTIVITY_HPP
 #define PHAL_PERMITTIVITY_HPP
 
+#include "Albany_MaterialDatabase.hpp"
 #include "Albany_SacadoTypes.hpp"
 #include "Albany_config.h"
 #include "PHAL_Dimension.hpp"
@@ -15,9 +16,8 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
-#include "Teuchos_ParameterList.hpp"
-#include "Albany_MaterialDatabase.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace PHAL {
 /**
@@ -97,7 +97,6 @@ class Permittivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Constant value
   ScalarT constant_value;
 
-
   //! Values of the random variables
   Teuchos::Array<ScalarT> rv;
 
@@ -107,7 +106,6 @@ class Permittivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Convenience function to initialize constant permittivity
   void
   init_constant(ScalarT value, Teuchos::ParameterList& p);
-
 
   SG_RF randField;
 };

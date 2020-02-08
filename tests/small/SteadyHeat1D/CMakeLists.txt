@@ -7,6 +7,5 @@ if(ALBANY_IFPACK2)
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
   # Create the test with this name and standard executable
   add_test(${testName} ${Albany.exe} input.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS
-                                                     "Basic;Tpetra;Forward")
+  set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 endif()

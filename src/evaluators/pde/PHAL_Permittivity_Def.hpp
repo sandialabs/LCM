@@ -89,7 +89,6 @@ Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
     if (typ == "Constant") {
       ScalarT value = subList.get("Value", 1.0);
       init_constant(value, p);
-
     }
   }  // Block dependent
 
@@ -122,7 +121,6 @@ Permittivity<EvalT, Traits>::init_constant(
   this->registerSacadoParameter("Permittivity", paramLib);
 
 }  // init_constant
-
 
 // **********************************************************************
 template <typename EvalT, typename Traits>

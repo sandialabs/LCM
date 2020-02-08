@@ -55,23 +55,23 @@ set(evaluator-headers
 
 # LCM model evaluators
 set(model-eval-sources
-  "${LCM_DIR}/solvers/Schwarz_Alternating.cpp"
-  "${LCM_DIR}/solvers/Schwarz_ObserverImpl.cpp"
-  "${LCM_DIR}/solvers/Schwarz_PiroObserver.cpp"
-  "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.cpp")
+    "${LCM_DIR}/solvers/Schwarz_Alternating.cpp"
+    "${LCM_DIR}/solvers/Schwarz_ObserverImpl.cpp"
+    "${LCM_DIR}/solvers/Schwarz_PiroObserver.cpp"
+    "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.cpp")
 set(model-eval-headers
-  "${LCM_DIR}/solvers/Schwarz_Alternating.hpp"
-  "${LCM_DIR}/solvers/Schwarz_ObserverImpl.hpp"
-  "${LCM_DIR}/solvers/Schwarz_PiroObserver.hpp"
-  "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.hpp")
+    "${LCM_DIR}/solvers/Schwarz_Alternating.hpp"
+    "${LCM_DIR}/solvers/Schwarz_ObserverImpl.hpp"
+    "${LCM_DIR}/solvers/Schwarz_PiroObserver.hpp"
+    "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.hpp")
 set(model-eval-sources
-  ${model-eval-sources} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.cpp"
-  "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.cpp"
-  "${LCM_DIR}/solvers/Schwarz_Coupled.cpp")
+    ${model-eval-sources} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.cpp"
+    "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.cpp"
+    "${LCM_DIR}/solvers/Schwarz_Coupled.cpp")
 set(model-eval-headers
-  ${model-eval-headers} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.hpp"
-  "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.hpp"
-  "${LCM_DIR}/solvers/Schwarz_Coupled.hpp")
+    ${model-eval-headers} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.hpp"
+    "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.hpp"
+    "${LCM_DIR}/solvers/Schwarz_Coupled.hpp")
 
 # LCM special boundary conditions
 set(bc-sources
@@ -93,17 +93,17 @@ set(bc-headers
     "${LCM_DIR}/evaluators/bc/TorsionBC.hpp")
 
 set(bc-sources
-  ${bc-sources} "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.cpp"
-  "${LCM_DIR}/evaluators/bc/SchwarzBC.cpp"
-  "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.cpp")
+    ${bc-sources} "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.cpp"
+    "${LCM_DIR}/evaluators/bc/SchwarzBC.cpp"
+    "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.cpp")
 set(bc-headers
-  ${bc-headers}
-  "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.hpp"
-  "${LCM_DIR}/evaluators/bc/PDNeighborFitBC_Def.hpp"
-  "${LCM_DIR}/evaluators/bc/SchwarzBC.hpp"
-  "${LCM_DIR}/evaluators/bc/SchwarzBC_Def.hpp"
-  "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.hpp"
-  "${LCM_DIR}/evaluators/bc/StrongSchwarzBC_Def.hpp")
+    ${bc-headers}
+    "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.hpp"
+    "${LCM_DIR}/evaluators/bc/PDNeighborFitBC_Def.hpp"
+    "${LCM_DIR}/evaluators/bc/SchwarzBC.hpp"
+    "${LCM_DIR}/evaluators/bc/SchwarzBC_Def.hpp"
+    "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.hpp"
+    "${LCM_DIR}/evaluators/bc/StrongSchwarzBC_Def.hpp")
 
 # LCM HMC evaluators
 set(hmc-sources
@@ -452,27 +452,27 @@ set(models-headers
     "${LCM_DIR}/parallel_models/ParallelConstitutiveModel.hpp"
     "${LCM_DIR}/parallel_models/ParallelNeohookeanModel_Def.hpp"
     "${LCM_DIR}/parallel_models/ParallelNeohookeanModel.hpp")
-  set(models-sources
-      ${models-sources}
-      "${LCM_DIR}/models/CrystalPlasticityModel.cpp"
-      "${LCM_DIR}/models/FM_AlbanyInterface.cpp"
-      "${LCM_DIR}/models/FerroicCore.cpp"
-      "${LCM_DIR}/models/GursonHMRModel.cpp"
-      "${LCM_DIR}/models/GursonModel.cpp")
-  set(models-headers
-      ${models-headers}
-      "${LCM_DIR}/models/CrystalPlasticityModel.hpp"
-      "${LCM_DIR}/models/CrystalPlasticityModel_Def.hpp"
-      "${LCM_DIR}/models/FM_AlbanyInterface.hpp"
-      "${LCM_DIR}/models/FM_AlbanyInterface_Def.hpp"
-      "${LCM_DIR}/models/FerroicCore.hpp"
-      "${LCM_DIR}/models/FerroicCore_Def.hpp"
-      "${LCM_DIR}/models/FerroicModel.hpp"
-      "${LCM_DIR}/models/FerroicModel_Def.hpp"
-      "${LCM_DIR}/models/GursonHMRModel.hpp"
-      "${LCM_DIR}/models/GursonHMRModel_Def.hpp"
-      "${LCM_DIR}/models/GursonModel.hpp"
-      "${LCM_DIR}/models/GursonModel_Def.hpp")
+set(models-sources
+    ${models-sources}
+    "${LCM_DIR}/models/CrystalPlasticityModel.cpp"
+    "${LCM_DIR}/models/FM_AlbanyInterface.cpp"
+    "${LCM_DIR}/models/FerroicCore.cpp"
+    "${LCM_DIR}/models/GursonHMRModel.cpp"
+    "${LCM_DIR}/models/GursonModel.cpp")
+set(models-headers
+    ${models-headers}
+    "${LCM_DIR}/models/CrystalPlasticityModel.hpp"
+    "${LCM_DIR}/models/CrystalPlasticityModel_Def.hpp"
+    "${LCM_DIR}/models/FM_AlbanyInterface.hpp"
+    "${LCM_DIR}/models/FM_AlbanyInterface_Def.hpp"
+    "${LCM_DIR}/models/FerroicCore.hpp"
+    "${LCM_DIR}/models/FerroicCore_Def.hpp"
+    "${LCM_DIR}/models/FerroicModel.hpp"
+    "${LCM_DIR}/models/FerroicModel_Def.hpp"
+    "${LCM_DIR}/models/GursonHMRModel.hpp"
+    "${LCM_DIR}/models/GursonHMRModel_Def.hpp"
+    "${LCM_DIR}/models/GursonModel.hpp"
+    "${LCM_DIR}/models/GursonModel_Def.hpp")
 
 # LCM utils
 set(utils-sources
@@ -504,18 +504,18 @@ set(utils-headers
 
 # LCM utils / topology
 set(topology-sources
-  "${LCM_DIR}/utils/topology/BarycentricSubdivision.cpp"
-  "${LCM_DIR}/utils/topology/MinimumSurface.cpp"
-  "${LCM_DIR}/utils/topology/Subgraph.cpp"
-  "${LCM_DIR}/utils/topology/Topology.cpp"
-  "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp"
-  "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
+    "${LCM_DIR}/utils/topology/BarycentricSubdivision.cpp"
+    "${LCM_DIR}/utils/topology/MinimumSurface.cpp"
+    "${LCM_DIR}/utils/topology/Subgraph.cpp"
+    "${LCM_DIR}/utils/topology/Topology.cpp"
+    "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp"
+    "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
 set(topology-headers
-  "${LCM_DIR}/utils/topology/Subgraph.hpp"
-  "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
-  "${LCM_DIR}/utils/topology/Topology.hpp"
-  "${LCM_DIR}/utils/topology/Topology_Types.hpp"
-  "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
+    "${LCM_DIR}/utils/topology/Subgraph.hpp"
+    "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
+    "${LCM_DIR}/utils/topology/Topology.hpp"
+    "${LCM_DIR}/utils/topology/Topology_Types.hpp"
+    "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
 
 set(SOURCES
     ${SOURCES}

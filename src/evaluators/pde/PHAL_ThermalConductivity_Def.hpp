@@ -90,7 +90,6 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
     if (typ == "Constant") {
       ScalarT value = subList.get("Value", 1.0);
       init_constant(value, p);
-
     }
   }  // Block dependent
 
@@ -123,7 +122,6 @@ ThermalConductivity<EvalT, Traits>::init_constant(
   this->registerSacadoParameter("ThermalConductivity", paramLib);
 
 }  // init_constant
-
 
 // **********************************************************************
 template <typename EvalT, typename Traits>

@@ -10,6 +10,7 @@
 #include <Shards_BasicTopologies.hpp>
 #include <cinttypes>
 #include <iostream>
+#include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/GetBuckets.hpp>
@@ -17,8 +18,6 @@
 #include <stk_mesh/base/Selector.hpp>
 
 #include "Teuchos_VerboseObject.hpp"
-
-#include <stk_io/IossBridge.hpp>
 
 #define ST_LLI "%" PRId64
 

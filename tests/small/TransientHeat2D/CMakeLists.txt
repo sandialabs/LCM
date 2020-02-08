@@ -7,7 +7,6 @@ get_filename_component(testNameRoot ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 set(testName ${testNameRoot}_Rythmos)
 
-
 if(ALBANY_IFPACK2)
   # RK 4 test
   set(testName ${testNameRoot}_Rythmos_RK4)
@@ -47,8 +46,8 @@ if(ALBANY_TEMPUS AND ALBANY_IFPACK2)
                  ${CMAKE_CURRENT_BINARY_DIR}/tempus_be_nox_solver.yaml COPYONLY)
 
   add_test(${testName} ${Albany.exe} tempus_be_nox_solver.yaml)
-  set_tests_properties(${testName}
-                       PROPERTIES LABELS "Basic;Tempus;Tpetra;Forward")
+  set_tests_properties(${testName} PROPERTIES LABELS
+                                              "Basic;Tempus;Tpetra;Forward")
 
   # RK 4 test
   set(testName ${testNameRoot}_Tempus_RK4)

@@ -9,9 +9,9 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <type_traits>
 #include <iostream>
 #include <new>
+#include <type_traits>
 
 namespace utility {
 // Using a unique_ptr deleter would be much nicer but there are CUDA

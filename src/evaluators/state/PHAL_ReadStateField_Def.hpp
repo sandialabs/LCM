@@ -5,15 +5,14 @@
 //
 
 #include "Albany_AbstractDiscretization.hpp"
+#include "Albany_AbstractSTKFieldContainer.hpp"
+#include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Albany_Utils.hpp"
 #include "PHAL_ReadStateField.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Phalanx_DataLayout_MDALayout.hpp"
 #include "Teuchos_TestForException.hpp"
-
-#include "Albany_AbstractSTKFieldContainer.hpp"
-#include "Albany_AbstractSTKMeshStruct.hpp"
 
 namespace PHAL {
 

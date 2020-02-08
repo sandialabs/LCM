@@ -15,7 +15,6 @@
 
 // uncomment the following to write stuff out to matrix market to debug
 
-
 // IK, 4/24/15: adding option to write the mass matrix to matrix market file,
 // which is needed
 // for some applications.  Uncomment the following line to turn on.
@@ -989,9 +988,6 @@ ModelEvaluator::evalModelImpl(
           j, curr_time, x, x_dot, x_dotdot, sacado_param_vec, g_out);
     }
   }
-
-
-
 }
 
 Thyra_InArgs

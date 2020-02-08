@@ -18,13 +18,13 @@
 #include "utility/Albany_ThyraUtils.hpp"
 
 // Start of STK stuff
+#include <stk_io/StkMeshIoBroker.hpp>
 #include <stk_mesh/base/BulkData.hpp>
 #include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/FieldTraits.hpp>
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Types.hpp>
 #include <stk_util/parallel/Parallel.hpp>
-#include <stk_io/StkMeshIoBroker.hpp>
 
 namespace Albany {
 
@@ -739,13 +739,13 @@ class STKDiscretization : public AbstractDiscretization
   std::map<std::string, Teuchos::RCP<Thyra_LinearOp>>   projectors;
   std::map<std::string, Teuchos::RCP<Thyra_LinearOp>>   ov_projectors;
 
-// Used in Exodus writing capability
+  // Used in Exodus writing capability
   Teuchos::RCP<stk::io::StkMeshIoBroker> mesh_data;
 
   int outputInterval;
 
   size_t outputFileIdx;
-  bool interleavedOrdering;
+  bool   interleavedOrdering;
 
  private:
   Teuchos::RCP<ThyraCrsMatrixFactory> nodalMatrixFactory;

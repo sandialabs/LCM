@@ -12,8 +12,7 @@ if(ALBANY_IOPX)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_rythmos.yaml
                    ${CMAKE_CURRENT_BINARY_DIR}/input_rythmos.yaml COPYONLY)
     add_test(${testName} ${Albany.exe} input_rythmos.yaml)
-    set_tests_properties(${testName} PROPERTIES LABELS
-                                                       "Demo;Tpetra;Forward")
+    set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
   endif()
 
   set(testName ${testNameRoot}_Tempus)

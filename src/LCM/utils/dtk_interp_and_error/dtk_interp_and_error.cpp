@@ -152,7 +152,6 @@ interp_and_calc_error(
   // Get number of time steps in source mesh
   int src_timestep_count = src_io_region->get_property("state_count").get_int();
 
-
   // Get source_field from source mesh
   FieldType* source_field = src_broker.meta_data().get_field<FieldType>(
       stk::topology::NODE_RANK, source_field_name);
@@ -244,7 +243,6 @@ interp_and_calc_error(
 
   // Get number of time steps in source mesh
   int tgt_timestep_count = tgt_io_region->get_property("state_count").get_int();
-
 
   if (src_timestep_count < 1) {
     TEUCHOS_TEST_FOR_EXCEPTION(true,
@@ -426,7 +424,6 @@ interp_and_calc_error(
         tgt_vector = tgt_manager.createFieldMultiVector<FieldType>(
             Teuchos::ptr(&target_interp_field), neq);
 
-
     // SOLUTION TRANSFER
     // -----------------
 
@@ -444,7 +441,6 @@ interp_and_calc_error(
     // Apply the map operator. This interpolates the data from one STK field
     // to the other.
     map_op->apply(*src_vector, *tgt_vector);
-
 
     // COMPUTE THE SOLUTION ERROR
     // --------------------------
@@ -483,7 +479,6 @@ interp_and_calc_error(
     int num_tgt_part_nodes =
         tgt_part_nodes.size();  // number nodes (owned + overlap)
 
-
     double error_l2_norm_global_vec{0.0};
     double rel_error_l2_norm_global_vec{0.0};
     double field_l2_norm_global_vec{0.0};
@@ -520,7 +515,6 @@ interp_and_calc_error(
         /*if (std::abs(gold_value[component]) > 1.0e-14) {
           rel_err_field_data[component] /= std::abs(gold_value[component]);
         }*/
-
 
         error_l2_norm_sq +=
             abs_err_field_data[component] * abs_err_field_data[component];

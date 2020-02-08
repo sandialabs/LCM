@@ -7,15 +7,13 @@
 #ifndef ALBANY_IOSS_STKMESHSTRUCT_HPP
 #define ALBANY_IOSS_STKMESHSTRUCT_HPP
 
-#include "Albany_config.h"
-
-
 #include <Ionit_Initializer.h>
 
 #include <stk_io/IossBridge.hpp>
 #include <stk_io/StkMeshIoBroker.hpp>
 
 #include "Albany_GenericSTKMeshStruct.hpp"
+#include "Albany_config.h"
 
 namespace Albany {
 
@@ -88,6 +86,5 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
 };
 
 }  // Namespace Albany
-
 
 #endif  // ALBANY_IOSS_STKMESHSTRUCT_HPP

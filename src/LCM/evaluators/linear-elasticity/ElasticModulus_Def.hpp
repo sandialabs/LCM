@@ -40,16 +40,16 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
     // Add Elastic Modulus as a Sacado-ized parameter
     this->registerSacadoParameter("Elastic Modulus", paramLib);
   }
-//  else if (type == 'Variable') {
-//	  is_constant = true; // this means no stochastic nature
-//	  is_field = true;
-//	  constant_value = elmd_list->get("Value", 1.0);
-//
-//	  // Add Elastic Modulus as a Sacado-ized parameter
-//	  new Sacado::ParameterRegistration<EvalT, SPL_Traits>(
-//	  	"Elastic Modulus", this, paramLib);
-//
-//  }
+  //  else if (type == 'Variable') {
+  //	  is_constant = true; // this means no stochastic nature
+  //	  is_field = true;
+  //	  constant_value = elmd_list->get("Value", 1.0);
+  //
+  //	  // Add Elastic Modulus as a Sacado-ized parameter
+  //	  new Sacado::ParameterRegistration<EvalT, SPL_Traits>(
+  //	  	"Elastic Modulus", this, paramLib);
+  //
+  //  }
   else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,

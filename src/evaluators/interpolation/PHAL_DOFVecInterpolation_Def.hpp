@@ -103,7 +103,6 @@ void
 DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-
 #ifdef ALBANY_TIMER
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -126,7 +125,6 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
   std::cout << "DOFVecInterpolationBase Residual time = " << millisec << "  "
             << microseconds << std::endl;
 #endif
-
 }
 
 // Specialization for Jacobian evaluation taking advantage of known sparsity

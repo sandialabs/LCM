@@ -15,8 +15,8 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
-#include "Teuchos_ParameterList.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace LCM {
 ///
@@ -154,7 +154,6 @@ class Porosity : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// For THM porous media
   ///
   PHX::MDField<const ScalarT, Cell, QuadPoint> refTemperature;
-
 
   ///
   /// Values of the random variables

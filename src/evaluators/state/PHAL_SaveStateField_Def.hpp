@@ -4,14 +4,13 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
+#include "Albany_AbstractDiscretization.hpp"
+#include "Albany_AbstractSTKFieldContainer.hpp"
+#include "Albany_AbstractSTKMeshStruct.hpp"
 #include "PHAL_SaveStateField.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Phalanx_DataLayout_MDALayout.hpp"
 #include "Teuchos_TestForException.hpp"
-
-#include "Albany_AbstractSTKFieldContainer.hpp"
-#include "Albany_AbstractSTKMeshStruct.hpp"
-#include "Albany_AbstractDiscretization.hpp"
 
 namespace PHAL {
 

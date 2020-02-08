@@ -13,9 +13,9 @@
 #include "Albany_ThyraUtils.hpp"
 
 // Start of STK stuff
+#include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/MetaData.hpp>
-#include <stk_io/IossBridge.hpp>
 
 namespace Albany {
 
@@ -153,7 +153,6 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   this->addStateStructs(sis);
 
   initializeSTKAdaptation();
-
 
   bool has_cell_boundary_indicator =
       (std::find(req.begin(), req.end(), "cell_boundary_indicator") !=

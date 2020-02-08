@@ -298,10 +298,10 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   // the same field).
   //       Otherwise, coordinates_field3d stores coordinates in 3d (useful for
   //       non-flat 2d meshes)
-  VectorFieldType*    coordinates_field3d;
-  VectorFieldType*    coordinates_field;
-  IntScalarFieldType* proc_rank_field;
-  IntScalarFieldType* refine_field;
+  VectorFieldType*      coordinates_field3d;
+  VectorFieldType*      coordinates_field;
+  IntScalarFieldType*   proc_rank_field;
+  IntScalarFieldType*   refine_field;
   IntScalarFieldType*   failure_state[stk::topology::ELEMENT_RANK + 1];
   stk::mesh::FieldBase* cell_boundary_indicator;
   stk::mesh::FieldBase* face_boundary_indicator;

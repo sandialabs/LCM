@@ -101,8 +101,8 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
   row_is_dbc_->assign(0.0);
   col_is_dbc_->assign(0.0);
 
-  auto const& fixed_dofs = dirichlet_workset.fixed_dofs_;
-  auto row_is_dbc_data = Albany::getNonconstLocalData(row_is_dbc_);
+  auto const& fixed_dofs      = dirichlet_workset.fixed_dofs_;
+  auto        row_is_dbc_data = Albany::getNonconstLocalData(row_is_dbc_);
   if (dirichlet_workset.is_schwarz_bc_ == false) {  // regular SDBC
     for (size_t ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
       auto dof             = ns_nodes[ns_node][this->offset];

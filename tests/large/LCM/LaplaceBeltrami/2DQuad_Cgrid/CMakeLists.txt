@@ -83,9 +83,8 @@ if(SEACAS_EPU AND SEACAS_EXODIFF)
   # set(testName ${testDirName}_TPS) add_test(NAME
   # LaplaceBeltrami:${testName}_MueLu COMMAND ${CMAKE_COMMAND}
   # "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-  # -DTEST_ARGS=inputPS_MueLu.yaml -DMPIMNP=${MPIMNP}
-  # -DSEACAS_EPU=${SEACAS_EPU} -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-  # -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+  # -DTEST_ARGS=inputPS_MueLu.yaml -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
+  # -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
   # ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
   #
   # set(testName ${testDirName}_LB) add_test(NAME

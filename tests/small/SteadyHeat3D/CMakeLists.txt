@@ -10,8 +10,7 @@ if(ALBANY_IFPACK2)
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 
   add_test(${testNameRoot} ${Albany.exe} input.yaml)
-  set_tests_properties(${testNameRoot} PROPERTIES LABELS
-                                                         "Basic;Tpetra;Forward")
+  set_tests_properties(${testNameRoot} PROPERTIES LABELS "Basic;Tpetra;Forward")
 endif()
 
 # ##############################################################################
@@ -32,8 +31,7 @@ if(NOT ALBANY_PARALLEL_ONLY)
       ${CMAKE_CURRENT_BINARY_DIR}/input_10x10x10_ascii.yaml COPYONLY)
 
     add_test(${testName} ${SerialAlbany.exe} input_10x10x10_ascii.yaml)
-    set_tests_properties(${testName} PROPERTIES LABELS
-                                                       "Basic;Tpetra;Forward")
+    set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
   endif()
 endif()
 
@@ -48,5 +46,4 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/input_nodeGIDArrayResponse.yaml COPYONLY)
 
 add_test(${testName} ${Albany.exe} input_nodeGIDArrayResponse.yaml)
-set_tests_properties(${testName} PROPERTIES LABELS
-                                                   "Basic;Tpetra;Forward")
+set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")

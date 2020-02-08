@@ -8,13 +8,12 @@
 #define PHAL_MORTAR_CONTACT_RESIDUAL_HPP
 
 #include "Albany_Layouts.hpp"
+#include "Kokkos_Vector.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Teuchos_ParameterList.hpp"
-
-#include "Kokkos_Vector.hpp"
 
 namespace PHAL {
 /** \brief Scatters Lagrange Multipliers from the residual fields into the
@@ -59,7 +58,6 @@ class MortarContactResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   Albany::DeviceView1d<ST>                    f_kokkos;
   Kokkos::vector<Kokkos::DynRankView<const ScalarT, PHX::Device>, PHX::Device>
       val_kokkos;
-
 };
 
 template <typename EvalT, typename Traits>
@@ -127,7 +125,6 @@ class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>
       PHAL_MortarContactResRank1_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank2_Tag>
       PHAL_MortarContactResRank2_Policy;
-
 };
 
 // **************************************************************
@@ -243,7 +240,6 @@ class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>
           PHAL_MortarContactJacRank2_Adjoint_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank2_Tag>
       PHAL_MortarContactJacRank2_Policy;
-
 };
 
 // **************************************************************

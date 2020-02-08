@@ -76,7 +76,6 @@ class GatherSolutionBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                      KV;
   KV                 val_kokkos, val_dot_kokkos, val_dotdot_kokkos;
   typename KV::t_dev d_val, d_val_dot, d_val_dotdot;
-
 };
 
 template <typename EvalT, typename Traits>
@@ -209,7 +208,6 @@ class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
   typedef Kokkos::
       RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Acceleration_Tag>
           PHAL_GatherSolRank0_Acceleration_Policy;
-
 };
 
 // **************************************************************
@@ -333,7 +331,6 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
   typedef Kokkos::
       RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Acceleration_Tag>
           PHAL_GatherJacRank0_Acceleration_Policy;
-
 };
 
 // **************************************************************

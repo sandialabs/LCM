@@ -10,10 +10,10 @@
 #include "Albany_Utils.hpp"
 
 // Start of STK stuff
+#include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Types.hpp>
-#include <stk_io/IossBridge.hpp>
 
 namespace Albany {
 

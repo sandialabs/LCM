@@ -7,16 +7,14 @@
 #define PHAL_FACTORY_TRAITS_HPP
 
 #include "Albany_config.h"
-
 #include "LCM/evaluators/Time.hpp"
 #include "LCM/evaluators/bc/EquilibriumConcentrationBC.hpp"
 #include "LCM/evaluators/bc/KfieldBC.hpp"
 #include "LCM/evaluators/bc/PDNeighborFitBC.hpp"
-#include "LCM/evaluators/bc/TimeTracBC.hpp"
-#include "LCM/evaluators/bc/TorsionBC.hpp"
 #include "LCM/evaluators/bc/SchwarzBC.hpp"
 #include "LCM/evaluators/bc/StrongSchwarzBC.hpp"
-
+#include "LCM/evaluators/bc/TimeTracBC.hpp"
+#include "LCM/evaluators/bc/TorsionBC.hpp"
 #include "PHAL_Dirichlet.hpp"
 #include "PHAL_DirichletCoordinateFunction.hpp"
 #include "PHAL_DirichletField.hpp"

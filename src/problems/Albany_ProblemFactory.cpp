@@ -163,8 +163,7 @@ Albany::ProblemFactory::create()
   } else if (method == "Electromechanics 3D") {
     strategy = rcp(
         new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
-  }
-  else {
+  } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         Teuchos::Exceptions::InvalidParameter,

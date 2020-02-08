@@ -9,6 +9,7 @@
 #include <Albany_STKNodeSharing.hpp>
 #include <Shards_BasicTopologies.hpp>
 #include <iostream>
+#include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/GetBuckets.hpp>
@@ -17,8 +18,6 @@
 
 #include "Teuchos_CommHelpers.hpp"
 #include "Teuchos_VerboseObject.hpp"
-
-#include <stk_io/IossBridge.hpp>
 
 //#include <stk_mesh/fem/FEMHelpers.hpp>
 #include <boost/algorithm/string/predicate.hpp>

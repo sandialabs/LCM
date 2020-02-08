@@ -1462,4 +1462,3 @@ Topology::findCoordinates(unsigned int nodeIdentifier)
 }
 
 }  // namespace LCM
-

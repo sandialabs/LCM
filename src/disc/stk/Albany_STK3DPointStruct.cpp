@@ -4,6 +4,7 @@
 // in the file license.txt in the top-level Albany directory.
 //
 #include "Albany_STK3DPointStruct.hpp"
+
 #include <stk_io/IossBridge.hpp>
 
 // Constructor for meshes read from ASCII file

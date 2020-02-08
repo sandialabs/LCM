@@ -21,6 +21,9 @@
 #include "Albany_ContactManager.hpp"
 #endif
 
+#include <Ionit_Initializer.h>
+#include <netcdf.h>
+
 #include <Intrepid2_Basis.hpp>
 #include <Intrepid2_CellTools.hpp>
 #include <Intrepid2_HGRAD_QUAD_Cn_FEM.hpp>
@@ -34,9 +37,6 @@
 #include <stk_mesh/base/Selector.hpp>
 #include <stk_util/parallel/Parallel.hpp>
 #include <string>
-
-#include <Ionit_Initializer.h>
-#include <netcdf.h>
 
 #ifdef ALBANY_PAR_NETCDF
 extern "C" {
@@ -1105,7 +1105,6 @@ STKDiscretization::writeSolutionMVToFile(
     const double             time,
     const bool               overlapped)
 {
-
   if (stkMeshStruct->exoOutput && stkMeshStruct->transferSolutionToCoords) {
     Teuchos::RCP<AbstractSTKFieldContainer> container =
         stkMeshStruct->getFieldContainer();
@@ -2633,14 +2632,13 @@ STKDiscretization::setupExodusOutput()
       }
     }
   }
-
 }
 
 int
 STKDiscretization::processNetCDFOutputRequest(
     const Thyra_Vector& /* solution_field */)
 {
-// IK, 10/13/14: need to implement!
+  // IK, 10/13/14: need to implement!
   return 0;
 }
 
@@ -2648,7 +2646,7 @@ int
 STKDiscretization::processNetCDFOutputRequestMV(
     const Thyra_MultiVector& /* solution_field */)
 {
-// IK, 10/13/14: need to implement!
+  // IK, 10/13/14: need to implement!
   return 0;
 }
 

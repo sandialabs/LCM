@@ -7,6 +7,7 @@
 #ifndef PHAL_THERMAL_CONDUCTIVITY_HPP
 #define PHAL_THERMAL_CONDUCTIVITY_HPP
 
+#include "Albany_MaterialDatabase.hpp"
 #include "Albany_Types.hpp"
 #include "Albany_config.h"
 #include "Phalanx_Evaluator_Derived.hpp"
@@ -14,9 +15,8 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
-#include "Teuchos_ParameterList.hpp"
-#include "Albany_MaterialDatabase.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace PHAL {
 /**
@@ -94,7 +94,6 @@ class ThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   //! Constant value
   ScalarT constant_value;
-
 
   //! Values of the random variables
   Teuchos::Array<ScalarT> rv;

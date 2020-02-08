@@ -15,8 +15,8 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
-#include "Teuchos_ParameterList.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_ParameterList.hpp"
 #include "Teuchos_TwoDArray.hpp"
 
 namespace PHAL {
@@ -79,7 +79,6 @@ class NSMaterialProperty : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::Array<ScalarT>     vector_constant_value;
   Teuchos::TwoDArray<ScalarT> tensor_constant_value;
   ScalarT                     ref_temp;
-
 
   //! Values of the random variables
   Teuchos::Array<ScalarT>     rv;

@@ -13,8 +13,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
   # Fails with FPE if FPE checking is enabled
   add_test(${testName} ${SerialAlbany.exe} input.yaml)
-  set_tests_properties(${testName}
-                       PROPERTIES LABELS "Demo;Tpetra;Forward;Serial")
+  set_tests_properties(${testName} PROPERTIES LABELS
+                                              "Demo;Tpetra;Forward;Serial")
   # endif ()
 
   set(testName ${testNameRoot}_Ifpack2)

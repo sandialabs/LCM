@@ -688,7 +688,6 @@ class Application
 
   bool is_schwarz_alternating_{false};
 
-
  public:
   //! Get Phalanx postRegistration data
   Teuchos::RCP<PHAL::Setup>
@@ -842,29 +841,29 @@ Application::loadWorksetBucketInfo(
     const int&         ws,
     const std::string& evalName)
 {
-  auto const& wsElNodeEqID       = disc->getWsElNodeEqID();
-  auto const& wsElNodeID         = disc->getWsElNodeID();
-  auto const& coords             = disc->getCoords();
-  auto const& wsEBNames          = disc->getWsEBNames();
-  auto const& sphereVolume       = disc->getSphereVolume();
-  auto const& latticeOrientation = disc->getLatticeOrientation();
+  auto const& wsElNodeEqID            = disc->getWsElNodeEqID();
+  auto const& wsElNodeID              = disc->getWsElNodeID();
+  auto const& coords                  = disc->getCoords();
+  auto const& wsEBNames               = disc->getWsEBNames();
+  auto const& sphereVolume            = disc->getSphereVolume();
+  auto const& latticeOrientation      = disc->getLatticeOrientation();
   auto const& cell_boundary_indicator = disc->getCellBoundaryIndicator();
   auto const& face_boundary_indicator = disc->getFaceBoundaryIndicator();
   auto const& edge_boundary_indicator = disc->getEdgeBoundaryIndicator();
   auto const& node_boundary_indicator = disc->getNodeBoundaryIndicator();
 
-  workset.numCells             = wsElNodeEqID[ws].extent(0);
-  workset.wsElNodeEqID         = wsElNodeEqID[ws];
-  workset.wsElNodeID           = wsElNodeID[ws];
-  workset.wsCoords             = coords[ws];
-  workset.wsSphereVolume       = sphereVolume[ws];
-  workset.wsLatticeOrientation = latticeOrientation[ws];
+  workset.numCells                = wsElNodeEqID[ws].extent(0);
+  workset.wsElNodeEqID            = wsElNodeEqID[ws];
+  workset.wsElNodeID              = wsElNodeID[ws];
+  workset.wsCoords                = coords[ws];
+  workset.wsSphereVolume          = sphereVolume[ws];
+  workset.wsLatticeOrientation    = latticeOrientation[ws];
   workset.cell_boundary_indicator = cell_boundary_indicator[ws];
   workset.face_boundary_indicator = face_boundary_indicator[ws];
   workset.edge_boundary_indicator = edge_boundary_indicator[ws];
   workset.node_boundary_indicator = node_boundary_indicator[ws];
-  workset.EBName  = wsEBNames[ws];
-  workset.wsIndex = ws;
+  workset.EBName                  = wsEBNames[ws];
+  workset.wsIndex                 = ws;
 
   workset.local_Vp.resize(workset.numCells);
 

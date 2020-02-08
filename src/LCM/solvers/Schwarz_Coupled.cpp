@@ -18,7 +18,6 @@
 
 // uncomment the following to write stuff out to matrix market to debug
 
-
 namespace LCM {
 
 SchwarzCoupled::SchwarzCoupled(
@@ -1111,9 +1110,6 @@ SchwarzCoupled::evalModelImpl(
       W_prec_out = W_prec;
     }
   }
-
-
-
 
   // Responses / sensitivities
   // FIXME: need to implement DgDx, DgDp, etc for sensitivity analysis!

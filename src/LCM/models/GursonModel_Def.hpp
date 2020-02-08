@@ -159,10 +159,10 @@ GursonModel<EvalT, Traits>::computeState(
       }
 
       // compute trial state
-      Fpinv = minitensor::inverse(Fpn);
-      Cpinv = Fpinv * minitensor::transpose(Fpinv);
-      be    = F * Cpinv * minitensor::transpose(F);
-      logbe = minitensor::log_sym<ScalarT>(be);
+      Fpinv      = minitensor::inverse(Fpn);
+      Cpinv      = Fpinv * minitensor::transpose(Fpinv);
+      be         = F * Cpinv * minitensor::transpose(F);
+      logbe      = minitensor::log_sym<ScalarT>(be);
       trlogbeby3 = minitensor::trace(logbe) / 3.0;
       detbe      = minitensor::det<ScalarT>(be);
       s          = mu * (logbe - trlogbeby3 * I);

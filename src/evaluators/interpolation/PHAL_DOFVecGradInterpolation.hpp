@@ -73,7 +73,6 @@ class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   operator()(
       const DOFVecGradInterpolationBase_Residual_Tag& tag,
       const int&                                      cell) const;
-
 };
 
 /** \brief Fast Finite Element Interpolation Evaluator
@@ -180,7 +179,6 @@ class FastSolutionVecGradInterpolationBase<
       const int&                                               cell) const;
 
   int num_dof, neq;
-
 };
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

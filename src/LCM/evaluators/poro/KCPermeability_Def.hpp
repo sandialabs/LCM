@@ -41,8 +41,7 @@ KCPermeability<EvalT, Traits>::KCPermeability(Teuchos::ParameterList& p)
 
     // Add Kozeny-Carman Permeability as a Sacado-ized parameter
     this->registerSacadoParameter("Kozeny-Carman Permeability", paramLib);
-  }
-  else {
+  } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         Teuchos::Exceptions::InvalidParameter,

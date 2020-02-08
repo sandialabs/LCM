@@ -12,6 +12,7 @@
 #include <Albany_STKNodeSharing.hpp>
 #include <Shards_BasicTopologies.hpp>
 #include <iostream>
+#include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/GetBuckets.hpp>
@@ -21,8 +22,6 @@
 #include "Teuchos_CommHelpers.hpp"
 #include "Teuchos_VerboseObject.hpp"
 #include "Teuchos_oblackholestream.hpp"
-
-#include <stk_io/IossBridge.hpp>
 
 //#include <stk_mesh/fem/FEMHelpers.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -205,7 +204,6 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
         &metaData->declare_part(nsn_ss.str(), stk::topology::NODE_RANK);
 
     stk::io::put_io_part_attribute(*nsPartVec[nsn_ss.str()]);
-
   }
 
   // Broadcasting the tags

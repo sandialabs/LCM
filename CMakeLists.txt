@@ -338,8 +338,8 @@ list(FIND Trilinos_PACKAGE_LIST STK have_stk_List_ID)
 if(have_stk_List_ID GREATER -1)
   message("-- Looking for STK:                  Found")
 
-  # set dependency on SEACAS, for I/O via stk_io MESSAGE("-- Looking
-  # for SEACAS:")
+  # set dependency on SEACAS, for I/O via stk_io MESSAGE("-- Looking for
+  # SEACAS:")
   list(FIND Trilinos_PACKAGE_LIST SEACASIoss SEACASIoss_List_ID)
   if(SEACASIoss_List_ID GREATER -1)
     message("  -- Looking for SEACASIoss:         Found")
@@ -517,9 +517,7 @@ option(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS
        "Flag to turn off LCM exodiff sensitive tests" OFF)
 set(LCM_TEST_EXES TRUE)
 if(NOT ALBANY_ROL)
-  message(
-    FATAL_ERROR
-    "ROL not installed from Trilinos (LCM needs ROL)")
+  message(FATAL_ERROR "ROL not installed from Trilinos (LCM needs ROL)")
 endif()
 if(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS)
   message("  -- LCM exodiff sensitive tests are DISABLED!")

@@ -39,8 +39,7 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
 
     // Add Poissons Ratio as a Sacado-ized parameter
     this->registerSacadoParameter("Poissons Ratio", paramLib);
-  }
-  else {
+  } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
         Teuchos::Exceptions::InvalidParameter,

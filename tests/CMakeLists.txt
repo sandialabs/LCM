@@ -64,7 +64,7 @@ if(ALBANY_MPI)
   endif(DEFINED MPIMNP)
   set(Albany.exe ${PARALLEL_CALL} ${AlbanyPath})
   set(Albany8.exe ${MPIEX} ${MPIPRE} ${MPINPF} ${MAX_MPI_RANKS} ${MPIPOST}
-    ${AlbanyPath})
+                  ${AlbanyPath})
 else()
   set(SerialAlbany.exe ${AlbanyPath})
   set(Albany.exe ${AlbanyPath})
@@ -74,8 +74,7 @@ set(PartitionTest.exe ${Albany_BINARY_DIR}/src/LCM/PartitionTest)
 set(Subdivision.exe ${Albany_BINARY_DIR}/src/LCM/Subdivision)
 set(MPS.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulator)
 set(MPST.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulatorT)
-set(DTK_Interp_and_Error.exe
-    ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_and_Error)
+set(DTK_Interp_and_Error.exe ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_and_Error)
 set(DTK_Interp_Volume_to_NS.exe
     ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_Volume_to_NS)
 if(ALBANY_MPI)

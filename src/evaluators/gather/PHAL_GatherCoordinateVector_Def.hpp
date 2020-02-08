@@ -143,6 +143,5 @@ GatherCoordinateVector<EvalT, Traits>::evaluateFields(
   }
   // Kokkos::deep_copy (coordVec.get_view(), coordVecHost);
   Kokkos::deep_copy(coordVec.get_static_view(), coordVecHost);
-
 }
 }  // namespace PHAL

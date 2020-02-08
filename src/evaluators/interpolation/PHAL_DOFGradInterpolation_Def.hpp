@@ -157,7 +157,6 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
   std::cout << "DOFGradInterpolationBase Residual time = " << millisec << "  "
             << microseconds << std::endl;
 #endif
-
 }
 // Specialization for Jacobian evaluation taking advantage of the sparsity of
 // the derivatives
@@ -209,7 +208,6 @@ FastSolutionGradInterpolationBase<
   // Intrepid2::FunctionSpaceTools:: evaluate<ScalarT>(grad_val_qp, val_node,
   // GradBF);
 
-
 #ifdef ALBANY_TIMER
   PHX::Device::fence();
   auto start = std::chrono::high_resolution_clock::now();
@@ -232,7 +230,6 @@ FastSolutionGradInterpolationBase<
   std::cout << "DOFGradInterpolationBase Jacobian time = " << millisec << "  "
             << microseconds << std::endl;
 #endif
-
 }
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

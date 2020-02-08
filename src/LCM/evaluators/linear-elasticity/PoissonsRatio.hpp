@@ -14,8 +14,8 @@
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
-#include "Teuchos_ParameterList.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 namespace LCM {
 
@@ -62,7 +62,6 @@ class PoissonsRatio : public PHX::EvaluatorWithBaseImpl<Traits>,
   bool                                         isThermoElastic;
   ScalarT                                      dnudT_value;
   RealType                                     refTemp;
-
 
   //! Values of the random variables
   Teuchos::Array<ScalarT> rv;

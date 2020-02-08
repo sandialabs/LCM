@@ -13,9 +13,9 @@
 #include "Albany_Utils.hpp"
 #include "Sacado_ParameterAccessor.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_VerboseObject.hpp"
 #include "Teuchos_Array.hpp"
 #include "Teuchos_TestForException.hpp"
+#include "Teuchos_VerboseObject.hpp"
 
 namespace PHAL {
 
@@ -571,7 +571,6 @@ Quadratic<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////////////
 

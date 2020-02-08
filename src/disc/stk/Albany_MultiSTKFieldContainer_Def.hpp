@@ -14,9 +14,9 @@
 #include "Albany_ThyraUtils.hpp"
 
 // Start of STK stuff
+#include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/MetaData.hpp>
-#include <stk_io/IossBridge.hpp>
 
 #include "Teuchos_VerboseObject.hpp"
 

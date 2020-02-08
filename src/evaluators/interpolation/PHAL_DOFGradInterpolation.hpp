@@ -191,7 +191,6 @@ class FastSolutionGradInterpolationBase<
   operator()(
       const FastSolutionGradInterpolationBase_Jacobian_Tag& tag,
       const int&                                            cell) const;
-
 };
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

@@ -14,8 +14,7 @@ configure_file(
 
 # Create the test with this name and standard executable
 add_test(${testName} ${Albany.exe} input_dirichlet_dist_param.yaml)
-set_tests_properties(${testName} PROPERTIES LABELS
-                                                   "Basic;Tpetra;Forward")
+set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 
 # ##############################################################################
 # Dirichlet Mixed Params tests ###
@@ -30,8 +29,7 @@ configure_file(
 
 # Create the test with this name and standard executable
 add_test(${testName} ${Albany.exe} input_dirichlet_mixed_params.yaml)
-set_tests_properties(${testName} PROPERTIES LABELS
-                                                   "Basic;Tpetra;Forward")
+set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 
 # ##############################################################################
 # Dirichlet Mixed Params tests ###
@@ -45,8 +43,7 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/input_conductivity_dist_param.yaml COPYONLY)
 # Create the test with this name and standard executable
 add_test(${testName} ${Albany.exe} input_conductivity_dist_param.yaml)
-set_tests_properties(${testName} PROPERTIES LABELS
-                                                   "Basic;Tpetra;Forward")
+set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 
 if(ALBANY_IOPX)
   # Copy Input file from source to binary dir
@@ -60,8 +57,7 @@ if(ALBANY_IOPX)
   # Create the test with this name and standard executable
   add_test(${testName}_Restart ${Albany.exe}
            input_conductivity_dist_param_restart.yaml)
-  set_tests_properties(${testName}_Restart
-                       PROPERTIES LABELS "Basic;Tpetra;Forward")
-  set_tests_properties(${testName}_Restart PROPERTIES DEPENDS
-                                                             ${testName})
+  set_tests_properties(${testName}_Restart PROPERTIES LABELS
+                                                      "Basic;Tpetra;Forward")
+  set_tests_properties(${testName}_Restart PROPERTIES DEPENDS ${testName})
 endif()

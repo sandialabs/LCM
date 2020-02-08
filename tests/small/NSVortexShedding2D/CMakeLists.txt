@@ -17,13 +17,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vortex.exo.4.3
 # Steady tests         ###
 # ##############################################################################
 
-
 # ##############################################################################
 # Transient tests        ###
 # ##############################################################################
 
 set(testName ${testNameRoot}_TransientIRK)
-
 
 if(ALBANY_IFPACK2)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputTransientRKT.yaml
@@ -33,8 +31,7 @@ if(ALBANY_IFPACK2)
     ${CMAKE_CURRENT_BINARY_DIR}/inputTransientRKT_RegressFail.yaml COPYONLY)
 
   add_test(${testName} ${Albany.exe} inputTransientRKT.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS
-                                                     "Demo;Tpetra;Forward")
+  set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
 
   add_test(NAME ${testName}_RegressFail
            COMMAND ${Albany.exe} inputTransientRKT_RegressFail.yaml)

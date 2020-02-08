@@ -12,15 +12,13 @@
 #include "Albany_PiroObserver.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Albany_Utils.hpp"
-
-#include "Schwarz_Alternating.hpp"
-#include "Schwarz_Coupled.hpp"
-#include "Schwarz_PiroObserver.hpp"
-
 #include "Piro_NOXSolver.hpp"
 #include "Piro_ProviderBase.hpp"
 #include "Piro_SolverFactory.hpp"
 #include "Piro_StratimikosUtils.hpp"
+#include "Schwarz_Alternating.hpp"
+#include "Schwarz_Coupled.hpp"
+#include "Schwarz_PiroObserver.hpp"
 #include "Stratimikos_DefaultLinearSolverBuilder.hpp"
 
 #ifdef ALBANY_IFPACK2

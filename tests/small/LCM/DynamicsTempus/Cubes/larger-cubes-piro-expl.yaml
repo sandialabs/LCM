@@ -56,7 +56,7 @@ LCM:
             Stratimikos Linear Solver:
               NOX Stratimikos Options: { }
               Stratimikos:
-                Linear Solver Type: AztecOO
+                Linear Solver Type: Belos
                 Linear Solver Types:
                   Belos:
                     Solver Type: Block GMRES
@@ -152,7 +152,7 @@ LCM:
           Stratimikos Linear Solver:
             NOX Stratimikos Options: { }
             Stratimikos:
-              Linear Solver Type: AztecOO
+              Linear Solver Type: Belos
               Linear Solver Types:
                 Belos:
                   Solver Type: Block GMRES

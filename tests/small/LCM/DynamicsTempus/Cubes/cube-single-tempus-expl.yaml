@@ -72,7 +72,7 @@ LCM:
         Newmark Explicit Parameters:
           Gamma: 0.50
       Stratimikos:
-        Linear Solver Type: AztecOO
+        Linear Solver Type: Belos
         Linear Solver Types:
           Belos:
             Solver Type: Block GMRES

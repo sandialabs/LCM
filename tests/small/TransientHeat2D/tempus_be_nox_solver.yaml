@@ -117,7 +117,7 @@ ANONYMOUS:
         Demo Predictor: 
           Stepper Type: Forward Euler
       Stratimikos: 
-        Linear Solver Type: AztecOO
+        Linear Solver Type: Belos
         Linear Solver Types: 
           Belos: 
             Solver Type: Block GMRES

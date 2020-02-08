@@ -62,7 +62,6 @@ cmake \
  -D TPL_ENABLE_CUSPARSE:BOOL=lcm_enable_cusparse \
 \
  -D Amesos2_ENABLE_KLU2:BOOL=ON \
- -D EpetraExt_USING_HDF5:BOOL=OFF \
  -D MiniTensor_ENABLE_TESTS:BOOL=ON \
  -D ROL_ENABLE_TESTS:BOOL=OFF \
  -D Phalanx_INDEX_SIZE_TYPE:STRING="lcm_phalanx_index_type" \
@@ -82,15 +81,15 @@ cmake \
  -D TPL_Netcdf_PARALLEL:BOOL=ON \
 \
  -D Trilinos_ENABLE_Amesos2:BOOL=ON \
- -D Trilinos_ENABLE_Amesos:BOOL=ON \
+ -D Trilinos_ENABLE_Amesos:BOOL=OFF \
  -D Trilinos_ENABLE_Anasazi:BOOL=ON \
- -D Trilinos_ENABLE_AztecOO:BOOL=ON \
+ -D Trilinos_ENABLE_AztecOO:BOOL=OFF \
  -D Trilinos_ENABLE_Belos:BOOL=ON \
  -D Trilinos_ENABLE_EXAMPLES:BOOL=OFF \
- -D Trilinos_ENABLE_Epetra:BOOL=ON \
- -D Trilinos_ENABLE_EpetraExt:BOOL=ON \
+ -D Trilinos_ENABLE_Epetra:BOOL=OFF \
+ -D Trilinos_ENABLE_EpetraExt:BOOL=OFF \
  -D Trilinos_ENABLE_Ifpack2:BOOL=ON \
- -D Trilinos_ENABLE_Ifpack:BOOL=ON \
+ -D Trilinos_ENABLE_Ifpack:BOOL=OFF \
  -D Trilinos_ENABLE_Intrepid2:BOOL=ON \
  -D Trilinos_ENABLE_Kokkos:BOOL=ON \
  -D Trilinos_ENABLE_KokkosAlgorithms:BOOL=ON \
@@ -114,7 +113,7 @@ cmake \
  -D Trilinos_ENABLE_Shards:BOOL=ON \
  -D Trilinos_ENABLE_Stratimikos:BOOL=ON \
  -D Trilinos_ENABLE_TESTS:BOOL=OFF \
- -D Trilinos_ENABLE_Teko:BOOL=ON \
+ -D Trilinos_ENABLE_Teko:BOOL=OFF \
  -D Trilinos_ENABLE_Tempus:BOOL=ON \
  -D Trilinos_ENABLE_Teuchos:BOOL=ON \
  -D Trilinos_ENABLE_Thyra:BOOL=ON \

@@ -80,21 +80,8 @@ LCM:
                       Block Size: 1
                       Num Blocks: 200
                       Flexible Gmres: false
-              Preconditioner Type: Teko
+              Preconditioner Type: Ifpack2
               Preconditioner Types:
-                Teko:
-                  Inverse Type: Ifpack2
-                  Write Block Operator: false
-                  Test Block Operator: false
-                  Inverse Factory Library:
-                    Iterative Preconditioner:
-                      Type: Ifpack2
-                      Overlap: 2
-                      Prec Type: ILUT
-                      Ifpack2 Settings:
-                        'fact: drop tolerance': 0.00000000e+00
-                        'fact: ilut level-of-fill': 1.00000000
-                        'fact: level-of-fill': 1
                 Ifpack2:
                   Overlap: 2
                   Prec Type: ILUT

@@ -38,7 +38,7 @@ ANONYMOUS:
         VerboseObject: 
           Verbosity Level: none
       Stratimikos: 
-        Linear Solver Type: AztecOO
+        Linear Solver Type: Belos
         Preconditioner Type: Ifpack
       Rythmos Integration Control: 
         Take Variable Steps: false

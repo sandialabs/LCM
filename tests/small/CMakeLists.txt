@@ -52,7 +52,6 @@ if(ALBANY_STK)
     add_subdirectory(ComprNS)
     add_subdirectory(ODE)
     add_subdirectory(ThermoElectrostatics2D)
-    # add_subdirectory(TekoPrec)
 
     # These require exodus, Ioss, stk_io, to read meshes
     if(ALBANY_SEACAS)
@@ -61,11 +60,6 @@ if(ALBANY_STK)
       add_subdirectory(NSRayleighBernard2D)
       add_subdirectory(NSVortexShedding2D)
       add_subdirectory(PNP)
-    endif()
-
-    if(ALBANY_ASCR)
-      add_subdirectory(CoupledReactor)
-      add_subdirectory(NSReactor)
     endif()
 
   endif(ALBANY_DEMO_PDES)

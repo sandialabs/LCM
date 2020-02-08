@@ -17,7 +17,3 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/lower_bar_material.yaml
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/upper_bar_material.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/upper_bar_material.yaml COPYONLY)
 
-if(ALBANY_DTK)
-  add_subdirectory(matrixFree)
-endif()
-add_subdirectory(modified)

@@ -95,15 +95,6 @@ LCM:
                     'fact: drop tolerance': 0.00000000e+00
                     'fact: ilut level-of-fill': 1.00000000
                     'fact: level-of-fill': 1
-                ML:
-                  Base Method Defaults: none
-                  ML Settings:
-                    default values: SA
-                    'aggregation: damping factor': 0.00000000e+00
-                    'coarse: type': 'Amesos-KLU'
-                    PDE equations: 3
-                    'smoother: type': ILU
-                    'coarse: max size': 1000
       Line Search:
         Full Step:
           Full Step: 1.00000000

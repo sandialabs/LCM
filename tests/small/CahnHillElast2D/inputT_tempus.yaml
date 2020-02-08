@@ -109,11 +109,6 @@ ANONYMOUS:
         Linear Solver Type: Belos
         Preconditioner Type: Ifpack2
         Preconditioner Types: 
-          ML: 
-            Base Method Defaults: SA
-            ML Settings: 
-              'aggregation: type': Uncoupled
-              'coarse: max size': 20
               'coarse: pre or post': post
               'coarse: sweeps': 1
               'coarse: type': Amesos-KLU

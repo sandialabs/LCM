@@ -91,16 +91,6 @@ LCM:
                       Flexible Gmres: false
               Preconditioner Type: ML
               Preconditioner Types:
-                ML:
-                  Base Method Defaults: none
-                  ML Settings:
-                    default values: SA
-                    'aggregation: damping factor': 0.00000000e+00
-                    'coarse: type': 'Amesos-KLU'
-                    PDE equations: 3
-                    'smoother: type': ILU
-                    'coarse: max size': 1000
-                    ML output: 10
                 Ifpack:
                   Overlap: 2
                   Prec Type: ILU

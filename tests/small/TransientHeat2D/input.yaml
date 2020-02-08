@@ -71,18 +71,4 @@ ANONYMOUS:
             Overlap: 1
             Ifpack Settings: 
               'fact: level-of-fill': 1
-          ML: 
-            Base Method Defaults: SA
-            ML Settings: 
-              'aggregation: type': Uncoupled
-              'coarse: max size': 20
-              'coarse: pre or post': post
-              'coarse: sweeps': 1
-              'coarse: type': Amesos-KLU
-              prec type: MGV
-              'smoother: type': Gauss-Seidel
-              'smoother: damping factor': 6.60000000000000031e-01
-              'smoother: pre or post': both
-              'smoother: sweeps': 1
-              ML output: 1
 ...

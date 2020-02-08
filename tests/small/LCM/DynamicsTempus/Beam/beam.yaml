@@ -114,15 +114,6 @@ LCM:
       Stratimikos:
         Linear Solver Type: Belos
         Linear Solver Types:
-          AztecOO:
-            Forward Solve:
-              AztecOO Settings:
-                Aztec Solver: GMRES
-                Convergence Test: r0
-                Size of Krylov Subspace: 200
-                Output Frequency: 1
-              Max Iterations: 100
-              Tolerance: 1e-5
           Belos:
             Solver Type: Block GMRES
             Solver Types:

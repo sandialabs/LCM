@@ -68,15 +68,6 @@ LCM:
                         Verbosity: 33
                         Maximum Iterations: 100
                         Num Blocks: 100
-                  AztecOO:
-                    Forward Solve:
-                      AztecOO Settings:
-                        Aztec Solver: GMRES
-                        Convergence Test: r0
-                        Size of Krylov Subspace: 200
-                        Output Frequency: 10
-                      Max Iterations: 100
-                      Tolerance: 1e-5
                 Preconditioner Type: Ifpack
                 Preconditioner Types:
                   Ifpack:
@@ -163,15 +154,6 @@ LCM:
             Stratimikos:
               Linear Solver Type: AztecOO
               Linear Solver Types:
-                AztecOO:
-                  Forward Solve:
-                    AztecOO Settings:
-                      Aztec Solver: GMRES
-                      Convergence Test: r0
-                      Size of Krylov Subspace: 200
-                      Output Frequency: 10
-                    Max Iterations: 200
-                    Tolerance: 1.00000000e-05
                 Belos:
                   Solver Type: Block GMRES
                   Solver Types:

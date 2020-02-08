@@ -83,15 +83,6 @@ ANONYMOUS:
             Stratimikos: 
               Linear Solver Type: AztecOO
               Linear Solver Types: 
-                AztecOO: 
-                  Forward Solve: 
-                    AztecOO Settings: 
-                      Aztec Solver: GMRES
-                      Convergence Test: r0
-                      Size of Krylov Subspace: 30
-                      Output Frequency: 20
-                    Max Iterations: 250
-                    Tolerance: 9.99999999999999980e-13
                   VerboseObject: 
                     Verbosity Level: none
               Preconditioner Type: ML

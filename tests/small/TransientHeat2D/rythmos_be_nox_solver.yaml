@@ -88,18 +88,8 @@ ANONYMOUS:
         VerboseObject: 
           Verbosity Level: none
       Stratimikos: 
-        Linear Solver Type: AztecOO
+        Linear Solver Type: Belos 
         Linear Solver Types: 
-          AztecOO: 
-            Forward Solve: 
-              AztecOO Settings: 
-                Aztec Solver: GMRES
-                Convergence Test: r0
-                Size of Krylov Subspace: 200
-                Output Frequency: 1
-              Max Iterations: 100
-              Tolerance: 1.00000000000000002e-02
-            Output Every RHS: true
           Belos: 
             Solver Type: Block GMRES
             Solver Types: 

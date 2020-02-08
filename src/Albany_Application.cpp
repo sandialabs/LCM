@@ -237,7 +237,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     solMethod = Transient;
   } else if (
       solutionMethod == "Transient Tempus" || "Transient Tempus No Piro") {
-#ifdef ALBANY_TEMPUS
     solMethod = TransientTempus;
 
     // Add NOX pre-post-operator for debugging.
@@ -333,14 +332,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     }
 #endif  // DEBUG
 
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        true,
-        std::logic_error,
-        "Solution Method = "
-            << solutionMethod << " is not valid because "
-            << "Trilinos was not built with Tempus turned ON.\n");
-#endif
   } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,

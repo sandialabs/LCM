@@ -484,16 +484,8 @@ endif()
 list(FIND Trilinos_PACKAGE_LIST Tempus Tempus_List_ID)
 if(Tempus_List_ID GREATER -1)
   message("-- Looking for Tempus in Trilinos:   Found")
-  set(ALBANY_TEMPUS TRUE)
 else()
-  message("-- Looking for Tempus in Trilinos:   NOT found.")
-  if(ENABLE_LCM)
-    message(
-      FATAL_ERROR
-        "LCM enabled but Tempus not installed from Trilinos (LCM needs Tempus)!  Please recompile Trilinos with Tempus enabled."
-    )
-  endif()
-  set(ALBANY_TEMPUS FALSE)
+  message(FATAL_ERROR "Tempus is required.")
 endif()
 
 # ##############################################################################

@@ -3,8 +3,6 @@
 # Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 # in the file license.txt in the top-level Albany directory.
 #
-
-# Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.g
                ${CMAKE_CURRENT_BINARY_DIR}/cube.g COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material.yaml
@@ -14,11 +12,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.yaml
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-if(ALBANY_TEMPUS)
-  if(ALBANY_IFPACK2)
-    add_test(Serial_Dynamic_${testName}_NewmarkImplicitDForm_Tempus
-             ${SerialAlbany.exe} cube.yaml)
-    set_tests_properties(Serial_Dynamic_${testName}_NewmarkImplicitDForm_Tempus
-                         PROPERTIES LABELS "LCM;Tpetra;Forward")
-  endif()
-endif()
+add_test(Serial_Dynamic_${testName}_NewmarkImplicitDForm_Tempus
+  ${SerialAlbany.exe} cube.yaml)
+set_tests_properties(Serial_Dynamic_${testName}_NewmarkImplicitDForm_Tempus
+  PROPERTIES LABELS "LCM;Tpetra;Forward")

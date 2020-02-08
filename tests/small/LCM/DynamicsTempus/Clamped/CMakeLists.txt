@@ -12,8 +12,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped-stk.yaml
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-# if (ALBANY_TEMPUS) if (ALBANY_IFPACK2)
 # add_test(Dynamic_${testName}_NewmarkImplicitAForm_Tempus ${Albany.exe}
 # clamped-stk.yaml)
 # add_test(Dynamic_${testName}_NewmarkImplicitAForm_Tempus_Shift ${Albany.exe}
-# clamped-stk-shift.yaml) endif() endif()
+# clamped-stk-shift.yaml)

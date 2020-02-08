@@ -4,7 +4,6 @@
 # in the file license.txt in the top-level Albany directory.
 #
 
-# Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material-clamped-ct.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/material-clamped-ct.yaml COPYONLY)
 configure_file(
@@ -25,17 +24,13 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_ct.g.4.3
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-if(ALBANY_TEMPUS)
-  if(ALBANY_IFPACK2)
-    add_test(${testName}_NewmarkImplicitDForm_CompositeTet10_AnalyticMass
-             ${Albany.exe} clamped-ct.yaml)
-    set_tests_properties(
-      ${testName}_NewmarkImplicitDForm_CompositeTet10_AnalyticMass
-      PROPERTIES LABELS "LCM;Tpetra;Forward")
-    add_test(${testName}_NewmarkExplicitAForm_CompositeTet10_LumpedMass
-             ${Albany.exe} clamped-ct-expl.yaml)
-    set_tests_properties(
-      ${testName}_NewmarkExplicitAForm_CompositeTet10_LumpedMass
-      PROPERTIES LABELS "LCM;Tpetra;Forward")
-  endif()
-endif()
+add_test(${testName}_NewmarkImplicitDForm_CompositeTet10_AnalyticMass
+  ${Albany.exe} clamped-ct.yaml)
+set_tests_properties(
+  ${testName}_NewmarkImplicitDForm_CompositeTet10_AnalyticMass
+  PROPERTIES LABELS "LCM;Tpetra;Forward")
+add_test(${testName}_NewmarkExplicitAForm_CompositeTet10_LumpedMass
+  ${Albany.exe} clamped-ct-expl.yaml)
+set_tests_properties(
+  ${testName}_NewmarkExplicitAForm_CompositeTet10_LumpedMass
+  PROPERTIES LABELS "LCM;Tpetra;Forward")

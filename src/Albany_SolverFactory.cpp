@@ -316,10 +316,8 @@ SolverFactory::createAlbanyAppAndModel(
     std::string piroSolverToken;
     if (solutionMethod == "Steady") {
       piroSolverToken = "NOX";
-#ifdef ALBANY_TEMPUS
     } else if (solutionMethod == "Transient Tempus") {
       piroSolverToken = "Tempus";
-#endif
     } else {
       // Piro cannot handle the corresponding problem
       piroSolverToken = "Unsupported";

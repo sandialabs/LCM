@@ -8,6 +8,3 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputLumped.yaml
 # 1. Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # 1. Create the test with this name and standard executable
-if(ALBANY_EPETRA)
-  # No Epetra for LCM
-endif()

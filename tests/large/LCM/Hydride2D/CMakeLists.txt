@@ -14,7 +14,3 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 # 1. Create the test with this name and standard executable
 
-if(ALBANY_EPETRA)
-  add_test(${testName} ${Albany.exe})
-  set_tests_properties(${testName} PROPERTIES LABELS "LCM;Epetra;Forward")
-endif()

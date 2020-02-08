@@ -1,10 +1,6 @@
 #ifndef ALBANY_CONFIG_H
 #define ALBANY_CONFIG_H
 
-// ======================== Albany packages and subpackages macros ============================== //
-
-#cmakedefine ALBANY_LCM
-
 // ===================== Macros to identify packages found in Trilinos ======================= //
 
 #cmakedefine ALBANY_AMESOS2
@@ -20,7 +16,6 @@
 #cmakedefine ALBANY_STK
 #cmakedefine ALBANY_STK_PERCEPT
 #cmakedefine ALBANY_STK_REBALANCE
-#cmakedefine ALBANY_TEKO
 #cmakedefine ALBANY_TEMPUS
 #cmakedefine ALBANY_ZOLTAN
 
@@ -89,12 +84,10 @@
 
 // ================ Package-specific macros ================= //
 
-#ifdef ALBANY_LCM
   // --- LCM
   #cmakedefine ALBANY_LAME
   #cmakedefine ALBANY_LAMENT
   #cmakedefine LCM_SPECULATIVE
   #cmakedefine ALBANY_YAML
-#endif
 
 #endif // ALBANY_CONFIG_H

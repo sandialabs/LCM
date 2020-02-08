@@ -45,7 +45,6 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
     return buildLatticeOrientation;
   }
 
-#if defined(ALBANY_LCM)
   bool
   hasCellBoundaryIndicatorField() const
   {
@@ -66,7 +65,6 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   {
     return build_node_boundary_indicator;
   }
-#endif
 
   void
   fillSolnVector(
@@ -150,12 +148,10 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   bool buildSphereVolume;
   bool buildLatticeOrientation;
 
-#if defined(ALBANY_LCM)
   bool build_cell_boundary_indicator{false};
   bool build_face_boundary_indicator{false};
   bool build_edge_boundary_indicator{false};
   bool build_node_boundary_indicator{false};
-#endif
 
   // Containers for residual and solution
 

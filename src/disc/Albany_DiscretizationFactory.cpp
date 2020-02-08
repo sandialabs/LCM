@@ -22,9 +22,9 @@
 #include "Albany_GmshSTKMeshStruct.hpp"
 #endif
 
-#if defined(ALBANY_LCM) && defined(ALBANY_STK)
+#if defined(ALBANY_STK)
 #include "Topology_Utils.hpp"
-#endif  // ALBANY_LCM
+#endif
 
 Albany::DiscretizationFactory::DiscretizationFactory(
     const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
@@ -52,7 +52,6 @@ Albany::DiscretizationFactory::DiscretizationFactory(
   }
 }
 
-#if defined(ALBANY_LCM)
 
 namespace {
 
@@ -166,7 +165,6 @@ createInterfaceParts(
 
 }  // anonymous namespace
 
-#endif  // ALBANY_LCM
 
 Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>
 Albany::DiscretizationFactory::createMeshSpecs()
@@ -174,11 +172,11 @@ Albany::DiscretizationFactory::createMeshSpecs()
   // First, create the mesh struct
   meshStruct = createMeshStruct(discParams, adaptParams, commT);
 
-#if defined(ALBANY_LCM) && defined(ALBANY_STK)
+#if defined(ALBANY_STK)
   // Add an interface block. For now relies on STK, so we force a cast that
   // will fail if the underlying meshStruct is not based on STK.
   createInterfaceParts(adaptParams, meshStruct);
-#endif  // ALBANY_LCM
+#endif
   return meshStruct->getMeshSpecs();
 }
 

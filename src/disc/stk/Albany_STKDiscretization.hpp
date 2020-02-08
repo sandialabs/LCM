@@ -276,7 +276,6 @@ class STKDiscretization : public AbstractDiscretization
     return latticeOrientation;
   }
 
-#if defined(ALBANY_LCM)
   WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
   getCellBoundaryIndicator() const
   {
@@ -313,7 +312,6 @@ class STKDiscretization : public AbstractDiscretization
 
   void
   printWsElNodeID() const;
-#endif
 
   //! Print the coordinates for debugging
   void
@@ -465,10 +463,8 @@ class STKDiscretization : public AbstractDiscretization
   Teuchos::RCP<Thyra_MultiVector>
   getSolutionMV(const bool overlapped = false) const;
 
-#if defined(ALBANY_LCM)
   void
   setResidualField(const Thyra_Vector& residual);
-#endif
 
   void
   getField(Thyra_Vector& field_vector, const std::string& field_name) const;
@@ -690,12 +686,10 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<Teuchos::ArrayRCP<double>>::type  sphereVolume;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type latticeOrientation;
 
-#if defined(ALBANY_LCM)
   WorksetArray<Teuchos::ArrayRCP<double*>>::type cell_boundary_indicator;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type face_boundary_indicator;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type edge_boundary_indicator;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type node_boundary_indicator;
-#endif
 
 #ifdef ALBANY_CONTACT
   Teuchos::RCP<ContactManager> contactManager;

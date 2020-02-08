@@ -12,10 +12,6 @@ if(SEACAS_EXODIFF AND SEACAS_ALGEBRA)
                           ${CMAKE_CURRENT_BINARY_DIR}/algebra)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run_algebra.sh
                  ${CMAKE_CURRENT_BINARY_DIR}/run_algebra.sh COPYONLY)
-  if(ALBANY_EPETRA)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
-                            ${CMAKE_CURRENT_BINARY_DIR}/Albany)
-  endif()
   if(ALBANY_IFPACK2)
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
                             ${CMAKE_CURRENT_BINARY_DIR}/Albany)

@@ -42,7 +42,6 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
     return false;
   }
 
-#if defined(ALBANY_LCM)
   bool
   hasCellBoundaryIndicatorField() const
   {
@@ -63,7 +62,6 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   {
     return build_node_boundary_indicator;
   }
-#endif
 
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>
   getSolutionFieldArray()
@@ -77,13 +75,11 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
     return solution_field[0];
   };
 
-#if defined(ALBANY_LCM)
   AbstractSTKFieldContainer::VectorFieldType*
   getResidualField()
   {
     return residual_field;
   };
-#endif
 #if defined(ALBANY_DTK)
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>
   getSolutionFieldDTKArray()
@@ -175,12 +171,10 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
 
   bool buildSphereVolume;
 
-#if defined(ALBANY_LCM)
   bool build_cell_boundary_indicator{false};
   bool build_face_boundary_indicator{false};
   bool build_edge_boundary_indicator{false};
   bool build_node_boundary_indicator{false};
-#endif
 
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field;
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>

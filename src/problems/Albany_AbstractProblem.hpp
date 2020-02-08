@@ -50,10 +50,8 @@ enum SolutionMethodType
   Unknown
 };
 
-#if defined(ALBANY_LCM)
 // Forward declaration needed for Schwarz coupling.
 class Application;
-#endif  // ALBANY_LCM
 
 enum FieldManagerChoice
 {
@@ -239,7 +237,6 @@ class AbstractProblem
   AbstractProblem&
   operator=(const AbstractProblem&);
 
-#if defined(ALBANY_LCM)
  public:
   void
   setApplication(Teuchos::RCP<Application> const& a)
@@ -255,7 +252,6 @@ class AbstractProblem
 
  private:
   Teuchos::RCP<Application> app_;
-#endif  // ALBANY_LCM
 };
 
 template <typename ProblemType>

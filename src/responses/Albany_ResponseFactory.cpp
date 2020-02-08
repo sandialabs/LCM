@@ -143,10 +143,8 @@ Albany::ResponseFactory::createResponseFunction(
       name == "AMP Energy") {
     responseParams.set("Name", name);
     for (int i = 0; i < meshSpecs.size(); i++) {
-#if defined(ALBANY_LCM)
       // Skip if dealing with interface block
       // if (meshSpecs[i]->ebName == "Surface Element") continue;
-#endif
       responses.push_back(rcp(new Albany::FieldManagerScalarResponseFunction(
           app, prob, meshSpecs[i], stateMgr, responseParams)));
     }
@@ -155,10 +153,8 @@ Albany::ResponseFactory::createResponseFunction(
   else if (name == "IP to Nodal Field" || name == "Project IP to Nodal Field") {
     responseParams.set("Name", name);
     for (int i = 0; i < meshSpecs.size(); i++) {
-#if defined(ALBANY_LCM)
       // Skip if dealing with interface block
       // if (meshSpecs[i]->ebName == "Surface Element") continue;
-#endif
       // For these RFs, default to true for this parm.
       const char* reb_parm = "Restrict to Element Block";
       if (!responseParams.isType<bool>(reb_parm) &&

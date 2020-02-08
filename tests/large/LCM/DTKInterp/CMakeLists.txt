@@ -6,8 +6,6 @@
 
 # This test is not currently set up to run on the BGQ...
 if(NOT ALBANY_PARALLEL_ONLY
-   AND ALBANY_LCM
-   AND LCM_TEST_EXES
    AND ALBANY_DTK)
   set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
   add_subdirectory(Meshes)

@@ -13,7 +13,7 @@
 #include "Albany_ThyraUtils.hpp"
 #include "Albany_Utils.hpp"
 
-#if defined(ALBANY_LCM) && defined(ALBANY_STK)
+#if defined(ALBANY_STK)
 #include "Schwarz_Alternating.hpp"
 #include "Schwarz_Coupled.hpp"
 #include "Schwarz_PiroObserver.hpp"
@@ -173,7 +173,7 @@ SolverFactory::createAndGetAlbanyApp(
   const std::string solutionMethod =
       problemParams->get("Solution Method", "Steady");
 
-#if defined(ALBANY_LCM) && defined(ALBANY_STK)
+#if defined(ALBANY_STK)
   bool const is_schwarz = solutionMethod == "Coupled Schwarz" ||
                           solutionMethod == "Schwarz Alternating";
 

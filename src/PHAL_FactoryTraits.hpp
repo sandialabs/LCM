@@ -8,7 +8,6 @@
 
 #include "Albany_config.h"
 
-#if defined(ALBANY_LCM)
 #include "LCM/evaluators/Time.hpp"
 #include "LCM/evaluators/bc/EquilibriumConcentrationBC.hpp"
 #include "LCM/evaluators/bc/KfieldBC.hpp"
@@ -19,7 +18,6 @@
 #include "LCM/evaluators/bc/SchwarzBC.hpp"
 #include "LCM/evaluators/bc/StrongSchwarzBC.hpp"
 #endif  // ALBANY_STK
-#endif  // ALBANY_LCM
 
 #include "PHAL_Dirichlet.hpp"
 #include "PHAL_DirichletCoordinateFunction.hpp"
@@ -78,14 +76,12 @@ struct DirichletFactoryTraits
       PHAL::TimeDepDBC<_, Traits>,              //  5
       PHAL::TimeDepSDBC<_, Traits>,             //  6
       PHAL::SDirichlet<_, Traits>               //  7
-#if defined(ALBANY_LCM)
       ,
       LCM::KfieldBC<_, Traits>,                    //  8
       LCM::EquilibriumConcentrationBC<_, Traits>,  // 9
       LCM::Time<_, Traits>,                        //  10
       LCM::TorsionBC<_, Traits>                    // 11
-#endif
-#if defined(ALBANY_LCM) && defined(ALBANY_STK)
+#if defined(ALBANY_STK)
       ,
       LCM::SchwarzBC<_, Traits>,        // 12
       LCM::StrongSchwarzBC<_, Traits>,  // 13
@@ -113,10 +109,8 @@ struct NeumannFactoryTraits
       PHAL::GatherSolution<_, Traits>,             //  3
       PHAL::LoadStateField<_, Traits>,             //  4
       PHAL::GatherScalarNodalParameter<_, Traits>  //  5
-#if defined(ALBANY_LCM)
       ,
       LCM::TimeTracBC<_, Traits>  //  6
-#endif
       >
       EvaluatorTypes;
 };

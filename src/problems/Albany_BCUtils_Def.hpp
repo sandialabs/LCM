@@ -588,7 +588,6 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
     }
   }
 
-#ifdef ALBANY_LCM
   ///
   /// Torsion BC specific
   ////
@@ -681,7 +680,6 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
     }
   }
 
-#endif  // ALBANY_LCM
 
   ///
   /// SDBC (S = "Symmetric", f.k.a. "Strong")
@@ -735,7 +733,6 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
     }
   }
 
-#if defined(ALBANY_LCM)
   ///
   /// Schwarz BC specific
   ///
@@ -891,7 +888,6 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
     }
   }
 
-#endif
   ///
   /// SideSet equations case: DBC to handle nodes not on the side set
   ///
@@ -1092,7 +1088,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
     }
   }
 
-#if defined(ALBANY_LCM)
 
   ///
   /// Time dependent BC specific
@@ -1190,7 +1185,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
     }
   }
 
-#endif
 
   // Build evaluator for Gather Coordinate Vector
   string NeuGCV = "Evaluator for Gather Coordinate Vector";

@@ -629,10 +629,8 @@ if(ALBANY_DEMO_PDES)
   set(ALBANY_LIBRARIES ${ALBANY_LIBRARIES} albanyPDEs)
 endif()
 
-if(ALBANY_LCM)
-  add_subdirectory(LCM)
-  set(ALBANY_LIBRARIES ${ALBANY_LIBRARIES} LCM)
-endif()
+add_subdirectory(LCM)
+set(ALBANY_LIBRARIES ${ALBANY_LIBRARIES} LCM)
 
 # Can remove this once rebalance is in Trilnos again
 if(ALBANY_STK_REBALANCE)

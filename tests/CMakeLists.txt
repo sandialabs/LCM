@@ -72,22 +72,20 @@ else()
   set(Albany.exe ${AlbanyPath})
 endif()
 
-if(ALBANY_LCM)
-  set(PartitionTest.exe ${Albany_BINARY_DIR}/src/LCM/PartitionTest)
-  set(Subdivision.exe ${Albany_BINARY_DIR}/src/LCM/Subdivision)
-  set(MPS.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulator)
-  set(MPST.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulatorT)
-  set(DTK_Interp_and_Error.exe
-      ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_and_Error)
-  set(DTK_Interp_Volume_to_NS.exe
-      ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_Volume_to_NS)
-  if(ALBANY_MPI)
-    set(Parallel_DTK_Interp_and_Error.exe ${PARALLEL_CALL}
-                                          ${DTK_Interp_and_Error.exe})
-    set(Parallel_DTK_Interp_Volume_to_NS.exe ${PARALLEL_CALL}
-                                             ${DTK_Interp_Volume_to_NS.exe})
-  endif()
-endif(ALBANY_LCM)
+set(PartitionTest.exe ${Albany_BINARY_DIR}/src/LCM/PartitionTest)
+set(Subdivision.exe ${Albany_BINARY_DIR}/src/LCM/Subdivision)
+set(MPS.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulator)
+set(MPST.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulatorT)
+set(DTK_Interp_and_Error.exe
+    ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_and_Error)
+set(DTK_Interp_Volume_to_NS.exe
+    ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_Volume_to_NS)
+if(ALBANY_MPI)
+  set(Parallel_DTK_Interp_and_Error.exe ${PARALLEL_CALL}
+                                        ${DTK_Interp_and_Error.exe})
+  set(Parallel_DTK_Interp_Volume_to_NS.exe ${PARALLEL_CALL}
+                                           ${DTK_Interp_Volume_to_NS.exe})
+endif()
 
 add_subdirectory(small)
 if(ALBANY_LARGE_TESTS)

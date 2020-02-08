@@ -1209,7 +1209,6 @@ STKDiscretization::monotonicTimeLabel(const double time)
   return previous_time_label;
 }
 
-#if defined(ALBANY_LCM)
 void
 STKDiscretization::setResidualField(const Thyra_Vector& residual)
 {
@@ -1283,7 +1282,6 @@ STKDiscretization::printWsElNodeID() const
     }
   }
 }
-#endif
 
 Teuchos::RCP<Thyra_Vector>
 STKDiscretization::getSolutionField(bool overlapped) const
@@ -1889,7 +1887,6 @@ STKDiscretization::computeWorksetInfo()
         stkMeshStruct->getFieldContainer()->getLatticeOrientationField();
   }
 
-#if defined(ALBANY_LCM)
   stk::mesh::FieldBase* cell_boundary_indicator_field{nullptr};
   stk::mesh::FieldBase* face_boundary_indicator_field{nullptr};
   stk::mesh::FieldBase* edge_boundary_indicator_field{nullptr};
@@ -1910,7 +1907,6 @@ STKDiscretization::computeWorksetInfo()
     node_boundary_indicator_field =
         stkMeshStruct->getFieldContainer()->getNodeBoundaryIndicator();
   }
-#endif
 
   wsEBNames.resize(numBuckets);
   for (int i = 0; i < numBuckets; i++) {
@@ -1943,12 +1939,10 @@ STKDiscretization::computeWorksetInfo()
   coords.resize(numBuckets);
   sphereVolume.resize(numBuckets);
   latticeOrientation.resize(numBuckets);
-#if defined(ALBANY_LCM)
   cell_boundary_indicator.resize(numBuckets);
   face_boundary_indicator.resize(numBuckets);
   edge_boundary_indicator.resize(numBuckets);
   node_boundary_indicator.resize(numBuckets);
-#endif
 
   nodesOnElemStateVec.resize(numBuckets);
   stateArrays.elemStateArrays.resize(numBuckets);
@@ -2063,7 +2057,6 @@ STKDiscretization::computeWorksetInfo()
       }
     }
 
-#if defined(ALBANY_LCM)
     if (stkMeshStruct->getFieldContainer()->hasSphereVolumeField()) {
       sphereVolume[b].resize(buck.size());
     }
@@ -2073,7 +2066,6 @@ STKDiscretization::computeWorksetInfo()
     if (stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField()) {
       cell_boundary_indicator[b].resize(buck.size());
     }
-#endif
 
     stk::mesh::Entity element           = buck[0];
     int               nodes_per_element = bulkData.num_nodes(element);
@@ -2129,7 +2121,6 @@ STKDiscretization::computeWorksetInfo()
         }
       }
 
-#if defined(ALBANY_LCM)
       if (stkMeshStruct->getFieldContainer()->hasSphereVolumeField() &&
           nodes_per_element == 1) {
         double* volumeTemp =
@@ -2144,7 +2135,6 @@ STKDiscretization::computeWorksetInfo()
         cell_boundary_indicator[b][i] = static_cast<double*>(
             stk::mesh::field_data(*cell_boundary_indicator_field, element));
       }
-#endif
 
       // loop over local nodes
       DOFsStruct& dofs_struct =

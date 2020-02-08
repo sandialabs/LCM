@@ -38,7 +38,7 @@ endif()
 
 # Random Criterion & Stress Fracture depend on LCM Speculative features and
 # code, currently
-if(ALBANY_LCM AND ALBANY_STK)
+if(ALBANY_STK)
   if(LCM_SPECULATIVE)
     set(SOURCES ${SOURCES} AAdapt_RandomCriterion.cpp AAdapt_RandomFracture.cpp
                 AAdapt_StressFracture.cpp)

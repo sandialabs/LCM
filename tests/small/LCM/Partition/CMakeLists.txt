@@ -6,8 +6,6 @@
 
 # This test is not currently set up to run on the BGQ...
 if(NOT ALBANY_PARALLEL_ONLY
-   AND ALBANY_LCM
-   AND LCM_TEST_EXES
    AND ALBANY_BGL
    AND SEACAS_EXODIFF)
 

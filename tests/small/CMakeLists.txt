@@ -66,8 +66,4 @@ if(ALBANY_STK)
 
 endif(ALBANY_STK)
 
-# LCM ###############
-if(ALBANY_LCM)
-  add_subdirectory(LCM)
-endif()
-# ##############################################################################
+add_subdirectory(LCM)

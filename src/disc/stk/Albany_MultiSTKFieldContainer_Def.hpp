@@ -170,7 +170,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
     }
   }
 
-#if defined(ALBANY_LCM)
   // do the residual next
 
   if (residual_vector.size() == 0) {  // Do the default residual vector
@@ -259,10 +258,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
   }
 
   haveResidual = true;
-#else
-  // Silence compiler warning
-  (void)residual_vector;
-#endif
 
   // Do the coordinates
   this->coordinates_field =
@@ -288,7 +283,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 #endif
   }
 
-#if defined(ALBANY_LCM) && defined(ALBANY_SEACAS)
+#if defined(ALBANY_SEACAS)
   // sphere volume is a mesh attribute read from a genesis mesh file containing
   // sphere element (used for peridynamics)
   this->sphereVolume_field = metaData_->template get_field<SVFT>(
@@ -319,7 +314,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 
   initializeSTKAdaptation();
 
-#if defined(ALBANY_LCM) && defined(ALBANY_SEACAS)
+#if defined(ALBANY_SEACAS)
   bool has_cell_boundary_indicator =
       (std::find(req.begin(), req.end(), "cell_boundary_indicator") !=
        req.end());
@@ -357,7 +352,6 @@ MultiSTKFieldContainer<Interleaved>::initializeSTKAdaptation()
   stk::mesh::put_field_on_mesh(
       *this->refine_field, this->metaData->universal_part(), nullptr);
 
-#if defined(ALBANY_LCM)
   // Failure state used for mesh adaptation
   for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK;
        rank <= stk::topology::ELEMENT_RANK;
@@ -374,18 +368,15 @@ MultiSTKFieldContainer<Interleaved>::initializeSTKAdaptation()
       *this->cell_boundary_indicator,
       this->metaData->universal_part(),
       nullptr);
-#endif  // ALBANY_LCM
 
 #ifdef ALBANY_SEACAS
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
   stk::io::set_field_role(*this->refine_field, Ioss::Field::MESH);
-#if defined(ALBANY_LCM)
   for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK;
        rank <= stk::topology::ELEMENT_RANK;
        ++rank) {
     stk::io::set_field_role(*this->failure_state[rank], Ioss::Field::MESH);
   }
-#endif  // ALBANY_LCM
 #endif
 }
 

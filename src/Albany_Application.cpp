@@ -27,9 +27,7 @@
 #include "Albany_ScalarResponseFunction.hpp"
 #include "PHAL_Utilities.hpp"
 
-#if defined(ALBANY_LCM)
 #include "SolutionSniffer.hpp"
-#endif  // ALBANY_LCM
 
 using Teuchos::ArrayRCP;
 using Teuchos::getFancyOStream;
@@ -480,7 +478,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   // Create discretization object
   discFactory = rcp(new Albany::DiscretizationFactory(params, comm, expl));
 
-#if defined(ALBANY_LCM)
   // Check for Schwarz parameters
   bool const has_app_array = params->isParameter("Application Array");
   bool const has_app_index = params->isParameter("Application Index");
@@ -505,7 +502,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     this->setAppIndex(ai);
     this->setAppNameIndexMap(anim);
   }
-#endif  // ALBANY_LCM
 }
 
 void
@@ -525,11 +521,9 @@ Application::createMeshSpecs(Teuchos::RCP<AbstractMeshStruct> mesh)
 void
 Application::buildProblem()
 {
-#if defined(ALBANY_LCM)
   // This is needed for Schwarz coupling so that when Dirichlet
   // BCs are created we know what application is doing it.
   problem->setApplication(Teuchos::rcp(this, false));
-#endif  // ALBANY_LCM
 
   problem->buildProblem(meshSpecs, stateMgr);
 
@@ -1091,11 +1085,9 @@ Application::set_dfm_workset(
 
   workset.current_time = this_time;
 
-#if defined(ALBANY_LCM)
   // Needed for more specialized Dirichlet BCs (e.g. Schwarz coupling)
   workset.apps_        = apps_;
   workset.current_app_ = Teuchos::rcp(this, false);
-#endif  // ALBANY_LCM
 
   workset.distParamLib = distParamLib;
   workset.disc         = disc;
@@ -1288,7 +1280,6 @@ Application::computeGlobalResidualImpl(
     }
   }
 
-#if defined(ALBANY_LCM)
   // Store pointers to solution and time derivatives.
   // Needed for Schwarz coupling.
   if (x != Teuchos::null)
@@ -1303,7 +1294,6 @@ Application::computeGlobalResidualImpl(
     xdotdot_ = x_dotdot;
   else
     xdotdot_ = Teuchos::null;
-#endif  // ALBANY_LCM
 
   // Zero out overlapped residual
   overlapped_f->assign(0.0);
@@ -1378,13 +1368,11 @@ Application::computeGlobalResidualImpl(
   }
 
 
-#if defined(ALBANY_LCM)
   // Push the assembled residual values back into the overlap vector
   cas_manager->scatter(f, overlapped_f, CombineMode::INSERT);
   // Write the residual to the discretization, which will later (optionally)
   // be written to the output file
   disc->setResidualField(*overlapped_f);
-#endif  // ALBANY_LCM
 
   // Apply Dirichlet conditions using dfm (Dirchelt Field Manager)
 
@@ -1609,11 +1597,9 @@ Application::computeGlobalJacobianImpl(
   workset.distParamLib = distParamLib;
   workset.disc         = disc;
 
-#if defined(ALBANY_LCM)
   // Needed for more specialized Dirichlet BCs (e.g. Schwarz coupling)
   workset.apps_        = apps_;
   workset.current_app_ = Teuchos::rcp(this, false);
-#endif  // ALBANY_LCM
 
   // FillType template argument used to specialize Sacado
   dfm->evaluateFields<EvalT>(workset);
@@ -1919,11 +1905,9 @@ Application::computeGlobalTangent(
 
     workset.disc = disc;
 
-#if defined(ALBANY_LCM)
     // Needed for more specialized Dirichlet BCs (e.g. Schwarz coupling)
     workset.apps_        = apps_;
     workset.current_app_ = Teuchos::rcp(this, false);
-#endif  // ALBANY_LCM
 
     // FillType template argument used to specialize Sacado
     dfm->evaluateFields<EvalT>(workset);
@@ -2757,7 +2741,6 @@ Application::setupTangentWorksetInfo(
   workset.param_offset = param_offset;
 }
 
-#if defined(ALBANY_LCM)
 void
 Application::setCoupledAppBlockNodeset(
     std::string const& app_name,
@@ -2780,6 +2763,5 @@ Application::setCoupledAppBlockNodeset(
 
   coupled_app_index_block_nodeset_names_map_.insert(app_index_block_names);
 }
-#endif
 
 }  // namespace Albany

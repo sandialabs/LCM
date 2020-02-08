@@ -203,14 +203,6 @@ if(SET_COMPILERS_AUTOMATICALLY)
   set(CMAKE_LINKER ${Trilinos_LINKER})
 endif()
 
-# No longer needed but keep for now as this shows how to silence specific
-# warnings on Intel compiler IF(${Trilinos_CXX_COMPILER_ID} MATCHES "Intel")
-# SET(USING_INTEL TRUE) On Intel, turn of interprocedural optimization at
-# linking to keep linker from hanging This could possibly be removed with
-# further study (GAH) SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -no-
-# ip") SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd2536,2196,858,488,161,47")
-# ENDIF()
-
 # Compiler details
 set(ALBANY_CXX_COMPILER_ID ${CMAKE_CXX_COMPILER_ID})
 message("-- ALBANY_CXX_COMPILER_ID = ${ALBANY_CXX_COMPILER_ID}")
@@ -434,16 +426,6 @@ else()
   set(ALBANY_IFPACK2 FALSE)
 endif()
 
-# set optional dependency on Teko, for preconditioning
-list(FIND Trilinos_PACKAGE_LIST Teko Teko_List_ID)
-if(Teko_List_ID GREATER -1)
-  message("-- Looking for Teko:                 Found.")
-  set(ALBANY_TEKO TRUE)
-else()
-  message("-- Looking for Teko:                 NOT found.")
-  set(ALBANY_TEKO FALSE)
-endif()
-
 # set optional dependency on MueLu, for preconditioning
 list(FIND Trilinos_PACKAGE_LIST MueLu MueLu_List_ID)
 if(MueLu_List_ID GREATER -1)
@@ -523,9 +505,6 @@ else()
   set(ALBANY_TEMPUS FALSE)
 endif()
 
-set(ALBANY_EPETRA FALSE)
-set(ALBANY_DAKOTA FALSE)
-
 # ##############################################################################
 # Check for optional physics sets in Albany ###
 # ##############################################################################
@@ -542,160 +521,18 @@ else()
   set(ALBANY_DEMO_PDES FALSE)
 endif()
 
-# set optional dependency on ATO, defaults to Disabled
-option(ENABLE_LCM "Flag to turn on LCM Mechanics source code" OFF)
-option(ENABLE_ATO "Flag to turn on ATO source code" OFF)
-if(ENABLE_ATO)
-  message("-- ATO                             is Enabled")
-  set(ALBANY_ATO TRUE)
-  if(ENABLE_ISOLIB)
-    set(ATO_USES_ISOLIB TRUE)
-  endif()
-  if(ENABLE_DOTK)
-    set(ATO_USES_DOTK TRUE)
-  endif()
-  if(ENABLE_NLopt)
-    set(ATO_USES_NLOPT TRUE)
-  endif()
-  if(ENABLE_Cogent)
-    set(ATO_USES_COGENT TRUE)
-  endif()
-else()
-  message("-- ATO                             is NOT Enabled.")
-  set(ALBANY_ATO FALSE)
-endif()
-
-# set optional dependency on LCM, defaults to Disabled
 option(ENABLE_LCM_TEST_EXES "Flag to turn on LCM Mechanics test executables" ON)
 option(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS
        "Flag to turn off LCM exodiff sensitive tests" OFF)
-set(LCM_TEST_EXES FALSE)
-if(ENABLE_LCM OR ENABLE_ATO)
-  if(NOT ENABLE_LCM)
-    message(
-      "-- LCM                             is Enabled because ATO requires LCM.")
-  else()
-    message("-- LCM                             is Enabled.")
-  endif()
-  set(ALBANY_LCM TRUE)
-  if(ENABLE_LCM AND NOT ALBANY_ROL)
-    message(
-      FATAL_ERROR
-        "LCM enabled but ROL not installed from Trilinos (LCM needs ROL)")
-  endif()
-  if(ENABLE_LCM_TEST_EXES AND ALBANY_STK) # Need STK for the EXES
-    set(LCM_TEST_EXES TRUE)
-  endif()
-  if(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS)
-    message("  -- LCM exodiff sensitive tests are DISABLED!")
-    set(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS TRUE)
-  endif()
-else()
-  message("-- LCM                             is NOT Enabled.")
-  set(ALBANY_LCM FALSE)
+set(LCM_TEST_EXES TRUE)
+if(NOT ALBANY_ROL)
+  message(
+    FATAL_ERROR
+    "ROL not installed from Trilinos (LCM needs ROL)")
 endif()
-
-# set optional dependency on MPMD, defaults to Disabled
-option(ENABLE_MPMD "Flag to turn on MPMD source code" OFF)
-if(ENABLE_MPMD)
-  message("-- MPMP executable                 is Enabled.")
-  set(ALBANY_MPMD TRUE)
-else()
-  message("-- MPMP executable                 is NOT Enabled.")
-  set(ALBANY_MPMD FALSE)
-endif()
-
-# Set optional build of LandIce (Land Ice SciDAC project), defaults to Disabled
-option(ENABLE_LANDICE "Flag to turn on LandIce Source code" OFF)
-option(ENABLE_CISM_INTERFACE
-       "Flag to turn on LandIce Interface to the CISM code" OFF)
-option(ENABLE_MPAS_INTERFACE "Flag to turn on LandIce Source code" OFF)
-if(ENABLE_LANDICE)
-  message("-- LandIce                         is Enabled")
-  set(ALBANY_LANDICE TRUE)
-
-  # set optional dependency of mesh on parameters, defaults to Disabled
-  option(ENABLE_USE_CISM_FLOW_PARAMETERS
-         "Flag to use the parameters of Glen's law used by Cism" ON)
-  if(ENABLE_USE_CISM_FLOW_PARAMETERS)
-    message("  -- USE_CISM_FLOW_PARAMETERS      is Enabled.")
-    set(USE_CISM_FLOW_PARAMETERS TRUE)
-  else()
-    set(USE_CISM_FLOW_PARAMETERS FALSE)
-    message("  -- USE_CISM_FLOW_PARAMETERS      is NOT Enabled.")
-  endif()
-
-  # Set optional build of MPAS Interface for LandIce (Land Ice SciDAC project),
-  # defaults to Disabled
-  if(ENABLE_MPAS_INTERFACE)
-    message("-- MPAS_INTERFACE                  is Enabled")
-    set(MPAS_HAS_LANDICE TRUE)
-  else()
-    message("  -- MPAS_INTERFACE                is NOT Enabled.")
-    set(MPAS_HAS_LANDICE FALSE)
-  endif()
-
-  # Set optional build of CISM Interface for LandIce (Land Ice SciDAC project),
-  # defaults to Disabled
-  option(ENABLE_CISM_REDUCED_COMM
-         "Flag to turn on reduced communicator for CISM-Albany runs" ON)
-  option(ENABLE_CISM_CHECK_COMPARISONS
-         "Flag to turn on comparisons checking for CISM-Albany" OFF)
-
-  if(ENABLE_CISM_INTERFACE)
-    message("  -- CISM_INTERFACE                is Enabled")
-    set(CISM_HAS_LANDICE TRUE)
-    if(ENABLE_CISM_CHECK_COMPARISONS)
-      set(CISM_CHECK_COMPARISONS TRUE)
-      message(
-        "  -- CISM_CHECK_COMPARISONS      is Enabled. Error will be thrown if comparisons fail for CISM-Albany run."
-      )
-    else()
-      message(
-        "  -- CISM_CHECK_COMPARISONS      is Disabled.  Error will NOT be thrown if comparisons fail for CISM-Albany run.  Please be cautious when running ctest from CISM!"
-      )
-    endif()
-    if(ENABLE_CISM_REDUCED_COMM)
-      set(REDUCED_COMM TRUE)
-      message(
-        "  -- CISM_REDUCED_COMM           is Enabled.  CISM-Albany will use reduced communicator."
-      )
-    endif()
-    set(CISM_HAS_LANDICE TRUE)
-    if(NOT CISM_INCLUDE_DIR)
-      message("\nError:  CISM_INCLUDE_DIR not defined\n")
-    else()
-      message("  -- CISM_INCLUDE_DIR ${CISM_INCLUDE_DIR}")
-    endif()
-    if(NOT CISM_EXE_DIR)
-      message("\n CISM_EXE_DIR not defined.  CismAlbany test will not run.\n")
-    else()
-      message("  -- CISM_EXE_DIR ${CISM_EXE_DIR}")
-    endif()
-  else()
-    message("  -- CISM_INTERFACE                is NOT Enabled.")
-    set(CISM_HAS_LANDICE FALSE)
-  endif()
-
-else()
-  message("-- LandIce                         is NOT Enabled.")
-  set(ALBANY_LANDICE FALSE)
-  if(ENABLE_MPAS_INTERFACE)
-    message(FATAL_ERROR "\nError:  ENABLE_MPAS_INTERFACE requires ENABLE_LANDICE
-  to be ON\n")
-  elseif(ENABLE_CISM_INTERFACE)
-    message(FATAL_ERROR "\nError:  ENABLE_CISM_INTERFACE requires ENABLE_LANDICE
-  to be ON\n")
-  endif()
-endif()
-
-option(ENABLE_TSUNAMI "Flag to turn on TSUNAMI Source code" OFF)
-if(ENABLE_TSUNAMI)
-  message("-- TSUNAMI                         is Enabled")
-  set(ALBANY_TSUNAMI TRUE)
-else()
-  message("-- TSUNAMI                         is NOT Enabled.")
-  set(ALBANY_TSUNAMI FALSE)
+if(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS)
+  message("  -- LCM exodiff sensitive tests are DISABLED!")
+  set(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS TRUE)
 endif()
 
 # set optional dependency of mesh on parameters, defaults to Disabled
@@ -736,27 +573,6 @@ elseif(ENABLE_MESH_DEPENDS_ON_SOLUTION)
 else()
   message("-- PARAMETERS_DEPEND_ON_SOLUTION   is NOT Enabled.")
   set(ALBANY_PARAMETERS_DEPEND_ON_SOLUTION FALSE)
-endif()
-
-# Set optional build of Aeras (Atmosphere Dynamics LDRD), defaults to Disabled
-option(ENABLE_AERAS "Flag to turn on Aeras Source code" OFF)
-option(
-  ENABLE_AERAS_IMPLICIT_HS
-  "Flag to turn on implicit time-int scheme for Aeras hydrostatic Source code"
-  OFF)
-if(ENABLE_AERAS)
-  message("-- Aeras                           is Enabled")
-  set(ALBANY_AERAS TRUE)
-  if(ENABLE_AERAS_IMPLICIT_HS)
-    message("  -- Aeras implicit hydrostatic    is Enabled")
-    set(AERAS_IMPLICIT_HS TRUE)
-  else()
-    message("  -- Aeras implicit hydrostatic    is NOT Enabled")
-    set(AERAS_IMPLICIT_HS FALSE)
-  endif()
-else()
-  message("-- Aeras                           is NOT Enabled.")
-  set(ALBANY_AERAS FALSE)
 endif()
 
 # optional dependency on LAME, defaults to FALSE
@@ -809,29 +625,6 @@ if(ENABLE_LAMENT)
 else()
   message("-- LAMENT                          is NOT Enabled.")
   set(ALBANY_LAMENT FALSE)
-endif()
-
-# Add option for ASCR work, defaults to disabled
-option(ENABLE_ASCR
-       "Flag to turn on ASCR-funded coupled UQ research source code" OFF)
-if(ENABLE_ASCR)
-  message("-- ASCR                            is Enabled")
-  set(ALBANY_ASCR TRUE)
-else()
-  message("-- ASCR                            is NOT Enabled.")
-  set(ALBANY_ASCR FALSE)
-endif()
-
-# Set optional dependency on AMP, defaults to Disabled
-option(ENABLE_AMP
-       "Flag to turn on AMP (additive manufacturing processes) source code" OFF)
-if(ENABLE_AMP)
-  set(ALBANY_APF TRUE)
-  message("-- AMP                             is Enabled")
-  set(ALBANY_AMP TRUE)
-else()
-  message("-- AMP                             is NOT Enabled.")
-  set(ALBANY_AMP FALSE)
 endif()
 
 option(ENABLE_OMEGA_H "Enable Omega_h dependency for adaptation" OFF)
@@ -1067,27 +860,6 @@ if(ALBANY_LIBRARIES_ONLY)
     message("--->  Disabling LCM_TEST_EXES")
   endif()
 endif()
-
-# Add option to include Dakota restart tests in the test suite
-if(NOT APPLE)
-  cmake_dependent_option(
-    ENABLE_DAKOTA_RESTART_EXAMPLES "Flag to include Dakota restart tests" ON
-    "ALBANY_DAKOTA" OFF)
-else(NOT APPLE)
-  # Portable Dakota restart files is broken on MacOS, deactivate test by default
-  cmake_dependent_option(
-    ENABLE_DAKOTA_RESTART_EXAMPLES "Flag to include Dakota restart tests" OFF
-    "ALBANY_DAKOTA" OFF)
-endif(NOT APPLE)
-if(ENABLE_DAKOTA_RESTART_EXAMPLES)
-  message("-- Dakota restart testing    is Enabled")
-  set(ALBANY_DAKOTA_RESTART_EXAMPLES TRUE)
-else(ENABLE_DAKOTA_RESTART_EXAMPLES)
-  if(ALBANY_DAKOTA)
-    message("-- Dakota restart testing    is NOT Enabled")
-  endif(ALBANY_DAKOTA)
-  set(ALBANY_DAKOTA_RESTART_EXAMPLES FALSE)
-endif(ENABLE_DAKOTA_RESTART_EXAMPLES)
 
 # Set which memory analysis system routines are available.
 option(ENABLE_MALLINFO "Use mallinfo() in Albany::printMemoryAnalysis()" off)

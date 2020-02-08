@@ -94,7 +94,6 @@ class ModelEvaluator
 
   //@}
 
-#if defined(ALBANY_LCM)
   // This is here to have a sane way to handle time and avoid Thyra ME.
   ST
   getCurrentTime() const
@@ -114,7 +113,6 @@ class ModelEvaluator
   {
     nominalValues = nv;
   }
-#endif  // ALBANY_LCM
 
  protected:
   /** \name Overridden from Thyra::ModelEvaluatorDefaultBase<ST> . */
@@ -210,10 +208,8 @@ class ModelEvaluator
   //! As it says, when reportFinalPoint is called.
   bool overwriteNominalValuesWithFinalPoint;
 
-#if defined(ALBANY_LCM)
   // This is here to have a sane way to handle time and avoid Thyra ME.
   ST current_time_{0.0};
-#endif  // ALBANY_LCM
 };
 
 }  // namespace Albany

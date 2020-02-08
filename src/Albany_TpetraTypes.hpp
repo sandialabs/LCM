@@ -18,10 +18,8 @@
 
 // Tpetra includes
 // Ignore annoying warnings that pollute compile log so extensively
-#if defined(ALBANY_LCM)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
 #include "TpetraCore_config.h"
 #include "Tpetra_CrsGraph.hpp"
 #include "Tpetra_CrsMatrix.hpp"
@@ -31,9 +29,7 @@
 #include "Tpetra_Map.hpp"
 #include "Tpetra_MultiVector.hpp"
 #include "Tpetra_Operator.hpp"
-#if defined(ALBANY_LCM)
 #pragma GCC diagnostic pop
-#endif
 
 #ifndef HAVE_TPETRA_INST_DOUBLE
 #error "Albany needs Tpetra to enable double as a Scalar type"

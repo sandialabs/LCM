@@ -26,14 +26,12 @@
 #include "Albany_ThermoElectrostaticsProblem.hpp"
 #endif
 
-#if defined(ALBANY_LCM)
 #include "LCM/problems/ConstitutiveDriverProblem.hpp"
 #include "LCM/problems/ElasticityProblem.hpp"
 #include "LCM/problems/ElectroMechanicsProblem.hpp"
 #include "LCM/problems/HMCProblem.hpp"
 #include "LCM/problems/MechanicsProblem.hpp"
 #include "LCM/problems/ThermoElasticityProblem.hpp"
-#endif
 
 Albany::ProblemFactory::ProblemFactory(
     const Teuchos::RCP<Teuchos::ParameterList>&   topLevelParams,
@@ -132,7 +130,6 @@ Albany::ProblemFactory::create()
         new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 3));
   }
 #endif
-#if defined(ALBANY_LCM)
   else if (getName(method) == "Mechanics") {
     strategy = rcp(new Albany::MechanicsProblem(
         problemParams, paramLib, getNumDim(method), rc_mgr, commT));
@@ -167,7 +164,6 @@ Albany::ProblemFactory::create()
     strategy = rcp(
         new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
   }
-#endif
   else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,

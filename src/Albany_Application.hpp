@@ -517,7 +517,6 @@ class Application
       const int&                                          phxGraphVisDetail);
 
  public:
-#if defined(ALBANY_LCM)
   double
   fixTime(double const current_time) const
   {
@@ -532,25 +531,10 @@ class Application
 
     return this_time;
   }
-#else
-  double
-  fixTime(double const current_time) const
-  {
-    bool const use_time_param = paramLib->isParameter("Time") == true;
-
-    double const this_time =
-        use_time_param == true ?
-            paramLib->getRealValue<PHAL::AlbanyTraits::Residual>("Time") :
-            current_time;
-
-    return this_time;
-  }
-#endif  // ALBANY_LCM
 
   void
   setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params);
 
-#if defined(ALBANY_LCM)
   // Needed for coupled Schwarz
 
   void
@@ -704,7 +688,6 @@ class Application
 
   bool is_schwarz_alternating_{false};
 
-#endif  // ALBANY_LCM
 
  public:
   //! Get Phalanx postRegistration data
@@ -865,12 +848,10 @@ Application::loadWorksetBucketInfo(
   auto const& wsEBNames          = disc->getWsEBNames();
   auto const& sphereVolume       = disc->getSphereVolume();
   auto const& latticeOrientation = disc->getLatticeOrientation();
-#ifdef ALBANY_LCM
   auto const& cell_boundary_indicator = disc->getCellBoundaryIndicator();
   auto const& face_boundary_indicator = disc->getFaceBoundaryIndicator();
   auto const& edge_boundary_indicator = disc->getEdgeBoundaryIndicator();
   auto const& node_boundary_indicator = disc->getNodeBoundaryIndicator();
-#endif
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);
   workset.wsElNodeEqID         = wsElNodeEqID[ws];
@@ -878,12 +859,10 @@ Application::loadWorksetBucketInfo(
   workset.wsCoords             = coords[ws];
   workset.wsSphereVolume       = sphereVolume[ws];
   workset.wsLatticeOrientation = latticeOrientation[ws];
-#ifdef ALBANY_LCM
   workset.cell_boundary_indicator = cell_boundary_indicator[ws];
   workset.face_boundary_indicator = face_boundary_indicator[ws];
   workset.edge_boundary_indicator = edge_boundary_indicator[ws];
   workset.node_boundary_indicator = node_boundary_indicator[ws];
-#endif
   workset.EBName  = wsEBNames[ws];
   workset.wsIndex = ws;
 

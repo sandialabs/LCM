@@ -7,7 +7,6 @@
 #include "Albany_config.h"
 
 // Define only if ALbany is enabled
-#if defined(ALBANY_LCM)
 
 #include <stk_mesh/base/FieldBase.hpp>
 
@@ -1464,4 +1463,3 @@ Topology::findCoordinates(unsigned int nodeIdentifier)
 
 }  // namespace LCM
 
-#endif  // #if defined (ALBANY_LCM)

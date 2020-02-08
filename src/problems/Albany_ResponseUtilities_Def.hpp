@@ -11,10 +11,8 @@
 #include "PHAL_ResponseSquaredL2DifferenceSide.hpp"
 #include "PHAL_ResponseThermalEnergy.hpp"
 #include "PHAL_SaveNodalField.hpp"
-#if defined(ALBANY_LCM)
 #include "IPtoNodalField.hpp"
 #include "ProjectIPtoNodalField.hpp"
-#endif
 
 template <typename EvalT, typename Traits>
 Albany::ResponseUtilities<EvalT, Traits>::ResponseUtilities(
@@ -130,7 +128,6 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
 
     res_ev = rcp(new PHAL::SaveNodalField<EvalT, Traits>(*p, dl));
   }
-#if defined(ALBANY_LCM)
   else if (responseName == "IP to Nodal Field") {
     p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
     p->set<RCP<DataLayout>>("Dummy Data Layout", dl->dummy);
@@ -145,7 +142,6 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
     res_ev =
         rcp(new LCM::ProjectIPtoNodalField<EvalT, Traits>(*p, dl, meshSpecs));
   }
-#endif
 
   else
     TEUCHOS_TEST_FOR_EXCEPTION(

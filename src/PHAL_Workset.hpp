@@ -26,10 +26,8 @@ namespace Albany {
 class AbstractDiscretization;
 class CombineAndScatterManager;
 class DistributedParameterLibrary;
-#if defined(ALBANY_LCM)
 // Forward declaration needed for Schwarz coupling
 class Application;
-#endif
 }  // namespace Albany
 
 namespace PHAL {
@@ -110,7 +108,6 @@ struct Workset
   // parameters.
   Teuchos::RCP<Albany::AbstractDiscretization> disc;
 
-#if defined(ALBANY_LCM)
   // Needed for Schwarz coupling
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> apps_;
   Teuchos::RCP<Albany::Application>                    current_app_;
@@ -120,7 +117,6 @@ struct Workset
   Teuchos::ArrayRCP<double*>                           node_boundary_indicator;
   std::set<int>                                        fixed_dofs_;
   bool                                                 is_schwarz_bc_{false};
-#endif
 
   int spatial_dimension_{0};
 

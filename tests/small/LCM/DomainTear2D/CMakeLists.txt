@@ -29,7 +29,4 @@ set_tests_properties(${testName}_BaseProblem PROPERTIES LABELS
 add_test(${testName}_CopyRemesh ${Albany.exe} inputCR.yaml)
 set_tests_properties(${testName}_CopyRemesh PROPERTIES LABELS
                                                        "LCM;Tpetra;Forward")
-
-if(ALBANY_LCM)
-  # add_test(${testName}_TopMod ${Albany.exe} inputM.yaml)
-endif()
+# add_test(${testName}_TopMod ${Albany.exe} inputM.yaml)

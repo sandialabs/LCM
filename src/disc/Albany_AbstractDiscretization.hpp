@@ -140,7 +140,6 @@ class AbstractDiscretization
   virtual const WorksetArray<Teuchos::ArrayRCP<double*>>::type&
   getLatticeOrientation() const = 0;
 
-#if defined(ALBANY_LCM)
   WorksetArray<Teuchos::ArrayRCP<double*>>::type dummy;
   virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
   getCellBoundaryIndicator() const
@@ -181,7 +180,6 @@ class AbstractDiscretization
   printWsElNodeID() const
   {
   }
-#endif
 
   //! Print the coords for mesh debugging
   virtual void
@@ -255,10 +253,8 @@ class AbstractDiscretization
   getSolutionField(bool overlapped = false) const = 0;
   virtual Teuchos::RCP<Thyra_MultiVector>
   getSolutionMV(bool overlapped = false) const = 0;
-#if defined(ALBANY_LCM)
   virtual void
   setResidualField(const Thyra_Vector& residual) = 0;
-#endif
   virtual void
   getField(Thyra_Vector& field_vector, const std::string& field_name) const = 0;
   virtual void

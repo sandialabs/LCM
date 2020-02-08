@@ -94,10 +94,8 @@ Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     int lunk = nsNodes[inode][this->offset];
     // (*f)[lunk] = ((*x)[lunk] - this->value);
     f_nonconstView[lunk] = x_constView[lunk] - this->value;
-#if defined(ALBANY_LCM)
     // Record DOFs to avoid setting Schwarz BCs on them.
     dirichletWorkset.fixed_dofs_.insert(lunk);
-#endif
   }
 }
 

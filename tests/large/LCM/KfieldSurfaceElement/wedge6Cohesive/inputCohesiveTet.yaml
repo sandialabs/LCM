@@ -44,8 +44,9 @@ LCM:
       Bifurcation: { }
       Constraints: { }
       Predictor:
-        Method: Tangent
+        Method: Constant
       Stepper:
+        Continuation Method: Natural
         Initial Value: 0.00000000e+00
         Continuation Parameter: Time
         Max Steps: 1000
@@ -88,12 +89,12 @@ LCM:
                       Block Size: 1
                       Num Blocks: 1000
                       Flexible Gmres: false
-              Preconditioner Type: Ifpack
+              Preconditioner Type: Ifpack2
               Preconditioner Types:
-                Ifpack:
+                Ifpack2:
                   Overlap: 2
-                  Prec Type: ILU
-                  Ifpack Settings:
+                  Prec Type: ILUT
+                  Ifpack2 Settings:
                     'fact: drop tolerance': 0.00000000e+00
                     'fact: ilut level-of-fill': 1.00000000
                     'fact: level-of-fill': 1

@@ -62,9 +62,9 @@ ANONYMOUS:
         Bound Constrained: true
         bound_eps: 1.00000000000000006e-01
         
-        Use Old Reduced Space Interface: true
+        Use Old Reduced Space Interface: false
         Full Space: false
-        Use NOX Solver: false
+        Use NOX Solver: true
         
         ROL Options: 
           General: 
@@ -154,6 +154,8 @@ ANONYMOUS:
               Linear Solver Type: Belos
               Linear Solver Types: 
                 Belos: 
+                  VerboseObject: 
+                    Verbosity Level: medium
                   Solver Type: Block GMRES
                   Solver Types: 
                     Block GMRES: 
@@ -165,15 +167,14 @@ ANONYMOUS:
                       Block Size: 1
                       Num Blocks: 50
                       Flexible Gmres: false
-              Preconditioner Type: Ifpack
+              Preconditioner Type: Ifpack2
               Preconditioner Types: 
-                Ifpack: 
+                Ifpack2: 
                   Overlap: 1
-                  Prec Type: ILU
-                  Ifpack Settings: 
+                  Prec Type: RILUK
+                  Ifpack2 Settings: 
                     'fact: drop tolerance': 0.00000000000000000e+00
-                    'fact: ilut level-of-fill': 1.00000000000000000e+00
-                    'fact: level-of-fill': 1
+                    'fact: iluk level-of-fill': 0
       Line Search: 
         Full Step: 
           Full Step: 1.00000000000000000e+00

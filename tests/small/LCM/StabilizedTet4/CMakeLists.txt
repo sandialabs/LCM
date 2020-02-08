@@ -9,10 +9,10 @@ if(NOT (ALBANY_IFPACK2 AND SEACAS_EXODIFF))
 endif()
 
 # input files
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/galerkinT.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/galerkinT.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/stabilizedT.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/stabilizedT.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/galerkin.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/galerkin.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/stabilized.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/stabilized.yaml COPYONLY)
 
 # material files
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml

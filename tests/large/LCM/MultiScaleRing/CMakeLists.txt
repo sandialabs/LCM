@@ -3,8 +3,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_nobridge.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/input_nobridge.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_nobridgeT.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/input_nobridgeT.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_nobridge.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/input_nobridge.yaml COPYONLY)
 
 # 1. Copy mesh file from source to binary dir. We only need a single file as
 #   there is only one master process used in this test.
@@ -21,6 +21,6 @@ add_executable(MPALE_dummy MPALE_dummy.cpp)
 
 # 1. Run the Albany test
 
-add_test(${testName}_nobridge_SERIAL ${SerialAlbany.exe} input_nobridgeT.yaml)
+add_test(${testName}_nobridge_SERIAL ${SerialAlbany.exe} input_nobridge.yaml)
 set_tests_properties(${testName}_nobridge_SERIAL
                      PROPERTIES LABELS "LCM;Tpetra;Forward")

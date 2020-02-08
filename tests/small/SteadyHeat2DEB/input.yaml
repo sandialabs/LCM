@@ -25,7 +25,7 @@ ANONYMOUS:
     Element Blocks: 2
     Block 0: 'begins at (0, 0) ends at (39, 40) length (0.975, 1.0) named MatA'
     Block 1: 'begins at (39, 0) ends at (40, 40) length (0.025, 1.0) named MatB'
-    Exodus Output File Name: twoDHeatEB_out.exo
+    Exodus Output File Name: twoDHeatEB_out_tpetra.exo
     Separate Evaluators by Element Block: true
   Regression Results: 
     Number of Comparisons: 3
@@ -55,12 +55,12 @@ ANONYMOUS:
                       Block Size: 1
                       Num Blocks: 50
                       Flexible Gmres: false
-              Preconditioner Type: Ifpack
+              Preconditioner Type: Ifpack2
               Preconditioner Types: 
-                Ifpack: 
+                Ifpack2: 
                   Overlap: 2
-                  Prec Type: ILU
-                  Ifpack Settings: 
+                  Prec Type: ILUT
+                  Ifpack2 Settings: 
                     'fact: drop tolerance': 0.00000000000000000e+00
                     'fact: ilut level-of-fill': 1.00000000000000000e+00
                     'fact: level-of-fill': 2

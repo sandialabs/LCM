@@ -32,13 +32,13 @@ if(ALBANY_IFPACK2)
     ${CMAKE_CURRENT_SOURCE_DIR}/inputTransientRKT_RegressFail.yaml
     ${CMAKE_CURRENT_BINARY_DIR}/inputTransientRKT_RegressFail.yaml COPYONLY)
 
-  add_test(${testName}_Tpetra ${Albany.exe} inputTransientRKT.yaml)
-  set_tests_properties(${testName}_Tpetra PROPERTIES LABELS
+  add_test(${testName} ${Albany.exe} inputTransientRKT.yaml)
+  set_tests_properties(${testName} PROPERTIES LABELS
                                                      "Demo;Tpetra;Forward")
 
-  add_test(NAME ${testName}_Tpetra_RegressFail
+  add_test(NAME ${testName}_RegressFail
            COMMAND ${Albany.exe} inputTransientRKT_RegressFail.yaml)
-  set_tests_properties(${testName}_Tpetra_RegressFail PROPERTIES WILL_FAIL TRUE)
-  set_tests_properties(${testName}_Tpetra_RegressFail
+  set_tests_properties(${testName}_RegressFail PROPERTIES WILL_FAIL TRUE)
+  set_tests_properties(${testName}_RegressFail
                        PROPERTIES LABELS "Demo;Tpetra;Forward;RegressFail")
 endif(ALBANY_IFPACK2)

@@ -31,5 +31,5 @@ set_tests_properties(${testName}_CopyRemesh PROPERTIES LABELS
                                                        "LCM;Tpetra;Forward")
 
 if(ALBANY_LCM)
-  # add_test(${testName}_TopMod ${Albany.exe} inputTM.yaml)
+  # add_test(${testName}_TopMod ${Albany.exe} inputM.yaml)
 endif()

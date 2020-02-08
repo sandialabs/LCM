@@ -9,11 +9,11 @@ if(NOT ALBANY_PARALLEL_ONLY)
   set(testName ${testNameRoot}_no_prec)
 
   # if (NOT (ALBANY_CHECK_FPE OR ALBANY_STRONG_FPE_CHECK))
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputT.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/inputT.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
   # Fails with FPE if FPE checking is enabled
-  add_test(${testName}_Tpetra ${SerialAlbany.exe} inputT.yaml)
-  set_tests_properties(${testName}_Tpetra
+  add_test(${testName} ${SerialAlbany.exe} input.yaml)
+  set_tests_properties(${testName}
                        PROPERTIES LABELS "Demo;Tpetra;Forward;Serial")
   # endif ()
 

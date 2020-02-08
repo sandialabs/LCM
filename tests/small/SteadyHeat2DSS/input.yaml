@@ -22,7 +22,7 @@ ANONYMOUS:
   Discretization: 
     Method: Ioss
     Exodus Input File Name: quadQuadSS.exo
-    Exodus Output File Name: quadOutSS.exo
+    Exodus Output File Name: quadOutSS_tpetra.exo
   Regression Results: 
     Number of Comparisons: 2
     Test Values: [1.53522399999999992e+00, 2.00000000000000000e+00]
@@ -51,12 +51,12 @@ ANONYMOUS:
                       Block Size: 1
                       Num Blocks: 50
                       Flexible Gmres: false
-              Preconditioner Type: Ifpack
+              Preconditioner Type: Ifpack2
               Preconditioner Types: 
-                Ifpack: 
+                Ifpack2: 
                   Overlap: 2
-                  Prec Type: ILU
-                  Ifpack Settings: 
+                  Prec Type: ILUT
+                  Ifpack2 Settings: 
                     'fact: drop tolerance': 0.00000000000000000e+00
                     'fact: ilut level-of-fill': 1.00000000000000000e+00
                     'fact: level-of-fill': 2

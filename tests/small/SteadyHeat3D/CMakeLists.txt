@@ -6,11 +6,11 @@ get_filename_component(testNameRoot ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # ##############################################################################
 
 if(ALBANY_IFPACK2)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputT.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/inputT.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 
-  add_test(${testNameRoot}_Tpetra ${Albany.exe} inputT.yaml)
-  set_tests_properties(${testNameRoot}_Tpetra PROPERTIES LABELS
+  add_test(${testNameRoot} ${Albany.exe} input.yaml)
+  set_tests_properties(${testNameRoot} PROPERTIES LABELS
                                                          "Basic;Tpetra;Forward")
 endif()
 
@@ -28,11 +28,11 @@ if(NOT ALBANY_PARALLEL_ONLY)
 
   if(ALBANY_IFPACK2)
     configure_file(
-      ${CMAKE_CURRENT_SOURCE_DIR}/inputT_10x10x10_ascii.yaml
-      ${CMAKE_CURRENT_BINARY_DIR}/inputT_10x10x10_ascii.yaml COPYONLY)
+      ${CMAKE_CURRENT_SOURCE_DIR}/input_10x10x10_ascii.yaml
+      ${CMAKE_CURRENT_BINARY_DIR}/input_10x10x10_ascii.yaml COPYONLY)
 
-    add_test(${testName}_Tpetra ${SerialAlbany.exe} inputT_10x10x10_ascii.yaml)
-    set_tests_properties(${testName}_Tpetra PROPERTIES LABELS
+    add_test(${testName} ${SerialAlbany.exe} input_10x10x10_ascii.yaml)
+    set_tests_properties(${testName} PROPERTIES LABELS
                                                        "Basic;Tpetra;Forward")
   endif()
 endif()
@@ -44,9 +44,9 @@ endif()
 set(testName ${testNameRoot}_nodeGIDArrayResponse)
 
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/inputT_nodeGIDArrayResponse.yaml
-  ${CMAKE_CURRENT_BINARY_DIR}/inputT_nodeGIDArrayResponse.yaml COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/input_nodeGIDArrayResponse.yaml
+  ${CMAKE_CURRENT_BINARY_DIR}/input_nodeGIDArrayResponse.yaml COPYONLY)
 
-add_test(${testName}_Tpetra ${Albany.exe} inputT_nodeGIDArrayResponse.yaml)
-set_tests_properties(${testName}_Tpetra PROPERTIES LABELS
+add_test(${testName} ${Albany.exe} input_nodeGIDArrayResponse.yaml)
+set_tests_properties(${testName} PROPERTIES LABELS
                                                    "Basic;Tpetra;Forward")

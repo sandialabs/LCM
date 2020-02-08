@@ -28,7 +28,7 @@ ANONYMOUS:
     2D Elements: 5
     2D Scale: 1.00000000000000006e-01
     Method: STK2D
-    Exodus Output File Name: thelect2d.exo
+    Exodus Output File Name: thelect2d_tpetra.exo
   Regression Results: 
     Number of Comparisons: 1
     Test Values: [1.23779894999999995e+00]
@@ -64,12 +64,12 @@ ANONYMOUS:
                       Block Size: 1
                       Num Blocks: 200
                       Flexible Gmres: false
-              Preconditioner Type: Ifpack
+              Preconditioner Type: Ifpack2
               Preconditioner Types: 
-                Ifpack: 
+                Ifpack2: 
                   Overlap: 2
-                  Prec Type: ILU
-                  Ifpack Settings: 
+                  Prec Type: ILUT
+                  Ifpack2 Settings: 
                     'fact: drop tolerance': 0.00000000000000000e+00
                     'fact: ilut level-of-fill': 1.00000000000000000e+00
                     'fact: level-of-fill': 2

@@ -46,8 +46,8 @@ if(ALBANY_TEMPUS AND ALBANY_IFPACK2)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tempus_be_nox_solver.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/tempus_be_nox_solver.yaml COPYONLY)
 
-  add_test(${testName}_Tpetra ${Albany.exe} tempus_be_nox_solver.yaml)
-  set_tests_properties(${testName}_Tpetra
+  add_test(${testName} ${Albany.exe} tempus_be_nox_solver.yaml)
+  set_tests_properties(${testName}
                        PROPERTIES LABELS "Basic;Tempus;Tpetra;Forward")
 
   # RK 4 test

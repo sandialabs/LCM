@@ -5,8 +5,8 @@
 #
 
 # Copy Input file from source to binary dir
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/NotchedTensileCT.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/NotchedTensileCT.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/NotchedTensileC.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/NotchedTensileC.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/notched_tensile.g
@@ -25,6 +25,6 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 # Create the test with this name and standard executable
 if(ALBANY_MUELU_EXAMPLES)
-  add_test(${testName} ${Albany.exe} NotchedTensileCT.yaml)
+  add_test(${testName} ${Albany.exe} NotchedTensileC.yaml)
   set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
 endif()

@@ -12,17 +12,17 @@ add_executable(HeatProfile HeatProfile.cpp)
 # executable
 
 if(ALBANY_IFPACK2)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputT.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/inputT.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 
   add_test(
-    NAME ${testName}_Tpetra
+    NAME ${testName}
     COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" "-DTEST_ARGS=inputT.yaml"
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" "-DTEST_ARGS=input.yaml"
       "-DAUX_ENV=${ALBANY_PRETEST_EXEC}"
       "-DAUX_PROG=${CMAKE_CURRENT_BINARY_DIR}/HeatProfile" -P
       ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  set_tests_properties(${testName}_Tpetra PROPERTIES LABELS
+  set_tests_properties(${testName} PROPERTIES LABELS
                                                      "Basic;Tpetra;Forward")
 endif()

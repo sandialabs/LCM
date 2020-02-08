@@ -19,8 +19,8 @@ configure_file(
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputMultiMat_100.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/inputMultiMat_100.yaml COPYONLY)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputMultiMat_100T.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/inputMultiMat_100T.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputMultiMat_100.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/inputMultiMat_100.yaml COPYONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_100.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials_100.yaml COPYONLY)
@@ -37,4 +37,4 @@ add_test(${testName}_MultiMaterial_10_SERIAL ${SerialAlbany.exe}
          inputMultiMat_10.yaml)
 
 add_test(${testName}_MultiMaterial_100_SERIAL ${SerialAlbany.exe}
-         inputMultiMat_100T.yaml)
+         inputMultiMat_100.yaml)

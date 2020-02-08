@@ -9,18 +9,18 @@ if(ALBANY_IOPX)
   set(testName ${testNameRoot}_Rythmos)
 
   if(ALBANY_IFPACK2)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputT_rythmos.yaml
-                   ${CMAKE_CURRENT_BINARY_DIR}/inputT_rythmos.yaml COPYONLY)
-    add_test(${testName}_Tpetra ${Albany.exe} inputT_rythmos.yaml)
-    set_tests_properties(${testName}_Tpetra PROPERTIES LABELS
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_rythmos.yaml
+                   ${CMAKE_CURRENT_BINARY_DIR}/input_rythmos.yaml COPYONLY)
+    add_test(${testName} ${Albany.exe} input_rythmos.yaml)
+    set_tests_properties(${testName} PROPERTIES LABELS
                                                        "Demo;Tpetra;Forward")
   endif()
 
   set(testName ${testNameRoot}_Tempus)
   if(ALBANY_IFPACK2 AND ALBANY_TEMPUS)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputT_tempus.yaml
-                   ${CMAKE_CURRENT_BINARY_DIR}/inputT_tempus.yaml COPYONLY)
-    add_test(${testName} ${Albany.exe} inputT_tempus.yaml)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_tempus.yaml
+                   ${CMAKE_CURRENT_BINARY_DIR}/input_tempus.yaml COPYONLY)
+    add_test(${testName} ${Albany.exe} input_tempus.yaml)
     set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
   endif()
 endif(ALBANY_IOPX)

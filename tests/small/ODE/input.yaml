@@ -37,5 +37,7 @@ ANONYMOUS:
       Rythmos Integrator: 
         VerboseObject: 
           Verbosity Level: none
-      Stratimikos: { }
+      Stratimikos: 
+        Linear Solver Type: Belos
+        Preconditioner Type: None
 ...

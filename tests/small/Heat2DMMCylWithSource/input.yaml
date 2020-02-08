@@ -16,7 +16,7 @@ ANONYMOUS:
   Discretization: 
     Method: Exodus
     Exodus Input File Name: fuel_volume.exo
-    Exodus Output File Name: fuel_volume-out.exo
+    Exodus Output File Name: fuel_volume-out_tpetra.exo
     Separate Evaluators by Element Block: true
   Regression Results: 
     Number of Comparisons: 2
@@ -47,12 +47,12 @@ ANONYMOUS:
                       Block Size: 1
                       Num Blocks: 50
                       Flexible Gmres: false
-              Preconditioner Type: Ifpack
+              Preconditioner Type: Ifpack2
               Preconditioner Types: 
-                Ifpack: 
+                Ifpack2: 
                   Overlap: 2
-                  Prec Type: ILU
-                  Ifpack Settings: 
+                  Prec Type: ILUT
+                  Ifpack2 Settings: 
                     'fact: drop tolerance': 0.00000000000000000e+00
                     'fact: ilut level-of-fill': 1.00000000000000000e+00
                     'fact: level-of-fill': 2

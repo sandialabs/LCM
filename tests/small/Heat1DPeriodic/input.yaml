@@ -36,14 +36,21 @@ ANONYMOUS:
       Name: 1D Gauss-Cos
       Rythmos Stepper: 
         VerboseObject: 
-          Verbosity Level: medium
+          Verbosity Level: none
       Stratimikos: 
         Linear Solver Type: Belos
-        Preconditioner Type: Ifpack
+        Preconditioner Type: Ifpack2
+        Preconditioner Types: 
+          Ifpack2: 
+            Overlap: 1
+            Prec Type: ILUT
+            Ifpack2 Settings: 
+              'fact: drop tolerance': 0.00000000000000000e+00
+              'fact: ilut level-of-fill': 1.00000000000000000e+00
       Rythmos Integration Control: 
         Take Variable Steps: false
         Number of Time Steps: 500
       Rythmos Integrator: 
         VerboseObject: 
-          Verbosity Level: medium
+          Verbosity Level: low
 ...

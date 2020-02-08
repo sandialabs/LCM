@@ -38,6 +38,7 @@ ANONYMOUS:
         Max Steps: 0
         Max Value: 1.00000000000000000e+02
         Min Value: 5.00000000000000000e-01
+        Return Failed on Reaching Max Steps: false
         Compute Eigenvalues: true
         Eigensolver: 
           Method: Anasazi
@@ -73,12 +74,12 @@ ANONYMOUS:
                       Block Size: 1
                       Num Blocks: 100
                       Flexible Gmres: false
-              Preconditioner Type: Ifpack
+              Preconditioner Type: Ifpack2
               Preconditioner Types: 
-                Ifpack: 
+                Ifpack2: 
                   Overlap: 1
-                  Prec Type: ILU
-                  Ifpack Settings: 
+                  Prec Type: ILUT
+                  Ifpack2 Settings: 
                     'fact: drop tolerance': 0.00000000000000000e+00
                     'fact: ilut level-of-fill': 1.00000000000000000e+00
                     'fact: level-of-fill': 1

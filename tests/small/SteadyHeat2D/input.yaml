@@ -1,9 +1,6 @@
 %YAML 1.1
 ---
 ANONYMOUS:
-  Debug Output: 
-    Compute Jacobian Condition Number: -1
-    Write Jacobian to MatrixMarket: -1
   Problem: 
     Name: Heat 2D
     Dirichlet BCs: 
@@ -29,7 +26,7 @@ ANONYMOUS:
     1D Elements: 40
     2D Elements: 40
     Method: STK2D
-    Exodus Output File Name: steady2d.exo
+    Exodus Output File Name: steady2d_tpetra.exo
     Cubature Degree: 9
   Regression Results: 
     Number of Comparisons: 2
@@ -73,12 +70,12 @@ ANONYMOUS:
                       Block Size: 1
                       Num Blocks: 50
                       Flexible Gmres: false
-              Preconditioner Type: Ifpack
+              Preconditioner Type: Ifpack2
               Preconditioner Types: 
-                Ifpack: 
+                Ifpack2: 
                   Overlap: 1
-                  Prec Type: ILU
-                  Ifpack Settings: 
+                  Prec Type: ILUT
+                  Ifpack2 Settings: 
                     'fact: drop tolerance': 0.00000000000000000e+00
                     'fact: ilut level-of-fill': 1.00000000000000000e+00
                     'fact: level-of-fill': 1

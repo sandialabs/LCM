@@ -78,14 +78,11 @@ ANONYMOUS:
                       Flexible Gmres: false
               Preconditioner Type: Ifpack2
               Preconditioner Types: 
-                ML: 
-                  Base Method Defaults: none
-                  ML Settings: 
-                    default values: SA
-                    'smoother: type': ML symmetric Gauss-Seidel
-                    'smoother: pre or post': both
-                    'coarse: type': Amesos-KLU
-                    PDE equations: 4
+                Ifpack2: 
+                  Prec Type: ILUT
+                  Overlap: 1
+                  Ifpack2 Settings: 
+                    'fact: ilut level-of-fill': 1.00000000000000000e+00
           Rescue Bad Newton Solve: true
       Line Search: 
         Full Step: 

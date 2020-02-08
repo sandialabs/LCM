@@ -31,36 +31,32 @@ set(HEADERS
     AAdapt_RC_Writer.hpp
     AAdapt_RC_Projector_impl.hpp)
 
-if(ALBANY_STK)
-  set(SOURCES ${SOURCES} AAdapt_CopyRemesh.cpp)
-  set(HEADERS ${HEADERS} AAdapt_CopyRemesh.hpp)
-endif()
+set(SOURCES ${SOURCES} AAdapt_CopyRemesh.cpp)
+set(HEADERS ${HEADERS} AAdapt_CopyRemesh.hpp)
 
 # Random Criterion & Stress Fracture depend on LCM Speculative features and
 # code, currently
-if(ALBANY_STK)
-  if(LCM_SPECULATIVE)
-    set(SOURCES ${SOURCES} AAdapt_RandomCriterion.cpp AAdapt_RandomFracture.cpp
-                AAdapt_StressFracture.cpp)
+if(LCM_SPECULATIVE)
+  set(SOURCES ${SOURCES} AAdapt_RandomCriterion.cpp AAdapt_RandomFracture.cpp
+    AAdapt_StressFracture.cpp)
 
-    set(HEADERS ${HEADERS} AAdapt_RandomCriterion.hpp AAdapt_RandomFracture.hpp
-                AAdapt_StressFracture.hpp)
-  endif()
+  set(HEADERS ${HEADERS} AAdapt_RandomCriterion.hpp AAdapt_RandomFracture.hpp
+    AAdapt_StressFracture.hpp)
+endif()
 
-  # Topology Modification depends on LCM and STK
-  if(ALBANY_BGL)
-    set(SOURCES ${SOURCES} AAdapt_Erosion.cpp AAdapt_TopologyModification.cpp)
+# Topology Modification depends on LCM and STK
+if(ALBANY_BGL)
+  set(SOURCES ${SOURCES} AAdapt_Erosion.cpp AAdapt_TopologyModification.cpp)
 
-    set(HEADERS ${HEADERS} AAdapt_Erosion.hpp AAdapt_TopologyModification.hpp)
-  endif()
+  set(HEADERS ${HEADERS} AAdapt_Erosion.hpp AAdapt_TopologyModification.hpp)
+endif()
 
-  if(ALBANY_STK_PERCEPT)
-    set(SOURCES ${SOURCES} AAdapt_STKAdapt.cpp AAdapt_STKConstantSizeField.cpp)
+if(ALBANY_STK_PERCEPT)
+  set(SOURCES ${SOURCES} AAdapt_STKAdapt.cpp AAdapt_STKConstantSizeField.cpp)
 
-    set(HEADERS ${HEADERS} AAdapt_STKAdapt.hpp AAdapt_STKAdapt_Def.hpp
-                AAdapt_STKConstantSizeField.hpp)
+  set(HEADERS ${HEADERS} AAdapt_STKAdapt.hpp AAdapt_STKAdapt_Def.hpp
+    AAdapt_STKConstantSizeField.hpp)
 
-  endif()
 endif()
 
 include_directories(

@@ -19,9 +19,7 @@
 #include "Albany_Utils.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 #define ST_LLU "%" PRId64
 
@@ -529,27 +527,21 @@ Albany::TmplSTKMeshStruct<Dim, traits>::DeclareParts(
     // declare each element block present in the mesh
     partVec[i] = &metaData->declare_part(
         ebStructArray[i].name, stk::topology::ELEMENT_RANK);
-#ifdef ALBANY_SEACAS
     stk::io::put_io_part_attribute(*partVec[i]);
-#endif
   }
 
   // SideSets
   for (std::size_t i = 0; i < ssNames.size(); i++) {
     std::string ssn = ssNames[i];
     ssPartVec[ssn]  = &metaData->declare_part(ssn, metaData->side_rank());
-#ifdef ALBANY_SEACAS
     stk::io::put_io_part_attribute(*ssPartVec[ssn]);
-#endif
   }
 
   // NodeSets
   for (std::size_t i = 0; i < nsNames.size(); i++) {
     std::string nsn = nsNames[i];
     nsPartVec[nsn]  = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
     stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
   }
 }
 

@@ -5,47 +5,45 @@
 #
 
 # Setup paths for SEACAS tools needed to run some of the tests
-if(ALBANY_SEACAS)
-  if(DEFINED ALBANY_SEACAS_PATH)
-    find_program(
-      SEACAS_EPU
-      NAMES epu
-      PATHS ${ALBANY_SEACAS_PATH})
-    find_program(
-      SEACAS_EXODIFF
-      NAMES exodiff
-      PATHS ${ALBANY_SEACAS_PATH})
-    find_program(
-      SEACAS_ALGEBRA
-      NAMES algebra
-      PATHS ${ALBANY_SEACAS_PATH})
-    find_program(
-      SEACAS_DECOMP
-      NAMES decomp
-      PATHS ${ALBANY_SEACAS_PATH})
-  else()
-    find_program(
-      SEACAS_EPU
-      NAMES epu
-      PATHS ${Trilinos_BIN_DIRS} ENV PATH)
-    find_program(
-      SEACAS_EXODIFF
-      NAMES exodiff
-      PATHS ${Trilinos_BIN_DIRS} ENV PATH)
-    find_program(
-      SEACAS_ALGEBRA
-      NAMES algebra
-      PATHS ${Trilinos_BIN_DIRS} ENV PATH)
-    find_program(
-      SEACAS_DECOMP
-      NAMES decomp
-      PATHS ${Trilinos_BIN_DIRS} ENV PATH)
-  endif()
-  message("-- SEACAS_ALGEBRA = ${SEACAS_ALGEBRA}")
-  message("-- SEACAS_DECOMP  = ${SEACAS_DECOMP}")
-  message("-- SEACAS_EPU     = ${SEACAS_EPU}")
-  message("-- SEACAS_EXODIFF = ${SEACAS_EXODIFF}")
+if(DEFINED ALBANY_SEACAS_PATH)
+  find_program(
+    SEACAS_EPU
+    NAMES epu
+    PATHS ${ALBANY_SEACAS_PATH})
+  find_program(
+    SEACAS_EXODIFF
+    NAMES exodiff
+    PATHS ${ALBANY_SEACAS_PATH})
+  find_program(
+    SEACAS_ALGEBRA
+    NAMES algebra
+    PATHS ${ALBANY_SEACAS_PATH})
+  find_program(
+    SEACAS_DECOMP
+    NAMES decomp
+    PATHS ${ALBANY_SEACAS_PATH})
+else()
+  find_program(
+    SEACAS_EPU
+    NAMES epu
+    PATHS ${Trilinos_BIN_DIRS} ENV PATH)
+  find_program(
+    SEACAS_EXODIFF
+    NAMES exodiff
+    PATHS ${Trilinos_BIN_DIRS} ENV PATH)
+  find_program(
+    SEACAS_ALGEBRA
+    NAMES algebra
+    PATHS ${Trilinos_BIN_DIRS} ENV PATH)
+  find_program(
+    SEACAS_DECOMP
+    NAMES decomp
+    PATHS ${Trilinos_BIN_DIRS} ENV PATH)
 endif()
+message("-- SEACAS_ALGEBRA = ${SEACAS_ALGEBRA}")
+message("-- SEACAS_DECOMP  = ${SEACAS_DECOMP}")
+message("-- SEACAS_EPU     = ${SEACAS_EPU}")
+message("-- SEACAS_EXODIFF = ${SEACAS_EXODIFF}")
 
 # Paths to the actual executables
 set(AlbanyPath ${Albany_BINARY_DIR}/src/Albany)

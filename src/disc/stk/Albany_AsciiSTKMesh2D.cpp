@@ -22,9 +22,7 @@
 #include "Teuchos_VerboseObject.hpp"
 #include "Teuchos_oblackholestream.hpp"
 
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 //#include <stk_mesh/fem/FEMHelpers.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -161,28 +159,22 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
   std::map<std::string, int> ebNameToIndex;
   ebNameToIndex[ebn] = 0;
 
-#ifdef ALBANY_SEACAS
   //  stk::io::put_io_part_attribute(metaData->universal_part());
   stk::io::put_io_part_attribute(*partVec[0]);
-#endif
 
   // All the nodes
   std::vector<std::string> nsNames;
   std::string              nsn = "node_set";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
 
   // All the sidesets
   std::vector<std::string> ssNames;
   std::string              ssn = "boundary_side_set";
   ssNames.push_back(ssn);
   ssPartVec[ssn] = &metaData->declare_part(ssn, metaData->side_rank());
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*ssPartVec[ssn]);
-#endif
 
   // Counting boundaries
 
@@ -212,10 +204,8 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
     nsPartVec[nsn_ss.str()] =
         &metaData->declare_part(nsn_ss.str(), stk::topology::NODE_RANK);
 
-#ifdef ALBANY_SEACAS
     stk::io::put_io_part_attribute(*nsPartVec[nsn_ss.str()]);
 
-#endif
   }
 
   // Broadcasting the tags
@@ -240,14 +230,10 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
     ssPartVec[ssn_ss.str()] =
         &metaData->declare_part(ssn_ss.str(), metaData->side_rank());
 
-#ifdef ALBANY_SEACAS
     stk::io::put_io_part_attribute(*ssPartVec[ssn_ss.str()]);
-#endif
   }
 
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(metaData->universal_part());
-#endif
 
   Teuchos::broadcast<LO, LO>(*commT, 0, &NumElemNodes);
   if (NumElemNodes == 3) {

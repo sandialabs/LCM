@@ -13,9 +13,7 @@
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Types.hpp>
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 namespace Albany {
 
@@ -34,7 +32,6 @@ GenericSTKFieldContainer<Interleaved>::GenericSTKFieldContainer(
 {
 }
 
-#ifdef ALBANY_SEACAS
 namespace {
 // amb 13 Nov 2014. After new STK was integrated, fields with output set to
 // false
@@ -54,7 +51,6 @@ role_type(const bool output)
   return output ? Ioss::Field::TRANSIENT : Ioss::Field::INFORMATION;
 }
 }  // namespace
-#endif
 
 template <bool Interleaved>
 void
@@ -86,10 +82,8 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
             stk::topology::ELEMENT_RANK, st.name));
         stk::mesh::put_field_on_mesh(
             *cell_scalar_states.back(), metaData->universal_part(), 1, nullptr);
-#ifdef ALBANY_SEACAS
         stk::io::set_field_role(
             *cell_scalar_states.back(), role_type(st.output));
-#endif
       } else if (dim.size() == 2) {
         // Vector on cell
         cell_vector_states.push_back(&metaData->declare_field<VFT>(
@@ -99,10 +93,8 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
             metaData->universal_part(),
             dim[1],
             nullptr);
-#ifdef ALBANY_SEACAS
         stk::io::set_field_role(
             *cell_vector_states.back(), role_type(st.output));
-#endif
       } else if (dim.size() == 3) {
         // 2nd order tensor on cell
         cell_tensor_states.push_back(&metaData->declare_field<TFT>(
@@ -113,10 +105,8 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
             dim[2],
             dim[1],
             nullptr);
-#ifdef ALBANY_SEACAS
         stk::io::set_field_role(
             *cell_tensor_states.back(), role_type(st.output));
-#endif
       } else {
         TEUCHOS_TEST_FOR_EXCEPTION(
             true, std::logic_error, "Error! Unexpected state rank.\n");
@@ -141,9 +131,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         //      cout << "Allocating qps field name " <<
         //      qpscalar_states.back()->name() <<
         //            " size: (" << dim[0] << ", " << dim[1] << ")" <<endl;
-#ifdef ALBANY_SEACAS
         stk::io::set_field_role(*qpscalar_states.back(), role_type(st.output));
-#endif
       } else if (dim.size() == 3) {  // Vector at QPs
         qpvector_states.push_back(&metaData->declare_field<QPVFT>(
             stk::topology::ELEMENT_RANK, st.name));
@@ -159,9 +147,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         //      qpvector_states.back()->name() <<
         //            " size: (" << dim[0] << ", " << dim[1] << ", " << dim[2]
         //            << ")" <<endl;
-#ifdef ALBANY_SEACAS
         stk::io::set_field_role(*qpvector_states.back(), role_type(st.output));
-#endif
       } else if (dim.size() == 4) {  // Tensor at QPs
         qptensor_states.push_back(&metaData->declare_field<QPTFT>(
             stk::topology::ELEMENT_RANK, st.name));
@@ -197,9 +183,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
               dim[3],
               nullptr);
         }
-#ifdef ALBANY_SEACAS
         stk::io::set_field_role(*qptensor_states.back(), role_type(st.output));
-#endif
       }
       // Something other than a scalar, vector, or tensor
       else

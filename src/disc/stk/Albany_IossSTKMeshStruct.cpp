@@ -6,7 +6,6 @@
 
 #include "Albany_IossSTKMeshStruct.hpp"
 
-#ifdef ALBANY_SEACAS
 
 #include <Ioss_SubSystem.h>
 
@@ -721,4 +720,3 @@ Albany::IossSTKMeshStruct::getValidDiscretizationParameters() const
   return validPL;
 }
 
-#endif  // ALBANY_SEACAS

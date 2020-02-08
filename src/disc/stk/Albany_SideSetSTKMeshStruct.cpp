@@ -13,9 +13,7 @@
 #include <stk_mesh/base/GetEntities.hpp>
 #include <stk_mesh/base/Selector.hpp>
 
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 #include "Albany_Utils.hpp"
 
@@ -41,17 +39,13 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
   std::map<std::string, int> ebNameToIndex;
   ebNameToIndex[ebn] = 0;
 
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*partVec[0]);
-#endif
 
   std::vector<std::string> nsNames;
   std::string              nsn = "all_nodes";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
 
   std::string input_elem_name = inputMeshSpecs.ctd.base->name;
   if (input_elem_name == "Tetrahedron_4") {

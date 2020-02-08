@@ -35,7 +35,6 @@
 #include <stk_util/parallel/Parallel.hpp>
 #include <string>
 
-#ifdef ALBANY_SEACAS
 #include <Ionit_Initializer.h>
 #include <netcdf.h>
 
@@ -44,7 +43,6 @@ extern "C" {
 #include <netcdf_par.h>
 }
 #endif
-#endif  // ALBANY_SEACAS
 
 #include <PHAL_Dimension.hpp>
 #include <algorithm>
@@ -449,7 +447,6 @@ STKDiscretization::STKDiscretization(
 
 STKDiscretization::~STKDiscretization()
 {
-#ifdef ALBANY_SEACAS
   if (stkMeshStruct->cdfOutput) {
     if (netCDFp) {
       const int ierr = nc_close(netCDFp);
@@ -459,7 +456,6 @@ STKDiscretization::~STKDiscretization()
                                           << nc_strerror(ierr));
     }
   }
-#endif
 
   for (size_t i = 0; i < toDelete.size(); i++) delete[] toDelete[i];
 }
@@ -1036,7 +1032,6 @@ STKDiscretization::writeSolutionToFile(
     const double        time,
     const bool          overlapped)
 {
-#ifdef ALBANY_SEACAS
   if (stkMeshStruct->exoOutput && stkMeshStruct->transferSolutionToCoords) {
     Teuchos::RCP<AbstractSTKFieldContainer> container =
         stkMeshStruct->getFieldContainer();
@@ -1102,7 +1097,6 @@ STKDiscretization::writeSolutionToFile(
       it.second->writeSolutionToFile(*ss_soln, time, overlapped);
     }
   }
-#endif
 }
 
 void
@@ -1111,7 +1105,6 @@ STKDiscretization::writeSolutionMVToFile(
     const double             time,
     const bool               overlapped)
 {
-#ifdef ALBANY_SEACAS
 
   if (stkMeshStruct->exoOutput && stkMeshStruct->transferSolutionToCoords) {
     Teuchos::RCP<AbstractSTKFieldContainer> container =
@@ -1180,7 +1173,6 @@ STKDiscretization::writeSolutionMVToFile(
       it.second->writeSolutionMVToFile(*ss_soln, time, overlapped);
     }
   }
-#endif
 }
 
 double
@@ -2600,7 +2592,6 @@ STKDiscretization::computeNodeSets()
 void
 STKDiscretization::setupExodusOutput()
 {
-#ifdef ALBANY_SEACAS
   if (stkMeshStruct->exoOutput) {
     outputInterval = 0;
 
@@ -2643,21 +2634,13 @@ STKDiscretization::setupExodusOutput()
     }
   }
 
-#else
-  if (stkMeshStruct->exoOutput) {
-    *out << "\nWARNING: exodus output requested but SEACAS not compiled in:"
-         << " disabling exodus output \n";
-  }
-#endif
 }
 
 int
 STKDiscretization::processNetCDFOutputRequest(
     const Thyra_Vector& /* solution_field */)
 {
-#ifdef ALBANY_SEACAS
 // IK, 10/13/14: need to implement!
-#endif
   return 0;
 }
 
@@ -2665,9 +2648,7 @@ int
 STKDiscretization::processNetCDFOutputRequestMV(
     const Thyra_MultiVector& /* solution_field */)
 {
-#ifdef ALBANY_SEACAS
 // IK, 10/13/14: need to implement!
-#endif
   return 0;
 }
 
@@ -2675,7 +2656,6 @@ void
 STKDiscretization::setupNetCDFOutput()
 {
   const long long unsigned rank = comm->getRank();
-#ifdef ALBANY_SEACAS
   if (stkMeshStruct->cdfOutput) {
     outputInterval      = 0;
     const unsigned nlat = stkMeshStruct->nLat;
@@ -2859,19 +2839,11 @@ STKDiscretization::setupNetCDFOutput()
             "nc_put_var lat returned error code "
                 << ierr << " - " << nc_strerror(ierr) << std::endl);
   }
-#else
-  if (stkMeshStruct->cdfOutput) {
-    *out << "\nWARNING: NetCDF output requested but SEACAS not compiled in:"
-         << " disabling NetCDF output \n";
-  }
-  stkMeshStruct->cdfOutput = false;
-#endif
 }
 
 void
 STKDiscretization::reNameExodusOutput(std::string& filename)
 {
-#ifdef ALBANY_SEACAS
   if (stkMeshStruct->exoOutput && !mesh_data.is_null()) {
     // Delete the mesh data object and recreate it
     mesh_data = Teuchos::null;
@@ -2882,12 +2854,6 @@ STKDiscretization::reNameExodusOutput(std::string& filename)
     // to a new file
     previous_time_label = -1.0e32;
   }
-#else
-  if (stkMeshStruct->exoOutput) {
-    *out << "\nWARNING: exodus output requested but SEACAS not compiled in:"
-         << " disabling exodus output \n";
-  }
-#endif
 }
 
 // Convert the stk mesh on this processor to a nodal graph.

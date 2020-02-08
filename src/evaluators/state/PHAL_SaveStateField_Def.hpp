@@ -9,10 +9,8 @@
 #include "Phalanx_DataLayout_MDALayout.hpp"
 #include "Teuchos_TestForException.hpp"
 
-#ifdef ALBANY_STK
 #include "Albany_AbstractSTKFieldContainer.hpp"
 #include "Albany_AbstractSTKMeshStruct.hpp"
-#endif
 #include "Albany_AbstractDiscretization.hpp"
 
 namespace PHAL {
@@ -223,7 +221,6 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   //       with stk fields. To do this we must extract entities from the bulk
   //       data and use them to access the values of the stk field.
 
-#ifdef ALBANY_STK
   Teuchos::RCP<Albany::AbstractDiscretization> disc = workset.disc;
   TEUCHOS_TEST_FOR_EXCEPTION(
       disc == Teuchos::null,
@@ -289,14 +286,6 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
           "Error! Unexpected field dimension (only node_scalar/node_vector for "
           "now).\n");
   }
-#else
-  (void)workset;
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      true,
-      std::runtime_error,
-      "Error! Nodal states only available for stk meshes, but Trilinos was "
-      "compiled without STK!\n");
-#endif
 }
 
 }  // namespace PHAL

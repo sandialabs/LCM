@@ -16,9 +16,7 @@
 // Start of STK stuff
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/MetaData.hpp>
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 #include "Teuchos_VerboseObject.hpp"
 
@@ -91,9 +89,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
           &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, name);
       stk::mesh::put_field_on_mesh(
           *solution, metaData_->universal_part(), neq_, nullptr);
-#ifdef ALBANY_SEACAS
       stk::io::set_field_role(*solution, Ioss::Field::TRANSIENT);
-#endif
 
       sol_vector_name[vec_num].push_back(name);
       sol_index[vec_num].push_back(this->neq);
@@ -105,9 +101,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
           stk::topology::NODE_RANK, solution_vector[vec_num][0]);
       stk::mesh::put_field_on_mesh(
           *solution, metaData_->universal_part(), neq_, nullptr);
-#ifdef ALBANY_SEACAS
       stk::io::set_field_role(*solution, Ioss::Field::TRANSIENT);
-#endif
 
       sol_vector_name[vec_num].push_back(solution_vector[vec_num][0]);
       sol_index[vec_num].push_back(neq_);
@@ -133,9 +127,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
               stk::topology::NODE_RANK, solution_vector[vec_num][i]);
           stk::mesh::put_field_on_mesh(
               *solution, metaData_->universal_part(), len, nullptr);
-#ifdef ALBANY_SEACAS
           stk::io::set_field_role(*solution, Ioss::Field::TRANSIENT);
-#endif
           sol_vector_name[vec_num].push_back(solution_vector[vec_num][i]);
           sol_index[vec_num].push_back(len);
 
@@ -146,9 +138,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
               stk::topology::NODE_RANK, solution_vector[vec_num][i]);
           stk::mesh::put_field_on_mesh(
               *solution, metaData_->universal_part(), nullptr);
-#ifdef ALBANY_SEACAS
           stk::io::set_field_role(*solution, Ioss::Field::TRANSIENT);
-#endif
           sol_vector_name[vec_num].push_back(solution_vector[vec_num][i]);
           sol_index[vec_num].push_back(len);
 
@@ -179,9 +169,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
         &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, name);
     stk::mesh::put_field_on_mesh(
         *residual, metaData_->universal_part(), neq_, nullptr);
-#ifdef ALBANY_SEACAS
     stk::io::set_field_role(*residual, Ioss::Field::TRANSIENT);
-#endif
 
     res_vector_name.push_back(name);
     res_index.push_back(neq_);
@@ -193,9 +181,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
         stk::topology::NODE_RANK, residual_vector[0]);
     stk::mesh::put_field_on_mesh(
         *residual, metaData_->universal_part(), neq_, nullptr);
-#ifdef ALBANY_SEACAS
     stk::io::set_field_role(*residual, Ioss::Field::TRANSIENT);
-#endif
 
     res_vector_name.push_back(residual_vector[0]);
     res_index.push_back(neq_);
@@ -221,9 +207,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
             stk::topology::NODE_RANK, residual_vector[i]);
         stk::mesh::put_field_on_mesh(
             *residual, metaData_->universal_part(), len, nullptr);
-#ifdef ALBANY_SEACAS
         stk::io::set_field_role(*residual, Ioss::Field::TRANSIENT);
-#endif
         res_vector_name.push_back(residual_vector[i]);
         res_index.push_back(len);
 
@@ -234,9 +218,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
             stk::topology::NODE_RANK, residual_vector[i]);
         stk::mesh::put_field_on_mesh(
             *residual, metaData_->universal_part(), nullptr);
-#ifdef ALBANY_SEACAS
         stk::io::set_field_role(*residual, Ioss::Field::TRANSIENT);
-#endif
         res_vector_name.push_back(residual_vector[i]);
         res_index.push_back(len);
 
@@ -264,9 +246,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
       &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, "coordinates");
   stk::mesh::put_field_on_mesh(
       *this->coordinates_field, metaData_->universal_part(), numDim_, nullptr);
-#ifdef ALBANY_SEACAS
   stk::io::set_field_role(*this->coordinates_field, Ioss::Field::MESH);
-#endif
 
   if (numDim_ == 3) {
     this->coordinates_field3d = this->coordinates_field;
@@ -275,15 +255,12 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
         stk::topology::NODE_RANK, "coordinates3d");
     stk::mesh::put_field_on_mesh(
         *this->coordinates_field3d, metaData_->universal_part(), 3, nullptr);
-#ifdef ALBANY_SEACAS
     if (params_->get<bool>("Export 3d coordinates field", false)) {
       stk::io::set_field_role(
           *this->coordinates_field3d, Ioss::Field::TRANSIENT);
     }
-#endif
   }
 
-#if defined(ALBANY_SEACAS)
   // sphere volume is a mesh attribute read from a genesis mesh file containing
   // sphere element (used for peridynamics)
   this->sphereVolume_field = metaData_->template get_field<SVFT>(
@@ -308,13 +285,11 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
           *this->latticeOrientation_field, Ioss::Field::ATTRIBUTE);
     }
   }
-#endif
 
   this->addStateStructs(sis);
 
   initializeSTKAdaptation();
 
-#if defined(ALBANY_SEACAS)
   bool has_cell_boundary_indicator =
       (std::find(req.begin(), req.end(), "cell_boundary_indicator") !=
        req.end());
@@ -329,7 +304,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
     stk::io::set_field_role(
         *this->cell_boundary_indicator, Ioss::Field::INFORMATION);
   }
-#endif
 }
 
 template <bool Interleaved>
@@ -369,7 +343,6 @@ MultiSTKFieldContainer<Interleaved>::initializeSTKAdaptation()
       this->metaData->universal_part(),
       nullptr);
 
-#ifdef ALBANY_SEACAS
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
   stk::io::set_field_role(*this->refine_field, Ioss::Field::MESH);
   for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK;
@@ -377,7 +350,6 @@ MultiSTKFieldContainer<Interleaved>::initializeSTKAdaptation()
        ++rank) {
     stk::io::set_field_role(*this->failure_state[rank], Ioss::Field::MESH);
   }
-#endif
 }
 
 template <bool Interleaved>

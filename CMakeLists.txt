@@ -333,18 +333,16 @@ else()
   set(ALBANY_MPI FALSE)
 endif()
 
-# set optional dependency on stk
+# set dependency on stk
 list(FIND Trilinos_PACKAGE_LIST STK have_stk_List_ID)
 if(have_stk_List_ID GREATER -1)
   message("-- Looking for STK:                  Found")
-  set(ALBANY_STK TRUE)
 
-  # set optional dependency on SEACAS, for I/O via stk_io MESSAGE("-- Looking
+  # set dependency on SEACAS, for I/O via stk_io MESSAGE("-- Looking
   # for SEACAS:")
   list(FIND Trilinos_PACKAGE_LIST SEACASIoss SEACASIoss_List_ID)
   if(SEACASIoss_List_ID GREATER -1)
     message("  -- Looking for SEACASIoss:         Found")
-    set(ALBANY_SEACAS TRUE)
     list(FIND SEACASIoss_LIBRARIES Iopx Iopx_List_ID)
     if(Iopx_List_ID GREATER -1)
       message("  -- Looking for Iopx:               Found")
@@ -354,8 +352,7 @@ if(have_stk_List_ID GREATER -1)
       set(ALBANY_IOPX FALSE)
     endif()
   else()
-    message("  -- Looking for SEACASIoss:         NOT found.")
-    set(ALBANY_SEACAS FALSE)
+    message(FATAL_ERROR "SEACAS is required.")
   endif()
 
   # set optional dependency on stk_percept, for uniform adaptivity
@@ -369,8 +366,7 @@ if(have_stk_List_ID GREATER -1)
   endif()
 
 else()
-  message("-- Looking for STK:                  NOT found.")
-  set(ALBANY_STK FALSE)
+  message(FATAL_ERROR "STK is required.")
 endif()
 
 # set optional dependency on Panzer's ExprEval subpackage
@@ -388,13 +384,8 @@ endif()
 list(FIND Trilinos_PACKAGE_LIST Zoltan Zoltan_List_ID)
 if(Zoltan_List_ID GREATER -1)
   set(ALBANY_ZOLTAN TRUE)
-  if(ALBANY_STK)
-    set(ALBANY_STK_REBALANCE TRUE)
-    message("-- Looking for Zoltan:               Found.")
-  else()
-    set(ALBANY_STK_REBALANCE FALSE)
-    message("-- Looking for Zoltan:               Found.")
-  endif()
+  set(ALBANY_STK_REBALANCE TRUE)
+  message("-- Looking for Zoltan:               Found.")
 else()
   message("-- Looking for Zoltan:               NOT found.")
   set(ALBANY_ZOLTAN FALSE)

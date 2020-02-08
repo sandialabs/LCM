@@ -4,15 +4,7 @@
 # in the file license.txt in the top-level Albany directory.
 #
 
-if(ALBANY_DTK)
-  add_subdirectory(DTKInterp)
-endif()
-
-if(ALBANY_STK)
-  if(ALBANY_SEACAS)
-    add_subdirectory(CrystalPlasticity)
-    # amota: disabled because enters infinite loop add_subdirectory(HMC)
-    add_subdirectory(Schwarz)
-    add_subdirectory(MechanicsWithHydrogenBar)
-  endif()
-endif()
+add_subdirectory(CrystalPlasticity)
+add_subdirectory(DTKInterp)
+add_subdirectory(MechanicsWithHydrogenBar)
+add_subdirectory(Schwarz)

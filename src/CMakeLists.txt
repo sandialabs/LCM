@@ -300,9 +300,7 @@ set(SOURCES
     evaluators/utility/PHAL_SharedParameter.cpp
     evaluators/utility/PHAL_Source.cpp)
 
-if(ALBANY_STK)
-  set(SOURCES ${SOURCES} evaluators/state/PHAL_SaveSideSetStateField.cpp)
-endif()
+set(SOURCES ${SOURCES} evaluators/state/PHAL_SaveSideSetStateField.cpp)
 
 set(PDE_SRCS
     ${PDE_SRCS}
@@ -459,10 +457,8 @@ set(HEADERS
     evaluators/utility/PHAL_Source.hpp
     evaluators/utility/PHAL_Source_Def.hpp)
 
-if(ALBANY_STK)
-  set(HEADERS ${HEADERS} evaluators/state/PHAL_SaveSideSetStateField.hpp
-              evaluators/state/PHAL_SaveSideSetStateField_Def.hpp)
-endif()
+set(HEADERS ${HEADERS} evaluators/state/PHAL_SaveSideSetStateField.hpp
+  evaluators/state/PHAL_SaveSideSetStateField_Def.hpp)
 
 set(PDE_HDRS
     ${PDE_HDRS}
@@ -618,11 +614,7 @@ set(ALL_LIBRARIES
 add_subdirectory(adapt)
 add_subdirectory(disc)
 
-if(ALBANY_STK)
-  set(ALBANY_LIBRARIES albanyLib albanyAdapt albanySTK)
-else()
-  set(ALBANY_LIBRARIES albanyLib albanyAdapt)
-endif()
+set(ALBANY_LIBRARIES albanyLib albanyAdapt albanySTK)
 
 if(ALBANY_DEMO_PDES)
   add_library(albanyPDEs ${Albany_LIBRARY_TYPE} ${PDE_SRCS} ${PDE_HDRS})

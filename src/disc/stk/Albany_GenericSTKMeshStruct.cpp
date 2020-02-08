@@ -16,9 +16,7 @@
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 #include <Albany_CombineAndScatterManager.hpp>
 #include <Albany_GlobalLocalIndexer.hpp>
@@ -314,7 +312,6 @@ GenericSTKMeshStruct::SetupFieldData(
 void
 GenericSTKMeshStruct::setAllPartsIO()
 {
-#ifdef ALBANY_SEACAS
   for (auto& it : partVec) {
     stk::mesh::Part& part = *it.second;
     if (!stk::io::is_part_io_part(part)) stk::io::put_io_part_attribute(part);
@@ -327,7 +324,6 @@ GenericSTKMeshStruct::setAllPartsIO()
     stk::mesh::Part& part = *it.second;
     if (!stk::io::is_part_io_part(part)) stk::io::put_io_part_attribute(part);
   }
-#endif
 }
 
 bool
@@ -944,9 +940,7 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
           this->sideSetMeshStructs[ss_name]->metaData->universal_part(),
           1,
           nullptr);
-#ifdef ALBANY_SEACAS
       stk::io::set_field_role(*side_to_cell_map, Ioss::Field::TRANSIENT);
-#endif
       // We need to create the 2D cell -> (3D cell, side_node_ids) map in the
       // side mesh now
       const int num_nodes =
@@ -960,9 +954,7 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
           this->sideSetMeshStructs[ss_name]->metaData->universal_part(),
           num_nodes,
           nullptr);
-#ifdef ALBANY_SEACAS
       stk::io::set_field_role(*side_nodes_ids, Ioss::Field::TRANSIENT);
-#endif
 
       // If requested, we ignore the side maps already stored in the imported
       // side mesh (if any) This can be useful for side mesh of an extruded

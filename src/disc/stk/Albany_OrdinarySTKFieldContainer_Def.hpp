@@ -15,9 +15,7 @@
 // Start of STK stuff
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/MetaData.hpp>
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 namespace Albany {
 
@@ -82,9 +80,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
       &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, "coordinates");
   stk::mesh::put_field_on_mesh(
       *this->coordinates_field, metaData_->universal_part(), numDim_, nullptr);
-#ifdef ALBANY_SEACAS
   stk::io::set_field_role(*this->coordinates_field, Ioss::Field::MESH);
-#endif
   if (numDim_ == 3) {
     this->coordinates_field3d = this->coordinates_field;
   } else {
@@ -92,12 +88,10 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
         stk::topology::NODE_RANK, "coordinates3d");
     stk::mesh::put_field_on_mesh(
         *this->coordinates_field3d, metaData_->universal_part(), 3, nullptr);
-#ifdef ALBANY_SEACAS
     if (params_->get<bool>("Export 3d coordinates field", false)) {
       stk::io::set_field_role(
           *this->coordinates_field3d, Ioss::Field::TRANSIENT);
     }
-#endif
   }
 
   solution_field.resize(num_time_deriv + 1);
@@ -125,13 +119,11 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     }
 #endif
 
-#ifdef ALBANY_SEACAS
     stk::io::set_field_role(*solution_field[num_vecs], Ioss::Field::TRANSIENT);
 #if defined(ALBANY_DTK)
     if (output_dtk_field == true)
       stk::io::set_field_role(
           *solution_field_dtk[num_vecs], Ioss::Field::TRANSIENT);
-#endif
 #endif
   }
 
@@ -140,11 +132,8 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
       params_->get<std::string>(res_tag_name[0], res_id_name[0]));
   stk::mesh::put_field_on_mesh(
       *residual_field, metaData_->universal_part(), neq_, nullptr);
-#ifdef ALBANY_SEACAS
   stk::io::set_field_role(*residual_field, Ioss::Field::TRANSIENT);
-#endif
 
-#if defined(ALBANY_SEACAS)
   // sphere volume is a mesh attribute read from a genesis mesh file containing
   // sphere element (used for peridynamics)
   this->sphereVolume_field = metaData_->template get_field<SVFT>(
@@ -153,7 +142,6 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     buildSphereVolume = true;
     stk::io::set_field_role(*this->sphereVolume_field, Ioss::Field::ATTRIBUTE);
   }
-#endif
   // If the problem requests that the initial guess at the solution equals the
   // input node coordinates, set that here
   /*
@@ -166,7 +154,6 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
   initializeSTKAdaptation();
 
-#if defined(ALBANY_SEACAS)
 
   bool has_cell_boundary_indicator =
       (std::find(req.begin(), req.end(), "cell_boundary_indicator") !=
@@ -228,7 +215,6 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
           *this->node_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
-#endif
 }
 
 template <bool Interleaved>
@@ -271,7 +257,6 @@ OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
         nullptr);
   }
 
-#ifdef ALBANY_SEACAS
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
   stk::io::set_field_role(*this->refine_field, Ioss::Field::MESH);
   for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK;
@@ -279,7 +264,6 @@ OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
        ++rank) {
     stk::io::set_field_role(*this->failure_state[rank], Ioss::Field::MESH);
   }
-#endif
 }
 
 template <bool Interleaved>

@@ -54,27 +54,24 @@ set(evaluator-headers
     "${LCM_DIR}/parallel_evaluators/ParallelSetField.hpp")
 
 # LCM model evaluators
-
-if(ALBANY_STK)
-  set(model-eval-sources
-      "${LCM_DIR}/solvers/Schwarz_Alternating.cpp"
-      "${LCM_DIR}/solvers/Schwarz_ObserverImpl.cpp"
-      "${LCM_DIR}/solvers/Schwarz_PiroObserver.cpp"
-      "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.cpp")
-  set(model-eval-headers
-      "${LCM_DIR}/solvers/Schwarz_Alternating.hpp"
-      "${LCM_DIR}/solvers/Schwarz_ObserverImpl.hpp"
-      "${LCM_DIR}/solvers/Schwarz_PiroObserver.hpp"
-      "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.hpp")
-  set(model-eval-sources
-      ${model-eval-sources} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.cpp"
-      "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.cpp"
-      "${LCM_DIR}/solvers/Schwarz_Coupled.cpp")
-  set(model-eval-headers
-      ${model-eval-headers} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.hpp"
-      "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.hpp"
-      "${LCM_DIR}/solvers/Schwarz_Coupled.hpp")
-endif(ALBANY_STK)
+set(model-eval-sources
+  "${LCM_DIR}/solvers/Schwarz_Alternating.cpp"
+  "${LCM_DIR}/solvers/Schwarz_ObserverImpl.cpp"
+  "${LCM_DIR}/solvers/Schwarz_PiroObserver.cpp"
+  "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.cpp")
+set(model-eval-headers
+  "${LCM_DIR}/solvers/Schwarz_Alternating.hpp"
+  "${LCM_DIR}/solvers/Schwarz_ObserverImpl.hpp"
+  "${LCM_DIR}/solvers/Schwarz_PiroObserver.hpp"
+  "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.hpp")
+set(model-eval-sources
+  ${model-eval-sources} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.cpp"
+  "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.cpp"
+  "${LCM_DIR}/solvers/Schwarz_Coupled.cpp")
+set(model-eval-headers
+  ${model-eval-headers} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.hpp"
+  "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.hpp"
+  "${LCM_DIR}/solvers/Schwarz_Coupled.hpp")
 
 # LCM special boundary conditions
 set(bc-sources
@@ -94,20 +91,19 @@ set(bc-headers
     "${LCM_DIR}/evaluators/bc/TimeTracBC.hpp"
     "${LCM_DIR}/evaluators/bc/TorsionBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/TorsionBC.hpp")
-if(ALBANY_STK)
-  set(bc-sources
-      ${bc-sources} "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.cpp"
-      "${LCM_DIR}/evaluators/bc/SchwarzBC.cpp"
-      "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.cpp")
-  set(bc-headers
-      ${bc-headers}
-      "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.hpp"
-      "${LCM_DIR}/evaluators/bc/PDNeighborFitBC_Def.hpp"
-      "${LCM_DIR}/evaluators/bc/SchwarzBC.hpp"
-      "${LCM_DIR}/evaluators/bc/SchwarzBC_Def.hpp"
-      "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.hpp"
-      "${LCM_DIR}/evaluators/bc/StrongSchwarzBC_Def.hpp")
-endif(ALBANY_STK)
+
+set(bc-sources
+  ${bc-sources} "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.cpp"
+  "${LCM_DIR}/evaluators/bc/SchwarzBC.cpp"
+  "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.cpp")
+set(bc-headers
+  ${bc-headers}
+  "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.hpp"
+  "${LCM_DIR}/evaluators/bc/PDNeighborFitBC_Def.hpp"
+  "${LCM_DIR}/evaluators/bc/SchwarzBC.hpp"
+  "${LCM_DIR}/evaluators/bc/SchwarzBC_Def.hpp"
+  "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.hpp"
+  "${LCM_DIR}/evaluators/bc/StrongSchwarzBC_Def.hpp")
 
 # LCM HMC evaluators
 set(hmc-sources
@@ -492,37 +488,34 @@ set(utils-headers
     "${LCM_DIR}/utils/Projection.hpp"
     "${LCM_DIR}/utils/SolutionSniffer.hpp"
     "${LCM_DIR}/utils/StateVarUtils.hpp")
-if(ALBANY_STK)
-  set(utils-sources
-      ${utils-sources} "${LCM_DIR}/utils/LCMPartition.cpp"
-      "${LCM_DIR}/utils/MiniLinearSolver.cpp"
-      "${LCM_DIR}/utils/MiniNonlinearSolver.cpp")
-  set(utils-headers
-      ${utils-headers}
-      "${LCM_DIR}/utils/LCMPartition.hpp"
-      "${LCM_DIR}/utils/MiniLinearSolver.hpp"
-      "${LCM_DIR}/utils/MiniLinearSolver.t.hpp"
-      "${LCM_DIR}/utils/MiniNonlinearSolver.hpp"
-      "${LCM_DIR}/utils/MiniNonlinearSolver_Def.hpp"
-      "${LCM_DIR}/utils/MiniSolvers.hpp")
-endif(ALBANY_STK)
+
+set(utils-sources
+    ${utils-sources} "${LCM_DIR}/utils/LCMPartition.cpp"
+    "${LCM_DIR}/utils/MiniLinearSolver.cpp"
+    "${LCM_DIR}/utils/MiniNonlinearSolver.cpp")
+set(utils-headers
+    ${utils-headers}
+    "${LCM_DIR}/utils/LCMPartition.hpp"
+    "${LCM_DIR}/utils/MiniLinearSolver.hpp"
+    "${LCM_DIR}/utils/MiniLinearSolver.t.hpp"
+    "${LCM_DIR}/utils/MiniNonlinearSolver.hpp"
+    "${LCM_DIR}/utils/MiniNonlinearSolver_Def.hpp"
+    "${LCM_DIR}/utils/MiniSolvers.hpp")
 
 # LCM utils / topology
-if(ALBANY_STK)
-  set(topology-sources
-      "${LCM_DIR}/utils/topology/BarycentricSubdivision.cpp"
-      "${LCM_DIR}/utils/topology/MinimumSurface.cpp"
-      "${LCM_DIR}/utils/topology/Subgraph.cpp"
-      "${LCM_DIR}/utils/topology/Topology.cpp"
-      "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp"
-      "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
-  set(topology-headers
-      "${LCM_DIR}/utils/topology/Subgraph.hpp"
-      "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
-      "${LCM_DIR}/utils/topology/Topology.hpp"
-      "${LCM_DIR}/utils/topology/Topology_Types.hpp"
-      "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
-endif()
+set(topology-sources
+  "${LCM_DIR}/utils/topology/BarycentricSubdivision.cpp"
+  "${LCM_DIR}/utils/topology/MinimumSurface.cpp"
+  "${LCM_DIR}/utils/topology/Subgraph.cpp"
+  "${LCM_DIR}/utils/topology/Topology.cpp"
+  "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp"
+  "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
+set(topology-headers
+  "${LCM_DIR}/utils/topology/Subgraph.hpp"
+  "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
+  "${LCM_DIR}/utils/topology/Topology.hpp"
+  "${LCM_DIR}/utils/topology/Topology_Types.hpp"
+  "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
 
 set(SOURCES
     ${SOURCES}

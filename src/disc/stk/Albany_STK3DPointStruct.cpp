@@ -4,9 +4,7 @@
 // in the file license.txt in the top-level Albany directory.
 //
 #include "Albany_STK3DPointStruct.hpp"
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 // Constructor for meshes read from ASCII file
 Albany::STK3DPointStruct::STK3DPointStruct(
@@ -15,9 +13,7 @@ Albany::STK3DPointStruct::STK3DPointStruct(
     : GenericSTKMeshStruct(params, Teuchos::null, 3)
 {
   partVec[0] = &metaData->declare_part("Block0", stk::topology::ELEMENT_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*partVec[0]);
-#endif
   std::cout << "---3DPoint constructor---" << std::endl;
   stk::mesh::set_topology(*partVec[0], stk::topology::PARTICLE);
   std::cout << "finished setting cell topology to shards::Particle"

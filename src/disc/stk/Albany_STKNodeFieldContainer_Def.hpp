@@ -6,9 +6,7 @@
 
 #include "Albany_STKNodeFieldContainer.hpp"
 
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/GetBuckets.hpp>
@@ -62,9 +60,7 @@ STKNodeField<DataType, ArrayDim, traits>::STKNodeField(
   // amb-leak Look into this later.
   node_field = traits_type::createField(name, dims, metaData_.get());
 
-#ifdef ALBANY_SEACAS
   if (output) { stk::io::set_field_role(*node_field, Ioss::Field::TRANSIENT); }
-#endif
 }
 
 template <typename DataType, unsigned ArrayDim, class traits>

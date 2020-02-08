@@ -9,7 +9,6 @@
 
 #include "Albany_config.h"
 
-#ifdef ALBANY_SEACAS
 
 #include <Ionit_Initializer.h>
 
@@ -90,6 +89,5 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
 
 }  // Namespace Albany
 
-#endif  // ALBANY_SEACAS
 
 #endif  // ALBANY_IOSS_STKMESHSTRUCT_HPP

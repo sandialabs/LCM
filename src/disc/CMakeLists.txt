@@ -3,6 +3,4 @@
 # Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 # in the file license.txt in the top-level Albany directory.
 #
-if(ALBANY_STK)
-  add_subdirectory(stk)
-endif()
+add_subdirectory(stk)

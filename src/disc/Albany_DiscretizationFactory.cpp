@@ -7,24 +7,18 @@
 #include "Albany_DiscretizationFactory.hpp"
 
 #include "Teuchos_TestForException.hpp"
-#if defined(ALBANY_STK)
 #include "Albany_GenericSTKMeshStruct.hpp"
 #include "Albany_STK3DPointStruct.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "Albany_TmplSTKMeshStruct.hpp"
 
-#ifdef ALBANY_SEACAS
 #include "Albany_IossSTKMeshStruct.hpp"
-#endif
 #include "Albany_AsciiSTKMesh2D.hpp"
 #include "Albany_AsciiSTKMeshStruct.hpp"
 #include "Albany_GmshSTKMeshStruct.hpp"
-#endif
 
-#if defined(ALBANY_STK)
 #include "Topology_Utils.hpp"
-#endif
 
 Albany::DiscretizationFactory::DiscretizationFactory(
     const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
@@ -60,7 +54,6 @@ createInterfaceParts(
     Teuchos::RCP<Teuchos::ParameterList> const& adapt_params,
     Teuchos::RCP<Albany::AbstractMeshStruct>&   mesh_struct)
 {
-#if defined(ALBANY_STK)  // LCM only uses STK for adaptation here
   // Top mod uses BGL
   bool const do_adaptation = adapt_params.is_null() == false;
 
@@ -104,9 +97,7 @@ createInterfaceParts(
       stk::mesh::get_topology(interface_cell_topology);
   stk::mesh::set_topology(interface_part, stk_interface_topo);
 
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(interface_part);
-#endif  // ALBANY_SEACAS
 
   // Augment the MeshSpecsStruct array with one additional entry for
   // the interface block. Essentially copy the last entry from the array
@@ -159,7 +150,6 @@ createInterfaceParts(
       is_interleaved,
       number_blocks > 1,
       cubature_rule));
-#endif
   return;
 }
 
@@ -172,11 +162,9 @@ Albany::DiscretizationFactory::createMeshSpecs()
   // First, create the mesh struct
   meshStruct = createMeshStruct(discParams, adaptParams, commT);
 
-#if defined(ALBANY_STK)
   // Add an interface block. For now relies on STK, so we force a cast that
   // will fail if the underlying meshStruct is not based on STK.
   createInterfaceParts(adaptParams, meshStruct);
-#endif
   return meshStruct->getMeshSpecs();
 }
 
@@ -187,7 +175,6 @@ Albany::DiscretizationFactory::createMeshStruct(
     Teuchos::RCP<const Teuchos_Comm>     comm)
 {
   std::string& method = disc_params->get("Method", "STK1D");
-#if defined(ALBANY_STK)
   if (method == "STK1D" || method == "STK1D Aeras") {
     return Teuchos::rcp(
         new Albany::TmplSTKMeshStruct<1>(disc_params, adapt_params, comm));
@@ -205,22 +192,12 @@ Albany::DiscretizationFactory::createMeshStruct(
   } else if (
       method == "Ioss" || method == "Exodus" || method == "Pamgen" ||
       method == "Ioss Aeras" || method == "Exodus Aeras") {
-#ifdef ALBANY_SEACAS
     return Teuchos::rcp(
         new Albany::IossSTKMeshStruct(disc_params, adapt_params, comm));
-#else
-    TEUCHOS_TEST_FOR_EXCEPTION(
-        method == "Ioss" || method == "Exodus" || method == "Pamgen" ||
-            method == "Ioss Aeras" || method == "Exodus Aeras",
-        Teuchos::Exceptions::InvalidParameter,
-        "Error: Discretization method "
-            << method << " requested, but not compiled in" << std::endl);
-#endif  // ALBANY_SEACAS
   } else if (method == "Ascii") {
     return Teuchos::rcp(new Albany::AsciiSTKMeshStruct(disc_params, comm));
   } else if (method == "Ascii2D") {
     return Teuchos::rcp(new Albany::AsciiSTKMesh2D(disc_params, comm));
-#ifdef ALBANY_SEACAS  // Fails to compile without SEACAS
   } else if (method == "Hacky Ascii2D") {
     // FixME very hacky! needed for printing 2d mesh
     Teuchos::RCP<Albany::GenericSTKMeshStruct> meshStruct2D;
@@ -245,11 +222,9 @@ Albany::DiscretizationFactory::createMeshStruct(
     size_t idx =
         mesh_data->create_output_mesh(output_filename, stk::io::WRITE_RESULTS);
     mesh_data->process_output_request(idx, 0.0);
-#endif  // ALBANY_SEACAS
   } else if (method == "Gmsh") {
     return Teuchos::rcp(new Albany::GmshSTKMeshStruct(disc_params, comm));
   } else
-#endif  // ALBANY_STK
 
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,

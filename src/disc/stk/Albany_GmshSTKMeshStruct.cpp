@@ -18,9 +18,7 @@
 #include "Teuchos_CommHelpers.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 //#include <stk_mesh/fem/FEMHelpers.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -74,10 +72,8 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
 
   create_element_block();
 
-#ifdef ALBANY_SEACAS
   //  stk::io::put_io_part_attribute(metaData->universal_part());
   stk::io::put_io_part_attribute(*partVec[0]);
-#endif
 
   // Set boundary (sideset, nodeset) information
   std::vector<std::string> nsNames;
@@ -1433,9 +1429,7 @@ Albany::GmshSTKMeshStruct::set_all_nodes_boundary(
   std::string nsn = "Node";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
 
   return;
 }
@@ -1447,10 +1441,8 @@ Albany::GmshSTKMeshStruct::set_all_sides_boundary(
   std::string ssn = "BoundarySide";
   ssNames.push_back(ssn);
   ssPartVec[ssn] = &metaData->declare_part(ssn, metaData->side_rank());
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*ssPartVec[ssn]);
   stk::io::put_io_part_attribute(metaData->universal_part());
-#endif
 
   return;
 }
@@ -1523,9 +1515,7 @@ Albany::GmshSTKMeshStruct::add_sideset(
 
   ssPartVec[ssn_i.str()] =
       &metaData->declare_part(ssn_i.str(), metaData->side_rank());
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*ssPartVec[ssn_i.str()]);
-#endif
 
   return;
 }
@@ -1544,9 +1534,7 @@ Albany::GmshSTKMeshStruct::add_nodeset(
 
   nsPartVec[nsn_i.str()] =
       &metaData->declare_part(nsn_i.str(), stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn_i.str()]);
-#endif
 
   return;
 }

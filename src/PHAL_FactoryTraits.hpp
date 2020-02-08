@@ -14,10 +14,8 @@
 #include "LCM/evaluators/bc/PDNeighborFitBC.hpp"
 #include "LCM/evaluators/bc/TimeTracBC.hpp"
 #include "LCM/evaluators/bc/TorsionBC.hpp"
-#if defined(ALBANY_STK)
 #include "LCM/evaluators/bc/SchwarzBC.hpp"
 #include "LCM/evaluators/bc/StrongSchwarzBC.hpp"
-#endif  // ALBANY_STK
 
 #include "PHAL_Dirichlet.hpp"
 #include "PHAL_DirichletCoordinateFunction.hpp"
@@ -81,12 +79,10 @@ struct DirichletFactoryTraits
       LCM::EquilibriumConcentrationBC<_, Traits>,  // 9
       LCM::Time<_, Traits>,                        //  10
       LCM::TorsionBC<_, Traits>                    // 11
-#if defined(ALBANY_STK)
       ,
       LCM::SchwarzBC<_, Traits>,        // 12
       LCM::StrongSchwarzBC<_, Traits>,  // 13
       LCM::PDNeighborFitBC<_, Traits>   // 14
-#endif
       >
       EvaluatorTypes;
 };

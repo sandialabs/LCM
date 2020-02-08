@@ -18,9 +18,7 @@
 
 #include "Teuchos_VerboseObject.hpp"
 
-#ifdef ALBANY_SEACAS
 #include <stk_io/IossBridge.hpp>
-#endif
 
 #define ST_LLI "%" PRId64
 
@@ -415,61 +413,43 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   std::map<std::string, int> ebNameToIndex;
   ebNameToIndex[ebn] = 0;
 
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*partVec[0]);
-#endif
 
   std::vector<std::string> nsNames;
   std::string              nsn = "Bottom";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
   nsn = "NodeSet0";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
   nsn = "NodeSet1";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
   nsn = "NodeSet2";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
   nsn = "NodeSet3";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
   nsn = "NodeSet4";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
   nsn = "NodeSet5";
   nsNames.push_back(nsn);
   nsPartVec[nsn] = &metaData->declare_part(nsn, stk::topology::NODE_RANK);
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*nsPartVec[nsn]);
-#endif
 
   std::vector<std::string> ssNames;
   std::string              ssn = "Basal";
   ssNames.push_back(ssn);
   ssPartVec[ssn] = &metaData->declare_part(ssn, metaData->side_rank());
-#ifdef ALBANY_SEACAS
   stk::io::put_io_part_attribute(*ssPartVec[ssn]);
-#endif
 
   stk::mesh::set_topology(*partVec[0], stk::topology::HEX_8);
   stk::mesh::set_topology(*ssPartVec[ssn], stk::topology::QUAD_4);

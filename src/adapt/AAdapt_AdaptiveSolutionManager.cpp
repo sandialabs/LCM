@@ -6,7 +6,6 @@
 
 #include "AAdapt_AdaptiveSolutionManager.hpp"
 
-#if defined(ALBANY_STK)
 #include "AAdapt_CopyRemesh.hpp"
 #if defined(ALBANY_BGL)
 #include "AAdapt_Erosion.hpp"
@@ -14,7 +13,6 @@
 #endif
 #if defined(ALBANY_STK_PERCEPT)
 #include "AAdapt_STKAdaptT.hpp"
-#endif
 #endif
 #include "AAdapt_RC_Manager.hpp"
 #include "Albany_CombineAndScatterManager.hpp"
@@ -167,7 +165,6 @@ AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
   std::string& method            = adaptParams_->get("Method", "");
   std::string  first_three_chars = method.substr(0, 3);
 
-#if defined(ALBANY_STK)
   if (method == "Copy Remesh") {
     adapter_ =
         Teuchos::rcp(new CopyRemesh(adaptParams_, paramLib_, stateMgr_, comm_));
@@ -180,7 +177,6 @@ AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
     adapter_ =
         Teuchos::rcp(new Erosion(adaptParams_, paramLib_, stateMgr_, comm_));
   } else
-#endif
 #endif
 
 #if defined(ALBANY_STK_PERCEPT)

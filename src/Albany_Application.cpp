@@ -16,19 +16,14 @@
 #include "Albany_Macros.hpp"
 #include "Albany_ProblemFactory.hpp"
 #include "Albany_ResponseFactory.hpp"
+#include "Albany_ScalarResponseFunction.hpp"
 #include "Albany_ThyraUtils.hpp"
+#include "PHAL_Utilities.hpp"
+#include "SolutionSniffer.hpp"
 #include "Teuchos_TimeMonitor.hpp"
 #include "Thyra_MultiVectorStdOps.hpp"
 #include "Thyra_VectorBase.hpp"
 #include "Thyra_VectorStdOps.hpp"
-
-#ifdef ALBANY_TEKO
-#include "Teko_InverseFactoryOperator.hpp"
-#endif
-
-#include "Albany_ScalarResponseFunction.hpp"
-#include "PHAL_Utilities.hpp"
-#include "SolutionSniffer.hpp"
 
 using Teuchos::ArrayRCP;
 using Teuchos::getFancyOStream;
@@ -410,10 +405,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
       problemParams->get("Use Physics-Based Preconditioner", false);
   if (physicsBasedPreconditioner) {
     precType = problemParams->get("Physics-Based Preconditioner", "Teko");
-#ifdef ALBANY_TEKO
-    if (precType == "Teko")
-      precParams = Teuchos::sublist(problemParams, "Teko", true);
-#endif
   }
 
   // Create debug output object

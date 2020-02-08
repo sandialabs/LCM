@@ -34,10 +34,6 @@
 #include <Stratimikos_FROSchXpetra.hpp>
 #endif /* ALBANY_FROSCH */
 
-#ifdef ALBANY_TEKO
-#include "Teko_StratimikosFactory.hpp"
-#endif
-
 #include "Teuchos_TestForException.hpp"
 #include "Teuchos_XMLParameterListHelpers.hpp"
 #include "Teuchos_YamlParameterListHelpers.hpp"
@@ -193,9 +189,6 @@ SolverFactory::createAndGetAlbanyApp(
     enableIfpack2(linearSolverBuilder);
     enableMueLu(linearSolverBuilder);
 
-#if defined(ALBANY_TEKO)
-    Teko::addTekoToStratimikosBuilder(linearSolverBuilder, "Teko");
-#endif
     linearSolverBuilder.setParameterList(stratList);
 
     const Teuchos::RCP<Thyra_LOWS_Factory> lowsFactory =
@@ -249,9 +242,6 @@ SolverFactory::createAndGetAlbanyApp(
     enableIfpack2(linearSolverBuilder);
     enableMueLu(linearSolverBuilder);
     enableFROSch(linearSolverBuilder);
-#ifdef ALBANY_TEKO
-    Teko::addTekoToStratimikosBuilder(linearSolverBuilder, "Teko");
-#endif
     linearSolverBuilder.setParameterList(stratList);
 
     const Teuchos::RCP<Thyra_LOWS_Factory> lowsFactory =

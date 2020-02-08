@@ -75,18 +75,14 @@ plane_dot_product(
 
 }  // anonymous namespace
 
-namespace AAdapt
+namespace AAdapt {
 
-    bool
-    STKUnifRefineField::operator()(
-        const stk::mesh::Entity    element,
-        stk::mesh::FieldBase*      field,
-        const stk::mesh::BulkData& bulkData)
+bool
+STKUnifRefineField::operator()(
+    const stk::mesh::Entity    element,
+    stk::mesh::FieldBase*      field,
+    const stk::mesh::BulkData& bulkData)
 {
-  /*
-    double plane_point[3] = {2, 0, 0};
-    double plane_normal[3] = {1, .5, -.5};
-  */
   double plane_point[3]  = {0, 0.7, 0};
   double plane_normal[3] = {0, 1, 0};
 
@@ -122,22 +118,14 @@ namespace AAdapt
 
   if (found) {
     f_data[0] = 1.0;
-    //    std::cout << "Splitting: " << element.identifier() << std::endl;
-  }
-
-  else {
+  } else {
     f_data[0] = 0.0;
-    //    std::cout << "Not splitting: " << element.identifier() << std::endl;
   }
 
   return false;  // don't terminate the loop
-}  // namespace
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
-   // AAdaptboolSTKUnifRefineField::operator()(conststk::mesh::Entityelement,stk::mesh::FieldBase*field,conststk::mesh::BulkData&bulkData)
+}
+
+}  // namespace AAdapt
 
 bool
 STKUnifUnrefineField::operator()(

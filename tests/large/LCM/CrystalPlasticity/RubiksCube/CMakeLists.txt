@@ -50,9 +50,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CreateMaterialsFile.py
                ${CMAKE_CURRENT_BINARY_DIR}/CreateMaterialsFile.py COPYONLY)
 
 # Add the tests
-if(ALBANY_IFPACK2)
-  # add_test(CrystalPlasticity_RubiksCube_np1 python ../run_exodiff_test.py
-  # "${SerialAlbany.exe}" RubiksCube.yaml)
-  # add_test(CrystalPlasticity_RubiksCube_np4 python ../run_exodiff_test.py
-  # "${Albany.exe}" RubiksCube.yaml)
-endif()
+# add_test(CrystalPlasticity_RubiksCube_np1 python ../run_exodiff_test.py
+# "${SerialAlbany.exe}" RubiksCube.yaml)
+# add_test(CrystalPlasticity_RubiksCube_np4 python ../run_exodiff_test.py
+# "${Albany.exe}" RubiksCube.yaml)

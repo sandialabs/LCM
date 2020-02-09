@@ -25,12 +25,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_ct.g.4.3
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 add_test(${testName}_NewmarkImplicitDForm_CompositeTet10_AnalyticMass
-  ${Albany.exe} clamped-ct.yaml)
+         ${Albany.exe} clamped-ct.yaml)
 set_tests_properties(
   ${testName}_NewmarkImplicitDForm_CompositeTet10_AnalyticMass
   PROPERTIES LABELS "LCM;Tpetra;Forward")
 add_test(${testName}_NewmarkExplicitAForm_CompositeTet10_LumpedMass
-  ${Albany.exe} clamped-ct-expl.yaml)
-set_tests_properties(
-  ${testName}_NewmarkExplicitAForm_CompositeTet10_LumpedMass
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
+         ${Albany.exe} clamped-ct-expl.yaml)
+set_tests_properties(${testName}_NewmarkExplicitAForm_CompositeTet10_LumpedMass
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

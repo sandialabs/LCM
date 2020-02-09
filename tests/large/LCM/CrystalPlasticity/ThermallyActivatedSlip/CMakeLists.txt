@@ -24,18 +24,15 @@ configure_file(
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-if(ALBANY_IFPACK2)
-  set(OUTFILE "ThermallyActivatedSlip.exo")
-  set(REF_FILE "ThermallyActivatedSlip.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=ThermallyActivatedSlip
-      -DTEST_ARGS=ThermallyActivatedSlip.yaml -DMPIMNP=1
-      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  set_tests_properties(CrystalPlasticity_${testName}
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-endif()
+set(OUTFILE "ThermallyActivatedSlip.exo")
+set(REF_FILE "ThermallyActivatedSlip.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=ThermallyActivatedSlip -DTEST_ARGS=ThermallyActivatedSlip.yaml
+    -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName}
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

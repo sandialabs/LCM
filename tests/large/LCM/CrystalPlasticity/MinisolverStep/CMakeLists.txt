@@ -83,52 +83,49 @@ configure_file(
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-if(ALBANY_IFPACK2)
-  # add_test(CrystalPlasticity_MinisolverStep_ConjugateGradient python
-  # ../run_exodiff_test.py "${SerialAlbany.exe}"
-  # MinisolverStep_ConjugateGradient.yaml)
-  # add_test(CrystalPlasticity_MinisolverStep_LineSearchRegularized python
-  # ../run_exodiff_test.py "${SerialAlbany.exe}"
-  # MinisolverStep_LineSearchRegularized.yaml) test 1 - Newton
-  set(OUTFILE "MinisolverStep_Newton.exo")
-  set(REF_FILE "MinisolverStep_Newton.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_Newton
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=MinisolverStep_Newton -DTEST_ARGS=MinisolverStep_Newton.yaml
-      -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  set_tests_properties(CrystalPlasticity_${testName}_Newton
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-  # test 2 - Newton Line Search
-  set(OUTFILE "MinisolverStep_NewtonLineSearch.exo")
-  set(REF_FILE "MinisolverStep_NewtonLineSearch.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_NewtonLineSearch
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=MinisolverStep_NewtonLineSearch
-      -DTEST_ARGS=MinisolverStep_NewtonLineSearch.yaml -DMPIMNP=1
-      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  set_tests_properties(CrystalPlasticity_${testName}_NewtonLineSearch
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-  # test 3 - Trust Region
-  set(OUTFILE "MinisolverStep_TrustRegion.exo")
-  set(REF_FILE "MinisolverStep_TrustRegion.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_TrustRegion
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=MinisolverStep_TrustRegion
-      -DTEST_ARGS=MinisolverStep_TrustRegion.yaml -DMPIMNP=1
-      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  set_tests_properties(CrystalPlasticity_${testName}_TrustRegion
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-
-endif()
+# add_test(CrystalPlasticity_MinisolverStep_ConjugateGradient python
+# ../run_exodiff_test.py "${SerialAlbany.exe}"
+# MinisolverStep_ConjugateGradient.yaml)
+# add_test(CrystalPlasticity_MinisolverStep_LineSearchRegularized python
+# ../run_exodiff_test.py "${SerialAlbany.exe}"
+# MinisolverStep_LineSearchRegularized.yaml) test 1 - Newton
+set(OUTFILE "MinisolverStep_Newton.exo")
+set(REF_FILE "MinisolverStep_Newton.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_Newton
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=MinisolverStep_Newton -DTEST_ARGS=MinisolverStep_Newton.yaml
+    -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName}_Newton
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
+# test 2 - Newton Line Search
+set(OUTFILE "MinisolverStep_NewtonLineSearch.exo")
+set(REF_FILE "MinisolverStep_NewtonLineSearch.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_NewtonLineSearch
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=MinisolverStep_NewtonLineSearch
+    -DTEST_ARGS=MinisolverStep_NewtonLineSearch.yaml -DMPIMNP=1
+    -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName}_NewtonLineSearch
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
+# test 3 - Trust Region
+set(OUTFILE "MinisolverStep_TrustRegion.exo")
+set(REF_FILE "MinisolverStep_TrustRegion.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_TrustRegion
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=MinisolverStep_TrustRegion
+    -DTEST_ARGS=MinisolverStep_TrustRegion.yaml -DMPIMNP=1
+    -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName}_TrustRegion
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

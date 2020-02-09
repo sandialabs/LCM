@@ -15,11 +15,8 @@
 #include "Albany_Utils.hpp"
 // #include <Teuchos_TestForException.hpp>
 
-#ifdef ALBANY_IFPACK2
-#include <Thyra_Ifpack2PreconditionerFactory.hpp>
-#endif
-
 #include <Phalanx_DataLayout_MDALayout.hpp>
+#include <Thyra_Ifpack2PreconditionerFactory.hpp>
 
 // #include <Intrepid2_CellTools.hpp>
 // #include <Intrepid2_DefaultCubatureFactory.hpp>
@@ -289,7 +286,6 @@ setDefaultSolverParameters(Teuchos::ParameterList& pl, const double solver_tol)
   solver.set<int>("Maximum Iterations", 1000);
   solver.set<double>("Convergence Tolerance", solver_tol);
 
-#ifdef ALBANY_IFPACK2
   pl.set<std::string>("Preconditioner Type", "Ifpack2");
   Teuchos::ParameterList& prec_types   = pl.sublist("Preconditioner Types");
   Teuchos::ParameterList& ifpack_types = prec_types.sublist("Ifpack2");
@@ -305,9 +301,6 @@ setDefaultSolverParameters(Teuchos::ParameterList& pl, const double solver_tol)
   Teuchos::ParameterList& ifpack_settings =
       ifpack_types.sublist("Ifpack2 Settings");
   ifpack_settings.set<int>("fact: iluk level-of-fill", 0);
-#else
-  pl.set<std::string>("Preconditioner Type", "None");
-#endif
 }
 
 // Represent the mass matrix type by an enumerated type.
@@ -642,8 +635,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
         p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getVecsize() -
         mgr_->ndb_start;
 
-// Set up linear solver.
-#ifdef ALBANY_IFPACK2
+  // Set up linear solver.
   {
     typedef Thyra::PreconditionerFactoryBase<ST>                  Base;
     typedef Thyra::Ifpack2PreconditionerFactory<Tpetra_CrsMatrix> Impl;
@@ -651,7 +643,6 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
     linearSolverBuilder_.setPreconditioningStrategyFactory(
         Teuchos::abstractFactoryStd<Base, Impl>(), "Ifpack2");
   }
-#endif  // IFPACK2
 
   Teuchos::ParameterList* upl =
       p.get<Teuchos::ParameterList*>("Parameter List");

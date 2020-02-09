@@ -20,11 +20,8 @@
 #include "Schwarz_Coupled.hpp"
 #include "Schwarz_PiroObserver.hpp"
 #include "Stratimikos_DefaultLinearSolverBuilder.hpp"
-
-#ifdef ALBANY_IFPACK2
 #include "Teuchos_AbstractFactoryStd.hpp"
 #include "Thyra_Ifpack2PreconditionerFactory.hpp"
-#endif /* ALBANY_IFPACK2 */
 
 #ifdef ALBANY_MUELU
 #include "Stratimikos_MueLuHelpers.hpp"
@@ -45,12 +42,10 @@ namespace {
 void
 enableIfpack2(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 {
-#ifdef ALBANY_IFPACK2
   typedef Thyra::PreconditionerFactoryBase<ST>                  Base;
   typedef Thyra::Ifpack2PreconditionerFactory<Tpetra_CrsMatrix> Impl;
   linearSolverBuilder.setPreconditioningStrategyFactory(
       Teuchos::abstractFactoryStd<Base, Impl>(), "Ifpack2");
-#endif
 }
 
 void

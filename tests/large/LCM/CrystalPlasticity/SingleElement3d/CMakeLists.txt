@@ -38,27 +38,25 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/AnalyticSolution.py
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-if(ALBANY_IFPACK2)
-  # test 1 - Elastic shear 3d
-  set(OUTFILE "ElasticShear3d.exo")
-  set(REF_FILE "ElasticShear3d.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_ElasticShear3d
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=ElasticShear3d -DTEST_ARGS=ElasticShear3d.yaml -DMPIMNP=1
-      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  # test 2 - Elastic Shear rotated 3d
-  set(OUTFILE "ElasticShearRotated3d.exo")
-  set(REF_FILE "ElasticShearRotated3d.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_ElasticShearRotated3d
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=ElasticShearRotated3d -DTEST_ARGS=ElasticShearRotated3d.yaml
-      -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-endif()
+# test 1 - Elastic shear 3d
+set(OUTFILE "ElasticShear3d.exo")
+set(REF_FILE "ElasticShear3d.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_ElasticShear3d
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=ElasticShear3d -DTEST_ARGS=ElasticShear3d.yaml -DMPIMNP=1
+    -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+# test 2 - Elastic Shear rotated 3d
+set(OUTFILE "ElasticShearRotated3d.exo")
+set(REF_FILE "ElasticShearRotated3d.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_ElasticShearRotated3d
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=ElasticShearRotated3d -DTEST_ARGS=ElasticShearRotated3d.yaml
+    -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})

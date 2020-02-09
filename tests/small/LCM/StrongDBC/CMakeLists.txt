@@ -12,8 +12,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material.yaml
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.g
                ${CMAKE_CURRENT_BINARY_DIR}/cube.g COPYONLY)
 
-if(ALBANY_IFPACK2)
-  get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-  add_test(${testName} ${SerialAlbany.exe} cube.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
-endif()
+get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+add_test(${testName} ${SerialAlbany.exe} cube.yaml)
+set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")

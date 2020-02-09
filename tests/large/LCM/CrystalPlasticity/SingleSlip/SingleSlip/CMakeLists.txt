@@ -31,31 +31,29 @@ configure_file(
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-if(ALBANY_IFPACK2)
-  # test 1 - Explicit
-  set(OUTFILE "SingleSlip_Explicit.exo")
-  set(REF_FILE "SingleSlip_Explicit.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_Explicit
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=SingleSlip_Explicit -DTEST_ARGS=SingleSlip_Explicit.yaml
-      -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  set_tests_properties(CrystalPlasticity_${testName}_Explicit
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-  # test 2 - Implicit
-  set(OUTFILE "SingleSlip_Implicit.exo")
-  set(REF_FILE "SingleSlip_Implicit.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_Implicit
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=SingleSlip_Implicit -DTEST_ARGS=SingleSlip_Implicit.yaml
-      -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  set_tests_properties(CrystalPlasticity_${testName}_Implicit
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-endif()
+# test 1 - Explicit
+set(OUTFILE "SingleSlip_Explicit.exo")
+set(REF_FILE "SingleSlip_Explicit.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_Explicit
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=SingleSlip_Explicit -DTEST_ARGS=SingleSlip_Explicit.yaml
+    -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName}_Explicit
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
+# test 2 - Implicit
+set(OUTFILE "SingleSlip_Implicit.exo")
+set(REF_FILE "SingleSlip_Implicit.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_Implicit
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=SingleSlip_Implicit -DTEST_ARGS=SingleSlip_Implicit.yaml
+    -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName}_Implicit
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

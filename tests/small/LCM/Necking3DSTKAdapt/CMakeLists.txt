@@ -14,9 +14,7 @@ configure_file(
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # 1. Create the test with this name and standard executable
 
-if(ALBANY_IFPACK2
-   AND SEACAS_EPU
-   AND SEACAS_EXODIFF)
+if(SEACAS_EPU AND SEACAS_EXODIFF)
   add_test(${testName}_ElasticML ${Albany.exe} inputElastAdapt.yaml)
   add_test(${testName} ${Albany.exe} mechanics.yaml)
 

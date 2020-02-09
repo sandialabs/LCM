@@ -13,29 +13,23 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vortex.exo.4.2
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vortex.exo.4.3
                ${CMAKE_CURRENT_BINARY_DIR}/vortex.exo.4.3 COPYONLY)
 
-# ##############################################################################
-# Steady tests         ###
-# ##############################################################################
-
-# ##############################################################################
-# Transient tests        ###
-# ##############################################################################
+#
+# Transient tests
+#
 
 set(testName ${testNameRoot}_TransientIRK)
 
-if(ALBANY_IFPACK2)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputTransientRKT.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/inputTransientRKT.yaml COPYONLY)
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/inputTransientRKT_RegressFail.yaml
-    ${CMAKE_CURRENT_BINARY_DIR}/inputTransientRKT_RegressFail.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputTransientRKT.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/inputTransientRKT.yaml COPYONLY)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/inputTransientRKT_RegressFail.yaml
+  ${CMAKE_CURRENT_BINARY_DIR}/inputTransientRKT_RegressFail.yaml COPYONLY)
 
-  add_test(${testName} ${Albany.exe} inputTransientRKT.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
+add_test(${testName} ${Albany.exe} inputTransientRKT.yaml)
+set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
 
-  add_test(NAME ${testName}_RegressFail
-           COMMAND ${Albany.exe} inputTransientRKT_RegressFail.yaml)
-  set_tests_properties(${testName}_RegressFail PROPERTIES WILL_FAIL TRUE)
-  set_tests_properties(${testName}_RegressFail
-                       PROPERTIES LABELS "Demo;Tpetra;Forward;RegressFail")
-endif(ALBANY_IFPACK2)
+add_test(NAME ${testName}_RegressFail
+         COMMAND ${Albany.exe} inputTransientRKT_RegressFail.yaml)
+set_tests_properties(${testName}_RegressFail PROPERTIES WILL_FAIL TRUE)
+set_tests_properties(${testName}_RegressFail
+                     PROPERTIES LABELS "Demo;Tpetra;Forward;RegressFail")

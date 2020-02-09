@@ -10,9 +10,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/surface3ElemMesh.g
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # 1. Create the test with this name and standard executable
 if(NOT ALBANY_PARALLEL_ONLY)
-  if(ALBANY_IFPACK2)
-    add_test(${testName}_SERIAL ${SerialAlbany.exe} input.yaml)
-    set_tests_properties(${testName}_SERIAL PROPERTIES LABELS
-                                                       "LCM;Tpetra;Forward")
-  endif()
+  add_test(${testName}_SERIAL ${SerialAlbany.exe} input.yaml)
+  set_tests_properties(${testName}_SERIAL PROPERTIES LABELS
+                                                     "LCM;Tpetra;Forward")
 endif()

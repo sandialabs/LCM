@@ -50,29 +50,27 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/examineCondition.py
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-if(ALBANY_IFPACK2)
-  # test 1 - Implicit Active Sets
-  set(OUTFILE "MultiSlipPlaneHard_Implicit_Active_Sets.exo")
-  set(REF_FILE "MultiSlipPlaneHard_Implicit_Active_Sets.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_Implicit_Active_Sets
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=MultiSlipPlaneHard_Implicit_Active_Sets
-      -DTEST_ARGS=MultiSlipPlaneHard_Implicit_Active_Sets.yaml -DMPIMNP=1
-      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  # test 2 - Implicit
-  set(OUTFILE "MultiSlipPlaneHard_Implicit.exo")
-  set(REF_FILE "MultiSlipPlaneHard_Implicit.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}_Implicit
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=MultiSlipPlaneHard_Implicit
-      -DTEST_ARGS=MultiSlipPlaneHard_Implicit.yaml -DMPIMNP=1
-      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-endif()
+# test 1 - Implicit Active Sets
+set(OUTFILE "MultiSlipPlaneHard_Implicit_Active_Sets.exo")
+set(REF_FILE "MultiSlipPlaneHard_Implicit_Active_Sets.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_Implicit_Active_Sets
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=MultiSlipPlaneHard_Implicit_Active_Sets
+    -DTEST_ARGS=MultiSlipPlaneHard_Implicit_Active_Sets.yaml -DMPIMNP=1
+    -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+# test 2 - Implicit
+set(OUTFILE "MultiSlipPlaneHard_Implicit.exo")
+set(REF_FILE "MultiSlipPlaneHard_Implicit.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}_Implicit
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=MultiSlipPlaneHard_Implicit
+    -DTEST_ARGS=MultiSlipPlaneHard_Implicit.yaml -DMPIMNP=1
+    -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})

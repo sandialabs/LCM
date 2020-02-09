@@ -19,13 +19,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/quadQuad.exo.4.3
 
 set(testName ${testNameRoot})
 
-if(ALBANY_IFPACK2)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 
-  add_test(${testName} ${Albany.exe} input.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
-endif()
+add_test(${testName} ${Albany.exe} input.yaml)
+set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 
 # ##############################################################################
 # Serial input tests      ###
@@ -34,12 +32,9 @@ endif()
 if(ALBANY_IOPX)
   set(testName ${testNameRoot}_SerialInput)
 
-  if(ALBANY_IFPACK2)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_Serial.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/input_Serial.yaml COPYONLY)
+  add_test(${testName} ${Albany.exe} input_Serial.yaml)
+  set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_Serial.yaml
-                   ${CMAKE_CURRENT_BINARY_DIR}/input_Serial.yaml COPYONLY)
-    add_test(${testName} ${Albany.exe} input_Serial.yaml)
-    set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
-
-  endif()
 endif()

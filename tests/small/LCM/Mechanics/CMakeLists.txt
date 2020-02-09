@@ -32,15 +32,13 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
 
 # Create the test with this name and standard executable
-if(ALBANY_IFPACK2)
-  add_test(${testName}2D_Blocked ${Albany.exe} inputBlocked.yaml)
-  set_tests_properties(${testName}2D_Blocked PROPERTIES LABELS
-                                                        "LCM;Tpetra;Forward")
-  add_test(${testName}2D_Blocked_dir_field ${Albany.exe}
-           inputBlocked_dir_field.yaml)
-  set_tests_properties(${testName}2D_Blocked_dir_field
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-endif()
+add_test(${testName}2D_Blocked ${Albany.exe} inputBlocked.yaml)
+set_tests_properties(${testName}2D_Blocked PROPERTIES LABELS
+                                                      "LCM;Tpetra;Forward")
+add_test(${testName}2D_Blocked_dir_field ${Albany.exe}
+         inputBlocked_dir_field.yaml)
+set_tests_properties(${testName}2D_Blocked_dir_field
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
 
 # test for 2D with J2 plasticity model
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputJ2Plasticity2D.yaml
@@ -63,15 +61,13 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/PlasticityJ2_3D_Traction_Material.yaml COPYONLY)
 
 # Create the test with this name and standard executable
-if(ALBANY_IFPACK2)
-  add_test(${testName}2D_J2 ${Albany.exe} inputJ2Plasticity2D.yaml)
-  set_tests_properties(${testName}2D_J2 PROPERTIES LABELS "LCM;Tpetra;Forward")
-  add_test(${testName}_PlasticityJ2_2D_Traction ${Albany.exe}
-           PlasticityJ2_2D_Traction.yaml)
-  set_tests_properties(${testName}_PlasticityJ2_2D_Traction
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-  add_test(${testName}_PlasticityJ2_3D_Traction ${Albany.exe}
-           PlasticityJ2_3D_Traction.yaml)
-  set_tests_properties(${testName}_PlasticityJ2_3D_Traction
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-endif()
+add_test(${testName}2D_J2 ${Albany.exe} inputJ2Plasticity2D.yaml)
+set_tests_properties(${testName}2D_J2 PROPERTIES LABELS "LCM;Tpetra;Forward")
+add_test(${testName}_PlasticityJ2_2D_Traction ${Albany.exe}
+         PlasticityJ2_2D_Traction.yaml)
+set_tests_properties(${testName}_PlasticityJ2_2D_Traction
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
+add_test(${testName}_PlasticityJ2_3D_Traction ${Albany.exe}
+         PlasticityJ2_3D_Traction.yaml)
+set_tests_properties(${testName}_PlasticityJ2_3D_Traction
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

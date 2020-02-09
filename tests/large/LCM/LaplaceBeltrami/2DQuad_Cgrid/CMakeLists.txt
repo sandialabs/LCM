@@ -14,83 +14,36 @@ if(SEACAS_EPU AND SEACAS_EXODIFF)
 
   # 1. Create the test with this name and standard executable
 
-  if(ALBANY_IFPACK2)
-    set(testName ${testDirName})
-    add_test(
-      NAME LaplaceBeltrami:${testName}
-      COMMAND
-        ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-        -DTEST_ARGS= -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
-        -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-        -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-        ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
-    set_tests_properties(LaplaceBeltrami:${testName}
-                         PROPERTIES LABELS "LCM;Tpetra;Forward")
+  set(testName ${testDirName})
+  add_test(
+    NAME LaplaceBeltrami:${testName}
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
+      -DTEST_ARGS= -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
+      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
+  set_tests_properties(LaplaceBeltrami:${testName}
+                       PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-    set(testName ${testDirName}_TPS)
-    add_test(
-      NAME LaplaceBeltrami:${testName}
-      COMMAND
-        ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-        -DTEST_ARGS=inputPS.yaml -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
-        -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-        -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-        ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
-    set_tests_properties(LaplaceBeltrami:${testName}
-                         PROPERTIES LABELS "LCM;Tpetra;Forward")
+  set(testName ${testDirName}_TPS)
+  add_test(
+    NAME LaplaceBeltrami:${testName}
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
+      -DTEST_ARGS=inputPS.yaml -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
+      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
+  set_tests_properties(LaplaceBeltrami:${testName}
+                       PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-    set(testName ${testDirName}_LB)
-    add_test(
-      NAME LaplaceBeltrami:${testName}
-      COMMAND
-        ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-        -DTEST_ARGS=inputLB.yaml -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
-        -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-        -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-        ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
-    set_tests_properties(LaplaceBeltrami:${testName}
-                         PROPERTIES LABELS "LCM;Tpetra;Forward")
-  endif()
-  # if (ALBANY_MUELU_EXAMPLES) set(testName ${testDirName}) add_test(NAME
-  # LaplaceBeltrami:${testName}_MueLu_64 COMMAND ${CMAKE_COMMAND}
-  # "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-  # -DTEST_ARGS=input_MueLu_64.yaml -DMPIMNP=${MPIMNP}
-  # -DSEACAS_EPU=${SEACAS_EPU} -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-  # -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-  # ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
-  #
-  # set(testName ${testDirName}_TPS) add_test(NAME
-  # LaplaceBeltrami:${testName}_MueLu_64 COMMAND ${CMAKE_COMMAND}
-  # "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-  # -DTEST_ARGS=inputPS_MueLu_64.yaml -DMPIMNP=${MPIMNP}
-  # -DSEACAS_EPU=${SEACAS_EPU} -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-  # -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-  # ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
-  #
-  # set(testName ${testDirName}_LB) add_test(NAME
-  # LaplaceBeltrami:${testName}_MueLu_64 COMMAND ${CMAKE_COMMAND}
-  # "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-  # -DTEST_ARGS=inputLB_MueLu_64.yaml -DMPIMNP=${MPIMNP}
-  # -DSEACAS_EPU=${SEACAS_EPU} -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-  # -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-  # ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake) else() set(testName
-  # ${testDirName}) add_test(NAME LaplaceBeltrami:${testName}_MueLu COMMAND
-  # ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-  # -DTEST_ARGS=input_MueLu.yaml -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
-  # -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-  # ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
-  #
-  # set(testName ${testDirName}_TPS) add_test(NAME
-  # LaplaceBeltrami:${testName}_MueLu COMMAND ${CMAKE_COMMAND}
-  # "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-  # -DTEST_ARGS=inputPS_MueLu.yaml -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
-  # -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-  # ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
-  #
-  # set(testName ${testDirName}_LB) add_test(NAME
-  # LaplaceBeltrami:${testName}_MueLu COMMAND ${CMAKE_COMMAND}
-  # "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
-  # -DTEST_ARGS=inputLB_MueLu.yaml -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
-  # -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-  # ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake) endif()
-endif(SEACAS_EPU AND SEACAS_EXODIFF)
+  set(testName ${testDirName}_LB)
+  add_test(
+    NAME LaplaceBeltrami:${testName}
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=${testName}
+      -DTEST_ARGS=inputLB.yaml -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
+      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
+  set_tests_properties(LaplaceBeltrami:${testName}
+                       PROPERTIES LABELS "LCM;Tpetra;Forward")
+endif()

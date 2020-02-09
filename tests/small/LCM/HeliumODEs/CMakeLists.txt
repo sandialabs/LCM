@@ -4,7 +4,7 @@
 # in the file license.txt in the top-level Albany directory.
 #
 
-if(ALBANY_IFPACK2 AND SEACAS_EXODIFF)
+if(SEACAS_EXODIFF)
   # Create a symlink to exodiff
   execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SEACAS_EXODIFF}
                           ${CMAKE_CURRENT_BINARY_DIR}/exodiff)
@@ -74,5 +74,4 @@ if(ALBANY_IFPACK2 AND SEACAS_EXODIFF)
                            PROPERTIES LABELS "LCM;Tpetra;Forward")
     endif()
   endif()
-
-endif(ALBANY_IFPACK2 AND SEACAS_EXODIFF)
+endif()

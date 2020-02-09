@@ -17,14 +17,14 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped-stk-expl.yaml
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 add_test(Dynamic_${testName}_NewmarkImplicitDForm_Tempus ${Albany.exe}
-  clamped-stk-shift.yaml)
+         clamped-stk-shift.yaml)
 set_tests_properties(Dynamic_${testName}_NewmarkImplicitDForm_Tempus
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
 add_test(Dynamic_${testName}_NewmarkExplicitAForm_Tempus ${Albany.exe}
-  clamped-stk-expl.yaml)
+         clamped-stk-expl.yaml)
 set_tests_properties(Dynamic_${testName}_NewmarkExplicitAForm_Tempus
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
-add_test(Dynamic_${testName}_NewmarkExplicitAForm_BLMesh_Tempus
-  ${Albany.exe} clamped-stk-bl-mesh.yaml)
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
+add_test(Dynamic_${testName}_NewmarkExplicitAForm_BLMesh_Tempus ${Albany.exe}
+         clamped-stk-bl-mesh.yaml)
 set_tests_properties(Dynamic_${testName}_NewmarkExplicitAForm_BLMesh_Tempus
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

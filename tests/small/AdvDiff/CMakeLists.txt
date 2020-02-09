@@ -1,4 +1,4 @@
-if(NOT ALBANY_PARALLEL_ONLY AND ALBANY_IFPACK2)
+if(NOT ALBANY_PARALLEL_ONLY)
   # Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 

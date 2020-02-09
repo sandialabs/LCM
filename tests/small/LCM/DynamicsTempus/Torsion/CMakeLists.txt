@@ -13,10 +13,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nobcs-expl.yaml
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 add_test(Dynamic_${testName}_NewmarkImplicitAForm_Tempus ${Albany.exe}
-  nobcs.yaml)
+         nobcs.yaml)
 set_tests_properties(Dynamic_${testName}_NewmarkImplicitAForm_Tempus
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
 add_test(Dynamic_${testName}_NewmarkExplicitAForm_Tempus ${Albany.exe}
-  nobcs-expl.yaml)
+         nobcs-expl.yaml)
 set_tests_properties(Dynamic_${testName}_NewmarkImplicitAForm_Tempus
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

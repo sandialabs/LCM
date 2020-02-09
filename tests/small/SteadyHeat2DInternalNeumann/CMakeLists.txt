@@ -21,10 +21,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mesh.exo.4.3
 
 set(testName ${testNameRoot})
 
-if(ALBANY_IFPACK2)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
 
-  add_test(${testName} ${Albany.exe} input.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
-endif()
+add_test(${testName} ${Albany.exe} input.yaml)
+set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")

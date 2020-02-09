@@ -13,6 +13,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.yaml
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 add_test(Serial_Dynamic_${testName}_NewmarkImplicitDForm_Tempus
-  ${SerialAlbany.exe} cube.yaml)
+         ${SerialAlbany.exe} cube.yaml)
 set_tests_properties(Serial_Dynamic_${testName}_NewmarkImplicitDForm_Tempus
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

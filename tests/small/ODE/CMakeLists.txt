@@ -18,12 +18,10 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # endif ()
 
   set(testName ${testNameRoot}_Ifpack2)
-  if(ALBANY_IFPACK2)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputTP.yaml
-                   ${CMAKE_CURRENT_BINARY_DIR}/inputTP.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputTP.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/inputTP.yaml COPYONLY)
 
-    add_test(${testName} ${SerialAlbany.exe} inputTP.yaml)
-    set_tests_properties(${testName} PROPERTIES LABELS
-                                                "Demo;Tpetra;Forward;Serial")
-  endif()
+  add_test(${testName} ${SerialAlbany.exe} inputTP.yaml)
+  set_tests_properties(${testName} PROPERTIES LABELS
+                                              "Demo;Tpetra;Forward;Serial")
 endif()

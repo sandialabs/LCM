@@ -4,7 +4,7 @@
 # in the file license.txt in the top-level Albany directory.
 #
 
-if(NOT (ALBANY_IFPACK2 AND SEACAS_EXODIFF))
+if(NOT SEACAS_EXODIFF)
   return()
 endif()
 

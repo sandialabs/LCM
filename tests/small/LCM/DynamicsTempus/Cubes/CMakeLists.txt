@@ -41,16 +41,15 @@ configure_file(
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 add_test(Serial_Dynamic_${testName}_NewmarkImplicitAForm_Tempus
-  ${SerialAlbany.exe} cube-single-tempus.yaml)
+         ${SerialAlbany.exe} cube-single-tempus.yaml)
 set_tests_properties(Serial_Dynamic_${testName}_NewmarkImplicitAForm_Tempus
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
 add_test(Parallel_Dynamic_${testName}_NewmarkImplicitAForm_Tempus
-  ${Albany8.exe} larger-cubes-tempus.yaml)
-set_tests_properties(
-  Parallel_Dynamic_${testName}_NewmarkImplicitAForm_Tempus
-  PROPERTIES LABELS "LCM;Tpetra;Forward")
+         ${Albany8.exe} larger-cubes-tempus.yaml)
+set_tests_properties(Parallel_Dynamic_${testName}_NewmarkImplicitAForm_Tempus
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")
 add_test(Parallel_Dynamic_${testName}_NewmarkExplicitAForm_LumpedMass_Tempus
-  ${Albany8.exe} larger-cubes-tempus-expl.yaml)
+         ${Albany8.exe} larger-cubes-tempus-expl.yaml)
 set_tests_properties(
   Parallel_Dynamic_${testName}_NewmarkExplicitAForm_LumpedMass_Tempus
   PROPERTIES LABELS "LCM;Tpetra;Forward")

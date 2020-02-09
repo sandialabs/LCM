@@ -24,19 +24,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/blockDiffusionStab.gold.e
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-if(ALBANY_IFPACK2)
-  # Big diffs in parallel
-  set(OUTFILE "blockDiffusionStab.e")
-  set(REF_FILE "blockDiffusionStab.gold.e")
-  add_test(
-    NAME MechanicsWithHydrogenBar_${testName}
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=blockDiffusionStab -DTEST_ARGS=blockDiffusionStab.yaml
-      -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  set_tests_properties(MechanicsWithHydrogenBar_${testName}
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-
-endif()
+# Big diffs in parallel
+set(OUTFILE "blockDiffusionStab.e")
+set(REF_FILE "blockDiffusionStab.gold.e")
+add_test(
+  NAME MechanicsWithHydrogenBar_${testName}
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=blockDiffusionStab -DTEST_ARGS=blockDiffusionStab.yaml
+    -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+set_tests_properties(MechanicsWithHydrogenBar_${testName}
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

@@ -411,10 +411,8 @@ endif()
 list(FIND Trilinos_PACKAGE_LIST Ifpack2 Ifpack2_List_ID)
 if(Ifpack2_List_ID GREATER -1)
   message("-- Looking for Ifpack2:              Found.")
-  set(ALBANY_IFPACK2 TRUE)
 else()
-  message("-- Looking for Ifpack2:              NOT found.")
-  set(ALBANY_IFPACK2 FALSE)
+  message(FATAL_ERROR "Ifpack2 is required.")
 endif()
 
 # set optional dependency on MueLu, for preconditioning

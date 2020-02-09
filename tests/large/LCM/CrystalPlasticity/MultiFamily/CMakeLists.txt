@@ -21,17 +21,14 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MultiFamily.gold.exo
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-if(ALBANY_IFPACK2)
-  set(OUTFILE "MultiFamily.exo")
-  set(REF_FILE "MultiFamily.gold.exo")
-  add_test(
-    NAME CrystalPlasticity_${testName}
-    COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-      -DTEST_NAME=MultiFamily -DTEST_ARGS=MultiFamily.yaml -DMPIMNP=1
-      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-      ${runtest.cmake})
-  set_tests_properties(CrystalPlasticity_${testName}
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-endif()
+set(OUTFILE "MultiFamily.exo")
+set(REF_FILE "MultiFamily.gold.exo")
+add_test(
+  NAME CrystalPlasticity_${testName}
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=MultiFamily
+    -DTEST_ARGS=MultiFamily.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE}
+    -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName}
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

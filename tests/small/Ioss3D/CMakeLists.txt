@@ -7,10 +7,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/cube.exo COPYONLY)
 
   # Create the test with this name and standard executable
-  if(ALBANY_IFPACK2)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
-                   ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
-    add_test(${testName} ${SerialAlbany.exe} input.yaml)
-    set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
-  endif()
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
+  add_test(${testName} ${SerialAlbany.exe} input.yaml)
+  set_tests_properties(${testName} PROPERTIES LABELS "Basic;Tpetra;Forward")
 endif()

@@ -12,15 +12,11 @@ if(SEACAS_EXODIFF AND SEACAS_ALGEBRA)
                           ${CMAKE_CURRENT_BINARY_DIR}/algebra)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run_algebra.sh
                  ${CMAKE_CURRENT_BINARY_DIR}/run_algebra.sh COPYONLY)
-  if(ALBANY_IFPACK2)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
-                            ${CMAKE_CURRENT_BINARY_DIR}/Albany)
-  endif()
+  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
+                          ${CMAKE_CURRENT_BINARY_DIR}/Albany)
 
-  if(ALBANY_IFPACK2)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputCohesive.yaml
-                   ${CMAKE_CURRENT_BINARY_DIR}/inputCohesive.yaml COPYONLY)
-  endif()
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputCohesive.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/inputCohesive.yaml COPYONLY)
 
   # material files
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/1materialCohesive.yaml
@@ -43,31 +39,27 @@ if(SEACAS_EXODIFF AND SEACAS_ALGEBRA)
                  ${CMAKE_CURRENT_BINARY_DIR}/outCohesive.alg.gold.e COPYONLY)
 
   # python runtest file
-  if(ALBANY_IFPACK2)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
-                   ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
-  endif()
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
+                 ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
 
   # 1. Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
   # 1. Create the test with this name and standard executable
   if(NOT ALBANY_PARALLEL_ONLY)
-    if(ALBANY_IFPACK2)
-      set(OUTFILE "outCohesive.e")
-      set(REF_FILE "outCohesive.alg.gold.e")
-      set(ALG_OUTFILE "outCohesive.alg.e")
-      add_test(
-        NAME ${testName}
-        COMMAND
-          ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-          -DTEST_NAME=Cohesive -DTEST_ARGS=inputCohesive.yaml -DMPIMNP=1
-          -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DSEACAS_ALGEBRA=${SEACAS_ALGEBRA}
-          -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${ALG_OUTFILE}
-          -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-          ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
+    set(OUTFILE "outCohesive.e")
+    set(REF_FILE "outCohesive.alg.gold.e")
+    set(ALG_OUTFILE "outCohesive.alg.e")
+    add_test(
+      NAME ${testName}
+      COMMAND
+        ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=Cohesive
+        -DTEST_ARGS=inputCohesive.yaml -DMPIMNP=1
+        -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DSEACAS_ALGEBRA=${SEACAS_ALGEBRA}
+        -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${ALG_OUTFILE}
+        -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+        ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
 
-      set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
-    endif()
+    set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
   endif()
-endif(SEACAS_EXODIFF AND SEACAS_ALGEBRA)
+endif()

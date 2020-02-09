@@ -34,16 +34,6 @@ set(HEADERS
 set(SOURCES ${SOURCES} AAdapt_CopyRemesh.cpp)
 set(HEADERS ${HEADERS} AAdapt_CopyRemesh.hpp)
 
-# Random Criterion & Stress Fracture depend on LCM Speculative features and
-# code, currently
-if(LCM_SPECULATIVE)
-  set(SOURCES ${SOURCES} AAdapt_RandomCriterion.cpp AAdapt_RandomFracture.cpp
-              AAdapt_StressFracture.cpp)
-
-  set(HEADERS ${HEADERS} AAdapt_RandomCriterion.hpp AAdapt_RandomFracture.hpp
-              AAdapt_StressFracture.hpp)
-endif()
-
 # Topology Modification depends on LCM and STK
 if(ALBANY_BGL)
   set(SOURCES ${SOURCES} AAdapt_Erosion.cpp AAdapt_TopologyModification.cpp)

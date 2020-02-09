@@ -60,16 +60,9 @@ struct EBSpecsStruct
   }
 
   //! Calculate the sizes of the elements in this element block
-//    void calcElemSizes(std::vector<std::vector<double> > &h){
-#ifdef __clang__
-  // GAH - clang++ causes an FPE here when optimizing. Turn off opt for this
-  // function.
-  void
-  calcElemSizes(std::vector<double> h[]) __attribute__((optnone))
-#else
+  //    void calcElemSizes(std::vector<std::vector<double> > &h){
   void
   calcElemSizes(std::vector<double> h[])
-#endif
   {
     //        for(std::size_t i = 0; i < h.size(); i++)
     for (unsigned i = 0; i < Dim; i++) {

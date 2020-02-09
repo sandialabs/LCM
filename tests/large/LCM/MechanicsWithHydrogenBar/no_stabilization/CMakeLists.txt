@@ -24,8 +24,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/blockDiffusionNoStab.gold.e
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-# Add the tests
-# Big diffs in parallel
+# Add the tests Big diffs in parallel
 set(OUTFILE "blockDiffusionNoStab.e")
 set(REF_FILE "blockDiffusionNoStab.gold.e")
 add_test(

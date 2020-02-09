@@ -37,8 +37,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/AnalyticSolution.py
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-# Add the tests
-# test 1 - Elastic shear 3d
+# Add the tests test 1 - Elastic shear 3d
 set(OUTFILE "ElasticShear3d.exo")
 set(REF_FILE "ElasticShear3d.gold.exo")
 add_test(

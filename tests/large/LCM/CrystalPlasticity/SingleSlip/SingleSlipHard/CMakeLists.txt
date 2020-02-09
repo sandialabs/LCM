@@ -34,8 +34,7 @@ configure_file(
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-# Add the tests
-# test 1 - Explicit
+# Add the tests test 1 - Explicit
 set(OUTFILE "SingleSlipHard_Explicit.exo")
 set(REF_FILE "SingleSlipHard_Explicit.gold.exo")
 add_test(

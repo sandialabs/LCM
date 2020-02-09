@@ -77,10 +77,8 @@
 
 // ================ Package-specific macros ================= //
 
-  // --- LCM
-  #cmakedefine ALBANY_LAME
-  #cmakedefine ALBANY_LAMENT
-  #cmakedefine LCM_SPECULATIVE
-  #cmakedefine ALBANY_YAML
+// --- LCM
+#cmakedefine ALBANY_LAME
+#cmakedefine ALBANY_LAMENT
 
 #endif // ALBANY_CONFIG_H

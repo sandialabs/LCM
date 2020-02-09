@@ -806,18 +806,6 @@ else()
   set(ALBANY_VERBOSE TRUE)
 endif()
 
-# Option to enable "speculative" features that are not ready for general
-# visibility
-option(ENABLE_LCM_SPECULATIVE "Flag to turn on speculative LCM features/code"
-       OFF)
-if(NOT ENABLE_LCM_SPECULATIVE)
-  message("-- Speculative LCM features  are NOT Enabled")
-  set(LCM_SPECULATIVE FALSE)
-else()
-  message("-- Speculative LCM features  are Enabled")
-  set(LCM_SPECULATIVE TRUE)
-endif()
-
 # Enhanced debugging option
 option(ENABLE_DEBUGGING "Flag to turn on enhanced debugging info" OFF)
 if(ENABLE_DEBUGGING)

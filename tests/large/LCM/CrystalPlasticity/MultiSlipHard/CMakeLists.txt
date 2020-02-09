@@ -49,8 +49,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/examineCondition.py
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-# Add the tests
-# test 1 - Implicit Active Sets
+# Add the tests test 1 - Implicit Active Sets
 set(OUTFILE "MultiSlipPlaneHard_Implicit_Active_Sets.exo")
 set(REF_FILE "MultiSlipPlaneHard_Implicit_Active_Sets.gold.exo")
 add_test(

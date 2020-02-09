@@ -79,11 +79,6 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
 
   EBSpecs.resize(numEB);
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
-#endif
-
   switch (Dim) {
     case 0:  // 0D
       default_element_type      = stk::topology::PARTICLE;
@@ -112,10 +107,6 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
                // Note that nelem will default to 0 and scale to 1 if element
                // blocks are specified
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
     // Read the values for "1D Elements", "2D Elements", "3D Elements"
     std::stringstream buf;
     buf << i + 1 << "D Elements";
@@ -142,16 +133,7 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
 
       std::stringstream nelem_txt, scale_txt;
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
-#endif
-
       for (unsigned idx = 0; idx < Dim - 1; idx++) {
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
         nelem_txt << nelem[idx] << "x";
         scale_txt << scale[idx] << "x";
       }
@@ -170,31 +152,13 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
     // Calculate total number of elements
     total_elems = nelem[0];
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
-#endif
-
     for (unsigned i = 1; i < Dim; i++) total_elems *= nelem[i];
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
   } else {  // Element blocks are present in input
 
     std::vector<GO> min(Dim), max(Dim);
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
-#endif
-
     for (unsigned i = 0; i < Dim; i++) {
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
       min[i] = std::numeric_limits<GO>::max();
       max[i] = std::numeric_limits<GO>::min();
 
@@ -209,59 +173,23 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
 
       //        nelem[i] += EBSpecs[eb].numElems(i);
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
-#endif
-
       for (unsigned i = 0; i < Dim; i++) {
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
         min[i] = (min[i] < EBSpecs[eb].min[i]) ? min[i] : EBSpecs[eb].min[i];
         max[i] = (max[i] > EBSpecs[eb].max[i]) ? max[i] : EBSpecs[eb].max[i];
       }
     }
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
-#endif
-
-    for (unsigned i = 0; i < Dim; i++)
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
-      nelem[i] = max[i] - min[i];
+    for (unsigned i = 0; i < Dim; i++) nelem[i] = max[i] - min[i];
 
     // Calculate total number of elements
     total_elems = nelem[0];
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
-#endif
-
-    for (unsigned i = 1; i < Dim; i++)
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
-      total_elems *= nelem[i];
+    for (unsigned i = 1; i < Dim; i++) total_elems *= nelem[i];
   }
 
   std::vector<std::string> nsNames;
 
   // Construct the nodeset names
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
-#endif
 
   for (unsigned idx = 0; idx < Dim * 2;
        idx++) {  // 2 nodesets per dimension (one at beginning, one at end)

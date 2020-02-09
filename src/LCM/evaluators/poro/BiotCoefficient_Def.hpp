@@ -80,11 +80,6 @@ template <typename EvalT, typename Traits>
 void
 BiotCoefficient<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
-#ifdef __clang__
-    // GAH - clang++ causes an FPE here when optimizing. Turn off opt for this
-    // function.
-    __attribute__((optnone))
-#endif
 {
   int numCells = workset.numCells;
 

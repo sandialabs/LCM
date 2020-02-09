@@ -82,9 +82,8 @@ configure_file(
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-# Add the tests
-# add_test(CrystalPlasticity_MinisolverStep_ConjugateGradient python
-# ../run_exodiff_test.py "${SerialAlbany.exe}"
+# Add the tests add_test(CrystalPlasticity_MinisolverStep_ConjugateGradient
+# python ../run_exodiff_test.py "${SerialAlbany.exe}"
 # MinisolverStep_ConjugateGradient.yaml)
 # add_test(CrystalPlasticity_MinisolverStep_LineSearchRegularized python
 # ../run_exodiff_test.py "${SerialAlbany.exe}"

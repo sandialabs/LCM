@@ -28,8 +28,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/PlasticShear2d.gold.exo
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-# Add the tests
-# test 1 - Elastic shear
+# Add the tests test 1 - Elastic shear
 set(OUTFILE "ElasticShear2d.exo")
 set(REF_FILE "ElasticShear2d.gold.exo")
 add_test(

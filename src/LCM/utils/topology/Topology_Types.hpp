@@ -19,15 +19,8 @@
 // Boost includes
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
-#include <boost/graph/properties.hpp>
-#ifdef __INTEL_COMPILER
-#pragma warning(disable : 2196)
-// On Intel compiler, disable boost warning
-// /projects/albany/intel5.1/include/boost/xpressive/detail/core/adaptor.hpp(75):
-// warning #2196:
-//    routine is both "inline" and "noinline"
-#endif
 #include <boost/graph/graphviz.hpp>
+#include <boost/graph/properties.hpp>
 
 // Shards includes
 #include <Shards_BasicTopologies.hpp>

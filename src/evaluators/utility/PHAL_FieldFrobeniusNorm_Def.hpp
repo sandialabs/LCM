@@ -8,7 +8,6 @@
 #include "Phalanx_Print.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
-#define OUTPUT_TO_SCREEN
 
 namespace PHAL {
 
@@ -188,18 +187,6 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(
     regularization = pow(
         10.0,
         -10.0 * Albany::convertScalar<const ScalarT>(regularizationParam(0)));
-
-#ifdef OUTPUT_TO_SCREEN
-  if (regularization_type != NONE) {
-    Teuchos::RCP<Teuchos::FancyOStream> output(
-        Teuchos::VerboseObjectBase::getDefaultOStream());
-    if (std::fabs(printedReg - regularization) > 1e-6 * regularization) {
-      *output << "[Field Norm<" << PHX::print<EvalT>()
-              << ">]] reg = " << regularization << "\n";
-      printedReg = regularization;
-    }
-  }
-#endif
 
   ScalarT norm;
   switch (numDims) {

@@ -402,12 +402,6 @@ Projector::project(Manager::Field& f)
     // Import (reverse mode) to the overlapping MV.
     f.data_->mv[fi]->assign(0);
     cas_manager_->scatter(x[fi], f.data_->mv[fi], Albany::CombineMode::ADD);
-#if 0
-    amb::write_CrsMatrix("M", *M_);
-    amb::write_MultiVector("b", *b);
-    amb::write_MultiVector("x", *x[fi]);
-    amb::write_MultiVector("mv", *f.data_->mv[fi]);
-#endif
   }
 }
 
@@ -520,9 +514,6 @@ struct Manager::Impl
   Teuchos::RCP<Albany::StateManager>    state_mgr_;
   Teuchos::RCP<Thyra_Vector>            x_;
   Teuchos::RCP<Projector>               proj_;
-#ifdef amb_test_projector
-  Teuchos::RCP<testing::ProjectorTester> proj_tester_;
-#endif
 
  private:
   typedef unsigned int                                WsIdx;
@@ -615,9 +606,6 @@ struct Manager::Impl
           f.data_->mv[i] =
               Thyra::createMembers(ol_node_vs, f.data_->mv[i]->domain()->dim());
       }
-#ifdef amb_test_projector
-      proj_tester_->init(node_vs, ol_node_vs);
-#endif
     }
   }
 
@@ -626,12 +614,7 @@ struct Manager::Impl
       const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
       const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs)
   {
-    if (Teuchos::nonnull(proj_)) {
-      proj_->init(node_vs, ol_node_vs);
-#ifdef amb_test_projector
-      proj_tester_->init(node_vs, ol_node_vs);
-#endif
-    }
+    if (Teuchos::nonnull(proj_)) { proj_->init(node_vs, ol_node_vs); }
   }
 
   void
@@ -757,13 +740,7 @@ struct Manager::Impl
   {
     transform_    = do_transform;
     building_sfm_ = false;
-    if (use_projection) {
-      proj_ = Teuchos::rcp(new Projector());
-#ifdef amb_test_projector
-      if (proj_tester_.is_null())
-        proj_tester_ = Teuchos::rcp(new testing::ProjectorTester());
-#endif
-    }
+    if (use_projection) { proj_ = Teuchos::rcp(new Projector()); }
   }
 
   void
@@ -1013,15 +990,11 @@ Manager::testProjector(
     const PHX::MDField<RealType, Cell, Vertex, Dim>&    coord_vert,
     const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
 {
-#ifdef amb_test_projector
-  impl_->proj_tester_->eval(workset, bf, wbf, coord_vert, coord_qp);
-#else
   (void)workset;
   (void)bf;
   (void)wbf;
   (void)coord_vert;
   (void)coord_qp;
-#endif
 }
 
 const Teuchos::RCP<Thyra_MultiVector>&

@@ -27,7 +27,6 @@
 #include "Albany_Utils.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
-//#define OUTPUT_TO_SCREEN
 
 namespace Albany {
 
@@ -71,11 +70,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   char betafilename[100];  // basal friction coefficient file
   if ((numProc == 1) &
       (contigIDs == true)) {  // serial run with contiguous global IDs
-#ifdef OUTPUT_TO_SCREEN
-    std::cout << "Ascii mesh has contiguous IDs; no bfIDs, geIDs, gnIDs files "
-                 "required."
-              << std::endl;
-#endif
     sprintf(meshfilename, "%s", "xyz");
     sprintf(shfilename, "%s", "sh");
     sprintf(confilename, "%s", "eles");
@@ -86,12 +80,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   } else {  // parallel run or serial run with non-contiguous global IDs - proc
             // # is appended to file name to indicate what processor the mesh
             // piece is on
-#ifdef OUTPUT_TO_SCREEN
-    if ((numProc == 1) & (contigIDs == false))
-      std::cout << "1 processor run with non-contiguous IDs; bfIDs0, geIDs0, "
-                   "gnIDs0 files required."
-                << std::endl;
-#endif
     int suffix = comm->getRank();  // current processor number
     sprintf(meshfilename, "%s%i", "xyz", suffix);
     sprintf(shfilename, "%s%i", "sh", suffix);
@@ -122,10 +110,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   fseek(meshfile, 0, SEEK_SET);
   safe_fscanf(1, meshfile, "%lf", &temp);
   NumNodes = int(temp);
-#ifdef OUTPUT_TO_SCREEN
-  *out << "numNodes: " << NumNodes << std::endl;
-#endif
-  xyz = new double[NumNodes][3];
+  xyz      = new double[NumNodes][3];
   char buffer[100];
   safe_fgets(buffer, 100, meshfile);
   for (int i = 0; i < NumNodes; i++) {
@@ -144,9 +129,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     fseek(shfile, 0, SEEK_SET);
     safe_fscanf(1, shfile, "%lf", &temp);
     int NumNodesSh = int(temp);
-#ifdef OUTPUT_TO_SCREEN
-    *out << "NumNodesSh: " << NumNodesSh << std::endl;
-#endif
     if (NumNodesSh != NumNodes) {
       *out << "Error in AsciiSTKMeshStruct: sh file must have same number "
               "nodes as xyz file!  numNodes in xyz = "
@@ -184,10 +166,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   fseek(confile, 0, SEEK_SET);
   safe_fscanf(1, confile, "%lf", &temp);
   NumEles = int(temp);
-#ifdef OUTPUT_TO_SCREEN
-  *out << "numEles: " << NumEles << std::endl;
-#endif
-  eles = new int[NumEles][8];
+  eles    = new int[NumEles][8];
   safe_fgets(buffer, 100, confile);
   for (int i = 0; i < NumEles; i++) {
     safe_fgets(buffer, 100, confile);
@@ -218,9 +197,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     fseek(bffile, 0, SEEK_SET);
     safe_fscanf(1, bffile, "%lf", &temp);
     NumBasalFaces = int(temp);
-#ifdef OUTPUT_TO_SCREEN
-    *out << "numBasalFaces: " << NumBasalFaces << std::endl;
-#endif
     bf = new int[NumBasalFaces][5];  // 1st column of bf: element # that face
                                      // belongs to, 2rd-5th columns of bf:
                                      // connectivity (hard-coded for quad faces)
@@ -511,14 +487,8 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
   stk::mesh::PartVector nodePartVec;
   stk::mesh::PartVector singlePartVec(1);
   stk::mesh::PartVector emptyPartVec;
-#ifdef OUTPUT_TO_SCREEN
-  *out << "elem_map # elements: " << elem_mapT->getNodeNumElements()
-       << std::endl;
-  *out << "node_map # elements: " << node_mapT->getNodeNumElements()
-       << std::endl;
-#endif
-  unsigned int ebNo   = 0;  // element block #???
-  int          sideID = 0;
+  unsigned int          ebNo   = 0;  // element block #???
+  int                   sideID = 0;
 
   typedef AbstractSTKFieldContainer::ScalarFieldType ScalarFieldType;
 

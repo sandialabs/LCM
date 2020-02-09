@@ -195,11 +195,6 @@ entity_label(stk::mesh::EntityRank const rank)
     case stk::topology::EDGE_RANK: oss << "segment"; break;
     case stk::topology::FACE_RANK: oss << "face"; break;
     case stk::topology::ELEMENT_RANK: oss << "cell"; break;
-#if defined(LCM_TOPOLOGY_HIGH_DIMENSIONS)
-    case 4: oss << "polychoron"; break;
-    case 5: oss << "polyteron"; break;
-    case 6: oss << "polypeton"; break;
-#endif  // LCM_TOPOLOGY_HIGH_DIMENSIONS
   }
 
   return oss.str();
@@ -255,11 +250,6 @@ entity_color(stk::mesh::EntityRank const rank, FailureState const failure_state)
         case stk::topology::EDGE_RANK: oss << "4"; break;
         case stk::topology::FACE_RANK: oss << "2"; break;
         case stk::topology::ELEMENT_RANK: oss << "8"; break;
-#if defined(LCM_TOPOLOGY_HIGH_DIMENSIONS)
-        case 4: oss << "10"; break;
-        case 5: oss << "12"; break;
-        case 6: oss << "14"; break;
-#endif  // LCM_TOPOLOGY_HIGH_DIMENSIONS
       }
       break;
 
@@ -276,11 +266,6 @@ entity_color(stk::mesh::EntityRank const rank, FailureState const failure_state)
         case stk::topology::EDGE_RANK: oss << "3"; break;
         case stk::topology::FACE_RANK: oss << "1"; break;
         case stk::topology::ELEMENT_RANK: oss << "7"; break;
-#if defined(LCM_TOPOLOGY_HIGH_DIMENSIONS)
-        case 4: oss << "9"; break;
-        case 5: oss << "11"; break;
-        case 6: oss << "13"; break;
-#endif  // LCM_TOPOLOGY_HIGH_DIMENSIONS
       }
       break;
   }

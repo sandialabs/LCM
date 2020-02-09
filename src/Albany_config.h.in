@@ -55,9 +55,6 @@
 #cmakedefine ALBANY_HAVE_GETRUSAGE
 #cmakedefine ALBANY_HAVE_KERNELGETMEMORYSIZE
 
-// Enable enhanced debugging features
-#cmakedefine ALBANY_DEBUG
-
 // FTZ/DAZ macro
 #cmakedefine ALBANY_FLUSH_DENORMALS
 

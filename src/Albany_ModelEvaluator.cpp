@@ -623,10 +623,6 @@ ModelEvaluator::evalModelImpl(
     const Thyra_InArgs&  inArgs,
     const Thyra_OutArgs& outArgs) const
 {
-#ifdef OUTPUT_TO_SCREEN
-  std::cout << "DEBUG: " << __PRETTY_FUNCTION__ << "\n";
-#endif
-
   Teuchos::TimeMonitor Timer(*timer);  // start timer
   //
   // Get the input arguments

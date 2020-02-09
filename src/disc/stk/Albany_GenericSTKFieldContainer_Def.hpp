@@ -152,13 +152,6 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         qptensor_states.push_back(&metaData->declare_field<QPTFT>(
             stk::topology::ELEMENT_RANK, st.name));
         // Multi-dim order is Fortran Ordering, so reversed here
-#ifdef IKT_DEBUG
-        // Debug
-        std::cout << "Allocating qpt field name "
-                  << qptensor_states.back()->name() << " size: (" << dim[0]
-                  << ", " << dim[1] << ", " << dim[2] << ", " << dim[3] << ")"
-                  << std::endl;
-#endif
         if (dim[1] == 4) {
           stk::mesh::put_field_on_mesh(
               *qptensor_states.back(),

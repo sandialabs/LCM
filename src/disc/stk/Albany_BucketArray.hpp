@@ -180,17 +180,9 @@ struct BucketArray<
         stride[0] = dim0;
         stride[1] = stk::mesh::field_scalars_per_entity(f, b);
       } else if (f.field_array_rank() == 3) {
-#ifdef IKT_DEBUG
-        std::cout << "IKT field arry rank = 3" << std::endl;
-#endif
         int dim0 =
             stk::mesh::find_restriction(f, b.entity_rank(), b.supersets())
                 .dimension();
-#ifdef IKT_DEBUG
-        std::cout << "IKT size tag1 = " << get_size<Tag1>(b) << std::endl;
-        std::cout << "IKT size tag2 = " << get_size<Tag2>(b) << std::endl;
-        std::cout << "IKT size tag3 = " << get_size<Tag3>(b) << std::endl;
-#endif
         if (dim0 == 4) {
           stride[0] = dim0;
           stride[1] = get_size<Tag2>(b) * dim0;
@@ -207,10 +199,6 @@ struct BucketArray<
           stride[1] = get_size<Tag2>(b) * stride[0];
           stride[2] = stk::mesh::field_scalars_per_entity(f, b);
         }
-#ifdef IKT_DEBUG
-        std::cout << "IKT stride0, stride1, stride2 = " << stride[0] << ", "
-                  << stride[1] << ", " << stride[2] << std::endl;
-#endif
       } else if (f.field_array_rank() == 4) {
         int dim0 =
             stk::mesh::find_restriction(f, b.entity_rank(), b.supersets())

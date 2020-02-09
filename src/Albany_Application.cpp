@@ -116,46 +116,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   paramLib     = rcp(new ParamLib);
   distParamLib = rcp(new DistributedParameterLibrary);
 
-#ifdef ALBANY_DEBUG
-  int break_set  = (getenv("ALBANY_BREAK") == NULL) ? 0 : 1;
-  int env_status = 0;
-  int length     = 1;
-  comm->SumAll(&break_set, &env_status, length);
-  if (env_status != 0) {
-    *out << "Host and Process Ids for tasks" << std::endl;
-    comm->Barrier();
-    int nproc = comm->NumProc();
-    for (int i = 0; i < nproc; i++) {
-      if (i == comm->MyPID()) {
-        char buf[80];
-        char hostname[80];
-        gethostname(hostname, sizeof(hostname));
-        sprintf(buf, "Host: %s   PID: %d", hostname, getpid());
-        *out << buf << std::endl;
-        std::cout.flush();
-        sleep(1);
-      }
-      comm->Barrier();
-    }
-    if (comm->MyPID() == 0) {
-      char go = ' ';
-      std::cout << "\n";
-      std::cout << "** Client has paused because the environment variable "
-                   "ALBANY_BREAK has been set.\n";
-      std::cout << "** You may attach a debugger to processes now.\n";
-      std::cout << "**\n";
-      std::cout << "** Enter a character (not whitespace), then <Return> to "
-                   "continue. > ";
-      std::cout.flush();
-      std::cin >> go;
-      std::cout << "\n** Now pausing for 3 seconds.\n";
-      std::cout.flush();
-    }
-    sleep(3);
-  }
-  comm->Barrier();
-#endif
-
   // Create problem object
   problemParams = Teuchos::sublist(params, "Problem", true);
 
@@ -315,23 +275,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
       requires_sdbcs_ = true;
     }
 
-#if defined(DEBUG)
-    bool const have_solver_opts = nox_params.isSublist("Solver Options");
-    ALBANY_ASSERT(have_solver_opts == true);
-    Teuchos::ParameterList& solver_opts = nox_params.sublist("Solver Options");
-    std::string const       ppo_str{"User Defined Pre/Post Operator"};
-    bool const              have_ppo = solver_opts.isParameter(ppo_str);
-    Teuchos::RCP<NOX::Abstract::PrePostOperator> ppo{Teuchos::null};
-
-    if (have_ppo == true) {
-      ppo = solver_opts.get<decltype(ppo)>(ppo_str);
-    } else {
-      ppo = Teuchos::rcp(new LCM::SolutionSniffer);
-      solver_opts.set(ppo_str, ppo);
-      ALBANY_ASSERT(solver_opts.isParameter(ppo_str) == true);
-    }
-#endif  // DEBUG
-
   } else {
     TEUCHOS_TEST_FOR_EXCEPTION(
         true,
@@ -386,8 +329,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
       Teuchos::RCP<Teuchos::ParameterList> rythmosSolverParams =
           Teuchos::sublist(piroParams, "Tempus", true);
     }
-    // IKT, 10/26/16, FIXME: get whether method is explicit from Tempus
-    // parameter list  expl = true;
   }
 
   determinePiroSolver(params);
@@ -449,15 +390,11 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
                "Acceptable values are -1, 0, 1, 2, ... "
             << std::endl);
   }
-  countJac = 0;  // initiate counter that counts instances of Jacobian matrix to
-                 // 0
-  countRes = 0;  // initiate counter that counts instances of residual vector to
-                 // 0
 
-  // FIXME: call setScaleBCDofs only on first step rather than at every Newton
-  // step.  It's called every step now b/c calling it once did not work for
-  // Schwarz problems.
+  countJac   = 0;  // initiate counter that counts instances of Jacobian matrix
+  countRes   = 0;  // initiate counter that counts instances of residual vector
   countScale = 0;
+
   // Create discretization object
   discFactory = rcp(new Albany::DiscretizationFactory(params, comm, expl));
 
@@ -1541,10 +1478,6 @@ Application::computeGlobalJacobianImpl(
         Teuchos::rcp_dynamic_cast<Thyra::ScaledLinearOpBase<ST>>(jac, true);
     jac_scaled_lop->scaleLeft(*scaleVec_);
     resumeFill(jac);
-    // scale residual
-    /*IKTif (Teuchos::nonnull(f)) {
-      Thyra::ele_wise_scale<ST>(*scaleVec_,f.ptr());
-    }*/
     countScale++;
   }
 
@@ -2354,7 +2287,6 @@ Application::determinePiroSolver(
       // Piro cannot handle the corresponding problem
       piroSolverToken = "Unsupported";
     }
-
     piroParams->set("Solver Type", piroSolverToken);
   }
 }
@@ -2369,11 +2301,10 @@ Application::loadBasicWorksetInfo(PHAL::Workset& workset, double current_time)
   workset.xdot    = numVectors > 1 ? overlapped_MV->col(1) : Teuchos::null;
   workset.xdotdot = numVectors > 2 ? overlapped_MV->col(2) : Teuchos::null;
 
-  workset.numEqs       = neq;
-  workset.current_time = current_time;
-  workset.distParamLib = distParamLib;
-  workset.disc         = disc;
-  // workset.delta_time = delta_time;
+  workset.numEqs            = neq;
+  workset.current_time      = current_time;
+  workset.distParamLib      = distParamLib;
+  workset.disc              = disc;
   workset.transientTerms    = Teuchos::nonnull(workset.xdot);
   workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot);
 }
@@ -2396,11 +2327,10 @@ Application::loadBasicWorksetInfoSDBCs(
   workset.xdot    = numVectors > 1 ? overlapped_MV->col(1) : Teuchos::null;
   workset.xdotdot = numVectors > 2 ? overlapped_MV->col(2) : Teuchos::null;
 
-  workset.numEqs       = neq;
-  workset.current_time = current_time;
-  workset.distParamLib = distParamLib;
-  workset.disc         = disc;
-  // workset.delta_time = delta_time;
+  workset.numEqs            = neq;
+  workset.current_time      = current_time;
+  workset.distParamLib      = distParamLib;
+  workset.disc              = disc;
   workset.transientTerms    = Teuchos::nonnull(workset.xdot);
   workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot);
 }
@@ -2498,12 +2428,10 @@ Application::setScaleBCDofs(
   auto scaleVecLocalData = getNonconstLocalData(scaleVec_);
   for (size_t ns = 0; ns < nodeSetIDs_.size(); ns++) {
     std::string key = nodeSetIDs_[ns];
-    // std::cout << "IKTIKT key = " << key << std::endl;
+
     const std::vector<std::vector<int>>& nsNodes =
         workset.nodeSets->find(key)->second;
     for (unsigned int i = 0; i < nsNodes.size(); i++) {
-      // std::cout << "IKTIKT ns, offsets size: " << ns << ", " <<
-      // offsets_[ns].size() << "\n";
       for (unsigned j = 0; j < offsets_[ns].size(); j++) {
         int lunk                = nsNodes[i][offsets_[ns][j]];
         scaleVecLocalData[lunk] = scale;
@@ -2517,46 +2445,7 @@ Application::setScaleBCDofs(
         std::logic_error,
         "Application::setScaleBCDofs is not yet implemented for"
             << " sideset equations!\n");
-
-    // Case where we have sideset equations: loop through sidesets' nodesets
-    // Note: the side discretizations' nodesets are indexed progressively:
-    //       nodeSet_0,...,nodeSetN,
-    //       side0_nodeSet0,...,side0_nodeSetN0,
-    //       ...,
-    //       sideM_nodeSet0,...,sideM_nodeSetNM
-    // Therefore, we simply loop through the sideset discretizations (in order)
-    // and in each one we loop through its nodesets
-    //
-    // IKT, FIXME, 6/30/18: the code below needs to be reimplemented using
-    // nodeSetIDs_, as done above, if wishing to use setScaleBCDofs with
-    // nodeset specified via the sideset discretization.
-    //
-    /*const auto &sdn =
-        disc->getMeshStruct()->getMeshSpecs()[0]->sideSetMeshNames;
-    for (int isd = 0; isd < sdn.size(); ++isd) {
-      const auto &sd = disc->getSideSetDiscretizations().at(sdn[isd]);
-      for (auto iterator = sd->getNodeSets().begin();
-           iterator != sd->getNodeSets().end(); iterator++) {
-        // std::cout << "key: " << iterator->first <<  std::endl;
-        const std::vector<std::vector<int>> &nsNodes = iterator->second;
-        for (unsigned int i = 0; i < nsNodes.size(); i++) {
-          // std::cout << "l, offsets size: " << l << ", " << offsets_[l].size()
-          // << std::endl;
-          for (unsigned j = 0; j < offsets_[l].size(); j++) {
-            int lunk = nsNodes[i][offsets_[l][j]];
-            // std::cout << "l, j, i, offsets_: " << l << ", " << j << ", " << i
-            // << ", " << offsets_[l][j] << std::endl;  std::cout << "lunk = "
-    <<
-            // lunk << std::endl;
-            scaleVec_->replaceLocalValue(lunk, scale);
-          }
-        }
-        l++;
-      }
-    }*/
   }
-  /*std::cout << "scaleVec_: " <<std::endl;
-  scaleVec_->describe(*out, Teuchos::VERB_EXTREME);*/
 }
 
 void
@@ -2597,22 +2486,17 @@ Application::setupBasicWorksetInfo(
     }
   }
 
-  workset.x            = overlapped_x;
-  workset.xdot         = overlapped_xdot;
-  workset.xdotdot      = overlapped_xdotdot;
-  workset.distParamLib = distParamLib;
-  workset.disc         = disc;
-
-  const double this_time = fixTime(current_time);
-
-  workset.current_time = this_time;
-
+  const double this_time    = fixTime(current_time);
+  workset.current_time      = this_time;
+  workset.x                 = overlapped_x;
+  workset.xdot              = overlapped_xdot;
+  workset.xdotdot           = overlapped_xdotdot;
+  workset.distParamLib      = distParamLib;
+  workset.disc              = disc;
   workset.transientTerms    = Teuchos::nonnull(workset.xdot);
   workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot);
-
-  workset.comm = comm;
-
-  workset.x_cas_manager = solMgr->get_cas_manager();
+  workset.comm              = comm;
+  workset.x_cas_manager     = solMgr->get_cas_manager();
 }
 
 void
@@ -2735,12 +2619,9 @@ Application::setCoupledAppBlockNodeset(
       std::logic_error,
       "Trying to couple to an unknown Application: " << app_name << '\n');
 
-  int const app_index = it->second;
-
-  auto block_nodeset_names = std::make_pair(block_name, nodeset_name);
-
+  int const app_index           = it->second;
+  auto      block_nodeset_names = std::make_pair(block_name, nodeset_name);
   auto app_index_block_names = std::make_pair(app_index, block_nodeset_names);
-
   coupled_app_index_block_nodeset_names_map_.insert(app_index_block_names);
 }
 

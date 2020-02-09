@@ -1024,18 +1024,6 @@ Topology::splitOpenFaces()
     if (get_failure_state(point) == FAILED) { open_points.push_back(point); }
   }
 
-#if defined(DEBUG_LCM_TOPOLOGY)
-  {
-    std::string const file_name = LCM::parallelize_string("before") + ".dot";
-
-    outputToGraphviz(file_name);
-
-    std::string const boundary_filename =
-        LCM::parallelize_string("before") + ".vtk";
-    outputBoundary(boundary_filename);
-  }
-#endif  // DEBUG_LCM_TOPOLOGY
-
   modification_begin();
 
   // Iterate over open points and fracture them.
@@ -1066,17 +1054,6 @@ Topology::splitOpenFaces()
       }
     }
 
-#if defined(DEBUG_LCM_TOPOLOGY)
-    {
-      std::string const file_name =
-          LCM::parallelize_string(
-              "graph-pre-segment-" + entity_string(get_topology(), point)) +
-          ".dot";
-
-      outputToGraphviz(file_name);
-    }
-#endif  // DEBUG_LCM_TOPOLOGY
-
     // Iterate over open segments and fracture them.
     for (stk::mesh::EntityVector::iterator j = open_segments.begin();
          j != open_segments.end();
@@ -1102,18 +1079,6 @@ Topology::splitOpenFaces()
 
       Subgraph segment_star(
           *this, first_entity, last_entity, first_edge, last_edge);
-
-#if defined(DEBUG_LCM_TOPOLOGY)
-      {
-        std::string const file_name =
-            LCM::parallelize_string(
-                "graph-pre-clone-" + entity_string(get_topology(), segment)) +
-            ".dot";
-
-        outputToGraphviz(file_name);
-        segment_star.outputToGraphviz("sub" + file_name);
-      }
-#endif  // DEBUG_LCM_TOPOLOGY
 
       // Collect open faces
       stk::mesh::Entity const* face_relations = bulk_data.begin_faces(segment);
@@ -1160,34 +1125,10 @@ Topology::splitOpenFaces()
       // Split the articulation point (current segment)
       Vertex segment_vertex = segment_star.vertexFromEntity(segment);
 
-#if defined(DEBUG_LCM_TOPOLOGY)
-      {
-        std::string const file_name =
-            LCM::parallelize_string(
-                "graph-pre-split-" + entity_string(get_topology(), segment)) +
-            ".dot";
-
-        outputToGraphviz(file_name);
-        segment_star.outputToGraphviz("sub" + file_name);
-      }
-#endif  // DEBUG_LCM_TOPOLOGY
-
       segment_star.splitArticulation(segment_vertex);
 
       // Reset segment fracture state
       set_failure_state(segment, INTACT);
-
-#if defined(DEBUG_LCM_TOPOLOGY)
-      {
-        std::string const file_name =
-            LCM::parallelize_string(
-                "graph-post-split-" + entity_string(get_topology(), segment)) +
-            ".dot";
-
-        outputToGraphviz(file_name);
-        segment_star.outputToGraphviz("sub" + file_name);
-      }
-#endif  // DEBUG_LCM_TOPOLOGY
     }
 
     // All open faces and segments have been dealt with.
@@ -1213,35 +1154,11 @@ Topology::splitOpenFaces()
 
     Vertex point_vertex = point_star.vertexFromEntity(point);
 
-#if defined(DEBUG_LCM_TOPOLOGY)
-    {
-      std::string const file_name =
-          LCM::parallelize_string(
-              "graph-pre-split-" + entity_string(get_topology(), point)) +
-          ".dot";
-
-      outputToGraphviz(file_name);
-      point_star.outputToGraphviz("sub" + file_name);
-    }
-#endif  // DEBUG_LCM_TOPOLOGY
-
     EntityEntityMap new_connectivity =
         point_star.splitArticulation(point_vertex);
 
     // Reset fracture state of point
     set_failure_state(point, INTACT);
-
-#if defined(DEBUG_LCM_TOPOLOGY)
-    {
-      std::string const file_name =
-          LCM::parallelize_string(
-              "graph-post-split-" + entity_string(get_topology(), point)) +
-          ".dot";
-
-      outputToGraphviz(file_name);
-      point_star.outputToGraphviz("sub" + file_name);
-    }
-#endif  // DEBUG_LCM_TOPOLOGY
 
     // Update the connectivity
     for (EntityEntityMap::iterator j = new_connectivity.begin();
@@ -1255,15 +1172,6 @@ Topology::splitOpenFaces()
 
   Albany::fix_node_sharing(bulk_data);
   modification_end();
-
-#if defined(DEBUG_LCM_TOPOLOGY)
-  {
-    std::string const file_name =
-        LCM::parallelize_string("graph-pre-surface-elements.dot");
-
-    outputToGraphviz(file_name);
-  }
-#endif  // DEBUG_LCM_TOPOLOGY
 
   bool const insert_surface_elements = false;
 
@@ -1459,18 +1367,6 @@ Topology::insertSurfaceElements(std::set<EntityPair> const& fractured_faces)
 
   Albany::fix_node_sharing(bulk_data);
   modification_end();
-
-#if defined(DEBUG_LCM_TOPOLOGY)
-  {
-    std::string const file_name = LCM::parallelize_string("after") + ".dot";
-
-    outputToGraphviz(file_name);
-
-    std::string const boundary_filename =
-        LCM::parallelize_string("after") + ".vtk";
-    outputBoundary(boundary_filename);
-  }
-#endif  // DEBUG_LCM_TOPOLOGY
 
   return;
 }

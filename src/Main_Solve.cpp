@@ -42,10 +42,6 @@
 #include "Kokkos_Core.hpp"
 #include "Phalanx_config.hpp"
 
-#if defined(ALBANY_APF)
-#include "Albany_APFMeshStruct.hpp"
-#endif
-
 int
 main(int argc, char* argv[])
 {
@@ -74,10 +70,6 @@ main(int argc, char* argv[])
         //           | _MM_MASK_UNDERFLOW
         ));
 
-#endif
-
-#if defined(ALBANY_APF)
-  Albany::APFMeshStruct::initialize_libraries(&argc, &argv);
 #endif
 
   using Teuchos::RCP;
@@ -355,10 +347,6 @@ main(int argc, char* argv[])
   options.output_minmax   = true;
   stackedTimer->report(
       std::cout, Teuchos::DefaultComm<int>::getComm(), options);
-
-#ifdef ALBANY_APF
-  Albany::APFMeshStruct::finalize_libraries();
-#endif
 
   Kokkos::finalize_all();
 

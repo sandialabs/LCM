@@ -48,7 +48,6 @@ extern "C" {
 #include <algorithm>
 
 // Uncomment the following line if you want debug output to be printed to screen
-// #define OUTPUT_TO_SCREEN
 
 constexpr double pi = 3.1415926535897932385;
 
@@ -584,11 +583,8 @@ STKDiscretization::transformMesh()
 
   if (transformType == "None") {
   } else if (transformType == "Spherical") {
-// This form takes a mesh of a square / cube and transforms it into a mesh of a
-// circle/sphere
-#ifdef OUTPUT_TO_SCREEN
-    *out << "Spherical!" << endl;
-#endif
+    // This form takes a mesh of a square / cube and transforms it into a mesh
+    // of a circle/sphere
     const int numDim = stkMeshStruct->numDim;
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
@@ -697,20 +693,10 @@ STKDiscretization::transformMesh()
     }
 
   } else if (transformType == "ISMIP-HOM Test A") {
-#ifdef OUTPUT_TO_SCREEN
-    *out << "Test A!" << endl;
-#endif
     double L     = stkMeshStruct->felixL;
     double alpha = stkMeshStruct->felixAlpha;
-#ifdef OUTPUT_TO_SCREEN
-    *out << "L: " << L << endl;
-    *out << "alpha degrees: " << alpha << endl;
-#endif
-    alpha = alpha * pi /
+    alpha        = alpha * pi /
             180;  // convert alpha, read in from ParameterList, to radians
-#ifdef OUTPUT_TO_SCREEN
-    *out << "alpha radians: " << alpha << endl;
-#endif
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field =
@@ -727,20 +713,10 @@ STKDiscretization::transformMesh()
       *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
     }
   } else if (transformType == "ISMIP-HOM Test B") {
-#ifdef OUTPUT_TO_SCREEN
-    *out << "Test B!" << endl;
-#endif
     double L     = stkMeshStruct->felixL;
     double alpha = stkMeshStruct->felixAlpha;
-#ifdef OUTPUT_TO_SCREEN
-    *out << "L: " << L << endl;
-    *out << "alpha degrees: " << alpha << endl;
-#endif
-    alpha = alpha * pi /
+    alpha        = alpha * pi /
             180;  // convert alpha, read in from ParameterList, to radians
-#ifdef OUTPUT_TO_SCREEN
-    *out << "alpha radians: " << alpha << endl;
-#endif
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field =
@@ -758,20 +734,10 @@ STKDiscretization::transformMesh()
   } else if (
       (transformType == "ISMIP-HOM Test C") ||
       (transformType == "ISMIP-HOM Test D")) {
-#ifdef OUTPUT_TO_SCREEN
-    *out << "Test C and D!" << endl;
-#endif
     double L     = stkMeshStruct->felixL;
     double alpha = stkMeshStruct->felixAlpha;
-#ifdef OUTPUT_TO_SCREEN
-    *out << "L: " << L << endl;
-    *out << "alpha degrees: " << alpha << endl;
-#endif
-    alpha = alpha * pi /
+    alpha        = alpha * pi /
             180;  // convert alpha, read in from ParameterList, to radians
-#ifdef OUTPUT_TO_SCREEN
-    *out << "alpha radians: " << alpha << endl;
-#endif
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field =
@@ -787,9 +753,6 @@ STKDiscretization::transformMesh()
       *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
     }
   } else if (transformType == "Dome") {
-#ifdef OUTPUT_TO_SCREEN
-    *out << "Dome transform!" << endl;
-#endif
     double L = 0.7071 * 30;
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
@@ -805,9 +768,6 @@ STKDiscretization::transformMesh()
       *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
     }
   } else if (transformType == "Confined Shelf") {
-#ifdef OUTPUT_TO_SCREEN
-    *out << "Confined shelf transform!" << endl;
-#endif
     double L = stkMeshStruct->felixL;
     cout << "L: " << L << endl;
     stkMeshStruct->PBCStruct.scale[0] *= L;
@@ -825,13 +785,7 @@ STKDiscretization::transformMesh()
       *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
     }
   } else if (transformType == "Circular Shelf") {
-#ifdef OUTPUT_TO_SCREEN
-    *out << "Circular shelf transform!" << endl;
-#endif
-    double L = stkMeshStruct->felixL;
-#ifdef OUTPUT_TO_SCREEN
-    *out << "L: " << L << endl;
-#endif
+    double L        = stkMeshStruct->felixL;
     double rhoIce   = 910.0;   // ice density, in kg/m^3
     double rhoOcean = 1028.0;  // ocean density, in kg/m^3
     stkMeshStruct->PBCStruct.scale[0] *= L;
@@ -851,20 +805,14 @@ STKDiscretization::transformMesh()
       *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
     }
   } else if (transformType == "FO XZ MMS") {
-// This test case assumes the domain read in from the input file is 0 < x < 2, 0
-// < y < 1, where y = z
-#ifdef OUTPUT_TO_SCREEN
-    *out << "FO XZ MMS transform!" << endl;
-#endif
+    // This test case assumes the domain read in from the input file is 0 < x <
+    // 2, 0 < y < 1, where y = z
     double L = stkMeshStruct->felixL;
     // hard-coding values of parameters...  make sure these are same as in the
     // FOStokes body force evaluator!
     double alpha0 = 4e-5;
     double s0     = 2.0;
     double H      = 1.0;
-#ifdef OUTPUT_TO_SCREEN
-    *out << "L: " << L << endl;
-#endif
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stk::mesh::Field<double>* surfaceHeight_field =
         metaData.get_field<stk::mesh::Field<double>>(
@@ -3097,12 +3045,6 @@ STKDiscretization::updateMesh()
 
   computeOwnedNodesAndUnknowns();
 
-#ifdef OUTPUT_TO_SCREEN
-  // write owned maps to matrix market file for debug
-  writeMatrixMarket(m_vs, "dof_vs");
-  writeMatrixMarket(m_node_vs, "node_vs");
-#endif
-
   computeNodalVectorSpaces(true);
 
   computeOverlapNodesAndUnknowns();
@@ -3114,9 +3056,6 @@ STKDiscretization::updateMesh()
   computeGraphs();
 
   computeWorksetInfo();
-#ifdef OUTPUT_TO_SCREEN
-  printConnectivity();
-#endif
 
   computeNodeSets();
 
@@ -3133,10 +3072,6 @@ STKDiscretization::updateMesh()
   setupNetCDFOutput();
   // meshToGraph();
   // printVertexConnectivity();
-
-#ifdef OUTPUT_TO_SCREEN
-  printCoords();
-#endif
 
   // If the mesh struct stores sideSet mesh structs, we update them
   if (stkMeshStruct->sideSetMeshStructs.size() > 0) {

@@ -1488,37 +1488,6 @@ ConnectivityArray::createGrid()
 
   std::cout << connectivity_.size() << " elements processed." << '\n';
 
-#if defined(DEBUG)
-  // Create points and output voxelization for debugging
-  std::ofstream in_ofs("in.csv");
-
-  std::ofstream out_ofs("out.csv");
-
-  in_ofs << "X, Y, Z" << '\n';
-  out_ofs << "X, Y, Z" << '\n';
-
-  minitensor::Vector<double> p(dimension);
-
-  domain_points_.clear();
-
-  for (minitensor::Index i = 0; i < points_per_dim(0); ++i) {
-    p(0) = i * cell_size_(0) + lower_corner_(0);
-    for (minitensor::Index j = 0; j < points_per_dim(1); ++j) {
-      p(1) = j * cell_size_(1) + lower_corner_(1);
-      for (minitensor::Index k = 0; k < points_per_dim(2); ++k) {
-        p(2) = k * cell_size_(2) + lower_corner_(2);
-        if (grid_[i][j][k] == true) {
-          domain_points_.push_back(p);
-          in_ofs << p << '\n';
-        } else {
-          out_ofs << p << '\n';
-        }
-      }
-    }
-  }
-
-#endif  // DEBUG
-
   minitensor::Index const number_generated_points =
       points_per_dim(0) * points_per_dim(1) * points_per_dim(2);
 

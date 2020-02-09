@@ -278,14 +278,6 @@ Albany::DiscretizationFactory::createDiscretization(
           sideSetEquations, rigidBodyModes);
 
   // Wrap the discretization in the catalyst decorator if needed.
-#ifdef ALBANY_CATALYST
-
-  if (Teuchos::nonnull(catalystParams) &&
-      catalystParams->get<bool>("Interface Activated", false))
-    result = Teuchos::rcp(static_cast<Albany::AbstractDiscretization*>(
-        new Catalyst::Decorator(result, catalystParams)));
-
-#endif
 
   return result;
 }

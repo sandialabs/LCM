@@ -13,7 +13,6 @@
 #include "Phalanx_Print.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
-#define OUTPUT_TO_SCREEN
 
 namespace PHAL {
 

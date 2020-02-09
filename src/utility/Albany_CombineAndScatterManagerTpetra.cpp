@@ -51,19 +51,6 @@ CombineAndScatterManagerTpetra::combine(
   auto srcT = Albany::getConstTpetraVector(src);
   auto dstT = Albany::getTpetraVector(dst);
 
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The map of the input src vector does not match the importer's "
-      "target map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The map of the input dst vector does not match the importer's "
-      "source map.\n");
-#endif
-
   dstT->doExport(*srcT, *importer, cmT);
 }
 
@@ -117,19 +104,6 @@ CombineAndScatterManagerTpetra::combine(
     dstT = Albany::getTpetraVector(*dstV);
   }
 
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The map of the input src multi vector does not match the "
-      "importer's target map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The map of the input dst multi vector does not match the "
-      "importer's source map.\n");
-#endif
-
   auto cmT = combineModeT(CM);
   dstT->doExport(*srcT, *importer, cmT);
 }
@@ -144,19 +118,6 @@ CombineAndScatterManagerTpetra::combine(
   auto srcT = Albany::getConstTpetraMatrix(src);
   auto dstT = Albany::getTpetraMatrix(dst);
 
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The row map of the input src matrix does not match the "
-      "importer's source map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The row map of the input dst matrix does not match the "
-      "importer's target map.\n");
-#endif
-
   dstT->doExport(*srcT, *importer, cmT);
 }
 
@@ -169,19 +130,6 @@ CombineAndScatterManagerTpetra::combine(
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraVector(src);
   auto dstT = Albany::getTpetraVector(dst);
-
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The map of the input src vector does not match the importer's "
-      "target map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The map of the input dst vector does not match the importer's "
-      "source map.\n");
-#endif
 
   dstT->doExport(*srcT, *importer, cmT);
 }
@@ -238,19 +186,6 @@ CombineAndScatterManagerTpetra::combine(
     dstT = Albany::getTpetraVector(dstV);
   }
 
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The map of the input src multi vector does not match the "
-      "importer's target map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The map of the input dst multi vector does not match the "
-      "importer's source map.\n");
-#endif
-
   auto cmT = combineModeT(CM);
   dstT->doExport(*srcT, *importer, cmT);
 }
@@ -264,19 +199,6 @@ CombineAndScatterManagerTpetra::combine(
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraMatrix(src);
   auto dstT = Albany::getTpetraMatrix(dst);
-
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The row map of the input src matrix does not match the "
-      "importer's source map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The row map of the input dst matrix does not match the "
-      "importer's target map.\n");
-#endif
 
   dstT->doExport(*srcT, *importer, cmT);
 }
@@ -292,19 +214,6 @@ CombineAndScatterManagerTpetra::scatter(
   auto srcT = Albany::getConstTpetraVector(src);
   auto dstT = Albany::getTpetraVector(dst);
 
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The map of the input src vector does not match the importer's "
-      "source map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The map of the input dst vector does not match the importer's "
-      "target map.\n");
-#endif
-
   dstT->doImport(*srcT, *importer, cmT);
 }
 
@@ -358,19 +267,6 @@ CombineAndScatterManagerTpetra::scatter(
     dstT = Albany::getTpetraVector(*dstV);
   }
 
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The map of the input src multi vector does not match the "
-      "importer's source map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The map of the input dst multi vector does not match the "
-      "importer's target map.\n");
-#endif
-
   auto cmT = combineModeT(CM);
   dstT->doImport(*srcT, *importer, cmT);
 }
@@ -385,19 +281,6 @@ CombineAndScatterManagerTpetra::scatter(
   auto srcT = Albany::getConstTpetraMatrix(src);
   auto dstT = Albany::getTpetraMatrix(dst);
 
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The row map of the input src matrix does not match the "
-      "importer's source map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The row map of the input dst matrix does not match the "
-      "importer's target map.\n");
-#endif
-
   dstT->doImport(*srcT, *importer, cmT);
 }
 
@@ -410,19 +293,6 @@ CombineAndScatterManagerTpetra::scatter(
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraVector(src);
   auto dstT = Albany::getTpetraVector(dst);
-
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The map of the input src vector does not match the importer's "
-      "source map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The map of the input dst vector does not match the importer's "
-      "target map.\n");
-#endif
 
   dstT->doImport(*srcT, *importer, cmT);
 }
@@ -479,19 +349,6 @@ CombineAndScatterManagerTpetra::scatter(
     dstT = Albany::getTpetraVector(dstV);
   }
 
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The map of the input src multi vector does not match the "
-      "importer's source map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The map of the input dst multi vector does not match the "
-      "importer's target map.\n");
-#endif
-
   auto cmT = combineModeT(CM);
   dstT->doImport(*srcT, *importer, cmT);
 }
@@ -505,19 +362,6 @@ CombineAndScatterManagerTpetra::scatter(
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraMatrix(src);
   auto dstT = Albany::getTpetraMatrix(dst);
-
-#ifdef ALBANY_DEBUG
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !srcT->getMap()->isSameAs(*importer->getSourceMap()),
-      std::runtime_error,
-      "Error! The row map of the input src matrix does not match the "
-      "importer's source map.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
-      !dstT->getMap()->isSameAs(*importer->getTargetMap()),
-      std::runtime_error,
-      "Error! The row map of the input dst matrix does not match the "
-      "importer's target map.\n");
-#endif
 
   dstT->doImport(*srcT, *importer, cmT);
 }

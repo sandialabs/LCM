@@ -9,7 +9,6 @@
 #include "Teuchos_TestForException.hpp"
 #include "Teuchos_VerboseObject.hpp"
 // uncomment the following line if you want debug output to be printed to screen
-//#define OUTPUT_TO_SCREEN
 
 namespace PHAL {
 
@@ -80,15 +79,6 @@ ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(
   intrepidBasis =
       p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
           "Intrepid Basis Side");
-
-#ifdef OUTPUT_TO_SCREEN
-  Teuchos::RCP<Teuchos::FancyOStream> output(
-      Teuchos::VerboseObjectBase::getDefaultOStream());
-  *output << "Compute Basis Functions Side has: " << numCells << " cells, "
-          << numSides << " sides, " << numSideNodes << " side nodes, "
-          << numSideQPs << " side QPs, " << numSideDims
-          << " side dimensions.\n";
-#endif
 
   this->setName("ComputeBasisFunctionsSide" + PHX::print<EvalT>());
 }

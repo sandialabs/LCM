@@ -190,7 +190,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
 
     // create the local communicator
     lcomm_ = gcomm_->split(color, key);
-#else   // the easy serial case
+#else  // the easy serial case
     const Teuchos::SerialComm<LO>* serialcomm =
         dynamic_cast<const Teuchos::SerialComm<LO>*>(gcomm_.get());
     if (!serialcomm) {

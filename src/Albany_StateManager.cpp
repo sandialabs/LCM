@@ -220,13 +220,11 @@ Albany::StateManager::registerStateVariable(
     else
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "StateManager: Element Entity type - "
               << dl->name(1) << " - not supported" << std::endl);
   } else
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "StateManager: Unknown Entity type - "
             << dl->name(0) << " - not supported" << std::endl);
 
@@ -330,13 +328,11 @@ Albany::StateManager::registerNodalVectorStateVariable(
     else
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "StateManager: Element Entity type - "
               << dl->name(1) << " - not supported" << std::endl);
   } else
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "StateManager: Unknown Entity type - "
             << dl->name(0) << " - not supported" << std::endl);
 
@@ -514,10 +510,10 @@ Albany::StateManager::registerSideSetStateVariable(
       mfe_type = StateStruct::QuadPoint;  // One value per side quad point
     else
       ALBANY_PANIC(
-          true, std::logic_error, "StateManager: Unknown Entity type.\n");
+          true,  "StateManager: Unknown Entity type.\n");
   } else {
     ALBANY_PANIC(
-        true, std::logic_error, "StateManager: Unknown Entity type.\n");
+        true,  "StateManager: Unknown Entity type.\n");
   }
 
   sis_ptr->push_back(Teuchos::rcp(new StateStruct(stateName, mfe_type)));
@@ -529,7 +525,6 @@ Albany::StateManager::registerSideSetStateVariable(
   if (stateRef.entity == StateStruct::NodalData) {
     ALBANY_PANIC(
         dl->name(0) == "Node",
-        std::logic_error,
         "Error! NodalData states should have dl <Node,...>.\n");
 
     dl->dimensions(stateRef.dim);
@@ -551,7 +546,6 @@ Albany::StateManager::registerSideSetStateVariable(
     // Strip one dimension out cause it's Side
     ALBANY_PANIC(
         dl->rank() < 2,
-        std::logic_error,
         "Error! The given layout does not appear to be that of a side set "
         "field.\n");
 
@@ -577,7 +571,6 @@ Albany::StateManager::registerSideSetStateVariable(
     // Strip one dimension out cause it's Side
     ALBANY_PANIC(
         dl->rank() < 2,
-        std::logic_error,
         "Error! The given layout does not appear to be that of a side set "
         "field.\n");
 
@@ -591,7 +584,6 @@ Albany::StateManager::registerSideSetStateVariable(
   stateRef.layered             = (dl->name(dl->rank() - 1) == "LayerDim");
   ALBANY_PANIC(
       stateRef.layered && (dl->extent(dl->rank() - 1) <= 0),
-      std::logic_error,
       "Error! Invalid number of layers for layered state " << stateName
                                                            << ".\n");
 
@@ -645,7 +637,6 @@ Albany::StateManager::setupStateArrays(
   for (auto const& it : sideSetStateInfo) {
     ALBANY_PANIC(
         ss_discs.find(it.first) == ss_discs.end(),
-        std::logic_error,
         "Error! Side Set "
             << it.first
             << "has sideSet states registered but no discretizations.\n");
@@ -747,7 +738,6 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
             default:
               ALBANY_PANIC(
                   size < 2 || size > 4,
-                  std::logic_error,
                   "Something is wrong during zero state variable fill: "
                       << size);
           }
@@ -793,7 +783,6 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
             default:
               ALBANY_PANIC(
                   true,
-                  std::logic_error,
                   "Something is wrong during node zero state variable fill: "
                       << size);
           }
@@ -802,7 +791,6 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
       default:
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Unknown state variable entity encountered "
                 << (*stateInfo)[i]->entity);
     }
@@ -822,7 +810,6 @@ Albany::StateManager::getStateArray(SAType type, const int ws) const
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error: Cannot match state array type in getStateArray()"
               << std::endl);
   }
@@ -895,7 +882,6 @@ Albany::StateManager::updateStates()
         default:
           ALBANY_PANIC(
               true,
-              std::logic_error,
               "Error: Cannot match state entity : " << (*stateInfo)[i]->entity
                                                     << " in state manager. "
                                                     << std::endl);
@@ -1075,7 +1061,6 @@ Albany::StateManager::doSetStateArrays(
               default:
                 ALBANY_PANIC(
                     size < 2 || size > 5,
-                    std::logic_error,
                     "Something is wrong during scalar state variable "
                     "initialization: "
                         << size);
@@ -1085,7 +1070,6 @@ Albany::StateManager::doSetStateArrays(
             // we assume operating on the last two indices is correct
             ALBANY_PANIC(
                 size != 4,
-                std::logic_error,
                 "Something is wrong during tensor state variable "
                 "initialization: "
                     << size);
@@ -1153,7 +1137,6 @@ Albany::StateManager::doSetStateArrays(
               default:
                 ALBANY_PANIC(
                     true,
-                    std::logic_error,
                     "Something is wrong during node scalar state variable "
                     "initialization: "
                         << size);
@@ -1162,7 +1145,6 @@ Albany::StateManager::doSetStateArrays(
             // we assume operating on the last two indices is correct
             ALBANY_PANIC(
                 size != 3,
-                std::logic_error,
                 "Something is wrong during node tensor state variable "
                 "initialization: "
                     << size);
@@ -1189,7 +1171,6 @@ Albany::StateManager::doSetStateArrays(
         } else if (pParentStruct && pParentStruct->restartDataAvailable) {
           ALBANY_PANIC(
               true,
-              std::logic_error,
               "Error: At the moment it is not possible to restart a "
               "NodalDataToElemNode field or a NodalDistParameter field from "
               "parent structure"
@@ -1197,7 +1178,6 @@ Albany::StateManager::doSetStateArrays(
         } else if ((init_type == "scalar") || (init_type == "identity")) {
           ALBANY_PANIC(
               true,
-              std::logic_error,
               "Error: At the moment it is not possible to initialize a "
               "NodalDataToElemNode field or a NodalDistParameter field. It "
               "should be initialized when building the mesh"

@@ -222,7 +222,6 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
 
   std::string cellTopo = params->get("Cell Topology", "Quad");
   if (cellTopo == "Tri" || cellTopo == "Triangle") triangles = true;
-  // else TEST_FOR_EXCEPTION (cellTopo != "Quad", std::logic_error,
   //    "\nUnknown Cell Topology entry in STK2D(not \'Tri\' or \'Quad\'): "
   //     << cellTopo);
 
@@ -286,7 +285,6 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameterValue,
         "Invalid Cubature Rule: "
             << cub_rule_string
             << "; valid options are GAUSS, GAUSS_RADAU_LEFT, "
@@ -735,7 +733,6 @@ Albany::TmplSTKMeshStruct<1>::buildMesh(
 
         ALBANY_PANIC(
             true,
-            Teuchos::Exceptions::InvalidParameter,
             std::endl
                 << "Error: Could not place element " << elem_GID
                 << " in its corresponding element block." << std::endl);
@@ -863,7 +860,6 @@ Albany::TmplSTKMeshStruct<2>::buildMesh(
 
         ALBANY_PANIC(
             true,
-            Teuchos::Exceptions::InvalidParameter,
             std::endl
                 << "Error: Could not place element " << elem_GID
                 << " in its corresponding element block." << std::endl);
@@ -1180,7 +1176,6 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(
 
         ALBANY_PANIC(
             true,
-            Teuchos::Exceptions::InvalidParameter,
             std::endl
                 << "Error: Could not place element " << elem_GID
                 << " in its corresponding element block." << std::endl);

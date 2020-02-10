@@ -98,7 +98,6 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   } else {
     ALBANY_PANIC(
         field_type == "Cell" || field_type == "Node",
-        std::runtime_error,
         "Error! Only read cell or node states for now.\n");
   }
 }

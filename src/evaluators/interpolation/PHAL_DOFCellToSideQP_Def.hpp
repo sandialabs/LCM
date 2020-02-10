@@ -21,7 +21,6 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! Layout for side set " << sideSetName << " not found.\n");
 
   Teuchos::RCP<Albany::Layouts> dl_side    = dl->side_layouts.at(sideSetName);
@@ -62,7 +61,6 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid field layout.\n");
   }
 
@@ -195,7 +193,6 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
       default:
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Error! Invalid layout (this error should have happened earlier "
             "though).\n");
     }

@@ -33,7 +33,6 @@ Albany::LameProblem::LameProblem(
   // currently only support 3D analyses
   ALBANY_PANIC(
       neq != 3,
-      Teuchos::Exceptions::InvalidParameter,
       "\nOnly three-dimensional analyses are suppored when using the Library "
       "of Advanced Materials for Engineering (LAME)\n");
 

@@ -124,7 +124,6 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::computeFadInfo(
   int numGlobalVars = B[0].size();
   ALBANY_PANIC(
       numGlobalVars == 0,
-      std::logic_error,
       "In LocalNonlinearSolver<Jacobian> the numGLobalVars is zero where it "
       "should be positive\n");
 
@@ -228,7 +227,6 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Tangent, Traits>::computeFadInfo(
   int numGlobalVars = B[0].size();
   ALBANY_PANIC(
       numGlobalVars == 0,
-      std::logic_error,
       "In LocalNonlinearSolver<Tangent, Traits> the numGLobalVars is zero "
       "where it should be positive\n");
 
@@ -334,7 +332,6 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
   int numGlobalVars = B[0].size();
   ALBANY_PANIC(
       numGlobalVars == 0,
-      std::logic_error,
       "In LocalNonlinearSolver<Tangent, Traits> the numGLobalVars is zero "
       "where it should be positive\n");
 

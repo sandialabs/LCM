@@ -227,7 +227,6 @@ printThyraVector(
 
   ALBANY_PANIC(
       names.size() != localLength,
-      std::logic_error,
       "Error! names and mvec length do not match.\n");
 
   os << std::setw(10) << std::endl;
@@ -249,7 +248,6 @@ printThyraMultiVector(
   const int localLength = mvv.size() > 0 ? mvv[0].size() : 0;
   ALBANY_PANIC(
       names.size() != localLength,
-      std::logic_error,
       "Error! names and mvec length do not match.\n");
 
   os << std::setw(10) << std::endl;

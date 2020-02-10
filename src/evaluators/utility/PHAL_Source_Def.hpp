@@ -202,7 +202,6 @@ Table<EvalT, Traits>::Table(Teuchos::ParameterList& p)
 
   ALBANY_PANIC(
       !inFile,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Cannot open tabular data file \"" << filename
           << "\" in source table fill" << std::endl);
@@ -307,7 +306,6 @@ Table<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
     ALBANY_PANIC(
         !found_it,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error! Cannot locate the current time \""
             << workset.current_time
@@ -1081,7 +1079,6 @@ PointSource<EvalT, Traits>::PointSource(Teuchos::ParameterList* source_list)
   } else {
     ALBANY_PANIC(
         m_spatials.empty(),
-        std::logic_error,
         "Point: Did not find a single spatial component.  Specify Gaussian.");
   }
   Teuchos::ParameterList& wavelet_param =
@@ -1092,7 +1089,6 @@ PointSource<EvalT, Traits>::PointSource(Teuchos::ParameterList* source_list)
   } else {
     ALBANY_PANIC(
         !m_wavelet,
-        std::logic_error,
         "Point: Did not find a single wavelet component. Specify Monotone.");
   }
 }

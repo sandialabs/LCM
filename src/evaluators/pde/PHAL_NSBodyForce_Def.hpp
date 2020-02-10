@@ -33,7 +33,6 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(const Teuchos::ParameterList& p)
   } else if (type == "Boussinesq") {
     ALBANY_PANIC(
         haveHeat == false,
-        std::logic_error,
         std::endl
             << "Error!  Must enable heat equation for Boussinesq "
             << "body force term!");

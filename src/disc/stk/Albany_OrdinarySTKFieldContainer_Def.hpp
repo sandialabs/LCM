@@ -536,7 +536,6 @@ OrdinarySTKFieldContainer<Interleaved>::fillVectorImpl(
   } else {
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         "Error! Only scalar and vector fields supported so far.\n");
   }
 }
@@ -597,7 +596,6 @@ OrdinarySTKFieldContainer<Interleaved>::saveVectorImpl(
   } else {
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         "Error! Only scalar and vector fields supported so far.\n");
   }
 }

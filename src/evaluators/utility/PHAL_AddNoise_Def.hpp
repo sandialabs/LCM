@@ -59,7 +59,6 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid noise p.d.f.\n");
   }
 
@@ -72,11 +71,9 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
 
   ALBANY_PANIC(
       rel_noise < 0,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Relative noise should be non-negative.\n");
   ALBANY_PANIC(
       abs_noise < 0,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Absolute noise should be non-negative.\n");
 
   noise_free = (rel_noise == 0) && (abs_noise == 0);
@@ -134,7 +131,6 @@ AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! [PHAL::AddNoiseBase] This exception should never throw.\n");
   }
 }

@@ -41,7 +41,6 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! Field dimension not supported.\n");
   }
 
@@ -118,7 +117,6 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
       default:
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Error! Field dimension not supported (this error should have "
             "already appeared).\n");
     }

@@ -172,7 +172,6 @@ verify_subdivision(
                            former_num_entities[2] + former_num_entities[3];
   ALBANY_PANIC(
       final_number_nodes != final_num_entities[0],
-      std::logic_error,
       "The number of nodes after subdivision is incorrect\n");
   // Verify the number of edges
   int final_number_edges = (former_num_entities[1] * 2) +
@@ -180,20 +179,17 @@ verify_subdivision(
                            (14 * former_num_entities[3]);
   ALBANY_PANIC(
       final_number_edges != final_num_entities[1],
-      std::logic_error,
       "The number of edges after subdivision is incorrect\n");
   // Verify the number of faces
   int final_number_faces =
       (former_num_entities[2] * 6) + (36 * former_num_entities[3]);
   ALBANY_PANIC(
       final_number_faces != final_num_entities[2],
-      std::logic_error,
       "The number of faces after subdivision is incorrect\n");
   // Verify the number of elements
   int final_number_elements = 24 * former_num_entities[3];
   ALBANY_PANIC(
       final_number_elements != final_num_entities[3],
-      std::logic_error,
       "The number of elements after subdivision is incorrect\n");
   // If all the subdivision is done correctly, the following message will be
   // displayed

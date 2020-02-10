@@ -26,7 +26,6 @@ SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(
 
     ALBANY_PANIC(
         dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-        std::runtime_error,
         "Error! The layout structure does not appear to store the layout for "
         "side set "
             << sideSetName << "\n");

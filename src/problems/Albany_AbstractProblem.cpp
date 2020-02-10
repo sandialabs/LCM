@@ -60,7 +60,6 @@ Albany::AbstractProblem::AbstractProblem(
   } else
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Solution Method must be Steady, Transient, Transient Tempus, "
             << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : "
             << solutionMethod);
@@ -74,7 +73,6 @@ Albany::AbstractProblem::numEquations() const
 {
   ALBANY_PANIC(
       neq <= 0,
-      Teuchos::Exceptions::InvalidParameter,
       "A Problem must have at least 1 equation: " << neq);
   return neq;
 }

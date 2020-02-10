@@ -169,7 +169,7 @@ myReduceAll(
       Teuchos::reduceAll<int, ValueT>(
           comm, reduct_type, pack.size(), &send[0], &pack[0]);
     } break;
-    default: ALBANY_PANIC(true, std::logic_error, "not impl'ed");
+    default: ALBANY_ASSERT(false, "not impl'ed");
   }
   // Unpack.
   int slot = 0;

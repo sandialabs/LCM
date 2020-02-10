@@ -166,7 +166,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
 
   ALBANY_PANIC(
       num_time_deriv > 2,
-      std::logic_error,
       "Input error: number of time derivatives must be <= 2 "
           << "(solution, solution_dot, solution_dotdot)");
 
@@ -260,7 +259,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
         if (nonlinear_solver != "Line Search Based") {
           ALBANY_PANIC(
               true,
-              std::logic_error,
               "Newmark Implicit d-Form Stepper Type will not work correctly "
               "with 'Nonlinear Solver' = "
                   << nonlinear_solver
@@ -278,7 +276,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   } else {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Solution Method must be Steady, Transient, Transient Tempus, "
         "Transient Tempus No Piro, "
             << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : "
@@ -353,7 +350,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   if (writeToMatrixMarketJac < -1) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in Albany::Application constructor:  "
             << "Invalid Parameter Write Jacobian to MatrixMarket.  Acceptable "
@@ -363,7 +359,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   if (writeToMatrixMarketRes < -1) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in Albany::Application constructor:  "
             << "Invalid Parameter Write Residual to MatrixMarket.  Acceptable "
@@ -373,7 +368,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   if (writeToCoutJac < -1) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in Albany::Application constructor:  "
             << "Invalid Parameter Write Jacobian to Standard Output.  "
@@ -383,7 +377,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   if (writeToCoutRes < -1) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in Albany::Application constructor:  "
             << "Invalid Parameter Write Residual to Standard Output.  "
@@ -451,7 +444,6 @@ Application::buildProblem()
       (no_dir_bcs_ == false)) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error in Albany::Application: you are using a "
         "solver that requires SDBCs yet you are not "
         "using SDBCs!\n");
@@ -460,7 +452,6 @@ Application::buildProblem()
   if ((requires_orig_dbcs_ == true) && (problem->useSDBCs() == true)) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error in Albany::Application: you are using a "
         "solver with SDBCs that does not work correctly "
         "with them!\n");
@@ -469,7 +460,6 @@ Application::buildProblem()
   if ((no_dir_bcs_ == true) && (scaleBCdofs == true)) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error in Albany::Application: you are attempting "
         "to set 'Scale DOF BCs = true' for a problem with no  "
         "Dirichlet BCs!  Scaling will do nothing.  Re-run "
@@ -564,7 +554,6 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
   } else {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "The scaling Type you selected "
             << scaleType << " is not supported!"
             << "Supported scaling Types are currently: Constant" << std::endl);
@@ -575,7 +564,6 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
   if ((scale != 1.0) && (problem->useSDBCs() == true)) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "'Scaling' sublist not recognized when using SDBCs.");
   }
 }
@@ -681,7 +669,6 @@ Application::finalSetUp(
   fm = problem->getFieldManager();
   ALBANY_PANIC(
       fm == Teuchos::null,
-      std::logic_error,
       "getFieldManager not implemented!!!");
   dfm = problem->getDirichletFieldManager();
 
@@ -1708,7 +1695,6 @@ Application::computeGlobalTangent(
   ALBANY_PANIC(
       sum_derivs && (num_cols_x != 0) && (num_cols_p != 0) &&
           (num_cols_x != num_cols_p),
-      std::logic_error,
       "Seed matrices Vx and Vp must have the same number "
           << " of columns when sum_derivs is true and both are "
           << "non-null!" << std::endl);
@@ -2239,7 +2225,6 @@ Application::getValue(const std::string& name)
   }
   ALBANY_PANIC(
       index == -1,
-      std::logic_error,
       "Error in GatherCoordinateVector::getValue, \n"
           << "   Unrecognized param name: " << name << std::endl);
 
@@ -2267,7 +2252,6 @@ Application::determinePiroSolver(
     ALBANY_PANIC(
         secondOrder != "No" && secondOrder != "Velocity Verlet" &&
             secondOrder != "Newmark" && secondOrder != "Trapezoid Rule",
-        std::logic_error,
         "Invalid value for Second Order: (No, Velocity Verlet, Newmark, "
         "Trapezoid Rule): "
             << secondOrder << "\n");
@@ -2442,7 +2426,6 @@ Application::setScaleBCDofs(
   if (problem->getSideSetEquations().size() > 0) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Application::setScaleBCDofs is not yet implemented for"
             << " sideset equations!\n");
   }
@@ -2573,7 +2556,6 @@ Application::setupTangentWorksetInfo(
   ALBANY_PANIC(
       sum_derivs && (num_cols_x != 0) && (num_cols_p != 0) &&
           (num_cols_x != num_cols_p),
-      std::logic_error,
       "Seed matrices Vx and Vp must have the same number "
           << " of columns when sum_derivs is true and both are "
           << "non-null!" << std::endl);
@@ -2616,7 +2598,6 @@ Application::setCoupledAppBlockNodeset(
 
   ALBANY_PANIC(
       it == app_name_index_map_->end(),
-      std::logic_error,
       "Trying to couple to an unknown Application: " << app_name << '\n');
 
   int const app_index           = it->second;

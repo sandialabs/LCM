@@ -286,7 +286,6 @@ Topology::getCoordinatesOfTriangle(const std::vector<double> normalToPlane)
   // SINCE NORMAL CAN COINCIDE WITH COORDINATES OF THE CENTER
   ALBANY_PANIC(
       vectorN[0] == 0 && vectorN[1] == 0 && vectorN[0] == 0,
-      std::logic_error,
       "The input normal vector was 0,0,0 \n");
 
   double theta_rand = 2 * (3.14159) * randomNumber(0, 1);

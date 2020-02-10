@@ -35,7 +35,6 @@ Albany::HMCProblem::HMCProblem(
   }
   ALBANY_PANIC(
       !validMaterialDB,
-      std::logic_error,
       "Mechanics Problem Requires a Material Database");
 
   // the following function returns the problem information required for setting
@@ -66,7 +65,6 @@ Albany::HMCProblem::buildProblem(
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(
       meshSpecs.size() != 1,
-      std::logic_error,
       "Problem supports one Material Block");
 
   fm.resize(1);
@@ -178,7 +176,6 @@ Albany::HMCProblem::constructNeumannEvaluators(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 

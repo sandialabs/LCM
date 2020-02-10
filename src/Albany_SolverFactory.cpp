@@ -223,7 +223,6 @@ SolverFactory::createAndGetAlbanyApp(
     // GAH: this is an error - should be fatal
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error: cannot locate Stratimikos solver parameters in the input file."
             << "\n");
   }
@@ -259,7 +258,6 @@ SolverFactory::createAndGetAlbanyApp(
   }
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "Reached end of createAndGetAlbanyAppT()"
           << "\n");
 
@@ -302,7 +300,6 @@ SolverFactory::createAlbanyAppAndModel(
     const std::string secondOrder = problemParams->get("Second Order", "No");
     ALBANY_PANIC(
         secondOrder != "No",
-        std::logic_error,
         "Second Order is not supported"
             << "\n");
 
@@ -518,7 +515,6 @@ SolverFactory::getTestParameters(int response_index) const
 
   ALBANY_PANIC(
       result->isType<std::string>("Test Values"),
-      std::logic_error,
       "Array information in XML file must now be of type Array(double)\n");
   result->validateParametersAndSetDefaults(
       *getValidRegressionResultsParameters(), 0);

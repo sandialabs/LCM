@@ -149,7 +149,6 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRow(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! invalid value row = " << row << " to tet4LocalMassRow! \n"
                                         << "Row must be between 0 and 3.\n");
   }
@@ -177,7 +176,6 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRowLumped(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! invalid value row = " << row
                                         << " to tet4LocalMassRowLumped! \n"
                                         << "Row must be between 0 and 3.\n");
@@ -322,7 +320,6 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRow(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! invalid value row = " << row << " to tet10LocalMassRow! \n"
                                         << "Row must be between 0 and 9.\n");
   }
@@ -356,7 +353,6 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRowLumped(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! invalid value row = " << row
                                         << " to tet10LocalMassRowLumped! \n"
                                         << "Row must be between 0 and 9.\n");
@@ -461,7 +457,6 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRow(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! invalid value row = " << row << " to hex8LocalMassRow! \n"
                                         << "Row must be between 0 and 7.\n");
   }
@@ -493,7 +488,6 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! invalid value row = " << row
                                         << " to hex8LocalMassRowLumped! \n"
                                         << "Row must be between 0 and 7.\n");
@@ -635,7 +629,6 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRow(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! invalid value row = " << row
                                         << " to compositeTet10LocalMassRow! \n"
                                         << "Row must be between 0 and 9.\n");
@@ -670,7 +663,6 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRowLumped(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! invalid value row = "
               << row << " to compositeTet10LocalMassRowLumped! \n"
               << "Row must be between 0 and 9.\n");
@@ -806,7 +798,6 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
           UNSUPPORTED) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error! AnalyticMassResidual is being run with unsupported element "
         "having \n"
             << this->num_nodes_
@@ -843,7 +834,6 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
           UNSUPPORTED) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error! AnalyticMassResidual is being run with unsupported element "
         "having \n"
             << this->num_nodes_
@@ -927,7 +917,6 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
 {
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "Error! Tangent specialization of AnalyticMassResidual not "
       "implemented!\n");
 }
@@ -955,7 +944,6 @@ AnalyticMassResidual<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
 {
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "Error! DistParamDeriv specialization of AnalyticMassResidual not "
       "implemented!\n");
 }

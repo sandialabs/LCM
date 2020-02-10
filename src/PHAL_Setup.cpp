@@ -143,7 +143,6 @@ Setup::check_fields(
       }
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "The following fields could not be found:\n" + os.str());
     }
   }

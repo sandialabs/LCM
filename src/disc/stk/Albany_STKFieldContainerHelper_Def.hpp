@@ -106,7 +106,6 @@ STKFieldContainerHelper<FieldType>::fillVector(
   constexpr int rank = getRank<FieldType>();
   ALBANY_PANIC(
       rank != 0 && rank != 1,
-      std::runtime_error,
       "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
 
   BucketArray<FieldType> field_array(field_stk, bucket);
@@ -152,7 +151,6 @@ STKFieldContainerHelper<FieldType>::saveVector(
   constexpr int rank = getRank<FieldType>();
   ALBANY_PANIC(
       rank != 0 && rank != 1,
-      std::runtime_error,
       "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
 
   BucketArray<FieldType> field_array(field_stk, bucket);
@@ -194,7 +192,6 @@ STKFieldContainerHelper<FieldType>::copySTKField(
   constexpr int rank = getRank<FieldType>();
   ALBANY_PANIC(
       rank != 0 && rank != 1,
-      std::runtime_error,
       "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
 
   const stk::mesh::BulkData&     mesh = source.get_mesh();
@@ -221,7 +218,6 @@ STKFieldContainerHelper<FieldType>::copySTKField(
     ALBANY_PANIC(
         (uneven_downsampling) ||
             (num_nodes_in_bucket != target_array.dimension(nodes_dim)),
-        std::logic_error,
         "Error in stk fields: specification of coordinate vector vs. solution "
         "layout is incorrect."
             << std::endl);

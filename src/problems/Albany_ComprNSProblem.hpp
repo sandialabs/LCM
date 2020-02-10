@@ -140,7 +140,6 @@ Albany::ComprNSProblem::constructEvaluators(
   // Problem is transient
   ALBANY_PANIC(
       number_of_time_deriv != 1,
-      std::logic_error,
       "Albany_ComprNSProblem must be defined as a transient calculation.");
 
   const int numNodes    = intrepidBasis->getCardinality();

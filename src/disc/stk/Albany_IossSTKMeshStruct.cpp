@@ -180,14 +180,12 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     if (ssb.size() == 0) { continue; }
     ALBANY_PANIC(
         ssb.size() == 0,
-        std::runtime_error,
         "Error! There is a sideset (" + ss->name() +
             ") in the input mesh with zero side sets.\n");
 
     const auto* ioss_topo = ssb[0]->topology();
     ALBANY_PANIC(
         ioss_topo == nullptr,
-        std::runtime_error,
         "I give up. No topology in the input mesh for side set " + ss->name()
             << ".\n");
 
@@ -234,7 +232,6 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameterValue,
         "Invalid Cubature Rule: "
             << cub_rule_string
             << "; valid options are GAUSS, GAUSS_RADAU_LEFT, "
@@ -576,7 +573,6 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
   }
   ALBANY_PANIC(
       !coherence,
-      std::runtime_error,
       "Error! The maps 'side_to_cell_map' and 'side_nodes_ids' should either "
       "both be present or both missing, but only one of them was found in the "
       "mesh file.\n");

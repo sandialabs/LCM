@@ -44,12 +44,10 @@ KfieldBC_Base<EvalT, Traits>::KfieldBC_Base(Teuchos::ParameterList& p)
 
   ALBANY_PANIC(
       !(timeValues.size() == KIValues.size()),
-      Teuchos::Exceptions::InvalidParameter,
       "Dimension of \"Time Values\" and \"KI Values\" do not match");
 
   ALBANY_PANIC(
       !(timeValues.size() == KIIValues.size()),
-      Teuchos::Exceptions::InvalidParameter,
       "Dimension of \"Time Values\" and \"KII Values\" do not match");
 }
 
@@ -76,7 +74,6 @@ KfieldBC_Base<EvalT, Traits>::computeBCs(
 {
   ALBANY_PANIC(
       time > timeValues.back(),
-      Teuchos::Exceptions::InvalidParameter,
       "Time is growing unbounded!");
 
   RealType X, Y, R, theta;

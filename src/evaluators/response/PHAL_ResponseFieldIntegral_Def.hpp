@@ -60,7 +60,6 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   } else if (fieldType == "Tensor") {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "local_ and global_response must have rank 2. However, this code path "
         "makes them rank 3. Needs to be fixed.");
     field_layout           = dl->qp_tensor;
@@ -69,7 +68,6 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid field type " << fieldType << ".  Support values are "
                               << "Scalar, Vector, and Tensor." << std::endl);
   }
@@ -123,7 +121,6 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error! Invalid number of dimensions: " << numDims << std::endl);
 

@@ -50,7 +50,6 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     } else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Mesh format not recognized.\n");
     }
   }
@@ -117,7 +116,6 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! Invalid number of element nodes (you should have got an "
           "error before though).\n");
   }
@@ -363,7 +361,6 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
 
       ALBANY_PANIC(
           found == false,
-          std::logic_error,
           "Error! Cannot find element connected to side " << i + 1 << ".\n");
     }
   }
@@ -421,14 +418,13 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
   std::string line;
   swallow_lines_until(ifile, line, "$NOD");
   ALBANY_PANIC(
-      ifile.eof(), std::runtime_error, "Error! Nodes section not found.\n");
+      ifile.eof(), "Error! Nodes section not found.\n");
 
   // Read the number of nodes
   std::getline(ifile, line);
   NumNodes = std::atoi(line.c_str());
   ALBANY_PANIC(
       NumNodes <= 0,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of nodes.\n");
   pts = new double[NumNodes][3];
 
@@ -442,14 +438,13 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$ELM");
   ALBANY_PANIC(
-      ifile.eof(), std::runtime_error, "Error! Element section not found.\n");
+      ifile.eof(), "Error! Element section not found.\n");
 
   // Read the number of entities
   std::getline(ifile, line);
   int num_entities = std::atoi(line.c_str());
   ALBANY_PANIC(
       num_entities <= 0,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of mesh elements.\n");
 
   // Gmsh lists elements and sides (and some points) all toghether, and does not
@@ -468,15 +463,12 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
 
   ALBANY_PANIC(
       nb_tetra * nb_hexas != 0,
-      std::logic_error,
       "Error! Cannot mix tetrahedra and hexahedra.\n");
   ALBANY_PANIC(
       nb_trias * nb_quads != 0,
-      std::logic_error,
       "Error! Cannot mix triangles and quadrilaterals.\n");
   ALBANY_PANIC(
       nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
-      std::logic_error,
       "Error! Can only handle 2D and 3D geometries.\n");
 
   lines = new int*[3];
@@ -527,7 +519,7 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(true, std::runtime_error, "Error! Invalid mesh dimension.\n");
+    ALBANY_PANIC(true, "Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section
@@ -535,7 +527,6 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
   swallow_lines_until(ifile, line, "$ELM");
   ALBANY_PANIC(
       ifile.eof(),
-      std::runtime_error,
       "Error! Element section not found; however, it was found earlier. This "
       "may be a bug.\n");
   std::getline(ifile, line);  // Skip line with number of elements
@@ -582,7 +573,6 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
       default:
         ALBANY_PANIC(
             true,
-            Teuchos::Exceptions::InvalidParameter,
             "Error! Element type not supported; but you should have got an "
             "error before!\n");
     }
@@ -611,7 +601,7 @@ Albany::GmshSTKMeshStruct::set_NumNodes(std::ifstream& ifile)
   std::string line;
   swallow_lines_until(ifile, line, "$Nodes");
   ALBANY_PANIC(
-      ifile.eof(), std::runtime_error, "Error! Nodes section not found.\n");
+      ifile.eof(), "Error! Nodes section not found.\n");
 
   if (version == GmshVersion::V2_2) {
     std::getline(ifile, line);
@@ -628,7 +618,6 @@ Albany::GmshSTKMeshStruct::set_NumNodes(std::ifstream& ifile)
 
   ALBANY_PANIC(
       NumNodes <= 0,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of nodes.\n");
   return;
 }
@@ -675,7 +664,7 @@ Albany::GmshSTKMeshStruct::set_num_entities(std::ifstream& ifile)
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Elements");
   ALBANY_PANIC(
-      ifile.eof(), std::runtime_error, "Error! Element section not found.\n");
+      ifile.eof(), "Error! Element section not found.\n");
 
   // Read the number of entities
   std::getline(ifile, line);
@@ -696,7 +685,6 @@ Albany::GmshSTKMeshStruct::set_num_entities(std::ifstream& ifile)
 
   ALBANY_PANIC(
       num_entities <= 0,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of mesh elements.\n");
 
   return;
@@ -718,7 +706,6 @@ Albany::GmshSTKMeshStruct::increment_element_type(int e_type)
     default:
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Element type (" << e_type << ") not supported.\n");
   }
 
@@ -782,20 +769,16 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
 
     ALBANY_PANIC(
         mixed_order_mesh,
-        std::logic_error,
         "Error! Found second order elements in first order mesh.\n");
 
     ALBANY_PANIC(
         nb_tetra * nb_hexas != 0,
-        std::logic_error,
         "Error! Cannot mix tetrahedra and hexahedra.\n");
     ALBANY_PANIC(
         nb_trias * nb_quads != 0,
-        std::logic_error,
         "Error! Cannot mix triangles and quadrilaterals.\n");
     ALBANY_PANIC(
         nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
-        std::logic_error,
         "Error! Can only handle 2D and 3D geometries.\n");
   } else if (is_second_order) {
     bool mixed_order_mesh = (nb_lines != 0);
@@ -804,7 +787,6 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
 
     ALBANY_PANIC(
         mixed_order_mesh,
-        std::logic_error,
         "Error! Found first order elements in second order mesh.\n");
 
     bool missing_parts = (nb_line3 == 0);
@@ -813,13 +795,11 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
 
     ALBANY_PANIC(
         missing_parts,
-        std::logic_error,
         "Error! This second order mesh is missing secord order parts.\n");
 
   } else {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error! Could not determine if mesh was first or second order.\n"
             << "Checked for number of 2pt lines and 3pt lines, both are "
                "non-zero. \n");
@@ -910,7 +890,7 @@ Albany::GmshSTKMeshStruct::set_generic_mesh_info()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(true, std::runtime_error, "Error! Invalid mesh dimension.\n");
+    ALBANY_PANIC(true, "Error! Invalid mesh dimension.\n");
   }
   return;
 }
@@ -986,7 +966,6 @@ Albany::GmshSTKMeshStruct::store_element_info(
     default:
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Element type not supported; but you should have got an error "
           "before!\n");
   }
@@ -1003,7 +982,6 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
   swallow_lines_until(ifile, line, "$Elements");
   ALBANY_PANIC(
       ifile.eof(),
-      std::runtime_error,
       "Error! Element section not found; however, it was found earlier. This "
       "may be a bug.\n");
 
@@ -1022,7 +1000,6 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
       ss >> id >> e_type >> n_tags;
       ALBANY_PANIC(
           n_tags <= 0,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Number of tags must be positive.\n");
       tags.resize(n_tags + 1);
       for (int j(0); j < n_tags; ++j) { ss >> tags[j]; }
@@ -1138,20 +1115,19 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
 
   ifile.read(one.c, sizeof(int));
   ALBANY_PANIC(
-      one.i != 1, std::runtime_error, "Error! Uncompatible binary format.\n");
+      one.i != 1, "Error! Uncompatible binary format.\n");
 
   // Start reading nodes
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Nodes");
   ALBANY_PANIC(
-      ifile.eof(), std::runtime_error, "Error! Nodes section not found.\n");
+      ifile.eof(), "Error! Nodes section not found.\n");
 
   // Read the number of nodes
   std::getline(ifile, line);
   NumNodes = std::atoi(line.c_str());
   ALBANY_PANIC(
       NumNodes <= 0,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of nodes.\n");
   pts = new double[NumNodes][3];
 
@@ -1166,14 +1142,13 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Elements");
   ALBANY_PANIC(
-      ifile.eof(), std::runtime_error, "Error! Element section not found.\n");
+      ifile.eof(), "Error! Element section not found.\n");
 
   // Read the number of entities
   std::getline(ifile, line);
   int num_entities = std::atoi(line.c_str());
   ALBANY_PANIC(
       num_entities <= 0,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of mesh elements.\n");
 
   // Gmsh lists elements and sides (and some points) all toghether, and does not
@@ -1188,10 +1163,9 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
 
     ALBANY_PANIC(
         header[1] <= 0,
-        std::logic_error,
         "Error! Invalid number of elements of this type.\n");
     ALBANY_PANIC(
-        header[2] <= 0, std::logic_error, "Error! Invalid number of tags.\n");
+        header[2] <= 0,  "Error! Invalid number of tags.\n");
 
     e_type = header[0];
     entities_found += header[1];
@@ -1239,21 +1213,17 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       default:
         ALBANY_PANIC(
             true,
-            Teuchos::Exceptions::InvalidParameter,
             "Error! Element type not supported.\n");
     }
   }
   ALBANY_PANIC(
       nb_tetra * nb_hexas != 0,
-      std::logic_error,
       "Error! Cannot mix tetrahedra and hexahedra.\n");
   ALBANY_PANIC(
       nb_trias * nb_quads != 0,
-      std::logic_error,
       "Error! Cannot mix triangles and quadrilaterals.\n");
   ALBANY_PANIC(
       nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
-      std::logic_error,
       "Error! Can only handle 2D and 3D geometries.\n");
 
   lines = new int*[3];
@@ -1304,7 +1274,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(true, std::runtime_error, "Error! Invalid mesh dimension.\n");
+    ALBANY_PANIC(true, "Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section
@@ -1320,10 +1290,9 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
 
     ALBANY_PANIC(
         header[1] <= 0,
-        std::logic_error,
         "Error! Invalid number of elements of this type.\n");
     ALBANY_PANIC(
-        header[2] <= 0, std::logic_error, "Error! Invalid number of tags.\n");
+        header[2] <= 0,  "Error! Invalid number of tags.\n");
 
     e_type = header[0];
     entities_found += header[1];
@@ -1407,7 +1376,6 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       default:
         ALBANY_PANIC(
             true,
-            Teuchos::Exceptions::InvalidParameter,
             "Error! Element type not supported.\n");
     }
   }
@@ -1578,7 +1546,6 @@ Albany::GmshSTKMeshStruct::check_version(std::ifstream& ifile)
 
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         "Cannot read this version of gmsh *.msh file!");
   }
 
@@ -1592,7 +1559,6 @@ Albany::GmshSTKMeshStruct::open_fname(std::ifstream& ifile)
   if (!ifile.is_open()) {
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         "Error! Cannot open mesh file '" << fname << "'.\n");
   }
 
@@ -1655,12 +1621,10 @@ Albany::GmshSTKMeshStruct::get_physical_tag_to_surface_tag_map(
 
     ALBANY_PANIC(
         num_physical_tags > 1,
-        std::runtime_error,
         "Cannot support more than one physical tag per surface.\n");
 
     ALBANY_PANIC(
         num_physical_tags < 0,
-        std::runtime_error,
         "Cannot have a negative number of physical tags per surface.\n");
 
     if (num_physical_tags == 1) {
@@ -1724,7 +1688,6 @@ Albany::GmshSTKMeshStruct::read_physical_names_from_file(
               << "names.size() = " << names.size() << ". \n";
     ALBANY_PANIC(
         physical_surface_tags.size() != names.size(),
-        std::runtime_error,
         error_msg.str());
 
     // Add each physical name pair to the map

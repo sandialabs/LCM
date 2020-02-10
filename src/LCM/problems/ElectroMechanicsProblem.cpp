@@ -46,7 +46,6 @@ Albany::ElectroMechanicsProblem::ElectroMechanicsProblem(
   } else {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         '\n' << "Error: " << __FILE__ << " line " << __LINE__
              << ": num_dims_ set incorrectly." << '\n');
   }
@@ -174,7 +173,6 @@ Albany::ElectroMechanicsProblem::constructNeumannEvaluators(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
 
   condNames[1] = "dudn";

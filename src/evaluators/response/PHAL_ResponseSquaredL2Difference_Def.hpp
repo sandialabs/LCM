@@ -47,7 +47,6 @@ PHAL::ResponseSquaredL2DifferenceBase<
   if (plist->isParameter("Target Field Name")) {
     ALBANY_PANIC(
         plist->isParameter("Target Value"),
-        std::logic_error,
         "[ResponseSquaredL2DifferenceSideBase] Error! Both target value and "
         "target field provided.\n");
     std::string target_fname;
@@ -57,7 +56,6 @@ PHAL::ResponseSquaredL2DifferenceBase<
   } else {
     ALBANY_PANIC(
         !plist->isParameter("Target Value"),
-        std::logic_error,
         "[ResponseSquaredL2DifferenceSideBase] Error! No target value or "
         "target field provided.\n");
     target_value     = true;
@@ -245,7 +243,6 @@ PHAL::ResponseSquaredL2DifferenceBase<
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid 'Field Rank'.\n");
   }
 

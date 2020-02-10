@@ -224,7 +224,6 @@ Albany::DiscretizationFactory::createMeshStruct(
 
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  Unknown discretization method in "
                "DiscretizationFactory: "
@@ -269,7 +268,6 @@ Albany::DiscretizationFactory::createDiscretization(
 {
   ALBANY_PANIC(
       meshStruct == Teuchos::null,
-      std::logic_error,
       "meshStruct accessed, but it has not been constructed" << std::endl);
 
   setupInternalMeshStruct(neq, sis, side_set_sis, req, side_set_req);

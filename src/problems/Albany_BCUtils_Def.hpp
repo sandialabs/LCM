@@ -138,7 +138,7 @@ imposeOrder(
     for (S2PL::const_iterator it = evname2pl.begin(); it != evname2pl.end();
          ++it)
       msg << "  " << plName(it->first) << "\n";
-    ALBANY_PANIC(true, std::logic_error, msg.str());
+    ALBANY_ASSERT(false, msg.str());
   }
 }
 }  // namespace
@@ -908,7 +908,6 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
           // The solution is prescribed a unique value off the given side sets.
           ALBANY_PANIC(
               *value != BCparams.get<double>(ss),
-              std::logic_error,
               "Error! For a given DOF, all Off-Node-Set BC MUST have the same "
               "value.\n");
         }
@@ -944,7 +943,6 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
   if ((use_dbcs_ == true) && (use_sdbcs_ == true)) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "You are attempting to prescribe a mix of SDBCs and DBCs, which is not "
         "allowed!\n");
   }
@@ -1018,7 +1016,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           ALBANY_PANIC(
               BCparams.isType<string>(ss),
-              std::logic_error,
               "NBC array information in XML/YAML file must be of type "
               "Array(double)\n");
 
@@ -1071,7 +1068,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           if (conditions[k] == "scaled jump" || conditions[k] == "radiate") {
             ALBANY_PANIC(
                 materialDB == Teuchos::null,
-                Teuchos::Exceptions::InvalidParameter,
                 "This BC needs a material database specified");
           }
           p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", materialDB);
@@ -1169,7 +1165,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           if (conditions[k] == "scaled jump" || conditions[k] == "robin") {
             ALBANY_PANIC(
                 materialDB == Teuchos::null,
-                Teuchos::Exceptions::InvalidParameter,
                 "This BC needs a material database specified");
 
             p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", materialDB);

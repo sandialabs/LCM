@@ -335,12 +335,10 @@ ThermoPoroPlasticityResidEnergy<EvalT, Traits>::evaluateFields(
       //  TResidual(cell,node)=0.0;
       for (int qp = 0; qp < numQPs; ++qp) {
         //          ALBANY_PANIC(J(cell,qp) <= 0,
-        //          std::runtime_error,
         //              " negative / zero volume detected in
         //              ThermoPoroPlasticityResidEnergy_Def.hpp line " +
         //              __LINE__);
         //          ALBANY_PANIC(Jold(cell,qp) <= 0,
-        //          std::runtime_error,
         //              " negative / zero volume detected in
         //              ThermoPoroPlasticityResidEnergy_Def.hpp line " +
         //              __LINE__);

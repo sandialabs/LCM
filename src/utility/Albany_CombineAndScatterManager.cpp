@@ -79,7 +79,6 @@ createCombineAndScatterManager(
 
   ALBANY_PANIC(
       manager.is_null(),
-      std::logic_error,
       "Error! We were not able to cast the input maps to any of the available "
       "concrete implementations (so far, only Tpetra).\n");
 

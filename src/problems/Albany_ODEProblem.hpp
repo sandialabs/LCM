@@ -138,7 +138,6 @@ Albany::ODEProblem::constructEvaluators(
   // Problem is transient
   ALBANY_PANIC(
       number_of_time_deriv != 1,
-      std::logic_error,
       "Albany_ODEProblem must be defined as a transient calculation.");
 
   // Temporary variable used numerous times below

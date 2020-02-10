@@ -14,7 +14,6 @@ class GlobalLocalIndexer
   {
     ALBANY_PANIC(
         m_vs.is_null(),
-        std::logic_error,
         "Error! Input vector space pointer is null.\n");
   }
 

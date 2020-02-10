@@ -339,7 +339,6 @@ CreepModel<EvalT, Traits>::computeState(
 
             ALBANY_PANIC(
                 count == max_count,
-                std::runtime_error,
                 std::endl
                     << "Error in return mapping, count = " << count
                     << "\nres = " << res << "\ng = " << F[0] << "\ndg = "
@@ -429,7 +428,6 @@ CreepModel<EvalT, Traits>::computeState(
 
           ALBANY_PANIC(
               count > 30,
-              std::runtime_error,
               std::endl
                   << "Error in return mapping, count = " << count
                   << "\nres = " << res << "\nrelres = " << res / f

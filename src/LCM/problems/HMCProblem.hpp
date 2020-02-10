@@ -203,7 +203,6 @@ Albany::HMCProblem::constructEvaluators(
           .get<std::string>("Model Name");
   ALBANY_PANIC(
       material_model_name.length() == 0,
-      std::logic_error,
       "A material model must be defined for block: " + eb_name);
 
 #if defined(ALBANY_VERBOSE)
@@ -244,7 +243,6 @@ Albany::HMCProblem::constructEvaluators(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
   ALBANY_PANIC(
       dl->vectorAndGradientLayoutsAreEquivalent == false,
-      std::logic_error,
       "Data Layout Usage in Mechanics problems assume vecDim = numDim");
 
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);

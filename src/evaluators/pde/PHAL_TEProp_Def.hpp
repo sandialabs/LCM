@@ -115,13 +115,11 @@ PHAL::TEProp<EvalT, Traits>::whichMat(const MeshScalarT& x)
 {
   ALBANY_PANIC(
       x < xBounds[0] || x > xBounds[mats],
-      std::logic_error,
       "Quadrature point " << x << " not within bounds \n");
   for (int i = 0; i < mats; i++)
     if (x < xBounds[i + 1]) return i;
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "Quadrature point " << x << " not within bounds \n");
   return -1;
 }

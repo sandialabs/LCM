@@ -166,7 +166,6 @@ Albany::ProblemFactory::create()
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  Unknown problem " << method << "!" << std::endl
             << "Supplied parameter list is " << std::endl

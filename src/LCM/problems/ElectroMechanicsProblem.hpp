@@ -237,7 +237,6 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
           .get<std::string>("Model Name");
   ALBANY_PANIC(
       material_model_name.length() == 0,
-      std::logic_error,
       "A material model must be defined for block: " + eb_name);
 
 #if defined(ALBANY_VERBOSE)
@@ -291,7 +290,6 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
       workset_size, num_vertices_, num_nodes_, num_pts_, num_dims_));
   ALBANY_PANIC(
       dl_->vectorAndGradientLayoutsAreEquivalent == false,
-      std::logic_error,
       "Data Layout Usage in ElectroMechanics problems assume vecDim = "
       "num_dims_");
 

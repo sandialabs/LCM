@@ -53,7 +53,6 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
   else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid elastic modulus type " << type);
   }
 
@@ -153,7 +152,6 @@ ElasticModulus<EvalT, Traits>::getValue(const std::string& n)
     return dEdT_value;
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in ElasticModulus::getValue()" << std::endl);

@@ -46,7 +46,6 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid field type " << fieldType << ".  Support value is "
                               << "Scalar." << std::endl);
   }

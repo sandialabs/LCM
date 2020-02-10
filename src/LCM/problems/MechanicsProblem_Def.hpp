@@ -165,7 +165,6 @@ MechanicsProblem::constructEvaluators(
 
   ALBANY_PANIC(
       material_model_name.length() == 0,
-      std::logic_error,
       "A material model must be defined for block: " + eb_name);
 
 #if defined(ALBANY_VERBOSE)
@@ -230,7 +229,6 @@ MechanicsProblem::constructEvaluators(
   // FIXME: really need to check for WEDGE_12 topologies
   ALBANY_PANIC(
       composite_ && surface_element,
-      std::logic_error,
       "Surface elements are not yet supported with the composite tet");
 
   // Get the intrepid basis for the given cell topology
@@ -335,7 +333,6 @@ MechanicsProblem::constructEvaluators(
 
   ALBANY_PANIC(
       dl_->vectorAndGradientLayoutsAreEquivalent == false,
-      std::logic_error,
       "Data Layout Usage in Mechanics problems assume vecDim = num_dims_");
 
   EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
@@ -432,7 +429,6 @@ MechanicsProblem::constructEvaluators(
 
   ALBANY_PANIC(
       SolutionType == SolutionMethodType::Unknown,
-      std::logic_error,
       "Solution Method must be Steady, Transient, "
       "Continuation, Eigensolve, or Aeras Hyperviscosity");
 
@@ -1087,7 +1083,6 @@ MechanicsProblem::constructEvaluators(
 
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Unrecognized thermal source specified in input file");
   }
 

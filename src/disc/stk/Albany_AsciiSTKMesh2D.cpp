@@ -60,7 +60,6 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
       if (shape == "Triangle") {
         ALBANY_PANIC(
             NumElemNodes != 3,
-            Teuchos::Exceptions::InvalidParameter,
             std::endl
                 << "Error in AsciiSTKMesh2D: Triangles must be linear. Number "
                    "of nodes per element in file "
@@ -69,7 +68,6 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
       } else if (shape == "Quadrilateral") {
         ALBANY_PANIC(
             NumElemNodes != 4,
-            Teuchos::Exceptions::InvalidParameter,
             std::endl
                 << "Error in AsciiSTKMesh2D: Quadrilaterals must be bilinear. "
                    "Number of nodes per element in file "
@@ -78,7 +76,6 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
       } else
         ALBANY_PANIC(
             true,
-            Teuchos::Exceptions::InvalidParameter,
             std::endl
                 << "Error in AsciiSTKMesh2D: Only Triangle or Quadrilateral "
                    "grids can be imported. Shape in in file "
@@ -144,7 +141,6 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
     } else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error in AsciiSTKMesh2D: Input Mesh File " << fname
               << " not found!" << std::endl);

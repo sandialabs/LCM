@@ -108,7 +108,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         stk::io::set_field_role(
             *cell_tensor_states.back(), role_type(st.output));
       } else {
-        ALBANY_PANIC(true, std::logic_error, "Error! Unexpected state rank.\n");
+        ALBANY_ASSERT(false, "Error! Unexpected state rank.\n");
       }
       // Debug
       //      cout << "Allocating qps field name " <<
@@ -181,7 +181,6 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
       else
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Error: GenericSTKFieldContainer - cannot match QPData");
     }  // end QuadPoint
     // Single scalar at center of the workset
@@ -225,7 +224,6 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
     else
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error: GenericSTKFieldContainer - cannot match unknown entity : "
               << st.entity << std::endl);
 
@@ -236,7 +234,6 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
 
       ALBANY_PANIC(
           mesh_vector_states.find(tmp_str) != mesh_vector_states.end(),
-          std::logic_error,
           "Error! Another layered state with the same name already exists.\n");
       mesh_vector_states[tmp_str] = std::vector<double>(dim.back());
     }

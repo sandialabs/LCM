@@ -93,7 +93,6 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 
   ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
-      std::logic_error,
       std::endl
           << "Error: cannot locate " << stateName
           << " in PHAL_SaveCellStateField_Def" << std::endl);

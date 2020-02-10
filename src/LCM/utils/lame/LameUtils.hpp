@@ -68,7 +68,6 @@ parameterListToMatProps(
     } else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           " parameters for LAME material models must be of type double, int, "
           "or string.\n");
     }
@@ -115,7 +114,6 @@ constructLamentMaterialModel(
     if (materialModel.is_null())
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           " unsupported LAMENT material model: " + lameMaterialModelName +
               " (" + materialModelName + ")\n");
   }

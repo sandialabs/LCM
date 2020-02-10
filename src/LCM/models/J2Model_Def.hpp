@@ -242,7 +242,6 @@ J2Model<EvalT, Traits>::computeState(
 
           ALBANY_PANIC(
               count == num_max_iter,
-              std::runtime_error,
               std::endl
                   << "Error in return mapping, count = " << count
                   << "\nres = " << res << "\nrelres  = " << res / f

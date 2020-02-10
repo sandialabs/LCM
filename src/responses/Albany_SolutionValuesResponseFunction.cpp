@@ -72,7 +72,6 @@ class SolutionValuesResponseFunction::SolutionPrinter
   {
     ALBANY_PANIC(
         g.size() != eq_gids.size(),
-        std::logic_error,
         "g.size() != eq_gids.size()");
 
     // Get all coordinates.

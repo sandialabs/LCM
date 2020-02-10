@@ -149,7 +149,6 @@ struct NormInf
   {
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         "SolutionFileResponseFunction::NormInf::NormDerivative is not "
         "Implemented yet!\n");
   }

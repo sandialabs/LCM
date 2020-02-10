@@ -21,7 +21,6 @@ ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(
   sideSetName = p.get<std::string>("Side Set Name");
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! Layouts for side set '" << sideSetName << "' not found.\n");
   Teuchos::RCP<Albany::Layouts> dl_side = dl->side_layouts.at(sideSetName);
 
@@ -231,7 +230,6 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(
       default:
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Error! The dimension of the side should be 1 or 2.\n");
     }
 

@@ -158,7 +158,6 @@ GenericSTKMeshStruct::SetupFieldData(
 {
   ALBANY_PANIC(
       !metaData->is_initialized(),
-      std::logic_error,
       "LogicError: metaData->FEM_initialize(numDim) not yet called"
           << std::endl);
 
@@ -412,7 +411,6 @@ GenericSTKMeshStruct::buildLocalRefiner()
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  Unknown local adaptation pattern in "
                "GenericSTKMeshStruct: "
@@ -481,7 +479,6 @@ GenericSTKMeshStruct::getMeshSpecs()
 {
   ALBANY_PANIC(
       meshSpecs == Teuchos::null,
-      std::logic_error,
       "meshSpecs accessed, but it has not been constructed" << std::endl);
   return meshSpecs;
 }
@@ -491,7 +488,6 @@ GenericSTKMeshStruct::getMeshSpecs() const
 {
   ALBANY_PANIC(
       meshSpecs == Teuchos::null,
-      std::logic_error,
       "meshSpecs accessed, but it has not been constructed" << std::endl);
   return meshSpecs;
 }
@@ -745,7 +741,6 @@ GenericSTKMeshStruct::addNodeSetsFromSideSets()
 {
   ALBANY_PANIC(
       this->meshSpecs[0] == Teuchos::null,
-      std::runtime_error,
       "Error! Mesh specs have not been initialized yet.\n");
 
   // This function adds a (sideset) part to nsPartVec and to the meshSpecs
@@ -781,7 +776,6 @@ GenericSTKMeshStruct::checkNodeSetsFromSideSetsIntegrity()
     auto it = ssPartVec.find(ssn);
     ALBANY_PANIC(
         it == ssPartVec.end(),
-        std::runtime_error,
         "Error! Side set "
             << ssn
             << " not found. This error should NEVER occurr though. Bug?\n");
@@ -800,7 +794,6 @@ GenericSTKMeshStruct::checkNodeSetsFromSideSetsIntegrity()
     for (const auto& side : sides) {
       ALBANY_PANIC(
           bulkData->num_nodes(side) == num_nodes,
-          std::runtime_error,
           "Error! Found a side with wrong number of nodes stored. Most likely,"
           "its nodes were not added to the side with 'declare_relation').\n");
     }
@@ -819,7 +812,6 @@ GenericSTKMeshStruct::initializeSideSetMeshSpecs(
       stk::mesh::Part* part = metaData->get_part(ssName);
       ALBANY_PANIC(
           part == nullptr,
-          std::runtime_error,
           "Error! One of the stored meshSpecs claims to have sideset " +
               ssName + " which, however, is not a part of the mesh.\n");
       stk::topology        stk_topo_data = metaData->get_topology(*part);
@@ -889,7 +881,6 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
         // The user said this mesh is extracted from a higher dimensional one
         ALBANY_PANIC(
             meshSpecs.size() != 1,
-            std::logic_error,
             "Error! So far, side set mesh extraction is allowed only from STK "
             "meshes with 1 element block.\n");
 
@@ -908,7 +899,6 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
               Teuchos::rcp_dynamic_cast<AbstractSTKMeshStruct>(ss_mesh, false);
           ALBANY_PANIC(
               this->sideSetMeshStructs[ss_name] == Teuchos::null,
-              std::runtime_error,
               "Error! Could not cast side mesh to AbstractSTKMeshStruct.\n");
         }
       }
@@ -918,7 +908,6 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
       // name)
       ALBANY_PANIC(
           sideDim != this->sideSetMeshStructs[ss_name]->numDim,
-          std::logic_error,
           "Error! Mesh on side " << ss_name << " has the wrong dimension.\n");
 
       // Update the side set mesh specs pointer in the mesh specs of this mesh
@@ -1027,7 +1016,6 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
 {
   ALBANY_PANIC(
       sideSetMeshStructs.find(sideSetName) == sideSetMeshStructs.end(),
-      Teuchos::Exceptions::InvalidParameter,
       "Error in 'buildSideNodeToSideSetCellNodeMap': side set "
           << sideSetName << " does not have a mesh.\n");
 
@@ -1118,7 +1106,6 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
       }
       ALBANY_PANIC(
           side_lid == -1,
-          std::logic_error,
           "Error! Cannot locate the right side in the cell.\n");
 
       sideMap[side3D_GID] = side_mesh->bulkData->identifier(cell2D) - 1;
@@ -1150,7 +1137,6 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
     // Safety check
     ALBANY_PANIC(
         bulkData->num_elements(side3D) != 1,
-        std::logic_error,
         "Error! Side " << side3D_GID
                        << " has more/less than 1 adjacent element.\n");
 
@@ -1339,7 +1325,6 @@ GenericSTKMeshStruct::loadRequiredInputFields(
     } else {
       ALBANY_PANIC(
           fusage != "Input" && fusage != "Input-Output",
-          Teuchos::Exceptions::InvalidParameter,
           "Error! 'Field Usage' for field '"
               << fname
               << "' must be one of 'Input', 'Output', 'Input-Output' or "
@@ -1356,7 +1341,6 @@ GenericSTKMeshStruct::loadRequiredInputFields(
     } else {
       ALBANY_PANIC(
           forigin != "File",
-          Teuchos::Exceptions::InvalidParameter,
           "Error! 'Field Origin' for field '"
               << fname << "' must be one of 'File' or 'Mesh'.\n");
     }
@@ -1371,17 +1355,14 @@ GenericSTKMeshStruct::loadRequiredInputFields(
                       fparams.isParameter("Random Value");
     ALBANY_PANIC(
         load_ascii && load_math_expr,
-        std::logic_error,
         "Error! You cannot specify both 'File Name' and 'Field Expression' for "
         "loading a field.\n");
     ALBANY_PANIC(
         load_ascii && load_value,
-        std::logic_error,
         "Error! You cannot specify both 'File Name' and 'Field Value' (or "
         "'Random Value') for loading a field.\n");
     ALBANY_PANIC(
         load_math_expr && load_value,
-        std::logic_error,
         "Error! You cannot specify both 'Field Expression' and 'Field Value' "
         "(or 'Random Value') for loading a field.\n");
 
@@ -1441,7 +1422,6 @@ GenericSTKMeshStruct::loadRequiredInputFields(
     } else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameterValue,
           "Error! Field '" << fname << "' has type '" << ftype << "'.\n"
                            << "Unfortunately, the only supported field types "
                               "so fare are 'Node/Elem Scalar/Vector' and "
@@ -1472,7 +1452,6 @@ GenericSTKMeshStruct::loadRequiredInputFields(
     } else {
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! No means were specified for loading field '" + fname +
               "'.\n");
     }
@@ -1504,7 +1483,6 @@ GenericSTKMeshStruct::loadRequiredInputFields(
 
     ALBANY_PANIC(
         scalar_field == 0 && vector_field == 0 && tensor_field == 0,
-        std::logic_error,
         "Error! Field " << fname << " not present (perhaps is not '" << ftype
                         << "'?).\n");
 
@@ -1536,7 +1514,6 @@ GenericSTKMeshStruct::loadRequiredInputFields(
 
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error! The following requirements were not found in the "
         "discretization list:"
             << missing_list << ".\n");
@@ -1622,7 +1599,6 @@ GenericSTKMeshStruct::loadField(
       ALBANY_PANIC(
           scale_factors.size() !=
               static_cast<int>(serial_req_mvec->domain()->dim()),
-          Teuchos::Exceptions::InvalidParameter,
           "Error! The given scale factors vector size does not match the field "
           "dimension.\n");
     } else if (field_params.isType<double>("Scale Factor")) {
@@ -1634,7 +1610,6 @@ GenericSTKMeshStruct::loadField(
     } else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Invalid type for parameter 'Scale Factor'. Should be either "
           "'double' or 'Array(double)'.\n");
     }
@@ -1724,16 +1699,13 @@ GenericSTKMeshStruct::fillField(
       values = field_params.get<Teuchos::Array<double>>("Field Value");
       ALBANY_PANIC(
           values.size() == 0,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! The given field value array has size 0.\n");
       ALBANY_PANIC(
           values.size() == 1 && !scalar,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! The given field value array has size 1, but the field is not "
           "scalar.\n");
       ALBANY_PANIC(
           values.size() > 1 && scalar,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! The given field value array has size >1, but the field is "
           "scalar.\n");
     } else if (field_params.isType<double>("Field Value")) {
@@ -1743,7 +1715,6 @@ GenericSTKMeshStruct::fillField(
       } else {
         ALBANY_PANIC(
             !field_params.isParameter("Vector Dim"),
-            std::logic_error,
             "Error! Cannot determine dimension of "
                 << field_type << " field '" << field_name
                 << "'. "
@@ -1758,7 +1729,6 @@ GenericSTKMeshStruct::fillField(
     } else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Invalid type for parameter 'Field Value'. Should be either "
           "'double' or 'Array(double)'.\n");
     }
@@ -1810,12 +1780,10 @@ GenericSTKMeshStruct::computeField(
   // Only nodal fields allowed, no layered fields
   ALBANY_PANIC(
       !nodal,
-      std::logic_error,
       "Error! Only nodal fields can be computed from a mathematical "
       "expression.\n");
   ALBANY_PANIC(
       layered,
-      std::logic_error,
       "Error! Layered fields cannot be computed from a mathematical "
       "expression.\n");
 
@@ -1823,7 +1791,6 @@ GenericSTKMeshStruct::computeField(
   if (!scalar) {
     ALBANY_PANIC(
         !field_params.isParameter("Vector Dim"),
-        std::logic_error,
         "Error! In order to compute the vector field '"
             << field_name
             << "' "
@@ -1851,7 +1818,6 @@ GenericSTKMeshStruct::computeField(
   field_type += (scalar ? " Scalar" : " Vector");
   ALBANY_PANIC(
       num_expr < field_dim,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Input array for 'Field Expression' is too short. "
       "Expected length >="
           << field_dim << ". Got " << num_expr << " instead.\n");
@@ -1922,7 +1888,6 @@ GenericSTKMeshStruct::computeField(
 #else
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "Error! Cannot read the field from a mathematical expression, since "
       "PanzerExprEval package was not found in Trilinos.\n");
 #endif
@@ -1950,14 +1915,12 @@ GenericSTKMeshStruct::readScalarFileSerial(
   ifile.open(fname.c_str());
   ALBANY_PANIC(
       !ifile.is_open(),
-      std::runtime_error,
       "Error in GenericSTKMeshStruct: unable to open the file " << fname
                                                                 << ".\n");
 
   ifile >> numNodes;
   ALBANY_PANIC(
       numNodes != nonConstView.size(),
-      Teuchos::Exceptions::InvalidParameterValue,
       "Error in GenericSTKMeshStruct: Number of nodes in file "
           << fname << " (" << numNodes << ") "
           << "is different from the number expected (" << nonConstView.size()
@@ -1982,7 +1945,6 @@ GenericSTKMeshStruct::readVectorFileSerial(
     ifile.open(fname.c_str());
     ALBANY_PANIC(
         !ifile.is_open(),
-        std::runtime_error,
         "Error in GenericSTKMeshStruct: unable to open the file " << fname
                                                                   << ".\n");
 
@@ -1996,7 +1958,6 @@ GenericSTKMeshStruct::readVectorFileSerial(
     auto nonConstView = getNonconstLocalData(mvec);
     ALBANY_PANIC(
         numNodes != nonConstView[0].size(),
-        Teuchos::Exceptions::InvalidParameterValue,
         "Error in GenericSTKMeshStruct: Number of nodes in file "
             << fname << " (" << numNodes << ") "
             << "is different from the number expected ("
@@ -2025,7 +1986,6 @@ GenericSTKMeshStruct::readLayeredScalarFileSerial(
     ifile.open(fname.c_str());
     ALBANY_PANIC(
         !ifile.is_open(),
-        std::runtime_error,
         "Error in GenericSTKMeshStruct: unable to open the file " << fname
                                                                   << ".\n");
 
@@ -2039,14 +1999,12 @@ GenericSTKMeshStruct::readLayeredScalarFileSerial(
     auto nonConstView = getNonconstLocalData(mvec);
     ALBANY_PANIC(
         numNodes != nonConstView[0].size(),
-        Teuchos::Exceptions::InvalidParameterValue,
         "Error in GenericSTKMeshStruct: Number of nodes in file "
             << fname << " (" << numNodes << ") "
             << "is different from the number expected ("
             << nonConstView[0].size() << ").\n");
     ALBANY_PANIC(
         numLayers != normalizedLayersCoords.size(),
-        Teuchos::Exceptions::InvalidParameterValue,
         "Error in GenericSTKMeshStruct: Number of layers in file "
             << fname << " (" << numLayers << ") "
             << "is different from the number expected ("
@@ -2081,7 +2039,6 @@ GenericSTKMeshStruct::readLayeredVectorFileSerial(
     ifile.open(fname.c_str());
     ALBANY_PANIC(
         !ifile.is_open(),
-        std::runtime_error,
         "Error in GenericSTKMeshStruct: unable to open the file " << fname
                                                                   << ".\n");
 
@@ -2097,7 +2054,6 @@ GenericSTKMeshStruct::readLayeredVectorFileSerial(
 
     ALBANY_PANIC(
         numNodes != nonConstView[0].size(),
-        Teuchos::Exceptions::InvalidParameterValue,
         "Error in GenericSTKMeshStruct: Number of nodes in file "
             << fname << " (" << numNodes << ") "
             << "is different from the number expected ("
@@ -2154,7 +2110,7 @@ GenericSTKMeshStruct::checkFieldIsInMesh(
     case 3: missing = (metaData->get_field<TFT>(entity_rank, fname) == 0);
     default:
       ALBANY_PANIC(
-          true, std::runtime_error, "Error! Invalid field dimension.\n");
+          true, "Error! Invalid field dimension.\n");
   }
 
   if (missing) {
@@ -2168,7 +2124,6 @@ GenericSTKMeshStruct::checkFieldIsInMesh(
     if (isFieldInMesh) {
       ALBANY_PANIC(
           missing,
-          std::runtime_error,
           "Error! The field '"
               << fname
               << "' in the mesh has different rank or dimensions than the ones "
@@ -2181,7 +2136,6 @@ GenericSTKMeshStruct::checkFieldIsInMesh(
     } else
       ALBANY_PANIC(
           missing,
-          std::runtime_error,
           "Error! The field '"
               << fname << "' was not found in the mesh.\n"
               << "  Probably it was not registered it in the state manager "
@@ -2203,7 +2157,6 @@ GenericSTKMeshStruct::checkInput(
 
   ALBANY_PANIC(
       true,
-      std::runtime_error,
       "Adaptation input error in GenericSTKMeshStruct initialization: bar "
       "option: "
           << option << std::endl);

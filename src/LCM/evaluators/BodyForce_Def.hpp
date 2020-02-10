@@ -58,7 +58,6 @@ BodyForce<EvalT, Traits>::BodyForce(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid body force type " << type);
   }
 

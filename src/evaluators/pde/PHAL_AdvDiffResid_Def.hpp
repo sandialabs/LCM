@@ -63,7 +63,6 @@ AdvDiffResid<EvalT, Traits>::AdvDiffResid(const Teuchos::ParameterList& p)
 
   ALBANY_PANIC(
       error,
-      std::logic_error,
       "Invalid Augmented Form Type: " << formType
                                       << "; valid options are 1 and 2");
 

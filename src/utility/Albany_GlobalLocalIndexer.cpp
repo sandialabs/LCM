@@ -18,7 +18,6 @@ createGlobalLocalIndexer(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
 
   ALBANY_PANIC(
       indexer.is_null(),
-      std::runtime_error,
       "Error! Could not cast the input vector space to any of the supported "
       "concrete types.\n");
 

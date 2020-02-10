@@ -32,7 +32,6 @@ LameStressBase<EvalT, Traits>::LameStressBase(Teuchos::ParameterList& p)
 
   ALBANY_PANIC(
       this->numDims != 3,
-      Teuchos::Exceptions::InvalidParameter,
       " LAME materials enabled only for three-dimensional analyses.");
 
   defGradName = p.get<std::string>("DefGrad Name") + "_old";
@@ -127,7 +126,6 @@ LameStressBase<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   ALBANY_PANIC(
       "LameStressBase::evaluateFields not implemented for this template type",
-      Teuchos::Exceptions::InvalidParameter,
       "Need specialization.");
 }
 

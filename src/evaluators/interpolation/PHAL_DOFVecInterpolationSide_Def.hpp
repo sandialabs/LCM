@@ -22,7 +22,6 @@ DOFVecInterpolationSideBase<EvalT, Traits, Type>::DOFVecInterpolationSideBase(
 {
   ALBANY_PANIC(
       !dl_side->isSideLayouts,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! The layouts structure does not appear to be that of a side "
       "set.\n");
 

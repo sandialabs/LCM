@@ -21,7 +21,6 @@ combineModeT(const Albany::CombineMode modeA)
     default:
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error! Unknown Albany combine mode. Please, contact developers.\n");
   }
   return modeT;
@@ -83,7 +82,6 @@ CombineAndScatterManagerTpetra::combine(
 
     ALBANY_PANIC(
         srcV == nullptr,
-        std::runtime_error,
         "Error! Input src does not seem to be a Tpetra_MultiVector or a "
         "Tpetra_Vector.\n");
 
@@ -97,7 +95,6 @@ CombineAndScatterManagerTpetra::combine(
 
     ALBANY_PANIC(
         dstV == nullptr,
-        std::runtime_error,
         "Error! Input dst does not seem to be a Tpetra_MultiVector or a "
         "Tpetra_Vector.\n");
 
@@ -164,7 +161,6 @@ CombineAndScatterManagerTpetra::combine(
 
     ALBANY_PANIC(
         srcV.is_null(),
-        std::runtime_error,
         "Error! Input src does not seem to be a Tpetra_MultiVector or a "
         "Tpetra_Vector.\n");
 
@@ -179,7 +175,6 @@ CombineAndScatterManagerTpetra::combine(
 
     ALBANY_PANIC(
         dstV.is_null(),
-        std::runtime_error,
         "Error! Input dst does not seem to be a Tpetra_MultiVector or a "
         "Tpetra_Vector.\n");
 
@@ -246,7 +241,6 @@ CombineAndScatterManagerTpetra::scatter(
 
     ALBANY_PANIC(
         srcV == nullptr,
-        std::runtime_error,
         "Error! Input src does not seem to be a Tpetra_MultiVector or a "
         "Tpetra_Vector.\n");
 
@@ -260,7 +254,6 @@ CombineAndScatterManagerTpetra::scatter(
 
     ALBANY_PANIC(
         dstV == nullptr,
-        std::runtime_error,
         "Error! Input dst does not seem to be a Tpetra_MultiVector or a "
         "Tpetra_Vector.\n");
 
@@ -327,7 +320,6 @@ CombineAndScatterManagerTpetra::scatter(
 
     ALBANY_PANIC(
         srcV.is_null(),
-        std::runtime_error,
         "Error! Input src does not seem to be a Tpetra_MultiVector or a "
         "Tpetra_Vector.\n");
 
@@ -342,7 +334,6 @@ CombineAndScatterManagerTpetra::scatter(
 
     ALBANY_PANIC(
         dstV.is_null(),
-        std::runtime_error,
         "Error! Input dst does not seem to be a Tpetra_MultiVector or a "
         "Tpetra_Vector.\n");
 

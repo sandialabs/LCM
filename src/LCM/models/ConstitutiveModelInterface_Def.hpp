@@ -158,11 +158,9 @@ ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
 {
   ALBANY_PANIC(
       dep_fields_map_.size() == 0,
-      std::logic_error,
       "something is wrong in the LCM::CMI");
   ALBANY_PANIC(
       eval_fields_map_.size() == 0,
-      std::logic_error,
       "something is wrong in the LCM::CMI");
   // dependent fields
   typename decltype(dep_fields_map_)::iterator it;
@@ -275,7 +273,7 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
   using Teuchos::rcp;
 
   if (model_name == "") {
-    ALBANY_PANIC(true, std::logic_error, error_msg);
+    ALBANY_ASSERT(false, error_msg);
   } else if (model_name == "Neohookean") {
     model = rcp(new NeohookeanModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Parallel Neohookean") {
@@ -349,7 +347,7 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
   } else if (model_name == "ACE permafrost") {
     model = rcp(new ACEpermafrost<EvalT, Traits>(p, dl));
   } else {
-    ALBANY_PANIC(true, std::logic_error, error_msg);
+    ALBANY_ASSERT(false, error_msg);
   }
 
   this->model_ = model;

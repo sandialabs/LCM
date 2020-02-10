@@ -72,7 +72,6 @@ constructLameMaterialModel(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         " unsupported LAME material model: " + lameMaterialModelName + " (" +
             materialModelName + ")\n");
 #endif
@@ -86,7 +85,6 @@ constructLameMaterialModel(
     if (materialModel.is_null())
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           " unsupported LAMENT material model: " + lameMaterialModelName +
               " (" + materialModelName + ")\n");
   }

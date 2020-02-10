@@ -261,7 +261,6 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "NOTE: Please remember that the Anisotropic size field is defined as a "
       "vector in xi, etc, zeta space not x, y, z!!!");
 }

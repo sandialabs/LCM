@@ -21,7 +21,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
 {
   ALBANY_PANIC(
       num_dims_ != FM::THREE_D,
-      std::invalid_argument,
       ">>> ERROR (FerroicModel): Only valid for 3D.");
 
   ferroicModel = Teuchos::rcp(new FM::FerroicModel<EvalT>());
@@ -78,7 +77,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
     crystalVariants.resize(nvars);
     ALBANY_PANIC(
         initialBinFractions.size() != nvars,
-        std::invalid_argument,
         ">>> ERROR (FerroicModel): 'Number of Variants' must equal length of "
         "'Bin Fractions' array");
     for (int i = 0; i < nvars; i++) {
@@ -106,7 +104,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
           Albany::strint("Variant", i + 1));
       ALBANY_PANIC(
           array.size() != nVariants,
-          std::invalid_argument,
           ">>> ERROR (FerroicModel): List of critical values for variant "
               << i + 1 << " is wrong length");
       for (int j = 0; j < nVariants; j++) {
@@ -258,8 +255,7 @@ FerroicDriver<EvalT, Traits>::computeStateParallel(
 /******************************************************************************/
 {
   ALBANY_PANIC(
-      true,
-      std::invalid_argument,
+      false,
       ">>> ERROR (FerroicDriver): computeStateParallel not implemented");
 }
 
@@ -385,7 +381,6 @@ parseCrystalVariant(
 {
   ALBANY_PANIC(
       phases.size() == 0,
-      std::invalid_argument,
       ">>> ERROR (FerroicModel): CrystalVariant constructor passed empty list "
       "of Phases.");
 
@@ -398,12 +393,10 @@ parseCrystalVariant(
   } else
     ALBANY_PANIC(
         true,
-        std::invalid_argument,
         ">>> ERROR (FerroicModel): Crystal variants require a phase.");
 
   ALBANY_PANIC(
       phaseIndex < 0 || phaseIndex >= phases.size(),
-      std::invalid_argument,
       ">>> ERROR (FerroicModel): Requested phase has not been defined.");
 
   if (vParam.isType<Teuchos::ParameterList>("Crystallographic Basis")) {
@@ -414,7 +407,6 @@ parseCrystalVariant(
   } else
     ALBANY_PANIC(
         true,
-        std::invalid_argument,
         ">>> ERROR (FerroicModel): Crystal variants require a crystallograph "
         "basis.");
 
@@ -423,7 +415,6 @@ parseCrystalVariant(
         vParam.get<Teuchos::Array<RealType>>("Spontaneous Polarization");
     ALBANY_PANIC(
         inVals.size() != FM::THREE_D,
-        std::invalid_argument,
         ">>> ERROR (FerroicModel): Expected 3 terms 'Spontaneous Polarization' "
         "vector.");
     cv.spontEDisp.set_dimension(FM::THREE_D);
@@ -431,7 +422,6 @@ parseCrystalVariant(
   } else
     ALBANY_PANIC(
         true,
-        std::invalid_argument,
         ">>> ERROR (FerroicModel): Crystal variants require a 'Spontaneous "
         "Polarization'.");
 
@@ -440,7 +430,6 @@ parseCrystalVariant(
         vParam.get<Teuchos::Array<RealType>>("Spontaneous Strain");
     ALBANY_PANIC(
         inVals.size() != 6,
-        std::invalid_argument,
         ">>> ERROR (FerroicModel): Expected 6 voigt terms 'Spontaneous Strain' "
         "tensor.");
     cv.spontStrain.set_dimension(FM::THREE_D);
@@ -456,7 +445,6 @@ parseCrystalVariant(
   } else
     ALBANY_PANIC(
         true,
-        std::invalid_argument,
         ">>> ERROR (FerroicModel): Crystal variants require a 'Spontaneous "
         "Strain'.");
 

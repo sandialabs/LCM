@@ -23,7 +23,6 @@ ScalarResponseFunction::createGradientOp() const
 {
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "Error!  Albany::ScalarResponseFunction::createGradientOpT():  "
           << "Operator form of dg/dx is not supported for scalar responses.");
   return Teuchos::null;

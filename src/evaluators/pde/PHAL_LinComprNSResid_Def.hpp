@@ -95,7 +95,6 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
   if (baseFlowData.size() != numDims + 2) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in PHAL::LinComprNS constructor:  "
             << "baseFlow data should have length numDims + 2 =  " << numDims + 2
@@ -105,7 +104,6 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
   if (eqn_type == EULER & vecDim != numDims + 1) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in PHAL::LinComprNS constructor:  "
             << "Invalid Parameter vecDim.  vecDim should be numDims + 1 = "
@@ -115,7 +113,6 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
   if (eqn_type == NS & vecDim != numDims + 2) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in PHAL::LinComprNS constructor:  "
             << "Invalid Parameter vecDim.  vecDim should be numDims + 2 = "

@@ -85,12 +85,10 @@ SharedParameterVec<EvalT, Traits>::SharedParameterVec(
 
   ALBANY_PANIC(
       paramNames.size() == numParams,
-      std::logic_error,
       "Error! The array of names' size does not match the layout first "
       "dimension.\n");
   ALBANY_PANIC(
       paramValues.size() == numParams,
-      std::logic_error,
       "Error! The array of values' size does not match the layout first "
       "dimension.\n");
 
@@ -130,7 +128,7 @@ SharedParameterVec<EvalT, Traits>::getValue(const std::string& n)
   for (int i = 0; i < numParams; ++i)
     if (n == paramNames[i]) return paramValues[i];
 
-  ALBANY_PANIC(true, std::runtime_error, "Error! Parameter name not found.\n");
+  ALBANY_PANIC(true, "Error! Parameter name not found.\n");
 
   // To avoid warnings
   static ScalarT dummy;

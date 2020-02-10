@@ -34,7 +34,6 @@ NodalDataBase::registerVectorState(const std::string& stateName, int ndofs)
 
   ALBANY_PANIC(
       (it != nodeVectorMap.end()),
-      std::logic_error,
       std::endl
           << "Error: found duplicate entry " << stateName
           << " in NodalDataVector");
@@ -115,7 +114,6 @@ NodalDataBase::registerManager(
 {
   ALBANY_PANIC(
       isManagerRegistered(key),
-      std::logic_error,
       "A manager is already registered with key " << key);
   mgr_map[key] = manager;
 }
@@ -132,7 +130,6 @@ NodalDataBase::getManager(const std::string& key) const
   ManagerMap::const_iterator it = mgr_map.find(key);
   ALBANY_PANIC(
       it == mgr_map.end(),
-      std::logic_error,
       "There is no manager with key " << key);
   return it->second;
 }

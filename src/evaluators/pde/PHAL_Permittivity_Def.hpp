@@ -71,7 +71,6 @@ Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
     } else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error! Must specify a material database if using block "
                  "dependent "
@@ -95,7 +94,6 @@ Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
   else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid permittivity type " << type);
   }
 
@@ -170,7 +168,6 @@ Permittivity<EvalT, Traits>::getValue(const std::string& n)
   }
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in Permittivity::getValue()" << std::endl);

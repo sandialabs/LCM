@@ -65,7 +65,6 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
       // Invalid
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameterValue,
           "Error! Invalid side topology name for elemeent 'Wedge_6'. Valid "
           "options are 'Triangle', 'Quadrilateral'.\n");
     }
@@ -77,7 +76,6 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
   } else {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error! The side-set mesh extraction has not yet been implemented for "
         "this type of element.\n");
   }
@@ -146,7 +144,6 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
   ALBANY_PANIC(
       parentMeshStruct->ssPartVec.find(parentMeshSideSetName) ==
           parentMeshStruct->ssPartVec.end(),
-      std::logic_error,
       "Error! The side set " << parentMeshSideSetName
                              << " is not present in the input mesh.\n");
 

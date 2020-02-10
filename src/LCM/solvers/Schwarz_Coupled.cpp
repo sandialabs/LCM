@@ -340,7 +340,6 @@ SchwarzCoupled::SchwarzCoupled(
         std::cout << "parameters!" << '\n';
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Error in CoupledSchwarz! Model input file "
                 << model_filenames[m]
                 << " cannot have a 'Parameters' section!  "
@@ -360,7 +359,6 @@ SchwarzCoupled::SchwarzCoupled(
       if (problem_params_m->isSublist("Response Functions")) {
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Error in CoupledSchwarz! Model input file "
                 << model_filenames[m]
                 << " cannot have a 'Response Functions' section!  "
@@ -384,7 +382,6 @@ SchwarzCoupled::SchwarzCoupled(
     if (matdb_exists == false) {
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Error in CoupledSchwarz! "
               << "Input file needs to have 'MaterialDB Filename' specified.\n");
     }

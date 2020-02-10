@@ -27,7 +27,6 @@ Albany::CumulativeScalarResponseFunction::CumulativeScalarResponseFunction(
     for (int iresp = 1; iresp < num_responses; ++iresp) {
       ALBANY_PANIC(
           !responses[iresp]->responseVectorSpace()->isCompatible(*vs),
-          std::runtime_error,
           "Error! All responses in CumulativeScalarResponseFunction must have "
           "compatible vector spaces.\n");
     }

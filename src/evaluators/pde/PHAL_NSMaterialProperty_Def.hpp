@@ -48,7 +48,6 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
       vector_constant_value.resize(numDims);
       ALBANY_PANIC(
           vector_constant_value.size() != numDims,
-          std::logic_error,
           "Vector constant value for material property "
               << name_mp << " has size " << vector_constant_value.size()
               << " but expected size " << numDims);
@@ -68,7 +67,6 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
       ALBANY_PANIC(
           tensor_constant_value.getNumRows() != numRows ||
               tensor_constant_value.getNumCols() != numCols,
-          std::logic_error,
           "Tensor constant value for material property "
               << name_mp << " has dimensions "
               << tensor_constant_value.getNumRows() << "x"
@@ -87,7 +85,6 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     } else
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Invalid material property rank "
               << rank << ".  Acceptable values are 2 (scalar), "
               << "3 (vector), or 4 (tensor)");
@@ -129,7 +126,6 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
 
     ALBANY_PANIC(
         !(timeValues.size() == depValues.size()),
-        Teuchos::Exceptions::InvalidParameter,
         "Dimension of \"Time Values\" and \"Dependent Values\" do not match");
 
     // Add property as a Sacado-ized parameter
@@ -137,7 +133,6 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid material property type " << type);
   }
 
@@ -217,7 +212,6 @@ NSMaterialProperty<EvalT, Traits>::evaluateFields(
     RealType time = workset.current_time;
     ALBANY_PANIC(
         time > timeValues.back(),
-        Teuchos::Exceptions::InvalidParameter,
         "Time is growing unbounded!");
 
     RealType     slope;
@@ -264,7 +258,6 @@ NSMaterialProperty<EvalT, Traits>::getValue(const std::string& n)
   }
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in NSMaterialProperty::getValue()" << std::endl);

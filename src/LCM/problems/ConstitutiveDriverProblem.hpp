@@ -231,7 +231,6 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
           .get<std::string>("Model Name");
   ALBANY_PANIC(
       material_model_name.length() == 0,
-      std::logic_error,
       "A material model must be defined for block: " + eb_name);
 
   // Note that these are the volume element quantities
@@ -251,7 +250,6 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
       "Data Layout Usage in Mechanics problems assume vecDim = num_dims_";
   ALBANY_PANIC(
       dl_->vectorAndGradientLayoutsAreEquivalent == false,
-      std::logic_error,
       msg);
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
   bool                                              supports_transient = true;

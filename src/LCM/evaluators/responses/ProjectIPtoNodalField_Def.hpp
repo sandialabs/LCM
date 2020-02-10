@@ -234,7 +234,6 @@ typename ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
   else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameterValue,
         "Field Layout value "
             << str
             << "is invalid; valid values are Scalar, Vector, and Tensor.");
@@ -321,7 +320,6 @@ struct EMassLinearOpType
     else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameterValue,
           "Mass Matrix Type value "
               << str << "is invalid; valid values are Full and Lumped.");
     }
@@ -392,7 +390,6 @@ class ProjectIPtoNodalFieldManager::FullMassLinearOp
               this->linear_op_, global_row, cols(), vals());
           ALBANY_PANIC(
               ret != 0,
-              std::logic_error,
               "Albany::addToGlobalRowValues failed: global row "
                   << global_row << " of mass matrix is missing elements \n");
         } else {
@@ -475,14 +472,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::initManager(
   else {
     EMassLinearOpType::Enum mass_linear_op_type;
     const std::string& mmstr = pl->get<std::string>("Mass Matrix Type", "Full");
-    try {
-      mass_linear_op_type = EMassLinearOpType::fromString(mmstr);
-    } catch (const Teuchos::Exceptions::InvalidParameterValue& e) {
-      *Teuchos::VerboseObjectBase::getDefaultOStream()
-          << "Warning: Mass Matrix Type was set to " << mmstr
-          << ", which is invalid; setting to Full." << std::endl;
-      mass_linear_op_type = EMassLinearOpType::full;
-    }
+    mass_linear_op_type = EMassLinearOpType::fromString(mmstr);
     mgr_ = Teuchos::rcp(new ProjectIPtoNodalFieldManager());
     mgr_->mass_linear_op =
         Teuchos::rcp(ProjectIPtoNodalFieldManager::MassLinearOp::create(

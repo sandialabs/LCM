@@ -89,7 +89,6 @@ ModelEvaluator::ModelEvaluator(
     const int numParameters = pList->get<int>("Number");
     ALBANY_PANIC(
         numParameters == 0,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  In Albany::ModelEvaluator constructor:  "
             << "Parameter vector " << l << " has zero parameters!"
@@ -120,7 +119,6 @@ ModelEvaluator::ModelEvaluator(
       const int numParameters = pList->get<int>("Number");
       ALBANY_PANIC(
           numParameters == 0,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error!  In Albany::ModelEvaluator constructor:  "
               << "Response vector " << l << " has zero parameters!"
@@ -186,7 +184,6 @@ ModelEvaluator::ModelEvaluator(
       Teuchos::Array<ST> lb = pList->get<Teuchos::Array<ST>>("Lower Bounds");
       ALBANY_PANIC(
           lb.size() != numParameters,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Input lower bounds array has the wrong dimension.\n");
 
       auto param_lower_bd_nonConstView =
@@ -202,7 +199,6 @@ ModelEvaluator::ModelEvaluator(
       Teuchos::Array<ST> ub = pList->get<Teuchos::Array<ST>>("Upper Bounds");
       ALBANY_PANIC(
           ub.size() != numParameters,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Input upper bounds array has the wrong dimension.\n");
 
       auto param_upper_bd_nonConstView =
@@ -219,7 +215,6 @@ ModelEvaluator::ModelEvaluator(
           pList->get<Teuchos::Array<ST>>("Nominal Values");
       ALBANY_PANIC(
           nvals.size() != numParameters,
-          Teuchos::Exceptions::InvalidParameter,
           "Error! Input nominal values array has the wrong dimension.\n");
 
       for (int k = 0; k < numParameters; ++k) {
@@ -261,7 +256,6 @@ ModelEvaluator::ModelEvaluator(
 
       ALBANY_PANIC(
           (*p_name_ptr != name_from_list) && (name_from_list != emptyString),
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error!  In Albany::ModelEvaluator constructor:  Provided "
                  "two different names for same parameter in Distributed "
@@ -272,7 +266,6 @@ ModelEvaluator::ModelEvaluator(
 
     ALBANY_PANIC(
         !distParamLib->has(*p_name_ptr),
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  In Albany::ModelEvaluator constructor:  "
             << "Invalid distributed parameter name \"" << *p_name_ptr << "\""
@@ -405,7 +398,6 @@ ModelEvaluator::get_p_space(int l) const
 {
   ALBANY_PANIC(
       l >= num_param_vecs + num_dist_param_vecs || l < 0,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::get_p_space():  "
           << "Invalid parameter index l = " << l << std::endl);
@@ -424,7 +416,6 @@ ModelEvaluator::get_g_space(int l) const
 {
   ALBANY_PANIC(
       l >= app->getNumResponses() || l < 0,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::get_g_space():  "
           << "Invalid response index l = " << l << std::endl);
@@ -437,7 +428,6 @@ ModelEvaluator::get_p_names(int l) const
 {
   ALBANY_PANIC(
       l >= num_param_vecs + num_dist_param_vecs || l < 0,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::get_p_names():  "
           << "Invalid parameter index l = " << l << std::endl);
@@ -469,7 +459,6 @@ ModelEvaluator::create_DfDp_op_impl(int j) const
 {
   ALBANY_PANIC(
       j >= num_param_vecs + num_dist_param_vecs || j < num_param_vecs,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::create_DfDp_op_impl():  "
           << "Invalid parameter index j = " << j << std::endl);
@@ -506,7 +495,6 @@ ModelEvaluator::create_DgDx_op_impl(int j) const
 {
   ALBANY_PANIC(
       j >= app->getNumResponses() || j < 0,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::create_DgDx_op_impl():  "
           << "Invalid response index j = " << j << std::endl);
@@ -520,7 +508,6 @@ ModelEvaluator::create_DgDx_dotdot_op_impl(int j) const
 {
   ALBANY_PANIC(
       j >= app->getNumResponses() || j < 0,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::create_DgDx_dotdot_op():  "
           << "Invalid response index j = " << j << std::endl);
@@ -533,7 +520,6 @@ ModelEvaluator::create_DgDx_dot_op_impl(int j) const
 {
   ALBANY_PANIC(
       j >= app->getNumResponses() || j < 0,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error!  Albany::ModelEvaluator::create_DgDx_dot_op_impl():  "
           << "Invalid response index j = " << j << std::endl);

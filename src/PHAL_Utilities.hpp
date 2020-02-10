@@ -165,7 +165,6 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 {
   ALBANY_PANIC(
       dims.size() != 8,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(
       new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>(
@@ -192,7 +191,6 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 {
   ALBANY_PANIC(
       dims.size() != 7,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(
       new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6>(
@@ -211,7 +209,6 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 {
   ALBANY_PANIC(
       dims.size() != 6,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5>(
       dims[0], dims[1], dims[2], dims[3], dims[4], dims[5]));
@@ -228,7 +225,6 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 {
   ALBANY_PANIC(
       dims.size() != 5,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4>(
       dims[0], dims[1], dims[2], dims[3], dims[4]));
@@ -240,7 +236,6 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 {
   ALBANY_PANIC(
       dims.size() != 4,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3>(
       dims[0], dims[1], dims[2], dims[3]));
@@ -252,7 +247,6 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 {
   ALBANY_PANIC(
       dims.size() != 3,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(
       new PHX::MDALayout<Tag0, Tag1, Tag2>(dims[0], dims[1], dims[2]));
@@ -264,7 +258,6 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 {
   ALBANY_PANIC(
       dims.size() != 2,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1>(dims[0], dims[1]));
 }
@@ -275,7 +268,6 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 {
   ALBANY_PANIC(
       dims.size() != 1,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(new PHX::MDALayout<Tag0>(dims[0]));
 }
@@ -291,7 +283,6 @@ struct ExtendLayout
     dl->dimensions(dims);
     ALBANY_PANIC(
         dims.size() != sizeof...(Tags),
-        Teuchos::Exceptions::InvalidParameter,
         "Error! Input layout dimensions vector size does not match the number "
         "of tags.\n");
 

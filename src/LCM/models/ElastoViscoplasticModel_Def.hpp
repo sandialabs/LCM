@@ -761,7 +761,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
               msg << "   initNorm: " << init_norm << "\n" << std::endl;
               msg << "    RelNorm: " << norm_res / init_norm << "\n"
                   << std::endl;
-              // ALBANY_PANIC(true, std::runtime_error,
               //                           msg.str());
               X[0] = X[1] = X[2] = X[3] = X[4] = 1. / 0.;
               break;

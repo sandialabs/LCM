@@ -35,7 +35,6 @@ ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
 {
   ALBANY_PANIC(
       !overlap_src->is_filled(),
-      std::logic_error,
       "Error! Can only build a graph from an overlapped source if source has "
       "been filled already.\n");
   m_graph = Teuchos::rcp(new Impl());
@@ -116,7 +115,6 @@ ThyraCrsMatrixFactory::createOp() const
 {
   ALBANY_PANIC(
       !m_filled,
-      std::logic_error,
       "Error! Cannot create a linear operator if the graph is not filled.\n");
 
   Teuchos::RCP<Thyra_LinearOp>   op;

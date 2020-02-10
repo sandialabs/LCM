@@ -166,7 +166,6 @@ Albany::HeatProblem::constructEvaluators(
   // Problem is steady or transient
   ALBANY_PANIC(
       number_of_time_deriv < 0 || number_of_time_deriv > 1,
-      std::logic_error,
       "Albany_HeatProblem must be defined as a steady or transient "
       "calculation.");
 

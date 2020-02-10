@@ -39,7 +39,6 @@ Albany::ComprNSProblem::buildProblem(
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(
       meshSpecs.size() != 1,
-      std::logic_error,
       "Problem supports one Material Block");
   fm.resize(1);
   fm[0] = rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
@@ -161,7 +160,6 @@ Albany::ComprNSProblem::constructNeumannEvaluators(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 

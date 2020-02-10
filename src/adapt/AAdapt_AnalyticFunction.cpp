@@ -91,7 +91,6 @@ AAdapt::createAnalyticFunction(
   else
     ALBANY_PANIC(
         name != "Valid Initial Condition Function",
-        std::logic_error,
         "Unrecognized initial condition function name: " << name);
 
   return F;
@@ -106,7 +105,6 @@ AAdapt::ConstantFunction::ConstantFunction(
 {
   ALBANY_PANIC(
       (data.size() != neq),
-      std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
       "Function Data for Constant Function; neq = "
           << neq << ", data.size() = " << data.size() << std::endl);
@@ -124,7 +122,6 @@ AAdapt::StepX::StepX(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   ALBANY_PANIC(
       (data.size() != 5),
-      std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
       "Function Data for Step X; Length = "
           << 5 << ", data.size() = " << data.size() << std::endl);
@@ -166,7 +163,6 @@ AAdapt::TemperatureStep::TemperatureStep(
 {
   ALBANY_PANIC(
       (data.size() != 6),
-      std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
       "Function Data for TemperatureStep; Length = "
           << 6 << ", data.size() = " << data.size() << std::endl);
@@ -194,7 +190,7 @@ AAdapt::TemperatureStep::compute(double* x, const double* X)
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
     ALBANY_PANIC(
-        true, std::logic_error, "Error! Coordinate not valid!" << std::endl);
+        true,  "Error! Coordinate not valid!" << std::endl);
   }
 
   const double TOL = 1.0e-12;
@@ -218,7 +214,6 @@ AAdapt::DispConstTemperatureStep::DispConstTemperatureStep(
 {
   ALBANY_PANIC(
       (data.size() != 9),
-      std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
       "Function Data for Displacement Constant TemperatureStep; Length = "
           << 9 << ", data.size() = " << data.size() << std::endl);
@@ -248,7 +243,7 @@ AAdapt::DispConstTemperatureStep::compute(double* x, const double* X)
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
     ALBANY_PANIC(
-        true, std::logic_error, "Error! Coordinate not valid!" << std::endl);
+        true,  "Error! Coordinate not valid!" << std::endl);
   }
 
   const double TOL = 1.0e-12;
@@ -272,7 +267,6 @@ AAdapt::DispConstTemperatureLinear::DispConstTemperatureLinear(
 {
   ALBANY_PANIC(
       (data.size() != 8),
-      std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
       "Function Data for Displacement Constant TemperatureLinear; Length = "
           << 8 << ", data.size() = " << data.size() << std::endl);
@@ -300,7 +294,7 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, const double* X)
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
     ALBANY_PANIC(
-        true, std::logic_error, "Error! Coordinate not valid!" << std::endl);
+        true,  "Error! Coordinate not valid!" << std::endl);
   }
 
   const double TOL = 1.0e-12;
@@ -308,13 +302,12 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, const double* X)
   // check that temperatures are not equal
   if (std::abs(T0 - T1) <= TOL) {
     ALBANY_PANIC(
-        true, std::logic_error, "Error! Temperature are equals!" << std::endl);
+        true,  "Error! Temperature are equals!" << std::endl);
   }
   // check coordinates are not equal
   if (std::abs(Z0 - Z1) <= TOL) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error! Z-coordinates are the same!" << std::endl);
   }
 
@@ -337,7 +330,6 @@ AAdapt::TemperatureLinear::TemperatureLinear(
 {
   ALBANY_PANIC(
       (data.size() != 5),
-      std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
       "Function Data for TemperatureLinear; Length = "
           << 5 << ", data.size() = " << data.size() << std::endl);
@@ -363,7 +355,7 @@ AAdapt::TemperatureLinear::compute(double* x, const double* X)
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
     ALBANY_PANIC(
-        true, std::logic_error, "Error! Coordinate not valid!" << std::endl);
+        true,  "Error! Coordinate not valid!" << std::endl);
   }
 
   const double TOL = 1.0e-12;
@@ -371,13 +363,12 @@ AAdapt::TemperatureLinear::compute(double* x, const double* X)
   // check that temperatures are not equal
   if (std::abs(T0 - T1) <= TOL) {
     ALBANY_PANIC(
-        true, std::logic_error, "Error! Temperature are equals!" << std::endl);
+        true,  "Error! Temperature are equals!" << std::endl);
   }
   // check coordinates are not equal
   if (std::abs(Z0 - Z1) <= TOL) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error! Z-coordinates are the same!" << std::endl);
   }
 
@@ -417,7 +408,6 @@ AAdapt::ConstantFunctionPerturbed::ConstantFunctionPerturbed(
 {
   ALBANY_PANIC(
       (data.size() != neq || pert_mag.size() != neq),
-      std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
           << "Function Data for Constant Function Perturbed; neq = " << neq
           << ", data.size() = " << data.size()
@@ -460,7 +450,6 @@ AAdapt::ConstantFunctionGaussianPerturbed::ConstantFunctionGaussianPerturbed(
 {
   ALBANY_PANIC(
       (data.size() != neq || pert_mag.size() != neq),
-      std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
           << "Function Data for Constant Function Gaussian Perturbed; neq = "
           << neq << ", data.size() = " << data.size()
@@ -495,7 +484,6 @@ AAdapt::GaussSin::GaussSin(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   ALBANY_PANIC(
       (neq != 1) || (numDim != 1) || (data.size() != 1),
-      std::logic_error,
       "Error! Invalid call of GaussSin with " << neq << " " << numDim << "  "
                                               << data.size() << std::endl);
 }
@@ -511,7 +499,6 @@ AAdapt::GaussCos::GaussCos(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   ALBANY_PANIC(
       (neq != 1) || (numDim != 1) || (data.size() != 1),
-      std::logic_error,
       "Error! Invalid call of GaussCos with " << neq << " " << numDim << "  "
                                               << data.size() << std::endl);
 }
@@ -526,7 +513,6 @@ AAdapt::LinearY::LinearY(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   ALBANY_PANIC(
       (neq < 2) || (numDim < 2) || (data.size() != 1),
-      std::logic_error,
       "Error! Invalid call of LinearY with " << neq << " " << numDim << "  "
                                              << data.size() << std::endl);
 }
@@ -544,7 +530,6 @@ AAdapt::Linear::Linear(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   ALBANY_PANIC(
       (data.size() != neq * numDim),
-      std::logic_error,
       "Error! Invalid call of Linear with " << neq << " " << numDim << "  "
                                             << data.size() << std::endl);
 }
@@ -568,7 +553,6 @@ AAdapt::ConstantBox::ConstantBox(
 {
   ALBANY_PANIC(
       (data.size() != 2 * numDim + neq),
-      std::logic_error,
       "Error! Invalid call of Linear with " << neq << " " << numDim << "  "
                                             << data.size() << std::endl);
 }
@@ -592,7 +576,6 @@ AAdapt::AboutZ::AboutZ(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   ALBANY_PANIC(
       (neq < 2) || (numDim < 2) || (data.size() != 1),
-      std::logic_error,
       "Error! Invalid call of AboutZ with " << neq << " " << numDim << "  "
                                             << data.size() << std::endl);
 }
@@ -610,7 +593,6 @@ AAdapt::RadialZ::RadialZ(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   ALBANY_PANIC(
       (neq < 2) || (numDim < 2) || (data.size() != 1),
-      std::logic_error,
       "Error! Invalid call of RadialZ with " << neq << " " << numDim << "  "
                                              << data.size() << std::endl);
 }
@@ -631,7 +613,6 @@ AAdapt::AboutLinearZ::AboutLinearZ(
 {
   ALBANY_PANIC(
       (neq < 3) || (numDim < 3) || (data.size() != 1),
-      std::logic_error,
       "Error! Invalid call of AboutLinearZ with "
           << neq << " " << numDim << "  " << data.size() << std::endl);
 }
@@ -651,7 +632,6 @@ AAdapt::GaussianZ::GaussianZ(
 {
   ALBANY_PANIC(
       (neq < 2) || (numDim < 2) || (data.size() != 3),
-      std::logic_error,
       "Error! Invalid call of GaussianZ with " << neq << " " << numDim << "  "
                                                << data.size() << std::endl);
 }
@@ -675,7 +655,6 @@ AAdapt::Circle::Circle(int neq_, int numDim_, Teuchos::Array<double> data_)
   if (neq == 1 || neq == 3) error = false;
   ALBANY_PANIC(
       error || (numDim != 2),
-      std::logic_error,
       "Error! Invalid call of Circle with " << neq << " " << numDim << "  "
                                             << data.size() << std::endl);
 }
@@ -703,7 +682,6 @@ AAdapt::GaussianPress::GaussianPress(
 {
   ALBANY_PANIC(
       (neq < 3) || (numDim < 2) || (data.size() != 4),
-      std::logic_error,
       "Error! Invalid call of GaussianPress with "
           << neq << " " << numDim << "  " << data.size() << std::endl);
 }
@@ -721,7 +699,6 @@ AAdapt::SinCos::SinCos(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   ALBANY_PANIC(
       (neq < 3) || (numDim < 2),
-      std::logic_error,
       "Error! Invalid call of SinCos with " << neq << " " << numDim << "  "
                                             << data.size() << std::endl);
 }
@@ -741,7 +718,6 @@ AAdapt::SinScalar::SinScalar(
 {
   ALBANY_PANIC(
       neq != 1 || numDim < 2 || data.size() != numDim,
-      std::logic_error,
       "Error! Invalid call of SinScalar with " << neq << " " << numDim << "  "
                                                << data.size() << std::endl);
 }
@@ -762,7 +738,6 @@ AAdapt::TaylorGreenVortex::TaylorGreenVortex(
 {
   ALBANY_PANIC(
       (neq < 3) || (numDim != 2),
-      std::logic_error,
       "Error! Invalid call of TaylorGreenVortex with "
           << neq << " " << numDim << "  " << data.size() << std::endl);
 }
@@ -783,7 +758,6 @@ AAdapt::AcousticWave::AcousticWave(
 {
   ALBANY_PANIC(
       (neq > 3) || (numDim > 2) || (data.size() != 3),
-      std::logic_error,
       "Error! Invalid call of AcousticWave with "
           << neq << " " << numDim << "  " << data.size() << std::endl);
 }
@@ -815,7 +789,6 @@ AAdapt::ExpressionParser::ExpressionParser(
 {
   ALBANY_PANIC(
       neq < 1 || neq > spatialDim || spatialDim != 3,
-      std::logic_error,
       "Error! Invalid call AAdapt::ExpressionParser::ExpressionParser(), neq = "
           << neq << ", spatialDim = " << spatialDim << ".");
 

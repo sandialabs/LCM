@@ -242,7 +242,6 @@ FieldManagerScalarResponseFunction::evaluateResponse(
 {
   ALBANY_PANIC(
       !performedPostRegSetup,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Post registration setup not performed in field manager "
           << std::endl
@@ -280,7 +279,6 @@ FieldManagerScalarResponseFunction::evaluateTangent(
 {
   ALBANY_PANIC(
       !performedPostRegSetup,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Post registration setup not performed in field manager "
           << std::endl
@@ -325,7 +323,6 @@ FieldManagerScalarResponseFunction::evaluateGradient(
 {
   ALBANY_PANIC(
       !performedPostRegSetup,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Post registration setup not performed in field manager "
           << std::endl
@@ -391,7 +388,6 @@ FieldManagerScalarResponseFunction::evaluateDistParamDeriv(
 {
   ALBANY_PANIC(
       !performedPostRegSetup,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Post registration setup not performed in field manager "
           << std::endl

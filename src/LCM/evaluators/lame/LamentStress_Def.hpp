@@ -34,7 +34,6 @@ LamentStress<EvalT, Traits>::LamentStress(Teuchos::ParameterList& p)
 
   ALBANY_PANIC(
       this->numDims != 3,
-      Teuchos::Exceptions::InvalidParameter,
       " LAMENT materials enabled only for three-dimensional analyses.");
 
   defGradName = p.get<std::string>("DefGrad Name") + "_old";

@@ -66,7 +66,6 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
   if (forces.size() != 3) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Length of Forces array for ReactDiffSystem problem must be 3."
             << "  You have provided an array of length " << forces.size()
             << ".\n");
@@ -75,7 +74,6 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
   if (reactCoeff0.size() != 3) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Length of Reaction Coefficients0 array for ReactDiffSystem problem "
         "must be 3."
             << "  You have provided an array of length " << reactCoeff0.size()
@@ -85,7 +83,6 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
   if (reactCoeff1.size() != 3) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Length of Reaction Coefficients1 array for ReactDiffSystem problem "
         "must be 3."
             << "  You have provided an array of length " << reactCoeff1.size()
@@ -95,7 +92,6 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
   if (reactCoeff2.size() != 3) {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Length of Reaction Coefficients2 array for ReactDiffSystem problem "
         "must be 3."
             << "  You have provided an array of length " << reactCoeff2.size()

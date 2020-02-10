@@ -22,7 +22,6 @@ DOFInterpolationSideBase<EvalT, Traits, ScalarT>::DOFInterpolationSideBase(
 {
   ALBANY_PANIC(
       !dl_side->isSideLayouts,
-      Teuchos::Exceptions::InvalidParameter,
       "Error! The layouts structure does not appear to be that of a side "
       "set.\n");
 

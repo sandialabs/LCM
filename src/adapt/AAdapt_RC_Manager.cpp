@@ -65,7 +65,7 @@ read(const Albany::MDArray& mda, PHX::MDField<RealType>& f)
           f(cell, qp, i0, i1) = mda(cell, qp, i0, i1);
       break;
     default:
-      ALBANY_PANIC(true, std::logic_error, "dims.size() \notin {2,3,4}.");
+      ALBANY_ASSERT(false, "dims.size() \notin {2,3,4}.");
   }
 }
 
@@ -86,7 +86,7 @@ write(Albany::MDArray& mda, const MDArray& f)
           mda(cell, qp, i0, i1) = f(cell, qp, i0, i1);
       break;
     default:
-      ALBANY_PANIC(true, std::logic_error, "dims.size() \notin {2,3,4}.");
+      ALBANY_ASSERT(false, "dims.size() \notin {2,3,4}.");
   }
 }
 
@@ -329,7 +329,7 @@ Projector::fillRhs(
       for (int qp = 0; qp < num_qp; ++qp) {
         switch (rank) {
           case 0:
-          case 1: ALBANY_PANIC(true, std::logic_error, "!impl"); break;
+          case 1: ALBANY_ASSERT(false, "!impl"); break;
           case 2: {
             switch (transformation) {
               case Transformation::none: {
@@ -359,7 +359,7 @@ Projector::fillRhs(
           default:
             std::stringstream ss;
             ss << "invalid rank: " << f.name << " with rank " << rank;
-            ALBANY_PANIC(true, std::logic_error, ss.str());
+            ALBANY_ASSERT(false, ss.str());
         }
       }
     }
@@ -422,7 +422,7 @@ Projector::interp(
     for (int qp = 0; qp < num_qp; ++qp) {
       switch (rank) {
         case 0:
-        case 1: ALBANY_PANIC(true, std::logic_error, "!impl"); break;
+        case 1: ALBANY_ASSERT(false, "!impl"); break;
         case 2: {
           for (int i = 0; i < ndim; ++i)
             for (int j = 0; j < ndim; ++j) mda1(cell, qp, i, j) = 0;
@@ -443,7 +443,7 @@ Projector::interp(
         default:
           std::stringstream ss;
           ss << "invalid rank: " << f.name << " with rank " << rank;
-          ALBANY_PANIC(true, std::logic_error, ss.str());
+          ALBANY_ASSERT(false, ss.str());
       }
     }
 }
@@ -661,7 +661,6 @@ struct Manager::Impl
       // EvalT=Jacobian is run before Residual, which I think should not happen.
       ALBANY_PANIC(
           is_g(workset.wsIndex),
-          std::logic_error,
           "If usingProjection(), then readQpField should always see G, not g.");
     }
     // Read from the primary field.
@@ -760,7 +759,6 @@ struct Manager::Impl
     Albany::StateArray::iterator it = esa.find(name);
     ALBANY_PANIC(
         it == esa.end(),
-        std::logic_error,
         "elemStateArrays is missing " + name);
     return it->second;
   }
@@ -995,7 +993,7 @@ const Teuchos::RCP<Thyra_MultiVector>&
 Manager::getNodalField(const Field& f, const int g_idx, const bool overlapped)
     const
 {
-  ALBANY_PANIC(!overlapped, std::logic_error, "must be overlapped");
+  ALBANY_PANIC(!overlapped,  "must be overlapped");
   return f.data_->mv[g_idx];
 }
 
@@ -1112,7 +1110,6 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
     }
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Error: unhandled argument in evalf() in AAdapt_RC_Manager.cpp"
             << std::endl);
   }

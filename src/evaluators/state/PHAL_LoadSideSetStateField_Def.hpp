@@ -51,7 +51,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 {
   ALBANY_PANIC(
       workset.sideSets == Teuchos::null,
-      std::logic_error,
       "Error! The mesh does not store any side set.\n");
 
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end())
@@ -59,7 +58,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 
   ALBANY_PANIC(
       workset.disc == Teuchos::null,
-      std::logic_error,
       "Error! The workset must store a valid discretization pointer.\n");
 
   const Albany::AbstractDiscretization::SideSetDiscretizationsType& ssDiscs =
@@ -67,12 +65,10 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 
   ALBANY_PANIC(
       ssDiscs.size() == 0,
-      std::logic_error,
       "Error! The discretization must store side set discretizations.\n");
 
   ALBANY_PANIC(
       ssDiscs.find(sideSetName) == ssDiscs.end(),
-      std::logic_error,
       "Error! No discretization found for side set " << sideSetName << ".\n");
 
   Teuchos::RCP<Albany::AbstractDiscretization> ss_disc =
@@ -80,7 +76,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 
   ALBANY_PANIC(
       ss_disc == Teuchos::null,
-      std::logic_error,
       "Error! Side discretization is invalid for side set " << sideSetName
                                                             << ".\n");
 
@@ -89,7 +84,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 
   ALBANY_PANIC(
       ss_maps.find(sideSetName) == ss_maps.end(),
-      std::logic_error,
       "Error! Something is off: the mesh has side discretization but no "
       "sideId-to-sideSetElemId map.\n");
 
@@ -105,7 +99,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   ALBANY_PANIC(
       workset.disc->getSideNodeNumerationMap().find(sideSetName) ==
           workset.disc->getSideNodeNumerationMap().end(),
-      std::logic_error,
       "Error! Sideset " << sideSetName << " has no sideNodeNumeration map.\n");
   const std::map<GO, std::vector<int>>& sideNodeNumerationMap =
       workset.disc->getSideNodeNumerationMap().at(sideSetName);
@@ -118,7 +111,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
       size > 2 ? field.fieldTag().dataLayout().name(2) : "";
   ALBANY_PANIC(
       size > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim",
-      std::logic_error,
       "Error! Invalid field layout in LoadSideSetStateField.\n");
 
   // Loop on the sides of this sideSet that are in this workset
@@ -133,7 +125,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     // Not sure if this is even possible, but just for debug pourposes
     ALBANY_PANIC(
         elemGIDws3D[it_side.elem_GID].ws != workset.wsIndex,
-        std::logic_error,
         "Error! This workset has a side that belongs to an element not in the "
         "workset.\n");
 
@@ -143,7 +134,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 
     ALBANY_PANIC(
         ss_map.find(side_GID) == ss_map.end(),
-        std::logic_error,
         "Error! The sideId-to-sideSetElemId map does not store this side GID. "
         "Weird, should never happen.\n");
 
@@ -155,7 +145,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     // state in the right 2D-ws
     ALBANY_PANIC(
         esa[wsIndex2D].find(stateName) == esa[wsIndex2D].end(),
-        std::logic_error,
         "Error! Cannot locate " << stateName
                                 << " in PHAL_LoadSideSetStateField_Def.\n");
     Albany::MDArray state = esa[wsIndex2D].at(stateName);
@@ -204,7 +193,6 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
       default:
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Error! Unexpected array dimensions in LoadSideSetStateField: "
                 << size << ".\n");
     }

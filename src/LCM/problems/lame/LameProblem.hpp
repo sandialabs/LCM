@@ -169,7 +169,6 @@ Albany::LameProblem::constructEvaluators(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
   ALBANY_PANIC(
       dl->vectorAndGradientLayoutsAreEquivalent == false,
-      std::logic_error,
       "Data Layout Usage in Mechanics problems assume vecDim = numDim");
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
   bool                                              supportsTransient = true;
@@ -220,7 +219,6 @@ Albany::LameProblem::constructEvaluators(
   if (haveSource) {  // Source
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Error!  Sources not implemented in Elasticity yet!");
 
     RCP<ParameterList> p = rcp(new ParameterList);

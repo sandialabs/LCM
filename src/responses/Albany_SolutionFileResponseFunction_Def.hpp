@@ -41,7 +41,6 @@ SolutionFileResponseFunction<Norm>::evaluateResponse(
 
     ALBANY_PANIC(
         MMFileStatus != 0,
-        std::runtime_error,
         std::endl
             << "MatrixMarketFile, file " __FILE__ " line " << __LINE__
             << " returned " << MMFileStatus << std::endl);
@@ -116,7 +115,6 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
 
     ALBANY_PANIC(
         MMFileStatus != 0,
-        std::runtime_error,
         std::endl
             << "MatrixMarketFile, file " __FILE__ " line " << __LINE__
             << " returned " << MMFileStatus << std::endl);
@@ -150,7 +148,6 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
   if (!dg_dx.is_null()) {
     ALBANY_PANIC(
         dg_dx->domain()->dim() != 1,
-        std::logic_error,
         "Error! dg_dx has more than one column.\n");
     Norm::NormDerivative(*x, *RefSoln, *dg_dx->col(0));
   }
@@ -203,7 +200,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
     // file not found
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         std::endl
             << "Reference solution file \" " << filename << " \" not found"
             << std::endl);
@@ -214,7 +210,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
 
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         std::endl
             << "Reference solution: MatrixMarket file is not in the proper "
                "format."
@@ -225,7 +220,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
 
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         std::endl
             << "Incorrect number of arguments on first line of reference "
                "solution file."
@@ -237,7 +231,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
 
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         std::endl
             << "Incorrect type of arguments on first line of reference "
                "solution file."
@@ -248,7 +241,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
     if (fgets(line, lineLength, handle) == 0)
       ALBANY_PANIC(
           true,
-          std::runtime_error,
           std::endl
               << "Reference solution file: invalid comment line." << std::endl);
   } while (line[0] == '%');
@@ -258,7 +250,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
 
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         std::endl
             << "Reference solution file: cannot compute problem dimensions"
             << std::endl);
@@ -284,7 +275,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   // Now construct vector/multivector
   ALBANY_PANIC(
       N != static_cast<int>(mv->domain()->dim()),
-      std::runtime_error,
       "Error! Input file is storing a Thyra MultiVector with a number of "
       "vectors "
       "different from the what was expected.\n");
@@ -302,7 +292,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
 
         ALBANY_PANIC(
             true,
-            std::runtime_error,
             std::endl
                 << "Reference solution file: cannot read line number "
                 << i + offset << " in file." << std::endl);
@@ -312,7 +301,6 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
         if (sscanf(line, "%lg\n", &V) == 0) {
           ALBANY_PANIC(
               true,
-              std::runtime_error,
               "Reference solution file: cannot parse line number "
                   << i << " in file.\n");
         }
@@ -323,7 +311,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
 
   if (fclose(handle)) {
     ALBANY_PANIC(
-        true, std::runtime_error, "Cannot close reference solution file.\n");
+        true, "Cannot close reference solution file.\n");
   }
 
   return 0;

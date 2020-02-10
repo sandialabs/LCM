@@ -42,7 +42,6 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid Biot modulus type " << type);
   }
 
@@ -131,7 +130,6 @@ BiotModulus<EvalT, Traits>::getValue(const std::string& n)
     return GrainBulkModulus;
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in BiotModulus::getValue()" << std::endl);

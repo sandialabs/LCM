@@ -127,7 +127,6 @@ interpolate(
   if (step > timestep_count)
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
             << " > total number of snapshots in " << source_mesh_input_file
@@ -135,7 +134,6 @@ interpolate(
   if (step <= 0)
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
             << "; value must be > 0." << std::endl);
@@ -189,7 +187,6 @@ interpolate(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "   Field with name " << source_field_name
             << " NOT found in source mesh file!" << std::endl);
@@ -226,7 +223,6 @@ interpolate(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "   Field with name " << target_field_name
             << " NOT found in target mesh file!" << std::endl);
@@ -240,7 +236,6 @@ interpolate(
   if (step > timestep_count)
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no
             << " > total number of snapshots in " << target_mesh_input_file
@@ -248,7 +243,6 @@ interpolate(
   if (step <= 0)
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no
             << "; value must be > 0." << std::endl);
@@ -424,7 +418,6 @@ main(int argc, char* argv[])
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in interpolation_volume_to_ns.cpp: invalid field_type = "
             << field_type

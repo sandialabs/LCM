@@ -76,7 +76,6 @@ NeumannBase<EvalT, Traits>::NeumannBase(const Teuchos::ParameterList& p)
          it++) {
       ALBANY_PANIC(
           !materialDB->isElementBlockParam(it->first, "Flux Scale"),
-          Teuchos::Exceptions::InvalidParameter,
           "Cannot locate the value of \"Flux Scale\" for element block "
               << it->first << " in the material database");
 
@@ -191,7 +190,6 @@ NeumannBase<EvalT, Traits>::NeumannBase(const Teuchos::ParameterList& p)
     else
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "PHAL_Neumann: side type : " << sideTypeName << " is not supported."
                                        << std::endl);
   }
@@ -290,7 +288,6 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
 
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Side sets defined in input file but not properly specified on the mesh"
             << std::endl);
 

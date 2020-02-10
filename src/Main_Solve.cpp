@@ -176,7 +176,6 @@ main(int argc, char* argv[])
       const int numParameters = pList->get<int>("Number");
       ALBANY_PANIC(
           numParameters == 0,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error!  In Albany::ModelEvaluator constructor:  "
               << "Parameter vector " << l << " has zero parameters!"
@@ -204,7 +203,6 @@ main(int argc, char* argv[])
         const int numParameters = pList->get<int>("Number");
         ALBANY_PANIC(
             numParameters == 0,
-            Teuchos::Exceptions::InvalidParameter,
             std::endl
                 << "Error!  In Albany::ModelEvaluator constructor:  "
                 << "Response vector " << l << " has zero parameters!"

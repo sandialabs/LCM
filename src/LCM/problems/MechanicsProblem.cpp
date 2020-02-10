@@ -237,7 +237,6 @@ MechanicsProblem::MechanicsProblem(
       default: {
         ALBANY_PANIC(
             true,
-            std::logic_error,
             '\n' << "Error: " << __FILE__ << " line " << __LINE__
                  << ": num_dims_ set incorrectly." << '\n');
         break;
@@ -546,7 +545,6 @@ MechanicsProblem::constructNeumannEvaluators(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
   }
 
@@ -596,7 +594,7 @@ MechanicsProblem::getVariableType(
     variable_type = MECH_VAR_TYPE_TIMEDEP;
   } else {
     ALBANY_PANIC(
-        true, std::logic_error, "Unknown variable type " << type << '\n');
+        true,  "Unknown variable type " << type << '\n');
   }
 
   have_variable = (variable_type != MECH_VAR_TYPE_NONE);

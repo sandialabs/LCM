@@ -18,7 +18,6 @@ TimeDepDBC_Base<EvalT, Traits>::TimeDepDBC_Base(Teuchos::ParameterList& p)
 
   ALBANY_PANIC(
       !(timeValues.size() == BCValues.size()),
-      Teuchos::Exceptions::InvalidParameter,
       "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
 
@@ -28,7 +27,6 @@ TimeDepDBC_Base<EvalT, Traits>::computeVal(RealType time)
 {
   ALBANY_PANIC(
       time > timeValues.back(),
-      Teuchos::Exceptions::InvalidParameter,
       "Time is growing unbounded!");
 
   ScalarT      val;

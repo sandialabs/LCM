@@ -49,7 +49,6 @@ SideLaplacian::buildProblem(
 {
   ALBANY_PANIC(
       meshSpecs.size() != 1,
-      std::logic_error,
       "Problem supports one Material Block");
 
   // Building cell basis and cubature
@@ -80,7 +79,6 @@ SideLaplacian::buildProblem(
     ALBANY_PANIC(
         meshSpecs[0]->sideSetMeshSpecs.find(sideSetName) ==
             meshSpecs[0]->sideSetMeshSpecs.end(),
-        std::logic_error,
         "Error! Either 'Side Set Name' ("
             << sideSetName << ") is wrong or something went wrong while "
             << "building the side mesh specs. (Did you forget to specify side "

@@ -136,7 +136,6 @@ Albany::CahnHillProblem::constructEvaluators(
   // Problem is transient
   ALBANY_PANIC(
       number_of_time_deriv != 1,
-      std::logic_error,
       "Albany_CahnHillProblem must be defined as a transient calculation.");
 
   const CellTopologyData* const elem_top = &meshSpecs.ctd;

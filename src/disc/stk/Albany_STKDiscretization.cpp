@@ -137,7 +137,6 @@ Basis(const int C)
   int deg = (int)std::sqrt((double)C);
   ALBANY_PANIC(
       deg * deg != C || deg < 2,
-      std::logic_error,
       " Albany_STKDiscretization Error Basis not perfect "
       "square > 1"
           << std::endl);
@@ -555,7 +554,6 @@ STKDiscretization::setCoordinates(
 {
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "STKDiscretization::setCoordinates is not implemented.");
 }
 
@@ -565,7 +563,6 @@ STKDiscretization::setReferenceConfigurationManager(
 {
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "STKDiscretization::setReferenceConfigurationManager is not "
       "implemented.");
 }
@@ -830,7 +827,6 @@ STKDiscretization::transformMesh()
   } else {
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "STKDiscretization::transformMesh() Unknown transform type :"
             << transformType << std::endl);
   }
@@ -1270,7 +1266,7 @@ void
 STKDiscretization::getSolutionField(Thyra_Vector& result, const bool overlapped)
     const
 {
-  ALBANY_PANIC(overlapped, std::logic_error, "Not implemented.");
+  ALBANY_PANIC(overlapped,  "Not implemented.");
 
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1287,7 +1283,7 @@ STKDiscretization::getSolutionMV(
     Thyra_MultiVector& result,
     const bool         overlapped) const
 {
-  ALBANY_PANIC(overlapped, std::logic_error, "Not implemented.");
+  ALBANY_PANIC(overlapped,  "Not implemented.");
 
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1460,7 +1456,7 @@ STKDiscretization::nonzeroesPerRow(const int num_eq) const
     case 3: estNonzeroesPerRow = 27 * num_eq; break;
     default:
       ALBANY_PANIC(
-          true, std::logic_error, "STKDiscretization:  Bad numDim" << numDim);
+          true,  "STKDiscretization:  Bad numDim" << numDim);
   }
   return estNonzeroesPerRow;
 }
@@ -2087,7 +2083,6 @@ STKDiscretization::computeWorksetInfo()
 
         ALBANY_PANIC(
             node_lid < 0,
-            std::logic_error,
             "STK1D_Disc: node_lid out of range " << node_lid << std::endl);
         coords[b][i][j] = stk::mesh::field_data(*coordinates_field, rowNode);
 
@@ -2102,7 +2097,6 @@ STKDiscretization::computeWorksetInfo()
               const GO node_gid = gid(rowNode);
               const LO node_lid = overlap_node_mapT->getLocalElement(node_gid);
 
-              ALBANY_PANIC(node_lid<0, std::logic_error,
                "STK1D_Disc: node_lid out of range " << node_lid << std::endl);
               coords[b][i][j] = stk::mesh::field_data(*coordinates_field,
          rowNode);
@@ -2334,7 +2328,6 @@ STKDiscretization::computeSideSets()
 
       ALBANY_PANIC(
           bulkData.num_elements(sidee) != 1,
-          std::logic_error,
           "STKDisc: cannot figure out side set topology for side set "
               << ss->first << std::endl);
 
@@ -2631,7 +2624,6 @@ STKDiscretization::setupNetCDFOutput()
             &netCDFp))
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "nc_create_par returned error code "
               << ierr << " - " << nc_strerror(ierr) << std::endl);
     MPI_Info_free(&info);
@@ -2643,7 +2635,6 @@ STKDiscretization::setupNetCDFOutput()
               &netCDFp))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_create returned error code " << ierr << " - "
                                              << nc_strerror(ierr) << std::endl);
 #endif
@@ -2659,7 +2650,6 @@ STKDiscretization::setupNetCDFOutput()
                 nc_def_dim(netCDFp, dimnames[i], dimlen[i], &dimID[i]))
           ALBANY_PANIC(
               true,
-              std::logic_error,
               "nc_def_dim returned error code "
                   << ierr << " - " << nc_strerror(ierr) << std::endl);
     }
@@ -2674,7 +2664,6 @@ STKDiscretization::setupNetCDFOutput()
                 netCDFp, field_name, NC_DOUBLE, 4, dimID, &varSolns[n]))
           ALBANY_PANIC(
               true,
-              std::logic_error,
               "nc_def_var " << field_name << " returned error code " << ierr
                             << " - " << nc_strerror(ierr) << std::endl);
 
@@ -2684,7 +2673,6 @@ STKDiscretization::setupNetCDFOutput()
                 netCDFp, varSolns[n], "FillValue", NC_DOUBLE, 1, &fillVal))
           ALBANY_PANIC(
               true,
-              std::logic_error,
               "nc_put_att FillValue returned error code "
                   << ierr << " - " << nc_strerror(ierr) << std::endl);
     }
@@ -2699,7 +2687,6 @@ STKDiscretization::setupNetCDFOutput()
               nc_def_var(netCDFp, "lat", NC_DOUBLE, 1, &dimID[2], &latVarID))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_def_var lat returned error code "
                 << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
@@ -2707,7 +2694,6 @@ STKDiscretization::setupNetCDFOutput()
               netCDFp, latVarID, "long_name", sizeof(lat_name), lat_name))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_put_att_text " << lat_name << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
@@ -2715,7 +2701,6 @@ STKDiscretization::setupNetCDFOutput()
               netCDFp, latVarID, "units", sizeof(lat_unit), lat_unit))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_put_att_text " << lat_unit << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
 
@@ -2725,7 +2710,6 @@ STKDiscretization::setupNetCDFOutput()
               nc_def_var(netCDFp, "lon", NC_DOUBLE, 1, &dimID[3], &lonVarID))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_def_var lon returned error code "
                 << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
@@ -2733,7 +2717,6 @@ STKDiscretization::setupNetCDFOutput()
               netCDFp, lonVarID, "long_name", sizeof(lon_name), lon_name))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_put_att_text " << lon_name << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
@@ -2741,7 +2724,6 @@ STKDiscretization::setupNetCDFOutput()
               netCDFp, lonVarID, "units", sizeof(lon_unit), lon_unit))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_put_att_text " << lon_unit << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
 
@@ -2751,7 +2733,6 @@ STKDiscretization::setupNetCDFOutput()
               netCDFp, NC_GLOBAL, "history", sizeof(history), history))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_put_att_text " << history << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
 
@@ -2759,7 +2740,6 @@ STKDiscretization::setupNetCDFOutput()
       if (const int ierr = nc_enddef(netCDFp))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_enddef returned error code " << ierr << " - "
                                              << nc_strerror(ierr) << std::endl);
 
@@ -2774,14 +2754,12 @@ STKDiscretization::setupNetCDFOutput()
       if (const int ierr = nc_put_var(netCDFp, lonVarID, &deglon[0]))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_put_var lon returned error code "
                 << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
       if (const int ierr = nc_put_var(netCDFp, latVarID, &deglat[0]))
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "nc_put_var lat returned error code "
                 << ierr << " - " << nc_strerror(ierr) << std::endl);
   }
@@ -2862,7 +2840,6 @@ STKDiscretization::meshToGraph()
     if (sur_elem[ncnt].empty()) {
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Node = " << ncnt + 1 << " has no elements" << std::endl);
     } else {
       std::size_t nsur = sur_elem[ncnt].size();

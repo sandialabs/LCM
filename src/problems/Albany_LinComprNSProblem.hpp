@@ -157,7 +157,6 @@ Albany::LinComprNSProblem::constructEvaluators(
   // Make sure we are transient
   ALBANY_PANIC(
       number_of_time_deriv < 0 || number_of_time_deriv > 1,
-      std::logic_error,
       "Albany_LinComprNSProblem must be defined as a steady or transient "
       "calculation.");
 

@@ -53,7 +53,6 @@ UpdateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
-      std::logic_error,
       std::endl
           << "Error: cannot locate " << name_N << " in UpdateField_Def"
           << std::endl);

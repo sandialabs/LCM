@@ -123,7 +123,6 @@ Coord2RBM(
       default:
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Coord2RBM: Ndof = " << Ndof << " not implemented\n");
     } /*switch*/
 
@@ -196,7 +195,6 @@ Coord2RBM_nonElasticity(
       default:
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Coord2RBM_nonElasticity: Ndof = " << Ndof << " not implemented\n");
     } /*switch*/
 
@@ -363,7 +361,6 @@ RigidBodyModes::setCoordinates(const Teuchos::RCP<Thyra_MultiVector>& coordMV_)
 
   ALBANY_PANIC(
       !isMueLuUsed() && !isFROSchUsed(),
-      std::logic_error,
       "setCoordinates was called without setting an ML, MueLu or FROSch "
       "parameter list.");
 
@@ -427,7 +424,6 @@ RigidBodyModes::setCoordinatesAndNullspace(
 
       ALBANY_PANIC(
           soln_vs.is_null(),
-          std::logic_error,
           "numElasticityDim > 0 and (isMueLuUsed() or isFROSchUsed()): "
           "soln_map must be provided.");
       if (isMueLuUsed()) {
@@ -440,7 +436,6 @@ RigidBodyModes::setCoordinatesAndNullspace(
   if (isFROSchUsed()) {
     ALBANY_PANIC(
         soln_overlap_vs.is_null(),
-        std::logic_error,
         "isFROSchUsed(): soln_overlap_map must be provided.");
     plist->set("Repeated Map", getTpetraMap(soln_overlap_vs));
   }

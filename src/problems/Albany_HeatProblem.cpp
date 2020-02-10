@@ -176,7 +176,6 @@ Albany::HeatProblem::constructNeumannEvaluators(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 

@@ -61,7 +61,6 @@ Albany::ElasticityProblem::buildProblem(
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(
       meshSpecs.size() != 1,
-      std::logic_error,
       "Problem supports one Material Block");
 
   fm.resize(1);
@@ -173,7 +172,6 @@ Albany::ElasticityProblem::constructNeumannEvaluators(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 

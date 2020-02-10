@@ -145,7 +145,6 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  Unknown response function " << responseName << "!"
             << std::endl

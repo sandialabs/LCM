@@ -228,7 +228,7 @@ class ParallelConstitutiveModel : public LCM::ConstitutiveModel<EvalT, Traits>
       FieldMap<const ScalarT>   dep_fields,
       FieldMap<ScalarT>         eval_fields) override
   {
-    ALBANY_PANIC(true, std::logic_error, "Not implemented.");
+    ALBANY_ASSERT(false, "Not implemented.");
   }
 
  protected:

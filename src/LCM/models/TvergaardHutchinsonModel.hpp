@@ -61,7 +61,7 @@ class TvergaardHutchinsonModel : public LCM::ConstitutiveModel<EvalT, Traits>
       DepFieldMap               dep_fields,
       FieldMap                  eval_fields)
   {
-    ALBANY_PANIC(true, std::logic_error, "Not implemented.");
+    ALBANY_ASSERT(false, "Not implemented.");
   }
 
  private:

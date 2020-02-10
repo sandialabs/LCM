@@ -492,7 +492,6 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
                                                   << " was not found.\n");
 
@@ -565,7 +564,6 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
                                                   << " was not found.\n");
 
@@ -737,7 +735,6 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
                                                   << " was not found.\n");
 
@@ -793,7 +790,6 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
                                                   << " was not found.\n");
 
@@ -916,7 +912,6 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
                                                   << " was not found.\n");
 
@@ -977,7 +972,6 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
                                                   << " was not found.\n");
 
@@ -1063,7 +1057,6 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
                                                   << " was not found.\n");
 

@@ -236,7 +236,6 @@ ConstitutiveModelParameters<EvalT, Traits>::getValue(const std::string& n)
 
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "Constituitive model " << n << " not supported in getValue" << std::endl);
 
   // Need to return something here or the Clang compiler complains a couple

@@ -49,7 +49,6 @@ void ScatterScalarNodalParameter<EvalT, Traits>::evaluateFields(
 {
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "PHAL::ScatterScalarNodalParameter is supposed to be used only for "
       "Residual evaluation Type.");
 }
@@ -61,7 +60,6 @@ void ScatterScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
 {
   ALBANY_PANIC(
       true,
-      std::logic_error,
       "PHAL::ScatterScalarNodalParameter is supposed to be used only for "
       "Residual evaluation Type.");
 }

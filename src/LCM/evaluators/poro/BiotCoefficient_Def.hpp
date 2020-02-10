@@ -43,7 +43,6 @@ BiotCoefficient<EvalT, Traits>::BiotCoefficient(Teuchos::ParameterList& p)
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid Biot coefficient type " << type);
   }
 
@@ -113,7 +112,6 @@ BiotCoefficient<EvalT, Traits>::getValue(const std::string& n)
     return Kgrain_value;
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in BiotCoefficient::getValue()" << std::endl);

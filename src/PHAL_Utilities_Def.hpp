@@ -70,7 +70,7 @@ MDFieldIterator<T>::ref()
     case 3: return a_(idxs_[0], idxs_[1], idxs_[2]);
     case 4: return a_(idxs_[0], idxs_[1], idxs_[2], idxs_[3]);
     case 5: return a_(idxs_[0], idxs_[1], idxs_[2], idxs_[3], idxs_[4]);
-    default: ALBANY_PANIC(true, std::logic_error, "not impl'ed"); return a_(0);
+    default: ALBANY_ASSERT(false, "not impl'ed"); return a_(0);
   }
 }
 
@@ -122,7 +122,7 @@ loop(Functor& f, PHX::MDField<ScalarT>& a)
       }
     } break;
     default:
-      ALBANY_PANIC(true, std::logic_error, "dims.size() \notin {1,2,3,4,5}.");
+      ALBANY_ASSERT(false, "dims.size() \notin {1,2,3,4,5}.");
   }
 }
 // Compile-time MDField.

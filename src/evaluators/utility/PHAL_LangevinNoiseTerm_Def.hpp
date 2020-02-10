@@ -87,7 +87,6 @@ LangevinNoiseTerm<EvalT, Traits>::getValue(const std::string& n)
   else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error! Logic error in getting parameter " << n
             << " in LangevinNoiseTerm::getValue()" << std::endl);

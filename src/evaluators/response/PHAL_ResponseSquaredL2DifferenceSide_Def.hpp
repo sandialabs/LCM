@@ -30,7 +30,6 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
   sideSetName = plist->get<std::string>("Side Set Name");
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      std::runtime_error,
       "Error! Layout for side set " << sideSetName << " not found.\n");
 
   Teuchos::RCP<Albany::Layouts> dl_side = dl->side_layouts.at(sideSetName);
@@ -62,7 +61,6 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
   if (plist->isParameter("Target Field Name")) {
     ALBANY_PANIC(
         plist->isParameter("Target Value"),
-        std::logic_error,
         "[ResponseSquaredL2DifferenceSideBase] Error! Both target value and "
         "target field provided.\n");
     std::string target_fname;
@@ -72,7 +70,6 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
   } else {
     ALBANY_PANIC(
         !plist->isParameter("Target Value"),
-        std::logic_error,
         "[ResponseSquaredL2DifferenceSideBase] Error! No target value or "
         "target field provided.\n");
     target_value     = true;
@@ -160,7 +157,6 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
 {
   ALBANY_PANIC(
       workset.sideSets == Teuchos::null,
-      std::logic_error,
       "Side sets defined in input file but not properly specified on the mesh"
           << std::endl);
 
@@ -292,7 +288,6 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid 'Field Rank'.\n");
   }
 

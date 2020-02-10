@@ -158,7 +158,6 @@ Albany::ReactDiffSystem::constructEvaluators(
   // exception if it is not
   ALBANY_PANIC(
       number_of_time_deriv != 0,
-      std::logic_error,
       "Albany_ReactDiffSystem must be defined as a steady calculation.");
 
   // Temporary variable used numerous times below

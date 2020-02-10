@@ -88,7 +88,6 @@ Albany::ResponseFactory::createResponseFunction(
     for (int i = 0; i < aggregated_responses.size(); i++) {
       ALBANY_PANIC(
           aggregated_responses[i]->isScalarResponse() != true,
-          std::logic_error,
           "Response function "
               << i << " is not a scalar response function." << std::endl
               << "The aggregated response can only aggregate scalar response "
@@ -178,7 +177,6 @@ Albany::ResponseFactory::createResponseFunction(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error!  Unknown response function " << name << "!" << std::endl
             << "Supplied parameter list is " << std::endl

@@ -163,7 +163,6 @@ interp_and_calc_error(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "   Field with name " << source_field_name
             << " NOT found in source mesh file!" << std::endl);
@@ -233,7 +232,6 @@ interp_and_calc_error(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "   Field with name " << target_field_name
             << " NOT found in target mesh file!" << std::endl);
@@ -248,14 +246,12 @@ interp_and_calc_error(
   if (src_timestep_count < 1) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Source file has 0 snapshots!" << std::endl);
   }
   if (tgt_timestep_count < 1) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Taret file has 0 snapshots!" << std::endl);
   }
@@ -263,7 +259,6 @@ interp_and_calc_error(
       ((tgt_snap_no == -1) && (src_snap_no != -1))) {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
             << ".  If Target Mesh Snapshot Number = -1, Source Mesh Snapshot "
@@ -292,7 +287,6 @@ interp_and_calc_error(
     if (tgt_timestep_count != src_timestep_count) {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Number of snapshots in source mesh file must equal number of "
               << "snapshots in target mesh file when Target Mesh Snapshot "
@@ -310,7 +304,6 @@ interp_and_calc_error(
     if (src_snap_no > src_timestep_count) {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Invalid value of Source Mesh Snapshot Number = "
               << src_snap_no << " > total number of snapshots in "
@@ -320,7 +313,6 @@ interp_and_calc_error(
     if (tgt_snap_no > tgt_timestep_count) {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Invalid value of Target Mesh Snapshot Number = "
               << tgt_snap_no << " > total number of snapshots in "
@@ -330,7 +322,6 @@ interp_and_calc_error(
     if ((src_snap_no == 0) || (src_snap_no < -1)) {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Invalid value of Source Mesh Snapshot Number = "
               << src_snap_no << "; valid values are -1 and >0." << std::endl);
@@ -338,7 +329,6 @@ interp_and_calc_error(
     if ((tgt_snap_no == 0) || (tgt_snap_no < -1)) {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Invalid value of Target Mesh Snapshot Number = "
               << tgt_snap_no << "; valid values are -1 and >0 ." << std::endl);
@@ -698,7 +688,6 @@ main(int argc, char* argv[])
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in dtk_interp_and_error.cpp: invalid field_type = "
             << field_type

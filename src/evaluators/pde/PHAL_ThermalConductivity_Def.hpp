@@ -72,7 +72,6 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
     } else {
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error! Must specify a material database if using block "
                  "dependent "
@@ -96,7 +95,6 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
   else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid thermal conductivity type " << type);
   }
 
@@ -157,7 +155,6 @@ ThermalConductivity<EvalT, Traits>::getValue(const std::string& n)
   if (is_constant) { return constant_value; }
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in ThermalConductivity::getValue()" << std::endl);

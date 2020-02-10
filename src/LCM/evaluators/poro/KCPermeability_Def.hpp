@@ -44,7 +44,6 @@ KCPermeability<EvalT, Traits>::KCPermeability(Teuchos::ParameterList& p)
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid Kozeny-Carman Permeability type " << type);
   }
 
@@ -114,7 +113,6 @@ KCPermeability<EvalT, Traits>::getValue(const std::string& n)
   if (n == "Kozeny-Carman Permeability") return constant_value;
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in KCPermeability::getValue()" << std::endl);

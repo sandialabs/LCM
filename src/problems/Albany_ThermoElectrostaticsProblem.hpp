@@ -154,7 +154,6 @@ Albany::ThermoElectrostaticsProblem::constructEvaluators(
   // Problem is not transient
   ALBANY_PANIC(
       number_of_time_deriv != 0,
-      std::logic_error,
       "Albany_ThermoElectroStaticsProblem cannot be defined as a transient "
       "calculation.");
 

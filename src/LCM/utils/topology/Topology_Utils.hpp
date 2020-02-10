@@ -179,7 +179,6 @@ interfaceCellTopogyFromBulkCellTopogy(
   } else {
     ALBANY_PANIC(
         false,
-        std::logic_error,
         "LogicError: Interface cell topology not implemented for:"
             << bulk_cell_topology_name << '\n');
   }

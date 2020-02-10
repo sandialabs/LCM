@@ -101,7 +101,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
          << " not found!" << std::endl;
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename
             << " not found!" << std::endl);
@@ -135,7 +134,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
            << NumNodes << ", numNodes in sh = " << NumNodesSh << std::endl;
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error in AsciiSTKMeshStruct: sh file must have same number "
                  "nodes as xyz file!  numNodes in xyz = "
@@ -158,7 +156,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
          << confilename << " not found!" << std::endl;
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error in AsciiSTKMeshStruct: element connectivity file "
             << confilename << " not found!" << std::endl);
@@ -235,7 +232,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
            << geIDsfilename << " not found!" << std::endl;
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error in AsciiSTKMeshStruct: global element IDs file "
               << geIDsfilename << " not found!" << std::endl);
@@ -271,7 +267,6 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
            << gnIDsfilename << " not found!" << std::endl;
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           std::endl
               << "Error in AsciiSTKMeshStruct: global node IDs file "
               << gnIDsfilename << " not found!" << std::endl);

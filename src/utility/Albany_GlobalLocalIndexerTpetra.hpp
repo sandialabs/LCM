@@ -16,7 +16,6 @@ class GlobalLocalIndexerTpetra : public GlobalLocalIndexer
   {
     ALBANY_PANIC(
         tmap.is_null(),
-        std::logic_error,
         "Error! Input tpetra map pointer is null.\n");
   }
 

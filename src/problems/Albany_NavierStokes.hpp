@@ -210,7 +210,6 @@ Albany::NavierStokes::constructEvaluators(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
   ALBANY_PANIC(
       dl->vectorAndGradientLayoutsAreEquivalent == false,
-      std::logic_error,
       "Data Layout Usage in NavierStokes problem assumes vecDim = numDim");
 
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
@@ -220,7 +219,6 @@ Albany::NavierStokes::constructEvaluators(
   // Problem is transient
   ALBANY_PANIC(
       number_of_time_deriv < 0 || number_of_time_deriv > 1,
-      std::logic_error,
       "Albany_NavierStokesProblem must be defined as a steady or transient "
       "calculation.");
 

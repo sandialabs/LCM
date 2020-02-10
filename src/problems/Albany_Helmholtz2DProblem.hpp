@@ -151,7 +151,6 @@ Albany::Helmholtz2DProblem::constructEvaluators(
   bool supportsTransient = false;
   ALBANY_PANIC(
       number_of_time_deriv != 0,
-      std::logic_error,
       "A transient calculation has been requested but the Helmholtz2DProblem "
       "does not support this.");
 

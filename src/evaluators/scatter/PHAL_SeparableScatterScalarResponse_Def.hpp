@@ -172,7 +172,6 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
   if (workset.sideSets == Teuchos::null)
     ALBANY_PANIC(
         true,
-        std::logic_error,
         "Side sets not properly specified on the mesh" << std::endl);
 
   const Albany::SideSetList&          ssList = *(workset.sideSets);

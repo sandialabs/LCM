@@ -51,7 +51,6 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
 
     ALBANY_PANIC(
         !dl->isSideLayouts,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
         "set.\n");
 
@@ -64,7 +63,6 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
 
     ALBANY_PANIC(
         !dl->isSideLayouts,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
         "set.\n");
 
@@ -77,7 +75,6 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
 
     ALBANY_PANIC(
         !dl->isSideLayouts,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
         "set.\n");
 
@@ -90,7 +87,6 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
 
     ALBANY_PANIC(
         !dl->isSideLayouts,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
         "set.\n");
 
@@ -103,7 +99,6 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
 
     ALBANY_PANIC(
         !dl->isSideLayouts,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
         "set.\n");
 
@@ -114,7 +109,6 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid field layout.\n");
   }
 
@@ -148,7 +142,6 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid regularization type");
   }
 
@@ -238,7 +231,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(
       }
       break;
     default:
-      ALBANY_PANIC(true, std::logic_error, "Error! Invalid field layout.\n");
+      ALBANY_ASSERT(false, "Error! Invalid field layout.\n");
   }
 }
 

@@ -30,7 +30,7 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(
     input_field_name = output_field_name = p.get<std::string>("Field Name");
   } else
     ALBANY_PANIC(
-        true, Teuchos::Exceptions::InvalidParameter, "Field Name not set.\n");
+        true, "Field Name not set.\n");
   in_field = decltype(in_field)(
       input_field_name, p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"));
   out_field = decltype(out_field)(
@@ -111,7 +111,6 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::evaluateFields(
     default:
       ALBANY_PANIC(
           true,
-          Teuchos::Exceptions::InvalidParameter,
           "Implemented only up to 6 dimensions in data layout.\n");
   }
 

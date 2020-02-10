@@ -82,7 +82,6 @@ class NodalDataBase
   {
     ALBANY_PANIC(
         nodal_data_vector.is_null(),
-        std::logic_error,
         "nodal_data_vector has not been allocated.");
     return nodal_data_vector;
   }

@@ -84,12 +84,10 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
   if (nodalState) {
     ALBANY_PANIC(
         field.fieldTag().dataLayout().size() < 2,
-        Teuchos::Exceptions::InvalidParameter,
         "Error! To save a nodal state, pass the cell-based version of it "
         "(<Cell,Node,...>).\n");
     ALBANY_PANIC(
         field.fieldTag().dataLayout().name(1) != "Node",
-        Teuchos::Exceptions::InvalidParameter,
         "Error! To save a nodal state, the second tag of the layout MUST be "
         "'Node'.\n");
   }
@@ -121,7 +119,6 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
 
   ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
-      std::logic_error,
       std::endl
           << "Error: cannot locate " << stateName
           << " in PHAL_SaveStateField_Def" << std::endl);
@@ -181,7 +178,6 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveWorksetState(
 
   ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
-      std::logic_error,
       std::endl
           << "Error: cannot locate " << stateName
           << " in PHAL_SaveStateField_Def" << std::endl);
@@ -223,7 +219,6 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   Teuchos::RCP<Albany::AbstractDiscretization> disc = workset.disc;
   ALBANY_PANIC(
       disc == Teuchos::null,
-      std::runtime_error,
       "Error! Discretization is needed to save nodal state.\n");
 
   Teuchos::RCP<Albany::AbstractSTKMeshStruct> mesh =
@@ -231,7 +226,6 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
           disc->getMeshStruct());
   ALBANY_PANIC(
       mesh == Teuchos::null,
-      std::runtime_error,
       "Error! Save nodal states available only for stk meshes.\n");
 
   stk::mesh::MetaData& metaData = *mesh->metaData;
@@ -256,7 +250,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
       scalar_field =
           metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
       ALBANY_PANIC(
-          scalar_field == 0, std::runtime_error, "Error! Field not found.\n");
+          scalar_field == 0, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
           nodeId    = wsElNodeID[workset.wsIndex][cell][node];
@@ -269,7 +263,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
       vector_field =
           metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
       ALBANY_PANIC(
-          vector_field == 0, std::runtime_error, "Error! Field not found.\n");
+          vector_field == 0, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
           nodeId = wsElNodeID[workset.wsIndex][cell][node];
@@ -281,7 +275,6 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
     default:  // error!
       ALBANY_PANIC(
           true,
-          std::runtime_error,
           "Error! Unexpected field dimension (only node_scalar/node_vector for "
           "now).\n");
   }

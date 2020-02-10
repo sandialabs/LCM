@@ -298,9 +298,8 @@ J2HMCModel<EvalT, Traits>::computeStateParallel(
     FieldMap                  eval_fields)
 /******************************************************************************/
 {
-  ALBANY_PANIC(
-      true,
-      std::invalid_argument,
+  ALBANY_ASSERT(
+      false,
       ">>> ERROR (J2HMCModel): computeStateParallel not implemented");
 }
 

@@ -188,7 +188,6 @@ AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
   {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error! Unknown adaptivity method requested:" << method << " !"
             << std::endl
@@ -223,7 +222,6 @@ AdaptiveSolutionManager::adaptProblem()
     // If dynamic cast fails
     ALBANY_PANIC(
         base == Teuchos::null,
-        std::logic_error,
         std::endl
             << "Error! : Cast to Thyra::ModelEvaluatorDelegatorBase failed!"
             << std::endl);
@@ -234,7 +232,6 @@ AdaptiveSolutionManager::adaptProblem()
     // If dynamic cast fails
     ALBANY_PANIC(
         me == Teuchos::null,
-        std::logic_error,
         std::endl
             << "Error! : Cast to Albany::ModelEvaluator failed!" << std::endl);
 
@@ -262,7 +259,7 @@ AdaptiveSolutionManager::adaptProblem()
           "exiting Albany!"
        << std::endl;
 
-  ALBANY_PANIC(true, std::logic_error, "Mesh adaptation failed!\n");
+  ALBANY_ASSERT(false, "Mesh adaptation failed!\n");
 
   return false;
 }
@@ -340,7 +337,6 @@ AdaptiveSolutionManager::scatterX(
   if (!x_dot.is_null()) {
     ALBANY_PANIC(
         overlapped_soln->domain()->dim() < 2,
-        std::logic_error,
         "AdaptiveSolutionManager error: x_dot defined but only a single "
         "solution vector is available");
     cas_manager->scatter(
@@ -350,7 +346,6 @@ AdaptiveSolutionManager::scatterX(
   if (!x_dotdot.is_null()) {
     ALBANY_PANIC(
         overlapped_soln->domain()->dim() < 3,
-        std::logic_error,
         "AdaptiveSolutionManager error: x_dotdot defined but only two solution "
         "vectors are available");
     cas_manager->scatter(

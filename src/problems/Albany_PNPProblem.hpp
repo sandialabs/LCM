@@ -162,7 +162,6 @@ Albany::PNPProblem::constructEvaluators(
   ALBANY_PANIC(
       number_of_time_deriv != 0,
       //      number_of_time_deriv < 0 || number_of_time_deriv > 1,
-      std::logic_error,
       "Albany_PNPProblem must be defined as a steady calculation.");
   //      "Albany_PNPProblem must be defined as a steady or transient
   //      calculation.");

@@ -158,7 +158,6 @@ Albany::AdvDiffProblem::constructEvaluators(
   // exception if it is not
   ALBANY_PANIC(
       number_of_time_deriv != 1,
-      std::logic_error,
       "Albany_AdvDiffProblem must be defined as a transient calculation.");
 
   // Temporary variable used numerous times below

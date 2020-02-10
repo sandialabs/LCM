@@ -237,7 +237,6 @@ getTpetraVector(Thyra_Vector& v, const bool throw_if_not_tpetra)
   if (tv == nullptr) {
     ALBANY_PANIC(
         throw_if_not_tpetra,
-        BadThyraTpetraCast,
         "Error! Could not cast input Thyra_Vector to Thyra_TpetraVector.\n");
 
     return Teuchos::null;
@@ -246,7 +245,6 @@ getTpetraVector(Thyra_Vector& v, const bool throw_if_not_tpetra)
     // valid
     ALBANY_PANIC(
         tv->getTpetraVector().is_null(),
-        std::runtime_error,
         "Error! The Thyra_TpetraVector object stores a null pointer.\n");
 
     return tv->getTpetraVector();
@@ -261,7 +259,6 @@ getConstTpetraVector(const Thyra_Vector& v, const bool throw_if_not_tpetra)
   if (tv == nullptr) {
     ALBANY_PANIC(
         throw_if_not_tpetra,
-        BadThyraTpetraCast,
         "Error! Could not cast input Thyra_Vector to Thyra_TpetraVector.\n");
     return Teuchos::null;
   } else {
@@ -269,7 +266,6 @@ getConstTpetraVector(const Thyra_Vector& v, const bool throw_if_not_tpetra)
     // valid
     ALBANY_PANIC(
         tv->getConstTpetraVector().is_null(),
-        std::runtime_error,
         "Error! The Thyra_TpetraVector object stores a null pointer.\n");
 
     return tv->getConstTpetraVector();
@@ -284,7 +280,6 @@ getTpetraMultiVector(Thyra_MultiVector& mv, const bool throw_if_not_tpetra)
   if (tmv == nullptr) {
     ALBANY_PANIC(
         throw_if_not_tpetra,
-        BadThyraTpetraCast,
         "Error! Could not cast input Thyra_MultiVector to "
         "Thyra_TpetraMultiVector.\n");
     return Teuchos::null;
@@ -293,7 +288,6 @@ getTpetraMultiVector(Thyra_MultiVector& mv, const bool throw_if_not_tpetra)
     // valid
     ALBANY_PANIC(
         tmv->getTpetraMultiVector().is_null(),
-        std::runtime_error,
         "Error! The Thyra_TpetraMultiVector object stores a null pointer.\n");
     return tmv->getTpetraMultiVector();
   }
@@ -310,7 +304,6 @@ getConstTpetraMultiVector(
   if (tmv == nullptr) {
     ALBANY_PANIC(
         throw_if_not_tpetra,
-        BadThyraTpetraCast,
         "Error! Could not cast input Thyra_MultiVector to "
         "Thyra_TpetraMultiVector.\n");
     return Teuchos::null;
@@ -319,7 +312,6 @@ getConstTpetraMultiVector(
     // valid
     ALBANY_PANIC(
         tmv->getConstTpetraMultiVector().is_null(),
-        std::runtime_error,
         "Error! The Thyra_TpetraMultiVector object stores a null pointer.\n");
     return tmv->getConstTpetraMultiVector();
   }
@@ -333,7 +325,6 @@ getTpetraOperator(Thyra_LinearOp& lop, const bool throw_if_not_tpetra)
   if (top == nullptr) {
     ALBANY_PANIC(
         throw_if_not_tpetra,
-        BadThyraTpetraCast,
         "Error! Could not cast input Thyra_LinearOp to "
         "Thyra_TpetraLinearOp.\n");
     return Teuchos::null;
@@ -342,7 +333,6 @@ getTpetraOperator(Thyra_LinearOp& lop, const bool throw_if_not_tpetra)
     // valid
     ALBANY_PANIC(
         top->getTpetraOperator().is_null(),
-        std::runtime_error,
         "Error! The Thyra_TpetraLinearOp object stores a null pointer.\n");
     return top->getTpetraOperator();
   }
@@ -359,7 +349,6 @@ getConstTpetraOperator(
   if (top == nullptr) {
     ALBANY_PANIC(
         throw_if_not_tpetra,
-        BadThyraTpetraCast,
         "Error! Could not cast input Thyra_LinearOp to "
         "Thyra_TpetraLinearOp.\n");
     return Teuchos::null;
@@ -368,7 +357,6 @@ getConstTpetraOperator(
     // valid
     ALBANY_PANIC(
         top->getConstTpetraOperator().is_null(),
-        std::runtime_error,
         "Error! The Thyra_TpetraLinearOp object stores a null pointer.\n");
     return top->getConstTpetraOperator();
   }
@@ -386,7 +374,6 @@ getTpetraMatrix(Thyra_LinearOp& lop, const bool throw_if_not_tpetra)
     auto tmat = Teuchos::rcp_dynamic_cast<Tpetra_CrsMatrix>(top);
     ALBANY_PANIC(
         tmat.is_null(),
-        std::runtime_error,
         "Error! The Thyra_TpetraLinearOp object does not store a "
         "Tpetra_CrsMatrix.\n");
     return tmat;
@@ -406,7 +393,6 @@ getConstTpetraMatrix(const Thyra_LinearOp& lop, const bool throw_if_not_tpetra)
     auto tmat = Teuchos::rcp_dynamic_cast<const Tpetra_CrsMatrix>(top);
     ALBANY_PANIC(
         tmat.is_null(),
-        std::runtime_error,
         "Error! The Thyra_TpetraLinearOp object does not store a "
         "Tpetra_CrsMatrix.\n");
     return tmat;

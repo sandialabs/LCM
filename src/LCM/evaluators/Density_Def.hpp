@@ -58,7 +58,6 @@ Density<EvalT, Traits>::getValue(const std::string& n)
 
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in Density::getValue()" << std::endl);

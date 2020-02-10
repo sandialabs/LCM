@@ -23,12 +23,10 @@ TimeTracBC_Base<EvalT, Traits>::TimeTracBC_Base(Teuchos::ParameterList& p)
 
     ALBANY_PANIC(
         !(this->cellDims == BCValues.getNumCols()),
-        Teuchos::Exceptions::InvalidParameter,
         "Dimension of the current problem and \"BC Values\" do not match");
 
   ALBANY_PANIC(
       !(timeValues.size() == BCValues.getNumRows()),
-      Teuchos::Exceptions::InvalidParameter,
       "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
 
@@ -39,7 +37,6 @@ TimeTracBC_Base<EvalT, Traits>::computeVal(RealType time)
 {
   ALBANY_PANIC(
       time > timeValues.back(),
-      Teuchos::Exceptions::InvalidParameter,
       "Time is growing unbounded!");
   ScalarT      Val;
   RealType     slope;
@@ -65,7 +62,6 @@ TimeTracBC_Base<EvalT, Traits>::computeCoordVal(RealType time)
 {
   ALBANY_PANIC(
       time > timeValues.back(),
-      Teuchos::Exceptions::InvalidParameter,
       "Time is growing unbounded!");
   ScalarT      Val;
   RealType     slope;
@@ -119,7 +115,6 @@ TimeTracBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
       ALBANY_PANIC(
           true,
-          std::logic_error,
           "Time dependent Neumann boundary condition of type - "
               << this->bc_type << " is not supported");
       break;

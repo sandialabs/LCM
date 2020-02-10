@@ -99,7 +99,6 @@ NodalDataVector::getNDofsAndOffset(
 
   ALBANY_PANIC(
       (it == nodeVectorMap.end()),
-      std::logic_error,
       std::endl
           << "Error: cannot find state " << stateName << " in NodalDataVector"
           << std::endl);
@@ -144,7 +143,6 @@ NodalDataVector::saveNodalDataVector(
   Albany::NodeFieldContainer::const_iterator it = nodeContainer->find(name);
   ALBANY_PANIC(
       it == nodeContainer->end(),
-      std::logic_error,
       "Error: Cannot locate nodal field " << name << " in NodalDataVector");
   (*nodeContainer)[name]->saveFieldVector(overlap_node_vector, offset);
 }

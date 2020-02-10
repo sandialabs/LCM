@@ -48,7 +48,6 @@ Porosity<EvalT, Traits>::Porosity(
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid porosity type " << type);
   }
 
@@ -212,7 +211,6 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
                        (Temperature(cell, qp) - refTemperature(cell, qp));
 
             //          ALBANY_PANIC(J(cell,qp) <= 0,
-            //          std::runtime_error,
             //              " negative / zero volume detected in
             //              Porosity_def.hpp line " + __LINE__);
             // Note - J(cell, qp) equal to zero causes an FPE (GAH)
@@ -264,7 +262,6 @@ Porosity<EvalT, Traits>::getValue(const std::string& n)
     return GrainBulkModulus;
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting parameter " << n
           << " in Porosity::getValue()" << std::endl);

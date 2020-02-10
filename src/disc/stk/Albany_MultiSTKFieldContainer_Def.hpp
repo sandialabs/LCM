@@ -112,7 +112,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 
       ALBANY_PANIC(
           (solution_vector[vec_num].size() % 2),
-          std::logic_error,
           "Error in input file: specification of solution vector layout is "
           "incorrect."
               << std::endl);
@@ -145,7 +144,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
         } else {
           ALBANY_PANIC(
               true,
-              std::logic_error,
               "Error in input file: specification of solution vector layout is "
               "incorrect."
                   << std::endl);
@@ -153,7 +151,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
       }
       ALBANY_PANIC(
           accum != neq_,
-          std::logic_error,
           "Error in input file: specification of solution vector layout is "
           "incorrect."
               << std::endl);
@@ -192,7 +189,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 
     ALBANY_PANIC(
         (residual_vector.size() % 2),
-        std::logic_error,
         "Error in input file: specification of residual vector layout is "
         "incorrect."
             << std::endl);
@@ -225,7 +221,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
       } else {
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "Error in input file: specification of residual vector layout is "
             "incorrect."
                 << std::endl);
@@ -233,7 +228,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
     }
     ALBANY_PANIC(
         accum != neq_,
-        std::logic_error,
         "Error in input file: specification of residual vector layout is "
         "incorrect."
             << std::endl);
@@ -626,7 +620,6 @@ MultiSTKFieldContainer<Interleaved>::fillVectorImpl(
   } else {
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         "Error! Only scalar and vector fields supported so far.\n");
   }
 }
@@ -688,7 +681,6 @@ MultiSTKFieldContainer<Interleaved>::saveVectorImpl(
   } else {
     ALBANY_PANIC(
         true,
-        std::runtime_error,
         "Error! Only scalar and vector fields supported so far.\n");
   }
 }

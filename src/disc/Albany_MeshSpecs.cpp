@@ -41,7 +41,6 @@ MeshSpecsStruct::MeshSpecsStruct(
 {
   ALBANY_PANIC(
       cubatureDegree < 0,
-      Teuchos::Exceptions::InvalidArgument,
       "Error! Invalid cubature degree on element block '" << ebName << "'.\n");
 }
 

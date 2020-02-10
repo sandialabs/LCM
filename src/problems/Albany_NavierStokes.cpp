@@ -31,7 +31,7 @@ Albany::NavierStokes::getVariableType(
     variableType = NS_VAR_TYPE_DOF;
   else
     ALBANY_PANIC(
-        true, std::logic_error, "Unknown variable type " << type << std::endl);
+        true,  "Unknown variable type " << type << std::endl);
   haveVariable = (variableType != NS_VAR_TYPE_NONE);
   haveEquation = (variableType == NS_VAR_TYPE_DOF);
 }
@@ -125,7 +125,6 @@ Albany::NavierStokes::buildProblem(
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(
       meshSpecs.size() != 1,
-      std::logic_error,
       "Problem supports one Material Block");
 
   fm.resize(1);
@@ -253,7 +252,6 @@ Albany::NavierStokes::constructNeumannEvaluators(
   else
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 

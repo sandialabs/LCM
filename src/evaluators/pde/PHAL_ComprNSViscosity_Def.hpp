@@ -187,7 +187,6 @@ ComprNSViscosity<EvalT, Traits>::evaluateFields(
                             qFluctGrad(cell, qp, 3, 1));  // mu*(dv/dz + dw/dy)
         ALBANY_PANIC(
             true,
-            std::logic_error,
             "This next line has qFluct in it with the wrong indexing: there"
             " should be 3, not 4. Inspection does not reveal what should be"
             " fixed. I suspect qFluct should be qFluctGrad, but I can't be"

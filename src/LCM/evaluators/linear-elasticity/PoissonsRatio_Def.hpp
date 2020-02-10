@@ -42,7 +42,6 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
   } else {
     ALBANY_PANIC(
         true,
-        Teuchos::Exceptions::InvalidParameter,
         "Invalid Poissons ratio type " << type);
   }
 
@@ -115,7 +114,6 @@ PoissonsRatio<EvalT, Traits>::getValue(const std::string& n)
     return dnudT_value;
   ALBANY_PANIC(
       true,
-      Teuchos::Exceptions::InvalidParameter,
       std::endl
           << "Error! Logic error in getting paramter " << n
           << " in PoissonsRatio::getValue()" << std::endl);

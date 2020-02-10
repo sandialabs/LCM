@@ -65,7 +65,7 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   {
   };
 
-#ifdef KOKKOS_OPTIMIZED
+#if defined(KOKKOS_OPTIMIZED)
   typedef Kokkos::TeamPolicy<ExecutionSpace> team_policy;
   typedef team_policy::member_type           team_member;
   const int                                  work_size = 256;

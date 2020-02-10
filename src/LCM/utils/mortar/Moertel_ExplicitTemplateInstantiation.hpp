@@ -12,7 +12,7 @@
 #include "Moertel_config.h"
 
 // Use typedefs for ST, LO, GO, N at least for now
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 typedef double        ST;
 typedef int           LO;
 typedef long long int GO;
@@ -87,7 +87,7 @@ typedef Kokkos::Compat::
     name, name2, ScalarType, LocalOrdinal, GlobalOrdinal, NodeType) \
   template class name<name2<ScalarType, LocalOrdinal, GlobalOrdinal, NodeType>>;
 
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_INT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
 #define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DII(name)     \
   MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ST_LO_GO_N( \
       name, double, int, int, KokkosNode)
@@ -95,7 +95,7 @@ typedef Kokkos::Compat::
 #define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DII(name)
 #endif
 
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 #define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DILLI(name)   \
   MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ST_LO_GO_N( \
       name, double, int, long long, KokkosNode)

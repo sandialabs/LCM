@@ -71,7 +71,7 @@ SurfaceBasis<EvalT, Traits>::SurfaceBasis(
   num_surf_dims_ = cubature_->getDimension();
   num_dims_      = num_surf_dims_ + 1;
 
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
   std::cout << "in Surface Basis" << '\n';
   std::cout << " num_surf_nodes_: " << num_surf_nodes_ << '\n';
   std::cout << " num_surf_dims_: " << num_surf_dims_ << '\n';

@@ -527,7 +527,7 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS(
 }
 
 // ETI
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_INT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
 template bool
 MoertelT::NodeT<3, double, int, int, KokkosNode>::
     GetPtrstoSegments<double, int, int, KokkosNode>(
@@ -537,7 +537,7 @@ MoertelT::NodeT<2, double, int, int, KokkosNode>::
     GetPtrstoSegments<double, int, int, KokkosNode>(
         MoertelT::InterfaceT<double, int, int, KokkosNode>& interface);
 #endif
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 template bool
 MoertelT::NodeT<3, double, int, long long, KokkosNode>::
     GetPtrstoSegments<double, int, long long, KokkosNode>(

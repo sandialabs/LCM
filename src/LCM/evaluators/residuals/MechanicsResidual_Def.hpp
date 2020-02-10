@@ -13,7 +13,7 @@
 
 #include "Albany_config.h"
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
 

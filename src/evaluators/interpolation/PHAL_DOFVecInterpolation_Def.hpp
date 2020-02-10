@@ -3,7 +3,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
 #include "Intrepid2_FunctionSpaceTools.hpp"
@@ -103,7 +103,7 @@ void
 DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
 #endif
 
@@ -115,7 +115,7 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
           decltype(val_node),
           decltype(val_qp)>(BF, val_node, val_qp, numQPs, numNodes, vecDim));
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =

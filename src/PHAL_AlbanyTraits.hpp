@@ -44,7 +44,7 @@ template <>
 struct Ref<FadType> : RefKokkos<FadType>
 {
 };
-#ifdef ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE
+#if defined(ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE)
 template <>
 struct Ref<TanFadType> : RefKokkos<TanFadType>
 {

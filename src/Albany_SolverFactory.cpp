@@ -23,11 +23,11 @@
 #include "Teuchos_AbstractFactoryStd.hpp"
 #include "Thyra_Ifpack2PreconditionerFactory.hpp"
 
-#ifdef ALBANY_MUELU
+#if defined(ALBANY_MUELU)
 #include "Stratimikos_MueLuHelpers.hpp"
 #endif /* ALBANY_MUELU */
 
-#ifdef ALBANY_FROSCH
+#if defined(ALBANY_FROSCH)
 #include <Stratimikos_FROSchXpetra.hpp>
 #endif /* ALBANY_FROSCH */
 
@@ -51,7 +51,7 @@ enableIfpack2(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 void
 enableMueLu(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 {
-#ifdef ALBANY_MUELU
+#if defined(ALBANY_MUELU)
   Stratimikos::enableMueLu<LO, Tpetra_GO, KokkosNode>(linearSolverBuilder);
 #endif
 }
@@ -59,7 +59,7 @@ enableMueLu(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 void
 enableFROSch(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 {
-#ifdef ALBANY_FROSCH
+#if defined(ALBANY_FROSCH)
   Stratimikos::enableFROSch<LO, Tpetra_GO, KokkosNode>(linearSolverBuilder);
 #endif
 }

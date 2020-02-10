@@ -18,7 +18,7 @@
 
 namespace Albany {
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
 class ContactManager;
 #endif
 
@@ -128,7 +128,7 @@ class AbstractDiscretization
   setReferenceConfigurationManager(
       const Teuchos::RCP<AAdapt::rc::Manager>& rcm) = 0;
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
   //! Get the contact manager
   virtual Teuchos::RCP<const ContactManager>
   getContactManager() const = 0;

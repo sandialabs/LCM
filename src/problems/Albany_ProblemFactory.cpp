@@ -13,7 +13,7 @@
 #include "Albany_PopulateMesh.hpp"
 #include "Albany_SideLaplacianProblem.hpp"
 
-#ifdef ALBANY_DEMO_PDES
+#if defined(ALBANY_DEMO_PDES)
 #include "Albany_AdvDiffProblem.hpp"
 #include "Albany_CahnHillProblem.hpp"
 #include "Albany_ComprNSProblem.hpp"
@@ -81,7 +81,7 @@ Albany::ProblemFactory::create()
   } else if (method == "Side Laplacian 3D") {
     strategy = rcp(new Albany::SideLaplacian(problemParams, paramLib, 1));
   }
-#ifdef ALBANY_DEMO_PDES
+#if defined(ALBANY_DEMO_PDES)
   else if (method == "CahnHill 2D") {
     strategy =
         rcp(new Albany::CahnHillProblem(problemParams, paramLib, 2, commT));

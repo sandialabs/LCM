@@ -17,7 +17,7 @@
 #include "Albany_STKNodeFieldContainer.hpp"
 #include "Albany_Utils.hpp"
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
 #include "Albany_ContactManager.hpp"
 #endif
 
@@ -38,7 +38,7 @@
 #include <stk_util/parallel/Parallel.hpp>
 #include <string>
 
-#ifdef ALBANY_PAR_NETCDF
+#if defined(ALBANY_PAR_NETCDF)
 extern "C" {
 #include <netcdf_par.h>
 }
@@ -2387,7 +2387,7 @@ STKDiscretization::computeSideSets()
     ss++;
   }
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
   contactManager = Teuchos::rcp(
       new ContactManager(discParams, *this, stkMeshStruct->getMeshSpecs()));
 #endif
@@ -2619,7 +2619,7 @@ STKDiscretization::setupNetCDFOutput()
     netCDFp                = 0;
     netCDFOutputRequest    = 0;
 
-#ifdef ALBANY_PAR_NETCDF
+#if defined(ALBANY_PAR_NETCDF)
     MPI_Comm theMPIComm = getMpiCommFromTeuchosComm(comm);
     MPI_Info info;
     MPI_Info_create(&info);

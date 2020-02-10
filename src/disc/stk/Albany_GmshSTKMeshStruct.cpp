@@ -371,7 +371,7 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
   }
   bulkData->modification_end();
 
-#ifdef ALBANY_ZOLTAN
+#if defined(ALBANY_ZOLTAN)
   // Gmsh is for sure using a serial mesh. We hard code it here, in case the
   // user did not set it
   params->set<bool>("Use Serial Mesh", true);

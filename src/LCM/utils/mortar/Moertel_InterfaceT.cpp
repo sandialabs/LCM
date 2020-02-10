@@ -6,7 +6,7 @@
 
 #include "Moertel_ExplicitTemplateInstantiation.hpp"
 
-#ifdef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
+#if defined(HAVE_MOERTEL_EXPLICIT_INSTANTIATION)
 #include "Moertel_InterfaceT.hpp"
 #include "Moertel_InterfaceT_Complete_Def.hpp"
 #include "Moertel_InterfaceT_Integrate3D_Def.hpp"
@@ -21,13 +21,13 @@ MOERTEL_INSTANTIATE_TEMPLATE_CLASS(InterfaceT)
 }  // namespace MoertelT
 
 // non-member operators at global scope
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_INT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
 template std::ostream&
 operator<<(
     std::ostream&                                             os,
     const MoertelT::InterfaceT<double, int, int, KokkosNode>& inter);
 #endif
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 template std::ostream&
 operator<<(
     std::ostream&                                                   os,

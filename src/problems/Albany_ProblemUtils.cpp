@@ -45,7 +45,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
   if (len != std::string::npos) name = name.substr(0, len);
 
 // #define ALBANY_VERBOSE
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
   cout << "CellTopology is " << name << " with nodes " << numNodes << "  dim "
        << numDim << endl;
   cout << "FullCellTopology name is " << ctd.name << endl;
@@ -53,7 +53,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
 
   // 1D elements -- non-spectral basis
   if (name == "Line") {
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes << endl;
 #endif
     if (numNodes == 2)
@@ -66,7 +66,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
           "Albany::ProblemUtils::getIntrepid2Basis line element with "
               << numNodes << " nodes is not supported");
   } else if (name == "SpectralLine") {
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes << endl;
 #endif
     intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_LINE_Cn_FEM<PHX::Device>(
@@ -75,7 +75,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
 
   // 2D triangles -- non-spectral basis
   else if (name == "Triangle") {
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes << endl;
 #endif
     if (numNodes == 3)
@@ -93,7 +93,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
   else if (name == "SpectralTriangle") {
     // Use quadratic formula to get the element degree
     int deg = (int)(std::sqrt(0.25 + 2.0 * numNodes) - 0.5);
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes
          << ", deg = " << deg << endl;
 #endif
@@ -116,7 +116,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
 
   // 2D quadrilateral elements -- non spectral basis
   else if (name == "Quadrilateral" || name == "ShellQuadrilateral") {
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes << endl;
 #endif
     if (numNodes == 4)
@@ -140,7 +140,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
       name == "SpectralQuadrilateral" || name == "SpectralShellQuadrilateral") {
     // Compute the element degree
     int deg = (int)std::sqrt((double)numNodes);
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes
          << ", deg = " << deg << endl;
 #endif
@@ -176,7 +176,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
 
   // 3D hexahedron elements -- non-spectral
   else if (name == "Hexahedron") {
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes << endl;
 #endif
     if (numNodes == 8)
@@ -194,7 +194,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
   else if (name == "SpectralHexahedron") {
     // Compute the element degree
     int deg = (int)(std::pow((double)numNodes, 1.0 / 3.0));
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes
          << ", deg = " << deg << endl;
 #endif
@@ -242,7 +242,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
 bool
 mesh_depends_on_solution()
 {
-#ifdef ALBANY_MESH_DEPENDS_ON_SOLUTION
+#if defined(ALBANY_MESH_DEPENDS_ON_SOLUTION)
   return true;
 #else
   return false;
@@ -252,7 +252,7 @@ mesh_depends_on_solution()
 bool
 mesh_depends_on_parameters()
 {
-#ifdef ALBANY_MESH_DEPENDS_ON_PARAMETERS
+#if defined(ALBANY_MESH_DEPENDS_ON_PARAMETERS)
   return true;
 #else
   return false;
@@ -262,7 +262,7 @@ mesh_depends_on_parameters()
 bool
 params_depend_on_solution()
 {
-#ifdef ALBANY_PARAMETERS_DEPEND_ON_SOLUTION
+#if defined(ALBANY_PARAMETERS_DEPEND_ON_SOLUTION)
   return true;
 #else
   return false;

@@ -75,7 +75,7 @@
 // Damage equation specific evaluators
 #include "StabilizedPressureResidual.hpp"
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
 // Contact evaluator
 #include "PHAL_MortarContactResidual.hpp"
 #endif
@@ -168,7 +168,7 @@ MechanicsProblem::constructEvaluators(
       std::logic_error,
       "A material model must be defined for block: " + eb_name);
 
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
   *out << "In MechanicsProblem::constructEvaluators" << std::endl;
   *out << "element block name: " << eb_name << std::endl;
   *out << "material model name: " << material_model_name << std::endl;
@@ -268,7 +268,7 @@ MechanicsProblem::constructEvaluators(
   Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> surfaceCubature;
 
   if (surface_element == true) {
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     *out << "In Surface Element Logic" << std::endl;
 #endif
 
@@ -297,7 +297,7 @@ MechanicsProblem::constructEvaluators(
           *surfaceTopology, meshSpecs.cubatureDegree);
     }
 
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
     *out << "surfaceCubature->getNumPoints(): "
          << surfaceCubature->getNumPoints() << std::endl;
     *out << "surfaceCubature->getDimension(): "
@@ -310,7 +310,7 @@ MechanicsProblem::constructEvaluators(
 
   int const workset_size = meshSpecs.worksetSize;
 
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
   *out << "Setting num_pts_, surface element is " << surface_element
        << std::endl;
 #endif
@@ -323,7 +323,7 @@ MechanicsProblem::constructEvaluators(
   }
   num_vertices_ = num_nodes_;
 
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
   *out << "Field Dimensions: Workset=" << workset_size
        << ", Vertices= " << num_vertices_ << ", Nodes= " << num_nodes_
        << ", QuadPts= " << num_pts_ << ", Dim= " << num_dims_ << std::endl;
@@ -478,7 +478,7 @@ MechanicsProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(
         evalUtils.constructScatterResidualEvaluator(true, resid_names));
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
     fm0.template registerEvaluator<EvalT>(
         evalUtils.constructMortarContactResidualEvaluator(resid_names));
 #endif

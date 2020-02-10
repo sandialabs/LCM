@@ -145,7 +145,7 @@ class ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
   PHX::MDField<const RealType, Cell, Node, QuadPoint>    BF;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint> wBF;
 
-#ifdef PROJ_INTERP_TEST
+#if defined(PROJ_INTERP_TEST)
   PHX::MDField<ScalarT>                                 test_ip_field_;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coords_qp_;
 #endif

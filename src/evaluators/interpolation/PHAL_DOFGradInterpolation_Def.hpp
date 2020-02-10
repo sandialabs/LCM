@@ -4,7 +4,7 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
 
@@ -55,7 +55,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 
 // *********************************************************************
 // Kokkos functor Residual
-#ifdef KOKKOS_OPTIMIZED
+#if defined(KOKKOS_OPTIMIZED)
 template <typename EvalT, typename Traits, typename ScalarT>
 KOKKOS_INLINE_FUNCTION void
 DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
@@ -125,13 +125,13 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
   // Intrepid2::FunctionSpaceTools:: evaluate<ScalarT>(grad_val_qp, val_node,
   // GradBF);
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto start = std::chrono::high_resolution_clock::now();
 #endif
   //  Kokkos::deep_copy(grad_val_qp.get_kokkos_view(), 0.0);
 
-#ifdef KOKKOS_OPTIMIZED
+#if defined(KOKKOS_OPTIMIZED)
 
   threads_per_team = work_size;
   numTeams =
@@ -147,7 +147,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
       DOFGradInterpolationBase_Residual_Policy(0, workset.numCells), *this);
 #endif
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =
@@ -208,7 +208,7 @@ FastSolutionGradInterpolationBase<
   // Intrepid2::FunctionSpaceTools:: evaluate<ScalarT>(grad_val_qp, val_node,
   // GradBF);
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -220,7 +220,7 @@ FastSolutionGradInterpolationBase<
       FastSolutionGradInterpolationBase_Jacobian_Policy(0, workset.numCells),
       *this);
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =

@@ -505,7 +505,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
     : ProjectIPtoNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>(dl),
       wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       BF(p.get<std::string>("BF Name"), dl->node_qp_scalar),
-#ifdef PROJ_INTERP_TEST
+#if defined(PROJ_INTERP_TEST)
       coords_qp_(p.get<std::string>("Coordinate Vector Name"), dl->qp_gradient),
 #endif
       coords_verts_(
@@ -517,7 +517,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
 
   this->addDependentField(wBF);
   this->addDependentField(BF);
-#ifdef PROJ_INTERP_TEST
+#if defined(PROJ_INTERP_TEST)
   this->addDependentField(coords_qp_);
 #endif
   this->addDependentField(coords_verts_);
@@ -602,7 +602,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
         output_to_exodus_);
   }
 
-#ifdef PROJ_INTERP_TEST
+#if defined(PROJ_INTERP_TEST)
   ip_field_names_.push_back("linear");
   nodal_field_names_.push_back("proj_nodal_linear");
   ip_field_layouts_.push_back(EFieldLayout::scalar);
@@ -678,7 +678,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
   this->utils.setFieldData(wBF, fm);
   for (int field = 0; field < num_fields_; ++field)
     this->utils.setFieldData(ip_fields_[field], fm);
-#ifdef PROJ_INTERP_TEST
+#if defined(PROJ_INTERP_TEST)
   this->utils.setFieldData(coords_qp_, fm);
 #endif
   this->utils.setFieldData(coords_verts_, fm);
@@ -746,7 +746,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(
   auto ip_field_nonconstView = Albany::getNonconstLocalData(mgr_->ip_field);
 
   const int num_fields = num_fields_
-#ifdef PROJ_INTERP_TEST
+#if defined(PROJ_INTERP_TEST)
                          + 1
 #endif
       ;
@@ -792,7 +792,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(
   }    // field
 }
 
-#ifdef PROJ_INTERP_TEST
+#if defined(PROJ_INTERP_TEST)
 // For Tet<10>, the rhs needs to be integrated with >= degree-3 quadrature to
 // recover a linear function exactly.
 static double
@@ -815,7 +815,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   } else {
     mgr_->mass_linear_op->fill(workset, BF, wBF);
   }
-#ifdef PROJ_INTERP_TEST
+#if defined(PROJ_INTERP_TEST)
   for (unsigned int cell = 0; cell < workset.numCells; ++cell)
     for (std::size_t qp = 0; qp < num_pts_; ++qp)
       test_ip_field_(cell, qp) = test_fn(

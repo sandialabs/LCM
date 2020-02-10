@@ -186,7 +186,7 @@ class EvaluatorUtilsBase
         tensorRank, arcp_str(resid_name), offsetToFirstDOF, scatterName);
   }
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
   //! Function to create parameter list for construction of
   //! MortarContactResidual evaluator with standard Field names Tensor rank of
   //! solution variable is 0, 1, or 2
@@ -534,7 +534,7 @@ class EvaluatorUtilsImpl : public EvaluatorUtilsBase<Traits>
       int                            offsetToFirstDOF = 0,
       std::string                    scatterName      = "Scatter") const;
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
   //! Function to create parameter list for construction of
   //! MortarContactResidual evaluator with standard Field names Tensor rank of
   //! solution variable is 0, 1, or 2

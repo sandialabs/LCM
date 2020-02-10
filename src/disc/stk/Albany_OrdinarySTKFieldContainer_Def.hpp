@@ -27,7 +27,7 @@ static const char* sol_id_name[3] = {"solution",
                                      "solution_dot",
                                      "solution_dotdot"};
 
-#ifdef ALBANY_DTK
+#if defined(ALBANY_DTK)
 static const char* sol_dtk_id_name[3] = {"solution dtk",
                                          "solution_dot dtk",
                                          "solution_dotdot dtk"};
@@ -37,7 +37,7 @@ static const char* res_tag_name[1] = {
     "Exodus Residual Name",
 };
 
-#ifdef ALBANY_DTK
+#if defined(ALBANY_DTK)
 static const char* sol_dtk_tag_name[3] = {"Exodus Solution DTK Name",
                                           "Exodus SolutionDot DTK Name",
                                           "Exodus SolutionDotDot DTK Name"};
@@ -70,7 +70,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
   int num_time_deriv = params_->get<int>("Number Of Time Derivatives");
 
-#ifdef ALBANY_DTK
+#if defined(ALBANY_DTK)
   int output_dtk_field =
       params_->get<bool>("Output DTK Field to Exodus", false);
 #endif

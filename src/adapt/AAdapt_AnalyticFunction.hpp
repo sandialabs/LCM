@@ -18,7 +18,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include "Teuchos_Array.hpp"
-#ifdef ALBANY_PAMGEN
+#if defined(ALBANY_PAMGEN)
 #include "RTC_FunctionRTC.hh"
 #endif
 
@@ -815,7 +815,7 @@ class ExpressionParser : public AnalyticFunction
   std::string expressionX;
   std::string expressionY;
   std::string expressionZ;
-#ifdef ALBANY_PAMGEN
+#if defined(ALBANY_PAMGEN)
   PG_RuntimeCompiler::Function rtcFunctionX;
   PG_RuntimeCompiler::Function rtcFunctionY;
   PG_RuntimeCompiler::Function rtcFunctionZ;

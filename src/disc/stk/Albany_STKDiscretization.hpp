@@ -249,7 +249,7 @@ class STKDiscretization : public AbstractDiscretization
   setReferenceConfigurationManager(
       const Teuchos::RCP<AAdapt::rc::Manager>& rcm);
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
   //! Get the contact manager
   Teuchos::RCP<const ContactManager>
   getContactManager() const
@@ -689,7 +689,7 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<Teuchos::ArrayRCP<double*>>::type edge_boundary_indicator;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type node_boundary_indicator;
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
   Teuchos::RCP<ContactManager> contactManager;
 #endif
 

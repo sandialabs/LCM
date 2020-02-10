@@ -935,12 +935,12 @@ Albany::StateManager::getResidResponseIDsToRequire(
     ebName = (*st)->nameMap[name];
     if (id.length() > 0 && ebName == elementBlockName) {
       idsToRequire.push_back(id);
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
       cout << "RRR1  " << name << " requiring " << id << " (" << i << ")"
            << endl;
 #endif
     } else {
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
       cout << "RRR1  " << name << " empty (" << i << ")" << endl;
 #endif
     }

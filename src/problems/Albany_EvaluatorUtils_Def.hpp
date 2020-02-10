@@ -7,7 +7,7 @@
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_GeneralPurposeFieldsNames.hpp"
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
 #include "PHAL_MortarContactResidual.hpp"
 #endif
 
@@ -408,7 +408,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
   return rcp(new PHAL::ScatterResidual<EvalT, Traits>(*p, dl));
 }
 
-#ifdef ALBANY_CONTACT
+#if defined(ALBANY_CONTACT)
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
 Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::

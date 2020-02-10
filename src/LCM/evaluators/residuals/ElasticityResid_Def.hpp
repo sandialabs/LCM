@@ -56,7 +56,7 @@ ElasticityResid<EvalT, Traits>::ElasticityResid(Teuchos::ParameterList& p)
     this->addDependentField(uDotDot);
   }
 
-#ifdef HARD_CODED_BODY_FORCE_ELASTICITY_RESID
+#if defined(HARD_CODED_BODY_FORCE_ELASTICITY_RESID)
   Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl =
       p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
   wBF =
@@ -89,7 +89,7 @@ ElasticityResid<EvalT, Traits>::postRegistrationSetup(
 
   if (enableTransient) this->utils.setFieldData(uDotDot, fm);
 
-#ifdef HARD_CODED_BODY_FORCE_ELASTICITY_RESID
+#if defined(HARD_CODED_BODY_FORCE_ELASTICITY_RESID)
   this->utils.setFieldData(wBF, fm);
 #else
   if (enableTransient) this->utils.setFieldData(wBF, fm);
@@ -128,7 +128,7 @@ ElasticityResid<EvalT, Traits>::evaluateFields(
     }
   }
 
-#ifdef HARD_CODED_BODY_FORCE_ELASTICITY_RESID
+#if defined(HARD_CODED_BODY_FORCE_ELASTICITY_RESID)
   std::vector<double> body_force(3);
   body_force[0] = 5.1732283464566922;
   body_force[1] = 0.0;

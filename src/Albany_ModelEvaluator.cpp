@@ -749,7 +749,7 @@ ModelEvaluator::evalModelImpl(
   // Setup Phalanx data before functions are computed
   app->getPhxSetup()->pre_eval();
 
-#ifdef WRITE_STIFFNESS_MATRIX_TO_MM_FILE
+#if defined(WRITE_STIFFNESS_MATRIX_TO_MM_FILE)
   // IK, 4/24/15: write stiffness matrix to matrix market file
   // Warning: to read this in to MATLAB correctly, code must be run in serial.
   // Otherwise Mass will have a distributed Map which would also need to be
@@ -774,7 +774,7 @@ ModelEvaluator::evalModelImpl(
   writeMatrixMarket(W_op_out->domain(), "domain_space.mm");
 #endif
 
-#ifdef WRITE_MASS_MATRIX_TO_MM_FILE
+#if defined(WRITE_MASS_MATRIX_TO_MM_FILE)
   // IK, 4/24/15: write mass matrix to matrix market file
   // Warning: to read this in to MATLAB correctly, code must be run in serial.
   // Otherwise Mass will have a distributed Map which would also need to be

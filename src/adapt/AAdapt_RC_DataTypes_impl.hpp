@@ -19,7 +19,7 @@ namespace rc {
  *  every AD type Albany_DataTypes.hpp defines. Type is RealType, FadType, etc,
  *  and arg2 is a user's argument.
  */
-#ifdef ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE
+#if defined(ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE)
 #define aadapt_rc_apply_to_all_ad_types(macro, arg2) \
   macro(RealType, arg2) macro(FadType, arg2) macro(TanFadType, arg2)
 #else

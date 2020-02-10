@@ -11,7 +11,7 @@
 #include "Teuchos_TestForException.hpp"
 
 // LAME material models
-#ifdef ALBANY_LAME
+#if defined(ALBANY_LAME)
 #include "models/development/CrystalPlasticity.h"
 #include "models/development/FeFp.h"
 #include "models/production/DuctileFracture.h"
@@ -46,7 +46,7 @@ constructLameMaterialModel(
 
   Teuchos::RCP<LameMaterial> materialModel;
 
-#ifdef ALBANY_LAME
+#if defined(ALBANY_LAME)
   if (materialModelName == "ELASTIC")
     materialModel = Teuchos::rcp(new lame::Elastic(props));
   else if (materialModelName == "NEO_HOOKEAN")
@@ -77,7 +77,7 @@ constructLameMaterialModel(
             materialModelName + ")\n");
 #endif
 
-#ifdef ALBANY_LAMENT
+#if defined(ALBANY_LAMENT)
   if (materialModelName == "ELASTIC_NEW")
     materialModel = Teuchos::rcp(new lament::ElasticNew<double>(props));
   else if (materialModelName == "NEOHOOKEAN")

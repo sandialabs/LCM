@@ -4,7 +4,7 @@
 #include "Teuchos_Comm.hpp"
 #include "Teuchos_RCP.hpp"
 
-#ifdef ALBANY_MPI
+#if defined(ALBANY_MPI)
 #include <mpi.h>
 
 #include <Teuchos_DefaultMpiComm.hpp>
@@ -24,7 +24,7 @@ gatherAllV(
     Teuchos::Array<GO>&                     allVals)
 {
   const int myCount = myVals.size();
-#ifdef ALBANY_MPI
+#if defined(ALBANY_MPI)
   if (const Teuchos::MpiComm<int>* mpiComm =
           dynamic_cast<const Teuchos::MpiComm<int>*>(comm.get())) {
     MPI_Comm rawComm = (*mpiComm->getRawMpiComm().get())();
@@ -77,7 +77,7 @@ gatherV(
     const LO                                root_rank)
 {
   const int myCount = myVals.size();
-#ifdef ALBANY_MPI
+#if defined(ALBANY_MPI)
   if (const Teuchos::MpiComm<int>* mpiComm =
           dynamic_cast<const Teuchos::MpiComm<int>*>(comm.get())) {
     MPI_Comm rawComm = (*mpiComm->getRawMpiComm().get())();

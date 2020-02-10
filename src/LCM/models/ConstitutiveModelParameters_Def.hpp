@@ -3,7 +3,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
 

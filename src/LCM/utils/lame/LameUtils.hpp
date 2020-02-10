@@ -11,13 +11,13 @@
 #include "Teuchos_RCP.hpp"
 
 // LAME material model base class
-#ifdef ALBANY_LAME
+#if defined(ALBANY_LAME)
 #include <models/Material.h>
 typedef lame::MatProps  LameMatProps;
 typedef lame::Material  LameMaterial;
 typedef lame::matParams LameMatParams;
 #endif
-#ifdef ALBANY_LAMENT
+#if defined(ALBANY_LAMENT)
 #include <models/Lament_Material.h>
 
 #include "models/Lament_ElasticNew.h"
@@ -84,7 +84,7 @@ constructLameMaterialModel(
     const std::string             lameMaterialModelName,
     const Teuchos::ParameterList& lameMaterialParameters);
 
-#ifdef ALBANY_LAMENT
+#if defined(ALBANY_LAMENT)
 //! Instantiate a lament::MaterialModel<ADType> given the model name and a set
 //! of material parameters.
 template <typename ScalarT>

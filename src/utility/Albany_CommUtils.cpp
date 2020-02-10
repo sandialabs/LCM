@@ -50,7 +50,7 @@ Teuchos::RCP<const Teuchos_Comm>
 createTeuchosCommFromThyraComm(
     const Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>& tc_in)
 {
-#ifdef HAVE_MPI
+#if defined(HAVE_MPI)
   const Teuchos::RCP<const Teuchos::MpiComm<Teuchos::Ordinal>> mpiCommIn =
       Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<Teuchos::Ordinal>>(
           tc_in);
@@ -69,7 +69,7 @@ createTeuchosCommFromThyraComm(
 Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>
 createThyraCommFromTeuchosComm(const Teuchos::RCP<const Teuchos_Comm>& tc_in)
 {
-#ifdef HAVE_MPI
+#if defined(HAVE_MPI)
   const Teuchos::RCP<const Teuchos::MpiComm<int>> mpiCommIn =
       Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(tc_in);
   if (nonnull(mpiCommIn)) {

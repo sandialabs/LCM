@@ -162,7 +162,7 @@ AAdapt::TopologyMod::showRelations()
   }
 }
 
-#ifdef ALBANY_MPI
+#if defined(ALBANY_MPI)
 //----------------------------------------------------------------------------
 int
 AAdapt::TopologyMod::accumulateFractured(int num_fractured)

@@ -6,7 +6,7 @@
 
 #include "Moertel_ExplicitTemplateInstantiation.hpp"
 
-#ifdef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
+#if defined(HAVE_MOERTEL_EXPLICIT_INSTANTIATION)
 #include "Moertel_ManagerT.hpp"
 #include "Moertel_ManagerT_Def.hpp"
 

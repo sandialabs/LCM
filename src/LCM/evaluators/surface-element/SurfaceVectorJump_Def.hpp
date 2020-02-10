@@ -41,7 +41,7 @@ SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(
   num_plane_nodes_ = num_nodes_ / 2;
   num_plane_dims_  = num_dims_ - 1;
 
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
   std::cout << "in Surface Vector Jump" << '\n';
   std::cout << " num_plane_nodes_: " << num_plane_nodes_ << '\n';
   std::cout << " num_plane_dims_: " << num_plane_dims_ << '\n';

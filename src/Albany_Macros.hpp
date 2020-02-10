@@ -34,7 +34,7 @@
 
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")
 
-#ifdef NDEBUG
+#if defined(NDEBUG)
 #define ALBANY_EXPECT(...)
 #else
 #define ALBANY_EXPECT(...) ALBANY_ASSERT(__VA_ARGS__)

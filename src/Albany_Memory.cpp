@@ -12,14 +12,14 @@
 #include <sstream>
 #include <vector>
 
-#ifdef ALBANY_HAVE_MALLINFO
+#if defined(ALBANY_HAVE_MALLINFO)
 #include <malloc.h>
 #endif
-#ifdef ALBANY_HAVE_GETRUSAGE
+#if defined(ALBANY_HAVE_GETRUSAGE)
 #include <sys/resource.h>
 #include <sys/time.h>
 #endif
-#ifdef ALBANY_HAVE_KERNELGETMEMORYSIZE
+#if defined(ALBANY_HAVE_KERNELGETMEMORYSIZE)
 // For RPI BG/Q.
 #include <spi/include/kernel/memory.h>
 #endif
@@ -28,7 +28,7 @@ namespace Albany {
 namespace {
 class MemoryAnalyzer
 {
-#ifdef HAVE_TEUCHOS_LONG_LONG_INT
+#if defined(HAVE_TEUCHOS_LONG_LONG_INT)
   typedef long long int Int;
 #else
   typedef int Int;
@@ -83,7 +83,7 @@ class MemoryAnalyzer
   static void
   collectMallinfo(Int* data)
   {
-#ifdef ALBANY_HAVE_MALLINFO
+#if defined(ALBANY_HAVE_MALLINFO)
     struct mallinfo mi = mallinfo();
 #define setd(name) data[mi_##name] = mi.name
     setd(arena);
@@ -103,7 +103,7 @@ class MemoryAnalyzer
   static void
   collectGetrusage(Int* data)
   {
-#ifdef ALBANY_HAVE_GETRUSAGE
+#if defined(ALBANY_HAVE_GETRUSAGE)
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
 #define setd(name) data[ru_##name] = static_cast<Int>(ru.ru_##name)
@@ -128,7 +128,7 @@ class MemoryAnalyzer
   static void
   collectKernelGetMemorySize(Int* data)
   {
-#ifdef ALBANY_HAVE_KERNELGETMEMORYSIZE
+#if defined(ALBANY_HAVE_KERNELGETMEMORYSIZE)
     uint64_t shared, persist, heapavail, stackavail, stack, heap, guard, mmap;
     Kernel_GetMemorySize(KERNEL_MEMSIZE_SHARED, &shared);
     Kernel_GetMemorySize(KERNEL_MEMSIZE_PERSIST, &persist);

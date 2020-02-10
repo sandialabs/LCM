@@ -23,7 +23,7 @@
 #include "Albany_CommTypes.hpp"
 
 // Code macros to support deprecated warnings
-#ifdef ALBANY_ENABLE_DEPRECATED
+#if defined(ALBANY_ENABLE_DEPRECATED)
 #if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
 #define ALBANY_DEPRECATED __attribute__((__deprecated__))
 #else

@@ -6,7 +6,7 @@
 
 #include "Moertel_ExplicitTemplateInstantiation.hpp"
 
-#ifdef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
+#if defined(HAVE_MOERTEL_EXPLICIT_INSTANTIATION)
 #include "Moertel_Projector3DT_Def.hpp"
 #include "Moertel_ProjectorT.hpp"
 #include "Moertel_ProjectorT_Def.hpp"
@@ -18,7 +18,7 @@ MOERTEL_INSTANTIATE_TEMPLATE_CLASS(ProjectorT)
 }  // namespace MoertelT
 
 // non-member operators at global scope
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_INT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
 template std::ostream&
 operator<<(
     std::ostream&                                                os,
@@ -28,7 +28,7 @@ operator<<(
     std::ostream&                                                os,
     const MoertelT::ProjectorT<2, double, int, int, KokkosNode>& inter);
 #endif
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 template std::ostream&
 operator<<(
     std::ostream&                                                      os,

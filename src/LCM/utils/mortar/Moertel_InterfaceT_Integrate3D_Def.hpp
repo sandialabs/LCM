@@ -890,7 +890,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator
       curr;
 
-#ifdef PDANDM  // Save and print the D and M for debugging
+#if defined(PDANDM)  // Save and print the D and M for debugging
   int              size = rnode_[sside].size();
   int              cnt  = 0;
   std::vector<int> dtable(size);
@@ -944,7 +944,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
         if (abs(val) <
             CONSTRAINT_MATRIX_ZERO)  // this entry of D is effectively zero
           continue;
-#ifdef PDANDM  // Save the row, col, and value
+#if defined(PDANDM)  // Save the row, col, and value
         Dmat.insertGlobalValues(curr->second->Id(), 1, &val, &colnode);
 #endif
 
@@ -1014,7 +1014,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 
           // std::cout << "Current colmnode: " << colnode << std::endl;
           //
-#ifdef PDANDM  // Save the row, col, and value
+#if defined(PDANDM)  // Save the row, col, and value
         Mmat.insertGlobalValues(curr->second->Id(), 1, &val, &colnode);
 #endif
 
@@ -1437,7 +1437,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
     valM_s.clear();
   }  // if (lComm()->NumProc()!=1)
 
-#ifdef PDANDM
+#if defined(PDANDM)
   //  Dmat.Print(std::cout);
   //  Mmat.Print(std::cout);
   Dmat.describe(std::cout);

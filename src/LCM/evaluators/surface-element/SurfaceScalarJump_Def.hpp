@@ -99,7 +99,7 @@ SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
   numPlaneNodes = numNodes / 2;
   numPlaneDims  = numDims - 1;
 
-#ifdef ALBANY_VERBOSE
+#if defined(ALBANY_VERBOSE)
   std::cout << "in Surface Scalar Jump" << std::endl;
   std::cout << " numPlaneNodes: " << numPlaneNodes << std::endl;
   std::cout << " numPlaneDims: " << numPlaneDims << std::endl;

@@ -11,7 +11,7 @@
 #include "Teuchos_ParameterList.hpp"
 
 // Refinement
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
 #include <stk_adapt/UniformRefinerPattern.hpp>
 #include <stk_percept/PerceptMesh.hpp>
 #endif
@@ -29,7 +29,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>&
   getMeshSpecs() const;
 
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
   Teuchos::RCP<stk::percept::PerceptMesh>
   getPerceptMesh()
   {
@@ -242,7 +242,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
 
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs;
 
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
   Teuchos::RCP<stk::percept::PerceptMesh>             eMesh;
   Teuchos::RCP<stk::adapt::UniformRefinerPatternBase> refinerPattern;
 #endif

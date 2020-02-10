@@ -3,7 +3,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
 
@@ -89,7 +89,7 @@ void
 DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -97,7 +97,7 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
   Kokkos::parallel_for(
       DOFVecGradInterpolationBase_Residual_Policy(0, workset.numCells), *this);
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =
@@ -156,7 +156,7 @@ FastSolutionVecGradInterpolationBase<
     typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
     evaluateFields(typename Traits::EvalData workset)
 {
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
 #endif
 
@@ -167,7 +167,7 @@ FastSolutionVecGradInterpolationBase<
       FastSolutionVecGradInterpolationBase_Jacobian_Policy(0, workset.numCells),
       *this);
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =

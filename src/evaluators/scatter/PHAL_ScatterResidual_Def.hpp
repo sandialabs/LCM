@@ -4,7 +4,7 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
 
@@ -175,7 +175,7 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 {
   Teuchos::RCP<Thyra_Vector> f = workset.f;
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
 #endif
   // Get map for local data structures
@@ -202,7 +202,7 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     cudaCheckError();
   }
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =
@@ -479,7 +479,7 @@ void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
 #endif
   // Get map for local data structures
@@ -548,7 +548,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     }
   }
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =

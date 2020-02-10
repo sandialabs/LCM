@@ -7,7 +7,7 @@
 #include "Moertel_InterfaceT.hpp"
 #include "Moertel_UtilsT.hpp"
 
-#ifdef HAVE_MOERTEL_MPI
+#if defined(HAVE_MOERTEL_MPI)
 #include <Teuchos_DefaultMpiComm.hpp>
 #else
 #include <Teuchos_DefaultSerialComm.hpp>
@@ -143,7 +143,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
   // this intra-communicator will be used to handle most stuff on this
   // interface so the interface will not block all other procs
   {
-#ifdef HAVE_MOERTEL_MPI
+#if defined(HAVE_MOERTEL_MPI)
     std::vector<int> lin(gcomm_->getSize());
     std::vector<int> gin(gcomm_->getSize());
     for (int i = 0; i < gcomm_->getSize(); ++i) lin[i] = 0;
@@ -202,7 +202,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
       throw MoertelT::ReportError(oss);
     }
     lcomm_ = Teuchos::rcp(new Teuchos::SerialComm<LO>(*serialcomm));
-#endif  // end of #ifdef PARALLEL
+#endif
   }
 
   //-------------------------------------------------------------------

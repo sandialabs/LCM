@@ -110,10 +110,10 @@ class LameProblem : public Albany::AbstractProblem
 #include "DefGrad.hpp"
 #include "PHAL_Source.hpp"
 #include "Strain.hpp"
-#ifdef ALBANY_LAME
+#if defined(ALBANY_LAME)
 #include "lame/LameStress.hpp"
 #endif
-#ifdef ALBANY_LAMENT
+#if defined(ALBANY_LAMENT)
 #include "lame/LamentStress.hpp"
 #endif
 #include "ElasticityResid.hpp"
@@ -317,11 +317,11 @@ Albany::LameProblem::constructEvaluators(
     // always double)
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl->qp_scalar);
 
-#ifdef ALBANY_LAME
+#if defined(ALBANY_LAME)
     ev = rcp(new LCM::LameStress<EvalT, AlbanyTraits>(*p));
 #endif
 
-#ifdef ALBANY_LAMENT
+#if defined(ALBANY_LAMENT)
     ev = rcp(new LCM::LamentStress<EvalT, AlbanyTraits>(*p));
 #endif
 

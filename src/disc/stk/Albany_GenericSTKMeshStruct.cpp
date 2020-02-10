@@ -25,12 +25,12 @@
 #include "Teuchos_VerboseObject.hpp"
 
 // Expression reading
-#ifdef ALBANY_PANZER_EXPR_EVAL
+#if defined(ALBANY_PANZER_EXPR_EVAL)
 #include <Panzer_ExprEval_impl.hpp>
 #endif
 
 // Rebalance
-#ifdef ALBANY_ZOLTAN
+#if defined(ALBANY_ZOLTAN)
 #include <percept/stk_rebalance/Partition.hpp>
 #include <percept/stk_rebalance/Rebalance.hpp>
 #include <percept/stk_rebalance/ZoltanPartition.hpp>
@@ -38,7 +38,7 @@
 #endif
 
 // Refinement
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
 #include <stk_adapt/UniformRefiner.hpp>
 #include <stk_adapt/UniformRefinerPattern.hpp>
 #endif
@@ -287,7 +287,7 @@ GenericSTKMeshStruct::SetupFieldData(
   transferSolutionToCoords =
       params->get<bool>("Transfer Solution to Coordinates", false);
 
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
   // Build the eMesh if needed
   if (buildEMesh)
 
@@ -348,7 +348,7 @@ GenericSTKMeshStruct::buildPerceptEMesh()
 bool
 GenericSTKMeshStruct::buildUniformRefiner()
 {
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
 
   stk::adapt::BlockNamesType block_names(stk::percept::EntityRankEnd + 1u);
 
@@ -389,7 +389,7 @@ GenericSTKMeshStruct::buildUniformRefiner()
 bool
 GenericSTKMeshStruct::buildLocalRefiner()
 {
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
 
   if (adaptParams.is_null()) return false;
 
@@ -607,7 +607,7 @@ void
 GenericSTKMeshStruct::uniformRefineMesh(
     const Teuchos::RCP<const Teuchos_Comm>& comm)
 {
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
   // Refine if requested
   if (!uniformRefinementInitialized) return;
 
@@ -665,7 +665,7 @@ GenericSTKMeshStruct::rebalanceAdaptedMeshT(
     const Teuchos::RCP<const Teuchos::Comm<int>>& comm)
 {
 // Zoltan is required here
-#ifdef ALBANY_ZOLTAN
+#if defined(ALBANY_ZOLTAN)
 
   using std::cout;
   using std::endl;
@@ -1806,7 +1806,7 @@ GenericSTKMeshStruct::computeField(
     bool                                         layered,
     const Teuchos::RCP<Teuchos::FancyOStream>    out)
 {
-#ifdef ALBANY_PANZER_EXPR_EVAL
+#if defined(ALBANY_PANZER_EXPR_EVAL)
   // Only nodal fields allowed, no layered fields
   TEUCHOS_TEST_FOR_EXCEPTION(
       !nodal,
@@ -2195,7 +2195,7 @@ GenericSTKMeshStruct::checkInput(
     std::string value,
     std::string allowed_values)
 {
-#ifdef ALBANY_STK_PERCEPT
+#if defined(ALBANY_STK_PERCEPT)
   std::vector<std::string> vals = stk::adapt::Util::split(allowed_values, ", ");
   for (unsigned i = 0; i < vals.size(); i++) {
     if (vals[i] == value) return;
@@ -2251,7 +2251,7 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
       "",
       "Name of residual output vector written to Exodus file. Requires SEACAS "
       "build");
-#ifdef ALBANY_DTK
+#if defined(ALBANY_DTK)
   validPL->set<std::string>(
       "Exodus Solution DTK Name",
       "",

@@ -336,7 +336,7 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   const auto& xdot    = workset.xdot;
   const auto& xdotdot = workset.xdotdot;
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
 #endif
 
@@ -425,7 +425,7 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     }
   }
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =
@@ -635,7 +635,7 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   const auto& xdot    = workset.xdot;
   const auto& xdotdot = workset.xdotdot;
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
 #endif
 
@@ -732,7 +732,7 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     }
   }
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =

@@ -821,7 +821,7 @@ AAdapt::ExpressionParser::ExpressionParser(
 
   bool success;
 
-#ifdef ALBANY_PAMGEN
+#if defined(ALBANY_PAMGEN)
   // set up RTCompiler
   rtcFunctionX.addVar("double", "x");
   rtcFunctionX.addVar("double", "y");
@@ -871,7 +871,7 @@ AAdapt::ExpressionParser::compute(double* solution, const double* X)
   bool   success;
   double value;
 
-#ifdef ALBANY_PAMGEN
+#if defined(ALBANY_PAMGEN)
   for (int i = 0; i < spatialDim; i++) {
     success = rtcFunctionX.varValueFill(i, X[i]);
     TEUCHOS_TEST_FOR_EXCEPT_MSG(

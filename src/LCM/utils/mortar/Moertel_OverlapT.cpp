@@ -6,7 +6,7 @@
 
 #include "Moertel_ExplicitTemplateInstantiation.hpp"
 
-#ifdef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
+#if defined(HAVE_MOERTEL_EXPLICIT_INSTANTIATION)
 #include "Moertel_Convexhull_Def.hpp"
 #include "Moertel_OverlapT.hpp"
 #include "Moertel_OverlapT_Def.hpp"
@@ -15,7 +15,7 @@
 
 namespace MoertelT {
 
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_INT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
 MOERTEL_INSTANTIATE_NESTED_TEMPLATE_CLASS_ST_LO_GO_N(
     MoertelT::OverlapT,
     MoertelT::InterfaceT,
@@ -24,7 +24,7 @@ MOERTEL_INSTANTIATE_NESTED_TEMPLATE_CLASS_ST_LO_GO_N(
     int,
     KokkosNode)
 #endif
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 MOERTEL_INSTANTIATE_NESTED_TEMPLATE_CLASS_ST_LO_GO_N(
     MoertelT::OverlapT,
     MoertelT::InterfaceT,

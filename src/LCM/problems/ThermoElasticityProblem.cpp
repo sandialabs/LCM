@@ -27,7 +27,7 @@ Albany::ThermoElasticityProblem::ThermoElasticityProblem(
 
 // Changing this ifdef changes ordering from  (X,Y,T) to (T,X,Y)
 //#define NUMBER_T_FIRST
-#ifdef NUMBER_T_FIRST
+#if defined(NUMBER_T_FIRST)
   T_offset = 0;
   X_offset = 1;
 #else

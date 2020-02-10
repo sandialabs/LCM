@@ -10,7 +10,7 @@
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>
 #include <Teuchos_TestForException.hpp>
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
 
@@ -194,7 +194,7 @@ template <typename EvalT, typename Traits>
 void
 FirstPK<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
 #endif
   // Copy stress_ to first_pk_stress_.
@@ -209,7 +209,7 @@ FirstPK<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     // small-strain case, this transformation is Identity.
     Kokkos::parallel_for(no_small_strain_Policy(0, workset.numCells), *this);
   }
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto      elapsed = std::chrono::high_resolution_clock::now() - start;
   long long microseconds =

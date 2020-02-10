@@ -80,7 +80,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   //          linear does not require Zoltan or metis
   if (params->get<bool>("Use Serial Mesh", false) && commT->getSize() > 1) {
     //    Option  external  reads the nemesis files, and must be the default
-#ifdef ALBANY_ZOLTAN
+#if defined(ALBANY_ZOLTAN)
     mesh_data->property_add(Ioss::Property("DECOMPOSITION_METHOD", "rib"));
 #else
     mesh_data->property_add(Ioss::Property("DECOMPOSITION_METHOD", "linear"));
@@ -380,7 +380,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
    * This code is only compiled if ALBANY_MPI and ALBANY_ZOLTAN are true
    */
 
-#ifdef ALBANY_ZOLTAN  // rebalance needs Zoltan
+#if defined(ALBANY_ZOLTAN)  // rebalance needs Zoltan
 
   if (useSerialMesh) {
     // trick to avoid hanging

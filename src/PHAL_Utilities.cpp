@@ -231,7 +231,7 @@ broadcast(
   copy<ScalarT>(v, a);
 }
 
-#ifdef ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE
+#if defined(ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE)
 #define apply_to_all_ad_types(macro) \
   macro(RealType) macro(FadType) macro(TanFadType)
 #else

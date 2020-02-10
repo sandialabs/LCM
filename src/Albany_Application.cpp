@@ -157,7 +157,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   else
     num_time_deriv = num_time_deriv_from_input;
 
-#ifdef ALBANY_DTK
+#if defined(ALBANY_DTK)
   if (is_schwarz_ == true) {
     // Write DTK Field to Exodus if Schwarz is used
     discParams.set<bool>("Output DTK Field to Exodus", true);
@@ -1264,7 +1264,7 @@ Application::computeGlobalResidualImpl(
   }
 
   // Allocate scaleVec_
-#ifdef ALBANY_MPI
+#if defined(ALBANY_MPI)
   if (scale != 1.0) {
     if (scaleVec_ == Teuchos::null) {
       scaleVec_ = Thyra::createMember(f->space());

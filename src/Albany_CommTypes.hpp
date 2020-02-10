@@ -13,7 +13,7 @@
 // Get Teuchos Comm type
 #include "Teuchos_DefaultComm.hpp"
 
-#ifdef ALBANY_MPI
+#if defined(ALBANY_MPI)
 using Albany_MPI_Comm = MPI_Comm;
 
 #define Albany_MPI_COMM_WORLD MPI_COMM_WORLD

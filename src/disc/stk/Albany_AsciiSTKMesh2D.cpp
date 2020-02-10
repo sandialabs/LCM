@@ -406,7 +406,7 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
   }
   bulkData->modification_end();
 
-#ifdef ALBANY_ZOLTAN
+#if defined(ALBANY_ZOLTAN)
   // Ascii2D is for sure using a serial mesh. We hard code here the rebalance
   // options, in case the user did not set it
   params->set<bool>("Use Serial Mesh", true);

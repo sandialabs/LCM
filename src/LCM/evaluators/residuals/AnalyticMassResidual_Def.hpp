@@ -11,7 +11,7 @@
 #include <Sacado_ParameterRegistration.hpp>
 #include <Teuchos_TestForException.hpp>
 
-#ifdef ALBANY_TIMER
+#if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
 

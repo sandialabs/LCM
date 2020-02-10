@@ -881,12 +881,12 @@ MOERTEL::Function* MOERTEL::Segment::GetFunction(int id)
 #endif
 
 // ETI
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_INT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
 template bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::
     GetPtrstoNodes<double, int, int, KokkosNode>(
         MoertelT::InterfaceT<double, int, int, KokkosNode>& interface);
 #endif
-#ifdef HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT
+#if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 template bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::
     GetPtrstoNodes<double, int, long long, KokkosNode>(
         MoertelT::InterfaceT<double, int, long long, KokkosNode>& interface);

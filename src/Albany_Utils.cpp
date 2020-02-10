@@ -22,7 +22,6 @@
 #include "Albany_Utils.hpp"
 #include "Kokkos_Macros.hpp"
 #include "MatrixMarket_Tpetra.hpp"
-#include "Albany_Macros.hpp"
 
 namespace Albany {
 

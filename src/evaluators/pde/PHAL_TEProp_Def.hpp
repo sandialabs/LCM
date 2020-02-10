@@ -6,9 +6,9 @@
 
 #include <fstream>
 
+#include "Albany_Macros.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Albany_Macros.hpp"
 
 template <typename EvalT, typename Traits>
 PHAL::TEProp<EvalT, Traits>::TEProp(Teuchos::ParameterList& p)

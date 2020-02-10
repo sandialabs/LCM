@@ -7,7 +7,6 @@
 #include "Albany_MaterialDatabase.hpp"
 
 #include "Albany_Macros.hpp"
-#include "Albany_Macros.hpp"
 #include "Teuchos_XMLParameterListHelpers.hpp"
 #include "Teuchos_YamlParameterListHelpers.hpp"
 

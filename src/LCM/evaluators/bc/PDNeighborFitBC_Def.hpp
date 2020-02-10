@@ -4,11 +4,11 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
+#include "Albany_Macros.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Genereric Template Code for Constructor and PostRegistrationSetup

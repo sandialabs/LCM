@@ -6,9 +6,9 @@
 
 #include <MiniTensor.h>
 
+#include "Albany_Macros.hpp"
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace LCM {
 

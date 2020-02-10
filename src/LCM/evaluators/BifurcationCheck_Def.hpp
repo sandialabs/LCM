@@ -7,10 +7,10 @@
 #include <random>
 #include <typeinfo>
 
+#include "Albany_Macros.hpp"
 #include "LocalNonlinearSolver.hpp"
 #include "MiniTensor.h"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace LCM {
 

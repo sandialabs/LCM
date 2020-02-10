@@ -17,7 +17,6 @@
 #include <Ionit_Initializer.h>
 #include <Ioss_SubSystem.h>
 
-#include "Albany_Macros.hpp"
 #include <Intrepid_FieldContainer.hpp>
 #include <Teuchos_Array.hpp>
 #include <Teuchos_ArrayRCP.hpp>
@@ -53,6 +52,7 @@
 #include <stk_util/parallel/Parallel.hpp>
 #include <vector>
 
+#include "Albany_Macros.hpp"
 #include "DTK_MapOperatorFactory.hpp"
 #include "DTK_STKMeshHelpers.hpp"
 #include "DTK_STKMeshManager.hpp"
@@ -246,18 +246,18 @@ interp_and_calc_error(
   int tgt_timestep_count = tgt_io_region->get_property("state_count").get_int();
 
   if (src_timestep_count < 1) {
-    ALBANY_PANIC(true,
-                               Teuchos::Exceptions::InvalidParameter,
-                               std::endl
-                                   << "Source file has 0 snapshots!"
-                 << std::endl);
+    ALBANY_PANIC(
+        true,
+        Teuchos::Exceptions::InvalidParameter,
+        std::endl
+            << "Source file has 0 snapshots!" << std::endl);
   }
   if (tgt_timestep_count < 1) {
-    ALBANY_PANIC(true,
-                               Teuchos::Exceptions::InvalidParameter,
-                               std::endl
-                                   << "Taret file has 0 snapshots!"
-                 << std::endl);
+    ALBANY_PANIC(
+        true,
+        Teuchos::Exceptions::InvalidParameter,
+        std::endl
+            << "Taret file has 0 snapshots!" << std::endl);
   }
   if (((src_snap_no == -1) && (tgt_snap_no != -1)) ||
       ((tgt_snap_no == -1) && (src_snap_no != -1))) {
@@ -297,7 +297,7 @@ interp_and_calc_error(
               << "Number of snapshots in source mesh file must equal number of "
               << "snapshots in target mesh file when Target Mesh Snapshot "
                  "Number = Source Mesh "
-          << "Snapshot Number = -1." << std::endl);
+              << "Snapshot Number = -1." << std::endl);
     } else {
       tgt_time_step_indices.resize(tgt_timestep_count);
       src_time_step_indices.resize(tgt_timestep_count);

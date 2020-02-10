@@ -8,11 +8,11 @@
 #include "Albany_CombineAndScatterManager.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_SeparableScatterScalarResponse.hpp"
 #include "PHAL_Utilities.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Base Class Generic Implemtation

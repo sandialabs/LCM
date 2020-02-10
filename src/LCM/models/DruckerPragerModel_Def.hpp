@@ -9,9 +9,9 @@
 #include <Intrepid2_FunctionSpaceTools.hpp>
 #include <typeinfo>
 
+#include "Albany_Macros.hpp"
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace LCM {
 

@@ -6,9 +6,8 @@
 
 #include "Albany_ProblemUtils.hpp"
 
-#include "Albany_config.h"
 #include "Albany_Macros.hpp"
-
+#include "Albany_config.h"
 #include "Intrepid2_HGRAD_HEX_C1_FEM.hpp"
 #include "Intrepid2_HGRAD_HEX_C2_FEM.hpp"
 #include "Intrepid2_HGRAD_LINE_C1_FEM.hpp"

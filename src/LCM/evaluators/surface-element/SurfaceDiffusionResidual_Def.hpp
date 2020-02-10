@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#include "Phalanx_DataLayout.hpp"
 #include "Albany_Macros.hpp"
+#include "Phalanx_DataLayout.hpp"
 
 namespace LCM {
 

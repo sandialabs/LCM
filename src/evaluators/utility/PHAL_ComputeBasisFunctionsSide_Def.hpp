@@ -4,9 +4,9 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
+#include "Albany_Macros.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 // uncomment the following line if you want debug output to be printed to screen
 

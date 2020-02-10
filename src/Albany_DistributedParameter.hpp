@@ -10,10 +10,10 @@
 #include <string>
 
 #include "Albany_CombineAndScatterManager.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_StateInfoStruct.hpp"  // For IDArray
 #include "Albany_ThyraTypes.hpp"
 #include "Teuchos_RCP.hpp"
-#include "Albany_Macros.hpp"
 
 namespace Albany {
 

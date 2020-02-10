@@ -6,10 +6,10 @@
 
 #include <fstream>
 
+#include "Albany_Macros.hpp"
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Albany_Macros.hpp"
 
 // Radom field types
 /*

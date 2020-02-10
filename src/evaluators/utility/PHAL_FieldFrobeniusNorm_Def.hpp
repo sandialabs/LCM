@@ -238,8 +238,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(
       }
       break;
     default:
-      ALBANY_PANIC(
-          true, std::logic_error, "Error! Invalid field layout.\n");
+      ALBANY_PANIC(true, std::logic_error, "Error! Invalid field layout.\n");
   }
 }
 

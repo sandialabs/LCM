@@ -15,7 +15,6 @@
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_ScatterResidual.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Base Class Generic Implemtation

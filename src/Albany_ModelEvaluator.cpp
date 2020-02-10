@@ -9,9 +9,9 @@
 #include "Albany_Application.hpp"
 #include "Albany_DistributedParameterDerivativeOp.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Teuchos_ScalarTraits.hpp"
-#include "Albany_Macros.hpp"
 
 // uncomment the following to write stuff out to matrix market to debug
 

@@ -5,10 +5,10 @@
 //
 
 #include "Albany_AbstractDiscretization.hpp"
+#include "Albany_Macros.hpp"
 #include "PHAL_LoadSideSetStateField.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Shards_CellTopology.hpp"
-#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 namespace PHAL {

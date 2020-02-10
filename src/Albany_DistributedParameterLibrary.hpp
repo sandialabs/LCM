@@ -10,8 +10,8 @@
 #include <map>
 
 #include "Albany_DistributedParameter.hpp"
-#include "Teuchos_RCP.hpp"
 #include "Albany_Macros.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 

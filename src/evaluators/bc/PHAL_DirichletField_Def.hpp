@@ -7,12 +7,12 @@
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_NodalDOFManager.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_DirichletField.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Genereric Template Code for Constructor and PostRegistrationSetup

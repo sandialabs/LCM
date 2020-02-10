@@ -7,10 +7,10 @@
 // Currently disabled until the PHX::MDField interface is fixed
 #if 0
 
+#include "Albany_Macros.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "LCM/evaluators/SetField.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace LCM {
 

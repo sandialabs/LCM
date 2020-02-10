@@ -8,10 +8,10 @@
 #include <vector>
 
 #include "Albany_EigendataInfoStruct.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_GatherEigenvectors.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace PHAL {
 

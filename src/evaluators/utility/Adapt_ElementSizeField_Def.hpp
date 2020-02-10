@@ -9,8 +9,8 @@
 #include "Adapt_ElementSizeField.hpp"
 #include "Adapt_NodalDataVector.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
-#include "Albany_StateManager.hpp"
 #include "Albany_Macros.hpp"
+#include "Albany_StateManager.hpp"
 
 template <typename T>
 T

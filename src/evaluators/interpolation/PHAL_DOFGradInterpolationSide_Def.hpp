@@ -5,10 +5,10 @@
 //
 
 #include "Albany_DiscretizationUtils.hpp"
+#include "Albany_Macros.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "PHAL_DOFGradInterpolationSide.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace PHAL {
 

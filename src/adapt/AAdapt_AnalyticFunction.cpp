@@ -10,8 +10,8 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "Teuchos_Exceptions.hpp"
 #include "Albany_Macros.hpp"
+#include "Teuchos_Exceptions.hpp"
 
 const double pi = 3.141592653589793;
 

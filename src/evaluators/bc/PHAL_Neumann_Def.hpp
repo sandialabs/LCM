@@ -4,6 +4,7 @@
 //
 
 #include "Albany_DistributedParameterLibrary.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
@@ -11,7 +12,6 @@
 #include "PHAL_Neumann.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Albany_Macros.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
 

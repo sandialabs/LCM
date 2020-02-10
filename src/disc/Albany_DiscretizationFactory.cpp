@@ -11,11 +11,11 @@
 #include "Albany_GenericSTKMeshStruct.hpp"
 #include "Albany_GmshSTKMeshStruct.hpp"
 #include "Albany_IossSTKMeshStruct.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_STK3DPointStruct.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "Albany_TmplSTKMeshStruct.hpp"
-#include "Albany_Macros.hpp"
 #include "Topology_Utils.hpp"
 
 Albany::DiscretizationFactory::DiscretizationFactory(

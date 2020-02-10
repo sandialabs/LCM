@@ -262,8 +262,7 @@ AdaptiveSolutionManager::adaptProblem()
           "exiting Albany!"
        << std::endl;
 
-  ALBANY_PANIC(
-      true, std::logic_error, "Mesh adaptation failed!\n");
+  ALBANY_PANIC(true, std::logic_error, "Mesh adaptation failed!\n");
 
   return false;
 }

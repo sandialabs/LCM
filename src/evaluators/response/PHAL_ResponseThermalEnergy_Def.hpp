@@ -5,9 +5,9 @@
 //
 #include <typeinfo>
 
+#include "Albany_Macros.hpp"
 #include "PHAL_Utilities.hpp"
 #include "Teuchos_CommHelpers.hpp"
-#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 template <typename EvalT, typename Traits>

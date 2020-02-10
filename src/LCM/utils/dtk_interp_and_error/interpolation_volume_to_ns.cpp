@@ -18,7 +18,6 @@
 #include <Ionit_Initializer.h>
 #include <Ioss_SubSystem.h>
 
-#include "Albany_Macros.hpp"
 #include <Intrepid_FieldContainer.hpp>
 #include <Teuchos_Array.hpp>
 #include <Teuchos_ArrayRCP.hpp>
@@ -54,6 +53,7 @@
 #include <stk_util/parallel/Parallel.hpp>
 #include <vector>
 
+#include "Albany_Macros.hpp"
 #include "DTK_MapOperatorFactory.hpp"
 #include "DTK_STKMeshHelpers.hpp"
 #include "DTK_STKMeshManager.hpp"

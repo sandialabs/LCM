@@ -10,10 +10,10 @@
 #include <Teuchos_DefaultMpiComm.hpp>
 #endif
 
+#include "Albany_Macros.hpp"
 #include "Teuchos_Array.hpp"
 #include "Teuchos_DefaultSerialComm.hpp"
 #include "Teuchos_Details_MpiTypeTraits.hpp"
-#include "Albany_Macros.hpp"
 
 namespace Albany {
 

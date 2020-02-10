@@ -8,8 +8,8 @@
 
 #include <PHAL_Utilities.hpp>
 
-#include "Phalanx_DataLayout.hpp"
 #include "Albany_Macros.hpp"
+#include "Phalanx_DataLayout.hpp"
 #if defined(ALBANY_TIMER)
 #include <chrono>
 #endif

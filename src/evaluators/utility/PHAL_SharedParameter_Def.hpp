@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
+#include "Albany_Macros.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -130,8 +130,7 @@ SharedParameterVec<EvalT, Traits>::getValue(const std::string& n)
   for (int i = 0; i < numParams; ++i)
     if (n == paramNames[i]) return paramValues[i];
 
-  ALBANY_PANIC(
-      true, std::runtime_error, "Error! Parameter name not found.\n");
+  ALBANY_PANIC(true, std::runtime_error, "Error! Parameter name not found.\n");
 
   // To avoid warnings
   static ScalarT dummy;

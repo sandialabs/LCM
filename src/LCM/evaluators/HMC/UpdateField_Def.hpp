@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
-#include "Phalanx_DataLayout.hpp"
 #include "Albany_Macros.hpp"
+#include "Phalanx_DataLayout.hpp"
 
 namespace LCM {
 

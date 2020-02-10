@@ -10,11 +10,11 @@
 #include <iostream>
 #include <sstream>
 
+#include "Albany_Macros.hpp"
 #include "Albany_Utils.hpp"
 #include "Sacado_ParameterAccessor.hpp"
 #include "Sacado_ParameterRegistration.hpp"
 #include "Teuchos_Array.hpp"
-#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 namespace PHAL {

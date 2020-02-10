@@ -1,8 +1,8 @@
 #include "Albany_MeshSpecs.hpp"
 
+#include "Albany_Macros.hpp"
 #include "Shards_BasicTopologies.hpp"
 #include "Shards_CellTopologyTraits.hpp"
-#include "Albany_Macros.hpp"
 
 namespace Albany {
 

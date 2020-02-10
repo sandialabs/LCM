@@ -6,9 +6,9 @@
 #if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
+#include "Albany_Macros.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace PHAL {
 

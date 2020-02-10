@@ -65,8 +65,7 @@ read(const Albany::MDArray& mda, PHX::MDField<RealType>& f)
           f(cell, qp, i0, i1) = mda(cell, qp, i0, i1);
       break;
     default:
-      ALBANY_PANIC(
-          true, std::logic_error, "dims.size() \notin {2,3,4}.");
+      ALBANY_PANIC(true, std::logic_error, "dims.size() \notin {2,3,4}.");
   }
 }
 
@@ -87,8 +86,7 @@ write(Albany::MDArray& mda, const MDArray& f)
           mda(cell, qp, i0, i1) = f(cell, qp, i0, i1);
       break;
     default:
-      ALBANY_PANIC(
-          true, std::logic_error, "dims.size() \notin {2,3,4}.");
+      ALBANY_PANIC(true, std::logic_error, "dims.size() \notin {2,3,4}.");
   }
 }
 
@@ -331,9 +329,7 @@ Projector::fillRhs(
       for (int qp = 0; qp < num_qp; ++qp) {
         switch (rank) {
           case 0:
-          case 1:
-            ALBANY_PANIC(true, std::logic_error, "!impl");
-            break;
+          case 1: ALBANY_PANIC(true, std::logic_error, "!impl"); break;
           case 2: {
             switch (transformation) {
               case Transformation::none: {
@@ -426,9 +422,7 @@ Projector::interp(
     for (int qp = 0; qp < num_qp; ++qp) {
       switch (rank) {
         case 0:
-        case 1:
-          ALBANY_PANIC(true, std::logic_error, "!impl");
-          break;
+        case 1: ALBANY_PANIC(true, std::logic_error, "!impl"); break;
         case 2: {
           for (int i = 0; i < ndim; ++i)
             for (int j = 0; j < ndim; ++j) mda1(cell, qp, i, j) = 0;
@@ -1001,8 +995,7 @@ const Teuchos::RCP<Thyra_MultiVector>&
 Manager::getNodalField(const Field& f, const int g_idx, const bool overlapped)
     const
 {
-  ALBANY_PANIC(
-      !overlapped, std::logic_error, "must be overlapped");
+  ALBANY_PANIC(!overlapped, std::logic_error, "must be overlapped");
   return f.data_->mv[g_idx];
 }
 

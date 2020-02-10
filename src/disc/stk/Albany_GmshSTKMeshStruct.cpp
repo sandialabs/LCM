@@ -6,12 +6,10 @@
 
 #include "Albany_GmshSTKMeshStruct.hpp"
 
-#include <iostream>
-
-#include "Albany_Macros.hpp"
 #include <Albany_STKNodeSharing.hpp>
-#include "Albany_Utils.hpp"
 #include <Shards_BasicTopologies.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <iostream>
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
@@ -19,10 +17,10 @@
 #include <stk_mesh/base/GetEntities.hpp>
 #include <stk_mesh/base/Selector.hpp>
 
+#include "Albany_Macros.hpp"
+#include "Albany_Utils.hpp"
 #include "Teuchos_CommHelpers.hpp"
 #include "Teuchos_VerboseObject.hpp"
-
-#include <boost/algorithm/string/predicate.hpp>
 
 Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
@@ -529,8 +527,7 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(
-        true, std::runtime_error, "Error! Invalid mesh dimension.\n");
+    ALBANY_PANIC(true, std::runtime_error, "Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section
@@ -825,7 +822,7 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
         std::logic_error,
         "Error! Could not determine if mesh was first or second order.\n"
             << "Checked for number of 2pt lines and 3pt lines, both are "
-        "non-zero. \n");
+               "non-zero. \n");
   }
 
   return;
@@ -913,8 +910,7 @@ Albany::GmshSTKMeshStruct::set_generic_mesh_info()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(
-        true, std::runtime_error, "Error! Invalid mesh dimension.\n");
+    ALBANY_PANIC(true, std::runtime_error, "Error! Invalid mesh dimension.\n");
   }
   return;
 }
@@ -1308,8 +1304,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(
-        true, std::runtime_error, "Error! Invalid mesh dimension.\n");
+    ALBANY_PANIC(true, std::runtime_error, "Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section

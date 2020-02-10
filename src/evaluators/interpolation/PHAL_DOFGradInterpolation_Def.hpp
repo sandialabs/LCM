@@ -8,11 +8,11 @@
 #include <chrono>
 #endif
 
+#include "Albany_Macros.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_DOFGradInterpolation.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace PHAL {
 

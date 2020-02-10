@@ -3,9 +3,9 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
+#include "Albany_Macros.hpp"
 #include "PHAL_Utilities.hpp"
 #include "Teuchos_CommHelpers.hpp"
-#include "Albany_Macros.hpp"
 
 namespace PHAL {
 

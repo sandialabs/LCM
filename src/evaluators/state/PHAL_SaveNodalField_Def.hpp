@@ -7,9 +7,9 @@
 #include <fstream>
 
 #include "Adapt_NodalDataVector.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_StateManager.hpp"
 #include "PHAL_SaveNodalField.hpp"
-#include "Albany_Macros.hpp"
 
 namespace PHAL {
 

@@ -11,6 +11,7 @@
 #include "Albany_FieldManagerResidualOnlyResponseFunction.hpp"
 #include "Albany_FieldManagerScalarResponseFunction.hpp"
 #include "Albany_KLResponseFunction.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_SolutionAverageResponseFunction.hpp"
 #include "Albany_SolutionFileResponseFunction.hpp"
 #include "Albany_SolutionMaxValueResponseFunction.hpp"
@@ -18,7 +19,6 @@
 #include "Albany_SolutionResponseFunction.hpp"
 #include "Albany_SolutionTwoNormResponseFunction.hpp"
 #include "Albany_SolutionValuesResponseFunction.hpp"
-#include "Albany_Macros.hpp"
 
 void
 Albany::ResponseFactory::createResponseFunction(

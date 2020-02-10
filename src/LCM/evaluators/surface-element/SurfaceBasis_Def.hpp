@@ -3,10 +3,10 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
+#include "Albany_Macros.hpp"
 #include "MiniTensor.h"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_MathFunctions.hpp"
-#include "Albany_Macros.hpp"
 
 namespace LCM {
 

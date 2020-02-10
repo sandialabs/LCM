@@ -7,6 +7,7 @@
 #include "AAAModel.hpp"
 #include "ACEice.hpp"
 #include "ACEpermafrost.hpp"
+#include "Albany_Macros.hpp"
 #include "AnisotropicDamageModel.hpp"
 #include "AnisotropicHyperelasticDamageModel.hpp"
 #include "AnisotropicViscoplasticModel.hpp"
@@ -40,7 +41,6 @@
 #include "RIHMRModel.hpp"
 #include "StVenantKirchhoffModel.hpp"
 #include "Teuchos_RCP.hpp"
-#include "Albany_Macros.hpp"
 #include "TvergaardHutchinsonModel.hpp"
 #include "ViscoElasticModel.hpp"
 

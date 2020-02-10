@@ -8,10 +8,10 @@
 
 #include <cmath>
 
+#include "Albany_Macros.hpp"
 #include "MiniTensor.h"
 #include "MiniTensor_Definitions.h"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace LCM {
 

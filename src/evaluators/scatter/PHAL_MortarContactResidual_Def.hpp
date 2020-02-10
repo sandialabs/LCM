@@ -7,9 +7,9 @@
 #include <chrono>
 #endif
 #include "Albany_ContactManager.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Base Class Generic Implemtation

@@ -12,7 +12,6 @@
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_GatherSolution.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 namespace PHAL {
 

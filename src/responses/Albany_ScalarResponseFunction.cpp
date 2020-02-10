@@ -6,8 +6,8 @@
 
 #include "Albany_ScalarResponseFunction.hpp"
 
-#include "Albany_ThyraUtils.hpp"
 #include "Albany_Macros.hpp"
+#include "Albany_ThyraUtils.hpp"
 
 namespace Albany {
 

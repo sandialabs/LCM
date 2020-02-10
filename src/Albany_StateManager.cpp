@@ -5,8 +5,8 @@
 //
 #include "Albany_StateManager.hpp"
 
-#include "Albany_Utils.hpp"
 #include "Albany_Macros.hpp"
+#include "Albany_Utils.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 Albany::StateManager::StateManager()

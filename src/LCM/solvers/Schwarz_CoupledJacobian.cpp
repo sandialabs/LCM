@@ -6,9 +6,9 @@
 
 #include "Schwarz_CoupledJacobian.hpp"
 
+#include "Albany_Macros.hpp"
 #include "Albany_Utils.hpp"
 #include "Teuchos_ParameterListExceptions.hpp"
-#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 #include "Thyra_DefaultBlockedLinearOp.hpp"
 

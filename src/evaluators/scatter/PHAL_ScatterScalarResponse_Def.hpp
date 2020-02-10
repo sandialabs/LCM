@@ -4,10 +4,10 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_Utilities.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Base Class Generic Implemtation

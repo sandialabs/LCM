@@ -11,8 +11,8 @@
 
 #include <iostream>
 
-#include "Phalanx_DataLayout.hpp"
 #include "Albany_Macros.hpp"
+#include "Phalanx_DataLayout.hpp"
 #include "utility/math/Tensor.hpp"
 
 namespace LCM {

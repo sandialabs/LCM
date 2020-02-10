@@ -562,7 +562,7 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
   if (scale == 1.0) scaleBCdofs = false;
 
   if ((scale != 1.0) && (problem->useSDBCs() == true)) {
-    ALBANY_ASSERT(false, "'Scaling' sublist not recognized when using SDBCs.");
+    ALBANY_ABORT("'Scaling' sublist not recognized when using SDBCs.");
   }
 }
 
@@ -587,77 +587,74 @@ Application::finalSetUp(
       comm));
   if (Teuchos::nonnull(rc_mgr)) rc_mgr->setSolutionManager(solMgr);
 
-  try {
-    // Create Distributed parameters and initialize them with data stored in the
-    // mesh.
-    const StateInfoStruct& distParamSIS = disc->getNodalParameterSIS();
-    for (size_t is = 0; is < distParamSIS.size(); is++) {
-      // Get name of distributed parameter
-      const std::string& param_name = distParamSIS[is]->name;
+  // Create Distributed parameters and initialize them with data stored in the
+  // mesh.
+  const StateInfoStruct& distParamSIS = disc->getNodalParameterSIS();
+  for (size_t is = 0; is < distParamSIS.size(); is++) {
+    // Get name of distributed parameter
+    const std::string& param_name = distParamSIS[is]->name;
 
-      // Get parameter vector spaces and build parameter vector
-      // Create distributed parameter and set workset_elem_dofs
-      Teuchos::RCP<DistributedParameter> parameter(new DistributedParameter(
-          param_name,
-          disc->getVectorSpace(param_name),
-          disc->getOverlapVectorSpace(param_name)));
-      parameter->set_workset_elem_dofs(
-          Teuchos::rcpFromRef(disc->getElNodeEqID(param_name)));
+    // Get parameter vector spaces and build parameter vector
+    // Create distributed parameter and set workset_elem_dofs
+    Teuchos::RCP<DistributedParameter> parameter(new DistributedParameter(
+        param_name,
+        disc->getVectorSpace(param_name),
+        disc->getOverlapVectorSpace(param_name)));
+    parameter->set_workset_elem_dofs(
+        Teuchos::rcpFromRef(disc->getElNodeEqID(param_name)));
 
-      // Get the vector and lower/upper bounds, and fill them with available
-      // data
-      Teuchos::RCP<Thyra_Vector> dist_param = parameter->vector();
-      Teuchos::RCP<Thyra_Vector> dist_param_lowerbound =
-          parameter->lower_bounds_vector();
-      Teuchos::RCP<Thyra_Vector> dist_param_upperbound =
-          parameter->upper_bounds_vector();
+    // Get the vector and lower/upper bounds, and fill them with available
+    // data
+    Teuchos::RCP<Thyra_Vector> dist_param = parameter->vector();
+    Teuchos::RCP<Thyra_Vector> dist_param_lowerbound =
+        parameter->lower_bounds_vector();
+    Teuchos::RCP<Thyra_Vector> dist_param_upperbound =
+        parameter->upper_bounds_vector();
 
-      std::stringstream lowerbound_name, upperbound_name;
-      lowerbound_name << param_name << "_lowerbound";
-      upperbound_name << param_name << "_upperbound";
+    std::stringstream lowerbound_name, upperbound_name;
+    lowerbound_name << param_name << "_lowerbound";
+    upperbound_name << param_name << "_upperbound";
 
-      // Initialize parameter with data stored in the mesh
-      disc->getField(*dist_param, param_name);
-      const auto& nodal_param_states = disc->getNodalParameterSIS();
-      bool        has_lowerbound(false), has_upperbound(false);
-      for (int ist = 0; ist < static_cast<int>(nodal_param_states.size());
-           ist++) {
-        has_lowerbound = has_lowerbound || (nodal_param_states[ist]->name ==
-                                            lowerbound_name.str());
-        has_upperbound = has_upperbound || (nodal_param_states[ist]->name ==
-                                            upperbound_name.str());
-      }
-      if (has_lowerbound) {
-        disc->getField(*dist_param_lowerbound, lowerbound_name.str());
-      } else {
-        dist_param_lowerbound->assign(std::numeric_limits<ST>::lowest());
-      }
-      if (has_upperbound) {
-        disc->getField(*dist_param_upperbound, upperbound_name.str());
-      } else {
-        dist_param_upperbound->assign(std::numeric_limits<ST>::max());
-      }
-      // JR: for now, initialize to constant value from user input if requested.
-      // This needs to be generalized.
-      if (params->sublist("Problem").isType<Teuchos::ParameterList>(
-              "Topology Parameters")) {
-        Teuchos::ParameterList& topoParams =
-            params->sublist("Problem").sublist("Topology Parameters");
-        if (topoParams.isType<std::string>("Entity Type") &&
-            topoParams.isType<double>("Initial Value")) {
-          if (topoParams.get<std::string>("Entity Type") ==
-                  "Distributed Parameter" &&
-              topoParams.get<std::string>("Topology Name") == param_name) {
-            double initVal = topoParams.get<double>("Initial Value");
-            dist_param->assign(initVal);
-          }
+    // Initialize parameter with data stored in the mesh
+    disc->getField(*dist_param, param_name);
+    const auto& nodal_param_states = disc->getNodalParameterSIS();
+    bool        has_lowerbound(false), has_upperbound(false);
+    for (int ist = 0; ist < static_cast<int>(nodal_param_states.size());
+         ist++) {
+      has_lowerbound = has_lowerbound ||
+                       (nodal_param_states[ist]->name == lowerbound_name.str());
+      has_upperbound = has_upperbound ||
+                       (nodal_param_states[ist]->name == upperbound_name.str());
+    }
+    if (has_lowerbound) {
+      disc->getField(*dist_param_lowerbound, lowerbound_name.str());
+    } else {
+      dist_param_lowerbound->assign(std::numeric_limits<ST>::lowest());
+    }
+    if (has_upperbound) {
+      disc->getField(*dist_param_upperbound, upperbound_name.str());
+    } else {
+      dist_param_upperbound->assign(std::numeric_limits<ST>::max());
+    }
+    // JR: for now, initialize to constant value from user input if requested.
+    // This needs to be generalized.
+    if (params->sublist("Problem").isType<Teuchos::ParameterList>(
+            "Topology Parameters")) {
+      Teuchos::ParameterList& topoParams =
+          params->sublist("Problem").sublist("Topology Parameters");
+      if (topoParams.isType<std::string>("Entity Type") &&
+          topoParams.isType<double>("Initial Value")) {
+        if (topoParams.get<std::string>("Entity Type") ==
+                "Distributed Parameter" &&
+            topoParams.get<std::string>("Topology Name") == param_name) {
+          double initVal = topoParams.get<double>("Initial Value");
+          dist_param->assign(initVal);
         }
       }
-
-      // Add parameter to the distributed parameter library
-      distParamLib->add(parameter->name(), parameter);
     }
-  } catch (const std::logic_error&) {
+
+    // Add parameter to the distributed parameter library
+    distParamLib->add(parameter->name(), parameter);
   }
 
   // Now setup response functions (see note above)

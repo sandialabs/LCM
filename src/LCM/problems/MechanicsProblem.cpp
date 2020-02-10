@@ -592,7 +592,7 @@ MechanicsProblem::getVariableType(
   } else if (type == "Time Dependent") {
     variable_type = MECH_VAR_TYPE_TIMEDEP;
   } else {
-    ALBANY_ASSERT(false, "Unknown variable type " << type << '\n');
+    ALBANY_ABORT("Unknown variable type " << type << '\n');
   }
 
   have_variable = (variable_type != MECH_VAR_TYPE_NONE);

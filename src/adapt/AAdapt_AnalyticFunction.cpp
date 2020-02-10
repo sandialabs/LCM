@@ -188,7 +188,7 @@ AAdapt::TemperatureStep::compute(double* x, const double* X)
 
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
-    ALBANY_ASSERT(false, "Error! Coordinate not valid!" << std::endl);
+    ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
   }
 
   const double TOL = 1.0e-12;
@@ -240,7 +240,7 @@ AAdapt::DispConstTemperatureStep::compute(double* x, const double* X)
 
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
-    ALBANY_ASSERT(false, "Error! Coordinate not valid!" << std::endl);
+    ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
   }
 
   const double TOL = 1.0e-12;
@@ -290,18 +290,18 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, const double* X)
 
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
-    ALBANY_ASSERT(false, "Error! Coordinate not valid!" << std::endl);
+    ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
   }
 
   const double TOL = 1.0e-12;
 
   // check that temperatures are not equal
   if (std::abs(T0 - T1) <= TOL) {
-    ALBANY_ASSERT(false, "Error! Temperature are equals!" << std::endl);
+    ALBANY_ABORT("Error! Temperature are equals!" << std::endl);
   }
   // check coordinates are not equal
   if (std::abs(Z0 - Z1) <= TOL) {
-    ALBANY_ASSERT(false, "Error! Z-coordinates are the same!" << std::endl);
+    ALBANY_ABORT("Error! Z-coordinates are the same!" << std::endl);
   }
 
   // We interpolate Temperature as a linear function of z-ccordinate: T = b +
@@ -347,18 +347,18 @@ AAdapt::TemperatureLinear::compute(double* x, const double* X)
 
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
-    ALBANY_ASSERT(false, "Error! Coordinate not valid!" << std::endl);
+    ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
   }
 
   const double TOL = 1.0e-12;
 
   // check that temperatures are not equal
   if (std::abs(T0 - T1) <= TOL) {
-    ALBANY_ASSERT(false, "Error! Temperature are equals!" << std::endl);
+    ALBANY_ABORT("Error! Temperature are equals!" << std::endl);
   }
   // check coordinates are not equal
   if (std::abs(Z0 - Z1) <= TOL) {
-    ALBANY_ASSERT(false, "Error! Z-coordinates are the same!" << std::endl);
+    ALBANY_ABORT("Error! Z-coordinates are the same!" << std::endl);
   }
 
   // We interpolate Temperature as a linear function of z-ccordinate: T = b +

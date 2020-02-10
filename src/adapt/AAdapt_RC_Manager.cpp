@@ -64,7 +64,7 @@ read(const Albany::MDArray& mda, PHX::MDField<RealType>& f)
       loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3)
           f(cell, qp, i0, i1) = mda(cell, qp, i0, i1);
       break;
-    default: ALBANY_ASSERT(false, "dims.size() \notin {2,3,4}.");
+    default: ALBANY_ABORT("dims.size() \notin {2,3,4}.");
   }
 }
 
@@ -84,7 +84,7 @@ write(Albany::MDArray& mda, const MDArray& f)
       loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3)
           mda(cell, qp, i0, i1) = f(cell, qp, i0, i1);
       break;
-    default: ALBANY_ASSERT(false, "dims.size() \notin {2,3,4}.");
+    default: ALBANY_ABORT("dims.size() \notin {2,3,4}.");
   }
 }
 
@@ -327,7 +327,7 @@ Projector::fillRhs(
       for (int qp = 0; qp < num_qp; ++qp) {
         switch (rank) {
           case 0:
-          case 1: ALBANY_ASSERT(false, "!impl"); break;
+          case 1: ALBANY_ABORT("!impl"); break;
           case 2: {
             switch (transformation) {
               case Transformation::none: {
@@ -357,7 +357,7 @@ Projector::fillRhs(
           default:
             std::stringstream ss;
             ss << "invalid rank: " << f.name << " with rank " << rank;
-            ALBANY_ASSERT(false, ss.str());
+            ALBANY_ABORT(ss.str());
         }
       }
     }
@@ -420,7 +420,7 @@ Projector::interp(
     for (int qp = 0; qp < num_qp; ++qp) {
       switch (rank) {
         case 0:
-        case 1: ALBANY_ASSERT(false, "!impl"); break;
+        case 1: ALBANY_ABORT("!impl"); break;
         case 2: {
           for (int i = 0; i < ndim; ++i)
             for (int j = 0; j < ndim; ++j) mda1(cell, qp, i, j) = 0;
@@ -441,7 +441,7 @@ Projector::interp(
         default:
           std::stringstream ss;
           ss << "invalid rank: " << f.name << " with rank " << rank;
-          ALBANY_ASSERT(false, ss.str());
+          ALBANY_ABORT(ss.str());
       }
     }
 }

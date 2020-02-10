@@ -352,7 +352,7 @@ Albany::ElasticityProblem::constructEvaluators(
   }
 
   if (haveSource) {  // Source
-    ALBANY_ASSERT(false, "Error!  Sources not implemented in Elasticity yet!");
+    ALBANY_ABORT("Error!  Sources not implemented in Elasticity yet!");
 
     RCP<ParameterList> p = rcp(new ParameterList);
 

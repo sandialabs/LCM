@@ -108,7 +108,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         stk::io::set_field_role(
             *cell_tensor_states.back(), role_type(st.output));
       } else {
-        ALBANY_ASSERT(false, "Error! Unexpected state rank.\n");
+        ALBANY_ABORT("Error! Unexpected state rank.\n");
       }
       // Debug
       //      cout << "Allocating qps field name " <<

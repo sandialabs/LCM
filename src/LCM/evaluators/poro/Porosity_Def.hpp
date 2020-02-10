@@ -46,7 +46,7 @@ Porosity<EvalT, Traits>::Porosity(
     // Add Porosity as a Sacado-ized parameter
     this->registerSacadoParameter("Porosity", paramLib);
   } else {
-    ALBANY_ASSERT(false, "Invalid porosity type " << type);
+    ALBANY_ABORT("Invalid porosity type " << type);
   }
 
   // Optional dependence on porePressure and Biot coefficient

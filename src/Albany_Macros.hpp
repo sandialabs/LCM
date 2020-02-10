@@ -19,21 +19,43 @@
 #define POP_RANGE
 
 #include <iostream>  // For std::cerr
-#define ALBANY_ASSERT_IMPL(cond, msg, ...)                                     \
-  do {                                                                         \
-    if (!(cond)) {                                                             \
-      std::ostringstream omsg;                                                 \
-      omsg << #cond " failed at ";                                             \
-      omsg << __FILE__ << " +" << __LINE__ << '\n';                            \
-      omsg << msg << '\n';                                                     \
-      std::cerr << #cond " failed at " << __FILE__ << " +" << __LINE__ << "\n" \
-                << msg << '\n';                                                \
-      abort();                                                                 \
-    }                                                                          \
+#define ALBANY_ASSERT_IMPL(cond, msg, ...)                              \
+  do {                                                                  \
+    if (!(cond)) {                                                      \
+      std::ostringstream omsg;                                          \
+      omsg << #cond " assertion failed at ";                            \
+      omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
+      std::cerr << #cond " assertion failed at ";                       \
+      std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
+      abort();                                                          \
+    }                                                                   \
+  } while (0)
+
+#define ALBANY_PANIC_IMPL(cond, msg, ...)                               \
+  do {                                                                  \
+    if ((cond)) {                                                       \
+      std::ostringstream omsg;                                          \
+      omsg << #cond " panic condition at ";                             \
+      omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
+      std::cerr << #cond " panic condition at ";                        \
+      std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
+      abort();                                                          \
+    }                                                                   \
+  } while (0)
+
+#define ALBANY_ABORT_IMPL(msg, ...)                                   \
+  do {                                                                \
+    std::ostringstream omsg;                                          \
+    omsg << " Reached abort statement at ";                           \
+    omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
+    std::cerr << " Reached abort statement at ";                      \
+    std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
+    abort();                                                          \
   } while (0)
 
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")
-#define ALBANY_PANIC(cond, msg) ALBANY_ASSERT(!(cond), msg)
+#define ALBANY_PANIC(...) ALBANY_PANIC_IMPL(__VA_ARGS__, "")
+#define ALBANY_ABORT(...) ALBANY_ABORT_IMPL(__VA_ARGS__, "")
 
 #if defined(NDEBUG)
 #define ALBANY_EXPECT(...)

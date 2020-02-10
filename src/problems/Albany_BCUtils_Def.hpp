@@ -138,7 +138,7 @@ imposeOrder(
     for (S2PL::const_iterator it = evname2pl.begin(); it != evname2pl.end();
          ++it)
       msg << "  " << plName(it->first) << "\n";
-    ALBANY_ASSERT(false, msg.str());
+    ALBANY_ABORT(msg.str());
   }
 }
 }  // namespace

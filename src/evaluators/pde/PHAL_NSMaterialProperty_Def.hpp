@@ -131,7 +131,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     // Add property as a Sacado-ized parameter
     this->registerSacadoParameter(name_mp, paramLib);
   } else {
-    ALBANY_ASSERT(false, "Invalid material property type " << type);
+    ALBANY_ABORT("Invalid material property type " << type);
   }
 
   this->addEvaluatedField(matprop);

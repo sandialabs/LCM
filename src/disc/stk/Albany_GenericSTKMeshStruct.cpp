@@ -2107,7 +2107,7 @@ GenericSTKMeshStruct::checkFieldIsInMesh(
       missing = (metaData->get_field<VFT>(entity_rank, fname) == 0);
       break;
     case 3: missing = (metaData->get_field<TFT>(entity_rank, fname) == 0);
-    default: ALBANY_ASSERT(false, "Error! Invalid field dimension.\n");
+    default: ALBANY_ABORT("Error! Invalid field dimension.\n");
   }
 
   if (missing) {

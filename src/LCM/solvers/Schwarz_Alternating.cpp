@@ -70,7 +70,7 @@ SchwarzAlternating::SchwarzAlternating(
   } else if (convergence_str == "BOTH") {
     criterion_ = ConvergenceCriterion::BOTH;
   } else {
-    ALBANY_ASSERT(false, "Unknown Convergence Criterion");
+    ALBANY_ABORT("Unknown Convergence Criterion");
   }
 
   std::string operator_str =
@@ -87,7 +87,7 @@ SchwarzAlternating::SchwarzAlternating(
   } else if (operator_str == "OR") {
     operator_ = ConvergenceLogicalOperator::OR;
   } else {
-    ALBANY_ASSERT(false, "Unknown Convergence Logical Operator");
+    ALBANY_ABORT("Unknown Convergence Logical Operator");
   }
 
   // Firewalls
@@ -321,7 +321,7 @@ SchwarzAlternating::get_p_names(int) const
 Teuchos::ArrayView<const std::string>
 SchwarzAlternating::get_g_names(int) const
 {
-  ALBANY_ASSERT(false, "not implemented");
+  ALBANY_ABORT("not implemented");
   return Teuchos::ArrayView<const std::string>(Teuchos::null);
 }
 
@@ -530,14 +530,12 @@ SchwarzAlternating::updateConvergenceCriterion() const
   bool const converged_relative = rel_error_ <= rel_tol_;
 
   switch (criterion_) {
-    default: ALBANY_ASSERT(false, "Unknown Convergence Criterion"); break;
+    default: ALBANY_ABORT("Unknown Convergence Criterion"); break;
     case ConvergenceCriterion::ABSOLUTE: converged_ = converged_absolute; break;
     case ConvergenceCriterion::RELATIVE: converged_ = converged_relative; break;
     case ConvergenceCriterion::BOTH:
       switch (operator_) {
-        default:
-          ALBANY_ASSERT(false, "Unknown Convergence Logical Operator");
-          break;
+        default: ALBANY_ABORT("Unknown Convergence Logical Operator"); break;
         case ConvergenceLogicalOperator::AND:
           converged_ = converged_absolute && converged_relative;
           break;

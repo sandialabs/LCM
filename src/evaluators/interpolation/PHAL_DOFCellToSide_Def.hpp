@@ -62,7 +62,7 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(
 
     layout = VERTEX_VECTOR;
   } else {
-    ALBANY_ASSERT(false, "Error! Invalid field layout.\n");
+    ALBANY_ABORT("Error! Invalid field layout.\n");
   }
 
   this->addDependentField(val_cell);

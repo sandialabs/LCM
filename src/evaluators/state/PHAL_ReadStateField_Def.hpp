@@ -162,8 +162,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(
         for (int i = 0; i < dims[2]; ++i) field(cell, 0, i) = values[i];
       }
     } break;
-    default:
-      ALBANY_ASSERT(false, "Unexpected dimension: only cell scalar/vector");
+    default: ALBANY_ABORT("Unexpected dimension: only cell scalar/vector");
   }
 }
 
@@ -221,8 +220,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(
           for (int i = 0; i < dims[2]; ++i) field(cell, node, i) = values[i];
         }
     } break;
-    default:
-      ALBANY_ASSERT(false, "Unexpected dimension: only cell scalar/vector");
+    default: ALBANY_ABORT("Unexpected dimension: only cell scalar/vector");
   }
 }
 }  // namespace PHAL

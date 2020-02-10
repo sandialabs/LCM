@@ -41,7 +41,7 @@ BiotCoefficient<EvalT, Traits>::BiotCoefficient(Teuchos::ParameterList& p)
     // Add Biot Coefficient as a Sacado-ized parameter
     this->registerSacadoParameter("Biot Coefficient", paramLib);
   } else {
-    ALBANY_ASSERT(false, "Invalid Biot coefficient type " << type);
+    ALBANY_ABORT("Invalid Biot coefficient type " << type);
   }
 
   // Optional dependence on Temperature (E = E_ + dEdT * T)

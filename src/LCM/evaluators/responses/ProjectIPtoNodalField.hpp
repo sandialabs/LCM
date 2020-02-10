@@ -84,7 +84,7 @@ class ProjectIPtoNodalField : public ProjectIPtoNodalFieldBase<EvalT, Traits>
   void preEvaluate(typename Traits::PreEvalData /* d */) {}
   void postEvaluate(typename Traits::PostEvalData /* d */)
   {
-    ALBANY_ASSERT(false, "Should never be called.");
+    ALBANY_ABORT("Should never be called.");
   }
   void evaluateFields(typename Traits::EvalData /* d */) {}
 };

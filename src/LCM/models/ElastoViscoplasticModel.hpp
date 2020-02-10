@@ -70,7 +70,7 @@ class ElastoViscoplasticModel : public LCM::ConstitutiveModel<EvalT, Traits>
       DepFieldMap               dep_fields,
       FieldMap                  eval_fields)
   {
-    ALBANY_ASSERT(false, "Not implemented.");
+    ALBANY_ABORT("Not implemented.");
   }
 
  private:

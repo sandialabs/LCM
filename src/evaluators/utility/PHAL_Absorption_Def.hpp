@@ -38,7 +38,7 @@ Absorption<EvalT, Traits>::Absorption(Teuchos::ParameterList& p)
         p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
     this->registerSacadoParameter("Absorption", paramLib);
   } else {
-    ALBANY_ASSERT(false, "Invalid absorption type " << type);
+    ALBANY_ABORT("Invalid absorption type " << type);
   }
 
   this->addEvaluatedField(absorption);

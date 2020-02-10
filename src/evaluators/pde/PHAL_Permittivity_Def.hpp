@@ -92,7 +92,7 @@ Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
   }  // Block dependent
 
   else {
-    ALBANY_ASSERT(false, "Invalid permittivity type " << type);
+    ALBANY_ABORT("Invalid permittivity type " << type);
   }
 
   this->addEvaluatedField(permittivity);

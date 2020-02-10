@@ -51,7 +51,7 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
   //
   //  }
   else {
-    ALBANY_ASSERT(false, "Invalid elastic modulus type " << type);
+    ALBANY_ABORT("Invalid elastic modulus type " << type);
   }
 
   // Optional dependence on Temperature (E = E_ + dEdT * T)

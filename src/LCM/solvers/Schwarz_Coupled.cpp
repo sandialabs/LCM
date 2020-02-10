@@ -26,12 +26,10 @@ SchwarzCoupled::SchwarzCoupled(
     Teuchos::RCP<Thyra::LinearOpWithSolveFactoryBase<ST> const> const& lowsfb)
     : supports_xdot_(false)
 {
-  comm_ = comm;
-
+  comm_   = comm;
   lowsfb_ = lowsfb;
 
-  // IK, 2/11/15: I am assuming for now we don't have any distributed
-  // parameters.
+  // Assume no distributed parameters.
   num_dist_params_total_ = 0;
 
   // Get "Coupled Schwarz" parameter sublist
@@ -87,7 +85,7 @@ SchwarzCoupled::SchwarzCoupled(
   } else if (mf_prec == "Identity") {
     mf_prec_type_ = ID;
   } else {
-    ALBANY_ASSERT(false, "Unknown Matrix-Free Preconditioner type.");
+    ALBANY_ABORT("Unknown Matrix-Free Preconditioner type.");
   }
 
   // If using matrix-free, get NOX sublist and set "Preconditioner Type" to
@@ -662,7 +660,7 @@ SchwarzCoupled::get_p_names(int l) const
 Teuchos::ArrayView<const std::string>
 SchwarzCoupled::get_g_names(int /* l */) const
 {
-  ALBANY_ASSERT(false, "not implemented");
+  ALBANY_ABORT("not implemented");
   return Teuchos::ArrayView<const std::string>();
 }
 
@@ -728,7 +726,7 @@ SchwarzCoupled::reportFinalPoint(
     Thyra::ModelEvaluatorBase::InArgs<ST> const& /* final_point */,
     bool const /* was_solved */)
 {
-  ALBANY_ASSERT(false, "Calling reportFinalPoint");
+  ALBANY_ABORT("Calling reportFinalPoint");
 }
 
 void

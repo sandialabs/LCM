@@ -54,7 +54,7 @@ class ModelEvaluator
   Teuchos::ArrayView<const std::string>
   get_g_names(int /* j */) const
   {
-    ALBANY_ASSERT(false, "not impl'ed");
+    ALBANY_ABORT("not impl'ed");
   }
 
   Thyra_InArgs

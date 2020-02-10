@@ -59,7 +59,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(
 
     layout = NODE_TENSOR;
   } else {
-    ALBANY_ASSERT(false, "Error! Invalid field layout.\n");
+    ALBANY_ABORT("Error! Invalid field layout.\n");
   }
 
   num_side_nodes = dl_side->node_scalar->extent(2);

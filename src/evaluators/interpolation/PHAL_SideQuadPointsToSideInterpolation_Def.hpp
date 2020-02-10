@@ -39,7 +39,7 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::
     field_side = decltype(field_side)(
         p.get<std::string>("Field Side Name"), dl_side->cell_tensor);
   } else {
-    ALBANY_ASSERT(false, "Error! Field dimension not supported.\n");
+    ALBANY_ABORT("Error! Field dimension not supported.\n");
   }
 
   this->addDependentField(field_qp.fieldTag());

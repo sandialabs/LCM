@@ -30,7 +30,7 @@ Albany::NavierStokes::getVariableType(
   else if (type == "DOF")
     variableType = NS_VAR_TYPE_DOF;
   else
-    ALBANY_ASSERT(false, "Unknown variable type " << type << std::endl);
+    ALBANY_ABORT("Unknown variable type " << type << std::endl);
   haveVariable = (variableType != NS_VAR_TYPE_NONE);
   haveEquation = (variableType == NS_VAR_TYPE_DOF);
 }

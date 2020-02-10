@@ -57,7 +57,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
 
     pdf_normal.reset(new std::normal_distribution<double>(mu, sigma));
   } else {
-    ALBANY_ASSERT(false, "Error! Invalid noise p.d.f.\n");
+    ALBANY_ABORT("Error! Invalid noise p.d.f.\n");
   }
 
   seed = pdf_params.get<int>("Random Seed", std::time(nullptr));

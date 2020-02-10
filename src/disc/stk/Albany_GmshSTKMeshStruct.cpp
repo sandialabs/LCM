@@ -48,7 +48,7 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     } else if (ascii) {
       loadAsciiMesh();
     } else {
-      ALBANY_ASSERT(false, "Error! Mesh format not recognized.\n");
+      ALBANY_ABORT("Error! Mesh format not recognized.\n");
     }
   }
   // Broadcasting topological information about the mesh to all procs
@@ -511,7 +511,7 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_ASSERT(false, "Error! Invalid mesh dimension.\n");
+    ALBANY_ABORT("Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section
@@ -875,7 +875,7 @@ Albany::GmshSTKMeshStruct::set_generic_mesh_info()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_ASSERT(false, "Error! Invalid mesh dimension.\n");
+    ALBANY_ABORT("Error! Invalid mesh dimension.\n");
   }
   return;
 }
@@ -1184,7 +1184,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
         break;
       case 15:  // Point
         break;
-      default: ALBANY_ASSERT(false, "Error! Element type not supported.\n");
+      default: ALBANY_ABORT("Error! Element type not supported.\n");
     }
   }
   ALBANY_PANIC(
@@ -1245,7 +1245,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_ASSERT(false, "Error! Invalid mesh dimension.\n");
+    ALBANY_ABORT("Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section
@@ -1342,7 +1342,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
         break;
       case 15:  // Point
         break;
-      default: ALBANY_ASSERT(false, "Error! Element type not supported.\n");
+      default: ALBANY_ABORT("Error! Element type not supported.\n");
     }
   }
 
@@ -1510,7 +1510,7 @@ Albany::GmshSTKMeshStruct::check_version(std::ifstream& ifile)
       *out << *it << std::endl;
     }
 
-    ALBANY_ASSERT(false, "Cannot read this version of gmsh *.msh file!");
+    ALBANY_ABORT("Cannot read this version of gmsh *.msh file!");
   }
 
   return;
@@ -1521,7 +1521,7 @@ Albany::GmshSTKMeshStruct::open_fname(std::ifstream& ifile)
 {
   ifile.open(fname.c_str());
   if (!ifile.is_open()) {
-    ALBANY_ASSERT(false, "Error! Cannot open mesh file '" << fname << "'.\n");
+    ALBANY_ABORT("Error! Cannot open mesh file '" << fname << "'.\n");
   }
 
   return;

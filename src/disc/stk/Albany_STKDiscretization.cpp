@@ -552,7 +552,7 @@ void
 STKDiscretization::setCoordinates(
     const Teuchos::ArrayRCP<const double>& /* c */)
 {
-  ALBANY_ASSERT(false, "STKDiscretization::setCoordinates is not implemented.");
+  ALBANY_ABORT("STKDiscretization::setCoordinates is not implemented.");
 }
 
 void
@@ -1452,7 +1452,7 @@ STKDiscretization::nonzeroesPerRow(const int num_eq) const
     case 1: estNonzeroesPerRow = 3 * num_eq; break;
     case 2: estNonzeroesPerRow = 9 * num_eq; break;
     case 3: estNonzeroesPerRow = 27 * num_eq; break;
-    default: ALBANY_ASSERT(false, "STKDiscretization:  Bad numDim" << numDim);
+    default: ALBANY_ABORT("STKDiscretization:  Bad numDim" << numDim);
   }
   return estNonzeroesPerRow;
 }

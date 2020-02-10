@@ -271,7 +271,7 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
   using Teuchos::rcp;
 
   if (model_name == "") {
-    ALBANY_ASSERT(false, error_msg);
+    ALBANY_ABORT(error_msg);
   } else if (model_name == "Neohookean") {
     model = rcp(new NeohookeanModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Parallel Neohookean") {
@@ -345,7 +345,7 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
   } else if (model_name == "ACE permafrost") {
     model = rcp(new ACEpermafrost<EvalT, Traits>(p, dl));
   } else {
-    ALBANY_ASSERT(false, error_msg);
+    ALBANY_ABORT(error_msg);
   }
 
   this->model_ = model;

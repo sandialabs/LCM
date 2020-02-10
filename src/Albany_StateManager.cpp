@@ -509,9 +509,9 @@ Albany::StateManager::registerSideSetStateVariable(
     else if (dl->name(2) == "QuadPoint")  // Quad point data
       mfe_type = StateStruct::QuadPoint;  // One value per side quad point
     else
-      ALBANY_ASSERT(false, "StateManager: Unknown Entity type.\n");
+      ALBANY_ABORT("StateManager: Unknown Entity type.\n");
   } else {
-    ALBANY_ASSERT(false, "StateManager: Unknown Entity type.\n");
+    ALBANY_ABORT("StateManager: Unknown Entity type.\n");
   }
 
   sis_ptr->push_back(Teuchos::rcp(new StateStruct(stateName, mfe_type)));

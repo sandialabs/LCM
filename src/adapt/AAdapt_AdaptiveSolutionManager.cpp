@@ -259,7 +259,7 @@ AdaptiveSolutionManager::adaptProblem()
           "exiting Albany!"
        << std::endl;
 
-  ALBANY_ASSERT(false, "Mesh adaptation failed!\n");
+  ALBANY_ABORT("Mesh adaptation failed!\n");
 
   return false;
 }

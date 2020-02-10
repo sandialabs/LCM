@@ -93,7 +93,7 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
   }  // Block dependent
 
   else {
-    ALBANY_ASSERT(false, "Invalid thermal conductivity type " << type);
+    ALBANY_ABORT("Invalid thermal conductivity type " << type);
   }
 
   this->addEvaluatedField(thermalCond);

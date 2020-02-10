@@ -118,7 +118,7 @@ PHAL::TEProp<EvalT, Traits>::whichMat(const MeshScalarT& x)
       "Quadrature point " << x << " not within bounds \n");
   for (int i = 0; i < mats; i++)
     if (x < xBounds[i + 1]) return i;
-  ALBANY_ASSERT(false, "Quadrature point " << x << " not within bounds \n");
+  ALBANY_ABORT("Quadrature point " << x << " not within bounds \n");
   return -1;
 }
 // **********************************************************************

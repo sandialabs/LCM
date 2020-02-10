@@ -9,7 +9,7 @@
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "PHAL_MapToPhysicalFrameSide.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -21,7 +21,7 @@ MapToPhysicalFrameSide<EvalT, Traits>::MapToPhysicalFrameSide(
 {
   sideSetName = p.get<std::string>("Side Set Name");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !dl_side->isSideLayouts,
       Teuchos::Exceptions::InvalidParameter,
       "Error! The layouts structure does not appear to be that of a side "

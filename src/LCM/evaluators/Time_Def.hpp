@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 

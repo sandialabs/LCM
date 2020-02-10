@@ -8,7 +8,7 @@
 
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -240,7 +240,7 @@ J2Model<EvalT, Traits>::computeState(
           if (res < 1.e-11 || res / Y < 1.E-11 || res / f < 1.E-11)
             converged = true;
 
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               count == num_max_iter,
               std::runtime_error,
               std::endl

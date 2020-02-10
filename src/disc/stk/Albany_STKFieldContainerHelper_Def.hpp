@@ -104,7 +104,7 @@ STKFieldContainerHelper<FieldType>::fillVector(
     const int                                     offset)
 {
   constexpr int rank = getRank<FieldType>();
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       rank != 0 && rank != 1,
       std::runtime_error,
       "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
@@ -150,7 +150,7 @@ STKFieldContainerHelper<FieldType>::saveVector(
     const int                                     offset)
 {
   constexpr int rank = getRank<FieldType>();
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       rank != 0 && rank != 1,
       std::runtime_error,
       "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
@@ -192,7 +192,7 @@ STKFieldContainerHelper<FieldType>::copySTKField(
     FieldType&       target)
 {
   constexpr int rank = getRank<FieldType>();
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       rank != 0 && rank != 1,
       std::runtime_error,
       "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
@@ -218,7 +218,7 @@ STKFieldContainerHelper<FieldType>::copySTKField(
     const int uneven_downsampling =
         num_source_components % num_target_components;
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         (uneven_downsampling) ||
             (num_nodes_in_bucket != target_array.dimension(nodes_dim)),
         std::logic_error,

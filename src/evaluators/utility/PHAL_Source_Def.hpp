@@ -14,7 +14,7 @@
 #include "Sacado_ParameterAccessor.hpp"
 #include "Sacado_ParameterRegistration.hpp"
 #include "Teuchos_Array.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 namespace PHAL {
@@ -200,7 +200,7 @@ Table<EvalT, Traits>::Table(Teuchos::ParameterList& p)
   // open file
   std::ifstream inFile(&filename[0]);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !inFile,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -305,7 +305,7 @@ Table<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         break;
       }
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !found_it,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -1079,7 +1079,7 @@ PointSource<EvalT, Traits>::PointSource(Teuchos::ParameterList* source_list)
       m_spatials.push_back(s);
     }
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         m_spatials.empty(),
         std::logic_error,
         "Point: Did not find a single spatial component.  Specify Gaussian.");
@@ -1090,7 +1090,7 @@ PointSource<EvalT, Traits>::PointSource(Teuchos::ParameterList* source_list)
     Monotone* monotone = new Monotone(wavelet_param);
     m_wavelet          = monotone;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !m_wavelet,
         std::logic_error,
         "Point: Did not find a single wavelet component. Specify Monotone.");

@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -46,7 +46,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
       Teuchos::Array<double> tmp =
           mp_list->get<Teuchos::Array<double>>("Value");
       vector_constant_value.resize(numDims);
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           vector_constant_value.size() != numDims,
           std::logic_error,
           "Vector constant value for material property "
@@ -65,7 +65,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
       PHX::index_size_type       numCols = dims[3];
       Teuchos::TwoDArray<double> tmp =
           mp_list->get<Teuchos::TwoDArray<double>>("Value");
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           tensor_constant_value.getNumRows() != numRows ||
               tensor_constant_value.getNumCols() != numCols,
           std::logic_error,
@@ -85,7 +85,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
           this->registerSacadoParameter(
               Albany::strint(Albany::strint(name_mp, i), j), paramLib);
     } else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Invalid material property rank "
@@ -127,7 +127,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     depValues =
         mp_list->get<Teuchos::Array<RealType>>("Dependent Values").toVector();
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !(timeValues.size() == depValues.size()),
         Teuchos::Exceptions::InvalidParameter,
         "Dimension of \"Time Values\" and \"Dependent Values\" do not match");
@@ -135,7 +135,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     // Add property as a Sacado-ized parameter
     this->registerSacadoParameter(name_mp, paramLib);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid material property type " << type);
@@ -215,7 +215,7 @@ NSMaterialProperty<EvalT, Traits>::evaluateFields(
     }
   } else if (matPropType == TIME_DEP_SCALAR) {
     RealType time = workset.current_time;
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         time > timeValues.back(),
         Teuchos::Exceptions::InvalidParameter,
         "Time is growing unbounded!");
@@ -262,7 +262,7 @@ NSMaterialProperty<EvalT, Traits>::getValue(const std::string& n)
         if (n == Albany::strint(Albany::strint(name_mp, dim1), dim2))
           return tensor_constant_value(dim1, dim2);
   }
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

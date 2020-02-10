@@ -132,7 +132,7 @@ main(int ac, char* av[])
   material_model_name =
       material_db->getElementBlockSublist(element_block_name, "Material Model")
           .get<std::string>("Model Name");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       material_model_name.length() == 0,
       std::logic_error,
       "A material model must be defined for block: " + element_block_name);
@@ -559,7 +559,7 @@ main(int ac, char* av[])
         mpsParams.get<Teuchos::Array<double>>("Deformation Gradient Components")
             .toVector();
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "Improper Loading Case in Material Point Simulator block");

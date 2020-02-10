@@ -284,7 +284,7 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
     cub_rule =
         static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_LOBATTO);
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameterValue,
         "Invalid Cubature Rule: "
@@ -733,7 +733,7 @@ Albany::TmplSTKMeshStruct<1>::buildMesh(
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             Teuchos::Exceptions::InvalidParameter,
             std::endl
@@ -861,7 +861,7 @@ Albany::TmplSTKMeshStruct<2>::buildMesh(
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             Teuchos::Exceptions::InvalidParameter,
             std::endl
@@ -1178,7 +1178,7 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             Teuchos::Exceptions::InvalidParameter,
             std::endl

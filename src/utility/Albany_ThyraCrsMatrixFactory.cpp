@@ -33,7 +33,7 @@ ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
     const Teuchos::RCP<const ThyraCrsMatrixFactory> overlap_src)
     : m_domain_vs(domain_vs), m_range_vs(range_vs)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !overlap_src->is_filled(),
       std::logic_error,
       "Error! Can only build a graph from an overlapped source if source has "
@@ -114,7 +114,7 @@ ThyraCrsMatrixFactory::fillComplete()
 Teuchos::RCP<Thyra_LinearOp>
 ThyraCrsMatrixFactory::createOp() const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !m_filled,
       std::logic_error,
       "Error! Cannot create a linear operator if the graph is not filled.\n");

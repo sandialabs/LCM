@@ -84,7 +84,7 @@ class ProjectIPtoNodalField : public ProjectIPtoNodalFieldBase<EvalT, Traits>
   void preEvaluate(typename Traits::PreEvalData /* d */) {}
   void postEvaluate(typename Traits::PostEvalData /* d */)
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Should never be called.");
   }
   void evaluateFields(typename Traits::EvalData /* d */) {}

@@ -24,7 +24,7 @@ SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(
   if (sideSetEquation) {
     sideSetName = p.get<std::string>("Side Set Name");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
         std::runtime_error,
         "Error! The layout structure does not appear to store the layout for "

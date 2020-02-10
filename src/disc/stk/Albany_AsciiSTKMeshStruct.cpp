@@ -99,7 +99,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   if (meshfile == NULL) {  // check if coordinates file exists
     *out << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename
          << " not found!" << std::endl;
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -133,7 +133,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
       *out << "Error in AsciiSTKMeshStruct: sh file must have same number "
               "nodes as xyz file!  numNodes in xyz = "
            << NumNodes << ", numNodes in sh = " << NumNodesSh << std::endl;
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           std::endl
@@ -156,7 +156,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   if (confile == NULL) {  // check if element connectivity file exists
     *out << "Error in AsciiSTKMeshStruct: element connectivity file "
          << confilename << " not found!" << std::endl;
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -233,7 +233,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     if (geIDsfile == NULL) {  // check if global element IDs file exists
       *out << "Error in AsciiSTKMeshStruct: global element IDs file "
            << geIDsfilename << " not found!" << std::endl;
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           std::endl
@@ -269,7 +269,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     if (gnIDsfile == NULL) {  // check if global node IDs file exists
       *out << "Error in AsciiSTKMeshStruct: global node IDs file "
            << gnIDsfilename << " not found!" << std::endl;
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           std::endl

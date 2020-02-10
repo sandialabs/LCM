@@ -186,7 +186,7 @@ AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
   } else
 #endif
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -221,7 +221,7 @@ AdaptiveSolutionManager::adaptProblem()
             model);
 
     // If dynamic cast fails
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         base == Teuchos::null,
         std::logic_error,
         std::endl
@@ -232,7 +232,7 @@ AdaptiveSolutionManager::adaptProblem()
         base->getNonconstUnderlyingModel());
 
     // If dynamic cast fails
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         me == Teuchos::null,
         std::logic_error,
         std::endl
@@ -262,7 +262,7 @@ AdaptiveSolutionManager::adaptProblem()
           "exiting Albany!"
        << std::endl;
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true, std::logic_error, "Mesh adaptation failed!\n");
 
   return false;
@@ -339,7 +339,7 @@ AdaptiveSolutionManager::scatterX(
       x, *overlapped_soln->col(0), Albany::CombineMode::INSERT);
 
   if (!x_dot.is_null()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         overlapped_soln->domain()->dim() < 2,
         std::logic_error,
         "AdaptiveSolutionManager error: x_dot defined but only a single "
@@ -349,7 +349,7 @@ AdaptiveSolutionManager::scatterX(
   }
 
   if (!x_dotdot.is_null()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         overlapped_soln->domain()->dim() < 3,
         std::logic_error,
         "AdaptiveSolutionManager error: x_dotdot defined but only two solution "

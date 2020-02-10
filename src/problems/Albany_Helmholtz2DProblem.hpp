@@ -149,7 +149,7 @@ Albany::Helmholtz2DProblem::constructEvaluators(
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
 
   bool supportsTransient = false;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       number_of_time_deriv != 0,
       std::logic_error,
       "A transient calculation has been requested but the Helmholtz2DProblem "

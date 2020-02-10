@@ -6,7 +6,7 @@
 #include "Albany_StateManager.hpp"
 
 #include "Albany_Utils.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 Albany::StateManager::StateManager()
@@ -218,13 +218,13 @@ Albany::StateManager::registerStateVariable(
       mfe_type = StateStruct::QuadPoint;  // One value for the whole workset
                                           // (i.e., time)
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "StateManager: Element Entity type - "
               << dl->name(1) << " - not supported" << std::endl);
   } else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "StateManager: Unknown Entity type - "
@@ -328,13 +328,13 @@ Albany::StateManager::registerNodalVectorStateVariable(
       mfe_type = StateStruct::QuadPoint;  // One value for the whole workset
                                           // (i.e., time)
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "StateManager: Element Entity type - "
               << dl->name(1) << " - not supported" << std::endl);
   } else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "StateManager: Unknown Entity type - "
@@ -513,10 +513,10 @@ Albany::StateManager::registerSideSetStateVariable(
     else if (dl->name(2) == "QuadPoint")  // Quad point data
       mfe_type = StateStruct::QuadPoint;  // One value per side quad point
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true, std::logic_error, "StateManager: Unknown Entity type.\n");
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "StateManager: Unknown Entity type.\n");
   }
 
@@ -527,7 +527,7 @@ Albany::StateManager::registerSideSetStateVariable(
   stateRef.setMeshPart(meshPartName);
 
   if (stateRef.entity == StateStruct::NodalData) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dl->name(0) == "Node",
         std::logic_error,
         "Error! NodalData states should have dl <Node,...>.\n");
@@ -549,7 +549,7 @@ Albany::StateManager::registerSideSetStateVariable(
       stateRef.entity == StateStruct::NodalDataToElemNode ||
       stateRef.entity == Albany::StateStruct::NodalDistParameter) {
     // Strip one dimension out cause it's Side
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dl->rank() < 2,
         std::logic_error,
         "Error! The given layout does not appear to be that of a side set "
@@ -575,7 +575,7 @@ Albany::StateManager::registerSideSetStateVariable(
           stateName, stateRef.dim[2] * stateRef.dim[3]);
   } else {
     // Strip one dimension out cause it's Side
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dl->rank() < 2,
         std::logic_error,
         "Error! The given layout does not appear to be that of a side set "
@@ -589,7 +589,7 @@ Albany::StateManager::registerSideSetStateVariable(
   stateRef.output              = outputToExodus;
   stateRef.responseIDtoRequire = responseIDtoRequire;
   stateRef.layered             = (dl->name(dl->rank() - 1) == "LayerDim");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       stateRef.layered && (dl->extent(dl->rank() - 1) <= 0),
       std::logic_error,
       "Error! Invalid number of layers for layered state " << stateName
@@ -643,7 +643,7 @@ Albany::StateManager::setupStateArrays(
   // First, we check the explicitly required side discretizations exist...
   const auto& ss_discs = disc->getSideSetDiscretizations();
   for (auto const& it : sideSetStateInfo) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         ss_discs.find(it.first) == ss_discs.end(),
         std::logic_error,
         "Error! Side Set "
@@ -745,7 +745,7 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
                           elemStatesToCopyFrom[ws][stateName](cell, qp, i, j);
               break;
             default:
-              TEUCHOS_TEST_FOR_EXCEPTION(
+              ALBANY_PANIC(
                   size < 2 || size > 4,
                   std::logic_error,
                   "Something is wrong during zero state variable fill: "
@@ -791,7 +791,7 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
                         nodeStatesToCopyFrom[ws][stateName](node, dim, i);
               break;
             default:
-              TEUCHOS_TEST_FOR_EXCEPTION(
+              ALBANY_PANIC(
                   true,
                   std::logic_error,
                   "Something is wrong during node zero state variable fill: "
@@ -800,7 +800,7 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
         }
         break;
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Unknown state variable entity encountered "
@@ -820,7 +820,7 @@ Albany::StateManager::getStateArray(SAType type, const int ws) const
     case ELEM: return getStateArrays().elemStateArrays[ws]; break;
     case NODE: return getStateArrays().nodeStateArrays[ws]; break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error: Cannot match state array type in getStateArray()"
@@ -893,7 +893,7 @@ Albany::StateManager::updateStates()
           break;
 
         default:
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::logic_error,
               "Error: Cannot match state entity : " << (*stateInfo)[i]->entity
@@ -1073,7 +1073,7 @@ Albany::StateManager::doSetStateArrays(
                 break;
 
               default:
-                TEUCHOS_TEST_FOR_EXCEPTION(
+                ALBANY_PANIC(
                     size < 2 || size > 5,
                     std::logic_error,
                     "Something is wrong during scalar state variable "
@@ -1083,7 +1083,7 @@ Albany::StateManager::doSetStateArrays(
 
           } else if (init_type == "identity") {
             // we assume operating on the last two indices is correct
-            TEUCHOS_TEST_FOR_EXCEPTION(
+            ALBANY_PANIC(
                 size != 4,
                 std::logic_error,
                 "Something is wrong during tensor state variable "
@@ -1151,7 +1151,7 @@ Albany::StateManager::doSetStateArrays(
                 break;
 
               default:
-                TEUCHOS_TEST_FOR_EXCEPTION(
+                ALBANY_PANIC(
                     true,
                     std::logic_error,
                     "Something is wrong during node scalar state variable "
@@ -1160,7 +1160,7 @@ Albany::StateManager::doSetStateArrays(
             }
           else if (init_type == "identity") {
             // we assume operating on the last two indices is correct
-            TEUCHOS_TEST_FOR_EXCEPTION(
+            ALBANY_PANIC(
                 size != 3,
                 std::logic_error,
                 "Something is wrong during node tensor state variable "
@@ -1187,7 +1187,7 @@ Albany::StateManager::doSetStateArrays(
           // exodus file
           continue;
         } else if (pParentStruct && pParentStruct->restartDataAvailable) {
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::logic_error,
               "Error: At the moment it is not possible to restart a "
@@ -1195,7 +1195,7 @@ Albany::StateManager::doSetStateArrays(
               "parent structure"
                   << std::endl);
         } else if ((init_type == "scalar") || (init_type == "identity")) {
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::logic_error,
               "Error: At the moment it is not possible to initialize a "

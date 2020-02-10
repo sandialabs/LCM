@@ -138,7 +138,7 @@ imposeOrder(
     for (S2PL::const_iterator it = evname2pl.begin(); it != evname2pl.end();
          ++it)
       msg << "  " << plName(it->first) << "\n";
-    TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, msg.str());
+    ALBANY_PANIC(true, std::logic_error, msg.str());
   }
 }
 }  // namespace
@@ -906,7 +906,7 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
           *value = BCparams.get<double>(ss);
         } else {
           // The solution is prescribed a unique value off the given side sets.
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               *value != BCparams.get<double>(ss),
               std::logic_error,
               "Error! For a given DOF, all Off-Node-Set BC MUST have the same "
@@ -942,7 +942,7 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
   }
 
   if ((use_dbcs_ == true) && (use_sdbcs_ == true)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "You are attempting to prescribe a mix of SDBCs and DBCs, which is not "
@@ -1016,7 +1016,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
         if (BCparams.isParameter(ss)) {
           //           std::cout << "Constructing NBC: " << ss << std::endl;
 
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               BCparams.isType<string>(ss),
               std::logic_error,
               "NBC array information in XML/YAML file must be of type "
@@ -1069,7 +1069,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           //       which means the user should not have to specify a material DB
 
           if (conditions[k] == "scaled jump" || conditions[k] == "radiate") {
-            TEUCHOS_TEST_FOR_EXCEPTION(
+            ALBANY_PANIC(
                 materialDB == Teuchos::null,
                 Teuchos::Exceptions::InvalidParameter,
                 "This BC needs a material database specified");
@@ -1167,7 +1167,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           // The material DB database needs to be passed to the BC object
 
           if (conditions[k] == "scaled jump" || conditions[k] == "robin") {
-            TEUCHOS_TEST_FOR_EXCEPTION(
+            ALBANY_PANIC(
                 materialDB == Teuchos::null,
                 Teuchos::Exceptions::InvalidParameter,
                 "This BC needs a material database specified");

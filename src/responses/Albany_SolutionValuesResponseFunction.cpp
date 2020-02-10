@@ -70,7 +70,7 @@ class SolutionValuesResponseFunction::SolutionPrinter
       const Teuchos::ArrayRCP<const ST>& g,
       const Teuchos::Array<GO>&          eq_gids)
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         g.size() != eq_gids.size(),
         std::logic_error,
         "g.size() != eq_gids.size()");

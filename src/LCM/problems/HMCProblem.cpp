@@ -33,7 +33,7 @@ Albany::HMCProblem::HMCProblem(
     std::string filename = params->get<std::string>("MaterialDB Filename");
     material_db_ = Teuchos::rcp(new Albany::MaterialDatabase(filename, commT));
   }
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !validMaterialDB,
       std::logic_error,
       "Mechanics Problem Requires a Material Database");
@@ -64,7 +64,7 @@ Albany::HMCProblem::buildProblem(
     Albany::StateManager&                                    stateMgr)
 {
   /* Construct All Phalanx Evaluators */
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       meshSpecs.size() != 1,
       std::logic_error,
       "Problem supports one Material Block");
@@ -176,7 +176,7 @@ Albany::HMCProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(t_x, t_y, t_z)";
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

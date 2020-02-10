@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
@@ -38,7 +38,7 @@ Absorption<EvalT, Traits>::Absorption(Teuchos::ParameterList& p)
         p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
     this->registerSacadoParameter("Absorption", paramLib);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid absorption type " << type);
@@ -94,7 +94,7 @@ Absorption<EvalT, Traits>::getValue(const std::string& n)
     if (n == Albany::strint("Thermal Conductivity KL Random Variable",i))
       return rv[i];
   }*/
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

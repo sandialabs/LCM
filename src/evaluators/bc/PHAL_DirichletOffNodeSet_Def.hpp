@@ -9,7 +9,7 @@
 #include "Albany_ThyraUtils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Genereric Template Code for Constructor and PostRegistrationSetup

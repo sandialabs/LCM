@@ -5,7 +5,7 @@
 //
 #include "PHAL_Utilities.hpp"
 #include "Teuchos_CommHelpers.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -58,7 +58,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
           Teuchos::rcp(new PHX::MDALayout<Dim>(field_components.size()));
     }
   } else if (fieldType == "Tensor") {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "local_ and global_response must have rank 2. However, this code path "
@@ -67,7 +67,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
     local_response_layout  = dl->cell_tensor;
     global_response_layout = dl->workset_tensor;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid field type " << fieldType << ".  Support values are "
@@ -121,7 +121,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   else if (numDims == 3)
     scaling = X0 * X0 * X0;
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

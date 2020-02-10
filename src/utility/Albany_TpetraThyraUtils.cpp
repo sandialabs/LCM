@@ -1,5 +1,12 @@
+//
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory.
+//
+
 #include "Albany_TpetraThyraUtils.hpp"
 
+#include "Albany_Macros.hpp"
 #include "Albany_TpetraThyraTypes.hpp"
 
 namespace Albany {
@@ -228,7 +235,7 @@ getTpetraVector(Thyra_Vector& v, const bool throw_if_not_tpetra)
   Thyra_TpetraVector* tv = dynamic_cast<Thyra_TpetraVector*>(&v);
 
   if (tv == nullptr) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         throw_if_not_tpetra,
         BadThyraTpetraCast,
         "Error! Could not cast input Thyra_Vector to Thyra_TpetraVector.\n");
@@ -237,7 +244,7 @@ getTpetraVector(Thyra_Vector& v, const bool throw_if_not_tpetra)
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         tv->getTpetraVector().is_null(),
         std::runtime_error,
         "Error! The Thyra_TpetraVector object stores a null pointer.\n");
@@ -252,7 +259,7 @@ getConstTpetraVector(const Thyra_Vector& v, const bool throw_if_not_tpetra)
   const Thyra_TpetraVector* tv = dynamic_cast<const Thyra_TpetraVector*>(&v);
 
   if (tv == nullptr) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         throw_if_not_tpetra,
         BadThyraTpetraCast,
         "Error! Could not cast input Thyra_Vector to Thyra_TpetraVector.\n");
@@ -260,7 +267,7 @@ getConstTpetraVector(const Thyra_Vector& v, const bool throw_if_not_tpetra)
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         tv->getConstTpetraVector().is_null(),
         std::runtime_error,
         "Error! The Thyra_TpetraVector object stores a null pointer.\n");
@@ -275,7 +282,7 @@ getTpetraMultiVector(Thyra_MultiVector& mv, const bool throw_if_not_tpetra)
   Thyra_TpetraMultiVector* tmv = dynamic_cast<Thyra_TpetraMultiVector*>(&mv);
 
   if (tmv == nullptr) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         throw_if_not_tpetra,
         BadThyraTpetraCast,
         "Error! Could not cast input Thyra_MultiVector to "
@@ -284,7 +291,7 @@ getTpetraMultiVector(Thyra_MultiVector& mv, const bool throw_if_not_tpetra)
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         tmv->getTpetraMultiVector().is_null(),
         std::runtime_error,
         "Error! The Thyra_TpetraMultiVector object stores a null pointer.\n");
@@ -301,7 +308,7 @@ getConstTpetraMultiVector(
       dynamic_cast<const Thyra_TpetraMultiVector*>(&mv);
 
   if (tmv == nullptr) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         throw_if_not_tpetra,
         BadThyraTpetraCast,
         "Error! Could not cast input Thyra_MultiVector to "
@@ -310,7 +317,7 @@ getConstTpetraMultiVector(
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         tmv->getConstTpetraMultiVector().is_null(),
         std::runtime_error,
         "Error! The Thyra_TpetraMultiVector object stores a null pointer.\n");
@@ -324,7 +331,7 @@ getTpetraOperator(Thyra_LinearOp& lop, const bool throw_if_not_tpetra)
   Thyra_TpetraLinearOp* top = dynamic_cast<Thyra_TpetraLinearOp*>(&lop);
 
   if (top == nullptr) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         throw_if_not_tpetra,
         BadThyraTpetraCast,
         "Error! Could not cast input Thyra_LinearOp to "
@@ -333,7 +340,7 @@ getTpetraOperator(Thyra_LinearOp& lop, const bool throw_if_not_tpetra)
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         top->getTpetraOperator().is_null(),
         std::runtime_error,
         "Error! The Thyra_TpetraLinearOp object stores a null pointer.\n");
@@ -350,7 +357,7 @@ getConstTpetraOperator(
       dynamic_cast<const Thyra_TpetraLinearOp*>(&lop);
 
   if (top == nullptr) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         throw_if_not_tpetra,
         BadThyraTpetraCast,
         "Error! Could not cast input Thyra_LinearOp to "
@@ -359,7 +366,7 @@ getConstTpetraOperator(
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         top->getConstTpetraOperator().is_null(),
         std::runtime_error,
         "Error! The Thyra_TpetraLinearOp object stores a null pointer.\n");
@@ -377,7 +384,7 @@ getTpetraMatrix(Thyra_LinearOp& lop, const bool throw_if_not_tpetra)
     // We allow bad cast, but once cast goes through, we *expect* the operator
     // to store a crs matrix
     auto tmat = Teuchos::rcp_dynamic_cast<Tpetra_CrsMatrix>(top);
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         tmat.is_null(),
         std::runtime_error,
         "Error! The Thyra_TpetraLinearOp object does not store a "
@@ -397,7 +404,7 @@ getConstTpetraMatrix(const Thyra_LinearOp& lop, const bool throw_if_not_tpetra)
     // We allow bad cast, but once cast goes through, we *expect* the operator
     // to store a crs matrix
     auto tmat = Teuchos::rcp_dynamic_cast<const Tpetra_CrsMatrix>(top);
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         tmat.is_null(),
         std::runtime_error,
         "Error! The Thyra_TpetraLinearOp object does not store a "

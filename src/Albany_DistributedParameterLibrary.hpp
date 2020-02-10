@@ -11,7 +11,7 @@
 
 #include "Albany_DistributedParameter.hpp"
 #include "Teuchos_RCP.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace Albany {
 
@@ -49,7 +49,7 @@ class DistributedParameterLibrary
   get(const std::string& name) const
   {
     const_iterator i = param_map.find(name);
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         i == param_map.end(),
         std::logic_error,
         "Parameter " << name << " is not in the library");

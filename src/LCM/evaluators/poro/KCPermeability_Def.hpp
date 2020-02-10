@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -42,7 +42,7 @@ KCPermeability<EvalT, Traits>::KCPermeability(Teuchos::ParameterList& p)
     // Add Kozeny-Carman Permeability as a Sacado-ized parameter
     this->registerSacadoParameter("Kozeny-Carman Permeability", paramLib);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid Kozeny-Carman Permeability type " << type);
@@ -112,7 +112,7 @@ typename KCPermeability<EvalT, Traits>::ScalarT&
 KCPermeability<EvalT, Traits>::getValue(const std::string& n)
 {
   if (n == "Kozeny-Carman Permeability") return constant_value;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

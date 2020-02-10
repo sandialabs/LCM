@@ -10,7 +10,7 @@
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_GatherScalarNodalParameter.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 

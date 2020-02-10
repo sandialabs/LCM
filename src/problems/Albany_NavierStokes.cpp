@@ -30,7 +30,7 @@ Albany::NavierStokes::getVariableType(
   else if (type == "DOF")
     variableType = NS_VAR_TYPE_DOF;
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Unknown variable type " << type << std::endl);
   haveVariable = (variableType != NS_VAR_TYPE_NONE);
   haveEquation = (variableType == NS_VAR_TYPE_DOF);
@@ -123,7 +123,7 @@ Albany::NavierStokes::buildProblem(
   using Teuchos::rcp;
 
   /* Construct All Phalanx Evaluators */
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       meshSpecs.size() != 1,
       std::logic_error,
       "Problem supports one Material Block");
@@ -251,7 +251,7 @@ Albany::NavierStokes::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(dudx, dudy, dudz)";
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

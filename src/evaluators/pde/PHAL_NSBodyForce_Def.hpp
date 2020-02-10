@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -31,7 +31,7 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(const Teuchos::ParameterList& p)
         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(rho.fieldTag());
   } else if (type == "Boussinesq") {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         haveHeat == false,
         std::logic_error,
         std::endl

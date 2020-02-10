@@ -7,17 +7,14 @@
 #include "Albany_ProblemUtils.hpp"
 
 #include "Albany_config.h"
-
-////#include "Intrepid2_HGRAD_LINE_Cn_FEM.hpp"
-//#include "Intrepid2_HGRAD_TRI_Cn_FEM.hpp"
-#include "Intrepid2_HGRAD_QUAD_Cn_FEM.hpp"
-//#include "Intrepid2_HGRAD_HEX_Cn_FEM.hpp"
+#include "Albany_Macros.hpp"
 
 #include "Intrepid2_HGRAD_HEX_C1_FEM.hpp"
 #include "Intrepid2_HGRAD_HEX_C2_FEM.hpp"
 #include "Intrepid2_HGRAD_LINE_C1_FEM.hpp"
 #include "Intrepid2_HGRAD_QUAD_C1_FEM.hpp"
 #include "Intrepid2_HGRAD_QUAD_C2_FEM.hpp"
+#include "Intrepid2_HGRAD_QUAD_Cn_FEM.hpp"
 #include "Intrepid2_HGRAD_TET_C1_FEM.hpp"
 #include "Intrepid2_HGRAD_TET_C2_FEM.hpp"
 #include "Intrepid2_HGRAD_TET_COMP12_FEM.hpp"
@@ -60,7 +57,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
       intrepidBasis =
           rcp(new Intrepid2::Basis_HGRAD_LINE_C1_FEM<PHX::Device>());
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Albany::ProblemUtils::getIntrepid2Basis line element with "
@@ -83,7 +80,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
     else if (numNodes == 6)
       intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_TRI_C2_FEM<PHX::Device>());
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Albany::ProblemUtils::getIntrepid2Basis triangle element with "
@@ -97,7 +94,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
     cout << "  For " << name << " element, numNodes = " << numNodes
          << ", deg = " << deg << endl;
 #endif
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         ((deg * deg + deg) / 2 != numNodes || deg == 1),
         Teuchos::Exceptions::InvalidParameter,
         "Albany::ProblemUtils::getIntrepid2Basis number of nodes for triangle "
@@ -105,7 +102,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
     --deg;
 
     // Spectral triangles not implemented in Intrepid2 yet
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         name == "SpectralTriangle",
         Teuchos::Exceptions::InvalidParameter,
         "Error: getIntrepid2Basis: No HGRAD_TRI_Cn in Intrepid2 ");
@@ -126,7 +123,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
       intrepidBasis =
           rcp(new Intrepid2::Basis_HGRAD_QUAD_C2_FEM<PHX::Device>());
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Albany::ProblemUtils::getIntrepid2Basis "
@@ -144,7 +141,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
     cout << "  For " << name << " element, numNodes = " << numNodes
          << ", deg = " << deg << endl;
 #endif
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         (deg * deg != numNodes || deg == 1),
         Teuchos::Exceptions::InvalidParameter,
         "Albany::ProblemUtils::getIntrepid2Basis number of nodes for "
@@ -167,7 +164,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
             rcp(new Intrepid2::Basis_HGRAD_TET_C2_FEM<PHX::Device>());
       }
     } else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Albany::ProblemUtils::getIntrepid2Basis tetrahedron element with "
@@ -184,7 +181,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
     else if (numNodes == 27)
       intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_HEX_C2_FEM<PHX::Device>());
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Albany::ProblemUtils::getIntrepid2Basis hexahedron element with "
@@ -198,14 +195,14 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
     cout << "  For " << name << " element, numNodes = " << numNodes
          << ", deg = " << deg << endl;
 #endif
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         (deg * deg * deg != numNodes || deg == 1),
         Teuchos::Exceptions::InvalidParameter,
         "Albany::ProblemUtils::getIntrepid2Basis number of nodes for "
         "hexahedron element is not perfect cube > 1");
     --deg;
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         name == "SpectralHexahedron",
         Teuchos::Exceptions::InvalidParameter,
         "Error: getIntrepid2Basis: No HGRAD_HEX_Cn in Intrepid2 ");
@@ -220,7 +217,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
       intrepidBasis =
           rcp(new Intrepid2::Basis_HGRAD_WEDGE_C1_FEM<PHX::Device>());
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Albany::ProblemUtils::getIntrepid2Basis wedge element with "
@@ -229,7 +226,7 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
 
   // Unrecognized element type
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Albany::ProblemUtils::getIntrepid2Basis did not recognize element "

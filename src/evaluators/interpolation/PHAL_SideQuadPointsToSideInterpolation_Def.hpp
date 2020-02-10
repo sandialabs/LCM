@@ -39,7 +39,7 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::
     field_side = decltype(field_side)(
         p.get<std::string>("Field Side Name"), dl_side->cell_tensor);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Error! Field dimension not supported.\n");
@@ -116,7 +116,7 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
         break;
 
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error! Field dimension not supported (this error should have "

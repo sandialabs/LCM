@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 // uncomment the following line if you want debug output to be printed to screen
 
@@ -19,7 +19,7 @@ ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(
 {
   // Get side set name and side set layouts
   sideSetName = p.get<std::string>("Side Set Name");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! Layouts for side set '" << sideSetName << "' not found.\n");
@@ -229,7 +229,7 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(
         }
         break;
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error! The dimension of the side should be 1 or 2.\n");

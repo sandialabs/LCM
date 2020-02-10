@@ -122,7 +122,7 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::computeFadInfo(
   // local system size
   int numLocalVars  = B.size();
   int numGlobalVars = B[0].size();
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       numGlobalVars == 0,
       std::logic_error,
       "In LocalNonlinearSolver<Jacobian> the numGLobalVars is zero where it "
@@ -226,7 +226,7 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Tangent, Traits>::computeFadInfo(
   // local system size
   int numLocalVars  = B.size();
   int numGlobalVars = B[0].size();
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       numGlobalVars == 0,
       std::logic_error,
       "In LocalNonlinearSolver<Tangent, Traits> the numGLobalVars is zero "
@@ -332,7 +332,7 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
   // local system size
   int numLocalVars  = B.size();
   int numGlobalVars = B[0].size();
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       numGlobalVars == 0,
       std::logic_error,
       "In LocalNonlinearSolver<Tangent, Traits> the numGLobalVars is zero "

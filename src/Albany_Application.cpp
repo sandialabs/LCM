@@ -164,7 +164,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   }
 #endif
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       num_time_deriv > 2,
       std::logic_error,
       "Input error: number of time derivatives must be <= 2 "
@@ -258,7 +258,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
       // SDBCs.
       if (stepper_type == "Newmark Implicit d-Form") {
         if (nonlinear_solver != "Line Search Based") {
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::logic_error,
               "Newmark Implicit d-Form Stepper Type will not work correctly "
@@ -276,7 +276,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     }
 
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Solution Method must be Steady, Transient, Transient Tempus, "
@@ -351,7 +351,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   derivatives_check_ = debugParams->get<int>("Derivative Check", 0);
   // the above 4 parameters cannot have values < -1
   if (writeToMatrixMarketJac < -1) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -361,7 +361,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
             << std::endl);
   }
   if (writeToMatrixMarketRes < -1) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -371,7 +371,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
             << std::endl);
   }
   if (writeToCoutJac < -1) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -381,7 +381,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
             << std::endl);
   }
   if (writeToCoutRes < -1) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -449,7 +449,7 @@ Application::buildProblem()
 
   if ((requires_sdbcs_ == true) && (problem->useSDBCs() == false) &&
       (no_dir_bcs_ == false)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error in Albany::Application: you are using a "
@@ -458,7 +458,7 @@ Application::buildProblem()
   }
 
   if ((requires_orig_dbcs_ == true) && (problem->useSDBCs() == true)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error in Albany::Application: you are using a "
@@ -467,7 +467,7 @@ Application::buildProblem()
   }
 
   if ((no_dir_bcs_ == true) && (scaleBCdofs == true)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error in Albany::Application: you are attempting "
@@ -562,7 +562,7 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
     scale_type = ABSROWSUM;
     scale      = 1.0e1;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "The scaling Type you selected "
@@ -573,7 +573,7 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
   if (scale == 1.0) scaleBCdofs = false;
 
   if ((scale != 1.0) && (problem->useSDBCs() == true)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "'Scaling' sublist not recognized when using SDBCs.");
@@ -679,7 +679,7 @@ Application::finalSetUp(
 
   // Set up memory for workset
   fm = problem->getFieldManager();
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       fm == Teuchos::null,
       std::logic_error,
       "getFieldManager not implemented!!!");
@@ -1705,7 +1705,7 @@ Application::computeGlobalTangent(
     param_offset = num_cols_x;  // offset of parameter derivs in deriv array
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       sum_derivs && (num_cols_x != 0) && (num_cols_p != 0) &&
           (num_cols_x != num_cols_p),
       std::logic_error,
@@ -2237,7 +2237,7 @@ Application::getValue(const std::string& name)
   for (unsigned int i = 0; i < shapeParamNames.size(); i++) {
     if (name == shapeParamNames[i]) index = i;
   }
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       index == -1,
       std::logic_error,
       "Error in GatherCoordinateVector::getValue, \n"
@@ -2264,7 +2264,7 @@ Application::determinePiroSolver(
     const std::string secondOrder =
         localProblemParams->get("Second Order", "No");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         secondOrder != "No" && secondOrder != "Velocity Verlet" &&
             secondOrder != "Newmark" && secondOrder != "Trapezoid Rule",
         std::logic_error,
@@ -2440,7 +2440,7 @@ Application::setScaleBCDofs(
   }
 
   if (problem->getSideSetEquations().size() > 0) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Application::setScaleBCDofs is not yet implemented for"
@@ -2570,7 +2570,7 @@ Application::setupTangentWorksetInfo(
   if (!sum_derivs)
     param_offset = num_cols_x;  // offset of parameter derivs in deriv array
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       sum_derivs && (num_cols_x != 0) && (num_cols_p != 0) &&
           (num_cols_x != num_cols_p),
       std::logic_error,
@@ -2614,7 +2614,7 @@ Application::setCoupledAppBlockNodeset(
   // Check for valid application name
   auto it = app_name_index_map_->find(app_name);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       it == app_name_index_map_->end(),
       std::logic_error,
       "Trying to couple to an unknown Application: " << app_name << '\n');

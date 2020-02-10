@@ -10,7 +10,7 @@
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_ScatterScalarNodalParameter.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -47,7 +47,7 @@ template <typename EvalT, typename Traits>
 void ScatterScalarNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData /* workset */)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "PHAL::ScatterScalarNodalParameter is supposed to be used only for "
@@ -59,7 +59,7 @@ template <typename EvalT, typename Traits>
 void ScatterScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData /* workset */)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "PHAL::ScatterScalarNodalParameter is supposed to be used only for "

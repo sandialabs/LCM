@@ -11,7 +11,7 @@
 #include <ctime>
 
 #include "Teuchos_Exceptions.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 const double pi = 3.141592653589793;
 
@@ -89,7 +89,7 @@ AAdapt::createAnalyticFunction(
     F = Teuchos::rcp(new AAdapt::AcousticWave(neq, numDim, data));
 
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         name != "Valid Initial Condition Function",
         std::logic_error,
         "Unrecognized initial condition function name: " << name);
@@ -104,7 +104,7 @@ AAdapt::ConstantFunction::ConstantFunction(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != neq),
       std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
@@ -122,7 +122,7 @@ AAdapt::ConstantFunction::compute(double* x, const double* X)
 AAdapt::StepX::StepX(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != 5),
       std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
@@ -164,7 +164,7 @@ AAdapt::TemperatureStep::TemperatureStep(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != 6),
       std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
@@ -193,7 +193,7 @@ AAdapt::TemperatureStep::compute(double* x, const double* X)
 
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Error! Coordinate not valid!" << std::endl);
   }
 
@@ -216,7 +216,7 @@ AAdapt::DispConstTemperatureStep::DispConstTemperatureStep(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != 9),
       std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
@@ -247,7 +247,7 @@ AAdapt::DispConstTemperatureStep::compute(double* x, const double* X)
 
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Error! Coordinate not valid!" << std::endl);
   }
 
@@ -270,7 +270,7 @@ AAdapt::DispConstTemperatureLinear::DispConstTemperatureLinear(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != 8),
       std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
@@ -299,7 +299,7 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, const double* X)
 
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Error! Coordinate not valid!" << std::endl);
   }
 
@@ -307,12 +307,12 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, const double* X)
 
   // check that temperatures are not equal
   if (std::abs(T0 - T1) <= TOL) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Error! Temperature are equals!" << std::endl);
   }
   // check coordinates are not equal
   if (std::abs(Z0 - Z1) <= TOL) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error! Z-coordinates are the same!" << std::endl);
@@ -335,7 +335,7 @@ AAdapt::TemperatureLinear::TemperatureLinear(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != 5),
       std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
@@ -362,7 +362,7 @@ AAdapt::TemperatureLinear::compute(double* x, const double* X)
 
   // check that coordinate is valid
   if ((coord > 2) || (coord < 0)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Error! Coordinate not valid!" << std::endl);
   }
 
@@ -370,12 +370,12 @@ AAdapt::TemperatureLinear::compute(double* x, const double* X)
 
   // check that temperatures are not equal
   if (std::abs(T0 - T1) <= TOL) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Error! Temperature are equals!" << std::endl);
   }
   // check coordinates are not equal
   if (std::abs(Z0 - Z1) <= TOL) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error! Z-coordinates are the same!" << std::endl);
@@ -415,7 +415,7 @@ AAdapt::ConstantFunctionPerturbed::ConstantFunctionPerturbed(
     Teuchos::Array<double> pert_mag_)
     : numDim(numDim_), neq(neq_), data(data_), pert_mag(pert_mag_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != neq || pert_mag.size() != neq),
       std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
@@ -458,7 +458,7 @@ AAdapt::ConstantFunctionGaussianPerturbed::ConstantFunctionGaussianPerturbed(
       nd(neq_),
       var_nor(neq_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != neq || pert_mag.size() != neq),
       std::logic_error,
       "Error! Invalid specification of initial condition: incorrect length of "
@@ -493,7 +493,7 @@ AAdapt::ConstantFunctionGaussianPerturbed::compute(double* x, const double* X)
 AAdapt::GaussSin::GaussSin(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq != 1) || (numDim != 1) || (data.size() != 1),
       std::logic_error,
       "Error! Invalid call of GaussSin with " << neq << " " << numDim << "  "
@@ -509,7 +509,7 @@ AAdapt::GaussSin::compute(double* x, const double* X)
 AAdapt::GaussCos::GaussCos(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq != 1) || (numDim != 1) || (data.size() != 1),
       std::logic_error,
       "Error! Invalid call of GaussCos with " << neq << " " << numDim << "  "
@@ -524,7 +524,7 @@ AAdapt::GaussCos::compute(double* x, const double* X)
 AAdapt::LinearY::LinearY(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq < 2) || (numDim < 2) || (data.size() != 1),
       std::logic_error,
       "Error! Invalid call of LinearY with " << neq << " " << numDim << "  "
@@ -542,7 +542,7 @@ AAdapt::LinearY::compute(double* x, const double* X)
 AAdapt::Linear::Linear(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != neq * numDim),
       std::logic_error,
       "Error! Invalid call of Linear with " << neq << " " << numDim << "  "
@@ -566,7 +566,7 @@ AAdapt::ConstantBox::ConstantBox(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (data.size() != 2 * numDim + neq),
       std::logic_error,
       "Error! Invalid call of Linear with " << neq << " " << numDim << "  "
@@ -590,7 +590,7 @@ AAdapt::ConstantBox::compute(double* x, const double* X)
 AAdapt::AboutZ::AboutZ(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq < 2) || (numDim < 2) || (data.size() != 1),
       std::logic_error,
       "Error! Invalid call of AboutZ with " << neq << " " << numDim << "  "
@@ -608,7 +608,7 @@ AAdapt::AboutZ::compute(double* x, const double* X)
 AAdapt::RadialZ::RadialZ(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq < 2) || (numDim < 2) || (data.size() != 1),
       std::logic_error,
       "Error! Invalid call of RadialZ with " << neq << " " << numDim << "  "
@@ -629,7 +629,7 @@ AAdapt::AboutLinearZ::AboutLinearZ(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq < 3) || (numDim < 3) || (data.size() != 1),
       std::logic_error,
       "Error! Invalid call of AboutLinearZ with "
@@ -649,7 +649,7 @@ AAdapt::GaussianZ::GaussianZ(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq < 2) || (numDim < 2) || (data.size() != 3),
       std::logic_error,
       "Error! Invalid call of GaussianZ with " << neq << " " << numDim << "  "
@@ -673,7 +673,7 @@ AAdapt::Circle::Circle(int neq_, int numDim_, Teuchos::Array<double> data_)
 {
   bool error = true;
   if (neq == 1 || neq == 3) error = false;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       error || (numDim != 2),
       std::logic_error,
       "Error! Invalid call of Circle with " << neq << " " << numDim << "  "
@@ -701,7 +701,7 @@ AAdapt::GaussianPress::GaussianPress(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq < 3) || (numDim < 2) || (data.size() != 4),
       std::logic_error,
       "Error! Invalid call of GaussianPress with "
@@ -719,7 +719,7 @@ AAdapt::GaussianPress::compute(double* x, const double* X)
 AAdapt::SinCos::SinCos(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq < 3) || (numDim < 2),
       std::logic_error,
       "Error! Invalid call of SinCos with " << neq << " " << numDim << "  "
@@ -739,7 +739,7 @@ AAdapt::SinScalar::SinScalar(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       neq != 1 || numDim < 2 || data.size() != numDim,
       std::logic_error,
       "Error! Invalid call of SinScalar with " << neq << " " << numDim << "  "
@@ -760,7 +760,7 @@ AAdapt::TaylorGreenVortex::TaylorGreenVortex(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq < 3) || (numDim != 2),
       std::logic_error,
       "Error! Invalid call of TaylorGreenVortex with "
@@ -781,7 +781,7 @@ AAdapt::AcousticWave::AcousticWave(
     Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (neq > 3) || (numDim > 2) || (data.size() != 3),
       std::logic_error,
       "Error! Invalid call of AcousticWave with "
@@ -813,7 +813,7 @@ AAdapt::ExpressionParser::ExpressionParser(
       expressionY(expressionY_),
       expressionZ(expressionZ_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       neq < 1 || neq > spatialDim || spatialDim != 3,
       std::logic_error,
       "Error! Invalid call AAdapt::ExpressionParser::ExpressionParser(), neq = "

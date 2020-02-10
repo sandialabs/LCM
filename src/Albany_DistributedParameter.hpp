@@ -13,7 +13,7 @@
 #include "Albany_StateInfoStruct.hpp"  // For IDArray
 #include "Albany_ThyraTypes.hpp"
 #include "Teuchos_RCP.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace Albany {
 
@@ -32,11 +32,11 @@ class DistributedParameter
       : param_name(param_name_)
   {
     // Sanity checks
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         owned_vs_.is_null(),
         std::runtime_error,
         "Error! Owned vector space is null.\n");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         overlapped_vs_.is_null(),
         std::runtime_error,
         "Error! Overlapped vector space is null.\n");

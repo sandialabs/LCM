@@ -163,7 +163,7 @@ MechanicsProblem::constructEvaluators(
   std::string const material_model_name =
       param_list.sublist("Material Model").get<std::string>("Model Name");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       material_model_name.length() == 0,
       std::logic_error,
       "A material model must be defined for block: " + eb_name);
@@ -228,7 +228,7 @@ MechanicsProblem::constructEvaluators(
       eb_name, "Compute Membrane Forces", false);
 
   // FIXME: really need to check for WEDGE_12 topologies
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       composite_ && surface_element,
       std::logic_error,
       "Surface elements are not yet supported with the composite tet");
@@ -333,7 +333,7 @@ MechanicsProblem::constructEvaluators(
   dl_ = Teuchos::rcp(new Layouts(
       workset_size, num_vertices_, num_nodes_, num_pts_, num_dims_));
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl_->vectorAndGradientLayoutsAreEquivalent == false,
       std::logic_error,
       "Data Layout Usage in Mechanics problems assume vecDim = num_dims_");
@@ -430,7 +430,7 @@ MechanicsProblem::constructEvaluators(
   // Get the solution method type
   SolutionMethodType SolutionType = getSolutionMethod();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       SolutionType == SolutionMethodType::Unknown,
       std::logic_error,
       "Solution Method must be Steady, Transient, "
@@ -1085,7 +1085,7 @@ MechanicsProblem::constructEvaluators(
       }
     } else
 
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Unrecognized thermal source specified in input file");

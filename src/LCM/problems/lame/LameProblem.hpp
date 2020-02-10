@@ -167,7 +167,7 @@ Albany::LameProblem::constructEvaluators(
   // Construct standard FEM evaluators with standard field names
   RCP<Albany::Layouts> dl = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->vectorAndGradientLayoutsAreEquivalent == false,
       std::logic_error,
       "Data Layout Usage in Mechanics problems assume vecDim = numDim");
@@ -218,7 +218,7 @@ Albany::LameProblem::constructEvaluators(
   Teuchos::RCP<PHX::Evaluator<AlbanyTraits>> ev;
 
   if (haveSource) {  // Source
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Error!  Sources not implemented in Elasticity yet!");

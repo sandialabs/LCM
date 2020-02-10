@@ -17,7 +17,7 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(
     const Teuchos::RCP<Albany::Layouts>& dl)
     : sideSetName(p.get<std::string>("Side Set Name"))
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! Layout for side set " << sideSetName << " not found.\n");
@@ -63,7 +63,7 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(
 
     layout = VERTEX_VECTOR;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid field layout.\n");
@@ -160,7 +160,7 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::evaluateFields(
                   val_cell(cell, sideNodes[side][node], i, j);
         break;
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error! Invalid layout (this error should have happened earlier "

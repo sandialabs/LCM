@@ -9,7 +9,7 @@
 #include "Albany_MaterialDatabase.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -30,7 +30,7 @@ LameStressBase<EvalT, Traits>::LameStressBase(Teuchos::ParameterList& p)
   numQPs  = dims[1];
   numDims = dims[2];
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       this->numDims != 3,
       Teuchos::Exceptions::InvalidParameter,
       " LAME materials enabled only for three-dimensional analyses.");
@@ -125,7 +125,7 @@ template <typename EvalT, typename Traits>
 void
 LameStressBase<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       "LameStressBase::evaluateFields not implemented for this template type",
       Teuchos::Exceptions::InvalidParameter,
       "Need specialization.");

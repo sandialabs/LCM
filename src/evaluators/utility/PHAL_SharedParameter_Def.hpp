@@ -9,7 +9,7 @@
 
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -83,12 +83,12 @@ SharedParameterVec<EvalT, Traits>::SharedParameterVec(
   paramNames  = p.get<Teuchos::Array<std::string>>("Parameters Names");
   paramValues = p.get<Teuchos::Array<ScalarT>>("Parameters Values");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       paramNames.size() == numParams,
       std::logic_error,
       "Error! The array of names' size does not match the layout first "
       "dimension.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       paramValues.size() == numParams,
       std::logic_error,
       "Error! The array of values' size does not match the layout first "
@@ -130,7 +130,7 @@ SharedParameterVec<EvalT, Traits>::getValue(const std::string& n)
   for (int i = 0; i < numParams; ++i)
     if (n == paramNames[i]) return paramValues[i];
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true, std::runtime_error, "Error! Parameter name not found.\n");
 
   // To avoid warnings

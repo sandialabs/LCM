@@ -18,6 +18,7 @@
 #include <Ionit_Initializer.h>
 #include <Ioss_SubSystem.h>
 
+#include "Albany_Macros.hpp"
 #include <Intrepid_FieldContainer.hpp>
 #include <Teuchos_Array.hpp>
 #include <Teuchos_ArrayRCP.hpp>
@@ -124,20 +125,20 @@ interpolate(
   int timestep_count = io_region->get_property("state_count").get_int();
   int step           = src_snap_no;
   if (step > timestep_count)
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
             << " > total number of snapshots in " << source_mesh_input_file
-            << " = " << timestep_count << "." << std::endl;);
+            << " = " << timestep_count << "." << std::endl);
   if (step <= 0)
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
-            << "; value must be > 0." << std::endl;);
+            << "; value must be > 0." << std::endl);
 
   if (timestep_count > 0) {
     double time = io_region->get_state_time(step);
@@ -186,7 +187,7 @@ interpolate(
     *out << "   Field with name " << source_field_name
          << " found in source mesh file!" << std::endl;
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -223,7 +224,7 @@ interpolate(
     *out << "   Field with name " << target_field_name
          << " found in target mesh file!" << std::endl;
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -237,20 +238,20 @@ interpolate(
   timestep_count = io_region->get_property("state_count").get_int();
   step           = tgt_snap_no;
   if (step > timestep_count)
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no
             << " > total number of snapshots in " << target_mesh_input_file
-            << " = " << timestep_count << "." << std::endl;);
+            << " = " << timestep_count << "." << std::endl);
   if (step <= 0)
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
             << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no
-            << "; value must be > 0." << std::endl;);
+            << "; value must be > 0." << std::endl);
   if (timestep_count > 0) {
     double time = io_region->get_state_time(step);
     if (step == timestep_count) interpolation_intervals = 1;
@@ -421,7 +422,7 @@ main(int argc, char* argv[])
   else if (field_type == "Node Tensor")
     field_type_num = 2;
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

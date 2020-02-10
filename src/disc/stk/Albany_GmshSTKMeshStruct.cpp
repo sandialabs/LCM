@@ -6,9 +6,12 @@
 
 #include "Albany_GmshSTKMeshStruct.hpp"
 
-#include <Albany_STKNodeSharing.hpp>
-#include <Shards_BasicTopologies.hpp>
 #include <iostream>
+
+#include "Albany_Macros.hpp"
+#include <Albany_STKNodeSharing.hpp>
+#include "Albany_Utils.hpp"
+#include <Shards_BasicTopologies.hpp>
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
@@ -19,10 +22,7 @@
 #include "Teuchos_CommHelpers.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
-//#include <stk_mesh/fem/FEMHelpers.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-
-#include "Albany_Utils.hpp"
 
 Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
@@ -50,7 +50,7 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     } else if (ascii) {
       loadAsciiMesh();
     } else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Error! Mesh format not recognized.\n");
@@ -117,7 +117,7 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
       }
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! Invalid number of element nodes (you should have got an "
@@ -363,7 +363,7 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
           break;
         }
 
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           found == false,
           std::logic_error,
           "Error! Cannot find element connected to side " << i + 1 << ".\n");
@@ -422,13 +422,13 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
   // Start reading nodes
   std::string line;
   swallow_lines_until(ifile, line, "$NOD");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ifile.eof(), std::runtime_error, "Error! Nodes section not found.\n");
 
   // Read the number of nodes
   std::getline(ifile, line);
   NumNodes = std::atoi(line.c_str());
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       NumNodes <= 0,
       Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of nodes.\n");
@@ -443,13 +443,13 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
   // Start reading elements (cells and sides)
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$ELM");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ifile.eof(), std::runtime_error, "Error! Element section not found.\n");
 
   // Read the number of entities
   std::getline(ifile, line);
   int num_entities = std::atoi(line.c_str());
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       num_entities <= 0,
       Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of mesh elements.\n");
@@ -468,15 +468,15 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
     increment_element_type(e_type);
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       nb_tetra * nb_hexas != 0,
       std::logic_error,
       "Error! Cannot mix tetrahedra and hexahedra.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       nb_trias * nb_quads != 0,
       std::logic_error,
       "Error! Cannot mix triangles and quadrilaterals.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
       std::logic_error,
       "Error! Can only handle 2D and 3D geometries.\n");
@@ -529,14 +529,14 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::runtime_error, "Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$ELM");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ifile.eof(),
       std::runtime_error,
       "Error! Element section not found; however, it was found earlier. This "
@@ -583,7 +583,7 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
       case 15:  // Point
         break;
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             Teuchos::Exceptions::InvalidParameter,
             "Error! Element type not supported; but you should have got an "
@@ -613,7 +613,7 @@ Albany::GmshSTKMeshStruct::set_NumNodes(std::ifstream& ifile)
 {
   std::string line;
   swallow_lines_until(ifile, line, "$Nodes");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ifile.eof(), std::runtime_error, "Error! Nodes section not found.\n");
 
   if (version == GmshVersion::V2_2) {
@@ -629,7 +629,7 @@ Albany::GmshSTKMeshStruct::set_NumNodes(std::ifstream& ifile)
     ss >> num_entity_blocks >> NumNodes >> min_node_tag >> max_node_tag;
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       NumNodes <= 0,
       Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of nodes.\n");
@@ -677,7 +677,7 @@ Albany::GmshSTKMeshStruct::set_num_entities(std::ifstream& ifile)
   std::string line;
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Elements");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ifile.eof(), std::runtime_error, "Error! Element section not found.\n");
 
   // Read the number of entities
@@ -697,7 +697,7 @@ Albany::GmshSTKMeshStruct::set_num_entities(std::ifstream& ifile)
     num_entities = num_elements;
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       num_entities <= 0,
       Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of mesh elements.\n");
@@ -719,7 +719,7 @@ Albany::GmshSTKMeshStruct::increment_element_type(int e_type)
     case 11: ++nb_tet10; break;
     case 15: /*point*/ break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Error! Element type (" << e_type << ") not supported.\n");
@@ -783,20 +783,20 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
     mixed_order_mesh      = (nb_tri6 != 0) || mixed_order_mesh;
     mixed_order_mesh      = (nb_tet10 != 0) || mixed_order_mesh;
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         mixed_order_mesh,
         std::logic_error,
         "Error! Found second order elements in first order mesh.\n");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         nb_tetra * nb_hexas != 0,
         std::logic_error,
         "Error! Cannot mix tetrahedra and hexahedra.\n");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         nb_trias * nb_quads != 0,
         std::logic_error,
         "Error! Cannot mix triangles and quadrilaterals.\n");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
         std::logic_error,
         "Error! Can only handle 2D and 3D geometries.\n");
@@ -805,7 +805,7 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
     mixed_order_mesh      = (nb_trias != 0) || mixed_order_mesh;
     mixed_order_mesh      = (nb_tetra != 0) || mixed_order_mesh;
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         mixed_order_mesh,
         std::logic_error,
         "Error! Found first order elements in second order mesh.\n");
@@ -814,18 +814,18 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
     missing_parts      = (nb_tri6 == 0) || missing_parts;
     missing_parts      = (nb_tet10 == 0) || missing_parts;
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         missing_parts,
         std::logic_error,
         "Error! This second order mesh is missing secord order parts.\n");
 
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error! Could not determine if mesh was first or second order.\n"
             << "Checked for number of 2pt lines and 3pt lines, both are "
-               "non-zero. \n")
+        "non-zero. \n");
   }
 
   return;
@@ -913,7 +913,7 @@ Albany::GmshSTKMeshStruct::set_generic_mesh_info()
     elems        = quads;
     sides        = lines;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::runtime_error, "Error! Invalid mesh dimension.\n");
   }
   return;
@@ -988,7 +988,7 @@ Albany::GmshSTKMeshStruct::store_element_info(
     case 15:  // Point
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Error! Element type not supported; but you should have got an error "
@@ -1005,7 +1005,7 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
   std::string line;
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Elements");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ifile.eof(),
       std::runtime_error,
       "Error! Element section not found; however, it was found earlier. This "
@@ -1024,7 +1024,7 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
       std::getline(ifile, line);
       std::stringstream ss(line);
       ss >> id >> e_type >> n_tags;
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           n_tags <= 0,
           Teuchos::Exceptions::InvalidParameter,
           "Error! Number of tags must be positive.\n");
@@ -1141,19 +1141,19 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
   } one;
 
   ifile.read(one.c, sizeof(int));
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       one.i != 1, std::runtime_error, "Error! Uncompatible binary format.\n");
 
   // Start reading nodes
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Nodes");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ifile.eof(), std::runtime_error, "Error! Nodes section not found.\n");
 
   // Read the number of nodes
   std::getline(ifile, line);
   NumNodes = std::atoi(line.c_str());
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       NumNodes <= 0,
       Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of nodes.\n");
@@ -1169,13 +1169,13 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
   // Start reading elements (cells and sides)
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Elements");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ifile.eof(), std::runtime_error, "Error! Element section not found.\n");
 
   // Read the number of entities
   std::getline(ifile, line);
   int num_entities = std::atoi(line.c_str());
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       num_entities <= 0,
       Teuchos::Exceptions::InvalidParameter,
       "Error! Invalid number of mesh elements.\n");
@@ -1190,11 +1190,11 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     int header[3];
     ifile.read(reinterpret_cast<char*>(header), 3 * sizeof(int));
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         header[1] <= 0,
         std::logic_error,
         "Error! Invalid number of elements of this type.\n");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         header[2] <= 0, std::logic_error, "Error! Invalid number of tags.\n");
 
     e_type = header[0];
@@ -1241,21 +1241,21 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       case 15:  // Point
         break;
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             Teuchos::Exceptions::InvalidParameter,
             "Error! Element type not supported.\n");
     }
   }
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       nb_tetra * nb_hexas != 0,
       std::logic_error,
       "Error! Cannot mix tetrahedra and hexahedra.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       nb_trias * nb_quads != 0,
       std::logic_error,
       "Error! Cannot mix triangles and quadrilaterals.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
       std::logic_error,
       "Error! Can only handle 2D and 3D geometries.\n");
@@ -1308,7 +1308,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::runtime_error, "Error! Invalid mesh dimension.\n");
   }
 
@@ -1323,11 +1323,11 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     int header[3];
     ifile.read(reinterpret_cast<char*>(header), 3 * sizeof(int));
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         header[1] <= 0,
         std::logic_error,
         "Error! Invalid number of elements of this type.\n");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         header[2] <= 0, std::logic_error, "Error! Invalid number of tags.\n");
 
     e_type = header[0];
@@ -1410,7 +1410,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       case 15:  // Point
         break;
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             Teuchos::Exceptions::InvalidParameter,
             "Error! Element type not supported.\n");
@@ -1581,7 +1581,7 @@ Albany::GmshSTKMeshStruct::check_version(std::ifstream& ifile)
       *out << *it << std::endl;
     }
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "Cannot read this version of gmsh *.msh file!");
@@ -1595,7 +1595,7 @@ Albany::GmshSTKMeshStruct::open_fname(std::ifstream& ifile)
 {
   ifile.open(fname.c_str());
   if (!ifile.is_open()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "Error! Cannot open mesh file '" << fname << "'.\n");
@@ -1658,12 +1658,12 @@ Albany::GmshSTKMeshStruct::get_physical_tag_to_surface_tag_map(
     ss >> surface_tag >> min_x >> min_y >> min_z >> max_x >> max_y >> max_z >>
         num_physical_tags >> physical_tag >> num_bounding_curves >> curve_tag;
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         num_physical_tags > 1,
         std::runtime_error,
         "Cannot support more than one physical tag per surface.\n");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         num_physical_tags < 0,
         std::runtime_error,
         "Cannot have a negative number of physical tags per surface.\n");
@@ -1727,7 +1727,7 @@ Albany::GmshSTKMeshStruct::read_physical_names_from_file(
               << "physical_surface_tags.size() = "
               << physical_surface_tags.size() << ". \n"
               << "names.size() = " << names.size() << ". \n";
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         physical_surface_tags.size() != names.size(),
         std::runtime_error,
         error_msg.str());

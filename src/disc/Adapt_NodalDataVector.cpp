@@ -6,6 +6,7 @@
 
 #include "Adapt_NodalDataVector.hpp"
 
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Teuchos_CommHelpers.hpp"
 
@@ -96,7 +97,7 @@ NodalDataVector::getNDofsAndOffset(
   NodeFieldSizeMap::const_iterator it;
   it = nodeVectorMap.find(stateName);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (it == nodeVectorMap.end()),
       std::logic_error,
       std::endl
@@ -141,7 +142,7 @@ NodalDataVector::saveNodalDataVector(
     const int                                    offset) const
 {
   Albany::NodeFieldContainer::const_iterator it = nodeContainer->find(name);
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       it == nodeContainer->end(),
       std::logic_error,
       "Error: Cannot locate nodal field " << name << " in NodalDataVector");

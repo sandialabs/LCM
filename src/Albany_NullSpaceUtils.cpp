@@ -7,6 +7,7 @@
 #include "Albany_NullSpaceUtils.hpp"
 
 #include "Albany_CommUtils.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Albany_TpetraThyraUtils.hpp"
 #include "Piro_StratimikosUtils.hpp"
@@ -120,7 +121,7 @@ Coord2RBM(
         break;
 
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Coord2RBM: Ndof = " << Ndof << " not implemented\n");
@@ -193,7 +194,7 @@ Coord2RBM_nonElasticity(
         break;
 
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Coord2RBM_nonElasticity: Ndof = " << Ndof << " not implemented\n");
@@ -360,7 +361,7 @@ RigidBodyModes::setCoordinates(const Teuchos::RCP<Thyra_MultiVector>& coordMV_)
 {
   coordMV = coordMV_;
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !isMueLuUsed() && !isFROSchUsed(),
       std::logic_error,
       "setCoordinates was called without setting an ML, MueLu or FROSch "
@@ -424,7 +425,7 @@ RigidBodyModes::setCoordinatesAndNullspace(
         Coord2RBM<Tpetra_NullSpace_Traits>(
             coordMV, numPDEs, numScalar, nullSpaceDim, trr);
 
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           soln_vs.is_null(),
           std::logic_error,
           "numElasticityDim > 0 and (isMueLuUsed() or isFROSchUsed()): "
@@ -437,7 +438,7 @@ RigidBodyModes::setCoordinatesAndNullspace(
     }
   }
   if (isFROSchUsed()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         soln_overlap_vs.is_null(),
         std::logic_error,
         "isFROSchUsed(): soln_overlap_map must be provided.");

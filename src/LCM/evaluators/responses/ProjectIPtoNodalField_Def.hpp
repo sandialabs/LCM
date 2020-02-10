@@ -232,7 +232,7 @@ typename ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
   else if (str == "Tensor")
     return tensor;
   else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameterValue,
         "Field Layout value "
@@ -319,7 +319,7 @@ struct EMassLinearOpType
     else if (str == "Lumped")
       return lumped;
     else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameterValue,
           "Mass Matrix Type value "
@@ -390,7 +390,7 @@ class ProjectIPtoNodalFieldManager::FullMassLinearOp
         if (is_static_graph) {
           const LO ret = Albany::addToGlobalRowValues(
               this->linear_op_, global_row, cols(), vals());
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               ret != 0,
               std::logic_error,
               "Albany::addToGlobalRowValues failed: global row "

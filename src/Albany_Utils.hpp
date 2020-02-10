@@ -149,37 +149,6 @@ writeMatrixMarket(
     writeMatrixMarket(x[i].getConst(), new_prefix, counter);
   }
 }
-/////
-
-// void
-// writeMatrixMarket(
-//    Teuchos::RCP<Tpetra_MultiVector const> const& x, std::string const&
-//    prefix, int const counter = -1);
-
-// void
-// writeMatrixMarket(
-//    Teuchos::RCP<Tpetra_CrsMatrix const> const& A, std::string const& prefix,
-//    int const counter = -1);
-
-// void
-// writeMatrixMarket(
-//    Teuchos::Array<Teuchos::RCP<Tpetra_Vector const>> const& x,
-//    std::string const& prefix, int const counter = -1);
-
-// void
-// writeMatrixMarket(
-//    Teuchos::Array<Teuchos::RCP<Tpetra_CrsMatrix const>> const& A,
-//    std::string const& prefix, int const counter = -1);
-
-// void
-// writeMatrixMarket(
-//    Teuchos::Array<Teuchos::RCP<Tpetra_Vector>> const& x,
-//    std::string const& prefix, int const counter = -1);
-
-// void
-// writeMatrixMarket(
-//    Teuchos::Array<Teuchos::RCP<Tpetra_CrsMatrix>> const& A,
-//    std::string const& prefix, int const counter = -1);
 
 // Parses and stores command-line arguments
 struct CmdLineArgs

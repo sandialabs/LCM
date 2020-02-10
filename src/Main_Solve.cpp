@@ -174,7 +174,7 @@ main(int argc, char* argv[])
               &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
 
       const int numParameters = pList->get<int>("Number");
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           numParameters == 0,
           Teuchos::Exceptions::InvalidParameter,
           std::endl
@@ -202,7 +202,7 @@ main(int argc, char* argv[])
 
       if (number_exists) {
         const int numParameters = pList->get<int>("Number");
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             numParameters == 0,
             Teuchos::Exceptions::InvalidParameter,
             std::endl

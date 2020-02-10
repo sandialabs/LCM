@@ -7,7 +7,7 @@
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_Utilities.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Base Class Generic Implemtation

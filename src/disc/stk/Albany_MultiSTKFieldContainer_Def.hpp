@@ -110,7 +110,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 
       // make sure the number of entries is even
 
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           (solution_vector[vec_num].size() % 2),
           std::logic_error,
           "Error in input file: specification of solution vector layout is "
@@ -143,7 +143,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
           sol_index[vec_num].push_back(len);
 
         } else {
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::logic_error,
               "Error in input file: specification of solution vector layout is "
@@ -151,7 +151,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
                   << std::endl);
         }
       }
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           accum != neq_,
           std::logic_error,
           "Error in input file: specification of solution vector layout is "
@@ -190,7 +190,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 
     // make sure the number of entries is even
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         (residual_vector.size() % 2),
         std::logic_error,
         "Error in input file: specification of residual vector layout is "
@@ -223,7 +223,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
         res_index.push_back(len);
 
       } else {
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error in input file: specification of residual vector layout is "
@@ -231,7 +231,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
                 << std::endl);
       }
     }
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         accum != neq_,
         std::logic_error,
         "Error in input file: specification of residual vector layout is "
@@ -624,7 +624,7 @@ MultiSTKFieldContainer<Interleaved>::fillVectorImpl(
           offset);
     }
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "Error! Only scalar and vector fields supported so far.\n");
@@ -686,7 +686,7 @@ MultiSTKFieldContainer<Interleaved>::saveVectorImpl(
           offset);
     }
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "Error! Only scalar and vector fields supported so far.\n");

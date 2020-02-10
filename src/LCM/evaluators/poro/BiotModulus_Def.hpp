@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -40,7 +40,7 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
     // Add Biot Modulus as a Sacado-ized parameter
     this->registerSacadoParameter("Biot Modulus", paramLib);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid Biot modulus type " << type);
@@ -129,7 +129,7 @@ BiotModulus<EvalT, Traits>::getValue(const std::string& n)
     return FluidBulkModulus;
   else if (n == "Grain Bulk Modulus Value")
     return GrainBulkModulus;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

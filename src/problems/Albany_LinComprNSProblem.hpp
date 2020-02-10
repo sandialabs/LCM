@@ -155,7 +155,7 @@ Albany::LinComprNSProblem::constructEvaluators(
   int                                               offset            = 0;
 
   // Make sure we are transient
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       number_of_time_deriv < 0 || number_of_time_deriv > 1,
       std::logic_error,
       "Albany_LinComprNSProblem must be defined as a steady or transient "

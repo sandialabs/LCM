@@ -10,7 +10,7 @@
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "PHAL_SaveSideSetStateField.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -67,12 +67,12 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::
   this->addEvaluatedField(*savestate_operation);
 
   if (nodalState) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         field.fieldTag().dataLayout().size() < 3,
         Teuchos::Exceptions::InvalidParameter,
         "Error! To save a side-set nodal state, pass the cell-side-based "
         "version of it (<Cell,Side,Node,...>).\n");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         field.fieldTag().dataLayout().name(2) != "Node",
         Teuchos::Exceptions::InvalidParameter,
         "Error! To save a side-set nodal state, the third tag of the layout "
@@ -127,7 +127,7 @@ void
 SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
     typename Traits::EvalData workset)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.sideSets == Teuchos::null,
       std::logic_error,
       "Error! The mesh does not store any side set.\n");
@@ -135,7 +135,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end())
     return;  // Side set not present in this workset
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.disc == Teuchos::null,
       std::logic_error,
       "Error! The workset must store a valid discretization pointer.\n");
@@ -143,12 +143,12 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   const Albany::AbstractDiscretization::SideSetDiscretizationsType& ssDiscs =
       workset.disc->getSideSetDiscretizations();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ssDiscs.size() == 0,
       std::logic_error,
       "Error! The discretization must store side set discretizations.\n");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ssDiscs.find(sideSetName) == ssDiscs.end(),
       std::logic_error,
       "Error! No discretization found for side set " << sideSetName << ".\n");
@@ -156,7 +156,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   Teuchos::RCP<Albany::AbstractDiscretization> ss_disc =
       ssDiscs.at(sideSetName);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ss_disc == Teuchos::null,
       std::logic_error,
       "Error! Side discretization is invalid for side set " << sideSetName
@@ -165,7 +165,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   const std::map<std::string, std::map<GO, GO>>& ss_maps =
       workset.disc->getSideToSideSetCellMap();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ss_maps.find(sideSetName) == ss_maps.end(),
       std::logic_error,
       "Error! Something is off: the mesh has side discretization but no "
@@ -180,7 +180,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   Albany::WsLIDList&     elemGIDws2D  = ss_disc->getElemGIDws();
 
   // Get side_node->side_set_cell_node map from discretization
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.disc->getSideNodeNumerationMap().find(sideSetName) ==
           workset.disc->getSideNodeNumerationMap().end(),
       std::logic_error,
@@ -193,7 +193,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   field.dimensions(dims);
   const std::string& tag2 =
       dims.size() > 2 ? field.fieldTag().dataLayout().name(2) : "";
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dims.size() > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim",
       std::logic_error,
       "Error! Invalid field layout in SaveSideSetStateField.\n");
@@ -208,7 +208,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
     const int side     = it_side.side_local_id;
 
     // Not sure if this is even possible, but just for debug pourposes
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         elemGIDws3D[it_side.elem_GID].ws != workset.wsIndex,
         std::logic_error,
         "Error! This workset has a side that belongs to an element not in the "
@@ -218,7 +218,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
     //    1) the 2D-wsIndex where the 2D element lies
     //    2) the LID of the 2D element
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         ss_map.find(side_GID) == ss_map.end(),
         std::logic_error,
         "Error! The sideId-to-sideSetElemId map does not store this side GID. "
@@ -230,7 +230,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
 
     // Then, after a safety check, we extract the StateArray of the desired
     // state in the right 2D-ws
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         esa[wsIndex2D].find(stateName) == esa[wsIndex2D].end(),
         std::logic_error,
         "Error! Cannot locate " << stateName
@@ -282,7 +282,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
         break;
 
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error! Unexpected array dimensions in SaveSideSetStateField: "
@@ -296,7 +296,7 @@ void
 SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
     typename Traits::EvalData workset)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.sideSets == Teuchos::null,
       std::logic_error,
       "Error! The mesh does not store any side set.\n");
@@ -312,7 +312,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   //       with stk fields. To do this we must extract entities from the bulk
   //       data and use them to access the values of the stk field.
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.disc == Teuchos::null,
       std::logic_error,
       "Error! The workset must store a valid discretization pointer.\n");
@@ -324,12 +324,12 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   const Albany::AbstractDiscretization::SideSetDiscretizationsType& ssDiscs =
       disc->getSideSetDiscretizations();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ssDiscs.size() == 0,
       std::logic_error,
       "Error! The discretization must store side set discretizations.\n");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ssDiscs.find(sideSetName) == ssDiscs.end(),
       std::logic_error,
       "Error! No discretization found for side set " << sideSetName << ".\n");
@@ -340,14 +340,14 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   const std::map<std::string, std::map<GO, GO>>& ss_maps =
       disc->getSideToSideSetCellMap();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ss_maps.find(sideSetName) == ss_maps.end(),
       std::logic_error,
       "Error! Something is off: the mesh has side discretization but no "
       "sideId-to-sideSetElemId map.\n");
 
   // Get side_node->side_set_cell_node map from discretization
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       disc->getSideNodeNumerationMap().find(sideSetName) ==
           disc->getSideNodeNumerationMap().end(),
       std::logic_error,
@@ -356,7 +356,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   Teuchos::RCP<Albany::AbstractSTKMeshStruct> mesh =
       Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(
           ss_disc->getMeshStruct());
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       mesh == Teuchos::null,
       std::runtime_error,
       "Error! Save nodal states available only for stk meshes.\n");
@@ -418,7 +418,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         case 3:  // node_scalar
           scalar_field =
               metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               scalar_field == 0,
               std::runtime_error,
               "Error! Field not found.\n");
@@ -433,7 +433,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         case 4:  // node_vector
           vector_field =
               metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               vector_field == 0,
               std::runtime_error,
               "Error! Field not found.\n");
@@ -446,7 +446,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
           }
           break;
         default:  // error!
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::runtime_error,
               "Error! Unexpected field dimension (only node_scalar/node_vector "
@@ -472,7 +472,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         case 3:  // node_scalar
           scalar_field =
               metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               scalar_field == 0,
               std::runtime_error,
               "Error! Field not found.\n");
@@ -488,7 +488,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         case 4:  // node_vector
           vector_field =
               metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               vector_field == 0,
               std::runtime_error,
               "Error! Field not found.\n");
@@ -503,7 +503,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
           }
           break;
         default:  // error!
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::runtime_error,
               "Error! Unexpected field dimension (only node_scalar/node_vector "

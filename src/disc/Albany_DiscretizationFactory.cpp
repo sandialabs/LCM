@@ -15,7 +15,7 @@
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "Albany_TmplSTKMeshStruct.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "Topology_Utils.hpp"
 
 Albany::DiscretizationFactory::DiscretizationFactory(
@@ -222,7 +222,7 @@ Albany::DiscretizationFactory::createMeshStruct(
     return Teuchos::rcp(new Albany::GmshSTKMeshStruct(disc_params, comm));
   } else
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -267,7 +267,7 @@ Albany::DiscretizationFactory::createDiscretization(
         AbstractFieldContainer::FieldContainerRequirements>& side_set_req,
     const Teuchos::RCP<Albany::RigidBodyModes>&              rigidBodyModes)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       meshStruct == Teuchos::null,
       std::logic_error,
       "meshStruct accessed, but it has not been constructed" << std::endl);

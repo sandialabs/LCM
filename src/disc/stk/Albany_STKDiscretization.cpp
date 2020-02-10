@@ -135,7 +135,7 @@ Basis(const int C)
 
   // Check for valid value of C
   int deg = (int)std::sqrt((double)C);
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       deg * deg != C || deg < 2,
       std::logic_error,
       " Albany_STKDiscretization Error Basis not perfect "
@@ -553,7 +553,7 @@ void
 STKDiscretization::setCoordinates(
     const Teuchos::ArrayRCP<const double>& /* c */)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "STKDiscretization::setCoordinates is not implemented.");
@@ -563,7 +563,7 @@ void
 STKDiscretization::setReferenceConfigurationManager(
     const Teuchos::RCP<AAdapt::rc::Manager>& /* rcm */)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "STKDiscretization::setReferenceConfigurationManager is not "
@@ -828,7 +828,7 @@ STKDiscretization::transformMesh()
       *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
     }
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "STKDiscretization::transformMesh() Unknown transform type :"
@@ -1270,7 +1270,7 @@ void
 STKDiscretization::getSolutionField(Thyra_Vector& result, const bool overlapped)
     const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(overlapped, std::logic_error, "Not implemented.");
+  ALBANY_PANIC(overlapped, std::logic_error, "Not implemented.");
 
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1287,7 +1287,7 @@ STKDiscretization::getSolutionMV(
     Thyra_MultiVector& result,
     const bool         overlapped) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(overlapped, std::logic_error, "Not implemented.");
+  ALBANY_PANIC(overlapped, std::logic_error, "Not implemented.");
 
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1459,7 +1459,7 @@ STKDiscretization::nonzeroesPerRow(const int num_eq) const
     case 2: estNonzeroesPerRow = 9 * num_eq; break;
     case 3: estNonzeroesPerRow = 27 * num_eq; break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true, std::logic_error, "STKDiscretization:  Bad numDim" << numDim);
   }
   return estNonzeroesPerRow;
@@ -2085,7 +2085,7 @@ STKDiscretization::computeWorksetInfo()
         const GO                node_gid = gid(rowNode);
         const LO node_lid = ov_node_indexer->getLocalElement(node_gid);
 
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             node_lid < 0,
             std::logic_error,
             "STK1D_Disc: node_lid out of range " << node_lid << std::endl);
@@ -2102,7 +2102,7 @@ STKDiscretization::computeWorksetInfo()
               const GO node_gid = gid(rowNode);
               const LO node_lid = overlap_node_mapT->getLocalElement(node_gid);
 
-              TEUCHOS_TEST_FOR_EXCEPTION(node_lid<0, std::logic_error,
+              ALBANY_PANIC(node_lid<0, std::logic_error,
                "STK1D_Disc: node_lid out of range " << node_lid << std::endl);
               coords[b][i][j] = stk::mesh::field_data(*coordinates_field,
          rowNode);
@@ -2332,7 +2332,7 @@ STKDiscretization::computeSideSets()
          localSideID++) {
       stk::mesh::Entity sidee = sides[localSideID];
 
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           bulkData.num_elements(sidee) != 1,
           std::logic_error,
           "STKDisc: cannot figure out side set topology for side set "
@@ -2629,7 +2629,7 @@ STKDiscretization::setupNetCDFOutput()
             theMPIComm,
             info,
             &netCDFp))
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "nc_create_par returned error code "
@@ -2641,7 +2641,7 @@ STKDiscretization::setupNetCDFOutput()
               name.c_str(),
               NC_CLOBBER | NC_SHARE | NC_64BIT_OFFSET | NC_CLASSIC_MODEL,
               &netCDFp))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_create returned error code " << ierr << " - "
@@ -2657,7 +2657,7 @@ STKDiscretization::setupNetCDFOutput()
       if (netCDFp)
         if (const int ierr =
                 nc_def_dim(netCDFp, dimnames[i], dimlen[i], &dimID[i]))
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::logic_error,
               "nc_def_dim returned error code "
@@ -2672,7 +2672,7 @@ STKDiscretization::setupNetCDFOutput()
       if (netCDFp)
         if (const int ierr = nc_def_var(
                 netCDFp, field_name, NC_DOUBLE, 4, dimID, &varSolns[n]))
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::logic_error,
               "nc_def_var " << field_name << " returned error code " << ierr
@@ -2682,7 +2682,7 @@ STKDiscretization::setupNetCDFOutput()
       if (netCDFp)
         if (const int ierr = nc_put_att(
                 netCDFp, varSolns[n], "FillValue", NC_DOUBLE, 1, &fillVal))
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::logic_error,
               "nc_put_att FillValue returned error code "
@@ -2697,7 +2697,7 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr =
               nc_def_var(netCDFp, "lat", NC_DOUBLE, 1, &dimID[2], &latVarID))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_def_var lat returned error code "
@@ -2705,7 +2705,7 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, latVarID, "long_name", sizeof(lat_name), lat_name))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_put_att_text " << lat_name << " returned error code " << ierr
@@ -2713,7 +2713,7 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, latVarID, "units", sizeof(lat_unit), lat_unit))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_put_att_text " << lat_unit << " returned error code " << ierr
@@ -2723,7 +2723,7 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr =
               nc_def_var(netCDFp, "lon", NC_DOUBLE, 1, &dimID[3], &lonVarID))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_def_var lon returned error code "
@@ -2731,7 +2731,7 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, lonVarID, "long_name", sizeof(lon_name), lon_name))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_put_att_text " << lon_name << " returned error code " << ierr
@@ -2739,7 +2739,7 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, lonVarID, "units", sizeof(lon_unit), lon_unit))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_put_att_text " << lon_unit << " returned error code " << ierr
@@ -2749,7 +2749,7 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, NC_GLOBAL, "history", sizeof(history), history))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_put_att_text " << history << " returned error code " << ierr
@@ -2757,7 +2757,7 @@ STKDiscretization::setupNetCDFOutput()
 
     if (netCDFp)
       if (const int ierr = nc_enddef(netCDFp))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_enddef returned error code " << ierr << " - "
@@ -2772,14 +2772,14 @@ STKDiscretization::setupNetCDFOutput()
 
     if (netCDFp)
       if (const int ierr = nc_put_var(netCDFp, lonVarID, &deglon[0]))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_put_var lon returned error code "
                 << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
       if (const int ierr = nc_put_var(netCDFp, latVarID, &deglat[0]))
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "nc_put_var lat returned error code "
@@ -2860,7 +2860,7 @@ STKDiscretization::meshToGraph()
   std::size_t max_nsur = 0;
   for (int ncnt = 0; ncnt < numOverlapNodes; ncnt++) {
     if (sur_elem[ncnt].empty()) {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Node = " << ncnt + 1 << " has no elements" << std::endl);

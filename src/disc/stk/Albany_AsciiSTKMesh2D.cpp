@@ -58,7 +58,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
         NumElemNodes = number;
       }
       if (shape == "Triangle") {
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             NumElemNodes != 3,
             Teuchos::Exceptions::InvalidParameter,
             std::endl
@@ -67,7 +67,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
                 << fname << " is: " << NumElemNodes << ". Should be 3!"
                 << std::endl);
       } else if (shape == "Quadrilateral") {
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             NumElemNodes != 4,
             Teuchos::Exceptions::InvalidParameter,
             std::endl
@@ -76,7 +76,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
                 << fname << " is: "
                 << " is: " << NumElemNodes << ". Should be 4!" << std::endl);
       } else
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             Teuchos::Exceptions::InvalidParameter,
             std::endl
@@ -142,7 +142,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
       }
       ifile.close();
     } else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           std::endl

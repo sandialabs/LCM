@@ -12,7 +12,7 @@
 #include "PHAL_ReadStateField.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Phalanx_DataLayout_MDALayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -96,7 +96,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   } else if (field_type == "Node") {
     readNodalState(workset);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         field_type == "Cell" || field_type == "Node",
         std::runtime_error,
         "Error! Only read cell or node states for now.\n");

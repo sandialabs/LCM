@@ -178,14 +178,14 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   for (auto ss : sss) {
     auto& ssb = ss->get_side_blocks();
     if (ssb.size() == 0) { continue; }
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         ssb.size() == 0,
         std::runtime_error,
         "Error! There is a sideset (" + ss->name() +
             ") in the input mesh with zero side sets.\n");
 
     const auto* ioss_topo = ssb[0]->topology();
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         ioss_topo == nullptr,
         std::runtime_error,
         "I give up. No topology in the input mesh for side set " + ss->name()
@@ -232,7 +232,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     cub_rule =
         static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_LOBATTO);
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameterValue,
         "Invalid Cubature Rule: "
@@ -574,7 +574,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
                                // coherence should change exactly twice
     }
   }
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !coherence,
       std::runtime_error,
       "Error! The maps 'side_to_cell_map' and 'side_nodes_ids' should either "

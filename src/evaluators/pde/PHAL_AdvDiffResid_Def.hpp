@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -61,7 +61,7 @@ AdvDiffResid<EvalT, Traits>::AdvDiffResid(const Teuchos::ParameterList& p)
   bool error = true;
   if (formType == 1 || formType == 2) error = false;
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       error,
       std::logic_error,
       "Invalid Augmented Form Type: " << formType

@@ -49,7 +49,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
   } else if (layout == "Cell Side Vector") {
     sideSetName = p.get<std::string>("Side Set Name");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !dl->isSideLayouts,
         Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
@@ -62,7 +62,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
   } else if (layout == "Cell Side Gradient") {
     sideSetName = p.get<std::string>("Side Set Name");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !dl->isSideLayouts,
         Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
@@ -75,7 +75,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
   } else if (layout == "Cell Side Node Vector") {
     sideSetName = p.get<std::string>("Side Set Name");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !dl->isSideLayouts,
         Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
@@ -88,7 +88,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
   } else if (layout == "Cell Side QuadPoint Vector") {
     sideSetName = p.get<std::string>("Side Set Name");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !dl->isSideLayouts,
         Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
@@ -101,7 +101,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
   } else if (layout == "Cell Side QuadPoint Gradient") {
     sideSetName = p.get<std::string>("Side Set Name");
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !dl->isSideLayouts,
         Teuchos::Exceptions::InvalidParameter,
         "Error! The layouts structure does not appear to be that of a side "
@@ -112,7 +112,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
 
     dl->qp_gradient->dimensions(dims);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid field layout.\n");
@@ -146,7 +146,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
     this->addDependentField(regularizationParam);
     printedReg = -1.0;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid regularization type");
@@ -238,7 +238,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(
       }
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true, std::logic_error, "Error! Invalid field layout.\n");
   }
 }

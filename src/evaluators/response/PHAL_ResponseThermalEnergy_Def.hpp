@@ -7,7 +7,7 @@
 
 #include "PHAL_Utilities.hpp"
 #include "Teuchos_CommHelpers.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 template <typename EvalT, typename Traits>
@@ -44,7 +44,7 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
     local_response_layout  = dl->cell_scalar;
     global_response_layout = dl->workset_scalar;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid field type " << fieldType << ".  Support value is "

@@ -22,7 +22,7 @@
 #include "Albany_Utils.hpp"
 #include "Kokkos_Macros.hpp"
 #include "MatrixMarket_Tpetra.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace Albany {
 
@@ -226,7 +226,7 @@ printThyraVector(
   Teuchos::ArrayRCP<const ST> vv          = Albany::getLocalData(vec);
   const int                   localLength = vv.size();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       names.size() != localLength,
       std::logic_error,
       "Error! names and mvec length do not match.\n");
@@ -248,7 +248,7 @@ printThyraMultiVector(
       Albany::getLocalData(mvec);
   const int numVecs     = mvec->domain()->dim();
   const int localLength = mvv.size() > 0 ? mvv[0].size() : 0;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       names.size() != localLength,
       std::logic_error,
       "Error! names and mvec length do not match.\n");

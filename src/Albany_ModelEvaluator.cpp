@@ -11,7 +11,7 @@
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Teuchos_ScalarTraits.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // uncomment the following to write stuff out to matrix market to debug
 
@@ -87,7 +87,7 @@ ModelEvaluator::ModelEvaluator(
             &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
 
     const int numParameters = pList->get<int>("Number");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         numParameters == 0,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -118,7 +118,7 @@ ModelEvaluator::ModelEvaluator(
 
     if (number_exists) {
       const int numParameters = pList->get<int>("Number");
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           numParameters == 0,
           Teuchos::Exceptions::InvalidParameter,
           std::endl
@@ -184,7 +184,7 @@ ModelEvaluator::ModelEvaluator(
     if (pList->isParameter("Lower Bounds")) {
       param_lower_bds[l]    = Thyra::createMember(param_vss[l]);
       Teuchos::Array<ST> lb = pList->get<Teuchos::Array<ST>>("Lower Bounds");
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           lb.size() != numParameters,
           Teuchos::Exceptions::InvalidParameter,
           "Error! Input lower bounds array has the wrong dimension.\n");
@@ -200,7 +200,7 @@ ModelEvaluator::ModelEvaluator(
     if (pList->isParameter("Upper Bounds")) {
       param_upper_bds[l]    = Thyra::createMember(param_vss[l]);
       Teuchos::Array<ST> ub = pList->get<Teuchos::Array<ST>>("Upper Bounds");
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           ub.size() != numParameters,
           Teuchos::Exceptions::InvalidParameter,
           "Error! Input upper bounds array has the wrong dimension.\n");
@@ -217,7 +217,7 @@ ModelEvaluator::ModelEvaluator(
     if (pList->isParameter("Nominal Values")) {
       Teuchos::Array<ST> nvals =
           pList->get<Teuchos::Array<ST>>("Nominal Values");
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           nvals.size() != numParameters,
           Teuchos::Exceptions::InvalidParameter,
           "Error! Input nominal values array has the wrong dimension.\n");
@@ -259,7 +259,7 @@ ModelEvaluator::ModelEvaluator(
 
       p_name_ptr = (*p_name_ptr != emptyString) ? p_name_ptr : &name_from_list;
 
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           (*p_name_ptr != name_from_list) && (name_from_list != emptyString),
           Teuchos::Exceptions::InvalidParameter,
           std::endl
@@ -270,7 +270,7 @@ ModelEvaluator::ModelEvaluator(
               << std::endl);
     }
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !distParamLib->has(*p_name_ptr),
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -403,7 +403,7 @@ ModelEvaluator::get_f_space() const
 Teuchos::RCP<const Thyra_VectorSpace>
 ModelEvaluator::get_p_space(int l) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       l >= num_param_vecs + num_dist_param_vecs || l < 0,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -422,7 +422,7 @@ ModelEvaluator::get_p_space(int l) const
 Teuchos::RCP<const Thyra_VectorSpace>
 ModelEvaluator::get_g_space(int l) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       l >= app->getNumResponses() || l < 0,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -435,7 +435,7 @@ ModelEvaluator::get_g_space(int l) const
 Teuchos::RCP<const Teuchos::Array<std::string>>
 ModelEvaluator::get_p_names(int l) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       l >= num_param_vecs + num_dist_param_vecs || l < 0,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -467,7 +467,7 @@ ModelEvaluator::create_W_prec() const
 Teuchos::RCP<Thyra_LinearOp>
 ModelEvaluator::create_DfDp_op_impl(int j) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       j >= num_param_vecs + num_dist_param_vecs || j < num_param_vecs,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -504,7 +504,7 @@ ModelEvaluator::reportFinalPoint(
 Teuchos::RCP<Thyra_LinearOp>
 ModelEvaluator::create_DgDx_op_impl(int j) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       j >= app->getNumResponses() || j < 0,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -518,7 +518,7 @@ ModelEvaluator::create_DgDx_op_impl(int j) const
 Teuchos::RCP<Thyra_LinearOp>
 ModelEvaluator::create_DgDx_dotdot_op_impl(int j) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       j >= app->getNumResponses() || j < 0,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -531,7 +531,7 @@ ModelEvaluator::create_DgDx_dotdot_op_impl(int j) const
 Teuchos::RCP<Thyra_LinearOp>
 ModelEvaluator::create_DgDx_dot_op_impl(int j) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       j >= app->getNumResponses() || j < 0,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

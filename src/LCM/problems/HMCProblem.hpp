@@ -201,7 +201,7 @@ Albany::HMCProblem::constructEvaluators(
   std::string material_model_name =
       material_db_->getElementBlockSublist(eb_name, "Material Model")
           .get<std::string>("Model Name");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       material_model_name.length() == 0,
       std::logic_error,
       "A material model must be defined for block: " + eb_name);
@@ -242,7 +242,7 @@ Albany::HMCProblem::constructEvaluators(
   // Construct standard FEM evaluators with standard field names
   dl = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->vectorAndGradientLayoutsAreEquivalent == false,
       std::logic_error,
       "Data Layout Usage in Mechanics problems assume vecDim = numDim");

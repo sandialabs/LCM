@@ -8,7 +8,7 @@
 
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 template <typename EvalT, typename Traits>
 PHAL::TEProp<EvalT, Traits>::TEProp(Teuchos::ParameterList& p)
@@ -113,13 +113,13 @@ template <typename EvalT, typename Traits>
 int
 PHAL::TEProp<EvalT, Traits>::whichMat(const MeshScalarT& x)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       x < xBounds[0] || x > xBounds[mats],
       std::logic_error,
       "Quadrature point " << x << " not within bounds \n");
   for (int i = 0; i < mats; i++)
     if (x < xBounds[i + 1]) return i;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "Quadrature point " << x << " not within bounds \n");

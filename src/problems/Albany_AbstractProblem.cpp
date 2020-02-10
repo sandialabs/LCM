@@ -58,7 +58,7 @@ Albany::AbstractProblem::AbstractProblem(
     number_of_time_deriv = 1;
     SolutionMethodName   = AerasHyperviscosity;
   } else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Solution Method must be Steady, Transient, Transient Tempus, "
@@ -72,7 +72,7 @@ Albany::AbstractProblem::AbstractProblem(
 unsigned int
 Albany::AbstractProblem::numEquations() const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       neq <= 0,
       Teuchos::Exceptions::InvalidParameter,
       "A Problem must have at least 1 equation: " << neq);

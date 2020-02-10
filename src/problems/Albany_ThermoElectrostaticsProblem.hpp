@@ -152,7 +152,7 @@ Albany::ThermoElectrostaticsProblem::constructEvaluators(
   bool                                              supportsTransient = false;
 
   // Problem is not transient
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       number_of_time_deriv != 0,
       std::logic_error,
       "Albany_ThermoElectroStaticsProblem cannot be defined as a transient "

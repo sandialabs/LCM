@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -56,7 +56,7 @@ BodyForce<EvalT, Traits>::BodyForce(
     len = sqrt(len);
     for (int i = 0; i < 3; i++) { this->rotation_axis_[i] /= len; }
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid body force type " << type);

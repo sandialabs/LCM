@@ -11,7 +11,7 @@
 #include "MiniTensor.h"
 #include "MiniTensor_Definitions.h"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 

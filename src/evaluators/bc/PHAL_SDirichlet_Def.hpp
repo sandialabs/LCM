@@ -13,7 +13,7 @@
 #include "PHAL_SDirichlet.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -200,7 +200,7 @@ template <typename Traits>
 void SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     typename Traits::EvalData /* dirichlet_workset */)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

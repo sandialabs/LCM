@@ -9,7 +9,7 @@
 #include "Albany_ContactManager.hpp"
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Base Class Generic Implemtation

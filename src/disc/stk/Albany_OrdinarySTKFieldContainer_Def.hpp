@@ -534,7 +534,7 @@ OrdinarySTKFieldContainer<Interleaved>::fillVectorImpl(
           0);
     }
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "Error! Only scalar and vector fields supported so far.\n");
@@ -595,7 +595,7 @@ OrdinarySTKFieldContainer<Interleaved>::saveVectorImpl(
           0);
     }
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "Error! Only scalar and vector fields supported so far.\n");

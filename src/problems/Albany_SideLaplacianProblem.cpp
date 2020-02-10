@@ -47,7 +47,7 @@ SideLaplacian::buildProblem(
     Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
     Albany::StateManager&                                    stateMgr)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       meshSpecs.size() != 1,
       std::logic_error,
       "Problem supports one Material Block");
@@ -77,7 +77,7 @@ SideLaplacian::buildProblem(
   int numSideQPs      = -1;
 
   if (numDim == 3) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         meshSpecs[0]->sideSetMeshSpecs.find(sideSetName) ==
             meshSpecs[0]->sideSetMeshSpecs.end(),
         std::logic_error,

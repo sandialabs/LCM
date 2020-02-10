@@ -10,7 +10,7 @@
 #include "PHAL_SaveStateField.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Phalanx_DataLayout_MDALayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -82,12 +82,12 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
   this->utils.setFieldData(field, fm);
 
   if (nodalState) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         field.fieldTag().dataLayout().size() < 2,
         Teuchos::Exceptions::InvalidParameter,
         "Error! To save a nodal state, pass the cell-based version of it "
         "(<Cell,Node,...>).\n");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         field.fieldTag().dataLayout().name(1) != "Node",
         Teuchos::Exceptions::InvalidParameter,
         "Error! To save a nodal state, the second tag of the layout MUST be "
@@ -119,7 +119,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   Albany::StateArray::const_iterator it;
   it = workset.stateArrayPtr->find(stateName);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
       std::logic_error,
       std::endl
@@ -179,7 +179,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveWorksetState(
   Albany::StateArray::const_iterator it;
   it = workset.stateArrayPtr->find(stateName);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
       std::logic_error,
       std::endl
@@ -221,7 +221,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   //       data and use them to access the values of the stk field.
 
   Teuchos::RCP<Albany::AbstractDiscretization> disc = workset.disc;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       disc == Teuchos::null,
       std::runtime_error,
       "Error! Discretization is needed to save nodal state.\n");
@@ -229,7 +229,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   Teuchos::RCP<Albany::AbstractSTKMeshStruct> mesh =
       Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(
           disc->getMeshStruct());
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       mesh == Teuchos::null,
       std::runtime_error,
       "Error! Save nodal states available only for stk meshes.\n");
@@ -255,7 +255,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
     case 2:  // node_scalar
       scalar_field =
           metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           scalar_field == 0, std::runtime_error, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
@@ -268,7 +268,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
     case 3:  // node_vector
       vector_field =
           metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           vector_field == 0, std::runtime_error, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
@@ -279,7 +279,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         }
       break;
     default:  // error!
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::runtime_error,
           "Error! Unexpected field dimension (only node_scalar/node_vector for "

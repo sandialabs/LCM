@@ -7,7 +7,7 @@
 #include <string>
 
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -21,12 +21,12 @@ TimeTracBC_Base<EvalT, Traits>::TimeTracBC_Base(Teuchos::ParameterList& p)
 
   if (this->bc_type == PHAL::NeumannBase<EvalT, Traits>::COORD)
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !(this->cellDims == BCValues.getNumCols()),
         Teuchos::Exceptions::InvalidParameter,
         "Dimension of the current problem and \"BC Values\" do not match");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !(timeValues.size() == BCValues.getNumRows()),
       Teuchos::Exceptions::InvalidParameter,
       "Dimension of \"Time Values\" and \"BC Values\" do not match");
@@ -37,7 +37,7 @@ template <typename EvalT, typename Traits>
 void
 TimeTracBC_Base<EvalT, Traits>::computeVal(RealType time)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       time > timeValues.back(),
       Teuchos::Exceptions::InvalidParameter,
       "Time is growing unbounded!");
@@ -63,7 +63,7 @@ template <typename EvalT, typename Traits>
 void
 TimeTracBC_Base<EvalT, Traits>::computeCoordVal(RealType time)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       time > timeValues.back(),
       Teuchos::Exceptions::InvalidParameter,
       "Time is growing unbounded!");
@@ -117,7 +117,7 @@ TimeTracBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
     default:
 
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Time dependent Neumann boundary condition of type - "

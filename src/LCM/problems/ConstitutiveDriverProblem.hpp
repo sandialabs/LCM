@@ -229,7 +229,7 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
   std::string material_model_name =
       material_db_->getElementBlockSublist(eb_name, "Material Model")
           .get<std::string>("Model Name");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       material_model_name.length() == 0,
       std::logic_error,
       "A material model must be defined for block: " + eb_name);
@@ -249,7 +249,7 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
       workset_size, num_vertices_, num_nodes_, num_pts_, num_dims_));
   std::string msg =
       "Data Layout Usage in Mechanics problems assume vecDim = num_dims_";
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl_->vectorAndGradientLayoutsAreEquivalent == false,
       std::logic_error,
       msg);

@@ -7,7 +7,7 @@
 #include <MiniTensor.h>
 
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // #include "Intrepid2_FunctionSpaceTools.hpp"
 #include <typeinfo>

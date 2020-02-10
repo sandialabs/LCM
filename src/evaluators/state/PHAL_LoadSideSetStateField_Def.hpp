@@ -8,7 +8,7 @@
 #include "PHAL_LoadSideSetStateField.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Shards_CellTopology.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 namespace PHAL {
@@ -49,7 +49,7 @@ void
 LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.sideSets == Teuchos::null,
       std::logic_error,
       "Error! The mesh does not store any side set.\n");
@@ -57,7 +57,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end())
     return;  // Side set not present in this workset
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.disc == Teuchos::null,
       std::logic_error,
       "Error! The workset must store a valid discretization pointer.\n");
@@ -65,12 +65,12 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   const Albany::AbstractDiscretization::SideSetDiscretizationsType& ssDiscs =
       workset.disc->getSideSetDiscretizations();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ssDiscs.size() == 0,
       std::logic_error,
       "Error! The discretization must store side set discretizations.\n");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ssDiscs.find(sideSetName) == ssDiscs.end(),
       std::logic_error,
       "Error! No discretization found for side set " << sideSetName << ".\n");
@@ -78,7 +78,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   Teuchos::RCP<Albany::AbstractDiscretization> ss_disc =
       ssDiscs.at(sideSetName);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ss_disc == Teuchos::null,
       std::logic_error,
       "Error! Side discretization is invalid for side set " << sideSetName
@@ -87,7 +87,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   const std::map<std::string, std::map<GO, GO>>& ss_maps =
       workset.disc->getSideToSideSetCellMap();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       ss_maps.find(sideSetName) == ss_maps.end(),
       std::logic_error,
       "Error! Something is off: the mesh has side discretization but no "
@@ -102,7 +102,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   Albany::WsLIDList&     elemGIDws2D  = ss_disc->getElemGIDws();
 
   // Get side_node->side_set_cell_node map from discretization
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.disc->getSideNodeNumerationMap().find(sideSetName) ==
           workset.disc->getSideNodeNumerationMap().end(),
       std::logic_error,
@@ -116,7 +116,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   int                size = dims.size();
   const std::string& tag2 =
       size > 2 ? field.fieldTag().dataLayout().name(2) : "";
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       size > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim",
       std::logic_error,
       "Error! Invalid field layout in LoadSideSetStateField.\n");
@@ -131,7 +131,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     const int side     = it_side.side_local_id;
 
     // Not sure if this is even possible, but just for debug pourposes
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         elemGIDws3D[it_side.elem_GID].ws != workset.wsIndex,
         std::logic_error,
         "Error! This workset has a side that belongs to an element not in the "
@@ -141,7 +141,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     //    1) the 2D-wsIndex where the 2D element lies
     //    2) the LID of the 2D element
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         ss_map.find(side_GID) == ss_map.end(),
         std::logic_error,
         "Error! The sideId-to-sideSetElemId map does not store this side GID. "
@@ -153,7 +153,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 
     // Then, after a safety check, we extract the StateArray of the desired
     // state in the right 2D-ws
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         esa[wsIndex2D].find(stateName) == esa[wsIndex2D].end(),
         std::logic_error,
         "Error! Cannot locate " << stateName
@@ -202,7 +202,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
         break;
 
       default:
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error! Unexpected array dimensions in LoadSideSetStateField: "

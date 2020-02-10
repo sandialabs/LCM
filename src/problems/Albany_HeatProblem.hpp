@@ -164,7 +164,7 @@ Albany::HeatProblem::constructEvaluators(
   const int numVertices = cellType->getNodeCount();
 
   // Problem is steady or transient
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       number_of_time_deriv < 0 || number_of_time_deriv > 1,
       std::logic_error,
       "Albany_HeatProblem must be defined as a steady or transient "

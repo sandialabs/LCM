@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -104,7 +104,7 @@ ComprNSResid<EvalT, Traits>::ComprNSResid(const Teuchos::ParameterList& p)
   std::cout << " numDims = " << numDims << std::endl;
 
   if (vecDim != numDims + 2) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

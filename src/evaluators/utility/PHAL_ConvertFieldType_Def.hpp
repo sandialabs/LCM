@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 //#include "Kokkos_DynRankView_Fad.hpp"
 
 #include "PHAL_Workset.hpp"
@@ -29,7 +29,7 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(
   } else if (p.isParameter("Field Name")) {
     input_field_name = output_field_name = p.get<std::string>("Field Name");
   } else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, Teuchos::Exceptions::InvalidParameter, "Field Name not set.\n");
   in_field = decltype(in_field)(
       input_field_name, p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"));
@@ -109,7 +109,7 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::evaluateFields(
                   out_field(i, j, k, l, m, n) = in_field(i, j, k, l, m, n);
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           "Implemented only up to 6 dimensions in data layout.\n");

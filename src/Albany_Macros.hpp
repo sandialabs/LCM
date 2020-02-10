@@ -33,6 +33,7 @@
   } while (0)
 
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")
+#define ALBANY_PANIC(cond, except, msg) ALBANY_ASSERT(!(cond), msg)
 
 #if defined(NDEBUG)
 #define ALBANY_EXPECT(...)

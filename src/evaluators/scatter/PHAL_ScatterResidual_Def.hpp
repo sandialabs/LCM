@@ -15,7 +15,7 @@
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_ScatterResidual.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Base Class Generic Implemtation
@@ -42,7 +42,7 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
     names =
         Teuchos::ArrayRCP<std::string>(1, p.get<std::string>("Residual Name"));
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "Error! You must specify either the std::string 'Residual Name', "

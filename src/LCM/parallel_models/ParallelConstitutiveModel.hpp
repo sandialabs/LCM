@@ -228,7 +228,7 @@ class ParallelConstitutiveModel : public LCM::ConstitutiveModel<EvalT, Traits>
       FieldMap<const ScalarT>   dep_fields,
       FieldMap<ScalarT>         eval_fields) override
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, "Not implemented.");
+    ALBANY_PANIC(true, std::logic_error, "Not implemented.");
   }
 
  protected:

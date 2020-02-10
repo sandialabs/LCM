@@ -240,7 +240,7 @@ FieldManagerScalarResponseFunction::evaluateResponse(
     const Teuchos::Array<ParamVec>&         p,
     const Teuchos::RCP<Thyra_Vector>&       g)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !performedPostRegSetup,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -278,7 +278,7 @@ FieldManagerScalarResponseFunction::evaluateTangent(
     const Teuchos::RCP<Thyra_MultiVector>&       gx,
     const Teuchos::RCP<Thyra_MultiVector>&       gp)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !performedPostRegSetup,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -323,7 +323,7 @@ FieldManagerScalarResponseFunction::evaluateGradient(
     const Teuchos::RCP<Thyra_MultiVector>& dg_dxdotdot,
     const Teuchos::RCP<Thyra_MultiVector>& /* dg_dp */)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !performedPostRegSetup,
       Teuchos::Exceptions::InvalidParameter,
       std::endl
@@ -389,7 +389,7 @@ FieldManagerScalarResponseFunction::evaluateDistParamDeriv(
     const std::string&                      dist_param_name,
     const Teuchos::RCP<Thyra_MultiVector>&  dg_dp)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !performedPostRegSetup,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

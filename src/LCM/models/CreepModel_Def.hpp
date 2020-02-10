@@ -9,7 +9,7 @@
 
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -337,7 +337,7 @@ CreepModel<EvalT, Traits>::computeState(
               }
             }
 
-            TEUCHOS_TEST_FOR_EXCEPTION(
+            ALBANY_PANIC(
                 count == max_count,
                 std::runtime_error,
                 std::endl
@@ -427,7 +427,7 @@ CreepModel<EvalT, Traits>::computeState(
           res = std::abs(F[0]);
           if (res < 1.e-10 || res / f < 1.E-11) converged = true;
 
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               count > 30,
               std::runtime_error,
               std::endl

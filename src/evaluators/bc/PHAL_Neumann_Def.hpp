@@ -11,7 +11,7 @@
 #include "PHAL_Neumann.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
 
@@ -74,7 +74,7 @@ NeumannBase<EvalT, Traits>::NeumannBase(const Teuchos::ParameterList& p)
     for (it = meshSpecs->ebNameToIndex.begin();
          it != meshSpecs->ebNameToIndex.end();
          it++) {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           !materialDB->isElementBlockParam(it->first, "Flux Scale"),
           Teuchos::Exceptions::InvalidParameter,
           "Cannot locate the value of \"Flux Scale\" for element block "
@@ -189,7 +189,7 @@ NeumannBase<EvalT, Traits>::NeumannBase(const Teuchos::ParameterList& p)
     else if (strncasecmp(sideTypeName, "Quad", 4) == 0)
       side_type[i] = QUAD;
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "PHAL_Neumann: side type : " << sideTypeName << " is not supported."
@@ -288,7 +288,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
 
   if (workset.sideSets == Teuchos::null || this->sideSetID.length() == 0)
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Side sets defined in input file but not properly specified on the mesh"

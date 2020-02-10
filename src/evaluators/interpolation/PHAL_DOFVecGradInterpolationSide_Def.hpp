@@ -5,7 +5,7 @@
 //
 
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -22,7 +22,7 @@ DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::
           p.get<std::string>("Gradient Variable Name"),
           dl_side->qp_vecgradient)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !dl_side->isSideLayouts,
       Teuchos::Exceptions::InvalidParameter,
       "Error! The layouts structure does not appear to be that of a side "

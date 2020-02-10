@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -41,7 +41,7 @@ BiotCoefficient<EvalT, Traits>::BiotCoefficient(Teuchos::ParameterList& p)
     // Add Biot Coefficient as a Sacado-ized parameter
     this->registerSacadoParameter("Biot Coefficient", paramLib);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid Biot coefficient type " << type);
@@ -111,7 +111,7 @@ BiotCoefficient<EvalT, Traits>::getValue(const std::string& n)
     return Kskeleton_value;
   else if (n == "Grain Bulk Modulus Value")
     return Kgrain_value;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

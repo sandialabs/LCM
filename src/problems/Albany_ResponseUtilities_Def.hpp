@@ -143,7 +143,7 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
   }
 
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

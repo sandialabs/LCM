@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 template <typename ScalarT>
 inline ScalarT
@@ -259,7 +259,7 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     }
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "NOTE: Please remember that the Anisotropic size field is defined as a "

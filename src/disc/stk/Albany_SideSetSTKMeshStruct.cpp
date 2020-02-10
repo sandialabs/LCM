@@ -63,7 +63,7 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
       stk::mesh::set_topology(*partVec[0], stk::topology::QUAD_4_2D);
     } else {
       // Invalid
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameterValue,
           "Error! Invalid side topology name for elemeent 'Wedge_6'. Valid "
@@ -75,7 +75,7 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
       input_elem_name == "Triangle_3" || input_elem_name == "Quadrilateral_4") {
     stk::mesh::set_topology(*partVec[0], stk::topology::LINE_2_1D);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error! The side-set mesh extraction has not yet been implemented for "
@@ -143,7 +143,7 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
 {
   this->SetupFieldData(commT, neq_, req, sis, worksetSize);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       parentMeshStruct->ssPartVec.find(parentMeshSideSetName) ==
           parentMeshStruct->ssPartVec.end(),
       std::logic_error,

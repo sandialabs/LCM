@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <string>
 
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // LAME material models
 #if defined(ALBANY_LAME)
@@ -70,7 +70,7 @@ constructLameMaterialModel(
   else if (materialModelName == "CRYSTAL_PLASTICITY")
     materialModel = Teuchos::rcp(new lame::CrystalPlasticity(props));
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         " unsupported LAME material model: " + lameMaterialModelName + " (" +
@@ -84,7 +84,7 @@ constructLameMaterialModel(
     materialModel = Teuchos::rcp(new lament::Neohookean<double>(props));
   else {
     if (materialModel.is_null())
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           " unsupported LAMENT material model: " + lameMaterialModelName +

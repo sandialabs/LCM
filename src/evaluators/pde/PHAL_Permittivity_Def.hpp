@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // Radom field types
 /*
@@ -69,7 +69,7 @@ Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
     if (p.isType<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB")) {
       materialDB = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
     } else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           std::endl
@@ -93,7 +93,7 @@ Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
   }  // Block dependent
 
   else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid permittivity type " << type);
@@ -168,7 +168,7 @@ Permittivity<EvalT, Traits>::getValue(const std::string& n)
   for (int i = 0; i < rv.size(); i++) {
     if (n == Albany::strint("Permittivity KL Random Variable", i)) return rv[i];
   }
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

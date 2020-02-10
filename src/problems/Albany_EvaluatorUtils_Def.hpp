@@ -490,7 +490,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
         const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature,
         const std::string&                                   sideSetName) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
@@ -563,7 +563,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
         const std::string&                                   sideSetName,
         const bool                                           buildNormals) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
@@ -735,7 +735,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
         const std::string& dof_name,
         const std::string& sideSetName) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
@@ -791,7 +791,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
         const std::string& dof_name,
         const std::string& sideSetName) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
@@ -914,7 +914,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
         const std::string& dof_name,
         const std::string& sideSetName) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
@@ -975,7 +975,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
         const std::string& dof_name,
         const std::string& sideSetName) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! The layout structure for side set " << sideSetName
@@ -1061,7 +1061,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
         const std::string& sideSetName,
         const int          fieldDim) const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! The layout structure for side set " << sideSetName

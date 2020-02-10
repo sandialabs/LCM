@@ -2,6 +2,7 @@
 #define ALBANY_GLOBAL_LOCAL_INDEXER_HPP
 
 #include "Albany_CommTypes.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraTypes.hpp"
 
 namespace Albany {
@@ -11,7 +12,7 @@ class GlobalLocalIndexer
  public:
   GlobalLocalIndexer(const Teuchos::RCP<const Thyra_VectorSpace>& vs) : m_vs(vs)
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         m_vs.is_null(),
         std::logic_error,
         "Error! Input vector space pointer is null.\n");

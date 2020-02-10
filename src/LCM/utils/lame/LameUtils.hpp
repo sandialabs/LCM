@@ -66,7 +66,7 @@ parameterListToMatProps(
       // Flag for reading from xml materials database is a bool -- not sent to
       // Lame
     } else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           " parameters for LAME material models must be of type double, int, "
@@ -113,7 +113,7 @@ constructLamentMaterialModel(
     materialModel = Teuchos::rcp(new lament::Neohookean<ScalarT>(props));
   else {
     if (materialModel.is_null())
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           " unsupported LAMENT material model: " + lameMaterialModelName +

@@ -31,7 +31,7 @@ Albany::LameProblem::LameProblem(
   }
 
   // currently only support 3D analyses
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       neq != 3,
       Teuchos::Exceptions::InvalidParameter,
       "\nOnly three-dimensional analyses are suppored when using the Library "

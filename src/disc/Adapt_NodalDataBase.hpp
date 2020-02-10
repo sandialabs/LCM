@@ -10,6 +10,7 @@
 #include "Adapt_NodalFieldUtils.hpp"
 #include "Albany_AbstractNodeFieldContainer.hpp"
 #include "Albany_CommTypes.hpp"
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraCrsMatrixFactory.hpp"
 #include "Albany_ThyraTypes.hpp"
 #include "Teuchos_RCP.hpp"
@@ -79,7 +80,7 @@ class NodalDataBase
   Teuchos::RCP<Adapt::NodalDataVector>
   getNodalDataVector()
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         nodal_data_vector.is_null(),
         std::logic_error,
         "nodal_data_vector has not been allocated.");

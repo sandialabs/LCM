@@ -156,7 +156,7 @@ Albany::AdvDiffProblem::constructEvaluators(
 
   // This problem appears to be only defined as a transient problem, throw
   // exception if it is not
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       number_of_time_deriv != 1,
       std::logic_error,
       "Albany_AdvDiffProblem must be defined as a transient calculation.");

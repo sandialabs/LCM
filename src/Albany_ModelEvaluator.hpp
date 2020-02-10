@@ -7,6 +7,7 @@
 #ifndef ALBANY_MODEL_EVALUATOR_HPP
 #define ALBANY_MODEL_EVALUATOR_HPP
 
+#include "Albany_Macros.hpp"
 #include "Albany_SacadoTypes.hpp"
 #include "Albany_ThyraTypes.hpp"
 #include "Albany_TpetraTypes.hpp"
@@ -53,7 +54,7 @@ class ModelEvaluator
   Teuchos::ArrayView<const std::string>
   get_g_names(int /* j */) const
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, "not impl'ed");
+    ALBANY_PANIC(true, std::logic_error, "not impl'ed");
   }
 
   Thyra_InArgs

@@ -65,7 +65,7 @@ read(const Albany::MDArray& mda, PHX::MDField<RealType>& f)
           f(cell, qp, i0, i1) = mda(cell, qp, i0, i1);
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true, std::logic_error, "dims.size() \notin {2,3,4}.");
   }
 }
@@ -87,7 +87,7 @@ write(Albany::MDArray& mda, const MDArray& f)
           mda(cell, qp, i0, i1) = f(cell, qp, i0, i1);
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true, std::logic_error, "dims.size() \notin {2,3,4}.");
   }
 }
@@ -332,7 +332,7 @@ Projector::fillRhs(
         switch (rank) {
           case 0:
           case 1:
-            TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, "!impl");
+            ALBANY_PANIC(true, std::logic_error, "!impl");
             break;
           case 2: {
             switch (transformation) {
@@ -363,7 +363,7 @@ Projector::fillRhs(
           default:
             std::stringstream ss;
             ss << "invalid rank: " << f.name << " with rank " << rank;
-            TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, ss.str());
+            ALBANY_PANIC(true, std::logic_error, ss.str());
         }
       }
     }
@@ -427,7 +427,7 @@ Projector::interp(
       switch (rank) {
         case 0:
         case 1:
-          TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, "!impl");
+          ALBANY_PANIC(true, std::logic_error, "!impl");
           break;
         case 2: {
           for (int i = 0; i < ndim; ++i)
@@ -449,7 +449,7 @@ Projector::interp(
         default:
           std::stringstream ss;
           ss << "invalid rank: " << f.name << " with rank " << rank;
-          TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, ss.str());
+          ALBANY_PANIC(true, std::logic_error, ss.str());
       }
     }
 }
@@ -665,7 +665,7 @@ struct Manager::Impl
     } else {
       // The most obvious reason this exception could be thrown is because
       // EvalT=Jacobian is run before Residual, which I think should not happen.
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           is_g(workset.wsIndex),
           std::logic_error,
           "If usingProjection(), then readQpField should always see G, not g.");
@@ -764,7 +764,7 @@ struct Manager::Impl
   {
     Albany::StateArray& esa = state_mgr_->getStateArrays().elemStateArrays[wi];
     Albany::StateArray::iterator it = esa.find(name);
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         it == esa.end(),
         std::logic_error,
         "elemStateArrays is missing " + name);
@@ -1001,7 +1001,7 @@ const Teuchos::RCP<Thyra_MultiVector>&
 Manager::getNodalField(const Field& f, const int g_idx, const bool overlapped)
     const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !overlapped, std::logic_error, "must be overlapped");
   return f.data_->mv[g_idx];
 }
@@ -1117,7 +1117,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       case 8: return x * x;
       case 9: return x * x * x;
     }
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error: unhandled argument in evalf() in AAdapt_RC_Manager.cpp"

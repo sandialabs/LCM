@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -40,7 +40,7 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
     // Add Poissons Ratio as a Sacado-ized parameter
     this->registerSacadoParameter("Poissons Ratio", paramLib);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid Poissons ratio type " << type);
@@ -113,7 +113,7 @@ PoissonsRatio<EvalT, Traits>::getValue(const std::string& n)
     return constant_value;
   else if (n == "dnudT Value")
     return dnudT_value;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

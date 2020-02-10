@@ -33,7 +33,7 @@ getComm(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
   auto tmap = getTpetraMap(vs, false);
   if (!tmap.is_null()) { return tmap->getComm(); }
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getComm! Could not cast Thyra_VectorSpace to any of the "
@@ -47,7 +47,7 @@ getMaxAllGlobalIndex(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
   auto tmap = getTpetraMap(vs, false);
   if (!tmap.is_null()) { return tmap->getMaxAllGlobalIndex(); }
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getMaxAllGlobalIndex! Could not cast Thyra_VectorSpace to any "
@@ -87,7 +87,7 @@ getGlobalElements(
 {
   auto     indexer  = createGlobalLocalIndexer(vs);
   const LO localDim = indexer->getNumLocalElements();
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       gids.size() != localDim,
       std::runtime_error,
       "Error! ArrayView for gids not properly dimensioned.\n");
@@ -123,7 +123,7 @@ sameAs(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in sameAs! Could not cast Thyra_VectorSpace to any of the "
@@ -143,7 +143,7 @@ removeComponents(
   if (!tmap.is_null()) {
     const LO num_node_lids         = tmap->getNodeNumElements();
     const LO num_reduced_node_lids = num_node_lids - local_components.size();
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         num_reduced_node_lids < 0,
         std::logic_error,
         "Error in removeComponents! Cannot remove more components than are "
@@ -169,7 +169,7 @@ removeComponents(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in removeComponents! Could not cast Thyra_VectorSpace to any of "
@@ -206,7 +206,7 @@ createSubspace(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in createSubspace! Could not cast Thyra_VectorSpace to any of the "
@@ -287,7 +287,7 @@ getColumnSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return createThyraVectorSpace(tmat->getColMap()); }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getColumnSpace! Could not cast Thyra_LinearOp to any of the "
@@ -305,7 +305,7 @@ getRowSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return createThyraVectorSpace(tmat->getRowMap()); }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getRowSpace! Could not cast Thyra_LinearOp to any of the "
@@ -325,7 +325,7 @@ getNumEntriesInLocalRow(
   if (!tmat.is_null()) { return tmat->getNumEntriesInLocalRow(lrow); }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getNumEntriesInLocalRow! Could not cast Thyra_LinearOp to any "
@@ -343,7 +343,7 @@ isFillActive(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return tmat->isFillActive(); }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in isFillActive! Could not cast Thyra_LinearOp to any of the "
@@ -361,7 +361,7 @@ isFillComplete(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return tmat->isFillComplete(); }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in isFillComplete! Could not cast Thyra_LinearOp to any of the "
@@ -382,7 +382,7 @@ resumeFill(const Teuchos::RCP<Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in resumeFill! Could not cast Thyra_LinearOp to any of the "
@@ -400,7 +400,7 @@ fillComplete(const Teuchos::RCP<Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in fillComplete! Could not cast Thyra_LinearOp to any of the "
@@ -428,7 +428,7 @@ assign(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST value)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in assign! Could not cast Thyra_LinearOp to any of the supported "
@@ -444,7 +444,7 @@ getDiagonalCopy(
   // From Thyra, we can't check the global ids of the range/domain vector
   // spaces, but at least we can check that they have the same (global)
   // dimension.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       lop->range()->dim() != lop->domain()->dim(),
       std::logic_error,
       "Error in getDiagonalCopy! Attempt to take the diagonal of a non-square "
@@ -461,7 +461,7 @@ getDiagonalCopy(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getDiagonalCopy! Could not cast Thyra_LinearOp to any of the "
@@ -478,7 +478,7 @@ scale(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST val)
     return;
   }
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in scale! Could not cast Thyra_LinearOp to any of the supported "
@@ -502,7 +502,7 @@ getLocalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getLocalRowValues! Could not cast Thyra_LinearOp to any of the "
@@ -539,7 +539,7 @@ addToLocalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in addToLocalRowValues! Could not cast Thyra_LinearOp to any of "
@@ -582,7 +582,7 @@ replaceGlobalValues(
     return;
   }
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in replaceGlobalValues! Could not cast Thyra_LinearOp to any of "
@@ -623,7 +623,7 @@ addToGlobalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in addToGlobalRowValues! Could not cast Thyra_LinearOp to any of "
@@ -645,7 +645,7 @@ setLocalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in setLocalRowValues! Could not cast Thyra_LinearOp to any of the "
@@ -663,7 +663,7 @@ setLocalRowValues(
   if (!tmat.is_null()) {
     Teuchos::ArrayView<const LO> indices;
     tmat->getGraph()->getLocalRowView(lrow, indices);
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         indices.size() != values.size(),
         std::logic_error,
         "Error! This routine is meant for setting *all* values in a row, "
@@ -674,7 +674,7 @@ setLocalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in setLocalRowValues! Could not cast Thyra_LinearOp to any of the "
@@ -692,7 +692,7 @@ getGlobalMaxNumRowEntries(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getGlobalMaxNumRowEntries! Could not cast Thyra_LinearOp to "
@@ -706,7 +706,7 @@ isStaticGraph(const Teuchos::RCP<Thyra_LinearOp>& lop)
   auto tmat = getTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return tmat->isStaticGraph(); }
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in isStaticGraph! Could not cast Thyra_LinearOp to any of the "
@@ -721,7 +721,7 @@ isStaticGraph(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return tmat->isStaticGraph(); }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in isStaticGraph! Could not cast Thyra_LinearOp to any of the "
@@ -740,7 +740,7 @@ createOneToOneVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace> vs)
     return createThyraVectorSpace(map);
   }
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in createOneToOneVectorSpace! Could not cast Thyra_VectorSpace to "
@@ -761,7 +761,7 @@ buildRestrictionOperator(
   const int localSubDim = subspace_indexer->getNumLocalElements();
   for (LO lid = 0; lid < localSubDim; ++lid) {
     const GO gid = subspace_indexer->getGlobalElement(lid);
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         space_indexer->isLocallyOwnedElement(gid),
         std::logic_error,
         "Error in buildRestrictionOperator! The input 'subspace' is not a "
@@ -790,7 +790,7 @@ buildProlongationOperator(
   const int localSubDim = subspace_indexer->getNumLocalElements();
   for (LO lid = 0; lid < localSubDim; ++lid) {
     const GO gid = subspace_indexer->getGlobalElement(lid);
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         space_indexer->isLocallyOwnedElement(gid),
         std::logic_error,
         "Error in buildProlongationOperator! The input 'subspace' is not a "
@@ -825,7 +825,7 @@ getDeviceData(Teuchos::RCP<const Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getDeviceData! Could not cast Thyra_Vector to any of the "
@@ -852,7 +852,7 @@ getNonconstDeviceData(Teuchos::RCP<Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getNonconstDeviceData! Could not cast Thyra_Vector to any of "
@@ -884,7 +884,7 @@ getNonconstLocalData(const Teuchos::RCP<Thyra_Vector>& v)
       spmd_v->getNonconstLocalData(Teuchos::outArg(vals));
     } else {
       // If all the tries above are unsuccessful, throw an error.
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::runtime_error,
           "Error in getNnconstLocalData! Could not cast Thyra_Vector to any of "
@@ -914,7 +914,7 @@ getLocalData(const Teuchos::RCP<const Thyra_Vector>& v)
       spmd_v->getLocalData(Teuchos::outArg(vals));
     } else {
       // If all the tries above are unsuccessful, throw an error.
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::runtime_error,
           "Error in getLocalData! Could not cast Thyra_Vector to any of the "
@@ -931,7 +931,7 @@ getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv)
   auto tv = getConstTpetraMultiVector(mv, false);
   if (!tv.is_null()) { return tv->getNumVectors(); }
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getNumVectors! Could not cast Thyra_MultiVector to any of the "
@@ -981,7 +981,7 @@ getNonconstLocalData(Thyra_Vector& v)
       spmd_v->getNonconstLocalData(Teuchos::outArg(vals));
     } else {
       // If all the tries above are unsuccessful, throw an error.
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::runtime_error,
           "Error in getNonconstLocalData! Could not cast Thyra_Vector to any "
@@ -1011,7 +1011,7 @@ getLocalData(const Thyra_Vector& v)
       spmd_v->getLocalData(Teuchos::outArg(vals));
     } else {
       // If all the tries above are unsuccessful, throw an error.
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::runtime_error,
           "Error in getLocalData! Could not cast Thyra_Vector to any of the "
@@ -1054,7 +1054,7 @@ getDeviceData(const Teuchos::RCP<const Thyra_Vector>& v)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getDeviceData! Could not cast Thyra_Vector to any of the "
@@ -1077,7 +1077,7 @@ getNonconstDeviceData(const Teuchos::RCP<Thyra_Vector>& v)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in getNonconstDeviceData! Could not cast Thyra_Vector to any of "
@@ -1131,7 +1131,7 @@ describe<Thyra_VectorSpace>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in describe! Could not cast Thyra_Vector to any of the supported "
@@ -1153,7 +1153,7 @@ describe<Thyra_Vector>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in describe! Could not cast Thyra_Vector to any of the supported "
@@ -1175,7 +1175,7 @@ describe<Thyra_LinearOp>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in describe! Could not cast Thyra_Vector to any of the supported "
@@ -1202,7 +1202,7 @@ writeMatrixMarket<const Thyra_Vector>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in writeMatrixMarket! Could not cast Thyra_Vector to any of the "
@@ -1234,7 +1234,7 @@ writeMatrixMarket<const Thyra_MultiVector>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in writeMatrixMarket! Could not cast Thyra_Vector to any of the "
@@ -1266,7 +1266,7 @@ writeMatrixMarket<const Thyra_LinearOp>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in writeMatrixMarket! Could not cast Thyra_LinearOp to any of the "
@@ -1300,7 +1300,7 @@ writeMatrixMarket<const Thyra_VectorSpace>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::runtime_error,
       "Error in writeMatrixMarket! Could not cast Thyra_VectorSpace to any of "

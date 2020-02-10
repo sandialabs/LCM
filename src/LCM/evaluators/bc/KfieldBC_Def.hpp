@@ -7,7 +7,7 @@
 #include "Albany_ThyraUtils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Genereric Template Code for Constructor and PostRegistrationSetup
@@ -42,12 +42,12 @@ KfieldBC_Base<EvalT, Traits>::KfieldBC_Base(Teuchos::ParameterList& p)
   KIValues   = p.get<Teuchos::Array<RealType>>("KI Values").toVector();
   KIIValues  = p.get<Teuchos::Array<RealType>>("KII Values").toVector();
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !(timeValues.size() == KIValues.size()),
       Teuchos::Exceptions::InvalidParameter,
       "Dimension of \"Time Values\" and \"KI Values\" do not match");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !(timeValues.size() == KIIValues.size()),
       Teuchos::Exceptions::InvalidParameter,
       "Dimension of \"Time Values\" and \"KII Values\" do not match");
@@ -74,7 +74,7 @@ KfieldBC_Base<EvalT, Traits>::computeBCs(
     ScalarT& Yval,
     RealType time)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       time > timeValues.back(),
       Teuchos::Exceptions::InvalidParameter,
       "Time is growing unbounded!");

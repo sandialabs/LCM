@@ -8,6 +8,7 @@
 
 #include <stack>
 
+#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 namespace PHAL {
@@ -140,7 +141,7 @@ Setup::check_fields(
       for (const auto& missingField : missingFields) {
         os << missingField << "\n";
       }
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "The following fields could not be found:\n" + os.str());

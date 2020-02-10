@@ -147,7 +147,7 @@ struct NormInf
       const Thyra_Vector& /* soln */,
       Thyra_Vector& /* grad */)
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         "SolutionFileResponseFunction::NormInf::NormDerivative is not "

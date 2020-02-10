@@ -12,7 +12,7 @@
 #include "Albany_Utils.hpp"
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -205,7 +205,7 @@ LinearPiezoModel<EvalT, Traits>::computeStateParallel(
     FieldMap                  eval_fields)
 /******************************************************************************/
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::invalid_argument,
       ">>> ERROR (LinearPiezoModel): computeStateParallel not implemented");

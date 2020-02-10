@@ -31,7 +31,7 @@ Albany::Helmholtz2DProblem::buildProblem(
     Albany::StateManager&                                    stateMgr)
 {
   /* Construct All Phalanx Evaluators */
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       meshSpecs.size() != 1,
       std::logic_error,
       "Problem supports one Material Block");

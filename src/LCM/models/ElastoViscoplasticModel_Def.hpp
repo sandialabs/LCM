@@ -8,7 +8,7 @@
 
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -761,7 +761,7 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
               msg << "   initNorm: " << init_norm << "\n" << std::endl;
               msg << "    RelNorm: " << norm_res / init_norm << "\n"
                   << std::endl;
-              // TEUCHOS_TEST_FOR_EXCEPTION(true, std::runtime_error,
+              // ALBANY_PANIC(true, std::runtime_error,
               //                           msg.str());
               X[0] = X[1] = X[2] = X[3] = X[4] = 1. / 0.;
               break;

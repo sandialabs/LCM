@@ -7,7 +7,7 @@
 #include "Albany_ScalarResponseFunction.hpp"
 
 #include "Albany_ThyraUtils.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace Albany {
 
@@ -21,7 +21,7 @@ ScalarResponseFunction::responseVectorSpace() const
 Teuchos::RCP<Thyra_LinearOp>
 ScalarResponseFunction::createGradientOp() const
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "Error!  Albany::ScalarResponseFunction::createGradientOpT():  "

@@ -32,7 +32,7 @@ NodalDataBase::registerVectorState(const std::string& stateName, int ndofs)
   // implies access order.
   auto it = nodeVectorMap.find(stateName);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (it != nodeVectorMap.end()),
       std::logic_error,
       std::endl
@@ -113,7 +113,7 @@ NodalDataBase::registerManager(
     const std::string&                          key,
     const Teuchos::RCP<NodalDataBase::Manager>& manager)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       isManagerRegistered(key),
       std::logic_error,
       "A manager is already registered with key " << key);
@@ -130,7 +130,7 @@ const Teuchos::RCP<NodalDataBase::Manager>&
 NodalDataBase::getManager(const std::string& key) const
 {
   ManagerMap::const_iterator it = mgr_map.find(key);
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       it == mgr_map.end(),
       std::logic_error,
       "There is no manager with key " << key);

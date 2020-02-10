@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -64,7 +64,7 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
       "Reaction Coefficients2", Teuchos::Array<double>()));
 
   if (forces.size() != 3) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Length of Forces array for ReactDiffSystem problem must be 3."
@@ -73,7 +73,7 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
   }
 
   if (reactCoeff0.size() != 3) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Length of Reaction Coefficients0 array for ReactDiffSystem problem "
@@ -83,7 +83,7 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
   }
 
   if (reactCoeff1.size() != 3) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Length of Reaction Coefficients1 array for ReactDiffSystem problem "
@@ -93,7 +93,7 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
   }
 
   if (reactCoeff2.size() != 3) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Length of Reaction Coefficients2 array for ReactDiffSystem problem "

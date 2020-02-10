@@ -338,7 +338,7 @@ SchwarzCoupled::SchwarzCoupled(
     if (parameter_params != Teuchos::null) {
       if (problem_params_m->isSublist("Parameters")) {
         std::cout << "parameters!" << '\n';
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error in CoupledSchwarz! Model input file "
@@ -358,7 +358,7 @@ SchwarzCoupled::SchwarzCoupled(
     // to the parameters specified in the "master" coupled input file.
     if (response_params != Teuchos::null) {
       if (problem_params_m->isSublist("Response Functions")) {
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error in CoupledSchwarz! Model input file "
@@ -382,7 +382,7 @@ SchwarzCoupled::SchwarzCoupled(
         problem_params_m->isType<std::string>("MaterialDB Filename");
 
     if (matdb_exists == false) {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error in CoupledSchwarz! "

@@ -277,7 +277,7 @@ CapImplicitModel<EvalT, Traits>::computeState(
 
           if (iter > 20) break;
 
-          // TEUCHOS_TEST_FOR_EXCEPTION( iter > 20, std::runtime_error,
+          // ALBANY_PANIC( iter > 20, std::runtime_error,
           // std::endl << "Error in return mapping, iter = "
           //<< iter << "\nres = " << normR << "\nrelres = " << conv <<
           // std::endl;

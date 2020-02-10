@@ -31,7 +31,7 @@
 #include <Stratimikos_FROSchXpetra.hpp>
 #endif /* ALBANY_FROSCH */
 
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "Teuchos_XMLParameterListHelpers.hpp"
 #include "Teuchos_YamlParameterListHelpers.hpp"
 #include "Thyra_DefaultModelEvaluatorWithSolveFactory.hpp"
@@ -221,7 +221,7 @@ SolverFactory::createAndGetAlbanyApp(
     *out << "Printing the Piro parameter list:" << std::endl;
     piroParams->print(*out);
     // GAH: this is an error - should be fatal
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error: cannot locate Stratimikos solver parameters in the input file."
@@ -257,7 +257,7 @@ SolverFactory::createAndGetAlbanyApp(
     return piroFactory.createSolver<ST, LO, Tpetra_GO, KokkosNode>(
         piroParams, modelWithSolve, Teuchos::null, observer_);
   }
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "Reached end of createAndGetAlbanyAppT()"
@@ -300,7 +300,7 @@ SolverFactory::createAlbanyAppAndModel(
 
     /* TODO: this should be a boolean, not a string ! */
     const std::string secondOrder = problemParams->get("Second Order", "No");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         secondOrder != "No",
         std::logic_error,
         "Second Order is not supported"
@@ -516,7 +516,7 @@ SolverFactory::getTestParameters(int response_index) const
         &(appParams->sublist(strint("Regression Results", response_index)));
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       result->isType<std::string>("Test Values"),
       std::logic_error,
       "Array information in XML file must now be of type Array(double)\n");

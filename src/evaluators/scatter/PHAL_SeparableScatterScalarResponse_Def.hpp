@@ -12,7 +12,7 @@
 #include "PHAL_SeparableScatterScalarResponse.hpp"
 #include "PHAL_Utilities.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // **********************************************************************
 // Base Class Generic Implemtation
@@ -170,7 +170,7 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
       workset.disc->getWsElNodeID()[workset.wsIndex];
 
   if (workset.sideSets == Teuchos::null)
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Side sets not properly specified on the mesh" << std::endl);

@@ -10,7 +10,7 @@
 #include "Adapt_NodalDataVector.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_StateManager.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 template <typename T>
 T

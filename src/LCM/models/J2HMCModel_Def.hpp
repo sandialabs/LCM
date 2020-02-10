@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -298,7 +298,7 @@ J2HMCModel<EvalT, Traits>::computeStateParallel(
     FieldMap                  eval_fields)
 /******************************************************************************/
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::invalid_argument,
       ">>> ERROR (J2HMCModel): computeStateParallel not implemented");

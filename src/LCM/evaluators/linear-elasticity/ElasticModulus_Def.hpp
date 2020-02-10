@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -51,7 +51,7 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
   //
   //  }
   else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid elastic modulus type " << type);
@@ -151,7 +151,7 @@ ElasticModulus<EvalT, Traits>::getValue(const std::string& n)
     return constant_value;
   else if (n == "dEdT Value")
     return dEdT_value;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

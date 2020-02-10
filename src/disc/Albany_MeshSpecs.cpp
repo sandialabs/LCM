@@ -2,7 +2,7 @@
 
 #include "Shards_BasicTopologies.hpp"
 #include "Shards_CellTopologyTraits.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace Albany {
 
@@ -39,7 +39,7 @@ MeshSpecsStruct::MeshSpecsStruct(
       sepEvalsByEB(sepEvalsByEB_),
       cubatureRule(cubatureRule_)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       cubatureDegree < 0,
       Teuchos::Exceptions::InvalidArgument,
       "Error! Invalid cubature degree on element block '" << ebName << "'.\n");

@@ -62,7 +62,7 @@ class GursonModel : public LCM::ConstitutiveModel<EvalT, Traits>
       DepFieldMap               dep_fields,
       FieldMap                  eval_fields)
   {
-    TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, "Not implemented.");
+    ALBANY_PANIC(true, std::logic_error, "Not implemented.");
   }
 
  private:

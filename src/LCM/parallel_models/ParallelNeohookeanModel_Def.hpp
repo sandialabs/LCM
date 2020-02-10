@@ -12,7 +12,7 @@
 #include <iostream>
 
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "utility/math/Tensor.hpp"
 
 namespace LCM {

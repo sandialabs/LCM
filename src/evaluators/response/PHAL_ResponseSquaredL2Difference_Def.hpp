@@ -45,21 +45,21 @@ PHAL::ResponseSquaredL2DifferenceBase<
 
   this->addDependentField(sourceField);
   if (plist->isParameter("Target Field Name")) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         plist->isParameter("Target Value"),
         std::logic_error,
         "[ResponseSquaredL2DifferenceSideBase] Error! Both target value and "
-        "target field provided.\n")
+        "target field provided.\n");
     std::string target_fname;
     target_fname = plist->get<std::string>("Target Field Name");
     targetField  = decltype(targetField)(target_fname, layout);
     this->addDependentField(targetField);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !plist->isParameter("Target Value"),
         std::logic_error,
         "[ResponseSquaredL2DifferenceSideBase] Error! No target value or "
-        "target field provided.\n")
+        "target field provided.\n");
     target_value     = true;
     target_value_val = TargetScalarT(plist->get<double>("Target Value"));
   }
@@ -243,7 +243,7 @@ PHAL::ResponseSquaredL2DifferenceBase<
     layout = dl->qp_tensor;
     dim    = 2;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid 'Field Rank'.\n");

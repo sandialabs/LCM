@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -20,7 +20,7 @@ DOFInterpolationSideBase<EvalT, Traits, ScalarT>::DOFInterpolationSideBase(
       BF(p.get<std::string>("BF Name"), dl_side->node_qp_scalar),
       val_qp(p.get<std::string>("Variable Name"), dl_side->qp_scalar)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       !dl_side->isSideLayouts,
       Teuchos::Exceptions::InvalidParameter,
       "Error! The layouts structure does not appear to be that of a side "

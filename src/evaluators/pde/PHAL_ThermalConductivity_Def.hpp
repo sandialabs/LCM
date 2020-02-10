@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // Radom field types
 /*
@@ -70,7 +70,7 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
     if (p.isType<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB")) {
       materialDB = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
     } else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           Teuchos::Exceptions::InvalidParameter,
           std::endl
@@ -94,7 +94,7 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
   }  // Block dependent
 
   else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid thermal conductivity type " << type);
@@ -155,7 +155,7 @@ typename ThermalConductivity<EvalT, Traits>::ScalarT&
 ThermalConductivity<EvalT, Traits>::getValue(const std::string& n)
 {
   if (is_constant) { return constant_value; }
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

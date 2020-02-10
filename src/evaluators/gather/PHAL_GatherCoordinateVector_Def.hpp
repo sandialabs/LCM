@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -115,7 +115,7 @@ GatherCoordinateVector<EvalT, Traits>::evaluateFields(
     Albany::StateArray::const_iterator it;
     it = workset.stateArrayPtr->find(*dispVecName);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         (it == workset.stateArrayPtr->end()),
         std::logic_error,
         std::endl

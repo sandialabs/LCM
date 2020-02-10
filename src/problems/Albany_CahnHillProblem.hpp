@@ -134,7 +134,7 @@ Albany::CahnHillProblem::constructEvaluators(
   using Teuchos::rcp;
 
   // Problem is transient
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       number_of_time_deriv != 1,
       std::logic_error,
       "Albany_CahnHillProblem must be defined as a transient calculation.");

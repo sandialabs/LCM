@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -46,7 +46,7 @@ Porosity<EvalT, Traits>::Porosity(
     // Add Porosity as a Sacado-ized parameter
     this->registerSacadoParameter("Porosity", paramLib);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Invalid porosity type " << type);
@@ -211,7 +211,7 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
                    3.0 * skeletonThermalExpansion(cell, qp) *
                        (Temperature(cell, qp) - refTemperature(cell, qp));
 
-            //          TEUCHOS_TEST_FOR_EXCEPTION(J(cell,qp) <= 0,
+            //          ALBANY_PANIC(J(cell,qp) <= 0,
             //          std::runtime_error,
             //              " negative / zero volume detected in
             //              Porosity_def.hpp line " + __LINE__);
@@ -262,7 +262,7 @@ Porosity<EvalT, Traits>::getValue(const std::string& n)
     return initialPorosityValue;
   else if (n == "Grain Bulk Modulus Value")
     return GrainBulkModulus;
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

@@ -8,7 +8,7 @@
 
 #include "LocalNonlinearSolver.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -260,7 +260,7 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
           res = std::abs(F[0]);
           if (res < 1.e-11 || res / f < 1.E-11) converged = true;
 
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               count == 30,
               std::runtime_error,
               std::endl

@@ -174,7 +174,7 @@ Albany::HeatProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(dudx, dudy, dudz)";
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

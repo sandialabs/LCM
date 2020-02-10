@@ -7,7 +7,7 @@
 
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -19,7 +19,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 /******************************************************************************/
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       num_dims_ != FM::THREE_D,
       std::invalid_argument,
       ">>> ERROR (FerroicModel): Only valid for 3D.");
@@ -76,7 +76,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
         p->get<Teuchos::ParameterList>("Variants");
     int nvars = vParams.get<int>("Number of Variants");
     crystalVariants.resize(nvars);
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         initialBinFractions.size() != nvars,
         std::invalid_argument,
         ">>> ERROR (FerroicModel): 'Number of Variants' must equal length of "
@@ -104,7 +104,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
     for (int i = 0; i < nVariants; i++) {
       Teuchos::Array<RealType> array = cParams.get<Teuchos::Array<RealType>>(
           Albany::strint("Variant", i + 1));
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           array.size() != nVariants,
           std::invalid_argument,
           ">>> ERROR (FerroicModel): List of critical values for variant "
@@ -257,7 +257,7 @@ FerroicDriver<EvalT, Traits>::computeStateParallel(
     FieldMap                  eval_fields)
 /******************************************************************************/
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::invalid_argument,
       ">>> ERROR (FerroicDriver): computeStateParallel not implemented");
@@ -383,7 +383,7 @@ parseCrystalVariant(
     const Teuchos::ParameterList&                         vParam)
 /******************************************************************************/
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       phases.size() == 0,
       std::invalid_argument,
       ">>> ERROR (FerroicModel): CrystalVariant constructor passed empty list "
@@ -396,12 +396,12 @@ parseCrystalVariant(
     phaseIndex = vParam.get<int>("Phase");
     phaseIndex--;  // Ids are one-based.  Indices are zero-based.
   } else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::invalid_argument,
         ">>> ERROR (FerroicModel): Crystal variants require a phase.");
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       phaseIndex < 0 || phaseIndex >= phases.size(),
       std::invalid_argument,
       ">>> ERROR (FerroicModel): Requested phase has not been defined.");
@@ -412,7 +412,7 @@ parseCrystalVariant(
         vParam.get<Teuchos::ParameterList>("Crystallographic Basis");
     LCM::parseBasis(pBasis, cv.R);
   } else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::invalid_argument,
         ">>> ERROR (FerroicModel): Crystal variants require a crystallograph "
@@ -421,7 +421,7 @@ parseCrystalVariant(
   if (vParam.isType<Teuchos::Array<RealType>>("Spontaneous Polarization")) {
     Teuchos::Array<RealType> inVals =
         vParam.get<Teuchos::Array<RealType>>("Spontaneous Polarization");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         inVals.size() != FM::THREE_D,
         std::invalid_argument,
         ">>> ERROR (FerroicModel): Expected 3 terms 'Spontaneous Polarization' "
@@ -429,7 +429,7 @@ parseCrystalVariant(
     cv.spontEDisp.set_dimension(FM::THREE_D);
     for (int i = 0; i < FM::THREE_D; i++) cv.spontEDisp(i) = inVals[i];
   } else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::invalid_argument,
         ">>> ERROR (FerroicModel): Crystal variants require a 'Spontaneous "
@@ -438,7 +438,7 @@ parseCrystalVariant(
   if (vParam.isType<Teuchos::Array<RealType>>("Spontaneous Strain")) {
     Teuchos::Array<RealType> inVals =
         vParam.get<Teuchos::Array<RealType>>("Spontaneous Strain");
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         inVals.size() != 6,
         std::invalid_argument,
         ">>> ERROR (FerroicModel): Expected 6 voigt terms 'Spontaneous Strain' "
@@ -454,7 +454,7 @@ parseCrystalVariant(
     cv.spontStrain(2, 0) = inVals[4];
     cv.spontStrain(1, 0) = inVals[5];
   } else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::invalid_argument,
         ">>> ERROR (FerroicModel): Crystal variants require a 'Spontaneous "

@@ -28,7 +28,7 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
       p.get<Teuchos::ParameterList*>("Parameter List");
 
   sideSetName = plist->get<std::string>("Side Set Name");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       std::runtime_error,
       "Error! Layout for side set " << sideSetName << " not found.\n");
@@ -60,21 +60,21 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
 
   this->addDependentField(sourceField);
   if (plist->isParameter("Target Field Name")) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         plist->isParameter("Target Value"),
         std::logic_error,
         "[ResponseSquaredL2DifferenceSideBase] Error! Both target value and "
-        "target field provided.\n")
+        "target field provided.\n");
     std::string target_fname;
     target_fname = plist->get<std::string>("Target Field Name");
     targetField  = decltype(targetField)(target_fname, layout);
     this->addDependentField(targetField);
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         !plist->isParameter("Target Value"),
         std::logic_error,
         "[ResponseSquaredL2DifferenceSideBase] Error! No target value or "
-        "target field provided.\n")
+        "target field provided.\n");
     target_value     = true;
     target_value_val = TargetScalarT(plist->get<double>("Target Value"));
   }
@@ -158,7 +158,7 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
     SourceScalarT,
     TargetScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       workset.sideSets == Teuchos::null,
       std::logic_error,
       "Side sets defined in input file but not properly specified on the mesh"
@@ -290,7 +290,7 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
     layout = dl->qp_tensor;
     dim    = 2;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid 'Field Rank'.\n");

@@ -8,7 +8,7 @@
 
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -56,7 +56,7 @@ Density<EvalT, Traits>::getValue(const std::string& n)
 {
   if (n == "Density") { return constant_value; }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       Teuchos::Exceptions::InvalidParameter,
       std::endl

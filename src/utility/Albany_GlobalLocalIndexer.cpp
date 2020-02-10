@@ -16,7 +16,7 @@ createGlobalLocalIndexer(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
     indexer = Teuchos::rcp(new GlobalLocalIndexerTpetra(vs, tmap));
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       indexer.is_null(),
       std::runtime_error,
       "Error! Could not cast the input vector space to any of the supported "

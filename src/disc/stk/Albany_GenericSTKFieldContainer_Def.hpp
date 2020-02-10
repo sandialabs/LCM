@@ -108,7 +108,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         stk::io::set_field_role(
             *cell_tensor_states.back(), role_type(st.output));
       } else {
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true, std::logic_error, "Error! Unexpected state rank.\n");
       }
       // Debug
@@ -180,7 +180,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
       }
       // Something other than a scalar, vector, or tensor
       else
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "Error: GenericSTKFieldContainer - cannot match QPData");
@@ -224,7 +224,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
 
     }  // end Node class - anything else is an error
     else
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error: GenericSTKFieldContainer - cannot match unknown entity : "
@@ -235,7 +235,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
     if (st.layered) {
       std::string tmp_str = st.name + "_NLC";
 
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           mesh_vector_states.find(tmp_str) != mesh_vector_states.end(),
           std::logic_error,
           "Error! Another layered state with the same name already exists.\n");

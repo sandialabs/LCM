@@ -44,7 +44,7 @@ Albany::ElectroMechanicsProblem::ElectroMechanicsProblem(
   } else if (num_dims_ == 3) {
     null_space_dim = 6;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         '\n' << "Error: " << __FILE__ << " line " << __LINE__
@@ -172,7 +172,7 @@ Albany::ElectroMechanicsProblem::constructNeumannEvaluators(
   else if (num_dims_ == 3)
     condNames[0] = "(t_x, t_y, t_z)";
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');

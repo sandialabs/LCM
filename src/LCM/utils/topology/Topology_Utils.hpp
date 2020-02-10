@@ -177,7 +177,7 @@ interfaceCellTopogyFromBulkCellTopogy(
     ctd = shards::getCellTopologyData<shards::Hexahedron<8>>();
 
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         false,
         std::logic_error,
         "LogicError: Interface cell topology not implemented for:"

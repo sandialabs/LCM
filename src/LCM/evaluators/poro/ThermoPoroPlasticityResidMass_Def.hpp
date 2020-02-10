@@ -11,7 +11,7 @@
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Intrepid2_RealSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -312,12 +312,12 @@ ThermoPoroPlasticityResidMass<EvalT, Traits>::evaluateFields(
     for (int node = 0; node < numNodes; ++node) {
       //	  TResidual(cell,node)=0.0;
       for (int qp = 0; qp < numQPs; ++qp) {
-        //          TEUCHOS_TEST_FOR_EXCEPTION(J(cell,qp) <= 0,
+        //          ALBANY_PANIC(J(cell,qp) <= 0,
         //          std::runtime_error,
         //              " negative / zero volume detected in
         //              ThermoPoroPlasticityResidMass_Def.hpp line " +
         //              __LINE__);
-        //          TEUCHOS_TEST_FOR_EXCEPTION(Jold(cell,qp) <= 0,
+        //          ALBANY_PANIC(Jold(cell,qp) <= 0,
         //          std::runtime_error,
         //              " negative / zero volume detected in
         //              ThermoPoroPlasticityResidMass_Def.hpp line " +

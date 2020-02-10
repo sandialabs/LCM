@@ -13,7 +13,7 @@
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
 #include "Teuchos_Array.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -234,7 +234,7 @@ ConstitutiveModelParameters<EvalT, Traits>::getValue(const std::string& n)
       return rv_map_[it2->first][i];
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "Constituitive model " << n << " not supported in getValue" << std::endl);

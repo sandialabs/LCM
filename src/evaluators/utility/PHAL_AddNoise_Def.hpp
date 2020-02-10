@@ -57,7 +57,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
 
     pdf_normal.reset(new std::normal_distribution<double>(mu, sigma));
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         "Error! Invalid noise p.d.f.\n");
@@ -70,11 +70,11 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
   rel_noise = pdf_params.get<double>("Relative Noise", 0.);
   abs_noise = pdf_params.get<double>("Absolute Noise", 0.);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       rel_noise < 0,
       Teuchos::Exceptions::InvalidParameter,
       "Error! Relative noise should be non-negative.\n");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       abs_noise < 0,
       Teuchos::Exceptions::InvalidParameter,
       "Error! Absolute noise should be non-negative.\n");
@@ -132,7 +132,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(
                (*in) * (1 + rel_noise * (*pdf_normal)(generator));
 
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! [PHAL::AddNoiseBase] This exception should never throw.\n");

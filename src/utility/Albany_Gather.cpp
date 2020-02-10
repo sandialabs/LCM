@@ -13,7 +13,7 @@
 #include "Teuchos_Array.hpp"
 #include "Teuchos_DefaultSerialComm.hpp"
 #include "Teuchos_Details_MpiTypeTraits.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace Albany {
 

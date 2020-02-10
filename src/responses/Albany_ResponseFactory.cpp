@@ -18,7 +18,7 @@
 #include "Albany_SolutionResponseFunction.hpp"
 #include "Albany_SolutionTwoNormResponseFunction.hpp"
 #include "Albany_SolutionValuesResponseFunction.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 void
 Albany::ResponseFactory::createResponseFunction(
@@ -86,7 +86,7 @@ Albany::ResponseFactory::createResponseFunction(
     }
     scalar_responses.resize(aggregated_responses.size());
     for (int i = 0; i < aggregated_responses.size(); i++) {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           aggregated_responses[i]->isScalarResponse() != true,
           std::logic_error,
           "Response function "
@@ -176,7 +176,7 @@ Albany::ResponseFactory::createResponseFunction(
       responses.push_back(rcp(
           new Albany::KLResponseFunction(base_responses[i], responseParams)));
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

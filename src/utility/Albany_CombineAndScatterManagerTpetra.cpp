@@ -1,5 +1,6 @@
 #include "Albany_CombineAndScatterManagerTpetra.hpp"
 
+#include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Albany_TpetraThyraUtils.hpp"
 
@@ -18,7 +19,7 @@ combineModeT(const Albany::CombineMode modeA)
       modeT = Tpetra::CombineMode::ABSMAX;
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! Unknown Albany combine mode. Please, contact developers.\n");
@@ -80,7 +81,7 @@ CombineAndScatterManagerTpetra::combine(
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
     const Thyra_Vector* srcV = dynamic_cast<const Thyra_Vector*>(&src);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         srcV == nullptr,
         std::runtime_error,
         "Error! Input src does not seem to be a Tpetra_MultiVector or a "
@@ -94,7 +95,7 @@ CombineAndScatterManagerTpetra::combine(
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
     Thyra_Vector* dstV = dynamic_cast<Thyra_Vector*>(&dst);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dstV == nullptr,
         std::runtime_error,
         "Error! Input dst does not seem to be a Tpetra_MultiVector or a "
@@ -161,7 +162,7 @@ CombineAndScatterManagerTpetra::combine(
     Teuchos::RCP<const Thyra_Vector> srcV =
         Teuchos::rcp_dynamic_cast<const Thyra_Vector>(src);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         srcV.is_null(),
         std::runtime_error,
         "Error! Input src does not seem to be a Tpetra_MultiVector or a "
@@ -176,7 +177,7 @@ CombineAndScatterManagerTpetra::combine(
     Teuchos::RCP<Thyra_Vector> dstV =
         Teuchos::rcp_dynamic_cast<Thyra_Vector>(dst);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dstV.is_null(),
         std::runtime_error,
         "Error! Input dst does not seem to be a Tpetra_MultiVector or a "
@@ -243,7 +244,7 @@ CombineAndScatterManagerTpetra::scatter(
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
     const Thyra_Vector* srcV = dynamic_cast<const Thyra_Vector*>(&src);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         srcV == nullptr,
         std::runtime_error,
         "Error! Input src does not seem to be a Tpetra_MultiVector or a "
@@ -257,7 +258,7 @@ CombineAndScatterManagerTpetra::scatter(
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
     Thyra_Vector* dstV = dynamic_cast<Thyra_Vector*>(&dst);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dstV == nullptr,
         std::runtime_error,
         "Error! Input dst does not seem to be a Tpetra_MultiVector or a "
@@ -324,7 +325,7 @@ CombineAndScatterManagerTpetra::scatter(
     Teuchos::RCP<const Thyra_Vector> srcV =
         Teuchos::rcp_dynamic_cast<const Thyra_Vector>(src);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         srcV.is_null(),
         std::runtime_error,
         "Error! Input src does not seem to be a Tpetra_MultiVector or a "
@@ -339,7 +340,7 @@ CombineAndScatterManagerTpetra::scatter(
     Teuchos::RCP<Thyra_Vector> dstV =
         Teuchos::rcp_dynamic_cast<Thyra_Vector>(dst);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dstV.is_null(),
         std::runtime_error,
         "Error! Input dst does not seem to be a Tpetra_MultiVector or a "

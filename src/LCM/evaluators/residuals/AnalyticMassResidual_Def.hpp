@@ -147,7 +147,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRow(
       mass_row[3] = 2.0;
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! invalid value row = " << row << " to tet4LocalMassRow! \n"
@@ -175,7 +175,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRowLumped(
     case 2: mass_row[2] = 1.0; break;
     case 3: mass_row[3] = 1.0; break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! invalid value row = " << row
@@ -320,7 +320,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRow(
       mass_row[9] = 32.0;
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! invalid value row = " << row << " to tet10LocalMassRow! \n"
@@ -354,7 +354,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRowLumped(
     case 8: mass_row[8] = 4.0; break;
     case 9: mass_row[9] = 4.0; break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! invalid value row = " << row
@@ -459,7 +459,7 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRow(
       mass_row[7] = 8.0;
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! invalid value row = " << row << " to hex8LocalMassRow! \n"
@@ -491,7 +491,7 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(
     case 6: mass_row[6] = 1.0; break;
     case 7: mass_row[7] = 1.0; break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! invalid value row = " << row
@@ -633,7 +633,7 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRow(
       mass_row[9] = 80.0;
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! invalid value row = " << row
@@ -668,7 +668,7 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRowLumped(
     case 8: mass_row[8] = 14.0; break;
     case 9: mass_row[9] = 14.0; break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::logic_error,
           "Error! invalid value row = "
@@ -804,7 +804,7 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   if (this->elt_type ==
       AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>::ELT_TYPE::
           UNSUPPORTED) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error! AnalyticMassResidual is being run with unsupported element "
@@ -841,7 +841,7 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   if (this->elt_type ==
       AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::
           UNSUPPORTED) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::logic_error,
         "Error! AnalyticMassResidual is being run with unsupported element "
@@ -925,7 +925,7 @@ void
 AnalyticMassResidual<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "Error! Tangent specialization of AnalyticMassResidual not "
@@ -953,7 +953,7 @@ void
 AnalyticMassResidual<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
     evaluateFields(typename Traits::EvalData workset)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       true,
       std::logic_error,
       "Error! DistParamDeriv specialization of AnalyticMassResidual not "

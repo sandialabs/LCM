@@ -1,3 +1,9 @@
+//
+// Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+// Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+// in the file license.txt in the top-level Albany directory.
+//
+
 #include "Albany_CombineAndScatterManager.hpp"
 
 #include "Albany_CombineAndScatterManagerTpetra.hpp"
@@ -71,7 +77,7 @@ createCombineAndScatterManager(
         Teuchos::rcp(new CombineAndScatterManagerTpetra(owned, overlapped));
   }
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       manager.is_null(),
       std::logic_error,
       "Error! We were not able to cast the input maps to any of the available "

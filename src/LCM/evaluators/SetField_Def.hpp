@@ -7,7 +7,7 @@
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "LCM/evaluators/SetField.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 

@@ -7,7 +7,7 @@
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 //*****
@@ -185,7 +185,7 @@ ComprNSViscosity<EvalT, Traits>::evaluateFields(
         tau23(cell, qp) +=
             mu(cell, qp) * (qFluctGrad(cell, qp, 2, 3) +
                             qFluctGrad(cell, qp, 3, 1));  // mu*(dv/dz + dw/dy)
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             "This next line has qFluct in it with the wrong indexing: there"

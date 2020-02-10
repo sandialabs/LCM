@@ -59,7 +59,7 @@ Albany::ElasticityProblem::buildProblem(
     Albany::StateManager&                                    stateMgr)
 {
   /* Construct All Phalanx Evaluators */
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       meshSpecs.size() != 1,
       std::logic_error,
       "Problem supports one Material Block");
@@ -171,7 +171,7 @@ Albany::ElasticityProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(t_x, t_y, t_z)";
   else
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

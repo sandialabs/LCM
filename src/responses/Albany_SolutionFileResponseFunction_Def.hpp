@@ -39,7 +39,7 @@ SolutionFileResponseFunction<Norm>::evaluateResponse(
     RefSoln      = Thyra::createMember(x->space());
     MMFileStatus = MatrixMarketFile("reference_solution.dat", RefSoln);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         MMFileStatus != 0,
         std::runtime_error,
         std::endl
@@ -114,7 +114,7 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
     RefSoln      = Thyra::createMember(x->space());
     MMFileStatus = MatrixMarketFile("reference_solution.dat", RefSoln);
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         MMFileStatus != 0,
         std::runtime_error,
         std::endl
@@ -148,7 +148,7 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
 
   // Evaluate dg/dx
   if (!dg_dx.is_null()) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         dg_dx->domain()->dim() != 1,
         std::logic_error,
         "Error! dg_dx has more than one column.\n");
@@ -201,7 +201,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   handle = fopen(filename, "r");  // Open file
   if (handle == 0)
     // file not found
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         std::endl
@@ -212,7 +212,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   // general" (without quotes)
   if (fgets(line, lineLength, handle) == 0)
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         std::endl
@@ -223,7 +223,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   if (sscanf(line, "%s %s %s %s %s", token1, token2, token3, token4, token5) ==
       0)
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         std::endl
@@ -235,7 +235,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
       strcmp(token3, "array") || strcmp(token4, "real") ||
       strcmp(token5, "general"))
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         std::endl
@@ -246,7 +246,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   // Next, strip off header lines (which start with "%")
   do {
     if (fgets(line, lineLength, handle) == 0)
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true,
           std::runtime_error,
           std::endl
@@ -256,7 +256,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   // Next get problem dimensions: M, N
   if (sscanf(line, "%d %d", &M, &N) == 0)
 
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         std::runtime_error,
         std::endl
@@ -282,7 +282,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   }
 
   // Now construct vector/multivector
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       N != static_cast<int>(mv->domain()->dim()),
       std::runtime_error,
       "Error! Input file is storing a Thyra MultiVector with a number of "
@@ -300,7 +300,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
     for (int i = 0; i < M; i++) {  // i is rownumber in file, or the GID
       if (fgets(line, lineLength, handle) == 0)  // Can't read the line
 
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::runtime_error,
             std::endl
@@ -310,7 +310,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
       const LO lid = indexer->getLocalElement(i);
       if (lid >= 0) {  // we own this data value
         if (sscanf(line, "%lg\n", &V) == 0) {
-          TEUCHOS_TEST_FOR_EXCEPTION(
+          ALBANY_PANIC(
               true,
               std::runtime_error,
               "Reference solution file: cannot parse line number "
@@ -322,7 +322,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   }
 
   if (fclose(handle)) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::runtime_error, "Cannot close reference solution file.\n");
   }
 

@@ -6,7 +6,7 @@
 
 #include "Albany_ProblemFactory.hpp"
 
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 // Always enable HeatProblem and SideLaplacianProblem
 #include "Albany_HeatProblem.hpp"
@@ -164,7 +164,7 @@ Albany::ProblemFactory::create()
     strategy = rcp(
         new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

@@ -8,7 +8,7 @@
 
 #include "Albany_Utils.hpp"
 #include "Teuchos_ParameterListExceptions.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "Teuchos_VerboseObject.hpp"
 #include "Thyra_DefaultBlockedLinearOp.hpp"
 

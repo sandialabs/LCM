@@ -6,7 +6,7 @@
 
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace PHAL {
 
@@ -93,7 +93,7 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
   std::cout << " numDims = " << numDims << std::endl;
 
   if (baseFlowData.size() != numDims + 2) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -103,7 +103,7 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
   }
 
   if (eqn_type == EULER & vecDim != numDims + 1) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl
@@ -113,7 +113,7 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
   }
 
   if (eqn_type == NS & vecDim != numDims + 2) {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         std::endl

@@ -40,7 +40,7 @@
 #include "RIHMRModel.hpp"
 #include "StVenantKirchhoffModel.hpp"
 #include "Teuchos_RCP.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 #include "TvergaardHutchinsonModel.hpp"
 #include "ViscoElasticModel.hpp"
 
@@ -156,11 +156,11 @@ ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
     typename Traits::SetupData d,
     PHX::FieldManager<Traits>& fm)
 {
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       dep_fields_map_.size() == 0,
       std::logic_error,
       "something is wrong in the LCM::CMI");
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       eval_fields_map_.size() == 0,
       std::logic_error,
       "something is wrong in the LCM::CMI");
@@ -275,7 +275,7 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
   using Teuchos::rcp;
 
   if (model_name == "") {
-    TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, error_msg);
+    ALBANY_PANIC(true, std::logic_error, error_msg);
   } else if (model_name == "Neohookean") {
     model = rcp(new NeohookeanModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Parallel Neohookean") {
@@ -349,7 +349,7 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
   } else if (model_name == "ACE permafrost") {
     model = rcp(new ACEpermafrost<EvalT, Traits>(p, dl));
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(true, std::logic_error, error_msg);
+    ALBANY_PANIC(true, std::logic_error, error_msg);
   }
 
   this->model_ = model;

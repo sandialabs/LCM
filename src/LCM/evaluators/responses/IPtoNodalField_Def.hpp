@@ -103,7 +103,7 @@ IPtoNodalFieldBase<EvalT, Traits>::IPtoNodalFieldBase(
       PHX::MDField<ScalarT const> t(ip_field_names_[field], dl->qp_tensor);
       ip_fields_[field] = t;
     } else {
-      TEUCHOS_TEST_FOR_EXCEPTION(
+      ALBANY_PANIC(
           true, std::runtime_error, "Field Layout unknown");
     }
 

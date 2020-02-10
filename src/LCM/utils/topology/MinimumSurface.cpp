@@ -284,7 +284,7 @@ Topology::getCoordinatesOfTriangle(const std::vector<double> normalToPlane)
 
   // Throw exception if input vector is 0,0,0 CHANGE THIS EXCEPTION
   // SINCE NORMAL CAN COINCIDE WITH COORDINATES OF THE CENTER
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       vectorN[0] == 0 && vectorN[1] == 0 && vectorN[0] == 0,
       std::logic_error,
       "The input normal vector was 0,0,0 \n");

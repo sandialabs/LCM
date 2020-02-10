@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 namespace LCM {
 
@@ -51,7 +51,7 @@ UpdateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   Albany::StateArray::const_iterator it;
   it = workset.stateArrayPtr->find(name_N);
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
       std::logic_error,
       std::endl

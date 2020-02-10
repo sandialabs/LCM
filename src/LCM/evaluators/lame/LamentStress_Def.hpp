@@ -9,7 +9,7 @@
 #include "Albany_MaterialDatabase.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "Teuchos_TestForException.hpp"
+#include "Albany_Macros.hpp"
 
 using namespace std;
 
@@ -32,7 +32,7 @@ LamentStress<EvalT, Traits>::LamentStress(Teuchos::ParameterList& p)
   numQPs  = dims[1];
   numDims = dims[2];
 
-  TEUCHOS_TEST_FOR_EXCEPTION(
+  ALBANY_PANIC(
       this->numDims != 3,
       Teuchos::Exceptions::InvalidParameter,
       " LAMENT materials enabled only for three-dimensional analyses.");

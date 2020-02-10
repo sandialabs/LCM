@@ -235,7 +235,7 @@ MechanicsProblem::MechanicsProblem(
         break;
       }
       default: {
-        TEUCHOS_TEST_FOR_EXCEPTION(
+        ALBANY_PANIC(
             true,
             std::logic_error,
             '\n' << "Error: " << __FILE__ << " line " << __LINE__
@@ -544,7 +544,7 @@ MechanicsProblem::constructNeumannEvaluators(
   } else if (num_dims_ == 3) {
     condNames[0] = "(t_x, t_y, t_z)";
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true,
         Teuchos::Exceptions::InvalidParameter,
         '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
@@ -595,7 +595,7 @@ MechanicsProblem::getVariableType(
   } else if (type == "Time Dependent") {
     variable_type = MECH_VAR_TYPE_TIMEDEP;
   } else {
-    TEUCHOS_TEST_FOR_EXCEPTION(
+    ALBANY_PANIC(
         true, std::logic_error, "Unknown variable type " << type << '\n');
   }
 

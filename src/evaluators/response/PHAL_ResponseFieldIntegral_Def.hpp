@@ -58,16 +58,14 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
           Teuchos::rcp(new PHX::MDALayout<Dim>(field_components.size()));
     }
   } else if (fieldType == "Tensor") {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "local_ and global_response must have rank 2. However, this code path "
         "makes them rank 3. Needs to be fixed.");
     field_layout           = dl->qp_tensor;
     local_response_layout  = dl->cell_tensor;
     global_response_layout = dl->workset_tensor;
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Invalid field type " << fieldType << ".  Support values are "
                               << "Scalar, Vector, and Tensor." << std::endl);
   }
@@ -119,10 +117,9 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   else if (numDims == 3)
     scaling = X0 * X0 * X0;
   else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error! Invalid number of dimensions: " << numDims << std::endl);
+        << "Error! Invalid number of dimensions: " << numDims << std::endl);
 
   // add dependent fields
   this->addDependentField(field.fieldTag());

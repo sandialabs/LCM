@@ -148,11 +148,10 @@ ElasticModulus<EvalT, Traits>::getValue(const std::string& n)
     return constant_value;
   else if (n == "dEdT Value")
     return dEdT_value;
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in ElasticModulus::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in ElasticModulus::getValue()" << std::endl);
   return constant_value;
 }
 

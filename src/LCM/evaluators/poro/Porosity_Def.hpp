@@ -258,11 +258,10 @@ Porosity<EvalT, Traits>::getValue(const std::string& n)
     return initialPorosityValue;
   else if (n == "Grain Bulk Modulus Value")
     return GrainBulkModulus;
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting parameter " << n
-          << " in Porosity::getValue()" << std::endl);
+      << "Error! Logic error in getting parameter " << n
+      << " in Porosity::getValue()" << std::endl);
   return constant_value;
 }
 

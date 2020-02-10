@@ -164,12 +164,11 @@ Albany::ProblemFactory::create()
     strategy = rcp(
         new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error!  Unknown problem " << method << "!" << std::endl
-            << "Supplied parameter list is " << std::endl
-            << *problemParams);
+        << "Error!  Unknown problem " << method << "!" << std::endl
+        << "Supplied parameter list is " << std::endl
+        << *problemParams);
   }
 
   return strategy;

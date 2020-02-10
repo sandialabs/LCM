@@ -179,8 +179,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
       }
       // Something other than a scalar, vector, or tensor
       else
-        ALBANY_PANIC(
-            true, "Error: GenericSTKFieldContainer - cannot match QPData");
+        ALBANY_ABORT("Error: GenericSTKFieldContainer - cannot match QPData");
     }  // end QuadPoint
     // Single scalar at center of the workset
     else if (
@@ -221,10 +220,9 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
 
     }  // end Node class - anything else is an error
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error: GenericSTKFieldContainer - cannot match unknown entity : "
-              << st.entity << std::endl);
+          << st.entity << std::endl);
 
     // Checking if the field is layered, in which case the normalized layer
     // coordinates need to be stored in the meta data

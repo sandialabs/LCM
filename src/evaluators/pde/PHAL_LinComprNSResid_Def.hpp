@@ -93,30 +93,27 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(const Teuchos::ParameterList& p)
   std::cout << " numDims = " << numDims << std::endl;
 
   if (baseFlowData.size() != numDims + 2) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in PHAL::LinComprNS constructor:  "
-            << "baseFlow data should have length numDims + 2 =  " << numDims + 2
-            << "." << std::endl);
+        << "Error in PHAL::LinComprNS constructor:  "
+        << "baseFlow data should have length numDims + 2 =  " << numDims + 2
+        << "." << std::endl);
   }
 
   if (eqn_type == EULER & vecDim != numDims + 1) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in PHAL::LinComprNS constructor:  "
-            << "Invalid Parameter vecDim.  vecDim should be numDims + 1 = "
-            << numDims + 1 << " for Euler equations." << std::endl);
+        << "Error in PHAL::LinComprNS constructor:  "
+        << "Invalid Parameter vecDim.  vecDim should be numDims + 1 = "
+        << numDims + 1 << " for Euler equations." << std::endl);
   }
 
   if (eqn_type == NS & vecDim != numDims + 2) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in PHAL::LinComprNS constructor:  "
-            << "Invalid Parameter vecDim.  vecDim should be numDims + 2 = "
-            << numDims + 2 << " for Navier-Stokes equations." << std::endl);
+        << "Error in PHAL::LinComprNS constructor:  "
+        << "Invalid Parameter vecDim.  vecDim should be numDims + 2 = "
+        << numDims + 2 << " for Navier-Stokes equations." << std::endl);
   }
 }
 

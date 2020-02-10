@@ -559,8 +559,7 @@ void
 STKDiscretization::setReferenceConfigurationManager(
     const Teuchos::RCP<AAdapt::rc::Manager>& /* rcm */)
 {
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "STKDiscretization::setReferenceConfigurationManager is not "
       "implemented.");
 }
@@ -823,10 +822,9 @@ STKDiscretization::transformMesh()
       *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
     }
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "STKDiscretization::transformMesh() Unknown transform type :"
-            << transformType << std::endl);
+        << transformType << std::endl);
   }
 }
 
@@ -2618,10 +2616,9 @@ STKDiscretization::setupNetCDFOutput()
             theMPIComm,
             info,
             &netCDFp))
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "nc_create_par returned error code "
-              << ierr << " - " << nc_strerror(ierr) << std::endl);
+          << ierr << " - " << nc_strerror(ierr) << std::endl);
     MPI_Info_free(&info);
 #else
     if (!rank)
@@ -2629,8 +2626,7 @@ STKDiscretization::setupNetCDFOutput()
               name.c_str(),
               NC_CLOBBER | NC_SHARE | NC_64BIT_OFFSET | NC_CLASSIC_MODEL,
               &netCDFp))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_create returned error code " << ierr << " - "
                                              << nc_strerror(ierr) << std::endl);
 #endif
@@ -2644,10 +2640,9 @@ STKDiscretization::setupNetCDFOutput()
       if (netCDFp)
         if (const int ierr =
                 nc_def_dim(netCDFp, dimnames[i], dimlen[i], &dimID[i]))
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "nc_def_dim returned error code "
-                  << ierr << " - " << nc_strerror(ierr) << std::endl);
+              << ierr << " - " << nc_strerror(ierr) << std::endl);
     }
     varSolns.resize(neq, 0);
 
@@ -2658,8 +2653,7 @@ STKDiscretization::setupNetCDFOutput()
       if (netCDFp)
         if (const int ierr = nc_def_var(
                 netCDFp, field_name, NC_DOUBLE, 4, dimID, &varSolns[n]))
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "nc_def_var " << field_name << " returned error code " << ierr
                             << " - " << nc_strerror(ierr) << std::endl);
 
@@ -2667,10 +2661,9 @@ STKDiscretization::setupNetCDFOutput()
       if (netCDFp)
         if (const int ierr = nc_put_att(
                 netCDFp, varSolns[n], "FillValue", NC_DOUBLE, 1, &fillVal))
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "nc_put_att FillValue returned error code "
-                  << ierr << " - " << nc_strerror(ierr) << std::endl);
+              << ierr << " - " << nc_strerror(ierr) << std::endl);
     }
 
     const char lat_name[] = "latitude";
@@ -2681,22 +2674,19 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr =
               nc_def_var(netCDFp, "lat", NC_DOUBLE, 1, &dimID[2], &latVarID))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_def_var lat returned error code "
-                << ierr << " - " << nc_strerror(ierr) << std::endl);
+            << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, latVarID, "long_name", sizeof(lat_name), lat_name))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_put_att_text " << lat_name << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, latVarID, "units", sizeof(lat_unit), lat_unit))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_put_att_text " << lat_unit << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
 
@@ -2704,22 +2694,19 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr =
               nc_def_var(netCDFp, "lon", NC_DOUBLE, 1, &dimID[3], &lonVarID))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_def_var lon returned error code "
-                << ierr << " - " << nc_strerror(ierr) << std::endl);
+            << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, lonVarID, "long_name", sizeof(lon_name), lon_name))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_put_att_text " << lon_name << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, lonVarID, "units", sizeof(lon_unit), lon_unit))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_put_att_text " << lon_unit << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
 
@@ -2727,15 +2714,13 @@ STKDiscretization::setupNetCDFOutput()
     if (netCDFp)
       if (const int ierr = nc_put_att_text(
               netCDFp, NC_GLOBAL, "history", sizeof(history), history))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_put_att_text " << history << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
 
     if (netCDFp)
       if (const int ierr = nc_enddef(netCDFp))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_enddef returned error code " << ierr << " - "
                                              << nc_strerror(ierr) << std::endl);
 
@@ -2748,16 +2733,14 @@ STKDiscretization::setupNetCDFOutput()
 
     if (netCDFp)
       if (const int ierr = nc_put_var(netCDFp, lonVarID, &deglon[0]))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_put_var lon returned error code "
-                << ierr << " - " << nc_strerror(ierr) << std::endl);
+            << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
       if (const int ierr = nc_put_var(netCDFp, latVarID, &deglat[0]))
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "nc_put_var lat returned error code "
-                << ierr << " - " << nc_strerror(ierr) << std::endl);
+            << ierr << " - " << nc_strerror(ierr) << std::endl);
   }
 }
 
@@ -2834,8 +2817,7 @@ STKDiscretization::meshToGraph()
   std::size_t max_nsur = 0;
   for (int ncnt = 0; ncnt < numOverlapNodes; ncnt++) {
     if (sur_elem[ncnt].empty()) {
-      ALBANY_PANIC(
-          true, "Node = " << ncnt + 1 << " has no elements" << std::endl);
+      ALBANY_ABORT("Node = " << ncnt + 1 << " has no elements" << std::endl);
     } else {
       std::size_t nsur = sur_elem[ncnt].size();
       if (nsur > max_nsur) max_nsur = nsur;

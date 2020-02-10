@@ -126,11 +126,10 @@ BiotModulus<EvalT, Traits>::getValue(const std::string& n)
     return FluidBulkModulus;
   else if (n == "Grain Bulk Modulus Value")
     return GrainBulkModulus;
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in BiotModulus::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in BiotModulus::getValue()" << std::endl);
   return constant_value;
 }
 

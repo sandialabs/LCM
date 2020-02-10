@@ -70,12 +70,11 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
     if (p.isType<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB")) {
       materialDB = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
     } else {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Error! Must specify a material database if using block "
-                 "dependent "
-              << "thermal conductivity" << std::endl);
+          << "Error! Must specify a material database if using block "
+             "dependent "
+          << "thermal conductivity" << std::endl);
     }
 
     // Get the sublist for thermal conductivity for the element block in the mat
@@ -151,11 +150,10 @@ typename ThermalConductivity<EvalT, Traits>::ScalarT&
 ThermalConductivity<EvalT, Traits>::getValue(const std::string& n)
 {
   if (is_constant) { return constant_value; }
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in ThermalConductivity::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in ThermalConductivity::getValue()" << std::endl);
   return constant_value;
 }
 

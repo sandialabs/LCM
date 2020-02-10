@@ -1104,10 +1104,9 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       case 8: return x * x;
       case 9: return x * x * x;
     }
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error: unhandled argument in evalf() in AAdapt_RC_Manager.cpp"
-            << std::endl);
+        << std::endl);
   }
 
   // Axis-aligned bounding box on the vertices.

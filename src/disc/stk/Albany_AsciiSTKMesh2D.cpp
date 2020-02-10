@@ -71,13 +71,12 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
                 << fname << " is: "
                 << " is: " << NumElemNodes << ". Should be 4!" << std::endl);
       } else
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             std::endl
-                << "Error in AsciiSTKMesh2D: Only Triangle or Quadrilateral "
-                   "grids can be imported. Shape in in file "
-                << fname << " is: " << shape
-                << ". Should be Triangle or Quadrialteral" << std::endl);
+            << "Error in AsciiSTKMesh2D: Only Triangle or Quadrilateral "
+               "grids can be imported. Shape in in file "
+            << fname << " is: " << shape
+            << ". Should be Triangle or Quadrialteral" << std::endl);
 
       ifile >> NumNodes >> NumElems >> NumBdEdges;
       // read in nodes coordinates
@@ -136,11 +135,10 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
       }
       ifile.close();
     } else {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Error in AsciiSTKMesh2D: Input Mesh File " << fname
-              << " not found!" << std::endl);
+          << "Error in AsciiSTKMesh2D: Input Mesh File " << fname
+          << " not found!" << std::endl);
     }
   }
 

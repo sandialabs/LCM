@@ -47,8 +47,7 @@ template <typename EvalT, typename Traits>
 void ScatterScalarNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData /* workset */)
 {
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "PHAL::ScatterScalarNodalParameter is supposed to be used only for "
       "Residual evaluation Type.");
 }
@@ -58,8 +57,7 @@ template <typename EvalT, typename Traits>
 void ScatterScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData /* workset */)
 {
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "PHAL::ScatterScalarNodalParameter is supposed to be used only for "
       "Residual evaluation Type.");
 }

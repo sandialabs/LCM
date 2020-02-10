@@ -109,11 +109,10 @@ typename KCPermeability<EvalT, Traits>::ScalarT&
 KCPermeability<EvalT, Traits>::getValue(const std::string& n)
 {
   if (n == "Kozeny-Carman Permeability") return constant_value;
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in KCPermeability::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in KCPermeability::getValue()" << std::endl);
   return constant_value;
 }
 

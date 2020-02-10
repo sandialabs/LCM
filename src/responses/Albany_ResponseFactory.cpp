@@ -175,12 +175,11 @@ Albany::ResponseFactory::createResponseFunction(
       responses.push_back(rcp(
           new Albany::KLResponseFunction(base_responses[i], responseParams)));
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error!  Unknown response function " << name << "!" << std::endl
-            << "Supplied parameter list is " << std::endl
-            << responseParams);
+        << "Error!  Unknown response function " << name << "!" << std::endl
+        << "Supplied parameter list is " << std::endl
+        << responseParams);
   }
 }
 

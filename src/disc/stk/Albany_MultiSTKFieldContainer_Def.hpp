@@ -142,11 +142,10 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
           sol_index[vec_num].push_back(len);
 
         } else {
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "Error in input file: specification of solution vector layout is "
               "incorrect."
-                  << std::endl);
+              << std::endl);
         }
       }
       ALBANY_PANIC(
@@ -219,11 +218,10 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
         res_index.push_back(len);
 
       } else {
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error in input file: specification of residual vector layout is "
             "incorrect."
-                << std::endl);
+            << std::endl);
       }
     }
     ALBANY_PANIC(
@@ -618,8 +616,7 @@ MultiSTKFieldContainer<Interleaved>::fillVectorImpl(
           offset);
     }
   } else {
-    ALBANY_PANIC(
-        true, "Error! Only scalar and vector fields supported so far.\n");
+    ALBANY_ABORT("Error! Only scalar and vector fields supported so far.\n");
   }
 }
 
@@ -678,8 +675,7 @@ MultiSTKFieldContainer<Interleaved>::saveVectorImpl(
           offset);
     }
   } else {
-    ALBANY_PANIC(
-        true, "Error! Only scalar and vector fields supported so far.\n");
+    ALBANY_ABORT("Error! Only scalar and vector fields supported so far.\n");
   }
 }
 

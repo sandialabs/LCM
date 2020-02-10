@@ -69,12 +69,11 @@ Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
     if (p.isType<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB")) {
       materialDB = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
     } else {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Error! Must specify a material database if using block "
-                 "dependent "
-              << "permittivity" << std::endl);
+          << "Error! Must specify a material database if using block "
+             "dependent "
+          << "permittivity" << std::endl);
     }
 
     // Get the sublist for permittivity for the element block in the mat DB (the
@@ -164,11 +163,10 @@ Permittivity<EvalT, Traits>::getValue(const std::string& n)
   for (int i = 0; i < rv.size(); i++) {
     if (n == Albany::strint("Permittivity KL Random Variable", i)) return rv[i];
   }
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in Permittivity::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in Permittivity::getValue()" << std::endl);
   return constant_value;
 }
 

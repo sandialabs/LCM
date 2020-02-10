@@ -227,12 +227,11 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     cub_rule =
         static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_LOBATTO);
   else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Invalid Cubature Rule: "
-            << cub_rule_string
-            << "; valid options are GAUSS, GAUSS_RADAU_LEFT, "
-               "GAUSS_RADAU_RIGHT, and GAUSS_LOBATTO");
+        << cub_rule_string
+        << "; valid options are GAUSS, GAUSS_RADAU_LEFT, "
+           "GAUSS_RADAU_RIGHT, and GAUSS_LOBATTO");
 
   int worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
 

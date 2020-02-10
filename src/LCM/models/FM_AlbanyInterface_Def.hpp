@@ -389,8 +389,7 @@ parseCrystalVariant(
     phaseIndex = vParam.get<int>("Phase");
     phaseIndex--;  // Ids are one-based.  Indices are zero-based.
   } else
-    ALBANY_PANIC(
-        true, ">>> ERROR (FerroicModel): Crystal variants require a phase.");
+    ALBANY_ABORT(">>> ERROR (FerroicModel): Crystal variants require a phase.");
 
   ALBANY_PANIC(
       phaseIndex < 0 || phaseIndex >= phases.size(),
@@ -402,8 +401,7 @@ parseCrystalVariant(
         vParam.get<Teuchos::ParameterList>("Crystallographic Basis");
     LCM::parseBasis(pBasis, cv.R);
   } else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         ">>> ERROR (FerroicModel): Crystal variants require a crystallograph "
         "basis.");
 
@@ -417,8 +415,7 @@ parseCrystalVariant(
     cv.spontEDisp.set_dimension(FM::THREE_D);
     for (int i = 0; i < FM::THREE_D; i++) cv.spontEDisp(i) = inVals[i];
   } else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         ">>> ERROR (FerroicModel): Crystal variants require a 'Spontaneous "
         "Polarization'.");
 
@@ -440,8 +437,7 @@ parseCrystalVariant(
     cv.spontStrain(2, 0) = inVals[4];
     cv.spontStrain(1, 0) = inVals[5];
   } else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         ">>> ERROR (FerroicModel): Crystal variants require a 'Spontaneous "
         "Strain'.");
 

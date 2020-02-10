@@ -170,8 +170,7 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
       workset.disc->getWsElNodeID()[workset.wsIndex];
 
   if (workset.sideSets == Teuchos::null)
-    ALBANY_PANIC(
-        true, "Side sets not properly specified on the mesh" << std::endl);
+    ALBANY_ABORT("Side sets not properly specified on the mesh" << std::endl);
 
   const Albany::SideSetList&          ssList = *(workset.sideSets);
   Albany::SideSetList::const_iterator it     = ssList.find(sideset);

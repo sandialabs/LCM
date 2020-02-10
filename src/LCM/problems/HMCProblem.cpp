@@ -171,10 +171,9 @@ Albany::HMCProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(t_x, t_y, t_z)";
   else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error: Sidesets only supported in 2 and 3D." << std::endl);
+        << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 
   condNames[1] = "dudn";
   condNames[2] = "P";

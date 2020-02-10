@@ -113,8 +113,7 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
         break;
 
       default:
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error! Field dimension not supported (this error should have "
             "already appeared).\n");
     }

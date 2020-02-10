@@ -108,11 +108,10 @@ BiotCoefficient<EvalT, Traits>::getValue(const std::string& n)
     return Kskeleton_value;
   else if (n == "Grain Bulk Modulus Value")
     return Kgrain_value;
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in BiotCoefficient::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in BiotCoefficient::getValue()" << std::endl);
   return constant_value;
 }
 

@@ -161,11 +161,10 @@ interp_and_calc_error(
     *out << "   Field with name " << source_field_name
          << " found in source mesh file!" << std::endl;
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "   Field with name " << source_field_name
-            << " NOT found in source mesh file!" << std::endl);
+        << "   Field with name " << source_field_name
+        << " NOT found in source mesh file!" << std::endl);
   }
 
   int neq = source_field->max_size(stk::topology::NODE_RANK);
@@ -230,11 +229,10 @@ interp_and_calc_error(
     *out << "   Field with name " << target_field_name;
     *out << " found in target mesh file!" << std::endl;
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "   Field with name " << target_field_name
-            << " NOT found in target mesh file!" << std::endl);
+        << "   Field with name " << target_field_name
+        << " NOT found in target mesh file!" << std::endl);
   }
 
   Teuchos::RCP<Ioss::Region> tgt_io_region = tgt_broker.get_input_io_region();
@@ -244,10 +242,7 @@ interp_and_calc_error(
   int tgt_timestep_count = tgt_io_region->get_property("state_count").get_int();
 
   if (src_timestep_count < 1) {
-    ALBANY_PANIC(
-        true,
-        std::endl
-            << "Source file has 0 snapshots!" << std::endl);
+    ALBANY_ABORT(std::endl << "Source file has 0 snapshots!" << std::endl);
   }
   if (tgt_timestep_count < 1) {
     ALBANY_ASSERT(
@@ -257,13 +252,12 @@ interp_and_calc_error(
   }
   if (((src_snap_no == -1) && (tgt_snap_no != -1)) ||
       ((tgt_snap_no == -1) && (src_snap_no != -1))) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
-            << ".  If Target Mesh Snapshot Number = -1, Source Mesh Snapshot "
-               "Number "
-            << "must be -1." << std::endl);
+        << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
+        << ".  If Target Mesh Snapshot Number = -1, Source Mesh Snapshot "
+           "Number "
+        << "must be -1." << std::endl);
   }
   if ((src_snap_no == -1) && (tgt_snap_no == -1)) {
     if (tgt_timestep_count < src_timestep_count) {
@@ -285,13 +279,12 @@ interp_and_calc_error(
       tgt_timestep_count = src_timestep_count;
     }
     if (tgt_timestep_count != src_timestep_count) {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Number of snapshots in source mesh file must equal number of "
-              << "snapshots in target mesh file when Target Mesh Snapshot "
-                 "Number = Source Mesh "
-              << "Snapshot Number = -1." << std::endl);
+          << "Number of snapshots in source mesh file must equal number of "
+          << "snapshots in target mesh file when Target Mesh Snapshot "
+             "Number = Source Mesh "
+          << "Snapshot Number = -1." << std::endl);
     } else {
       tgt_time_step_indices.resize(tgt_timestep_count);
       src_time_step_indices.resize(tgt_timestep_count);
@@ -302,36 +295,30 @@ interp_and_calc_error(
     }
   } else {
     if (src_snap_no > src_timestep_count) {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Invalid value of Source Mesh Snapshot Number = "
-              << src_snap_no << " > total number of snapshots in "
-              << source_mesh_input_file << " = " << src_timestep_count << "."
-              << std::endl);
+          << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
+          << " > total number of snapshots in " << source_mesh_input_file
+          << " = " << src_timestep_count << "." << std::endl);
     }
     if (tgt_snap_no > tgt_timestep_count) {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Invalid value of Target Mesh Snapshot Number = "
-              << tgt_snap_no << " > total number of snapshots in "
-              << target_mesh_input_file << " = " << tgt_timestep_count << "."
-              << std::endl);
+          << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no
+          << " > total number of snapshots in " << target_mesh_input_file
+          << " = " << tgt_timestep_count << "." << std::endl);
     }
     if ((src_snap_no == 0) || (src_snap_no < -1)) {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Invalid value of Source Mesh Snapshot Number = "
-              << src_snap_no << "; valid values are -1 and >0." << std::endl);
+          << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no
+          << "; valid values are -1 and >0." << std::endl);
     }
     if ((tgt_snap_no == 0) || (tgt_snap_no < -1)) {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Invalid value of Target Mesh Snapshot Number = "
-              << tgt_snap_no << "; valid values are -1 and >0 ." << std::endl);
+          << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no
+          << "; valid values are -1 and >0 ." << std::endl);
     }
     tgt_time_step_indices.resize(1);
     src_time_step_indices.resize(1);
@@ -686,14 +673,13 @@ main(int argc, char* argv[])
   } else if (field_type == "Node Tensor") {
     field_type_num = 2;
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in dtk_interp_and_error.cpp: invalid field_type = "
-            << field_type
-            << "!  Valid field_types are 'Node Vector', 'Node "
-               "Scalar' and 'Node Tensor'."
-            << std::endl);
+        << "Error in dtk_interp_and_error.cpp: invalid field_type = "
+        << field_type
+        << "!  Valid field_types are 'Node Vector', 'Node "
+           "Scalar' and 'Node Tensor'."
+        << std::endl);
   }
 
   switch (field_type_num) {

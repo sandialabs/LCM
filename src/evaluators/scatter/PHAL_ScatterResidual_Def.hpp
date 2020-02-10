@@ -41,8 +41,7 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
     names =
         Teuchos::ArrayRCP<std::string>(1, p.get<std::string>("Residual Name"));
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error! You must specify either the std::string 'Residual Name', "
         "or the Teuchos::ArrayRCP<std::string> 'Residual Names'.\n");
   }

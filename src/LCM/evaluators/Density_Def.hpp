@@ -56,11 +56,10 @@ Density<EvalT, Traits>::getValue(const std::string& n)
 {
   if (n == "Density") { return constant_value; }
 
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in Density::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in Density::getValue()" << std::endl);
   return constant_value;
 }
 

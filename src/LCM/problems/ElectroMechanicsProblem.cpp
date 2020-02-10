@@ -44,10 +44,10 @@ Albany::ElectroMechanicsProblem::ElectroMechanicsProblem(
   } else if (num_dims_ == 3) {
     null_space_dim = 6;
   } else {
-    ALBANY_PANIC(
-        true,
-        '\n' << "Error: " << __FILE__ << " line " << __LINE__
-             << ": num_dims_ set incorrectly." << '\n');
+    ALBANY_ABORT(
+        '\n'
+        << "Error: " << __FILE__ << " line " << __LINE__
+        << ": num_dims_ set incorrectly." << '\n');
   }
 
   rigidBodyModes->setParameters(
@@ -171,8 +171,7 @@ Albany::ElectroMechanicsProblem::constructNeumannEvaluators(
   else if (num_dims_ == 3)
     condNames[0] = "(t_x, t_y, t_z)";
   else
-    ALBANY_PANIC(
-        true, '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
+    ALBANY_ABORT('\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
 
   condNames[1] = "dudn";
   condNames[2] = "P";

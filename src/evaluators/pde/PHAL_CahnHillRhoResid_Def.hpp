@@ -123,11 +123,10 @@ CahnHillRhoResid<EvalT, Traits>::getValue(const std::string& n)
     return gamma;
 
   else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error! Logic error in getting parameter " << n
-            << " in CahnHillRhoResid::getValue()" << std::endl);
+        << "Error! Logic error in getting parameter " << n
+        << " in CahnHillRhoResid::getValue()" << std::endl);
     return gamma;
   }
 }

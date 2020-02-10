@@ -121,8 +121,7 @@ Coord2RBM(
         break;
 
       default:
-        ALBANY_PANIC(
-            true, "Coord2RBM: Ndof = " << Ndof << " not implemented\n");
+        ALBANY_ABORT("Coord2RBM: Ndof = " << Ndof << " not implemented\n");
     } /*switch*/
 
   } /*for (node = 0 ; node < numNodes; node++)*/
@@ -192,8 +191,7 @@ Coord2RBM_nonElasticity(
         break;
 
       default:
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Coord2RBM_nonElasticity: Ndof = " << Ndof << " not implemented\n");
     } /*switch*/
 

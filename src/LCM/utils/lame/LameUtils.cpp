@@ -70,10 +70,9 @@ constructLameMaterialModel(
   else if (materialModelName == "CRYSTAL_PLASTICITY")
     materialModel = Teuchos::rcp(new lame::CrystalPlasticity(props));
   else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         " unsupported LAME material model: " + lameMaterialModelName + " (" +
-            materialModelName + ")\n");
+        materialModelName + ")\n");
 #endif
 
 #if defined(ALBANY_LAMENT)
@@ -83,10 +82,9 @@ constructLameMaterialModel(
     materialModel = Teuchos::rcp(new lament::Neohookean<double>(props));
   else {
     if (materialModel.is_null())
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           " unsupported LAMENT material model: " + lameMaterialModelName +
-              " (" + materialModelName + ")\n");
+          " (" + materialModelName + ")\n");
   }
 #endif
 

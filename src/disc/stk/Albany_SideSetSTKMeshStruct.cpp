@@ -63,8 +63,7 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
       stk::mesh::set_topology(*partVec[0], stk::topology::QUAD_4_2D);
     } else {
       // Invalid
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! Invalid side topology name for elemeent 'Wedge_6'. Valid "
           "options are 'Triangle', 'Quadrilateral'.\n");
     }
@@ -74,8 +73,7 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
       input_elem_name == "Triangle_3" || input_elem_name == "Quadrilateral_4") {
     stk::mesh::set_topology(*partVec[0], stk::topology::LINE_2_1D);
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error! The side-set mesh extraction has not yet been implemented for "
         "this type of element.\n");
   }

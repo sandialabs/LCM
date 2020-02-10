@@ -110,11 +110,10 @@ PoissonsRatio<EvalT, Traits>::getValue(const std::string& n)
     return constant_value;
   else if (n == "dnudT Value")
     return dnudT_value;
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in PoissonsRatio::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in PoissonsRatio::getValue()" << std::endl);
   return constant_value;
 }
 

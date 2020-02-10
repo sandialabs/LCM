@@ -112,8 +112,7 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
       }
       break;
     default:
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! Invalid number of element nodes (you should have got an "
           "error before though).\n");
   }
@@ -563,8 +562,7 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
       case 15:  // Point
         break;
       default:
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error! Element type not supported; but you should have got an "
             "error before!\n");
     }
@@ -690,8 +688,7 @@ Albany::GmshSTKMeshStruct::increment_element_type(int e_type)
     case 11: ++nb_tet10; break;
     case 15: /*point*/ break;
     default:
-      ALBANY_PANIC(
-          true, "Error! Element type (" << e_type << ") not supported.\n");
+      ALBANY_ABORT("Error! Element type (" << e_type << ") not supported.\n");
   }
 
   return;
@@ -783,11 +780,10 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
         "Error! This second order mesh is missing secord order parts.\n");
 
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error! Could not determine if mesh was first or second order.\n"
-            << "Checked for number of 2pt lines and 3pt lines, both are "
-               "non-zero. \n");
+        << "Checked for number of 2pt lines and 3pt lines, both are "
+           "non-zero. \n");
   }
 
   return;
@@ -949,8 +945,7 @@ Albany::GmshSTKMeshStruct::store_element_info(
     case 15:  // Point
       break;
     default:
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! Element type not supported; but you should have got an error "
           "before!\n");
   }

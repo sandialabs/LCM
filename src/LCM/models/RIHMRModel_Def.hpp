@@ -217,7 +217,7 @@ RIHMRModel<EvalT, Traits>::computeState(
           if (conv < 1.e-11 || normR < 1.e-11) break;
           if (iter > 20) break;
 
-          //            ALBANY_PANIC( iter > 20,
+          //            ALBANY_PANIC(iter > 20,
           //                std::endl << "Error in return mapping, iter = " <<
           //                iter << "\nres = " << normR << "\nrelres = " << conv
           //                << std::endl);

@@ -141,8 +141,7 @@ Setup::check_fields(
       for (const auto& missingField : missingFields) {
         os << missingField << "\n";
       }
-      ALBANY_PANIC(
-          true, "The following fields could not be found:\n" + os.str());
+      ALBANY_ABORT("The following fields could not be found:\n" + os.str());
     }
   }
 }

@@ -191,10 +191,9 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
         break;
 
       default:
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error! Unexpected array dimensions in LoadSideSetStateField: "
-                << size << ".\n");
+            << size << ".\n");
     }
   }
 }

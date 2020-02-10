@@ -269,10 +269,9 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
         break;
 
       default:
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error! Unexpected array dimensions in SaveSideSetStateField: "
-                << size << ".\n");
+            << size << ".\n");
     }
   }
 }
@@ -419,8 +418,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
           }
           break;
         default:  // error!
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "Error! Unexpected field dimension (only node_scalar/node_vector "
               "for now).\n");
       }
@@ -469,8 +467,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
           }
           break;
         default:  // error!
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "Error! Unexpected field dimension (only node_scalar/node_vector "
               "for now).\n");
       }

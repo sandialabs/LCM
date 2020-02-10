@@ -109,10 +109,9 @@ TimeTracBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
     default:
 
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Time dependent Neumann boundary condition of type - "
-              << this->bc_type << " is not supported");
+          << this->bc_type << " is not supported");
       break;
   }
 

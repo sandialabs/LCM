@@ -534,8 +534,7 @@ OrdinarySTKFieldContainer<Interleaved>::fillVectorImpl(
           0);
     }
   } else {
-    ALBANY_PANIC(
-        true, "Error! Only scalar and vector fields supported so far.\n");
+    ALBANY_ABORT("Error! Only scalar and vector fields supported so far.\n");
   }
 }
 
@@ -593,8 +592,7 @@ OrdinarySTKFieldContainer<Interleaved>::saveVectorImpl(
           0);
     }
   } else {
-    ALBANY_PANIC(
-        true, "Error! Only scalar and vector fields supported so far.\n");
+    ALBANY_ABORT("Error! Only scalar and vector fields supported so far.\n");
   }
 }
 

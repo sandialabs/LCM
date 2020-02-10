@@ -198,61 +198,55 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   handle = fopen(filename, "r");  // Open file
   if (handle == 0)
     // file not found
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Reference solution file \" " << filename << " \" not found"
-            << std::endl);
+        << "Reference solution file \" " << filename << " \" not found"
+        << std::endl);
 
   // Check first line, which should be "%%MatrixMarket matrix coordinate real
   // general" (without quotes)
   if (fgets(line, lineLength, handle) == 0)
 
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Reference solution: MatrixMarket file is not in the proper "
-               "format."
-            << std::endl);
+        << "Reference solution: MatrixMarket file is not in the proper "
+           "format."
+        << std::endl);
 
   if (sscanf(line, "%s %s %s %s %s", token1, token2, token3, token4, token5) ==
       0)
 
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Incorrect number of arguments on first line of reference "
-               "solution file."
-            << std::endl);
+        << "Incorrect number of arguments on first line of reference "
+           "solution file."
+        << std::endl);
 
   if (strcmp(token1, "%%MatrixMarket") || strcmp(token2, "matrix") ||
       strcmp(token3, "array") || strcmp(token4, "real") ||
       strcmp(token5, "general"))
 
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Incorrect type of arguments on first line of reference "
-               "solution file."
-            << std::endl);
+        << "Incorrect type of arguments on first line of reference "
+           "solution file."
+        << std::endl);
 
   // Next, strip off header lines (which start with "%")
   do {
     if (fgets(line, lineLength, handle) == 0)
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Reference solution file: invalid comment line." << std::endl);
+          << "Reference solution file: invalid comment line." << std::endl);
   } while (line[0] == '%');
 
   // Next get problem dimensions: M, N
   if (sscanf(line, "%d %d", &M, &N) == 0)
 
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Reference solution file: cannot compute problem dimensions"
-            << std::endl);
+        << "Reference solution file: cannot compute problem dimensions"
+        << std::endl);
 
   // Compute the offset for each processor for when it should start storing
   // values
@@ -290,19 +284,17 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
     for (int i = 0; i < M; i++) {  // i is rownumber in file, or the GID
       if (fgets(line, lineLength, handle) == 0)  // Can't read the line
 
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             std::endl
-                << "Reference solution file: cannot read line number "
-                << i + offset << " in file." << std::endl);
+            << "Reference solution file: cannot read line number " << i + offset
+            << " in file." << std::endl);
 
       const LO lid = indexer->getLocalElement(i);
       if (lid >= 0) {  // we own this data value
         if (sscanf(line, "%lg\n", &V) == 0) {
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "Reference solution file: cannot parse line number "
-                  << i << " in file.\n");
+              << i << " in file.\n");
         }
         v[lid] = V;
       }

@@ -98,11 +98,10 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   if (meshfile == NULL) {  // check if coordinates file exists
     *out << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename
          << " not found!" << std::endl;
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename
-            << " not found!" << std::endl);
+        << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename
+        << " not found!" << std::endl);
   }
   double temp;
   fseek(meshfile, 0, SEEK_SET);
@@ -131,12 +130,11 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
       *out << "Error in AsciiSTKMeshStruct: sh file must have same number "
               "nodes as xyz file!  numNodes in xyz = "
            << NumNodes << ", numNodes in sh = " << NumNodesSh << std::endl;
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Error in AsciiSTKMeshStruct: sh file must have same number "
-                 "nodes as xyz file!  numNodes in xyz = "
-              << NumNodes << ", numNodes in sh = " << NumNodesSh << std::endl);
+          << "Error in AsciiSTKMeshStruct: sh file must have same number "
+             "nodes as xyz file!  numNodes in xyz = "
+          << NumNodes << ", numNodes in sh = " << NumNodesSh << std::endl);
     }
     sh = new double[NumNodes];
     safe_fgets(buffer, 100, shfile);
@@ -153,11 +151,10 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   if (confile == NULL) {  // check if element connectivity file exists
     *out << "Error in AsciiSTKMeshStruct: element connectivity file "
          << confilename << " not found!" << std::endl;
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in AsciiSTKMeshStruct: element connectivity file "
-            << confilename << " not found!" << std::endl);
+        << "Error in AsciiSTKMeshStruct: element connectivity file "
+        << confilename << " not found!" << std::endl);
   }
   fseek(confile, 0, SEEK_SET);
   safe_fscanf(1, confile, "%lf", &temp);
@@ -229,11 +226,10 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     if (geIDsfile == NULL) {  // check if global element IDs file exists
       *out << "Error in AsciiSTKMeshStruct: global element IDs file "
            << geIDsfilename << " not found!" << std::endl;
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Error in AsciiSTKMeshStruct: global element IDs file "
-              << geIDsfilename << " not found!" << std::endl);
+          << "Error in AsciiSTKMeshStruct: global element IDs file "
+          << geIDsfilename << " not found!" << std::endl);
     }
     fseek(geIDsfile, 0, SEEK_SET);
     safe_fgets(buffer, 100, geIDsfile);
@@ -264,11 +260,10 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     if (gnIDsfile == NULL) {  // check if global node IDs file exists
       *out << "Error in AsciiSTKMeshStruct: global node IDs file "
            << gnIDsfilename << " not found!" << std::endl;
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           std::endl
-              << "Error in AsciiSTKMeshStruct: global node IDs file "
-              << gnIDsfilename << " not found!" << std::endl);
+          << "Error in AsciiSTKMeshStruct: global node IDs file "
+          << gnIDsfilename << " not found!" << std::endl);
     }
     fseek(gnIDsfile, 0, SEEK_SET);
     safe_fgets(buffer, 100, gnIDsfile);

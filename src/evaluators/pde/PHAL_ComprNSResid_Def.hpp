@@ -104,12 +104,11 @@ ComprNSResid<EvalT, Traits>::ComprNSResid(const Teuchos::ParameterList& p)
   std::cout << " numDims = " << numDims << std::endl;
 
   if (vecDim != numDims + 2) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in PHAL::ComprNS constructor:  "
-            << "Invalid Parameter vecDim.  vecDim should be numDims + 2 = "
-            << numDims + 2 << "." << std::endl);
+        << "Error in PHAL::ComprNS constructor:  "
+        << "Invalid Parameter vecDim.  vecDim should be numDims + 2 = "
+        << numDims + 2 << "." << std::endl);
   }
 }
 

@@ -555,8 +555,7 @@ main(int ac, char* av[])
         mpsParams.get<Teuchos::Array<double>>("Deformation Gradient Components")
             .toVector();
   } else {
-    ALBANY_PANIC(
-        true, "Improper Loading Case in Material Point Simulator block");
+    ALBANY_ABORT("Improper Loading Case in Material Point Simulator block");
   }
 
   minitensor::Tensor<ScalarT> F_tensor(3, &F_vector[0]);

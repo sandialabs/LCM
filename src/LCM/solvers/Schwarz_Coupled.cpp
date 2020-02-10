@@ -335,13 +335,11 @@ SchwarzCoupled::SchwarzCoupled(
     if (parameter_params != Teuchos::null) {
       if (problem_params_m->isSublist("Parameters")) {
         std::cout << "parameters!" << '\n';
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error in CoupledSchwarz! Model input file "
-                << model_filenames[m]
-                << " cannot have a 'Parameters' section!  "
-                << "Parameters must be specified in the 'master' input file "
-                << "driving the coupled problem.\n");
+            << model_filenames[m] << " cannot have a 'Parameters' section!  "
+            << "Parameters must be specified in the 'master' input file "
+            << "driving the coupled problem.\n");
       }
       Teuchos::ParameterList& param_params_m =
           problem_params_m->sublist("Parameters", false);
@@ -354,13 +352,12 @@ SchwarzCoupled::SchwarzCoupled(
     // to the parameters specified in the "master" coupled input file.
     if (response_params != Teuchos::null) {
       if (problem_params_m->isSublist("Response Functions")) {
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error in CoupledSchwarz! Model input file "
-                << model_filenames[m]
-                << " cannot have a 'Response Functions' section!  "
-                << "Responses must be specified in the 'master' input file "
-                << "driving the coupled problem.\n");
+            << model_filenames[m]
+            << " cannot have a 'Response Functions' section!  "
+            << "Responses must be specified in the 'master' input file "
+            << "driving the coupled problem.\n");
       }
       Teuchos::ParameterList& response_params_m =
           problem_params_m->sublist("Response Functions", false);
@@ -377,10 +374,9 @@ SchwarzCoupled::SchwarzCoupled(
         problem_params_m->isType<std::string>("MaterialDB Filename");
 
     if (matdb_exists == false) {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error in CoupledSchwarz! "
-              << "Input file needs to have 'MaterialDB Filename' specified.\n");
+          << "Input file needs to have 'MaterialDB Filename' specified.\n");
     }
 
     std::string const& matdb_file =

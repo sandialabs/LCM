@@ -941,8 +941,7 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
   }
 
   if ((use_dbcs_ == true) && (use_sdbcs_ == true)) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "You are attempting to prescribe a mix of SDBCs and DBCs, which is not "
         "allowed!\n");
   }

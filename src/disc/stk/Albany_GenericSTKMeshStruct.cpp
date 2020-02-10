@@ -409,15 +409,14 @@ GenericSTKMeshStruct::buildLocalRefiner()
     return true;
 
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error!  Unknown local adaptation pattern in "
-               "GenericSTKMeshStruct: "
-            << pattern << "!" << std::endl
-            << "Supplied parameter list is: " << std::endl
-            << *adaptParams << "\nValid patterns are: Local_Tet4_Tet4_N"
-            << std::endl);
+        << "Error!  Unknown local adaptation pattern in "
+           "GenericSTKMeshStruct: "
+        << pattern << "!" << std::endl
+        << "Supplied parameter list is: " << std::endl
+        << *adaptParams << "\nValid patterns are: Local_Tet4_Tet4_N"
+        << std::endl);
   }
 
 #endif
@@ -1419,8 +1418,7 @@ GenericSTKMeshStruct::loadRequiredInputFields(
       cas_manager = cas_manager_elem;
       entities    = &elems;
     } else {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! Field '" << fname << "' has type '" << ftype << "'.\n"
                            << "Unfortunately, the only supported field types "
                               "so fare are 'Node/Elem Scalar/Vector' and "
@@ -1449,10 +1447,9 @@ GenericSTKMeshStruct::loadRequiredInputFields(
       computeField(
           fname, fparams, field_mv, vs, *entities, nodal, scalar, layered, out);
     } else {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! No means were specified for loading field '" + fname +
-              "'.\n");
+          "'.\n");
     }
 
     auto field_mv_view = getLocalData(field_mv.getConst());
@@ -1511,11 +1508,10 @@ GenericSTKMeshStruct::loadRequiredInputFields(
     for (auto i : missing) { missing_list += " '" + i + "',"; }
     missing_list.erase(missing_list.size() - 1);
 
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error! The following requirements were not found in the "
         "discretization list:"
-            << missing_list << ".\n");
+        << missing_list << ".\n");
   }
 }
 
@@ -1607,8 +1603,7 @@ GenericSTKMeshStruct::loadField(
           scale_factors.size(),
           field_params.get<double>("Scale Factor"));
     } else {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! Invalid type for parameter 'Scale Factor'. Should be either "
           "'double' or 'Array(double)'.\n");
     }
@@ -1726,8 +1721,7 @@ GenericSTKMeshStruct::fillField(
             field_params.get<double>("Field Value"));
       }
     } else {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! Invalid type for parameter 'Field Value'. Should be either "
           "'double' or 'Array(double)'.\n");
     }
@@ -1885,8 +1879,7 @@ GenericSTKMeshStruct::computeField(
         getNonconstDeviceData(field_mv->col(idim)), result_view_1d);
   }
 #else
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error! Cannot read the field from a mathematical expression, since "
       "PanzerExprEval package was not found in Trilinos.\n");
 #endif
@@ -2152,11 +2145,10 @@ GenericSTKMeshStruct::checkInput(
     if (vals[i] == value) return;
   }
 
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Adaptation input error in GenericSTKMeshStruct initialization: bar "
       "option: "
-          << option << std::endl);
+      << option << std::endl);
 #else
   // Silence compiler warnings
   (void)option;

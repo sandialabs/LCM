@@ -230,11 +230,9 @@ typename ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
   else if (str == "Tensor")
     return tensor;
   else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Field Layout value "
-            << str
-            << "is invalid; valid values are Scalar, Vector, and Tensor.");
+        << str << "is invalid; valid values are Scalar, Vector, and Tensor.");
   }
 }
 
@@ -316,10 +314,9 @@ struct EMassLinearOpType
     else if (str == "Lumped")
       return lumped;
     else {
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Mass Matrix Type value "
-              << str << "is invalid; valid values are Full and Lumped.");
+          << str << "is invalid; valid values are Full and Lumped.");
     }
   }
 };

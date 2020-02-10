@@ -64,38 +64,33 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(
       "Reaction Coefficients2", Teuchos::Array<double>()));
 
   if (forces.size() != 3) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Length of Forces array for ReactDiffSystem problem must be 3."
-            << "  You have provided an array of length " << forces.size()
-            << ".\n");
+        << "  You have provided an array of length " << forces.size() << ".\n");
   }
 
   if (reactCoeff0.size() != 3) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Length of Reaction Coefficients0 array for ReactDiffSystem problem "
         "must be 3."
-            << "  You have provided an array of length " << reactCoeff0.size()
-            << ".\n");
+        << "  You have provided an array of length " << reactCoeff0.size()
+        << ".\n");
   }
 
   if (reactCoeff1.size() != 3) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Length of Reaction Coefficients1 array for ReactDiffSystem problem "
         "must be 3."
-            << "  You have provided an array of length " << reactCoeff1.size()
-            << ".\n");
+        << "  You have provided an array of length " << reactCoeff1.size()
+        << ".\n");
   }
 
   if (reactCoeff2.size() != 3) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Length of Reaction Coefficients2 array for ReactDiffSystem problem "
         "must be 3."
-            << "  You have provided an array of length " << reactCoeff2.size()
-            << ".\n");
+        << "  You have provided an array of length " << reactCoeff2.size()
+        << ".\n");
   }
 
   Teuchos::RCP<Teuchos::FancyOStream> out =

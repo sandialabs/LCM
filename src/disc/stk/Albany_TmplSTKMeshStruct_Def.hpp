@@ -283,12 +283,11 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
     cub_rule =
         static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_LOBATTO);
   else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Invalid Cubature Rule: "
-            << cub_rule_string
-            << "; valid options are GAUSS, GAUSS_RADAU_LEFT, "
-               "GAUSS_RADAU_RIGHT, and GAUSS_LOBATTO");
+        << cub_rule_string
+        << "; valid options are GAUSS, GAUSS_RADAU_LEFT, "
+           "GAUSS_RADAU_RIGHT, and GAUSS_LOBATTO");
 
   // Create just enough of the mesh to figure out number of owned elements
   // so that the problem setup can know the worksetSize
@@ -731,11 +730,10 @@ Albany::TmplSTKMeshStruct<1>::buildMesh(
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             std::endl
-                << "Error: Could not place element " << elem_GID
-                << " in its corresponding element block." << std::endl);
+            << "Error: Could not place element " << elem_GID
+            << " in its corresponding element block." << std::endl);
       }
     }
 
@@ -858,11 +856,10 @@ Albany::TmplSTKMeshStruct<2>::buildMesh(
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             std::endl
-                << "Error: Could not place element " << elem_GID
-                << " in its corresponding element block." << std::endl);
+            << "Error: Could not place element " << elem_GID
+            << " in its corresponding element block." << std::endl);
       }
     }
 
@@ -1174,11 +1171,10 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             std::endl
-                << "Error: Could not place element " << elem_GID
-                << " in its corresponding element block." << std::endl);
+            << "Error: Could not place element " << elem_GID
+            << " in its corresponding element block." << std::endl);
       }
     }
 

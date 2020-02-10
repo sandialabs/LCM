@@ -143,13 +143,12 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
   }
 
   else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error!  Unknown response function " << responseName << "!"
-            << std::endl
-            << "Supplied parameter list is " << std::endl
-            << responseParams);
+        << "Error!  Unknown response function " << responseName << "!"
+        << std::endl
+        << "Supplied parameter list is " << std::endl
+        << responseParams);
 
   // Register the evaluator
   fm.template registerEvaluator<EvalT>(res_ev);

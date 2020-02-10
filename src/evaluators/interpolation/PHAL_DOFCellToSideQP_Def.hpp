@@ -189,8 +189,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
         }
         break;
       default:
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error! Invalid layout (this error should have happened earlier "
             "though).\n");
     }

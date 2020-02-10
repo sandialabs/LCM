@@ -44,8 +44,7 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
     local_response_layout  = dl->cell_scalar;
     global_response_layout = dl->workset_scalar;
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Invalid field type " << fieldType << ".  Support value is "
                               << "Scalar." << std::endl);
   }

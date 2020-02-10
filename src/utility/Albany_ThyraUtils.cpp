@@ -33,8 +33,7 @@ getComm(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
   auto tmap = getTpetraMap(vs, false);
   if (!tmap.is_null()) { return tmap->getComm(); }
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getComm! Could not cast Thyra_VectorSpace to any of the "
       "supported concrete types.\n");
 }
@@ -46,8 +45,7 @@ getMaxAllGlobalIndex(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
   auto tmap = getTpetraMap(vs, false);
   if (!tmap.is_null()) { return tmap->getMaxAllGlobalIndex(); }
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getMaxAllGlobalIndex! Could not cast Thyra_VectorSpace to any "
       "of the supported concrete types.\n");
 }
@@ -120,8 +118,7 @@ sameAs(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in sameAs! Could not cast Thyra_VectorSpace to any of the "
       "supported concrete types.\n");
 
@@ -164,8 +161,7 @@ removeComponents(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in removeComponents! Could not cast Thyra_VectorSpace to any of "
       "the supported concrete types.\n");
 
@@ -200,8 +196,7 @@ createSubspace(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in createSubspace! Could not cast Thyra_VectorSpace to any of the "
       "supported concrete types.\n");
 
@@ -280,8 +275,7 @@ getColumnSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return createThyraVectorSpace(tmat->getColMap()); }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getColumnSpace! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 
@@ -297,8 +291,7 @@ getRowSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return createThyraVectorSpace(tmat->getRowMap()); }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getRowSpace! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 
@@ -316,8 +309,7 @@ getNumEntriesInLocalRow(
   if (!tmat.is_null()) { return tmat->getNumEntriesInLocalRow(lrow); }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getNumEntriesInLocalRow! Could not cast Thyra_LinearOp to any "
       "of the supported concrete types.\n");
 
@@ -333,8 +325,7 @@ isFillActive(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return tmat->isFillActive(); }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in isFillActive! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 
@@ -350,8 +341,7 @@ isFillComplete(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return tmat->isFillComplete(); }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in isFillComplete! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 
@@ -370,8 +360,7 @@ resumeFill(const Teuchos::RCP<Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in resumeFill! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -387,8 +376,7 @@ fillComplete(const Teuchos::RCP<Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in fillComplete! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -414,8 +402,7 @@ assign(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST value)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in assign! Could not cast Thyra_LinearOp to any of the supported "
       "concrete types.\n");
 }
@@ -445,8 +432,7 @@ getDiagonalCopy(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getDiagonalCopy! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -461,8 +447,7 @@ scale(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST val)
     return;
   }
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in scale! Could not cast Thyra_LinearOp to any of the supported "
       "concrete types.\n");
 }
@@ -484,8 +469,7 @@ getLocalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getLocalRowValues! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -520,8 +504,7 @@ addToLocalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in addToLocalRowValues! Could not cast Thyra_LinearOp to any of "
       "the supported concrete types.\n");
 }
@@ -562,8 +545,7 @@ replaceGlobalValues(
     return;
   }
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in replaceGlobalValues! Could not cast Thyra_LinearOp to any of "
       "the supported concrete types.\n");
 }
@@ -602,8 +584,7 @@ addToGlobalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in addToGlobalRowValues! Could not cast Thyra_LinearOp to any of "
       "the supported concrete types.\n");
 }
@@ -623,8 +604,7 @@ setLocalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in setLocalRowValues! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -650,8 +630,7 @@ setLocalRowValues(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in setLocalRowValues! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -667,8 +646,7 @@ getGlobalMaxNumRowEntries(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getGlobalMaxNumRowEntries! Could not cast Thyra_LinearOp to "
       "any of the supported concrete types.\n");
 }
@@ -680,8 +658,7 @@ isStaticGraph(const Teuchos::RCP<Thyra_LinearOp>& lop)
   auto tmat = getTpetraMatrix(lop, false);
   if (!tmat.is_null()) { return tmat->isStaticGraph(); }
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in isStaticGraph! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -694,8 +671,7 @@ isStaticGraph(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   if (!tmat.is_null()) { return tmat->isStaticGraph(); }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in isStaticGraph! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -712,8 +688,7 @@ createOneToOneVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace> vs)
     return createThyraVectorSpace(map);
   }
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in createOneToOneVectorSpace! Could not cast Thyra_VectorSpace to "
       "any of the supported concrete types.\n");
 }
@@ -794,8 +769,7 @@ getDeviceData(Teuchos::RCP<const Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getDeviceData! Could not cast Thyra_Vector to any of the "
       "supported concrete types.\n");
 
@@ -820,8 +794,7 @@ getNonconstDeviceData(Teuchos::RCP<Thyra_LinearOp>& lop)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getNonconstDeviceData! Could not cast Thyra_Vector to any of "
       "the supported concrete types.\n");
 
@@ -851,8 +824,7 @@ getNonconstLocalData(const Teuchos::RCP<Thyra_Vector>& v)
       spmd_v->getNonconstLocalData(Teuchos::outArg(vals));
     } else {
       // If all the tries above are unsuccessful, throw an error.
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error in getNnconstLocalData! Could not cast Thyra_Vector to any of "
           "the supported concrete types.\n");
     }
@@ -880,8 +852,7 @@ getLocalData(const Teuchos::RCP<const Thyra_Vector>& v)
       spmd_v->getLocalData(Teuchos::outArg(vals));
     } else {
       // If all the tries above are unsuccessful, throw an error.
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error in getLocalData! Could not cast Thyra_Vector to any of the "
           "supported concrete types.\n");
     }
@@ -896,8 +867,7 @@ getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv)
   auto tv = getConstTpetraMultiVector(mv, false);
   if (!tv.is_null()) { return tv->getNumVectors(); }
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getNumVectors! Could not cast Thyra_MultiVector to any of the "
       "supported concrete types.\n");
 }
@@ -945,8 +915,7 @@ getNonconstLocalData(Thyra_Vector& v)
       spmd_v->getNonconstLocalData(Teuchos::outArg(vals));
     } else {
       // If all the tries above are unsuccessful, throw an error.
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error in getNonconstLocalData! Could not cast Thyra_Vector to any "
           "of the supported concrete types.\n");
     }
@@ -974,8 +943,7 @@ getLocalData(const Thyra_Vector& v)
       spmd_v->getLocalData(Teuchos::outArg(vals));
     } else {
       // If all the tries above are unsuccessful, throw an error.
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error in getLocalData! Could not cast Thyra_Vector to any of the "
           "supported concrete types.\n");
     }
@@ -1016,8 +984,7 @@ getDeviceData(const Teuchos::RCP<const Thyra_Vector>& v)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getDeviceData! Could not cast Thyra_Vector to any of the "
       "supported concrete types.\n");
 
@@ -1038,8 +1005,7 @@ getNonconstDeviceData(const Teuchos::RCP<Thyra_Vector>& v)
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in getNonconstDeviceData! Could not cast Thyra_Vector to any of "
       "the supported concrete types.\n");
 
@@ -1091,8 +1057,7 @@ describe<Thyra_VectorSpace>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in describe! Could not cast Thyra_Vector to any of the supported "
       "concrete types.\n");
 }
@@ -1112,8 +1077,7 @@ describe<Thyra_Vector>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in describe! Could not cast Thyra_Vector to any of the supported "
       "concrete types.\n");
 }
@@ -1133,8 +1097,7 @@ describe<Thyra_LinearOp>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in describe! Could not cast Thyra_Vector to any of the supported "
       "concrete types.\n");
 }
@@ -1159,8 +1122,7 @@ writeMatrixMarket<const Thyra_Vector>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in writeMatrixMarket! Could not cast Thyra_Vector to any of the "
       "supported concrete types.\n");
 }
@@ -1190,8 +1152,7 @@ writeMatrixMarket<const Thyra_MultiVector>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in writeMatrixMarket! Could not cast Thyra_Vector to any of the "
       "supported concrete types.\n");
 }
@@ -1221,8 +1182,7 @@ writeMatrixMarket<const Thyra_LinearOp>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in writeMatrixMarket! Could not cast Thyra_LinearOp to any of the "
       "supported concrete types.\n");
 }
@@ -1254,8 +1214,7 @@ writeMatrixMarket<const Thyra_VectorSpace>(
   }
 
   // If all the tries above are unsuccessful, throw an error.
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Error in writeMatrixMarket! Could not cast Thyra_VectorSpace to any of "
       "the supported concrete types.\n");
 }

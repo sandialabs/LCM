@@ -166,8 +166,7 @@ DOFSideToCellBase<EvalT, Traits, ScalarT>::evaluateFields(
                   val_side(cell, side, node, i, j);
         break;
       default:
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Error! Invalid layout (this error should have happened earlier "
             "though).\n");
     }

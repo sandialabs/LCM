@@ -23,9 +23,9 @@
   do {                                                                  \
     if (!(cond)) {                                                      \
       std::ostringstream omsg;                                          \
-      omsg << #cond " assertion failed at ";                            \
+      omsg << #cond " ALBANY_ASSERT failed at ";                        \
       omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
-      std::cerr << #cond " assertion failed at ";                       \
+      std::cerr << #cond " ALBANY_ASSERT failed at ";                   \
       std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
       abort();                                                          \
     }                                                                   \
@@ -35,9 +35,9 @@
   do {                                                                  \
     if ((cond)) {                                                       \
       std::ostringstream omsg;                                          \
-      omsg << #cond " panic condition at ";                             \
+      omsg << #cond " ALBANY_PANIC condition at ";                      \
       omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
-      std::cerr << #cond " panic condition at ";                        \
+      std::cerr << #cond " ALBANY_PANIC condition at ";                 \
       std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
       abort();                                                          \
     }                                                                   \
@@ -46,9 +46,9 @@
 #define ALBANY_ABORT_IMPL(msg, ...)                                   \
   do {                                                                \
     std::ostringstream omsg;                                          \
-    omsg << " Reached abort statement at ";                           \
+    omsg << " ALBANY_ABORT statement at ";                            \
     omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
-    std::cerr << " Reached abort statement at ";                      \
+    std::cerr << " ALBANY_ABORT statement at ";                       \
     std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
     abort();                                                          \
   } while (0)

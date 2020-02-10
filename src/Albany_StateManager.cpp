@@ -218,15 +218,13 @@ Albany::StateManager::registerStateVariable(
       mfe_type = StateStruct::QuadPoint;  // One value for the whole workset
                                           // (i.e., time)
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "StateManager: Element Entity type - "
-              << dl->name(1) << " - not supported" << std::endl);
+          << dl->name(1) << " - not supported" << std::endl);
   } else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "StateManager: Unknown Entity type - "
-            << dl->name(0) << " - not supported" << std::endl);
+        << dl->name(0) << " - not supported" << std::endl);
 
   (*stateInfo).push_back(Teuchos::rcp(new StateStruct(stateName, mfe_type)));
   StateStruct& stateRef = *stateInfo->back();
@@ -326,15 +324,13 @@ Albany::StateManager::registerNodalVectorStateVariable(
       mfe_type = StateStruct::QuadPoint;  // One value for the whole workset
                                           // (i.e., time)
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "StateManager: Element Entity type - "
-              << dl->name(1) << " - not supported" << std::endl);
+          << dl->name(1) << " - not supported" << std::endl);
   } else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "StateManager: Unknown Entity type - "
-            << dl->name(0) << " - not supported" << std::endl);
+        << dl->name(0) << " - not supported" << std::endl);
 
   (*stateInfo).push_back(Teuchos::rcp(new StateStruct(stateName, mfe_type)));
   StateStruct& stateRef = *stateInfo->back();
@@ -779,18 +775,16 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
                         nodeStatesToCopyFrom[ws][stateName](node, dim, i);
               break;
             default:
-              ALBANY_PANIC(
-                  true,
+              ALBANY_ABORT(
                   "Something is wrong during node zero state variable fill: "
-                      << size);
+                  << size);
           }
         }
         break;
       default:
-        ALBANY_PANIC(
-            true,
+        ALBANY_ABORT(
             "Unknown state variable entity encountered "
-                << (*stateInfo)[i]->entity);
+            << (*stateInfo)[i]->entity);
     }
   }
 
@@ -806,10 +800,9 @@ Albany::StateManager::getStateArray(SAType type, const int ws) const
     case ELEM: return getStateArrays().elemStateArrays[ws]; break;
     case NODE: return getStateArrays().nodeStateArrays[ws]; break;
     default:
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error: Cannot match state array type in getStateArray()"
-              << std::endl);
+          << std::endl);
   }
 }
 
@@ -878,11 +871,9 @@ Albany::StateManager::updateStates()
           break;
 
         default:
-          ALBANY_PANIC(
-              true,
-              "Error: Cannot match state entity : " << (*stateInfo)[i]->entity
-                                                    << " in state manager. "
-                                                    << std::endl);
+          ALBANY_ABORT(
+              "Error: Cannot match state entity : "
+              << (*stateInfo)[i]->entity << " in state manager. " << std::endl);
           break;
       }
     }
@@ -1133,11 +1124,10 @@ Albany::StateManager::doSetStateArrays(
                 break;
 
               default:
-                ALBANY_PANIC(
-                    true,
+                ALBANY_ABORT(
                     "Something is wrong during node scalar state variable "
                     "initialization: "
-                        << size);
+                    << size);
             }
           else if (init_type == "identity") {
             // we assume operating on the last two indices is correct
@@ -1167,19 +1157,17 @@ Albany::StateManager::doSetStateArrays(
           // exodus file
           continue;
         } else if (pParentStruct && pParentStruct->restartDataAvailable) {
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "Error: At the moment it is not possible to restart a "
               "NodalDataToElemNode field or a NodalDistParameter field from "
               "parent structure"
-                  << std::endl);
+              << std::endl);
         } else if ((init_type == "scalar") || (init_type == "identity")) {
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "Error: At the moment it is not possible to initialize a "
               "NodalDataToElemNode field or a NodalDistParameter field. It "
               "should be initialized when building the mesh"
-                  << std::endl);
+              << std::endl);
         }
     }
   }

@@ -106,8 +106,7 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::evaluateFields(
                   out_field(i, j, k, l, m, n) = in_field(i, j, k, l, m, n);
       break;
     default:
-      ALBANY_PANIC(
-          true, "Implemented only up to 6 dimensions in data layout.\n");
+      ALBANY_ABORT("Implemented only up to 6 dimensions in data layout.\n");
   }
 
   //  all the switch above might be substituted in the future with the simple

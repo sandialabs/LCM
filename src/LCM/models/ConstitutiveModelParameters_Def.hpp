@@ -234,8 +234,7 @@ ConstitutiveModelParameters<EvalT, Traits>::getValue(const std::string& n)
       return rv_map_[it2->first][i];
   }
 
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Constituitive model " << n << " not supported in getValue" << std::endl);
 
   // Need to return something here or the Clang compiler complains a couple

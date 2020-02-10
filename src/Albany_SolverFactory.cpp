@@ -221,10 +221,9 @@ SolverFactory::createAndGetAlbanyApp(
     *out << "Printing the Piro parameter list:" << std::endl;
     piroParams->print(*out);
     // GAH: this is an error - should be fatal
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error: cannot locate Stratimikos solver parameters in the input file."
-            << "\n");
+        << "\n");
   }
 
   Teuchos::RCP<Thyra_ModelEvaluator> modelWithSolve;
@@ -256,10 +255,9 @@ SolverFactory::createAndGetAlbanyApp(
     return piroFactory.createSolver<ST, LO, Tpetra_GO, KokkosNode>(
         piroParams, modelWithSolve, Teuchos::null, observer_);
   }
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       "Reached end of createAndGetAlbanyAppT()"
-          << "\n");
+      << "\n");
 
   // Silence compiler warning in case it wasn't used (due to ifdef logic)
   (void)solverComm;

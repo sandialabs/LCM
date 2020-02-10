@@ -83,11 +83,10 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
           this->registerSacadoParameter(
               Albany::strint(Albany::strint(name_mp, i), j), paramLib);
     } else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Invalid material property rank "
-              << rank << ".  Acceptable values are 2 (scalar), "
-              << "3 (vector), or 4 (tensor)");
+          << rank << ".  Acceptable values are 2 (scalar), "
+          << "3 (vector), or 4 (tensor)");
   } else if (type == "SQRT Temperature Dependent") {
     matPropType           = SQRT_TEMP;
     scalar_constant_value = mp_list->get("Reference Value", default_value);
@@ -252,11 +251,10 @@ NSMaterialProperty<EvalT, Traits>::getValue(const std::string& n)
         if (n == Albany::strint(Albany::strint(name_mp, dim1), dim2))
           return tensor_constant_value(dim1, dim2);
   }
-  ALBANY_PANIC(
-      true,
+  ALBANY_ABORT(
       std::endl
-          << "Error! Logic error in getting paramter " << n
-          << " in NSMaterialProperty::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n
+      << " in NSMaterialProperty::getValue()" << std::endl);
   return scalar_constant_value;
 }
 

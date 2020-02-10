@@ -85,11 +85,10 @@ LangevinNoiseTerm<EvalT, Traits>::getValue(const std::string& n)
     return sd;
 
   else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error! Logic error in getting parameter " << n
-            << " in LangevinNoiseTerm::getValue()" << std::endl);
+        << "Error! Logic error in getting parameter " << n
+        << " in LangevinNoiseTerm::getValue()" << std::endl);
     return sd;
   }
 }

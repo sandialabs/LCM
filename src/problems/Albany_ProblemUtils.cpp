@@ -56,10 +56,9 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
       intrepidBasis =
           rcp(new Intrepid2::Basis_HGRAD_LINE_C1_FEM<PHX::Device>());
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Albany::ProblemUtils::getIntrepid2Basis line element with "
-              << numNodes << " nodes is not supported");
+          << numNodes << " nodes is not supported");
   } else if (name == "SpectralLine") {
 #if defined(ALBANY_VERBOSE)
     cout << "  For " << name << " element, numNodes = " << numNodes << endl;
@@ -78,10 +77,9 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
     else if (numNodes == 6)
       intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_TRI_C2_FEM<PHX::Device>());
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Albany::ProblemUtils::getIntrepid2Basis triangle element with "
-              << numNodes << " nodes is not supported");
+          << numNodes << " nodes is not supported");
   }
   // 2D triangles -- spectral basis
   else if (name == "SpectralTriangle") {
@@ -118,11 +116,10 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
       intrepidBasis =
           rcp(new Intrepid2::Basis_HGRAD_QUAD_C2_FEM<PHX::Device>());
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Albany::ProblemUtils::getIntrepid2Basis "
           "quadrilateral/shellquadrilateral element with "
-              << numNodes << " nodes is not supported");
+          << numNodes << " nodes is not supported");
   }
   // 2D quadrilateral elements -- spectral basis
   // FIXME: extend this logic to other element types besides quads (IKT,
@@ -157,10 +154,9 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
             rcp(new Intrepid2::Basis_HGRAD_TET_C2_FEM<PHX::Device>());
       }
     } else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Albany::ProblemUtils::getIntrepid2Basis tetrahedron element with "
-              << numNodes << " nodes is not supported");
+          << numNodes << " nodes is not supported");
   }
 
   // 3D hexahedron elements -- non-spectral
@@ -173,10 +169,9 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
     else if (numNodes == 27)
       intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_HEX_C2_FEM<PHX::Device>());
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Albany::ProblemUtils::getIntrepid2Basis hexahedron element with "
-              << numNodes << " nodes is not supported");
+          << numNodes << " nodes is not supported");
   }
   // 3D hexahedron elements -- spectral
   else if (name == "SpectralHexahedron") {
@@ -206,19 +201,17 @@ getIntrepid2Basis(const CellTopologyData& ctd, bool compositeTet)
       intrepidBasis =
           rcp(new Intrepid2::Basis_HGRAD_WEDGE_C1_FEM<PHX::Device>());
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Albany::ProblemUtils::getIntrepid2Basis wedge element with "
-              << numNodes << " nodes is not supported");
+          << numNodes << " nodes is not supported");
   }
 
   // Unrecognized element type
   else
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Albany::ProblemUtils::getIntrepid2Basis did not recognize element "
         "name: "
-            << ctd.name);
+        << ctd.name);
 
   return intrepidBasis;
 }

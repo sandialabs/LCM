@@ -188,8 +188,7 @@ NeumannBase<EvalT, Traits>::NeumannBase(const Teuchos::ParameterList& p)
     else if (strncasecmp(sideTypeName, "Quad", 4) == 0)
       side_type[i] = QUAD;
     else
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "PHAL_Neumann: side type : " << sideTypeName << " is not supported."
                                        << std::endl);
   }
@@ -286,10 +285,9 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
 
   if (workset.sideSets == Teuchos::null || this->sideSetID.length() == 0)
 
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Side sets defined in input file but not properly specified on the mesh"
-            << std::endl);
+        << std::endl);
 
   // neumann data type is always ScalarT, but the deriv dimension
   // actually needed depends on BC type. For many it just needs

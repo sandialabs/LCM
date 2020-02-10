@@ -271,8 +271,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         }
       break;
     default:  // error!
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! Unexpected field dimension (only node_scalar/node_vector for "
           "now).\n");
   }

@@ -125,8 +125,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(
                (*in) * (1 + rel_noise * (*pdf_normal)(generator));
 
     default:
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! [PHAL::AddNoiseBase] This exception should never throw.\n");
   }
 }

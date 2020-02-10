@@ -19,8 +19,7 @@ combineModeT(const Albany::CombineMode modeA)
       modeT = Tpetra::CombineMode::ABSMAX;
       break;
     default:
-      ALBANY_PANIC(
-          true,
+      ALBANY_ABORT(
           "Error! Unknown Albany combine mode. Please, contact developers.\n");
   }
   return modeT;

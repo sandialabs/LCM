@@ -257,13 +257,12 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
       // SDBCs.
       if (stepper_type == "Newmark Implicit d-Form") {
         if (nonlinear_solver != "Line Search Based") {
-          ALBANY_PANIC(
-              true,
+          ALBANY_ABORT(
               "Newmark Implicit d-Form Stepper Type will not work correctly "
               "with 'Nonlinear Solver' = "
-                  << nonlinear_solver
-                  << "!  The valid Nonlinear Solver for this scheme is 'Line "
-                     "Search Based'.");
+              << nonlinear_solver
+              << "!  The valid Nonlinear Solver for this scheme is 'Line "
+                 "Search Based'.");
         }
       }
       if (stepper_type == "Newmark Implicit a-Form") {
@@ -274,12 +273,11 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     }
 
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Solution Method must be Steady, Transient, Transient Tempus, "
         "Transient Tempus No Piro, "
-            << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : "
-            << solutionMethod);
+        << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : "
+        << solutionMethod);
   }
 
   bool        expl = false;
@@ -348,40 +346,36 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   derivatives_check_ = debugParams->get<int>("Derivative Check", 0);
   // the above 4 parameters cannot have values < -1
   if (writeToMatrixMarketJac < -1) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in Albany::Application constructor:  "
-            << "Invalid Parameter Write Jacobian to MatrixMarket.  Acceptable "
-               "values are -1, 0, 1, 2, ... "
-            << std::endl);
+        << "Error in Albany::Application constructor:  "
+        << "Invalid Parameter Write Jacobian to MatrixMarket.  Acceptable "
+           "values are -1, 0, 1, 2, ... "
+        << std::endl);
   }
   if (writeToMatrixMarketRes < -1) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in Albany::Application constructor:  "
-            << "Invalid Parameter Write Residual to MatrixMarket.  Acceptable "
-               "values are -1, 0, 1, 2, ... "
-            << std::endl);
+        << "Error in Albany::Application constructor:  "
+        << "Invalid Parameter Write Residual to MatrixMarket.  Acceptable "
+           "values are -1, 0, 1, 2, ... "
+        << std::endl);
   }
   if (writeToCoutJac < -1) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in Albany::Application constructor:  "
-            << "Invalid Parameter Write Jacobian to Standard Output.  "
-               "Acceptable values are -1, 0, 1, 2, ... "
-            << std::endl);
+        << "Error in Albany::Application constructor:  "
+        << "Invalid Parameter Write Jacobian to Standard Output.  "
+           "Acceptable values are -1, 0, 1, 2, ... "
+        << std::endl);
   }
   if (writeToCoutRes < -1) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error in Albany::Application constructor:  "
-            << "Invalid Parameter Write Residual to Standard Output.  "
-               "Acceptable values are -1, 0, 1, 2, ... "
-            << std::endl);
+        << "Error in Albany::Application constructor:  "
+        << "Invalid Parameter Write Residual to Standard Output.  "
+           "Acceptable values are -1, 0, 1, 2, ... "
+        << std::endl);
   }
 
   countJac   = 0;  // initiate counter that counts instances of Jacobian matrix
@@ -442,24 +436,21 @@ Application::buildProblem()
 
   if ((requires_sdbcs_ == true) && (problem->useSDBCs() == false) &&
       (no_dir_bcs_ == false)) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error in Albany::Application: you are using a "
         "solver that requires SDBCs yet you are not "
         "using SDBCs!\n");
   }
 
   if ((requires_orig_dbcs_ == true) && (problem->useSDBCs() == true)) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error in Albany::Application: you are using a "
         "solver with SDBCs that does not work correctly "
         "with them!\n");
   }
 
   if ((no_dir_bcs_ == true) && (scaleBCdofs == true)) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Error in Albany::Application: you are attempting "
         "to set 'Scale DOF BCs = true' for a problem with no  "
         "Dirichlet BCs!  Scaling will do nothing.  Re-run "
@@ -552,11 +543,10 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
     scale_type = ABSROWSUM;
     scale      = 1.0e1;
   } else {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "The scaling Type you selected "
-            << scaleType << " is not supported!"
-            << "Supported scaling Types are currently: Constant" << std::endl);
+        << scaleType << " is not supported!"
+        << "Supported scaling Types are currently: Constant" << std::endl);
   }
 
   if (scale == 1.0) scaleBCdofs = false;
@@ -2417,10 +2407,9 @@ Application::setScaleBCDofs(
   }
 
   if (problem->getSideSetEquations().size() > 0) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "Application::setScaleBCDofs is not yet implemented for"
-            << " sideset equations!\n");
+        << " sideset equations!\n");
   }
 }
 

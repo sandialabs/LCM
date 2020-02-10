@@ -147,8 +147,7 @@ struct NormInf
       const Thyra_Vector& /* soln */,
       Thyra_Vector& /* grad */)
   {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         "SolutionFileResponseFunction::NormInf::NormDerivative is not "
         "Implemented yet!\n");
   }

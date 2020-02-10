@@ -186,13 +186,12 @@ AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
   } else
 #endif
   {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ABORT(
         std::endl
-            << "Error! Unknown adaptivity method requested:" << method << " !"
-            << std::endl
-            << "Supplied parameter list is " << std::endl
-            << *adaptParams_);
+        << "Error! Unknown adaptivity method requested:" << method << " !"
+        << std::endl
+        << "Supplied parameter list is " << std::endl
+        << *adaptParams_);
   }
 
   // Teuchos::RCP<const Teuchos::ParameterList> valid_params =

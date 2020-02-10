@@ -24,7 +24,6 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::SDirichlet(
     Teuchos::ParameterList& p)
     : PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
-  return;
 }
 
 //
@@ -199,13 +198,6 @@ template <typename Traits>
 void SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     typename Traits::EvalData /* dirichlet_workset */)
 {
-  ALBANY_PANIC(
-      true,
-      Teuchos::Exceptions::InvalidParameter,
-      std::endl
-          << "Error!  Tangent specialization for PHAL::SDirichlet "
-             "is not implemented!\n");
-  return;
 }
 
 //
@@ -216,7 +208,6 @@ SDirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>::SDirichlet(
     Teuchos::ParameterList& p)
     : PHAL::DirichletBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p)
 {
-  return;
 }
 
 //

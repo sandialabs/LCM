@@ -9,7 +9,6 @@
 #include <PHAL_Utilities.hpp>
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>
-#include <Teuchos_TestForException.hpp>
 #if defined(ALBANY_TIMER)
 #include <chrono>
 #endif

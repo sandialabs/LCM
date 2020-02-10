@@ -4,12 +4,10 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#include <Intrepid2_FunctionSpaceTools.hpp>
-#include <Phalanx_DataLayout.hpp>
-#include <Teuchos_TestForException.hpp>
-//#include <Intrepid2_RealSpaceTools.hpp>
 #include <MiniTensor.h>
 
+#include <Intrepid2_FunctionSpaceTools.hpp>
+#include <Phalanx_DataLayout.hpp>
 #include <typeinfo>
 
 namespace LCM {

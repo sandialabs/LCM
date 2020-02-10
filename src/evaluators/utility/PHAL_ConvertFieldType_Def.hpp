@@ -6,10 +6,8 @@
 
 #include "Albany_Macros.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
-#include "Phalanx_DataLayout.hpp"
-//#include "Kokkos_DynRankView_Fad.hpp"
-
 #include "PHAL_Workset.hpp"
+#include "Phalanx_DataLayout.hpp"
 
 namespace PHAL {
 

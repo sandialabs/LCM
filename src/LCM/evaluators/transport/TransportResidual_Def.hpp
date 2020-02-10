@@ -5,7 +5,6 @@
 //
 
 #include <Phalanx_DataLayout.hpp>
-#include <Teuchos_TestForException.hpp>
 #include <typeinfo>
 
 #include "PHAL_Utilities.hpp"

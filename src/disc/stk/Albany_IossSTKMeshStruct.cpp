@@ -9,6 +9,7 @@
 #include <Ioss_SubSystem.h>
 
 #include <Shards_BasicTopologies.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <iostream>
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
@@ -17,12 +18,8 @@
 #include <stk_mesh/base/GetEntities.hpp>
 #include <stk_mesh/base/Selector.hpp>
 
-#include "Teuchos_VerboseObject.hpp"
-
-//#include <stk_mesh/fem/FEMHelpers.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-
 #include "Albany_Utils.hpp"
+#include "Teuchos_VerboseObject.hpp"
 
 namespace {
 

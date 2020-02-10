@@ -4,7 +4,6 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-//#include "Topology.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 

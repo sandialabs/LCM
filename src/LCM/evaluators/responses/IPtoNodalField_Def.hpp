@@ -4,7 +4,6 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#include <Teuchos_TestForException.hpp>
 #include <fstream>
 
 #include "Adapt_NodalDataVector.hpp"

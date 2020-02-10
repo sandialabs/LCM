@@ -13,17 +13,15 @@
 #include <cmath>
 #include <cstdlib>
 #include <limits>
+#include <percept/stk_rebalance/GeomDecomp.hpp>
 #include <stdexcept>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/Types.hpp>
-#include <string>
-#include <vector>
-//#include <stk_mesh/base/FieldData.hpp>
-
-#include <percept/stk_rebalance/GeomDecomp.hpp>
 #include <stk_util/environment/ReportHandler.hpp>
 #include <stk_util/parallel/Parallel.hpp>
+#include <string>
+#include <vector>
 
 static const stk::mesh::EntityRank NODE_RANK = stk::topology::NODE_RANK;
 

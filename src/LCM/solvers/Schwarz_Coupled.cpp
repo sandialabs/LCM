@@ -5,7 +5,6 @@
 //
 #include "Schwarz_Coupled.hpp"
 
-#include <Teuchos_TestForException.hpp>
 #include <Teuchos_VerboseObject.hpp>
 #include <sstream>
 

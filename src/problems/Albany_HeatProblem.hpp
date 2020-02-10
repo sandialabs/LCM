@@ -122,11 +122,10 @@ class HeatProblem : public AbstractProblem
 #include "Albany_Utils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
 #include "PHAL_Absorption.hpp"
+#include "PHAL_HeatEqResid.hpp"
 #include "PHAL_Source.hpp"
 #include "PHAL_ThermalConductivity.hpp"
 #include "Shards_CellTopology.hpp"
-//#include "PHAL_Neumann.hpp"
-#include "PHAL_HeatEqResid.hpp"
 
 template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>

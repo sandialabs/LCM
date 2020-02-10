@@ -47,7 +47,6 @@
 #include <vector>
 // AGS: had to add this!
 #include <stk_mesh/base/CoordinateSystems.hpp>
-//#include <stk_mesh/fem/TopologyDimensions.hpp>
 
 namespace stk {
 namespace rebalance {

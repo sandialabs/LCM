@@ -5,7 +5,6 @@
 //
 
 #include <Phalanx_DataLayout.hpp>
-#include <Teuchos_TestForException.hpp>
 
 namespace LCM {
 

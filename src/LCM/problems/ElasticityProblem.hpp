@@ -144,11 +144,7 @@ class ElasticityProblem : public Albany::AbstractProblem
 #include "PoissonsRatio.hpp"
 #include "Strain.hpp"
 #include "Stress.hpp"
-//#include "ElasticityDispErrResid.hpp"
-
 #include "Time.hpp"
-//#include "CapExplicit.hpp"
-//#include "CapImplicit.hpp"
 
 template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>

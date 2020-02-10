@@ -8,9 +8,6 @@
 // Reads in material.xml file and runs at single material point
 //
 
-#include <iostream>
-//#include <</span>sys/time.h>
-
 #include <MiniTensor.h>
 
 #include <Albany_Layouts.hpp>
@@ -25,9 +22,9 @@
 #include <Teuchos_GlobalMPISession.hpp>
 #include <Teuchos_ParameterList.hpp>
 #include <Teuchos_RCP.hpp>
-#include <Teuchos_TestForException.hpp>
 #include <Teuchos_as.hpp>
 #include <fstream>
+#include <iostream>
 
 #include "Albany_MaterialDatabase.hpp"
 #include "BifurcationCheck.hpp"

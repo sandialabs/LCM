@@ -6,7 +6,6 @@
 #include "Schwarz_BoundaryJacobian.hpp"
 
 #include <Teuchos_ParameterListExceptions.hpp>
-#include <Teuchos_TestForException.hpp>
 
 #include "Albany_GenericSTKMeshStruct.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"

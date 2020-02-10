@@ -6,13 +6,10 @@
 
 #include <MiniTensor.h>
 
+#include <typeinfo>
+
 #include "Albany_Macros.hpp"
 #include "Phalanx_DataLayout.hpp"
-
-//#include "Intrepid2_FunctionSpaceTools.hpp"
-//#include "Intrepid2_RealSpaceTools.hpp"
-
-#include <typeinfo>
 
 namespace LCM {
 

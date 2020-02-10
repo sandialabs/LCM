@@ -9,8 +9,6 @@
 
 #include "Albany_GenericSTKMeshStruct.hpp"
 
-//#include <Ionit_Initializer.h>
-
 namespace Albany {
 
 enum class GmshVersion

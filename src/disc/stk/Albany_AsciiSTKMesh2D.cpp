@@ -11,6 +11,7 @@
 
 #include <Albany_STKNodeSharing.hpp>
 #include <Shards_BasicTopologies.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <iostream>
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
@@ -19,14 +20,10 @@
 #include <stk_mesh/base/GetEntities.hpp>
 #include <stk_mesh/base/Selector.hpp>
 
+#include "Albany_Utils.hpp"
 #include "Teuchos_CommHelpers.hpp"
 #include "Teuchos_VerboseObject.hpp"
 #include "Teuchos_oblackholestream.hpp"
-
-//#include <stk_mesh/fem/FEMHelpers.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-
-#include "Albany_Utils.hpp"
 
 Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
     const Teuchos::RCP<Teuchos::ParameterList>& params,

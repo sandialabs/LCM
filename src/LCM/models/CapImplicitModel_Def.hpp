@@ -7,7 +7,6 @@
 
 #include <Intrepid2_FunctionSpaceTools.hpp>
 #include <Phalanx_DataLayout.hpp>
-#include <Teuchos_TestForException.hpp>
 #include <typeinfo>
 
 #include "LocalNonlinearSolver.hpp"

@@ -19,7 +19,6 @@
 #include <Teuchos_GlobalMPISession.hpp>
 #include <Teuchos_ParameterList.hpp>
 #include <Teuchos_RCP.hpp>
-#include <Teuchos_TestForException.hpp>
 #include <Teuchos_as.hpp>
 #include <iomanip>
 #include <iostream>

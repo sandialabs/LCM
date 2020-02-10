@@ -8,15 +8,13 @@
 #include "Albany_config.h"
 #include "ProjectIPtoNodalField.hpp"
 // #include "Albany_ProblemUtils.hpp"
+#include <Phalanx_DataLayout_MDALayout.hpp>
 #include <Teuchos_AbstractFactoryStd.hpp>
+#include <Thyra_Ifpack2PreconditionerFactory.hpp>
 
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Albany_Utils.hpp"
-// #include <Teuchos_TestForException.hpp>
-
-#include <Phalanx_DataLayout_MDALayout.hpp>
-#include <Thyra_Ifpack2PreconditionerFactory.hpp>
 
 // #include <Intrepid2_CellTools.hpp>
 // #include <Intrepid2_DefaultCubatureFactory.hpp>

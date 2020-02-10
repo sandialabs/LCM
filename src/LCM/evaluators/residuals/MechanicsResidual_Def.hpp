@@ -9,7 +9,6 @@
 
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>
-#include <Teuchos_TestForException.hpp>
 
 #include "Albany_config.h"
 

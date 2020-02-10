@@ -9,14 +9,13 @@
 
 #include "Albany_config.h"
 #include "PHAL_AlbanyTraits.hpp"
+#include "PHAL_SDirichlet.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_ParameterList.hpp"
-//#include "PHAL_Dirichlet.hpp"
-#include "PHAL_SDirichlet.hpp"
 
 #if defined(ALBANY_DTK)
 #include "Albany_OrdinarySTKFieldContainer.hpp"

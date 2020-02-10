@@ -6,22 +6,19 @@
   States Government.
 */
 
-#include <cstdlib>
-#include <percept/stk_rebalance/ZoltanPartition.hpp>
-#include <sstream>
-#include <stk_mesh/base/Field.hpp>
-#include <string>
-#include <vector>
-//#include <stk_mesh/base/FieldData.hpp>
-#include <stk_mesh/base/Bucket.hpp>
-#include <stk_mesh/base/BulkData.hpp>
-#include <stk_mesh/base/Entity.hpp>
-//#include <stk_mesh/fem/FEMMetaData.hpp>
-
 #include <zoltan.h>
 
 #include <Teuchos_ParameterList.hpp>
+#include <cstdlib>
+#include <percept/stk_rebalance/ZoltanPartition.hpp>
+#include <sstream>
+#include <stk_mesh/base/Bucket.hpp>
+#include <stk_mesh/base/BulkData.hpp>
+#include <stk_mesh/base/Entity.hpp>
+#include <stk_mesh/base/Field.hpp>
 #include <stk_util/parallel/ParallelReduce.hpp>
+#include <string>
+#include <vector>
 
 using namespace std;
 using namespace stk;

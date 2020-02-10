@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#if !defined(LCM_Topology_Types_h)
-#define LCM_Topology_Types_h
+#if !defined(LCM_Topology_Types_hpp)
+#define LCM_Topology_Types_hpp
 
 // STK includes
 #include <stk_mesh/base/BulkData.hpp>
@@ -149,4 +149,4 @@ class Topology;
 
 }  // namespace LCM
 
-#endif  // LCM_Topology_Types_h
+#endif  // LCM_Topology_Types_hpp

@@ -6,8 +6,8 @@
   States Government.
 */
 
-#ifndef stk_rebalance_Partition_hpp
-#define stk_rebalance_Partition_hpp
+#ifndef STK_REBALANCE_PARTITION_HPP
+#define STK_REBALANCE_PARTITION_HPP
 
 /** \addtogroup stk_rebalance_module
  *  \{

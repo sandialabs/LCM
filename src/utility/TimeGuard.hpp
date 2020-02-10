@@ -6,8 +6,8 @@
 
 // @HEADER
 
-#ifndef TIMEGUARD_HPP_
-#define TIMEGUARD_HPP_
+#ifndef TIMEGUARD_HPP
+#define TIMEGUARD_HPP
 
 #include <Teuchos_RCPDecl.hpp>
 #include <Teuchos_Time.hpp>
@@ -36,4 +36,4 @@ class TimeGuard
 };
 }  // namespace util
 
-#endif  // TIMEGUARD_HPP_
+#endif  // TIMEGUARD_HPP

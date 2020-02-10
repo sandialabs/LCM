@@ -3,8 +3,8 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-#if !defined(LCM_MiniSolvers_h)
-#define LCM_MiniSolvers_h
+#if !defined(LCM_MiniSolvers_hpp)
+#define LCM_MiniSolvers_hpp
 
 #include "MiniNonlinearSolver.hpp"
 #include "MiniTensor_Solvers.h"
@@ -189,4 +189,4 @@ class Paraboloid_Traits
 
 }  // namespace LCM
 
-#endif  // LCM_MiniSolvers_h
+#endif  // LCM_MiniSolvers_hpp

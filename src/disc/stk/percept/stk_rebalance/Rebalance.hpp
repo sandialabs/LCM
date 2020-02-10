@@ -6,8 +6,8 @@
   States Government.
 */
 
-#ifndef stk_rebalance_Rebalance_hpp
-#define stk_rebalance_Rebalance_hpp
+#ifndef STK_REBALANCE_REBALANCE_HPP
+#define STK_REBALANCE_REBALANCE_HPP
 
 #include <percept/PerceptMesh.hpp>
 #include <percept/stk_rebalance/Partition.hpp>

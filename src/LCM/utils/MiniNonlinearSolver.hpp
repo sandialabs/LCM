@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#if !defined(LCM_MiniNonlinearSolver_h)
-#define LCM_MiniNonlinearSolver_h
+#if !defined(LCM_MiniNonlinearSolver_hpp)
+#define LCM_MiniNonlinearSolver_hpp
 
 #include <type_traits>
 
@@ -666,4 +666,4 @@ struct peel_tensor4
 
 #include "MiniNonlinearSolver_Def.hpp"
 
-#endif  // LCM_MiniNonlinearSolver_h
+#endif  // LCM_MiniNonlinearSolver_hpp

@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#ifndef ALBANY_UTILS_H
-#define ALBANY_UTILS_H
+#ifndef ALBANY_UTILS_HPP
+#define ALBANY_UTILS_HPP
 
 // Get Albany configuration macros
 #include <sstream>
@@ -227,4 +227,4 @@ getProcRank();
 
 }  // end namespace Albany
 
-#endif  // ALBANY_UTILS
+#endif  // ALBANY_UTILS_HPP

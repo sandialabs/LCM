@@ -9,8 +9,8 @@
 /// called check that takes as argument an entity and returns a bool.
 ///
 
-#if !defined(LCM_Topology_FailureCriterion_h)
-#define LCM_Topology_FailureCriterion_h
+#if !defined(LCM_Topology_FailureCriterion_hpp)
+#define LCM_Topology_FailureCriterion_hpp
 
 #include <cassert>
 #include <stk_mesh/base/FieldBase.hpp>
@@ -267,4 +267,4 @@ class BulkFailureCriterion : public AbstractFailureCriterion
 };
 }  // namespace LCM
 
-#endif  // LCM_Topology_FailureCriterion_h
+#endif  // LCM_Topology_FailureCriterion_hpp

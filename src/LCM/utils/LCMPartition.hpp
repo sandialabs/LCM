@@ -5,8 +5,8 @@
 //
 
 // Define only if Zoltan is enabled
-#if !defined(LCM_Partition_h)
-#define LCM_Partition_h
+#if !defined(LCM_Partition_hpp)
+#define LCM_Partition_hpp
 
 #include <MiniTensor_Geometry.h>
 #include <zoltan_cpp.h>
@@ -1097,4 +1097,4 @@ operator<<(
 
 }  // namespace LCM
 
-#endif  // #if !defined(LCM_Partition_h)
+#endif  // #if !defined(LCM_Partition_hpp)

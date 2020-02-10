@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#if !defined(LCM_MiniLinearSolver_h)
-#define LCM_MiniLinearSolver_h
+#if !defined(LCM_MiniLinearSolver_hpp)
+#define LCM_MiniLinearSolver_hpp
 
 #include "MiniTensor_Solvers.h"
 #include "PHAL_AlbanyTraits.hpp"
@@ -115,4 +115,4 @@ class MiniLinearSolver<PHAL::AlbanyTraits::DistParamDeriv, N>
 
 #include "MiniLinearSolver.t.hpp"
 
-#endif  // LCM_MiniLinearSolver_h
+#endif  // LCM_MiniLinearSolver_hpp

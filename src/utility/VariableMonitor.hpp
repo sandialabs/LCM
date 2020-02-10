@@ -6,8 +6,8 @@
 
 // @HEADER
 
-#ifndef VARIABLEMONITOR_HPP_
-#define VARIABLEMONITOR_HPP_
+#ifndef VARIABLEMONITOR_HPP
+#define VARIABLEMONITOR_HPP
 
 /**
  *  \file VariableMonitor.hpp
@@ -64,4 +64,4 @@ VariableHistory::addValue(T&& val)
 
 }  // namespace util
 
-#endif  // VARIABLEMONITOR_HPP_
+#endif  // VARIABLEMONITOR_HPP

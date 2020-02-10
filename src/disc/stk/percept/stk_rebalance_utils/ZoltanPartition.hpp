@@ -12,8 +12,8 @@
 // Sandia, LLC (NTESS)
 //
 
-#ifndef stk_rebalance_ZoltanPartition_hpp
-#define stk_rebalance_ZoltanPartition_hpp
+#ifndef STK_REBALANCE_ZOLTANPARTITION_HPP
+#define STK_REBALANCE_ZOLTANPARTITION_HPP
 
 #include <Teuchos_ParameterList.hpp>
 #include <percept/PerceptMesh.hpp>

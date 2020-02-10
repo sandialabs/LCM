@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#ifndef Moertel_ExplicitTemplateInstantiation_hpp
-#define Moertel_ExplicitTemplateInstantiation_hpp
+#ifndef MOERTEL_EXPLICITTEMPLATEINSTANTIATION_HPP
+#define MOERTEL_EXPLICITTEMPLATEINSTANTIATION_HPP
 
 #include <Kokkos_DefaultNode.hpp>
 

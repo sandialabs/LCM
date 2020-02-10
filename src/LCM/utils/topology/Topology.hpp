@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#if !defined(LCM_Topology_Topology_h)
-#define LCM_Topology_Topology_h
+#if !defined(LCM_Topology_Topology_hpp)
+#define LCM_Topology_Topology_hpp
 
 #include <iterator>
 #include <set>
@@ -1061,4 +1061,4 @@ class Topology
 
 }  // namespace LCM
 
-#endif  // LCM_Topology_Topology_h
+#endif  // LCM_Topology_Topology_hpp

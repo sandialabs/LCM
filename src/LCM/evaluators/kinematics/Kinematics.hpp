@@ -6,8 +6,6 @@
 
 #ifndef KINEMATICS_HPP
 #define KINEMATICS_HPP
-//#ifndef DEFGRAD_HPP
-//#define DEFGRAD_HPP
 
 #include "AAdapt_RC_Field.hpp"
 #include "Albany_Layouts.hpp"

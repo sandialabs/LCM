@@ -4,8 +4,8 @@
 // detailed in the file license.txt in the top-level Albany directory.
 //
 
-#if !defined(LCM_Topology_Utils_h)
-#define LCM_Topology_Utils_h
+#if !defined(LCM_Topology_Utils_hpp)
+#define LCM_Topology_Utils_hpp
 
 #include "Topology_Types.hpp"
 
@@ -191,4 +191,4 @@ interfaceCellTopogyFromBulkCellTopogy(
 
 }  // namespace LCM
 
-#endif  // LCM_Topology_Utils_h
+#endif  // LCM_Topology_Utils_hpp

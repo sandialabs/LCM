@@ -1,5 +1,5 @@
-#ifndef percept_PerceptMyPairIterRelation_hpp
-#define percept_PerceptMyPairIterRelation_hpp
+#ifndef PERCEPT_PERCEPTMYPAIRITERRELATION_HPP
+#define PERCEPT_PERCEPTMYPAIRITERRELATION_HPP
 
 #include <stk_mesh/base/BulkData.hpp>
 namespace percept {

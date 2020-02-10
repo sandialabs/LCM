@@ -3,8 +3,8 @@
 // Sandia, LLC (NTESS)
 //
 
-#ifndef stk_rebalance_GeomDecomp_hpp
-#define stk_rebalance_GeomDecomp_hpp
+#ifndef STK_REBALANCE_GEOMDECOMP_HPP
+#define STK_REBALANCE_GEOMDECOMP_HPP
 
 // STL components
 #include <map>

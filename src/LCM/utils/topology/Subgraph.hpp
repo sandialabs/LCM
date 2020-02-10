@@ -4,8 +4,8 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#if !defined(LCM_Topology_Subgraph_h)
-#define LCM_Topology_Subgraph_h
+#if !defined(LCM_Topology_Subgraph_hpp)
+#define LCM_Topology_Subgraph_hpp
 
 #include <stk_mesh/base/FieldBase.hpp>
 
@@ -343,4 +343,4 @@ class Subgraph : public Graph
 
 }  // namespace LCM
 
-#endif  // LCM_Topology_Subgraph_h
+#endif  // LCM_Topology_Subgraph_hpp

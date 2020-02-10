@@ -291,9 +291,7 @@ Albany::ThermoElasticityProblem::constructEvaluators(
   }
 
   if (haveSource) {  // Source
-    ALBANY_PANIC(
-        true,
-        "Error!  Sources not implemented in Elasticity yet!");
+    ALBANY_ASSERT(false, "Error!  Sources not implemented in Elasticity yet!");
 
     RCP<ParameterList> p = rcp(new ParameterList);
 

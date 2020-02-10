@@ -30,8 +30,7 @@ Albany::NavierStokes::getVariableType(
   else if (type == "DOF")
     variableType = NS_VAR_TYPE_DOF;
   else
-    ALBANY_PANIC(
-        true,  "Unknown variable type " << type << std::endl);
+    ALBANY_ASSERT(false, "Unknown variable type " << type << std::endl);
   haveVariable = (variableType != NS_VAR_TYPE_NONE);
   haveEquation = (variableType == NS_VAR_TYPE_DOF);
 }
@@ -123,9 +122,7 @@ Albany::NavierStokes::buildProblem(
   using Teuchos::rcp;
 
   /* Construct All Phalanx Evaluators */
-  ALBANY_PANIC(
-      meshSpecs.size() != 1,
-      "Problem supports one Material Block");
+  ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
 
   fm.resize(1);
   fm[0] = rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);

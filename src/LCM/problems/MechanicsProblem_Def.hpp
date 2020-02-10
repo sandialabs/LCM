@@ -1081,9 +1081,8 @@ MechanicsProblem::constructEvaluators(
       }
     } else
 
-      ALBANY_PANIC(
-          true,
-          "Unrecognized thermal source specified in input file");
+      ALBANY_ASSERT(
+          false, "Unrecognized thermal source specified in input file");
   }
 
   {  // Constitutive Model Parameters

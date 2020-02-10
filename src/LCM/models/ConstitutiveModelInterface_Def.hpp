@@ -157,11 +157,9 @@ ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
     PHX::FieldManager<Traits>& fm)
 {
   ALBANY_PANIC(
-      dep_fields_map_.size() == 0,
-      "something is wrong in the LCM::CMI");
+      dep_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
   ALBANY_PANIC(
-      eval_fields_map_.size() == 0,
-      "something is wrong in the LCM::CMI");
+      eval_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
   // dependent fields
   typename decltype(dep_fields_map_)::iterator it;
   for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) {

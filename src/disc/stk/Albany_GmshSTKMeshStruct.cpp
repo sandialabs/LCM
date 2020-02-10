@@ -48,9 +48,7 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     } else if (ascii) {
       loadAsciiMesh();
     } else {
-      ALBANY_PANIC(
-          true,
-          "Error! Mesh format not recognized.\n");
+      ALBANY_ASSERT(false, "Error! Mesh format not recognized.\n");
     }
   }
   // Broadcasting topological information about the mesh to all procs
@@ -417,15 +415,12 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
   // Start reading nodes
   std::string line;
   swallow_lines_until(ifile, line, "$NOD");
-  ALBANY_PANIC(
-      ifile.eof(), "Error! Nodes section not found.\n");
+  ALBANY_PANIC(ifile.eof(), "Error! Nodes section not found.\n");
 
   // Read the number of nodes
   std::getline(ifile, line);
   NumNodes = std::atoi(line.c_str());
-  ALBANY_PANIC(
-      NumNodes <= 0,
-      "Error! Invalid number of nodes.\n");
+  ALBANY_PANIC(NumNodes <= 0, "Error! Invalid number of nodes.\n");
   pts = new double[NumNodes][3];
 
   // Read the nodes
@@ -437,15 +432,12 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
   // Start reading elements (cells and sides)
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$ELM");
-  ALBANY_PANIC(
-      ifile.eof(), "Error! Element section not found.\n");
+  ALBANY_PANIC(ifile.eof(), "Error! Element section not found.\n");
 
   // Read the number of entities
   std::getline(ifile, line);
   int num_entities = std::atoi(line.c_str());
-  ALBANY_PANIC(
-      num_entities <= 0,
-      "Error! Invalid number of mesh elements.\n");
+  ALBANY_PANIC(num_entities <= 0, "Error! Invalid number of mesh elements.\n");
 
   // Gmsh lists elements and sides (and some points) all toghether, and does not
   // specify beforehand what kind of elements the mesh has. Hence, we need to
@@ -519,7 +511,7 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(true, "Error! Invalid mesh dimension.\n");
+    ALBANY_ASSERT(false, "Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section
@@ -600,8 +592,7 @@ Albany::GmshSTKMeshStruct::set_NumNodes(std::ifstream& ifile)
 {
   std::string line;
   swallow_lines_until(ifile, line, "$Nodes");
-  ALBANY_PANIC(
-      ifile.eof(), "Error! Nodes section not found.\n");
+  ALBANY_PANIC(ifile.eof(), "Error! Nodes section not found.\n");
 
   if (version == GmshVersion::V2_2) {
     std::getline(ifile, line);
@@ -616,9 +607,7 @@ Albany::GmshSTKMeshStruct::set_NumNodes(std::ifstream& ifile)
     ss >> num_entity_blocks >> NumNodes >> min_node_tag >> max_node_tag;
   }
 
-  ALBANY_PANIC(
-      NumNodes <= 0,
-      "Error! Invalid number of nodes.\n");
+  ALBANY_PANIC(NumNodes <= 0, "Error! Invalid number of nodes.\n");
   return;
 }
 
@@ -663,8 +652,7 @@ Albany::GmshSTKMeshStruct::set_num_entities(std::ifstream& ifile)
   std::string line;
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Elements");
-  ALBANY_PANIC(
-      ifile.eof(), "Error! Element section not found.\n");
+  ALBANY_PANIC(ifile.eof(), "Error! Element section not found.\n");
 
   // Read the number of entities
   std::getline(ifile, line);
@@ -683,9 +671,7 @@ Albany::GmshSTKMeshStruct::set_num_entities(std::ifstream& ifile)
     num_entities = num_elements;
   }
 
-  ALBANY_PANIC(
-      num_entities <= 0,
-      "Error! Invalid number of mesh elements.\n");
+  ALBANY_PANIC(num_entities <= 0, "Error! Invalid number of mesh elements.\n");
 
   return;
 }
@@ -705,8 +691,7 @@ Albany::GmshSTKMeshStruct::increment_element_type(int e_type)
     case 15: /*point*/ break;
     default:
       ALBANY_PANIC(
-          true,
-          "Error! Element type (" << e_type << ") not supported.\n");
+          true, "Error! Element type (" << e_type << ") not supported.\n");
   }
 
   return;
@@ -890,7 +875,7 @@ Albany::GmshSTKMeshStruct::set_generic_mesh_info()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(true, "Error! Invalid mesh dimension.\n");
+    ALBANY_ASSERT(false, "Error! Invalid mesh dimension.\n");
   }
   return;
 }
@@ -998,9 +983,7 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
       std::getline(ifile, line);
       std::stringstream ss(line);
       ss >> id >> e_type >> n_tags;
-      ALBANY_PANIC(
-          n_tags <= 0,
-          "Error! Number of tags must be positive.\n");
+      ALBANY_PANIC(n_tags <= 0, "Error! Number of tags must be positive.\n");
       tags.resize(n_tags + 1);
       for (int j(0); j < n_tags; ++j) { ss >> tags[j]; }
       tags[n_tags] = 0;
@@ -1114,21 +1097,17 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
   } one;
 
   ifile.read(one.c, sizeof(int));
-  ALBANY_PANIC(
-      one.i != 1, "Error! Uncompatible binary format.\n");
+  ALBANY_PANIC(one.i != 1, "Error! Uncompatible binary format.\n");
 
   // Start reading nodes
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Nodes");
-  ALBANY_PANIC(
-      ifile.eof(), "Error! Nodes section not found.\n");
+  ALBANY_PANIC(ifile.eof(), "Error! Nodes section not found.\n");
 
   // Read the number of nodes
   std::getline(ifile, line);
   NumNodes = std::atoi(line.c_str());
-  ALBANY_PANIC(
-      NumNodes <= 0,
-      "Error! Invalid number of nodes.\n");
+  ALBANY_PANIC(NumNodes <= 0, "Error! Invalid number of nodes.\n");
   pts = new double[NumNodes][3];
 
   // Read the nodes
@@ -1141,15 +1120,12 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
   // Start reading elements (cells and sides)
   ifile.seekg(0, std::ios::beg);
   swallow_lines_until(ifile, line, "$Elements");
-  ALBANY_PANIC(
-      ifile.eof(), "Error! Element section not found.\n");
+  ALBANY_PANIC(ifile.eof(), "Error! Element section not found.\n");
 
   // Read the number of entities
   std::getline(ifile, line);
   int num_entities = std::atoi(line.c_str());
-  ALBANY_PANIC(
-      num_entities <= 0,
-      "Error! Invalid number of mesh elements.\n");
+  ALBANY_PANIC(num_entities <= 0, "Error! Invalid number of mesh elements.\n");
 
   // Gmsh lists elements and sides (and some points) all toghether, and does not
   // specify beforehand what kind of elements the mesh has. Hence, we need to
@@ -1162,10 +1138,8 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     ifile.read(reinterpret_cast<char*>(header), 3 * sizeof(int));
 
     ALBANY_PANIC(
-        header[1] <= 0,
-        "Error! Invalid number of elements of this type.\n");
-    ALBANY_PANIC(
-        header[2] <= 0,  "Error! Invalid number of tags.\n");
+        header[1] <= 0, "Error! Invalid number of elements of this type.\n");
+    ALBANY_PANIC(header[2] <= 0, "Error! Invalid number of tags.\n");
 
     e_type = header[0];
     entities_found += header[1];
@@ -1210,10 +1184,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
         break;
       case 15:  // Point
         break;
-      default:
-        ALBANY_PANIC(
-            true,
-            "Error! Element type not supported.\n");
+      default: ALBANY_ASSERT(false, "Error! Element type not supported.\n");
     }
   }
   ALBANY_PANIC(
@@ -1274,7 +1245,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     elems        = quads;
     sides        = lines;
   } else {
-    ALBANY_PANIC(true, "Error! Invalid mesh dimension.\n");
+    ALBANY_ASSERT(false, "Error! Invalid mesh dimension.\n");
   }
 
   // Reset the stream to the beginning of the element section
@@ -1289,10 +1260,8 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     ifile.read(reinterpret_cast<char*>(header), 3 * sizeof(int));
 
     ALBANY_PANIC(
-        header[1] <= 0,
-        "Error! Invalid number of elements of this type.\n");
-    ALBANY_PANIC(
-        header[2] <= 0,  "Error! Invalid number of tags.\n");
+        header[1] <= 0, "Error! Invalid number of elements of this type.\n");
+    ALBANY_PANIC(header[2] <= 0, "Error! Invalid number of tags.\n");
 
     e_type = header[0];
     entities_found += header[1];
@@ -1373,10 +1342,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
         break;
       case 15:  // Point
         break;
-      default:
-        ALBANY_PANIC(
-            true,
-            "Error! Element type not supported.\n");
+      default: ALBANY_ASSERT(false, "Error! Element type not supported.\n");
     }
   }
 
@@ -1544,9 +1510,7 @@ Albany::GmshSTKMeshStruct::check_version(std::ifstream& ifile)
       *out << *it << std::endl;
     }
 
-    ALBANY_PANIC(
-        true,
-        "Cannot read this version of gmsh *.msh file!");
+    ALBANY_ASSERT(false, "Cannot read this version of gmsh *.msh file!");
   }
 
   return;
@@ -1557,9 +1521,7 @@ Albany::GmshSTKMeshStruct::open_fname(std::ifstream& ifile)
 {
   ifile.open(fname.c_str());
   if (!ifile.is_open()) {
-    ALBANY_PANIC(
-        true,
-        "Error! Cannot open mesh file '" << fname << "'.\n");
+    ALBANY_ASSERT(false, "Error! Cannot open mesh file '" << fname << "'.\n");
   }
 
   return;
@@ -1686,9 +1648,7 @@ Albany::GmshSTKMeshStruct::read_physical_names_from_file(
               << "physical_surface_tags.size() = "
               << physical_surface_tags.size() << ". \n"
               << "names.size() = " << names.size() << ". \n";
-    ALBANY_PANIC(
-        physical_surface_tags.size() != names.size(),
-        error_msg.str());
+    ALBANY_PANIC(physical_surface_tags.size() != names.size(), error_msg.str());
 
     // Add each physical name pair to the map
     for (int i = 0; i < names.size(); i++) {

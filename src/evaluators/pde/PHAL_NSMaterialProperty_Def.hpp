@@ -131,9 +131,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     // Add property as a Sacado-ized parameter
     this->registerSacadoParameter(name_mp, paramLib);
   } else {
-    ALBANY_PANIC(
-        true,
-        "Invalid material property type " << type);
+    ALBANY_ASSERT(false, "Invalid material property type " << type);
   }
 
   this->addEvaluatedField(matprop);
@@ -210,9 +208,7 @@ NSMaterialProperty<EvalT, Traits>::evaluateFields(
     }
   } else if (matPropType == TIME_DEP_SCALAR) {
     RealType time = workset.current_time;
-    ALBANY_PANIC(
-        time > timeValues.back(),
-        "Time is growing unbounded!");
+    ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
 
     RealType     slope;
     unsigned int index(0);

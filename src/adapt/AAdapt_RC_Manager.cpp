@@ -64,8 +64,7 @@ read(const Albany::MDArray& mda, PHX::MDField<RealType>& f)
       loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3)
           f(cell, qp, i0, i1) = mda(cell, qp, i0, i1);
       break;
-    default:
-      ALBANY_ASSERT(false, "dims.size() \notin {2,3,4}.");
+    default: ALBANY_ASSERT(false, "dims.size() \notin {2,3,4}.");
   }
 }
 
@@ -85,8 +84,7 @@ write(Albany::MDArray& mda, const MDArray& f)
       loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3)
           mda(cell, qp, i0, i1) = f(cell, qp, i0, i1);
       break;
-    default:
-      ALBANY_ASSERT(false, "dims.size() \notin {2,3,4}.");
+    default: ALBANY_ASSERT(false, "dims.size() \notin {2,3,4}.");
   }
 }
 
@@ -757,9 +755,7 @@ struct Manager::Impl
   {
     Albany::StateArray& esa = state_mgr_->getStateArrays().elemStateArrays[wi];
     Albany::StateArray::iterator it = esa.find(name);
-    ALBANY_PANIC(
-        it == esa.end(),
-        "elemStateArrays is missing " + name);
+    ALBANY_PANIC(it == esa.end(), "elemStateArrays is missing " + name);
     return it->second;
   }
 
@@ -993,7 +989,7 @@ const Teuchos::RCP<Thyra_MultiVector>&
 Manager::getNodalField(const Field& f, const int g_idx, const bool overlapped)
     const
 {
-  ALBANY_PANIC(!overlapped,  "must be overlapped");
+  ALBANY_PANIC(!overlapped, "must be overlapped");
   return f.data_->mv[g_idx];
 }
 

@@ -34,8 +34,7 @@ Albany::HMCProblem::HMCProblem(
     material_db_ = Teuchos::rcp(new Albany::MaterialDatabase(filename, commT));
   }
   ALBANY_PANIC(
-      !validMaterialDB,
-      "Mechanics Problem Requires a Material Database");
+      !validMaterialDB, "Mechanics Problem Requires a Material Database");
 
   // the following function returns the problem information required for setting
   // the rigid body modes (RBMs) for elasticity problems
@@ -63,9 +62,7 @@ Albany::HMCProblem::buildProblem(
     Albany::StateManager&                                    stateMgr)
 {
   /* Construct All Phalanx Evaluators */
-  ALBANY_PANIC(
-      meshSpecs.size() != 1,
-      "Problem supports one Material Block");
+  ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
 
   fm.resize(1);
 

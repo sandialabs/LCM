@@ -72,9 +72,7 @@ KfieldBC_Base<EvalT, Traits>::computeBCs(
     ScalarT& Yval,
     RealType time)
 {
-  ALBANY_PANIC(
-      time > timeValues.back(),
-      "Time is growing unbounded!");
+  ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
 
   RealType X, Y, R, theta;
   ScalarT  coeff_1, coeff_2;

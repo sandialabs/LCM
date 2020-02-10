@@ -121,8 +121,7 @@ loop(Functor& f, PHX::MDField<ScalarT>& a)
         ++ctr;
       }
     } break;
-    default:
-      ALBANY_ASSERT(false, "dims.size() \notin {1,2,3,4,5}.");
+    default: ALBANY_ASSERT(false, "dims.size() \notin {1,2,3,4,5}.");
   }
 }
 // Compile-time MDField.

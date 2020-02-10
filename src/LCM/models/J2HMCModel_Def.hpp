@@ -299,8 +299,7 @@ J2HMCModel<EvalT, Traits>::computeStateParallel(
 /******************************************************************************/
 {
   ALBANY_ASSERT(
-      false,
-      ">>> ERROR (J2HMCModel): computeStateParallel not implemented");
+      false, ">>> ERROR (J2HMCModel): computeStateParallel not implemented");
 }
 
 /******************************************************************************/

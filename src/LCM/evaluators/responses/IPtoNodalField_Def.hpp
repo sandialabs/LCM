@@ -103,7 +103,7 @@ IPtoNodalFieldBase<EvalT, Traits>::IPtoNodalFieldBase(
       PHX::MDField<ScalarT const> t(ip_field_names_[field], dl->qp_tensor);
       ip_fields_[field] = t;
     } else {
-      ALBANY_PANIC(true, "Field Layout unknown");
+      ALBANY_ASSERT(false, "Field Layout unknown");
     }
 
     this->addDependentField(ip_fields_[field].fieldTag());

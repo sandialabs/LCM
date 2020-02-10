@@ -229,8 +229,7 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(
         break;
       default:
         ALBANY_PANIC(
-            true,
-            "Error! The dimension of the side should be 1 or 2.\n");
+            true, "Error! The dimension of the side should be 1 or 2.\n");
     }
 
     for (int node = 0; node < numSideNodes; ++node) {

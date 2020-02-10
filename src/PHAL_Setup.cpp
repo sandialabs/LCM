@@ -142,8 +142,7 @@ Setup::check_fields(
         os << missingField << "\n";
       }
       ALBANY_PANIC(
-          true,
-          "The following fields could not be found:\n" + os.str());
+          true, "The following fields could not be found:\n" + os.str());
     }
   }
 }

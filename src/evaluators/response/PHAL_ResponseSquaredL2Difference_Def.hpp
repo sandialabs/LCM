@@ -241,9 +241,7 @@ PHAL::ResponseSquaredL2DifferenceBase<
     layout = dl->qp_tensor;
     dim    = 2;
   } else {
-    ALBANY_PANIC(
-        true,
-        "Error! Invalid 'Field Rank'.\n");
+    ALBANY_ASSERT(false, "Error! Invalid 'Field Rank'.\n");
   }
 
   return dim;

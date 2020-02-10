@@ -128,7 +128,7 @@ SharedParameterVec<EvalT, Traits>::getValue(const std::string& n)
   for (int i = 0; i < numParams; ++i)
     if (n == paramNames[i]) return paramValues[i];
 
-  ALBANY_PANIC(true, "Error! Parameter name not found.\n");
+  ALBANY_ASSERT(false, "Error! Parameter name not found.\n");
 
   // To avoid warnings
   static ScalarT dummy;

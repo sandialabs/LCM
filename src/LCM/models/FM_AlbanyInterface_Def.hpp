@@ -20,8 +20,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
 /******************************************************************************/
 {
   ALBANY_PANIC(
-      num_dims_ != FM::THREE_D,
-      ">>> ERROR (FerroicModel): Only valid for 3D.");
+      num_dims_ != FM::THREE_D, ">>> ERROR (FerroicModel): Only valid for 3D.");
 
   ferroicModel = Teuchos::rcp(new FM::FerroicModel<EvalT>());
 
@@ -255,8 +254,7 @@ FerroicDriver<EvalT, Traits>::computeStateParallel(
 /******************************************************************************/
 {
   ALBANY_PANIC(
-      false,
-      ">>> ERROR (FerroicDriver): computeStateParallel not implemented");
+      false, ">>> ERROR (FerroicDriver): computeStateParallel not implemented");
 }
 
 /******************************************************************************/
@@ -392,8 +390,7 @@ parseCrystalVariant(
     phaseIndex--;  // Ids are one-based.  Indices are zero-based.
   } else
     ALBANY_PANIC(
-        true,
-        ">>> ERROR (FerroicModel): Crystal variants require a phase.");
+        true, ">>> ERROR (FerroicModel): Crystal variants require a phase.");
 
   ALBANY_PANIC(
       phaseIndex < 0 || phaseIndex >= phases.size(),

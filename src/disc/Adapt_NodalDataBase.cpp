@@ -128,9 +128,7 @@ const Teuchos::RCP<NodalDataBase::Manager>&
 NodalDataBase::getManager(const std::string& key) const
 {
   ManagerMap::const_iterator it = mgr_map.find(key);
-  ALBANY_PANIC(
-      it == mgr_map.end(),
-      "There is no manager with key " << key);
+  ALBANY_PANIC(it == mgr_map.end(), "There is no manager with key " << key);
   return it->second;
 }
 

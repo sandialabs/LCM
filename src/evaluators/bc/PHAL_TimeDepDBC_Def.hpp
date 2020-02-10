@@ -25,9 +25,7 @@ template <typename EvalT, typename Traits>
 typename TimeDepDBC_Base<EvalT, Traits>::ScalarT
 TimeDepDBC_Base<EvalT, Traits>::computeVal(RealType time)
 {
-  ALBANY_PANIC(
-      time > timeValues.back(),
-      "Time is growing unbounded!");
+  ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
 
   ScalarT      val;
   RealType     slope;

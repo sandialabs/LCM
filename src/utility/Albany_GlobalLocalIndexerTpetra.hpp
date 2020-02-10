@@ -14,9 +14,7 @@ class GlobalLocalIndexerTpetra : public GlobalLocalIndexer
       const Teuchos::RCP<const Tpetra_Map>&        tmap)
       : GlobalLocalIndexer(vs), m_tmap(tmap)
   {
-    ALBANY_PANIC(
-        tmap.is_null(),
-        "Error! Input tpetra map pointer is null.\n");
+    ALBANY_PANIC(tmap.is_null(), "Error! Input tpetra map pointer is null.\n");
   }
 
   GO

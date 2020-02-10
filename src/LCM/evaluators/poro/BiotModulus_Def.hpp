@@ -40,9 +40,7 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
     // Add Biot Modulus as a Sacado-ized parameter
     this->registerSacadoParameter("Biot Modulus", paramLib);
   } else {
-    ALBANY_PANIC(
-        true,
-        "Invalid Biot modulus type " << type);
+    ALBANY_ASSERT(false, "Invalid Biot modulus type " << type);
   }
 
   if (p.isType<std::string>("Porosity Name")) {

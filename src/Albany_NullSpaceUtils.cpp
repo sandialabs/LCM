@@ -122,8 +122,7 @@ Coord2RBM(
 
       default:
         ALBANY_PANIC(
-            true,
-            "Coord2RBM: Ndof = " << Ndof << " not implemented\n");
+            true, "Coord2RBM: Ndof = " << Ndof << " not implemented\n");
     } /*switch*/
 
   } /*for (node = 0 ; node < numNodes; node++)*/

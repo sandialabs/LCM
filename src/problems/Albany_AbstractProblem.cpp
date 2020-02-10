@@ -71,9 +71,7 @@ Albany::AbstractProblem::AbstractProblem(
 unsigned int
 Albany::AbstractProblem::numEquations() const
 {
-  ALBANY_PANIC(
-      neq <= 0,
-      "A Problem must have at least 1 equation: " << neq);
+  ALBANY_PANIC(neq <= 0, "A Problem must have at least 1 equation: " << neq);
   return neq;
 }
 

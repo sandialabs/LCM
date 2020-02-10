@@ -552,9 +552,7 @@ void
 STKDiscretization::setCoordinates(
     const Teuchos::ArrayRCP<const double>& /* c */)
 {
-  ALBANY_PANIC(
-      true,
-      "STKDiscretization::setCoordinates is not implemented.");
+  ALBANY_ASSERT(false, "STKDiscretization::setCoordinates is not implemented.");
 }
 
 void
@@ -1266,7 +1264,7 @@ void
 STKDiscretization::getSolutionField(Thyra_Vector& result, const bool overlapped)
     const
 {
-  ALBANY_PANIC(overlapped,  "Not implemented.");
+  ALBANY_PANIC(overlapped, "Not implemented.");
 
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1283,7 +1281,7 @@ STKDiscretization::getSolutionMV(
     Thyra_MultiVector& result,
     const bool         overlapped) const
 {
-  ALBANY_PANIC(overlapped,  "Not implemented.");
+  ALBANY_PANIC(overlapped, "Not implemented.");
 
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1454,9 +1452,7 @@ STKDiscretization::nonzeroesPerRow(const int num_eq) const
     case 1: estNonzeroesPerRow = 3 * num_eq; break;
     case 2: estNonzeroesPerRow = 9 * num_eq; break;
     case 3: estNonzeroesPerRow = 27 * num_eq; break;
-    default:
-      ALBANY_PANIC(
-          true,  "STKDiscretization:  Bad numDim" << numDim);
+    default: ALBANY_ASSERT(false, "STKDiscretization:  Bad numDim" << numDim);
   }
   return estNonzeroesPerRow;
 }
@@ -2839,8 +2835,7 @@ STKDiscretization::meshToGraph()
   for (int ncnt = 0; ncnt < numOverlapNodes; ncnt++) {
     if (sur_elem[ncnt].empty()) {
       ALBANY_PANIC(
-          true,
-          "Node = " << ncnt + 1 << " has no elements" << std::endl);
+          true, "Node = " << ncnt + 1 << " has no elements" << std::endl);
     } else {
       std::size_t nsur = sur_elem[ncnt].size();
       if (nsur > max_nsur) max_nsur = nsur;

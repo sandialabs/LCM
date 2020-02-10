@@ -33,9 +33,7 @@ Albany::CahnHillProblem::buildProblem(
     Albany::StateManager&                                    stateMgr)
 {
   /* Construct All Phalanx Evaluators */
-  ALBANY_PANIC(
-      meshSpecs.size() != 1,
-      "Problem supports one Material Block");
+  ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
 
   fm.resize(1);
   fm[0] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);

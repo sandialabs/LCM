@@ -397,9 +397,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         case 3:  // node_scalar
           scalar_field =
               metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
-          ALBANY_PANIC(
-              scalar_field == 0,
-              "Error! Field not found.\n");
+          ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
             stk::mesh::EntityKey key(stk::topology::NODE_RANK, nodeId3d + 1);
@@ -411,9 +409,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         case 4:  // node_vector
           vector_field =
               metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
-          ALBANY_PANIC(
-              vector_field == 0,
-              "Error! Field not found.\n");
+          ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
             e = bulkData.get_entity(stk::topology::NODE_RANK, nodeId3d + 1);
@@ -448,9 +444,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         case 3:  // node_scalar
           scalar_field =
               metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
-          ALBANY_PANIC(
-              scalar_field == 0,
-              "Error! Field not found.\n");
+          ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
             layeredMeshNumbering->getIndices(nodeId3d, nodeId2d, layer_id);
@@ -463,9 +457,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         case 4:  // node_vector
           vector_field =
               metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
-          ALBANY_PANIC(
-              vector_field == 0,
-              "Error! Field not found.\n");
+          ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
             layeredMeshNumbering->getIndices(nodeId3d, nodeId2d, layer_id);

@@ -40,9 +40,7 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
     // Add Poissons Ratio as a Sacado-ized parameter
     this->registerSacadoParameter("Poissons Ratio", paramLib);
   } else {
-    ALBANY_PANIC(
-        true,
-        "Invalid Poissons ratio type " << type);
+    ALBANY_ASSERT(false, "Invalid Poissons ratio type " << type);
   }
 
   // Optional dependence on Temperature (nu = nu_ + dnudT * T)

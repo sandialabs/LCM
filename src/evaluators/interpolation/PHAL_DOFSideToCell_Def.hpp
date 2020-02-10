@@ -76,9 +76,7 @@ DOFSideToCellBase<EvalT, Traits, ScalarT>::DOFSideToCellBase(
 
     layout = VERTEX_VECTOR;
   } else {
-    ALBANY_PANIC(
-        true,
-        "Error! Invalid field layout.\n");
+    ALBANY_ASSERT(false, "Error! Invalid field layout.\n");
   }
 
   Teuchos::RCP<shards::CellTopology> cellType;

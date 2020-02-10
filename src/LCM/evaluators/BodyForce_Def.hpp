@@ -56,9 +56,7 @@ BodyForce<EvalT, Traits>::BodyForce(
     len = sqrt(len);
     for (int i = 0; i < 3; i++) { this->rotation_axis_[i] /= len; }
   } else {
-    ALBANY_PANIC(
-        true,
-        "Invalid body force type " << type);
+    ALBANY_ASSERT(false, "Invalid body force type " << type);
   }
 
   this->addDependentField(coordinates_);

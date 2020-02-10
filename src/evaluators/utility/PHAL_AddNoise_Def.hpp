@@ -57,9 +57,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
 
     pdf_normal.reset(new std::normal_distribution<double>(mu, sigma));
   } else {
-    ALBANY_PANIC(
-        true,
-        "Error! Invalid noise p.d.f.\n");
+    ALBANY_ASSERT(false, "Error! Invalid noise p.d.f.\n");
   }
 
   seed = pdf_params.get<int>("Random Seed", std::time(nullptr));
@@ -70,11 +68,9 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
   abs_noise = pdf_params.get<double>("Absolute Noise", 0.);
 
   ALBANY_PANIC(
-      rel_noise < 0,
-      "Error! Relative noise should be non-negative.\n");
+      rel_noise < 0, "Error! Relative noise should be non-negative.\n");
   ALBANY_PANIC(
-      abs_noise < 0,
-      "Error! Absolute noise should be non-negative.\n");
+      abs_noise < 0, "Error! Absolute noise should be non-negative.\n");
 
   noise_free = (rel_noise == 0) && (abs_noise == 0);
 

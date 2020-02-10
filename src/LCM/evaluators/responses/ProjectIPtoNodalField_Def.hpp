@@ -472,8 +472,8 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::initManager(
   else {
     EMassLinearOpType::Enum mass_linear_op_type;
     const std::string& mmstr = pl->get<std::string>("Mass Matrix Type", "Full");
-    mass_linear_op_type = EMassLinearOpType::fromString(mmstr);
-    mgr_ = Teuchos::rcp(new ProjectIPtoNodalFieldManager());
+    mass_linear_op_type      = EMassLinearOpType::fromString(mmstr);
+    mgr_                     = Teuchos::rcp(new ProjectIPtoNodalFieldManager());
     mgr_->mass_linear_op =
         Teuchos::rcp(ProjectIPtoNodalFieldManager::MassLinearOp::create(
             mass_linear_op_type));

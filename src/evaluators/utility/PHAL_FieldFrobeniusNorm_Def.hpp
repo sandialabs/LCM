@@ -107,9 +107,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
 
     dl->qp_gradient->dimensions(dims);
   } else {
-    ALBANY_PANIC(
-        true,
-        "Error! Invalid field layout.\n");
+    ALBANY_ASSERT(false, "Error! Invalid field layout.\n");
   }
 
   this->addDependentField(field);
@@ -140,9 +138,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
     this->addDependentField(regularizationParam);
     printedReg = -1.0;
   } else {
-    ALBANY_PANIC(
-        true,
-        "Error! Invalid regularization type");
+    ALBANY_ASSERT(false, "Error! Invalid regularization type");
   }
 
   numDims = dims.size();
@@ -230,8 +226,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(
         }
       }
       break;
-    default:
-      ALBANY_ASSERT(false, "Error! Invalid field layout.\n");
+    default: ALBANY_ASSERT(false, "Error! Invalid field layout.\n");
   }
 }
 

@@ -36,9 +36,7 @@ template <typename EvalT, typename Traits>
 void
 RigidContactBC_Base<EvalT, Traits>::computeVal(RealType time)
 {
-  ALBANY_PANIC(
-      time > timeValues.back(),
-      "Time is growing unbounded!");
+  ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
   ScalarT      Val;
   RealType     slope;
   unsigned int Index(0);
@@ -61,9 +59,7 @@ template <typename EvalT, typename Traits>
 void
 RigidContactBC_Base<EvalT, Traits>::computeCoordVal(RealType time)
 {
-  ALBANY_PANIC(
-      time > timeValues.back(),
-      "Time is growing unbounded!");
+  ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
   ScalarT      Val;
   RealType     slope;
   unsigned int Index(0);

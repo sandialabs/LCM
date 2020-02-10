@@ -37,9 +37,7 @@ Albany::LinComprNSProblem::buildProblem(
   using Teuchos::rcp;
 
   /* Construct All Phalanx Evaluators */
-  ALBANY_PANIC(
-      meshSpecs.size() != 1,
-      "Problem supports one Material Block");
+  ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
   fm.resize(1);
   fm[0] = rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
   buildEvaluators(

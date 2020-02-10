@@ -310,8 +310,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   }
 
   if (fclose(handle)) {
-    ALBANY_PANIC(
-        true, "Cannot close reference solution file.\n");
+    ALBANY_ASSERT(false, "Cannot close reference solution file.\n");
   }
 
   return 0;

@@ -180,8 +180,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
       // Something other than a scalar, vector, or tensor
       else
         ALBANY_PANIC(
-            true,
-            "Error: GenericSTKFieldContainer - cannot match QPData");
+            true, "Error: GenericSTKFieldContainer - cannot match QPData");
     }  // end QuadPoint
     // Single scalar at center of the workset
     else if (

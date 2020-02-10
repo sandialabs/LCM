@@ -172,8 +172,7 @@ Albany::ElectroMechanicsProblem::constructNeumannEvaluators(
     condNames[0] = "(t_x, t_y, t_z)";
   else
     ALBANY_PANIC(
-        true,
-        '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
+        true, '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
 
   condNames[1] = "dudn";
   condNames[2] = "P";

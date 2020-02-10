@@ -32,12 +32,9 @@ class DistributedParameter
       : param_name(param_name_)
   {
     // Sanity checks
+    ALBANY_PANIC(owned_vs_.is_null(), "Error! Owned vector space is null.\n");
     ALBANY_PANIC(
-        owned_vs_.is_null(),
-        "Error! Owned vector space is null.\n");
-    ALBANY_PANIC(
-        overlapped_vs_.is_null(),
-        "Error! Overlapped vector space is null.\n");
+        overlapped_vs_.is_null(), "Error! Overlapped vector space is null.\n");
 
     owned_vec      = Thyra::createMember(owned_vs_);
     overlapped_vec = Thyra::createMember(overlapped_vs_);

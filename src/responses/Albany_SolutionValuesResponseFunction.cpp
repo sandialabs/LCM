@@ -70,9 +70,7 @@ class SolutionValuesResponseFunction::SolutionPrinter
       const Teuchos::ArrayRCP<const ST>& g,
       const Teuchos::Array<GO>&          eq_gids)
   {
-    ALBANY_PANIC(
-        g.size() != eq_gids.size(),
-        "g.size() != eq_gids.size()");
+    ALBANY_PANIC(g.size() != eq_gids.size(), "g.size() != eq_gids.size()");
 
     // Get all coordinates.
     std::vector<GO>          node_gids;

@@ -250,8 +250,8 @@ interp_and_calc_error(
             << "Source file has 0 snapshots!" << std::endl);
   }
   if (tgt_timestep_count < 1) {
-    ALBANY_PANIC(
-        true,
+    ALBANY_ASSERT(
+        false,
         std::endl
             << "Taret file has 0 snapshots!" << std::endl);
   }

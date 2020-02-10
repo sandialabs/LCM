@@ -562,9 +562,7 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
   if (scale == 1.0) scaleBCdofs = false;
 
   if ((scale != 1.0) && (problem->useSDBCs() == true)) {
-    ALBANY_PANIC(
-        true,
-        "'Scaling' sublist not recognized when using SDBCs.");
+    ALBANY_ASSERT(false, "'Scaling' sublist not recognized when using SDBCs.");
   }
 }
 
@@ -667,9 +665,7 @@ Application::finalSetUp(
 
   // Set up memory for workset
   fm = problem->getFieldManager();
-  ALBANY_PANIC(
-      fm == Teuchos::null,
-      "getFieldManager not implemented!!!");
+  ALBANY_PANIC(fm == Teuchos::null, "getFieldManager not implemented!!!");
   dfm = problem->getDirichletFieldManager();
 
   offsets_    = problem->getOffsets();

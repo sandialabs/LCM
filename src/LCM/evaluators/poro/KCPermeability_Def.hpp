@@ -42,9 +42,7 @@ KCPermeability<EvalT, Traits>::KCPermeability(Teuchos::ParameterList& p)
     // Add Kozeny-Carman Permeability as a Sacado-ized parameter
     this->registerSacadoParameter("Kozeny-Carman Permeability", paramLib);
   } else {
-    ALBANY_PANIC(
-        true,
-        "Invalid Kozeny-Carman Permeability type " << type);
+    ALBANY_ASSERT(false, "Invalid Kozeny-Carman Permeability type " << type);
   }
 
   // Optional dependence on Temperature (E = E_ + dEdT * T)

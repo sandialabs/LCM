@@ -248,9 +248,7 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
       workset_size, num_vertices_, num_nodes_, num_pts_, num_dims_));
   std::string msg =
       "Data Layout Usage in Mechanics problems assume vecDim = num_dims_";
-  ALBANY_PANIC(
-      dl_->vectorAndGradientLayoutsAreEquivalent == false,
-      msg);
+  ALBANY_PANIC(dl_->vectorAndGradientLayoutsAreEquivalent == false, msg);
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
   bool                                              supports_transient = true;
   int                                               offset             = 0;

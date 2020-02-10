@@ -1105,8 +1105,7 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
         }
       }
       ALBANY_PANIC(
-          side_lid == -1,
-          "Error! Cannot locate the right side in the cell.\n");
+          side_lid == -1, "Error! Cannot locate the right side in the cell.\n");
 
       sideMap[side3D_GID] = side_mesh->bulkData->identifier(cell2D) - 1;
       sideNodeMap[side3D_GID].resize(num_nodes);
@@ -2108,9 +2107,7 @@ GenericSTKMeshStruct::checkFieldIsInMesh(
       missing = (metaData->get_field<VFT>(entity_rank, fname) == 0);
       break;
     case 3: missing = (metaData->get_field<TFT>(entity_rank, fname) == 0);
-    default:
-      ALBANY_PANIC(
-          true, "Error! Invalid field dimension.\n");
+    default: ALBANY_ASSERT(false, "Error! Invalid field dimension.\n");
   }
 
   if (missing) {

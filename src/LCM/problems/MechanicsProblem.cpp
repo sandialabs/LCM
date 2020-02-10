@@ -544,8 +544,7 @@ MechanicsProblem::constructNeumannEvaluators(
     condNames[0] = "(t_x, t_y, t_z)";
   } else {
     ALBANY_PANIC(
-        true,
-        '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
+        true, '\n' << "Error: Sidesets only supported in 2 and 3D." << '\n');
   }
 
   condNames[1] = "dudn";
@@ -593,8 +592,7 @@ MechanicsProblem::getVariableType(
   } else if (type == "Time Dependent") {
     variable_type = MECH_VAR_TYPE_TIMEDEP;
   } else {
-    ALBANY_PANIC(
-        true,  "Unknown variable type " << type << '\n');
+    ALBANY_ASSERT(false, "Unknown variable type " << type << '\n');
   }
 
   have_variable = (variable_type != MECH_VAR_TYPE_NONE);

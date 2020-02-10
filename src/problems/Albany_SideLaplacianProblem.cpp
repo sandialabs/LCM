@@ -47,9 +47,7 @@ SideLaplacian::buildProblem(
     Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
     Albany::StateManager&                                    stateMgr)
 {
-  ALBANY_PANIC(
-      meshSpecs.size() != 1,
-      "Problem supports one Material Block");
+  ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
 
   // Building cell basis and cubature
   const CellTopologyData* const cell_top = &meshSpecs[0]->ctd;

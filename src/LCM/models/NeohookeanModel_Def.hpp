@@ -87,21 +87,14 @@ NeohookeanModel<EvalT, Traits>::computeState(
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      auto const& E = elastic_modulus(cell, pt);
-
+      auto const& E  = elastic_modulus(cell, pt);
       auto const& nu = poissons_ratio(cell, pt);
-
-      auto const& J = jac_det(cell, pt);
-
-      kappa = E / (3.0 * (1.0 - 2.0 * nu));
-
-      mu = E / (2.0 * (1.0 + nu));
-
-      Jm13 = 1.0 / std::cbrt(J);
-
-      Jm23 = Jm13 * Jm13;
-
-      Jm53 = Jm23 * Jm23 * Jm13;
+      auto const& J  = jac_det(cell, pt);
+      kappa          = E / (3.0 * (1.0 - 2.0 * nu));
+      mu             = E / (2.0 * (1.0 + nu));
+      Jm13           = 1.0 / std::cbrt(J);
+      Jm23           = Jm13 * Jm13;
+      Jm53           = Jm23 * Jm23 * Jm13;
 
       F.fill(def_grad, cell, pt, 0, 0);
 

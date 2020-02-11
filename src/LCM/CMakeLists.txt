@@ -93,13 +93,11 @@ set(bc-headers
     "${LCM_DIR}/evaluators/bc/TorsionBC.hpp")
 
 set(bc-sources
-    ${bc-sources} "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.cpp"
+    ${bc-sources}
     "${LCM_DIR}/evaluators/bc/SchwarzBC.cpp"
     "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.cpp")
 set(bc-headers
     ${bc-headers}
-    "${LCM_DIR}/evaluators/bc/PDNeighborFitBC.hpp"
-    "${LCM_DIR}/evaluators/bc/PDNeighborFitBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/SchwarzBC.hpp"
     "${LCM_DIR}/evaluators/bc/SchwarzBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.hpp"

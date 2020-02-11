@@ -10,7 +10,6 @@
 #include "LCM/evaluators/Time.hpp"
 #include "LCM/evaluators/bc/EquilibriumConcentrationBC.hpp"
 #include "LCM/evaluators/bc/KfieldBC.hpp"
-#include "LCM/evaluators/bc/PDNeighborFitBC.hpp"
 #include "LCM/evaluators/bc/SchwarzBC.hpp"
 #include "LCM/evaluators/bc/StrongSchwarzBC.hpp"
 #include "LCM/evaluators/bc/TimeTracBC.hpp"
@@ -51,36 +50,32 @@ struct DirichletFactoryTraits
   static const int id_dirichlet_aggregator          = 1;
   static const int id_dirichlet_coordinate_function = 2;
   static const int id_dirichlet_field               = 3;
-  static const int id_dirichlet_off_nodeset =
-      4;  // To handle equations on side set (see PHAL_DirichletOffNodeSet)
-  static const int id_timedep_bc          = 5;  // Only for LCM probs
-  static const int id_timedep_sdbc        = 6;  // Only for LCM probs
-  static const int id_sdbc                = 7;
-  static const int id_kfield_bc           = 8;   // Only for LCM probs
-  static const int id_eq_concentration_bc = 9;   // Only for LCM probs
-  static const int id_time                = 10;  // Only for LCM probs
-  static const int id_torsion_bc          = 11;  // Only for LCM probs
-  static const int id_schwarz_bc          = 12;  // Only for LCM probs
-  static const int id_strong_schwarz_bc   = 13;  // Only for LCM probs
+  static const int id_dirichlet_off_nodeset         = 4;  // eqs on side set
+  static const int id_timedep_bc                    = 5;  // Only for LCM
+  static const int id_timedep_sdbc                  = 6;  // Only for LCM
+  static const int id_sdbc                          = 7;
+  static const int id_kfield_bc                     = 8;   // Only for LCM
+  static const int id_eq_concentration_bc           = 9;   // Only for LCM
+  static const int id_time                          = 10;  // Only for LCM
+  static const int id_torsion_bc                    = 11;  // Only for LCM
+  static const int id_schwarz_bc                    = 12;  // Only for LCM
+  static const int id_strong_schwarz_bc             = 13;  // Only for LCM
 
   typedef Sacado::mpl::vector<
-      PHAL::Dirichlet<_, Traits>,               //  0
-      PHAL::DirichletAggregator<_, Traits>,     //  1
-      PHAL::DirichletCoordFunction<_, Traits>,  //  2
-      PHAL::DirichletField<_, Traits>,          //  3
-      PHAL::DirichletOffNodeSet<_, Traits>,     //  4
-      PHAL::TimeDepDBC<_, Traits>,              //  5
-      PHAL::TimeDepSDBC<_, Traits>,             //  6
-      PHAL::SDirichlet<_, Traits>               //  7
-      ,
+      PHAL::Dirichlet<_, Traits>,                  //  0
+      PHAL::DirichletAggregator<_, Traits>,        //  1
+      PHAL::DirichletCoordFunction<_, Traits>,     //  2
+      PHAL::DirichletField<_, Traits>,             //  3
+      PHAL::DirichletOffNodeSet<_, Traits>,        //  4
+      PHAL::TimeDepDBC<_, Traits>,                 //  5
+      PHAL::TimeDepSDBC<_, Traits>,                //  6
+      PHAL::SDirichlet<_, Traits>,                 //  7
       LCM::KfieldBC<_, Traits>,                    //  8
-      LCM::EquilibriumConcentrationBC<_, Traits>,  // 9
-      LCM::Time<_, Traits>,                        //  10
-      LCM::TorsionBC<_, Traits>                    // 11
-      ,
-      LCM::SchwarzBC<_, Traits>,        // 12
-      LCM::StrongSchwarzBC<_, Traits>,  // 13
-      LCM::PDNeighborFitBC<_, Traits>   // 14
+      LCM::EquilibriumConcentrationBC<_, Traits>,  //  9
+      LCM::Time<_, Traits>,                        // 10
+      LCM::TorsionBC<_, Traits>,                   // 11
+      LCM::SchwarzBC<_, Traits>,                   // 12
+      LCM::StrongSchwarzBC<_, Traits>              // 13
       >
       EvaluatorTypes;
 };
@@ -97,14 +92,13 @@ struct NeumannFactoryTraits
   static const int id_timedep_bc                 = 6;  // Only for LCM probs
 
   typedef Sacado::mpl::vector<
-      PHAL::Neumann<_, Traits>,                    //  0
-      PHAL::NeumannAggregator<_, Traits>,          //  1
-      PHAL::GatherCoordinateVector<_, Traits>,     //  2
-      PHAL::GatherSolution<_, Traits>,             //  3
-      PHAL::LoadStateField<_, Traits>,             //  4
-      PHAL::GatherScalarNodalParameter<_, Traits>  //  5
-      ,
-      LCM::TimeTracBC<_, Traits>  //  6
+      PHAL::Neumann<_, Traits>,                     //  0
+      PHAL::NeumannAggregator<_, Traits>,           //  1
+      PHAL::GatherCoordinateVector<_, Traits>,      //  2
+      PHAL::GatherSolution<_, Traits>,              //  3
+      PHAL::LoadStateField<_, Traits>,              //  4
+      PHAL::GatherScalarNodalParameter<_, Traits>,  //  5
+      LCM::TimeTracBC<_, Traits>                    //  6
       >
       EvaluatorTypes;
 };

@@ -516,23 +516,11 @@ GenericSTKMeshStruct::computeAddlConnectivity()
   if (method == "Random") {
     stk::mesh::PartVector add_parts;
     stk::mesh::create_adjacent_entities(*bulkData, add_parts);
-
     stk::mesh::EntityRank sideRank = metaData->side_rank();
-
     std::vector<stk::mesh::Entity> element_lst;
-    //  stk::mesh::get_entities(*(bulkData),stk::topology::ELEMENT_RANK,element_lst);
-
     stk::mesh::Selector select_owned_or_shared =
         metaData->locally_owned_part() | metaData->globally_shared_part();
     stk::mesh::Selector select_owned = metaData->locally_owned_part();
-
-    /*
-          stk::mesh::Selector select_owned_in_part =
-          stk::mesh::Selector( metaData->universal_part() ) &
-          stk::mesh::Selector( metaData->locally_owned_part() );
-
-          stk::mesh::get_selected_entities( select_owned_in_part ,
-    */
 
     // Loop through only on-processor elements as we are just deleting entities
     // inside the element
@@ -554,7 +542,6 @@ GenericSTKMeshStruct::computeAddlConnectivity()
     if (bulkData->mesh_meta_data().spatial_dimension() == 3) {
       // Remove extra relations from face
       std::vector<stk::mesh::Entity> face_lst;
-      // stk::mesh::get_entities(*(bulkData),stk::topology::ELEMENT_RANK-1,face_lst);
       // Loop through all faces visible to this processor, as a face can be
       // visible on two processors
       stk::mesh::get_selected_entities(

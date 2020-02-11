@@ -1,5 +1,3 @@
-%YAML 1.1
----
 LCM:
   Time Dependent DBC on NS nodelist_7 for DOF X:
     Number of points: 3

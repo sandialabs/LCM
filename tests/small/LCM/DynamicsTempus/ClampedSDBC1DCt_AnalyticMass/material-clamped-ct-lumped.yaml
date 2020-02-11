@@ -1,6 +1,4 @@
-%YAML 1.1
----
-ANONYMOUS:
+ALBANY:
   ElementBlocks: 
     Block0: 
       material: Clamped

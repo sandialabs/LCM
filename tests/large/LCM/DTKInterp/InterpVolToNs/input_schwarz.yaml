@@ -1,5 +1,3 @@
-%YAML 1.1
----
 LCM:
   Source Mesh Input File: '../Meshes/notched-cylinder-0.exo'
   Source Mesh Snapshot Number: 11

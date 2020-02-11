@@ -1,5 +1,3 @@
-%YAML 1.1
----
 LCM:
   Problem:
     Register dirichlet_field: false

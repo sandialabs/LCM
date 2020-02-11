@@ -1,6 +1,4 @@
-%YAML 1.1
----
-ANONYMOUS:
+ALBANY:
   Coupled System: 
     Model XML Files: [pipe.yaml, reactor.yaml]
     Network Model: Reactor Network

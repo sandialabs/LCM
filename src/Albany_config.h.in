@@ -8,7 +8,6 @@
 #cmakedefine ALBANY_FROSCH
 #cmakedefine ALBANY_MUELU
 #cmakedefine ALBANY_PAMGEN
-#cmakedefine ALBANY_PANZER_EXPR_EVAL
 #cmakedefine ALBANY_RBGEN
 #cmakedefine ALBANY_ROL
 #cmakedefine ALBANY_STK_PERCEPT

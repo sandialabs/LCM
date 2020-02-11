@@ -369,16 +369,6 @@ else()
   message(FATAL_ERROR "STK is required.")
 endif()
 
-# set optional dependency on Panzer's ExprEval subpackage
-list(FIND Trilinos_PACKAGE_LIST PanzerExprEval PanzerExprEval_List_ID)
-if(PanzerExprEval_List_ID GREATER -1)
-  message("-- Looking for PanzerExprEval:       Found")
-  set(ALBANY_PANZER_EXPR_EVAL TRUE)
-else()
-  message("-- Looking for PanzerExprEval:       NOT found.")
-  set(ALBANY_PANZER_EXPR_EVAL FALSE)
-endif()
-
 # set optional dependency on Zoltan, for partitioning MESSAGE("-- Looking for
 # Zoltan:")
 list(FIND Trilinos_PACKAGE_LIST Zoltan Zoltan_List_ID)

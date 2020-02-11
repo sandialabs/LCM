@@ -245,10 +245,7 @@ interp_and_calc_error(
     ALBANY_ABORT(std::endl << "Source file has 0 snapshots!" << std::endl);
   }
   if (tgt_timestep_count < 1) {
-    ALBANY_ASSERT(
-        false,
-        std::endl
-            << "Taret file has 0 snapshots!" << std::endl);
+    ALBANY_ABORT(std::endl << "Target file has 0 snapshots!" << std::endl);
   }
   if (((src_snap_no == -1) && (tgt_snap_no != -1)) ||
       ((tgt_snap_no == -1) && (src_snap_no != -1))) {

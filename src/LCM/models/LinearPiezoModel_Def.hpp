@@ -205,9 +205,7 @@ LinearPiezoModel<EvalT, Traits>::computeStateParallel(
     FieldMap                  eval_fields)
 /******************************************************************************/
 {
-  ALBANY_ASSERT(
-      false,
-      ">>> ERROR (LinearPiezoModel): computeStateParallel not implemented");
+  ALBANY_ABORT("computeStateParallel not implemented");
 }
 
 /******************************************************************************/

@@ -388,10 +388,9 @@ class ProjectIPtoNodalFieldManager::FullMassLinearOp
               "Albany::addToGlobalRowValues failed: global row "
                   << global_row << " of mass matrix is missing elements \n");
         } else {
-          ALBANY_ASSERT(
-              false,
+          ALBANY_ABORT(
               "Albany is switching to static graph, so ProjectIPtoNodalField \n"
-                  << "response is not supported with dynamic graph!\n");
+              << "response is not supported with dynamic graph!\n");
           // IKT, FIXME: does this case need to be implemented?
           Albany::addToGlobalRowValues(
               this->linear_op_, global_row, cols(), vals());
@@ -429,10 +428,9 @@ class ProjectIPtoNodalFieldManager::LumpedMassLinearOp
           Albany::addToGlobalRowValues(
               this->linear_op_, global_row, cols(), vals());
         } else {
-          ALBANY_ASSERT(
-              false,
+          ALBANY_ABORT(
               "Albany is switching to static graph, so ProjectIPtoNodalField \n"
-                  << "response is not supported with dynamic graph!\n");
+              << "response is not supported with dynamic graph!\n");
           // IKT, FIXME: does this case need to be implemented?
           Albany::addToGlobalRowValues(
               this->linear_op_, global_row, cols, vals);
@@ -686,10 +684,9 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
                                 ->getNodalOpFactory();
   mgr_->mass_linear_op->is_static() = true;
   if (Teuchos::is_null(mgr_->ovl_graph_factory)) {
-    ALBANY_ASSERT(
-        false,
+    ALBANY_ABORT(
         "Construction of graph on the fly not implemented in \n"
-            << "ProjectIPtoNodalField preEvaluate routine!\n");
+        << "ProjectIPtoNodalField preEvaluate routine!\n");
     // IKT, FIXME: implement this case?
     // Otherwise, construct the graph on the fly.
     mgr_->mass_linear_op->is_static() = false;
@@ -847,10 +844,9 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
     const Teuchos::RCP<const Thyra_LinearOp>& mm_ovl =
         mgr_->mass_linear_op->linear_op();
     if (!mgr_->mass_linear_op->is_static()) {
-      ALBANY_ASSERT(
-          false,
+      ALBANY_ABORT(
           "Albany is switching to static graph, so ProjectIPtoNodalField \n"
-              << "response is not supported with dynamic graph!\n");
+          << "response is not supported with dynamic graph!\n");
       // If this matrix was constructed without a graph, grab the graph now and
       // store it for possible reuse later.
       // IKT, FIXME: does this case need to be implemented?

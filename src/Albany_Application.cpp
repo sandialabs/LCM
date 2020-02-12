@@ -966,21 +966,20 @@ Application::set_dfm_workset(
     countScale++;
   }
 
-  if (x_post_SDBCs == Teuchos::null)
+  if (x_post_SDBCs == Teuchos::null) {
     dfm_set(workset, x, x_dot, x_dotdot, rc_mgr);
-  else
+  } else {
     dfm_set(workset, x_post_SDBCs, x_dot, x_dotdot, rc_mgr);
+  }
 
   double const this_time = fixTime(current_time);
 
-  workset.current_time = this_time;
-
-  // Needed for more specialized Dirichlet BCs (e.g. Schwarz coupling)
-  workset.apps_        = apps_;
-  workset.current_app_ = Teuchos::rcp(this, false);
-
-  workset.distParamLib = distParamLib;
-  workset.disc         = disc;
+  workset.current_time       = this_time;
+  workset.apps_              = apps_;
+  workset.current_app_       = Teuchos::rcp(this, false);
+  workset.distParamLib       = distParamLib;
+  workset.disc               = disc;
+  workset.spatial_dimension_ = getSpatialDimension();
 
   return workset;
 }

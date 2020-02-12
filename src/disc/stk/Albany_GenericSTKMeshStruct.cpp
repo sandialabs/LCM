@@ -511,9 +511,9 @@ GenericSTKMeshStruct::computeAddlConnectivity()
   if (method == "Random") {
     stk::mesh::PartVector add_parts;
     stk::mesh::create_adjacent_entities(*bulkData, add_parts);
-    stk::mesh::EntityRank sideRank = metaData->side_rank();
+    stk::mesh::EntityRank          sideRank = metaData->side_rank();
     std::vector<stk::mesh::Entity> element_lst;
-    stk::mesh::Selector select_owned_or_shared =
+    stk::mesh::Selector            select_owned_or_shared =
         metaData->locally_owned_part() | metaData->globally_shared_part();
     stk::mesh::Selector select_owned = metaData->locally_owned_part();
 

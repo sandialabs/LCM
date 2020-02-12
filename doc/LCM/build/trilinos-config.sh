@@ -107,6 +107,7 @@ cmake \
  -D Trilinos_ENABLE_ROL:BOOL=ON \
  -D Trilinos_ENABLE_Rythmos:BOOL=ON \
  -D Trilinos_ENABLE_SEACAS:BOOL=ON \
+ -D Trilinos_ENABLE_STKExprEval:BOOL=ON \
  -D Trilinos_ENABLE_STKIO:BOOL=ON \
  -D Trilinos_ENABLE_STKMesh:BOOL=ON \
  -D Trilinos_ENABLE_Sacado:BOOL=ON \

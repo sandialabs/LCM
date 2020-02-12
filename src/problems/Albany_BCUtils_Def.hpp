@@ -33,7 +33,7 @@ plName(const std::string& name)
 
 // DBCs do not depend on each other. However, BCs are not always compatible at
 // corners, and so order of evaluation can matter. Establish an order here. The
-// order is the order the BC is listed in the XML input file.
+// order is the order the BC is listed in the input file.
 void
 imposeOrder(
     const Teuchos::ParameterList& bc_pl,
@@ -48,7 +48,7 @@ imposeOrder(
   const std::string parm_name("BCOrder");
   const char*       parm_val = "BCOrder_";
 
-  // Get the order of the BCs as they are written in the XML file.
+  // Get the order of the BCs as they are written in the input file.
   // ParameterList::ConstIterator preserves the text ordering.
   S2int order;
   int   ne = 0;
@@ -61,7 +61,7 @@ imposeOrder(
     const std::string     name     = plName(it->first);
     S2int::const_iterator order_it = order.find(name);
     if (order_it == order.end()) {
-      // It is not an error to add an evaluator not directly mapped to an XML
+      // It is not an error to add an evaluator not directly mapped to an input
       // entry.
 
       // LB: if the bc is of the form 'DBC off NS...', we ignore the miss,
@@ -704,6 +704,35 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
       }
     }
   }
+
+  ///
+  /// Expression Evaluated SDBC (S = "Symmetric", f.k.a. "Strong")
+  ///
+  for (std::size_t i = 0; i < nodeSetIDs.size(); i++) {
+    for (std::size_t j = 0; j < bcNames.size(); j++) {
+      string ss =
+          traits_type::constructExprEvalSDBCName(nodeSetIDs[i], bcNames[j]);
+      if (BCparams.isParameter(ss)) {
+        RCP<ParameterList> p = rcp(new ParameterList);
+        use_sdbcs_           = true;
+        p->set<int>("Type", traits_type::typeEe);
+        p->set<RCP<DataLayout>>("Data Layout", dummy);
+        p->set<string>("Dirichlet Name", ss);
+        p->set<std::string>(
+            "Dirichlet Expression", BCparams.get<std::string>(ss));
+        p->set<RealType>("Dirichlet Value", 0.0);
+        p->set<string>("Node Set ID", nodeSetIDs[i]);
+        p->set<int>("Equation Offset", j);
+        offsets_[i].push_back(j);
+        p->set<RCP<ParamLib>>("Parameter Library", paramLib);
+
+        evaluators_to_build[evaluatorsToBuildName(ss)] = p;
+
+        bcs->push_back(ss);
+      }
+    }
+  }
+
   ///
   /// Scaled SDBC (S = "Symmetric", f.k.a. "Strong")
   ///
@@ -1285,12 +1314,18 @@ Albany::DirichletTraits::getValidBCParameters(
           nodeSetIDs[i], bcNames[j]);
       std::string st =
           Albany::DirichletTraits::constructSDBCName(nodeSetIDs[i], bcNames[j]);
+      std::string ee = Albany::DirichletTraits::constructExprEvalSDBCName(
+          nodeSetIDs[i], bcNames[j]);
       std::string sst = Albany::DirichletTraits::constructScaledSDBCName(
           nodeSetIDs[i], bcNames[j]);
       validPL->set<double>(
           ss, 0.0, "Value of BC corresponding to nodeSetID and dofName");
       validPL->set<double>(
           st, 0.0, "Value of SDBC corresponding to nodeSetID and dofName");
+      validPL->set<std::string>(
+          ee,
+          "0.0",
+          "Expression of SDBC corresponding to nodeSetID and dofName");
       Teuchos::Array<double> array(1);
       array[0] = 0.0;
       validPL->set<Teuchos::Array<double>>(
@@ -1307,12 +1342,16 @@ Albany::DirichletTraits::getValidBCParameters(
           nodeSetIDs[i], bcNames[j]);
       st = Albany::DirichletTraits::constructSDBCNameField(
           nodeSetIDs[i], bcNames[j]);
+      ee = Albany::DirichletTraits::constructExprEvalSDBCNameField(
+          nodeSetIDs[i], bcNames[j]);
       sst = Albany::DirichletTraits::constructScaledSDBCNameField(
           nodeSetIDs[i], bcNames[j]);
       validPL->set<std::string>(
           ss, "dirichlet field", "Field used to prescribe Dirichlet BCs");
       validPL->set<std::string>(
           st, "dirichlet field", "Field used to prescribe SDBCs");
+      validPL->set<std::string>(
+          ee, "dirichlet field", "Field used to prescribe Expression SDBCs");
       std::string onsbc = Albany::DirichletTraits::constructBCNameOffNodeSet(
           nodeSetIDs[i], bcNames[j]);
       validPL->set<double>(
@@ -1369,16 +1408,6 @@ Albany::NeumannTraits::getValidBCParameters(
         std::string tt = Albany::NeumannTraits::constructTimeDepBCName(
             sideSetIDs[i], bcNames[j], conditions[k]);
 
-        /*
-         if(numDim == 2)
-         validPL->set<Teuchos::Array<double>>(ss, Teuchos::tuple<double>(0.0,
-         0.0),
-         "Value of BC corresponding to sideSetID and boundary condition");
-         else
-         validPL->set<Teuchos::Array<double>>(ss, Teuchos::tuple<double>(0.0,
-         0.0, 0.0),
-         "Value of BC corresponding to sideSetID and boundary condition");
-         */
         Teuchos::Array<double> defaultData;
         validPL->set<Teuchos::Array<double>>(
             ss,
@@ -1420,6 +1449,17 @@ Albany::DirichletTraits::constructSDBCName(
 }
 
 std::string
+Albany::DirichletTraits::constructExprEvalSDBCName(
+    const std::string& ns,
+    const std::string& dof)
+{
+  std::stringstream ss;
+  ss << "Analytic SDBC on NS " << ns << " for DOF " << dof;
+
+  return ss.str();
+}
+
+std::string
 Albany::DirichletTraits::constructScaledSDBCName(
     const std::string& ns,
     const std::string& dof)
@@ -1448,6 +1488,18 @@ Albany::DirichletTraits::constructSDBCNameField(
 {
   std::stringstream ss;
   ss << "SDBC on NS " << ns << " for DOF " << dof << " prescribe Field";
+
+  return ss.str();
+}
+
+std::string
+Albany::DirichletTraits::constructExprEvalSDBCNameField(
+    const std::string& ns,
+    const std::string& dof)
+{
+  std::stringstream ss;
+  ss << "Analytic SDBC on NS " << ns << " for DOF " << dof
+     << " prescribe Field";
 
   return ss.str();
 }

@@ -106,6 +106,7 @@ function(lcm_do_trilinos)
       "-DTrilinos_ENABLE_Rythmos:BOOL=ON"
       "-DTrilinos_ENABLE_SEACAS:BOOL=ON"
       "-DTrilinos_ENABLE_SEACASAprepro_lib:BOOL=ON"
+      "-DTrilinos_ENABLE_STKExprEval:BOOL=ON"
       "-DTrilinos_ENABLE_STKIO:BOOL=ON"
       "-DTrilinos_ENABLE_STKMesh:BOOL=ON"
       "-DTrilinos_ENABLE_Sacado:BOOL=ON"

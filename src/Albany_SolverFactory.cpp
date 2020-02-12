@@ -72,7 +72,7 @@ SolverFactory::SolverFactory(
     const Teuchos::RCP<const Teuchos_Comm>& comm)
     : out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
-  // Set up application parameters: read and broadcast XML file, and set
+  // Set up application parameters: read and broadcast input file, and set
   // defaults
   // Teuchos::RCP<Teuchos::ParameterList> input_
   appParams = Teuchos::createParameterList("Albany Parameters");
@@ -513,7 +513,7 @@ SolverFactory::getTestParameters(int response_index) const
 
   ALBANY_PANIC(
       result->isType<std::string>("Test Values"),
-      "Array information in XML file must now be of type Array(double)\n");
+      "Array information in input file must now be of type Array(double)\n");
   result->validateParametersAndSetDefaults(
       *getValidRegressionResultsParameters(), 0);
 

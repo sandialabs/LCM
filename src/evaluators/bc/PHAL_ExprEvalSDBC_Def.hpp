@@ -4,13 +4,15 @@
 // in the file license.txt in the top-level Albany directory.
 //
 
-#ifndef PHAL_SDIRICHLET_DEF_HPP
-#define PHAL_SDIRICHLET_DEF_HPP
+#ifndef PHAL_EXPREVALSDBC_DEF_HPP
+#define PHAL_EXPREVALSDBC_DEF_HPP
+
+#include <stk_expreval/Evaluator.hpp>
 
 #include "Albany_CombineAndScatterManager.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
-#include "PHAL_SDirichlet.hpp"
+#include "PHAL_ExprEvalSDBC.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
 
@@ -20,10 +22,11 @@ namespace PHAL {
 // Specialization: Residual
 //
 template <typename Traits>
-SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::SDirichlet(
+ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(
     Teuchos::ParameterList& p)
     : PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
+  expression = p.get<std::string>("Dirichlet Expression");
 }
 
 //
@@ -31,18 +34,30 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::SDirichlet(
 //
 template <typename Traits>
 void
-SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
+ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     typename Traits::EvalData dirichlet_workset)
 {
+  auto const          dim = dirichlet_workset.spatial_dimension_;
+  stk::expreval::Eval expr_eval(expression);
+  expr_eval.parse();
+  expr_eval.bindVariable("t", dirichlet_workset.current_time);
+
   Teuchos::RCP<Thyra_Vector const> x = dirichlet_workset.x;
   Teuchos::ArrayRCP<ST>            x_view =
       Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x));
   // Grab the vector of node GIDs for this Node Set ID
-  std::vector<std::vector<int>> const& ns_nodes =
+  auto const& ns_nodes =
       dirichlet_workset.nodeSets->find(this->nodeSetID)->second;
+
+  auto const& ns_coords =
+      dirichlet_workset.nodeSetCoords->find(this->nodeSetID)->second;
+
   for (size_t ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
     int const dof = ns_nodes[ns_node][this->offset];
-    x_view[dof]   = this->value;
+    if (dim > 0) expr_eval.bindVariable("x", ns_coords[ns_node][0]);
+    if (dim > 1) expr_eval.bindVariable("y", ns_coords[ns_node][1]);
+    if (dim > 2) expr_eval.bindVariable("z", ns_coords[ns_node][2]);
+    x_view[dof] = this->value = expr_eval.evaluate();
   }
 }
 
@@ -51,7 +66,7 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
 //
 template <typename Traits>
 void
-SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
+ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     typename Traits::EvalData dirichlet_workset)
 {
   Teuchos::RCP<Thyra_Vector> f      = dirichlet_workset.f;
@@ -73,7 +88,7 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 // Specialization: Jacobian
 //
 template <typename Traits>
-SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::SDirichlet(
+ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::ExprEvalSDBC(
     Teuchos::ParameterList& p)
     : PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
@@ -84,7 +99,7 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::SDirichlet(
 //
 template <typename Traits>
 void
-SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
+ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
     typename Traits::EvalData dirichlet_workset)
 {
   Teuchos::RCP<const Thyra_LinearOp> J = dirichlet_workset.Jac;
@@ -127,7 +142,7 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
 //
 template <typename Traits>
 void
-SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
+ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData dirichlet_workset)
 {
   Teuchos::RCP<const Thyra_Vector> x = dirichlet_workset.x;
@@ -184,7 +199,7 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 // Specialization: Tangent
 //
 template <typename Traits>
-SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>::SDirichlet(
+ExprEvalSDBC<PHAL::AlbanyTraits::Tangent, Traits>::ExprEvalSDBC(
     Teuchos::ParameterList& p)
     : PHAL::DirichletBase<PHAL::AlbanyTraits::Tangent, Traits>(p)
 {
@@ -195,7 +210,7 @@ SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>::SDirichlet(
 //
 
 template <typename Traits>
-void SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
+void ExprEvalSDBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     typename Traits::EvalData /* dirichlet_workset */)
 {
 }
@@ -204,7 +219,7 @@ void SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
 // Specialization: DistParamDeriv
 //
 template <typename Traits>
-SDirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>::SDirichlet(
+ExprEvalSDBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::ExprEvalSDBC(
     Teuchos::ParameterList& p)
     : PHAL::DirichletBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p)
 {
@@ -215,7 +230,7 @@ SDirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>::SDirichlet(
 //
 template <typename Traits>
 void
-SDirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
+ExprEvalSDBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
     typename Traits::EvalData dirichlet_workset)
 {
   return;
@@ -256,4 +271,4 @@ SDirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
 
 }  // namespace PHAL
 
-#endif  // PHAL_SDIRICHLET_DEF_HPP
+#endif  // PHAL_EXPREVALSDBC_DEF_HPP

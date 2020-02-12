@@ -472,10 +472,9 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
       ((1.0 - porosity) * soil_density_);
 
   // Update the effective material heat capacity
-  heat_capacity_(cell, pt) =
-      (porosity * ((ice_heat_capacity_ * icurr) +
-                   (water_heat_capacity_ * wcurr))) +
-      ((1.0 - porosity) * soil_heat_capacity_);
+  heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
+                                          (water_heat_capacity_ * wcurr))) +
+                             ((1.0 - porosity) * soil_heat_capacity_);
 
   // Update the effective material thermal conductivity
   thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *

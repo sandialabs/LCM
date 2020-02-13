@@ -333,21 +333,21 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
             data_nonconstView[node_var_offset][local_row] +=
                 this->ip_fields_[field](cell, pt) * this->weights_(cell, pt);
           } else if (this->ip_field_layouts_[field] == "Vector") {
-            for (int dim0 = 0; dim0 < num_dims; ++dim0) {
+            for (int i = 0; i < num_dims; ++i) {
               // save the vector component
-              data_nonconstView[node_var_offset + dim0][local_row] +=
-                  this->ip_fields_[field](cell, pt, dim0) *
+              data_nonconstView[node_var_offset + i][local_row] +=
+                  this->ip_fields_[field](cell, pt, i) *
                   this->weights_(cell, pt);
             }
           } else if (this->ip_field_layouts_[field] == "Tensor") {
-            for (int dim0 = 0; dim0 < num_dims; ++dim0) {
-              for (int dim1 = 0; dim1 < num_dims; ++dim1) {
+            for (int i = 0; i < num_dims; ++i) {
+              for (int j = 0; j < num_dims; ++j) {
                 // save the tensor component
                 PHX::MDField<ScalarT const>& tensor_field =
                     this->ip_fields_[field];
-                ScalarT ipval  = tensor_field(cell, pt, dim0, dim1);
+                ScalarT ipval  = tensor_field(cell, pt, i, j);
                 ScalarT weight = this->weights_(cell, pt);
-                data_nonconstView[node_var_offset + dim0 * num_dims + dim1]
+                data_nonconstView[node_var_offset + j * num_dims + i]
                                  [local_row] += ipval * weight;
               }
             }

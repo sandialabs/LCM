@@ -752,18 +752,17 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(
                   ip_fields_[field](cell, qp) * wBF(cell, node, qp);
               break;
             case EFieldLayout::vector:
-              for (std::size_t dim0 = 0; dim0 < num_dims_; ++dim0) {
-                ip_field_nonconstView[node_var_offset + dim0][local_row] +=
-                    (ip_fields_[field](cell, qp, dim0) * wBF(cell, node, qp));
+              for (std::size_t i = 0; i < num_dims_; ++i) {
+                ip_field_nonconstView[node_var_offset + i][local_row] +=
+                    (ip_fields_[field](cell, qp, i) * wBF(cell, node, qp));
               }
               break;
             case EFieldLayout::tensor:
-              for (std::size_t dim0 = 0; dim0 < num_dims_; ++dim0) {
-                for (std::size_t dim1 = 0; dim1 < num_dims_; ++dim1) {
-                  ip_field_nonconstView
-                      [node_var_offset + dim0 * num_dims_ + dim1][local_row] +=
-                      (ip_fields_[field](cell, qp, dim0, dim1) *
-                       wBF(cell, node, qp));
+              for (std::size_t i = 0; i < num_dims_; ++i) {
+                for (std::size_t j = 0; j < num_dims_; ++j) {
+                  ip_field_nonconstView[node_var_offset + j * num_dims_ + i]
+                                       [local_row] +=
+                      (ip_fields_[field](cell, qp, i, j) * wBF(cell, node, qp));
                 }
               }
               break;

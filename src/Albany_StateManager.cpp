@@ -186,7 +186,7 @@ Albany::StateManager::registerStateVariable(
     const std::string&                   meshPartName)
 {
   ALBANY_ASSERT(stateName != "", "State Name cannot be the empty string");
-  TEUCHOS_TEST_FOR_EXCEPT(stateVarsAreAllocated);
+  ALBANY_PANIC(stateVarsAreAllocated);
   using Albany::StateStruct;
   auto       registered_states = statesToStore[ebName];
   auto const it                = registered_states.find(stateName);
@@ -299,7 +299,7 @@ Albany::StateManager::registerNodalVectorStateVariable(
     const std::string&                   responseIDtoRequire)
 
 {
-  TEUCHOS_TEST_FOR_EXCEPT(stateVarsAreAllocated);
+  ALBANY_PANIC(stateVarsAreAllocated);
   using Albany::StateStruct;
 
   if (statesToStore[ebName].find(stateName) != statesToStore[ebName].end()) {
@@ -454,7 +454,7 @@ Albany::StateManager::registerSideSetStateVariable(
     StateStruct::MeshFieldEntity const*  fieldEntity,
     const std::string&                   meshPartName)
 {
-  TEUCHOS_TEST_FOR_EXCEPT(stateVarsAreAllocated);
+  ALBANY_PANIC(stateVarsAreAllocated);
   using Albany::StateStruct;
 
   // Create param list for SaveSideSetStateField evaluator
@@ -619,7 +619,7 @@ void
 Albany::StateManager::setupStateArrays(
     const Teuchos::RCP<Albany::AbstractDiscretization>& disc_)
 {
-  TEUCHOS_TEST_FOR_EXCEPT(stateVarsAreAllocated);
+  ALBANY_PANIC(stateVarsAreAllocated);
   stateVarsAreAllocated = true;
 
   disc = disc_;
@@ -670,10 +670,8 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
   int                    numElemWorksets      = esa.size();
   int                    numNodeWorksets      = nsa.size();
 
-  TEUCHOS_TEST_FOR_EXCEPT(
-      (unsigned int)numElemWorksets != elemStatesToCopyFrom.size());
-  TEUCHOS_TEST_FOR_EXCEPT(
-      (unsigned int)numNodeWorksets != nodeStatesToCopyFrom.size());
+  ALBANY_PANIC((unsigned int)numElemWorksets != elemStatesToCopyFrom.size());
+  ALBANY_PANIC((unsigned int)numNodeWorksets != nodeStatesToCopyFrom.size());
 
   Teuchos::RCP<Teuchos::FancyOStream> out(
       Teuchos::VerboseObjectBase::getDefaultOStream());
@@ -1062,7 +1060,7 @@ Albany::StateManager::doSetStateArrays(
                 "Something is wrong during tensor state variable "
                 "initialization: "
                     << size);
-            TEUCHOS_TEST_FOR_EXCEPT(!(dims[2] == dims[3]));
+            ALBANY_PANIC(!(dims[2] == dims[3]));
 
             for (int cell = 0; cell < dims[0]; ++cell)
               for (int qp = 0; qp < dims[1]; ++qp)
@@ -1136,7 +1134,7 @@ Albany::StateManager::doSetStateArrays(
                 "Something is wrong during node tensor state variable "
                 "initialization: "
                     << size);
-            TEUCHOS_TEST_FOR_EXCEPT(!(dims[1] == dims[2]));
+            ALBANY_PANIC(!(dims[1] == dims[2]));
             for (int node = 0; node < dims[0]; ++node)
               for (int i = 0; i < dims[1]; ++i)
                 for (int j = 0; j < dims[2]; ++j)

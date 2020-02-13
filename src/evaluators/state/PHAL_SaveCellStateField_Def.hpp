@@ -169,7 +169,7 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
       }
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(
+      ALBANY_PANIC(
           size < 1 || size > 5,
           "Unexpected Array dimensions in SaveCellStateField: " << size);
   }

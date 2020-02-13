@@ -43,7 +43,7 @@ evaluateFields(typename Traits::EvalData workset)
 {
   unsigned int numDimensions = evaluatedFieldDimensions.size();
 
-  TEUCHOS_TEST_FOR_EXCEPT_MSG(numDimensions < 1, "SetField::evaluateFields(), unsupported field type.");
+  ALBANY_PANIC(numDimensions < 1, "SetField::evaluateFields(), unsupported field type.");
 
   int dim1 = evaluatedFieldDimensions[0];
 
@@ -59,7 +59,7 @@ evaluateFields(typename Traits::EvalData workset)
     auto view = evaluatedField.get_kokkos_view2();
     auto hostMirror = Kokkos::create_mirror_view(view);
     int dim2 = evaluatedFieldDimensions[1];
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(fieldValues.size() != dim1*dim2, "SetField::evaluateFields(), inconsistent data sizes.");
+    ALBANY_PANIC(fieldValues.size() != dim1*dim2, "SetField::evaluateFields(), inconsistent data sizes.");
     for(int i=0 ; i<dim1 ; ++i){
       for(int j=0 ; j<dim2 ; ++j){
         hostMirror(i,j) = fieldValues[i*dim2 + j];
@@ -72,7 +72,7 @@ evaluateFields(typename Traits::EvalData workset)
     auto hostMirror = Kokkos::create_mirror_view(view);
     int dim2 = evaluatedFieldDimensions[1];
     int dim3 = evaluatedFieldDimensions[2];
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(fieldValues.size() != dim1*dim2*dim3, "SetField::evaluateFields(), inconsistent data sizes.");
+    ALBANY_PANIC(fieldValues.size() != dim1*dim2*dim3, "SetField::evaluateFields(), inconsistent data sizes.");
     for(int i=0 ; i<dim1 ; ++i){
       for(int j=0 ; j<dim2 ; ++j){
         for(int m=0 ; m<dim3 ; ++m){
@@ -88,7 +88,7 @@ evaluateFields(typename Traits::EvalData workset)
     int dim3 = evaluatedFieldDimensions[2];
     int dim2 = evaluatedFieldDimensions[1];
     int dim4 = evaluatedFieldDimensions[3];
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(fieldValues.size() != dim1*dim2*dim3*dim4, "SetField::evaluateFields(), inconsistent data sizes.");
+    ALBANY_PANIC(fieldValues.size() != dim1*dim2*dim3*dim4, "SetField::evaluateFields(), inconsistent data sizes.");
     for(int i=0 ; i<dim1 ; ++i){
       for(int j=0 ; j<dim2 ; ++j){
         for(int m=0 ; m<dim3 ; ++m){
@@ -101,7 +101,7 @@ evaluateFields(typename Traits::EvalData workset)
     Kokkos::deep_copy (view, hostMirror);
   }
   else{
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(numDimensions > 4, "SetField::evaluateFields(), unsupported data type.");
+    ALBANY_PANIC(numDimensions > 4, "SetField::evaluateFields(), unsupported data type.");
   }
 }
 }

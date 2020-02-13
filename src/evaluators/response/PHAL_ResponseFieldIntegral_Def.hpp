@@ -91,19 +91,19 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   limitX = limitY = limitZ = false;
   if (plist->isParameter("x min") && plist->isParameter("x max")) {
     limitX = true;
-    TEUCHOS_TEST_FOR_EXCEPT(numDims <= 0);
+    ALBANY_PANIC(numDims <= 0);
     xmin = plist->get<double>("x min");
     xmax = plist->get<double>("x max");
   }
   if (plist->isParameter("y min") && plist->isParameter("y max")) {
     limitY = true;
-    TEUCHOS_TEST_FOR_EXCEPT(numDims <= 1);
+    ALBANY_PANIC(numDims <= 1);
     ymin = plist->get<double>("y min");
     ymax = plist->get<double>("y max");
   }
   if (plist->isParameter("z min") && plist->isParameter("z max")) {
     limitZ = true;
-    TEUCHOS_TEST_FOR_EXCEPT(numDims <= 2);
+    ALBANY_PANIC(numDims <= 2);
     zmin = plist->get<double>("z min");
     zmax = plist->get<double>("z max");
   }

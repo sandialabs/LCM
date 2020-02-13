@@ -439,7 +439,7 @@ SolverFactory::checkDakotaTestResults(
     Teuchos::Array<double> testValues =
         testParams->get<Teuchos::Array<double>>("Dakota Test Values");
 
-    TEUCHOS_TEST_FOR_EXCEPT(numDakotaTests != testValues.size());
+    ALBANY_PANIC(numDakotaTests != testValues.size());
     for (int i = 0; i < numDakotaTests; i++) {
       auto s = std::string("Dakota Test ") + std::to_string(i);
       failures += scaledCompare((*drdv)[i], testValues[i], relTol, absTol, s);
@@ -478,7 +478,7 @@ SolverFactory::checkAnalysisTestResults(
     Teuchos::Array<double> testValues =
         testParams->get<Teuchos::Array<double>>("Piro Analysis Test Values");
 
-    TEUCHOS_TEST_FOR_EXCEPT(numPiroTests != testValues.size());
+    ALBANY_PANIC(numPiroTests != testValues.size());
     if (testParams->get<bool>("Piro Analysis Test Two Norm", false)) {
       const auto norm = tvec->norm_2();
       *out << "Parameter Vector Two Norm: " << norm << std::endl;

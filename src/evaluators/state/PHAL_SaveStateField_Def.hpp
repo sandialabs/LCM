@@ -160,7 +160,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
                 sta(cell, qp, i, j, k) = field(cell, qp, i, j, k);
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(
+      ALBANY_PANIC(
           size < 1 || size > 5,
           "Unexpected Array dimensions in SaveStateField: " << size);
   }
@@ -197,7 +197,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveWorksetState(
       ;
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(
+      ALBANY_PANIC(
           size < 1 || size > 5,
           "Unexpected (workset) Array dimensions in SaveStateField: " << size);
   }

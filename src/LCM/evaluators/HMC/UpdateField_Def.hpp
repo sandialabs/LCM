@@ -96,7 +96,7 @@ UpdateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
                     state_N(i, j, k, l, m) + field_Inc(i, j, k, l, m);
       break;
     default:
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(
+      ALBANY_PANIC(
           size < 1 || size > 5,
           "Unexpected Array dimensions in UpdateField: " << size);
   }

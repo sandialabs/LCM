@@ -40,9 +40,7 @@ buildSTKNodeField(
           new STKNodeField<double, 3>(name, dim, metaData, output));
       break;
 
-    default:
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(
-          true, "Error: unexpected argument for dimension");
+    default: ALBANY_PANIC(true, "Error: unexpected argument for dimension");
   }
   return nfc;
 }

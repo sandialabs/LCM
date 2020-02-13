@@ -213,7 +213,7 @@ SolutionValuesResponseFunction::evaluateTangent(
   }
 
   if (!gx.is_null()) {
-    TEUCHOS_TEST_FOR_EXCEPT(Vx.is_null());
+    ALBANY_PANIC(Vx.is_null());
     // Import the selected gids (only if not already done for the response)
     if (g.is_null()) {
       cas_manager->scatter(*x, *culledVec, CombineMode::INSERT);

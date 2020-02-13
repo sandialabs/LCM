@@ -31,10 +31,10 @@ STKAdapt<SizeField>::STKAdapt(
       stk_discretization->getSTKMeshStruct());
 
   eMesh = genericMeshStruct->getPerceptMesh();
-  TEUCHOS_TEST_FOR_EXCEPT(eMesh.is_null());
+  ALBANY_PANIC(eMesh.is_null());
 
   refinerPattern = genericMeshStruct->getRefinerPattern();
-  TEUCHOS_TEST_FOR_EXCEPT(refinerPattern.is_null());
+  ALBANY_PANIC(refinerPattern.is_null());
 
   num_iterations =
       adapt_params_->get<int>("Max Number of STK Adapt Iterations", 1);

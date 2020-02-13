@@ -794,7 +794,7 @@ AAdapt::ExpressionParser::ExpressionParser(
     std::string msg =
         "\n**** Error in AAdapt::ExpressionParser::ExpressionParser().\n";
     msg += "**** " + rtcFunctionX.getErrors() + "\n";
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(!success, msg);
+    ALBANY_PANIC(!success, msg);
   }
 
   if (neq > 1) {
@@ -807,7 +807,7 @@ AAdapt::ExpressionParser::ExpressionParser(
       std::string msg =
           "\n**** Error in AAdapt::ExpressionParser::ExpressionParser().\n";
       msg += "**** " + rtcFunctionY.getErrors() + "\n";
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(!success, msg);
+      ALBANY_PANIC(!success, msg);
     }
   }
 
@@ -821,7 +821,7 @@ AAdapt::ExpressionParser::ExpressionParser(
       std::string msg =
           "\n**** Error in AAdapt::ExpressionParser::ExpressionParser().\n";
       msg += "**** " + rtcFunctionZ.getErrors() + "\n";
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(!success, msg);
+      ALBANY_PANIC(!success, msg);
     }
   }
 #endif
@@ -836,20 +836,20 @@ AAdapt::ExpressionParser::compute(double* solution, const double* X)
 #if defined(ALBANY_PAMGEN)
   for (int i = 0; i < spatialDim; i++) {
     success = rtcFunctionX.varValueFill(i, X[i]);
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(
+    ALBANY_PANIC(
         !success,
         "Error inAAdapt::ExpressionParser::compute(), "
         "rtcFunctionX.varValueFill(), " +
             rtcFunctionX.getErrors());
   }
   success = rtcFunctionX.varValueFill(spatialDim, 0.0);
-  TEUCHOS_TEST_FOR_EXCEPT_MSG(
+  ALBANY_PANIC(
       !success,
       "Error inAAdapt::ExpressionParser::compute(), "
       "rtcFunctionX.varValueFill(), " +
           rtcFunctionX.getErrors());
   success = rtcFunctionX.execute();
-  TEUCHOS_TEST_FOR_EXCEPT_MSG(
+  ALBANY_PANIC(
       !success,
       "Error inAAdapt::ExpressionParser::compute(), rtcFunctionX.execute(), " +
           rtcFunctionX.getErrors());
@@ -858,20 +858,20 @@ AAdapt::ExpressionParser::compute(double* solution, const double* X)
   if (neq > 1) {
     for (int i = 0; i < spatialDim; i++) {
       success = rtcFunctionY.varValueFill(i, X[i]);
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(
+      ALBANY_PANIC(
           !success,
           "Error inAAdapt::ExpressionParser::compute(), "
           "rtcFunctionY.varValueFill(), " +
               rtcFunctionY.getErrors());
     }
     success = rtcFunctionY.varValueFill(spatialDim, 0.0);
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(
+    ALBANY_PANIC(
         !success,
         "Error inAAdapt::ExpressionParser::compute(), "
         "rtcFunctionY.varValueFill(), " +
             rtcFunctionY.getErrors());
     success = rtcFunctionY.execute();
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(
+    ALBANY_PANIC(
         !success,
         "Error inAAdapt::ExpressionParser::compute(), "
         "rtcFunctionY.execute(), " +
@@ -882,20 +882,20 @@ AAdapt::ExpressionParser::compute(double* solution, const double* X)
   if (neq > 2) {
     for (int i = 0; i < spatialDim; i++) {
       success = rtcFunctionZ.varValueFill(i, X[i]);
-      TEUCHOS_TEST_FOR_EXCEPT_MSG(
+      ALBANY_PANIC(
           !success,
           "Error inAAdapt::ExpressionParser::compute(), "
           "rtcFunctionZ.varValueFill(), " +
               rtcFunctionZ.getErrors());
     }
     success = rtcFunctionZ.varValueFill(spatialDim, 0.0);
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(
+    ALBANY_PANIC(
         !success,
         "Error inAAdapt::ExpressionParser::compute(), "
         "rtcFunctionZ.varValueFill(), " +
             rtcFunctionZ.getErrors());
     success = rtcFunctionZ.execute();
-    TEUCHOS_TEST_FOR_EXCEPT_MSG(
+    ALBANY_PANIC(
         !success,
         "Error inAAdapt::ExpressionParser::compute(), "
         "rtcFunctionZ.execute(), " +

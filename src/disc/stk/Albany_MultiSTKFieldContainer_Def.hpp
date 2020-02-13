@@ -557,8 +557,7 @@ MultiSTKFieldContainer<Interleaved>::transferSolutionToCoords()
 {
   const bool MultiSTKFieldContainer_transferSolutionToCoords_not_implemented =
       true;
-  TEUCHOS_TEST_FOR_EXCEPT(
-      MultiSTKFieldContainer_transferSolutionToCoords_not_implemented);
+  ALBANY_PANIC(MultiSTKFieldContainer_transferSolutionToCoords_not_implemented);
 }
 
 template <bool Interleaved>

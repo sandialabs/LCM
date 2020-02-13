@@ -37,7 +37,7 @@ gatherAllV(
     Teuchos::Array<int> allValCounts(cpuCount);
     const int           ierr = MPI_Allgather(
         &myCount, 1, MPI_INT, allValCounts.getRawPtr(), 1, MPI_INT, rawComm);
-    TEUCHOS_TEST_FOR_EXCEPT(ierr != 0);
+    ALBANY_PANIC(ierr != 0);
 
     Teuchos::Array<int> allValDisps(cpuCount, 0);
     for (int i = 1; i < cpuCount; ++i) {
@@ -65,7 +65,7 @@ gatherAllV(
         myVals.getRawPtr(), myVals.getRawPtr() + myCount, allVals.getRawPtr());
   } else {
     const bool commTypeNotSupported = true;
-    TEUCHOS_TEST_FOR_EXCEPT(commTypeNotSupported);
+    ALBANY_PANIC(commTypeNotSupported);
   }
 }
 
@@ -100,7 +100,7 @@ gatherV(
         MPI_INT,
         root_rank,
         rawComm);
-    TEUCHOS_TEST_FOR_EXCEPT(ierr != 0);
+    ALBANY_PANIC(ierr != 0);
 
     Teuchos::Array<int> allValDisps(cpuCount, 0);
     for (int i = 1; i < cpuCount; ++i) {
@@ -130,7 +130,7 @@ gatherV(
         myVals.getRawPtr(), myVals.getRawPtr() + myCount, allVals.getRawPtr());
   } else {
     const bool commTypeNotSupported = true;
-    TEUCHOS_TEST_FOR_EXCEPT(commTypeNotSupported);
+    ALBANY_PANIC(commTypeNotSupported);
   }
 }
 

@@ -170,9 +170,8 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
           stk::mesh::put_field_on_mesh(
               *qptensor_states.back(),
               metaData->universal_part(),
+              dim[2] * dim[3],
               dim[1],
-              dim[2],
-              dim[3],
               nullptr);
         }
         stk::io::set_field_role(*qptensor_states.back(), role_type(st.output));

@@ -113,6 +113,9 @@ class ElasticityProblem : public Albany::AbstractProblem
   //! Compute exact error in displacement solution
   bool computeError;
 
+  //! Problem parameterlist
+  const Teuchos::RCP<Teuchos::ParameterList> params; 
+
   std::string                   matModel;
   Teuchos::RCP<Albany::Layouts> dl;
 

@@ -217,6 +217,9 @@ class MechanicsProblem : public AbstractProblem
   /// boolean marking whether using composite tet
   bool composite_;
 
+  /// Problem parameter list
+  Teuchos::RCP<Teuchos::ParameterList> const params_; 
+
   /// Type of mechanics variable (disp or acc)
   MECH_VAR_TYPE
   mech_type_;

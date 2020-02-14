@@ -98,6 +98,9 @@ class PNPProblem : public Albany::AbstractProblem
 
   /// Boolean marking whether SDBCs are used
   bool use_sdbcs_;
+
+  /// Problem parameter list
+  const Teuchos::RCP<Teuchos::ParameterList> params; 
 };
 
 }  // namespace Albany

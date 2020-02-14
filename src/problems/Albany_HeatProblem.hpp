@@ -105,6 +105,8 @@ class HeatProblem : public AbstractProblem
   std::string meshPartDirichlet;
   int         numDim;
 
+  const Teuchos::RCP<Teuchos::ParameterList> params; 
+
   Teuchos::RCP<Albany::MaterialDatabase> materialDB;
   Teuchos::RCP<const Teuchos::Comm<int>> commT;
 

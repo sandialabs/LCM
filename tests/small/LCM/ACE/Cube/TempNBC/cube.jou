@@ -1,0 +1,30 @@
+undo on
+create brick x 1.0 y 1.0 z 1.0
+
+#{eps = 0.001}
+
+#volume all scheme tetmesh
+volume 1 size 0.5
+mesh volume 1
+block 1 volume 1
+block 1 name "cube"
+#block all element type tetra4
+nodeset 1 surface 4
+nodeset 1 name "-X"
+nodeset 2 surface 6
+nodeset 2 name "+X"
+nodeset 3 surface 3
+nodeset 3 name "-Y"
+nodeset 4 surface 5
+nodeset 4 name "+Y"
+nodeset 5 surface 2
+nodeset 5 name "-Z"
+nodeset 6 surface 1
+nodeset 6 name "+Z"
+sideset 1 surface 1
+sideset 1 name "top"
+#nodeset 7 curve with x_coord < {0.50 + eps} and x_coord > {0.50 - eps} and z_coord < {0.50 + eps} and z_coord > {0.50 - eps}
+#nodeset 7 node with x_coord < {eps} and x_coord > {-eps} and z_coord < {0.50 + eps} and z_coord > {0.50 - eps}
+#nodeset 7 name "line"
+set large exodus file off
+export mesh "cube.g" overwrite

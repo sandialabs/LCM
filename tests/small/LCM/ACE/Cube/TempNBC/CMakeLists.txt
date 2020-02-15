@@ -11,9 +11,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/material.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.g
                ${CMAKE_CURRENT_BINARY_DIR}/cube.g COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/disp.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/disp.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/temp.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/temp.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/level.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/level.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/time.txt COPYONLY)
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-add_test(ACE_${testName} ${SerialAlbany.exe} cube.yaml)
-set_tests_properties(ACE_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
+add_test(ACE_${testName}_TempNBC ${SerialAlbany.exe} cube.yaml)
+set_tests_properties(ACE_${testName}_TempNBC PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-add_subdirectory(TempNBC)

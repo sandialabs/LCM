@@ -1035,10 +1035,10 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
         // "NBC on SS surface_1 for DOF all set P"
 
         // Set logic for certain NBCs which allow array inputs  
-        bool allowArrayNBC = false;
-        if ((conditions[k] != "robin") && (conditions[k] != "radiate")
-              && (conditions[k].find("("))) {
-          allowArrayNBC = true;
+        bool allowArrayNBC = false;   
+        if ((conditions[k] == "robin") || (conditions[k] == "radiate")
+              || (conditions[k].find("(") < conditions[k].length())) {
+          allowArrayNBC = true; 
         }
 
         string ss = traits_type::constructBCName(
@@ -1092,12 +1092,25 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           Teuchos::Array<double> niv = BCparams.get<Teuchos::Array<double>>(ss);
           // Note, we use a Teuchos::Array  here to allow the user to specify
           // multiple components of the traction vector.
-          // This is only allowed for certain BCs (see how allowArrayNBC) is set. 
-          if (allowArrayNBC) {
+          // This is only allowed for certain BCs (see how allowArrayNBC) is set.
+          if (!allowArrayNBC) {
             if (niv.size() != 1) {
-              ALBANY_ASSERT(false, "NBC takes a scalar value.  You attempted to provide an array!");
+              ALBANY_ASSERT(false, "NBC takes a scalar value.  You attempted to provide an array!");  
             }
           }
+          else {
+            if ((conditions[k] == "robin") || (conditions[k] == "radiate")) {
+              if (niv.size() != 2) {
+                ALBANY_ASSERT(false, "Robin NBC takes a 2-array!");  
+              }
+            }
+            else {
+              if (niv.size() != meshSpecs->numDim) {
+                ALBANY_ASSERT(false, "Traction NBC takes an array of size numDim!");  
+              }
+            }
+          }
+
           p->set<Teuchos::Array<double>>("Neumann Input Value", niv);
           p->set<string>("Neumann Input Conditions", conditions[k]);
  
@@ -1141,10 +1154,10 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
         // "Time Dependent NBC on SS surface_1 for DOF all set P"
 
         // Set logic for certain NBCs which allow array inputs  
-        bool allowArrayNBC = false;
-        if ((conditions[k] != "robin") && (conditions[k] != "radiate")
-              && (conditions[k].find("("))) {
-          allowArrayNBC = true;
+        bool allowArrayNBC = false;   
+        if ((conditions[k] == "robin") || (conditions[k] == "radiate")
+              || (conditions[k].find("(") < conditions[k].length())) {
+          allowArrayNBC = true; 
         }
 
         string ss = traits_type::constructTimeDepBCName(
@@ -1182,9 +1195,21 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           // assumes bcvals is a scalar for all but a few NBCs (see comment above).  
           // Throw an error if user attempts to specify array for NBCs where this 
           // is not allowed.
-          if (allowArrayNBC) {
+          if (!allowArrayNBC) {
             if (bcvals.getNumCols() != 1) {
-              ALBANY_ASSERT(false, "Time Dependent NBC takes 1D array for 'BC Values'.  You attempted to provide a multi-D array!");
+              ALBANY_ASSERT(false, "Time Dependent NBC takes 1D array for 'BC Values'.  You attempted to provide a multi-D array!");  
+            }
+          }
+          else {
+            if ((conditions[k] == "robin") || (conditions[k] == "radiate")) {
+              if (bcvals.getNumCols() != 2) {
+                ALBANY_ASSERT(false, "Time Dependent robin NBC takes a 2-array for 'BC Values' at each time!");  
+              }
+            }
+            else {
+              if (bcvals.getNumCols() != meshSpecs->numDim) {
+                ALBANY_ASSERT(false, "Time Dependent traction NBC takes an array of size numDim for 'BC Values' at each time!");  
+              }
             }
           }
 

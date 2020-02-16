@@ -1034,6 +1034,13 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
         // or
         // "NBC on SS surface_1 for DOF all set P"
 
+        // Set logic for certain NBCs which allow array inputs  
+        bool allowArrayNBC = false;
+        if ((conditions[k] != "robin") && (conditions[k] != "radiate")
+              && (conditions[k].find("("))) {
+          allowArrayNBC = true;
+        }
+
         string ss = traits_type::constructBCName(
             meshSpecs->ssNames[i], bcNames[j], conditions[k]);
 
@@ -1081,10 +1088,19 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           // Pass the input file line
           p->set<string>("Neumann Input String", ss);
-          p->set<Teuchos::Array<double>>(
-              "Neumann Input Value", BCparams.get<Teuchos::Array<double>>(ss));
+         
+          Teuchos::Array<double> niv = BCparams.get<Teuchos::Array<double>>(ss);
+          // Note, we use a Teuchos::Array  here to allow the user to specify
+          // multiple components of the traction vector.
+          // This is only allowed for certain BCs (see how allowArrayNBC) is set. 
+          if (allowArrayNBC) {
+            if (niv.size() != 1) {
+              ALBANY_ASSERT(false, "NBC takes a scalar value.  You attempted to provide an array!");
+            }
+          }
+          p->set<Teuchos::Array<double>>("Neumann Input Value", niv);
           p->set<string>("Neumann Input Conditions", conditions[k]);
-
+ 
           // If we are doing a Neumann internal boundary with a "scaled jump",
           // the material DB database needs to be passed to the BC object
           // Note: 'robin' is a very generic name. It is ok to allow some
@@ -1124,6 +1140,13 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
         // or
         // "Time Dependent NBC on SS surface_1 for DOF all set P"
 
+        // Set logic for certain NBCs which allow array inputs  
+        bool allowArrayNBC = false;
+        if ((conditions[k] != "robin") && (conditions[k] != "radiate")
+              && (conditions[k].find("("))) {
+          allowArrayNBC = true;
+        }
+
         string ss = traits_type::constructTimeDepBCName(
             meshSpecs->ssNames[i], bcNames[j], conditions[k]);
 
@@ -1143,17 +1166,31 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<int>("Type", traits_type::typeTd);
 
-          p->set<Teuchos::Array<RealType>>(
-              "Time Values",
-              sub_list.get<Teuchos::Array<RealType>>("Time Values"));
+          Teuchos::Array<RealType> timevals = sub_list.get<Teuchos::Array<RealType>>("Time Values");
 
-          // Note, we use a TwoDArray here as we expect the user to specify
-          // multiple components of
-          // the traction vector at each "time" step.
+          // Note, we use a TwoDArray here to allow the user to specify
+          // multiple components of the traction vector at each "time" step.
+          // This is only allowed for certain BCs (see how allowArrayNBC) is set. 
+          Teuchos::TwoDArray<RealType> bcvals = sub_list.get<Teuchos::TwoDArray<RealType>>("BC Values");
 
-          p->set<Teuchos::TwoDArray<RealType>>(
-              "BC Values",
-              sub_list.get<Teuchos::TwoDArray<RealType>>("BC Values"));
+          // Check that bcvals and timevals have the same size.  If they do not, throw an error.
+          if (timevals.size() != bcvals.getNumRows()) {
+            ALBANY_ASSERT(false, "'Time Values' array must have same length as 'BC Values' array!");
+          }
+
+          // IKT, 2/15/2020: Currently, the code downstream of this
+          // assumes bcvals is a scalar for all but a few NBCs (see comment above).  
+          // Throw an error if user attempts to specify array for NBCs where this 
+          // is not allowed.
+          if (allowArrayNBC) {
+            if (bcvals.getNumCols() != 1) {
+              ALBANY_ASSERT(false, "Time Dependent NBC takes 1D array for 'BC Values'.  You attempted to provide a multi-D array!");
+            }
+          }
+
+          p->set<Teuchos::Array<RealType>>("Time Values", timevals); 
+
+          p->set<Teuchos::TwoDArray<RealType>>("BC Values", bcvals); 
 
           p->set<RCP<ParamLib>>("Parameter Library", paramLib);
 

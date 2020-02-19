@@ -115,6 +115,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   setDependentField("ACE Temperature", dl->qp_scalar);
 
   // define evaluated fields
+  setEvaluatedField("ACE Bluff Salinity", dl->qp_scalar);
   setEvaluatedField("ACE Ice Saturation", dl->qp_scalar);
   setEvaluatedField("ACE Density", dl->qp_scalar);
   setEvaluatedField("ACE Heat Capacity", dl->qp_scalar);
@@ -167,6 +168,15 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
       0.0,
       false,
       p->get<bool>("Output Yield Surface", false));
+  
+  // ACE Bluff salinity
+  addStateVariable(
+      "ACE Bluff Salinity",
+      dl->qp_scalar,
+      "scalar",
+      salinity_base_,
+      true,
+      p->get<bool>("Output ACE Bluff Salinity", false));
 
   // ACE Ice saturation
   addStateVariable(
@@ -288,6 +298,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::init(
   Fp_               = *output_fields[Fp_string];
   eqps_             = *output_fields[eqps_string];
   yield_surf_       = *output_fields[yieldSurface_string];
+  bluff_salinity_   = *output_fields["ACE Bluff Salinity"];
   ice_saturation_   = *output_fields["ACE Ice Saturation"];
   density_          = *output_fields["ACE Density"];
   heat_capacity_    = *output_fields["ACE Heat Capacity"];

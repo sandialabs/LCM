@@ -20,13 +20,13 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
   this->setIntegrationPointLocationFlag(true);
 
   // Baseline constants
-  sat_mod_            = p->get<RealType>("Saturation Modulus", 0.0);
-  sat_exp_            = p->get<RealType>("Saturation Exponent", 0.0);
-  ice_density_        = p->get<RealType>("ACE Ice Density", 0.0);
-  water_density_      = p->get<RealType>("ACE Water Density", 0.0);
-  ice_thermal_cond_   = p->get<RealType>("ACE Ice Thermal Conductivity", 0.0);
-  water_thermal_cond_ = p->get<RealType>("ACE Water Thermal Conductivity", 0.0);
-  ice_heat_capacity_  = p->get<RealType>("ACE Ice Heat Capacity", 0.0);
+  sat_mod_              = p->get<RealType>("Saturation Modulus", 0.0);
+  sat_exp_              = p->get<RealType>("Saturation Exponent", 0.0);
+  ice_density_          = p->get<RealType>("ACE Ice Density", 0.0);
+  water_density_        = p->get<RealType>("ACE Water Density", 0.0);
+  ice_thermal_cond_     = p->get<RealType>("ACE Ice Thermal Conductivity", 0.0);
+  water_thermal_cond_   = p->get<RealType>("ACE Water Thermal Conductivity", 0.0);
+  ice_heat_capacity_    = p->get<RealType>("ACE Ice Heat Capacity", 0.0);
   water_heat_capacity_  = p->get<RealType>("ACE Water Heat Capacity", 0.0);
   ice_saturation_init_  = p->get<RealType>("ACE Ice Initial Saturation", 0.0);
   ice_saturation_max_   = p->get<RealType>("ACE Ice Maximum Saturation", 0.0);
@@ -111,6 +111,7 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
   setDependentField("ACE Temperature", dl->qp_scalar);
 
   // define the evaluated fields
+  setEvaluatedField("ACE Bluff Salinity", dl->qp_scalar);
   setEvaluatedField("ACE Ice Saturation", dl->qp_scalar);
   setEvaluatedField("ACE Density", dl->qp_scalar);
   setEvaluatedField("ACE Heat Capacity", dl->qp_scalar);
@@ -163,6 +164,15 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
       0.0,
       false,
       p->get<bool>("Output Yield Surface", false));
+  
+  // ACE Bluff salinity
+  addStateVariable(
+      "ACE Bluff Salinity",
+      dl->qp_scalar,
+      "scalar",
+      salinity_base_,
+      true,
+      p->get<bool>("Output ACE Bluff Salinity", false));
 
   // ACE Ice saturation
   addStateVariable(
@@ -284,6 +294,7 @@ ACEiceMiniKernel<EvalT, Traits>::init(
   Fp_               = *output_fields[Fp_string];
   eqps_             = *output_fields[eqps_string];
   yield_surf_       = *output_fields[yieldSurface_string];
+  bluff_salinity_   = *output_fields["ACE Bluff Salinity"];
   ice_saturation_   = *output_fields["ACE Ice Saturation"];
   density_          = *output_fields["ACE Density"];
   heat_capacity_    = *output_fields["ACE Heat Capacity"];

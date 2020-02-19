@@ -61,6 +61,14 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
       "*** ERROR: Number of z values and number of salinity values in ACE "
       "Salinity File must match.");
   }
+  if (p->isParameter("ACE Ocean Salinity File") == true) {
+    auto const filename = p->get<std::string>("ACE Ocean Salinity File");
+    ocean_salinity_     = vectorFromFile(filename);
+    ALBANY_ASSERT(
+      time_.size() == ocean_salinity_.size(),
+      "*** ERROR: Number of time values and number of ocean salinity values in "
+      "ACE Ocean Salinity File must match.");
+  }
   if (p->isParameter("ACE Porosity File") == true) {
     auto const filename = p->get<std::string>("ACE Porosity File");
     porosity_from_file_ = vectorFromFile(filename);

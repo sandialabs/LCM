@@ -60,39 +60,40 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   if (p->isParameter("ACE Salinity File") == true) {
     auto const filename = p->get<std::string>("ACE Salinity File");
     salinity_           = vectorFromFile(filename);
+    ALBANY_ASSERT(
+      z_above_mean_sea_level_.size() == salinity_.size(),
+      "*** ERROR: Number of z values and number of salinity values in ACE "
+      "Salinity File must match.");
   }
   if (p->isParameter("ACE Ocean Salinity File") == true) {
     auto const filename = p->get<std::string>("ACE Ocean Salinity File");
     ocean_salinity_     = vectorFromFile(filename);
+    ALBANY_ASSERT(
+      time_.size() == ocean_salinity_.size(),
+      "*** ERROR: Number of time values and number of ocean salinity values in "
+      "ACE Ocean Salinity File must match.");
   }
   if (p->isParameter("ACE Porosity File") == true) {
     auto const filename = p->get<std::string>("ACE Porosity File");
     porosity_from_file_ = vectorFromFile(filename);
+    ALBANY_ASSERT(
+      z_above_mean_sea_level_.size() == porosity_from_file_.size(),
+      "*** ERROR: Number of z values and number of porosity values in "
+      "ACE Porosity File must match.");
   }
   if (p->isParameter("ACE Freezing Curve Width File") == true) {
     auto const filename = p->get<std::string>("ACE Freezing Curve Width File");
     freezing_curve_width_ = vectorFromFile(filename);
-  }
-  ALBANY_ASSERT(
-      time_.size() == sea_level_.size(),
-      "*** ERROR: Number of times and number of sea level values must match.");
-  ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == salinity_.size(),
-      "*** ERROR: Number of z values and number of salinity values in ACE "
-      "Salinity File must match.");
-  ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == ocean_salinity_.size(),
-      "*** ERROR: Number of z values and number of ocean salinity values in "
-      "ACE Ocean Salinity File must match.");
-  ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == porosity_from_file_.size(),
-      "*** ERROR: Number of z values and number of porosity values in "
-      "ACE Porosity File must match.");
-  ALBANY_ASSERT(
+    ALBANY_ASSERT(
       z_above_mean_sea_level_.size() == freezing_curve_width_.size(),
       "*** ERROR: Number of z values and number of freezing curve width values "
       "in "
       "ACE Freezing Curve Width File must match.");
+  }
+  
+  ALBANY_ASSERT(
+      time_.size() == sea_level_.size(),
+      "*** ERROR: Number of times and number of sea level values must match.");
 
   // retrieve appropriate field name strings
   auto const cauchy_string       = field_name_map_["Cauchy_Stress"];

@@ -21,6 +21,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time.txt
                ${CMAKE_CURRENT_BINARY_DIR}/time.txt COPYONLY)
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-add_test(ACE_${testName}_TempNBC ${SerialAlbany.exe} cube.yaml)
-set_tests_properties(ACE_${testName}_TempNBC PROPERTIES LABELS "LCM;Tpetra;Forward")
+add_test(ACE_Cube_${testName} ${SerialAlbany.exe} cube.yaml)
+set_tests_properties(ACE_Cube_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
 

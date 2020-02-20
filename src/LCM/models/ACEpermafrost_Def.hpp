@@ -91,6 +91,30 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
       "in "
       "ACE Freezing Curve Width File must match.");
   }
+  if (p->isParameter("ACE Sand File") == true) {
+    auto const filename = p->get<std::string>("ACE Sand File");
+    sand_from_file_ = vectorFromFile(filename);
+    ALBANY_ASSERT(
+      z_above_mean_sea_level_.size() == sand_from_file_.size(),
+      "*** ERROR: Number of z values and number of sand values in "
+      "ACE Sand File must match.");
+  }
+  if (p->isParameter("ACE Clay File") == true) {
+    auto const filename = p->get<std::string>("ACE Clay File");
+    clay_from_file_ = vectorFromFile(filename);
+    ALBANY_ASSERT(
+      z_above_mean_sea_level_.size() == clay_from_file_.size(),
+      "*** ERROR: Number of z values and number of clay values in "
+      "ACE Clay File must match.");
+  }
+  if (p->isParameter("ACE Silt File") == true) {
+    auto const filename = p->get<std::string>("ACE Silt File");
+    silt_from_file_ = vectorFromFile(filename);
+    ALBANY_ASSERT(
+      z_above_mean_sea_level_.size() == silt_from_file_.size(),
+      "*** ERROR: Number of z values and number of silt values in "
+      "ACE Silt File must match.");
+  }
   
   ALBANY_ASSERT(
       time_.size() == sea_level_.size(),
@@ -500,20 +524,49 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     wcurr = 0.0;
   }
 
+  ScalarT calc_soil_heat_capacity;
+  ScalarT calc_soil_thermal_cond;
+  bool sediment_given = false;
+  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) && (silt_from_file_.size() > 0)) {
+    sediment_given = true;
+    auto sand_frac = interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
+    auto clay_frac = interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
+    auto silt_frac = interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
+    // THERMAL PROPERTIES OF ROCKS, E.C. Robertson, U.S. Geological Survey
+    // Open-File Report 88-441 (1988).
+    // Cp values in [J/kg/K]
+    calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) 
+                                                  + (0.7e3 * silt_frac);
+    // K values in [W/K/m]
+    calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac);
+  }
+  
   // Update the effective material density
   density_(cell, pt) =
       (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
       ((1.0 - porosity) * soil_density_);
 
-  // Update the effective material heat capacity
-  heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
-                                          (water_heat_capacity_ * wcurr))) +
-                             ((1.0 - porosity) * soil_heat_capacity_);
+  // Update the effective material heat capacity 
+  if (sediment_given == true) {
+      heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
+                                             (water_heat_capacity_ * wcurr))) +
+                                ((1.0 - porosity) * calc_soil_heat_capacity);
+  } else {
+      heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
+                                             (water_heat_capacity_ * wcurr))) +
+                                ((1.0 - porosity) * soil_heat_capacity_);
+  }
 
   // Update the effective material thermal conductivity
-  thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
-                            pow(water_thermal_cond_, (wcurr * porosity)) *
-                            pow(soil_thermal_cond_, (1.0 - porosity));
+  if (sediment_given == true) {
+      thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
+                                pow(water_thermal_cond_, (wcurr * porosity)) *
+                                pow(calc_soil_thermal_cond, (1.0 - porosity));
+  } else {
+      thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
+                                pow(water_thermal_cond_, (wcurr * porosity)) *
+                                pow(soil_thermal_cond_, (1.0 - porosity));
+  }
 
   // Update the material thermal inertia term
   thermal_inertia_(cell, pt) = (density_(cell, pt) * heat_capacity_(cell, pt)) -

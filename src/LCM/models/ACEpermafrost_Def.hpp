@@ -407,11 +407,32 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // A boundary cell (this is a hack): porosity = -1.0 (set in input deck)
   bool const b_cell = porosity < 0.0;
 
-  // Calculate melting temperature
-  auto sal = salinity_base_;  // should come from chemical part of model
+  // Calculate the salinity of the grid cell
+  //
+  // If first time step:
+  RealType sal = salinity_base_;  // should come from chemical part of model
   if (salinity_.size() > 0) {
     sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
   }
+  bluff_salinity_(cell, pt) = sal;  // we don't want to keep overwriting this every time
+  // End if first time step
+  // 
+  /*if (is_at_boundary == true) {
+    RealType ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
+    RealType dh2 = 0.1; // this is the half the grid cell width
+    RealType area = 0.04; // this is the grid cell area exposed to the ocean
+    RealType cell_volume = 0.008; // this is the grid cell volume
+    RealType sal_grad = (ocean_sal - bluff_salinity_(cell, pt))/dh2;
+    RealType sal_update = (salt_enhanced_D_ * sal_grad * area * delta_time * (1.0/cell_volume));
+    if (std::abs(sal_update) > std::abs(ocean_sal - bluff_salinity_(cell, pt))) {
+       sal_update = ocean_sal - bluff_salinity_(cell, pt);
+    }
+    sal = bluff_salinity_(cell, pt) + sal_update; 
+  } else {
+    sal = bluff_salinity_(cell, pt);
+  }*/
+  
+  // Calculate melting temperature
   auto sal15          = std::sqrt(sal * sal * sal);
   auto pressure_fixed = 1.0;
   // Tmelt is in Kelvin
@@ -518,6 +539,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Return values
   ice_saturation_(cell, pt)   = icurr;
   water_saturation_(cell, pt) = wcurr;
+  bluff_salinity_(cell, pt) = sal;
 
   //
   // Mechanical calculation

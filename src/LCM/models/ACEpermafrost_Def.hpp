@@ -198,7 +198,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
       "ACE Bluff Salinity",
       dl->qp_scalar,
       "scalar",
-      salinity_base_,
+      0.0,
       true,
       p->get<bool>("Output ACE Bluff Salinity", false));
 
@@ -431,36 +431,41 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // A boundary cell (this is a hack): porosity = -1.0 (set in input deck)
   bool const b_cell = porosity < 0.0;
 
-  // Calculate the salinity of the grid cell
+// Calculate the salinity of the grid cell
   //
   // If first time step:
-  RealType sal = salinity_base_;  // should come from chemical part of model
+  auto sal = salinity_base_;  // should come from chemical part of model
   if (salinity_.size() > 0) {
     sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
   }
   bluff_salinity_(cell, pt) = sal;  // we don't want to keep overwriting this every time
   // End if first time step
   // 
-  /*if (is_at_boundary == true) {
-    RealType ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
-    RealType dh2 = 0.1; // this is the half the grid cell width
-    RealType area = 0.04; // this is the grid cell area exposed to the ocean
-    RealType cell_volume = 0.008; // this is the grid cell volume
-    RealType sal_grad = (ocean_sal - bluff_salinity_(cell, pt))/dh2;
-    RealType sal_update = (salt_enhanced_D_ * sal_grad * area * delta_time * (1.0/cell_volume));
-    if (std::abs(sal_update) > std::abs(ocean_sal - bluff_salinity_(cell, pt))) {
-       sal_update = ocean_sal - bluff_salinity_(cell, pt);
+  auto sal_curr = bluff_salinity_(cell, pt);  // this should have memory from previous ts
+  if (is_at_boundary == true) {
+    auto ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
+    auto dh2 = 0.1; // this is the half the grid cell width
+    auto area = 0.04; // this is the grid cell area exposed to the ocean
+    auto cell_volume = 0.008; // this is the grid cell volume
+    auto sal_grad = (ocean_sal - sal_curr)/dh2;
+    auto sal_update = (salt_enhanced_D_ * sal_grad * area * delta_time * (1.0/cell_volume));
+    if (std::abs(sal_update) > std::abs(ocean_sal - sal_curr)) {
+        sal = ocean_sal;
+    } else {
+        sal = sal_curr + sal_update; 
     }
-    sal = bluff_salinity_(cell, pt) + sal_update; 
   } else {
-    sal = bluff_salinity_(cell, pt);
-  }*/
+    sal = sal_curr; 
+  }
   
   // Calculate melting temperature
-  auto sal15          = std::sqrt(sal * sal * sal);
-  auto pressure_fixed = 1.0;
+  ScalarT sal15(0.0); 
+  if (std::abs(sal) > 0.0) {
+    sal15 = std::sqrt(sal * sal * sal);
+  }
+  ScalarT pressure_fixed(1.0);
   // Tmelt is in Kelvin
-  auto Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal -
+  ScalarT Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal -
                0.000753 / 10000.0 * pressure_fixed + 273.15;
 
   // Calculate temperature change

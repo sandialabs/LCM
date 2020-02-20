@@ -16,8 +16,8 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/CrystalElasticity3d_Material.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ElasticShear3d.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/ElasticShear3d.exodiff COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ElasticShear3d.gold.exo
-               ${CMAKE_CURRENT_BINARY_DIR}/ElasticShear3d.gold.exo COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ElasticShear3d.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/ElasticShear3d.gold.e COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/AnalyticSolution.py
                ${CMAKE_CURRENT_BINARY_DIR}/AnalyticSolution.py COPYONLY)
 
@@ -30,16 +30,16 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/ElasticShearRotated3d.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/ElasticShearRotated3d.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/ElasticShearRotated3d.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/ElasticShearRotated3d.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/ElasticShearRotated3d.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/ElasticShearRotated3d.gold.e COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/AnalyticSolution.py
                ${CMAKE_CURRENT_BINARY_DIR}/AnalyticSolution.py COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests test 1 - Elastic shear 3d
-set(OUTFILE "ElasticShear3d.exo")
-set(REF_FILE "ElasticShear3d.gold.exo")
+set(OUTFILE "ElasticShear3d.e")
+set(REF_FILE "ElasticShear3d.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_ElasticShear3d
   COMMAND
@@ -49,8 +49,8 @@ add_test(
     -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
     ${runtest.cmake})
 # test 2 - Elastic Shear rotated 3d
-set(OUTFILE "ElasticShearRotated3d.exo")
-set(REF_FILE "ElasticShearRotated3d.gold.exo")
+set(OUTFILE "ElasticShearRotated3d.e")
+set(REF_FILE "ElasticShearRotated3d.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_ElasticShearRotated3d
   COMMAND

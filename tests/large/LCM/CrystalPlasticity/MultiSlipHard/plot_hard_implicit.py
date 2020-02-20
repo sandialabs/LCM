@@ -3,7 +3,7 @@ import exodus
 import numpy
 import matplotlib.pyplot as plt
 
-file_name = "MultiSlipPlaneHard_Implicit.exo"
+file_name = "MultiSlipPlaneHard_Implicit.e"
 exo_file = exodus.exodus(file_name,"r")
 # taking first integration point
 inp_var_name = "gamma_1_1"

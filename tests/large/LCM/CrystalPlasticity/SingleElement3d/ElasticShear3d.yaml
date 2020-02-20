@@ -24,7 +24,7 @@ LCM:
   Discretization:
     Method: Exodus
     Exodus Input File Name: SingleHexElement.g
-    Exodus Output File Name: ElasticShear3d.exo
+    Exodus Output File Name: ElasticShear3d.e
     Cubature Degree: 2
     Solution Vector Components: [displacement, V]
     Residual Vector Components: [force, V]

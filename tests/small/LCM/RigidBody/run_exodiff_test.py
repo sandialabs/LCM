@@ -10,9 +10,9 @@ import sys
 import os
 import string
 import glob
-from subprocess import Popen
+import subprocess
 
-def runtest(albany_command, yaml_file_name):
+def runtest(albany_command,yaml_file_name):
 
     # When run as part of ctest, the albany_command string is a set of commands
     # separated by semicolons.  This will not be the case if this script
@@ -23,7 +23,7 @@ def runtest(albany_command, yaml_file_name):
     # python ../run_exodiff_test.py "mpirun;-np;4;/scratch/djlittl/Albany/GCC_4.7.2_OPT/src/Albany" RubiksCube.yaml
 
     result = 0
-    base_name = yaml_file_name[:-5]
+    base_name =yaml_file_name[:-5]
 
     # parse the Albany command and append the yaml file name
     command = string.splitfields(albany_command, ";")
@@ -47,12 +47,12 @@ def runtest(albany_command, yaml_file_name):
     # give the final exodus output file an extension that reflects the number of processors
     # this avoids overwriting results from previous versions of the given test run on a
     # different number of processors
-    exodus_extension = "exo"
+    exodus_extension = "e"
     if num_processors > 1:
-        exodus_extension = "np" + str(num_processors) + ".exo"
+        exodus_extension = "np" + str(num_processors) + ".e"
 
     # remove old output files, if any
-    exodus_files = glob.glob(base_name + "*." + exodus_extension) + glob.glob(base_name + "*.exo.*")
+    exodus_files = glob.glob(base_name + "*." + exodus_extension) + glob.glob(base_name + "*.e.*")
     files_to_remove = []
     for file_name in exodus_files:
         if "gold" not in file_name:
@@ -62,15 +62,15 @@ def runtest(albany_command, yaml_file_name):
         os.remove(file)
 
     # run Albany
-    p = Popen(command, stdout=logfile, stderr=logfile)
+    p = subprocess.Popen(command, stdout=logfile, stderr=logfile)
     return_code = p.wait()
     if return_code != 0:
         result = return_code
 
     # run epu
     if num_processors > 1:
-        command = ["./epu", "-extension", "exo", "-output_extension", exodus_extension, "-p", str(num_processors), base_name]
-        p = Popen(command, stdout=logfile, stderr=logfile)
+        command = ["./epu", "-extension", "e", "-output_extension", exodus_extension, "-p", str(num_processors), base_name]
+        p = subprocess.Popen(command, stdout=logfile, stderr=logfile)
         return_code = p.wait()
         if return_code != 0:
             result = return_code
@@ -80,14 +80,15 @@ def runtest(albany_command, yaml_file_name):
     # run exodiff
     command = ["./exodiff", "-stat", "-f", \
                    base_name+".exodiff", \
-                   base_name+".gold.exo", \
+                   base_name+".gold.e", \
                    base_name+exodus_extension]
-    p = Popen(command, stdout=logfile, stderr=logfile)
+    p = subprocess.Popen(command, stdout=logfile, stderr=logfile)
     return_code = p.wait()
-    if return_code != 0:
-        result = return_code
 
     logfile.close()
+
+    if return_code != 0:
+        result = return_code
 
     with open(log_file_name, 'r') as log_file:
         print log_file.read()
@@ -104,6 +105,5 @@ if __name__ == "__main__":
     yaml_file_name = sys.argv[2]
 
     result = runtest(executable, yaml_file_name)
-
 
     sys.exit(result)

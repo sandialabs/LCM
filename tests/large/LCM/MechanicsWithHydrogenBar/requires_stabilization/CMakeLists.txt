@@ -8,8 +8,8 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SEACAS_EXODIFF}
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest.cmake}
                         ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/blockDiffusion.exo
-               ${CMAKE_CURRENT_BINARY_DIR}/blockDiffusion.exo COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/blockDiffusion.e
+               ${CMAKE_CURRENT_BINARY_DIR}/blockDiffusion.e COPYONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/blockDiffusionStab.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/blockDiffusionStab.yaml COPYONLY)

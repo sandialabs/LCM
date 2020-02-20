@@ -17,14 +17,14 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlipSaturation.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/SingleSlipSaturation.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlipSaturation.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlipSaturation.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlipSaturation.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlipSaturation.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-set(OUTFILE "SingleSlipSaturation.exo")
-set(REF_FILE "SingleSlipSaturation.gold.exo")
+set(OUTFILE "SingleSlipSaturation.e")
+set(REF_FILE "SingleSlipSaturation.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}
   COMMAND

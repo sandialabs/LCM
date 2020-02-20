@@ -2,7 +2,7 @@ LCM:
   Problem:
     Name: Mechanics 2D
     Solution Method: Continuation
-    Phalanx Graph Visualization Detail: 1
+    Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: CrystalPlasticity2d_Material.yaml
     Register dirichlet_field: true
     Dirichlet BCs:
@@ -24,7 +24,7 @@ LCM:
     2D Elements: 1
     Workset Size: 300
     Method: STK2D
-    Exodus Output File Name: PlasticShear2d.exo
+    Exodus Output File Name: PlasticShear2d.e
     Solution Vector Components: [displacement, V]
     Residual Vector Components: [force, V]
   Regression Results:

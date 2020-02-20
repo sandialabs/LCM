@@ -16,14 +16,14 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/RigidRotation_Material.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/RigidRotation_Material.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/RigidRotation.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/RigidRotation.exodiff COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/RigidRotation.gold.exo
-               ${CMAKE_CURRENT_BINARY_DIR}/RigidRotation.gold.exo COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/RigidRotation.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/RigidRotation.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-set(OUTFILE "RigidRotation.exo")
-set(REF_FILE "RigidRotation.gold.exo")
+set(OUTFILE "RigidRotation.e")
+set(REF_FILE "RigidRotation.gold.e")
 add_test(
   NAME ${testName}
   COMMAND

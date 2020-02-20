@@ -34,7 +34,7 @@ LCM:
       Response 0: Solution Average
   Discretization:
     Method: Exodus
-    Exodus Input File Name: blockDiffusion.exo
+    Exodus Input File Name: blockDiffusion.e
     Exodus Output File Name: blockDiffusionStab.e
     Solution Vector Components: [disp, V, CL, S, tauH, S]
     Residual Vector Components: [force, V, CLresid, S, tauHresid, S]

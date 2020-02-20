@@ -22,8 +22,8 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSlipPlaneHard_Implicit.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/MultiSlipPlaneHard_Implicit.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSlipPlaneHard_Implicit.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/MultiSlipPlaneHard_Implicit.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSlipPlaneHard_Implicit.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/MultiSlipPlaneHard_Implicit.gold.e COPYONLY)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSlipPlaneHard_Implicit_Active_Sets.yaml
@@ -38,8 +38,8 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/MultiSlipPlaneHard_Implicit_Active_Sets.exodiff
   COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSlipPlaneHard_Implicit_Active_Sets.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/MultiSlipPlaneHard_Implicit_Active_Sets.gold.exo
+  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSlipPlaneHard_Implicit_Active_Sets.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/MultiSlipPlaneHard_Implicit_Active_Sets.gold.e
   COPYONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plot_hard_implicit.py
@@ -50,8 +50,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/examineCondition.py
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests test 1 - Implicit Active Sets
-set(OUTFILE "MultiSlipPlaneHard_Implicit_Active_Sets.exo")
-set(REF_FILE "MultiSlipPlaneHard_Implicit_Active_Sets.gold.exo")
+set(OUTFILE "MultiSlipPlaneHard_Implicit_Active_Sets.e")
+set(REF_FILE "MultiSlipPlaneHard_Implicit_Active_Sets.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_Implicit_Active_Sets
   COMMAND
@@ -62,8 +62,8 @@ add_test(
     -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
     ${runtest.cmake})
 # test 2 - Implicit
-set(OUTFILE "MultiSlipPlaneHard_Implicit.exo")
-set(REF_FILE "MultiSlipPlaneHard_Implicit.gold.exo")
+set(OUTFILE "MultiSlipPlaneHard_Implicit.e")
+set(REF_FILE "MultiSlipPlaneHard_Implicit.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_Implicit
   COMMAND

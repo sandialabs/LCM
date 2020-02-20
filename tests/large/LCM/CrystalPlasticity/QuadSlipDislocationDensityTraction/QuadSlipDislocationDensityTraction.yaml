@@ -21,7 +21,7 @@ ALBANY:
   Discretization: 
     Method: Exodus
     Exodus Input File Name: QuadSlip.g
-    Exodus Output File Name: QuadSlipDislocationDensityTraction.exo
+    Exodus Output File Name: QuadSlipDislocationDensityTraction.e
     Cubature Degree: 2
     Separate Evaluators by Element Block: true
     Solution Vector Components: [displacement, V]

@@ -25,7 +25,7 @@ LCM:
   Discretization:
     Method: Exodus
     Exodus Input File Name: OrientationOnMesh.g
-    Exodus Output File Name: OrientationOnMesh.exo
+    Exodus Output File Name: OrientationOnMesh.e
     Cubature Degree: 2
     Separate Evaluators by Element Block: true
     Solution Vector Components: [displacement, V]

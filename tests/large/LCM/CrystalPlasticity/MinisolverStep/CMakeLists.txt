@@ -18,8 +18,8 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_Newton.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_Newton.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_Newton.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_Newton.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_Newton.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_Newton.gold.e COPYONLY)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_NewtonLineSearch.yaml
@@ -32,8 +32,8 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_NewtonLineSearch.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_NewtonLineSearch.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_NewtonLineSearch.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_NewtonLineSearch.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_NewtonLineSearch.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_NewtonLineSearch.gold.e COPYONLY)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_TrustRegion.yaml
@@ -45,8 +45,8 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_TrustRegion.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_TrustRegion.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_TrustRegion.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_TrustRegion.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_TrustRegion.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_TrustRegion.gold.e COPYONLY)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_ConjugateGradient.yaml
@@ -59,8 +59,8 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_ConjugateGradient.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_ConjugateGradient.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_ConjugateGradient.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_ConjugateGradient.gold.exo
+  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_ConjugateGradient.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_ConjugateGradient.gold.e
   COPYONLY)
 
 configure_file(
@@ -76,8 +76,8 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_LineSearchRegularized.exodiff
   COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_LineSearchRegularized.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_LineSearchRegularized.gold.exo
+  ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_LineSearchRegularized.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_LineSearchRegularized.gold.e
   COPYONLY)
 
 # Name the test with the directory name
@@ -88,8 +88,8 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # add_test(CrystalPlasticity_MinisolverStep_LineSearchRegularized python
 # ../run_exodiff_test.py "${SerialAlbany.exe}"
 # MinisolverStep_LineSearchRegularized.yaml) test 1 - Newton
-set(OUTFILE "MinisolverStep_Newton.exo")
-set(REF_FILE "MinisolverStep_Newton.gold.exo")
+set(OUTFILE "MinisolverStep_Newton.e")
+set(REF_FILE "MinisolverStep_Newton.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_Newton
   COMMAND
@@ -101,8 +101,8 @@ add_test(
 set_tests_properties(CrystalPlasticity_${testName}_Newton
                      PROPERTIES LABELS "LCM;Tpetra;Forward")
 # test 2 - Newton Line Search
-set(OUTFILE "MinisolverStep_NewtonLineSearch.exo")
-set(REF_FILE "MinisolverStep_NewtonLineSearch.gold.exo")
+set(OUTFILE "MinisolverStep_NewtonLineSearch.e")
+set(REF_FILE "MinisolverStep_NewtonLineSearch.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_NewtonLineSearch
   COMMAND
@@ -115,8 +115,8 @@ add_test(
 set_tests_properties(CrystalPlasticity_${testName}_NewtonLineSearch
                      PROPERTIES LABELS "LCM;Tpetra;Forward")
 # test 3 - Trust Region
-set(OUTFILE "MinisolverStep_TrustRegion.exo")
-set(REF_FILE "MinisolverStep_TrustRegion.gold.exo")
+set(OUTFILE "MinisolverStep_TrustRegion.e")
+set(REF_FILE "MinisolverStep_TrustRegion.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_TrustRegion
   COMMAND

@@ -22,7 +22,7 @@ LCM:
   Discretization:
     Method: Exodus
     Exodus Input File Name: ThermallyActivatedSlip.g
-    Exodus Output File Name: ThermallyActivatedSlip.exo
+    Exodus Output File Name: ThermallyActivatedSlip.e
     Cubature Degree: 2
     Separate Evaluators by Element Block: true
     Solution Vector Components: [displacement, V]

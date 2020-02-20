@@ -21,15 +21,15 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/QuadSlipDislocationDensityTraction.exodiff
   COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/QuadSlipDislocationDensityTraction.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/QuadSlipDislocationDensityTraction.gold.exo
+  ${CMAKE_CURRENT_SOURCE_DIR}/QuadSlipDislocationDensityTraction.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/QuadSlipDislocationDensityTraction.gold.e
   COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-set(OUTFILE "QuadSlipDislocationDensityTraction.exo")
-set(REF_FILE "QuadSlipDislocationDensityTraction.gold.exo")
+set(OUTFILE "QuadSlipDislocationDensityTraction.e")
+set(REF_FILE "QuadSlipDislocationDensityTraction.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}
   COMMAND

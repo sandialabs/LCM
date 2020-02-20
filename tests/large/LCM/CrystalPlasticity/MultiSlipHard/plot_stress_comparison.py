@@ -5,10 +5,10 @@ import exodus
 import numpy
 import matplotlib.pyplot as plt
 
-file_name_old_gold = "MultiSlipPlaneHard_Implicit_Active_Sets.gold.exo"
+file_name_old_gold = "MultiSlipPlaneHard_Implicit_Active_Sets.gold.e"
 exo_file_old_gold = exodus.exodus(file_name_old_gold,"r")
 
-file_name_new_gold = "MultiSlipPlaneHard_Implicit_Active_Sets.exo"
+file_name_new_gold = "MultiSlipPlaneHard_Implicit_Active_Sets.e"
 exo_file_new_gold = exodus.exodus(file_name_new_gold,"r")
 
 dep_var_name = "Cauchy_Stress_01"

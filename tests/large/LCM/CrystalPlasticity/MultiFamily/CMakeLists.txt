@@ -15,14 +15,14 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MultiFamily_Material.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/MultiFamily_Material.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MultiFamily.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/MultiFamily.exodiff COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MultiFamily.gold.exo
-               ${CMAKE_CURRENT_BINARY_DIR}/MultiFamily.gold.exo COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MultiFamily.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/MultiFamily.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-set(OUTFILE "MultiFamily.exo")
-set(REF_FILE "MultiFamily.gold.exo")
+set(OUTFILE "MultiFamily.e")
+set(REF_FILE "MultiFamily.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}
   COMMAND

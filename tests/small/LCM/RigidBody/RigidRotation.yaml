@@ -59,7 +59,7 @@ LCM:
   Discretization:
     Method: Exodus
     Exodus Input File Name: RigidRotation.g
-    Exodus Output File Name: RigidRotation.exo
+    Exodus Output File Name: RigidRotation.e
     Solution Vector Components: [displacement, V]
     Residual Vector Components: [force, V]
     Cubature Degree: 3

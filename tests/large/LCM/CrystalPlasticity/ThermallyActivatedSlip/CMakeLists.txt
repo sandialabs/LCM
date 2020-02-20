@@ -18,14 +18,14 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/ThermallyActivatedSlip.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/ThermallyActivatedSlip.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/ThermallyActivatedSlip.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/ThermallyActivatedSlip.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/ThermallyActivatedSlip.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/ThermallyActivatedSlip.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-set(OUTFILE "ThermallyActivatedSlip.exo")
-set(REF_FILE "ThermallyActivatedSlip.gold.exo")
+set(OUTFILE "ThermallyActivatedSlip.e")
+set(REF_FILE "ThermallyActivatedSlip.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}
   COMMAND

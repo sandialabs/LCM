@@ -21,7 +21,7 @@ LCM:
   Discretization:
     Method: Exodus
     Exodus Input File Name: MultiSlipPlaneHard.g
-    Exodus Output File Name: MultiSlipPlaneHard_Implicit_Active_Sets.exo
+    Exodus Output File Name: MultiSlipPlaneHard_Implicit_Active_Sets.e
     Cubature Degree: 2
     Separate Evaluators by Element Block: true
     Solution Vector Components: [displacement, V]

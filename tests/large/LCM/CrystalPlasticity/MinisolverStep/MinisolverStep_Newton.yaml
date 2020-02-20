@@ -19,7 +19,7 @@ LCM:
   Discretization:
     Method: Exodus
     Exodus Input File Name: MinisolverStep_Specimen.g
-    Exodus Output File Name: MinisolverStep_Newton.exo
+    Exodus Output File Name: MinisolverStep_Newton.e
     Cubature Degree: 2
     Separate Evaluators by Element Block: true
     Solution Vector Components: [displacement, V]

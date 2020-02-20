@@ -21,14 +21,14 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
-set(OUTFILE "DislocationDensityHardening.exo")
-set(REF_FILE "DislocationDensityHardening.gold.exo")
+set(OUTFILE "DislocationDensityHardening.e")
+set(REF_FILE "DislocationDensityHardening.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}
   COMMAND

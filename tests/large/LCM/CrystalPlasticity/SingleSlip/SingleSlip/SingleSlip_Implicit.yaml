@@ -33,7 +33,7 @@ LCM:
   Discretization:
     Method: Exodus
     Exodus Input File Name: "../SingleSlip.g"
-    Exodus Output File Name: SingleSlip_Implicit.exo
+    Exodus Output File Name: SingleSlip_Implicit.e
     Cubature Degree: 2
     Separate Evaluators by Element Block: true
     Solution Vector Components: [displacement, V]

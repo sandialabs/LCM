@@ -47,12 +47,12 @@ def runtest(albany_command,yaml_file_name):
     # give the final exodus output file an extension that reflects the number of processors
     # this avoids overwriting results from previous versions of the given test run on a
     # different number of processors
-    exodus_extension = "exo"
+    exodus_extension = "e"
     if num_processors > 1:
-        exodus_extension = "np" + str(num_processors) + ".exo"
+        exodus_extension = "np" + str(num_processors) + ".e"
 
     # remove old output files, if any
-    exodus_files = glob.glob(base_name + "*." + exodus_extension) + glob.glob(base_name + "*.exo.*")
+    exodus_files = glob.glob(base_name + "*." + exodus_extension) + glob.glob(base_name + "*.e.*")
     files_to_remove = []
     for file_name in exodus_files:
         if "gold" not in file_name:
@@ -69,7 +69,7 @@ def runtest(albany_command,yaml_file_name):
 
     # run epu
     if num_processors > 1:
-        command = ["./epu", "-extension", "exo", "-output_extension", exodus_extension, "-p", str(num_processors), base_name]
+        command = ["./epu", "-extension", "e", "-output_extension", exodus_extension, "-p", str(num_processors), base_name]
         p = subprocess.Popen(command, stdout=logfile, stderr=logfile)
         return_code = p.wait()
         if return_code != 0:
@@ -80,7 +80,7 @@ def runtest(albany_command,yaml_file_name):
     # run exodiff
     command = ["./exodiff", "-stat", "-f", \
                    base_name+".exodiff", \
-                   base_name+".gold.exo", \
+                   base_name+".gold.e", \
                    base_name+exodus_extension]
     p = subprocess.Popen(command, stdout=logfile, stderr=logfile)
     return_code = p.wait()

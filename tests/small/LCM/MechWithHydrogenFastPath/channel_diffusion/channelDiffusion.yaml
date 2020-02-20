@@ -2,7 +2,7 @@ LCM:
   Problem:
     Name: Mechanics 3D
     Solution Method: Continuation
-    Phalanx Graph Visualization Detail: 1
+    Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: channelDiffusionMaterials.yaml
     Transport:
       Variable Type: DOF

@@ -25,8 +25,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OrientationOnMesh.g.4.3
                ${CMAKE_CURRENT_BINARY_DIR}/OrientationOnMesh.g.4.3 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OrientationOnMesh.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/OrientationOnMesh.exodiff COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OrientationOnMesh.gold.exo
-               ${CMAKE_CURRENT_BINARY_DIR}/OrientationOnMesh.gold.exo COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OrientationOnMesh.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/OrientationOnMesh.gold.e COPYONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OrientationNotOnMesh.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/OrientationNotOnMesh.yaml COPYONLY)
@@ -47,14 +47,14 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/OrientationNotOnMesh.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/OrientationNotOnMesh.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/OrientationNotOnMesh.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/OrientationNotOnMesh.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/OrientationNotOnMesh.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/OrientationNotOnMesh.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests test 1 - OrientationOnMesh
-set(OUTFILE "OrientationOnMesh.exo")
-set(REF_FILE "OrientationOnMesh.gold.exo")
+set(OUTFILE "OrientationOnMesh.e")
+set(REF_FILE "OrientationOnMesh.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}
   COMMAND
@@ -66,8 +66,8 @@ add_test(
 set_tests_properties(CrystalPlasticity_${testName}
                      PROPERTIES LABELS "LCM;Tpetra;Forward")
 # test 2 - OrientationOnMesh 4 procs
-set(OUTFILE "OrientationOnMesh.exo")
-set(REF_FILE "OrientationOnMesh.gold.exo")
+set(OUTFILE "OrientationOnMesh.e")
+set(REF_FILE "OrientationOnMesh.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_np4
   COMMAND
@@ -79,8 +79,8 @@ add_test(
 set_tests_properties(CrystalPlasticity_${testName}_np4
                      PROPERTIES LABELS "LCM;Tpetra;Forward")
 # test 3 - OrientationNotOnMesh
-set(OUTFILE "OrientationNotOnMesh.exo")
-set(REF_FILE "OrientationNotOnMesh.gold.exo")
+set(OUTFILE "OrientationNotOnMesh.e")
+set(REF_FILE "OrientationNotOnMesh.gold.e")
 add_test(
   NAME CrystalPlasticity_OrientationNotOnMesh
   COMMAND
@@ -92,8 +92,8 @@ add_test(
 set_tests_properties(CrystalPlasticity_OrientationNotOnMesh
                      PROPERTIES LABELS "LCM;Tpetra;Forward")
 # test 4 - OrientationNotOnMesh 4 procs
-set(OUTFILE "OrientationNotOnMesh.exo")
-set(REF_FILE "OrientationNotOnMesh.gold.exo")
+set(OUTFILE "OrientationNotOnMesh.e")
+set(REF_FILE "OrientationNotOnMesh.gold.e")
 add_test(
   NAME CrystalPlasticity_OrientationNotOnMesh_np4
   COMMAND

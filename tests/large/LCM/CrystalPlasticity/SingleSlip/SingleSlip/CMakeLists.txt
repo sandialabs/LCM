@@ -14,8 +14,8 @@ configure_file(
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Implicit.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Implicit.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Implicit.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Implicit.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Implicit.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Implicit.gold.e COPYONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Explicit.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit.yaml COPYONLY)
@@ -25,14 +25,14 @@ configure_file(
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Explicit.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit.exodiff COPYONLY)
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Explicit.gold.exo
-  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit.gold.exo COPYONLY)
+  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Explicit.gold.e
+  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests test 1 - Explicit
-set(OUTFILE "SingleSlip_Explicit.exo")
-set(REF_FILE "SingleSlip_Explicit.gold.exo")
+set(OUTFILE "SingleSlip_Explicit.e")
+set(REF_FILE "SingleSlip_Explicit.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_Explicit
   COMMAND
@@ -44,8 +44,8 @@ add_test(
 set_tests_properties(CrystalPlasticity_${testName}_Explicit
                      PROPERTIES LABELS "LCM;Tpetra;Forward")
 # test 2 - Implicit
-set(OUTFILE "SingleSlip_Implicit.exo")
-set(REF_FILE "SingleSlip_Implicit.gold.exo")
+set(OUTFILE "SingleSlip_Implicit.e")
+set(REF_FILE "SingleSlip_Implicit.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}_Implicit
   COMMAND

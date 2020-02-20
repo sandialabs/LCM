@@ -431,10 +431,13 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   
   // Calculate melting temperature
-  auto sal15          = std::sqrt(sal * sal * sal);
-  auto pressure_fixed = 1.0;
+  ScalarT sal15(0.0); 
+  if (std::abs(sal) > 0.0) {
+    sal15 = std::sqrt(sal * sal * sal);
+  }
+  ScalarT pressure_fixed(1.0);
   // Tmelt is in Kelvin
-  auto Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal -
+  ScalarT Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal -
                0.000753 / 10000.0 * pressure_fixed + 273.15;
 
   // Calculate temperature change

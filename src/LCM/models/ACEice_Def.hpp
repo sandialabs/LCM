@@ -170,7 +170,7 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
       "ACE Bluff Salinity",
       dl->qp_scalar,
       "scalar",
-      salinity_base_,
+      0.0,
       true,
       p->get<bool>("Output ACE Bluff Salinity", false));
 
@@ -424,10 +424,10 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     if (std::abs(sal_update) > std::abs(ocean_sal - sal_curr)) {
         sal = ocean_sal;
     } else {
-        //sal = sal_curr + sal_update;  //<---- incompatible types
+        sal = sal_curr + sal_update; 
     }
   } else {
-    //sal = sal_curr;  //<----- incompatible types
+    sal = sal_curr; 
   }
   
   // Calculate melting temperature

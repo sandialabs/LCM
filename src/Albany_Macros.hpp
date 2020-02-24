@@ -53,9 +53,19 @@
     abort();                                                          \
   } while (0)
 
+#define ALBANY_TRACE_IMPL(msg, ...)                                   \
+  do {                                                                \
+    std::ostringstream omsg;                                          \
+    omsg << "********** ALBANY_TRACE at ";                            \
+    omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
+    std::cerr << "********** ALBANY_TRACE at ";                       \
+    std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
+  } while (0)
+
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")
 #define ALBANY_PANIC(...) ALBANY_PANIC_IMPL(__VA_ARGS__, "")
 #define ALBANY_ABORT(...) ALBANY_ABORT_IMPL(__VA_ARGS__, "")
+#define ALBANY_TRACE(...) ALBANY_TRACE_IMPL(__VA_ARGS__, "")
 
 #if defined(NDEBUG)
 #define ALBANY_EXPECT(...)

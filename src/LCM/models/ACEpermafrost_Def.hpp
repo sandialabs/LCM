@@ -62,60 +62,62 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
     auto const filename = p->get<std::string>("ACE Salinity File");
     salinity_           = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == salinity_.size(),
-      "*** ERROR: Number of z values and number of salinity values in ACE "
-      "Salinity File must match.");
+        z_above_mean_sea_level_.size() == salinity_.size(),
+        "*** ERROR: Number of z values and number of salinity values in ACE "
+        "Salinity File must match.");
   }
   if (p->isParameter("ACE Ocean Salinity File") == true) {
     auto const filename = p->get<std::string>("ACE Ocean Salinity File");
     ocean_salinity_     = vectorFromFile(filename);
     ALBANY_ASSERT(
-      time_.size() == ocean_salinity_.size(),
-      "*** ERROR: Number of time values and number of ocean salinity values in "
-      "ACE Ocean Salinity File must match.");
+        time_.size() == ocean_salinity_.size(),
+        "*** ERROR: Number of time values and number of ocean salinity values "
+        "in "
+        "ACE Ocean Salinity File must match.");
   }
   if (p->isParameter("ACE Porosity File") == true) {
     auto const filename = p->get<std::string>("ACE Porosity File");
     porosity_from_file_ = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == porosity_from_file_.size(),
-      "*** ERROR: Number of z values and number of porosity values in "
-      "ACE Porosity File must match.");
+        z_above_mean_sea_level_.size() == porosity_from_file_.size(),
+        "*** ERROR: Number of z values and number of porosity values in "
+        "ACE Porosity File must match.");
   }
   if (p->isParameter("ACE Freezing Curve Width File") == true) {
     auto const filename = p->get<std::string>("ACE Freezing Curve Width File");
     freezing_curve_width_ = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == freezing_curve_width_.size(),
-      "*** ERROR: Number of z values and number of freezing curve width values "
-      "in "
-      "ACE Freezing Curve Width File must match.");
+        z_above_mean_sea_level_.size() == freezing_curve_width_.size(),
+        "*** ERROR: Number of z values and number of freezing curve width "
+        "values "
+        "in "
+        "ACE Freezing Curve Width File must match.");
   }
   if (p->isParameter("ACE Sand File") == true) {
     auto const filename = p->get<std::string>("ACE Sand File");
-    sand_from_file_ = vectorFromFile(filename);
+    sand_from_file_     = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == sand_from_file_.size(),
-      "*** ERROR: Number of z values and number of sand values in "
-      "ACE Sand File must match.");
+        z_above_mean_sea_level_.size() == sand_from_file_.size(),
+        "*** ERROR: Number of z values and number of sand values in "
+        "ACE Sand File must match.");
   }
   if (p->isParameter("ACE Clay File") == true) {
     auto const filename = p->get<std::string>("ACE Clay File");
-    clay_from_file_ = vectorFromFile(filename);
+    clay_from_file_     = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == clay_from_file_.size(),
-      "*** ERROR: Number of z values and number of clay values in "
-      "ACE Clay File must match.");
+        z_above_mean_sea_level_.size() == clay_from_file_.size(),
+        "*** ERROR: Number of z values and number of clay values in "
+        "ACE Clay File must match.");
   }
   if (p->isParameter("ACE Silt File") == true) {
     auto const filename = p->get<std::string>("ACE Silt File");
-    silt_from_file_ = vectorFromFile(filename);
+    silt_from_file_     = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == silt_from_file_.size(),
-      "*** ERROR: Number of z values and number of silt values in "
-      "ACE Silt File must match.");
+        z_above_mean_sea_level_.size() == silt_from_file_.size(),
+        "*** ERROR: Number of z values and number of silt values in "
+        "ACE Silt File must match.");
   }
-  
+
   ALBANY_ASSERT(
       time_.size() == sea_level_.size(),
       "*** ERROR: Number of times and number of sea level values must match.");
@@ -192,7 +194,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
       0.0,
       false,
       p->get<bool>("Output Yield Surface", false));
-  
+
   // ACE Bluff salinity
   addStateVariable(
       "ACE Bluff Salinity",
@@ -431,45 +433,53 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // A boundary cell (this is a hack): porosity = -1.0 (set in input deck)
   bool const b_cell = porosity < 0.0;
 
-// Calculate the salinity of the grid cell
+  // Calculate the salinity of the grid cell
   //
   // If first time step:
-  auto sal = salinity_base_;  // should come from chemical part of model
+  ScalarT sal = salinity_base_;  // should come from chemical part of model
   if (salinity_.size() > 0) {
     sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
   }
-  bluff_salinity_(cell, pt) = sal;  // we don't want to keep overwriting this every time
+  bluff_salinity_(cell, pt) =
+      sal;  // we don't want to keep overwriting this every time
   // End if first time step
-  // 
-  auto sal_curr = bluff_salinity_(cell, pt);  // this should have memory from previous ts
+  //
+  auto sal_curr =
+      bluff_salinity_(cell, pt);  // this should have memory from previous ts
   if (is_at_boundary == true) {
-    auto ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
-    auto dh2 = 0.1; // this is the half the grid cell width
-    auto area = 0.04; // this is the grid cell area exposed to the ocean
-    auto cell_volume = 0.008; // this is the grid cell volume
-    auto sal_grad = (ocean_sal - sal_curr)/dh2;
-    auto sal_update = (salt_enhanced_D_ * sal_grad * area * delta_time * (1.0/cell_volume));
-    if (std::abs(sal_update) > std::abs(ocean_sal - sal_curr)) {
-        sal = ocean_sal;
+    auto const ocean_sal =
+        interpolateVectors(time_, ocean_salinity_, current_time);
+    auto constexpr cell_half_width  = 0.1;
+    auto constexpr cell_exposed_area = 0.04;
+    auto constexpr cell_volume = 0.008;
+    auto constexpr per_exposed_length = cell_exposed_area / cell_volume;
+    auto const sal_diff = ocean_sal - sal_curr;
+    auto const sal_grad    = sal_diff / cell_half_width;
+    auto const factor = per_exposed_length * salt_enhanced_D_;
+    // TODO: factor == 0, should be a factor here but leads to Sacado FPE (!!??)
+    auto const sal_update = sal_grad * delta_time;
+    bool const is_update_large_pos = sal_diff > 0.0 && sal_update > sal_diff;
+    bool const is_update_large_neg = sal_diff < 0.0 && sal_update < sal_diff;
+    if (is_update_large_pos == true || is_update_large_neg == true) {
+      sal = ocean_sal;
     } else {
-        sal = sal_curr + sal_update; 
+      sal = sal_curr + sal_update;
     }
   } else {
-    sal = sal_curr; 
+    sal = sal_curr;
   }
-  
+
   // Calculate melting temperature
-  ScalarT sal15(0.0); 
-  if (std::abs(sal) > 0.0) {
-    sal15 = std::sqrt(sal * sal * sal);
-  }
-  ScalarT pressure_fixed(1.0);
+  ScalarT sal15(0.0);
+  if (std::abs(sal) > 0.0) { sal15 = std::sqrt(sal * sal * sal); }
+  auto const pressure_fixed = 1.0;
   // Tmelt is in Kelvin
-  ScalarT Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal -
-               0.000753 / 10000.0 * pressure_fixed + 273.15;
+  ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 -
+                        0.0002154996 * sal * sal -
+                        0.000753 / 10000.0 * pressure_fixed + 273.15;
 
   // Calculate temperature change
-  auto dTemp = Tcurr - Told;
+  auto const dTemp = Tcurr - Told;
   if (delta_time > 0.0) {
     tdot_(cell, pt) = dTemp / delta_time;
   } else {
@@ -531,46 +541,51 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   ScalarT calc_soil_heat_capacity;
   ScalarT calc_soil_thermal_cond;
-  bool sediment_given = false;
-  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) && (silt_from_file_.size() > 0)) {
+  bool    sediment_given = false;
+  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) &&
+      (silt_from_file_.size() > 0)) {
     sediment_given = true;
-    auto sand_frac = interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
-    auto clay_frac = interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
-    auto silt_frac = interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
+    auto sand_frac =
+        interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
+    auto clay_frac =
+        interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
+    auto silt_frac =
+        interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
     // THERMAL PROPERTIES OF ROCKS, E.C. Robertson, U.S. Geological Survey
     // Open-File Report 88-441 (1988).
     // Cp values in [J/kg/K]
-    calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) 
-                                                  + (0.7e3 * silt_frac);
+    calc_soil_heat_capacity =
+        (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac);
     // K values in [W/K/m]
-    calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac);
+    calc_soil_thermal_cond =
+        (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac);
   }
-  
+
   // Update the effective material density
   density_(cell, pt) =
       (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
       ((1.0 - porosity) * soil_density_);
 
-  // Update the effective material heat capacity 
+  // Update the effective material heat capacity
   if (sediment_given == true) {
-      heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
-                                             (water_heat_capacity_ * wcurr))) +
-                                ((1.0 - porosity) * calc_soil_heat_capacity);
+    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
+                                            (water_heat_capacity_ * wcurr))) +
+                               ((1.0 - porosity) * calc_soil_heat_capacity);
   } else {
-      heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
-                                             (water_heat_capacity_ * wcurr))) +
-                                ((1.0 - porosity) * soil_heat_capacity_);
+    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
+                                            (water_heat_capacity_ * wcurr))) +
+                               ((1.0 - porosity) * soil_heat_capacity_);
   }
 
   // Update the effective material thermal conductivity
   if (sediment_given == true) {
-      thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
-                                pow(water_thermal_cond_, (wcurr * porosity)) *
-                                pow(calc_soil_thermal_cond, (1.0 - porosity));
+    thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
+                              pow(water_thermal_cond_, (wcurr * porosity)) *
+                              pow(calc_soil_thermal_cond, (1.0 - porosity));
   } else {
-      thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
-                                pow(water_thermal_cond_, (wcurr * porosity)) *
-                                pow(soil_thermal_cond_, (1.0 - porosity));
+    thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
+                              pow(water_thermal_cond_, (wcurr * porosity)) *
+                              pow(soil_thermal_cond_, (1.0 - porosity));
   }
 
   // Update the material thermal inertia term
@@ -597,7 +612,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Return values
   ice_saturation_(cell, pt)   = icurr;
   water_saturation_(cell, pt) = wcurr;
-  bluff_salinity_(cell, pt) = sal;
+  bluff_salinity_(cell, pt)   = sal;
 
   //
   // Mechanical calculation

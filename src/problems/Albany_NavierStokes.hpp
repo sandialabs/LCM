@@ -132,7 +132,7 @@ class NavierStokes : public AbstractProblem
   bool porousMedia;     //! flow through porous media problem
 
   /// Problem parameter list
-  const Teuchos::RCP<Teuchos::ParameterList> params; 
+  const Teuchos::RCP<Teuchos::ParameterList> params;
 
   Teuchos::RCP<Albany::Layouts> dl;
 

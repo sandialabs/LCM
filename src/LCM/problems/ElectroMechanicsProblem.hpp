@@ -181,7 +181,7 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
   ///
   /// Problem parameter list
   ///
-  const Teuchos::RCP<Teuchos::ParameterList> params_; 
+  const Teuchos::RCP<Teuchos::ParameterList> params_;
 
   template <typename EvalT>
   void

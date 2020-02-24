@@ -18,7 +18,7 @@ Albany::PNPProblem::PNPProblem(
     const Teuchos::RCP<ParamLib>&               paramLib_,
     const int                                   numDim_)
     : Albany::AbstractProblem(params_, paramLib_),
-      params(params_), 
+      params(params_),
       numDim(numDim_),
       use_sdbcs_(false)
 {
@@ -50,18 +50,22 @@ Albany::PNPProblem::buildProblem(
         *fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
   }
 
-  if (meshSpecs[0]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
+  if (meshSpecs[0]->nsNames.size() >
+      0) {  // Build a nodeset evaluator if nodesets are present
     constructDirichletEvaluators(*meshSpecs[0]);
   }
 
   // Check if have Neumann sublist; throw error if attempting to specify
-  // Neumann BCs, but there are no sidesets in the input mesh 
+  // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ASSERT(false, "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ASSERT(
+        false,
+        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
+  if (meshSpecs[0]->ssNames.size() >
+      0) {  // Build a sideset evaluator if sidesets are present
     constructNeumannEvaluators(meshSpecs[0]);
   }
 }

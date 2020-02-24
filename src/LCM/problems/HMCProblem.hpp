@@ -133,7 +133,7 @@ class HMCProblem : public virtual Albany::AbstractProblem
   int  numMicroScales;
 
   //! Problem parameter list
-  const Teuchos::RCP<Teuchos::ParameterList> params; 
+  const Teuchos::RCP<Teuchos::ParameterList> params;
 
   std::string                   matModel;
   Teuchos::RCP<Albany::Layouts> dl;

@@ -19,7 +19,7 @@ MechanicsProblem::MechanicsProblem(
     Teuchos::RCP<AAdapt::rc::Manager> const&    rc_mgr,
     Teuchos::RCP<const Teuchos::Comm<int>>&     commT)
     : AbstractProblem(params, param_lib),
-      params_(params), 
+      params_(params),
       have_source_(false),
       thermal_source_(SOURCE_TYPE_NONE),
       thermal_source_evaluated_(false),
@@ -322,10 +322,12 @@ MechanicsProblem::buildProblem(
   constructDirichletEvaluators(*meshSpecs[0]);
 
   // Check if have Neumann sublist; throw error if attempting to specify
-  // Neumann BCs, but there are no sidesets in the input mesh 
+  // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params_->isSublist("Neumann BCs");
   if (isNeumannPL && !haveSidesets) {
-    ALBANY_ASSERT(false, "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ASSERT(
+        false,
+        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
   if (haveSidesets) {
@@ -500,9 +502,8 @@ MechanicsProblem::constructNeumannEvaluators(
   // By "all", we mean components of the traction vector only
   // Other fields cannot use this specifier
   if (have_temperature_eq_ || have_ace_temperature_eq_) {
-    neumannNames[neq] = "all-disp-dofs"; 
-  }
-  else {
+    neumannNames[neq] = "all-disp-dofs";
+  } else {
     neumannNames[neq] = "all";
   }
 
@@ -529,7 +530,7 @@ MechanicsProblem::constructNeumannEvaluators(
 
   if (have_temperature_eq_ || have_ace_temperature_eq_) {
     neumannNames[index] = "T";
-    auto num_eq_mech = have_mech_eq_ ? num_dims_ : 0;
+    auto num_eq_mech    = have_mech_eq_ ? num_dims_ : 0;
     offsets[index]      = Teuchos::Array<int>(1, num_eq_mech);
     index++;
   }
@@ -537,9 +538,9 @@ MechanicsProblem::constructNeumannEvaluators(
   if (have_dislocation_density_eq_) {
     for (int i{0}; i < LCM::DislocationDensity::get_num_slip(num_dims_); ++i) {
       neumannNames[index] = strint("DF", i, '_');
-      //IKT, 2/14/2020: we may want to check that this is correct, given 
-      //the bug fix I made having to do with offsets for temp above...
-      offsets[index]      = Teuchos::Array<int>(1, index);
+      // IKT, 2/14/2020: we may want to check that this is correct, given
+      // the bug fix I made having to do with offsets for temp above...
+      offsets[index] = Teuchos::Array<int>(1, index);
       index++;
     }
   }
@@ -550,7 +551,8 @@ MechanicsProblem::constructNeumannEvaluators(
 
   Teuchos::ArrayRCP<std::string> dof_names(1, "Displacement");
 
-  std::vector<std::string> condNames(4);  // dudx, dudy, dudz, dudn, P, closed_form
+  std::vector<std::string> condNames(
+      4);  // dudx, dudy, dudz, dudn, P, closed_form
 
   // Note that sidesets are only supported for two and 3D currently
   if (num_dims_ == 2) {

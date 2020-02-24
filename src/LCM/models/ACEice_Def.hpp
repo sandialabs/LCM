@@ -20,13 +20,13 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
   this->setIntegrationPointLocationFlag(true);
 
   // Baseline constants
-  sat_mod_              = p->get<RealType>("Saturation Modulus", 0.0);
-  sat_exp_              = p->get<RealType>("Saturation Exponent", 0.0);
-  ice_density_          = p->get<RealType>("ACE Ice Density", 0.0);
-  water_density_        = p->get<RealType>("ACE Water Density", 0.0);
-  ice_thermal_cond_     = p->get<RealType>("ACE Ice Thermal Conductivity", 0.0);
-  water_thermal_cond_   = p->get<RealType>("ACE Water Thermal Conductivity", 0.0);
-  ice_heat_capacity_    = p->get<RealType>("ACE Ice Heat Capacity", 0.0);
+  sat_mod_            = p->get<RealType>("Saturation Modulus", 0.0);
+  sat_exp_            = p->get<RealType>("Saturation Exponent", 0.0);
+  ice_density_        = p->get<RealType>("ACE Ice Density", 0.0);
+  water_density_      = p->get<RealType>("ACE Water Density", 0.0);
+  ice_thermal_cond_   = p->get<RealType>("ACE Ice Thermal Conductivity", 0.0);
+  water_thermal_cond_ = p->get<RealType>("ACE Water Thermal Conductivity", 0.0);
+  ice_heat_capacity_  = p->get<RealType>("ACE Ice Heat Capacity", 0.0);
   water_heat_capacity_  = p->get<RealType>("ACE Water Heat Capacity", 0.0);
   ice_saturation_init_  = p->get<RealType>("ACE Ice Initial Saturation", 0.0);
   ice_saturation_max_   = p->get<RealType>("ACE Ice Maximum Saturation", 0.0);
@@ -58,36 +58,38 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
     auto const filename = p->get<std::string>("ACE Salinity File");
     salinity_           = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == salinity_.size(),
-      "*** ERROR: Number of z values and number of salinity values in ACE "
-      "Salinity File must match.");
+        z_above_mean_sea_level_.size() == salinity_.size(),
+        "*** ERROR: Number of z values and number of salinity values in ACE "
+        "Salinity File must match.");
   }
   if (p->isParameter("ACE Ocean Salinity File") == true) {
     auto const filename = p->get<std::string>("ACE Ocean Salinity File");
     ocean_salinity_     = vectorFromFile(filename);
     ALBANY_ASSERT(
-      time_.size() == ocean_salinity_.size(),
-      "*** ERROR: Number of time values and number of ocean salinity values in "
-      "ACE Ocean Salinity File must match.");
+        time_.size() == ocean_salinity_.size(),
+        "*** ERROR: Number of time values and number of ocean salinity values "
+        "in "
+        "ACE Ocean Salinity File must match.");
   }
   if (p->isParameter("ACE Porosity File") == true) {
     auto const filename = p->get<std::string>("ACE Porosity File");
     porosity_from_file_ = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == porosity_from_file_.size(),
-      "*** ERROR: Number of z values and number of porosity values in "
-      "ACE Porosity File must match.");
+        z_above_mean_sea_level_.size() == porosity_from_file_.size(),
+        "*** ERROR: Number of z values and number of porosity values in "
+        "ACE Porosity File must match.");
   }
   if (p->isParameter("ACE Freezing Curve Width File") == true) {
     auto const filename = p->get<std::string>("ACE Freezing Curve Width File");
     freezing_curve_width_ = vectorFromFile(filename);
     ALBANY_ASSERT(
-      z_above_mean_sea_level_.size() == freezing_curve_width_.size(),
-      "*** ERROR: Number of z values and number of freezing curve width values "
-      "in "
-      "ACE Freezing Curve Width File must match.");
+        z_above_mean_sea_level_.size() == freezing_curve_width_.size(),
+        "*** ERROR: Number of z values and number of freezing curve width "
+        "values "
+        "in "
+        "ACE Freezing Curve Width File must match.");
   }
-  
+
   ALBANY_ASSERT(
       time_.size() == sea_level_.size(),
       "*** ERROR: Number of times and number of sea level values must match");
@@ -164,7 +166,7 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
       0.0,
       false,
       p->get<bool>("Output Yield Surface", false));
-  
+
   // ACE Bluff salinity
   addStateVariable(
       "ACE Bluff Salinity",
@@ -410,35 +412,38 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (salinity_.size() > 0) {
     sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
   }
-  bluff_salinity_(cell, pt) = sal;  // we don't want to keep overwriting this every time
+  bluff_salinity_(cell, pt) =
+      sal;  // we don't want to keep overwriting this every time
   // End if first time step
-  // 
-  auto sal_curr = bluff_salinity_(cell, pt);  // this should have memory from previous ts
+  //
+  auto sal_curr =
+      bluff_salinity_(cell, pt);  // this should have memory from previous ts
   if (is_at_boundary == true) {
-    auto ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
-    auto dh2 = 0.1; // this is the half the grid cell width
-    auto area = 0.04; // this is the grid cell area exposed to the ocean
-    auto cell_volume = 0.008; // this is the grid cell volume
-    auto sal_grad = (ocean_sal - sal_curr)/dh2;
-    auto sal_update = (salt_enhanced_D_ * sal_grad * area * delta_time * (1.0/cell_volume));
+    auto const ocean_sal =
+        interpolateVectors(time_, ocean_salinity_, current_time);
+    auto const dh2  = 0.1;   // this is the half the grid cell width
+    auto const area = 0.04;  // this is the grid cell area exposed to the ocean
+    auto const cell_volume = 0.008;  // this is the grid cell volume
+    auto const sal_grad    = (ocean_sal - sal_curr) / dh2;
+    auto const sal_update =
+        salt_enhanced_D_ * sal_grad * area * delta_time / cell_volume;
     if (std::abs(sal_update) > std::abs(ocean_sal - sal_curr)) {
-        sal = ocean_sal;
+      sal = ocean_sal;
     } else {
-        sal = sal_curr + sal_update; 
+      sal = sal_curr + sal_update;
     }
   } else {
-    sal = sal_curr; 
+    sal = sal_curr;
   }
-  
+
   // Calculate melting temperature
-  ScalarT sal15(0.0); 
-  if (std::abs(sal) > 0.0) {
-    sal15 = std::sqrt(sal * sal * sal);
-  }
-  ScalarT pressure_fixed(1.0);
+  ScalarT sal15(0.0);
+  if (std::abs(sal) > 0.0) { sal15 = std::sqrt(sal * sal * sal); }
+  auto const pressure_fixed = 1.0;
   // Tmelt is in Kelvin
-  ScalarT Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal -
-               0.000753 / 10000.0 * pressure_fixed + 273.15;
+  ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 -
+                        0.0002154996 * sal * sal -
+                        0.000753 / 10000.0 * pressure_fixed + 273.15;
 
   // Calculate temperature change
   auto dTemp = Tcurr - Told;
@@ -520,7 +525,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Return values
   ice_saturation_(cell, pt)   = icurr;
   water_saturation_(cell, pt) = wcurr;
-  bluff_salinity_(cell, pt) = sal;
+  bluff_salinity_(cell, pt)   = sal;
 
   //
   // Mechanical calculation

@@ -218,7 +218,7 @@ class MechanicsProblem : public AbstractProblem
   bool composite_;
 
   /// Problem parameter list
-  Teuchos::RCP<Teuchos::ParameterList> const params_; 
+  Teuchos::RCP<Teuchos::ParameterList> const params_;
 
   /// Type of mechanics variable (disp or acc)
   MECH_VAR_TYPE

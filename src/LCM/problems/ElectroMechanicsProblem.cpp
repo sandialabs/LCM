@@ -17,8 +17,8 @@ Albany::ElectroMechanicsProblem::ElectroMechanicsProblem(
     const Teuchos::RCP<ParamLib>&               param_lib,
     const int                                   num_dims,
     Teuchos::RCP<const Teuchos::Comm<int>>&     commT)
-    : Albany::AbstractProblem(params, param_lib), 
-      params_(params), 
+    : Albany::AbstractProblem(params, param_lib),
+      params_(params),
       num_dims_(num_dims)
 {
   std::string& method = params->get("Name", "ElectroMechanics ");
@@ -77,12 +77,14 @@ Albany::ElectroMechanicsProblem::buildProblem(
     if (meshSpecs[ps]->ssNames.size() > 0) haveSidesets = true;
   }
   constructDirichletEvaluators(*meshSpecs[0]);
-  
+
   // Check if have Neumann sublist; throw error if attempting to specify
-  // Neumann BCs, but there are no sidesets in the input mesh 
+  // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params_->isSublist("Neumann BCs");
   if (isNeumannPL && !haveSidesets) {
-    ALBANY_ASSERT(false, "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ASSERT(
+        false,
+        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
   if (haveSidesets) constructNeumannEvaluators(meshSpecs[0]);

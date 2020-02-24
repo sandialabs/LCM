@@ -1096,20 +1096,18 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           // set.
           if (!allowArrayNBC) {
             if (niv.size() != 1) {
-              ALBANY_ASSERT(
-                  false,
+              ALBANY_ABORT(
                   "NBC takes a scalar value.  You attempted to provide an "
                   "array!");
             }
           } else {
             if ((conditions[k] == "robin") || (conditions[k] == "radiate")) {
               if (niv.size() != 2) {
-                ALBANY_ASSERT(false, "Robin NBC takes a 2-array!");
+                ALBANY_ABORT("Robin NBC takes a 2-array!");
               }
             } else {
               if (niv.size() != meshSpecs->numDim) {
-                ALBANY_ASSERT(
-                    false, "Traction NBC takes an array of size numDim!");
+                ALBANY_ABORT("Traction NBC takes an array of size numDim!");
               }
             }
           }
@@ -1195,8 +1193,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           // Check that bcvals and timevals have the same size.  If they do not,
           // throw an error.
           if (timevals.size() != bcvals.getNumRows()) {
-            ALBANY_ASSERT(
-                false,
+            ALBANY_ABORT(
                 "'Time Values' array must have same length as 'BC Values' "
                 "array!");
           }
@@ -1207,23 +1204,20 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           // where this is not allowed.
           if (!allowArrayNBC) {
             if (bcvals.getNumCols() != 1) {
-              ALBANY_ASSERT(
-                  false,
+              ALBANY_ABORT(
                   "Time Dependent NBC takes 1D array for 'BC Values'.  You "
                   "attempted to provide a multi-D array!");
             }
           } else {
             if ((conditions[k] == "robin") || (conditions[k] == "radiate")) {
               if (bcvals.getNumCols() != 2) {
-                ALBANY_ASSERT(
-                    false,
+                ALBANY_ABORT(
                     "Time Dependent robin NBC takes a 2-array for 'BC Values' "
                     "at each time!");
               }
             } else {
               if (bcvals.getNumCols() != meshSpecs->numDim) {
-                ALBANY_ASSERT(
-                    false,
+                ALBANY_ABORT(
                     "Time Dependent traction NBC takes an array of size numDim "
                     "for 'BC Values' at each time!");
               }

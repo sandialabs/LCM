@@ -325,8 +325,7 @@ MechanicsProblem::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params_->isSublist("Neumann BCs");
   if (isNeumannPL && !haveSidesets) {
-    ALBANY_ASSERT(
-        false,
+    ALBANY_ABORT(
         "You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 

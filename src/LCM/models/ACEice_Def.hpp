@@ -408,7 +408,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Calculate the salinity of the grid cell
   //
   // If first time step:
-  auto sal = salinity_base_;  // should come from chemical part of model
+  ScalarT sal = salinity_base_;  // should come from chemical part of model
   if (salinity_.size() > 0) {
     sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
   }
@@ -421,13 +421,18 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (is_at_boundary == true) {
     auto const ocean_sal =
         interpolateVectors(time_, ocean_salinity_, current_time);
-    auto const dh2  = 0.1;   // this is the half the grid cell width
-    auto const area = 0.04;  // this is the grid cell area exposed to the ocean
-    auto const cell_volume = 0.008;  // this is the grid cell volume
-    auto const sal_grad    = (ocean_sal - sal_curr) / dh2;
-    auto const sal_update =
-        salt_enhanced_D_ * sal_grad * area * delta_time / cell_volume;
-    if (std::abs(sal_update) > std::abs(ocean_sal - sal_curr)) {
+    auto constexpr cell_half_width    = 0.1;
+    auto constexpr cell_exposed_area  = 0.04;
+    auto constexpr cell_volume        = 0.008;
+    auto constexpr per_exposed_length = cell_exposed_area / cell_volume;
+    auto const sal_diff               = ocean_sal - sal_curr;
+    auto const sal_grad               = sal_diff / cell_half_width;
+    auto const factor                 = per_exposed_length * salt_enhanced_D_;
+    // TODO: factor == 0, should be a factor here but leads to Sacado FPE (!!??)
+    auto const sal_update          = sal_grad * delta_time;
+    bool const is_update_large_pos = sal_diff > 0.0 && sal_update > sal_diff;
+    bool const is_update_large_neg = sal_diff < 0.0 && sal_update < sal_diff;
+    if (is_update_large_pos == true || is_update_large_neg == true) {
       sal = ocean_sal;
     } else {
       sal = sal_curr + sal_update;

@@ -449,15 +449,15 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (is_at_boundary == true) {
     auto const ocean_sal =
         interpolateVectors(time_, ocean_salinity_, current_time);
-    auto constexpr cell_half_width  = 0.1;
-    auto constexpr cell_exposed_area = 0.04;
-    auto constexpr cell_volume = 0.008;
+    auto constexpr cell_half_width    = 0.1;
+    auto constexpr cell_exposed_area  = 0.04;
+    auto constexpr cell_volume        = 0.008;
     auto constexpr per_exposed_length = cell_exposed_area / cell_volume;
-    auto const sal_diff = ocean_sal - sal_curr;
-    auto const sal_grad    = sal_diff / cell_half_width;
-    auto const factor = per_exposed_length * salt_enhanced_D_;
+    auto const sal_diff               = ocean_sal - sal_curr;
+    auto const sal_grad               = sal_diff / cell_half_width;
+    auto const factor                 = per_exposed_length * salt_enhanced_D_;
     // TODO: factor == 0, should be a factor here but leads to Sacado FPE (!!??)
-    auto const sal_update = sal_grad * delta_time;
+    auto const sal_update          = sal_grad * delta_time;
     bool const is_update_large_pos = sal_diff > 0.0 && sal_update > sal_diff;
     bool const is_update_large_neg = sal_diff < 0.0 && sal_update < sal_diff;
     if (is_update_large_pos == true || is_update_large_neg == true) {

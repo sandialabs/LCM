@@ -101,8 +101,7 @@ Albany::HeatProblem::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ASSERT(
-        false,
+    ALBANY_ABORT(
         "You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 

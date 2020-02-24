@@ -54,5 +54,6 @@ LCM:
       ACE Latent Heat: 334.0e+03 #[J/kg]
       ACE Time File: 'time.txt'
       ACE Sea Level File: 'level.txt'
+      ACE Ocean Salinity File: 'ocean_salinity.txt'
       ACE Element Size: 1.00
       ACE Critical Angle: 0.02

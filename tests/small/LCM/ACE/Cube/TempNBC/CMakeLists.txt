@@ -19,6 +19,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/level.txt
                ${CMAKE_CURRENT_BINARY_DIR}/level.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time.txt
                ${CMAKE_CURRENT_BINARY_DIR}/time.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/salinity.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/salinity.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ocean_salinity.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/ocean_salinity.txt COPYONLY)
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 add_test(ACE_Cube_${testName} ${SerialAlbany.exe} cube.yaml)

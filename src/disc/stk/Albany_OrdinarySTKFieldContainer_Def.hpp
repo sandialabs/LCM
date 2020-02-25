@@ -154,24 +154,22 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
   initializeSTKAdaptation();
 
-  bool has_cell_boundary_indicator =
+  bool const has_cell_boundary_indicator =
       (std::find(req.begin(), req.end(), "cell_boundary_indicator") !=
        req.end());
-  bool has_face_boundary_indicator =
+  bool const has_face_boundary_indicator =
       (std::find(req.begin(), req.end(), "face_boundary_indicator") !=
        req.end());
-  bool has_edge_boundary_indicator =
+  bool const has_edge_boundary_indicator =
       (std::find(req.begin(), req.end(), "edge_boundary_indicator") !=
        req.end());
-  bool has_node_boundary_indicator =
+  bool const has_node_boundary_indicator =
       (std::find(req.begin(), req.end(), "node_boundary_indicator") !=
        req.end());
   if (has_cell_boundary_indicator) {
-    // STK says that attributes are of type Field<double,anonymous>[ name:
-    // "extra_attribute_3" , #states: 1 ]
     this->cell_boundary_indicator =
         metaData_->template get_field<stk::mesh::FieldBase>(
-            stk::topology::ELEMENT_RANK, "extra_attribute_1");
+            stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
     if (this->cell_boundary_indicator != nullptr) {
       build_cell_boundary_indicator = true;
       stk::io::set_field_role(
@@ -179,11 +177,9 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     }
   }
   if (has_face_boundary_indicator) {
-    // STK says that attributes are of type Field<double,anonymous>[ name:
-    // "extra_attribute_3" , #states: 1 ]
     this->face_boundary_indicator =
         metaData_->template get_field<stk::mesh::FieldBase>(
-            stk::topology::FACE_RANK, "extra_attribute_2");
+            stk::topology::FACE_RANK, "face_boundary_indicator");
     if (this->face_boundary_indicator != nullptr) {
       build_face_boundary_indicator = true;
       stk::io::set_field_role(
@@ -191,11 +187,9 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     }
   }
   if (has_edge_boundary_indicator) {
-    // STK says that attributes are of type Field<double,anonymous>[ name:
-    // "extra_attribute_3" , #states: 1 ]
     this->edge_boundary_indicator =
         metaData_->template get_field<stk::mesh::FieldBase>(
-            stk::topology::EDGE_RANK, "extra_attribute_3");
+            stk::topology::EDGE_RANK, "edge_boundary_indicator");
     if (this->edge_boundary_indicator != nullptr) {
       build_edge_boundary_indicator = true;
       stk::io::set_field_role(
@@ -203,11 +197,9 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     }
   }
   if (has_node_boundary_indicator) {
-    // STK says that attributes are of type Field<double,anonymous>[ name:
-    // "extra_attribute_3" , #states: 1 ]
     this->node_boundary_indicator =
         metaData_->template get_field<stk::mesh::FieldBase>(
-            stk::topology::NODE_RANK, "extra_attribute_4");
+            stk::topology::NODE_RANK, "node_boundary_indicator");
     if (this->node_boundary_indicator != nullptr) {
       build_node_boundary_indicator = true;
       stk::io::set_field_role(
@@ -245,16 +237,39 @@ OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
 
     stk::mesh::put_field_on_mesh(
         *this->failure_state[rank], this->metaData->universal_part(), nullptr);
-
-    // Boundary indicator
-    this->cell_boundary_indicator =
-        &this->metaData->template declare_field<SFT>(
-            stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
-    stk::mesh::put_field_on_mesh(
-        *this->cell_boundary_indicator,
-        this->metaData->universal_part(),
-        nullptr);
   }
+
+  // Cell boundary indicator
+  this->cell_boundary_indicator = &this->metaData->template declare_field<SFT>(
+      stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
+  stk::mesh::put_field_on_mesh(
+      *this->cell_boundary_indicator,
+      this->metaData->universal_part(),
+      nullptr);
+
+  // Face boundary indicator
+  this->face_boundary_indicator = &this->metaData->template declare_field<SFT>(
+      stk::topology::FACE_RANK, "face_boundary_indicator");
+  stk::mesh::put_field_on_mesh(
+      *this->face_boundary_indicator,
+      this->metaData->universal_part(),
+      nullptr);
+
+  // Edge boundary indicator
+  this->edge_boundary_indicator = &this->metaData->template declare_field<SFT>(
+      stk::topology::EDGE_RANK, "edge_boundary_indicator");
+  stk::mesh::put_field_on_mesh(
+      *this->edge_boundary_indicator,
+      this->metaData->universal_part(),
+      nullptr);
+
+  // Node boundary indicator
+  this->node_boundary_indicator = &this->metaData->template declare_field<SFT>(
+      stk::topology::NODE_RANK, "node_boundary_indicator");
+  stk::mesh::put_field_on_mesh(
+      *this->node_boundary_indicator,
+      this->metaData->universal_part(),
+      nullptr);
 
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
   stk::io::set_field_role(*this->refine_field, Ioss::Field::MESH);

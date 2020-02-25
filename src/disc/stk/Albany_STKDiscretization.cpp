@@ -1785,6 +1785,87 @@ STKDiscretization::fillCompleteGraphs()
 }
 
 void
+STKDiscretization::computeWorksetInfoBoundaryIndicators()
+{
+  auto local_part = stk::mesh::Selector(metaData.universal_part()) &
+                    stk::mesh::Selector(metaData.locally_owned_part());
+
+  auto& field_container = *(stkMeshStruct->getFieldContainer());
+
+  auto const& cell_buckets =
+      bulkData.get_buckets(stk::topology::ELEM_RANK, local_part);
+  auto const num_cell_buckets = cell_buckets.size();
+  cell_boundary_indicator.resize(num_cell_buckets);
+  auto const has_cell = field_container.hasCellBoundaryIndicatorField();
+  if (has_cell == true) {
+    auto* cell_field = field_container.getCellBoundaryIndicator();
+    for (auto b = 0; b < num_cell_buckets; ++b) {
+      auto& cell_bucket = *cell_buckets[b];
+      cell_boundary_indicator[b].resize(cell_bucket.size());
+      for (auto i = 0; i < cell_bucket.size(); ++i) {
+        auto cell = cell_bucket[i];
+        cell_boundary_indicator[b][i] =
+            static_cast<double*>(stk::mesh::field_data(*cell_field, cell));
+      }
+    }
+  }
+
+  auto const& face_buckets =
+      bulkData.get_buckets(stk::topology::FACE_RANK, local_part);
+  auto const num_face_buckets = face_buckets.size();
+  auto const has_face         = field_container.hasFaceBoundaryIndicatorField();
+  face_boundary_indicator.resize(num_face_buckets);
+  if (has_face == true) {
+    auto* face_field = field_container.getFaceBoundaryIndicator();
+    for (auto b = 0; b < num_face_buckets; ++b) {
+      auto& face_bucket = *face_buckets[b];
+      face_boundary_indicator[b].resize(face_bucket.size());
+      for (auto i = 0; i < face_bucket.size(); ++i) {
+        auto face = face_bucket[i];
+        face_boundary_indicator[b][i] =
+            static_cast<double*>(stk::mesh::field_data(*face_field, face));
+      }
+    }
+  }
+
+  auto const& edge_buckets =
+      bulkData.get_buckets(stk::topology::EDGE_RANK, local_part);
+  auto const num_edge_buckets = edge_buckets.size();
+  auto const has_edge         = field_container.hasEdgeBoundaryIndicatorField();
+  edge_boundary_indicator.resize(num_edge_buckets);
+  if (has_edge == true) {
+    auto* edge_field = field_container.getEdgeBoundaryIndicator();
+    for (auto b = 0; b < num_edge_buckets; ++b) {
+      auto& edge_bucket = *edge_buckets[b];
+      edge_boundary_indicator[b].resize(edge_bucket.size());
+      for (auto i = 0; i < edge_bucket.size(); ++i) {
+        auto edge = edge_bucket[i];
+        edge_boundary_indicator[b][i] =
+            static_cast<double*>(stk::mesh::field_data(*edge_field, edge));
+      }
+    }
+  }
+
+  auto const& node_buckets =
+      bulkData.get_buckets(stk::topology::NODE_RANK, local_part);
+  auto const num_node_buckets = node_buckets.size();
+  auto const has_node         = field_container.hasNodeBoundaryIndicatorField();
+  node_boundary_indicator.resize(num_node_buckets);
+  if (has_node == true) {
+    auto* node_field = field_container.getNodeBoundaryIndicator();
+    for (auto b = 0; b < num_node_buckets; ++b) {
+      auto& node_bucket = *node_buckets[b];
+      node_boundary_indicator[b].resize(node_bucket.size());
+      for (auto i = 0; i < node_bucket.size(); ++i) {
+        auto node = node_bucket[i];
+        node_boundary_indicator[b][i] =
+            static_cast<double*>(stk::mesh::field_data(*node_field, node));
+      }
+    }
+  }
+}
+
+void
 STKDiscretization::computeWorksetInfo()
 {
   stk::mesh::Selector select_owned_in_part =
@@ -1794,7 +1875,7 @@ STKDiscretization::computeWorksetInfo()
   const stk::mesh::BucketVector& buckets =
       bulkData.get_buckets(stk::topology::ELEMENT_RANK, select_owned_in_part);
 
-  const int numBuckets = buckets.size();
+  auto const num_buckets = buckets.size();
 
   typedef AbstractSTKFieldContainer::ScalarFieldType ScalarFieldType;
   typedef AbstractSTKFieldContainer::VectorFieldType VectorFieldType;
@@ -1816,65 +1897,37 @@ STKDiscretization::computeWorksetInfo()
         stkMeshStruct->getFieldContainer()->getLatticeOrientationField();
   }
 
-  stk::mesh::FieldBase* cell_boundary_indicator_field{nullptr};
-  stk::mesh::FieldBase* face_boundary_indicator_field{nullptr};
-  stk::mesh::FieldBase* edge_boundary_indicator_field{nullptr};
-  stk::mesh::FieldBase* node_boundary_indicator_field{nullptr};
-  if (stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField()) {
-    cell_boundary_indicator_field =
-        stkMeshStruct->getFieldContainer()->getCellBoundaryIndicator();
-  }
-  if (stkMeshStruct->getFieldContainer()->hasFaceBoundaryIndicatorField()) {
-    face_boundary_indicator_field =
-        stkMeshStruct->getFieldContainer()->getFaceBoundaryIndicator();
-  }
-  if (stkMeshStruct->getFieldContainer()->hasEdgeBoundaryIndicatorField()) {
-    edge_boundary_indicator_field =
-        stkMeshStruct->getFieldContainer()->getEdgeBoundaryIndicator();
-  }
-  if (stkMeshStruct->getFieldContainer()->hasNodeBoundaryIndicatorField()) {
-    node_boundary_indicator_field =
-        stkMeshStruct->getFieldContainer()->getNodeBoundaryIndicator();
-  }
-
-  wsEBNames.resize(numBuckets);
-  for (int i = 0; i < numBuckets; i++) {
+  wsEBNames.resize(num_buckets);
+  for (int i = 0; i < num_buckets; i++) {
     stk::mesh::PartVector const& bpv = buckets[i]->supersets();
 
     for (std::size_t j = 0; j < bpv.size(); j++) {
       if (bpv[j]->primary_entity_rank() == stk::topology::ELEMENT_RANK &&
           !stk::mesh::is_auto_declared_part(*bpv[j])) {
-        // *out << "Bucket " << i << " is in Element Block:  " << bpv[j]->name()
-        //      << "  and has " << buckets[i]->size() << " elements." <<
-        //      std::endl;
         wsEBNames[i] = bpv[j]->name();
       }
     }
   }
 
-  wsPhysIndex.resize(numBuckets);
+  wsPhysIndex.resize(num_buckets);
   if (stkMeshStruct->allElementBlocksHaveSamePhysics) {
-    for (int i = 0; i < numBuckets; ++i) { wsPhysIndex[i] = 0; }
+    for (int i = 0; i < num_buckets; ++i) { wsPhysIndex[i] = 0; }
   } else {
-    for (int i = 0; i < numBuckets; ++i) {
+    for (int i = 0; i < num_buckets; ++i) {
       wsPhysIndex[i] =
           stkMeshStruct->getMeshSpecs()[0]->ebNameToIndex[wsEBNames[i]];
     }
   }
 
   // Fill  wsElNodeEqID(workset, el_LID, local node, Eq) => unk_LID
-  wsElNodeEqID.resize(numBuckets);
-  wsElNodeID.resize(numBuckets);
-  coords.resize(numBuckets);
-  sphereVolume.resize(numBuckets);
-  latticeOrientation.resize(numBuckets);
-  cell_boundary_indicator.resize(numBuckets);
-  face_boundary_indicator.resize(numBuckets);
-  edge_boundary_indicator.resize(numBuckets);
-  node_boundary_indicator.resize(numBuckets);
+  wsElNodeEqID.resize(num_buckets);
+  wsElNodeID.resize(num_buckets);
+  coords.resize(num_buckets);
+  sphereVolume.resize(num_buckets);
+  latticeOrientation.resize(num_buckets);
 
-  nodesOnElemStateVec.resize(numBuckets);
-  stateArrays.elemStateArrays.resize(numBuckets);
+  nodesOnElemStateVec.resize(num_buckets);
+  stateArrays.elemStateArrays.resize(num_buckets);
   const StateInfoStruct& nodal_states =
       stkMeshStruct->getFieldContainer()->getNodalSIS();
 
@@ -1888,14 +1941,14 @@ STKDiscretization::computeWorksetInfo()
   NodalDOFsStructContainer::MapOfDOFsStructs& mapOfDOFsStructs =
       nodalDOFsStructContainer.mapOfDOFsStructs;
   for (auto it = mapOfDOFsStructs.begin(); it != mapOfDOFsStructs.end(); ++it) {
-    it->second.wsElNodeEqID.resize(numBuckets);
-    it->second.wsElNodeEqID_rawVec.resize(numBuckets);
-    it->second.wsElNodeID.resize(numBuckets);
-    it->second.wsElNodeID_rawVec.resize(numBuckets);
+    it->second.wsElNodeEqID.resize(num_buckets);
+    it->second.wsElNodeEqID_rawVec.resize(num_buckets);
+    it->second.wsElNodeID.resize(num_buckets);
+    it->second.wsElNodeID_rawVec.resize(num_buckets);
   }
 
   auto ov_node_indexer = createGlobalLocalIndexer(m_overlap_node_vs);
-  for (int b = 0; b < numBuckets; b++) {
+  for (int b = 0; b < num_buckets; b++) {
     stk::mesh::Bucket& buck = *buckets[b];
     wsElNodeID[b].resize(buck.size());
     coords[b].resize(buck.size());
@@ -1992,9 +2045,6 @@ STKDiscretization::computeWorksetInfo()
     if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
       latticeOrientation[b].resize(buck.size());
     }
-    if (stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField()) {
-      cell_boundary_indicator[b].resize(buck.size());
-    }
 
     stk::mesh::Entity element           = buck[0];
     int               nodes_per_element = bulkData.num_nodes(element);
@@ -2060,10 +2110,6 @@ STKDiscretization::computeWorksetInfo()
         latticeOrientation[b][i] = static_cast<double*>(
             stk::mesh::field_data(*latticeOrientation_field, element));
       }
-      if (stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField()) {
-        cell_boundary_indicator[b][i] = static_cast<double*>(
-            stk::mesh::field_data(*cell_boundary_indicator_field, element));
-      }
 
       // loop over local nodes
       DOFsStruct& dofs_struct =
@@ -2085,28 +2131,12 @@ STKDiscretization::computeWorksetInfo()
         for (int eq = 0; eq < static_cast<int>(neq); ++eq)
           wsElNodeEqID[b](i, j, eq) = node_eq_array((int)i, j, eq);
       }
-      /*
-            for (int j=0; j < nodes_per_element; j++) {
-              const stk::mesh::Entity rowNode = node_rels[j];
-              const GO node_gid = gid(rowNode);
-              const LO node_lid = overlap_node_mapT->getLocalElement(node_gid);
-
-               "STK1D_Disc: node_lid out of range " << node_lid << std::endl);
-              coords[b][i][j] = stk::mesh::field_data(*coordinates_field,
-         rowNode);
-              wsElNodeID[b][i][j] = node_gid;
-
-              wsElNodeEqID[b][i][j].resize(neq);
-              for (std::size_t eq=0; eq < neq; eq++)
-                wsElNodeEqID[b][i][j][eq] = getOverlapDOF(node_lid,eq);
-            }
-      */
     }
   }
 
   for (int d = 0; d < stkMeshStruct->numDim; d++) {
     if (stkMeshStruct->PBCStruct.periodic[d]) {
-      for (int b = 0; b < numBuckets; b++) {
+      for (int b = 0; b < num_buckets; b++) {
         for (std::size_t i = 0; i < buckets[b]->size(); i++) {
           int  nodes_per_element = buckets[b]->num_nodes(i);
           bool anyXeqZero        = false;
@@ -2182,9 +2212,6 @@ STKDiscretization::computeWorksetInfo()
          ++css) {
       BucketArray<AbstractSTKFieldContainer::ScalarFieldType> array(
           **css, buck);
-      // Debug
-      // std::cout << "Buck.size(): " << buck.size() << " SFT dim[1]: " <<
-      // array.extent(1) << std::endl;
       MDArray ar                                     = array;
       stateArrays.elemStateArrays[b][(*css)->name()] = ar;
     }
@@ -2192,9 +2219,6 @@ STKDiscretization::computeWorksetInfo()
          ++cvs) {
       BucketArray<AbstractSTKFieldContainer::VectorFieldType> array(
           **cvs, buck);
-      // Debug
-      // std::cout << "Buck.size(): " << buck.size() << " VFT dim[2]: " <<
-      // array.extent(2) << std::endl;
       MDArray ar                                     = array;
       stateArrays.elemStateArrays[b][(*cvs)->name()] = ar;
     }
@@ -2202,9 +2226,6 @@ STKDiscretization::computeWorksetInfo()
          ++cts) {
       BucketArray<AbstractSTKFieldContainer::TensorFieldType> array(
           **cts, buck);
-      // Debug
-      // std::cout << "Buck.size(): " << buck.size() << " TFT dim[3]: " <<
-      // array.extent(3) << std::endl;
       MDArray ar                                     = array;
       stateArrays.elemStateArrays[b][(*cts)->name()] = ar;
     }
@@ -2212,9 +2233,6 @@ STKDiscretization::computeWorksetInfo()
          ++qpss) {
       BucketArray<AbstractSTKFieldContainer::QPScalarFieldType> array(
           **qpss, buck);
-      // Debug
-      // std::cout << "Buck.size(): " << buck.size() << " QPSFT dim[1]: " <<
-      // array.extent(1) << std::endl;
       MDArray ar                                      = array;
       stateArrays.elemStateArrays[b][(*qpss)->name()] = ar;
     }
@@ -2222,9 +2240,6 @@ STKDiscretization::computeWorksetInfo()
          ++qpvs) {
       BucketArray<AbstractSTKFieldContainer::QPVectorFieldType> array(
           **qpvs, buck);
-      // Debug
-      // std::cout << "Buck.size(): " << buck.size() << " QPVFT dim[2]: " <<
-      // array.extent(2) << std::endl;
       MDArray ar                                      = array;
       stateArrays.elemStateArrays[b][(*qpvs)->name()] = ar;
     }
@@ -2232,24 +2247,14 @@ STKDiscretization::computeWorksetInfo()
          ++qpts) {
       BucketArray<AbstractSTKFieldContainer::QPTensorFieldType> array(
           **qpts, buck);
-      // Debug
-      // std::cout << "Buck.size(): " << buck.size() << " QPTFT dim[3]: " <<
-      // array.extent(3) << std::endl;
       MDArray ar                                      = array;
       stateArrays.elemStateArrays[b][(*qpts)->name()] = ar;
     }
-    //    for (ScalarValueState::iterator svs = scalarValue_states.begin();
-    //              svs != scalarValue_states.end(); ++svs){
     for (size_t i = 0; i < scalarValue_states.size(); i++) {
       const int                                         size = 1;
       shards::Array<double, shards::NaturalOrder, Cell> array(
           &time[*scalarValue_states[i]], size);
-      MDArray ar = array;
-      // Debug
-      // std::cout << "Buck.size(): " << buck.size() << " SVState dim[0]: " <<
-      // array.extent(0) << std::endl;
-      // std::cout << "SV Name: " << *svs << " address : " << &array <<
-      // std::endl;
+      MDArray ar                                             = array;
       stateArrays.elemStateArrays[b][*scalarValue_states[i]] = ar;
     }
   }
@@ -2279,6 +2284,9 @@ STKDiscretization::computeWorksetInfo()
       }
     }
   }
+
+  // Set boundary indicator fields
+  computeWorksetInfoBoundaryIndicators();
 }
 
 void

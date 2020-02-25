@@ -606,10 +606,16 @@ class Topology
   initializeCellFailureState();
 
   ///
-  /// Setting boundary indicator
+  /// Setting boundary indicators
   ///
   void
   setCellBoundaryIndicator();
+  void
+  setFaceBoundaryIndicator();
+  void
+  setEdgeBoundaryIndicator();
+  void
+  setNodeBoundaryIndicator();
 
   ///
   ///
@@ -910,16 +916,28 @@ class Topology
   get_failure_state(stk::mesh::Entity e);
 
   //
-  // Set boundary indicator.
+  // Set boundary indicators.
   //
   void
   set_cell_boundary_indicator(stk::mesh::Entity e, BoundaryIndicator const bi);
+  void
+  set_edge_boundary_indicator(stk::mesh::Entity e, BoundaryIndicator const bi);
+  void
+  set_face_boundary_indicator(stk::mesh::Entity e, BoundaryIndicator const bi);
+  void
+  set_node_boundary_indicator(stk::mesh::Entity e, BoundaryIndicator const bi);
 
   //
-  // Get boundary indicator.
+  // Get boundary indicators.
   //
   BoundaryIndicator
   get_cell_boundary_indicator(stk::mesh::Entity e);
+  BoundaryIndicator
+  get_edge_boundary_indicator(stk::mesh::Entity e);
+  BoundaryIndicator
+  get_face_boundary_indicator(stk::mesh::Entity e);
+  BoundaryIndicator
+  get_node_boundary_indicator(stk::mesh::Entity e);
 
   bool
   is_internal(stk::mesh::Entity e);
@@ -954,6 +972,15 @@ class Topology
 
   bool
   is_boundary_cell(stk::mesh::Entity e);
+
+  bool
+  is_boundary_face(stk::mesh::Entity e);
+
+  bool
+  is_boundary_edge(stk::mesh::Entity e);
+
+  bool
+  is_boundary_node(stk::mesh::Entity e);
 
   bool
   is_failed_boundary_cell(stk::mesh::Entity e)

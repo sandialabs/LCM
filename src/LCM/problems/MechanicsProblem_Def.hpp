@@ -360,12 +360,27 @@ MechanicsProblem::constructEvaluators(
         &entity);
   }
 
-  // Have to register cell_boundary_indicator in the mesh before the
+  // Have to register boundary_indicators in the mesh before the
   // discretization is built
   auto find_cell_boundary_indicator = std::find(
       this->requirements.begin(),
       this->requirements.end(),
       "cell_boundary_indicator");
+
+  auto find_face_boundary_indicator = std::find(
+      this->requirements.begin(),
+      this->requirements.end(),
+      "face_boundary_indicator");
+
+  auto find_edge_boundary_indicator = std::find(
+      this->requirements.begin(),
+      this->requirements.end(),
+      "edge_boundary_indicator");
+
+  auto find_node_boundary_indicator = std::find(
+      this->requirements.begin(),
+      this->requirements.end(),
+      "node_boundary_indicator");
 
   if (find_cell_boundary_indicator != this->requirements.end()) {
     auto entity = StateStruct::ElemData;
@@ -373,6 +388,27 @@ MechanicsProblem::constructEvaluators(
     stateMgr.registerStateVariable(
         "cell_boundary_indicator",
         dl_->cell_scalar,
+        meshSpecs.ebName,
+        false,
+        &entity);
+  }
+  if (find_face_boundary_indicator != this->requirements.end()) {
+    auto entity = StateStruct::ElemData;
+
+    stateMgr.registerStateVariable(
+        "face_boundary_indicator",
+        dl_->face_scalar,
+        meshSpecs.ebName,
+        false,
+        &entity);
+  }
+  // TODO: Layout for edge does not exist yet
+  if (find_node_boundary_indicator != this->requirements.end()) {
+    auto entity = StateStruct::ElemData;
+
+    stateMgr.registerStateVariable(
+        "node_boundary_indicator",
+        dl_->node_scalar,
         meshSpecs.ebName,
         false,
         &entity);

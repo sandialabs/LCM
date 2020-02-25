@@ -176,8 +176,7 @@ Topology::initializeCellFailureState()
 }
 
 //
-// Set boundary indicator
-// For now meaningful for elements only
+// Set boundary indicators
 //
 void
 Topology::setCellBoundaryIndicator()
@@ -190,6 +189,48 @@ Topology::setCellBoundaryIndicator()
   for (auto cell : cells) {
     auto const bi = is_boundary_cell(cell) == true ? EXTERIOR : INTERIOR;
     set_cell_boundary_indicator(cell, bi);
+  }
+}
+
+void
+Topology::setFaceBoundaryIndicator()
+{
+  auto&                   bulk_data = get_bulk_data();
+  auto const              face_rank = stk::topology::FACE_RANK;
+  stk::mesh::EntityVector faces;
+  stk::mesh::get_entities(bulk_data, face_rank, faces);
+
+  for (auto face : faces) {
+    auto const bi = is_boundary_face(face) == true ? EXTERIOR : INTERIOR;
+    set_face_boundary_indicator(face, bi);
+  }
+}
+
+void
+Topology::setEdgeBoundaryIndicator()
+{
+  auto&                   bulk_data = get_bulk_data();
+  auto const              edge_rank = stk::topology::EDGE_RANK;
+  stk::mesh::EntityVector edges;
+  stk::mesh::get_entities(bulk_data, edge_rank, edges);
+
+  for (auto edge : edges) {
+    auto const bi = is_boundary_edge(edge) == true ? EXTERIOR : INTERIOR;
+    set_edge_boundary_indicator(edge, bi);
+  }
+}
+
+void
+Topology::setNodeBoundaryIndicator()
+{
+  auto&                   bulk_data = get_bulk_data();
+  auto const              node_rank = stk::topology::NODE_RANK;
+  stk::mesh::EntityVector nodes;
+  stk::mesh::get_entities(bulk_data, node_rank, nodes);
+
+  for (auto node : nodes) {
+    auto const bi = is_boundary_node(node) == true ? EXTERIOR : INTERIOR;
+    set_node_boundary_indicator(node, bi);
   }
 }
 
@@ -1737,7 +1778,7 @@ Topology::get_failure_state(stk::mesh::Entity e)
 }
 
 //
-// Set boundary indicator.
+// Set boundary indicators.
 //
 void
 Topology::set_cell_boundary_indicator(
@@ -1752,8 +1793,47 @@ Topology::set_cell_boundary_indicator(
   *cell_boundary_indicator = static_cast<double>(bi);
 }
 
+void
+Topology::set_face_boundary_indicator(
+    stk::mesh::Entity       e,
+    BoundaryIndicator const bi)
+{
+  auto& bulk_data               = get_bulk_data();
+  auto& boundary_field          = get_face_boundary_indicator_field();
+  auto* pbi                     = stk::mesh::field_data(boundary_field, e);
+  auto* face_boundary_indicator = static_cast<double*>(pbi);
+  ALBANY_ASSERT(face_boundary_indicator != nullptr);
+  *face_boundary_indicator = static_cast<double>(bi);
+}
+
+void
+Topology::set_edge_boundary_indicator(
+    stk::mesh::Entity       e,
+    BoundaryIndicator const bi)
+{
+  auto& bulk_data               = get_bulk_data();
+  auto& boundary_field          = get_edge_boundary_indicator_field();
+  auto* pbi                     = stk::mesh::field_data(boundary_field, e);
+  auto* edge_boundary_indicator = static_cast<double*>(pbi);
+  ALBANY_ASSERT(edge_boundary_indicator != nullptr);
+  *edge_boundary_indicator = static_cast<double>(bi);
+}
+
+void
+Topology::set_node_boundary_indicator(
+    stk::mesh::Entity       e,
+    BoundaryIndicator const bi)
+{
+  auto& bulk_data               = get_bulk_data();
+  auto& boundary_field          = get_node_boundary_indicator_field();
+  auto* pbi                     = stk::mesh::field_data(boundary_field, e);
+  auto* node_boundary_indicator = static_cast<double*>(pbi);
+  ALBANY_ASSERT(node_boundary_indicator != nullptr);
+  *node_boundary_indicator = static_cast<double>(bi);
+}
+
 //
-// Get boundary indicator.
+// Get boundary indicators.
 //
 BoundaryIndicator
 Topology::get_cell_boundary_indicator(stk::mesh::Entity e)
@@ -1764,6 +1844,39 @@ Topology::get_cell_boundary_indicator(stk::mesh::Entity e)
   auto* cell_boundary_indicator = static_cast<double*>(pbi);
   ALBANY_ASSERT(cell_boundary_indicator != nullptr);
   return static_cast<BoundaryIndicator>(*cell_boundary_indicator);
+}
+
+BoundaryIndicator
+Topology::get_face_boundary_indicator(stk::mesh::Entity e)
+{
+  auto& bulk_data               = get_bulk_data();
+  auto& boundary_field          = get_face_boundary_indicator_field();
+  auto* pbi                     = stk::mesh::field_data(boundary_field, e);
+  auto* face_boundary_indicator = static_cast<double*>(pbi);
+  ALBANY_ASSERT(face_boundary_indicator != nullptr);
+  return static_cast<BoundaryIndicator>(*face_boundary_indicator);
+}
+
+BoundaryIndicator
+Topology::get_edge_boundary_indicator(stk::mesh::Entity e)
+{
+  auto& bulk_data               = get_bulk_data();
+  auto& boundary_field          = get_edge_boundary_indicator_field();
+  auto* pbi                     = stk::mesh::field_data(boundary_field, e);
+  auto* edge_boundary_indicator = static_cast<double*>(pbi);
+  ALBANY_ASSERT(edge_boundary_indicator != nullptr);
+  return static_cast<BoundaryIndicator>(*edge_boundary_indicator);
+}
+
+BoundaryIndicator
+Topology::get_node_boundary_indicator(stk::mesh::Entity e)
+{
+  auto& bulk_data               = get_bulk_data();
+  auto& boundary_field          = get_node_boundary_indicator_field();
+  auto* pbi                     = stk::mesh::field_data(boundary_field, e);
+  auto* node_boundary_indicator = static_cast<double*>(pbi);
+  ALBANY_ASSERT(node_boundary_indicator != nullptr);
+  return static_cast<BoundaryIndicator>(*node_boundary_indicator);
 }
 
 bool
@@ -1781,6 +1894,47 @@ Topology::is_boundary_cell(stk::mesh::Entity e)
   stk::mesh::EntityRank const face_rank = get_boundary_rank();
   auto&                       bulk_data = get_bulk_data();
   assert(bulk_data.entity_rank(e) == cell_rank);
+  stk::mesh::Entity const* relations = bulk_data.begin(e, face_rank);
+  size_t const num_relations         = bulk_data.num_connectivity(e, face_rank);
+  for (size_t i = 0; i < num_relations; ++i) {
+    stk::mesh::Entity face_entity = relations[i];
+    if (is_at_boundary(face_entity) == true) return true;
+  }
+  return false;
+}
+
+bool
+Topology::is_boundary_face(stk::mesh::Entity e)
+{
+  stk::mesh::EntityRank const face_rank = stk::topology::FACE_RANK;
+  auto&                       bulk_data = get_bulk_data();
+  assert(bulk_data.entity_rank(e) == face_rank);
+  return is_at_boundary(e);
+}
+
+bool
+Topology::is_boundary_edge(stk::mesh::Entity e)
+{
+  stk::mesh::EntityRank const edge_rank = stk::topology::EDGE_RANK;
+  stk::mesh::EntityRank const face_rank = get_boundary_rank();
+  auto&                       bulk_data = get_bulk_data();
+  assert(bulk_data.entity_rank(e) == edge_rank);
+  stk::mesh::Entity const* relations = bulk_data.begin(e, face_rank);
+  size_t const num_relations         = bulk_data.num_connectivity(e, face_rank);
+  for (size_t i = 0; i < num_relations; ++i) {
+    stk::mesh::Entity face_entity = relations[i];
+    if (is_at_boundary(face_entity) == true) return true;
+  }
+  return false;
+}
+
+bool
+Topology::is_boundary_node(stk::mesh::Entity e)
+{
+  stk::mesh::EntityRank const node_rank = stk::topology::NODE_RANK;
+  stk::mesh::EntityRank const face_rank = get_boundary_rank();
+  auto&                       bulk_data = get_bulk_data();
+  assert(bulk_data.entity_rank(e) == node_rank);
   stk::mesh::Entity const* relations = bulk_data.begin(e, face_rank);
   size_t const num_relations         = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {

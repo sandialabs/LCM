@@ -277,28 +277,24 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
   getCellBoundaryIndicator() const
   {
-    ALBANY_ASSERT(cell_boundary_indicator.is_null() == false);
     return cell_boundary_indicator;
   }
 
   WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
   getFaceBoundaryIndicator() const
   {
-    ALBANY_ASSERT(face_boundary_indicator.is_null() == false);
     return face_boundary_indicator;
   }
 
   WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
   getEdgeBoundaryIndicator() const
   {
-    ALBANY_ASSERT(edge_boundary_indicator.is_null() == false);
     return edge_boundary_indicator;
   }
 
   WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
   getNodeBoundaryIndicator() const
   {
-    ALBANY_ASSERT(node_boundary_indicator.is_null() == false);
     return node_boundary_indicator;
   }
 
@@ -765,8 +761,12 @@ class STKDiscretization : public AbstractDiscretization
 
   void
   computeGraphsUpToFillComplete();
+
   void
   fillCompleteGraphs();
+
+  void
+  computeWorksetInfoBoundaryIndicators();
 };
 
 }  // namespace Albany

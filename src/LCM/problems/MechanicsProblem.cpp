@@ -291,6 +291,9 @@ MechanicsProblem::MechanicsProblem(
   }
   if (have_erosion == true) {
     requirements.push_back("cell_boundary_indicator");
+    requirements.push_back("face_boundary_indicator");
+    // TODO: Layout for edge does not exist yet
+    requirements.push_back("node_boundary_indicator");
   }
 }  // MechanicsProblem
 

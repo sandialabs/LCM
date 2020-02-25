@@ -7,7 +7,6 @@ LCM:
     Write Solution to MatrixMarket: false
     Write Solution to Standard Output: false
   Problem:
-    #Phalanx Graph Visualization Detail: 2
     Name: Mechanics 3D
     Parameters:
       Number: 1
@@ -31,11 +30,6 @@ LCM:
     Initial Condition:
       Function: Constant
       Function Data: [0.0, 0.0, 0.0, 250.0]
-    Adaptation:
-      Equilibrate: false
-      Method: Erosion
-      Bluff Width: 2.0
-      Cross Section: 2.0
     Response Functions:
       Number: 2
       Response 0: Solution Average
@@ -65,12 +59,6 @@ LCM:
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 1
     Exodus Write Interval: 1
-    Required Fields Info:
-      Number Of Fields: 1
-      Field 0:
-        Field Name: cell_boundary_indicator
-        Field Type: Elem Scalar
-        Field Origin: Mesh
   Regression Results: 
     Number of Comparisons: 2
     Test Values: [-4.156250000065e+03, 0.0]

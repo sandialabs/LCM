@@ -852,24 +852,40 @@ Application::loadWorksetBucketInfo(
   auto const& edge_boundary_indicator = disc->getEdgeBoundaryIndicator();
   auto const& node_boundary_indicator = disc->getNodeBoundaryIndicator();
 
-  workset.numCells                = wsElNodeEqID[ws].extent(0);
-  workset.wsElNodeEqID            = wsElNodeEqID[ws];
-  workset.wsElNodeID              = wsElNodeID[ws];
-  workset.wsCoords                = coords[ws];
-  workset.wsSphereVolume          = sphereVolume[ws];
-  workset.wsLatticeOrientation    = latticeOrientation[ws];
-  workset.cell_boundary_indicator = cell_boundary_indicator[ws];
-  workset.face_boundary_indicator = face_boundary_indicator[ws];
-  workset.edge_boundary_indicator = edge_boundary_indicator[ws];
-  workset.node_boundary_indicator = node_boundary_indicator[ws];
-  workset.EBName                  = wsEBNames[ws];
-  workset.wsIndex                 = ws;
+  auto const has_cell = cell_boundary_indicator != Teuchos::null &&
+                        ws < cell_boundary_indicator.size();
+  auto const has_face = face_boundary_indicator != Teuchos::null &&
+                        ws < face_boundary_indicator.size();
+  auto const has_edge = edge_boundary_indicator != Teuchos::null &&
+                        ws < edge_boundary_indicator.size();
+  auto const has_node = node_boundary_indicator != Teuchos::null &&
+                        ws < node_boundary_indicator.size();
+
+  if (has_cell == true) {
+    workset.cell_boundary_indicator = cell_boundary_indicator[ws];
+  }
+  if (has_face == true) {
+    workset.face_boundary_indicator = face_boundary_indicator[ws];
+  }
+  if (has_edge == true) {
+    workset.edge_boundary_indicator = edge_boundary_indicator[ws];
+  }
+  if (has_node == true) {
+    workset.node_boundary_indicator = node_boundary_indicator[ws];
+  }
+
+  workset.numCells             = wsElNodeEqID[ws].extent(0);
+  workset.wsElNodeEqID         = wsElNodeEqID[ws];
+  workset.wsElNodeID           = wsElNodeID[ws];
+  workset.wsCoords             = coords[ws];
+  workset.wsSphereVolume       = sphereVolume[ws];
+  workset.wsLatticeOrientation = latticeOrientation[ws];
+  workset.EBName               = wsEBNames[ws];
+  workset.wsIndex              = ws;
 
   workset.local_Vp.resize(workset.numCells);
 
   workset.savedMDFields = phxSetup->get_saved_fields(evalName);
-
-  //  workset.print(*out);
 
   // Sidesets are integrated within the Cells
   loadWorksetSidesetInfo(workset, ws);

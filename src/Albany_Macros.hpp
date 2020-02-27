@@ -58,8 +58,8 @@
     std::ostringstream omsg;                                          \
     omsg << "********** ALBANY_TRACE at ";                            \
     omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
-    std::cerr << "********** ALBANY_TRACE at ";                       \
-    std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
+    std::cout << "********** ALBANY_TRACE at ";                       \
+    std::cout << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
   } while (0)
 
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")

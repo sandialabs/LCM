@@ -1983,8 +1983,7 @@ GenericSTKMeshStruct::checkFieldIsInMesh(
       if (isFieldInMesh) break;
     }
     if (isFieldInMesh) {
-      ALBANY_PANIC(
-          missing,
+      ALBANY_ABORT(
           "Error! The field '"
               << fname
               << "' in the mesh has different rank or dimensions than the ones "
@@ -1995,8 +1994,7 @@ GenericSTKMeshStruct::checkFieldIsInMesh(
               << ", dimension of field in mesh: "
               << (*f)->field_array_rank() + 1 << "\n");
     } else
-      ALBANY_PANIC(
-          missing,
+      ALBANY_ABORT(
           "Error! The field '"
               << fname << "' was not found in the mesh.\n"
               << "  Probably it was not registered it in the state manager "

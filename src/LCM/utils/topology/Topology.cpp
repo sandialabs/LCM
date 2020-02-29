@@ -1890,6 +1890,12 @@ Topology::is_internal(stk::mesh::Entity e)
 }
 
 bool
+Topology::is_external(stk::mesh::Entity e)
+{
+  return is_internal(e) == false;
+}
+
+bool
 Topology::is_boundary_cell(stk::mesh::Entity e)
 {
   stk::mesh::EntityRank const cell_rank = stk::topology::ELEMENT_RANK;
@@ -1911,7 +1917,7 @@ Topology::is_boundary_face(stk::mesh::Entity e)
   stk::mesh::EntityRank const face_rank = stk::topology::FACE_RANK;
   auto&                       bulk_data = get_bulk_data();
   assert(bulk_data.entity_rank(e) == face_rank);
-  return is_at_boundary(e);
+  return is_external(e);
 }
 
 bool
@@ -1925,7 +1931,7 @@ Topology::is_boundary_edge(stk::mesh::Entity e)
   size_t const num_relations         = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
-    if (is_at_boundary(face_entity) == true) return true;
+    if (is_external(face_entity) == true) return true;
   }
   return false;
 }
@@ -1941,7 +1947,7 @@ Topology::is_boundary_node(stk::mesh::Entity e)
   size_t const num_relations         = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
-    if (is_at_boundary(face_entity) == true) return true;
+    if (is_external(face_entity) == true) return true;
   }
   return false;
 }

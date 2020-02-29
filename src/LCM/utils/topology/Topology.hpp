@@ -943,6 +943,9 @@ class Topology
   is_internal(stk::mesh::Entity e);
 
   bool
+  is_external(stk::mesh::Entity e);
+
+  bool
   is_erodible(stk::mesh::Entity e);
 
   bool

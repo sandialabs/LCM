@@ -26,6 +26,7 @@ namespace Albany {
 using NodeSetList      = std::map<std::string, std::vector<std::vector<int>>>;
 using NodeSetGIDsList  = std::map<std::string, std::vector<GO>>;
 using NodeSetCoordList = std::map<std::string, std::vector<double*>>;
+using NodeGID2LIDMap   = std::map<GO, LO>;
 
 class SideStruct
 {

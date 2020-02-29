@@ -1846,19 +1846,30 @@ STKDiscretization::computeWorksetInfoBoundaryIndicators()
     }
   }
 
+  // Place all node boundary indicators in a single workset and ignore
+  // the distribution in buckets, which is an obstacle for this purpose.
   auto const& node_buckets =
       bulkData.get_buckets(stk::topology::NODE_RANK, local_part);
   auto const num_node_buckets = node_buckets.size();
   auto const has_node         = field_container.hasNodeBoundaryIndicatorField();
-  node_boundary_indicator.resize(num_node_buckets);
+  auto       num_nodes        = 0;
+  for (auto b = 0; b < num_node_buckets; ++b) {
+    auto const& node_bucket = *node_buckets[b];
+    num_nodes += node_bucket.size();
+  }
+  // Only one workset for this
+  node_boundary_indicator.resize(1);
+  node_boundary_indicator[0].resize(num_nodes);
   if (has_node == true) {
     auto* node_field = field_container.getNodeBoundaryIndicator();
     for (auto b = 0; b < num_node_buckets; ++b) {
       auto& node_bucket = *node_buckets[b];
-      node_boundary_indicator[b].resize(node_bucket.size());
       for (auto i = 0; i < node_bucket.size(); ++i) {
-        auto node = node_bucket[i];
-        node_boundary_indicator[b][i] =
+        auto const node     = node_bucket[i];
+        auto const num_node = node.m_value - 1;
+        auto const gid      = bulkData.identifier(node);
+        node_GID_2_LID_map.insert(std::make_pair(gid, num_node));
+        node_boundary_indicator[0][num_node] =
             static_cast<double*>(stk::mesh::field_data(*node_field, node));
       }
     }

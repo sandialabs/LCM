@@ -375,6 +375,7 @@ Topology::graphInitialization()
   createAllLevelsRelations();
   initializeCellFailureState();
   setCellBoundaryIndicator();
+  setNodeBoundaryIndicator();
   Albany::fix_node_sharing(bulk_data);
   get_stk_discretization().updateMesh();
   initializeTopologies();
@@ -1325,6 +1326,7 @@ Topology::erodeFailedElements()
   initializeCellFailureState();
   createBoundary();
   setCellBoundaryIndicator();
+  setNodeBoundaryIndicator();
 
   return eroded_volume;
 }
@@ -2020,6 +2022,7 @@ Topology::erodeElements()
   initializeCellFailureState();
   createBoundary();
   setCellBoundaryIndicator();
+  setNodeBoundaryIndicator();
   return eroded_volume;
 }
 

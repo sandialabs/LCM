@@ -83,6 +83,8 @@ class AbstractDiscretization
   getNodeSetGIDs() const = 0;
   virtual const NodeSetCoordList&
   getNodeSetCoords() const = 0;
+  virtual const NodeGID2LIDMap&
+  getNodeGID2LIDMap() const = 0;
 
   //! Get Side set lists
   virtual const SideSetList&
@@ -140,30 +142,29 @@ class AbstractDiscretization
   virtual const WorksetArray<Teuchos::ArrayRCP<double*>>::type&
   getLatticeOrientation() const = 0;
 
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type dummy;
   virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getCellBoundaryIndicator() const
-  {
-    return dummy;
-  }
+  getCellBoundaryIndicator() const = 0;
 
   virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getFaceBoundaryIndicator() const
-  {
-    return dummy;
-  }
+  getFaceBoundaryIndicator() const = 0;
 
   virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getEdgeBoundaryIndicator() const
-  {
-    return dummy;
-  }
+  getEdgeBoundaryIndicator() const = 0;
 
   virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getNodeBoundaryIndicator() const
-  {
-    return dummy;
-  }
+  getNodeBoundaryIndicator() const = 0;
+
+  virtual bool
+  hasCellBoundaryIndicator() const = 0;
+
+  virtual bool
+  hasFaceBoundaryIndicator() const = 0;
+
+  virtual bool
+  hasEdgeBoundaryIndicator() const = 0;
+
+  virtual bool
+  hasNodeBoundaryIndicator() const = 0;
 
   virtual void
   printElemGIDws() const

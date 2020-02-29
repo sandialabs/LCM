@@ -980,6 +980,7 @@ Application::set_dfm_workset(
   workset.distParamLib       = distParamLib;
   workset.disc               = disc;
   workset.spatial_dimension_ = getSpatialDimension();
+  workset.numEqs             = neq;
 
   return workset;
 }
@@ -2320,6 +2321,7 @@ Application::loadWorksetNodesetInfo(PHAL::Workset& workset)
 {
   workset.nodeSets      = Teuchos::rcpFromRef(disc->getNodeSets());
   workset.nodeSetCoords = Teuchos::rcpFromRef(disc->getNodeSetCoords());
+  workset.nodeSetGIDs   = Teuchos::rcpFromRef(disc->getNodeSetGIDs());
 }
 
 void

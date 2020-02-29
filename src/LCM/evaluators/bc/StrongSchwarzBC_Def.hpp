@@ -36,25 +36,15 @@ StrongSchwarzBC_Base<EvalT, Traits>::StrongSchwarzBC_Base(
 
   app_->setCoupledAppBlockNodeset(
       coupled_app_name_, coupled_block_name_, nodeset_name);
-
-  std::string const& this_app_name = app_->getAppName();
-
-  auto const& app_name_index_map = *(app_->getAppNameIndexMap());
-
-  auto it = app_name_index_map.find(this_app_name);
-
+  std::string const& this_app_name      = app_->getAppName();
+  auto const&        app_name_index_map = *(app_->getAppNameIndexMap());
+  auto               it = app_name_index_map.find(this_app_name);
   ALBANY_EXPECT(it != app_name_index_map.end());
-
   auto const this_app_index = it->second;
-
   setThisAppIndex(this_app_index);
-
   it = app_name_index_map.find(coupled_app_name_);
-
   ALBANY_EXPECT(it != app_name_index_map.end());
-
   auto const coupled_app_index = it->second;
-
   setCoupledAppIndex(coupled_app_index);
 }
 
@@ -556,11 +546,11 @@ StrongSchwarzBC_Base<EvalT, Traits>::doDTKInterpolation(
 //
 template <typename StrongSchwarzBC, typename Traits>
 void
-fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
+fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<const Thyra_Vector> const_disp = dirichlet_workset.x;
-  Teuchos::RCP<const Thyra_Vector> const_velo = dirichlet_workset.xdot;
-  Teuchos::RCP<const Thyra_Vector> const_acce = dirichlet_workset.xdotdot;
+  Teuchos::RCP<const Thyra_Vector> const_disp = dbc_workset.x;
+  Teuchos::RCP<const Thyra_Vector> const_velo = dbc_workset.xdot;
+  Teuchos::RCP<const Thyra_Vector> const_acce = dbc_workset.xdotdot;
 
   bool const has_disp = const_disp != Teuchos::null;
 
@@ -598,7 +588,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
       has_acce == true ? Albany::getNonconstLocalData(acce) : Teuchos::null;
 
   std::vector<std::vector<int>> const& ns_nodes =
-      dirichlet_workset.nodeSets->find(sbc.nodeSetID)->second;
+      dbc_workset.nodeSets->find(sbc.nodeSetID)->second;
 
   auto const ns_number_nodes = ns_nodes.size();
 
@@ -662,7 +652,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
 
     auto const dof = x_dof / 3;
 
-    std::set<int> const& fixed_dofs = dirichlet_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       disp_view[x_dof] = bcs_disp_const_view_x[dof];
@@ -692,7 +682,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
 
     auto const z_dof = ns_nodes[ns_node][2];
 
-    std::set<int> const& fixed_dofs = dirichlet_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       disp_view[x_dof] = x_val;
@@ -714,14 +704,14 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
 //
 template <typename StrongSchwarzBC, typename Traits>
 void
-fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
+fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 {
   // Residual
-  Teuchos::RCP<Thyra_Vector> f      = dirichlet_workset.f;
+  Teuchos::RCP<Thyra_Vector> f      = dbc_workset.f;
   Teuchos::ArrayRCP<ST>      f_view = Albany::getNonconstLocalData(f);
 
   std::vector<std::vector<int>> const& ns_nodes =
-      dirichlet_workset.nodeSets->find(sbc.nodeSetID)->second;
+      dbc_workset.nodeSets->find(sbc.nodeSetID)->second;
 
   auto const ns_number_nodes = ns_nodes.size();
 
@@ -732,7 +722,7 @@ fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
 
     auto const z_dof = ns_nodes[ns_node][2];
 
-    std::set<int> const& fixed_dofs = dirichlet_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) { f_view[x_dof] = 0.0; }
     if (fixed_dofs.find(y_dof) == fixed_dofs.end()) { f_view[y_dof] = 0.0; }
@@ -757,10 +747,10 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::StrongSchwarzBC(
 template <typename Traits>
 void
 StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
-    typename Traits::EvalData dirichlet_workset)
+    typename Traits::EvalData dbc_workset)
 {
   fillSolution<StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>, Traits>(
-      *this, dirichlet_workset);
+      *this, dbc_workset);
   return;
 }
 
@@ -770,10 +760,10 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
 template <typename Traits>
 void
 StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData dirichlet_workset)
+    typename Traits::EvalData dbc_workset)
 {
   fillResidual<StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>, Traits>(
-      *this, dirichlet_workset);
+      *this, dbc_workset);
   return;
 }
 
@@ -793,18 +783,18 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::StrongSchwarzBC(
 template <typename Traits>
 void
 StrongSchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData dirichlet_workset)
+    typename Traits::EvalData dbc_workset)
 {
-  dirichlet_workset.is_schwarz_bc_     = true;
-  dirichlet_workset.spatial_dimension_ = this->app_->getSpatialDimension();
+  dbc_workset.is_schwarz_bc_     = true;
+  dbc_workset.spatial_dimension_ = this->app_->getSpatialDimension();
   PHAL::SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-      dirichlet_workset);
+      dbc_workset);
 
-  if (dirichlet_workset.f != Teuchos::null) {
+  if (dbc_workset.f != Teuchos::null) {
     fillResidual<StrongSchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>, Traits>(
-        *this, dirichlet_workset);
+        *this, dbc_workset);
   }
-  dirichlet_workset.is_schwarz_bc_ = false;
+  dbc_workset.is_schwarz_bc_ = false;
   return;
 }
 
@@ -823,7 +813,7 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::StrongSchwarzBC(
 //
 template <typename Traits>
 void StrongSchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
-    typename Traits::EvalData /* dirichlet_workset */)
+    typename Traits::EvalData /* dbc_workset */)
 {
   return;
 }
@@ -845,7 +835,7 @@ StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::StrongSchwarzBC(
 template <typename Traits>
 void
     StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
-        typename Traits::EvalData /* dirichlet_workset */)
+        typename Traits::EvalData /* dbc_workset */)
 {
   return;
 }

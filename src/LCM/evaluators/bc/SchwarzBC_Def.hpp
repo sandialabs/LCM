@@ -476,20 +476,20 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
 //
 template <typename SchwarzBC, typename Traits>
 void
-fillResidual(SchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
+fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 {
   // Solution
-  Teuchos::RCP<const Thyra_Vector> x = dirichlet_workset.x;
+  Teuchos::RCP<const Thyra_Vector> x = dbc_workset.x;
 
   Teuchos::ArrayRCP<ST const> x_const_view = Albany::getLocalData(x);
 
   // Residual
-  Teuchos::RCP<Thyra_Vector> f = dirichlet_workset.f;
+  Teuchos::RCP<Thyra_Vector> f = dbc_workset.f;
 
   Teuchos::ArrayRCP<ST> f_view = Albany::getNonconstLocalData(f);
 
   std::vector<std::vector<int>> const& ns_dof =
-      dirichlet_workset.nodeSets->find(sbc.nodeSetID)->second;
+      dbc_workset.nodeSets->find(sbc.nodeSetID)->second;
 
   auto const ns_number_nodes = ns_dof.size();
 
@@ -520,7 +520,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
 
     auto const dof = x_dof / 3;
 
-    std::set<int> const& fixed_dofs = dirichlet_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       f_view[x_dof] = x_const_view[x_dof] - schwarz_bcs_const_view_x[dof];
@@ -544,7 +544,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData dirichlet_workset)
 
     auto const z_dof = ns_dof[ns_node][2];
 
-    std::set<int> const& fixed_dofs = dirichlet_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       f_view[x_dof] = x_const_view[x_dof] - x_val;
@@ -577,10 +577,10 @@ SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::SchwarzBC(
 template <typename Traits>
 void
 SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData dirichlet_workset)
+    typename Traits::EvalData dbc_workset)
 {
   fillResidual<SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>, Traits>(
-      *this, dirichlet_workset);
+      *this, dbc_workset);
   return;
 }
 
@@ -600,19 +600,19 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::SchwarzBC(
 template <typename Traits>
 void
 SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData dirichlet_workset)
+    typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<const Thyra_Vector> x   = dirichlet_workset.x;
-  Teuchos::RCP<Thyra_Vector>       f   = dirichlet_workset.f;
-  Teuchos::RCP<Thyra_LinearOp>     jac = dirichlet_workset.Jac;
+  Teuchos::RCP<const Thyra_Vector> x   = dbc_workset.x;
+  Teuchos::RCP<Thyra_Vector>       f   = dbc_workset.f;
+  Teuchos::RCP<Thyra_LinearOp>     jac = dbc_workset.Jac;
 
   Teuchos::ArrayRCP<ST const> x_const_view = Albany::getLocalData(x);
   Teuchos::ArrayRCP<ST>       f_view;
 
-  RealType const j_coeff = dirichlet_workset.j_coeff;
+  RealType const j_coeff = dbc_workset.j_coeff;
 
   std::vector<std::vector<int>> const& ns_nodes =
-      dirichlet_workset.nodeSets->find(this->nodeSetID)->second;
+      dbc_workset.nodeSets->find(this->nodeSetID)->second;
 
   Teuchos::Array<LO> index(1);
   Teuchos::Array<ST> value(1);
@@ -631,7 +631,7 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     auto const y_dof = ns_nodes[ns_node][1];
     auto const z_dof = ns_nodes[ns_node][2];
 
-    std::set<int> const& fixed_dofs = dirichlet_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       // replace jac values for the X dof
@@ -663,7 +663,7 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 
   if (fill_residual == true) {
     fillResidual<SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>, Traits>(
-        *this, dirichlet_workset);
+        *this, dbc_workset);
   }
   return;
 }
@@ -684,18 +684,18 @@ SchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::SchwarzBC(
 template <typename Traits>
 void
 SchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
-    typename Traits::EvalData dirichlet_workset)
+    typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<const Thyra_Vector>      x  = dirichlet_workset.x;
-  Teuchos::RCP<const Thyra_MultiVector> Vx = dirichlet_workset.Vx;
-  Teuchos::RCP<Thyra_Vector>            f  = dirichlet_workset.f;
-  Teuchos::RCP<Thyra_MultiVector>       fp = dirichlet_workset.fp;
-  Teuchos::RCP<Thyra_MultiVector>       JV = dirichlet_workset.JV;
+  Teuchos::RCP<const Thyra_Vector>      x  = dbc_workset.x;
+  Teuchos::RCP<const Thyra_MultiVector> Vx = dbc_workset.Vx;
+  Teuchos::RCP<Thyra_Vector>            f  = dbc_workset.f;
+  Teuchos::RCP<Thyra_MultiVector>       fp = dbc_workset.fp;
+  Teuchos::RCP<Thyra_MultiVector>       JV = dbc_workset.JV;
 
-  RealType const j_coeff = dirichlet_workset.j_coeff;
+  RealType const j_coeff = dbc_workset.j_coeff;
 
   std::vector<std::vector<int>> const& ns_nodes =
-      dirichlet_workset.nodeSets->find(this->nodeSetID)->second;
+      dbc_workset.nodeSets->find(this->nodeSetID)->second;
 
   Teuchos::ArrayRCP<ST const> x_const_view = Albany::getLocalData(x);
   Teuchos::ArrayRCP<ST>       f_view;
@@ -719,7 +719,7 @@ SchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     auto const z_dof = ns_nodes[ns_node][2];
 
     if (JV != Teuchos::null) {
-      for (auto i = 0; i < dirichlet_workset.num_cols_x; ++i) {
+      for (auto i = 0; i < dbc_workset.num_cols_x; ++i) {
         JV_view[i][x_dof] = j_coeff * Vx_const_view[i][x_dof];
         JV_view[i][y_dof] = j_coeff * Vx_const_view[i][y_dof];
         JV_view[i][z_dof] = j_coeff * Vx_const_view[i][z_dof];
@@ -782,10 +782,10 @@ SchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
         f_view[z_dof] = x_const_view[z_dof] - z_val.val();
       }
       if (fp != Teuchos::null) {
-        for (auto i = 0; i < dirichlet_workset.num_cols_p; ++i) {
-          fp_view[i][x_dof] = -x_val.dx(dirichlet_workset.param_offset + i);
-          fp_view[i][y_dof] = -y_val.dx(dirichlet_workset.param_offset + i);
-          fp_view[i][z_dof] = -z_val.dx(dirichlet_workset.param_offset + i);
+        for (auto i = 0; i < dbc_workset.num_cols_p; ++i) {
+          fp_view[i][x_dof] = -x_val.dx(dbc_workset.param_offset + i);
+          fp_view[i][y_dof] = -y_val.dx(dbc_workset.param_offset + i);
+          fp_view[i][z_dof] = -z_val.dx(dbc_workset.param_offset + i);
         }
       }
     }
@@ -810,11 +810,11 @@ SchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::SchwarzBC(
 template <typename Traits>
 void
 SchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
-    typename Traits::EvalData dirichlet_workset)
+    typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<Thyra_MultiVector> fpV = dirichlet_workset.fpV;
+  Teuchos::RCP<Thyra_MultiVector> fpV = dbc_workset.fpV;
 
-  bool const trans = dirichlet_workset.transpose_dist_param_deriv;
+  bool const trans = dbc_workset.transpose_dist_param_deriv;
 
   auto const num_cols = fpV->domain()->dim();
 
@@ -825,11 +825,11 @@ SchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
   //
 
   std::vector<std::vector<int>> const& ns_nodes =
-      dirichlet_workset.nodeSets->find(this->nodeSetID)->second;
+      dbc_workset.nodeSets->find(this->nodeSetID)->second;
 
   if (trans == true) {
     // For (df/dp)^T*V we zero out corresponding entries in V
-    Teuchos::RCP<Thyra_MultiVector> Vp = dirichlet_workset.Vp_bc;
+    Teuchos::RCP<Thyra_MultiVector> Vp = dbc_workset.Vp_bc;
     Teuchos::ArrayRCP<ST>           Vp_view;
 
     for (auto inode = 0; inode < ns_nodes.size(); ++inode) {

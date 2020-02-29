@@ -171,24 +171,29 @@ class STKDiscretization : public AbstractDiscretization
   }
 
   //! Get Node set lists (typedef in Albany_AbstractDiscretization.hpp)
-  const NodeSetList&
+  NodeSetList const&
   getNodeSets() const
   {
     return nodeSets;
   }
-  const NodeSetGIDsList&
+  NodeSetGIDsList const&
   getNodeSetGIDs() const
   {
     return nodeSetGIDs;
   }
-  const NodeSetCoordList&
+  NodeSetCoordList const&
   getNodeSetCoords() const
   {
     return nodeSetCoords;
   }
+  NodeGID2LIDMap const&
+  getNodeGID2LIDMap() const
+  {
+    return node_GID_2_LID_map;
+  }
 
   //! Get Side set lists (typedef in Albany_AbstractDiscretization.hpp)
-  const SideSetList&
+  SideSetList const&
   getSideSets(const int workset) const
   {
     return sideSets[workset];
@@ -207,13 +212,13 @@ class STKDiscretization : public AbstractDiscretization
   }
 
   //! Get map from ws, elem, node [, eq] -> [Node|DOF] GID
-  const Conn&
+  Conn const&
   getWsElNodeEqID() const
   {
     return wsElNodeEqID;
   }
 
-  const WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>>::type&
+  WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>>::type const&
   getWsElNodeID() const
   {
     return wsElNodeID;
@@ -221,7 +226,7 @@ class STKDiscretization : public AbstractDiscretization
 
   //! Get IDArray for (Ws, Local Node, nComps) -> (local) NodeLID, works for
   //! both scalar and vector fields
-  const std::vector<IDArray>&
+  std::vector<IDArray> const&
   getElNodeEqID(const std::string& field_name) const
   {
     return nodalDOFsStructContainer.getDOFsStruct(field_name).wsElNodeEqID;
@@ -296,6 +301,30 @@ class STKDiscretization : public AbstractDiscretization
   getNodeBoundaryIndicator() const
   {
     return node_boundary_indicator;
+  }
+
+  bool
+  hasCellBoundaryIndicator() const
+  {
+    return stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField();
+  }
+
+  bool
+  hasFaceBoundaryIndicator() const
+  {
+    return stkMeshStruct->getFieldContainer()->hasFaceBoundaryIndicatorField();
+  }
+
+  bool
+  hasEdgeBoundaryIndicator() const
+  {
+    return stkMeshStruct->getFieldContainer()->hasEdgeBoundaryIndicatorField();
+  }
+
+  bool
+  hasNodeBoundaryIndicator() const
+  {
+    return stkMeshStruct->getFieldContainer()->hasNodeBoundaryIndicatorField();
   }
 
   void
@@ -661,6 +690,7 @@ class STKDiscretization : public AbstractDiscretization
   NodeSetList      nodeSets;
   NodeSetGIDsList  nodeSetGIDs;
   NodeSetCoordList nodeSetCoords;
+  NodeGID2LIDMap   node_GID_2_LID_map;
 
   //! side sets stored as std::map(string ID, SideArray classes) per workset
   //! (std::vector across worksets)

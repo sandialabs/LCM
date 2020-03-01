@@ -4,6 +4,7 @@
 # in the file license.txt in the top-level Albany directory.
 #
 add_subdirectory(ACE)
+add_subdirectory(AnalyticSDBC)
 add_subdirectory(BoreDemo)
 add_subdirectory(CapModelPlasticity3D)
 add_subdirectory(CohesiveElement)

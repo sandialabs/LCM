@@ -38,10 +38,12 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
   auto const& ns_nodes = dbc_workset.nodeSets->find(ns_id)->second;
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
     if (has_nbi == true) {
-      auto const& boundary_indicator = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids = dbc_workset.nodeSetGIDs->find(ns_id)->second;
-      auto const  gid     = ns_gids[ns_node] + 1;
-      auto const  nbi     = *(boundary_indicator.find(gid)->second);
+      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+      auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+      auto const  gid      = ns_gids[ns_node] + 1;
+      auto const  it       = bi_field.find(gid);
+      if (it == bi_field.end()) continue;
+      auto const nbi = *(it->second);
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
@@ -63,10 +65,12 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   auto const& ns_nodes = dbc_workset.nodeSets->find(ns_id)->second;
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
     if (has_nbi == true) {
-      auto const& boundary_indicator = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids = dbc_workset.nodeSetGIDs->find(ns_id)->second;
-      auto const  gid     = ns_gids[ns_node] + 1;
-      auto const  nbi     = *(boundary_indicator.find(gid)->second);
+      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+      auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+      auto const  gid      = ns_gids[ns_node] + 1;
+      auto const  it       = bi_field.find(gid);
+      if (it == bi_field.end()) continue;
+      auto const nbi = *(it->second);
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
@@ -108,10 +112,12 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
   if (dbc_workset.is_schwarz_bc_ == false) {  // regular SDBC
     for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
       if (has_nbi == true) {
-        auto const& boundary_indicator = stk_disc->getNodeBoundaryIndicator();
-        auto const  ns_gids = dbc_workset.nodeSetGIDs->find(ns_id)->second;
-        auto const  gid     = ns_gids[ns_node] + 1;
-        auto const  nbi     = *(boundary_indicator.find(gid)->second);
+        auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+        auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+        auto const  gid      = ns_gids[ns_node] + 1;
+        auto const  it       = bi_field.find(gid);
+        if (it == bi_field.end()) continue;
+        auto const nbi = *(it->second);
         if (nbi == 0.0) continue;
       }
       auto const dof       = ns_nodes[ns_node][this->offset];

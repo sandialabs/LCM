@@ -858,8 +858,7 @@ Application::loadWorksetBucketInfo(
                         ws < face_boundary_indicator.size();
   auto const has_edge = edge_boundary_indicator != Teuchos::null &&
                         ws < edge_boundary_indicator.size();
-  auto const has_node = node_boundary_indicator != Teuchos::null &&
-                        ws < node_boundary_indicator.size();
+  auto const has_node = node_boundary_indicator.size() > 0;
 
   if (has_cell == true) {
     workset.cell_boundary_indicator = cell_boundary_indicator[ws];
@@ -871,7 +870,7 @@ Application::loadWorksetBucketInfo(
     workset.edge_boundary_indicator = edge_boundary_indicator[ws];
   }
   if (has_node == true) {
-    workset.node_boundary_indicator = node_boundary_indicator[ws];
+    workset.node_boundary_indicator = node_boundary_indicator;
   }
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);

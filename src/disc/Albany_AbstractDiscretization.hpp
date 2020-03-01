@@ -151,7 +151,7 @@ class AbstractDiscretization
   virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
   getEdgeBoundaryIndicator() const = 0;
 
-  virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
+  virtual std::map<GO, double*> const&
   getNodeBoundaryIndicator() const = 0;
 
   virtual bool

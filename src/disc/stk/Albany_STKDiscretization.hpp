@@ -297,7 +297,7 @@ class STKDiscretization : public AbstractDiscretization
     return edge_boundary_indicator;
   }
 
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
+  std::map<GO, double*> const&
   getNodeBoundaryIndicator() const
   {
     return node_boundary_indicator;
@@ -713,7 +713,8 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<Teuchos::ArrayRCP<double*>>::type cell_boundary_indicator;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type face_boundary_indicator;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type edge_boundary_indicator;
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type node_boundary_indicator;
+
+  std::map<GO, double*> node_boundary_indicator;
 
 #if defined(ALBANY_CONTACT)
   Teuchos::RCP<ContactManager> contactManager;

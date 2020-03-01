@@ -194,10 +194,8 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         (st.entity == StateStruct::NodalDataToElemNode) ||
         (st.entity ==
          StateStruct::NodalDistParameter)) {  // Data at the node points
-      const Teuchos::RCP<Albany::NodeFieldContainer>& nodeContainer =
+      Teuchos::RCP<Albany::NodeFieldContainer> const& nodeContainer =
           sis->getNodalDataBase()->getNodeContainer();
-      // const Teuchos::RCP<Albany::AbstractNodeFieldContainer>& nodeContainer
-      //         = sis->getNodalDataBlock()->getNodeContainer();
 
       if (st.entity == StateStruct::NodalDataToElemNode) {
         nodal_sis.push_back((*sis)[i]);

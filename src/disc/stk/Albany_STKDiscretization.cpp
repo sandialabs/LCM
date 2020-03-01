@@ -1857,9 +1857,7 @@ STKDiscretization::computeWorksetInfoBoundaryIndicators()
     auto const& node_bucket = *node_buckets[b];
     num_nodes += node_bucket.size();
   }
-  // Only one workset for this
-  node_boundary_indicator.resize(1);
-  node_boundary_indicator[0].resize(num_nodes);
+  node_boundary_indicator.clear();
   if (has_node == true) {
     auto* node_field = field_container.getNodeBoundaryIndicator();
     for (auto b = 0; b < num_node_buckets; ++b) {
@@ -1869,8 +1867,9 @@ STKDiscretization::computeWorksetInfoBoundaryIndicators()
         auto const num_node = node.m_value - 1;
         auto const gid      = bulkData.identifier(node);
         node_GID_2_LID_map.insert(std::make_pair(gid, num_node));
-        node_boundary_indicator[0][num_node] =
+        auto* nbi_ptr =
             static_cast<double*>(stk::mesh::field_data(*node_field, node));
+        node_boundary_indicator.insert(std::make_pair(gid, nbi_ptr));
       }
     }
   }

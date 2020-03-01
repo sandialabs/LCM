@@ -124,9 +124,9 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
       row_is_dbc_data[dof] = 1;
     }
   } else {  // special case for Schwarz SDBC
-    int const spatial_dimension = dbc_workset.spatial_dimension_;
+    auto const spatial_dimension = dbc_workset.spatial_dimension_;
 
-    for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
+    for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
       for (int offset = 0; offset < spatial_dimension; ++offset) {
         auto dof = ns_nodes[ns_node][offset];
         // If this DOF already has a DBC, skip it.
@@ -144,16 +144,13 @@ void
 SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData dbc_workset)
 {
-  auto x = dbc_workset.x;
-  auto f = dbc_workset.f;
-  auto J = dbc_workset.Jac;
-
-  bool const fill_residual = f != Teuchos::null;
-
-  auto f_view = fill_residual ? Albany::getNonconstLocalData(f) : Teuchos::null;
-  auto x_view = fill_residual ?
-                    Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x)) :
-                    Teuchos::null;
+  auto       x      = dbc_workset.x;
+  auto       f      = dbc_workset.f;
+  auto       J      = dbc_workset.Jac;
+  auto const fill   = f != Teuchos::null;
+  auto       f_view = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
+  auto x_view = fill ? Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x)) :
+                       Teuchos::null;
 
   Teuchos::Array<GO> global_index(1);
   Teuchos::Array<LO> index(1);
@@ -167,19 +164,19 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 
   auto     col_is_dbc_data = Albany::getLocalData(col_is_dbc_.getConst());
   auto     range_spmd_vs   = Albany::getSpmdVectorSpace(J->range());
-  const LO num_local_rows  = range_spmd_vs->localSubDim();
+  LO const num_local_rows  = range_spmd_vs->localSubDim();
 
   for (LO local_row = 0; local_row < num_local_rows; ++local_row) {
     Albany::getLocalRowValues(J, local_row, indices, entries);
 
     auto row_is_dbc = col_is_dbc_data[local_row] > 0;
 
-    if (row_is_dbc && fill_residual == true) {
+    if (row_is_dbc && fill == true) {
       f_view[local_row] = 0.0;
       x_view[local_row] = this->value.val();
     }
 
-    const LO num_row_entries = entries.size();
+    LO const num_row_entries = entries.size();
 
     for (LO row_entry = 0; row_entry < num_row_entries; ++row_entry) {
       auto local_col         = indices[row_entry];
@@ -191,7 +188,6 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     }
     Albany::setLocalRowValues(J, local_row, indices(), entries());
   }
-  return;
 }
 
 template <typename Traits>

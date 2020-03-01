@@ -11,6 +11,7 @@
 
 #include "Albany_CombineAndScatterManager.hpp"
 #include "Albany_Macros.hpp"
+#include "Albany_STKDiscretization.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_ExprEvalSDBC.hpp"
 #include "Phalanx_DataLayout.hpp"
@@ -41,18 +42,26 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
   stk::expreval::Eval expr_eval(expression);
   expr_eval.parse();
   expr_eval.bindVariable("t", dbc_workset.current_time);
+  auto rcp_disc = dbc_workset.disc;
+  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto x        = dbc_workset.x;
+  auto x_view   = Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x));
+  auto const  has_nbi   = stk_disc->hasNodeBoundaryIndicator();
+  auto const  ns_id     = this->nodeSetID;
+  auto const& ns_nodes  = dbc_workset.nodeSets->find(ns_id)->second;
+  auto const& ns_coords = dbc_workset.nodeSetCoords->find(ns_id)->second;
 
-  Teuchos::RCP<Thyra_Vector const> x = dbc_workset.x;
-  Teuchos::ArrayRCP<ST>            x_view =
-      Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x));
-  // Grab the vector of node GIDs for this Node Set ID
-  auto const& ns_nodes = dbc_workset.nodeSets->find(this->nodeSetID)->second;
-
-  auto const& ns_coords =
-      dbc_workset.nodeSetCoords->find(this->nodeSetID)->second;
-
-  for (size_t ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
-    int const dof = ns_nodes[ns_node][this->offset];
+  for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
+    if (has_nbi == true) {
+      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+      auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+      auto const  gid      = ns_gids[ns_node] + 1;
+      auto const  it       = bi_field.find(gid);
+      if (it == bi_field.end()) continue;
+      auto const nbi = *(it->second);
+      if (nbi == 0.0) continue;
+    }
+    auto const dof = ns_nodes[ns_node][this->offset];
     if (dim > 0) expr_eval.bindVariable("x", ns_coords[ns_node][0]);
     if (dim > 1) expr_eval.bindVariable("y", ns_coords[ns_node][1]);
     if (dim > 2) expr_eval.bindVariable("z", ns_coords[ns_node][2]);
@@ -68,16 +77,25 @@ void
 ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<Thyra_Vector> f      = dbc_workset.f;
-  Teuchos::ArrayRCP<ST>      f_view = Albany::getNonconstLocalData(f);
-
-  // Grab the vector of node GIDs for this Node Set ID
-  std::vector<std::vector<int>> const& ns_nodes =
-      dbc_workset.nodeSets->find(this->nodeSetID)->second;
-
-  for (size_t ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
-    int const dof = ns_nodes[ns_node][this->offset];
-    f_view[dof]   = 0.0;
+  auto rcp_disc = dbc_workset.disc;
+  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto f        = dbc_workset.f;
+  auto f_view   = Albany::getNonconstLocalData(f);
+  auto const  has_nbi  = stk_disc->hasNodeBoundaryIndicator();
+  auto const  ns_id    = this->nodeSetID;
+  auto const& ns_nodes = dbc_workset.nodeSets->find(ns_id)->second;
+  for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
+    if (has_nbi == true) {
+      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+      auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+      auto const  gid      = ns_gids[ns_node] + 1;
+      auto const  it       = bi_field.find(gid);
+      if (it == bi_field.end()) continue;
+      auto const nbi = *(it->second);
+      if (nbi == 0.0) continue;
+    }
+    auto const dof = ns_nodes[ns_node][this->offset];
+    f_view[dof]    = 0.0;
     // Record DOFs to avoid setting Schwarz BCs on them.
     dbc_workset.fixed_dofs_.insert(dof);
   }
@@ -101,12 +119,15 @@ void
 ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
     typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<const Thyra_LinearOp> J = dbc_workset.Jac;
-
-  auto  range_vs  = J->range();
-  auto  col_vs    = Albany::getColumnSpace(J);
-  auto& ns_nodes  = dbc_workset.nodeSets->find(this->nodeSetID)->second;
-  auto  domain_vs = range_vs;  // we are assuming this!
+  auto rcp_disc = dbc_workset.disc;
+  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto J        = dbc_workset.Jac;
+  auto range_vs = J->range();
+  auto col_vs   = Albany::getColumnSpace(J);
+  auto const  has_nbi   = stk_disc->hasNodeBoundaryIndicator();
+  auto const  ns_id     = this->nodeSetID;
+  auto const& ns_nodes  = dbc_workset.nodeSets->find(ns_id)->second;
+  auto const  domain_vs = range_vs;  // we are assuming this!
 
   row_is_dbc_ = Thyra::createMember(range_vs);
   col_is_dbc_ = Thyra::createMember(col_vs);
@@ -116,14 +137,23 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
   auto const& fixed_dofs      = dbc_workset.fixed_dofs_;
   auto        row_is_dbc_data = Albany::getNonconstLocalData(row_is_dbc_);
   if (dbc_workset.is_schwarz_bc_ == false) {  // regular SDBC
-    for (size_t ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
+    for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
+      if (has_nbi == true) {
+        auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+        auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+        auto const  gid      = ns_gids[ns_node] + 1;
+        auto const  it       = bi_field.find(gid);
+        if (it == bi_field.end()) continue;
+        auto const nbi = *(it->second);
+        if (nbi == 0.0) continue;
+      }
       auto dof             = ns_nodes[ns_node][this->offset];
       row_is_dbc_data[dof] = 1;
     }
   } else {  // special case for Schwarz SDBC
-    int const spatial_dimension = dbc_workset.spatial_dimension_;
+    auto const spatial_dimension = dbc_workset.spatial_dimension_;
 
-    for (size_t ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
+    for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
       for (int offset = 0; offset < spatial_dimension; ++offset) {
         auto dof = ns_nodes[ns_node][offset];
         // If this DOF already has a DBC, skip it.
@@ -144,16 +174,13 @@ void
 ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<const Thyra_Vector> x = dbc_workset.x;
-  Teuchos::RCP<Thyra_Vector>       f = dbc_workset.f;
-  Teuchos::RCP<Thyra_LinearOp>     J = dbc_workset.Jac;
-
-  bool const fill_residual = f != Teuchos::null;
-
-  auto f_view = fill_residual ? Albany::getNonconstLocalData(f) : Teuchos::null;
-  auto x_view = fill_residual ?
-                    Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x)) :
-                    Teuchos::null;
+  auto       x      = dbc_workset.x;
+  auto       f      = dbc_workset.f;
+  auto       J      = dbc_workset.Jac;
+  auto const fill   = f != Teuchos::null;
+  auto       f_view = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
+  auto x_view = fill ? Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x)) :
+                       Teuchos::null;
 
   Teuchos::Array<GO> global_index(1);
   Teuchos::Array<LO> index(1);
@@ -167,19 +194,19 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 
   auto     col_is_dbc_data = Albany::getLocalData(col_is_dbc_.getConst());
   auto     range_spmd_vs   = Albany::getSpmdVectorSpace(J->range());
-  const LO num_local_rows  = range_spmd_vs->localSubDim();
+  LO const num_local_rows  = range_spmd_vs->localSubDim();
 
   for (LO local_row = 0; local_row < num_local_rows; ++local_row) {
     Albany::getLocalRowValues(J, local_row, indices, entries);
 
     auto row_is_dbc = col_is_dbc_data[local_row] > 0;
 
-    if (row_is_dbc && fill_residual == true) {
+    if (row_is_dbc && fill == true) {
       f_view[local_row] = 0.0;
       x_view[local_row] = this->value.val();
     }
 
-    const LO num_row_entries = entries.size();
+    LO const num_row_entries = entries.size();
 
     for (LO row_entry = 0; row_entry < num_row_entries; ++row_entry) {
       auto local_col         = indices[row_entry];
@@ -191,7 +218,6 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     }
     Albany::setLocalRowValues(J, local_row, indices(), entries());
   }
-  return;
 }
 
 //

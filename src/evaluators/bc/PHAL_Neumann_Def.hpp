@@ -333,7 +333,6 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
           dof.get_view(), "DDN", numCells, numNodes, numDOFsSet);
       break;
     default:
-      // std::cout << "NN1 " << std::endl;
       neumann = Kokkos::createDynRankViewWithType<
           Kokkos::DynRankView<ScalarT, PHX::Device>>(
           coordVec.get_view(), "DDN", numCells, numNodes, numDOFsSet);
@@ -345,8 +344,6 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
 
   // Needed?
   Kokkos::deep_copy(neumann, 0.0);
-
-  // std::cout << "NNN " << neumann(0,0,0) << std::endl;
 
   const Albany::SideSetList&          ssList = *(workset.sideSets);
   Albany::SideSetList::const_iterator it     = ssList.find(this->sideSetID);
@@ -378,7 +375,6 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
   DynRankViewScalarT dofSideVec;
   DynRankViewScalarT dofCell;
   DynRankViewScalarT dofCellVec;
-
   DynRankViewScalarT data;
 
   //! For each element block, and for each local side id (e.g. side_id=0,1,2,3,4

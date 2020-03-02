@@ -6,8 +6,10 @@
 
 #include "AAdapt_Erosion.hpp"
 
+#include <stk_util/parallel/ParallelReduce.hpp>
 #include <Teuchos_TimeMonitor.hpp>
 
+#include "Albany_GenericSTKMeshStruct.hpp"
 #include "StateVarUtils.hpp"
 #include "Topology_FailureCriterion.hpp"
 
@@ -266,10 +268,20 @@ AAdapt::Erosion::adaptMesh()
   remesh_file_index_++;
 
   // Start the mesh update process
-  double volume = topology_->erodeFailedElements();
-  erosion_volume_ += volume;
+  double local_volume = topology_->erodeFailedElements();
+  double global_volume{0.0};
+  auto       comm = static_cast<stk::ParallelMachine>(Albany_MPI_COMM_WORLD);
+  stk::all_reduce_sum(comm, &local_volume, &global_volume, 1);
+  erosion_volume_ += global_volume;
 
   // Throw away all the Albany data structures and re-build them from the mesh
+  auto const rebalance = adapt_params_->get<bool>("Rebalance", false);
+  if (rebalance == true) {
+    auto stk_mesh_struct =
+        Teuchos::rcp_dynamic_cast<Albany::GenericSTKMeshStruct>(
+            stk_discretization_->getSTKMeshStruct());
+    stk_mesh_struct->rebalanceAdaptedMeshT(adapt_params_, teuchos_comm_);
+  }
   stk_discretization_->updateMesh();
 
   *output_stream_ << "*** ACE INFO: Eroded Volume : " << erosion_volume_

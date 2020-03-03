@@ -239,6 +239,9 @@ class Topology
   double
   erodeFailedElements();
 
+  int
+  numberCells();
+
   double
   erodeElements();
 

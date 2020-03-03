@@ -1269,6 +1269,19 @@ Topology::remove_entity_and_up_relations(stk::mesh::Entity entity)
   assert(successfully_destroyed == true);
 }
 
+int
+Topology::numberCells()
+{
+  auto const cell_rank     = stk::topology::ELEMENT_RANK;
+  auto&      bulk_data     = get_bulk_data();
+  auto&      meta_data     = get_meta_data();
+  auto&      locally_owned = meta_data.locally_owned_part();
+  auto const&             cell_buckets = bulk_data.buckets(cell_rank);
+  stk::mesh::EntityVector cells;
+  stk::mesh::get_selected_entities(locally_owned, cell_buckets, cells);
+  return cells.size();
+}
+
 //
 // Remove failed elements from the mesh
 //

@@ -1266,17 +1266,17 @@ Topology::remove_entity_and_up_relations(stk::mesh::Entity entity)
     }
   }
   bool successfully_destroyed = bulk_data.destroy_entity(entity);
-  assert(successfully_destroyed == true);
+  ALBANY_ASSERT(successfully_destroyed == true);
 }
 
 int
 Topology::numberCells()
 {
-  auto const cell_rank     = stk::topology::ELEMENT_RANK;
-  auto&      bulk_data     = get_bulk_data();
-  auto&      meta_data     = get_meta_data();
-  auto&      locally_owned = meta_data.locally_owned_part();
-  auto const&             cell_buckets = bulk_data.buckets(cell_rank);
+  auto const              cell_rank     = stk::topology::ELEMENT_RANK;
+  auto&                   bulk_data     = get_bulk_data();
+  auto&                   meta_data     = get_meta_data();
+  auto&                   locally_owned = meta_data.locally_owned_part();
+  auto const&             cell_buckets  = bulk_data.buckets(cell_rank);
   stk::mesh::EntityVector cells;
   stk::mesh::get_selected_entities(locally_owned, cell_buckets, cells);
   return cells.size();
@@ -1312,7 +1312,6 @@ Topology::erodeFailedElements()
       remove_entity_and_up_relations(cell);
     }
   }
-
   auto const&             face_buckets = bulk_data.buckets(face_rank);
   stk::mesh::EntityVector faces;
   stk::mesh::get_selected_entities(locally_owned, face_buckets, faces);
@@ -1324,15 +1323,22 @@ Topology::erodeFailedElements()
   stk::mesh::EntityVector edges;
   stk::mesh::get_selected_entities(locally_owned, edge_buckets, edges);
   for (auto edge : edges) {
+    auto const num_elems = bulk_data.num_elements(edge);
     auto const num_faces = bulk_data.num_faces(edge);
-    if (num_faces == 0) { remove_entity_and_up_relations(edge); }
+    if (num_elems == 0 || num_faces == 0) {
+      remove_entity_and_up_relations(edge);
+    }
   }
   auto const&             node_buckets = bulk_data.buckets(node_rank);
   stk::mesh::EntityVector nodes;
   stk::mesh::get_selected_entities(locally_owned, node_buckets, nodes);
   for (auto node : nodes) {
+    auto const num_elems = bulk_data.num_elements(node);
+    auto const num_faces = bulk_data.num_faces(node);
     auto const num_edges = bulk_data.num_edges(node);
-    if (num_edges == 0) { remove_entity_and_up_relations(node); }
+    if (num_elems == 0 || num_faces == 0 || num_edges == 0) {
+      remove_entity_and_up_relations(node);
+    }
   }
   modification_end();
   Albany::fix_node_sharing(bulk_data);

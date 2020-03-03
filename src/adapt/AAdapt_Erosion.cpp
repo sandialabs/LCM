@@ -6,8 +6,8 @@
 
 #include "AAdapt_Erosion.hpp"
 
-#include <stk_util/parallel/ParallelReduce.hpp>
 #include <Teuchos_TimeMonitor.hpp>
+#include <stk_util/parallel/ParallelReduce.hpp>
 
 #include "Albany_GenericSTKMeshStruct.hpp"
 #include "StateVarUtils.hpp"
@@ -268,9 +268,12 @@ AAdapt::Erosion::adaptMesh()
   remesh_file_index_++;
 
   // Start the mesh update process
-  double local_volume = topology_->erodeFailedElements();
+  double const local_volume = topology_->erodeFailedElements();
+  auto const   num_cells    = topology_->numberCells();
+  auto const   rank         = topology_->get_proc_rank();
+  ALBANY_ASSERT(num_cells > 0, "Zero elements on processor #" << rank << '\n');
   double global_volume{0.0};
-  auto       comm = static_cast<stk::ParallelMachine>(Albany_MPI_COMM_WORLD);
+  auto   comm = static_cast<stk::ParallelMachine>(Albany_MPI_COMM_WORLD);
   stk::all_reduce_sum(comm, &local_volume, &global_volume, 1);
   erosion_volume_ += global_volume;
 

@@ -1260,7 +1260,8 @@ Topology::remove_entity_and_up_relations(stk::mesh::Entity entity)
     auto const* rel_entities = bulk_data.begin(entity, rank);
     auto const* rel_ordinals = bulk_data.begin_ordinals(entity, rank);
     // Must delete relation from higher-to-lower ranked entity
-    for (auto j = num_conn - 1; j >= 0; --j) {
+    // DO NOT use auto here. Need a signed int.
+    for (int j = num_conn - 1; j >= 0; --j) {
       ALBANY_ASSERT(bulk_data.is_valid(rel_entities[j]) == true);
       bulk_data.destroy_relation(rel_entities[j], entity, rel_ordinals[j]);
     }

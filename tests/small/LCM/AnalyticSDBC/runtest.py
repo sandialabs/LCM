@@ -12,7 +12,7 @@ name = "cube"
 log_file_name = name + ".log"
 result = 0
 
-print "test 1 - Analytic SDBC"
+print "test 1 - ExpressionEvaluated SDBC"
 
 if os.path.exists(log_file_name):
     os.remove(log_file_name)

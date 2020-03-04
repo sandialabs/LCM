@@ -17,22 +17,22 @@ LCM:
       Variable Type: DOF
     Dirichlet BCs:
       SDBC on NS -x for DOF X: 0.0
-      Analytic SDBC on NS -x for DOF Y: '0.01 * x * t'
+      ExpressionEvaluated SDBC on NS -x for DOF Y: '0.01 * x * t'
       SDBC on NS -x for DOF Z: 0.0
       SDBC on NS +x for DOF X: 0.0
-      Analytic SDBC on NS +x for DOF Y: '0.01 * x * t'
+      ExpressionEvaluated SDBC on NS +x for DOF Y: '0.01 * x * t'
       SDBC on NS +x for DOF Z: 0.0
       SDBC on NS -y for DOF X: 0.0
-      Analytic SDBC on NS -y for DOF Y: '0.01 * x * t'
+      ExpressionEvaluated SDBC on NS -y for DOF Y: '0.01 * x * t'
       SDBC on NS -y for DOF Z: 0.0
       SDBC on NS +y for DOF X: 0.0
-      Analytic SDBC on NS +y for DOF Y: '0.01 * x * t'
+      ExpressionEvaluated SDBC on NS +y for DOF Y: '0.01 * x * t'
       SDBC on NS +y for DOF Z: 0.0
       SDBC on NS -z for DOF X: 0.0
-      Analytic SDBC on NS -z for DOF Y: '0.01 * x * t'
+      ExpressionEvaluated SDBC on NS -z for DOF Y: '0.01 * x * t'
       SDBC on NS -z for DOF Z: 0.0
       SDBC on NS +z for DOF X: 0.0
-      Analytic SDBC on NS +z for DOF Y: '0.01 * x * t'
+      ExpressionEvaluated SDBC on NS +z for DOF Y: '0.01 * x * t'
       SDBC on NS +z for DOF Z: 0.0
     Initial Condition:
       Function: Constant

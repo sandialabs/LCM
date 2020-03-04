@@ -1527,7 +1527,7 @@ Albany::DirichletTraits::constructExprEvalSDBCName(
     const std::string& dof)
 {
   std::stringstream ss;
-  ss << "Analytic SDBC on NS " << ns << " for DOF " << dof;
+  ss << "ExpressionEvaluated SDBC on NS " << ns << " for DOF " << dof;
 
   return ss.str();
 }
@@ -1571,7 +1571,7 @@ Albany::DirichletTraits::constructExprEvalSDBCNameField(
     const std::string& dof)
 {
   std::stringstream ss;
-  ss << "Analytic SDBC on NS " << ns << " for DOF " << dof
+  ss << "ExpressionEvaluated SDBC on NS " << ns << " for DOF " << dof
      << " prescribe Field";
 
   return ss.str();

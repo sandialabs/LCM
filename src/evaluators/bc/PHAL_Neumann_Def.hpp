@@ -6,6 +6,7 @@
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ProblemUtils.hpp"
+#include "Albany_STKDiscretization.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
@@ -935,20 +936,33 @@ void
 Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  auto                       nodeID         = workset.wsElNodeEqID;
-  Teuchos::RCP<Thyra_Vector> f              = workset.f;
-  Teuchos::ArrayRCP<ST>      f_nonconstView = Albany::getNonconstLocalData(f);
+  auto rcp_disc      = workset.disc;
+  auto stk_disc      = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto nodeID        = workset.wsElNodeEqID;
+  auto node_gids     = workset.wsElNodeID;
+  auto f             = workset.f;
+  auto f_view        = Albany::getNonconstLocalData(f);
+  auto const has_nbi = stk_disc->hasNodeBoundaryIndicator();
 
   // Fill in "neumann" array
   this->evaluateNeumannContribution(workset);
 
   // Place it at the appropriate offset into F
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    for (std::size_t node = 0; node < this->numNodes; ++node)
-      for (std::size_t dim = 0; dim < this->numDOFsSet; ++dim) {
-        f_nonconstView[nodeID(cell, node, this->offset[dim])] +=
-            this->neumann(cell, node, dim);
+  for (auto cell = 0; cell < workset.numCells; ++cell) {
+    for (auto node = 0; node < this->numNodes; ++node) {
+      if (has_nbi == true) {
+        auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+        auto const  gid      = node_gids[cell][node] + 1;
+        auto const  it       = bi_field.find(gid);
+        if (it == bi_field.end()) continue;
+        auto const nbi = *(it->second);
+        if (nbi == 0.0) continue;
       }
+      for (auto dim = 0; dim < this->numDOFsSet; ++dim) {
+        auto const dof = nodeID(cell, node, this->offset[dim]);
+        f_view[dof] += this->neumann(cell, node, dim);
+      }
+    }
   }
 }
 
@@ -969,40 +983,46 @@ void
 Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  auto nodeID = workset.wsElNodeEqID;
-
-  Teuchos::RCP<Thyra_Vector>   f   = workset.f;
-  Teuchos::RCP<Thyra_LinearOp> jac = workset.Jac;
-
-  Teuchos::ArrayRCP<ST> f_nonconstView;
-  if (f != Teuchos::null) { f_nonconstView = Albany::getNonconstLocalData(f); }
+  auto rcp_disc      = workset.disc;
+  auto stk_disc      = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto nodeID        = workset.wsElNodeEqID;
+  auto node_gids     = workset.wsElNodeID;
+  auto f             = workset.f;
+  auto jac           = workset.Jac;
+  auto const has_nbi = stk_disc->hasNodeBoundaryIndicator();
+  auto const fill    = f != Teuchos::null;
+  auto       f_view  = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
 
   // Fill in "neumann" array
   this->evaluateNeumannContribution(workset);
-  int                lcol;
   Teuchos::Array<LO> row(1);
   Teuchos::Array<LO> col(1);
   Teuchos::Array<ST> value(1);
 
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    for (std::size_t node = 0; node < this->numNodes; ++node)
-      for (std::size_t dim = 0; dim < this->numDOFsSet; ++dim) {
-        row[0] = nodeID(cell, node, this->offset[dim]);
-
-        int neq = nodeID.extent(2);
-
-        if (f != Teuchos::null) {
-          f_nonconstView[row[0]] += this->neumann(cell, node, dim).val();
+  for (auto cell = 0; cell < workset.numCells; ++cell) {
+    for (auto node = 0; node < this->numNodes; ++node) {
+      if (has_nbi == true) {
+        auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+        auto const  gid      = node_gids[cell][node] + 1;
+        auto const  it       = bi_field.find(gid);
+        if (it == bi_field.end()) continue;
+        auto const nbi = *(it->second);
+        if (nbi == 0.0) continue;
+      }
+      for (auto dim = 0; dim < this->numDOFsSet; ++dim) {
+        row[0]         = nodeID(cell, node, this->offset[dim]);
+        auto const neq = nodeID.extent(2);
+        if (fill == true) {
+          f_view[row[0]] += this->neumann(cell, node, dim).val();
         }
 
         // Check derivative array is nonzero
         if (this->neumann(cell, node, dim).hasFastAccess()) {
           // Loop over nodes in element
-          for (unsigned int node_col = 0; node_col < this->numNodes;
-               node_col++) {
+          for (auto node_col = 0; node_col < this->numNodes; node_col++) {
             // Loop over equations per node
-            for (unsigned int eq_col = 0; eq_col < neq; eq_col++) {
-              lcol = neq * node_col + eq_col;
+            for (auto eq_col = 0; eq_col < neq; eq_col++) {
+              auto const lcol = neq * node_col + eq_col;
 
               // Global column
               col[0]   = nodeID(cell, node_col, eq_col);
@@ -1018,36 +1038,8 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
           }    // column nodes
         }      // has fast access
       }
+    }
   }
-  /*#else
-
-    fT = workset.fT;
-    //fT_nonconstView = fT->get1dViewNonConst();
-    if (this->fT != Teuchos::null)
-      fT_nonconstView = fT->get1dViewNonConst();
-    else
-      fT_nonconstView = Teuchos::null;
-    JacT = workset.JacT;
-
-
-    // Fill in "neumann" array
-    this->evaluateNeumannContribution(workset);
-
-   //  if ( !JacT->isFillActive())
-  //    JacT->resumeFill();
-
-     jacobian=JacT->getLocalMatrix();
-
-     Index=workset.wsElNodeEqID_kokkos;
-
-     is_adjoint=workset.is_adjoint;
-
-     Kokkos::parallel_for(Neumann_Policy(0,workset.numCells),*this);
-
-  //   if ( !JacT->isFillActive())
-  //    JacT->fillComplete();
-
-  #endif*/
 }
 
 // **********************************************************************
@@ -1072,12 +1064,12 @@ Neumann<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
   Teuchos::RCP<Thyra_MultiVector> JV = workset.JV;
   Teuchos::RCP<Thyra_MultiVector> fp = workset.fp;
 
-  Teuchos::ArrayRCP<ST> f_nonconstView;
+  Teuchos::ArrayRCP<ST> f_view;
 
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> JV_nonconst2dView;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> fp_nonconst2dView;
 
-  if (!f.is_null()) { f_nonconstView = Albany::getNonconstLocalData(f); }
+  if (!f.is_null()) { f_view = Albany::getNonconstLocalData(f); }
   if (!JV.is_null()) { JV_nonconst2dView = Albany::getNonconstLocalData(JV); }
   if (!fp.is_null()) { fp_nonconst2dView = Albany::getNonconstLocalData(fp); }
   // Fill the local "neumann" array with cell contributions
@@ -1090,7 +1082,7 @@ Neumann<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
         int row = nodeID(cell, node, this->offset[dim]);
 
         if (f != Teuchos::null) {
-          f_nonconstView[row] += this->neumann(cell, node, dim).val();
+          f_view[row] += this->neumann(cell, node, dim).val();
         }
 
         if (JV != Teuchos::null) {

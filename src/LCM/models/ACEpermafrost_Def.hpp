@@ -441,26 +441,23 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
   }
   bluff_salinity_(cell, pt) = sal;
-  ScalarT const sal_curr    = sal;
   if (is_at_boundary == true) {
-    ScalarT const zero_sal(0.0);
-    ScalarT const ocean_sal =
-        interpolateVectors(time_, ocean_salinity_, current_time);
     RealType constexpr cell_half_width    = 0.1;
     RealType constexpr cell_exposed_area  = 0.04;
     RealType constexpr cell_volume        = 0.008;
     RealType constexpr per_exposed_length = cell_exposed_area / cell_volume;
-    RealType const factor   = per_exposed_length * salt_enhanced_D_;
-    ScalarT const  sal_diff = ocean_sal - sal_curr;
-    ScalarT const  sal_grad = sal_diff / cell_half_width;
+    RealType const factor = per_exposed_length * salt_enhanced_D_;
+    ScalarT const  zero_sal(0.0);
+    ScalarT const  ocean_sal =
+        interpolateVectors(time_, ocean_salinity_, current_time);
+    ScalarT const sal_diff = ocean_sal - sal;
+    ScalarT const sal_grad = sal_diff / cell_half_width;
     // TODO: factor == 0, should be a factor here but leads to Sacado FPE (!!??)
     ScalarT const sal_update = sal_grad * delta_time;
-    ScalarT       sal_trial  = sal_curr + sal_update;
+    ScalarT       sal_trial  = sal + sal_update;
     if (sal_trial < zero_sal) sal_trial = zero_sal;
     if (sal_trial > ocean_sal) sal_trial = ocean_sal;
     sal = sal_trial;
-  } else {
-    sal = sal_curr;
   }
 
   // Calculate melting temperature

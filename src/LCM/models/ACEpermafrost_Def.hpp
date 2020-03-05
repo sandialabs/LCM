@@ -440,38 +440,32 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (salinity_.size() > 0) {
     sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
   }
-  bluff_salinity_(cell, pt) =
-      sal;  // we don't want to keep overwriting this every time
-  // End if first time step
-  //
-  auto sal_curr =
-      bluff_salinity_(cell, pt);  // this should have memory from previous ts
+  bluff_salinity_(cell, pt) = sal;
+  ScalarT const sal_curr    = sal;
   if (is_at_boundary == true) {
-    auto const ocean_sal =
+    ScalarT const zero_sal(0.0);
+    ScalarT const ocean_sal =
         interpolateVectors(time_, ocean_salinity_, current_time);
-    auto constexpr cell_half_width    = 0.1;
-    auto constexpr cell_exposed_area  = 0.04;
-    auto constexpr cell_volume        = 0.008;
-    auto constexpr per_exposed_length = cell_exposed_area / cell_volume;
-    auto const sal_diff               = ocean_sal - sal_curr;
-    auto const sal_grad               = sal_diff / cell_half_width;
-    auto const factor                 = per_exposed_length * salt_enhanced_D_;
+    RealType constexpr cell_half_width    = 0.1;
+    RealType constexpr cell_exposed_area  = 0.04;
+    RealType constexpr cell_volume        = 0.008;
+    RealType constexpr per_exposed_length = cell_exposed_area / cell_volume;
+    RealType const factor   = per_exposed_length * salt_enhanced_D_;
+    ScalarT const  sal_diff = ocean_sal - sal_curr;
+    ScalarT const  sal_grad = sal_diff / cell_half_width;
     // TODO: factor == 0, should be a factor here but leads to Sacado FPE (!!??)
-    auto const sal_update          = sal_grad * delta_time;
-    bool const is_update_large_pos = sal_diff > 0.0 && sal_update > sal_diff;
-    bool const is_update_large_neg = sal_diff < 0.0 && sal_update < sal_diff;
-    if (is_update_large_pos == true || is_update_large_neg == true) {
-      sal = ocean_sal;
-    } else {
-      sal = sal_curr + sal_update;
-    }
+    ScalarT const sal_update = sal_grad * delta_time;
+    ScalarT       sal_trial  = sal_curr + sal_update;
+    if (sal_trial < zero_sal) sal_trial = zero_sal;
+    if (sal_trial > ocean_sal) sal_trial = ocean_sal;
+    sal = sal_trial;
   } else {
     sal = sal_curr;
   }
 
   // Calculate melting temperature
   ScalarT sal15(0.0);
-  if (std::abs(sal) > 0.0) { sal15 = std::sqrt(sal * sal * sal); }
+  if (sal > 0.0) { sal15 = std::sqrt(sal * sal * sal); }
   auto const pressure_fixed = 1.0;
   // Tmelt is in Kelvin
   ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 -

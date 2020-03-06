@@ -203,8 +203,7 @@ InitialConditions(
         icParams.get("Function Expressions", default_expr);
 
     Teuchos::RCP<AAdapt::AnalyticFunction> initFunc =
-        Teuchos::rcp(new AAdapt::ExpressionParser(
-            neq, numDim, expr));
+        Teuchos::rcp(new AAdapt::ExpressionParser(neq, numDim, expr));
 
     // Loop over all worksets, elements, all local nodes: compute soln as a
     // function of coord

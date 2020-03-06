@@ -420,8 +420,10 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     RealType constexpr per_exposed_length = cell_exposed_area / cell_volume;
     RealType const factor = per_exposed_length * salt_enhanced_D_;
     ScalarT const  zero_sal(0.0);
-    ScalarT const  ocean_sal =
-        interpolateVectors(time_, ocean_salinity_, current_time);
+    ScalarT        ocean_sal = salinity_base_;
+    if (ocean_salinity_.size() > 0) {
+      ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
+    }
     ScalarT const sal_diff = ocean_sal - sal;
     ScalarT const sal_grad = sal_diff / cell_half_width;
     // TODO: factor == 0, should be a factor here but leads to Sacado FPE (!!??)

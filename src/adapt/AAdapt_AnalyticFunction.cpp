@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <stk_expreval/Evaluator.hpp>
 
 #include "Albany_Macros.hpp"
 
@@ -95,7 +96,6 @@ AAdapt::createAnalyticFunction(
   return F;
 }
 
-//************
 AAdapt::ConstantFunction::ConstantFunction(
     int                    neq_,
     int                    numDim_,
@@ -115,7 +115,6 @@ AAdapt::ConstantFunction::compute(double* x, const double* X)
     for (int i = 0; i < neq; i++) x[i] = data[i];
 }
 
-//************
 AAdapt::StepX::StepX(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -151,9 +150,7 @@ AAdapt::StepX::compute(double* x, const double* X)
     x[0] = T;
   }
 }
-//************
 
-//************
 AAdapt::TemperatureStep::TemperatureStep(
     int                    neq_,
     int                    numDim_,
@@ -203,7 +200,6 @@ AAdapt::TemperatureStep::compute(double* x, const double* X)
   }
 }
 
-//************
 AAdapt::DispConstTemperatureStep::DispConstTemperatureStep(
     int                    neq_,
     int                    numDim_,
@@ -255,7 +251,6 @@ AAdapt::DispConstTemperatureStep::compute(double* x, const double* X)
   }
 }
 
-//************
 AAdapt::DispConstTemperatureLinear::DispConstTemperatureLinear(
     int                    neq_,
     int                    numDim_,
@@ -314,7 +309,6 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, const double* X)
   x[3] = b + m * X[coord];
 }
 
-//************
 AAdapt::TemperatureLinear::TemperatureLinear(
     int                    neq_,
     int                    numDim_,
@@ -371,7 +365,6 @@ AAdapt::TemperatureLinear::compute(double* x, const double* X)
   x[0] = b + m * X[coord];
 }
 
-//************
 // Private convenience function
 long
 AAdapt::seedgen(int worksetID)
@@ -421,7 +414,7 @@ AAdapt::ConstantFunctionPerturbed::udrand(double lo, double hi)
   double              deviate = std::rand() * base;
   return lo + deviate * (hi - lo);
 }
-//************
+
 AAdapt::ConstantFunctionGaussianPerturbed::ConstantFunctionGaussianPerturbed(
     int                    neq_,
     int                    numDim_,
@@ -467,7 +460,6 @@ AAdapt::ConstantFunctionGaussianPerturbed::compute(double* x, const double* X)
       x[i] = data[i];
 }
 
-//************
 AAdapt::GaussSin::GaussSin(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -482,7 +474,6 @@ AAdapt::GaussSin::compute(double* x, const double* X)
   x[0] = sin(pi * X[0]) + 0.5 * data[0] * X[0] * (1.0 - X[0]);
 }
 
-//************
 AAdapt::GaussCos::GaussCos(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -496,7 +487,7 @@ AAdapt::GaussCos::compute(double* x, const double* X)
 {
   x[0] = 1 + cos(2 * pi * X[0]) + 0.5 * data[0] * X[0] * (1.0 - X[0]);
 }
-//************
+
 AAdapt::LinearY::LinearY(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -513,7 +504,7 @@ AAdapt::LinearY::compute(double* x, const double* X)
 
   if (numDim > 2) x[2] = 0.0;
 }
-//************
+
 AAdapt::Linear::Linear(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -533,7 +524,7 @@ AAdapt::Linear::compute(double* x, const double* X)
     x[eq] = s;
   }
 }
-//************
+
 AAdapt::ConstantBox::ConstantBox(
     int                    neq_,
     int                    numDim_,
@@ -559,7 +550,7 @@ AAdapt::ConstantBox::compute(double* x, const double* X)
     for (auto eq = 0; eq < neq; ++eq) { x[eq] = data[2 * numDim + eq]; }
   }
 }
-//************
+
 AAdapt::AboutZ::AboutZ(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -576,7 +567,7 @@ AAdapt::AboutZ::compute(double* x, const double* X)
 
   if (neq > 2) x[2] = 0.0;
 }
-//************
+
 AAdapt::RadialZ::RadialZ(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -593,7 +584,7 @@ AAdapt::RadialZ::compute(double* x, const double* X)
 
   if (neq > 2) x[2] = 0.0;
 }
-//************
+
 AAdapt::AboutLinearZ::AboutLinearZ(
     int                    neq_,
     int                    numDim_,
@@ -612,7 +603,7 @@ AAdapt::AboutLinearZ::compute(double* x, const double* X)
   x[1] = data[0] * X[0] * X[2];
   x[2] = 0.0;
 }
-//************
+
 AAdapt::GaussianZ::GaussianZ(
     int                    neq_,
     int                    numDim_,
@@ -636,7 +627,7 @@ AAdapt::GaussianZ::compute(double* x, const double* X)
   x[1] = 0.0;
   x[2] = a * std::exp(-d * d / c / c / 2.0);
 }
-//************
+
 AAdapt::Circle::Circle(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -662,7 +653,7 @@ AAdapt::Circle::compute(double* x, const double* X)
     x[2] = 0.0;
   }*/
 }
-//************
+
 AAdapt::GaussianPress::GaussianPress(
     int                    neq_,
     int                    numDim_,
@@ -682,7 +673,7 @@ AAdapt::GaussianPress::compute(double* x, const double* X)
   x[neq - 1] = data[0] * exp(-data[1] * ((X[0] - data[2]) * (X[0] - data[2]) +
                                          (X[1] - data[3]) * (X[1] - data[3])));
 }
-//************
+
 AAdapt::SinCos::SinCos(int neq_, int numDim_, Teuchos::Array<double> data_)
     : numDim(numDim_), neq(neq_), data(data_)
 {
@@ -698,7 +689,7 @@ AAdapt::SinCos::compute(double* x, const double* X)
   x[1] = cos(2.0 * pi * X[0]) * sin(2.0 * pi * X[1]);
   x[2] = sin(2.0 * pi * X[0]) * sin(2.0 * pi * X[1]);
 }
-//************
+
 AAdapt::SinScalar::SinScalar(
     int                    neq_,
     int                    numDim_,
@@ -718,7 +709,7 @@ AAdapt::SinScalar::compute(double* x, const double* X)
     x[0] *= sin(pi / data[dim] * X[dim]);
   }
 }
-//************
+
 AAdapt::TaylorGreenVortex::TaylorGreenVortex(
     int                    neq_,
     int                    numDim_,
@@ -738,7 +729,7 @@ AAdapt::TaylorGreenVortex::compute(double* x, const double* X)
   x[2] = sin(2.0 * pi * X[0]) * cos(2.0 * pi * X[1]);   // initial v-velocity
   x[3] = cos(2.0 * pi * X[0]) + cos(2.0 * pi * X[1]);   // initial temperature
 }
-//************
+
 AAdapt::AcousticWave::AcousticWave(
     int                    neq_,
     int                    numDim_,
@@ -763,15 +754,17 @@ AAdapt::AcousticWave::compute(double* x, const double* X)
 
 AAdapt::ExpressionParser::ExpressionParser(
     int                          neq_,
-    int                          spatialDim_,
+    int                          dim_,
     Teuchos::Array<std::string>& expr_)
-    : spatialDim(spatialDim_), neq(neq_), expr(expr_)
+    : dim(dim_), neq(neq_), expr(expr_)
 {
+  ALBANY_ASSERT(
+      expr.size() == neq,
+      "Must have the same number of equations (" << neq << ") and expressions ("
+                                                 << expr.size() << ").");
 }
 
 void
-AAdapt::ExpressionParser::compute(double* solution, const double* X)
+AAdapt::ExpressionParser::compute(double* x, const double* X)
 {
-  bool   success;
-  double value;
 }

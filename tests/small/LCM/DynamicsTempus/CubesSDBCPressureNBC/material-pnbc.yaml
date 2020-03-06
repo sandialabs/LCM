@@ -1,0 +1,12 @@
+LCM:
+  ElementBlocks:
+    fine:
+      material: VolDev
+  Materials:
+    VolDev:
+      Material Model:
+        Model Name: Linear Elastic Volumetric Deviatoric
+      Bulk Modulus: 1.0e+09
+      Shear Modulus: 1.0e+09
+      Density: 1.0e+03
+      Output Cauchy Stress: true

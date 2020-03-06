@@ -173,7 +173,7 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
       dl->qp_scalar,
       "scalar",
       0.0,
-      true,
+      false,
       p->get<bool>("Output ACE Bluff Salinity", false));
 
   // ACE Ice saturation
@@ -329,7 +329,18 @@ ACEiceMiniKernel<EvalT, Traits>::init(
   block_name_   = workset.EBName;
 
   auto const num_cells = workset.numCells;
-  for (auto cell = 0; cell < num_cells; ++cell) { failed_(cell, 0) = 0.0; }
+  auto const coords    = this->model_.getCoordVecField();
+  for (auto cell = 0; cell < num_cells; ++cell) {
+    failed_(cell, 0) = 0.0;  // One per element
+    for (auto pt = 0; pt < num_pts_; ++pt) {
+      auto const height = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
+      ScalarT    sal    = salinity_base_;
+      if (salinity_.size() > 0) {
+        sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
+      }
+      bluff_salinity_(cell, pt) = sal;
+    }
+  }
 }
 
 template <typename EvalT, typename Traits>
@@ -406,13 +417,6 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   bool const b_cell = porosity < 0.0;
 
   // Calculate the salinity of the grid cell
-  //
-  // If first time step:
-  ScalarT sal = salinity_base_;  // should come from chemical part of model
-  if (salinity_.size() > 0) {
-    sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
-  }
-  bluff_salinity_(cell, pt) = sal;
   if (is_at_boundary == true) {
     RealType constexpr cell_half_width    = 0.1;
     RealType constexpr cell_exposed_area  = 0.04;
@@ -420,19 +424,21 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     RealType constexpr per_exposed_length = cell_exposed_area / cell_volume;
     RealType const factor = per_exposed_length * salt_enhanced_D_;
     ScalarT const  zero_sal(0.0);
+    ScalarT const  sal_curr  = bluff_salinity_(cell, pt);
     ScalarT        ocean_sal = salinity_base_;
     if (ocean_salinity_.size() > 0) {
       ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
     }
-    ScalarT const sal_diff = ocean_sal - sal;
+    ScalarT const sal_diff = ocean_sal - sal_curr;
     ScalarT const sal_grad = sal_diff / cell_half_width;
     // TODO: factor == 0, should be a factor here but leads to Sacado FPE (!!??)
     ScalarT const sal_update = sal_grad * delta_time;
-    ScalarT       sal_trial  = sal + sal_update;
+    ScalarT       sal_trial  = sal_curr + sal_update;
     if (sal_trial < zero_sal) sal_trial = zero_sal;
     if (sal_trial > ocean_sal) sal_trial = ocean_sal;
-    sal = sal_trial;
+    bluff_salinity_(cell, pt) = sal_trial;
   }
+  ScalarT const sal = bluff_salinity_(cell, pt);
 
   // Calculate melting temperature
   ScalarT sal15(0.0);
@@ -523,7 +529,6 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Return values
   ice_saturation_(cell, pt)   = icurr;
   water_saturation_(cell, pt) = wcurr;
-  bluff_salinity_(cell, pt)   = sal;
 
   //
   // Mechanical calculation

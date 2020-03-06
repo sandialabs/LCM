@@ -197,18 +197,14 @@ InitialConditions(
       }
     }
   } else if (name == "Expression Parser") {
-    std::string defaultExpression = "value = 0.0";
-
-    std::string expressionX =
-        icParams.get("Function Expression for DOF X", defaultExpression);
-    std::string expressionY =
-        icParams.get("Function Expression for DOF Y", defaultExpression);
-    std::string expressionZ =
-        icParams.get("Function Expression for DOF Z", defaultExpression);
+    Teuchos::Array<std::string> default_expr(neq);
+    for (auto i = 0; i < default_expr.size(); ++i) { default_expr[i] = "0.0"; }
+    Teuchos::Array<std::string> expr =
+        icParams.get("Function Expressions", default_expr);
 
     Teuchos::RCP<AAdapt::AnalyticFunction> initFunc =
         Teuchos::rcp(new AAdapt::ExpressionParser(
-            neq, numDim, expressionX, expressionY, expressionZ));
+            neq, numDim, expr));
 
     // Loop over all worksets, elements, all local nodes: compute soln as a
     // function of coord

@@ -801,25 +801,16 @@ class ExpressionParser : public AnalyticFunction
 {
  public:
   ExpressionParser(
-      int         neq_,
-      int         spatialDim_,
-      std::string expressionX_,
-      std::string expressionY_,
-      std::string expressionZ_);
+      int                          neq_,
+      int                          spatialDim_,
+      Teuchos::Array<std::string>& expr);
   void
   compute(double* x, const double* X);
 
  private:
-  int         spatialDim;  // size of coordinate vector X
-  int         neq;         // size of solution vector x
-  std::string expressionX;
-  std::string expressionY;
-  std::string expressionZ;
-#if defined(ALBANY_PAMGEN)
-  PG_RuntimeCompiler::Function rtcFunctionX;
-  PG_RuntimeCompiler::Function rtcFunctionY;
-  PG_RuntimeCompiler::Function rtcFunctionZ;
-#endif
+  int                         spatialDim;  // size of coordinate vector X
+  int                         neq;         // size of solution vector x
+  Teuchos::Array<std::string> expr;
 };
 
 }  // namespace AAdapt

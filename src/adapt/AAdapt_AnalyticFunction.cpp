@@ -761,70 +761,12 @@ AAdapt::AcousticWave::compute(double* x, const double* X)
   for (int i = 1; i < numDim; i++) x[i] = 0.0;
 }
 
-//************
-// ExpressionParser
-
 AAdapt::ExpressionParser::ExpressionParser(
-    int         neq_,
-    int         spatialDim_,
-    std::string expressionX_,
-    std::string expressionY_,
-    std::string expressionZ_)
-    : spatialDim(spatialDim_),
-      neq(neq_),
-      expressionX(expressionX_),
-      expressionY(expressionY_),
-      expressionZ(expressionZ_)
+    int                          neq_,
+    int                          spatialDim_,
+    Teuchos::Array<std::string>& expr_)
+    : spatialDim(spatialDim_), neq(neq_), expr(expr_)
 {
-  ALBANY_PANIC(
-      neq < 1 || neq > spatialDim || spatialDim != 3,
-      "Error! Invalid call AAdapt::ExpressionParser::ExpressionParser(), neq = "
-          << neq << ", spatialDim = " << spatialDim << ".");
-
-  bool success;
-
-#if defined(ALBANY_PAMGEN)
-  // set up RTCompiler
-  rtcFunctionX.addVar("double", "x");
-  rtcFunctionX.addVar("double", "y");
-  rtcFunctionX.addVar("double", "z");
-  rtcFunctionX.addVar("double", "value");
-  success = rtcFunctionX.addBody(expressionX);
-  if (!success) {
-    std::string msg =
-        "\n**** Error in AAdapt::ExpressionParser::ExpressionParser().\n";
-    msg += "**** " + rtcFunctionX.getErrors() + "\n";
-    ALBANY_PANIC(!success, msg);
-  }
-
-  if (neq > 1) {
-    rtcFunctionY.addVar("double", "x");
-    rtcFunctionY.addVar("double", "y");
-    rtcFunctionY.addVar("double", "z");
-    rtcFunctionY.addVar("double", "value");
-    success = rtcFunctionY.addBody(expressionY);
-    if (!success) {
-      std::string msg =
-          "\n**** Error in AAdapt::ExpressionParser::ExpressionParser().\n";
-      msg += "**** " + rtcFunctionY.getErrors() + "\n";
-      ALBANY_PANIC(!success, msg);
-    }
-  }
-
-  if (neq > 2) {
-    rtcFunctionZ.addVar("double", "x");
-    rtcFunctionZ.addVar("double", "y");
-    rtcFunctionZ.addVar("double", "z");
-    rtcFunctionZ.addVar("double", "value");
-    success = rtcFunctionZ.addBody(expressionZ);
-    if (!success) {
-      std::string msg =
-          "\n**** Error in AAdapt::ExpressionParser::ExpressionParser().\n";
-      msg += "**** " + rtcFunctionZ.getErrors() + "\n";
-      ALBANY_PANIC(!success, msg);
-    }
-  }
-#endif
 }
 
 void
@@ -832,85 +774,4 @@ AAdapt::ExpressionParser::compute(double* solution, const double* X)
 {
   bool   success;
   double value;
-
-#if defined(ALBANY_PAMGEN)
-  for (int i = 0; i < spatialDim; i++) {
-    success = rtcFunctionX.varValueFill(i, X[i]);
-    ALBANY_PANIC(
-        !success,
-        "Error inAAdapt::ExpressionParser::compute(), "
-        "rtcFunctionX.varValueFill(), " +
-            rtcFunctionX.getErrors());
-  }
-  success = rtcFunctionX.varValueFill(spatialDim, 0.0);
-  ALBANY_PANIC(
-      !success,
-      "Error inAAdapt::ExpressionParser::compute(), "
-      "rtcFunctionX.varValueFill(), " +
-          rtcFunctionX.getErrors());
-  success = rtcFunctionX.execute();
-  ALBANY_PANIC(
-      !success,
-      "Error inAAdapt::ExpressionParser::compute(), rtcFunctionX.execute(), " +
-          rtcFunctionX.getErrors());
-  solution[0] = rtcFunctionX.getValueOfVar("value");
-
-  if (neq > 1) {
-    for (int i = 0; i < spatialDim; i++) {
-      success = rtcFunctionY.varValueFill(i, X[i]);
-      ALBANY_PANIC(
-          !success,
-          "Error inAAdapt::ExpressionParser::compute(), "
-          "rtcFunctionY.varValueFill(), " +
-              rtcFunctionY.getErrors());
-    }
-    success = rtcFunctionY.varValueFill(spatialDim, 0.0);
-    ALBANY_PANIC(
-        !success,
-        "Error inAAdapt::ExpressionParser::compute(), "
-        "rtcFunctionY.varValueFill(), " +
-            rtcFunctionY.getErrors());
-    success = rtcFunctionY.execute();
-    ALBANY_PANIC(
-        !success,
-        "Error inAAdapt::ExpressionParser::compute(), "
-        "rtcFunctionY.execute(), " +
-            rtcFunctionY.getErrors());
-    solution[1] = rtcFunctionY.getValueOfVar("value");
-  }
-
-  if (neq > 2) {
-    for (int i = 0; i < spatialDim; i++) {
-      success = rtcFunctionZ.varValueFill(i, X[i]);
-      ALBANY_PANIC(
-          !success,
-          "Error inAAdapt::ExpressionParser::compute(), "
-          "rtcFunctionZ.varValueFill(), " +
-              rtcFunctionZ.getErrors());
-    }
-    success = rtcFunctionZ.varValueFill(spatialDim, 0.0);
-    ALBANY_PANIC(
-        !success,
-        "Error inAAdapt::ExpressionParser::compute(), "
-        "rtcFunctionZ.varValueFill(), " +
-            rtcFunctionZ.getErrors());
-    success = rtcFunctionZ.execute();
-    ALBANY_PANIC(
-        !success,
-        "Error inAAdapt::ExpressionParser::compute(), "
-        "rtcFunctionZ.execute(), " +
-            rtcFunctionZ.getErrors());
-    solution[2] = rtcFunctionZ.getValueOfVar("value");
-  }
-#endif
-
-  //   std::cout << "DEBUG CHECK ExpressionParser " << expressionX << "
-  //   evaluated at " << X[0] << ", " << X[1] << ", " << X[2] << " yields " <<
-  //   solution[0] << std::endl; std::cout << "DEBUG CHECK ExpressionParser " <<
-  //   expressionY << " evaluated at " << X[0] << ", " << X[1] << ", " << X[2]
-  //   << " yields " << solution[1] << std::endl; std::cout << "DEBUG CHECK
-  //   ExpressionParser " << expressionZ << " evaluated at " << X[0] << ", " <<
-  //   X[1] << ", " << X[2] << " yields " << solution[2] << std::endl;
-
-  return;
 }

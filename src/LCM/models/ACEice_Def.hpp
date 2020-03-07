@@ -331,7 +331,7 @@ ACEiceMiniKernel<EvalT, Traits>::init(
   auto const num_cells = workset.numCells;
   auto const coords    = this->model_.getCoordVecField();
   for (auto cell = 0; cell < num_cells; ++cell) {
-    failed_(cell, 0) = 0.0;  // One per element
+    failed_(cell) = 0.0;  // One per element
     for (auto pt = 0; pt < num_pts_; ++pt) {
       auto const height = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
       ScalarT    sal    = salinity_base_;
@@ -369,7 +369,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const& Told          = T_old_(cell, pt);
   auto const& iold          = ice_saturation_old_(cell, pt);
   auto&&      delta_time    = delta_time_(0);
-  auto&&      failed        = failed_(cell, 0);
+  auto&&      failed        = failed_(cell);
   auto&&      exposure_time = exposure_time_(cell, pt);
 
   // Determine if erosion has occurred.

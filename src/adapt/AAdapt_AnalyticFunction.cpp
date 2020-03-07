@@ -765,6 +765,23 @@ AAdapt::ExpressionParser::ExpressionParser(
 }
 
 void
-AAdapt::ExpressionParser::compute(double* x, const double* X)
+AAdapt::ExpressionParser::compute(double* x, double const* X)
 {
+  for (auto eq = 0; eq < neq; ++eq) {
+    stk::expreval::Eval expr_eval(expr[eq]);
+    expr_eval.parse();
+    if (dim > 0) {
+      auto X0 = X[0];
+      expr_eval.bindVariable("x", X0);
+    }
+    if (dim > 1) {
+      auto X1 = X[1];
+      expr_eval.bindVariable("y", X1);
+    }
+    if (dim > 2) {
+      auto X2 = X[2];
+      expr_eval.bindVariable("z", X2);
+    }
+    x[eq] = expr_eval.evaluate();
+  }
 }

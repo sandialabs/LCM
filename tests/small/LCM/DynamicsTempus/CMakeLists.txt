@@ -4,9 +4,9 @@
 # in the file license.txt in the top-level Albany directory.
 #
 
-add_subdirectory(Cubes)
-add_subdirectory(CubesSDBC)
-add_subdirectory(CubesSDBCPressureNBC)
+add_subdirectory(Cube)
+add_subdirectory(CubeSDBC)
+add_subdirectory(CubePressureNBC)
 add_subdirectory(Clamped)
 add_subdirectory(ClampedSDBC)
 add_subdirectory(Torsion)

@@ -60,8 +60,7 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_ConjugateGradient.exodiff COPYONLY)
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_ConjugateGradient.gold.e
-  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_ConjugateGradient.gold.e
-  COPYONLY)
+  ${CMAKE_CURRENT_BINARY_DIR}/MinisolverStep_ConjugateGradient.gold.e COPYONLY)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MinisolverStep_LineSearchRegularized.yaml

@@ -25,17 +25,16 @@ getValidInitialConditionParameters(
       rcp(new Teuchos::ParameterList("ValidInitialConditionParams"));
   ;
   validPL->set<std::string>("Function", "", "");
-  Teuchos::Array<double> defaultData;
+  Teuchos::Array<double>      defaultData;
+  Teuchos::Array<std::string> expr;
   validPL->set<Teuchos::Array<double>>("Function Data", defaultData, "");
-  validPL->set<std::string>("Function Expression for DOF X", "None", "");
-  validPL->set<std::string>("Function Expression for DOF Y", "None", "");
-  validPL->set<std::string>("Function Expression for DOF Z", "None", "");
+  validPL->set<Teuchos::Array<std::string>>("Function Expressions", expr);
 
   // Validate element block constant data
 
-  for (int i = 0; i < wsEBNames.size(); i++)
-
+  for (int i = 0; i < wsEBNames.size(); i++) {
     validPL->set<Teuchos::Array<double>>(wsEBNames[i], defaultData, "");
+  }
 
   // For EBConstant data, we can optionally randomly perturb the IC on each
   // variable some amount

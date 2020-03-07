@@ -13,9 +13,8 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Implicit_Material.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Implicit.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Implicit.exodiff COPYONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Implicit.gold.e
-  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Implicit.gold.e COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Implicit.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Implicit.gold.e COPYONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Explicit.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit.yaml COPYONLY)
@@ -24,9 +23,8 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit_Material.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Explicit.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit.exodiff COPYONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Explicit.gold.e
-  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit.gold.e COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlip_Explicit.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/SingleSlip_Explicit.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)

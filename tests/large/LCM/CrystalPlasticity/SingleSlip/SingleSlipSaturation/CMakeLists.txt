@@ -16,9 +16,8 @@ configure_file(
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlipSaturation.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/SingleSlipSaturation.exodiff COPYONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/SingleSlipSaturation.gold.e
-  ${CMAKE_CURRENT_BINARY_DIR}/SingleSlipSaturation.gold.e COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleSlipSaturation.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/SingleSlipSaturation.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)

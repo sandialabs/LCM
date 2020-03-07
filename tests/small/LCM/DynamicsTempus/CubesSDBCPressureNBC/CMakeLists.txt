@@ -14,5 +14,6 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 add_test(Serial_Dynamic_${testName}_NewmarkImplicitDForm_PressureNBC_Tempus
          ${SerialAlbany.exe} cube-pnbc.yaml)
-set_tests_properties(Serial_Dynamic_${testName}_NewmarkImplicitDForm_PressureNBC_Tempus
-                     PROPERTIES LABELS "LCM;Tpetra;Forward")
+set_tests_properties(
+  Serial_Dynamic_${testName}_NewmarkImplicitDForm_PressureNBC_Tempus
+  PROPERTIES LABELS "LCM;Tpetra;Forward")

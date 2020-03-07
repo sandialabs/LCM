@@ -26,5 +26,5 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ocean_salinity.txt
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 add_test(ACE_Cube_${testName} ${SerialAlbany.exe} cube.yaml)
-set_tests_properties(ACE_Cube_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
-
+set_tests_properties(ACE_Cube_${testName} PROPERTIES LABELS
+                                                     "LCM;Tpetra;Forward")

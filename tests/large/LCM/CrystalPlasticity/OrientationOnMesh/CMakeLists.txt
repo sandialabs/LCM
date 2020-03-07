@@ -46,9 +46,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OrientationNotOnMesh.g.4.3
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/OrientationNotOnMesh.exodiff
   ${CMAKE_CURRENT_BINARY_DIR}/OrientationNotOnMesh.exodiff COPYONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/OrientationNotOnMesh.gold.e
-  ${CMAKE_CURRENT_BINARY_DIR}/OrientationNotOnMesh.gold.e COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OrientationNotOnMesh.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/OrientationNotOnMesh.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)

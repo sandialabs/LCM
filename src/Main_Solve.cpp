@@ -111,7 +111,7 @@ main(int argc, char* argv[])
         slvrfctry.getAnalysisParameters().sublist(
             "Solve", /*mustAlreadyExist =*/false);
 
-    Teuchos::Array<Teuchos::RCP<const Thyra_Vector>> thyraResponses;
+    Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> thyraResponses;
     Teuchos::Array<Teuchos::Array<Teuchos::RCP<const Thyra_MultiVector>>>
         thyraSensitivities;
     Piro::PerformSolve(

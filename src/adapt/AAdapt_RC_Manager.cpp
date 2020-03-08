@@ -862,7 +862,7 @@ Manager::update_x(const Thyra_Vector& soln_nol)
       x_data, sol_data, impl_->state_mgr_->getDiscretization());
 }
 
-Teuchos::RCP<const Thyra_Vector>
+Teuchos::RCP<Thyra_Vector const>
 Manager::add_x(Teuchos::RCP<Thyra_Vector const> const& a) const
 {
   Teuchos::RCP<Thyra_Vector> c = Thyra::createMember(a->space());

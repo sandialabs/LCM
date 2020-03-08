@@ -63,7 +63,7 @@ void
 TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     typename Traits::EvalData dirichletWorkset)
 {
-  Teuchos::RCP<const Thyra_Vector> x = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
 
   Teuchos::ArrayRCP<const ST> x_constView    = Albany::getLocalData(x);
@@ -112,7 +112,7 @@ void
 TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData dirichletWorkset)
 {
-  Teuchos::RCP<const Thyra_Vector> x   = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;
   Teuchos::RCP<Thyra_LinearOp>     jac = dirichletWorkset.Jac;
 
@@ -184,7 +184,7 @@ void
 TorsionBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     typename Traits::EvalData dirichletWorkset)
 {
-  Teuchos::RCP<const Thyra_Vector>      x  = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const>      x  = dirichletWorkset.x;
   Teuchos::RCP<const Thyra_MultiVector> Vx = dirichletWorkset.Vx;
   Teuchos::RCP<Thyra_Vector>            f  = dirichletWorkset.f;
   Teuchos::RCP<Thyra_MultiVector>       fp = dirichletWorkset.fp;

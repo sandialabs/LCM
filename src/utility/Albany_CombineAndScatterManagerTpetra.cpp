@@ -155,7 +155,7 @@ CombineAndScatterManagerTpetra::combine(
 
   if (srcT.is_null()) {
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
-    Teuchos::RCP<const Thyra_Vector> srcV =
+    Teuchos::RCP<Thyra_Vector const> srcV =
         Teuchos::rcp_dynamic_cast<const Thyra_Vector>(src);
 
     ALBANY_PANIC(
@@ -314,7 +314,7 @@ CombineAndScatterManagerTpetra::scatter(
 
   if (srcT.is_null()) {
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
-    Teuchos::RCP<const Thyra_Vector> srcV =
+    Teuchos::RCP<Thyra_Vector const> srcV =
         Teuchos::rcp_dynamic_cast<const Thyra_Vector>(src);
 
     ALBANY_PANIC(

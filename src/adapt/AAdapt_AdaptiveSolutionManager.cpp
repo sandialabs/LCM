@@ -282,7 +282,7 @@ AdaptiveSolutionManager::resizeMeshDataArrays(
   cas_manager = Albany::createCombineAndScatterManager(owned_vs, overlapped_vs);
 }
 
-Teuchos::RCP<const Thyra_Vector>
+Teuchos::RCP<Thyra_Vector const>
 AdaptiveSolutionManager::updateAndReturnOverlapSolution(
     const Thyra_Vector& solution /* not overlapped */)
 {
@@ -291,7 +291,7 @@ AdaptiveSolutionManager::updateAndReturnOverlapSolution(
   return overlapped_soln->col(0);
 }
 
-Teuchos::RCP<const Thyra_Vector>
+Teuchos::RCP<Thyra_Vector const>
 AdaptiveSolutionManager::updateAndReturnOverlapSolutionDot(
     const Thyra_Vector& solution_dot /* not overlapped */)
 {
@@ -300,7 +300,7 @@ AdaptiveSolutionManager::updateAndReturnOverlapSolutionDot(
   return overlapped_soln->col(1);
 }
 
-Teuchos::RCP<const Thyra_Vector>
+Teuchos::RCP<Thyra_Vector const>
 AdaptiveSolutionManager::updateAndReturnOverlapSolutionDotDot(
     const Thyra_Vector& solution_dotdot /* not overlapped */)
 {

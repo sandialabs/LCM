@@ -158,9 +158,9 @@ PiroObserver::observeSolutionImpl(
 void
 PiroObserver::observeResponse(
     const ST                         defaultStamp,
-    Teuchos::RCP<const Thyra_Vector> solution,
-    Teuchos::RCP<const Thyra_Vector> solution_dot,
-    Teuchos::RCP<const Thyra_Vector> /* solution_dotdot */)
+    Teuchos::RCP<Thyra_Vector const> solution,
+    Teuchos::RCP<Thyra_Vector const> solution_dot,
+    Teuchos::RCP<Thyra_Vector const> /* solution_dotdot */)
 {
   // IKT, 5/10/17: note that this function takes solution_dotdot as an input
   // argument but does not do anything with it yet.  This can be modified

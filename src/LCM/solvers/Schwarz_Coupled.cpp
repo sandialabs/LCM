@@ -835,11 +835,11 @@ SchwarzCoupled::evalModelImpl(
   }
 
   // Create a Teuchos array of the x for each model
-  Teuchos::Array<Teuchos::RCP<const Thyra_Vector>> xs(num_models_),
+  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> xs(num_models_),
       x_dots(num_models_);
 
   // x_dotdot not used, so just create a global Thyra Vector RCP
-  Teuchos::RCP<const Thyra_Vector> x_dotdotT;
+  Teuchos::RCP<Thyra_Vector const> x_dotdotT;
 
   for (int m = 0; m < num_models_; ++m) {
     // Get each Thyra vector

@@ -57,11 +57,11 @@ DirichletField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   const std::vector<GO>& nsNodesGIDs =
       dirichletWorkset.disc->getNodeSetGIDs().find(this->nodeSetID)->second;
 
-  Teuchos::RCP<const Thyra_Vector> pvec =
+  Teuchos::RCP<Thyra_Vector const> pvec =
       dirichletWorkset.distParamLib->get(this->field_name)->vector();
   Teuchos::ArrayRCP<const ST> p_constView = Albany::getLocalData(pvec);
 
-  Teuchos::RCP<const Thyra_Vector> x = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
 
   Teuchos::ArrayRCP<const ST> x_constView    = Albany::getLocalData(x);
@@ -105,11 +105,11 @@ DirichletField<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   const std::vector<GO>& nsNodesGIDs =
       dirichletWorkset.disc->getNodeSetGIDs().find(this->nodeSetID)->second;
 
-  Teuchos::RCP<const Thyra_Vector> pvec =
+  Teuchos::RCP<Thyra_Vector const> pvec =
       dirichletWorkset.distParamLib->get(this->field_name)->vector();
   Teuchos::ArrayRCP<const ST> p_constView = Albany::getLocalData(pvec);
 
-  Teuchos::RCP<const Thyra_Vector> x   = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;
   Teuchos::RCP<Thyra_LinearOp>     jac = dirichletWorkset.Jac;
 
@@ -178,11 +178,11 @@ DirichletField<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
   const std::vector<GO>& nsNodesGIDs =
       dirichletWorkset.disc->getNodeSetGIDs().find(this->nodeSetID)->second;
 
-  Teuchos::RCP<const Thyra_Vector> pvec =
+  Teuchos::RCP<Thyra_Vector const> pvec =
       dirichletWorkset.distParamLib->get(this->field_name)->vector();
   Teuchos::ArrayRCP<const ST> p_constView = Albany::getLocalData(pvec);
 
-  Teuchos::RCP<const Thyra_Vector> x = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
 
   Teuchos::RCP<const Thyra_MultiVector> Vx = dirichletWorkset.Vx;

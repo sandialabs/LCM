@@ -112,13 +112,13 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
   double time;
 
   //! Velocity vector
-  Teuchos::RCP<const Thyra_Vector> xdot;
+  Teuchos::RCP<Thyra_Vector const> xdot;
 
   //! Acceleration vector
-  Teuchos::RCP<const Thyra_Vector> xdotdot;
+  Teuchos::RCP<Thyra_Vector const> xdotdot;
 
   //! Solution vector
-  Teuchos::RCP<const Thyra_Vector> x;
+  Teuchos::RCP<Thyra_Vector const> x;
 
   //! Scalar parameters
   Teuchos::RCP<Teuchos::Array<ParamVec>> scalar_params;

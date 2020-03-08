@@ -893,7 +893,7 @@ checkDerivatives(
   }
 
   // If necessary, compute f(x).
-  Teuchos::RCP<const Thyra_Vector> f;
+  Teuchos::RCP<Thyra_Vector const> f;
   if (fi.is_null()) {
     Teuchos::RCP<Thyra_Vector> tmp = Thyra::createMember(x->space());
     app.computeGlobalResidual(time, x, xdot, xdotdot, p, tmp);
@@ -2433,10 +2433,10 @@ Application::setupBasicWorksetInfo(
       solMgr->getOverlappedSolution();
   auto numVectors = overlapped_MV->domain()->dim();
 
-  Teuchos::RCP<const Thyra_Vector> overlapped_x = overlapped_MV->col(0);
-  Teuchos::RCP<const Thyra_Vector> overlapped_xdot =
+  Teuchos::RCP<Thyra_Vector const> overlapped_x = overlapped_MV->col(0);
+  Teuchos::RCP<Thyra_Vector const> overlapped_xdot =
       numVectors > 1 ? overlapped_MV->col(1) : Teuchos::null;
-  Teuchos::RCP<const Thyra_Vector> overlapped_xdotdot =
+  Teuchos::RCP<Thyra_Vector const> overlapped_xdotdot =
       numVectors > 2 ? overlapped_MV->col(2) : Teuchos::null;
 
   // Scatter xT and xdotT to the overlapped distrbution

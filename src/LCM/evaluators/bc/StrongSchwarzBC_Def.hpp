@@ -548,9 +548,9 @@ template <typename StrongSchwarzBC, typename Traits>
 void
 fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<const Thyra_Vector> const_disp = dbc_workset.x;
-  Teuchos::RCP<const Thyra_Vector> const_velo = dbc_workset.xdot;
-  Teuchos::RCP<const Thyra_Vector> const_acce = dbc_workset.xdotdot;
+  Teuchos::RCP<Thyra_Vector const> const_disp = dbc_workset.x;
+  Teuchos::RCP<Thyra_Vector const> const_velo = dbc_workset.xdot;
+  Teuchos::RCP<Thyra_Vector const> const_acce = dbc_workset.xdotdot;
 
   bool const has_disp = const_disp != Teuchos::null;
 

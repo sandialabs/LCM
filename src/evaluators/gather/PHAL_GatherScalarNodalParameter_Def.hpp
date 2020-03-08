@@ -72,7 +72,7 @@ void
 GatherScalarNodalParameter<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  Teuchos::RCP<const Thyra_Vector> pvec =
+  Teuchos::RCP<Thyra_Vector const> pvec =
       workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
 
@@ -109,7 +109,7 @@ GatherScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
 {
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?
-  Teuchos::RCP<const Thyra_Vector> pvec =
+  Teuchos::RCP<Thyra_Vector const> pvec =
       workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
 
@@ -179,7 +179,7 @@ GatherScalarNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>::
     evaluateFields(typename Traits::EvalData workset)
 {
   // Distributed parameter vector
-  Teuchos::RCP<const Thyra_Vector> pvec =
+  Teuchos::RCP<Thyra_Vector const> pvec =
       workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
 
@@ -275,7 +275,7 @@ GatherScalarExtruded2DNodalParameter<
 {
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?
-  Teuchos::RCP<const Thyra_Vector> pvec =
+  Teuchos::RCP<Thyra_Vector const> pvec =
       workset.distParamLib->get(this->param_name)->overlapped_vector();
   Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
 

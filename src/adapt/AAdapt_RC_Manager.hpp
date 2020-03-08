@@ -95,7 +95,7 @@ class Manager
   void
   update_x(const Thyra_Vector& soln_nol);
   //! Return x + a for nonoverlapping a.
-  Teuchos::RCP<const Thyra_Vector>
+  Teuchos::RCP<Thyra_Vector const>
   add_x(Teuchos::RCP<Thyra_Vector const> const& a) const;
 
   /* Problems use these methods to set up RCU. */

@@ -41,9 +41,9 @@ struct Workset
   unsigned int numEqs{0};
 
   // Solution vector (and time derivatives)
-  Teuchos::RCP<const Thyra_Vector> x;
-  Teuchos::RCP<const Thyra_Vector> xdot;
-  Teuchos::RCP<const Thyra_Vector> xdotdot;
+  Teuchos::RCP<Thyra_Vector const> x;
+  Teuchos::RCP<Thyra_Vector const> xdot;
+  Teuchos::RCP<Thyra_Vector const> xdotdot;
 
   Teuchos::RCP<ParamVec> params;
 

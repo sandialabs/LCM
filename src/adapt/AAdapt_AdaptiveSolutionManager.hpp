@@ -70,13 +70,13 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
     return overlapped_soln;
   }
 
-  Teuchos::RCP<const Thyra_Vector>
+  Teuchos::RCP<Thyra_Vector const>
   updateAndReturnOverlapSolution(
       const Thyra_Vector& solution /*not overlapped*/);
-  Teuchos::RCP<const Thyra_Vector>
+  Teuchos::RCP<Thyra_Vector const>
   updateAndReturnOverlapSolutionDot(
       const Thyra_Vector& solution_dot /*not overlapped*/);
-  Teuchos::RCP<const Thyra_Vector>
+  Teuchos::RCP<Thyra_Vector const>
   updateAndReturnOverlapSolutionDotDot(
       const Thyra_Vector& solution_dotdot /*not overlapped*/);
   Teuchos::RCP<const Thyra_MultiVector>

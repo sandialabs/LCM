@@ -45,10 +45,10 @@ createThyraVector(const Teuchos::RCP<Tpetra_Vector>& v)
   return v_thyra;
 }
 
-Teuchos::RCP<const Thyra_Vector>
+Teuchos::RCP<Thyra_Vector const>
 createConstThyraVector(const Teuchos::RCP<const Tpetra_Vector>& v)
 {
-  Teuchos::RCP<const Thyra_Vector> v_thyra = Teuchos::null;
+  Teuchos::RCP<Thyra_Vector const> v_thyra = Teuchos::null;
   if (!v.is_null()) { v_thyra = Thyra::createConstVector(v); }
 
   return v_thyra;

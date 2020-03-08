@@ -18,7 +18,7 @@ createThyraVectorSpace(const Teuchos::RCP<const Tpetra_Map>& map);
 Teuchos::RCP<Thyra_Vector>
 createThyraVector(const Teuchos::RCP<Tpetra_Vector>& v);
 
-Teuchos::RCP<const Thyra_Vector>
+Teuchos::RCP<Thyra_Vector const>
 createConstThyraVector(const Teuchos::RCP<const Tpetra_Vector>& v);
 
 Teuchos::RCP<Thyra_MultiVector>

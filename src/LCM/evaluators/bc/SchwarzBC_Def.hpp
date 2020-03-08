@@ -479,7 +479,7 @@ void
 fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 {
   // Solution
-  Teuchos::RCP<const Thyra_Vector> x = dbc_workset.x;
+  Teuchos::RCP<Thyra_Vector const> x = dbc_workset.x;
 
   Teuchos::ArrayRCP<ST const> x_const_view = Albany::getLocalData(x);
 
@@ -602,7 +602,7 @@ void
 SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<const Thyra_Vector> x   = dbc_workset.x;
+  Teuchos::RCP<Thyra_Vector const> x   = dbc_workset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dbc_workset.f;
   Teuchos::RCP<Thyra_LinearOp>     jac = dbc_workset.Jac;
 
@@ -686,7 +686,7 @@ void
 SchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     typename Traits::EvalData dbc_workset)
 {
-  Teuchos::RCP<const Thyra_Vector>      x  = dbc_workset.x;
+  Teuchos::RCP<Thyra_Vector const>      x  = dbc_workset.x;
   Teuchos::RCP<const Thyra_MultiVector> Vx = dbc_workset.Vx;
   Teuchos::RCP<Thyra_Vector>            f  = dbc_workset.f;
   Teuchos::RCP<Thyra_MultiVector>       fp = dbc_workset.fp;

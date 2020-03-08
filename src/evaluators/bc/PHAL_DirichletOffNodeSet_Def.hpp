@@ -44,7 +44,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     }
   }
 
-  Teuchos::RCP<const Thyra_Vector> x = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
 
   Teuchos::ArrayRCP<const ST> x_constView    = Albany::getLocalData(x);
@@ -86,7 +86,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     }
   }
 
-  Teuchos::RCP<const Thyra_Vector> x   = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;
   Teuchos::RCP<Thyra_LinearOp>     jac = dirichletWorkset.Jac;
 
@@ -154,7 +154,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     }
   }
 
-  Teuchos::RCP<const Thyra_Vector>      x  = dirichletWorkset.x;
+  Teuchos::RCP<Thyra_Vector const>      x  = dirichletWorkset.x;
   Teuchos::RCP<const Thyra_MultiVector> Vx = dirichletWorkset.Vx;
   Teuchos::RCP<Thyra_Vector>            f  = dirichletWorkset.f;
   Teuchos::RCP<Thyra_MultiVector>       fp = dirichletWorkset.fp;

@@ -83,9 +83,9 @@ class PiroObserver : public Piro::ObserverBase<ST>
   void
   observeResponse(
       const ST                         defaultStamp,
-      Teuchos::RCP<const Thyra_Vector> solution,
-      Teuchos::RCP<const Thyra_Vector> solution_dot    = Teuchos::null,
-      Teuchos::RCP<const Thyra_Vector> solution_dotdot = Teuchos::null);
+      Teuchos::RCP<Thyra_Vector const> solution,
+      Teuchos::RCP<Thyra_Vector const> solution_dot    = Teuchos::null,
+      Teuchos::RCP<Thyra_Vector const> solution_dotdot = Teuchos::null);
 
   ObserverImpl impl_;
 

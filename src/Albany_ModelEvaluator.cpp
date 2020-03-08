@@ -663,7 +663,7 @@ ModelEvaluator::evalModelImpl(
   // IKT, 3/30/17: the following logic is meant to support both the Thyra
   // time-integrators in Piro
   //(e.g., trapezoidal rule) and the second order time-integrators in Tempus.
-  Teuchos::RCP<const Thyra_Vector> x_dotdot;
+  Teuchos::RCP<Thyra_Vector const> x_dotdot;
   ST                               omega = 0.0;
   if (supports_xdotdot == true) {
     if (use_tempus == true) omega = inArgs.get_W_x_dot_dot_coeff();

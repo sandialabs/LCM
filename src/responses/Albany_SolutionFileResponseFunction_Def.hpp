@@ -60,7 +60,7 @@ SolutionFileResponseFunction<Norm>::evaluateResponse(
   Teuchos::Array<ST> coeffs(2);
   coeffs[0] = 1.0;
   coeffs[1] = -1.0;
-  Teuchos::Array<Teuchos::Ptr<const Thyra_Vector>> vecs(2);
+  Teuchos::Array<Teuchos::Ptr<Thyra_Vector const>> vecs(2);
   vecs[0] = x.ptr();
   vecs[1] = RefSoln.ptr();
   diff->linear_combination(coeffs, vecs, 0.0);
@@ -135,7 +135,7 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
     Teuchos::Array<ST> coeffs(2);
     coeffs[0] = 1.0;
     coeffs[1] = -1.0;
-    Teuchos::Array<Teuchos::Ptr<const Thyra_Vector>> vecs(2);
+    Teuchos::Array<Teuchos::Ptr<Thyra_Vector const>> vecs(2);
     vecs[0] = x.ptr();
     vecs[1] = RefSoln.ptr();
     diff->linear_combination(coeffs, vecs, 0.0);

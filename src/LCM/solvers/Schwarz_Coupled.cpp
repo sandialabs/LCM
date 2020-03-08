@@ -1011,7 +1011,7 @@ SchwarzCoupled::evalModelImpl(
               Thyra::createMember(jacs_[m]->range());
           invdiag->reciprocal(*diag);
           auto invdiag_constView = Albany::getLocalData(
-              Teuchos::rcp_dynamic_cast<const Thyra_Vector>(invdiag));
+              Teuchos::rcp_dynamic_cast<Thyra_Vector const>(invdiag));
           // Zero out precs_[m]
           Albany::resumeFill(precs_[m]);
           Albany::scale(precs_[m], 0.0);
@@ -1061,7 +1061,7 @@ SchwarzCoupled::evalModelImpl(
               Thyra::createMember(jacs_[m]->range());
           invabsrowsum->reciprocal(*absrowsum);
           auto invabsrowsum_constView = Albany::getLocalData(
-              Teuchos::rcp_dynamic_cast<const Thyra_Vector>(invabsrowsum));
+              Teuchos::rcp_dynamic_cast<Thyra_Vector const>(invabsrowsum));
           // Zero out precs_[m]
           Albany::resumeFill(precs_[m]);
           Albany::scale(precs_[m], 0.0);

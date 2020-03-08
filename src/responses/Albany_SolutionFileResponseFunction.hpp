@@ -111,7 +111,7 @@ class SolutionFileResponseFunction : public SamplingBasedScalarResponseFunction
 struct NormTwo
 {
   static double
-  Norm(const Thyra_Vector& vec)
+  Norm(Thyra_Vector const& vec)
   {
     auto norm = vec.norm_2();
     return norm * norm;
@@ -119,14 +119,14 @@ struct NormTwo
 
   static void
   NormDerivative(
-      const Thyra_Vector& x,
-      const Thyra_Vector& soln,
+      Thyra_Vector const& x,
+      Thyra_Vector const& soln,
       Thyra_Vector&       grad)
   {
     Teuchos::Array<ST> coeffs(2);
     coeffs[0] = 2.0;
     coeffs[1] = -2.0;
-    Teuchos::Array<Teuchos::Ptr<const Thyra_Vector>> vecs(2);
+    Teuchos::Array<Teuchos::Ptr<Thyra_Vector const>> vecs(2);
     vecs[0] = Teuchos::constPtr(x);
     vecs[1] = Teuchos::constPtr(soln);
     grad.linear_combination(coeffs, vecs, 0.0);
@@ -136,15 +136,15 @@ struct NormTwo
 struct NormInf
 {
   static double
-  Norm(const Thyra_Vector& vec)
+  Norm(Thyra_Vector const& vec)
   {
     return vec.norm_inf();
   }
 
   static void
   NormDerivative(
-      const Thyra_Vector& /* x */,
-      const Thyra_Vector& /* soln */,
+      Thyra_Vector const& /* x */,
+      Thyra_Vector const& /* soln */,
       Thyra_Vector& /* grad */)
   {
     ALBANY_ABORT(

@@ -19,7 +19,7 @@ class CombineAndScatterManagerTpetra : public CombineAndScatterManager
 
   // Combine methods
   void
-  combine(const Thyra_Vector& src, Thyra_Vector& dst, const CombineMode CM)
+  combine(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM)
       const override;
   void
   combine(
@@ -48,7 +48,7 @@ class CombineAndScatterManagerTpetra : public CombineAndScatterManager
 
   // Scatter methods
   void
-  scatter(const Thyra_Vector& src, Thyra_Vector& dst, const CombineMode CM)
+  scatter(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM)
       const override;
   void
   scatter(

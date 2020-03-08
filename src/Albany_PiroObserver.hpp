@@ -25,22 +25,22 @@ class PiroObserver : public Piro::ObserverBase<ST>
       Teuchos::RCP<const Thyra_ModelEvaluator> model = Teuchos::null);
 
   virtual void
-  observeSolution(const Thyra_Vector& solution);
+  observeSolution(Thyra_Vector const& solution);
 
   virtual void
-  observeSolution(const Thyra_Vector& solution, const ST stamp);
+  observeSolution(Thyra_Vector const& solution, const ST stamp);
 
   virtual void
   observeSolution(
-      const Thyra_Vector& solution,
-      const Thyra_Vector& solution_dot,
+      Thyra_Vector const& solution,
+      Thyra_Vector const& solution_dot,
       const ST            stamp);
 
   virtual void
   observeSolution(
-      const Thyra_Vector& solution,
-      const Thyra_Vector& solution_dot,
-      const Thyra_Vector& solution_dotdot,
+      Thyra_Vector const& solution,
+      Thyra_Vector const& solution_dot,
+      Thyra_Vector const& solution_dotdot,
       const ST            stamp);
 
   virtual void
@@ -51,19 +51,19 @@ class PiroObserver : public Piro::ObserverBase<ST>
 
  private:
   void
-  observeSolutionImpl(const Thyra_Vector& solution, const ST defaultStamp);
+  observeSolutionImpl(Thyra_Vector const& solution, const ST defaultStamp);
 
   void
   observeSolutionImpl(
-      const Thyra_Vector& solution,
-      const Thyra_Vector& solution_dot,
+      Thyra_Vector const& solution,
+      Thyra_Vector const& solution_dot,
       const ST            defaultStamp);
 
   void
   observeSolutionImpl(
-      const Thyra_Vector& solution,
-      const Thyra_Vector& solution_dot,
-      const Thyra_Vector& solution_dotdot,
+      Thyra_Vector const& solution,
+      Thyra_Vector const& solution_dot,
+      Thyra_Vector const& solution_dotdot,
       const ST            defaultStamp);
 
   void

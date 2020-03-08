@@ -85,32 +85,32 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
   saveVector(
-      const Thyra_Vector&                          field_vector,
+      Thyra_Vector const&                          field_vector,
       const std::string&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager);
   void
   saveSolnVector(
-      const Thyra_Vector&                          soln,
+      Thyra_Vector const&                          soln,
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
   saveSolnVector(
-      const Thyra_Vector&                          soln,
-      const Thyra_Vector&                          soln_dot,
+      Thyra_Vector const&                          soln,
+      Thyra_Vector const&                          soln_dot,
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
   saveSolnVector(
-      const Thyra_Vector&                          soln,
-      const Thyra_Vector&                          soln_dot,
-      const Thyra_Vector&                          soln_dotdot,
+      Thyra_Vector const&                          soln,
+      Thyra_Vector const&                          soln_dot,
+      Thyra_Vector const&                          soln_dotdot,
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
   saveResVector(
-      const Thyra_Vector&                          res,
+      Thyra_Vector const&                          res,
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
@@ -133,7 +133,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       const int                                    offset);
   void
   saveVectorImpl(
-      const Thyra_Vector&                          field_vector,
+      Thyra_Vector const&                          field_vector,
       const std::string&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,

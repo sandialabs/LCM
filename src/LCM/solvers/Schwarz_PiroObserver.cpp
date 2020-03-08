@@ -71,7 +71,7 @@ arrayVecsFromVec(Thyra::VectorBase<double> const& v, int n_models)
 
   for (int m = 0; m < n_models; ++m) {
     // Get each Thyra vector
-    vs[m] = Teuchos::rcp_dynamic_cast<const Thyra_Vector>(
+    vs[m] = Teuchos::rcp_dynamic_cast<Thyra_Vector const>(
         v_nonowning_rcp->getVectorBlock(m), true);
   }
   return vs;

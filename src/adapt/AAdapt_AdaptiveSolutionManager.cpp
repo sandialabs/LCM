@@ -284,7 +284,7 @@ AdaptiveSolutionManager::resizeMeshDataArrays(
 
 Teuchos::RCP<Thyra_Vector const>
 AdaptiveSolutionManager::updateAndReturnOverlapSolution(
-    const Thyra_Vector& solution /* not overlapped */)
+    Thyra_Vector const& solution /* not overlapped */)
 {
   cas_manager->scatter(
       solution, *overlapped_soln->col(0), Albany::CombineMode::INSERT);
@@ -293,7 +293,7 @@ AdaptiveSolutionManager::updateAndReturnOverlapSolution(
 
 Teuchos::RCP<Thyra_Vector const>
 AdaptiveSolutionManager::updateAndReturnOverlapSolutionDot(
-    const Thyra_Vector& solution_dot /* not overlapped */)
+    Thyra_Vector const& solution_dot /* not overlapped */)
 {
   cas_manager->scatter(
       solution_dot, *overlapped_soln->col(1), Albany::CombineMode::INSERT);
@@ -302,7 +302,7 @@ AdaptiveSolutionManager::updateAndReturnOverlapSolutionDot(
 
 Teuchos::RCP<Thyra_Vector const>
 AdaptiveSolutionManager::updateAndReturnOverlapSolutionDotDot(
-    const Thyra_Vector& solution_dotdot /* not overlapped */)
+    Thyra_Vector const& solution_dotdot /* not overlapped */)
 {
   cas_manager->scatter(
       solution_dotdot, *overlapped_soln->col(2), Albany::CombineMode::INSERT);
@@ -326,9 +326,9 @@ AdaptiveSolutionManager::scatterX(
 
 void
 AdaptiveSolutionManager::scatterX(
-    const Thyra_Vector&                    x,
-    const Teuchos::Ptr<const Thyra_Vector> x_dot,
-    const Teuchos::Ptr<const Thyra_Vector> x_dotdot)
+    Thyra_Vector const&                    x,
+    const Teuchos::Ptr<Thyra_Vector const> x_dot,
+    const Teuchos::Ptr<Thyra_Vector const> x_dotdot)
 {
   cas_manager->scatter(
       x, *overlapped_soln->col(0), Albany::CombineMode::INSERT);

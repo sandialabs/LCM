@@ -256,32 +256,32 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
   saveVector(
-      const Thyra_Vector&                          field_vector,
+      Thyra_Vector const&                          field_vector,
       const std::string&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager) = 0;
   virtual void
   saveSolnVector(
-      const Thyra_Vector&                          soln,
+      Thyra_Vector const&                          soln,
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
   saveSolnVector(
-      const Thyra_Vector&                          soln,
-      const Thyra_Vector&                          soln_dot,
+      Thyra_Vector const&                          soln,
+      Thyra_Vector const&                          soln_dot,
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
   saveSolnVector(
-      const Thyra_Vector&                          soln,
-      const Thyra_Vector&                          soln_dot,
-      const Thyra_Vector&                          soln_dotdot,
+      Thyra_Vector const&                          soln,
+      Thyra_Vector const&                          soln_dot,
+      Thyra_Vector const&                          soln_dotdot,
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
   saveResVector(
-      const Thyra_Vector&                          res,
+      Thyra_Vector const&                          res,
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void

@@ -74,7 +74,7 @@ class CombineAndScatterManager
 
   // Combine methods
   virtual void
-  combine(const Thyra_Vector& src, Thyra_Vector& dst, const CombineMode CM)
+  combine(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM)
       const = 0;
   virtual void
   combine(
@@ -103,7 +103,7 @@ class CombineAndScatterManager
 
   // Scatter methods
   virtual void
-  scatter(const Thyra_Vector& src, Thyra_Vector& dst, const CombineMode CM)
+  scatter(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM)
       const = 0;
   virtual void
   scatter(

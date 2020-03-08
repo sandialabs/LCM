@@ -89,7 +89,7 @@ class SolutionAverageResponseFunction : public ScalarResponseFunction
 
  private:
   void
-  evaluateResponseImpl(const Thyra_Vector& x, Thyra_Vector& g);
+  evaluateResponseImpl(Thyra_Vector const& x, Thyra_Vector& g);
 
   Teuchos::RCP<Thyra_Vector>      one;
   Teuchos::RCP<Thyra_MultiVector> ones;

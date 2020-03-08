@@ -47,8 +47,8 @@ StatelessObserverImpl::getNonOverlappedVectorSpace() const
 void
 StatelessObserverImpl::observeSolution(
     double                                  stamp,
-    const Thyra_Vector&                     nonOverlappedSolution,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot)
+    Thyra_Vector const&                     nonOverlappedSolution,
+    const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot)
 {
   Teuchos::TimeMonitor                   timer(*solOutTime_);
   Teuchos::RCP<Thyra_Vector const> const overlappedSolution =
@@ -72,9 +72,9 @@ StatelessObserverImpl::observeSolution(
 void
 StatelessObserverImpl::observeSolution(
     double                                  stamp,
-    const Thyra_Vector&                     nonOverlappedSolution,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDotDot)
+    Thyra_Vector const&                     nonOverlappedSolution,
+    const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot,
+    const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDotDot)
 {
   Teuchos::TimeMonitor                   timer(*solOutTime_);
   Teuchos::RCP<Thyra_Vector const> const overlappedSolution =

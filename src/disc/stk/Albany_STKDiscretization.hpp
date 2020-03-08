@@ -487,13 +487,13 @@ class STKDiscretization : public AbstractDiscretization
   getSolutionMV(const bool overlapped = false) const;
 
   void
-  setResidualField(const Thyra_Vector& residual);
+  setResidualField(Thyra_Vector const& residual);
 
   void
   getField(Thyra_Vector& field_vector, const std::string& field_name) const;
   void
   setField(
-      const Thyra_Vector& field_vector,
+      Thyra_Vector const& field_vector,
       const std::string&  field_name,
       const bool          overlapped = false);
 
@@ -501,20 +501,20 @@ class STKDiscretization : public AbstractDiscretization
 
   void
   writeSolution(
-      const Thyra_Vector& solution,
+      Thyra_Vector const& solution,
       const double        time,
       const bool          overlapped = false);
   void
   writeSolution(
-      const Thyra_Vector& solution,
-      const Thyra_Vector& solution_dot,
+      Thyra_Vector const& solution,
+      Thyra_Vector const& solution_dot,
       const double        time,
       const bool          overlapped = false);
   void
   writeSolution(
-      const Thyra_Vector& solution,
-      const Thyra_Vector& solution_dot,
-      const Thyra_Vector& solution_dotdot,
+      Thyra_Vector const& solution,
+      Thyra_Vector const& solution_dot,
+      Thyra_Vector const& solution_dotdot,
       const double        time,
       const bool          overlapped = false);
   void
@@ -526,20 +526,20 @@ class STKDiscretization : public AbstractDiscretization
   //! Write the solution to the mesh database.
   void
   writeSolutionToMeshDatabase(
-      const Thyra_Vector& solution,
+      Thyra_Vector const& solution,
       const double /* time */,
       const bool overlapped = false);
   void
   writeSolutionToMeshDatabase(
-      const Thyra_Vector& solution,
-      const Thyra_Vector& solution_dot,
+      Thyra_Vector const& solution,
+      Thyra_Vector const& solution_dot,
       const double /* time */,
       const bool overlapped = false);
   void
   writeSolutionToMeshDatabase(
-      const Thyra_Vector& solution,
-      const Thyra_Vector& solution_dot,
-      const Thyra_Vector& solution_dotdot,
+      Thyra_Vector const& solution,
+      Thyra_Vector const& solution_dot,
+      Thyra_Vector const& solution_dotdot,
       const double /* time */,
       const bool overlapped = false);
   void
@@ -551,7 +551,7 @@ class STKDiscretization : public AbstractDiscretization
   //! Write the solution to file. Must call writeSolution first.
   void
   writeSolutionToFile(
-      const Thyra_Vector& solution,
+      Thyra_Vector const& solution,
       const double        time,
       const bool          overlapped = false);
   void
@@ -576,17 +576,17 @@ class STKDiscretization : public AbstractDiscretization
   getSolutionMV(Thyra_MultiVector& result, bool overlapped) const;
 
   void
-  setSolutionField(const Thyra_Vector& soln, const bool overlapped);
+  setSolutionField(Thyra_Vector const& soln, const bool overlapped);
   void
   setSolutionField(
-      const Thyra_Vector& soln,
-      const Thyra_Vector& soln_dot,
+      Thyra_Vector const& soln,
+      Thyra_Vector const& soln_dot,
       const bool          overlapped);
   void
   setSolutionField(
-      const Thyra_Vector& soln,
-      const Thyra_Vector& soln_dot,
-      const Thyra_Vector& soln_dotdot,
+      Thyra_Vector const& soln,
+      Thyra_Vector const& soln_dot,
+      Thyra_Vector const& soln_dotdot,
       const bool          overlapped);
   void
   setSolutionFieldMV(const Thyra_MultiVector& solnT, const bool overlapped);
@@ -626,7 +626,7 @@ class STKDiscretization : public AbstractDiscretization
   setupNetCDFOutput();
 
   int
-  processNetCDFOutputRequest(const Thyra_Vector&);
+  processNetCDFOutputRequest(Thyra_Vector const&);
   int
   processNetCDFOutputRequestMV(const Thyra_MultiVector&);
 

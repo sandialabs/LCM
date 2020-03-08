@@ -925,7 +925,7 @@ getNonconstLocalData(Thyra_Vector& v)
 }
 
 Teuchos::ArrayRCP<const ST>
-getLocalData(const Thyra_Vector& v)
+getLocalData(Thyra_Vector const& v)
 {
   Teuchos::ArrayRCP<const ST> vals;
 
@@ -1109,7 +1109,7 @@ describe<Thyra_LinearOp>(
 
 template <>
 void
-writeMatrixMarket<const Thyra_Vector>(
+writeMatrixMarket<Thyra_Vector const>(
     Teuchos::RCP<Thyra_Vector const> const& v,
     const std::string&                      prefix,
     const int                               counter)
@@ -1201,7 +1201,7 @@ writeMatrixMarket<Thyra_LinearOp>(
 // in Albany_Utils.hpp
 template <>
 void
-writeMatrixMarket<const Thyra_VectorSpace>(
+writeMatrixMarket<Thyra_VectorSpace const>(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const std::string&                           prefix,
     const int                                    counter)

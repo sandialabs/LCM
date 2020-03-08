@@ -376,9 +376,9 @@ class Application
   void
   evaluateStateFieldManager(
       const double                     current_time,
-      const Thyra_Vector&              x,
-      Teuchos::Ptr<const Thyra_Vector> xdot,
-      Teuchos::Ptr<const Thyra_Vector> xdotdot);
+      Thyra_Vector const&              x,
+      Teuchos::Ptr<Thyra_Vector const> xdot,
+      Teuchos::Ptr<Thyra_Vector const> xdotdot);
 
   void
   evaluateStateFieldManager(

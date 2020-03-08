@@ -86,7 +86,7 @@ getTpetraVector(Thyra_Vector& v, const bool throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_Vector>
 getConstTpetraVector(
-    const Thyra_Vector& v,
+    Thyra_Vector const& v,
     const bool          throw_if_not_tpetra = true);
 
 Teuchos::RCP<Tpetra_MultiVector>

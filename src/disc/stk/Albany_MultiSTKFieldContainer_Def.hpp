@@ -480,7 +480,7 @@ MultiSTKFieldContainer<Interleaved>::fillSolnMultiVector(
 template <bool Interleaved>
 void
 MultiSTKFieldContainer<Interleaved>::saveVector(
-    const Thyra_Vector&                          field_vector,
+    Thyra_Vector const&                          field_vector,
     const std::string&                           field_name,
     stk::mesh::Selector&                         field_selection,
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
@@ -498,7 +498,7 @@ MultiSTKFieldContainer<Interleaved>::saveVector(
 template <bool Interleaved>
 void
 MultiSTKFieldContainer<Interleaved>::saveSolnVector(
-    const Thyra_Vector&                          solution,
+    Thyra_Vector const&                          solution,
     stk::mesh::Selector&                         sel,
     Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
@@ -522,8 +522,8 @@ MultiSTKFieldContainer<Interleaved>::saveSolnVector(
 template <bool Interleaved>
 void
 MultiSTKFieldContainer<Interleaved>::saveSolnVector(
-    const Thyra_Vector& solution,
-    const Thyra_Vector& /* solution_dot */,
+    Thyra_Vector const& solution,
+    Thyra_Vector const& /* solution_dot */,
     stk::mesh::Selector&                         sel,
     Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
@@ -542,9 +542,9 @@ MultiSTKFieldContainer<Interleaved>::saveSolnVector(
 template <bool Interleaved>
 void
 MultiSTKFieldContainer<Interleaved>::saveSolnVector(
-    const Thyra_Vector& solution,
-    const Thyra_Vector& /* solution_dot */,
-    const Thyra_Vector& /* solution_dotdot */,
+    Thyra_Vector const& solution,
+    Thyra_Vector const& /* solution_dot */,
+    Thyra_Vector const& /* solution_dotdot */,
     stk::mesh::Selector&                         sel,
     Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
@@ -594,7 +594,7 @@ MultiSTKFieldContainer<Interleaved>::saveSolnMultiVector(
 template <bool Interleaved>
 void
 MultiSTKFieldContainer<Interleaved>::saveResVector(
-    const Thyra_Vector&                          res,
+    Thyra_Vector const&                          res,
     stk::mesh::Selector&                         sel,
     Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
@@ -685,7 +685,7 @@ MultiSTKFieldContainer<Interleaved>::fillVectorImpl(
 template <bool Interleaved>
 void
 MultiSTKFieldContainer<Interleaved>::saveVectorImpl(
-    const Thyra_Vector&                          field_vector,
+    Thyra_Vector const&                          field_vector,
     const std::string&                           field_name,
     stk::mesh::Selector&                         field_selection,
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,

@@ -72,13 +72,13 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
 
   Teuchos::RCP<Thyra_Vector const>
   updateAndReturnOverlapSolution(
-      const Thyra_Vector& solution /*not overlapped*/);
+      Thyra_Vector const& solution /*not overlapped*/);
   Teuchos::RCP<Thyra_Vector const>
   updateAndReturnOverlapSolutionDot(
-      const Thyra_Vector& solution_dot /*not overlapped*/);
+      Thyra_Vector const& solution_dot /*not overlapped*/);
   Teuchos::RCP<Thyra_Vector const>
   updateAndReturnOverlapSolutionDotDot(
-      const Thyra_Vector& solution_dotdot /*not overlapped*/);
+      Thyra_Vector const& solution_dotdot /*not overlapped*/);
   Teuchos::RCP<const Thyra_MultiVector>
   updateAndReturnOverlapSolutionMV(
       const Thyra_MultiVector& solution /*not overlapped*/);
@@ -108,9 +108,9 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
 
   void
   scatterX(
-      const Thyra_Vector&                    x,
-      const Teuchos::Ptr<const Thyra_Vector> x_dot,
-      const Teuchos::Ptr<const Thyra_Vector> x_dotdot);
+      Thyra_Vector const&                    x,
+      const Teuchos::Ptr<Thyra_Vector const> x_dot,
+      const Teuchos::Ptr<Thyra_Vector const> x_dotdot);
 
   void
   scatterX(const Thyra_MultiVector& soln);

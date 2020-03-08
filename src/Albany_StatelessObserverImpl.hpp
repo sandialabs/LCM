@@ -58,15 +58,15 @@ class StatelessObserverImpl
   virtual void
   observeSolution(
       double                                  stamp,
-      const Thyra_Vector&                     nonOverlappedSolution,
-      const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot,
-      const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDotDot);
+      Thyra_Vector const&                     nonOverlappedSolution,
+      const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot,
+      const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDotDot);
 
   virtual void
   observeSolution(
       double                                  stamp,
-      const Thyra_Vector&                     nonOverlappedSolution,
-      const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot);
+      Thyra_Vector const&                     nonOverlappedSolution,
+      const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot);
 
   virtual void
   observeSolution(double stamp, const Thyra_MultiVector& nonOverlappedSolution);

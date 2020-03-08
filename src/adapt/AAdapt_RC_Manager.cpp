@@ -852,7 +852,7 @@ update_x(
 }
 
 void
-Manager::update_x(const Thyra_Vector& soln_nol)
+Manager::update_x(Thyra_Vector const& soln_nol)
 {
   // By convention (e.g., in MechanicsProblem), the displacement DOFs are before
   // any other DOFs.

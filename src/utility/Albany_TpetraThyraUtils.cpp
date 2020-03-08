@@ -252,7 +252,7 @@ getTpetraVector(Thyra_Vector& v, const bool throw_if_not_tpetra)
 }
 
 Teuchos::RCP<const Tpetra_Vector>
-getConstTpetraVector(const Thyra_Vector& v, const bool throw_if_not_tpetra)
+getConstTpetraVector(Thyra_Vector const& v, const bool throw_if_not_tpetra)
 {
   const Thyra_TpetraVector* tv = dynamic_cast<const Thyra_TpetraVector*>(&v);
 

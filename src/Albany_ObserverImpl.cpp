@@ -18,9 +18,9 @@ ObserverImpl::ObserverImpl(const Teuchos::RCP<Application>& app)
 void
 ObserverImpl::observeSolution(
     double                                  stamp,
-    const Thyra_Vector&                     nonOverlappedSolution,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDot,
-    const Teuchos::Ptr<const Thyra_Vector>& nonOverlappedSolutionDotDot)
+    Thyra_Vector const&                     nonOverlappedSolution,
+    const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot,
+    const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDotDot)
 {
   app_->evaluateStateFieldManager(
       stamp,

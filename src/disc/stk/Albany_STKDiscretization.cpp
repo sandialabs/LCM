@@ -880,7 +880,7 @@ STKDiscretization::writeCoordsToMatrixMarket() const
 
 void
 STKDiscretization::writeSolution(
-    const Thyra_Vector& soln,
+    Thyra_Vector const& soln,
     const double        time,
     const bool          overlapped)
 {
@@ -890,8 +890,8 @@ STKDiscretization::writeSolution(
 
 void
 STKDiscretization::writeSolution(
-    const Thyra_Vector& soln,
-    const Thyra_Vector& soln_dot,
+    Thyra_Vector const& soln,
+    Thyra_Vector const& soln_dot,
     const double        time,
     const bool          overlapped)
 {
@@ -902,9 +902,9 @@ STKDiscretization::writeSolution(
 
 void
 STKDiscretization::writeSolution(
-    const Thyra_Vector& soln,
-    const Thyra_Vector& soln_dot,
-    const Thyra_Vector& soln_dotdot,
+    Thyra_Vector const& soln,
+    Thyra_Vector const& soln_dot,
+    Thyra_Vector const& soln_dotdot,
     const double        time,
     const bool          overlapped)
 {
@@ -925,7 +925,7 @@ STKDiscretization::writeSolutionMV(
 
 void
 STKDiscretization::writeSolutionToMeshDatabase(
-    const Thyra_Vector& soln,
+    Thyra_Vector const& soln,
     const double /* time */,
     const bool overlapped)
 {
@@ -935,8 +935,8 @@ STKDiscretization::writeSolutionToMeshDatabase(
 
 void
 STKDiscretization::writeSolutionToMeshDatabase(
-    const Thyra_Vector& soln,
-    const Thyra_Vector& soln_dot,
+    Thyra_Vector const& soln,
+    Thyra_Vector const& soln_dot,
     const double /* time */,
     const bool overlapped)
 {
@@ -946,9 +946,9 @@ STKDiscretization::writeSolutionToMeshDatabase(
 
 void
 STKDiscretization::writeSolutionToMeshDatabase(
-    const Thyra_Vector& soln,
-    const Thyra_Vector& soln_dot,
-    const Thyra_Vector& soln_dotdot,
+    Thyra_Vector const& soln,
+    Thyra_Vector const& soln_dot,
+    Thyra_Vector const& soln_dotdot,
     const double /* time */,
     const bool overlapped)
 {
@@ -968,7 +968,7 @@ STKDiscretization::writeSolutionMVToMeshDatabase(
 
 void
 STKDiscretization::writeSolutionToFile(
-    const Thyra_Vector& soln,
+    Thyra_Vector const& soln,
     const double        time,
     const bool          overlapped)
 {
@@ -1141,7 +1141,7 @@ STKDiscretization::monotonicTimeLabel(const double time)
 }
 
 void
-STKDiscretization::setResidualField(const Thyra_Vector& residual)
+STKDiscretization::setResidualField(Thyra_Vector const& residual)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1297,7 +1297,7 @@ STKDiscretization::getSolutionMV(
 
 void
 STKDiscretization::setField(
-    const Thyra_Vector& result,
+    Thyra_Vector const& result,
     const std::string&  name,
     bool                overlapped)
 {
@@ -1339,7 +1339,7 @@ STKDiscretization::setField(
 
 void
 STKDiscretization::setSolutionField(
-    const Thyra_Vector& soln,
+    Thyra_Vector const& soln,
     const bool          overlapped)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
@@ -1355,8 +1355,8 @@ STKDiscretization::setSolutionField(
 
 void
 STKDiscretization::setSolutionField(
-    const Thyra_Vector& soln,
-    const Thyra_Vector& soln_dot,
+    Thyra_Vector const& soln,
+    Thyra_Vector const& soln_dot,
     const bool          overlapped)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
@@ -1372,9 +1372,9 @@ STKDiscretization::setSolutionField(
 
 void
 STKDiscretization::setSolutionField(
-    const Thyra_Vector& soln,
-    const Thyra_Vector& soln_dot,
-    const Thyra_Vector& soln_dotdot,
+    Thyra_Vector const& soln,
+    Thyra_Vector const& soln_dot,
+    Thyra_Vector const& soln_dotdot,
     const bool          overlapped)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
@@ -2589,7 +2589,7 @@ STKDiscretization::setupExodusOutput()
 
 int
 STKDiscretization::processNetCDFOutputRequest(
-    const Thyra_Vector& /* solution_field */)
+    Thyra_Vector const& /* solution_field */)
 {
   // IK, 10/13/14: need to implement!
   return 0;

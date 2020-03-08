@@ -34,7 +34,7 @@ struct STKFieldContainerHelper
 
   static void
   saveVector(
-      const Thyra_Vector&                           field_thyra,
+      Thyra_Vector const&                           field_thyra,
       FieldType&                                    field_stk,
       const Teuchos::RCP<const GlobalLocalIndexer>& node_vs,
       const stk::mesh::Bucket&                      bucket,

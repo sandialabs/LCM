@@ -141,7 +141,7 @@ STKFieldContainerHelper<FieldType>::fillVector(
 template <class FieldType>
 void
 STKFieldContainerHelper<FieldType>::saveVector(
-    const Thyra_Vector&                           field_thyra,
+    Thyra_Vector const&                           field_thyra,
     FieldType&                                    field_stk,
     const Teuchos::RCP<const GlobalLocalIndexer>& indexer,
     const stk::mesh::Bucket&                      bucket,

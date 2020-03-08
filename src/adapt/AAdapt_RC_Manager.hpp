@@ -93,7 +93,7 @@ class Manager
   init_x_if_not(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
   //! x += soln, where soln is nonoverlapping.
   void
-  update_x(const Thyra_Vector& soln_nol);
+  update_x(Thyra_Vector const& soln_nol);
   //! Return x + a for nonoverlapping a.
   Teuchos::RCP<Thyra_Vector const>
   add_x(Teuchos::RCP<Thyra_Vector const> const& a) const;

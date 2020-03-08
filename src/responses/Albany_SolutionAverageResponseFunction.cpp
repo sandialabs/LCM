@@ -123,7 +123,7 @@ SolutionAverageResponseFunction::evaluateDistParamDeriv(
 
 void
 SolutionAverageResponseFunction::evaluateResponseImpl(
-    const Thyra_Vector& x,
+    Thyra_Vector const& x,
     Thyra_Vector&       g)
 {
   if (one.is_null() || !sameAs(one->range(), x.range())) {

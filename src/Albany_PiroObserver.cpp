@@ -37,14 +37,14 @@ PiroObserver::PiroObserver(
 }
 
 void
-PiroObserver::observeSolution(const Thyra_Vector& solution)
+PiroObserver::observeSolution(Thyra_Vector const& solution)
 {
   this->observeSolutionImpl(solution, Teuchos::ScalarTraits<ST>::zero());
   stepper_counter_++;
 }
 
 void
-PiroObserver::observeSolution(const Thyra_Vector& solution, const ST stamp)
+PiroObserver::observeSolution(Thyra_Vector const& solution, const ST stamp)
 {
   this->observeSolutionImpl(solution, stamp);
   stepper_counter_++;
@@ -52,8 +52,8 @@ PiroObserver::observeSolution(const Thyra_Vector& solution, const ST stamp)
 
 void
 PiroObserver::observeSolution(
-    const Thyra_Vector& solution,
-    const Thyra_Vector& solution_dot,
+    Thyra_Vector const& solution,
+    Thyra_Vector const& solution_dot,
     const ST            stamp)
 {
   this->observeSolutionImpl(solution, solution_dot, stamp);
@@ -62,9 +62,9 @@ PiroObserver::observeSolution(
 
 void
 PiroObserver::observeSolution(
-    const Thyra_Vector& solution,
-    const Thyra_Vector& solution_dot,
-    const Thyra_Vector& solution_dotdot,
+    Thyra_Vector const& solution,
+    Thyra_Vector const& solution_dot,
+    Thyra_Vector const& solution_dotdot,
     const ST            stamp)
 {
   this->observeSolutionImpl(solution, solution_dot, solution_dotdot, stamp);
@@ -86,7 +86,7 @@ PiroObserver::parameterChanged(const std::string& param)
 
 void
 PiroObserver::observeSolutionImpl(
-    const Thyra_Vector& solution,
+    Thyra_Vector const& solution,
     const ST            defaultStamp)
 {
   // Determine the stamp associated with the snapshot
@@ -102,8 +102,8 @@ PiroObserver::observeSolutionImpl(
 
 void
 PiroObserver::observeSolutionImpl(
-    const Thyra_Vector& solution,
-    const Thyra_Vector& solution_dot,
+    Thyra_Vector const& solution,
+    Thyra_Vector const& solution_dot,
     const ST            defaultStamp)
 {
   // Determine the stamp associated with the snapshot
@@ -123,9 +123,9 @@ PiroObserver::observeSolutionImpl(
 
 void
 PiroObserver::observeSolutionImpl(
-    const Thyra_Vector& solution,
-    const Thyra_Vector& solution_dot,
-    const Thyra_Vector& solution_dotdot,
+    Thyra_Vector const& solution,
+    Thyra_Vector const& solution_dot,
+    Thyra_Vector const& solution_dotdot,
     const ST            defaultStamp)
 {
   // Determine the stamp associated with the snapshot

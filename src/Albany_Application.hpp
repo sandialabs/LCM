@@ -49,7 +49,8 @@ class Application
     Transient,
     TransientTempus,
     Continuation,
-    Eigensolve
+    Eigensolve,
+    Invalid
   };
 
   //! Constructor(s) and Destructor
@@ -697,71 +698,51 @@ class Application
   }
 
  protected:
-  bool is_schwarz_;
-  bool no_dir_bcs_;
-  bool requires_sdbcs_;
-  bool requires_orig_dbcs_;
+  bool is_schwarz_{false};
+  bool no_dir_bcs_{false};
+  bool requires_sdbcs_{false};
+  bool requires_orig_dbcs_{false};
 
-  //! Teuchos communicator
-  Teuchos::RCP<const Teuchos_Comm> comm;
+  Teuchos::RCP<const Teuchos_Comm>             comm{Teuchos::null};
+  Teuchos::RCP<Teuchos::FancyOStream>          out{Teuchos::null};
+  Teuchos::RCP<Albany::AbstractDiscretization> disc{Teuchos::null};
+  Teuchos::RCP<Albany::DiscretizationFactory>  discFactory{Teuchos::null};
+  Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs{
+      Teuchos::null};
+  Teuchos::RCP<Albany::AbstractProblem>         problem{Teuchos::null};
+  Teuchos::RCP<Teuchos::ParameterList>          problemParams{Teuchos::null};
+  Teuchos::RCP<Teuchos::ParameterList>          params_{Teuchos::null};
+  Teuchos::RCP<ParamLib>                        paramLib{Teuchos::null};
+  Teuchos::RCP<DistributedParameterLibrary>     distParamLib{Teuchos::null};
+  Teuchos::RCP<AAdapt::AdaptiveSolutionManager> solMgr{Teuchos::null};
 
-  //! Output stream, defaults to pronting just Proc 0
-  Teuchos::RCP<Teuchos::FancyOStream> out;
+  // Reference configuration (update) manager
+  Teuchos::RCP<AAdapt::rc::Manager> rc_mgr{Teuchos::null};
 
-  //! Element discretization
-  Teuchos::RCP<Albany::AbstractDiscretization> disc;
-
-  //! discretization factory
-  Teuchos::RCP<Albany::DiscretizationFactory> discFactory;
-
-  //! mesh specs
-  Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs;
-
-  //! Problem class
-  Teuchos::RCP<Albany::AbstractProblem> problem;
-
-  //! Problem Parameters
-  Teuchos::RCP<Teuchos::ParameterList> problemParams;
-
-  //! App Parameters
-  Teuchos::RCP<Teuchos::ParameterList> params_;
-
-  //! Parameter library
-  Teuchos::RCP<ParamLib> paramLib;
-
-  //! Distributed parameter library
-  Teuchos::RCP<DistributedParameterLibrary> distParamLib;
-
-  //! Solution memory manager
-  Teuchos::RCP<AAdapt::AdaptiveSolutionManager> solMgr;
-
-  //! Reference configuration (update) manager
-  Teuchos::RCP<AAdapt::rc::Manager> rc_mgr;
-
-  //! Response functions
+  // Response functions
   Teuchos::Array<Teuchos::RCP<Albany::AbstractResponseFunction>> responses;
 
-  //! Phalanx Field Manager for volumetric fills
+  // Phalanx Field Manager for volumetric fills
   Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>> fm;
 
-  //! Phalanx Field Manager for Dirichlet Conditions
+  // Phalanx Field Manager for Dirichlet Boundary Conditions
   Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> dfm;
 
-  //! Phalanx Field Manager for Neumann Conditions
+  // Phalanx Field Manager for Neumann Boundary Conditions
   Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>> nfm;
 
-  //! Phalanx Field Manager for states
+  // Phalanx Field Manager for states
   Teuchos::Array<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>> sfm;
 
-  bool explicit_scheme;
+  bool explicit_scheme{false};
 
-  //! Data for Physics-Based Preconditioners
-  bool                                 physicsBasedPreconditioner;
-  Teuchos::RCP<Teuchos::ParameterList> precParams;
-  std::string                          precType;
+  // Data for Physics-Based Preconditioners
+  bool                                 physicsBasedPreconditioner{false};
+  Teuchos::RCP<Teuchos::ParameterList> precParams{Teuchos::null};
+  std::string                          precType{""};
 
   //! Type of solution method
-  SolutionMethod solMethod;
+  SolutionMethod solMethod{Invalid};
 
   //! Integer specifying whether user wants to write Jacobian to MatrixMarket
   //! file
@@ -770,65 +751,65 @@ class Application
   // arises writeToMatrixMarketJac = N: write N^th Jacobian to MatrixMarket
   // ...and similarly for writeToMatrixMarketRes (integer specifying whether
   // user wants to write residual to MatrixMarket file)
-  int writeToMatrixMarketJac;
-  int writeToMatrixMarketRes;
+  int writeToMatrixMarketJac{0};
+  int writeToMatrixMarketRes{0};
   //! Integer specifying whether user wants to write Jacobian and residual to
   //! Standard output (cout)
-  int writeToCoutJac;
-  int writeToCoutRes;
+  int writeToCoutJac{0};
+  int writeToCoutRes{0};
 
   // Value to scale Jacobian/Residual by to possibly improve conditioning
-  double scale;
-  double scaleBCdofs;
+  double scale{0.0};
+  double scaleBCdofs{0.0};
   // Scaling types
   enum SCALETYPE
   {
     CONSTANT,
     DIAG,
-    ABSROWSUM
+    ABSROWSUM,
+    INVALID
   };
-  SCALETYPE scale_type;
+  SCALETYPE scale_type{INVALID};
 
   //! Shape Optimization data
-  bool                     shapeParamsHaveBeenReset;
+  bool                     shapeParamsHaveBeenReset{false};
   std::vector<RealType>    shapeParams;
   std::vector<std::string> shapeParamNames;
 
-  unsigned int neq, spatial_dimension, tangent_deriv_dim;
+  unsigned int neq{0}, spatial_dimension{0}, tangent_deriv_dim{0};
 
   //! Phalanx postRegistration data
-  Teuchos::RCP<PHAL::Setup> phxSetup;
-  mutable int               phxGraphVisDetail;
-  mutable int               stateGraphVisDetail;
+  Teuchos::RCP<PHAL::Setup> phxSetup{Teuchos::null};
+  mutable int               phxGraphVisDetail{0};
+  mutable int               stateGraphVisDetail{0};
 
   StateManager stateMgr;
 
-  bool morphFromInit;
-  bool ignore_residual_in_jacobian;
+  bool morphFromInit{false};
+  bool ignore_residual_in_jacobian{false};
 
-  //! To prevent a singular mass matrix associated with Dirichlet
+  // To prevent a singular mass matrix associated with Dirichlet
   //  conditions, optionally add a small perturbation to the diag
-  double perturbBetaForDirichlets;
+  double perturbBetaForDirichlets{0.0};
 
   void
   determinePiroSolver(
       const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams);
 
-  int derivatives_check_;
-
-  int num_time_deriv;
+  int derivatives_check_{0};
+  int num_time_deriv{0};
 
   // The following are for Jacobian/residual scaling
   Teuchos::Array<Teuchos::Array<int>> offsets_;
   std::vector<std::string>            nodeSetIDs_;
-  Teuchos::RCP<Thyra_Vector>          scaleVec_;
+  Teuchos::RCP<Thyra_Vector>          scaleVec_{Teuchos::null};
 
   // boolean read from input file telling code whether to compute/print
   // responses every step
-  bool observe_responses;
+  bool observe_responses{false};
 
   // how often one wants the responses to be computed/printed
-  int response_observ_freq;
+  int response_observ_freq{0};
 
   // local responses
   Teuchos::Array<unsigned int> relative_responses;

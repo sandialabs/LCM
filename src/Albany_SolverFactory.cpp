@@ -140,7 +140,7 @@ Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
 SolverFactory::create(
     const Teuchos::RCP<const Teuchos_Comm>& appComm,
     const Teuchos::RCP<const Teuchos_Comm>& solverComm,
-    const Teuchos::RCP<const Thyra_Vector>& initial_guess)
+    Teuchos::RCP<Thyra_Vector const> const& initial_guess)
 {
   Teuchos::RCP<Application> dummyAlbanyApp;
   return createAndGetAlbanyApp(
@@ -152,7 +152,7 @@ SolverFactory::createAndGetAlbanyApp(
     Teuchos::RCP<Application>&              albanyApp,
     const Teuchos::RCP<const Teuchos_Comm>& appComm,
     const Teuchos::RCP<const Teuchos_Comm>& solverComm,
-    const Teuchos::RCP<const Thyra_Vector>& initial_guess,
+    Teuchos::RCP<Thyra_Vector const> const& initial_guess,
     bool                                    createAlbanyApp)
 {
   const Teuchos::RCP<Teuchos::ParameterList> problemParams =
@@ -269,7 +269,7 @@ Teuchos::RCP<Thyra_ModelEvaluator>
 SolverFactory::createAlbanyAppAndModel(
     Teuchos::RCP<Application>&              albanyApp,
     const Teuchos::RCP<const Teuchos_Comm>& appComm,
-    const Teuchos::RCP<const Thyra_Vector>& initial_guess,
+    Teuchos::RCP<Thyra_Vector const> const& initial_guess,
     const bool                              createAlbanyApp)
 {
   if (createAlbanyApp) {
@@ -328,7 +328,7 @@ int
 SolverFactory::checkSolveTestResults(
     int                                          response_index,
     int                                          parameter_index,
-    const Teuchos::RCP<const Thyra_Vector>&      g,
+    Teuchos::RCP<Thyra_Vector const> const&      g,
     const Teuchos::RCP<const Thyra_MultiVector>& dgdp) const
 {
   Teuchos::ParameterList* testParams = getTestParameters(response_index);

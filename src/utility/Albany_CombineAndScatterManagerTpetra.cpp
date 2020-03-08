@@ -120,7 +120,7 @@ CombineAndScatterManagerTpetra::combine(
 
 void
 CombineAndScatterManagerTpetra::combine(
-    const Teuchos::RCP<const Thyra_Vector>& src,
+    Teuchos::RCP<Thyra_Vector const> const& src,
     const Teuchos::RCP<Thyra_Vector>&       dst,
     const CombineMode                       CM) const
 {
@@ -279,7 +279,7 @@ CombineAndScatterManagerTpetra::scatter(
 
 void
 CombineAndScatterManagerTpetra::scatter(
-    const Teuchos::RCP<const Thyra_Vector>& src,
+    Teuchos::RCP<Thyra_Vector const> const& src,
     const Teuchos::RCP<Thyra_Vector>&       dst,
     const CombineMode                       CM) const
 {

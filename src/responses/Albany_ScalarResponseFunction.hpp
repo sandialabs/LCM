@@ -53,9 +53,9 @@ class ScalarResponseFunction : public AbstractResponseFunction
   virtual void
   evaluateGradient(
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       ParamVec*                               deriv_p,
       const Teuchos::RCP<Thyra_Vector>&       g,
@@ -98,9 +98,9 @@ class ScalarResponseFunction : public AbstractResponseFunction
   void
   evaluateDerivative(
       const double                                     current_time,
-      const Teuchos::RCP<const Thyra_Vector>&          x,
-      const Teuchos::RCP<const Thyra_Vector>&          xdot,
-      const Teuchos::RCP<const Thyra_Vector>&          xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const&          x,
+      Teuchos::RCP<Thyra_Vector const> const&          xdot,
+      Teuchos::RCP<Thyra_Vector const> const&          xdotdot,
       const Teuchos::Array<ParamVec>&                  p,
       ParamVec*                                        deriv_p,
       const Teuchos::RCP<Thyra_Vector>&                g,

@@ -38,9 +38,9 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
   //! Set values needed for apply()
   void
   set(const double                                  time_,
-      const Teuchos::RCP<const Thyra_Vector>&       x_,
-      const Teuchos::RCP<const Thyra_Vector>&       xdot_,
-      const Teuchos::RCP<const Thyra_Vector>&       xdotdot_,
+      Teuchos::RCP<Thyra_Vector const> const&       x_,
+      Teuchos::RCP<Thyra_Vector const> const&       xdot_,
+      Teuchos::RCP<Thyra_Vector const> const&       xdotdot_,
       const Teuchos::RCP<Teuchos::Array<ParamVec>>& scalar_params_)
   {
     time          = time_;

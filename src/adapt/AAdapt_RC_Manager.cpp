@@ -863,7 +863,7 @@ Manager::update_x(const Thyra_Vector& soln_nol)
 }
 
 Teuchos::RCP<const Thyra_Vector>
-Manager::add_x(const Teuchos::RCP<const Thyra_Vector>& a) const
+Manager::add_x(Teuchos::RCP<Thyra_Vector const> const& a) const
 {
   Teuchos::RCP<Thyra_Vector> c = Thyra::createMember(a->space());
   c->assign(*a);

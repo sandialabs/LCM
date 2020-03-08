@@ -128,9 +128,9 @@ SaveNodalField<AlbanyTraits::Residual, Traits>::postEvaluate(
     typename Traits::PostEvalData workset)
 {
   // Here is what we might like to save ...
-  const Teuchos::RCP<const Thyra_Vector> x       = workset.x;
-  const Teuchos::RCP<const Thyra_Vector> xdot    = workset.xdot;
-  const Teuchos::RCP<const Thyra_Vector> xdotdot = workset.xdotdot;
+  Teuchos::RCP<Thyra_Vector const> const x       = workset.x;
+  Teuchos::RCP<Thyra_Vector const> const xdot    = workset.xdot;
+  Teuchos::RCP<Thyra_Vector const> const xdotdot = workset.xdotdot;
 
   // Note: we are in postEvaluate so all PEs call this
 

@@ -201,7 +201,7 @@ getNonconstDeviceData(Teuchos::RCP<Thyra_LinearOp>& lop);
 Teuchos::ArrayRCP<ST>
 getNonconstLocalData(const Teuchos::RCP<Thyra_Vector>& v);
 Teuchos::ArrayRCP<const ST>
-getLocalData(const Teuchos::RCP<const Thyra_Vector>& v);
+getLocalData(Teuchos::RCP<Thyra_Vector const> const& v);
 Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>
 getNonconstLocalData(const Teuchos::RCP<Thyra_MultiVector>& mv);
 Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>>
@@ -217,7 +217,7 @@ Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>>
 getLocalData(const Thyra_MultiVector& mv);
 
 DeviceView1d<const ST>
-getDeviceData(const Teuchos::RCP<const Thyra_Vector>& v);
+getDeviceData(Teuchos::RCP<Thyra_Vector const> const& v);
 DeviceView1d<ST>
 getNonconstDeviceData(const Teuchos::RCP<Thyra_Vector>& v);
 
@@ -237,14 +237,14 @@ void
 scale_and_update(
     const Teuchos::RCP<Thyra_Vector>       y,
     const ST                               y_coeff,
-    const Teuchos::RCP<const Thyra_Vector> x,
+    Teuchos::RCP<Thyra_Vector const> const x,
     const ST                               x_coeff);
 
 // Thyra does not offer a 'mean' method in its (multi)vector interface.
 // The method 'sum' in Thyra_VectorStdOps already does the sum,
 // so here we simply scale by the vector (global) length.
 ST
-mean(const Teuchos::RCP<const Thyra_Vector>& v);
+mean(Teuchos::RCP<Thyra_Vector const> const& v);
 Teuchos::Array<ST>
 means(const Teuchos::RCP<const Thyra_MultiVector>& mv);
 
@@ -284,7 +284,7 @@ getProductVector(
 
 Teuchos::RCP<const Thyra_ProductVector>
 getConstProductVector(
-    const Teuchos::RCP<const Thyra_Vector> v,
+    Teuchos::RCP<Thyra_Vector const> const v,
     const bool                             throw_on_failure = true);
 
 Teuchos::RCP<Thyra_ProductMultiVector>

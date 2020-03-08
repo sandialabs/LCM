@@ -61,7 +61,7 @@ StatelessObserverImpl::observeSolution(
         apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolution(
             *non_overlapped_solution[m]);
     if (non_overlapped_solution_dot[m] != Teuchos::null) {
-      const Teuchos::RCP<const Thyra_Vector> overlapped_solution_dot =
+      Teuchos::RCP<Thyra_Vector const> const overlapped_solution_dot =
           apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolutionDot(
               *non_overlapped_solution_dot[m]);
       apps_[m]->getDiscretization()->writeSolution(

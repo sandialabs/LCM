@@ -30,9 +30,9 @@ ScalarResponseFunction::createGradientOp() const
 void
 ScalarResponseFunction::evaluateDerivative(
     const double                                     current_time,
-    const Teuchos::RCP<const Thyra_Vector>&          x,
-    const Teuchos::RCP<const Thyra_Vector>&          xdot,
-    const Teuchos::RCP<const Thyra_Vector>&          xdotdot,
+    Teuchos::RCP<Thyra_Vector const> const&          x,
+    Teuchos::RCP<Thyra_Vector const> const&          xdot,
+    Teuchos::RCP<Thyra_Vector const> const&          xdotdot,
     const Teuchos::Array<ParamVec>&                  p,
     ParamVec*                                        deriv_p,
     const Teuchos::RCP<Thyra_Vector>&                g,

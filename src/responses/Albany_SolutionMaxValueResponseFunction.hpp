@@ -39,9 +39,9 @@ class SolutionMaxValueResponseFunction
   void
   evaluateResponse(
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       g);
 
@@ -53,9 +53,9 @@ class SolutionMaxValueResponseFunction
       const double                                 omega,
       const double                                 current_time,
       bool                                         sum_derivs,
-      const Teuchos::RCP<const Thyra_Vector>&      x,
-      const Teuchos::RCP<const Thyra_Vector>&      xdot,
-      const Teuchos::RCP<const Thyra_Vector>&      xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const&      x,
+      Teuchos::RCP<Thyra_Vector const> const&      xdot,
+      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
       const Teuchos::Array<ParamVec>&              p,
       ParamVec*                                    deriv_p,
       const Teuchos::RCP<const Thyra_MultiVector>& Vx,
@@ -70,9 +70,9 @@ class SolutionMaxValueResponseFunction
   void
   evaluateGradient(
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       ParamVec*                               deriv_p,
       const Teuchos::RCP<Thyra_Vector>&       g,
@@ -85,9 +85,9 @@ class SolutionMaxValueResponseFunction
   void
   evaluateDistParamDeriv(
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         param_array,
       const std::string&                      dist_param_name,
       const Teuchos::RCP<Thyra_MultiVector>&  dg_dp);
@@ -106,7 +106,7 @@ class SolutionMaxValueResponseFunction
 
   //! Compute max value
   void
-  computeMaxValue(const Teuchos::RCP<const Thyra_Vector>& x, ST& val);
+  computeMaxValue(Teuchos::RCP<Thyra_Vector const> const& x, ST& val);
 };
 
 }  // namespace Albany

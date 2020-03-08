@@ -834,7 +834,7 @@ getNonconstLocalData(const Teuchos::RCP<Thyra_Vector>& v)
 }
 
 Teuchos::ArrayRCP<const ST>
-getLocalData(const Teuchos::RCP<const Thyra_Vector>& v)
+getLocalData(Teuchos::RCP<Thyra_Vector const> const& v)
 {
   Teuchos::ArrayRCP<const ST> vals;
 
@@ -973,7 +973,7 @@ getLocalData(const Thyra_MultiVector& mv)
 }
 
 DeviceView1d<const ST>
-getDeviceData(const Teuchos::RCP<const Thyra_Vector>& v)
+getDeviceData(Teuchos::RCP<Thyra_Vector const> const& v)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tv = getConstTpetraVector(v, false);
@@ -1018,14 +1018,14 @@ void
 scale_and_update(
     const Teuchos::RCP<Thyra_Vector>       y,
     const ST                               y_coeff,
-    const Teuchos::RCP<const Thyra_Vector> x,
+    Teuchos::RCP<Thyra_Vector const> const x,
     const ST                               x_coeff)
 {
   Thyra::V_StVpStV(y.ptr(), x_coeff, *x, y_coeff, *y);
 }
 
 ST
-mean(const Teuchos::RCP<const Thyra_Vector>& v)
+mean(Teuchos::RCP<Thyra_Vector const> const& v)
 {
   return Thyra::sum(*v) / v->space()->dim();
 }
@@ -1065,7 +1065,7 @@ describe<Thyra_VectorSpace>(
 template <>
 void
 describe<Thyra_Vector>(
-    const Teuchos::RCP<const Thyra_Vector>& v,
+    Teuchos::RCP<Thyra_Vector const> const& v,
     Teuchos::FancyOStream&                  out,
     const Teuchos::EVerbosityLevel          verbLevel)
 {
@@ -1110,7 +1110,7 @@ describe<Thyra_LinearOp>(
 template <>
 void
 writeMatrixMarket<const Thyra_Vector>(
-    const Teuchos::RCP<const Thyra_Vector>& v,
+    Teuchos::RCP<Thyra_Vector const> const& v,
     const std::string&                      prefix,
     const int                               counter)
 {
@@ -1267,7 +1267,7 @@ getProductVector(
 
 Teuchos::RCP<const Thyra_ProductVector>
 getConstProductVector(
-    const Teuchos::RCP<const Thyra_Vector> v,
+    Teuchos::RCP<Thyra_Vector const> const v,
     const bool                             throw_on_failure)
 {
   Teuchos::RCP<const Thyra_ProductVector> pv;

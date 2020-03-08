@@ -28,7 +28,7 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
  public:
   AdaptiveSolutionManager(
       const Teuchos::RCP<Teuchos::ParameterList>& appParams,
-      const Teuchos::RCP<const Thyra_Vector>&     initial_guess,
+      Teuchos::RCP<Thyra_Vector const> const&     initial_guess,
       const Teuchos::RCP<ParamLib>&               param_lib,
       const Albany::StateManager&                 StateMgr,
       const Teuchos::RCP<rc::Manager>&            rc_mgr,

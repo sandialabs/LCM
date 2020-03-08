@@ -20,9 +20,9 @@ SolutionAverageResponseFunction::SolutionAverageResponseFunction(
 void
 SolutionAverageResponseFunction::evaluateResponse(
     const double /*current_time*/,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,
-    const Teuchos::RCP<const Thyra_Vector>& /*xdotdot*/,
+    Teuchos::RCP<Thyra_Vector const> const& x,
+    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
+    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
     const Teuchos::Array<ParamVec>& /*p*/,
     const Teuchos::RCP<Thyra_Vector>& g)
 {
@@ -36,9 +36,9 @@ SolutionAverageResponseFunction::evaluateTangent(
     const double /*omega*/,
     const double /*current_time*/,
     bool /*sum_derivs*/,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,
-    const Teuchos::RCP<const Thyra_Vector>& /*xdotdot*/,
+    Teuchos::RCP<Thyra_Vector const> const& x,
+    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
+    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
     const Teuchos::Array<ParamVec>& /*p*/,
     ParamVec* /*deriv_p*/,
     const Teuchos::RCP<const Thyra_MultiVector>& Vx,
@@ -80,9 +80,9 @@ SolutionAverageResponseFunction::evaluateTangent(
 void
 SolutionAverageResponseFunction::evaluateGradient(
     const double /* current_time */,
-    const Teuchos::RCP<const Thyra_Vector>& x,
-    const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,
-    const Teuchos::RCP<const Thyra_Vector>& /*xdotdot*/,
+    Teuchos::RCP<Thyra_Vector const> const& x,
+    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
+    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
     const Teuchos::Array<ParamVec>& /* p */,
     ParamVec* /* deriv_p */,
     const Teuchos::RCP<Thyra_Vector>&      g,
@@ -110,9 +110,9 @@ SolutionAverageResponseFunction::evaluateGradient(
 void
 SolutionAverageResponseFunction::evaluateDistParamDeriv(
     const double /*current_time*/,
-    const Teuchos::RCP<const Thyra_Vector>& /*x*/,
-    const Teuchos::RCP<const Thyra_Vector>& /*xdot*/,
-    const Teuchos::RCP<const Thyra_Vector>& /*xdotdot*/,
+    Teuchos::RCP<Thyra_Vector const> const& /*x*/,
+    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
+    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
     const Teuchos::Array<ParamVec>& /*param_array*/,
     const std::string& /*dist_param_name*/,
     const Teuchos::RCP<Thyra_MultiVector>& dg_dp)

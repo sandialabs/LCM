@@ -204,7 +204,7 @@ getFileExtension(std::string const& filename)
 }
 
 void
-printThyraVector(std::ostream& os, const Teuchos::RCP<const Thyra_Vector>& vec)
+printThyraVector(std::ostream& os, Teuchos::RCP<Thyra_Vector const> const& vec)
 {
   Teuchos::ArrayRCP<const ST> vv          = Albany::getLocalData(vec);
   const int                   localLength = vv.size();
@@ -220,7 +220,7 @@ void
 printThyraVector(
     std::ostream&                           os,
     const Teuchos::Array<std::string>&      names,
-    const Teuchos::RCP<const Thyra_Vector>& vec)
+    Teuchos::RCP<Thyra_Vector const> const& vec)
 {
   Teuchos::ArrayRCP<const ST> vv          = Albany::getLocalData(vec);
   const int                   localLength = vv.size();

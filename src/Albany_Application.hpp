@@ -57,7 +57,7 @@ class Application
   Application(
       const Teuchos::RCP<const Teuchos_Comm>&     comm,
       const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<const Thyra_Vector>&     initial_guess = Teuchos::null,
+      Teuchos::RCP<Thyra_Vector const> const&     initial_guess = Teuchos::null,
       const bool                                  schwarz       = false);
 
   Application(const Teuchos::RCP<const Teuchos_Comm>& comm);
@@ -85,7 +85,7 @@ class Application
   void
   finalSetUp(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<const Thyra_Vector>& initial_guess = Teuchos::null);
+      Teuchos::RCP<Thyra_Vector const> const& initial_guess = Teuchos::null);
 
   //! Get underlying abstract discretization
   Teuchos::RCP<Albany::AbstractDiscretization>
@@ -187,9 +187,9 @@ class Application
   void
   computeGlobalResidual(
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& x_dot,
-      const Teuchos::RCP<const Thyra_Vector>& x_dotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& x_dot,
+      Teuchos::RCP<Thyra_Vector const> const& x_dotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       f,
       const double                            dt = 0.0);
@@ -198,9 +198,9 @@ class Application
   void
   computeGlobalResidualImpl(
       const double                           current_time,
-      const Teuchos::RCP<const Thyra_Vector> x,
-      const Teuchos::RCP<const Thyra_Vector> x_dot,
-      const Teuchos::RCP<const Thyra_Vector> x_dotdot,
+      Teuchos::RCP<Thyra_Vector const> const x,
+      Teuchos::RCP<Thyra_Vector const> const x_dot,
+      Teuchos::RCP<Thyra_Vector const> const x_dotdot,
       const Teuchos::Array<ParamVec>&        p,
       const Teuchos::RCP<Thyra_Vector>&      f,
       const double                           dt = 0.0);
@@ -208,11 +208,11 @@ class Application
   PHAL::Workset
   set_dfm_workset(
       double const                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>  x,
-      const Teuchos::RCP<const Thyra_Vector>  x_dot,
-      const Teuchos::RCP<const Thyra_Vector>  x_dotdot,
+      Teuchos::RCP<Thyra_Vector const> const  x,
+      Teuchos::RCP<Thyra_Vector const> const  x_dot,
+      Teuchos::RCP<Thyra_Vector const> const  x_dotdot,
       const Teuchos::RCP<Thyra_Vector>&       f,
-      const Teuchos::RCP<const Thyra_Vector>& x_post_SDBCs = Teuchos::null);
+      Teuchos::RCP<Thyra_Vector const> const& x_post_SDBCs = Teuchos::null);
 
  public:
   //! Compute global Jacobian
@@ -225,9 +225,9 @@ class Application
       const double                            beta,
       const double                            omega,
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       f,
       const Teuchos::RCP<Thyra_LinearOp>&     jac,
@@ -240,9 +240,9 @@ class Application
       const double                            beta,
       const double                            omega,
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       f,
       const Teuchos::RCP<Thyra_LinearOp>&     jac,
@@ -261,9 +261,9 @@ class Application
       const double                                 omega,
       const double                                 current_time,
       bool                                         sum_derivs,
-      const Teuchos::RCP<const Thyra_Vector>&      x,
-      const Teuchos::RCP<const Thyra_Vector>&      xdot,
-      const Teuchos::RCP<const Thyra_Vector>&      xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const&      x,
+      Teuchos::RCP<Thyra_Vector const> const&      xdot,
+      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
       const Teuchos::Array<ParamVec>&              par,
       ParamVec*                                    deriv_par,
       const Teuchos::RCP<const Thyra_MultiVector>& Vx,
@@ -283,9 +283,9 @@ class Application
   void
   applyGlobalDistParamDerivImpl(
       const double                                 current_time,
-      const Teuchos::RCP<const Thyra_Vector>&      x,
-      const Teuchos::RCP<const Thyra_Vector>&      xdot,
-      const Teuchos::RCP<const Thyra_Vector>&      xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const&      x,
+      Teuchos::RCP<Thyra_Vector const> const&      xdot,
+      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
       const Teuchos::Array<ParamVec>&              p,
       const std::string&                           dist_param_name,
       const bool                                   trans,
@@ -300,9 +300,9 @@ class Application
   evaluateResponse(
       int                                     response_index,
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       g);
 
@@ -318,9 +318,9 @@ class Application
       const double                                 omega,
       const double                                 current_time,
       bool                                         sum_derivs,
-      const Teuchos::RCP<const Thyra_Vector>&      x,
-      const Teuchos::RCP<const Thyra_Vector>&      xdot,
-      const Teuchos::RCP<const Thyra_Vector>&      xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const&      x,
+      Teuchos::RCP<Thyra_Vector const> const&      xdot,
+      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
       const Teuchos::Array<ParamVec>&              p,
       ParamVec*                                    deriv_p,
       const Teuchos::RCP<const Thyra_MultiVector>& Vx,
@@ -339,9 +339,9 @@ class Application
   evaluateResponseDerivative(
       int                                     response_index,
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       ParamVec*                               deriv_p,
       const Teuchos::RCP<Thyra_Vector>&       g,
@@ -354,9 +354,9 @@ class Application
   evaluateResponseDistParamDeriv(
       int                                     response_index,
       const double                            current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         param_array,
       const std::string&                      dist_param_name,
       const Teuchos::RCP<Thyra_MultiVector>&  dg_dp);
@@ -445,7 +445,7 @@ class Application
   void
   loadBasicWorksetInfoSDBCs(
       PHAL::Workset&                          workset,
-      const Teuchos::RCP<const Thyra_Vector>& owned_sol,
+      Teuchos::RCP<Thyra_Vector const> const& owned_sol,
       const double                            current_time);
 
   void
@@ -481,9 +481,9 @@ class Application
   setupBasicWorksetInfo(
       PHAL::Workset&                          workset,
       double                                  current_time,
-      const Teuchos::RCP<const Thyra_Vector>& x,
-      const Teuchos::RCP<const Thyra_Vector>& xdot,
-      const Teuchos::RCP<const Thyra_Vector>& xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const& x,
+      Teuchos::RCP<Thyra_Vector const> const& xdot,
+      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p);
 
   void
@@ -491,9 +491,9 @@ class Application
       PHAL::Workset&                               workset,
       double                                       current_time,
       bool                                         sum_derivs,
-      const Teuchos::RCP<const Thyra_Vector>&      x,
-      const Teuchos::RCP<const Thyra_Vector>&      xdot,
-      const Teuchos::RCP<const Thyra_Vector>&      xdotdot,
+      Teuchos::RCP<Thyra_Vector const> const&      x,
+      Teuchos::RCP<Thyra_Vector const> const&      xdot,
+      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
       const Teuchos::Array<ParamVec>&              p,
       ParamVec*                                    deriv_p,
       const Teuchos::RCP<const Thyra_MultiVector>& Vx,

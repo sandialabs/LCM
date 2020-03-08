@@ -84,12 +84,12 @@ getFileExtension(std::string const& filename);
 
 //! Nicely prints out a Thyra Vector
 void
-printThyraVector(std::ostream& os, const Teuchos::RCP<const Thyra_Vector>& vec);
+printThyraVector(std::ostream& os, Teuchos::RCP<Thyra_Vector const> const& vec);
 void
 printThyraVector(
     std::ostream&                           os,
     const Teuchos::Array<std::string>&      names,
-    const Teuchos::RCP<const Thyra_Vector>& vec);
+    Teuchos::RCP<Thyra_Vector const> const& vec);
 
 //! Inlined product version
 inline void

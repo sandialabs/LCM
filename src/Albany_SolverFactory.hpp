@@ -42,7 +42,7 @@ class SolverFactory
   create(
       const Teuchos::RCP<const Teuchos_Comm>& appComm,
       const Teuchos::RCP<const Teuchos_Comm>& solverComm,
-      const Teuchos::RCP<const Thyra_Vector>& initial_guess = Teuchos::null);
+      Teuchos::RCP<Thyra_Vector const> const& initial_guess = Teuchos::null);
 
   // Thyra version of above
   Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
@@ -50,7 +50,7 @@ class SolverFactory
       Teuchos::RCP<Application>&              albanyApp,
       const Teuchos::RCP<const Teuchos_Comm>& appComm,
       const Teuchos::RCP<const Teuchos_Comm>& solverComm,
-      const Teuchos::RCP<const Thyra_Vector>& initial_guess   = Teuchos::null,
+      Teuchos::RCP<Thyra_Vector const> const& initial_guess   = Teuchos::null,
       bool                                    createAlbanyApp = true);
 
   // Thyra version of above
@@ -58,7 +58,7 @@ class SolverFactory
   createAlbanyAppAndModel(
       Teuchos::RCP<Application>&              albanyApp,
       const Teuchos::RCP<const Teuchos_Comm>& appComm,
-      const Teuchos::RCP<const Thyra_Vector>& initial_guess   = Teuchos::null,
+      Teuchos::RCP<Thyra_Vector const> const& initial_guess   = Teuchos::null,
       const bool                              createAlbanyApp = true);
 
   Teuchos::ParameterList&
@@ -110,7 +110,7 @@ class SolverFactory
   checkSolveTestResults(
       int                                          response_index,
       int                                          parameter_index,
-      const Teuchos::RCP<const Thyra_Vector>&      g,
+      Teuchos::RCP<Thyra_Vector const> const&      g,
       const Teuchos::RCP<const Thyra_MultiVector>& dgdp) const;
 
   /** \brief Function that does regression testing for Dakota runs. */

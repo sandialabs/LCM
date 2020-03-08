@@ -20,41 +20,41 @@ createLocallyReplicatedVectorSpace(
     const Teuchos::RCP<const Teuchos_Comm> comm);
 
 Teuchos::RCP<const Teuchos_Comm>
-getComm(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+getComm(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 Teuchos::Array<GO>
 getGlobalElements(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          lids);
 Teuchos::Array<LO>
 getLocalElements(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const GO>&          gids);
 void
 getGlobalElements(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<GO>&                gids);
 LO
-getLocalSubdim(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+getLocalSubdim(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 
 Teuchos::Array<GO>
-getGlobalElements(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 
 // Check if two vector spaces are indeed the same vector space
 bool
 sameAs(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs1,
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs2);
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs2);
 
 // Remove a set of local components from a vector space
 Teuchos::RCP<const Thyra_VectorSpace>
 removeComponents(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          local_components);
 
 // The complement of the above: the specified components are the ones to keep
 Teuchos::RCP<const Thyra_VectorSpace>
 createSubspace(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          subspace_components);
 
 // Create a vector space, given the ids of the space components
@@ -67,16 +67,16 @@ createVectorSpace(
 // Intersects vectors spaces
 Teuchos::RCP<const Thyra_VectorSpace>
 createVectorSpacesIntersection(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs1,
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs2,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
     const Teuchos::RCP<const Teuchos_Comm>&      comm);
 
 // Complement of a vector spaces to another
 // NOTE: elements in vs2 that are not in vs1 are ignored.
 Teuchos::RCP<const Thyra_VectorSpace>
 createVectorSpacesDifference(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs1,
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs2,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
     const Teuchos::RCP<const Teuchos_Comm>&      comm);
 
 // ========= Thyra_LinearOp utilities ========= //
@@ -167,7 +167,7 @@ void
 scale(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST val);
 
 Teuchos::RCP<const Thyra_VectorSpace>
-createOneToOneVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace> vs);
+createOneToOneVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const vs);
 
 bool
 isStaticGraph(const Teuchos::RCP<Thyra_LinearOp>& lop);
@@ -176,13 +176,13 @@ isStaticGraph(const Teuchos::RCP<const Thyra_LinearOp>& lop);
 
 Teuchos::RCP<const Thyra_LinearOp>
 buildRestrictionOperator(
-    const Teuchos::RCP<const Thyra_VectorSpace>& space,
-    const Teuchos::RCP<const Thyra_VectorSpace>& subspace);
+    Teuchos::RCP<Thyra_VectorSpace const> const& space,
+    Teuchos::RCP<Thyra_VectorSpace const> const& subspace);
 
 Teuchos::RCP<const Thyra_LinearOp>
 buildProlongationOperator(
-    const Teuchos::RCP<const Thyra_VectorSpace>& space,
-    const Teuchos::RCP<const Thyra_VectorSpace>& subspace);
+    Teuchos::RCP<Thyra_VectorSpace const> const& space,
+    Teuchos::RCP<Thyra_VectorSpace const> const& subspace);
 
 // Math properties helpers
 double
@@ -264,7 +264,7 @@ describe(
 
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
 getSpmdVectorSpace(
-    const Teuchos::RCP<const Thyra_VectorSpace> vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const vs,
     const bool                                  throw_on_failure = true);
 
 // ========= Thyra_ProductXYZ utilities ========== //
@@ -274,7 +274,7 @@ getSpmdVectorSpace(
 
 Teuchos::RCP<const Thyra_ProductVectorSpace>
 getProductVectorSpace(
-    const Teuchos::RCP<const Thyra_VectorSpace> vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const vs,
     const bool                                  throw_on_failure = true);
 
 Teuchos::RCP<Thyra_ProductVector>

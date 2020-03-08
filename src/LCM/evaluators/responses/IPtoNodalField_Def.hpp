@@ -376,7 +376,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
           ->getNodalDataVector();
 
   // Export the data from the local to overlapped decomposition.
-  const Teuchos::RCP<const Thyra_VectorSpace> overlap_node_space =
+  Teuchos::RCP<Thyra_VectorSpace const> const overlap_node_space =
       node_data->getOverlappedVectorSpace();
   const Teuchos::RCP<Thyra_MultiVector> data =
       Thyra::createMembers(overlap_node_space, this->mgr_->ndb_numvecs);

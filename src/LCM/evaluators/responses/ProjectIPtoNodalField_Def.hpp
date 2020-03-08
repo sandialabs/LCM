@@ -690,7 +690,7 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     // IKT, FIXME: implement this case?
     // Otherwise, construct the graph on the fly.
     mgr_->mass_linear_op->is_static() = false;
-    const Teuchos::RCP<const Thyra_VectorSpace> ovl_vs =
+    Teuchos::RCP<Thyra_VectorSpace const> const ovl_vs =
         (p_state_mgr_->getStateInfoStruct()
              ->getNodalDataBase()
              ->getNodalDataVector()
@@ -852,9 +852,9 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
       p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->updateNodalGraph(
           mgr_->ovl_graph_factory);
     }
-    const Teuchos::RCP<const Thyra_VectorSpace> ovl_space =
+    Teuchos::RCP<Thyra_VectorSpace const> const ovl_space =
         mgr_->ovl_graph_factory->getRangeVectorSpace();
-    const Teuchos::RCP<const Thyra_VectorSpace> space =
+    Teuchos::RCP<Thyra_VectorSpace const> const space =
         Albany::createOneToOneVectorSpace(ovl_space);
     // Export the mass matrix.
     // IKT, the last argument in the following line tells the code to use a
@@ -922,12 +922,12 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
   Thyra::SolveStatus<ST> solveStatus =
       Thyra::solve(*nsA, Thyra::NOTRANS, *b, x.ptr());
   {  // Store the overlapped vector data back in stk.
-    const Teuchos::RCP<const Thyra_VectorSpace> ovl_space =
+    Teuchos::RCP<Thyra_VectorSpace const> const ovl_space =
         (p_state_mgr_->getStateInfoStruct()
              ->getNodalDataBase()
              ->getNodalDataVector()
              ->getOverlappedVectorSpace());
-    const Teuchos::RCP<const Thyra_VectorSpace> space =
+    Teuchos::RCP<Thyra_VectorSpace const> const space =
         node_projected_ip_field->col(0)->space();
     Teuchos::RCP<Thyra_MultiVector> npif = Thyra::createMembers(
         ovl_space, Albany::getNumVectors(node_projected_ip_field));

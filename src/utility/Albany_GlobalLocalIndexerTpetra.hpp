@@ -10,7 +10,7 @@ class GlobalLocalIndexerTpetra : public GlobalLocalIndexer
 {
  public:
   GlobalLocalIndexerTpetra(
-      const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       const Teuchos::RCP<const Tpetra_Map>&        tmap)
       : GlobalLocalIndexer(vs), m_tmap(tmap)
   {

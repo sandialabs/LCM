@@ -14,8 +14,8 @@ class CombineAndScatterManagerTpetra : public CombineAndScatterManager
 {
  public:
   CombineAndScatterManagerTpetra(
-      const Teuchos::RCP<const Thyra_VectorSpace>& owned,
-      const Teuchos::RCP<const Thyra_VectorSpace>& overlapped);
+      Teuchos::RCP<Thyra_VectorSpace const> const& owned,
+      Teuchos::RCP<Thyra_VectorSpace const> const& overlapped);
 
   // Combine methods
   void

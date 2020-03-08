@@ -47,10 +47,10 @@ class NodalDataBase
   }
 
   void
-  replaceOwnedVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+  replaceOwnedVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 
   void
-  replaceOverlapVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+  replaceOverlapVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 
   void
   replaceOwnedVectorSpace(

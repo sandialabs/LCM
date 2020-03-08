@@ -15,8 +15,8 @@ struct ThyraCrsMatrixFactory::Impl
 };
 
 ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
-    const Teuchos::RCP<const Thyra_VectorSpace> domain_vs,
-    const Teuchos::RCP<const Thyra_VectorSpace> range_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const domain_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const range_vs,
     const int /*nonzeros_per_row*/)
     : m_graph(new Impl()),
       m_domain_vs(domain_vs),
@@ -28,8 +28,8 @@ ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
 }
 
 ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
-    const Teuchos::RCP<const Thyra_VectorSpace>     domain_vs,
-    const Teuchos::RCP<const Thyra_VectorSpace>     range_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const     domain_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const     range_vs,
     const Teuchos::RCP<const ThyraCrsMatrixFactory> overlap_src)
     : m_domain_vs(domain_vs), m_range_vs(range_vs)
 {

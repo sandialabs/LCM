@@ -28,14 +28,14 @@ struct ThyraCrsMatrixFactory
 {
   // Create an empty graph, that needs to be filled later
   ThyraCrsMatrixFactory(
-      const Teuchos::RCP<const Thyra_VectorSpace> domain_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace> range_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const domain_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const range_vs,
       const int nonzeros_per_row = -1);  // currently not used
 
   // Create a graph from an overlapped one
   ThyraCrsMatrixFactory(
-      const Teuchos::RCP<const Thyra_VectorSpace>     domain_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace>     range_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const     domain_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const     range_vs,
       const Teuchos::RCP<const ThyraCrsMatrixFactory> overlap_src);
 
   // Inserts global indices in a temporary local graph.

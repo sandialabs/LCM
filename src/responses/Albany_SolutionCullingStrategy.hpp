@@ -24,7 +24,7 @@ class SolutionCullingStrategyBase
   }
 
   virtual Teuchos::Array<GO>
-  selectedGIDs(const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const = 0;
+  selectedGIDs(Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const = 0;
 
   virtual ~SolutionCullingStrategyBase() = default;
 };

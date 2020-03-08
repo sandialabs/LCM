@@ -94,7 +94,7 @@ createConstThyraLinearOp(const Teuchos::RCP<const Tpetra_Operator>& op)
 
 Teuchos::RCP<const Tpetra_Map>
 getTpetraMap(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const bool                                   throw_if_not_tpetra)
 {
   Teuchos::RCP<const Tpetra_Map> map;

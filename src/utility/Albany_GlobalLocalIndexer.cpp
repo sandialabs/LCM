@@ -6,7 +6,7 @@
 namespace Albany {
 
 Teuchos::RCP<const GlobalLocalIndexer>
-createGlobalLocalIndexer(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+createGlobalLocalIndexer(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   Teuchos::RCP<const GlobalLocalIndexer> indexer;
 

@@ -27,8 +27,8 @@ class DistributedParameter
   //! Constructor
   DistributedParameter(
       const std::string&                           param_name_,
-      const Teuchos::RCP<const Thyra_VectorSpace>& owned_vs_,
-      const Teuchos::RCP<const Thyra_VectorSpace>& overlapped_vs_)
+      Teuchos::RCP<Thyra_VectorSpace const> const& owned_vs_,
+      Teuchos::RCP<Thyra_VectorSpace const> const& overlapped_vs_)
       : param_name(param_name_)
   {
     // Sanity checks

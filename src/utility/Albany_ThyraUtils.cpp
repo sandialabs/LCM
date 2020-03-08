@@ -27,7 +27,7 @@ createLocallyReplicatedVectorSpace(
 }
 
 Teuchos::RCP<const Teuchos_Comm>
-getComm(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+getComm(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
@@ -39,7 +39,7 @@ getComm(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
 }
 
 GO
-getMaxAllGlobalIndex(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+getMaxAllGlobalIndex(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
@@ -52,7 +52,7 @@ getMaxAllGlobalIndex(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
 
 Teuchos::Array<GO>
 getGlobalElements(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          lids)
 {
   auto               indexer = createGlobalLocalIndexer(vs);
@@ -65,7 +65,7 @@ getGlobalElements(
 
 Teuchos::Array<LO>
 getLocalElements(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const GO>&          gids)
 {
   auto               indexer = createGlobalLocalIndexer(vs);
@@ -78,7 +78,7 @@ getLocalElements(
 
 void
 getGlobalElements(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<GO>&                gids)
 {
   auto     indexer  = createGlobalLocalIndexer(vs);
@@ -91,7 +91,7 @@ getGlobalElements(
 }
 
 Teuchos::Array<GO>
-getGlobalElements(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   Teuchos::Array<GO> gids(getLocalSubdim(vs));
   getGlobalElements(vs, gids());
@@ -99,7 +99,7 @@ getGlobalElements(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
 }
 
 LO
-getLocalSubdim(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+getLocalSubdim(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   auto spmd_vs = getSpmdVectorSpace(vs);
   return spmd_vs->localSubDim();
@@ -107,8 +107,8 @@ getLocalSubdim(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
 
 bool
 sameAs(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs1,
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs2)
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs2)
 {
   auto tmap1 = getTpetraMap(vs1, false);
   if (!tmap1.is_null()) {
@@ -128,7 +128,7 @@ sameAs(
 
 Teuchos::RCP<const Thyra_VectorSpace>
 removeComponents(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          local_components)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -171,7 +171,7 @@ removeComponents(
 
 Teuchos::RCP<const Thyra_VectorSpace>
 createSubspace(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          subspace_components)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -224,8 +224,8 @@ createVectorSpace(
 
 Teuchos::RCP<const Thyra_VectorSpace>
 createVectorSpacesIntersection(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs1,
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs2,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
     const Teuchos::RCP<const Teuchos_Comm>&      comm)
 {
   auto gids1 = getGlobalElements(vs1);
@@ -245,8 +245,8 @@ createVectorSpacesIntersection(
 
 Teuchos::RCP<const Thyra_VectorSpace>
 createVectorSpacesDifference(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs1,
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs2,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
     const Teuchos::RCP<const Teuchos_Comm>&      comm)
 {
   auto gids1 = getGlobalElements(vs1);
@@ -679,7 +679,7 @@ isStaticGraph(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 // The following routine creates a one-to-one version of the given Map where
 // each GID lives on only one process. Therefore it is an owned (unique) map.
 Teuchos::RCP<const Thyra_VectorSpace>
-createOneToOneVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace> vs)
+createOneToOneVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const vs)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
@@ -695,8 +695,8 @@ createOneToOneVectorSpace(const Teuchos::RCP<const Thyra_VectorSpace> vs)
 
 Teuchos::RCP<const Thyra_LinearOp>
 buildRestrictionOperator(
-    const Teuchos::RCP<const Thyra_VectorSpace>& space,
-    const Teuchos::RCP<const Thyra_VectorSpace>& subspace)
+    Teuchos::RCP<Thyra_VectorSpace const> const& space,
+    Teuchos::RCP<Thyra_VectorSpace const> const& subspace)
 {
   // In the process, verify the that subspace is a subspace of space
   auto space_indexer    = createGlobalLocalIndexer(space);
@@ -723,8 +723,8 @@ buildRestrictionOperator(
 
 Teuchos::RCP<const Thyra_LinearOp>
 buildProlongationOperator(
-    const Teuchos::RCP<const Thyra_VectorSpace>& space,
-    const Teuchos::RCP<const Thyra_VectorSpace>& subspace)
+    Teuchos::RCP<Thyra_VectorSpace const> const& space,
+    Teuchos::RCP<Thyra_VectorSpace const> const& subspace)
 {
   // In the process, verify the that subspace is a subspace of space
   auto space_indexer    = createGlobalLocalIndexer(space);
@@ -1045,7 +1045,7 @@ means(const Teuchos::RCP<const Thyra_MultiVector>& mv)
 template <>
 void
 describe<Thyra_VectorSpace>(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     Teuchos::FancyOStream&                       out,
     const Teuchos::EVerbosityLevel               verbLevel)
 {
@@ -1202,7 +1202,7 @@ writeMatrixMarket<Thyra_LinearOp>(
 template <>
 void
 writeMatrixMarket<const Thyra_VectorSpace>(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const std::string&                           prefix,
     const int                                    counter)
 {
@@ -1233,7 +1233,7 @@ writeMatrixMarket<Thyra_VectorSpace>(
 
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
 getSpmdVectorSpace(
-    const Teuchos::RCP<const Thyra_VectorSpace> vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const vs,
     const bool                                  throw_on_failure)
 {
   Teuchos::RCP<const Thyra_SpmdVectorSpace> spmd_vs;
@@ -1246,7 +1246,7 @@ getSpmdVectorSpace(
 
 Teuchos::RCP<const Thyra_ProductVectorSpace>
 getProductVectorSpace(
-    const Teuchos::RCP<const Thyra_VectorSpace> vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const vs,
     const bool                                  throw_on_failure)
 {
   Teuchos::RCP<const Thyra_ProductVectorSpace> pvs;

@@ -90,7 +90,7 @@ class Manager
   //! Initialize x_accum using this nonoverlapping map if x_accum has not
   //  already been initialized.
   void
-  init_x_if_not(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+  init_x_if_not(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
   //! x += soln, where soln is nonoverlapping.
   void
   update_x(const Thyra_Vector& soln_nol);
@@ -195,8 +195,8 @@ class Manager
   //  unnecessary.
   void
   initProjector(
-      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs);
+      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
 
   /* Methods to inform Manager of what is happening. */
 
@@ -218,8 +218,8 @@ class Manager
   //! The mesh was just adapted. The maps are needed only if usingProjection().
   void
   endAdapt(
-      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs);
+      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
 
   /* Methods to inform others of what is happening. */
   bool

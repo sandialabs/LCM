@@ -26,8 +26,8 @@ class CombineAndScatterManager
 {
  public:
   CombineAndScatterManager(
-      const Teuchos::RCP<const Thyra_VectorSpace>& owned,
-      const Teuchos::RCP<const Thyra_VectorSpace>& overlapped);
+      Teuchos::RCP<Thyra_VectorSpace const> const& owned,
+      Teuchos::RCP<Thyra_VectorSpace const> const& overlapped);
 
   virtual ~CombineAndScatterManager() = default;
 
@@ -203,8 +203,8 @@ CombineAndScatterManager::getOwnedAuraUsers() const
 // type of the input vector spaces.
 Teuchos::RCP<CombineAndScatterManager>
 createCombineAndScatterManager(
-    const Teuchos::RCP<const Thyra_VectorSpace>& owned,
-    const Teuchos::RCP<const Thyra_VectorSpace>& overlapped);
+    Teuchos::RCP<Thyra_VectorSpace const> const& owned,
+    Teuchos::RCP<Thyra_VectorSpace const> const& overlapped);
 
 }  // namespace Albany
 

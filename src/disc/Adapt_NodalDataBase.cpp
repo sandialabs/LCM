@@ -64,7 +64,7 @@ NodalDataBase::initialize()
 
 void
 NodalDataBase::replaceOverlapVectorSpace(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   initialize();
 
@@ -74,7 +74,7 @@ NodalDataBase::replaceOverlapVectorSpace(
 
 void
 NodalDataBase::replaceOwnedVectorSpace(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   initialize();
 

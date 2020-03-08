@@ -10,7 +10,7 @@ namespace Albany {
 class GlobalLocalIndexer
 {
  public:
-  GlobalLocalIndexer(const Teuchos::RCP<const Thyra_VectorSpace>& vs) : m_vs(vs)
+  GlobalLocalIndexer(Teuchos::RCP<Thyra_VectorSpace const> const& vs) : m_vs(vs)
   {
     ALBANY_PANIC(
         m_vs.is_null(), "Error! Input vector space pointer is null.\n");
@@ -50,7 +50,7 @@ class GlobalLocalIndexer
 // WARNING: this is a COLLECTIVE operation. All ranks in the comm associated
 //          with the vector space MUST call this function.
 Teuchos::RCP<const GlobalLocalIndexer>
-createGlobalLocalIndexer(const Teuchos::RCP<const Thyra_VectorSpace>& vs);
+createGlobalLocalIndexer(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 
 }  // namespace Albany
 

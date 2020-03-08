@@ -207,8 +207,8 @@ class Projector
   Projector() {}
   void
   init(
-      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs);
+      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
   void
   fillMassMatrix(
       const PHAL::Workset& workset,
@@ -230,12 +230,12 @@ class Projector
       Albany::MDArray&      mda1,
       Albany::MDArray&      mda2);
   // For testing.
-  const Teuchos::RCP<const Thyra_VectorSpace>&
+  Teuchos::RCP<Thyra_VectorSpace const> const&
   get_node_vs() const
   {
     return node_vs_;
   }
-  const Teuchos::RCP<const Thyra_VectorSpace>&
+  Teuchos::RCP<Thyra_VectorSpace const> const&
   get_ol_node_vs() const
   {
     return ol_node_vs_;
@@ -248,8 +248,8 @@ class Projector
 
 void
 Projector::init(
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-    const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
 {
   node_vs_                  = node_vs;
   ol_node_vs_               = ol_node_vs;
@@ -465,8 +465,8 @@ class ProjectorTester
   ProjectorTester();
   void
   init(
-      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs);
+      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
   void
   eval(
       const PHAL::Workset&                                workset,
@@ -585,8 +585,8 @@ struct Manager::Impl
 
   void
   endAdapt(
-      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs)
+      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
   {
     init_g(state_mgr_->getStateArrays().elemStateArrays.size(), true);
     if (Teuchos::nonnull(proj_)) {
@@ -603,8 +603,8 @@ struct Manager::Impl
 
   void
   initProjector(
-      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs)
+      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
   {
     if (Teuchos::nonnull(proj_)) { proj_->init(node_vs, ol_node_vs); }
   }
@@ -833,7 +833,7 @@ Manager::getValidParameters(Teuchos::RCP<Teuchos::ParameterList>& valid_pl)
 }
 
 void
-Manager::init_x_if_not(const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+Manager::init_x_if_not(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   if (Teuchos::nonnull(impl_->x_)) { return; }
   impl_->x_ = Thyra::createMember(vs);
@@ -1033,16 +1033,16 @@ Manager::beginAdapt()
 }
 void
 Manager::endAdapt(
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-    const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
 {
   impl_->endAdapt(node_vs, ol_node_vs);
 }
 
 void
 Manager::initProjector(
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-    const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
 {
   impl_->initProjector(node_vs, ol_node_vs);
 }
@@ -1400,8 +1400,8 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
 
   void
   ProjectorTester::init(
-      const Teuchos::RCP<const Thyra_VectorSpace>& node_vs,
-      const Teuchos::RCP<const Thyra_VectorSpace>& ol_node_vs)
+      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
   {
     d->p.init(node_vs, ol_node_vs);
     d->projected = d->finished = false;

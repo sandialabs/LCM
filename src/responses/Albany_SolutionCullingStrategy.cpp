@@ -23,7 +23,7 @@ class UniformSolutionCullingStrategy : public SolutionCullingStrategyBase
     // Nothing to be done here
   }
   Teuchos::Array<GO>
-  selectedGIDs(const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const;
+  selectedGIDs(Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const;
 
  private:
   int numValues_;
@@ -31,7 +31,7 @@ class UniformSolutionCullingStrategy : public SolutionCullingStrategyBase
 
 Teuchos::Array<GO>
 UniformSolutionCullingStrategy::selectedGIDs(
-    const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const
+    Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
 {
   auto source_indexer = createGlobalLocalIndexer(sourceVS);
 
@@ -64,7 +64,7 @@ class NodeSetSolutionCullingStrategy : public SolutionCullingStrategyBase
   }
 
   Teuchos::Array<GO>
-  selectedGIDs(const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const;
+  selectedGIDs(Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const;
 
   void
   setup()
@@ -83,7 +83,7 @@ class NodeSetSolutionCullingStrategy : public SolutionCullingStrategyBase
 
 Teuchos::Array<GO>
 NodeSetSolutionCullingStrategy::selectedGIDs(
-    const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const
+    Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
 {
   auto source_indexer = createGlobalLocalIndexer(sourceVS);
 
@@ -140,7 +140,7 @@ class NodeGIDsSolutionCullingStrategy : public SolutionCullingStrategyBase
   }
 
   Teuchos::Array<GO>
-  selectedGIDs(const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const;
+  selectedGIDs(Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const;
   void
   setup();
 
@@ -163,7 +163,7 @@ NodeGIDsSolutionCullingStrategy::setup()
 
 Teuchos::Array<GO>
 NodeGIDsSolutionCullingStrategy::selectedGIDs(
-    const Teuchos::RCP<const Thyra_VectorSpace>& sourceVS) const
+    Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
 {
   Teuchos::Array<GO> mySelectedGIDs;
 

@@ -387,8 +387,8 @@ RigidBodyModes::setCoordinates(const Teuchos::RCP<Thyra_MultiVector>& coordMV_)
 void
 RigidBodyModes::setCoordinatesAndNullspace(
     const Teuchos::RCP<Thyra_MultiVector>&       coordMV_in,
-    const Teuchos::RCP<const Thyra_VectorSpace>& soln_vs,
-    const Teuchos::RCP<const Thyra_VectorSpace>& soln_overlap_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& soln_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& soln_overlap_vs)
 {
   setCoordinates(coordMV_in);
 

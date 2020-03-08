@@ -30,7 +30,7 @@ NodalDataVector::NodalDataVector(
 
 void
 NodalDataVector::replaceOverlapVectorSpace(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   overlap_node_vs = vs;
 
@@ -51,7 +51,7 @@ NodalDataVector::replaceOverlapVectorSpace(
 
 void
 NodalDataVector::replaceOwnedVectorSpace(
-    const Teuchos::RCP<const Thyra_VectorSpace>& vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   owned_node_vs = vs;
 

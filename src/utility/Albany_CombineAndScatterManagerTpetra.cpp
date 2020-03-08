@@ -30,8 +30,8 @@ combineModeT(const Albany::CombineMode modeA)
 namespace Albany {
 
 CombineAndScatterManagerTpetra::CombineAndScatterManagerTpetra(
-    const Teuchos::RCP<const Thyra_VectorSpace>& owned,
-    const Teuchos::RCP<const Thyra_VectorSpace>& overlapped)
+    Teuchos::RCP<Thyra_VectorSpace const> const& owned,
+    Teuchos::RCP<Thyra_VectorSpace const> const& overlapped)
     : CombineAndScatterManager(owned, overlapped)
 {
   auto ownedT      = Albany::getTpetraMap(owned);

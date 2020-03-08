@@ -293,7 +293,7 @@ SolutionValuesResponseFunction::evaluateGradient(
 void
 SolutionValuesResponseFunction::updateCASManager()
 {
-  const Teuchos::RCP<const Thyra_VectorSpace> solutionVS =
+  Teuchos::RCP<Thyra_VectorSpace const> const solutionVS =
       app_->getVectorSpace();
   if (cas_manager.is_null() ||
       !sameAs(solutionVS, cas_manager->getOwnedVectorSpace())) {

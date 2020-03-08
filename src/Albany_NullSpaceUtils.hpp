@@ -65,8 +65,8 @@ class RigidBodyModes
   void
   setCoordinatesAndNullspace(
       const Teuchos::RCP<Thyra_MultiVector>&       coordMV,
-      const Teuchos::RCP<const Thyra_VectorSpace>& soln_vs = Teuchos::null,
-      const Teuchos::RCP<const Thyra_VectorSpace>& soln_overlap_vs =
+      Teuchos::RCP<Thyra_VectorSpace const> const& soln_vs = Teuchos::null,
+      Teuchos::RCP<Thyra_VectorSpace const> const& soln_overlap_vs =
           Teuchos::null);
 
   //! Pass only the coordinates.

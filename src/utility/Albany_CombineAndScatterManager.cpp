@@ -14,8 +14,8 @@
 namespace Albany {
 
 CombineAndScatterManager::CombineAndScatterManager(
-    const Teuchos::RCP<const Thyra_VectorSpace>& owned,
-    const Teuchos::RCP<const Thyra_VectorSpace>& overlapped)
+    Teuchos::RCP<Thyra_VectorSpace const> const& owned,
+    Teuchos::RCP<Thyra_VectorSpace const> const& overlapped)
     : owned_vs(owned), overlapped_vs(overlapped)
 {
   ghosted_aura_owners_computed = false;
@@ -61,8 +61,8 @@ CombineAndScatterManager::create_aura_vss() const
 // Utility function that returns a concrete manager.
 Teuchos::RCP<CombineAndScatterManager>
 createCombineAndScatterManager(
-    const Teuchos::RCP<const Thyra_VectorSpace>& owned,
-    const Teuchos::RCP<const Thyra_VectorSpace>& overlapped)
+    Teuchos::RCP<Thyra_VectorSpace const> const& owned,
+    Teuchos::RCP<Thyra_VectorSpace const> const& overlapped)
 {
   Teuchos::RCP<CombineAndScatterManager> manager;
 

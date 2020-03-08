@@ -168,7 +168,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       const std::string&                           field_name,
       const Teuchos::ParameterList&                params,
       Teuchos::RCP<Thyra_MultiVector>&             field_mv,
-      const Teuchos::RCP<const Thyra_VectorSpace>& entities_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
       bool                                         node,
       bool                                         scalar,
       bool                                         layered,
@@ -178,7 +178,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       const std::string&                           field_name,
       const Teuchos::ParameterList&                params,
       Teuchos::RCP<Thyra_MultiVector>&             field_mv,
-      const Teuchos::RCP<const Thyra_VectorSpace>& entities_vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
       const std::vector<stk::mesh::Entity>&        entities,
       bool                                         node,
       bool                                         scalar,
@@ -190,21 +190,21 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   readScalarFileSerial(
       const std::string&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
-      const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
 
   void
   readVectorFileSerial(
       const std::string&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
-      const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
 
   void
   readLayeredScalarFileSerial(
       const std::string&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
-      const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       std::vector<double>&                         normalizedLayersCoords,
       const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
 
@@ -212,7 +212,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   readLayeredVectorFileSerial(
       const std::string&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
-      const Teuchos::RCP<const Thyra_VectorSpace>& vs,
+      Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       std::vector<double>&                         normalizedLayersCoords,
       const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
 

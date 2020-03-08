@@ -413,7 +413,7 @@ MultiSTKFieldContainer<Interleaved>::fillVector(
     Thyra_Vector&                                field_vector,
     const std::string&                           field_name,
     stk::mesh::Selector&                         field_selection,
-    const Teuchos::RCP<const Thyra_VectorSpace>& field_node_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager)
 {
   fillVectorImpl(
@@ -430,7 +430,7 @@ void
 MultiSTKFieldContainer<Interleaved>::fillSolnVector(
     Thyra_Vector&                                solution,
     stk::mesh::Selector&                         sel,
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   const LO        numLocalNodes = getSpmdVectorSpace(node_vs)->localSubDim();
   NodalDOFManager nodalDofManager;
@@ -449,7 +449,7 @@ void
 MultiSTKFieldContainer<Interleaved>::fillSolnMultiVector(
     Thyra_MultiVector&                           solution,
     stk::mesh::Selector&                         sel,
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   using VFT = typename AbstractSTKFieldContainer::VectorFieldType;
   using SFT = typename AbstractSTKFieldContainer::ScalarFieldType;
@@ -483,7 +483,7 @@ MultiSTKFieldContainer<Interleaved>::saveVector(
     const Thyra_Vector&                          field_vector,
     const std::string&                           field_name,
     stk::mesh::Selector&                         field_selection,
-    const Teuchos::RCP<const Thyra_VectorSpace>& field_node_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager)
 {
   saveVectorImpl(
@@ -500,7 +500,7 @@ void
 MultiSTKFieldContainer<Interleaved>::saveSolnVector(
     const Thyra_Vector&                          solution,
     stk::mesh::Selector&                         sel,
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   // Setup a dof manger on the fly (it's cheap anyways).
   // We don't care about global dofs (hence, the -1), since it's used only
@@ -525,7 +525,7 @@ MultiSTKFieldContainer<Interleaved>::saveSolnVector(
     const Thyra_Vector& solution,
     const Thyra_Vector& /* solution_dot */,
     stk::mesh::Selector&                         sel,
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   // TODO: why can't we save also solution_dot?
   Teuchos::RCP<Teuchos::FancyOStream> out =
@@ -546,7 +546,7 @@ MultiSTKFieldContainer<Interleaved>::saveSolnVector(
     const Thyra_Vector& /* solution_dot */,
     const Thyra_Vector& /* solution_dotdot */,
     stk::mesh::Selector&                         sel,
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   // TODO: why can't we save also solution_dot?
   Teuchos::RCP<Teuchos::FancyOStream> out =
@@ -566,7 +566,7 @@ void
 MultiSTKFieldContainer<Interleaved>::saveSolnMultiVector(
     const Thyra_MultiVector&                     solution,
     stk::mesh::Selector&                         sel,
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   // Setup a dof manger on the fly (it's cheap anyways).
   // We don't care about global dofs (hence, the -1), since it's used only
@@ -596,7 +596,7 @@ void
 MultiSTKFieldContainer<Interleaved>::saveResVector(
     const Thyra_Vector&                          res,
     stk::mesh::Selector&                         sel,
-    const Teuchos::RCP<const Thyra_VectorSpace>& node_vs)
+    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   // Setup a dof manger on the fly (it's cheap anyways).
   // We don't care about global dofs (hence, the -1), since it's used only
@@ -629,7 +629,7 @@ MultiSTKFieldContainer<Interleaved>::fillVectorImpl(
     Thyra_Vector&                                field_vector,
     const std::string&                           field_name,
     stk::mesh::Selector&                         field_selection,
-    const Teuchos::RCP<const Thyra_VectorSpace>& field_node_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager,
     const int                                    offset)
 {
@@ -688,7 +688,7 @@ MultiSTKFieldContainer<Interleaved>::saveVectorImpl(
     const Thyra_Vector&                          field_vector,
     const std::string&                           field_name,
     stk::mesh::Selector&                         field_selection,
-    const Teuchos::RCP<const Thyra_VectorSpace>& field_node_vs,
+    Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager,
     const int                                    offset)
 {

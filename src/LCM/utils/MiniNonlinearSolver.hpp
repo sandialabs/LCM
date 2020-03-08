@@ -55,26 +55,6 @@ struct MiniSolver<MIN, STEP, FN, PHAL::AlbanyTraits::Jacobian, N>
       minitensor::Vector<PHAL::AlbanyTraits::Jacobian::ScalarT, N>& soln);
 };
 
-template <typename MIN, typename STEP, typename FN, minitensor::Index N>
-struct MiniSolver<MIN, STEP, FN, PHAL::AlbanyTraits::Tangent, N>
-{
-  MiniSolver(
-      MIN&                                                         minimizer,
-      STEP&                                                        step_method,
-      FN&                                                          function,
-      minitensor::Vector<PHAL::AlbanyTraits::Tangent::ScalarT, N>& soln);
-};
-
-template <typename MIN, typename STEP, typename FN, minitensor::Index N>
-struct MiniSolver<MIN, STEP, FN, PHAL::AlbanyTraits::DistParamDeriv, N>
-{
-  MiniSolver(
-      MIN&  minimizer,
-      STEP& step_method,
-      FN&   function,
-      minitensor::Vector<PHAL::AlbanyTraits::DistParamDeriv::ScalarT, N>& soln);
-};
-
 ///
 /// Class for dealing with Albany traits. ROL implementation.
 ///
@@ -112,28 +92,6 @@ struct MiniSolverROL<MIN, FN, PHAL::AlbanyTraits::Jacobian, N>
       Teuchos::ParameterList&                                       params,
       FN&                                                           function,
       minitensor::Vector<PHAL::AlbanyTraits::Jacobian::ScalarT, N>& soln);
-};
-
-template <typename MIN, typename FN, minitensor::Index N>
-struct MiniSolverROL<MIN, FN, PHAL::AlbanyTraits::Tangent, N>
-{
-  MiniSolverROL(
-      MIN&                                                         minimizer,
-      std::string const&                                           algoname,
-      Teuchos::ParameterList&                                      params,
-      FN&                                                          function,
-      minitensor::Vector<PHAL::AlbanyTraits::Tangent::ScalarT, N>& soln);
-};
-
-template <typename MIN, typename FN, minitensor::Index N>
-struct MiniSolverROL<MIN, FN, PHAL::AlbanyTraits::DistParamDeriv, N>
-{
-  MiniSolverROL(
-      MIN&                    minimizer,
-      std::string const&      algoname,
-      Teuchos::ParameterList& params,
-      FN&                     function,
-      minitensor::Vector<PHAL::AlbanyTraits::DistParamDeriv::ScalarT, N>& soln);
 };
 
 ///
@@ -183,30 +141,6 @@ struct MiniSolverBoundsROL<MIN, FN, BC, PHAL::AlbanyTraits::Jacobian, N>
       FN&                                                           function,
       BC&                                                           bounds,
       minitensor::Vector<PHAL::AlbanyTraits::Jacobian::ScalarT, N>& soln);
-};
-
-template <typename MIN, typename FN, typename BC, minitensor::Index N>
-struct MiniSolverBoundsROL<MIN, FN, BC, PHAL::AlbanyTraits::Tangent, N>
-{
-  MiniSolverBoundsROL(
-      MIN&                                                         minimizer,
-      std::string const&                                           algoname,
-      Teuchos::ParameterList&                                      params,
-      FN&                                                          function,
-      BC&                                                          bounds,
-      minitensor::Vector<PHAL::AlbanyTraits::Tangent::ScalarT, N>& soln);
-};
-
-template <typename MIN, typename FN, typename BC, minitensor::Index N>
-struct MiniSolverBoundsROL<MIN, FN, BC, PHAL::AlbanyTraits::DistParamDeriv, N>
-{
-  MiniSolverBoundsROL(
-      MIN&                    minimizer,
-      std::string const&      algoname,
-      Teuchos::ParameterList& params,
-      FN&                     function,
-      BC&                     bounds,
-      minitensor::Vector<PHAL::AlbanyTraits::DistParamDeriv::ScalarT, N>& soln);
 };
 
 ///
@@ -276,52 +210,6 @@ struct MiniSolverEqIneqROL<MIN, FN, EIC, PHAL::AlbanyTraits::Jacobian, N, NC>
           cv);
 };
 
-template <
-    typename MIN,
-    typename FN,
-    typename EIC,
-    minitensor::Index N,
-    minitensor::Index NC>
-struct MiniSolverEqIneqROL<MIN, FN, EIC, PHAL::AlbanyTraits::Tangent, N, NC>
-{
-  MiniSolverEqIneqROL(
-      MIN&                    minimizer,
-      std::string const&      algoname,
-      Teuchos::ParameterList& params,
-      FN&                     function,
-      EIC&                    eqineq,
-      minitensor::Vector<typename PHAL::AlbanyTraits::Tangent::ScalarT, N>&
-          soln,
-      minitensor::Vector<typename PHAL::AlbanyTraits::Tangent::ScalarT, NC>&
-          cv);
-};
-
-template <
-    typename MIN,
-    typename FN,
-    typename EIC,
-    minitensor::Index N,
-    minitensor::Index NC>
-struct MiniSolverEqIneqROL<
-    MIN,
-    FN,
-    EIC,
-    PHAL::AlbanyTraits::DistParamDeriv,
-    N,
-    NC>
-{
-  MiniSolverEqIneqROL(
-      MIN&                    minimizer,
-      std::string const&      algoname,
-      Teuchos::ParameterList& params,
-      FN&                     function,
-      EIC&                    eqineq,
-      minitensor::
-          Vector<typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT, N>& soln,
-      minitensor::
-          Vector<typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT, NC>& cv);
-};
-
 ///
 /// Deal with derivative information for all the mini solvers.
 /// Call this when a converged solution is obtained on a system that is
@@ -357,7 +245,6 @@ struct peel
     // TS const
     // t = Sacado::ScalarValue<S>::eval(s);
     TS const t = s;
-
     return t;
   }
 };
@@ -366,8 +253,6 @@ namespace {
 
 using RE = PHAL::AlbanyTraits::Residual;
 using JE = PHAL::AlbanyTraits::Jacobian;
-using TE = PHAL::AlbanyTraits::Tangent;
-using DE = PHAL::AlbanyTraits::DistParamDeriv;
 
 template <int N>
 using AD = minitensor::FAD<RealType, N>;
@@ -387,7 +272,6 @@ struct peel<RE, RealType, N>
   operator()(RE::ScalarT const& s)
   {
     RealType const t = s;
-
     return t;
   }
 };
@@ -399,31 +283,6 @@ struct peel<JE, RealType, N>
   operator()(JE::ScalarT const& s)
   {
     RealType const t = Sacado::Value<typename JE::ScalarT>::eval(s);
-
-    return t;
-  }
-};
-
-template <int N>
-struct peel<TE, RealType, N>
-{
-  RealType
-  operator()(TE::ScalarT const& s)
-  {
-    RealType const t = Sacado::Value<typename TE::ScalarT>::eval(s);
-
-    return t;
-  }
-};
-
-template <int N>
-struct peel<DE, RealType, N>
-{
-  RealType
-  operator()(DE::ScalarT const& s)
-  {
-    RealType const t = Sacado::Value<typename DE::ScalarT>::eval(s);
-
     return t;
   }
 };
@@ -435,7 +294,6 @@ struct peel<RE, AD<N>, N>
   operator()(typename RE::ScalarT const& s)
   {
     AD<N> const t = s;
-
     return t;
   }
 };
@@ -447,31 +305,6 @@ struct peel<JE, AD<N>, N>
   operator()(JE::ScalarT const& s)
   {
     AD<N> const t = Sacado::Value<typename JE::ScalarT>::eval(s);
-
-    return t;
-  }
-};
-
-template <int N>
-struct peel<TE, AD<N>, N>
-{
-  AD<N>
-  operator()(TE::ScalarT const& s)
-  {
-    AD<N> const t = Sacado::Value<typename TE::ScalarT>::eval(s);
-
-    return t;
-  }
-};
-
-template <int N>
-struct peel<DE, AD<N>, N>
-{
-  AD<N>
-  operator()(DE::ScalarT const& s)
-  {
-    AD<N> const t = Sacado::Value<typename DE::ScalarT>::eval(s);
-
     return t;
   }
 };
@@ -483,7 +316,6 @@ struct peel<RE, ADAD<N>, N>
   operator()(typename RE::ScalarT const& s)
   {
     ADAD<N> const t = s;
-
     return t;
   }
 };
@@ -495,31 +327,6 @@ struct peel<JE, ADAD<N>, N>
   operator()(JE::ScalarT const& s)
   {
     ADAD<N> const t = Sacado::Value<typename JE::ScalarT>::eval(s);
-
-    return t;
-  }
-};
-
-template <int N>
-struct peel<TE, ADAD<N>, N>
-{
-  ADAD<N>
-  operator()(TE::ScalarT const& s)
-  {
-    ADAD<N> const t = Sacado::Value<typename TE::ScalarT>::eval(s);
-
-    return t;
-  }
-};
-
-template <int N>
-struct peel<DE, ADAD<N>, N>
-{
-  ADAD<N>
-  operator()(DE::ScalarT const& s)
-  {
-    ADAD<N> const t = Sacado::Value<typename DE::ScalarT>::eval(s);
-
     return t;
   }
 };
@@ -531,7 +338,6 @@ struct peel<RE, ADJE<N>, N>
   operator()(typename RE::ScalarT const& s)
   {
     ADJE<N> const t = s;
-
     return t;
   }
 };
@@ -543,31 +349,6 @@ struct peel<JE, ADJE<N>, N>
   operator()(JE::ScalarT const& s)
   {
     ADJE<N> const t = Sacado::Value<typename JE::ScalarT>::eval(s);
-
-    return t;
-  }
-};
-
-template <int N>
-struct peel<TE, ADJE<N>, N>
-{
-  ADJE<N>
-  operator()(TE::ScalarT const& s)
-  {
-    ADJE<N> const t = Sacado::Value<typename TE::ScalarT>::eval(s);
-
-    return t;
-  }
-};
-
-template <int N>
-struct peel<DE, ADJE<N>, N>
-{
-  ADJE<N>
-  operator()(DE::ScalarT const& s)
-  {
-    ADJE<N> const t = Sacado::Value<typename DE::ScalarT>::eval(s);
-
     return t;
   }
 };
@@ -582,16 +363,12 @@ struct peel_vector
   minitensor::Vector<T, N>
   operator()(minitensor::Vector<S, N> const& s)
   {
-    minitensor::Index const dimension = s.get_dimension();
-
+    minitensor::Index const  dimension = s.get_dimension();
     minitensor::Vector<T, N> t(dimension);
-
-    minitensor::Index const num_components = s.get_number_components();
-
+    minitensor::Index const  num_components = s.get_number_components();
     for (minitensor::Index i = 0; i < num_components; ++i) {
       t[i] = peel<EvalT, T, M>()(s[i]);
     }
-
     return t;
   }
 };
@@ -604,16 +381,13 @@ struct peel_tensor
   minitensor::Tensor<T, N>
   operator()(minitensor::Tensor<S, N> const& s)
   {
-    minitensor::Index const dimension = s.get_dimension();
-
+    minitensor::Index const  dimension = s.get_dimension();
     minitensor::Tensor<T, N> t(dimension);
-
-    minitensor::Index const num_components = s.get_number_components();
+    minitensor::Index const  num_components = s.get_number_components();
 
     for (minitensor::Index i = 0; i < num_components; ++i) {
       t[i] = peel<EvalT, T, M>()(s[i]);
     }
-
     return t;
   }
 };
@@ -626,16 +400,13 @@ struct peel_tensor3
   minitensor::Tensor3<T, N>
   operator()(minitensor::Tensor3<S, N> const& s)
   {
-    minitensor::Index const dimension = s.get_dimension();
-
+    minitensor::Index const   dimension = s.get_dimension();
     minitensor::Tensor3<T, N> t(dimension);
-
-    minitensor::Index const num_components = s.get_number_components();
+    minitensor::Index const   num_components = s.get_number_components();
 
     for (minitensor::Index i = 0; i < num_components; ++i) {
       t[i] = peel<EvalT, T, M>()(s[i]);
     }
-
     return t;
   }
 };
@@ -648,16 +419,13 @@ struct peel_tensor4
   minitensor::Tensor4<T, N>
   operator()(minitensor::Tensor4<S, N> const& s)
   {
-    minitensor::Index const dimension = s.get_dimension();
-
+    minitensor::Index const   dimension = s.get_dimension();
     minitensor::Tensor4<T, N> t(dimension);
-
-    minitensor::Index const num_components = s.get_number_components();
+    minitensor::Index const   num_components = s.get_number_components();
 
     for (minitensor::Index i = 0; i < num_components; ++i) {
       t[i] = peel<EvalT, T, M>()(s[i]);
     }
-
     return t;
   }
 };

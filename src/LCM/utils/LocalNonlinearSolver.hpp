@@ -88,52 +88,6 @@ class LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>
       std::vector<ScalarT>& B);
 };
 
-// -----------------------------------------------------------------------------
-// Tangent
-// -----------------------------------------------------------------------------
-template <typename Traits>
-class LocalNonlinearSolver<PHAL::AlbanyTraits::Tangent, Traits>
-    : public LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-  LocalNonlinearSolver();
-  void
-  solve(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
-  void
-  computeFadInfo(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
-};
-
-// -----------------------------------------------------------------------------
-// Distributed Parameter Derivative
-// -----------------------------------------------------------------------------
-template <typename Traits>
-class LocalNonlinearSolver<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public LocalNonlinearSolver_Base<
-          PHAL::AlbanyTraits::DistParamDeriv,
-          Traits>
-{
- public:
-  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
-  LocalNonlinearSolver();
-  void
-  solve(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
-  void
-  computeFadInfo(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
-};
-
 }  // namespace LCM
 
 #include "LocalNonlinearSolver_Def.hpp"

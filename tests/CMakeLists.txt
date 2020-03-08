@@ -104,7 +104,6 @@ add_subdirectory(SteadyHeat2D)
 add_subdirectory(SteadyHeat2DEB)
 add_subdirectory(SteadyHeat3D)
 add_subdirectory(SteadyHeat3DTest)
-add_subdirectory(SteadyHeatConstrainedOpt2D)
 add_subdirectory(TransientHeat1D)
 add_subdirectory(TransientHeat2D)
 

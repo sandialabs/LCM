@@ -333,48 +333,6 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
           PHAL_GatherJacRank0_Acceleration_Policy;
 };
 
-// **************************************************************
-// Tangent (Jacobian mat-vec + parameter derivatives)
-// **************************************************************
-template <typename Traits>
-class GatherSolution<PHAL::AlbanyTraits::Tangent, Traits>
-    : public GatherSolutionBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  GatherSolution(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  GatherSolution(const Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- private:
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-  typedef typename Kokkos::View<ScalarT*, PHX::Device>::reference_type
-                    reference_type;
-  const std::size_t numFields;
-};
-
-// **************************************************************
-// Distributed Parameter Derivative
-// **************************************************************
-template <typename Traits>
-class GatherSolution<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public GatherSolutionBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  GatherSolution(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  GatherSolution(const Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- private:
-  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
-  const std::size_t                                            numFields;
-};
-
 }  // namespace PHAL
 
 #endif  // PHAL_GATHER_SOLUTION_HPP

@@ -36,28 +36,17 @@ SchwarzBC_Base<EvalT, Traits>::SchwarzBC_Base(Teuchos::ParameterList& p)
       coupled_block_name_(p.get<std::string>("Coupled Block", "NONE"))
 {
   std::string const& nodeset_name = this->nodeSetID;
-
   app_->setCoupledAppBlockNodeset(
       coupled_app_name_, coupled_block_name_, nodeset_name);
-
-  std::string const& this_app_name = app_->getAppName();
-
-  auto const& app_name_index_map = *(app_->getAppNameIndexMap());
-
-  auto it = app_name_index_map.find(this_app_name);
-
+  std::string const& this_app_name      = app_->getAppName();
+  auto const&        app_name_index_map = *(app_->getAppNameIndexMap());
+  auto               it = app_name_index_map.find(this_app_name);
   ALBANY_EXPECT(it != app_name_index_map.end());
-
   auto const this_app_index = it->second;
-
   setThisAppIndex(this_app_index);
-
   it = app_name_index_map.find(coupled_app_name_);
-
   ALBANY_EXPECT(it != app_name_index_map.end());
-
   auto const coupled_app_index = it->second;
-
   setCoupledAppIndex(coupled_app_index);
 }
 
@@ -112,11 +101,9 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
 
   // Get cell topology of the application and block to which this node set
   // is coupled.
-  std::string const& this_app_name = this_app.getAppName();
-
+  std::string const& this_app_name    = this_app.getAppName();
   std::string const& coupled_app_name = coupled_app.getAppName();
-
-  std::string const coupled_block_name =
+  std::string const  coupled_block_name =
       this_app.getCoupledBlockName(coupled_app_index);
 
   bool const use_block = coupled_block_name != "NONE";
@@ -124,8 +111,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
   std::map<std::string, int> const& coupled_block_name_to_index =
       coupled_gms.getMeshSpecs()[0]->ebNameToIndex;
 
-  auto it = coupled_block_name_to_index.find(coupled_block_name);
-
+  auto       it = coupled_block_name_to_index.find(coupled_block_name);
   bool const missing_block = it == coupled_block_name_to_index.end();
 
   if (use_block == true && missing_block == true) {
@@ -144,9 +130,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
       coupled_mesh_specs[coupled_block_index]->ctd;
 
   shards::CellTopology coupled_cell_topology(&coupled_cell_topology_data);
-
-  auto const coupled_dimension = coupled_cell_topology_data.dimension;
-
+  auto const           coupled_dimension = coupled_cell_topology_data.dimension;
   auto const coupled_node_count = coupled_cell_topology_data.node_count;
 
   std::string const& coupled_nodeset_name =
@@ -174,14 +158,11 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
   double const tolerance = 5.0e-2;
 
   auto const parametric_dimension = coupled_dimension;
-
   auto const coupled_vertex_count = coupled_cell_topology_data.vertex_count;
-
   auto const coupled_element_type =
       minitensor::find_type(coupled_dimension, coupled_vertex_count);
 
   minitensor::Vector<double> lo(parametric_dimension, minitensor::Filler::ONES);
-
   minitensor::Vector<double> hi(parametric_dimension, minitensor::Filler::ONES);
 
   hi = hi * (1.0 + tolerance);
@@ -204,12 +185,9 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
       break;
   }
 
-  double* const coord = ns_coord[ns_node];
-
+  double* const              coord = ns_coord[ns_node];
   minitensor::Vector<double> point;
-
   point.set_dimension(coupled_dimension);
-
   point.fill(coord);
 
   // Determine the element that contains this point.
@@ -256,9 +234,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
     std::string const& coupled_element_block = coupled_ws_eb_names[workset];
 
     bool const block_names_differ = coupled_element_block != coupled_block_name;
-
     if (use_block == true && block_names_differ == true) continue;
-
     auto const elements_per_workset = ws_elem_to_node_id[workset].size();
 
     for (auto element = 0; element < elements_per_workset; ++element) {
@@ -340,8 +316,6 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
   x_val = value(0);
   y_val = value(1);
   z_val = value(2);
-
-  return;
 }
 
 //
@@ -352,12 +326,9 @@ template <typename EvalT, typename Traits>
 Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>
 SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
 {
-  auto const this_app_index = getThisAppIndex();
-
-  auto const coupled_app_index = getCoupledAppIndex();
-
-  Albany::Application const& this_app = getApplication(this_app_index);
-
+  auto const                 this_app_index    = getThisAppIndex();
+  auto const                 coupled_app_index = getCoupledAppIndex();
+  Albany::Application const& this_app          = getApplication(this_app_index);
   Albany::Application const& coupled_app = getApplication(coupled_app_index);
 
   // neq should be the same for this_app and coupled_app.
@@ -479,15 +450,12 @@ void
 fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 {
   // Solution
-  Teuchos::RCP<Thyra_Vector const> x = dbc_workset.x;
-
-  Teuchos::ArrayRCP<ST const> x_const_view = Albany::getLocalData(x);
+  Teuchos::RCP<Thyra_Vector const> x            = dbc_workset.x;
+  Teuchos::ArrayRCP<ST const>      x_const_view = Albany::getLocalData(x);
 
   // Residual
-  Teuchos::RCP<Thyra_Vector> f = dbc_workset.f;
-
-  Teuchos::ArrayRCP<ST> f_view = Albany::getNonconstLocalData(f);
-
+  Teuchos::RCP<Thyra_Vector>           f      = dbc_workset.f;
+  Teuchos::ArrayRCP<ST>                f_view = Albany::getNonconstLocalData(f);
   std::vector<std::vector<int>> const& ns_dof =
       dbc_workset.nodeSets->find(sbc.nodeSetID)->second;
 
@@ -513,12 +481,9 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 
   for (auto ns_node = 0; ns_node < ns_number_nodes; ++ns_node) {
     auto const x_dof = ns_dof[ns_node][0];
-
     auto const y_dof = ns_dof[ns_node][1];
-
     auto const z_dof = ns_dof[ns_node][2];
-
-    auto const dof = x_dof / 3;
+    auto const dof   = x_dof / 3;
 
     std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
@@ -535,15 +500,10 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 #else   // ALBANY_DTK
   for (auto ns_node = 0; ns_node < ns_number_nodes; ++ns_node) {
     ST x_val, y_val, z_val;
-
     sbc.computeBCs(ns_node, x_val, y_val, z_val);
-
-    auto const x_dof = ns_dof[ns_node][0];
-
-    auto const y_dof = ns_dof[ns_node][1];
-
-    auto const z_dof = ns_dof[ns_node][2];
-
+    auto const           x_dof      = ns_dof[ns_node][0];
+    auto const           y_dof      = ns_dof[ns_node][1];
+    auto const           z_dof      = ns_dof[ns_node][2];
     std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
@@ -664,205 +624,6 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   if (fill_residual == true) {
     fillResidual<SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>, Traits>(
         *this, dbc_workset);
-  }
-  return;
-}
-
-//
-// Specialization: Tangent
-//
-template <typename Traits>
-SchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::SchwarzBC(
-    Teuchos::ParameterList& p)
-    : SchwarzBC_Base<PHAL::AlbanyTraits::Tangent, Traits>(p)
-{
-}
-
-//
-//
-//
-template <typename Traits>
-void
-SchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
-    typename Traits::EvalData dbc_workset)
-{
-  Teuchos::RCP<Thyra_Vector const>      x  = dbc_workset.x;
-  Teuchos::RCP<const Thyra_MultiVector> Vx = dbc_workset.Vx;
-  Teuchos::RCP<Thyra_Vector>            f  = dbc_workset.f;
-  Teuchos::RCP<Thyra_MultiVector>       fp = dbc_workset.fp;
-  Teuchos::RCP<Thyra_MultiVector>       JV = dbc_workset.JV;
-
-  RealType const j_coeff = dbc_workset.j_coeff;
-
-  std::vector<std::vector<int>> const& ns_nodes =
-      dbc_workset.nodeSets->find(this->nodeSetID)->second;
-
-  Teuchos::ArrayRCP<ST const> x_const_view = Albany::getLocalData(x);
-  Teuchos::ArrayRCP<ST>       f_view;
-
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> Vx_const_view;
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>       JV_view;
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>       fp_view;
-
-  if (f != Teuchos::null) { f_view = Albany::getNonconstLocalData(f); }
-  if (JV != Teuchos::null) {
-    JV_view       = Albany::getNonconstLocalData(JV);
-    Vx_const_view = Albany::getLocalData(Vx);
-  }
-  if (fp != Teuchos::null) { fp_view = Albany::getNonconstLocalData(fp); }
-
-  for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-    auto const x_dof = ns_nodes[ns_node][0];
-
-    auto const y_dof = ns_nodes[ns_node][1];
-
-    auto const z_dof = ns_nodes[ns_node][2];
-
-    if (JV != Teuchos::null) {
-      for (auto i = 0; i < dbc_workset.num_cols_x; ++i) {
-        JV_view[i][x_dof] = j_coeff * Vx_const_view[i][x_dof];
-        JV_view[i][y_dof] = j_coeff * Vx_const_view[i][y_dof];
-        JV_view[i][z_dof] = j_coeff * Vx_const_view[i][z_dof];
-      }
-    }
-  }
-
-  if (f != Teuchos::null || fp != Teuchos::null) {
-#if defined(ALBANY_DTK)
-    if (f != Teuchos::null) {
-      Teuchos::RCP<
-          Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> const
-          schwarz_bcs = this->computeBCsDTK();
-
-      Teuchos::RCP<const Teuchos::Comm<int>> commT =
-          schwarz_bcs->getMap()->getComm();
-
-      Teuchos::ArrayRCP<ST const> schwarz_bcs_const_view_x =
-          schwarz_bcs->getData(0);
-
-      Teuchos::ArrayRCP<ST const> schwarz_bcs_const_view_y =
-          schwarz_bcs->getData(1);
-
-      Teuchos::ArrayRCP<ST const> schwarz_bcs_const_view_z =
-          schwarz_bcs->getData(2);
-
-      for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-        auto const x_dof = ns_nodes[ns_node][0];
-
-        auto const y_dof = ns_nodes[ns_node][1];
-
-        auto const z_dof = ns_nodes[ns_node][2];
-
-        auto const dof = x_dof / 3;
-
-        f_view[x_dof] = x_const_view[x_dof] - schwarz_bcs_const_view_x[dof];
-        f_view[y_dof] = x_const_view[y_dof] - schwarz_bcs_const_view_y[dof];
-        f_view[z_dof] = x_const_view[z_dof] - schwarz_bcs_const_view_z[dof];
-      }
-    }
-
-    if (fp != Teuchos::null) {
-      std::cout << "WARNING: fpT requested but unset when ALBANY_DTK is ON!\n";
-    }
-#else
-    for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-      auto const x_dof = ns_nodes[ns_node][0];
-
-      auto const y_dof = ns_nodes[ns_node][1];
-
-      auto const z_dof = ns_nodes[ns_node][2];
-
-      ScalarT x_val, y_val, z_val;
-
-      this->computeBCs(ns_node, x_val, y_val, z_val);
-
-      if (f != Teuchos::null) {
-        f_view[x_dof] = x_const_view[x_dof] - x_val.val();
-        f_view[y_dof] = x_const_view[y_dof] - y_val.val();
-        f_view[z_dof] = x_const_view[z_dof] - z_val.val();
-      }
-      if (fp != Teuchos::null) {
-        for (auto i = 0; i < dbc_workset.num_cols_p; ++i) {
-          fp_view[i][x_dof] = -x_val.dx(dbc_workset.param_offset + i);
-          fp_view[i][y_dof] = -y_val.dx(dbc_workset.param_offset + i);
-          fp_view[i][z_dof] = -z_val.dx(dbc_workset.param_offset + i);
-        }
-      }
-    }
-#endif  // ALBANY_DTK
-  }
-  return;
-}
-
-//
-// Specialization: DistParamDeriv
-//
-template <typename Traits>
-SchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::SchwarzBC(
-    Teuchos::ParameterList& p)
-    : SchwarzBC_Base<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p)
-{
-}
-
-//
-//
-//
-template <typename Traits>
-void
-SchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
-    typename Traits::EvalData dbc_workset)
-{
-  Teuchos::RCP<Thyra_MultiVector> fpV = dbc_workset.fpV;
-
-  bool const trans = dbc_workset.transpose_dist_param_deriv;
-
-  auto const num_cols = fpV->domain()->dim();
-
-  //
-  // We're currently assuming Dirichlet BC's can't be distributed parameters.
-  // Thus we don't need to actually evaluate the BC's here.  The code to do
-  // so is still here, just commented out for future reference.
-  //
-
-  std::vector<std::vector<int>> const& ns_nodes =
-      dbc_workset.nodeSets->find(this->nodeSetID)->second;
-
-  if (trans == true) {
-    // For (df/dp)^T*V we zero out corresponding entries in V
-    Teuchos::RCP<Thyra_MultiVector> Vp = dbc_workset.Vp_bc;
-    Teuchos::ArrayRCP<ST>           Vp_view;
-
-    for (auto inode = 0; inode < ns_nodes.size(); ++inode) {
-      auto const x_dof = ns_nodes[inode][0];
-
-      auto const y_dof = ns_nodes[inode][1];
-
-      auto const z_dof = ns_nodes[inode][2];
-
-      for (auto col = 0; col < num_cols; ++col) {
-        Vp_view        = Albany::getNonconstLocalData(Vp->col(col));
-        Vp_view[x_dof] = 0.0;
-        Vp_view[y_dof] = 0.0;
-        Vp_view[z_dof] = 0.0;
-      }
-    }
-  } else {
-    Teuchos::ArrayRCP<ST> fpV_view;
-    // for (df/dp)*V we zero out corresponding entries in df/dp
-    for (auto inode = 0; inode < ns_nodes.size(); ++inode) {
-      auto const x_dof = ns_nodes[inode][0];
-
-      auto const y_dof = ns_nodes[inode][1];
-
-      auto const z_dof = ns_nodes[inode][2];
-
-      for (auto col = 0; col < num_cols; ++col) {
-        fpV_view        = Albany::getNonconstLocalData(fpV->col(col));
-        fpV_view[x_dof] = 0.0;
-        fpV_view[y_dof] = 0.0;
-        fpV_view[z_dof] = 0.0;
-      }
-    }
   }
 }
 

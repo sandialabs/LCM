@@ -73,10 +73,8 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
     return;
   }
 
-  auto const this_app_index = getThisAppIndex();
-
-  Albany::Application const& this_app = getApplication(this_app_index);
-
+  auto const                 this_app_index = getThisAppIndex();
+  Albany::Application const& this_app       = getApplication(this_app_index);
   Teuchos::RCP<Albany::AbstractDiscretization> this_disc =
       this_app.getDiscretization();
 
@@ -99,20 +97,16 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
 
   // Get cell topology of the application and block to which this node set
   // is coupled.
-  std::string const& this_app_name = this_app.getAppName();
-
+  std::string const& this_app_name    = this_app.getAppName();
   std::string const& coupled_app_name = coupled_app.getAppName();
-
-  std::string const coupled_block_name =
+  std::string const  coupled_block_name =
       this_app.getCoupledBlockName(coupled_app_index);
 
-  bool const use_block = coupled_block_name != "NONE";
-
+  bool const                        use_block = coupled_block_name != "NONE";
   std::map<std::string, int> const& coupled_block_name_to_index =
       coupled_gms.getMeshSpecs()[0]->ebNameToIndex;
 
-  auto it = coupled_block_name_to_index.find(coupled_block_name);
-
+  auto       it = coupled_block_name_to_index.find(coupled_block_name);
   bool const missing_block = it == coupled_block_name_to_index.end();
 
   if (use_block == true && missing_block == true) {
@@ -131,9 +125,7 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
       coupled_mesh_specs[coupled_block_index]->ctd;
 
   shards::CellTopology coupled_cell_topology(&coupled_cell_topology_data);
-
-  auto const coupled_dimension = coupled_cell_topology_data.dimension;
-
+  auto const           coupled_dimension = coupled_cell_topology_data.dimension;
   auto const coupled_node_count = coupled_cell_topology_data.node_count;
 
   std::string const& coupled_nodeset_name =
@@ -158,21 +150,15 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
   // This tolerance is used for geometric approximations. It will be used
   // to determine whether a node of this_app is inside an element of
   // coupled_app within that tolerance.
-  double const tolerance = 5.0e-2;
-
-  auto const parametric_dimension = coupled_dimension;
-
-  auto const coupled_vertex_count = coupled_cell_topology_data.vertex_count;
-
-  auto const coupled_element_type =
+  double const tolerance            = 5.0e-2;
+  auto const   parametric_dimension = coupled_dimension;
+  auto const   coupled_vertex_count = coupled_cell_topology_data.vertex_count;
+  auto const   coupled_element_type =
       minitensor::find_type(coupled_dimension, coupled_vertex_count);
 
   minitensor::Vector<double> lo(parametric_dimension, minitensor::Filler::ONES);
-
   minitensor::Vector<double> hi(parametric_dimension, minitensor::Filler::ONES);
-
   hi = hi * (1.0 + tolerance);
-
   Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> basis;
 
   switch (coupled_element_type) {
@@ -191,12 +177,9 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
       break;
   }
 
-  double* const coord = ns_coord[ns_node];
-
+  double* const              coord = ns_coord[ns_node];
   minitensor::Vector<double> point;
-
   point.set_dimension(coupled_dimension);
-
   point.fill(coord);
 
   // Determine the element that contains this point.
@@ -243,15 +226,12 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
     std::string const& coupled_element_block = coupled_ws_eb_names[workset];
 
     bool const block_names_differ = coupled_element_block != coupled_block_name;
-
     if (use_block == true && block_names_differ == true) continue;
-
     auto const elements_per_workset = ws_elem_to_node_id[workset].size();
 
     for (auto element = 0; element < elements_per_workset; ++element) {
       for (unsigned node = 0; node < coupled_node_count; ++node) {
         auto const global_node_id = ws_elem_to_node_id[workset][element][node];
-
         auto const local_node_id =
             coupled_ov_node_vs_indexer->getLocalElement(global_node_id);
 
@@ -327,8 +307,6 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
   x_val = value(0);
   y_val = value(1);
   z_val = value(2);
-
-  return;
 }
 
 //
@@ -340,12 +318,9 @@ Teuchos::Array<
     Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>>
 StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
 {
-  auto const this_app_index = getThisAppIndex();
-
-  auto const coupled_app_index = getCoupledAppIndex();
-
-  Albany::Application const& this_app = getApplication(this_app_index);
-
+  auto const                 this_app_index    = getThisAppIndex();
+  auto const                 coupled_app_index = getCoupledAppIndex();
+  Albany::Application const& this_app          = getApplication(this_app_index);
   Albany::Application const& coupled_app = getApplication(coupled_app_index);
 
   // neq should be the same for this_app and coupled_app.
@@ -428,9 +403,7 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
 
   // Get the part corresponding to this nodeset.
   std::string const& nodeset_name = this->nodeSetID;
-
-  stk::mesh::Part* this_part = this_meta_data->get_part(nodeset_name);
-
+  stk::mesh::Part*   this_part    = this_meta_data->get_part(nodeset_name);
   Teuchos::RCP<stk::mesh::BulkData> this_bulk_data =
       Teuchos::rcpFromRef(this_field->get_mesh());
 
@@ -464,7 +437,6 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   // Do interpolation of solution time-derivatives using DTK (if applicable)
   Albany::AbstractSTKFieldContainer::VectorFieldType* this_field_dot;
   Albany::AbstractSTKFieldContainer::VectorFieldType* this_field_dotdot;
-
   Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field_dot;
   Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field_dotdot;
 
@@ -553,9 +525,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
   Teuchos::RCP<Thyra_Vector const> const_acce = dbc_workset.xdotdot;
 
   bool const has_disp = const_disp != Teuchos::null;
-
   bool const has_velo = const_velo != Teuchos::null;
-
   bool const has_acce = const_acce != Teuchos::null;
 
   ALBANY_ASSERT(has_disp == true, "");
@@ -606,11 +576,8 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
       bcs_disp = bcs_array[0];
 
   Teuchos::RCP<const Teuchos::Comm<int>> commT = bcs_disp->getMap()->getComm();
-
   Teuchos::ArrayRCP<ST const> bcs_disp_const_view_x = bcs_disp->getData(0);
-
   Teuchos::ArrayRCP<ST const> bcs_disp_const_view_y = bcs_disp->getData(1);
-
   Teuchos::ArrayRCP<ST const> bcs_disp_const_view_z = bcs_disp->getData(2);
 
   // Velocity
@@ -645,12 +612,9 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 
   for (auto ns_node = 0; ns_node < ns_number_nodes; ++ns_node) {
     auto const x_dof = ns_nodes[ns_node][0];
-
     auto const y_dof = ns_nodes[ns_node][1];
-
     auto const z_dof = ns_nodes[ns_node][2];
-
-    auto const dof = x_dof / 3;
+    auto const dof   = x_dof / 3;
 
     std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
@@ -673,15 +637,10 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 #else   // ALBANY_DTK
   for (auto ns_node = 0; ns_node < ns_number_nodes; ++ns_node) {
     ST x_val, y_val, z_val;
-
     sbc.computeBCs(ns_node, x_val, y_val, z_val);
-
-    auto const x_dof = ns_nodes[ns_node][0];
-
-    auto const y_dof = ns_nodes[ns_node][1];
-
-    auto const z_dof = ns_nodes[ns_node][2];
-
+    auto const           x_dof      = ns_nodes[ns_node][0];
+    auto const           y_dof      = ns_nodes[ns_node][1];
+    auto const           z_dof      = ns_nodes[ns_node][2];
     std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
@@ -696,7 +655,6 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 
   }  // node in node set loop
 #endif  // ALBANY_DTK
-  return;
 }
 
 //
@@ -717,9 +675,7 @@ fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
 
   for (auto ns_node = 0; ns_node < ns_number_nodes; ++ns_node) {
     auto const x_dof = ns_nodes[ns_node][0];
-
     auto const y_dof = ns_nodes[ns_node][1];
-
     auto const z_dof = ns_nodes[ns_node][2];
 
     std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
@@ -728,7 +684,6 @@ fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
     if (fixed_dofs.find(y_dof) == fixed_dofs.end()) { f_view[y_dof] = 0.0; }
     if (fixed_dofs.find(z_dof) == fixed_dofs.end()) { f_view[z_dof] = 0.0; }
   }
-  return;
 }
 
 //
@@ -795,48 +750,6 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
         *this, dbc_workset);
   }
   dbc_workset.is_schwarz_bc_ = false;
-  return;
-}
-
-//
-// Specialization: Tangent
-//
-template <typename Traits>
-StrongSchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::StrongSchwarzBC(
-    Teuchos::ParameterList& p)
-    : StrongSchwarzBC_Base<PHAL::AlbanyTraits::Tangent, Traits>(p)
-{
-}
-
-//
-//
-//
-template <typename Traits>
-void StrongSchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
-    typename Traits::EvalData /* dbc_workset */)
-{
-  return;
-}
-
-//
-// Specialization: DistParamDeriv
-//
-template <typename Traits>
-StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::StrongSchwarzBC(
-    Teuchos::ParameterList& p)
-    : StrongSchwarzBC_Base<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p)
-{
-  return;
-}
-
-//
-//
-//
-template <typename Traits>
-void
-    StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
-        typename Traits::EvalData /* dbc_workset */)
-{
   return;
 }
 

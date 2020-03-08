@@ -652,7 +652,7 @@ STKDiscretization::transformMesh()
     if (numDim >= 0) {
       beta  = betas[0];
       scale = scales[0];
-      if (abs(beta) > 1.0e-12) {
+      if (std::abs(beta) > 1.0e-12) {
         for (int i = 0; i < numOverlapNodes; i++) {
           double* x =
               stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
@@ -664,7 +664,7 @@ STKDiscretization::transformMesh()
     if (numDim >= 1) {
       beta  = betas[1];
       scale = scales[1];
-      if (abs(beta) > 1.0e-12) {
+      if (std::abs(beta) > 1.0e-12) {
         for (int i = 0; i < numOverlapNodes; i++) {
           double* x =
               stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
@@ -676,7 +676,7 @@ STKDiscretization::transformMesh()
     if (numDim >= 2) {
       beta  = betas[2];
       scale = scales[2];
-      if (abs(beta) > 1.0e-12) {
+      if (std::abs(beta) > 1.0e-12) {
         for (int i = 0; i < numOverlapNodes; i++) {
           double* x =
               stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
@@ -1123,7 +1123,7 @@ STKDiscretization::monotonicTimeLabel(const double time)
     return time;
   }
   // Try absolute value
-  double time_label = fabs(time);
+  double time_label = std::abs(time);
   if (time_label > previous_time_label) {
     previous_time_label = time_label;
     return time_label;

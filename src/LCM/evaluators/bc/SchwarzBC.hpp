@@ -164,34 +164,6 @@ class SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>
   evaluateFields(typename Traits::EvalData d);
 };
 
-//
-// Tangent
-//
-template <typename Traits>
-class SchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>
-    : public SchwarzBC_Base<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  SchwarzBC(Teuchos::ParameterList& p);
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
-//
-// Distributed Parameter Derivative
-//
-template <typename Traits>
-class SchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public SchwarzBC_Base<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  SchwarzBC(Teuchos::ParameterList& p);
-  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
 }  // namespace LCM
 
 #endif  // LCM_SchwarzBC_hpp

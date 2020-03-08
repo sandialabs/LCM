@@ -35,9 +35,8 @@ namespace rc {
  * cause an error) GAH If this changes - need
  * "macro(PHAL::AlbanyTraits::Residual)                   \"
  */
-#define aadapt_rc_apply_to_all_eval_types(macro)                         \
-  macro(PHAL::AlbanyTraits::Jacobian) macro(PHAL::AlbanyTraits::Tangent) \
-      macro(PHAL::AlbanyTraits::DistParamDeriv)
+#define aadapt_rc_apply_to_all_eval_types(macro) \
+  macro(PHAL::AlbanyTraits::Jacobian)
 
 /*! Perform ETI for a class \code template<int rank> Class \endcode.
  */

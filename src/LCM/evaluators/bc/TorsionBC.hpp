@@ -72,34 +72,6 @@ class TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>
   evaluateFields(typename Traits::EvalData d);
 };
 
-// **************************************************************
-// Tangent
-// **************************************************************
-template <typename Traits>
-class TorsionBC<PHAL::AlbanyTraits::Tangent, Traits>
-    : public TorsionBC_Base<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  TorsionBC(Teuchos::ParameterList& p);
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
-// **************************************************************
-// Distributed Parameter Derivative
-// **************************************************************
-template <typename Traits>
-class TorsionBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public TorsionBC_Base<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  TorsionBC(Teuchos::ParameterList& p);
-  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
 }  // namespace LCM
 
 #endif

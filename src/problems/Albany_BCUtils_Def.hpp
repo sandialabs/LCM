@@ -1356,12 +1356,6 @@ Albany::BCUtils<BCTraits>::buildFieldManager(
   PHX::Tag<AlbanyTraits::Jacobian::ScalarT> jac_tag0(allBC, dummy);
   fm->requireField<AlbanyTraits::Jacobian>(jac_tag0);
 
-  PHX::Tag<AlbanyTraits::Tangent::ScalarT> tan_tag0(allBC, dummy);
-  fm->requireField<AlbanyTraits::Tangent>(tan_tag0);
-
-  PHX::Tag<AlbanyTraits::DistParamDeriv::ScalarT> dpd_tag0(allBC, dummy);
-  fm->requireField<AlbanyTraits::DistParamDeriv>(dpd_tag0);
-
   return fm;
 }
 

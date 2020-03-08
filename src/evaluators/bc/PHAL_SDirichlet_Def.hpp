@@ -190,67 +190,6 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   }
 }
 
-template <typename Traits>
-SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>::SDirichlet(
-    Teuchos::ParameterList& p)
-    : PHAL::DirichletBase<PHAL::AlbanyTraits::Tangent, Traits>(p)
-{
-}
-
-template <typename Traits>
-void SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
-    typename Traits::EvalData /* dbc_workset */)
-{
-}
-
-template <typename Traits>
-SDirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>::SDirichlet(
-    Teuchos::ParameterList& p)
-    : PHAL::DirichletBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>(p)
-{
-}
-
-template <typename Traits>
-void
-SDirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>::evaluateFields(
-    typename Traits::EvalData dbc_workset)
-{
-  return;
-  Teuchos::RCP<Thyra_MultiVector> fpV = dbc_workset.fpV;
-
-  bool trans    = dbc_workset.transpose_dist_param_deriv;
-  int  num_cols = fpV->domain()->dim();
-
-  const std::vector<std::vector<int>>& nsNodes =
-      dbc_workset.nodeSets->find(this->nodeSetID)->second;
-
-  if (trans) {
-    // For (df/dp)^T*V we zero out corresponding entries in V
-    Teuchos::RCP<Thyra_MultiVector>          Vp = dbc_workset.Vp_bc;
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> Vp_nonconst2dView =
-        Albany::getNonconstLocalData(Vp);
-
-    for (unsigned int inode = 0; inode < nsNodes.size(); inode++) {
-      int lunk = nsNodes[inode][this->offset];
-
-      for (int col = 0; col < num_cols; ++col) {
-        Vp_nonconst2dView[col][lunk] = 0.0;
-      }
-    }
-  } else {
-    // for (df/dp)*V we zero out corresponding entries in df/dp
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> fpV_nonconst2dView =
-        Albany::getNonconstLocalData(fpV);
-    for (unsigned int inode = 0; inode < nsNodes.size(); inode++) {
-      int lunk = nsNodes[inode][this->offset];
-
-      for (int col = 0; col < num_cols; ++col) {
-        fpV_nonconst2dView[col][lunk] = 0.0;
-      }
-    }
-  }
-}
-
 }  // namespace PHAL
 
 #endif  // PHAL_SDIRICHLET_DEF_HPP

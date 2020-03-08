@@ -133,17 +133,12 @@ class StrongSchwarzBC_Base : public PHAL::SDirichlet<EvalT, Traits>
   fillResidual(SBC& sbc, typename T::EvalData d);
 
  protected:
-  Teuchos::RCP<Albany::Application> app_{Teuchos::null};
-
+  Teuchos::RCP<Albany::Application>                    app_{Teuchos::null};
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> coupled_apps_;
-
   std::string coupled_app_name_{"SELF"};
-
   std::string coupled_block_name_{"NONE"};
-
-  int this_app_index_{-1};
-
-  int coupled_app_index_{-1};
+  int         this_app_index_{-1};
+  int         coupled_app_index_{-1};
 };
 
 //
@@ -186,34 +181,6 @@ class StrongSchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>
  public:
   StrongSchwarzBC(Teuchos::ParameterList& p);
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
-//
-// Tangent
-//
-template <typename Traits>
-class StrongSchwarzBC<PHAL::AlbanyTraits::Tangent, Traits>
-    : public StrongSchwarzBC_Base<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  StrongSchwarzBC(Teuchos::ParameterList& p);
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
-//
-// Distributed Parameter Derivative
-//
-template <typename Traits>
-class StrongSchwarzBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public StrongSchwarzBC_Base<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  StrongSchwarzBC(Teuchos::ParameterList& p);
-  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
   void
   evaluateFields(typename Traits::EvalData d);
 };

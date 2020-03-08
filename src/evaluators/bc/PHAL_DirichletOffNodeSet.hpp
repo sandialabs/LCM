@@ -65,38 +65,6 @@ class DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>
   std::vector<std::string> nodeSets;
 };
 
-// **************************************************************
-// Tangent
-// **************************************************************
-template <typename Traits>
-class DirichletOffNodeSet<PHAL::AlbanyTraits::Tangent, Traits>
-    : public DirichletBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  DirichletOffNodeSet(Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- private:
-  std::vector<std::string> nodeSets;
-};
-
-// **************************************************************
-// Distributed Parameter Derivative
-// **************************************************************
-template <typename Traits>
-class DirichletOffNodeSet<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public DirichletBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  DirichletOffNodeSet(Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- private:
-  std::vector<std::string> nodeSets;
-};
-
 }  // Namespace PHAL
 
 #endif  // PHAL_DIRICHLET_OFF_SIDE_SET_HPP

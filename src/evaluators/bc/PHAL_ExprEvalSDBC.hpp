@@ -76,38 +76,6 @@ class ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>
   Teuchos::RCP<Thyra_Vector> col_is_dbc_{Teuchos::null};
 };
 
-//
-// Tangent
-//
-template <typename Traits>
-class ExprEvalSDBC<PHAL::AlbanyTraits::Tangent, Traits>
-    : public PHAL::DirichletBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  using ScalarT = typename PHAL::AlbanyTraits::Tangent::ScalarT;
-
-  ExprEvalSDBC(Teuchos::ParameterList& p);
-
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
-//
-// Distributed Parameter Derivative
-//
-template <typename Traits>
-class ExprEvalSDBC<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public PHAL::DirichletBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  using ScalarT = typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT;
-
-  ExprEvalSDBC(Teuchos::ParameterList& p);
-
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
 }  // namespace PHAL
 
 #endif  // PHAL_ExprEvalSDBC_hpp

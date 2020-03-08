@@ -246,39 +246,6 @@ class Neumann<PHAL::AlbanyTraits::Jacobian, Traits>
 };
 
 // **************************************************************
-// Tangent
-// **************************************************************
-template <typename Traits>
-class Neumann<PHAL::AlbanyTraits::Tangent, Traits>
-    : public NeumannBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  Neumann(Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- private:
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-};
-
-// **************************************************************
-// Distributed Parameter Derivative
-// **************************************************************
-template <typename Traits>
-class Neumann<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public NeumannBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  Neumann(Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- private:
-  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
-};
-
-// **************************************************************
-// **************************************************************
 // Evaluator to aggregate all Neumann BCs into one "field"
 // **************************************************************
 template <typename EvalT, typename Traits>

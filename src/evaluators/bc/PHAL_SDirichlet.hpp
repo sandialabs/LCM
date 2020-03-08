@@ -73,38 +73,6 @@ class SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>
   Teuchos::RCP<Thyra_Vector> col_is_dbc_;
 };
 
-//
-// Tangent
-//
-template <typename Traits>
-class SDirichlet<PHAL::AlbanyTraits::Tangent, Traits>
-    : public PHAL::DirichletBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  using ScalarT = typename PHAL::AlbanyTraits::Tangent::ScalarT;
-
-  SDirichlet(Teuchos::ParameterList& p);
-
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
-//
-// Distributed Parameter Derivative
-//
-template <typename Traits>
-class SDirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public PHAL::DirichletBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  using ScalarT = typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT;
-
-  SDirichlet(Teuchos::ParameterList& p);
-
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
 }  // namespace PHAL
 
 #endif  // PHAL_SDirichlet_hpp

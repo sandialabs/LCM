@@ -88,32 +88,8 @@ struct AlbanyTraits : public PHX::TraitsBase
   };
 #endif
 
-#if defined(ALBANY_MESH_DEPENDS_ON_PARAMETERS) || \
-    defined(ALBANY_MESH_DEPENDS_ON_SOLUTION)
-  struct Tangent : EvaluationType<TanFadType, TanFadType, TanFadType>
-  {
-  };
-#else
-  struct Tangent : EvaluationType<TanFadType, RealType, TanFadType>
-  {
-  };
-#endif
-
-#if defined(ALBANY_MESH_DEPENDS_ON_PARAMETERS) || \
-    defined(ALBANY_MESH_DEPENDS_ON_SOLUTION)
-  struct DistParamDeriv : EvaluationType<TanFadType, TanFadType, TanFadType>
-  {
-  };
-#else
-  struct DistParamDeriv : EvaluationType<TanFadType, RealType, TanFadType>
-  {
-  };
-#endif
-
-  typedef Sacado::mpl::vector<Residual, Jacobian, Tangent, DistParamDeriv>
-      EvalTypes;
-  typedef Sacado::mpl::vector<Residual, Jacobian, Tangent, DistParamDeriv>
-      BEvalTypes;
+  using EvalTypes  = Sacado::mpl::vector<Residual, Jacobian>;
+  using BEvalTypes = Sacado::mpl::vector<Residual, Jacobian>;
 
   // ******************************************************************
   // *** Allocator Type
@@ -147,20 +123,6 @@ print<PHAL::AlbanyTraits::Jacobian>()
   return "<Jacobian>";
 }
 
-template <>
-inline std::string
-print<PHAL::AlbanyTraits::Tangent>()
-{
-  return "<Tangent>";
-}
-
-template <>
-inline std::string
-print<PHAL::AlbanyTraits::DistParamDeriv>()
-{
-  return "<DistParamDeriv>";
-}
-
 // ******************************************************************
 // *** Data Types
 // ******************************************************************
@@ -180,8 +142,6 @@ struct eval_scalar_types<PHAL::AlbanyTraits::Residual>
   typedef Sacado::mpl::vector<RealType> type;
 };
 DECLARE_EVAL_SCALAR_TYPES(Jacobian, FadType, RealType)
-DECLARE_EVAL_SCALAR_TYPES(Tangent, TanFadType, RealType)
-DECLARE_EVAL_SCALAR_TYPES(DistParamDeriv, TanFadType, RealType)
 
 #undef DECLARE_EVAL_SCALAR_TYPES
 }  // namespace PHX
@@ -193,10 +153,6 @@ DECLARE_EVAL_SCALAR_TYPES(DistParamDeriv, TanFadType, RealType)
   template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>;
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_JACOBIAN(name) \
   template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_TANGENT(name) \
-  template class name<PHAL::AlbanyTraits::Tangent, PHAL::AlbanyTraits>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_DISTPARAMDERIV(name) \
-  template class name<PHAL::AlbanyTraits::DistParamDeriv, PHAL::AlbanyTraits>;
 
 // 2. Versatile cases: after EvalT and Traits, accept any number of args
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_RESIDUAL(name, ...) \
@@ -208,32 +164,6 @@ DECLARE_EVAL_SCALAR_TYPES(DistParamDeriv, TanFadType, RealType)
   template class name<                                                      \
       PHAL::AlbanyTraits::Jacobian,                                         \
       PHAL::AlbanyTraits,                                                   \
-      __VA_ARGS__>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_TANGENT(name, ...) \
-  template class name<                                                     \
-      PHAL::AlbanyTraits::Tangent,                                         \
-      PHAL::AlbanyTraits,                                                  \
-      __VA_ARGS__>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_DISTPARAMDERIV( \
-    name, ...)                                                          \
-  template class name<                                                  \
-      PHAL::AlbanyTraits::DistParamDeriv,                               \
-      PHAL::AlbanyTraits,                                               \
-      __VA_ARGS__>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_MPTANGENT(name, ...) \
-  template class name<                                                       \
-      PHAL::AlbanyTraits::MPTangent,                                         \
-      PHAL::AlbanyTraits,                                                    \
-      __VA_ARGS__>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_MPRESIDUAL(name, ...) \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::MPResidual,                                         \
-      PHAL::AlbanyTraits,                                                     \
-      __VA_ARGS__>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_MPJACOBIAN(name, ...) \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::MPJacobian,                                         \
-      PHAL::AlbanyTraits,                                                     \
       __VA_ARGS__>;
 
 // 3. Scalar dependent cases: after EvalT and Traits, accept one or two scalar
@@ -253,27 +183,6 @@ DECLARE_EVAL_SCALAR_TYPES(DistParamDeriv, TanFadType, RealType)
   template class name<                                                      \
       PHAL::AlbanyTraits::Jacobian,                                         \
       PHAL::AlbanyTraits,                                                   \
-      RealType>;
-
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_TANGENT(name) \
-  template class name<                                                     \
-      PHAL::AlbanyTraits::Tangent,                                         \
-      PHAL::AlbanyTraits,                                                  \
-      TanFadType>;                                                         \
-  template class name<                                                     \
-      PHAL::AlbanyTraits::Tangent,                                         \
-      PHAL::AlbanyTraits,                                                  \
-      RealType>;
-
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_DISTPARAMDERIV( \
-    name)                                                                    \
-  template class name<                                                       \
-      PHAL::AlbanyTraits::DistParamDeriv,                                    \
-      PHAL::AlbanyTraits,                                                    \
-      TanFadType>;                                                           \
-  template class name<                                                       \
-      PHAL::AlbanyTraits::DistParamDeriv,                                    \
-      PHAL::AlbanyTraits,                                                    \
       RealType>;
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_RESIDUAL(name) \
@@ -304,51 +213,6 @@ DECLARE_EVAL_SCALAR_TYPES(DistParamDeriv, TanFadType, RealType)
       PHAL::AlbanyTraits,                                                    \
       RealType,                                                              \
       FadType>;
-
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_TANGENT(name) \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Tangent,                                          \
-      PHAL::AlbanyTraits,                                                   \
-      TanFadType,                                                           \
-      RealType>;                                                            \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Tangent,                                          \
-      PHAL::AlbanyTraits,                                                   \
-      RealType,                                                             \
-      RealType>;                                                            \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Tangent,                                          \
-      PHAL::AlbanyTraits,                                                   \
-      TanFadType,                                                           \
-      TanFadType>;                                                          \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Tangent,                                          \
-      PHAL::AlbanyTraits,                                                   \
-      RealType,                                                             \
-      TanFadType>;
-
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_DISTPARAMDERIV( \
-    name)                                                                     \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::DistParamDeriv,                                     \
-      PHAL::AlbanyTraits,                                                     \
-      RealType,                                                               \
-      RealType>;                                                              \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::DistParamDeriv,                                     \
-      PHAL::AlbanyTraits,                                                     \
-      TanFadType,                                                             \
-      RealType>;                                                              \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::DistParamDeriv,                                     \
-      PHAL::AlbanyTraits,                                                     \
-      RealType,                                                               \
-      TanFadType>;                                                            \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::DistParamDeriv,                                     \
-      PHAL::AlbanyTraits,                                                     \
-      TanFadType,                                                             \
-      TanFadType>;
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_RESIDUAL(name) \
   template class name<                                                         \
@@ -408,107 +272,6 @@ DECLARE_EVAL_SCALAR_TYPES(DistParamDeriv, TanFadType, RealType)
       FadType,                                                                 \
       FadType>;
 
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_TANGENT(name) \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      TanFadType,                                                             \
-      RealType,                                                               \
-      RealType>;                                                              \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      RealType,                                                               \
-      RealType,                                                               \
-      RealType>;                                                              \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      TanFadType,                                                             \
-      TanFadType,                                                             \
-      RealType>;                                                              \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      RealType,                                                               \
-      TanFadType,                                                             \
-      RealType>;                                                              \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      TanFadType,                                                             \
-      RealType,                                                               \
-      TanFadType>;                                                            \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      RealType,                                                               \
-      RealType,                                                               \
-      TanFadType>;                                                            \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      TanFadType,                                                             \
-      TanFadType,                                                             \
-      TanFadType>;                                                            \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      RealType,                                                               \
-      TanFadType,                                                             \
-      TanFadType>;
-
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_DISTPARAMDERIV( \
-    name)                                                                       \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      RealType,                                                                 \
-      RealType,                                                                 \
-      RealType>;                                                                \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      TanFadType,                                                               \
-      RealType,                                                                 \
-      RealType>;                                                                \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      RealType,                                                                 \
-      TanFadType,                                                               \
-      RealType>;                                                                \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      TanFadType,                                                               \
-      TanFadType,                                                               \
-      RealType>;                                                                \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      RealType,                                                                 \
-      RealType,                                                                 \
-      TanFadType>;                                                              \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      TanFadType,                                                               \
-      RealType,                                                                 \
-      TanFadType>;                                                              \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      RealType,                                                                 \
-      TanFadType,                                                               \
-      TanFadType>;                                                              \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      TanFadType,                                                               \
-      TanFadType,                                                               \
-      TanFadType>;
-
 // 4. Input-output scalar type case: similar to the above one with two scalar
 // types.
 //    However, the output scalar type MUST be constructible from the input one,
@@ -537,79 +300,31 @@ DECLARE_EVAL_SCALAR_TYPES(DistParamDeriv, TanFadType, RealType)
       FadType,                                                                 \
       FadType>;
 
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_TANGENT(name) \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      RealType,                                                               \
-      RealType>;                                                              \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      RealType,                                                               \
-      TanFadType>;                                                            \
-  template class name<                                                        \
-      PHAL::AlbanyTraits::Tangent,                                            \
-      PHAL::AlbanyTraits,                                                     \
-      TanFadType,                                                             \
-      TanFadType>;
-
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_DISTPARAMDERIV( \
-    name)                                                                       \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      RealType,                                                                 \
-      RealType>;                                                                \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      RealType,                                                                 \
-      TanFadType>;                                                              \
-  template class name<                                                          \
-      PHAL::AlbanyTraits::DistParamDeriv,                                       \
-      PHAL::AlbanyTraits,                                                       \
-      TanFadType,                                                               \
-      TanFadType>;
-
 // 5. General macros: you should call these in your cpp files,
 //    which in turn will call the ones above.
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS(name)    \
   PHAL_INSTANTIATE_TEMPLATE_CLASS_RESIDUAL(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_JACOBIAN(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_TANGENT(name)  \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_DISTPARAMDERIV(name)
+  PHAL_INSTANTIATE_TEMPLATE_CLASS_JACOBIAN(name)
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(name)    \
   PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_RESIDUAL(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_JACOBIAN(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_TANGENT(name)  \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_DISTPARAMDERIV(name)
+  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_JACOBIAN(name)
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES(name)    \
   PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_RESIDUAL(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_JACOBIAN(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_TANGENT(name)  \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_DISTPARAMDERIV(name)
+  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_JACOBIAN(name)
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES(name)    \
   PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_RESIDUAL(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_JACOBIAN(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_TANGENT(name)  \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_DISTPARAMDERIV(name)
+  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_JACOBIAN(name)
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES(name)    \
   PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_RESIDUAL(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_JACOBIAN(name) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_TANGENT(name)  \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_DISTPARAMDERIV(name)
+  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_JACOBIAN(name)
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS(name, ...)            \
   PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_RESIDUAL(name, __VA_ARGS__) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_JACOBIAN(name, __VA_ARGS__) \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_TANGENT(name, __VA_ARGS__)  \
-  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_DISTPARAMDERIV(             \
-      name, __VA_ARGS__)
+  PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_JACOBIAN(name, __VA_ARGS__)
 
 #include "PHAL_Workset.hpp"
 

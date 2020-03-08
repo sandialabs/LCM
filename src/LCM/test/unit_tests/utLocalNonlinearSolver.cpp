@@ -118,42 +118,5 @@ TEUCHOS_UNIT_TEST(LocalNonlinearSolver, Jacobian)
   const RealType refX[] = {std::sqrt(2)};
   TEST_COMPARE(fabs(X[0].val() - refX[0]), <=, 1.0e-15);
 }
-TEUCHOS_UNIT_TEST(LocalNonlinearSolver, Tangent)
-{
-  typedef PHAL::AlbanyTraits                   Traits;
-  typedef PHAL::AlbanyTraits::Tangent          EvalT;
-  typedef PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
 
-  // local objective function and solution
-  int                                      numLocalVars(1);
-  std::vector<ScalarT>                     F(numLocalVars);
-  std::vector<ScalarT>                     dFdX(numLocalVars * numLocalVars);
-  std::vector<ScalarT>                     X(numLocalVars);
-  LCM::LocalNonlinearSolver<EvalT, Traits> solver;
-
-  // initialize X
-  X[0] = 1.0;
-
-  ScalarT two(1, 0, 2.0);
-
-  int  count(0);
-  bool converged = false;
-  while (!converged && count < 10) {
-    // objective function --> x^2 - 2 == 0
-    F[0]    = X[0] * X[0] - two;
-    dFdX[0] = 2.0 * X[0];
-
-    solver.solve(dFdX, X, F);
-
-    if (fabs(F[0]) <= 1.0E-15) converged = true;
-
-    count++;
-  }
-
-  F[0] = X[0] * X[0] - two;
-  solver.computeFadInfo(dFdX, X, F);
-
-  const RealType refX[] = {std::sqrt(2)};
-  TEST_COMPARE(fabs(X[0].val() - refX[0]), <=, 1.0e-15);
-}
 }  // namespace

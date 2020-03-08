@@ -75,42 +75,6 @@ class MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N>
       minitensor::Vector<ScalarT, N>&       x) override;
 };
 
-//
-// Tangent
-//
-template <minitensor::Index N>
-class MiniLinearSolver<PHAL::AlbanyTraits::Tangent, N>
-    : public MiniLinearSolver_Base<PHAL::AlbanyTraits::Tangent, N>
-{
- public:
-  using ScalarT = PHAL::AlbanyTraits::Tangent::ScalarT;
-  using ValueT  = typename Sacado::ValueType<ScalarT>::type;
-
-  void
-  solve(
-      minitensor::Tensor<ScalarT, N> const& A,
-      minitensor::Vector<ScalarT, N> const& b,
-      minitensor::Vector<ScalarT, N>&       x) override;
-};
-
-//
-// Distributed Parameter Derivative
-//
-template <minitensor::Index N>
-class MiniLinearSolver<PHAL::AlbanyTraits::DistParamDeriv, N>
-    : public MiniLinearSolver_Base<PHAL::AlbanyTraits::DistParamDeriv, N>
-{
- public:
-  using ScalarT = PHAL::AlbanyTraits::DistParamDeriv::ScalarT;
-  using ValueT  = typename Sacado::ValueType<ScalarT>::type;
-
-  void
-  solve(
-      minitensor::Tensor<ScalarT, N> const& A,
-      minitensor::Vector<ScalarT, N> const& b,
-      minitensor::Vector<ScalarT, N>&       x) override;
-};
-
 }  // namespace LCM
 
 #include "MiniLinearSolver.t.hpp"

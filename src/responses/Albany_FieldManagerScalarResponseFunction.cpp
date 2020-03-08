@@ -143,21 +143,6 @@ FieldManagerScalarResponseFunction::postRegImpl<PHAL::AlbanyTraits::Jacobian>()
   postRegDerivImpl<PHAL::AlbanyTraits::Jacobian>();
 }
 
-template <>
-void
-FieldManagerScalarResponseFunction::postRegImpl<PHAL::AlbanyTraits::Tangent>()
-{
-  postRegDerivImpl<PHAL::AlbanyTraits::Tangent>();
-}
-
-template <>
-void
-FieldManagerScalarResponseFunction::postRegImpl<
-    PHAL::AlbanyTraits::DistParamDeriv>()
-{
-  postRegDerivImpl<PHAL::AlbanyTraits::DistParamDeriv>();
-}
-
 template <typename EvalT>
 void
 FieldManagerScalarResponseFunction::postReg()
@@ -206,8 +191,6 @@ FieldManagerScalarResponseFunction::postRegSetup()
 {
   postReg<PHAL::AlbanyTraits::Residual>();
   postReg<PHAL::AlbanyTraits::Jacobian>();
-  postReg<PHAL::AlbanyTraits::Tangent>();
-  postReg<PHAL::AlbanyTraits::DistParamDeriv>();
   performedPostRegSetup = true;
 }
 
@@ -304,7 +287,6 @@ FieldManagerScalarResponseFunction::evaluateTangent(
   workset.dgdp = gp;
 
   // Perform fill via field manager
-  evaluate<PHAL::AlbanyTraits::Tangent>(workset);
 }
 
 void
@@ -408,7 +390,6 @@ FieldManagerScalarResponseFunction::evaluateDistParamDeriv(
     workset.overlapped_dgdp = Thyra::createMembers(
         workset.p_cas_manager->getOverlappedVectorSpace(),
         dg_dp->domain()->dim());
-    evaluate<PHAL::AlbanyTraits::DistParamDeriv>(workset);
   }
 }
 

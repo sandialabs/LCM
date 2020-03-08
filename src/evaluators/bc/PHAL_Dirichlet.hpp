@@ -97,33 +97,6 @@ class Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>
 };
 
 // **************************************************************
-// Tangent
-// **************************************************************
-template <typename Traits>
-class Dirichlet<PHAL::AlbanyTraits::Tangent, Traits>
-    : public DirichletBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  Dirichlet(Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
-// **************************************************************
-// Distributed Parameter Derivative
-// **************************************************************
-template <typename Traits>
-class Dirichlet<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public DirichletBase<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-{
- public:
-  Dirichlet(Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-};
-
-// **************************************************************
-// **************************************************************
 // Evaluator to aggregate all Dirichlet BCs into one "field"
 // **************************************************************
 template <typename EvalT, typename Traits>

@@ -117,40 +117,6 @@ class ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian -- No implementation can be provided
 // **************************************************************
 
-// **************************************************************
-// Tangent
-// **************************************************************
-template <typename Traits>
-class ScatterScalarResponse<PHAL::AlbanyTraits::Tangent, Traits>
-    : public ScatterScalarResponseBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  ScatterScalarResponse(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  void
-  postEvaluate(typename Traits::PostEvalData d);
-
- protected:
-  typedef PHAL::AlbanyTraits::Tangent EvalT;
-  ScatterScalarResponse() {}
-  void
-  setup(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
-  {
-    ScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);
-  }
-
- private:
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-};
-
-// **************************************************************
-// Distributed Parameter Derivative -- No implementation can be provided
-// **************************************************************
-
-// **************************************************************
 }  // namespace PHAL
 
 #endif

@@ -242,51 +242,6 @@ class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>
       PHAL_MortarContactJacRank2_Policy;
 };
 
-// **************************************************************
-// Tangent
-// **************************************************************
-template <typename Traits>
-class MortarContactResidual<PHAL::AlbanyTraits::Tangent, Traits>
-    : public MortarContactResidualBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  MortarContactResidual(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- protected:
-  const std::size_t numFields;
-
- private:
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-};
-
-// **************************************************************
-// Distributed parameter derivative
-// **************************************************************
-template <typename Traits>
-class MortarContactResidual<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public MortarContactResidualBase<
-          PHAL::AlbanyTraits::DistParamDeriv,
-          Traits>
-{
- public:
-  MortarContactResidual(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- protected:
-  const std::size_t numFields;
-
- private:
-  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
-};
-
-// **************************************************************
 }  // namespace PHAL
 
 #endif

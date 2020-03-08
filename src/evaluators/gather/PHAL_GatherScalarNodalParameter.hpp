@@ -97,56 +97,6 @@ class GatherScalarExtruded2DNodalParameter
   const int                            fieldLevel;
 };
 
-// **************************************************************
-// **************************************************************
-// * Specializations
-// **************************************************************
-// **************************************************************
-
-// **************************************************************
-// DistParamDeriv
-// **************************************************************
-template <typename Traits>
-class GatherScalarNodalParameter<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public GatherScalarNodalParameterBase<
-          PHAL::AlbanyTraits::DistParamDeriv,
-          Traits>
-{
- public:
-  GatherScalarNodalParameter(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  // Old constructor, still needed by BCs that use PHX Factory
-  GatherScalarNodalParameter(const Teuchos::ParameterList& p);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- private:
-  typedef
-      typename PHAL::AlbanyTraits::DistParamDeriv::ParamScalarT ParamScalarT;
-};
-
-template <typename Traits>
-class GatherScalarExtruded2DNodalParameter<
-    PHAL::AlbanyTraits::DistParamDeriv,
-    Traits>
-    : public GatherScalarNodalParameterBase<
-          PHAL::AlbanyTraits::DistParamDeriv,
-          Traits>
-{
- public:
-  GatherScalarExtruded2DNodalParameter(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- private:
-  typedef
-      typename PHAL::AlbanyTraits::DistParamDeriv::ParamScalarT ParamScalarT;
-  const int                                                     fieldLevel;
-};
-
 }  // namespace PHAL
 
 #endif  // PHAL_GATHER_SCALAR_NODAL_PARAMETER_HPP

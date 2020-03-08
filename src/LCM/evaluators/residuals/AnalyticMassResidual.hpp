@@ -189,50 +189,6 @@ class AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
 };
 
-// **************************************************************
-// Tangent
-// **************************************************************
-template <typename Traits>
-class AnalyticMassResidual<PHAL::AlbanyTraits::Tangent, Traits>
-    : public AnalyticMassResidualBase<PHAL::AlbanyTraits::Tangent, Traits>
-{
- public:
-  AnalyticMassResidual(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- protected:
-  std::vector<RealType>
-  compositeTet10LocalMassRow(const int row) const;
-
- private:
-  typedef typename PHAL::AlbanyTraits::Tangent::ScalarT ScalarT;
-};
-
-// **************************************************************
-// Distributed parameter derivative
-// **************************************************************
-template <typename Traits>
-class AnalyticMassResidual<PHAL::AlbanyTraits::DistParamDeriv, Traits>
-    : public AnalyticMassResidualBase<
-          PHAL::AlbanyTraits::DistParamDeriv,
-          Traits>
-{
- public:
-  AnalyticMassResidual(
-      const Teuchos::ParameterList&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
-  void
-  evaluateFields(typename Traits::EvalData d);
-
- protected:
- private:
-  typedef typename PHAL::AlbanyTraits::DistParamDeriv::ScalarT ScalarT;
-};
-
-// **************************************************************
 }  // namespace LCM
 
 #endif

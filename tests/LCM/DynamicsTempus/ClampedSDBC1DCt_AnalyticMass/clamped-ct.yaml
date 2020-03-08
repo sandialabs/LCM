@@ -47,8 +47,6 @@ ALBANY:
     Relative Tolerance: 1.0e-7
     Absolute Tolerance: 1.0e-7
   Piro:
-    Analysis:
-      Compute Sensitivities: false
     Tempus: 
       Integrator Name: Tempus Integrator
       Tempus Integrator:

@@ -53,8 +53,6 @@ LCM:
     Relative Tolerance: 1.0e-8
     Absolute Tolerance: 1.0e-8
   Piro:
-    Analysis:
-      Compute Sensitivities: false
     Tempus:
       Invert Mass Matrix: true
       Lump Mass Matrix: true

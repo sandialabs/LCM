@@ -40,8 +40,6 @@ ALBANY:
     Number of Sensitivity Comparisons: 1
     Sensitivity Test Values 0: [3.05378999999999998e-02, 3.30262109999999998e-01]
   Piro: 
-    Analysis: 
-      Compute Sensitivities: false
     Rythmos Solver: 
       NonLinear Solver: 
         VerboseObject: 

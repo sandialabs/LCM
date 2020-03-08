@@ -48,8 +48,6 @@ LCM:
     Relative Tolerance: 0.0
     Absolute Tolerance: 0.0
   Piro:
-    Analysis:
-      Compute Sensitivities: false
     Tempus:
       Integrator Name: Tempus Integrator
       Tempus Integrator:

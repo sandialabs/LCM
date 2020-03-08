@@ -46,9 +46,7 @@ LCM:
     Relative Tolerance: 50.00000000
     Absolute Tolerance: 50.00000000
   Piro:
-    Analysis:
       Solve:
-        Compute Sensitivities: false
     LOCA:
       Bifurcation: { }
       Constraints: { }

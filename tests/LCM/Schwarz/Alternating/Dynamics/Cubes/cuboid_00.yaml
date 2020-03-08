@@ -40,8 +40,6 @@ LCM:
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 2
   Piro:
-    Analysis:
-      Compute Sensitivities: false
     Tempus:
       Integrator Name: Tempus Integrator
       Tempus Integrator:

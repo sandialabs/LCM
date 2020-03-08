@@ -765,23 +765,17 @@ AAdapt::ExpressionParser::ExpressionParser(
 }
 
 void
-AAdapt::ExpressionParser::compute(double* x, double const* X)
+AAdapt::ExpressionParser::compute(double* unknowns, double const* coords)
 {
+  std::vector<std::string> coord_str{"x", "y", "z"};
+  double*                  X = const_cast<double*>(coords);
   for (auto eq = 0; eq < neq; ++eq) {
-    stk::expreval::Eval expr_eval(expr[eq]);
+    auto const&         expr_str = expr[eq];
+    stk::expreval::Eval expr_eval(expr_str);
     expr_eval.parse();
-    if (dim > 0) {
-      auto X0 = X[0];
-      expr_eval.bindVariable("x", X0);
+    for (auto i = 0; i < dim; ++i) {
+      expr_eval.bindVariable(coord_str[i], X[i]);
     }
-    if (dim > 1) {
-      auto X1 = X[1];
-      expr_eval.bindVariable("y", X1);
-    }
-    if (dim > 2) {
-      auto X2 = X[2];
-      expr_eval.bindVariable("z", X2);
-    }
-    x[eq] = expr_eval.evaluate();
+    unknowns[eq] = expr_eval.evaluate();
   }
 }

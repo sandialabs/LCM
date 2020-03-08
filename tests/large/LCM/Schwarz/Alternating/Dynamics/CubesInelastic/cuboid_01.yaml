@@ -1,6 +1,4 @@
 LCM:
-  Scaling:
-    Scale: 1.0
   DataTransferKit:
     Map Type: Consistent Interpolation
     L2 Projection:
@@ -36,8 +34,8 @@ LCM:
         IP Field Layout 1: Scalar
         Output to File: true
     Dirichlet BCs:
-      Scaled SDBC on NS nodelist_1 for DOF X: [0.0, 10.0]
-      Scaled SDBC on NS nodelist_3 for DOF Y: [0.0, 10.0] 
+      SDBC on NS nodelist_1 for DOF X: 0.0
+      SDBC on NS nodelist_3 for DOF Y: 0.0
       SDBC on NS nodelist_5 for DOF StrongSchwarz:
         BC Function: StrongSchwarz
         Coupled Application: cuboid_00.yaml

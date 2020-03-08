@@ -1,6 +1,4 @@
 LCM:
-  Scaling:
-    Scale: 1.0000000
   Debug Output:
     Write Jacobian to MatrixMarket: -1
     #Write Jacobian to Standard Output: 0
@@ -13,28 +11,10 @@ LCM:
     Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: 'material.yaml'
     Solution Method: Transient Tempus
-    #Initial Condition:
-    #  Function: Constant
-    #  Function Data: [0.0, 0.0, 0.0]
-    #Initial Condition Dot:
-    #  Function: About Z
-    #  Function Data: [1.0]
-    #Initial Condition DotDot:
-    #  Function: Radial Z
-    #  Function Data: [-1.0]
-    #Initial Condition:
-    #  Function: Constant
-    #  Function Data: [0.0, 0.0, 0.0]
-    #Initial Condition Dot:
-    #  Function: Constant
-    #  Function Data: [0.0, 0.0, 0.0]
-    #Initial Condition DotDot:
-    #  Function: Constant
-    #  Function Data: [0.0, 0.0, 0.0]
     Dirichlet BCs:
-      Scaled SDBC on NS nodelist_1 for DOF X: [0.0, 10]
-      Scaled SDBC on NS nodelist_3 for DOF Y: [0.0, 10]
-      Scaled SDBC on NS nodelist_5 for DOF Z: [0.0, 10]
+      SDBC on NS nodelist_1 for DOF X: 0.0
+      SDBC on NS nodelist_3 for DOF Y: 0.0
+      SDBC on NS nodelist_5 for DOF Z: 0.0
       Time Dependent SDBC on NS nodelist_6 for DOF Z:
         Number of points: 2
         Time Values: [0.0, 2.0]

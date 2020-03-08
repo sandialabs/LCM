@@ -4,7 +4,6 @@
 # in the file license.txt in the top-level Albany directory.
 #
 add_subdirectory(ACE)
-add_subdirectory(AnalyticSDBC)
 add_subdirectory(BoreDemo)
 add_subdirectory(CapModelPlasticity3D)
 add_subdirectory(CohesiveElement)
@@ -15,6 +14,8 @@ add_subdirectory(Elasticity2DTraction)
 add_subdirectory(Elasticity2DTriangles)
 add_subdirectory(Elasticity3DPressureBC)
 add_subdirectory(EquilibriumConcentrationBC)
+add_subdirectory(ExpressionEvaluatedIC)
+add_subdirectory(ExpressionEvaluatedSDBC)
 add_subdirectory(HeliumODEs)
 add_subdirectory(HydrogenKfieldBC)
 add_subdirectory(KfieldBC)

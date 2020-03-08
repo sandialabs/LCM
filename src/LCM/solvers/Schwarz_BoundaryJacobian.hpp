@@ -64,14 +64,14 @@ class Schwarz_BoundaryJacobian : public Thyra_LinearOp
   getExplicitOperator() const;
 
   //! Overrides Thyra::LinearOpBase purely virtual method
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   domain() const
   {
     return domain_vs_;
   }
 
   //! Overrides Thyra::LinearOpBase purely virtual method
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   range() const
   {
     return range_vs_;

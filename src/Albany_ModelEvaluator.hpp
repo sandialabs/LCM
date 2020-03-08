@@ -32,19 +32,19 @@ class ModelEvaluator
   //@{
 
   //! Return solution vector map
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   get_x_space() const;
 
   //! Return residual vector map
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   get_f_space() const;
 
   //! Return parameter vector map
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   get_p_space(int l) const;
 
   //! Return response function map
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   get_g_space(int j) const;
 
   //! Return array of parameter names
@@ -181,7 +181,7 @@ class ModelEvaluator
   Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>> param_names;
 
   //! Thyra vector spaces for parameter vector
-  Teuchos::Array<Teuchos::RCP<const Thyra_VectorSpace>> param_vss;
+  Teuchos::Array<Teuchos::RCP<Thyra_VectorSpace const>> param_vss;
 
   //! Thyra vectors for parameters and their bounds
   Teuchos::Array<Teuchos::RCP<Thyra_Vector>> param_vecs;

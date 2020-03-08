@@ -193,7 +193,7 @@ class Projector
   typedef PHX::MDField<const RealType, Cell, Node, QuadPoint> BasisField;
   typedef BasisField::size_type                               size_type;
 
-  Teuchos::RCP<const Thyra_VectorSpace>          node_vs_, ol_node_vs_;
+  Teuchos::RCP<Thyra_VectorSpace const>          node_vs_, ol_node_vs_;
   Teuchos::RCP<Albany::ThyraCrsMatrixFactory>    M_factory_;
   Teuchos::RCP<Thyra_LinearOp>                   M_;
   Teuchos::RCP<Albany::CombineAndScatterManager> cas_manager_;

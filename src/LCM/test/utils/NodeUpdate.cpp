@@ -116,7 +116,7 @@ main(int ac, char* av[])
   //   disconnected nature of the final mesh
 
   // Create a vector to hold displacement values for nodes
-  Teuchos::RCP<const Thyra_VectorSpace> dof_space =
+  Teuchos::RCP<Thyra_VectorSpace const> dof_space =
       stk_discretization.getVectorSpace();
   Teuchos::RCP<Thyra_Vector> displacement = Thyra::createMember(dof_space);
   Teuchos::ArrayRCP<ST>      displacement_nonconstView =

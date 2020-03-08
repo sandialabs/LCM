@@ -491,7 +491,7 @@ main(int ac, char* av[])
       "Exodus Output File Name", output_file);
   discretizationParameterList->set<int>("Workset Size", workset_size);
 
-  Teuchos::RCP<const Thyra_VectorSpace> space =
+  Teuchos::RCP<Thyra_VectorSpace const> space =
       Albany::createLocallyReplicatedVectorSpace(
           workset_size * num_dims * num_nodes, commT);
 

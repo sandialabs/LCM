@@ -32,7 +32,7 @@ class CombineAndScatterManager
   virtual ~CombineAndScatterManager() = default;
 
   // The VS corresponding to elements exclusively owned by this rank
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOwnedVectorSpace() const
   {
     return owned_vs;
@@ -40,7 +40,7 @@ class CombineAndScatterManager
 
   // The VS corresponding to elements that this rank owns or shares with other
   // ranks
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOverlappedVectorSpace() const
   {
     return overlapped_vs;
@@ -50,17 +50,17 @@ class CombineAndScatterManager
   // that is
   //    sharedVS(rank=p) = overlappedVS(rank=p) intersect
   //    Sum_q(overlappedVS(rank=q))
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getSharedAuraVectorSpace() const;
 
   // The subset of the shared aura VS that also belongs to owned VS, that is
   //   ownedAuraVS = sharedAuraVS intersect ownedVS
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOwnedAuraVectorSpace() const;
 
   // The subset of the shared aura VS that is not in owned aura VS
   //    ghostedVS = sharedAuraVS minus ownedAuraVS
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getGhostedAuraVectorSpace() const;
 
   // Get the ranks that own ids in the ghosted aura VS
@@ -138,13 +138,13 @@ class CombineAndScatterManager
   virtual void
   create_owned_aura_users() const = 0;
 
-  Teuchos::RCP<const Thyra_VectorSpace> owned_vs;
-  Teuchos::RCP<const Thyra_VectorSpace> overlapped_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> owned_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> overlapped_vs;
 
   // Mutable, so we can lazy initialize them
-  mutable Teuchos::RCP<const Thyra_VectorSpace> owned_aura_vs;
-  mutable Teuchos::RCP<const Thyra_VectorSpace> shared_aura_vs;
-  mutable Teuchos::RCP<const Thyra_VectorSpace> ghosted_aura_vs;
+  mutable Teuchos::RCP<Thyra_VectorSpace const> owned_aura_vs;
+  mutable Teuchos::RCP<Thyra_VectorSpace const> shared_aura_vs;
+  mutable Teuchos::RCP<Thyra_VectorSpace const> ghosted_aura_vs;
   mutable Teuchos::Array<int>                   ghosted_aura_owners;
   mutable Teuchos::Array<std::pair<GO, int>>    owned_aura_users;
 
@@ -158,21 +158,21 @@ class CombineAndScatterManager
   mutable bool owned_aura_users_computed;
 };
 
-inline Teuchos::RCP<const Thyra_VectorSpace>
+inline Teuchos::RCP<Thyra_VectorSpace const>
 CombineAndScatterManager::getSharedAuraVectorSpace() const
 {
   if (shared_aura_vs.is_null()) { create_aura_vss(); }
   return shared_aura_vs;
 }
 
-inline Teuchos::RCP<const Thyra_VectorSpace>
+inline Teuchos::RCP<Thyra_VectorSpace const>
 CombineAndScatterManager::getOwnedAuraVectorSpace() const
 {
   if (owned_aura_vs.is_null()) { create_aura_vss(); }
   return owned_aura_vs;
 }
 
-inline Teuchos::RCP<const Thyra_VectorSpace>
+inline Teuchos::RCP<Thyra_VectorSpace const>
 CombineAndScatterManager::getGhostedAuraVectorSpace() const
 {
   if (ghosted_aura_vs.is_null()) { create_aura_vss(); }

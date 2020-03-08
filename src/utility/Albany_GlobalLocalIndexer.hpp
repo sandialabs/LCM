@@ -36,14 +36,14 @@ class GlobalLocalIndexer
   virtual bool
   isLocallyOwnedElement(const GO gid) const = 0;
 
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getVectorSpace() const
   {
     return m_vs;
   }
 
  protected:
-  Teuchos::RCP<const Thyra_VectorSpace> m_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> m_vs;
 };
 
 // Create an indexer from a vector space

@@ -11,7 +11,7 @@
 
 namespace Albany {
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 ScalarResponseFunction::responseVectorSpace() const
 {
   int num_responses = this->numResponses();

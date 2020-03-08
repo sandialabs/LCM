@@ -16,7 +16,7 @@ namespace Albany {
 
 // ========= Vector Spaces utilities ========= //
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createLocallyReplicatedVectorSpace(
     const int                              size,
     const Teuchos::RCP<const Teuchos_Comm> comm)
@@ -126,7 +126,7 @@ sameAs(
   TEUCHOS_UNREACHABLE_RETURN(false);
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 removeComponents(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          local_components)
@@ -169,7 +169,7 @@ removeComponents(
   TEUCHOS_UNREACHABLE_RETURN(Teuchos::null);
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createSubspace(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          subspace_components)
@@ -222,7 +222,7 @@ createVectorSpace(
   return createThyraVectorSpace(tmap);
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createVectorSpacesIntersection(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
@@ -243,7 +243,7 @@ createVectorSpacesIntersection(
   return createVectorSpace(comm, gids);
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createVectorSpacesDifference(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
@@ -267,7 +267,7 @@ createVectorSpacesDifference(
 
 // ========= Thyra_LinearOp utilities ========= //
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 getColumnSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -283,7 +283,7 @@ getColumnSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
   return Teuchos::null;
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 getRowSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -678,7 +678,7 @@ isStaticGraph(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 
 // The following routine creates a one-to-one version of the given Map where
 // each GID lives on only one process. Therefore it is an owned (unique) map.
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createOneToOneVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const vs)
 {
   // Allow failure, since we don't know what the underlying linear algebra is

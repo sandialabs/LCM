@@ -92,7 +92,7 @@ class ScalarResponseFunction : public AbstractResponseFunction
   createGradientOp() const override;
 
   //! Get the map associate with this response
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   responseVectorSpace() const override;
 
   void

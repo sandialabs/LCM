@@ -481,25 +481,25 @@ STKDiscretization::printConnectivity() const
   }
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 STKDiscretization::getVectorSpace(const std::string& field_name) const
 {
   return nodalDOFsStructContainer.getDOFsStruct(field_name).vs;
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 STKDiscretization::getNodeVectorSpace(const std::string& field_name) const
 {
   return nodalDOFsStructContainer.getDOFsStruct(field_name).node_vs;
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 STKDiscretization::getOverlapVectorSpace(const std::string& field_name) const
 {
   return nodalDOFsStructContainer.getDOFsStruct(field_name).overlap_vs;
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 STKDiscretization::getOverlapNodeVectorSpace(
     const std::string& field_name) const
 {
@@ -1533,7 +1533,7 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
       indices[lid] = nodal_dofManager.getGlobalDOF(nodeId, 0);
     }
 
-    Teuchos::RCP<const Thyra_VectorSpace> part_node_vs =
+    Teuchos::RCP<Thyra_VectorSpace const> part_node_vs =
         createVectorSpace(comm, indices());
 
     // Now that the node_vs is created, we can loop over the dofs struct on this
@@ -1547,7 +1547,7 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
       dofManager.setup(
           numComponents, numNodes, maxGlobalNodeGID, interleavedOrdering);
 
-      Teuchos::RCP<const Thyra_VectorSpace>& node_vs =
+      Teuchos::RCP<Thyra_VectorSpace const>& node_vs =
           (overlapped) ? dofs_struct->overlap_node_vs : dofs_struct->node_vs;
       node_vs = part_node_vs;
 
@@ -1566,7 +1566,7 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
             indices[lid] = dofManager.getGlobalDOF(nodeId, j);
           }
         }
-        Teuchos::RCP<const Thyra_VectorSpace>& vs =
+        Teuchos::RCP<Thyra_VectorSpace const>& vs =
             (overlapped) ? dofs_struct->overlap_vs : dofs_struct->vs;
         vs = createVectorSpace(comm, indices());
       }
@@ -2909,7 +2909,7 @@ STKDiscretization::buildSideSetProjectors()
   // Note: the Global index of a node should be the same in both this and the
   // side discretizations
   //       since the underlying STK entities should have the same ID
-  Teuchos::RCP<const Thyra_VectorSpace> ss_ov_vs, ss_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> ss_ov_vs, ss_vs;
   Teuchos::RCP<ThyraCrsMatrixFactory>   graphP, ov_graphP;
   Teuchos::RCP<Thyra_LinearOp>          P, ov_P;
 

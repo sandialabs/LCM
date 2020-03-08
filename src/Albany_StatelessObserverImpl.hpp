@@ -52,7 +52,7 @@ class StatelessObserverImpl
   RealType
   getTimeParamValueOrDefault(RealType defaultValue) const;
 
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getNonOverlappedVectorSpace() const;
 
   virtual void

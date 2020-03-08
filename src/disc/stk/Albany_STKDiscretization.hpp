@@ -34,10 +34,10 @@ class GlobalLocalIndexer;
 
 struct DOFsStruct
 {
-  Teuchos::RCP<const Thyra_VectorSpace> node_vs;
-  Teuchos::RCP<const Thyra_VectorSpace> overlap_node_vs;
-  Teuchos::RCP<const Thyra_VectorSpace> vs;
-  Teuchos::RCP<const Thyra_VectorSpace> overlap_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> node_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> overlap_node_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> vs;
+  Teuchos::RCP<Thyra_VectorSpace const> overlap_vs;
   NodalDOFManager                       dofManager;
   NodalDOFManager                       overlap_dofManager;
   std::vector<std::vector<LO>>          wsElNodeEqID_rawVec;
@@ -117,39 +117,39 @@ class STKDiscretization : public AbstractDiscretization
   printConnectivity() const;
 
   //! Get node vector space (owned and overlapped)
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getNodeVectorSpace() const
   {
     return m_node_vs;
   }
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOverlapNodeVectorSpace() const
   {
     return m_overlap_node_vs;
   }
 
   //! Get solution DOF vector space (owned and overlapped).
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getVectorSpace() const
   {
     return m_vs;
   }
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOverlapVectorSpace() const
   {
     return m_overlap_vs;
   }
 
   //! Get Field node vector space (owned and overlapped)
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getNodeVectorSpace(const std::string& field_name) const;
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOverlapNodeVectorSpace(const std::string& field_name) const;
 
   //! Get Field vector space (owned and overlapped)
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getVectorSpace(const std::string& field_name) const;
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOverlapVectorSpace(const std::string& field_name) const;
 
   //! Create a Jacobian operator (owned and overlapped)
@@ -661,12 +661,12 @@ class STKDiscretization : public AbstractDiscretization
   Teuchos::RCP<const Teuchos_Comm> comm;
 
   //! Unknown map and node map
-  Teuchos::RCP<const Thyra_VectorSpace> m_vs;
-  Teuchos::RCP<const Thyra_VectorSpace> m_node_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> m_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> m_node_vs;
 
   //! Overlapped unknown map and node map
-  Teuchos::RCP<const Thyra_VectorSpace> m_overlap_vs;
-  Teuchos::RCP<const Thyra_VectorSpace> m_overlap_node_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> m_overlap_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> m_overlap_node_vs;
 
   //! Jacobian matrix graph proxy (owned and overlap)
   Teuchos::RCP<ThyraCrsMatrixFactory> m_jac_factory;

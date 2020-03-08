@@ -32,7 +32,7 @@ class AbstractResponseFunction
   setup() = 0;
 
   //! Get the vector space associated with this response.
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   responseVectorSpace() const = 0;
 
   /*!

@@ -83,12 +83,12 @@ class NodalDataVector
     return Albany::getLocalData(overlap_node_vec->col(i).getConst());
   }
 
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOverlappedVectorSpace() const
   {
     return overlap_node_vs;
   }
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getOwnedVectorSpace() const
   {
     return owned_node_vs;
@@ -131,8 +131,8 @@ class NodalDataVector
  private:
   NodalDataVector();
 
-  Teuchos::RCP<const Thyra_VectorSpace> overlap_node_vs;
-  Teuchos::RCP<const Thyra_VectorSpace> owned_node_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> overlap_node_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> owned_node_vs;
 
   Teuchos::RCP<Thyra_MultiVector> overlap_node_vec;
   Teuchos::RCP<Thyra_MultiVector> owned_node_vec;

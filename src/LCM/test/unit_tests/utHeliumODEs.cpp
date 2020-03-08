@@ -252,7 +252,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   discretizationParameterList->set<int>("Number Of Time Derivatives", 0);
   discretizationParameterList->set<std::string>(
       "Exodus Output File Name", output_file);
-  Teuchos::RCP<const Thyra_VectorSpace> space =
+  Teuchos::RCP<Thyra_VectorSpace const> space =
       Albany::createLocallyReplicatedVectorSpace(
           workset_size * num_dims * num_nodes, commT);
 

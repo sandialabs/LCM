@@ -51,7 +51,7 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
   }
 
   //! Overrides Thyra::LinearOpBase purely virtual method
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   domain() const
   {
     return app->getDistributedParameterLibrary()
@@ -60,7 +60,7 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
   }
 
   //! Overrides Thyra::LinearOpBase purely virtual method
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   range() const
   {
     return app->getVectorSpace();

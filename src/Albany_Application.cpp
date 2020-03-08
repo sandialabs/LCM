@@ -720,7 +720,7 @@ Application::getComm() const
   return comm;
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 Application::getVectorSpace() const
 {
   return disc->getVectorSpace();

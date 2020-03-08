@@ -42,27 +42,27 @@ class AbstractDiscretization
   virtual ~AbstractDiscretization() = default;
 
   //! Get node vector space (owned and overlapped)
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   getNodeVectorSpace() const = 0;
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   getOverlapNodeVectorSpace() const = 0;
 
   //! Get solution DOF vector space (owned and overlapped).
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   getVectorSpace() const = 0;
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   getOverlapVectorSpace() const = 0;
 
   //! Get Field node vector space (owned and overlapped)
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   getNodeVectorSpace(const std::string& field_name) const = 0;
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   getOverlapNodeVectorSpace(const std::string& field_name) const = 0;
 
   //! Get Field vector space (owned and overlapped)
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   getVectorSpace(const std::string& field_name) const = 0;
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   getOverlapVectorSpace(const std::string& field_name) const = 0;
 
   //! Create a Jacobian operator (owned and overlapped)

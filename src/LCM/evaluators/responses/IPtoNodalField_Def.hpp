@@ -279,7 +279,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   // Get the node data block container
   const Teuchos::RCP<Thyra_MultiVector>&   data       = this->mgr_->nodal_field;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID = workset.wsElNodeID;
-  Teuchos::RCP<const Thyra_VectorSpace>    local_node_space =
+  Teuchos::RCP<Thyra_VectorSpace const>    local_node_space =
       data->col(0)->space();
 
   const Teuchos::RCP<Adapt::NodalDataVector> node_data =

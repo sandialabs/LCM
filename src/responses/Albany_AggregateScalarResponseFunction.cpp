@@ -32,7 +32,7 @@ AggregateScalarResponseFunction::setup()
   }
 
   // Now that all responses are setup, build the product vector space
-  Teuchos::Array<Teuchos::RCP<const Thyra_VectorSpace>> vss(responses.size());
+  Teuchos::Array<Teuchos::RCP<Thyra_VectorSpace const>> vss(responses.size());
   for (int i = 0; i < responses.size(); ++i) {
     vss[i] = responses[i]->responseVectorSpace();
   }

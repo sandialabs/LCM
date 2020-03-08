@@ -72,14 +72,14 @@ class DistributedParameter
   }
 
   //! Get vector space
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   vector_space() const
   {
     return owned_vec->space();
   }
 
   //! Get overlap vector space
-  virtual Teuchos::RCP<const Thyra_VectorSpace>
+  virtual Teuchos::RCP<Thyra_VectorSpace const>
   overlap_vector_space() const
   {
     return overlapped_vec->space();

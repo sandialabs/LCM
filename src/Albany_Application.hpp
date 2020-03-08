@@ -100,7 +100,7 @@ class Application
   getComm() const;
 
   //! Get Thyra DOF vector space
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getVectorSpace() const;
 
   //! Create Jacobian operator

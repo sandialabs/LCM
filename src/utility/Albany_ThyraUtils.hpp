@@ -14,7 +14,7 @@ namespace Albany {
 
 // ========= Vector Spaces utilities ========= //
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createLocallyReplicatedVectorSpace(
     const int                              size,
     const Teuchos::RCP<const Teuchos_Comm> comm);
@@ -46,13 +46,13 @@ sameAs(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2);
 
 // Remove a set of local components from a vector space
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 removeComponents(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          local_components);
 
 // The complement of the above: the specified components are the ones to keep
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createSubspace(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::ArrayView<const LO>&          subspace_components);
@@ -65,7 +65,7 @@ createVectorSpace(
     const GO globalDim = Teuchos::OrdinalTraits<GO>::invalid());
 
 // Intersects vectors spaces
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createVectorSpacesIntersection(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
@@ -73,7 +73,7 @@ createVectorSpacesIntersection(
 
 // Complement of a vector spaces to another
 // NOTE: elements in vs2 that are not in vs1 are ignored.
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createVectorSpacesDifference(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
@@ -85,10 +85,10 @@ createVectorSpacesDifference(
 // so we can abstract from the concrete linear algebra package, and rely
 // only on the Thyra interfaces.
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 getColumnSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop);
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 getRowSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop);
 
 std::size_t
@@ -166,7 +166,7 @@ getGlobalMaxNumRowEntries(const Teuchos::RCP<const Thyra_LinearOp>& lop);
 void
 scale(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST val);
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 createOneToOneVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const vs);
 
 bool

@@ -381,19 +381,19 @@ ModelEvaluator::allocateVectors()
 
 // Overridden from Thyra::ModelEvaluator<ST>
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 ModelEvaluator::get_x_space() const
 {
   return app->getVectorSpace();
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 ModelEvaluator::get_f_space() const
 {
   return app->getVectorSpace();
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 ModelEvaluator::get_p_space(int l) const
 {
   ALBANY_PANIC(
@@ -401,7 +401,7 @@ ModelEvaluator::get_p_space(int l) const
       std::endl
           << "Error!  Albany::ModelEvaluator::get_p_space():  "
           << "Invalid parameter index l = " << l << std::endl);
-  Teuchos::RCP<const Thyra_VectorSpace> vs;
+  Teuchos::RCP<Thyra_VectorSpace const> vs;
   if (l < num_param_vecs) {
     vs = param_vss[l];
   } else {
@@ -411,7 +411,7 @@ ModelEvaluator::get_p_space(int l) const
   return vs;
 }
 
-Teuchos::RCP<const Thyra_VectorSpace>
+Teuchos::RCP<Thyra_VectorSpace const>
 ModelEvaluator::get_g_space(int l) const
 {
   ALBANY_PANIC(

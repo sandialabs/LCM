@@ -733,7 +733,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(
 #endif
       ;
 
-  Teuchos::RCP<const Thyra_VectorSpace> ip_field_space =
+  Teuchos::RCP<Thyra_VectorSpace const> ip_field_space =
       mgr_->ip_field->col(0)->space();
   auto ip_field_vs_indexer = Albany::createGlobalLocalIndexer(ip_field_space);
   for (int field = 0; field < num_fields; ++field) {

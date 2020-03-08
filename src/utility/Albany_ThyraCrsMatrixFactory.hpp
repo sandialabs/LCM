@@ -52,12 +52,12 @@ struct ThyraCrsMatrixFactory
   void
   fillComplete();
 
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getDomainVectorSpace() const
   {
     return m_domain_vs;
   }
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   getRangeVectorSpace() const
   {
     return m_range_vs;
@@ -79,8 +79,8 @@ struct ThyraCrsMatrixFactory
   struct Impl;
   Teuchos::RCP<Impl> m_graph;
 
-  Teuchos::RCP<const Thyra_VectorSpace> m_domain_vs;
-  Teuchos::RCP<const Thyra_VectorSpace> m_range_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> m_domain_vs;
+  Teuchos::RCP<Thyra_VectorSpace const> m_range_vs;
 
   std::vector<std::set<Tpetra_GO>> t_local_graph;
   Teuchos::RCP<const Tpetra_Map>   t_range;

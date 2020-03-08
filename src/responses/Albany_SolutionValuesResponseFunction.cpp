@@ -299,7 +299,7 @@ SolutionValuesResponseFunction::updateCASManager()
       !sameAs(solutionVS, cas_manager->getOwnedVectorSpace())) {
     const Teuchos::Array<GO> selectedGIDs =
         cullingStrategy_->selectedGIDs(solutionVS);
-    Teuchos::RCP<const Thyra_VectorSpace> targetVS =
+    Teuchos::RCP<Thyra_VectorSpace const> targetVS =
         createVectorSpace(app_->getComm(), selectedGIDs);
 
     cas_manager = createCombineAndScatterManager(solutionVS, targetVS);

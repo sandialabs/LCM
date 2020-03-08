@@ -45,7 +45,7 @@ class KLResponseFunction : public AbstractResponseFunction
   }
 
   //! Get the vector space associated with this response
-  Teuchos::RCP<const Thyra_VectorSpace>
+  Teuchos::RCP<Thyra_VectorSpace const>
   responseVectorSpace() const override
   {
     return response->responseVectorSpace();

@@ -265,7 +265,7 @@ main(int argc, char* argv[])
     }
 
     for (int i = 0; i < num_g - 1; i++) {
-      const RCP<const Thyra_Vector> g = thyraResponses[i];
+      RCP<Thyra_Vector const> const g = thyraResponses[i];
       if (!app->getResponse(i)->isScalarResponse()) continue;
 
       if (response_names[i] != Teuchos::null) {
@@ -317,7 +317,7 @@ main(int argc, char* argv[])
       bool writeToCoutSoln =
           debugParams.get("Write Solution to Standard Output", false);
 
-      const RCP<const Thyra_Vector> xfinal = thyraResponses.back();
+      RCP<Thyra_Vector const> const xfinal = thyraResponses.back();
       auto                          mnv    = Albany::mean(xfinal);
       *out << "\nMain_Solve: MeanValue of final solution " << mnv << std::endl;
       *out << "\nNumber of Failed Comparisons: " << status << std::endl;

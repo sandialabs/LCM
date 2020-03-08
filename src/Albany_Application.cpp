@@ -70,7 +70,7 @@ namespace Albany {
 Application::Application(
     const RCP<const Teuchos_Comm>&     comm_,
     const RCP<Teuchos::ParameterList>& params,
-    const RCP<const Thyra_Vector>&     initial_guess,
+    RCP<Thyra_Vector const> const&     initial_guess,
     const bool                         schwarz)
     : is_schwarz_{schwarz},
       no_dir_bcs_(false),

@@ -10,12 +10,12 @@
 #include "PHAL_ScatterScalarNodalParameter_Def.hpp"
 
 template <typename Traits>
-const std::string PHAL::ScatterScalarNodalParameter<
+std::string const PHAL::ScatterScalarNodalParameter<
     PHAL::AlbanyTraits::Residual,
     Traits>::className = "ScatterScalarNodalParameter";
 
 template <typename Traits>
-const std::string PHAL::ScatterScalarExtruded2DNodalParameter<
+std::string const PHAL::ScatterScalarExtruded2DNodalParameter<
     PHAL::AlbanyTraits::Residual,
     Traits>::className = "ScatterScalarExtruded2NodalParameter";
 

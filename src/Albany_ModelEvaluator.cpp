@@ -47,7 +47,7 @@ ModelEvaluator::ModelEvaluator(
   Teuchos::ParameterList& problemParams   = appParams->sublist("Problem");
   Teuchos::ParameterList& parameterParams = problemParams.sublist("Parameters");
 
-  const std::string soln_method =
+  std::string const soln_method =
       problemParams.get("Solution Method", "Steady");
   if (soln_method == "Transient Tempus") { use_tempus = true; }
 
@@ -236,10 +236,10 @@ ModelEvaluator::ModelEvaluator(
   dist_param_names.resize(num_dist_param_vecs);
   *out << "Number of distributed parameters vectors  = " << num_dist_param_vecs
        << std::endl;
-  const std::string* p_name_ptr;
-  const std::string  emptyString("");
+  std::string const* p_name_ptr;
+  std::string const  emptyString("");
   for (int i = 0; i < num_dist_param_vecs; i++) {
-    const std::string& p_sublist_name = strint("Distributed Parameter", i);
+    std::string const& p_sublist_name = strint("Distributed Parameter", i);
     param_list = distParameterParams.isSublist(p_sublist_name) ?
                      &distParameterParams.sublist(p_sublist_name) :
                      NULL;
@@ -248,7 +248,7 @@ ModelEvaluator::ModelEvaluator(
         strint("Parameter", i), emptyString);
 
     if (param_list != NULL) {
-      const std::string& name_from_list =
+      std::string const& name_from_list =
           param_list->get<std::string>("Name", emptyString);
 
       p_name_ptr = (*p_name_ptr != emptyString) ? p_name_ptr : &name_from_list;

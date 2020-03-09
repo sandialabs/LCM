@@ -259,7 +259,7 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
   int worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
 
   // Get Cubature Rule
-  const std::string    cub_rule_string = params->get("Cubature Rule", "GAUSS");
+  std::string const    cub_rule_string = params->get("Cubature Rule", "GAUSS");
   Intrepid2::EPolyType cub_rule;
   if (cub_rule_string == "GAUSS")
     cub_rule = static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS);

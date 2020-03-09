@@ -66,7 +66,7 @@ class ResponseFactory
   //! Create individual response function
   void
   createResponseFunction(
-      const std::string&                                      name,
+      std::string const&                                      name,
       Teuchos::ParameterList&                                 responseParams,
       Teuchos::Array<Teuchos::RCP<AbstractResponseFunction>>& responses) const;
 };

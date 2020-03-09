@@ -22,9 +22,9 @@ Field<rank>::Field() : valid_(false)
 
 template <int rank>
 bool
-Field<rank>::init(const Teuchos::ParameterList& p, const std::string& name)
+Field<rank>::init(const Teuchos::ParameterList& p, std::string const& name)
 {
-  const std::string name_rc      = Manager::decorate(name),
+  std::string const name_rc      = Manager::decorate(name),
                     name_rc_name = name_rc + " Name";
   valid_                         = p.isType<std::string>(name_rc_name);
   if (!valid_) return false;

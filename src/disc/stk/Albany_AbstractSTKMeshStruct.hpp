@@ -164,7 +164,7 @@ struct AbstractSTKMeshStruct : public AbstractMeshStruct
 
   virtual void
   buildCellSideNodeNumerationMap(
-      const std::string&              sideSetName,
+      std::string const&              sideSetName,
       std::map<GO, GO>&               sideMap,
       std::map<GO, std::vector<int>>& sideNodeMap) = 0;
 

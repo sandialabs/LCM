@@ -129,7 +129,7 @@ class FieldManagerScalarResponseFunction : public ScalarResponseFunction
 
   template <typename EvalT>
   void
-  writePhalanxGraph(const std::string& evalName);
+  writePhalanxGraph(std::string const& evalName);
 
   template <typename EvalT>
   void

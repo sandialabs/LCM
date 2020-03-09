@@ -199,7 +199,7 @@ AAdapt::TopologyMod::getGlobalOpenList(
     /*
       const unsigned entity_rank = stk::mesh::entity_rank( me.first);
       const stk::mesh::EntityId entity_id = stk::mesh::entity_id( me.first );
-      const std::string & entity_rank_name = metaData->entity_rank_name(
+      std::string const & entity_rank_name = metaData->entity_rank_name(
       entity_rank ); Entity entity = bulk_data_->get_entity(me.first);
       std::cout<<"Single proc fracture list contains "<<" "<<entity_rank_name<<"
       ["<<entity_id<<"] Proc:"
@@ -253,7 +253,7 @@ AAdapt::TopologyMod::getGlobalOpenList(
     /*
       const unsigned entity_rank = stk::mesh::entity_rank( key);
       const stk::mesh::EntityId entity_id = stk::mesh::entity_id( key );
-      const std::string & entity_rank_name = metaData->entity_rank_name(
+      std::string const & entity_rank_name = metaData->entity_rank_name(
     entity_rank ); Entity entity = bulk_data_->get_entity(key); if(!entity) {
     std::cout << "Error on this processor: Entity not addressible!!!!!!!!!!!!!"
     << std::endl;

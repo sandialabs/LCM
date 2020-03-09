@@ -26,7 +26,7 @@ NodalDataBase::updateNodalGraph(
 }
 
 void
-NodalDataBase::registerVectorState(const std::string& stateName, int ndofs)
+NodalDataBase::registerVectorState(std::string const& stateName, int ndofs)
 {
   // Save the nodal data field names and lengths in order of allocation which
   // implies access order.
@@ -109,7 +109,7 @@ NodalDataBase::replaceOwnedVectorSpace(
 
 void
 NodalDataBase::registerManager(
-    const std::string&                          key,
+    std::string const&                          key,
     const Teuchos::RCP<NodalDataBase::Manager>& manager)
 {
   ALBANY_PANIC(
@@ -119,13 +119,13 @@ NodalDataBase::registerManager(
 }
 
 bool
-NodalDataBase::isManagerRegistered(const std::string& key) const
+NodalDataBase::isManagerRegistered(std::string const& key) const
 {
   return mgr_map.find(key) != mgr_map.end();
 }
 
 const Teuchos::RCP<NodalDataBase::Manager>&
-NodalDataBase::getManager(const std::string& key) const
+NodalDataBase::getManager(std::string const& key) const
 {
   ManagerMap::const_iterator it = mgr_map.find(key);
   ALBANY_PANIC(it == mgr_map.end(), "There is no manager with key " << key);

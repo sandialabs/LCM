@@ -27,7 +27,7 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
   // Constructor
   DistributedParameterDerivativeOp(
       const Teuchos::RCP<Application>& app_,
-      const std::string&               param_name_)
+      std::string const&               param_name_)
       : app(app_), param_name(param_name_)
   {
   }

@@ -66,7 +66,7 @@ struct StateStruct
   };
   typedef std::vector<PHX::DataLayout::size_type> FieldDims;
 
-  StateStruct(const std::string& name_, MeshFieldEntity ent)
+  StateStruct(std::string const& name_, MeshFieldEntity ent)
       : name(name_),
         entity(ent),
         responseIDtoRequire(""),
@@ -80,12 +80,12 @@ struct StateStruct
   }
 
   StateStruct(
-      const std::string& name_,
+      std::string const& name_,
       MeshFieldEntity    ent,
       const FieldDims&   dims,
-      const std::string& type,
-      const std::string& meshPart_ = "",
-      const std::string& ebName_   = "")
+      std::string const& type,
+      std::string const& meshPart_ = "",
+      std::string const& ebName_   = "")
       : name(name_),
         dim(dims),
         entity(ent),
@@ -102,7 +102,7 @@ struct StateStruct
   }
 
   void
-  setInitType(const std::string& type)
+  setInitType(std::string const& type)
   {
     initType = type;
   }
@@ -117,12 +117,12 @@ struct StateStruct
     dim = dims;
   }
   void
-  setMeshPart(const std::string& meshPart_)
+  setMeshPart(std::string const& meshPart_)
   {
     meshPart = meshPart_;
   }
   void
-  setEBName(const std::string& ebName_)
+  setEBName(std::string const& ebName_)
   {
     ebName = ebName_;
   }
@@ -138,7 +138,7 @@ struct StateStruct
     std::cout << "Entity : " << entity << std::endl;
   }
 
-  const std::string                  name{""};
+  std::string const                  name{""};
   FieldDims                          dim;
   MeshFieldEntity                    entity;
   std::string                        initType{""};

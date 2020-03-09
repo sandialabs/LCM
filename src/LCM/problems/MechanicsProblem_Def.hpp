@@ -120,11 +120,11 @@ MechanicsProblem::getValidProblemParameters() const
       "materials.xml",
       "Filename of material database xml file");
 
-  for (const std::string& variable : variables_problem_) {
+  for (std::string const& variable : variables_problem_) {
     validPL->sublist(variable, false, "");
   }
 
-  for (const std::string& variable : variables_auxiliary_) {
+  for (std::string const& variable : variables_auxiliary_) {
     validPL->sublist(variable, false, "");
   }
 

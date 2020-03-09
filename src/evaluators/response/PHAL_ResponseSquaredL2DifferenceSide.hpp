@@ -47,7 +47,7 @@ class ResponseSquaredL2DifferenceSideBase
   int
   getLayout(
       const Teuchos::RCP<Albany::Layouts>& dl,
-      const std::string&                   rank,
+      std::string const&                   rank,
       Teuchos::RCP<PHX::DataLayout>&       layout);
 
   std::string sideSetName;

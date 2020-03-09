@@ -209,7 +209,7 @@ Albany::DiscretizationFactory::createMeshStruct(
     Teuchos::RCP<stk::io::StkMeshIoBroker> mesh_data =
         Teuchos::rcp(new stk::io::StkMeshIoBroker(MPI_COMM_WORLD));
     mesh_data->set_bulk_data(*meshStruct2D->bulkData);
-    const std::string& output_filename =
+    std::string const& output_filename =
         disc_params->get("Exodus Output File Name", "ice_mesh.2d.exo");
     size_t idx =
         mesh_data->create_output_mesh(output_filename, stk::io::WRITE_RESULTS);

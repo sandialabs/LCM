@@ -61,7 +61,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   // map[3DsideGID][3Dside_local_node] = 2Dcell_local_node
   void
   buildCellSideNodeNumerationMap(
-      const std::string&              sideSetName,
+      std::string const&              sideSetName,
       std::map<GO, GO>&               sideMap,
       std::map<GO, std::vector<int>>& sideNodeMap);
 
@@ -154,7 +154,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   // Routines to load, fill, or compute a field
   void
   loadField(
-      const std::string&                        field_name,
+      std::string const&                        field_name,
       const Teuchos::ParameterList&             params,
       Teuchos::RCP<Thyra_MultiVector>&          field_mv,
       const CombineAndScatterManager&           cas_manager,
@@ -165,7 +165,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       const Teuchos::RCP<Teuchos::FancyOStream> out);
   void
   fillField(
-      const std::string&                           field_name,
+      std::string const&                           field_name,
       const Teuchos::ParameterList&                params,
       Teuchos::RCP<Thyra_MultiVector>&             field_mv,
       Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
@@ -175,7 +175,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       const Teuchos::RCP<Teuchos::FancyOStream>    out);
   void
   computeField(
-      const std::string&                           field_name,
+      std::string const&                           field_name,
       const Teuchos::ParameterList&                params,
       Teuchos::RCP<Thyra_MultiVector>&             field_mv,
       Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
@@ -188,21 +188,21 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   // Routines to read a field from file
   void
   readScalarFileSerial(
-      const std::string&                           fname,
+      std::string const&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
       Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
 
   void
   readVectorFileSerial(
-      const std::string&                           fname,
+      std::string const&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
       Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
 
   void
   readLayeredScalarFileSerial(
-      const std::string&                           fname,
+      std::string const&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
       Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       std::vector<double>&                         normalizedLayersCoords,
@@ -210,14 +210,14 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
 
   void
   readLayeredVectorFileSerial(
-      const std::string&                           fname,
+      std::string const&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
       Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       std::vector<double>&                         normalizedLayersCoords,
       const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
 
   void
-  checkFieldIsInMesh(const std::string& fname, const std::string& ftype) const;
+  checkFieldIsInMesh(std::string const& fname, std::string const& ftype) const;
 
   //! Perform initial adaptation input checking
   void

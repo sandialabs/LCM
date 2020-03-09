@@ -221,7 +221,7 @@ template <typename Traits>
 typename ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
     EFieldLayout::Enum
     ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::EFieldLayout::
-        fromString(const std::string& str)
+        fromString(std::string const& str)
 {
   if (str == "Scalar")
     return scalar;
@@ -307,7 +307,7 @@ struct EMassLinearOpType
     lumped
   };
   static Enum
-  fromString(const std::string& str)
+  fromString(std::string const& str)
   {
     if (str == "Full")
       return full;
@@ -454,9 +454,9 @@ template <typename Traits>
 bool
 ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::initManager(
     Teuchos::ParameterList* const pl,
-    const std::string&            key_suffix)
+    std::string const&            key_suffix)
 {
-  const std::string key = "ProjectIPtoNodalField_" + key_suffix;
+  std::string const key = "ProjectIPtoNodalField_" + key_suffix;
   Teuchos::RCP<Adapt::NodalDataBase> ndb = p_state_mgr_->getNodalDataBase();
   const bool                         isr = ndb->isManagerRegistered(key);
   if (isr)
@@ -464,7 +464,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::initManager(
         ndb->getManager(key));
   else {
     EMassLinearOpType::Enum mass_linear_op_type;
-    const std::string& mmstr = pl->get<std::string>("Mass Matrix Type", "Full");
+    std::string const& mmstr = pl->get<std::string>("Mass Matrix Type", "Full");
     mass_linear_op_type      = EMassLinearOpType::fromString(mmstr);
     mgr_                     = Teuchos::rcp(new ProjectIPtoNodalFieldManager());
     mgr_->mass_linear_op =
@@ -529,12 +529,12 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
   num_fields_ = plist->get<int>("Number of Fields", 0);
 
   // Surface element prefix, if any.
-  const std::string field_name_prefix =
+  std::string const field_name_prefix =
       mesh_specs->ebName == "Surface Element" ? "surf_" : "";
 
   p_state_mgr_ = p.get<Albany::StateManager*>("State Manager Ptr");
 
-  const std::string key_suffix =
+  std::string const key_suffix =
       field_name_prefix +
       (num_fields_ > 0 ?
            plist->get<std::string>(Albany::strint("IP Field Name", 0)) :

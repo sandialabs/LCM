@@ -235,7 +235,7 @@ Print_Vector(
 
 //! Error reporting method
 int
-ReportError(const std::stringstream& Message);
+ReportError(std::string conststream& Message);
 
 }  // namespace MoertelT
 

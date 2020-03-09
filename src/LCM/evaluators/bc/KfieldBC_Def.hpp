@@ -54,7 +54,7 @@ KfieldBC_Base<EvalT, Traits>::KfieldBC_Base(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename KfieldBC_Base<EvalT, Traits>::ScalarT&
-KfieldBC_Base<EvalT, Traits>::getValue(const std::string& n)
+KfieldBC_Base<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == KI_name) return KI;
   // else if (n== timeValues)

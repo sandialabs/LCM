@@ -147,7 +147,7 @@ ThermalConductivity<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename ThermalConductivity<EvalT, Traits>::ScalarT&
-ThermalConductivity<EvalT, Traits>::getValue(const std::string& n)
+ThermalConductivity<EvalT, Traits>::getValue(std::string const& n)
 {
   if (is_constant) { return constant_value; }
   ALBANY_ABORT(

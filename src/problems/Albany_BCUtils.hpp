@@ -90,7 +90,7 @@ struct DirichletTraits
         PHAL::AlbanyTraits>::id_dirichlet_off_nodeset
   };
 
-  static const std::string bcParamsPl;
+  static std::string const bcParamsPl;
 
   typedef PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits> factory_type;
 
@@ -100,40 +100,40 @@ struct DirichletTraits
       const std::vector<std::string>& bcNames);
 
   static std::string
-  constructBCName(const std::string& ns, const std::string& dof);
+  constructBCName(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructSDBCName(const std::string& ns, const std::string& dof);
+  constructSDBCName(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructExprEvalSDBCName(const std::string& ns, const std::string& dof);
+  constructExprEvalSDBCName(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructScaledSDBCName(const std::string& ns, const std::string& dof);
+  constructScaledSDBCName(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructBCNameField(const std::string& ns, const std::string& dof);
+  constructBCNameField(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructSDBCNameField(const std::string& ns, const std::string& dof);
+  constructSDBCNameField(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructExprEvalSDBCNameField(const std::string& ns, const std::string& dof);
+  constructExprEvalSDBCNameField(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructScaledSDBCNameField(const std::string& ns, const std::string& dof);
+  constructScaledSDBCNameField(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructTimeDepBCName(const std::string& ns, const std::string& dof);
+  constructTimeDepBCName(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructTimeDepSDBCName(const std::string& ns, const std::string& dof);
+  constructTimeDepSDBCName(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructBCNameOffNodeSet(const std::string& ns, const std::string& dof);
+  constructBCNameOffNodeSet(std::string const& ns, std::string const& dof);
 
   static std::string
-  constructPressureDepBCName(const std::string& ns, const std::string& dof);
+  constructPressureDepBCName(std::string const& ns, std::string const& dof);
 };
 
 struct NeumannTraits
@@ -170,7 +170,7 @@ struct NeumannTraits
         PHAL::AlbanyTraits>::id_GatherScalarNodalParameter
   };
 
-  static const std::string bcParamsPl;
+  static std::string const bcParamsPl;
 
   typedef PHAL::NeumannFactoryTraits<PHAL::AlbanyTraits> factory_type;
 
@@ -182,15 +182,15 @@ struct NeumannTraits
 
   static std::string
   constructBCName(
-      const std::string& ns,
-      const std::string& dof,
-      const std::string& condition);
+      std::string const& ns,
+      std::string const& dof,
+      std::string const& condition);
 
   static std::string
   constructTimeDepBCName(
-      const std::string& ns,
-      const std::string& dof,
-      const std::string& condition);
+      std::string const& ns,
+      std::string const& dof,
+      std::string const& condition);
 };
 
 template <typename BCTraits>

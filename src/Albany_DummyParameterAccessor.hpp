@@ -28,7 +28,7 @@ class DummyParameterAccessor : public Sacado::ParameterAccessor<EvalT, Traits>
  public:
   DummyParameterAccessor() { dummy = 0.0; };
   typename EvalT::ScalarT&
-  getValue(const std::string& name)
+  getValue(std::string const& name)
   {
     return dummy;
   };

@@ -64,7 +64,7 @@ class Constant : public Source_Base<EvalT, Traits>,
   virtual void
   evaluateFields(typename Traits::EvalData workset);
   virtual ScalarT&
-  getValue(const std::string& n)
+  getValue(std::string const& n)
   {
     return m_constant;
   };
@@ -167,7 +167,7 @@ class Table : public Source_Base<EvalT, Traits>,
   virtual void
   evaluateFields(typename Traits::EvalData workset);
   virtual ScalarT&
-  getValue(const std::string& n)
+  getValue(std::string const& n)
   {
     return m_constant;
   };
@@ -344,7 +344,7 @@ class Trigonometric : public Source_Base<EvalT, Traits>,
   virtual void
   evaluateFields(typename Traits::EvalData workset);
   virtual ScalarT&
-  getValue(const std::string& n)
+  getValue(std::string const& n)
   {
     return m_constant;
   };
@@ -475,7 +475,7 @@ class Quadratic : public Source_Base<EvalT, Traits>,
   virtual void
   evaluateFields(typename Traits::EvalData workset);
   virtual ScalarT&
-  getValue(const std::string& n)
+  getValue(std::string const& n)
   {
     return m_factor;
   };
@@ -675,7 +675,7 @@ class MVQuadratic : public Source_Base<EvalT, Traits>,
   virtual void
   evaluateFields(typename Traits::EvalData workset);
   virtual ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
 
  private:
   std::vector<ScalarT>                     m_factor;
@@ -772,7 +772,7 @@ MVQuadratic<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
 template <typename EvalT, typename Traits>
 typename MVQuadratic<EvalT, Traits>::ScalarT&
-MVQuadratic<EvalT, Traits>::getValue(const std::string& n)
+MVQuadratic<EvalT, Traits>::getValue(std::string const& n)
 {
   for (unsigned int i = 0; i < m_factor.size(); i++) {
     if (n == Albany::strint("Multivariate Quadratic Nonlinear Factor", i))
@@ -803,7 +803,7 @@ class MVExponential : public Source_Base<EvalT, Traits>,
   virtual void
   evaluateFields(typename Traits::EvalData workset);
   virtual ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
 
  private:
   std::vector<ScalarT>                     m_factor;
@@ -901,7 +901,7 @@ MVExponential<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
 template <typename EvalT, typename Traits>
 typename MVExponential<EvalT, Traits>::ScalarT&
-MVExponential<EvalT, Traits>::getValue(const std::string& n)
+MVExponential<EvalT, Traits>::getValue(std::string const& n)
 {
   for (unsigned int i = 0; i < m_factor.size(); i++) {
     if (n == Albany::strint("Multivariate Exponential Nonlinear Factor", i))

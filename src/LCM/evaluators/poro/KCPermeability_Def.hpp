@@ -106,7 +106,7 @@ KCPermeability<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename KCPermeability<EvalT, Traits>::ScalarT&
-KCPermeability<EvalT, Traits>::getValue(const std::string& n)
+KCPermeability<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Kozeny-Carman Permeability") return constant_value;
   ALBANY_ABORT(

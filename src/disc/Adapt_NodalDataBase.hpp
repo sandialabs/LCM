@@ -69,7 +69,7 @@ class NodalDataBase
   }
 
   void
-  registerVectorState(const std::string& stateName, int ndofs);
+  registerVectorState(std::string const& stateName, int ndofs);
 
   LO
   getVecsize()
@@ -97,13 +97,13 @@ class NodalDataBase
   };
   // Register a manager. Throws if the key is already in use.
   void
-  registerManager(const std::string& key, const Teuchos::RCP<Manager>& manager);
+  registerManager(std::string const& key, const Teuchos::RCP<Manager>& manager);
   // Check whether a manager has been registered with this key.
   bool
-  isManagerRegistered(const std::string& key) const;
+  isManagerRegistered(std::string const& key) const;
   // Get a manager. Throws if there is no manager associated with key.
   const Teuchos::RCP<Manager>&
-  getManager(const std::string& key) const;
+  getManager(std::string const& key) const;
 
  private:
   Teuchos::RCP<Albany::NodeFieldContainer>          nodeContainer;

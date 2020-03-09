@@ -47,14 +47,14 @@ Albany::ProblemFactory::ProblemFactory(
 namespace {
 // In "Mechanics 3D", extract "Mechanics".
 inline std::string
-getName(const std::string& method)
+getName(std::string const& method)
 {
   if (method.size() < 3) return method;
   return method.substr(0, method.size() - 3);
 }
 // In "Mechanics 3D", extract 3.
 inline int
-getNumDim(const std::string& method)
+getNumDim(std::string const& method)
 {
   if (method.size() < 3) return -1;
   return static_cast<int>(method[method.size() - 2] - '0');

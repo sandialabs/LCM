@@ -250,7 +250,7 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename Porosity<EvalT, Traits>::ScalarT&
-Porosity<EvalT, Traits>::getValue(const std::string& n)
+Porosity<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Porosity")
     return constant_value;

@@ -78,7 +78,7 @@ LangevinNoiseTerm<EvalT, Traits>::evaluateFields(
 
 template <typename EvalT, typename Traits>
 typename LangevinNoiseTerm<EvalT, Traits>::ScalarT&
-LangevinNoiseTerm<EvalT, Traits>::getValue(const std::string& n)
+LangevinNoiseTerm<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "sd")
 

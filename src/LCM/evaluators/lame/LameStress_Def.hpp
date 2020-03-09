@@ -524,7 +524,7 @@ LameStressBase<EvalT, Traits>::calcStressRealType(
         // this->lameMaterialModelStateVariableNames[iVar]; const
         // Intrepid2::FieldContainer_Kokkos<RealType, PHX::Layout, PHX::Device>&
         // stateVar = *oldState[variableName];
-        const std::string& variableName =
+        std::string const& variableName =
             this->lameMaterialModelStateVariableNames[iVar] + "_old";
         Albany::MDArray stateVar = (*workset.stateArrayPtr)[variableName];
         *stateOldPtr             = stateVar(cell, qp);

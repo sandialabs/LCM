@@ -131,11 +131,11 @@ class Zoltan : public GeomDecomp
   reset_dest_proc_data();
 
   /** \brief Return name of Zoltan parameter block being used. */
-  static const std::string
+  static std::string const
   zoltan_parameters_name();
 
   /** \brief Return name of default Zoltan parameter block being used. */
-  static const std::string
+  static std::string const
   default_parameters_name();
 
   /** \brief Constructor
@@ -321,7 +321,7 @@ class Zoltan : public GeomDecomp
   zoltan_version() const;
 
   /** \brief Return the parameter list that is being used for this partition. */
-  const std::string&
+  std::string const&
   parameter_entry_name() const;
 
   /** \brief Zoltan_Struct is an internal Zoltan handle. */
@@ -357,8 +357,8 @@ class Zoltan : public GeomDecomp
    */
   std::string m_parameter_entry_name_;
 
-  static const std::string m_zoltanparametersname_;
-  static const std::string m_defaultparametersname_;
+  static std::string const m_zoltanparametersname_;
+  static std::string const m_defaultparametersname_;
   Parameters               m_default_parameters_;
   MeshInfo                 m_mesh_information_;
   unsigned                 m_total_number_entities_;

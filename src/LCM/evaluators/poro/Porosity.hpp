@@ -61,7 +61,7 @@ class Porosity : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Sacado method to access parameters
   ///
   ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
 
  private:
   ///

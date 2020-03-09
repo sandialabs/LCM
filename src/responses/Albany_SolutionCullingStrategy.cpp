@@ -56,7 +56,7 @@ class NodeSetSolutionCullingStrategy : public SolutionCullingStrategyBase
 {
  public:
   NodeSetSolutionCullingStrategy(
-      const std::string&                     nodeSetLabel,
+      std::string const&                     nodeSetLabel,
       const Teuchos::RCP<const Application>& app)
       : nodeSetLabel_(nodeSetLabel), app_(app), comm(app->getComm())
   {
@@ -193,14 +193,14 @@ createSolutionCullingStrategy(
     const Teuchos::RCP<const Application>& app,
     Teuchos::ParameterList&                params)
 {
-  const std::string cullingStrategyToken =
+  std::string const cullingStrategyToken =
       params.get("Culling Strategy", "Uniform");
 
   if (cullingStrategyToken == "Uniform") {
     int const numValues = params.get("Num Values", 10);
     return Teuchos::rcp(new UniformSolutionCullingStrategy(numValues));
   } else if (cullingStrategyToken == "Node Set") {
-    const std::string nodeSetLabel = params.get<std::string>("Node Set Label");
+    std::string const nodeSetLabel = params.get<std::string>("Node Set Label");
     return Teuchos::rcp(new NodeSetSolutionCullingStrategy(nodeSetLabel, app));
   } else if (cullingStrategyToken == "Node GIDs") {
     Teuchos::Array<int> nodeGIDs =

@@ -482,26 +482,26 @@ STKDiscretization::printConnectivity() const
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-STKDiscretization::getVectorSpace(const std::string& field_name) const
+STKDiscretization::getVectorSpace(std::string const& field_name) const
 {
   return nodalDOFsStructContainer.getDOFsStruct(field_name).vs;
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-STKDiscretization::getNodeVectorSpace(const std::string& field_name) const
+STKDiscretization::getNodeVectorSpace(std::string const& field_name) const
 {
   return nodalDOFsStructContainer.getDOFsStruct(field_name).node_vs;
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-STKDiscretization::getOverlapVectorSpace(const std::string& field_name) const
+STKDiscretization::getOverlapVectorSpace(std::string const& field_name) const
 {
   return nodalDOFsStructContainer.getDOFsStruct(field_name).overlap_vs;
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
 STKDiscretization::getOverlapNodeVectorSpace(
-    const std::string& field_name) const
+    std::string const& field_name) const
 {
   return nodalDOFsStructContainer.getDOFsStruct(field_name).overlap_node_vs;
 }
@@ -1235,14 +1235,14 @@ STKDiscretization::getSolutionMV(bool overlapped) const
 }
 
 void
-STKDiscretization::getField(Thyra_Vector& result, const std::string& name) const
+STKDiscretization::getField(Thyra_Vector& result, std::string const& name) const
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
 
   // Iterate over the on-processor nodes by getting node buckets and iterating
   // over each bucket.
-  const std::string& part =
+  std::string const& part =
       nodalDOFsStructContainer.fieldToMap.find(name)->second->first.first;
   stk::mesh::Selector selector = metaData.locally_owned_part();
   if (part.size()) {
@@ -1298,13 +1298,13 @@ STKDiscretization::getSolutionMV(
 void
 STKDiscretization::setField(
     Thyra_Vector const& result,
-    const std::string&  name,
+    std::string const&  name,
     bool                overlapped)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
 
-  const std::string& part =
+  std::string const& part =
       nodalDOFsStructContainer.fieldToMap.find(name)->second->first.first;
 
   stk::mesh::Selector selector =
@@ -1497,7 +1497,7 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
   Teuchos::Array<GO> indices;
   for (auto& it1 : tmp_map) {
     stk::mesh::Selector selector(vs_type_selector);
-    const std::string&  part = it1.first;
+    std::string const&  part = it1.first;
     if (part.size()) {
       auto it2 = stkMeshStruct->nsPartVec.find(part);
       if (it2 != stkMeshStruct->nsPartVec.end()) {
@@ -1979,7 +1979,7 @@ STKDiscretization::computeWorksetInfo()
       nodesOnElemStateVec[b].resize(nodal_states.size());
 
       for (size_t is = 0; is < nodal_states.size(); ++is) {
-        const std::string&            name = nodal_states[is]->name;
+        std::string const&            name = nodal_states[is]->name;
         const StateStruct::FieldDims& dim  = nodal_states[is]->dim;
         MDArray&             array    = stateArrays.elemStateArrays[b][name];
         std::vector<double>& stateVec = nodesOnElemStateVec[b][is];
@@ -2620,7 +2620,7 @@ STKDiscretization::setupNetCDFOutput()
 
     setup_latlon_interp(nlat, nlon, coords, interpolateData, comm);
 
-    const std::string name = stkMeshStruct->cdfOutFile;
+    std::string const name = stkMeshStruct->cdfOutFile;
     netCDFp                = 0;
     netCDFOutputRequest    = 0;
 
@@ -2921,7 +2921,7 @@ STKDiscretization::buildSideSetProjectors()
   stk::mesh::EntityRank        SIDE_RANK = stkMeshStruct->metaData->side_rank();
   for (auto it : sideSetDiscretizationsSTK) {
     // Extract the discretization
-    const std::string&           sideSetName = it.first;
+    std::string const&           sideSetName = it.first;
     const STKDiscretization&     disc        = *it.second;
     const AbstractSTKMeshStruct& ss_mesh     = *disc.stkMeshStruct;
 

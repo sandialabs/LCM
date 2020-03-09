@@ -653,11 +653,11 @@ SchwarzCoupled::get_p_names(int l) const
   return param_names_[l];
 }
 
-Teuchos::ArrayView<const std::string>
+Teuchos::ArrayView<std::string const>
 SchwarzCoupled::get_g_names(int /* l */) const
 {
   ALBANY_ABORT("not implemented");
-  return Teuchos::ArrayView<const std::string>();
+  return Teuchos::ArrayView<std::string const>();
 }
 
 Thyra::ModelEvaluatorBase::InArgs<ST>

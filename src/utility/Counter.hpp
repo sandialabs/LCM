@@ -33,7 +33,7 @@ class Counter
    *  \param name [in]  Name of the counter.
    *  \param start [in] Starting value of the counter (defaults to 0).
    */
-  explicit Counter(const std::string& name, counter_type start = 0);
+  explicit Counter(std::string const& name, counter_type start = 0);
 
   Counter&
   set(counter_type val)

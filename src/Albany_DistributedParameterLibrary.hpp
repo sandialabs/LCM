@@ -39,14 +39,14 @@ class DistributedParameterLibrary
 
   //! Add parameter to library
   void
-  add(const std::string& name, const Teuchos::RCP<param_type>& param)
+  add(std::string const& name, const Teuchos::RCP<param_type>& param)
   {
     param_map[name] = param;
   }
 
   //! Get parameter from library
   Teuchos::RCP<param_type>
-  get(const std::string& name) const
+  get(std::string const& name) const
   {
     const_iterator i = param_map.find(name);
     ALBANY_PANIC(
@@ -56,7 +56,7 @@ class DistributedParameterLibrary
 
   //! Return if library has parameter
   bool
-  has(const std::string& name) const
+  has(std::string const& name) const
   {
     return param_map.find(name) != param_map.end();
   }

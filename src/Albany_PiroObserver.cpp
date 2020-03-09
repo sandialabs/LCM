@@ -79,7 +79,7 @@ PiroObserver::observeSolution(const Thyra_MultiVector& solution, const ST stamp)
 }
 
 void
-PiroObserver::parameterChanged(const std::string& param)
+PiroObserver::parameterChanged(std::string const& param)
 {
   impl_.parameterChanged(param);
 }

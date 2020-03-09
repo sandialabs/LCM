@@ -38,7 +38,7 @@ class SideSetSTKMeshStruct : public GenericSTKMeshStruct
   void
   setParentMeshInfo(
       const AbstractSTKMeshStruct& parentMeshStruct_,
-      const std::string&           sideSetName);
+      std::string const&           sideSetName);
 
   bool
   hasRestartSolution() const

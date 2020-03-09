@@ -79,8 +79,8 @@ STKAdapt<SizeField>::printElementData()
   std::cout << "Num Worksets = " << numElemWorksets << std::endl;
 
   for (unsigned int i = 0; i < stateInfo->size(); i++) {
-    const std::string stateName = (*stateInfo)[i]->name;
-    const std::string init_type = (*stateInfo)[i]->initType;
+    std::string const stateName = (*stateInfo)[i]->name;
+    std::string const init_type = (*stateInfo)[i]->initType;
     std::vector<int>  dims;
     esa[0][stateName].dimensions(dims);
     int size = dims.size();

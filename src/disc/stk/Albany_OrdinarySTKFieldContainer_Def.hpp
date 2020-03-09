@@ -284,7 +284,7 @@ template <bool Interleaved>
 void
 OrdinarySTKFieldContainer<Interleaved>::fillVector(
     Thyra_Vector&                                field_vector,
-    const std::string&                           field_name,
+    std::string const&                           field_name,
     stk::mesh::Selector&                         field_selection,
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager)
@@ -347,7 +347,7 @@ template <bool Interleaved>
 void
 OrdinarySTKFieldContainer<Interleaved>::saveVector(
     Thyra_Vector const&                          field_vector,
-    const std::string&                           field_name,
+    std::string const&                           field_name,
     stk::mesh::Selector&                         field_selection,
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager)
@@ -495,7 +495,7 @@ template <bool Interleaved>
 void
 OrdinarySTKFieldContainer<Interleaved>::fillVectorImpl(
     Thyra_Vector&                                field_vector,
-    const std::string&                           field_name,
+    std::string const&                           field_name,
     stk::mesh::Selector&                         field_selection,
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager)
@@ -557,7 +557,7 @@ template <bool Interleaved>
 void
 OrdinarySTKFieldContainer<Interleaved>::saveVectorImpl(
     Thyra_Vector const&                          field_vector,
-    const std::string&                           field_name,
+    std::string const&                           field_name,
     stk::mesh::Selector&                         field_selection,
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager)

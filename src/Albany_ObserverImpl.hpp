@@ -30,7 +30,7 @@ class ObserverImpl : public StatelessObserverImpl
       override;
 
   void
-  parameterChanged(const std::string& param);
+  parameterChanged(std::string const& param);
 };
 
 }  // namespace Albany

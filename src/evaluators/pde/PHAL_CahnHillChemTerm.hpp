@@ -38,7 +38,7 @@ class CahnHillChemTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
   evaluateFields(typename Traits::EvalData d);
 
   ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
 
  private:
   typedef typename EvalT::MeshScalarT MeshScalarT;

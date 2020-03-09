@@ -59,7 +59,7 @@ struct NodalDOFsStructContainer
   std::map<std::string, MapOfDOFsStructs::const_iterator> fieldToMap;
 
   const DOFsStruct&
-  getDOFsStruct(const std::string& field_name) const
+  getDOFsStruct(std::string const& field_name) const
   {
     return fieldToMap.find(field_name)->second->second;
   };  // TODO handole errors
@@ -84,8 +84,8 @@ struct NodalDOFsStructContainer
 
   void
   addEmptyDOFsStruct(
-      const std::string& field_name,
-      const std::string& meshPart,
+      std::string const& field_name,
+      std::string const& meshPart,
       int                numComps)
   {
     if (numComps != 1)
@@ -142,15 +142,15 @@ class STKDiscretization : public AbstractDiscretization
 
   //! Get Field node vector space (owned and overlapped)
   Teuchos::RCP<Thyra_VectorSpace const>
-  getNodeVectorSpace(const std::string& field_name) const;
+  getNodeVectorSpace(std::string const& field_name) const;
   Teuchos::RCP<Thyra_VectorSpace const>
-  getOverlapNodeVectorSpace(const std::string& field_name) const;
+  getOverlapNodeVectorSpace(std::string const& field_name) const;
 
   //! Get Field vector space (owned and overlapped)
   Teuchos::RCP<Thyra_VectorSpace const>
-  getVectorSpace(const std::string& field_name) const;
+  getVectorSpace(std::string const& field_name) const;
   Teuchos::RCP<Thyra_VectorSpace const>
-  getOverlapVectorSpace(const std::string& field_name) const;
+  getOverlapVectorSpace(std::string const& field_name) const;
 
   //! Create a Jacobian operator (owned and overlapped)
   Teuchos::RCP<Thyra_LinearOp>
@@ -221,19 +221,19 @@ class STKDiscretization : public AbstractDiscretization
   //! Get IDArray for (Ws, Local Node, nComps) -> (local) NodeLID, works for
   //! both scalar and vector fields
   std::vector<IDArray> const&
-  getElNodeEqID(const std::string& field_name) const
+  getElNodeEqID(std::string const& field_name) const
   {
     return nodalDOFsStructContainer.getDOFsStruct(field_name).wsElNodeEqID;
   }
 
   const NodalDOFManager&
-  getDOFManager(const std::string& field_name) const
+  getDOFManager(std::string const& field_name) const
   {
     return nodalDOFsStructContainer.getDOFsStruct(field_name).dofManager;
   }
 
   const NodalDOFManager&
-  getOverlapDOFManager(const std::string& field_name) const
+  getOverlapDOFManager(std::string const& field_name) const
   {
     return nodalDOFsStructContainer.getDOFsStruct(field_name)
         .overlap_dofManager;
@@ -484,11 +484,11 @@ class STKDiscretization : public AbstractDiscretization
   setResidualField(Thyra_Vector const& residual);
 
   void
-  getField(Thyra_Vector& field_vector, const std::string& field_name) const;
+  getField(Thyra_Vector& field_vector, std::string const& field_name) const;
   void
   setField(
       Thyra_Vector const& field_vector,
-      const std::string&  field_name,
+      std::string const&  field_name,
       const bool          overlapped = false);
 
   // --- Methods to write solution in the output file --- //

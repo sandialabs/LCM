@@ -124,7 +124,7 @@ PHAL::TEProp<EvalT, Traits>::whichMat(const MeshScalarT& x)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename PHAL::TEProp<EvalT, Traits>::ScalarT&
-PHAL::TEProp<EvalT, Traits>::getValue(const std::string& n)
+PHAL::TEProp<EvalT, Traits>::getValue(std::string const& n)
 {
   int mat;
   for (int i = 0; i < mats; i++) {

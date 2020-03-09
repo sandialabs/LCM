@@ -58,7 +58,7 @@ SharedParameter<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename SharedParameter<EvalT, Traits>::ScalarT&
-SharedParameter<EvalT, Traits>::getValue(const std::string& n)
+SharedParameter<EvalT, Traits>::getValue(std::string const& n)
 {
   ALBANY_PANIC(n != paramName);
   return paramValue;
@@ -123,7 +123,7 @@ SharedParameterVec<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename SharedParameterVec<EvalT, Traits>::ScalarT&
-SharedParameterVec<EvalT, Traits>::getValue(const std::string& n)
+SharedParameterVec<EvalT, Traits>::getValue(std::string const& n)
 {
   for (int i = 0; i < numParams; ++i)
     if (n == paramNames[i]) return paramValues[i];

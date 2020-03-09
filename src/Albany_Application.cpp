@@ -475,7 +475,7 @@ Application::buildProblem()
     for (it = responseIDs_to_require.begin();
          it != responseIDs_to_require.end();
          it++) {
-      const std::string&                              responseID = *it;
+      std::string const&                              responseID = *it;
       PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT> res_response_tag(
           responseID, dummy);
       sfm[ps]->requireField<PHAL::AlbanyTraits::Residual>(res_response_tag);
@@ -558,7 +558,7 @@ Application::finalSetUp(
   const StateInfoStruct& distParamSIS = disc->getNodalParameterSIS();
   for (size_t is = 0; is < distParamSIS.size(); is++) {
     // Get name of distributed parameter
-    const std::string& param_name = distParamSIS[is]->name;
+    std::string const& param_name = distParamSIS[is]->name;
 
     // Get parameter vector spaces and build parameter vector
     // Create distributed parameter and set workset_elem_dofs
@@ -660,7 +660,7 @@ Application::finalSetUp(
   // For backward compatibility, use any value at the old location of the
   // "Compute Sensitivity" flag as a default value for the new flag location
   // when the latter has been left undefined
-  const std::string              sensitivityToken = "Compute Sensitivities";
+  std::string const              sensitivityToken = "Compute Sensitivities";
   const Teuchos::Ptr<const bool> oldSensitivityFlag(
       problemParams->getPtr<bool>(sensitivityToken));
   if (Teuchos::nonnull(oldSensitivityFlag)) {
@@ -1075,14 +1075,14 @@ template <typename EvalT>
 void
 Application::writePhalanxGraph(
     Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm,
-    const std::string&                                  evalName,
+    std::string const&                                  evalName,
     int const&                                          phxGraphVisDetail)
 {
   if (phxGraphVisDetail > 0) {
     const bool detail = (phxGraphVisDetail > 1) ? true : false;
     *out << "Phalanx writing graphviz file for graph of " << evalName
          << " (detail = " << phxGraphVisDetail << ")" << std::endl;
-    const std::string graphName = "phalanxGraph" + evalName;
+    std::string const graphName = "phalanxGraph" + evalName;
     *out << "Process using 'dot -Tpng -O " << graphName << std::endl;
     fm->writeGraphvizFile<EvalT>(graphName, detail, detail);
 
@@ -1174,7 +1174,7 @@ Application::computeGlobalResidualImpl(
     workset.f = overlapped_f;
 
     for (int ws = 0; ws < numWorksets; ws++) {
-      const std::string evalName = PHAL::evalName<EvalT>("FM", wsPhysIndex[ws]);
+      std::string const evalName = PHAL::evalName<EvalT>("FM", wsPhysIndex[ws]);
       loadWorksetBucketInfo<EvalT>(workset, ws, evalName);
 
       // FillType template argument used to specialize Sacado
@@ -1363,7 +1363,7 @@ Application::computeGlobalJacobianImpl(
       workset.Jac_kokkos = getNonconstDeviceData(workset.Jac);
     }
     for (int ws = 0; ws < numWorksets; ws++) {
-      const std::string evalName = PHAL::evalName<EvalT>("FM", wsPhysIndex[ws]);
+      std::string const evalName = PHAL::evalName<EvalT>("FM", wsPhysIndex[ws]);
       loadWorksetBucketInfo<EvalT>(workset, ws, evalName);
 
       // FillType template argument used to specialize Sacado
@@ -1603,7 +1603,7 @@ Application::evaluateStateFieldManager(
   // Perform fill via field manager
   if (Teuchos::nonnull(rc_mgr)) rc_mgr->beginEvaluatingSfm();
   for (int ws = 0; ws < numWorksets; ws++) {
-    const std::string evalName =
+    std::string const evalName =
         PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", wsPhysIndex[ws]);
     loadWorksetBucketInfo<PHAL::AlbanyTraits::Residual>(workset, ws, evalName);
     sfm[wsPhysIndex[ws]]->evaluateFields<PHAL::AlbanyTraits::Residual>(workset);
@@ -1635,7 +1635,7 @@ Application::registerShapeParameters()
 }
 
 PHAL::AlbanyTraits::Residual::ScalarT&
-Application::getValue(const std::string& name)
+Application::getValue(std::string const& name)
 {
   int index = -1;
   for (unsigned int i = 0; i < shapeParamNames.size(); i++) {
@@ -1664,7 +1664,7 @@ Application::determinePiroSolver(
   // If not explicitly specified, determine which Piro solver to use from the
   // problem parameters
   if (!piroParams->getPtr<std::string>("Solver Type")) {
-    const std::string secondOrder =
+    std::string const secondOrder =
         localProblemParams->get("Second Order", "No");
 
     ALBANY_PANIC(

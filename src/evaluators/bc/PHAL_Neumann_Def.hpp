@@ -646,7 +646,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
 
 template <typename EvalT, typename Traits>
 typename NeumannBase<EvalT, Traits>::ScalarT&
-NeumannBase<EvalT, Traits>::getValue(const std::string& n)
+NeumannBase<EvalT, Traits>::getValue(std::string const& n)
 {
   if (std::string::npos != n.find("robin")) {
     for (int i = 0; i < 2; i++) {

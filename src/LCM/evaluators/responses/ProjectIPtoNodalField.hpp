@@ -131,7 +131,7 @@ class ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
       tensor
     };
     static Enum
-    fromString(const std::string& user_str);
+    fromString(std::string const& user_str);
   };
 
   std::vector<std::string>                 ip_field_names_;
@@ -158,7 +158,7 @@ class ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
   Teuchos::RCP<Thyra::LinearOpWithSolveFactoryBase<ST>> lowsFactory_;
 
   bool
-  initManager(Teuchos::ParameterList* const pl, const std::string& key_suffix);
+  initManager(Teuchos::ParameterList* const pl, std::string const& key_suffix);
   void
   fillRHS(const typename Traits::EvalData workset);
 };

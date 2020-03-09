@@ -176,7 +176,7 @@ Albany::ContactManager::ContactManager(
 void
 Albany::ContactManager::processSS(
     int const            ctr,
-    const std::string&   sideSetName,
+    std::string const&   sideSetName,
     int                  s_or_mortar,
     int                  mortarside,
     WorksetContactNodes& nodeGIDs,

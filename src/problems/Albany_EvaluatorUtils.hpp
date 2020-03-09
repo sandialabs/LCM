@@ -41,8 +41,8 @@ class EvaluatorUtilsBase
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructGatherSolutionEvaluator(
       bool               isVectorField,
-      const std::string& dof_name,
-      const std::string& dof_name_dot,
+      std::string const& dof_name,
+      std::string const& dof_name_dot,
       int                offsetToFirstDOF = 0) const
   {
     return constructGatherSolutionEvaluator(
@@ -92,7 +92,7 @@ class EvaluatorUtilsBase
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructGatherSolutionEvaluator_noTransient(
       bool               isVectorField,
-      const std::string& dof_name,
+      std::string const& dof_name,
       int                offsetToFirstDOF = 0) const
   {
     return constructGatherSolutionEvaluator_noTransient(
@@ -110,7 +110,7 @@ class EvaluatorUtilsBase
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructGatherSolutionEvaluator_noTransient(
       int                tensorRank,
-      const std::string& dof_name,
+      std::string const& dof_name,
       int                offsetToFirstDOF = 0) const
   {
     return constructGatherSolutionEvaluator_noTransient(
@@ -131,7 +131,7 @@ class EvaluatorUtilsBase
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructScatterResidualEvaluator(
       bool               isVectorField,
-      const std::string& resid_name,
+      std::string const& resid_name,
       int                offsetToFirstDOF = 0,
       std::string        scatterName      = "Scatter") const
   {
@@ -152,7 +152,7 @@ class EvaluatorUtilsBase
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructScatterResidualEvaluatorWithExtrudedParams(
       bool                                     isVectorField,
-      const std::string&                       resid_name,
+      std::string const&                       resid_name,
       Teuchos::RCP<std::map<std::string, int>> extruded_params_levels,
       int                                      offsetToFirstDOF = 0,
       std::string                              scatterName = "Scatter") const
@@ -178,7 +178,7 @@ class EvaluatorUtilsBase
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructScatterResidualEvaluator(
       int                tensorRank,
-      const std::string& resid_name,
+      std::string const& resid_name,
       int                offsetToFirstDOF = 0,
       std::string        scatterName      = "Scatter") const
   {
@@ -201,29 +201,29 @@ class EvaluatorUtilsBase
   //! GatherScalarNodalParameter
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructGatherScalarNodalParameter(
-          const std::string& param_name,
-          const std::string& field_name = "") const = 0;
+          std::string const& param_name,
+          std::string const& field_name = "") const = 0;
 
   //! Function to create parameter list for construction of
   //! ScatterScalarNodalParameter
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructScatterScalarNodalParameter(
-          const std::string& param_name,
-          const std::string& field_name = "") const = 0;
+          std::string const& param_name,
+          std::string const& field_name = "") const = 0;
 
   //! Function to create parameter list for construction of
   //! GatherScalarExtruded2DNodalParameter
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructGatherScalarExtruded2DNodalParameter(
-          const std::string& param_name,
-          const std::string& field_name = "") const = 0;
+          std::string const& param_name,
+          std::string const& field_name = "") const = 0;
 
   //! Function to create parameter list for construction of
   //! ScatterScalarExtruded2DNodalParameter
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructScatterScalarExtruded2DNodalParameter(
-          const std::string& param_name,
-          const std::string& field_name = "") const = 0;
+          std::string const& param_name,
+          std::string const& field_name = "") const = 0;
 
   //! Function to create parameter list for construction of DOFInterpolation
   //! evaluator with standard field names
@@ -234,62 +234,62 @@ class EvaluatorUtilsBase
   //   computed, and the chain rule is coded with that known sparsity.
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFInterpolationEvaluator(
-          const std::string& dof_names,
+          std::string const& dof_names,
           int                offsetToFirstDOF = -1) const = 0;
 
   //! Same as above, for Interpolating the Gradient
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFGradInterpolationEvaluator(
-          const std::string& dof_names,
+          std::string const& dof_names,
           int                offsetToFirstDOF = -1) const = 0;
 
   //! Interpolation functions for vector quantities
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFVecInterpolationEvaluator(
-          const std::string& dof_names,
+          std::string const& dof_names,
           int                offsetToFirstDOF = -1) const = 0;
 
   //! Same as above, for Interpolating the Gradient for Vector quantities
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFVecGradInterpolationEvaluator(
-          const std::string& dof_names,
+          std::string const& dof_names,
           int                offsetToFirstDOF = -1) const = 0;
 
   //! Interpolation functions for Tensor quantities
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFTensorInterpolationEvaluator(
-          const std::string& dof_names,
+          std::string const& dof_names,
           int                offsetToFirstDOF = -1) const = 0;
   //! Same as above, for Interpolating the Gradient for Tensor quantities
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFTensorGradInterpolationEvaluator(
-          const std::string& dof_names,
+          std::string const& dof_names,
           int                offsetToFirstDOF = -1) const = 0;
 
   //! Interpolation functions for scalar quantities defined on a side set
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFInterpolationSideEvaluator(
-          const std::string& dof_names,
-          const std::string& sideSetName) const = 0;
+          std::string const& dof_names,
+          std::string const& sideSetName) const = 0;
 
   //! Interpolation functions for vector defined on a side set
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFVecInterpolationSideEvaluator(
-          const std::string& dof_names,
-          const std::string& sideSetName) const = 0;
+          std::string const& dof_names,
+          std::string const& sideSetName) const = 0;
 
   //! Interpolation functions for gradient of quantities defined on a side set
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFGradInterpolationSideEvaluator(
-          const std::string& dof_names,
-          const std::string& sideSetName) const = 0;
+          std::string const& dof_names,
+          std::string const& sideSetName) const = 0;
 
   //! Interpolation functions for gradient of vector quantities defined on a
   //! side set
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFVecGradInterpolationSideEvaluator(
-          const std::string& dof_names,
-          const std::string& sideSetName) const = 0;
+          std::string const& dof_names,
+          std::string const& sideSetName) const = 0;
 
   //! Function to create parameter list for construction of
   //! GatherCoordinateVector evaluator with standard Field names
@@ -312,44 +312,44 @@ class EvaluatorUtilsBase
       RCP<PHX::Evaluator<Traits>> virtual constructMapToPhysicalFrameSideEvaluator(
           const Teuchos::RCP<shards::CellTopology>&            cellType,
           const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature,
-          const std::string& sideSetName) const = 0;
+          std::string const& sideSetName) const = 0;
 
   //! Function to create evaluator for restriction to side set
   Teuchos::RCP<PHX::Evaluator<Traits>> virtual constructDOFCellToSideEvaluator(
-      const std::string&                        cell_dof_name,
-      const std::string&                        sideSetName,
-      const std::string&                        layout,
+      std::string const&                        cell_dof_name,
+      std::string const&                        sideSetName,
+      std::string const&                        layout,
       const Teuchos::RCP<shards::CellTopology>& cellType      = Teuchos::null,
-      const std::string&                        side_dof_name = "") const = 0;
+      std::string const&                        side_dof_name = "") const = 0;
 
   //! Combo: restriction to side plus interpolation
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructDOFCellToSideQPEvaluator(
-          const std::string&                        cell_dof_name,
-          const std::string&                        sideSetName,
-          const std::string&                        layout,
+          std::string const&                        cell_dof_name,
+          std::string const&                        sideSetName,
+          std::string const&                        layout,
           const Teuchos::RCP<shards::CellTopology>& cellType = Teuchos::null,
-          const std::string& side_dof_name                   = "") const = 0;
+          std::string const& side_dof_name                   = "") const = 0;
 
   //! Function to create evaluator for prolongation to cell
   Teuchos::RCP<PHX::Evaluator<Traits>> virtual constructDOFSideToCellEvaluator(
-      const std::string&                        side_dof_name,
-      const std::string&                        sideSetName,
-      const std::string&                        layout,
+      std::string const&                        side_dof_name,
+      std::string const&                        sideSetName,
+      std::string const&                        layout,
       const Teuchos::RCP<shards::CellTopology>& cellType      = Teuchos::null,
-      const std::string&                        cell_dof_name = "") const = 0;
+      std::string const&                        cell_dof_name = "") const = 0;
 
   //! Function to create evaluator NodesToCellInterpolation
   //! (=DOFInterpolation+QuadPointsToCellInterpolation)
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructNodesToCellInterpolationEvaluator(
-          const std::string& dof_name,
+          std::string const& dof_name,
           bool               isVectorField = false) const = 0;
 
   //! Function to create evaluator QuadPointsToCellInterpolation
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructQuadPointsToCellInterpolationEvaluator(
-          const std::string&                  dof_name,
+          std::string const&                  dof_name,
           const Teuchos::RCP<PHX::DataLayout> qp_layout = Teuchos::null,
           const Teuchos::RCP<PHX::DataLayout> cell_layout =
               Teuchos::null) const = 0;
@@ -357,8 +357,8 @@ class EvaluatorUtilsBase
   //! Function to create evaluator QuadPointsToCellInterpolation
   Teuchos::
       RCP<PHX::Evaluator<Traits>> virtual constructSideQuadPointsToSideInterpolationEvaluator(
-          const std::string& dof_name,
-          const std::string& sideSetName,
+          std::string const& dof_name,
+          std::string const& sideSetName,
           int const          fieldDim = 0) const = 0;
 
   //! Function to create parameter list for construction of
@@ -379,12 +379,12 @@ class EvaluatorUtilsBase
           const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
                                                                intrepidBasisSide,
           const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubatureSide,
-          const std::string&                                   sideSetName,
+          std::string const&                                   sideSetName,
           const bool buildNormals = false) const = 0;
 
  protected:
   Teuchos::ArrayRCP<std::string>
-  arcp_str(const std::string& s) const
+  arcp_str(std::string const& s) const
   {
     return Teuchos::ArrayRCP<std::string>(1, s);
   }
@@ -549,29 +549,29 @@ class EvaluatorUtilsImpl : public EvaluatorUtilsBase<Traits>
   //! GatherScalarNodalParameter
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructGatherScalarNodalParameter(
-      const std::string& param_name,
-      const std::string& field_name = "") const;
+      std::string const& param_name,
+      std::string const& field_name = "") const;
 
   //! Function to create parameter list for construction of
   //! ScatterScalarNodalParameter
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructScatterScalarNodalParameter(
-      const std::string& param_name,
-      const std::string& field_name = "") const;
+      std::string const& param_name,
+      std::string const& field_name = "") const;
 
   //! Function to create parameter list for construction of
   //! GatherScalarExtruded2DNodalParameter
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructGatherScalarExtruded2DNodalParameter(
-      const std::string& param_name,
-      const std::string& field_name = "") const;
+      std::string const& param_name,
+      std::string const& field_name = "") const;
 
   //! Function to create parameter list for construction of
   //! ScatterScalarExtruded2DNodalParameter
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructScatterScalarExtruded2DNodalParameter(
-      const std::string& param_name,
-      const std::string& field_name = "") const;
+      std::string const& param_name,
+      std::string const& field_name = "") const;
 
   //! Function to create parameter list for construction of DOFInterpolation
   //! evaluator with standard field names
@@ -582,62 +582,62 @@ class EvaluatorUtilsImpl : public EvaluatorUtilsBase<Traits>
   //   computed, and the chain rule is coded with that known sparsity.
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFInterpolationEvaluator(
-      const std::string& dof_names,
+      std::string const& dof_names,
       int                offsetToFirstDOF = -1) const;
 
   //! Same as above, for Interpolating the Gradient
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFGradInterpolationEvaluator(
-      const std::string& dof_names,
+      std::string const& dof_names,
       int                offsetToFirstDOF = -1) const;
 
   //! Interpolation functions for vector quantities
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFVecInterpolationEvaluator(
-      const std::string& dof_names,
+      std::string const& dof_names,
       int                offsetToFirstDOF = -1) const;
 
   //! Same as above, for Interpolating the Gradient for Vector quantities
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFVecGradInterpolationEvaluator(
-      const std::string& dof_names,
+      std::string const& dof_names,
       int                offsetToFirstDOF = -1) const;
 
   //! Interpolation functions for Tensor quantities
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFTensorInterpolationEvaluator(
-      const std::string& dof_names,
+      std::string const& dof_names,
       int                offsetToFirstDOF = -1) const;
   //! Same as above, for Interpolating the Gradient for Tensor quantities
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFTensorGradInterpolationEvaluator(
-      const std::string& dof_names,
+      std::string const& dof_names,
       int                offsetToFirstDOF = -1) const;
 
   //! Interpolation functions for scalar quantities defined on a side set
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFInterpolationSideEvaluator(
-      const std::string& dof_names,
-      const std::string& sideSetName) const;
+      std::string const& dof_names,
+      std::string const& sideSetName) const;
 
   //! Interpolation functions for vector defined on a side set
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFVecInterpolationSideEvaluator(
-      const std::string& dof_names,
-      const std::string& sideSetName) const;
+      std::string const& dof_names,
+      std::string const& sideSetName) const;
 
   //! Interpolation functions for gradient of quantities defined on a side set
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFGradInterpolationSideEvaluator(
-      const std::string& dof_names,
-      const std::string& sideSetName) const;
+      std::string const& dof_names,
+      std::string const& sideSetName) const;
 
   //! Interpolation functions for gradient of vector quantities defined on a
   //! side set
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFVecGradInterpolationSideEvaluator(
-      const std::string& dof_names,
-      const std::string& sideSetName) const;
+      std::string const& dof_names,
+      std::string const& sideSetName) const;
 
   //! Function to create parameter list for construction of
   //! GatherCoordinateVector evaluator with standard Field names
@@ -660,54 +660,54 @@ class EvaluatorUtilsImpl : public EvaluatorUtilsBase<Traits>
   constructMapToPhysicalFrameSideEvaluator(
       const Teuchos::RCP<shards::CellTopology>&            cellType,
       const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature,
-      const std::string&                                   sideSetName) const;
+      std::string const&                                   sideSetName) const;
 
   //! Function to create evaluator for restriction to side set
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFCellToSideEvaluator(
-      const std::string&                        cell_dof_name,
-      const std::string&                        sideSetName,
-      const std::string&                        layout,
+      std::string const&                        cell_dof_name,
+      std::string const&                        sideSetName,
+      std::string const&                        layout,
       const Teuchos::RCP<shards::CellTopology>& cellType      = Teuchos::null,
-      const std::string&                        side_dof_name = "") const;
+      std::string const&                        side_dof_name = "") const;
 
   //! Combo: restriction to side plus interpolation
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFCellToSideQPEvaluator(
-      const std::string&                        cell_dof_name,
-      const std::string&                        sideSetName,
-      const std::string&                        layout,
+      std::string const&                        cell_dof_name,
+      std::string const&                        sideSetName,
+      std::string const&                        layout,
       const Teuchos::RCP<shards::CellTopology>& cellType      = Teuchos::null,
-      const std::string&                        side_dof_name = "") const;
+      std::string const&                        side_dof_name = "") const;
 
   //! Function to create evaluator for prolongation to cell
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructDOFSideToCellEvaluator(
-      const std::string&                        side_dof_name,
-      const std::string&                        sideSetName,
-      const std::string&                        layout,
+      std::string const&                        side_dof_name,
+      std::string const&                        sideSetName,
+      std::string const&                        layout,
       const Teuchos::RCP<shards::CellTopology>& cellType      = Teuchos::null,
-      const std::string&                        cell_dof_name = "") const;
+      std::string const&                        cell_dof_name = "") const;
 
   //! Function to create evaluator NodesToCellInterpolation
   //! (=DOFInterpolation+QuadPointsToCellInterpolation)
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructNodesToCellInterpolationEvaluator(
-      const std::string& dof_name,
+      std::string const& dof_name,
       bool               isVectorField = false) const;
 
   //! Function to create evaluator QuadPointsToCellInterpolation
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructQuadPointsToCellInterpolationEvaluator(
-      const std::string&                  dof_name,
+      std::string const&                  dof_name,
       const Teuchos::RCP<PHX::DataLayout> qp_layout   = Teuchos::null,
       const Teuchos::RCP<PHX::DataLayout> cell_layout = Teuchos::null) const;
 
   //! Function to create evaluator QuadPointsToCellInterpolation
   Teuchos::RCP<PHX::Evaluator<Traits>>
   constructSideQuadPointsToSideInterpolationEvaluator(
-      const std::string& dof_name,
-      const std::string& sideSetName,
+      std::string const& dof_name,
+      std::string const& sideSetName,
       int const          fieldDim = 0) const;
 
   //! Function to create parameter list for construction of
@@ -727,7 +727,7 @@ class EvaluatorUtilsImpl : public EvaluatorUtilsBase<Traits>
       const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
                                                            intrepidBasisSide,
       const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubatureSide,
-      const std::string&                                   sideSetName,
+      std::string const&                                   sideSetName,
       const bool buildNormals = false) const;
 
  private:

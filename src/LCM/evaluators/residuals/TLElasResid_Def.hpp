@@ -140,7 +140,7 @@ TLElasResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename TLElasResid<EvalT, Traits>::ScalarT&
-TLElasResid<EvalT, Traits>::getValue(const std::string& n)
+TLElasResid<EvalT, Traits>::getValue(std::string const& n)
 {
   return zGrav;
 }

@@ -311,7 +311,7 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
       // copy data from the state manager to the LAMENT data structure
       for (int iVar = 0; iVar < numStateVariables; iVar++) {
-        const std::string& variableName =
+        std::string const& variableName =
             this->lamentMaterialModelStateVariableNames[iVar] + "_old";
         Albany::MDArray stateVar = (*workset.stateArrayPtr)[variableName];
         stateOld[iVar]           = stateVar(cell, qp);

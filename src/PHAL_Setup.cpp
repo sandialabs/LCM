@@ -40,7 +40,7 @@ Setup::init_problem_params(
 }
 
 void
-Setup::init_unsaved_param(const std::string& param)
+Setup::init_unsaved_param(std::string const& param)
 {
   if (_enableMemoizationForParams) {
     auto out = Teuchos::VerboseObjectBase::getDefaultOStream();
@@ -83,13 +83,13 @@ Setup::pre_eval()
 }
 
 void
-Setup::insert_eval(const std::string& eval)
+Setup::insert_eval(std::string const& eval)
 {
   _setupEvals->insert(eval);
 }
 
 bool
-Setup::contain_eval(const std::string& eval) const
+Setup::contain_eval(std::string const& eval) const
 {
   return _setupEvals->count(eval) > 0;
 }
@@ -179,7 +179,7 @@ Setup::print_fields(std::ostream& os) const
 }
 
 Teuchos::RCP<const StringSet>
-Setup::get_saved_fields(const std::string& eval) const
+Setup::get_saved_fields(std::string const& eval) const
 {
   if (_enableMemoizationForParams && !_unsavedParams->empty()) {
     // If a parameter has changed, use saved fields w/o parameter

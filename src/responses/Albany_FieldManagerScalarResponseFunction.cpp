@@ -149,7 +149,7 @@ FieldManagerScalarResponseFunction::postReg()
 {
   const auto phxSetup = application->getPhxSetup();
 
-  const std::string evalName =
+  std::string const evalName =
       PHAL::evalName<EvalT>("RFM", 0) + "_" + vis_response_name;
   phxSetup->insert_eval(evalName);
 
@@ -165,7 +165,7 @@ FieldManagerScalarResponseFunction::postReg()
 template <typename EvalT>
 void
 FieldManagerScalarResponseFunction::writePhalanxGraph(
-    const std::string& evalName)
+    std::string const& evalName)
 {
   if (vis_response_graph > 0) {
     const bool detail = (vis_response_graph > 1) ? true : false;
@@ -173,7 +173,7 @@ FieldManagerScalarResponseFunction::writePhalanxGraph(
         Teuchos::VerboseObjectBase::getDefaultOStream();
     *out << "Phalanx writing graphviz file for graph of " << evalName
          << " (detail = " << vis_response_graph << ")" << std::endl;
-    const std::string graphName = "phalanxGraph" + evalName;
+    std::string const graphName = "phalanxGraph" + evalName;
     *out << "Process using 'dot -Tpng -O " << graphName << std::endl;
     rfm->writeGraphvizFile<EvalT>(graphName, detail, detail);
 
@@ -206,7 +206,7 @@ FieldManagerScalarResponseFunction::evaluate(PHAL::Workset& workset)
        ws++) {
     if (element_block_index >= 0 && element_block_index != wsPhysIndex[ws])
       continue;
-    const std::string evalName =
+    std::string const evalName =
         PHAL::evalName<EvalT>("RFM", wsPhysIndex[ws]) + "_" + vis_response_name;
     application->loadWorksetBucketInfo<EvalT>(workset, ws, evalName);
     rfm->evaluateFields<EvalT>(workset);

@@ -97,7 +97,7 @@ void
 stk::rebalance::check_ownership(
     mesh::BulkData&          bulk_data,
     stk::mesh::EntityVector& entities,
-    const std::string&       msg)
+    std::string const&       msg)
 {
   const unsigned entity_iter_len = entities.size();
   std::cout << "P[" << bulk_data.parallel_rank()

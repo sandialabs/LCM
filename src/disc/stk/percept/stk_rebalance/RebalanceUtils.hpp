@@ -49,7 +49,7 @@ void
 check_ownership(
     mesh::BulkData&          bulk_data,
     stk::mesh::EntityVector& entities,
-    const std::string&       msg);
+    std::string const&       msg);
 
 double
 check_balance(

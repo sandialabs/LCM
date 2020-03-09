@@ -90,7 +90,7 @@ NodalDataVector::exportAddNodalDataVector()
 
 void
 NodalDataVector::getNDofsAndOffset(
-    const std::string& stateName,
+    std::string const& stateName,
     int&               offset,
     int&               ndofs) const
 {
@@ -136,7 +136,7 @@ NodalDataVector::saveNodalDataState(
 
 void
 NodalDataVector::saveNodalDataVector(
-    const std::string&                           name,
+    std::string const&                           name,
     const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vector,
     int const                                    offset) const
 {

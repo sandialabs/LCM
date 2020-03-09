@@ -65,7 +65,7 @@ Time<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename Time<EvalT, Traits>::ScalarT&
-Time<EvalT, Traits>::getValue(const std::string& n)
+Time<EvalT, Traits>::getValue(std::string const& n)
 {
   return timeValue;
 }

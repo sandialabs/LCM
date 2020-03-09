@@ -11,7 +11,7 @@ namespace PHAL {
 
 // Utility function to split a std::string by a delimiter, so far only used here
 static void
-split(const std::string& s, char delim, std::vector<std::string>& elems)
+split(std::string const& s, char delim, std::vector<std::string>& elems)
 {
   std::stringstream ss(s);
   std::string       item;

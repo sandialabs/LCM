@@ -10,7 +10,7 @@
 
 // Initialize statics
 
-const std::string Albany::DirichletTraits::bcParamsPl = "Dirichlet BCs";
-const std::string Albany::NeumannTraits::bcParamsPl   = "Neumann BCs";
+std::string const Albany::DirichletTraits::bcParamsPl = "Dirichlet BCs";
+std::string const Albany::NeumannTraits::bcParamsPl   = "Neumann BCs";
 
 BCUTILS_INSTANTIATE_TEMPLATE_CLASS(Albany::BCUtils)

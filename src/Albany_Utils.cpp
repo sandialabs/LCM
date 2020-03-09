@@ -135,7 +135,7 @@ AbsRowSum(
 }
 
 std::string
-strint(const std::string s, int const i, const char delim)
+strint(std::string const s, int const i, const char delim)
 {
   std::ostringstream ss;
   ss << s << delim << i;
@@ -143,7 +143,7 @@ strint(const std::string s, int const i, const char delim)
 }
 
 bool
-isValidInitString(const std::string& initString)
+isValidInitString(std::string const& initString)
 {
   // Make sure the first part of the string has the correct verbiage
   std::string verbiage("initial value ");
@@ -173,7 +173,7 @@ doubleToInitString(double val)
 }
 
 double
-initStringToDouble(const std::string& initString)
+initStringToDouble(std::string const& initString)
 {
   ALBANY_ASSERT(
       isValidInitString(initString),
@@ -187,7 +187,7 @@ initStringToDouble(const std::string& initString)
 
 void
 splitStringOnDelim(
-    const std::string&        s,
+    std::string const&        s,
     char                      delim,
     std::vector<std::string>& elems)
 {
@@ -288,7 +288,7 @@ template <>
 void
 writeMatrixMarket<const Tpetra_Map>(
     const Teuchos::RCP<const Tpetra_Map>& map,
-    const std::string&                    prefix,
+    std::string const&                    prefix,
     int const                             counter)
 {
   if (map.is_null()) { return; }
@@ -300,7 +300,7 @@ writeMatrixMarket<const Tpetra_Map>(
   }
   oss << ".mm";
 
-  const std::string& filename = oss.str();
+  std::string const& filename = oss.str();
 
   Tpetra::MatrixMarket::Writer<Tpetra_CrsMatrix>::writeMapFile(filename, *map);
 }
@@ -312,7 +312,7 @@ template <>
 void
 writeMatrixMarket<const Tpetra_Vector>(
     const Teuchos::RCP<const Tpetra_Vector>& v,
-    const std::string&                       prefix,
+    std::string const&                       prefix,
     int const                                counter)
 {
   if (v.is_null()) { return; }
@@ -325,7 +325,7 @@ writeMatrixMarket<const Tpetra_Vector>(
   }
   oss << ".mm";
 
-  const std::string& filename = oss.str();
+  std::string const& filename = oss.str();
 
   Tpetra::MatrixMarket::Writer<Tpetra_CrsMatrix>::writeDenseFile(filename, v);
 }
@@ -337,7 +337,7 @@ template <>
 void
 writeMatrixMarket<const Tpetra_MultiVector>(
     const Teuchos::RCP<const Tpetra_MultiVector>& mv,
-    const std::string&                            prefix,
+    std::string const&                            prefix,
     int const                                     counter)
 {
   if (mv.is_null()) { return; }
@@ -350,7 +350,7 @@ writeMatrixMarket<const Tpetra_MultiVector>(
   }
   oss << ".mm";
 
-  const std::string& filename = oss.str();
+  std::string const& filename = oss.str();
 
   Tpetra::MatrixMarket::Writer<Tpetra_CrsMatrix>::writeDenseFile(filename, mv);
 }
@@ -362,7 +362,7 @@ template <>
 void
 writeMatrixMarket<const Tpetra_CrsMatrix>(
     const Teuchos::RCP<const Tpetra_CrsMatrix>& A,
-    const std::string&                          prefix,
+    std::string const&                          prefix,
     int const                                   counter)
 {
   if (A.is_null()) { return; }
@@ -375,15 +375,15 @@ writeMatrixMarket<const Tpetra_CrsMatrix>(
   }
   oss << ".mm";
 
-  const std::string& filename = oss.str();
+  std::string const& filename = oss.str();
 
   Tpetra::MatrixMarket::Writer<Tpetra_CrsMatrix>::writeSparseFile(filename, A);
 }
 
 CmdLineArgs::CmdLineArgs(
-    const std::string& default_yaml_filename,
-    const std::string& default_yaml_filename2,
-    const std::string& default_yaml_filename3)
+    std::string const& default_yaml_filename,
+    std::string const& default_yaml_filename2,
+    std::string const& default_yaml_filename3)
     : yaml_filename(default_yaml_filename),
       yaml_filename2(default_yaml_filename2),
       yaml_filename3(default_yaml_filename3),
@@ -429,8 +429,8 @@ connect_vtune(int const p_rank)
 {
   std::stringstream cmd;
   pid_t             my_os_pid  = getpid();
-  const std::string vtune_loc  = "amplxe-cl";
-  const std::string output_dir = "./vtune/vtune.";
+  std::string const vtune_loc  = "amplxe-cl";
+  std::string const output_dir = "./vtune/vtune.";
   cmd << vtune_loc << " -collect hotspots -result-dir " << output_dir << p_rank
       << " -target-pid " << my_os_pid << " &";
   if (p_rank == 0) std::cout << cmd.str() << std::endl;

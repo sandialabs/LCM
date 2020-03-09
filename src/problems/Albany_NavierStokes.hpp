@@ -102,7 +102,7 @@ class NavierStokes : public AbstractProblem
   void
   getVariableType(
       Teuchos::ParameterList& paramList,
-      const std::string&      defaultType,
+      std::string const&      defaultType,
       NS_VAR_TYPE&            variableType,
       bool&                   haveVariable,
       bool&                   haveEquation);

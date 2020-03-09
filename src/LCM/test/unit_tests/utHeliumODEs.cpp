@@ -223,7 +223,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
       stateMgr.getResidResponseIDsToRequire(element_block_name);
   std::vector<std::string>::const_iterator it;
   for (it = responseIDs.begin(); it != responseIDs.end(); it++) {
-    const std::string&                              responseID = *it;
+    std::string const&                              responseID = *it;
     PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT> res_response_tag(
         responseID, dummy);
     state_field_manager.requireField<PHAL::AlbanyTraits::Residual>(

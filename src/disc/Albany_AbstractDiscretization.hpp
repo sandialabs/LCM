@@ -55,15 +55,15 @@ class AbstractDiscretization
 
   //! Get Field node vector space (owned and overlapped)
   virtual Teuchos::RCP<Thyra_VectorSpace const>
-  getNodeVectorSpace(const std::string& field_name) const = 0;
+  getNodeVectorSpace(std::string const& field_name) const = 0;
   virtual Teuchos::RCP<Thyra_VectorSpace const>
-  getOverlapNodeVectorSpace(const std::string& field_name) const = 0;
+  getOverlapNodeVectorSpace(std::string const& field_name) const = 0;
 
   //! Get Field vector space (owned and overlapped)
   virtual Teuchos::RCP<Thyra_VectorSpace const>
-  getVectorSpace(const std::string& field_name) const = 0;
+  getVectorSpace(std::string const& field_name) const = 0;
   virtual Teuchos::RCP<Thyra_VectorSpace const>
-  getOverlapVectorSpace(const std::string& field_name) const = 0;
+  getOverlapVectorSpace(std::string const& field_name) const = 0;
 
   //! Create a Jacobian operator (owned and overlapped)
   virtual Teuchos::RCP<Thyra_LinearOp>
@@ -96,15 +96,15 @@ class AbstractDiscretization
   //! Get IDArray for (Ws, Local Node, nComps) -> (local) NodeLID, works for
   //! both scalar and vector fields
   virtual const std::vector<IDArray>&
-  getElNodeEqID(const std::string& field_name) const = 0;
+  getElNodeEqID(std::string const& field_name) const = 0;
 
   //! Get Dof Manager of field field_name
   virtual const NodalDOFManager&
-  getDOFManager(const std::string& field_name) const = 0;
+  getDOFManager(std::string const& field_name) const = 0;
 
   //! Get Dof Manager of field field_name
   virtual const NodalDOFManager&
-  getOverlapDOFManager(const std::string& field_name) const = 0;
+  getOverlapDOFManager(std::string const& field_name) const = 0;
 
   //! Retrieve coodinate ptr_field (ws, el, node)
   virtual const WorksetArray<
@@ -252,11 +252,11 @@ class AbstractDiscretization
   virtual void
   setResidualField(Thyra_Vector const& residual) = 0;
   virtual void
-  getField(Thyra_Vector& field_vector, const std::string& field_name) const = 0;
+  getField(Thyra_Vector& field_vector, std::string const& field_name) const = 0;
   virtual void
   setField(
       Thyra_Vector const& field_vector,
-      const std::string&  field_name,
+      std::string const&  field_name,
       bool                overlapped) = 0;
 
   // --- Methods to write solution in the output file --- //

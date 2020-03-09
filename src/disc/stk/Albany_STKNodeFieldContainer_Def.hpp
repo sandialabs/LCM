@@ -18,7 +18,7 @@ namespace Albany {
 
 Teuchos::RCP<AbstractNodeFieldContainer>
 buildSTKNodeField(
-    const std::string&                             name,
+    std::string const&                             name,
     const std::vector<PHX::DataLayout::size_type>& dim,
     const Teuchos::RCP<stk::mesh::MetaData>&       metaData,
     const bool                                     output)
@@ -47,7 +47,7 @@ buildSTKNodeField(
 
 template <typename DataType, unsigned ArrayDim, class traits>
 STKNodeField<DataType, ArrayDim, traits>::STKNodeField(
-    const std::string&                             name_,
+    std::string const&                             name_,
     const std::vector<PHX::DataLayout::size_type>& dims_,
     const Teuchos::RCP<stk::mesh::MetaData>&       metaData_,
     const bool                                     output)

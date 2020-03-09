@@ -223,7 +223,7 @@ ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(
 //------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename ConstitutiveModelParameters<EvalT, Traits>::ScalarT&
-ConstitutiveModelParameters<EvalT, Traits>::getValue(const std::string& n)
+ConstitutiveModelParameters<EvalT, Traits>::getValue(std::string const& n)
 {
   for (auto& pair : constant_value_map_) {
     if (n == pair.first) { return constant_value_map_[pair.first]; }
@@ -246,7 +246,7 @@ ConstitutiveModelParameters<EvalT, Traits>::getValue(const std::string& n)
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelParameters<EvalT, Traits>::parseParameters(
-    const std::string&      n,
+    std::string const&      n,
     Teuchos::ParameterList& p,
     Teuchos::RCP<ParamLib>  paramLib)
 {

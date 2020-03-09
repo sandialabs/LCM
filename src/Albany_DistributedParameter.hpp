@@ -26,7 +26,7 @@ class DistributedParameter
 
   //! Constructor
   DistributedParameter(
-      const std::string&                           param_name_,
+      std::string const&                           param_name_,
       Teuchos::RCP<Thyra_VectorSpace const> const& owned_vs_,
       Teuchos::RCP<Thyra_VectorSpace const> const& overlapped_vs_)
       : param_name(param_name_)
@@ -49,7 +49,7 @@ class DistributedParameter
   virtual ~DistributedParameter() {}
 
   //! Get name
-  const std::string&
+  std::string const&
   name() const
   {
     return param_name;

@@ -36,7 +36,7 @@ class Setup
 
   //! Pass unsaved parameter into Setup to change unsaved/saved fields
   void
-  init_unsaved_param(const std::string& param);
+  init_unsaved_param(std::string const& param);
 
   //! Check if memoization is activated
   bool
@@ -52,11 +52,11 @@ class Setup
 
   //! Insert evaluation type name
   void
-  insert_eval(const std::string& eval);
+  insert_eval(std::string const& eval);
 
   //! Determine if evaluation type name exists
   bool
-  contain_eval(const std::string& eval) const;
+  contain_eval(std::string const& eval) const;
 
   //! Store MDField identifiers in order to identify field dependencies in the
   //! FieldManager "saved" is used to specify whether an MDField should be saved
@@ -88,7 +88,7 @@ class Setup
 
   //! Get list of saved MDFields
   Teuchos::RCP<const StringSet>
-  get_saved_fields(const std::string& eval) const;
+  get_saved_fields(std::string const& eval) const;
 
  private:
   //! Update list of saved/unsaved MDFields based on unsaved MDFields and field

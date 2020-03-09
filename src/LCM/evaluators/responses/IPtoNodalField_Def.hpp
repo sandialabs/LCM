@@ -170,12 +170,12 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::IPtoNodalField(
   // Initialize manager.
   bool first;
   {
-    const std::string key_suffix =
+    std::string const key_suffix =
         field_name_prefix +
         (this->number_of_fields_ > 0 ?
              plist->get<std::string>(Albany::strint("IP Field Name", 0)) :
              "");
-    const std::string key = "IPtoNodalField_" + key_suffix;
+    std::string const key = "IPtoNodalField_" + key_suffix;
     const Teuchos::RCP<Adapt::NodalDataBase> ndb =
         this->p_state_mgr_->getNodalDataBase();
     first = !ndb->isManagerRegistered(key);

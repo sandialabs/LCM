@@ -65,8 +65,8 @@ convert_param_to_string(
 
   for (; from_iter != from_end; ++from_iter) {
     std::string       s;
-    const std::string name  = from.name(from_iter);
-    const std::string entry = from.entry(from_iter).getValue(&s);
+    std::string const name  = from.name(from_iter);
+    std::string const entry = from.entry(from_iter).getValue(&s);
     std::pair<std::string, std::string> p(name, entry);
 
     to.push_back(p);
@@ -516,16 +516,16 @@ stkCallback_Edge_List(
 
 }  // namespace
 
-const std::string Zoltan::m_zoltanparametersname_  = "Zoltan_Parameters";
-const std::string Zoltan::m_defaultparametersname_ = "DEFAULT";
+std::string const Zoltan::m_zoltanparametersname_  = "Zoltan_Parameters";
+std::string const Zoltan::m_defaultparametersname_ = "DEFAULT";
 
-const std::string
+std::string const
 Zoltan::zoltan_parameters_name()
 {
   return m_zoltanparametersname_;
 }
 
-const std::string
+std::string const
 Zoltan::default_parameters_name()
 {
   return m_defaultparametersname_;
@@ -574,7 +574,7 @@ Zoltan::Zoltan(
     ParallelMachine      pm,
     const unsigned       ndim,
     Parameters&          rebal_region_parameters,
-    const std::string    parameters_name)
+    std::string const    parameters_name)
     : GeomDecomp(pm),
       m_bulk(bulk),
       m_zoltan_id_(NULL),
@@ -799,7 +799,7 @@ Zoltan::num_moid() const
   return m_mesh_information_.mesh_entities.size();
 }
 
-const std::string&
+std::string const&
 Zoltan::parameter_entry_name() const
 {
   return m_parameter_entry_name_;
@@ -1048,7 +1048,7 @@ Zoltan::convert_names_and_values(const Parameters& from, Parameters& to)
   // NOTE: "LOAD BALANCING METHOD" default
   // is also hard coded in fill_default_values();
   std::string       algorithm;
-  const std::string keyname("LOAD BALANCING METHOD");
+  std::string const keyname("LOAD BALANCING METHOD");
   if (from.isParameter(keyname))
     algorithm = from.get<std::string>(keyname);
   else

@@ -68,7 +68,7 @@ enableFROSch(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 namespace Albany {
 
 SolverFactory::SolverFactory(
-    const std::string&                      inputFile,
+    std::string const&                      inputFile,
     const Teuchos::RCP<const Teuchos_Comm>& comm)
     : out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
@@ -157,7 +157,7 @@ SolverFactory::createAndGetAlbanyApp(
 {
   const Teuchos::RCP<Teuchos::ParameterList> problemParams =
       Teuchos::sublist(appParams, "Problem");
-  const std::string solutionMethod =
+  std::string const solutionMethod =
       problemParams->get("Solution Method", "Steady");
 
   bool const is_schwarz = solutionMethod == "Coupled Schwarz" ||
@@ -291,11 +291,11 @@ SolverFactory::createAlbanyAppAndModel(
   const Teuchos::RCP<Teuchos::ParameterList> piroParams =
       Teuchos::sublist(appParams, "Piro");
   if (!piroParams->getPtr<std::string>("Solver Type")) {
-    const std::string solutionMethod =
+    std::string const solutionMethod =
         problemParams->get("Solution Method", "Steady");
 
     /* TODO: this should be a boolean, not a string ! */
-    const std::string secondOrder = problemParams->get("Second Order", "No");
+    std::string const secondOrder = problemParams->get("Second Order", "No");
     ALBANY_PANIC(
         secondOrder != "No",
         "Second Order is not supported"

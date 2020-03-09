@@ -20,7 +20,7 @@ struct NodeFieldSize
 };
 
 typedef std::vector<NodeFieldSize>               NodeFieldSizeVector;
-typedef std::map<const std::string, std::size_t> NodeFieldSizeMap;
+typedef std::map<std::string const, std::size_t> NodeFieldSizeMap;
 
 }  // namespace Adapt
 

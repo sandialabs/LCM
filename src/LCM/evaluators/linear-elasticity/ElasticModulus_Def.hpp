@@ -142,7 +142,7 @@ ElasticModulus<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename ElasticModulus<EvalT, Traits>::ScalarT&
-ElasticModulus<EvalT, Traits>::getValue(const std::string& n)
+ElasticModulus<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Elastic Modulus")
     return constant_value;

@@ -341,7 +341,7 @@ class MDFieldMemoizer
 //! Return field manager name and evaluation type string
 template <typename EvalT>
 inline std::string
-evalName(const std::string& fmName, int const& ps)
+evalName(std::string const& fmName, int const& ps)
 {
   std::string evalName = PHX::print<EvalT>();
   evalName.erase(evalName.begin());

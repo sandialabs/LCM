@@ -27,7 +27,7 @@ class SolverFactory
  public:
   //! Default constructor
   SolverFactory(
-      const std::string&                      inputfile,
+      std::string const&                      inputfile,
       const Teuchos::RCP<const Teuchos_Comm>& comm);
 
   SolverFactory(

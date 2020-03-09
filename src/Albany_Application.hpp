@@ -265,7 +265,7 @@ class Application
 
   //! Provide access to shapeParameters -- no AD
   PHAL::AlbanyTraits::Residual::ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
 
   //! Class to manage state variables (a.k.a. history)
   StateManager&
@@ -339,7 +339,7 @@ class Application
   loadWorksetBucketInfo(
       PHAL::Workset&     workset,
       int const&         ws,
-      const std::string& evalName);
+      std::string const& evalName);
 
   void
   loadBasicWorksetInfo(PHAL::Workset& workset, double current_time);
@@ -401,7 +401,7 @@ class Application
   void
   writePhalanxGraph(
       Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm,
-      const std::string&                                  evalName,
+      std::string const&                                  evalName,
       int const&                                          phxGraphVisDetail);
 
  public:
@@ -705,7 +705,7 @@ void
 Application::loadWorksetBucketInfo(
     PHAL::Workset&     workset,
     int const&         ws,
-    const std::string& evalName)
+    std::string const& evalName)
 {
   auto const& wsElNodeEqID            = disc->getWsElNodeEqID();
   auto const& wsElNodeID              = disc->getWsElNodeID();

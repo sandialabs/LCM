@@ -52,7 +52,7 @@ Density<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename Density<EvalT, Traits>::ScalarT&
-Density<EvalT, Traits>::getValue(const std::string& n)
+Density<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Density") { return constant_value; }
 

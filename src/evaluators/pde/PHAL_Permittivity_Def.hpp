@@ -156,7 +156,7 @@ Permittivity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename Permittivity<EvalT, Traits>::ScalarT&
-Permittivity<EvalT, Traits>::getValue(const std::string& n)
+Permittivity<EvalT, Traits>::getValue(std::string const& n)
 {
   if (is_constant) { return constant_value; }
 

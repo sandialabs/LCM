@@ -81,7 +81,7 @@ CahnHillChemTerm<EvalT, Traits>::evaluateFields(
 
 template <typename EvalT, typename Traits>
 typename CahnHillChemTerm<EvalT, Traits>::ScalarT&
-CahnHillChemTerm<EvalT, Traits>::getValue(const std::string& n)
+CahnHillChemTerm<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "b")
 

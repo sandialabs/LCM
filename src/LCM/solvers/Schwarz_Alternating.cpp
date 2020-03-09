@@ -318,11 +318,11 @@ SchwarzAlternating::get_p_names(int) const
 //
 //
 //
-Teuchos::ArrayView<const std::string>
+Teuchos::ArrayView<std::string const>
 SchwarzAlternating::get_g_names(int) const
 {
   ALBANY_ABORT("not implemented");
-  return Teuchos::ArrayView<const std::string>(Teuchos::null);
+  return Teuchos::ArrayView<std::string const>(Teuchos::null);
 }
 
 //

@@ -54,7 +54,7 @@ class GatherScalarNodalParameterBase
   typedef typename EvalT::ParamScalarT ParamScalarT;
 
   const std::size_t numNodes;
-  const std::string param_name;
+  std::string const param_name;
 
   // Output:
   PHX::MDField<ParamScalarT, Cell, Node> val;

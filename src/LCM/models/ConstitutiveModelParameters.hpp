@@ -58,14 +58,14 @@ class ConstitutiveModelParameters
   /// Sacado method to access parameter values
   ///
   ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
 
   ///
   /// Helper method to parse a parameter
   ///
   void
   parseParameters(
-      const std::string&      n,
+      std::string const&      n,
       Teuchos::ParameterList& pl,
       Teuchos::RCP<ParamLib>  paramLib);
 

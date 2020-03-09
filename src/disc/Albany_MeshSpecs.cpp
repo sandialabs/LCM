@@ -22,7 +22,7 @@ MeshSpecsStruct::MeshSpecsStruct(
     std::vector<std::string>   nsNames_,
     std::vector<std::string>   ssNames_,
     int                        worksetSize_,
-    const std::string          ebName_,
+    std::string const          ebName_,
     std::map<std::string, int> ebNameToIndex_,
     bool                       interleavedOrdering_,
     const bool                 sepEvalsByEB_,

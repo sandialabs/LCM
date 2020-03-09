@@ -125,7 +125,7 @@ class ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>
  private:
   typedef typename PHAL::AlbanyTraits::Residual::ParamScalarT ParamScalarT;
   Teuchos::RCP<PHX::Tag<ParamScalarT>>                        nodal_field_tag;
-  static const std::string                                    className;
+  static std::string const                                    className;
 };
 
 template <typename Traits>
@@ -147,7 +147,7 @@ class ScatterScalarExtruded2DNodalParameter<
  private:
   typedef typename PHAL::AlbanyTraits::Residual::ParamScalarT ParamScalarT;
   Teuchos::RCP<PHX::Tag<ParamScalarT>>                        nodal_field_tag;
-  static const std::string                                    className;
+  static std::string const                                    className;
   int                                                         fieldLevel;
 };
 

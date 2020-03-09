@@ -54,12 +54,12 @@ ReplaceDiagonalEntries(
 //! strint("dog",2,' ') = "dog 2"
 //! The default delimiter is ' '. Potential delimiters include '_' - "dog_2"
 std::string
-strint(const std::string s, int const i, const char delim = ' ');
+strint(std::string const s, int const i, const char delim = ' ');
 
 //! Returns true of the given string is a valid initialization string of the
 //! format "initial value 1.54"
 bool
-isValidInitString(const std::string& initString);
+isValidInitString(std::string const& initString);
 
 //! Converts a double to an initialization string:  doubleToInitString(1.54) =
 //! "initial value 1.54"
@@ -69,12 +69,12 @@ doubleToInitString(double val);
 //! Converts an init string to a double:  initStringToDouble("initial value
 //! 1.54") = 1.54
 double
-initStringToDouble(const std::string& initString);
+initStringToDouble(std::string const& initString);
 
 //! Splits a std::string on a delimiter
 void
 splitStringOnDelim(
-    const std::string&        s,
+    std::string const&        s,
     char                      delim,
     std::vector<std::string>& elems);
 
@@ -129,14 +129,14 @@ template <typename LinearAlgebraObjectType>
 void
 writeMatrixMarket(
     const Teuchos::RCP<LinearAlgebraObjectType>& A,
-    const std::string&                           prefix,
+    std::string const&                           prefix,
     int const                                    counter = -1);
 
 template <typename LinearAlgebraObjectType>
 void
 writeMatrixMarket(
     const Teuchos::Array<Teuchos::RCP<LinearAlgebraObjectType>>& x,
-    const std::string&                                           prefix,
+    std::string const&                                           prefix,
     int const                                                    counter = -1)
 {
   for (auto i = 0; i < x.size(); ++i) {
@@ -144,7 +144,7 @@ writeMatrixMarket(
 
     oss << prefix << '-' << std::setfill('0') << std::setw(2) << i;
 
-    const std::string& new_prefix = oss.str();
+    std::string const& new_prefix = oss.str();
 
     writeMatrixMarket(x[i].getConst(), new_prefix, counter);
   }
@@ -162,9 +162,9 @@ struct CmdLineArgs
   bool        vtune;
 
   CmdLineArgs(
-      const std::string& default_yaml_filename  = "input.yaml",
-      const std::string& default_yaml_filename2 = "",
-      const std::string& default_yaml_filename3 = "");
+      std::string const& default_yaml_filename  = "input.yaml",
+      std::string const& default_yaml_filename2 = "",
+      std::string const& default_yaml_filename3 = "");
   void
   parse_cmdline(int argc, char** argv, std::ostream& os);
 };

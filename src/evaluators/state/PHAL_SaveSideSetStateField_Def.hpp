@@ -182,7 +182,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   // Establishing the kind of field layout
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
-  const std::string& tag2 =
+  std::string const& tag2 =
       dims.size() > 2 ? field.fieldTag().dataLayout().name(2) : "";
   ALBANY_PANIC(
       dims.size() > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim",

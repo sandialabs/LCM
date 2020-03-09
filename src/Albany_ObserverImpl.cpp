@@ -59,7 +59,7 @@ ObserverImpl::observeSolution(
 }
 
 void
-ObserverImpl::parameterChanged(const std::string& param)
+ObserverImpl::parameterChanged(std::string const& param)
 {
   //! If a parameter has changed in value, saved/unsaved fields must be updated
   auto out = Teuchos::VerboseObjectBase::getDefaultOStream();

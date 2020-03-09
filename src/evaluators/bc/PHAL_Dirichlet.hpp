@@ -50,7 +50,7 @@ class DirichletBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   evaluateFields(typename Traits::EvalData d) = 0;
 
   virtual ScalarT&
-  getValue(const std::string& /* n */)
+  getValue(std::string const& /* n */)
   {
     return value;
   }

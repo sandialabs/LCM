@@ -118,7 +118,7 @@ BiotModulus<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename BiotModulus<EvalT, Traits>::ScalarT&
-BiotModulus<EvalT, Traits>::getValue(const std::string& n)
+BiotModulus<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Biot Modulus")
     return constant_value;

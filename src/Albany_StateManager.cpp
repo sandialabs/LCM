@@ -17,11 +17,11 @@ Albany::StateManager::StateManager()
 
 Teuchos::RCP<Teuchos::ParameterList>
 Albany::StateManager::registerStateVariable(
-    const std::string&                   name,
+    std::string const&                   name,
     const Teuchos::RCP<PHX::DataLayout>& dl,
     const Teuchos::RCP<PHX::DataLayout>& dummy,
-    const std::string&                   ebName,
-    const std::string&                   init_type,
+    std::string const&                   ebName,
+    std::string const&                   init_type,
     double const                         init_val,
     const bool                           registerOldState)
 {
@@ -31,14 +31,14 @@ Albany::StateManager::registerStateVariable(
 
 Teuchos::RCP<Teuchos::ParameterList>
 Albany::StateManager::registerStateVariable(
-    const std::string&                   stateName,
+    std::string const&                   stateName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
     const Teuchos::RCP<PHX::DataLayout>& dummy,
-    const std::string&                   ebName,
-    const std::string&                   init_type,
+    std::string const&                   ebName,
+    std::string const&                   init_type,
     double const                         init_val,
     const bool                           registerOldState,
-    const std::string&                   fieldName)
+    std::string const&                   fieldName)
 {
   const bool bOutputToExodus = true;
   registerStateVariable(
@@ -55,8 +55,8 @@ Albany::StateManager::registerStateVariable(
   Teuchos::RCP<Teuchos::ParameterList> p =
       Teuchos::rcp(new Teuchos::ParameterList(
           "Save or Load State " + stateName + " to/from field " + fieldName));
-  p->set<const std::string>("State Name", stateName);
-  p->set<const std::string>("Field Name", fieldName);
+  p->set<std::string const>("State Name", stateName);
+  p->set<std::string const>("Field Name", fieldName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout", dummy);
   return p;
@@ -64,11 +64,11 @@ Albany::StateManager::registerStateVariable(
 
 Teuchos::RCP<Teuchos::ParameterList>
 Albany::StateManager::registerStateVariable(
-    const std::string&                   stateName,
+    std::string const&                   stateName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
     const Teuchos::RCP<PHX::DataLayout>& dummy,
-    const std::string&                   ebName,
-    const std::string&                   init_type,
+    std::string const&                   ebName,
+    std::string const&                   init_type,
     double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus)
@@ -87,8 +87,8 @@ Albany::StateManager::registerStateVariable(
   Teuchos::RCP<Teuchos::ParameterList> p =
       Teuchos::rcp(new Teuchos::ParameterList(
           "Save or Load State " + stateName + " to/from field " + stateName));
-  p->set<const std::string>("State Name", stateName);
-  p->set<const std::string>("Field Name", stateName);
+  p->set<std::string const>("State Name", stateName);
+  p->set<std::string const>("Field Name", stateName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout", dummy);
   return p;
@@ -96,11 +96,11 @@ Albany::StateManager::registerStateVariable(
 
 Teuchos::RCP<Teuchos::ParameterList>
 Albany::StateManager::registerNodalVectorStateVariable(
-    const std::string&                   stateName,
+    std::string const&                   stateName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
     const Teuchos::RCP<PHX::DataLayout>& dummy,
-    const std::string&                   ebName,
-    const std::string&                   init_type,
+    std::string const&                   ebName,
+    std::string const&                   init_type,
     double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus)
@@ -119,8 +119,8 @@ Albany::StateManager::registerNodalVectorStateVariable(
   Teuchos::RCP<Teuchos::ParameterList> p =
       Teuchos::rcp(new Teuchos::ParameterList(
           "Save or Load State " + stateName + " to/from field " + stateName));
-  p->set<const std::string>("State Name", stateName);
-  p->set<const std::string>("Field Name", stateName);
+  p->set<std::string const>("State Name", stateName);
+  p->set<std::string const>("Field Name", stateName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout", dummy);
   return p;
@@ -128,12 +128,12 @@ Albany::StateManager::registerNodalVectorStateVariable(
 
 Teuchos::RCP<Teuchos::ParameterList>
 Albany::StateManager::registerStateVariable(
-    const std::string&                   stateName,
+    std::string const&                   stateName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
-    const std::string&                   ebName,
+    std::string const&                   ebName,
     const bool                           outputToExodus,
     StateStruct::MeshFieldEntity const*  fieldEntity,
-    const std::string&                   meshPartName)
+    std::string const&                   meshPartName)
 {
   registerStateVariable(
       stateName,
@@ -151,17 +151,17 @@ Albany::StateManager::registerStateVariable(
   Teuchos::RCP<Teuchos::ParameterList> p =
       Teuchos::rcp(new Teuchos::ParameterList(
           "Save or Load State " + stateName + " to/from field " + stateName));
-  p->set<const std::string>("State Name", stateName);
-  p->set<const std::string>("Field Name", stateName);
+  p->set<std::string const>("State Name", stateName);
+  p->set<std::string const>("Field Name", stateName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl);
   return p;
 }
 
 void
 Albany::StateManager::registerStateVariable(
-    const std::string&                   stateName,
+    std::string const&                   stateName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
-    const std::string&                   init_type)
+    std::string const&                   init_type)
 {
   // Grab the ebName
   std::string                             ebName;
@@ -174,16 +174,16 @@ Albany::StateManager::registerStateVariable(
 
 void
 Albany::StateManager::registerStateVariable(
-    const std::string&                   stateName,
+    std::string const&                   stateName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
-    const std::string&                   ebName,
-    const std::string&                   init_type,
+    std::string const&                   ebName,
+    std::string const&                   init_type,
     double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus,
-    const std::string&                   responseIDtoRequire,
+    std::string const&                   responseIDtoRequire,
     StateStruct::MeshFieldEntity const*  fieldEntity,
-    const std::string&                   meshPartName)
+    std::string const&                   meshPartName)
 {
   ALBANY_ASSERT(stateName != "", "State Name cannot be the empty string");
   ALBANY_PANIC(stateVarsAreAllocated);
@@ -289,14 +289,14 @@ Albany::StateManager::registerStateVariable(
 
 void
 Albany::StateManager::registerNodalVectorStateVariable(
-    const std::string&                   stateName,
+    std::string const&                   stateName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
-    const std::string&                   ebName,
-    const std::string&                   init_type,
+    std::string const&                   ebName,
+    std::string const&                   init_type,
     double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus,
-    const std::string&                   responseIDtoRequire)
+    std::string const&                   responseIDtoRequire)
 
 {
   ALBANY_PANIC(stateVarsAreAllocated);
@@ -414,14 +414,14 @@ Albany::StateManager::registerNodalVectorStateVariable(
 
 Teuchos::RCP<Teuchos::ParameterList>
 Albany::StateManager::registerSideSetStateVariable(
-    const std::string&                   sideSetName,
-    const std::string&                   stateName,
-    const std::string&                   fieldName,
+    std::string const&                   sideSetName,
+    std::string const&                   stateName,
+    std::string const&                   fieldName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
-    const std::string&                   ebName,
+    std::string const&                   ebName,
     const bool                           outputToExodus,
     StateStruct::MeshFieldEntity const*  fieldEntity,
-    const std::string&                   meshPartName)
+    std::string const&                   meshPartName)
 
 {
   return registerSideSetStateVariable(
@@ -441,18 +441,18 @@ Albany::StateManager::registerSideSetStateVariable(
 
 Teuchos::RCP<Teuchos::ParameterList>
 Albany::StateManager::registerSideSetStateVariable(
-    const std::string&                   sideSetName,
-    const std::string&                   stateName,
-    const std::string&                   fieldName,
+    std::string const&                   sideSetName,
+    std::string const&                   stateName,
+    std::string const&                   fieldName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
-    const std::string&                   ebName,
-    const std::string&                   init_type,
+    std::string const&                   ebName,
+    std::string const&                   init_type,
     double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus,
-    const std::string&                   responseIDtoRequire,
+    std::string const&                   responseIDtoRequire,
     StateStruct::MeshFieldEntity const*  fieldEntity,
-    const std::string&                   meshPartName)
+    std::string const&                   meshPartName)
 {
   ALBANY_PANIC(stateVarsAreAllocated);
   using Albany::StateStruct;
@@ -462,9 +462,9 @@ Albany::StateManager::registerSideSetStateVariable(
       Teuchos::rcp(new Teuchos::ParameterList(
           "Save Side Set State " + stateName + " to/from Side Set Field " +
           fieldName));
-  p->set<const std::string>("State Name", stateName);
-  p->set<const std::string>("Field Name", fieldName);
-  p->set<const std::string>("Side Set Name", sideSetName);
+  p->set<std::string const>("State Name", stateName);
+  p->set<std::string const>("Field Name", fieldName);
+  p->set<std::string const>("Side Set Name", sideSetName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("Field Layout", dl);
 
   if (sideSetStatesToStore[sideSetName][ebName].find(stateName) !=
@@ -678,7 +678,7 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
   *out << std::endl;
 
   for (unsigned int i = 0; i < stateInfo->size(); i++) {
-    const std::string stateName = (*stateInfo)[i]->name;
+    std::string const stateName = (*stateInfo)[i]->name;
 
     switch ((*stateInfo)[i]->entity) {
       case Albany::StateStruct::WorksetValue:
@@ -838,8 +838,8 @@ Albany::StateManager::updateStates()
 
   for (unsigned int i = 0; i < stateInfo->size(); i++) {
     if ((*stateInfo)[i]->saveOldState) {
-      const std::string stateName     = (*stateInfo)[i]->name;
-      const std::string stateName_old = stateName + "_old";
+      std::string const stateName     = (*stateInfo)[i]->name;
+      std::string const stateName_old = stateName + "_old";
 
       switch ((*stateInfo)[i]->entity) {
         case Albany::StateStruct::NodalDataToElemNode:
@@ -954,9 +954,9 @@ Albany::StateManager::doSetStateArrays(
   // For each workset, loop over registered states
 
   for (unsigned int i = 0; i < stateInfoPtr->size(); i++) {
-    const std::string& stateName    = (*stateInfoPtr)[i]->name;
-    const std::string& init_type    = (*stateInfoPtr)[i]->initType;
-    const std::string& ebName       = (*stateInfoPtr)[i]->ebName;
+    std::string const& stateName    = (*stateInfoPtr)[i]->name;
+    std::string const& init_type    = (*stateInfoPtr)[i]->initType;
+    std::string const& ebName       = (*stateInfoPtr)[i]->ebName;
     double const       init_val     = (*stateInfoPtr)[i]->initValue;
     bool               have_restart = (*stateInfoPtr)[i]->restartDataAvailable;
     Albany::StateStruct* pParentStruct = (*stateInfoPtr)[i]->pParentStateStruct;

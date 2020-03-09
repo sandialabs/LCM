@@ -62,7 +62,7 @@ class SaveNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::string              xName;
   std::string              xdotName;
   std::string              xdotdotName;
-  static const std::string className;
+  static std::string const className;
 
   Teuchos::RCP<PHX::Tag<ScalarT>> nodal_field_tag;
   Albany::StateManager*           pStateMgr;

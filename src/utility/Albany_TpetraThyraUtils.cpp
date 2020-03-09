@@ -13,7 +13,7 @@ namespace Albany {
 
 struct BadThyraTpetraCast : public std::bad_cast
 {
-  BadThyraTpetraCast(const std::string& msg) : m_msg(msg) {}
+  BadThyraTpetraCast(std::string const& msg) : m_msg(msg) {}
 
   const char*
   what() const noexcept
@@ -22,7 +22,7 @@ struct BadThyraTpetraCast : public std::bad_cast
   }
 
  private:
-  const std::string& m_msg;
+  std::string const& m_msg;
 };
 
 // ============ Tpetra->Thyra conversion routines ============ //

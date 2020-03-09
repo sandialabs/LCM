@@ -47,7 +47,7 @@ class PiroObserver : public Piro::ObserverBase<ST>
   observeSolution(const Thyra_MultiVector& solution, const ST stamp);
 
   virtual void
-  parameterChanged(const std::string& param);
+  parameterChanged(std::string const& param);
 
  private:
   void

@@ -56,7 +56,7 @@ class SchwarzAlternating : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   Teuchos::RCP<Teuchos::Array<std::string> const>
   get_p_names(int l) const;
 
-  Teuchos::ArrayView<const std::string>
+  Teuchos::ArrayView<std::string const>
   get_g_names(int j) const;
 
   Thyra::ModelEvaluatorBase::InArgs<ST>

@@ -142,7 +142,7 @@ class GeomDecomp : public Partition
    */
 
   static bool
-  confirm(const std::string& param_set_name);
+  confirm(std::string const& param_set_name);
 };
 
 /** \} */

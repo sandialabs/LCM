@@ -451,7 +451,7 @@ GenericSTKMeshStruct::cullSubsetParts(
     const stk::mesh::PartVector& subsets = it->second->subsets();
 
     for (p = subsets.begin(); p != subsets.end(); ++p) {
-      const std::string& n = (*p)->name();
+      std::string const& n = (*p)->name();
       //      std::cout << "Erasing: " << n << std::endl;
       partVec.erase(n);  // erase it if it is in the base map
     }
@@ -851,7 +851,7 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
     int                                  sideDim = this->numDim - 1;
     for (int i(0); i < sideSets.size(); ++i) {
       Teuchos::RCP<AbstractMeshStruct> ss_mesh;
-      const std::string&               ss_name = sideSets[i];
+      std::string const&               ss_name = sideSets[i];
       params_ss =
           Teuchos::rcp(new Teuchos::ParameterList(ssd_list.sublist(ss_name)));
       if (!params_ss->isParameter("Number Of Time Derivatives"))
@@ -991,7 +991,7 @@ GenericSTKMeshStruct::finalizeSideSetMeshStructs(
 
 void
 GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
-    const std::string&              sideSetName,
+    std::string const&              sideSetName,
     std::map<GO, GO>&               sideMap,
     std::map<GO, std::vector<int>>& sideNodeMap)
 {
@@ -1499,7 +1499,7 @@ GenericSTKMeshStruct::loadRequiredInputFields(
 
 void
 GenericSTKMeshStruct::loadField(
-    const std::string&                        field_name,
+    std::string const&                        field_name,
     const Teuchos::ParameterList&             field_params,
     Teuchos::RCP<Thyra_MultiVector>&          field_mv,
     const CombineAndScatterManager&           cas_manager,
@@ -1609,7 +1609,7 @@ GenericSTKMeshStruct::loadField(
 
 void
 GenericSTKMeshStruct::fillField(
-    const std::string&                           field_name,
+    std::string const&                           field_name,
     const Teuchos::ParameterList&                field_params,
     Teuchos::RCP<Thyra_MultiVector>&             field_mv,
     Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
@@ -1741,7 +1741,7 @@ GenericSTKMeshStruct::fillField(
 
 void
 GenericSTKMeshStruct::computeField(
-    const std::string&                           field_name,
+    std::string const&                           field_name,
     const Teuchos::ParameterList&                field_params,
     Teuchos::RCP<Thyra_MultiVector>&             field_mv,
     Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
@@ -1758,7 +1758,7 @@ GenericSTKMeshStruct::computeField(
 
 void
 GenericSTKMeshStruct::readScalarFileSerial(
-    const std::string&                           fname,
+    std::string const&                           fname,
     Teuchos::RCP<Thyra_MultiVector>&             mvec,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::RCP<const Teuchos_Comm>&      comm) const
@@ -1796,7 +1796,7 @@ GenericSTKMeshStruct::readScalarFileSerial(
 
 void
 GenericSTKMeshStruct::readVectorFileSerial(
-    const std::string&                           fname,
+    std::string const&                           fname,
     Teuchos::RCP<Thyra_MultiVector>&             mvec,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const Teuchos::RCP<const Teuchos_Comm>&      comm) const
@@ -1836,7 +1836,7 @@ GenericSTKMeshStruct::readVectorFileSerial(
 
 void
 GenericSTKMeshStruct::readLayeredScalarFileSerial(
-    const std::string&                           fname,
+    std::string const&                           fname,
     Teuchos::RCP<Thyra_MultiVector>&             mvec,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     std::vector<double>&                         normalizedLayersCoords,
@@ -1888,7 +1888,7 @@ GenericSTKMeshStruct::readLayeredScalarFileSerial(
 
 void
 GenericSTKMeshStruct::readLayeredVectorFileSerial(
-    const std::string&                           fname,
+    std::string const&                           fname,
     Teuchos::RCP<Thyra_MultiVector>&             mvec,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     std::vector<double>&                         normalizedLayersCoords,
@@ -1945,8 +1945,8 @@ GenericSTKMeshStruct::readLayeredVectorFileSerial(
 
 void
 GenericSTKMeshStruct::checkFieldIsInMesh(
-    const std::string& fname,
-    const std::string& ftype) const
+    std::string const& fname,
+    std::string const& ftype) const
 {
   stk::topology::rank_t entity_rank;
   if (ftype.find("Node") == std::string::npos) {

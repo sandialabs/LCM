@@ -83,7 +83,7 @@ class SeparableScatterScalarResponse
   void
   evaluate2DFieldsDerivativesDueToExtrudedSolution(
       typename Traits::EvalData /* d */,
-      const std::string& /* sidesetName */,
+      std::string const& /* sidesetName */,
       Teuchos::RCP<const CellTopologyData> /* cellTopo */)
   {
   }

@@ -235,7 +235,7 @@ NSMaterialProperty<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename NSMaterialProperty<EvalT, Traits>::ScalarT&
-NSMaterialProperty<EvalT, Traits>::getValue(const std::string& n)
+NSMaterialProperty<EvalT, Traits>::getValue(std::string const& n)
 {
   if (matPropType == SCALAR_CONSTANT || matPropType == SQRT_TEMP ||
       matPropType == INV_SQRT_TEMP || matPropType == TIME_DEP_SCALAR) {

@@ -43,7 +43,7 @@ getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
 {
   const Teuchos::RCP<const Teuchos::ParameterList> pl = app->getProblemPL();
   if (Teuchos::nonnull(pl)) {
-    const std::string problemName =
+    std::string const problemName =
         pl->isType<std::string>("Name") ? pl->get<std::string>("Name") : "";
   }
   return getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(

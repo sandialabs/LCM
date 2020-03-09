@@ -14,7 +14,7 @@ std::string const decorator = "Evaluator for ";
 
 // Name decorator.
 inline std::string
-evaluatorsToBuildName(const std::string& bc_name)
+evaluatorsToBuildName(std::string const& bc_name)
 {
   std::stringstream ess;
   ess << decorator << bc_name;
@@ -24,7 +24,7 @@ evaluatorsToBuildName(const std::string& bc_name)
 // Either (1) the inverse of above or (2) identity, in case the decorator is not
 // used.
 inline std::string
-plName(const std::string& name)
+plName(std::string const& name)
 {
   const std::size_t pos = name.find(decorator);
   if (pos == std::string::npos) return name;
@@ -45,7 +45,7 @@ imposeOrder(
   typedef std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>> S2PL;
   typedef std::map<std::string, int>                                  S2int;
 
-  const std::string parm_name("BCOrder");
+  std::string const parm_name("BCOrder");
   const char*       parm_val = "BCOrder_";
 
   // Get the order of the BCs as they are written in the input file.
@@ -58,7 +58,7 @@ imposeOrder(
   std::vector<bool> found(ne, false);
   for (S2PL::const_iterator it = evname2pl.begin(); it != evname2pl.end();
        ++it) {
-    const std::string     name     = plName(it->first);
+    std::string const     name     = plName(it->first);
     S2int::const_iterator order_it = order.find(name);
     if (order_it == order.end()) {
       // It is not an error to add an evaluator not directly mapped to an input
@@ -1495,8 +1495,8 @@ Albany::NeumannTraits::getValidBCParameters(
 
 std::string
 Albany::DirichletTraits::constructBCName(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "DBC on NS " << ns << " for DOF " << dof;
@@ -1506,8 +1506,8 @@ Albany::DirichletTraits::constructBCName(
 
 std::string
 Albany::DirichletTraits::constructSDBCName(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "SDBC on NS " << ns << " for DOF " << dof;
@@ -1517,8 +1517,8 @@ Albany::DirichletTraits::constructSDBCName(
 
 std::string
 Albany::DirichletTraits::constructExprEvalSDBCName(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "ExpressionEvaluated SDBC on NS " << ns << " for DOF " << dof;
@@ -1528,8 +1528,8 @@ Albany::DirichletTraits::constructExprEvalSDBCName(
 
 std::string
 Albany::DirichletTraits::constructScaledSDBCName(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "Scaled SDBC on NS " << ns << " for DOF " << dof;
@@ -1539,8 +1539,8 @@ Albany::DirichletTraits::constructScaledSDBCName(
 
 std::string
 Albany::DirichletTraits::constructBCNameField(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "DBC on NS " << ns << " for DOF " << dof << " prescribe Field";
@@ -1550,8 +1550,8 @@ Albany::DirichletTraits::constructBCNameField(
 
 std::string
 Albany::DirichletTraits::constructSDBCNameField(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "SDBC on NS " << ns << " for DOF " << dof << " prescribe Field";
@@ -1561,8 +1561,8 @@ Albany::DirichletTraits::constructSDBCNameField(
 
 std::string
 Albany::DirichletTraits::constructExprEvalSDBCNameField(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "ExpressionEvaluated SDBC on NS " << ns << " for DOF " << dof
@@ -1573,8 +1573,8 @@ Albany::DirichletTraits::constructExprEvalSDBCNameField(
 
 std::string
 Albany::DirichletTraits::constructScaledSDBCNameField(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "Scaled SDBC on NS " << ns << " for DOF " << dof << " prescribe Field";
@@ -1584,9 +1584,9 @@ Albany::DirichletTraits::constructScaledSDBCNameField(
 
 std::string
 Albany::NeumannTraits::constructBCName(
-    const std::string& ns,
-    const std::string& dof,
-    const std::string& condition)
+    std::string const& ns,
+    std::string const& dof,
+    std::string const& condition)
 {
   std::stringstream ss;
   ss << "NBC on SS " << ns << " for DOF " << dof << " set " << condition;
@@ -1595,8 +1595,8 @@ Albany::NeumannTraits::constructBCName(
 
 std::string
 Albany::DirichletTraits::constructTimeDepBCName(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "Time Dependent " << Albany::DirichletTraits::constructBCName(ns, dof);
@@ -1605,8 +1605,8 @@ Albany::DirichletTraits::constructTimeDepBCName(
 
 std::string
 Albany::DirichletTraits::constructTimeDepSDBCName(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "Time Dependent "
@@ -1616,8 +1616,8 @@ Albany::DirichletTraits::constructTimeDepSDBCName(
 
 std::string
 Albany::DirichletTraits::constructBCNameOffNodeSet(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "DBC off NS " << ns << " for DOF " << dof;
@@ -1627,8 +1627,8 @@ Albany::DirichletTraits::constructBCNameOffNodeSet(
 
 std::string
 Albany::DirichletTraits::constructPressureDepBCName(
-    const std::string& ns,
-    const std::string& dof)
+    std::string const& ns,
+    std::string const& dof)
 {
   std::stringstream ss;
   ss << "Pressure Dependent "
@@ -1638,9 +1638,9 @@ Albany::DirichletTraits::constructPressureDepBCName(
 
 std::string
 Albany::NeumannTraits::constructTimeDepBCName(
-    const std::string& ns,
-    const std::string& dof,
-    const std::string& condition)
+    std::string const& ns,
+    std::string const& dof,
+    std::string const& condition)
 {
   std::stringstream ss;
   ss << "Time Dependent "

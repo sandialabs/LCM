@@ -224,7 +224,7 @@ PHAL::ResponseSquaredL2DifferenceBase<
     TargetScalarT>::
     getLayout(
         const Teuchos::RCP<Albany::Layouts>& dl,
-        const std::string&                   rank,
+        std::string const&                   rank,
         Teuchos::RCP<PHX::DataLayout>&       layout)
 {
   int dim = -1;

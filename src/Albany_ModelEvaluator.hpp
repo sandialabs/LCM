@@ -51,7 +51,7 @@ class ModelEvaluator
   Teuchos::RCP<const Teuchos::Array<std::string>>
   get_p_names(int l) const;
 
-  Teuchos::ArrayView<const std::string>
+  Teuchos::ArrayView<std::string const>
   get_g_names(int /* j */) const
   {
     ALBANY_ABORT("not impl'ed");

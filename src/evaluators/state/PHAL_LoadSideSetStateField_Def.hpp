@@ -107,7 +107,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
   int                size = dims.size();
-  const std::string& tag2 =
+  std::string const& tag2 =
       size > 2 ? field.fieldTag().dataLayout().name(2) : "";
   ALBANY_PANIC(
       size > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim",

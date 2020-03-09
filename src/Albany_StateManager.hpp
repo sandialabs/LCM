@@ -50,27 +50,27 @@ class StateManager
   /// will be saved.
   void
   registerStateVariable(
-      const std::string&                   stateName,
+      std::string const&                   stateName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
-      const std::string&                   ebName,
-      const std::string&                   init_type           = "scalar",
+      std::string const&                   ebName,
+      std::string const&                   init_type           = "scalar",
       double const                         init_val            = 0.0,
       const bool                           registerOldState    = false,
       const bool                           outputToExodus      = true,
-      const std::string&                   responseIDtoRequire = "",
+      std::string const&                   responseIDtoRequire = "",
       StateStruct::MeshFieldEntity const*  fieldEntity         = 0,
-      const std::string&                   meshPartName        = "");
+      std::string const&                   meshPartName        = "");
 
   void
   registerNodalVectorStateVariable(
-      const std::string&                   stateName,
+      std::string const&                   stateName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
-      const std::string&                   ebName,
-      const std::string&                   init_type           = "scalar",
+      std::string const&                   ebName,
+      std::string const&                   init_type           = "scalar",
       double const                         init_val            = 0.0,
       const bool                           registerOldState    = false,
       const bool                           outputToExodus      = true,
-      const std::string&                   responseIDtoRequire = "");
+      std::string const&                   responseIDtoRequire = "");
 
   /// Method to call multiple times (before allocate) to register which states
   /// will be saved.
@@ -78,11 +78,11 @@ class StateManager
   /// LoadStateField evaluator
   Teuchos::RCP<Teuchos::ParameterList>
   registerStateVariable(
-      const std::string&                   name,
+      std::string const&                   name,
       const Teuchos::RCP<PHX::DataLayout>& dl,
       const Teuchos::RCP<PHX::DataLayout>& dummy,
-      const std::string&                   ebName,
-      const std::string&                   init_type        = "scalar",
+      std::string const&                   ebName,
+      std::string const&                   init_type        = "scalar",
       double const                         init_val         = 0.0,
       const bool                           registerOldState = false);
 
@@ -90,44 +90,44 @@ class StateManager
   // ElemNode type
   Teuchos::RCP<Teuchos::ParameterList>
   registerStateVariable(
-      const std::string&                   stateName,
+      std::string const&                   stateName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
-      const std::string&                   ebName,
+      std::string const&                   ebName,
       const bool                           outputToExodus,
       StateStruct::MeshFieldEntity const*  fieldEntity,
-      const std::string&                   meshPartName = "");
+      std::string const&                   meshPartName = "");
 
   /// If field name to save/load is different from state name
   Teuchos::RCP<Teuchos::ParameterList>
   registerStateVariable(
-      const std::string&                   stateName,
+      std::string const&                   stateName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
       const Teuchos::RCP<PHX::DataLayout>& dummy,
-      const std::string&                   ebName,
-      const std::string&                   init_type,
+      std::string const&                   ebName,
+      std::string const&                   init_type,
       double const                         init_val,
       const bool                           registerOldState,
-      const std::string&                   fieldName);
+      std::string const&                   fieldName);
 
   /// If you want to give more control over whether or not to output to Exodus
   Teuchos::RCP<Teuchos::ParameterList>
   registerStateVariable(
-      const std::string&                   stateName,
+      std::string const&                   stateName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
       const Teuchos::RCP<PHX::DataLayout>& dummy,
-      const std::string&                   ebName,
-      const std::string&                   init_type,
+      std::string const&                   ebName,
+      std::string const&                   init_type,
       double const                         init_val,
       const bool                           registerOldState,
       const bool                           outputToExodus);
 
   Teuchos::RCP<Teuchos::ParameterList>
   registerNodalVectorStateVariable(
-      const std::string&                   stateName,
+      std::string const&                   stateName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
       const Teuchos::RCP<PHX::DataLayout>& dummy,
-      const std::string&                   ebName,
-      const std::string&                   init_type,
+      std::string const&                   ebName,
+      std::string const&                   init_type,
       double const                         init_val,
       const bool                           registerOldState,
       const bool                           outputToExodus);
@@ -135,35 +135,35 @@ class StateManager
   /// Very basic
   void
   registerStateVariable(
-      const std::string&                   stateName,
+      std::string const&                   stateName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
-      const std::string&                   init_type);
+      std::string const&                   init_type);
 
   Teuchos::RCP<Teuchos::ParameterList>
   registerSideSetStateVariable(
-      const std::string&                   sideSetName,
-      const std::string&                   stateName,
-      const std::string&                   fieldName,
+      std::string const&                   sideSetName,
+      std::string const&                   stateName,
+      std::string const&                   fieldName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
-      const std::string&                   ebName,
+      std::string const&                   ebName,
       const bool                           outputToExodus,
       StateStruct::MeshFieldEntity const*  fieldEntity  = NULL,
-      const std::string&                   meshPartName = "");
+      std::string const&                   meshPartName = "");
 
   Teuchos::RCP<Teuchos::ParameterList>
   registerSideSetStateVariable(
-      const std::string&                   sideSetName,
-      const std::string&                   stateName,
-      const std::string&                   fieldName,
+      std::string const&                   sideSetName,
+      std::string const&                   stateName,
+      std::string const&                   fieldName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
-      const std::string&                   ebName,
-      const std::string&                   init_type,
+      std::string const&                   ebName,
+      std::string const&                   init_type,
       double const                         init_val,
       const bool                           registerOldState,
       const bool                           outputToExodus,
-      const std::string&                   responseIDtoRequire,
+      std::string const&                   responseIDtoRequire,
       StateStruct::MeshFieldEntity const*  fieldEntity,
-      const std::string&                   meshPartName = "");
+      std::string const&                   meshPartName = "");
 
   /// Method to re-initialize state variables, which can be called multiple
   /// times after allocating
@@ -225,7 +225,7 @@ class StateManager
   setStateArrays(Albany::StateArrays& sa);
 
   Albany::StateArrays&
-  getSideSetStateArrays(const std::string& sideSet);
+  getSideSetStateArrays(std::string const& sideSet);
 
   Teuchos::RCP<Adapt::NodalDataBase>
   getNodalDataBase()
@@ -234,7 +234,7 @@ class StateManager
   }
 
   Teuchos::RCP<Adapt::NodalDataBase>
-  getSideSetNodalDataBase(const std::string& sideSet)
+  getSideSetNodalDataBase(std::string const& sideSet)
   {
     return sideSetStateInfo.at(sideSet)->createNodalDataBase();
   }

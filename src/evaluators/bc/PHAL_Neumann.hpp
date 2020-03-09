@@ -68,7 +68,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   evaluateFields(typename Traits::EvalData d) = 0;
 
   ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
 
  protected:
   using ICT  = Intrepid2::CellTools<PHX::Device>;

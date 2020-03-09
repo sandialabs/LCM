@@ -74,7 +74,7 @@ class ThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   evaluateFields(typename Traits::EvalData d);
 
   ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
 
  private:
   //! Validate the name strings under "ThermalConductivity" section in xml input

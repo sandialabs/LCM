@@ -22,7 +22,7 @@ StatelessObserverImpl::StatelessObserverImpl(
 RealType
 StatelessObserverImpl::getTimeParamValueOrDefault(RealType defaultValue) const
 {
-  const std::string label("Time");
+  std::string const label("Time");
   // IKT, NOTE: solMethod == 2 corresponds to TransientTempus
   bool const use_time_param =
       (app_->getParamLib()->isParameter(label) == true) &&

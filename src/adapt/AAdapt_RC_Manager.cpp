@@ -529,7 +529,7 @@ struct Manager::Impl
 
   void
   registerField(
-      const std::string&                          name,
+      std::string const&                          name,
       const Teuchos::RCP<PHX::DataLayout>&        dl,
       const Init::Enum                            init_G,
       Transformation::Enum                        transformation,
@@ -537,7 +537,7 @@ struct Manager::Impl
   {
     if (!transform_) transformation = Transformation::none;
 
-    const std::string name_rc = decorate(name);
+    std::string const name_rc = decorate(name);
     p->set<std::string>(name_rc + " Name", name_rc);
     p->set<Teuchos::RCP<PHX::DataLayout>>(name_rc + " Data Layout", dl);
 
@@ -623,7 +623,7 @@ struct Manager::Impl
     }
     if (!is_g(workset.wsIndex)) return;
     // Interpolate g at NP to g at QP.
-    const std::string          name_rc = f_G_qp.fieldTag().name();
+    std::string const          name_rc = f_G_qp.fieldTag().name();
     const Teuchos::RCP<Field>& f       = field_map_[name_rc];
     proj_->interp(
         *f,
@@ -671,7 +671,7 @@ struct Manager::Impl
       const PHAL::Workset&                workset,
       const BasisField&                   wbf)
   {
-    const std::string name_rc = decorate(f.fieldTag().name());
+    std::string const name_rc = decorate(f.fieldTag().name());
     if (proj_.is_null()) {
       // Write to the provisional field.
       write(getMDArray(name_rc + "_1", workset.wsIndex), f);
@@ -714,7 +714,7 @@ struct Manager::Impl
   }
 
   Transformation::Enum
-  get_transformation(const std::string& name_rc)
+  get_transformation(std::string const& name_rc)
   {
     return field_map_[name_rc]->data_->transformation;
   }
@@ -736,7 +736,7 @@ struct Manager::Impl
 
   void
   registerStateVariable(
-      const std::string&                   name,
+      std::string const&                   name,
       const Teuchos::RCP<PHX::DataLayout>& dl,
       const Init::Enum                     init)
   {
@@ -751,7 +751,7 @@ struct Manager::Impl
   }
 
   Albany::MDArray&
-  getMDArray(const std::string& name, const WsIdx wi)
+  getMDArray(std::string const& name, const WsIdx wi)
   {
     Albany::StateArray& esa = state_mgr_->getStateArrays().elemStateArrays[wi];
     Albany::StateArray::iterator it = esa.find(name);
@@ -778,7 +778,7 @@ struct Manager::Impl
 
   void
   transformStateArray(
-      const std::string&    name_rc,
+      std::string const&    name_rc,
       const WsIdx           wi,
       const Direction::Enum dir)
   {
@@ -911,7 +911,7 @@ Manager::createEvaluators<PHAL::AlbanyTraits::Residual>(
 
 void
 Manager::registerField(
-    const std::string&                          name,
+    std::string const&                          name,
     const Teuchos::RCP<PHX::DataLayout>&        dl,
     const Init::Enum                            init,
     const Transformation::Enum                  transformation,

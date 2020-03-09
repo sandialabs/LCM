@@ -116,7 +116,7 @@ CahnHillRhoResid<EvalT, Traits>::evaluateFields(
 
 template <typename EvalT, typename Traits>
 typename CahnHillRhoResid<EvalT, Traits>::ScalarT&
-CahnHillRhoResid<EvalT, Traits>::getValue(const std::string& n)
+CahnHillRhoResid<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "gamma")
 

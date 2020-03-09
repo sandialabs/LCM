@@ -17,7 +17,7 @@
 void
 Albany::NavierStokes::getVariableType(
     Teuchos::ParameterList&            paramList,
-    const std::string&                 defaultType,
+    std::string const&                 defaultType,
     Albany::NavierStokes::NS_VAR_TYPE& variableType,
     bool&                              haveVariable,
     bool&                              haveEquation)

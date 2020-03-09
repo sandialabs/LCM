@@ -10,7 +10,7 @@
 
 namespace util {
 
-Counter::Counter(const std::string& name, counter_type start)
+Counter::Counter(std::string const& name, counter_type start)
     : name_(name), value_(start)
 {
 }

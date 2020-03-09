@@ -316,7 +316,7 @@ RigidBodyModes::setPiroPL(
   mueLuUsed = froschUsed = false;
   if (Teuchos::nonnull(stratList) &&
       stratList->isParameter("Preconditioner Type")) {
-    const std::string& ptype =
+    std::string const& ptype =
         stratList->get<std::string>("Preconditioner Type");
     if (ptype == "MueLu") {
       plist     = sublist(sublist(stratList, "Preconditioner Types"), ptype);

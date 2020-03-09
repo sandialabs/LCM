@@ -84,7 +84,7 @@ Absorption<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename Absorption<EvalT, Traits>::ScalarT&
-Absorption<EvalT, Traits>::getValue(const std::string& n)
+Absorption<EvalT, Traits>::getValue(std::string const& n)
 {
   if (is_constant) return constant_value;
   /*for (int i=0; i<rv.size(); i++) {

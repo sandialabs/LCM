@@ -117,7 +117,7 @@ SideSetSTKMeshStruct::~SideSetSTKMeshStruct()
 void
 SideSetSTKMeshStruct::setParentMeshInfo(
     const AbstractSTKMeshStruct& parentMeshStruct_,
-    const std::string&           sideSetName)
+    std::string const&           sideSetName)
 {
   parentMeshStruct      = Teuchos::rcpFromRef(parentMeshStruct_);
   parentMeshSideSetName = sideSetName;

@@ -57,7 +57,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   typedef stk::mesh::Field<double, stk::mesh::Cartesian3d>
       SphereVolumeFieldType;
 
-  typedef std::vector<const std::string*> ScalarValueState;
+  typedef std::vector<std::string const*> ScalarValueState;
   typedef std::vector<QPScalarFieldType*> QPScalarState;
   typedef std::vector<QPVectorFieldType*> QPVectorState;
   typedef std::vector<QPTensorFieldType*> QPTensorState;
@@ -245,7 +245,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   virtual void
   fillVector(
       Thyra_Vector&                                field_vector,
-      const std::string&                           field_name,
+      std::string const&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager) = 0;
@@ -257,7 +257,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   virtual void
   saveVector(
       Thyra_Vector const&                          field_vector,
-      const std::string&                           field_name,
+      std::string const&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager) = 0;

@@ -1111,7 +1111,7 @@ template <>
 void
 writeMatrixMarket<Thyra_Vector const>(
     Teuchos::RCP<Thyra_Vector const> const& v,
-    const std::string&                      prefix,
+    std::string const&                      prefix,
     int const                               counter)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -1131,7 +1131,7 @@ template <>
 void
 writeMatrixMarket<Thyra_Vector>(
     const Teuchos::RCP<Thyra_Vector>& v,
-    const std::string&                prefix,
+    std::string const&                prefix,
     int const                         counter)
 {
   writeMatrixMarket(v.getConst(), prefix, counter);
@@ -1141,7 +1141,7 @@ template <>
 void
 writeMatrixMarket<const Thyra_MultiVector>(
     const Teuchos::RCP<const Thyra_MultiVector>& mv,
-    const std::string&                           prefix,
+    std::string const&                           prefix,
     int const                                    counter)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -1161,7 +1161,7 @@ template <>
 void
 writeMatrixMarket<Thyra_MultiVector>(
     const Teuchos::RCP<Thyra_MultiVector>& mv,
-    const std::string&                     prefix,
+    std::string const&                     prefix,
     int const                              counter)
 {
   writeMatrixMarket(mv.getConst(), prefix, counter);
@@ -1171,7 +1171,7 @@ template <>
 void
 writeMatrixMarket<const Thyra_LinearOp>(
     const Teuchos::RCP<const Thyra_LinearOp>& A,
-    const std::string&                        prefix,
+    std::string const&                        prefix,
     int const                                 counter)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -1191,7 +1191,7 @@ template <>
 void
 writeMatrixMarket<Thyra_LinearOp>(
     const Teuchos::RCP<Thyra_LinearOp>& A,
-    const std::string&                  prefix,
+    std::string const&                  prefix,
     int const                           counter)
 {
   writeMatrixMarket(A.getConst(), prefix, counter);
@@ -1203,7 +1203,7 @@ template <>
 void
 writeMatrixMarket<Thyra_VectorSpace const>(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const std::string&                           prefix,
+    std::string const&                           prefix,
     int const                                    counter)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -1223,7 +1223,7 @@ template <>
 void
 writeMatrixMarket<Thyra_VectorSpace>(
     const Teuchos::RCP<Thyra_VectorSpace>& vs,
-    const std::string&                     prefix,
+    std::string const&                     prefix,
     int const                              counter)
 {
   writeMatrixMarket(vs.getConst(), prefix, counter);

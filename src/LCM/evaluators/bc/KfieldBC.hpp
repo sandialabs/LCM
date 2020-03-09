@@ -39,7 +39,7 @@ class KfieldBC_Base : public PHAL::DirichletBase<EvalT, Traits>
   using ScalarT = typename EvalT::ScalarT;
   KfieldBC_Base(Teuchos::ParameterList& p);
   ScalarT&
-  getValue(const std::string& n);
+  getValue(std::string const& n);
   void
   computeBCs(double* coord, ScalarT& Xval, ScalarT& Yval, RealType time);
 

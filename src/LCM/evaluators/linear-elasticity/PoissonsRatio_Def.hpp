@@ -104,7 +104,7 @@ PoissonsRatio<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename PoissonsRatio<EvalT, Traits>::ScalarT&
-PoissonsRatio<EvalT, Traits>::getValue(const std::string& n)
+PoissonsRatio<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Poissons Ratio")
     return constant_value;

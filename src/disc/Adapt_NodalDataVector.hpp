@@ -114,12 +114,12 @@ class NodalDataVector
 
   void
   saveNodalDataVector(
-      const std::string&                           name,
+      std::string const&                           name,
       const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec,
       int const                                    offset) const;
 
   void
-  getNDofsAndOffset(const std::string& stateName, int& offset, int& ndofs)
+  getNDofsAndOffset(std::string const& stateName, int& offset, int& ndofs)
       const;
 
   LO

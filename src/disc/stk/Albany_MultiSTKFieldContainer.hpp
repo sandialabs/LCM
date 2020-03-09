@@ -74,7 +74,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   void
   fillVector(
       Thyra_Vector&                                field_vector,
-      const std::string&                           field_name,
+      std::string const&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager);
@@ -86,7 +86,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   void
   saveVector(
       Thyra_Vector const&                          field_vector,
-      const std::string&                           field_name,
+      std::string const&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager);
@@ -126,7 +126,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   void
   fillVectorImpl(
       Thyra_Vector&                                field_vector,
-      const std::string&                           field_name,
+      std::string const&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager,
@@ -134,7 +134,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   void
   saveVectorImpl(
       Thyra_Vector const&                          field_vector,
-      const std::string&                           field_name,
+      std::string const&                           field_name,
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager,

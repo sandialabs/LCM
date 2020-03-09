@@ -103,7 +103,7 @@ class Manager
   //! The problem registers the field.
   void
   registerField(
-      const std::string&                          name,
+      std::string const&                          name,
       const Teuchos::RCP<PHX::DataLayout>&        dl,
       const Init::Enum                            init,
       const Transformation::Enum                  transformation,
@@ -120,13 +120,13 @@ class Manager
 
   //! Append a decoration to the name indicating this is an RCU field.
   static inline std::string
-  decorate(const std::string& name)
+  decorate(std::string const& name)
   {
     return name + "_RC";
   }
   //! Remove the decoration from the end of the name. (No error checking.)
   static inline std::string
-  undecorate(const std::string& name_dec)
+  undecorate(std::string const& name_dec)
   {
     return name_dec.substr(0, name_dec.size() - 3);
   }

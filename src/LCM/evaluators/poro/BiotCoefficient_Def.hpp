@@ -100,7 +100,7 @@ BiotCoefficient<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename BiotCoefficient<EvalT, Traits>::ScalarT&
-BiotCoefficient<EvalT, Traits>::getValue(const std::string& n)
+BiotCoefficient<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Biot Coefficient")
     return constant_value;

@@ -213,7 +213,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   int const cub = params->get("Cubature Degree", 3);
 
   // Get Cubature Rule
-  const std::string    cub_rule_string = params->get("Cubature Rule", "GAUSS");
+  std::string const    cub_rule_string = params->get("Cubature Rule", "GAUSS");
   Intrepid2::EPolyType cub_rule;
   if (cub_rule_string == "GAUSS")
     cub_rule = static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS);
@@ -620,7 +620,7 @@ Albany::IossSTKMeshStruct::getSolutionFieldHistoryStamp(int step) const
 void
 Albany::IossSTKMeshStruct::loadOrSetCoordinates3d(int index)
 {
-  const std::string coords3d_name = "coordinates3d";
+  std::string const coords3d_name = "coordinates3d";
 
   Teuchos::RCP<Ioss::Region>      region = mesh_data->get_input_io_region();
   const Ioss::NodeBlockContainer& node_blocks = region->get_node_blocks();

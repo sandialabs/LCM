@@ -971,7 +971,7 @@ Gaussian<EvalT>::evaluateFields(
     const std::vector<typename EvalT::MeshScalarT>& coords)
 {
   MeshScalarT       exponent = 0;
-  const std::size_t nsd      = coords.size();
+  std::size_t const nsd      = coords.size();
   for (std::size_t i = 0; i < nsd; ++i) {
     exponent += std::pow(m_centroid[i] - coords[i], 2);
   }
@@ -1069,7 +1069,7 @@ PointSource<EvalT, Traits>::PointSource(Teuchos::ParameterList* source_list)
     : m_num_qp(0), m_wavelet(NULL), m_spatials(), m_source_list(source_list)
 {
   Teuchos::ParameterList& paramList     = source_list->sublist("Point", true);
-  const std::size_t       num           = paramList.get("Number", 0);
+  std::size_t const       num           = paramList.get("Number", 0);
   Teuchos::ParameterList& spatial_param = paramList.sublist("Spatial", true);
   if (Gaussian<EvalT>::check_for_existance(spatial_param)) {
     for (std::size_t i = 0; i < num; ++i) {

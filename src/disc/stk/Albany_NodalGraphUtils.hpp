@@ -14,22 +14,22 @@ namespace Albany {
  *
  */
 
-const std::size_t hex_table[] = {1, 3, 4, 0, 2, 5, 1, 3, 6, 0, 2, 7,
+std::size_t const hex_table[] = {1, 3, 4, 0, 2, 5, 1, 3, 6, 0, 2, 7,
                                  0, 5, 7, 1, 4, 6, 2, 5, 7, 3, 4, 6};
 
-const std::size_t hex_nconnect = 3;
+std::size_t const hex_nconnect = 3;
 
-const std::size_t tet_table[] = {1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2};
+std::size_t const tet_table[] = {1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2};
 
-const std::size_t tet_nconnect = 3;
+std::size_t const tet_nconnect = 3;
 
-const std::size_t quad_table[] = {1, 3, 0, 2, 1, 3, 0, 2};
+std::size_t const quad_table[] = {1, 3, 0, 2, 1, 3, 0, 2};
 
-const std::size_t quad_nconnect = 2;
+std::size_t const quad_nconnect = 2;
 
-const std::size_t tri_table[] = {1, 2, 0, 2, 0, 1};
+std::size_t const tri_table[] = {1, 2, 0, 2, 0, 1};
 
-const std::size_t tri_nconnect = 2;
+std::size_t const tri_nconnect = 2;
 
 }  // namespace Albany
 

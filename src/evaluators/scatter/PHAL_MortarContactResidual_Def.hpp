@@ -28,7 +28,7 @@ MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(
       p.get<Teuchos::ArrayRCP<std::string>>("Residual Names");
 
   numFieldsBase             = names.size();
-  const std::size_t num_val = numFieldsBase;
+  std::size_t const num_val = numFieldsBase;
   val.resize(num_val);
   for (std::size_t eq = 0; eq < numFieldsBase; ++eq) {
     PHX::MDField<ScalarT const, Cell, Node> mdf(names[eq], dl->node_scalar);

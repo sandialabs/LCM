@@ -399,7 +399,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
 template <typename EvalT, typename Traits>
 void
 ElementSizeFieldBase<EvalT, Traits>::getCellRadius(
-    const std::size_t            cell,
+    std::size_t const            cell,
     typename EvalT::MeshScalarT& cellRadius) const
 {
   std::vector<MeshScalarT> maxCoord(3, -1e10);

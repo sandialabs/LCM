@@ -53,7 +53,7 @@ class GatherScalarNodalParameterBase
  protected:
   typedef typename EvalT::ParamScalarT ParamScalarT;
 
-  const std::size_t numNodes;
+  std::size_t const numNodes;
   std::string const param_name;
 
   // Output:

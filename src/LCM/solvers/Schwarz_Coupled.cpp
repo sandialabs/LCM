@@ -1025,7 +1025,7 @@ SchwarzCoupled::evalModelImpl(
           auto absrowsum_nonconstView = Albany::getNonconstLocalData(absrowsum);
           // Compute abs sum of each row and store in absrowsum vector
           for (LO i = 0; i < jac_range_indexer->getNumLocalElements(); ++i) {
-            const std::size_t NumEntries =
+            std::size_t const NumEntries =
                 Albany::getNumEntriesInLocalRow(jacs_[m], i);
             Teuchos::Array<LO> Indices(NumEntries);
             Teuchos::Array<ST> Values(NumEntries);

@@ -26,7 +26,7 @@ evaluatorsToBuildName(std::string const& bc_name)
 inline std::string
 plName(std::string const& name)
 {
-  const std::size_t pos = name.find(decorator);
+  std::size_t const pos = name.find(decorator);
   if (pos == std::string::npos) return name;
   return name.substr(pos + decorator.length());
 }

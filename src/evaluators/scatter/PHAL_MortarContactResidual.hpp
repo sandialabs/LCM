@@ -84,7 +84,7 @@ class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>
   evaluateFields(typename Traits::EvalData d);
 
  protected:
-  const std::size_t numFields;
+  std::size_t const numFields;
 
  private:
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
@@ -142,7 +142,7 @@ class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>
   evaluateFields(typename Traits::EvalData d);
 
  protected:
-  const std::size_t numFields;
+  std::size_t const numFields;
 
  private:
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;

@@ -69,7 +69,7 @@ class ElementSizeFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   getValidSizeFieldParameters() const;
 
   void
-  getCellRadius(const std::size_t cell, MeshScalarT& cellRadius) const;
+  getCellRadius(std::size_t const cell, MeshScalarT& cellRadius) const;
 
   std::string scalingName;
   std::string className;

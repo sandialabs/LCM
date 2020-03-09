@@ -82,8 +82,8 @@ class Field
   void
   multiplyInto(
       typename Tensor<ad_type, 2>::type& f_incr,
-      const std::size_t                  cell,
-      const std::size_t                  qp) const;
+      std::size_t const                  cell,
+      std::size_t const                  qp) const;
 
   //! f_incr += f_accum.
   template <typename ad_type>
@@ -94,8 +94,8 @@ class Field
   void
   addTo(
       typename Tensor<ad_type, rank>::type& f_incr,
-      const std::size_t                     cell,
-      const std::size_t                     qp) const;
+      std::size_t const                     cell,
+      std::size_t const                     qp) const;
 
  private:
   typename Tensor<const RealType, rank>::type f_;

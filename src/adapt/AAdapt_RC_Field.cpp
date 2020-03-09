@@ -80,8 +80,8 @@ template <typename ad_type>
 void
 Field<0>::addTo(
     typename Tensor<ad_type, 0>::type& f_incr,
-    const std::size_t                  cell,
-    const std::size_t                  qp) const
+    std::size_t const                  cell,
+    std::size_t const                  qp) const
 {
   f_incr(cell, qp) += f_(cell, qp);
 }
@@ -90,8 +90,8 @@ template <typename ad_type>
 void
 Field<1>::addTo(
     typename Tensor<ad_type, 1>::type& f_incr,
-    const std::size_t                  cell,
-    const std::size_t                  qp) const
+    std::size_t const                  cell,
+    std::size_t const                  qp) const
 {
   loopf(i0, 2) f_incr(cell, qp, i0) += f_(cell, qp, i0);
 }
@@ -100,8 +100,8 @@ template <typename ad_type>
 void
 Field<2>::addTo(
     typename Tensor<ad_type, 2>::type& f_incr,
-    const std::size_t                  cell,
-    const std::size_t                  qp) const
+    std::size_t const                  cell,
+    std::size_t const                  qp) const
 {
   loopf(i0, 2) loopf(i1, 3) f_incr(cell, qp, i0, i1) += f_(cell, qp, i0, i1);
 }
@@ -112,7 +112,7 @@ struct MultiplyWork
 {
   minitensor::Tensor<ad_type>  f_incr_mt;
   minitensor::Tensor<RealType> f_accum_mt;
-  MultiplyWork(const std::size_t dim) : f_incr_mt(dim), f_accum_mt(dim) {}
+  MultiplyWork(std::size_t const dim) : f_incr_mt(dim), f_accum_mt(dim) {}
 };
 
 template <typename ad_type>
@@ -120,8 +120,8 @@ inline void
 multiplyIntoImpl(
     const Tensor<const RealType, 2>::type& f_,
     typename Tensor<ad_type, 2>::type&     f_incr,
-    const std::size_t                      cell,
-    const std::size_t                      qp,
+    std::size_t const                      cell,
+    std::size_t const                      qp,
     MultiplyWork<ad_type>&                 w)
 {
   loopf(i0, 2) loopf(i1, 3) w.f_incr_mt(i0, i1)  = f_incr(cell, qp, i0, i1);
@@ -136,8 +136,8 @@ template <typename ad_type>
 void
 Field<2>::multiplyInto(
     typename Tensor<ad_type, 2>::type& f_incr,
-    const std::size_t                  cell,
-    const std::size_t                  qp) const
+    std::size_t const                  cell,
+    std::size_t const                  qp) const
 {
   MultiplyWork<ad_type> w(f_.extent(2));
   multiplyIntoImpl(f_, f_incr, cell, qp, w);
@@ -161,7 +161,7 @@ aadapt_rc_eti_class(Field)
 #undef eti
 #define eti(ad_type, rank)                                                \
   template void Field<rank>::addTo<ad_type>(                              \
-      Tensor<ad_type, rank>::type&, const std::size_t, const std::size_t) \
+      Tensor<ad_type, rank>::type&, std::size_t const, std::size_t const) \
       const;
         aadapt_rc_apply_to_all_ad_types_all_ranks(eti)
 #undef eti
@@ -172,7 +172,7 @@ aadapt_rc_eti_class(Field)
 #undef eti
 #define eti(ad_type, arg2)                       \
   template void Field<2>::multiplyInto<ad_type>( \
-      Tensor<ad_type, 2>::type&, const std::size_t, const std::size_t) const;
+      Tensor<ad_type, 2>::type&, std::size_t const, std::size_t const) const;
                 aadapt_rc_apply_to_all_ad_types(eti, )
 #undef eti
 

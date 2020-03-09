@@ -923,9 +923,9 @@ J2HMCModel<EvalT, Traits>::computeTrialState(
         (*workset.stateArrayPtr)[current_doubleStressName[i]];
   }
 
-  const std::size_t zero(0);
-  const std::size_t one(1);
-  const std::size_t two(2);
+  std::size_t const zero(0);
+  std::size_t const one(1);
+  std::size_t const two(2);
 
   int numCells = workset.numCells;
 

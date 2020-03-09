@@ -45,17 +45,6 @@ getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
   if (Teuchos::nonnull(pl)) {
     const std::string problemName =
         pl->isType<std::string>("Name") ? pl->get<std::string>("Name") : "";
-    if (problemName == "LandIce Coupled FO H 3D") {  // all column is coupled
-      int side_node_count = app->getEnrichedMeshSpecs()[ebi]
-                                .get()
-                                ->ctd.side[3]
-                                .topology->node_count;
-      int node_count = app->getEnrichedMeshSpecs()[ebi].get()->ctd.node_count;
-      int numLevels =
-          app->getDiscretization()->getLayeredMeshNumbering()->numLayers + 1;
-      return app->getNumEquations() *
-             (node_count + side_node_count * numLevels);
-    }
   }
   return getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
       app, app->getEnrichedMeshSpecs()[ebi].get());

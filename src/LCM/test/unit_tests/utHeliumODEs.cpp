@@ -51,11 +51,11 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   // set tolerance once and for all
   double tolerance = 1.0e-15;
 
-  const int                  workset_size = 1;
-  const int                  num_pts      = 1;
-  const int                  num_dims     = 3;
-  const int                  num_vertices = 8;
-  const int                  num_nodes    = 8;
+  int const                  workset_size = 1;
+  int const                  num_pts      = 1;
+  int const                  num_dims     = 3;
+  int const                  num_vertices = 8;
+  int const                  num_nodes    = 8;
   const RCP<Albany::Layouts> dl           = rcp(new Albany::Layouts(
       workset_size, num_vertices, num_nodes, num_pts, num_dims));
 

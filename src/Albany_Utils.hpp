@@ -54,7 +54,7 @@ ReplaceDiagonalEntries(
 //! strint("dog",2,' ') = "dog 2"
 //! The default delimiter is ' '. Potential delimiters include '_' - "dog_2"
 std::string
-strint(const std::string s, const int i, const char delim = ' ');
+strint(const std::string s, int const i, const char delim = ' ');
 
 //! Returns true of the given string is a valid initialization string of the
 //! format "initial value 1.54"
@@ -171,7 +171,7 @@ struct CmdLineArgs
 
 // Connect executable to vtune for profiling
 void
-connect_vtune(const int p_rank);
+connect_vtune(int const p_rank);
 
 // Do a nice stack trace for debugging
 void

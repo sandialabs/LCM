@@ -13,7 +13,7 @@
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 MoertelT::MOERTEL_TEMPLATE_CLASS(
-    PointT)::PointT(const int id, const double* xi, int out)
+    PointT)::PointT(int const id, const double* xi, int out)
     : id_(id), outputlevel_(out)
 {
   xi_[0] = xi[0];

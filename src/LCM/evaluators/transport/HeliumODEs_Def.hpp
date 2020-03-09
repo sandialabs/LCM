@@ -117,11 +117,11 @@ HeliumODEs<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   // tolarences and iterations for newton
   const double tolerance = 1.0e-12, tolerance_2 = tolerance * tolerance;
-  const int    maxIterations =
+  int const    maxIterations =
       20;  // FIXME: Currently a maximum, need relative measures
   // subincrementation for explicit predictor //FIXME: No guarantee of stability
   ScalarT   dt_explicit;
-  const int explicit_sub_increments = 5;
+  int const explicit_sub_increments = 5;
 
   // state old
   Albany::MDArray total_concentration_old =

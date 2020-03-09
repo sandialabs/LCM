@@ -808,7 +808,7 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
         Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>::iterator
         curr;
     for (curr = interface_.begin(); curr != interface_.end(); ++curr) {
-      const int nseg = curr->second->GlobalNsegment();
+      int const nseg = curr->second->GlobalNsegment();
       MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)** segs =
           curr->second->GetSegmentView();
       for (int i = 0; i < nseg; ++i)
@@ -1029,7 +1029,7 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::ChooseMortarSideInterface(
 bool MoertelT::Manager::ChooseMortarSide_2D(std::vector<Teuchos::RCP<MoertelT::Interface> >& inter)
 {
   // number of interfaces
-  const int ninter = inter.size();
+  int const ninter = inter.size();
   if (ninter < 2) 
   {
     if (inter[0]->MortarSide() != 0 && inter[0]->MortarSide() != 1)

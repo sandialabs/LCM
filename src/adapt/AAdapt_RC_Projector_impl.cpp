@@ -23,7 +23,7 @@ solve(
     const Teuchos::RCP<const Thyra_MultiVector>& b,
     Teuchos::ParameterList&                      pl)
 {
-  const int                       nrhs = b->domain()->dim();
+  int const                       nrhs = b->domain()->dim();
   Teuchos::RCP<Thyra_MultiVector> x = Thyra::createMembers(A->domain(), nrhs);
 
   if (P.is_null()) {

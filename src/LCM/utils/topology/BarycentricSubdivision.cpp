@@ -405,7 +405,7 @@ std::vector<stk::mesh::Entity>
 Topology::findAdjacentSegmentsFromFace(
     const std::vector<std::vector<stk::mesh::Entity>>& faces_inside_element,
     const stk::mesh::Entity                            face,
-    const int                                          element_number)
+    int const                                          element_number)
 {
   std::vector<stk::mesh::Entity> adjacent_faces;
 
@@ -714,7 +714,7 @@ Topology::barycentricSubdivision()
   start3 = clock();
   // Add the new segments that will connect the center point with the
   // points at the boundary
-  const int New_Boundary_segments =
+  int const New_Boundary_segments =
       (getDirectlyConnectedEntities(
            initial_entities_2D[0], stk::topology::EDGE_RANK)
            .size()) *
@@ -1033,9 +1033,9 @@ Topology::barycentricSubdivision()
   // segments has changed. Thus, create a new vector that contains
   // the segments that connect the element centroid with the element
   // boundary points
-  const int Start_ = Num_segments_face * initial_entities_2D.size() +
+  int const Start_ = Num_segments_face * initial_entities_2D.size() +
                      initial_entities_1D.size();
-  const int End_ = modified3_entities_1D.size() - initial_entities_1D.size();
+  int const End_ = modified3_entities_1D.size() - initial_entities_1D.size();
   std::vector<stk::mesh::Entity> segments_connected_centroid;
   for (int ii = Start_; ii < End_; ++ii) {
     segments_connected_centroid.push_back(modified3_entities_1D[ii]);
@@ -1139,7 +1139,7 @@ Topology::barycentricSubdivision()
   // subdivision
   // -------------------------------------------------------------------------
 
-  const int number_new_elements =
+  int const number_new_elements =
       _faces_element.size() * initial_entities_3d.size();
 
   // Add the new elements

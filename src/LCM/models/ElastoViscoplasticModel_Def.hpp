@@ -493,7 +493,7 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
           //
           bool      converged = false;
           int       iter(0);
-          const int max_iter(30);
+          int const max_iter(30);
           RealType  init_norm = Sacado::ScalarValue<ScalarT>::eval(Phi);
 
           // hardening and recovery parameters
@@ -512,7 +512,7 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
 
           // create some vectors to store solver data
           //
-          const int            num_vars(5);
+          int const            num_vars(5);
           std::vector<ScalarT> R(num_vars);
           std::vector<ScalarT> dRdX(num_vars * num_vars);
           std::vector<ScalarT> X(num_vars);

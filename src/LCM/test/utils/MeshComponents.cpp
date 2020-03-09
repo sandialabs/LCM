@@ -62,7 +62,7 @@ main(int ac, char* av[])
   //
   std::vector<int> components;
 
-  const int number_components = dual_graph.getConnectedComponents(components);
+  int const number_components = dual_graph.getConnectedComponents(components);
 
   // Get abstract discretization from connectivity array and convert
   // to stk discretization to use stk-specific methods.
@@ -83,7 +83,7 @@ main(int ac, char* av[])
   // Assumption: numbering of elements is contiguous.
   for (std::vector<int>::size_type element = 0; element < components.size();
        ++element) {
-    const int component = components[element];
+    int const component = components[element];
 
     // set component number in stk field memory
     stk_component[element] = component;
@@ -97,7 +97,7 @@ main(int ac, char* av[])
   //  stk_discretization.outputToExodus(*solution_field, 1.0);
   stk_discretization.writeSolution(*solution_field, 1.0);
 
-  const int number_elements = connectivity_array.getNumberElements();
+  int const number_elements = connectivity_array.getNumberElements();
 
   std::cout << std::endl;
   std::cout << "==========================================";

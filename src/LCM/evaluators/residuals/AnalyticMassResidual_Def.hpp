@@ -116,8 +116,8 @@ AnalyticMassResidualBase<EvalT, Traits>::postRegistrationSetup(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRow(
-    const int cell,
-    const int row) const
+    int const cell,
+    int const row) const
 {
   std::vector<RealType> mass_row(4);
   switch (row) {
@@ -162,8 +162,8 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRow(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRowLumped(
-    const int cell,
-    const int row) const
+    int const cell,
+    int const row) const
 {
   std::vector<RealType> mass_row(4);
   switch (row) {
@@ -189,8 +189,8 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRowLumped(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRow(
-    const int cell,
-    const int row) const
+    int const cell,
+    int const row) const
 {
   std::vector<RealType> mass_row(10);
   switch (row) {
@@ -331,8 +331,8 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRow(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRowLumped(
-    const int cell,
-    const int row) const
+    int const cell,
+    int const row) const
 {
   std::vector<RealType> mass_row(10);
   switch (row) {
@@ -364,8 +364,8 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRowLumped(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRow(
-    const int cell,
-    const int row) const
+    int const cell,
+    int const row) const
 {
   std::vector<RealType> mass_row(8);
   switch (row) {
@@ -466,8 +466,8 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRow(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(
-    const int cell,
-    const int row) const
+    int const cell,
+    int const row) const
 {
   std::vector<RealType> mass_row(8);
   switch (row) {
@@ -494,8 +494,8 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRow(
-    const int cell,
-    const int row) const
+    int const cell,
+    int const row) const
 {
   std::vector<RealType> mass_row(10);
   switch (row) {
@@ -637,8 +637,8 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRow(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRowLumped(
-    const int cell,
-    const int row) const
+    int const cell,
+    int const row) const
 {
   std::vector<RealType> mass_row(10);
   switch (row) {
@@ -670,8 +670,8 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRowLumped(
 template <typename EvalT, typename Traits>
 RealType
 AnalyticMassResidualBase<EvalT, Traits>::computeElementVolScaling(
-    const int cell,
-    const int node) const
+    int const cell,
+    int const node) const
 {
   RealType elt_vol_scale_at_node = 0.0;
   for (int pt = 0; pt < num_pts_; ++pt) {
@@ -683,7 +683,7 @@ AnalyticMassResidualBase<EvalT, Traits>::computeElementVolScaling(
 template <typename EvalT, typename Traits>
 RealType
 AnalyticMassResidualBase<EvalT, Traits>::computeElementVolume(
-    const int cell) const
+    int const cell) const
 {
   RealType elt_vol = 0.0;
   for (int pt = 0; pt < num_pts_; ++pt) {

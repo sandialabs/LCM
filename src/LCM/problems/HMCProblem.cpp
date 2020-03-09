@@ -13,7 +13,7 @@
 Albany::HMCProblem::HMCProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
-    const int                                   numDim_,
+    int const                                   numDim_,
     Teuchos::RCP<const Teuchos::Comm<int>>&     commT)
     : Albany::AbstractProblem(
           params_,

@@ -18,7 +18,7 @@ namespace Albany {
 
 Teuchos::RCP<Thyra_VectorSpace const>
 createLocallyReplicatedVectorSpace(
-    const int                              size,
+    int const                              size,
     const Teuchos::RCP<const Teuchos_Comm> comm)
 {
   Teuchos::RCP<const Tpetra_Map> tmap(
@@ -704,7 +704,7 @@ buildRestrictionOperator(
 
   ThyraCrsMatrixFactory factory(space, subspace);
 
-  const int localSubDim = subspace_indexer->getNumLocalElements();
+  int const localSubDim = subspace_indexer->getNumLocalElements();
   for (LO lid = 0; lid < localSubDim; ++lid) {
     const GO gid = subspace_indexer->getGlobalElement(lid);
     ALBANY_PANIC(
@@ -732,7 +732,7 @@ buildProlongationOperator(
 
   ThyraCrsMatrixFactory factory(subspace, space);
 
-  const int localSubDim = subspace_indexer->getNumLocalElements();
+  int const localSubDim = subspace_indexer->getNumLocalElements();
   for (LO lid = 0; lid < localSubDim; ++lid) {
     const GO gid = subspace_indexer->getGlobalElement(lid);
     ALBANY_PANIC(
@@ -1033,7 +1033,7 @@ mean(Teuchos::RCP<Thyra_Vector const> const& v)
 Teuchos::Array<ST>
 means(const Teuchos::RCP<const Thyra_MultiVector>& mv)
 {
-  const int          numVecs = mv->domain()->dim();
+  int const          numVecs = mv->domain()->dim();
   Teuchos::Array<ST> vals(numVecs);
   for (int i = 0; i < numVecs; ++i) { vals[i] = mean(mv->col(i)); }
 
@@ -1112,7 +1112,7 @@ void
 writeMatrixMarket<Thyra_Vector const>(
     Teuchos::RCP<Thyra_Vector const> const& v,
     const std::string&                      prefix,
-    const int                               counter)
+    int const                               counter)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tv = getConstTpetraVector(v, false);
@@ -1132,7 +1132,7 @@ void
 writeMatrixMarket<Thyra_Vector>(
     const Teuchos::RCP<Thyra_Vector>& v,
     const std::string&                prefix,
-    const int                         counter)
+    int const                         counter)
 {
   writeMatrixMarket(v.getConst(), prefix, counter);
 }
@@ -1142,7 +1142,7 @@ void
 writeMatrixMarket<const Thyra_MultiVector>(
     const Teuchos::RCP<const Thyra_MultiVector>& mv,
     const std::string&                           prefix,
-    const int                                    counter)
+    int const                                    counter)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmv = getConstTpetraMultiVector(mv, false);
@@ -1162,7 +1162,7 @@ void
 writeMatrixMarket<Thyra_MultiVector>(
     const Teuchos::RCP<Thyra_MultiVector>& mv,
     const std::string&                     prefix,
-    const int                              counter)
+    int const                              counter)
 {
   writeMatrixMarket(mv.getConst(), prefix, counter);
 }
@@ -1172,7 +1172,7 @@ void
 writeMatrixMarket<const Thyra_LinearOp>(
     const Teuchos::RCP<const Thyra_LinearOp>& A,
     const std::string&                        prefix,
-    const int                                 counter)
+    int const                                 counter)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tA = getConstTpetraMatrix(A, false);
@@ -1192,7 +1192,7 @@ void
 writeMatrixMarket<Thyra_LinearOp>(
     const Teuchos::RCP<Thyra_LinearOp>& A,
     const std::string&                  prefix,
-    const int                           counter)
+    int const                           counter)
 {
   writeMatrixMarket(A.getConst(), prefix, counter);
 }
@@ -1204,7 +1204,7 @@ void
 writeMatrixMarket<Thyra_VectorSpace const>(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     const std::string&                           prefix,
-    const int                                    counter)
+    int const                                    counter)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tm = getTpetraMap(vs, false);
@@ -1224,7 +1224,7 @@ void
 writeMatrixMarket<Thyra_VectorSpace>(
     const Teuchos::RCP<Thyra_VectorSpace>& vs,
     const std::string&                     prefix,
-    const int                              counter)
+    int const                              counter)
 {
   writeMatrixMarket(vs.getConst(), prefix, counter);
 }

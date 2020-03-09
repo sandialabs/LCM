@@ -96,8 +96,8 @@ GeomDecomp::compute_entity_centroid(
     entity_coordinates(bulk_data, entity, nodal_coor_ref, coordinates);
   }
 
-  const int num_nodes = coordinates.size();
-  const int ndim      = coordinates.front().size();
+  int const num_nodes = coordinates.size();
+  int const ndim      = coordinates.front().size();
 
   centroid.resize(ndim);
   for (int i = 0; i < ndim; ++i) { centroid[i] = 0; }

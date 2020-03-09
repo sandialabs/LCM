@@ -126,7 +126,7 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
   Teuchos::RCP<Thyra_MultiVector> overlapped_soln;
 
   // Number of time derivative vectors that we need to support
-  const int num_time_deriv;
+  int const num_time_deriv;
 
   const Teuchos::RCP<Teuchos::ParameterList>         appParams_;
   const Teuchos::RCP<Albany::AbstractDiscretization> disc_;

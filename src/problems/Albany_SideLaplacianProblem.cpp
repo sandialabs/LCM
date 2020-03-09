@@ -19,7 +19,7 @@ namespace Albany {
 SideLaplacian::SideLaplacian(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
     const Teuchos::RCP<ParamLib>&               paramLib,
-    const int                                   numEq)
+    int const                                   numEq)
     : Albany::AbstractProblem(params, paramLib, numEq), use_sdbcs_(false)
 {
   bool solve_as_ss_eqn = params->get<bool>("Solve As Side Set Equation");
@@ -60,11 +60,11 @@ SideLaplacian::buildProblem(
 
   cellEBName = meshSpecs[0]->ebName;
 
-  const int worksetSize     = meshSpecs[0]->worksetSize;
-  const int numCellSides    = cellType->getSideCount();
-  const int numCellVertices = cellType->getNodeCount();
-  const int numCellNodes    = cellBasis->getCardinality();
-  const int numCellQPs      = cellCubature->getNumPoints();
+  int const worksetSize     = meshSpecs[0]->worksetSize;
+  int const numCellSides    = cellType->getSideCount();
+  int const numCellVertices = cellType->getNodeCount();
+  int const numCellNodes    = cellBasis->getCardinality();
+  int const numCellQPs      = cellCubature->getNumPoints();
 
   dl = Teuchos::rcp(new Albany::Layouts(
       worksetSize, numCellVertices, numCellNodes, numCellQPs, numDim));

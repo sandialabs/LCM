@@ -94,7 +94,7 @@ class computeVolumeAverageKernel
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const int cell) const
+  operator()(int const cell) const
   {
     ScalarT                     volume, pbar, p;
     minitensor::Tensor<ScalarT> sig(num_dims_);

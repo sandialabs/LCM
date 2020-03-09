@@ -16,7 +16,7 @@ namespace Albany {
 
 Teuchos::RCP<Thyra_VectorSpace const>
 createLocallyReplicatedVectorSpace(
-    const int                              size,
+    int const                              size,
     const Teuchos::RCP<const Teuchos_Comm> comm);
 
 Teuchos::RCP<const Teuchos_Comm>

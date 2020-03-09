@@ -105,11 +105,11 @@ Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
 MoertelT::PaddedMatrix(
     const Tpetra::Map<LO, GO, N>& rowmap,
     double                        val,
-    const int                     numentriesperrow)
+    int const                     numentriesperrow)
 {
   Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> tmp = Teuchos::rcp(
       new Tpetra::CrsMatrix<ST, LO, GO, N>(rowmap, numentriesperrow));
-  const int numrows = tmp->getGlobalNumRows();
+  int const numrows = tmp->getGlobalNumRows();
   for (int i = 0; i < numrows; ++i) {
     int grid = tmp->getRangeMap()->getGlobalElement(i);
     int err  = tmp->insertGlobalValues(grid, 1, &val, &grid);
@@ -145,7 +145,7 @@ MoertelT::StripZeros(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, double eps)
       return Teuchos::null;
     }
     int           numentries;
-    const int*    lindices;
+    int const*    lindices;
     const double* values;
     //    int err  = A.ExtractMyRowView(lrow,numentries,values,lindices);
     LO err = A.getLocalRowViewRaw(lrow, numentries, lindices, values);
@@ -418,7 +418,7 @@ MoertelT::SplitMatrix2x2(
     std::vector<int>    a22gcindices(100);
     std::vector<double> a22values(100);
     for (int i = 0; i < A->NumMyRows(); ++i) {
-      const int grid = A->GRID(i);
+      int const grid = A->GRID(i);
       if (A22map.MyGID(grid) == false) continue;
       // std::cout << "Row " << grid << " in A22 Columns ";
       int     numentries;
@@ -438,7 +438,7 @@ MoertelT::SplitMatrix2x2(
       }
       int count = 0;
       for (int j = 0; j < numentries; ++j) {
-        const int gcid = A->ColMap().GID(cindices[j]);
+        int const gcid = A->ColMap().GID(cindices[j]);
         // see whether we have gcid in a22gmap
         std::map<int, int>::iterator curr = a22gmap.find(gcid);
         if (curr == a22gmap.end()) continue;
@@ -471,7 +471,7 @@ MoertelT::SplitMatrix2x2(
     std::vector<int>    a11gcindices(100);
     std::vector<double> a11values(100);
     for (int i = 0; i < A->NumMyRows(); ++i) {
-      const int grid = A->GRID(i);
+      int const grid = A->GRID(i);
       if (A11map.MyGID(grid) == false) continue;
       int     numentries;
       double* values;
@@ -490,7 +490,7 @@ MoertelT::SplitMatrix2x2(
       }
       int count = 0;
       for (int j = 0; j < numentries; ++j) {
-        const int gcid = A->ColMap().GID(cindices[j]);
+        int const gcid = A->ColMap().GID(cindices[j]);
         // see whether we have gcid as part of a22gmap
         std::map<int, int>::iterator curr = a22gmap.find(gcid);
         if (curr != a22gmap.end()) continue;
@@ -520,7 +520,7 @@ MoertelT::SplitMatrix2x2(
     std::vector<int>    a12gcindices(100);
     std::vector<double> a12values(100);
     for (int i = 0; i < A->NumMyRows(); ++i) {
-      const int grid = A->GRID(i);
+      int const grid = A->GRID(i);
       if (A11map.MyGID(grid) == false) continue;
       int     numentries;
       double* values;
@@ -539,7 +539,7 @@ MoertelT::SplitMatrix2x2(
       }
       int count = 0;
       for (int j = 0; j < numentries; ++j) {
-        const int gcid = A->ColMap().GID(cindices[j]);
+        int const gcid = A->ColMap().GID(cindices[j]);
         // see whether we have gcid as part of a22gmap
         std::map<int, int>::iterator curr = a22gmap.find(gcid);
         if (curr == a22gmap.end()) continue;
@@ -569,7 +569,7 @@ MoertelT::SplitMatrix2x2(
     std::vector<int>    a21gcindices(100);
     std::vector<double> a21values(100);
     for (int i = 0; i < A->NumMyRows(); ++i) {
-      const int grid = A->GRID(i);
+      int const grid = A->GRID(i);
       if (A22map.MyGID(grid) == false) continue;
       int     numentries;
       double* values;
@@ -588,7 +588,7 @@ MoertelT::SplitMatrix2x2(
       }
       int count = 0;
       for (int j = 0; j < numentries; ++j) {
-        const int gcid = A->ColMap().GID(cindices[j]);
+        int const gcid = A->ColMap().GID(cindices[j]);
         // see whether we have gcid as part of a22gmap
         std::map<int, int>::iterator curr = a22gmap.find(gcid);
         if (curr != a22gmap.end()) continue;
@@ -632,7 +632,7 @@ MoertelT::SplitMap(
   int              count = 0;
   std::vector<int> myaugids(Amap.NumMyElements());
   for (int i = 0; i < Amap.NumMyElements(); ++i) {
-    const int gid = Amap.GID(i);
+    int const gid = Amap.GID(i);
     if (Ag.MyGID(gid)) continue;
     myaugids[count] = gid;
     ++count;

@@ -51,8 +51,8 @@ InitialConditions(
     const Teuchos::ArrayRCP<std::string>& wsEBNames,
     const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>
                             coords,
-    const int               neq,
-    const int               numDim,
+    int const               neq,
+    int const               numDim,
     Teuchos::ParameterList& icParams,
     const bool              hasRestartSolution)
 {

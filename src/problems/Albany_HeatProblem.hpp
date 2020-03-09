@@ -30,7 +30,7 @@ class HeatProblem : public AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
       // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib,
-      const int                               numDim_,
+      int const                               numDim_,
       Teuchos::RCP<const Teuchos::Comm<int>>& commT_);
 
   //! Destructor
@@ -153,16 +153,16 @@ Albany::HeatProblem::constructEvaluators(
       Albany::getIntrepid2Basis(*elem_top);
   RCP<shards::CellTopology> cellType = rcp(new shards::CellTopology(elem_top));
 
-  const int numNodes    = intrepidBasis->getCardinality();
-  const int worksetSize = meshSpecs.worksetSize;
+  int const numNodes    = intrepidBasis->getCardinality();
+  int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cellCubature =
       cubFactory.create<PHX::Device, RealType, RealType>(
           *cellType, meshSpecs.cubatureDegree);
 
-  const int numQPtsCell = cellCubature->getNumPoints();
-  const int numVertices = cellType->getNodeCount();
+  int const numQPtsCell = cellCubature->getNumPoints();
+  int const numVertices = cellType->getNodeCount();
 
   // Problem is steady or transient
   ALBANY_PANIC(

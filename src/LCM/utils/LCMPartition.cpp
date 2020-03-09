@@ -1644,14 +1644,14 @@ shuffled_sequence(int number_elements)
   for (int i = 0; i < number_elements; ++i) { unshuffled.push_back(i); }
 
   // Happens to be a Mersenne prime for int_32
-  const int prime = std::numeric_limits<int>::max();
+  int const prime = std::numeric_limits<int>::max();
 
   for (int i = 0; i < number_elements; ++i) {
-    const int remainder = number_elements - i;
+    int const remainder = number_elements - i;
 
-    const int index = prime % remainder;
+    int const index = prime % remainder;
 
-    const int selection = unshuffled[index];
+    int const selection = unshuffled[index];
 
     shuffled.push_back(selection);
 

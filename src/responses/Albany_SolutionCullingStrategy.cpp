@@ -35,7 +35,7 @@ UniformSolutionCullingStrategy::selectedGIDs(
 {
   auto source_indexer = createGlobalLocalIndexer(sourceVS);
 
-  const int          localDim = source_indexer->getNumLocalElements();
+  int const          localDim = source_indexer->getNumLocalElements();
   Teuchos::Array<GO> allGIDs(sourceVS->dim());
   Teuchos::Array<GO> myGIDs(localDim);
 
@@ -47,7 +47,7 @@ UniformSolutionCullingStrategy::selectedGIDs(
   std::sort(allGIDs.begin(), allGIDs.end());
 
   Teuchos::Array<GO> target_gids(numValues_);
-  const int          stride = 1 + (allGIDs.size() - 1) / numValues_;
+  int const          stride = 1 + (allGIDs.size() - 1) / numValues_;
   for (int i = 0; i < numValues_; ++i) { target_gids[i] = allGIDs[i * stride]; }
   return target_gids;
 }
@@ -197,7 +197,7 @@ createSolutionCullingStrategy(
       params.get("Culling Strategy", "Uniform");
 
   if (cullingStrategyToken == "Uniform") {
-    const int numValues = params.get("Num Values", 10);
+    int const numValues = params.get("Num Values", 10);
     return Teuchos::rcp(new UniformSolutionCullingStrategy(numValues));
   } else if (cullingStrategyToken == "Node Set") {
     const std::string nodeSetLabel = params.get<std::string>("Node Set Label");

@@ -68,7 +68,7 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 #if defined(KOKKOS_OPTIMIZED)
   typedef Kokkos::TeamPolicy<ExecutionSpace> team_policy;
   typedef team_policy::member_type           team_member;
-  const int                                  work_size = 256;
+  int const                                  work_size = 256;
   int                                        numCells;
   int threads_per_team;  //=worksize/numQP
   int numTeams;          //#of elements/threads_per_team
@@ -83,7 +83,7 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const DOFGradInterpolationBase_Residual_Tag& tag, const int& cell)
+  operator()(const DOFGradInterpolationBase_Residual_Tag& tag, int const& cell)
       const;
 #endif
 };
@@ -190,7 +190,7 @@ class FastSolutionGradInterpolationBase<
   void
   operator()(
       const FastSolutionGradInterpolationBase_Jacobian_Tag& tag,
-      const int&                                            cell) const;
+      int const&                                            cell) const;
 };
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

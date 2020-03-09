@@ -38,7 +38,7 @@ template <typename EvalT>
 int
 getDerivativeDimensions(
     const Albany::Application* app,
-    const int                  element_block_idx);
+    int const                  element_block_idx);
 
 template <class ViewType>
 int
@@ -119,7 +119,7 @@ reduceAll(
 //! Broadcast an MDField.
 template <typename T>
 void
-broadcast(const Teuchos_Comm& comm, const int root_rank, PHX::MDField<T>& a);
+broadcast(const Teuchos_Comm& comm, int const root_rank, PHX::MDField<T>& a);
 
 /*! \brief Loop over an array and apply a functor.
  *
@@ -341,7 +341,7 @@ class MDFieldMemoizer
 //! Return field manager name and evaluation type string
 template <typename EvalT>
 inline std::string
-evalName(const std::string& fmName, const int& ps)
+evalName(const std::string& fmName, int const& ps)
 {
   std::string evalName = PHX::print<EvalT>();
   evalName.erase(evalName.begin());

@@ -26,7 +26,7 @@ class ReactDiffSystem : public AbstractProblem
   ReactDiffSystem(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
-      const int                                   numDim_);
+      int const                                   numDim_);
 
   //! Destructor
   ~ReactDiffSystem();
@@ -130,16 +130,16 @@ Albany::ReactDiffSystem::constructEvaluators(
   RCP<shards::CellTopology> cellType =
       rcp(new shards::CellTopology(&meshSpecs.ctd));
 
-  const int numNodes    = intrepidBasis->getCardinality();
-  const int worksetSize = meshSpecs.worksetSize;
+  int const numNodes    = intrepidBasis->getCardinality();
+  int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(
           *cellType, meshSpecs.cubatureDegree);
 
-  const int numQPts     = cubature->getNumPoints();
-  const int numVertices = cellType->getNodeCount();
+  int const numQPts     = cubature->getNumPoints();
+  int const numVertices = cellType->getNodeCount();
 
   *out << "Field Dimensions: Workset=" << worksetSize
        << ", Vertices= " << numVertices << ", Nodes= " << numNodes

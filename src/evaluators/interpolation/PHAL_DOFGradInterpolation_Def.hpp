@@ -61,25 +61,25 @@ KOKKOS_INLINE_FUNCTION void
 DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
     const team_member& thread) const
 {
-  const int thread_idx = thread.league_rank() * threads_per_team;
-  const int end_loop   = thread_idx + threads_per_team > (numCells * numQPs) ?
+  int const thread_idx = thread.league_rank() * threads_per_team;
+  int const end_loop   = thread_idx + threads_per_team > (numCells * numQPs) ?
                            (numCells * numQPs) :
                            (thread_idx + threads_per_team);
   ScalarT gradVal_tmp;
 
   Kokkos::parallel_for(
       Kokkos::TeamThreadRange(thread, thread_idx, end_loop), [=](int& indx) {
-        const int cell = indx / numCells;
-        const int qp = indx    = indx / numCells;
-        const int vector_range = numNodes - 1;
+        int const cell = indx / numCells;
+        int const qp = indx    = indx / numCells;
+        int const vector_range = numNodes - 1;
         for (int dim = 0; dim < numDims; dim++) {
           grad_val_qp(cell, qp, dim) =
               val_node(cell, 0) * GradBF(cell, 0, qp, dim);
 
           /* Kokkos::parallel_reduce(Kokkos::ThreadVectorRange(thread,
           vector_range),
-                              [&](const int& lk, ScalarT& gradVal){
-                          const int node=1+lk;
+                              [&](int const& lk, ScalarT& gradVal){
+                          int const node=1+lk;
                           gradVal += val_node(cell, node) * GradBF(cell, node,
           qp, dim);
                }, gradVal_tmp);
@@ -101,7 +101,7 @@ template <typename EvalT, typename Traits, typename ScalarT>
 KOKKOS_INLINE_FUNCTION void
 DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
     const DOFGradInterpolationBase_Residual_Tag& tag,
-    const int&                                   cell) const
+    int const&                                   cell) const
 {
   for (int qp = 0; qp < numQPs; ++qp) {
     for (int dim = 0; dim < numDims; dim++) {
@@ -172,7 +172,7 @@ FastSolutionGradInterpolationBase<
     typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
 operator()(
     const FastSolutionGradInterpolationBase_Jacobian_Tag& tag,
-    const int&                                            cell) const
+    int const&                                            cell) const
 {
   for (int qp = 0; qp < this->numQPs; ++qp) {
     for (int dim = 0; dim < this->numDims; dim++) {

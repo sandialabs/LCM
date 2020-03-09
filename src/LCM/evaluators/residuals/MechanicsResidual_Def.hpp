@@ -98,7 +98,7 @@ MechanicsResidual<EvalT, Traits>::postRegistrationSetup(
 //
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MechanicsResidual<EvalT, Traits>::compute_Stress(const int i) const
+MechanicsResidual<EvalT, Traits>::compute_Stress(int const i) const
 {
   for (int node = 0; node < num_nodes_; ++node) {
     for (int dim = 0; dim < num_dims_; ++dim) {
@@ -119,7 +119,7 @@ MechanicsResidual<EvalT, Traits>::compute_Stress(const int i) const
 
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MechanicsResidual<EvalT, Traits>::compute_BodyForce(const int i) const
+MechanicsResidual<EvalT, Traits>::compute_BodyForce(int const i) const
 {
   for (int node = 0; node < num_nodes_; ++node) {
     for (int pt = 0; pt < num_pts_; ++pt) {
@@ -132,7 +132,7 @@ MechanicsResidual<EvalT, Traits>::compute_BodyForce(const int i) const
 
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MechanicsResidual<EvalT, Traits>::compute_Acceleration(const int i) const
+MechanicsResidual<EvalT, Traits>::compute_Acceleration(int const i) const
 {
   for (int node = 0; node < num_nodes_; ++node) {
     for (int pt = 0; pt < num_pts_; ++pt) {
@@ -148,7 +148,7 @@ template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MechanicsResidual<EvalT, Traits>::operator()(
     const residual_Tag& tag,
-    const int&          i) const
+    int const&          i) const
 {
   this->compute_Stress(i);
 }
@@ -157,7 +157,7 @@ template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MechanicsResidual<EvalT, Traits>::operator()(
     const residual_haveBodyForce_Tag& tag,
-    const int&                        i) const
+    int const&                        i) const
 {
   this->compute_Stress(i);
   this->compute_BodyForce(i);
@@ -167,7 +167,7 @@ template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MechanicsResidual<EvalT, Traits>::operator()(
     const residual_haveBodyForce_and_dynamic_Tag& tag,
-    const int&                                    i) const
+    int const&                                    i) const
 {
   this->compute_Stress(i);
   this->compute_BodyForce(i);
@@ -178,7 +178,7 @@ template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MechanicsResidual<EvalT, Traits>::operator()(
     const residual_have_dynamic_Tag& tag,
-    const int&                       i) const
+    int const&                       i) const
 {
   this->compute_Stress(i);
   this->compute_Acceleration(i);

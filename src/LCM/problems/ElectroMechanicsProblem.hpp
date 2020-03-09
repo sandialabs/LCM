@@ -33,7 +33,7 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
   ElectroMechanicsProblem(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               param_lib,
-      const int                                   num_dims,
+      int const                                   num_dims,
       Teuchos::RCP<const Teuchos::Comm<int>>&     commT);
   ///
   /// Destructor
@@ -278,7 +278,7 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
 
   // Note that these are the volume element quantities
   num_nodes_             = intrepidBasis->getCardinality();
-  const int workset_size = meshSpecs.worksetSize;
+  int const workset_size = meshSpecs.worksetSize;
 
   num_dims_     = cubature->getDimension();
   num_pts_      = cubature->getNumPoints();

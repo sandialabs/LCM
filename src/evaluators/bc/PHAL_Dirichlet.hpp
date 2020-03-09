@@ -56,7 +56,7 @@ class DirichletBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   }
 
  protected:
-  const int   offset;
+  int const   offset;
   ScalarT     value;
   std::string nodeSetID;
 };

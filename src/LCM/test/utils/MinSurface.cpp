@@ -85,7 +85,7 @@ main(int ac, char* av[])
       topology.get_rank_entities(bulk_data, 0);
 
   // Definition of parameters and arrays of the function Graph
-  const int TotalNumberNodes =
+  int const TotalNumberNodes =
       MeshNodes.size();  // Total number of nodes of the input the mesh
   std::vector<int> _nodeNames = topology.nodeNames();  // Vector with node names
 
@@ -95,7 +95,7 @@ main(int ac, char* av[])
       1);  // Get all the edges of the mesh
 
   // Initialize Array of edges
-  const int ArraySize = MeshEdges.size();
+  int const ArraySize = MeshEdges.size();
   Edge*     EdgesArray;
   EdgesArray = new Edge[ArraySize];
 

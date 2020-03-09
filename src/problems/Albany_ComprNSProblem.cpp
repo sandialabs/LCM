@@ -18,7 +18,7 @@
 Albany::ComprNSProblem::ComprNSProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
-    const int                                   numDim_)
+    int const                                   numDim_)
     : Albany::AbstractProblem(params_, paramLib_),
       params(params_),
       numDim(numDim_),

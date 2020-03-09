@@ -144,8 +144,8 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
     const char*                            filename,
     const Teuchos::RCP<Thyra_MultiVector>& mv)
 {
-  const int lineLength  = 1025;
-  const int tokenLength = 35;
+  int const lineLength  = 1025;
+  int const tokenLength = 35;
   char      line[lineLength];
   char      token1[tokenLength];
   char      token2[tokenLength];

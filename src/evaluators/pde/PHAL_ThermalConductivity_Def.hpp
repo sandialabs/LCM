@@ -14,7 +14,7 @@
 // Radom field types
 /*
 enum SG_RF {CONSTANT, UNIFORM, LOGNORMAL};
-const int num_sg_rf = 3;
+int const num_sg_rf = 3;
 const SG_RF sg_rf_values[] = {CONSTANT, UNIFORM, LOGNORMAL};
 const char *sg_rf_names[] = {"Constant", "Uniform", "Log-Normal"};
 

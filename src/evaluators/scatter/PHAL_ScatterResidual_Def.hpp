@@ -127,7 +127,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
     const PHAL_ScatterResRank0_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -140,7 +140,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
     const PHAL_ScatterResRank1_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -153,7 +153,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
     const PHAL_ScatterResRank2_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
@@ -231,7 +231,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterResRank0_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -245,10 +245,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterJacRank0_Adjoint_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO col[500];
   LO row;
@@ -277,10 +277,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterJacRank0_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO row;
   LO col[500];
@@ -308,7 +308,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterResRank1_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++) {
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -323,10 +323,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterJacRank1_Adjoint_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO col[500];
   LO row;
@@ -356,10 +356,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterJacRank1_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO col[500];
   LO row;
@@ -389,7 +389,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterResRank2_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
@@ -404,10 +404,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterJacRank2_Adjoint_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO col[500];
   LO row;
@@ -439,10 +439,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_ScatterJacRank2_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO col[500];
   LO row;

@@ -31,7 +31,7 @@ class ConstitutiveDriverProblem : public Albany::AbstractProblem
   ConstitutiveDriverProblem(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               param_lib,
-      const int                                   num_dims,
+      int const                                   num_dims,
       Teuchos::RCP<const Teuchos::Comm<int>>&     commT);
 
   ///
@@ -235,7 +235,7 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
 
   // Note that these are the volume element quantities
   num_nodes_             = 1;
-  const int workset_size = meshSpecs.worksetSize;
+  int const workset_size = meshSpecs.worksetSize;
   num_pts_               = 1;
   num_vertices_          = num_nodes_;
 

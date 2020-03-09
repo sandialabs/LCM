@@ -85,7 +85,7 @@ ModelEvaluator::ModelEvaluator(
             &parameterParams :
             &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
 
-    const int numParameters = pList->get<int>("Number");
+    int const numParameters = pList->get<int>("Number");
     ALBANY_PANIC(
         numParameters == 0,
         std::endl
@@ -115,7 +115,7 @@ ModelEvaluator::ModelEvaluator(
     bool number_exists = pList->getEntryPtr("Number");
 
     if (number_exists) {
-      const int numParameters = pList->get<int>("Number");
+      int const numParameters = pList->get<int>("Number");
       ALBANY_PANIC(
           numParameters == 0,
           std::endl
@@ -526,7 +526,7 @@ ModelEvaluator::createOutArgsImpl() const
   Thyra_ModelEvaluator::OutArgsSetup<ST> result;
   result.setModelEvalDescription(this->description());
 
-  const int n_g = app->getNumResponses();
+  int const n_g = app->getNumResponses();
   result.set_Np_Ng(num_param_vecs + num_dist_param_vecs, n_g);
 
   result.setSupports(Thyra_ModelEvaluator::OUT_ARG_f, true);

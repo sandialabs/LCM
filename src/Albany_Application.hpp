@@ -338,7 +338,7 @@ class Application
   void
   loadWorksetBucketInfo(
       PHAL::Workset&     workset,
-      const int&         ws,
+      int const&         ws,
       const std::string& evalName);
 
   void
@@ -369,7 +369,7 @@ class Application
 
   //! Routine to load common sideset info into workset
   void
-  loadWorksetSidesetInfo(PHAL::Workset& workset, const int ws);
+  loadWorksetSidesetInfo(PHAL::Workset& workset, int const ws);
 
   //! Routines for setting a scaling to be applied to the Jacobian/resdiual
   void
@@ -402,7 +402,7 @@ class Application
   writePhalanxGraph(
       Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm,
       const std::string&                                  evalName,
-      const int&                                          phxGraphVisDetail);
+      int const&                                          phxGraphVisDetail);
 
  public:
   double
@@ -704,7 +704,7 @@ template <typename EvalT>
 void
 Application::loadWorksetBucketInfo(
     PHAL::Workset&     workset,
-    const int&         ws,
+    int const&         ws,
     const std::string& evalName)
 {
   auto const& wsElNodeEqID            = disc->getWsElNodeEqID();

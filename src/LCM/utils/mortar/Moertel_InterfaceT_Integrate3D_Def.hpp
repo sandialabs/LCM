@@ -165,7 +165,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D()
 #endif
 
     // check whether I own at least one of the nodes on this slave segment
-    const int nnode                                 = actsseg->Nnode();
+    int const nnode                                 = actsseg->Nnode();
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** nodes = actsseg->Nodes();
     bool foundone                                   = false;
 
@@ -325,7 +325,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> rowsnode =
         curr->second;
     int        snlmdof = rowsnode->Nlmdof();
-    const int* slmdof  = rowsnode->LMDof();
+    int const* slmdof  = rowsnode->LMDof();
     // std::cout << "Current row snode: " << rowsnode->Id() << std::endl;
 
     std::map<int, double>::iterator rowcurr;
@@ -357,7 +357,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
 
         // get the primal dofs
         int        sndof = colsnode->Ndof();
-        const int* sdof  = colsnode->Dof();
+        int const* sdof  = colsnode->Dof();
 
         if (snlmdof != sndof) {
           std::cout
@@ -429,7 +429,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
 
         // get the primal dofs
         int        mndof = colmnode->Ndof();
-        const int* mdof  = colmnode->Dof();
+        int const* mdof  = colmnode->Dof();
 
         if (snlmdof != mndof) {
           std::cout
@@ -667,7 +667,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
 
             // get lagrange multipliers
             int        nslmdof = snode->Nlmdof();
-            const int* slmdof  = snode->LMDof();
+            int const* slmdof  = snode->LMDof();
 
             // loop colD_r/valD_r and assemble
             for (int j = 0; j < size; ++j) {
@@ -691,7 +691,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
               }
 
               int        nsdof = colnode->Ndof();
-              const int* sdof  = colnode->Dof();
+              int const* sdof  = colnode->Dof();
 
               if (nsdof != nslmdof) {
                 std::stringstream oss;
@@ -768,7 +768,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
 
             // get the lagrange multipliers
             int        nslmdof = snode->Nlmdof();
-            const int* slmdof  = snode->LMDof();
+            int const* slmdof  = snode->LMDof();
 
             // loop colM_r/valM_r and assemble
             for (int j = 0; j < size; ++j) {
@@ -792,7 +792,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
               }
 
               int        nmdof = colnode->Ndof();
-              const int* mdof  = colnode->Dof();
+              int const* mdof  = colnode->Dof();
 
               if (nmdof != nslmdof) {
                 std::stringstream oss;
@@ -928,7 +928,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> rowsnode =
         curr->second;
     int        snlmdof = rowsnode->Nlmdof();
-    const int* slmdof  = rowsnode->LMDof();
+    int const* slmdof  = rowsnode->LMDof();
     // std::cout << "Current row snode: " << rowsnode->Id() << std::endl;
 
     std::map<int, double>::iterator rowcurr;
@@ -965,7 +965,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 
         // get the primal dofs
         int        sndof = colsnode->Ndof();
-        const int* sdof  = colsnode->Dof();
+        int const* sdof  = colsnode->Dof();
 
         if (snlmdof != sndof) {
           std::cout
@@ -1033,7 +1033,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 
         // get the primal dofs
         int        mndof = colmnode->Ndof();
-        const int* mdof  = colmnode->Dof();
+        int const* mdof  = colmnode->Dof();
 
         if (snlmdof != mndof) {
           std::cout
@@ -1267,7 +1267,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 
             // get lagrange multipliers
             int        nslmdof = snode->Nlmdof();
-            const int* slmdof  = snode->LMDof();
+            int const* slmdof  = snode->LMDof();
 
             // loop colD_r/valD_r and assemble
             for (int j = 0; j < size; ++j) {
@@ -1291,7 +1291,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
               }
 
               int        nsdof = colnode->Ndof();
-              const int* sdof  = colnode->Dof();
+              int const* sdof  = colnode->Dof();
 
               if (nsdof != nslmdof) {
                 std::stringstream oss;
@@ -1359,7 +1359,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 
             // get the lagrange multipliers
             int        nslmdof = snode->Nlmdof();
-            const int* slmdof  = snode->LMDof();
+            int const* slmdof  = snode->LMDof();
 
             // loop colM_r/valM_r and assemble
             for (int j = 0; j < size; ++j) {
@@ -1383,7 +1383,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
               }
 
               int        nmdof = colnode->Ndof();
-              const int* mdof  = colnode->Dof();
+              int const* mdof  = colnode->Dof();
 
               if (nmdof != nslmdof) {
                 std::stringstream oss;

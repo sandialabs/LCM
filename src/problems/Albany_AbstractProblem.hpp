@@ -72,7 +72,7 @@ class AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& params_,
       const Teuchos::RCP<ParamLib>&               paramLib_,
       // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib_,
-      const int neq_ = 0);
+      int const neq_ = 0);
 
   //! Destructor
   virtual ~AbstractProblem(){};
@@ -83,7 +83,7 @@ class AbstractProblem
   const std::map<int, std::vector<std::string>>&
   getSideSetEquations() const;
   void
-  setNumEquations(const int neq_);
+  setNumEquations(int const neq_);
   unsigned int
   numStates() const;
 

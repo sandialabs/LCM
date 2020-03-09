@@ -79,8 +79,8 @@ FastSolutionTensorInterpolationBase<
     typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
     evaluateFields(typename Traits::EvalData workset)
 {
-  const int  num_dof = this->val_node(0, 0, 0, 0).size();
-  const int  neq     = workset.wsElNodeEqID.extent(2);
+  int const  num_dof = this->val_node(0, 0, 0, 0).size();
+  int const  neq     = workset.wsElNodeEqID.extent(2);
   const auto vecDim  = this->vecDim;
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < this->numQPs; ++qp) {

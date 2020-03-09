@@ -339,7 +339,7 @@ SolverFactory::checkSolveTestResults(
   const double absTol      = testParams->get<double>("Absolute Tolerance");
 
   // Get number of responses (g) to test
-  const int numResponseTests = testParams->get<int>("Number of Comparisons");
+  int const numResponseTests = testParams->get<int>("Number of Comparisons");
   if (numResponseTests > 0) {
     ALBANY_ASSERT(
         g != Teuchos::null,
@@ -392,7 +392,7 @@ SolverFactory::checkSolveTestResults(
             << dgdp->range()->dim() << ") !");
   }
   for (int i = 0; i < numSensTests; i++) {
-    const int              numVecs = dgdp->domain()->dim();
+    int const              numVecs = dgdp->domain()->dim();
     Teuchos::Array<double> testSensValues =
         sensitivityParams->get<Teuchos::Array<double>>(
             strint("Sensitivity Test Values", i));
@@ -428,7 +428,7 @@ SolverFactory::checkDakotaTestResults(
   const double relTol      = testParams->get<double>("Relative Tolerance");
   const double absTol      = testParams->get<double>("Absolute Tolerance");
 
-  const int numDakotaTests =
+  int const numDakotaTests =
       testParams->get<int>("Number of Dakota Comparisons");
   if (numDakotaTests > 0 && drdv != NULL) {
     ALBANY_ASSERT(
@@ -729,7 +729,7 @@ SolverFactory::getValidRegressionResultsParameters() const
       0,
       "Number of sensitivity vectors to regress against");
 
-  const int maxSensTests = 10;
+  int const maxSensTests = 10;
   for (int i = 0; i < maxSensTests; i++) {
     validPL->set<Array<double>>(
         strint("Sensitivity Test Values", i),
@@ -771,7 +771,7 @@ SolverFactory::getValidRegressionResultsParameters() const
       0,
       "Number of stochastic Galerkin expansions to regress against");
 
-  const int maxSGTests = 10;
+  int const maxSGTests = 10;
   for (int i = 0; i < maxSGTests; i++) {
     validPL->set<Array<double>>(
         strint("Stochastic Galerkin Expansion Test Values", i),
@@ -822,7 +822,7 @@ SolverFactory::getValidParameterParameters() const
   ;
 
   validPL->set<int>("Number", 0);
-  const int maxParameters = 100;
+  int const maxParameters = 100;
   for (int i = 0; i < maxParameters; i++) {
     validPL->set<std::string>(strint("Parameter", i), "");
   }
@@ -847,7 +847,7 @@ SolverFactory::getValidResponseParameters() const
 
   validPL->set<int>("Number", 0);
   validPL->set<int>("Equation", 0);
-  const int maxParameters = 500;
+  int const maxParameters = 500;
   for (int i = 0; i < maxParameters; i++) {
     validPL->set<std::string>(strint("Response", i), "");
     validPL->sublist(strint("ResponseParams", i));

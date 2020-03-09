@@ -105,7 +105,7 @@ imposeOrder(
         continue;
       }
     }
-    const int index = order_it->second;
+    int const index = order_it->second;
     found[index]    = true;
     if (index > 0) {
       std::stringstream dependency;

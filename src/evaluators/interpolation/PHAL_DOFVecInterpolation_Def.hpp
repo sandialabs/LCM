@@ -59,9 +59,9 @@ class VecInterpolation
   MDFieldType1 BF_;
   MDFieldType2 val_node_;
   MDFieldType3 U_;
-  const int    numQPs_;
-  const int    numNodes_;
-  const int    vecDims_;
+  int const    numQPs_;
+  int const    numNodes_;
+  int const    vecDims_;
 
  public:
   typedef DeviceType device_type;
@@ -84,7 +84,7 @@ class VecInterpolation
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const int i) const
+  operator()(int const i) const
   {
     for (int qp = 0; qp < numQPs_; ++qp) {
       for (int vec = 0; vec < vecDims_; vec++) {
@@ -144,11 +144,11 @@ class VecInterpolationJacob
   MDFieldType     BF_;
   MDFieldTypeFad1 val_node_;
   MDFieldTypeFad2 U_;
-  const int       numNodes_;
-  const int       numQPs_;
-  const int       vecDims_;
-  const int       num_dof_;
-  const int       offset_;
+  int const       numNodes_;
+  int const       numQPs_;
+  int const       vecDims_;
+  int const       num_dof_;
+  int const       offset_;
 
  public:
   typedef Device device_type;
@@ -175,9 +175,9 @@ class VecInterpolationJacob
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const int i) const
+  operator()(int const i) const
   {
-    const int neq = num_dof_ / numNodes_;
+    int const neq = num_dof_ / numNodes_;
     for (int qp = 0; qp < numQPs_; ++qp) {
       for (int vec = 0; vec < vecDims_; vec++) {
         U_(i, qp, vec) =

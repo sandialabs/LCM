@@ -99,7 +99,7 @@ class ProjectIPtoNodalFieldQuadrature
       Teuchos::ParameterList&              p,
       const Teuchos::RCP<Albany::Layouts>& dl,
       const CellTopologyData&              ctd,
-      const int                            degree);
+      int const                            degree);
   void
   evaluateBasis(
       const PHX::MDField<const MeshScalarT, Cell, Vertex, Dim>& coords_verts);
@@ -129,14 +129,14 @@ ProjectIPtoNodalFieldQuadrature::ProjectIPtoNodalFieldQuadrature(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl,
     const CellTopologyData&              ctd,
-    const int                            degree)
+    int const                            degree)
     : ctd_(ctd)
 {
   cell_topo_ = Teuchos::rcp(new shards::CellTopology(&ctd_));
   Intrepid2::DefaultCubatureFactory              cubFactory;
   Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(*cell_topo_, degree);
-  const int nqp = cubature->getNumPoints(), nd = cubature->getDimension();
+  int const nqp = cubature->getNumPoints(), nd = cubature->getDimension();
   ref_points_  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", nqp, nd);
   ref_weights_ = Kokkos::DynRankView<RealType, PHX::Device>("XXX", nqp);
   cubature->getCubature(ref_points_, ref_weights_);
@@ -186,7 +186,7 @@ ProjectIPtoNodalFieldQuadrature::evaluateBasis(
 {
   using namespace Intrepid2;
   typedef CellTools<PHX::Device> CellTools;
-  const int nqp = ref_points_.extent(0), nd = ref_points_.extent(1),
+  int const nqp = ref_points_.extent(0), nd = ref_points_.extent(1),
             nc = coord_vert.extent(0), nn = coord_vert.extent(1);
   Kokkos::DynRankView<RealType, PHX::Device> jacobian("JJJ", nc, nqp, nd, nd),
       jacobian_det("JJJ", nc, nqp), weighted_measure("JJJ", nc, nqp),
@@ -210,7 +210,7 @@ initQuadMgr(
     const Teuchos::RCP<Albany::Layouts>& dl,
     const Albany::MeshSpecsStruct*       mesh_specs)
 {
-  const int min_quad_deg =
+  int const min_quad_deg =
       mesh_specs->ctd.node_count > mesh_specs->ctd.vertex_count ? 4 : 2;
   if (mesh_specs->cubatureDegree >= min_quad_deg) return Teuchos::null;
   return Teuchos::rcp(new ProjectIPtoNodalFieldQuadrature(
@@ -363,7 +363,7 @@ class ProjectIPtoNodalFieldManager::FullMassLinearOp
       const PHX::MDField<const RealType, Cell, Node, QuadPoint>& bf,
       const PHX::MDField<const RealType, Cell, Node, QuadPoint>& wbf)
   {
-    const int  num_nodes = bf.extent(1), num_pts = bf.extent(2);
+    int const  num_nodes = bf.extent(1), num_pts = bf.extent(2);
     const bool is_static_graph = this->is_static();
     for (unsigned int cell = 0; cell < workset.numCells; ++cell) {
       for (int rnode = 0; rnode < num_nodes; ++rnode) {
@@ -410,7 +410,7 @@ class ProjectIPtoNodalFieldManager::LumpedMassLinearOp
       const PHX::MDField<const RealType, Cell, Node, QuadPoint>& bf,
       const PHX::MDField<const RealType, Cell, Node, QuadPoint>& wbf)
   {
-    const int  num_nodes = bf.extent(1), num_pts = bf.extent(2);
+    int const  num_nodes = bf.extent(1), num_pts = bf.extent(2);
     const bool is_static_graph = this->is_static();
     for (unsigned int cell = 0; cell < workset.numCells; ++cell) {
       for (int rnode = 0; rnode < num_nodes; ++rnode) {
@@ -671,7 +671,7 @@ template <typename Traits>
 void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     typename Traits::PreEvalData /* workset */)
 {
-  const int  ctr      = mgr_->incrPreCounter();
+  int const  ctr      = mgr_->incrPreCounter();
   const bool am_first = ctr == 1;
   if (!am_first) return;
 
@@ -727,7 +727,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(
   // [numCols][numLocalVals]
   auto ip_field_nonconstView = Albany::getNonconstLocalData(mgr_->ip_field);
 
-  const int num_fields = num_fields_
+  int const num_fields = num_fields_
 #if defined(PROJ_INTERP_TEST)
                          + 1
 #endif
@@ -811,7 +811,7 @@ template <typename Traits>
 void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
     typename Traits::PostEvalData /* workset */)
 {
-  const int  ctr     = mgr_->incrPostCounter();
+  int const  ctr     = mgr_->incrPostCounter();
   const bool am_last = ctr == mgr_->nWorker();
   if (!am_last) return;
   mgr_->initCounters();

@@ -124,7 +124,7 @@ struct NodeData_Traits<T, 1>
 
       BucketArray<field_type> solution_array(*fld, bucket);
 
-      const int num_nodes_in_bucket = solution_array.dimension(0);
+      int const num_nodes_in_bucket = solution_array.dimension(0);
 
       for (std::size_t i = 0; i < num_nodes_in_bucket; i++) {
         const GO global_id =
@@ -174,8 +174,8 @@ struct NodeData_Traits<T, 2>
       BucketArray<field_type>    solution_array(*fld, bucket);
       stk::mesh::BulkData const& bulkData = bucket.mesh();
 
-      const int num_vec_components  = solution_array.dimension(0);
-      const int num_nodes_in_bucket = solution_array.dimension(1);
+      int const num_vec_components  = solution_array.dimension(0);
+      int const num_nodes_in_bucket = solution_array.dimension(1);
 
       for (int j = 0; j < num_vec_components; ++j) {
         Teuchos::ArrayRCP<const ST> const_overlap_node_view =
@@ -232,9 +232,9 @@ struct NodeData_Traits<T, 3>
 
       BucketArray<field_type> solution_array(*fld, bucket);
 
-      const int num_i_components    = solution_array.dimension(0);
-      const int num_j_components    = solution_array.dimension(1);
-      const int num_nodes_in_bucket = solution_array.dimension(2);
+      int const num_i_components    = solution_array.dimension(0);
+      int const num_j_components    = solution_array.dimension(1);
+      int const num_nodes_in_bucket = solution_array.dimension(2);
 
       for (int j = 0; j < num_j_components; ++j) {
         for (int k = 0; k < num_i_components; ++k) {

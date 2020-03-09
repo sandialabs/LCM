@@ -32,7 +32,7 @@ class SideLaplacian : public Albany::AbstractProblem
   SideLaplacian(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
-      const int                                   numDimensions);
+      int const                                   numDimensions);
 
   //! Destructor
   virtual ~SideLaplacian();

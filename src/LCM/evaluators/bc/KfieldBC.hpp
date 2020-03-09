@@ -48,7 +48,7 @@ class KfieldBC_Base : public PHAL::DirichletBase<EvalT, Traits>
   std::string KI_name, KII_name;
 
  protected:
-  const int             offset;
+  int const             offset;
   std::vector<RealType> timeValues;
   std::vector<RealType> KIValues;
   std::vector<RealType> KIIValues;

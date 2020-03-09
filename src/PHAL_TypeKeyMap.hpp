@@ -45,7 +45,7 @@ class TypeKeyMap
     typedef typename Sacado::mpl::deref<Iter>::type  Pair;
     typedef typename Sacado::mpl::second<Pair>::type type;
     typedef typename Iter::pos                       pos;
-    static const int                                 value = pos::value;
+    static int const                                 value = pos::value;
   };
 
   //! Meta-function for getting the object reference type indexed by T
@@ -86,7 +86,7 @@ class TypeKeyMap
   getValue()
   {
     typedef typename GetObjectTypeAndPos<T>::type type;
-    const int pos = GetObjectTypeAndPos<T>::value;
+    int const pos = GetObjectTypeAndPos<T>::value;
     return Teuchos::any_cast<type>(objects[pos]);
   }
 
@@ -96,7 +96,7 @@ class TypeKeyMap
   getValue() const
   {
     typedef typename GetObjectTypeAndPos<T>::type type;
-    const int pos = GetObjectTypeAndPos<T>::value;
+    int const pos = GetObjectTypeAndPos<T>::value;
     return Teuchos::any_cast<type>(objects[pos]);
   }
 
@@ -105,7 +105,7 @@ class TypeKeyMap
   void
   setValue(typename GetObjectConstRefType<T>::type x)
   {
-    const int pos = GetObjectTypeAndPos<T>::value;
+    int const pos = GetObjectTypeAndPos<T>::value;
     objects[pos]  = x;
   }
 

@@ -591,7 +591,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     // we want to add the row Mdense(slave,...) to the rows lmdof[sdof]
     // get the dofs of slave node snodes[slave];
     int        snlmdof = snodes[slave]->Nlmdof();
-    const int* slmdof  = snodes[slave]->LMDof();
+    int const* slmdof  = snodes[slave]->LMDof();
 
     // this slave node might not have a projection, then the number
     // of lagrange multipliers snlmdof of it is zero
@@ -605,7 +605,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
       if (abs(val) < 1.e-10) continue;
 
       int        mndof = mnodes[master]->Ndof();
-      const int* mdof  = mnodes[master]->Dof();
+      int const* mdof  = mnodes[master]->Dof();
 
       if (mndof != snlmdof) {
         std::stringstream oss;
@@ -661,7 +661,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
 
     // get row dofs
     int        nlmdof = snodes[rownode]->Nlmdof();
-    const int* lmdof  = snodes[rownode]->LMDof();
+    int const* lmdof  = snodes[rownode]->LMDof();
 
     // this slave node might not have a projection and therefore might not
     // carry lagrange multipliers. In this case, do not insert anything
@@ -674,7 +674,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
       if (abs(val) < 1.e-10) continue;
 
       int        ndof = snodes[colnode]->Ndof();
-      const int* dof  = snodes[colnode]->Dof();
+      int const* dof  = snodes[colnode]->Dof();
 
       if (nlmdof != ndof) {
         std::stringstream oss;
@@ -859,7 +859,7 @@ MoertelT::IntegratorT<LocalOrdinal, Scalar>::Assemble_2D_Mod(MoertelT::Interface
     // and                row Ddense(slave,...) to the rows lmdof[sdof]
     // get the dofs of slave node snodes[slave];
     int        snlmdof = snodes[slave]->Nlmdof();
-    const int* slmdof  = snodes[slave]->LMDof();
+    int const* slmdof  = snodes[slave]->LMDof();
 
     // this slave node might not have a projection, then the number
     // of lagrange multipliers snlmdof of it is zero
@@ -875,7 +875,7 @@ MoertelT::IntegratorT<LocalOrdinal, Scalar>::Assemble_2D_Mod(MoertelT::Interface
       for (int master=0; master<mseg.Nnode(); ++master)
       {
         int mndof = mnodes[master]->Ndof();
-        const int* mdofs = mnodes[master]->Dof();
+        int const* mdofs = mnodes[master]->Dof();
 
         // dofs on node master
         for (int mdof=0; mdof<mndof; ++mdof)
@@ -931,7 +931,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
 
     // what we would like to do is
     // int        snlmdof = snodes[slave]->Nlmdof();
-    // const int* slmdof  = snodes[slave]->LMDof();
+    // int const* slmdof  = snodes[slave]->LMDof();
 
     // what we temporarily do is
     int snlmdof = snodes[slave]->Ndof();
@@ -949,7 +949,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
       // loop nodes on master segment
       for (int master = 0; master < mseg.Nnode(); ++master) {
         int        mndof = mnodes[master]->Ndof();
-        const int* mdofs = mnodes[master]->Dof();
+        int const* mdofs = mnodes[master]->Dof();
 
         // dofs on node master
         for (int mdof = 0; mdof < mndof; ++mdof) {
@@ -1009,9 +1009,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
   int nrow = sseg.Nnode();
   int ncol = mseg.Nnode();
   // get the points
-  const int np =
+  int const np =
       actseg->Nnode();  // this is an overlap segment - always a triangle
-  const int*                     nodeid = actseg->NodeIds();
+  int const*                     nodeid = actseg->NodeIds();
   std::vector<MoertelT::PointT*> points;
   overlap.PointView(points, nodeid, np);
 
@@ -1245,7 +1245,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     Teuchos::SerialDenseMatrix<LO, ST>& Ddense)
 {
   // get nodes
-  const int nnode                                 = sseg.Nnode();
+  int const nnode                                 = sseg.Nnode();
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** snode = sseg.Nodes();
 
 #if 0
@@ -1315,8 +1315,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     Teuchos::SerialDenseMatrix<LO, ST>& Mdense)
 {
   // get nodes
-  const int nsnode                                = sseg.Nnode();
-  const int nmnode                                = mseg.Nnode();
+  int const nsnode                                = sseg.Nnode();
+  int const nmnode                                = mseg.Nnode();
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** snode = sseg.Nodes();
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** mnode = mseg.Nodes();
 

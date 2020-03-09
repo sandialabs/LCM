@@ -83,7 +83,7 @@ class AbstractDiscretization
 
   //! Get Side set lists
   virtual const SideSetList&
-  getSideSets(const int ws) const = 0;
+  getSideSets(int const ws) const = 0;
 
   //! Get map from (Ws, El, Local Node, Eq) -> unkLID
   virtual const Conn&

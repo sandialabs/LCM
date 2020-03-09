@@ -193,9 +193,9 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
       workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the data that corresponds to the side
-    const int side_GID = it_side.side_GID;
-    const int cell     = it_side.elem_LID;
-    const int side     = it_side.side_local_id;
+    int const side_GID = it_side.side_GID;
+    int const cell     = it_side.elem_LID;
+    int const side     = it_side.side_local_id;
 
     // Not sure if this is even possible, but just for debug pourposes
     ALBANY_PANIC(
@@ -383,8 +383,8 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         workset.sideSets->at(sideSetName);
     for (auto const& it_side : sideSet) {
       // Get the data that corresponds to the side
-      const int cell = it_side.elem_LID;
-      const int side = it_side.side_local_id;
+      int const cell = it_side.elem_LID;
+      int const side = it_side.side_local_id;
 
       // Notice: in the following, we retrieve the id of the stk node using the
       // 3d mesh.
@@ -435,8 +435,8 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         workset.sideSets->at(sideSetName);
     for (auto const& it_side : sideSet) {
       // Get the data that corresponds to the side
-      const int cell = it_side.elem_LID;
-      const int side = it_side.side_local_id;
+      int const cell = it_side.elem_LID;
+      int const side = it_side.side_local_id;
 
       switch (dims.size()) {
         case 3:  // node_scalar

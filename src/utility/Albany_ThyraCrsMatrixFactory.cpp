@@ -17,7 +17,7 @@ struct ThyraCrsMatrixFactory::Impl
 ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
     Teuchos::RCP<Thyra_VectorSpace const> const domain_vs,
     Teuchos::RCP<Thyra_VectorSpace const> const range_vs,
-    const int /*nonzeros_per_row*/)
+    int const /*nonzeros_per_row*/)
     : m_graph(new Impl()),
       m_domain_vs(domain_vs),
       m_range_vs(range_vs),

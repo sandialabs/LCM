@@ -375,7 +375,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
 
     Teuchos::ArrayRCP<const ST> weights = Albany::getLocalData(
         node_data_vector->col(node_weight_offset).getConst());
-    const int numNodes =
+    int const numNodes =
         Albany::getSpmdVectorSpace(overlap_node_vs)->localSubDim();
 
     for (int k = 0; k < node_var_ndofs; ++k) {

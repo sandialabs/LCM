@@ -142,7 +142,7 @@ class Manager
     int num_g_fields;
     //! Get decorated name for i'th g component field.
     std::string
-    get_g_name(const int i) const;
+    get_g_name(int const i) const;
     // Opaque internal data for use by the implementation.
     struct Data;
     Teuchos::RCP<Data> data_;
@@ -189,7 +189,7 @@ class Manager
   //! MeshAdapt uses this method to read and write nodal data from the mesh
   // database before and after adaptation.
   const Teuchos::RCP<Thyra_MultiVector>&
-  getNodalField(const Field& f, const int g_idx, const bool overlapped) const;
+  getNodalField(const Field& f, int const g_idx, const bool overlapped) const;
   //! MeshAdapt does this if usingProjection(). In the future, I may switch to
   //  keeping an RCP<AbstractDiscretization>, and then this call would be
   //  unnecessary.

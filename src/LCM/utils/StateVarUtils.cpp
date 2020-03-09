@@ -40,7 +40,7 @@ fromTo(LCM::StateArrayVec const& src, Albany::StateArrayVec& dst)
       auto&& src_states = kv.second;
       assert(dst_map.find(state_name) != dst_map.end());
       auto&&    dst_states = dst_map[state_name];
-      const int num_states = src_states.size();
+      int const num_states = src_states.size();
       assert(num_states == dst_states.size());
       for (auto s = 0; s < num_states; ++s) { dst_states[s] = src_states[s]; }
     }

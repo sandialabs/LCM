@@ -157,27 +157,27 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const residual_Tag& tag, const int& i) const;
+  operator()(const residual_Tag& tag, int const& i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const residual_haveBodyForce_Tag& tag, const int& i) const;
+  operator()(const residual_haveBodyForce_Tag& tag, int const& i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const residual_haveBodyForce_and_dynamic_Tag& tag, const int& i)
+  operator()(const residual_haveBodyForce_and_dynamic_Tag& tag, int const& i)
       const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const residual_have_dynamic_Tag& tag, const int& i) const;
+  operator()(const residual_have_dynamic_Tag& tag, int const& i) const;
 
   KOKKOS_INLINE_FUNCTION
   void
-  compute_Stress(const int cell) const;
+  compute_Stress(int const cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  compute_BodyForce(const int cell) const;
+  compute_BodyForce(int const cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  compute_Acceleration(const int cell) const;
+  compute_Acceleration(int const cell) const;
 };
 }  // namespace LCM
 

@@ -507,8 +507,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Clipelements()
     throw ReportError(oss);
   }
 
-  const int nmnode = mseg_.Nnode();
-  const int nsnode = sseg_.Nnode();
+  int const nmnode = mseg_.Nnode();
+  int const nsnode = sseg_.Nnode();
 
   // put all mseg nodes in polygon
   // These coordinates are the corners of the master segment projected into the
@@ -864,7 +864,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::buildPoly(
   const unsigned int source_xi_size = source_xi.size();
   for (unsigned int i = static_cast<unsigned int>(index); i < source_xi_size;
        ++i) {
-    const int slot = (i + 1) % source_xi_size;
+    int const slot = (i + 1) % source_xi_size;
     point_p[0]     = source_xi[slot];
     point_p[1]     = source_eta[slot];
 
@@ -1023,8 +1023,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ClipelementsSH()
     throw ReportError(oss);
   }
 
-  const int nmnode = mseg_.Nnode();
-  const int nsnode = sseg_.Nnode();
+  int const nmnode = mseg_.Nnode();
+  int const nsnode = sseg_.Nnode();
   bool      ok     = true;
 
   // I am reading http://cs.fit.edu/~wds/classes/graphics/Clip/clip/clip.html

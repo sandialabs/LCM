@@ -118,7 +118,7 @@ class SolutionValuesResponseFunction::SolutionPrinter
     auto ov_node_indexer = createGlobalLocalIndexer(ov_node_vs);
     auto node_indexer    = createGlobalLocalIndexer(node_vs);
     ndim                 = disc->getNumDim();
-    const int neq        = disc->getNumEq();
+    int const neq        = disc->getNumEq();
     for (int i = 0; i < eq_gids.size(); ++i) {
       const GO node_gid = eq_gids[i] / neq;
       if (!node_indexer->isLocallyOwnedElement(node_gid)) { continue; }
@@ -211,7 +211,7 @@ SolutionValuesResponseFunction::evaluateGradient(
     auto ov_vs_indexer =
         createGlobalLocalIndexer(cas_manager->getOverlappedVectorSpace());
     auto      deriv_vs_indexer = createGlobalLocalIndexer(dg_dx->range());
-    const int colCount         = dg_dx->domain()->dim();
+    int const colCount         = dg_dx->domain()->dim();
     for (int icol = 0; icol < colCount; ++icol) {
       const GO gid = ov_vs_indexer->getGlobalElement(icol);
       const LO lid = deriv_vs_indexer->getLocalElement(gid);

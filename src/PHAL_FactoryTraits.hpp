@@ -47,21 +47,21 @@ namespace PHAL {
 template <typename Traits>
 struct DirichletFactoryTraits
 {
-  static const int id_dirichlet                     = 0;
-  static const int id_dirichlet_aggregator          = 1;
-  static const int id_dirichlet_coordinate_function = 2;
-  static const int id_dirichlet_field               = 3;
-  static const int id_dirichlet_off_nodeset         = 4;  // eqs on side set
-  static const int id_timedep_bc                    = 5;
-  static const int id_timedep_sdbc                  = 6;
-  static const int id_sdbc                          = 7;
-  static const int id_expreval_sdbc                 = 8;
-  static const int id_kfield_bc                     = 9;
-  static const int id_eq_concentration_bc           = 10;
-  static const int id_time                          = 11;
-  static const int id_torsion_bc                    = 12;
-  static const int id_schwarz_bc                    = 13;
-  static const int id_strong_schwarz_bc             = 14;
+  static int const id_dirichlet                     = 0;
+  static int const id_dirichlet_aggregator          = 1;
+  static int const id_dirichlet_coordinate_function = 2;
+  static int const id_dirichlet_field               = 3;
+  static int const id_dirichlet_off_nodeset         = 4;  // eqs on side set
+  static int const id_timedep_bc                    = 5;
+  static int const id_timedep_sdbc                  = 6;
+  static int const id_sdbc                          = 7;
+  static int const id_expreval_sdbc                 = 8;
+  static int const id_kfield_bc                     = 9;
+  static int const id_eq_concentration_bc           = 10;
+  static int const id_time                          = 11;
+  static int const id_torsion_bc                    = 12;
+  static int const id_schwarz_bc                    = 13;
+  static int const id_strong_schwarz_bc             = 14;
 
   typedef Sacado::mpl::vector<
       PHAL::Dirichlet<_, Traits>,                  //  0
@@ -86,13 +86,13 @@ struct DirichletFactoryTraits
 template <typename Traits>
 struct NeumannFactoryTraits
 {
-  static const int id_neumann                    = 0;
-  static const int id_neumann_aggregator         = 1;
-  static const int id_gather_coord_vector        = 2;
-  static const int id_gather_solution            = 3;
-  static const int id_load_stateField            = 4;
-  static const int id_GatherScalarNodalParameter = 5;
-  static const int id_timedep_bc                 = 6;
+  static int const id_neumann                    = 0;
+  static int const id_neumann_aggregator         = 1;
+  static int const id_gather_coord_vector        = 2;
+  static int const id_gather_solution            = 3;
+  static int const id_load_stateField            = 4;
+  static int const id_GatherScalarNodalParameter = 5;
+  static int const id_timedep_bc                 = 6;
 
   typedef Sacado::mpl::vector<
       PHAL::Neumann<_, Traits>,                     //  0

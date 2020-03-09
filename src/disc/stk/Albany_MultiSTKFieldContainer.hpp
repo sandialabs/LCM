@@ -20,9 +20,9 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       const Teuchos::RCP<Teuchos::ParameterList>&               params_,
       const Teuchos::RCP<stk::mesh::MetaData>&                  metaData_,
       const Teuchos::RCP<stk::mesh::BulkData>&                  bulkData_,
-      const int                                                 neq_,
+      int const                                                 neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,
-      const int                                                 numDim_,
+      int const                                                 numDim_,
       const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
       const Teuchos::Array<Teuchos::Array<std::string>>&        solution_vector,
       const Teuchos::Array<std::string>& residual_vector);
@@ -130,7 +130,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager,
-      const int                                    offset);
+      int const                                    offset);
   void
   saveVectorImpl(
       Thyra_Vector const&                          field_vector,
@@ -138,7 +138,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       stk::mesh::Selector&                         field_selection,
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager,
-      const int                                    offset);
+      int const                                    offset);
 
   void
   initializeSTKAdaptation();

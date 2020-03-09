@@ -56,7 +56,7 @@ stk::rebalance::check_balance(
 
   all_reduce(comm, ReduceMax<1>(&max_load) & ReduceSum<1>(&tot_load));
 
-  const int    proc_size = parallel_machine_size(comm);
+  int const    proc_size = parallel_machine_size(comm);
   const double avg_load  = tot_load / proc_size;
 
   const double imbalance_threshold = max_load / avg_load;

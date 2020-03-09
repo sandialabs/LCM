@@ -91,8 +91,8 @@ MonitorBase<MonitoredType>::summarize(
 {
   using std::vector;
 
-  // const int nprocs = comm->getSize();
-  const int rank = comm->getRank();
+  // int const nprocs = comm->getSize();
+  int const rank = comm->getRank();
 
   // Build table and print out data if we are rank 0
   if (0 == rank) {

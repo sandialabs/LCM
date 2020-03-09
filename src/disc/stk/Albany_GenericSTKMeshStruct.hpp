@@ -69,17 +69,17 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   GenericSTKMeshStruct(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<Teuchos::ParameterList>& adaptParams,
-      const int                                   numDim = -1);
+      int const                                   numDim = -1);
 
   virtual ~GenericSTKMeshStruct() = default;
 
   void
   SetupFieldData(
       const Teuchos::RCP<const Teuchos_Comm>&                   commT,
-      const int                                                 neq_,
+      int const                                                 neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,
       const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-      const int                                                 worksetSize_);
+      int const                                                 worksetSize_);
 
   bool
   buildUniformRefiner();
@@ -98,7 +98,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   //! Utility function that uses some integer arithmetic to choose a good
   //! worksetSize
   int
-  computeWorksetSize(const int worksetSizeMax, const int ebSizeMax) const;
+  computeWorksetSize(int const worksetSizeMax, int const ebSizeMax) const;
 
   //! Re-load balance mesh
   void

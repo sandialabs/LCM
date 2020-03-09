@@ -73,7 +73,7 @@ class MemoryAnalyzer
   };
 
   Teuchos::RCP<const Teuchos::Comm<int>> comm_;
-  static const int                       ndata_ = gms_mmap + 1;
+  static int const                       ndata_ = gms_mmap + 1;
   Int                                    data_[ndata_];
   struct
   {
@@ -157,7 +157,7 @@ class MemoryAnalyzer
     if (comm_->getRank() != 0) return;
 
     const Int* pd    = &d[0];
-    const int  nproc = d.size() / ndata_;
+    int const  nproc = d.size() / ndata_;
     for (int i = 0; i < nproc; ++i) {
       for (int j = 0; j < ndata_; ++j) {
         if (i == 0 || pd[j] < stats_.min[j]) {

@@ -210,7 +210,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   // end debugging
 #endif
 
-  const int cub = params->get("Cubature Degree", 3);
+  int const cub = params->get("Cubature Degree", 3);
 
   // Get Cubature Rule
   const std::string    cub_rule_string = params->get("Cubature Rule", "GAUSS");
@@ -612,7 +612,7 @@ Albany::IossSTKMeshStruct::getSolutionFieldHistoryStamp(int step) const
 {
   TEUCHOS_ASSERT(step >= 0 && step < m_solutionFieldHistoryDepth);
 
-  const int           index       = step + 1;  // 1-based step indexing
+  int const           index       = step + 1;  // 1-based step indexing
   const Ioss::Region& inputRegion = *(mesh_data->get_input_io_region());
   return inputRegion.get_state_time(index);
 }
@@ -639,7 +639,7 @@ Albany::IossSTKMeshStruct::loadOrSetCoordinates3d(int index)
     // or different to the one desired, we set it to the restart
     // index state. If the state was already set, we also take
     // care of resetting the index back to the original configuration.
-    const int current_step = region->get_current_state();
+    int const current_step = region->get_current_state();
     if (current_step != index) {
       if (current_step != -1) { region->end_state(current_step); }
       region->begin_state(index);
@@ -673,7 +673,7 @@ Albany::IossSTKMeshStruct::loadSolutionFieldHistory(int step)
 {
   TEUCHOS_ASSERT(step >= 0 && step < m_solutionFieldHistoryDepth);
 
-  const int index = step + 1;  // 1-based step indexing
+  int const index = step + 1;  // 1-based step indexing
   mesh_data->read_defined_input_fields(index);
 }
 

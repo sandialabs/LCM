@@ -30,7 +30,7 @@ struct STKFieldContainerHelper
       const Teuchos::RCP<const GlobalLocalIndexer>& node_vs,
       const stk::mesh::Bucket&                      bucket,
       const NodalDOFManager&                        nodalDofManager,
-      const int                                     offset);
+      int const                                     offset);
 
   static void
   saveVector(
@@ -39,7 +39,7 @@ struct STKFieldContainerHelper
       const Teuchos::RCP<const GlobalLocalIndexer>& node_vs,
       const stk::mesh::Bucket&                      bucket,
       const NodalDOFManager&                        nodalDofManager,
-      const int                                     offset);
+      int const                                     offset);
 
   // Convenience function to copy one field's contents to another
   static void

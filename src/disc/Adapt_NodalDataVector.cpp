@@ -121,7 +121,7 @@ NodalDataVector::saveNodalDataState() const
 void
 NodalDataVector::saveNodalDataState(
     const Teuchos::RCP<const Thyra_MultiVector>& mv,
-    const int                                    start_col) const
+    int const                                    start_col) const
 {
   // Save the nodal data arrays back to stk.
   const size_t nv = mv->domain()->dim();
@@ -138,7 +138,7 @@ void
 NodalDataVector::saveNodalDataVector(
     const std::string&                           name,
     const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vector,
-    const int                                    offset) const
+    int const                                    offset) const
 {
   Albany::NodeFieldContainer::const_iterator it = nodeContainer->find(name);
   ALBANY_PANIC(

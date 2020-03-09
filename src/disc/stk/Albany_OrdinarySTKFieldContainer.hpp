@@ -19,9 +19,9 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       const Teuchos::RCP<Teuchos::ParameterList>&               params_,
       const Teuchos::RCP<stk::mesh::MetaData>&                  metaData_,
       const Teuchos::RCP<stk::mesh::BulkData>&                  bulkData_,
-      const int                                                 neq_,
+      int const                                                 neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,
-      const int                                                 numDim_,
+      int const                                                 numDim_,
       const Teuchos::RCP<Albany::StateInfoStruct>&              sis);
 
   ~OrdinarySTKFieldContainer() = default;

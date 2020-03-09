@@ -359,7 +359,7 @@ class EvaluatorUtilsBase
       RCP<PHX::Evaluator<Traits>> virtual constructSideQuadPointsToSideInterpolationEvaluator(
           const std::string& dof_name,
           const std::string& sideSetName,
-          const int          fieldDim = 0) const = 0;
+          int const          fieldDim = 0) const = 0;
 
   //! Function to create parameter list for construction of
   //! ComputeBasisFunctions evaluator with standard Field names
@@ -708,7 +708,7 @@ class EvaluatorUtilsImpl : public EvaluatorUtilsBase<Traits>
   constructSideQuadPointsToSideInterpolationEvaluator(
       const std::string& dof_name,
       const std::string& sideSetName,
-      const int          fieldDim = 0) const;
+      int const          fieldDim = 0) const;
 
   //! Function to create parameter list for construction of
   //! ComputeBasisFunctions evaluator with standard Field names

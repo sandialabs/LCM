@@ -20,14 +20,14 @@ typename std::conditional<
     std::is_const<BucketArrayType>::value,
     const double&,
     double&>::type
-access(BucketArrayType& array, const int i, const int j);
+access(BucketArrayType& array, int const i, int const j);
 
 template <>
 const double&
 access<const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
     const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array,
-    const int                                                      j,
-    const int                                                      i)
+    int const                                                      j,
+    int const                                                      i)
 {
   ALBANY_EXPECT(
       j == 0, "Error! Attempting to access 1d array with two indices.\n");
@@ -39,8 +39,8 @@ template <>
 double&
 access<BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
     BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array,
-    const int                                                j,
-    const int                                                i)
+    int const                                                j,
+    int const                                                i)
 {
   ALBANY_EXPECT(
       j == 0, "Error! Attempting to access 1d array with two indices.\n");
@@ -52,8 +52,8 @@ template <>
 const double&
 access<const BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(
     const BucketArray<AbstractSTKFieldContainer::VectorFieldType>& array,
-    const int                                                      j,
-    const int                                                      i)
+    int const                                                      j,
+    int const                                                      i)
 {
   return array(j, i);
 }
@@ -62,8 +62,8 @@ template <>
 double&
 access<BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(
     BucketArray<AbstractSTKFieldContainer::VectorFieldType>& array,
-    const int                                                j,
-    const int                                                i)
+    int const                                                j,
+    int const                                                i)
 {
   return array(j, i);
 }
@@ -101,7 +101,7 @@ STKFieldContainerHelper<FieldType>::fillVector(
     const Teuchos::RCP<const GlobalLocalIndexer>& indexer,
     const stk::mesh::Bucket&                      bucket,
     const NodalDOFManager&                        nodalDofManager,
-    const int                                     offset)
+    int const                                     offset)
 {
   constexpr int rank = getRank<FieldType>();
   ALBANY_PANIC(
@@ -114,7 +114,7 @@ STKFieldContainerHelper<FieldType>::fillVector(
   constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
   constexpr int  nodes_dim = is_SFT ? 0 : 1;
 
-  const int num_nodes_in_bucket = field_array.dimension(nodes_dim);
+  int const num_nodes_in_bucket = field_array.dimension(nodes_dim);
 
   const stk::mesh::BulkData& mesh = field_stk.get_mesh();
   auto                       data = getNonconstLocalData(field_thyra);
@@ -146,7 +146,7 @@ STKFieldContainerHelper<FieldType>::saveVector(
     const Teuchos::RCP<const GlobalLocalIndexer>& indexer,
     const stk::mesh::Bucket&                      bucket,
     const NodalDOFManager&                        nodalDofManager,
-    const int                                     offset)
+    int const                                     offset)
 {
   constexpr int rank = getRank<FieldType>();
   ALBANY_PANIC(
@@ -159,7 +159,7 @@ STKFieldContainerHelper<FieldType>::saveVector(
   constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
   constexpr int  nodes_dim = is_SFT ? 0 : 1;
 
-  const int num_nodes_in_bucket = field_array.dimension(nodes_dim);
+  int const num_nodes_in_bucket = field_array.dimension(nodes_dim);
 
   const stk::mesh::BulkData& mesh = field_stk.get_mesh();
   auto                       data = getLocalData(field_thyra);
@@ -208,11 +208,11 @@ STKFieldContainerHelper<FieldType>::copySTKField(
     BucketArray<FieldType> source_array(source, bucket);
     BucketArray<FieldType> target_array(target, bucket);
 
-    const int num_source_components = is_SFT ? 1 : source_array.dimension(0);
-    const int num_target_components = is_SFT ? 1 : target_array.dimension(0);
-    const int num_nodes_in_bucket   = source_array.dimension(nodes_dim);
+    int const num_source_components = is_SFT ? 1 : source_array.dimension(0);
+    int const num_target_components = is_SFT ? 1 : target_array.dimension(0);
+    int const num_nodes_in_bucket   = source_array.dimension(nodes_dim);
 
-    const int uneven_downsampling =
+    int const uneven_downsampling =
         num_source_components % num_target_components;
 
     ALBANY_PANIC(

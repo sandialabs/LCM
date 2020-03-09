@@ -67,7 +67,7 @@ convert_param_to_string(
 }
 
 inline void
-fill_parameters(const char* T[][2], const int i, Parameters& Entry)
+fill_parameters(const char* T[][2], int const i, Parameters& Entry)
 {
   for (int j = 0; j < i; ++j) Entry.set(T[j][0], T[j][1]);
 }
@@ -328,7 +328,7 @@ stkCallback_Num_Dimensions(void* data, int* ierr)
     return 0;
   }
 
-  const int nd = zdata->spatial_dimension();
+  int const nd = zdata->spatial_dimension();
 
   *ierr = ZOLTAN_OK;
   return nd;
@@ -712,7 +712,7 @@ Zoltan::~Zoltan()
 void
 Zoltan::reset_dest_proc_data()
 {
-  const int      proc = parallel_machine_rank(comm_);
+  int const      proc = parallel_machine_rank(comm_);
   const unsigned size = m_mesh_information_.mesh_entities.size();
   m_mesh_information_.dest_proc_ids.assign(size, proc);
 }

@@ -299,7 +299,7 @@ SurfaceBasis<EvalT, Traits>::computeJacobian(
     PHX::MDField<MeshScalarT, Cell, QuadPoint, Dim, Dim> const dual_basis,
     PHX::MDField<MeshScalarT, Cell, QuadPoint>                 area)
 {
-  const int worksetSize = basis.extent(0);
+  int const worksetSize = basis.extent(0);
 
   for (int cell(0); cell < worksetSize; ++cell) {
     for (int pt(0); pt < num_qps_; ++pt) {

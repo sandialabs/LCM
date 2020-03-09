@@ -221,7 +221,7 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
     // Adding the relation elem->node
     stk::mesh::Entity const* node_rels =
         inputBulkData.begin_nodes(sides[iside]);
-    const int num_local_nodes = inputBulkData.num_nodes(sides[iside]);
+    int const num_local_nodes = inputBulkData.num_nodes(sides[iside]);
     for (int j(0); j < num_local_nodes; ++j) {
       node = bulkData->get_entity(
           stk::topology::NODE_RANK, inputBulkData.identifier(node_rels[j]));

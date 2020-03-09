@@ -218,7 +218,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::AddSegment(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::AddPointtoPolygon(
-    const int     id,
+    int const     id,
     const double* P)
 {
   // check whether this point is already in there
@@ -248,7 +248,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::AddPointtoPolygon(
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::AddPointtoPolygon(
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
-    const int                                                              id,
+    int const                                                              id,
     const double*                                                          P)
 {
   Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> point = Teuchos::rcp(
@@ -266,7 +266,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::AddPointtoPolygon(
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(
     OverlapT,
-    IFace)::RemovePointfromPolygon(const int id, const double* P)
+    IFace)::RemovePointfromPolygon(int const id, const double* P)
 {
   // check whether this point is in there
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::
@@ -375,8 +375,8 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::PointView(
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::PointView(
     std::vector<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) *>& p,
-    const int*                                               nodeids,
-    const int                                                np)
+    int const*                                               nodeids,
+    int const                                                np)
 {
   p.resize(np);
 
@@ -418,8 +418,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::QuickOverlapTest()
 {
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** snode = sseg_.Nodes();
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** mnode = mseg_.Nodes();
-  const int nsnode                                = sseg_.Nnode();
-  const int nmnode                                = mseg_.Nnode();
+  int const nsnode                                = sseg_.Nnode();
+  int const nmnode                                = mseg_.Nnode();
   // compute closest distance between 2 nodes of sseg and mseg
   double dmin[3];
   double minlength;
@@ -590,7 +590,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Centroid(
     double xi[],
     const std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
               points,
-    const int np)
+    int const np)
 {
   xi[0] = xi[1] = 0.0;
   double A      = 0.0;

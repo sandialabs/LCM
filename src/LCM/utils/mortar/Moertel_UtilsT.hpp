@@ -90,7 +90,7 @@ Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
 PaddedMatrix(
     const Tpetra::Map<LO, GO, N>& rowmap,
     double                        val,
-    const int                     numentriesperrow);
+    int const                     numentriesperrow);
 
 /*!
 \brief Strip out values from a matrix below a certain tolerance

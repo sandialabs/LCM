@@ -48,11 +48,11 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   // set tolerance once and for all
   double tolerance = 1.0e-15;
 
-  const int                  worksetSize = 1;
-  const int                  numQPts     = 4;
-  const int                  numDim      = 3;
-  const int                  numVertices = 8;
-  const int                  numNodes    = 8;
+  int const                  worksetSize = 1;
+  int const                  numQPts     = 4;
+  int const                  numDim      = 3;
+  int const                  numVertices = 8;
+  int const                  numNodes    = 8;
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
@@ -371,11 +371,11 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
 TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
 {
   // Set up the data layout
-  const int                  worksetSize = 1;
-  const int                  numQPts     = 4;
-  const int                  numDim      = 3;
-  const int                  numVertices = 8;
-  const int                  numNodes    = 8;
+  int const                  worksetSize = 1;
+  int const                  numQPts     = 4;
+  int const                  numDim      = 3;
+  int const                  numVertices = 8;
+  int const                  numNodes    = 8;
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
@@ -535,11 +535,11 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
 TEUCHOS_UNIT_TEST(SurfaceElement, VectorJump)
 {
   // Set up the data layout
-  const int                  worksetSize = 1;
-  const int                  numQPts     = 4;
-  const int                  numDim      = 3;
-  const int                  numVertices = 8;
-  const int                  numNodes    = 8;
+  int const                  worksetSize = 1;
+  int const                  numQPts     = 4;
+  int const                  numDim      = 3;
+  int const                  numVertices = 8;
+  int const                  numNodes    = 8;
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
@@ -711,11 +711,11 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   // set tolerance once and for all
   double tolerance = 1.0e-15;
 
-  const int                  worksetSize = 1;
-  const int                  numQPts     = 4;
-  const int                  numDim      = 3;
-  const int                  numVertices = 8;
-  const int                  numNodes    = 8;
+  int const                  worksetSize = 1;
+  int const                  numQPts     = 4;
+  int const                  numDim      = 3;
+  int const                  numVertices = 8;
+  int const                  numNodes    = 8;
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
@@ -923,11 +923,11 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   // set tolerance once and for all
   double tolerance = 1.0e-15;
 
-  const int                  worksetSize = 1;
-  const int                  numQPts     = 4;
-  const int                  numDim      = 3;
-  const int                  numVertices = 8;
-  const int                  numNodes    = 8;
+  int const                  worksetSize = 1;
+  int const                  numQPts     = 4;
+  int const                  numDim      = 3;
+  int const                  numVertices = 8;
+  int const                  numNodes    = 8;
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
@@ -1115,12 +1115,12 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
 TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
 {
   // Set up the data layout
-  const int                  worksetSize   = 1;
-  const int                  numQPts       = 4;
-  const int                  numDim        = 3;
-  const int                  numVertices   = 8;
-  const int                  numNodes      = 8;
-  const int                  numPlaneNodes = numNodes / 2;
+  int const                  worksetSize   = 1;
+  int const                  numQPts       = 4;
+  int const                  numDim        = 3;
+  int const                  numVertices   = 8;
+  int const                  numNodes      = 8;
+  int const                  numPlaneNodes = numNodes / 2;
   const RCP<Albany::Layouts> dl            = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
@@ -1249,11 +1249,11 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   // set tolerance once and for all
   double tolerance = 1.0e-15;
 
-  const int                  worksetSize = 1;
-  const int                  numQPts     = 4;
-  const int                  numDim      = 3;
-  const int                  numVertices = 8;
-  const int                  numNodes    = 8;
+  int const                  worksetSize = 1;
+  int const                  numQPts     = 4;
+  int const                  numDim      = 3;
+  int const                  numVertices = 8;
+  int const                  numNodes    = 8;
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 

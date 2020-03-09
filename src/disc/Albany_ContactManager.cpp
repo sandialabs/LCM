@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 #include "Moertel_InterfaceT.hpp"
 
-const int printLevel = 4;
+int const printLevel = 4;
 
 Albany::ContactManager::ContactManager(
     const Teuchos::RCP<Teuchos::ParameterList>&                     params_,
@@ -107,10 +107,10 @@ Albany::ContactManager::ContactManager(
     mfile.open(strstrm.str());
   }
 
-  const int mortarside(1);
-  const int nonmortarside(0);
+  int const mortarside(1);
+  int const nonmortarside(0);
 
-  const int number_of_mortar_pairs = masterSideNames.size();
+  int const number_of_mortar_pairs = masterSideNames.size();
   ALBANY_ASSERT(
       number_of_mortar_pairs == slaveSideNames.size(),
       "Input error: number of master and slave interfaces differ.");
@@ -175,7 +175,7 @@ Albany::ContactManager::ContactManager(
 // Process all the contact surfaces and insert the data into a Moertel Interface
 void
 Albany::ContactManager::processSS(
-    const int            ctr,
+    int const            ctr,
     const std::string&   sideSetName,
     int                  s_or_mortar,
     int                  mortarside,
@@ -222,20 +222,20 @@ Albany::ContactManager::processSS(
 
       for (std::size_t side = 0; side < theSideSet.size(); ++side) {
         // Get the data that corresponds to the side.
-        const int elem_GID =
+        int const elem_GID =
             theSideSet[side].elem_GID;  // GID of the element that contains the
                                         // master segment
-        const int elem_LID =
+        int const elem_LID =
             theSideSet[side]
                 .elem_LID;  // LID (numbered from zero) id of the element
                             // containing the master segment on this processor
-        const int elem_side =
+        int const elem_side =
             theSideSet[side].side_local_id;  // which edge of the element the
                                              // side is (cf. exodus manual)?
-        const int side_GID =
+        int const side_GID =
             theSideSet[side]
                 .side_GID;  // Need a global id for each contact "edge / face"
-        const int elem_block =
+        int const elem_block =
             theSideSet[side]
                 .elem_ebIndex;  // which  element block is the element in?
         const CellTopologyData_Subcell& subcell_side =
@@ -256,7 +256,7 @@ Albany::ContactManager::processSS(
         const bool on_boundary =
             false;  // will eventually want to allow boundaries to be
                     // intersected by contact surfaces
-        const int contact_pair_id =
+        int const contact_pair_id =
             0;  // will eventually want to allow multiple pairs
         const Teuchos::ArrayRCP<GO>& elNodeID =
             disc.getWsElNodeID()[workset][elem_LID];
@@ -343,7 +343,7 @@ Albany::ContactManager::processSS(
 // Fill in residual from M&D
 void
 Albany::ContactManager::fillInMortarResidual(
-    const int              ws,
+    int const              ws,
     Teuchos::ArrayRCP<ST>& resid)
 {
   //  Teuchos::Array<GO> masterNodeGIDs& = contactManager->masterNodeGIDs[ws];

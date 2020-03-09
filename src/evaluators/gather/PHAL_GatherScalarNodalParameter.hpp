@@ -94,7 +94,7 @@ class GatherScalarExtruded2DNodalParameter
 
  private:
   typedef typename EvalT::ParamScalarT ParamScalarT;
-  const int                            fieldLevel;
+  int const                            fieldLevel;
 };
 
 }  // namespace PHAL

@@ -126,7 +126,7 @@ main(int argc, char* argv[])
                    Teuchos::null;
     }
 
-    const int num_p = solver->Np();  // Number of *vectors* of parameters
+    int const num_p = solver->Np();  // Number of *vectors* of parameters
     int       num_g = solver->Ng();  // Number of *vectors* of responses
     if (r_prod != Teuchos::null && num_g > 0) {
       *out << "WARNING: For Thyra::ProductVectorBase, printing of responses "
@@ -173,7 +173,7 @@ main(int argc, char* argv[])
               &parameterParams :
               &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
 
-      const int numParameters = pList->get<int>("Number");
+      int const numParameters = pList->get<int>("Number");
       ALBANY_PANIC(
           numParameters == 0,
           std::endl
@@ -200,7 +200,7 @@ main(int argc, char* argv[])
       bool number_exists = pList->getEntryPtr("Number");
 
       if (number_exists) {
-        const int numParameters = pList->get<int>("Number");
+        int const numParameters = pList->get<int>("Number");
         ALBANY_PANIC(
             numParameters == 0,
             std::endl

@@ -42,7 +42,7 @@ class HMCProblem : public virtual Albany::AbstractProblem
   HMCProblem(
       const Teuchos::RCP<Teuchos::ParameterList>& params_,
       const Teuchos::RCP<ParamLib>&               paramLib_,
-      const int                                   numDim_,
+      int const                                   numDim_,
       Teuchos::RCP<const Teuchos::Comm<int>>&     commT);
 
   //! Destructor
@@ -219,17 +219,17 @@ Albany::HMCProblem::constructEvaluators(
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
       Albany::getIntrepid2Basis(meshSpecs.ctd);
 
-  const int numNodes    = intrepidBasis->getCardinality();
-  const int worksetSize = meshSpecs.worksetSize;
+  int const numNodes    = intrepidBasis->getCardinality();
+  int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(
           *cellType, meshSpecs.cubatureDegree);
 
-  const int numDim      = cubature->getDimension();
-  const int numQPts     = cubature->getNumPoints();
-  const int numVertices = cellType->getNodeCount();
+  int const numDim      = cubature->getDimension();
+  int const numQPts     = cubature->getNumPoints();
+  int const numVertices = cellType->getNodeCount();
 
   *out << "Field Dimensions: Workset=" << worksetSize
        << ", Vertices= " << numVertices << ", Nodes= " << numNodes
@@ -260,7 +260,7 @@ Albany::HMCProblem::constructEvaluators(
   i.e. $\Delta u_{Ii}$, etc. \end{text}*/
   // displacement increment
   //   macro
-  const int                      numMacroScales = 1;
+  int const                      numMacroScales = 1;
   Teuchos::ArrayRCP<std::string> macro_dof_names(numMacroScales);
   macro_dof_names[0] = std::string("Delta") + strDisplacement;
   Teuchos::ArrayRCP<std::string> macro_resid_names(numMacroScales);

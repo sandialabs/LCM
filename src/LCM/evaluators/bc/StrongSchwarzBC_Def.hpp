@@ -480,7 +480,7 @@ StrongSchwarzBC_Base<EvalT, Traits>::doDTKInterpolation(
     DataTransferKit::STKMeshManager&                    this_manager,
     Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field,
     Albany::AbstractSTKFieldContainer::VectorFieldType* this_field,
-    const int                                           neq,
+    int const                                           neq,
     Teuchos::ParameterList&                             dtk_params)
 {
   // Create a solution vector for the source.

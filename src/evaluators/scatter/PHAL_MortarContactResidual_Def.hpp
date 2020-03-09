@@ -81,7 +81,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
     const PHAL_MortarContactResRank0_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -94,7 +94,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
     const PHAL_MortarContactResRank1_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -107,7 +107,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
     const PHAL_MortarContactResRank2_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
@@ -176,7 +176,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactResRank0_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -190,10 +190,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactJacRank0_Adjoint_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO colT[500];
   LO rowT;
@@ -224,10 +224,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactJacRank0_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   // colT=(LO*) Kokkos::cuda_malloc<PHX::Device>(nunk*sizeof(LO));
   LO rowT;
@@ -258,7 +258,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactResRank1_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -272,10 +272,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactJacRank1_Adjoint_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO colT[500];
   LO rowT;
@@ -309,10 +309,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactJacRank1_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO colT[500];
   LO rowT;
@@ -345,7 +345,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactResRank2_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
@@ -360,10 +360,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactJacRank2_Adjoint_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO colT[500];
   LO rowT;
@@ -397,10 +397,10 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     const PHAL_MortarContactJacRank2_Tag&,
-    const int& cell) const
+    int const& cell) const
 {
-  // const int neq = nodeID.extent(2);
-  // const int nunk = neq*this->numNodes;
+  // int const neq = nodeID.extent(2);
+  // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
   LO colT[500];
   LO rowT;

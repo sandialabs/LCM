@@ -40,7 +40,7 @@ class FieldFrobeniusNormBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const int i) const;
+  operator()(int const i) const;
 
  private:
   // The parameter is always defined in terms of the

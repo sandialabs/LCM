@@ -254,15 +254,15 @@ class OverlapT
 
   // add a point to the polygon
   bool
-  AddPointtoPolygon(const int id, const double* P);
+  AddPointtoPolygon(int const id, const double* P);
   bool
   AddPointtoPolygon(
       std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
-      const int                                                              id,
+      int const                                                              id,
       const double*                                                          P);
   // remove a point from the polygon
   bool
-  RemovePointfromPolygon(const int id, const double* P);
+  RemovePointfromPolygon(int const id, const double* P);
   // get the size of the nodal polygon
   int
   SizePointPolygon()
@@ -282,8 +282,8 @@ class OverlapT
   void
   PointView(
       std::vector<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) *>& p,
-      const int*                                               nodeids,
-      const int                                                np);
+      int const*                                               nodeids,
+      int const                                                np);
   // copy a point polygon to another polygon
   bool
   CopyPointPolygon(
@@ -297,7 +297,7 @@ class OverlapT
       double xi[],
       const std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
                 points,
-      const int np);
+      int const np);
 
   //@}
 

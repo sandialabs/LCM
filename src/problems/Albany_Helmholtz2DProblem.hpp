@@ -127,8 +127,8 @@ Albany::Helmholtz2DProblem::constructEvaluators(
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
       Albany::getIntrepid2Basis(meshSpecs.ctd);
 
-  const int numNodes    = intrepidBasis->getCardinality();
-  const int worksetSize = meshSpecs.worksetSize;
+  int const numNodes    = intrepidBasis->getCardinality();
+  int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory cubFactory;
 
@@ -136,9 +136,9 @@ Albany::Helmholtz2DProblem::constructEvaluators(
       cubFactory.create<PHX::Device, RealType, RealType>(
           *cellType, meshSpecs.cubatureDegree);
 
-  const int numDim      = cubature->getDimension();
-  const int numQPts     = cubature->getNumPoints();
-  const int numVertices = cellType->getNodeCount();
+  int const numDim      = cubature->getDimension();
+  int const numQPts     = cubature->getNumPoints();
+  int const numVertices = cellType->getNodeCount();
 
   *out << "Field Dimensions: Workset=" << worksetSize
        << ", Vertices= " << numVertices << ", Nodes= " << numNodes

@@ -13,7 +13,7 @@ Albany::AbstractProblem::AbstractProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
     // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib_,
-    const int neq_)
+    int const neq_)
     : out(Teuchos::VerboseObjectBase::getDefaultOStream()),
       neq(neq_),
       number_of_time_deriv(-1),
@@ -81,7 +81,7 @@ Albany::AbstractProblem::getSideSetEquations() const
 }
 
 void
-Albany::AbstractProblem::setNumEquations(const int neq_)
+Albany::AbstractProblem::setNumEquations(int const neq_)
 {
   neq = neq_;
   rigidBodyModes->setNumPDEs(neq_);

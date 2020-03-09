@@ -139,10 +139,10 @@ main(int ac, char* av[])
   //
 
   // Set up the data layout
-  // const int workset_size = 1;
-  const int                           num_dims     = 3;
-  const int                           num_vertices = 8;
-  const int                           num_nodes    = 8;
+  // int const workset_size = 1;
+  int const                           num_dims     = 3;
+  int const                           num_vertices = 8;
+  int const                           num_nodes    = 8;
   const Teuchos::RCP<Albany::Layouts> dl = Teuchos::rcp(new Albany::Layouts(
       workset_size, num_vertices, num_nodes, num_pts, num_dims));
 

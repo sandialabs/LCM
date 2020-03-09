@@ -105,7 +105,7 @@ class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
 
  private:
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
-  const int                                              numFields;
+  int const                                              numFields;
 
  public:
   struct PHAL_GatherSolRank2_Tag
@@ -140,35 +140,35 @@ class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank2_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherSolRank2_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank2_Transient_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherSolRank2_Transient_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank2_Acceleration_Tag&, const int& cell)
+  operator()(const PHAL_GatherSolRank2_Acceleration_Tag&, int const& cell)
       const;
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank1_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherSolRank1_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank1_Transient_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherSolRank1_Transient_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank1_Acceleration_Tag&, const int& cell)
+  operator()(const PHAL_GatherSolRank1_Acceleration_Tag&, int const& cell)
       const;
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank0_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherSolRank0_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank0_Transient_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherSolRank0_Transient_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherSolRank0_Acceleration_Tag&, const int& cell)
+  operator()(const PHAL_GatherSolRank0_Acceleration_Tag&, int const& cell)
       const;
 
  private:
@@ -227,7 +227,7 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
 
  private:
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
-  const int                                              numFields;
+  int const                                              numFields;
 
  public:
   struct PHAL_GatherJacRank2_Tag
@@ -262,35 +262,35 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank2_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherJacRank2_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank2_Transient_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherJacRank2_Transient_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank2_Acceleration_Tag&, const int& cell)
+  operator()(const PHAL_GatherJacRank2_Acceleration_Tag&, int const& cell)
       const;
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank1_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherJacRank1_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank1_Transient_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherJacRank1_Transient_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank1_Acceleration_Tag&, const int& cell)
+  operator()(const PHAL_GatherJacRank1_Acceleration_Tag&, int const& cell)
       const;
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank0_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherJacRank0_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank0_Transient_Tag&, const int& cell) const;
+  operator()(const PHAL_GatherJacRank0_Transient_Tag&, int const& cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const PHAL_GatherJacRank0_Acceleration_Tag&, const int& cell)
+  operator()(const PHAL_GatherJacRank0_Acceleration_Tag&, int const& cell)
       const;
 
  private:

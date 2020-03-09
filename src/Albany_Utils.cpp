@@ -135,7 +135,7 @@ AbsRowSum(
 }
 
 std::string
-strint(const std::string s, const int i, const char delim)
+strint(const std::string s, int const i, const char delim)
 {
   std::ostringstream ss;
   ss << s << delim << i;
@@ -207,7 +207,7 @@ void
 printThyraVector(std::ostream& os, Teuchos::RCP<Thyra_Vector const> const& vec)
 {
   Teuchos::ArrayRCP<const ST> vv          = Albany::getLocalData(vec);
-  const int                   localLength = vv.size();
+  int const                   localLength = vv.size();
 
   os << std::setw(10) << std::endl;
   for (int i = 0; i < localLength; ++i) {
@@ -223,7 +223,7 @@ printThyraVector(
     Teuchos::RCP<Thyra_Vector const> const& vec)
 {
   Teuchos::ArrayRCP<const ST> vv          = Albany::getLocalData(vec);
-  const int                   localLength = vv.size();
+  int const                   localLength = vv.size();
 
   ALBANY_PANIC(
       names.size() != localLength,
@@ -244,8 +244,8 @@ printThyraMultiVector(
 {
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> mvv =
       Albany::getLocalData(mvec);
-  const int numVecs     = mvec->domain()->dim();
-  const int localLength = mvv.size() > 0 ? mvv[0].size() : 0;
+  int const numVecs     = mvec->domain()->dim();
+  int const localLength = mvv.size() > 0 ? mvv[0].size() : 0;
   ALBANY_PANIC(
       names.size() != localLength,
       "Error! names and mvec length do not match.\n");
@@ -269,8 +269,8 @@ printThyraMultiVector(
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> mvv =
       Albany::getLocalData(mvec);
 
-  const int numVecs     = mvec->domain()->dim();
-  const int localLength = mvv.size() > 0 ? mvv[0].size() : 0;
+  int const numVecs     = mvec->domain()->dim();
+  int const localLength = mvv.size() > 0 ? mvv[0].size() : 0;
   os << std::setw(10) << std::endl;
   for (int row = 0; row < localLength; ++row) {
     for (int col = 0; col < numVecs; ++col) {
@@ -425,7 +425,7 @@ CmdLineArgs::parse_cmdline(int argc, char** argv, std::ostream& os)
 }
 
 void
-connect_vtune(const int p_rank)
+connect_vtune(int const p_rank)
 {
   std::stringstream cmd;
   pid_t             my_os_pid  = getpid();

@@ -1053,7 +1053,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
     constructSideQuadPointsToSideInterpolationEvaluator(
         const std::string& dof_name,
         const std::string& sideSetName,
-        const int          fieldDim) const
+        int const          fieldDim) const
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),

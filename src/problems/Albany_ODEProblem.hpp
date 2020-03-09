@@ -26,7 +26,7 @@ class ODEProblem : public AbstractProblem
   ODEProblem(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
-      const int                                   numDim_);
+      int const                                   numDim_);
 
   //! Destructor
   ~ODEProblem();
@@ -121,10 +121,10 @@ Albany::ODEProblem::constructEvaluators(
   using Teuchos::RCP;
   using Teuchos::rcp;
 
-  const int numNodes = 1;
+  int const numNodes = 1;
 
-  const int numVertices = 1;
-  const int worksetSize = meshSpecs.worksetSize;
+  int const numVertices = 1;
+  int const worksetSize = meshSpecs.worksetSize;
 
   *out << "Field Dimensions: Workset=" << worksetSize
        << ", Vertices= " << numVertices << ", Nodes= " << numNodes

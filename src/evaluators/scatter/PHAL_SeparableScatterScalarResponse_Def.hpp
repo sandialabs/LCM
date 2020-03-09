@@ -160,7 +160,7 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
   }
   auto dg_data = Albany::getNonconstLocalData(dg);
 
-  const int                      neq = workset.wsElNodeEqID.extent(2);
+  int const                      neq = workset.wsElNodeEqID.extent(2);
   const Albany::NodalDOFManager& solDOFManager =
       workset.disc->getOverlapDOFManager("ordinary_solution");
   const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering =
@@ -184,8 +184,8 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
     for (std::size_t iSide = 0; iSide < sideSet.size();
          ++iSide) {  // loop over the sides on this ws and name
       // Get the data that corresponds to the side
-      const int                       elem_LID  = sideSet[iSide].elem_LID;
-      const int                       elem_side = sideSet[iSide].side_local_id;
+      int const                       elem_LID  = sideSet[iSide].elem_LID;
+      int const                       elem_side = sideSet[iSide].side_local_id;
       const CellTopologyData_Subcell& side      = cellTopo->side[elem_side];
       int                             numSideNodes = side.topology->node_count;
 

@@ -43,11 +43,11 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<stk::mesh::MetaData>&    metaData_,
     const Teuchos::RCP<stk::mesh::BulkData>&    bulkData_,
-    const int                                   neq_,
+    int const                                   neq_,
     const AbstractFieldContainer::FieldContainerRequirements&
         req,  // TODO: remove this altogether?
               // AM: No, used in LCM for crystal plasticity and ACE
-    const int                                          numDim_,
+    int const                                          numDim_,
     const Teuchos::RCP<StateInfoStruct>&               sis,
     const Teuchos::Array<Teuchos::Array<std::string>>& solution_vector,
     const Teuchos::Array<std::string>&                 residual_vector)
@@ -631,7 +631,7 @@ MultiSTKFieldContainer<Interleaved>::fillVectorImpl(
     stk::mesh::Selector&                         field_selection,
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager,
-    const int                                    offset)
+    int const                                    offset)
 {
   using VFT = typename AbstractSTKFieldContainer::VectorFieldType;
   using SFT = typename AbstractSTKFieldContainer::ScalarFieldType;
@@ -646,7 +646,7 @@ MultiSTKFieldContainer<Interleaved>::fillVectorImpl(
   ALBANY_EXPECT(
       raw_field != nullptr,
       "Error! Something went wrong while retrieving a field.\n");
-  const int rank = raw_field->field_array_rank();
+  int const rank = raw_field->field_array_rank();
 
   auto field_node_vs_indexer = createGlobalLocalIndexer(field_node_vs);
   if (rank == 0) {
@@ -690,7 +690,7 @@ MultiSTKFieldContainer<Interleaved>::saveVectorImpl(
     stk::mesh::Selector&                         field_selection,
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager,
-    const int                                    offset)
+    int const                                    offset)
 {
   using VFT = typename AbstractSTKFieldContainer::VectorFieldType;
   using SFT = typename AbstractSTKFieldContainer::ScalarFieldType;
@@ -700,7 +700,7 @@ MultiSTKFieldContainer<Interleaved>::saveVectorImpl(
   ALBANY_EXPECT(
       raw_field != nullptr,
       "Error! Something went wrong while retrieving a field.\n");
-  const int rank = raw_field->field_array_rank();
+  int const rank = raw_field->field_array_rank();
 
   // Iterate over the on-processor nodes by getting node buckets and iterating
   // over each bucket.

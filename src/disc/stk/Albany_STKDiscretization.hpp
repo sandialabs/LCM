@@ -188,7 +188,7 @@ class STKDiscretization : public AbstractDiscretization
 
   //! Get Side set lists (typedef in Albany_AbstractDiscretization.hpp)
   SideSetList const&
-  getSideSets(const int workset) const
+  getSideSets(int const workset) const
   {
     return sideSets[workset];
   }
@@ -442,11 +442,11 @@ class STKDiscretization : public AbstractDiscretization
 
   //! Locate nodal dofs in non-overlapping vectors using local indexing
   int
-  getOwnedDOF(const int inode, const int eq) const;
+  getOwnedDOF(int const inode, int const eq) const;
 
   //! Locate nodal dofs in overlapping vectors using local indexing
   int
-  getOverlapDOF(const int inode, const int eq) const;
+  getOverlapDOF(int const inode, int const eq) const;
 
   //! Get global id of the stk entity
   GO
@@ -454,7 +454,7 @@ class STKDiscretization : public AbstractDiscretization
 
   //! Locate nodal dofs using global indexing
   GO
-  getGlobalDOF(const GO inode, const int eq) const;
+  getGlobalDOF(const GO inode, int const eq) const;
 
   Teuchos::RCP<LayeredMeshNumbering<LO>>
   getLayeredMeshNumbering() const
@@ -641,7 +641,7 @@ class STKDiscretization : public AbstractDiscretization
   double previous_time_label;
 
   int
-  nonzeroesPerRow(const int neq) const;
+  nonzeroesPerRow(int const neq) const;
 
   // ==================== Members =================== //
 

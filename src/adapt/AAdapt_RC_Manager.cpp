@@ -39,7 +39,7 @@ struct Manager::Field::Data
 };
 
 std::string
-Manager::Field::get_g_name(const int g_field_idx) const
+Manager::Field::get_g_name(int const g_field_idx) const
 {
   std::stringstream ss;
   ss << this->name << "_" << g_field_idx;
@@ -253,7 +253,7 @@ Projector::init(
 {
   node_vs_                  = node_vs;
   ol_node_vs_               = ol_node_vs;
-  const int max_num_entries = 27;  // Enough for first-order hex.
+  int const max_num_entries = 27;  // Enough for first-order hex.
   M_factory_                = Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(
       ol_node_vs_, ol_node_vs_, max_num_entries));
   M_                        = Teuchos::null;
@@ -307,12 +307,12 @@ Projector::fillRhs(
     const PHAL::Workset&                workset,
     const BasisField&                   wbf)
 {
-  const int rank = f.layout->rank() - 2, num_node = wbf.dimension(1),
+  int const rank = f.layout->rank() - 2, num_node = wbf.dimension(1),
             num_qp = wbf.dimension(2),
             ndim   = rank >= 1 ? f_G_qp.dimension(2) : 1;
 
   if (f.data_->mv[0].is_null()) {
-    const int ncol = rank == 0 ? 1 : rank == 1 ? ndim : ndim * ndim;
+    int const ncol = rank == 0 ? 1 : rank == 1 ? ndim : ndim * ndim;
     for (int fi = 0; fi < f.num_g_fields; ++fi) {
       f.data_->mv[fi] = Thyra::createMembers(ol_node_vs_, ncol);
     }
@@ -379,7 +379,7 @@ Projector::project(Manager::Field& f)
   }
   Teuchos::RCP<Thyra_MultiVector> x[2];
   for (int fi = 0; fi < f.num_g_fields; ++fi) {
-    const int nrhs = f.data_->mv[fi]->domain()->dim();
+    int const nrhs = f.data_->mv[fi]->domain()->dim();
     // Export the rhs to the same row map.
     auto b = Thyra::createMembers(M_->range(), nrhs);
     cas_manager_->combine(f.data_->mv[fi], b, Albany::CombineMode::ADD);
@@ -407,13 +407,13 @@ Projector::interp(
     Albany::MDArray&      mda1,
     Albany::MDArray&      mda2)
 {
-  const int rank = f.layout->rank() - 2, num_node = bf.dimension(1),
+  int const rank = f.layout->rank() - 2, num_node = bf.dimension(1),
             num_qp = bf.dimension(2), ndim = rank >= 1 ? mda1.dimension(2) : 1;
 
   Albany::MDArray* mdas[2];
   mdas[0]       = &mda1;
   mdas[1]       = &mda2;
-  const int nmv = f.num_g_fields;
+  int const nmv = f.num_g_fields;
 
   auto indexer = Albany::createGlobalLocalIndexer(ol_node_vs_);
   for (int cell = 0; cell < (int)workset.numCells; ++cell)
@@ -760,18 +760,18 @@ struct Manager::Impl
   }
 
   void
-  init_g(const int n, const bool is_g)
+  init_g(int const n, const bool is_g)
   {
     is_g_.clear();
     is_g_.resize(n, is_g ? 0 : fields_.size());
   }
   bool
-  is_g(const int ws_idx) const
+  is_g(int const ws_idx) const
   {
     return is_g_[ws_idx] < static_cast<int>(fields_.size());
   }
   void
-  set_G(const int ws_idx)
+  set_G(int const ws_idx)
   {
     ++is_g_[ws_idx];
   }
@@ -846,7 +846,7 @@ update_x(
     const Teuchos::ArrayRCP<const double>&              s,
     const Teuchos::RCP<Albany::AbstractDiscretization>& disc)
 {
-  const int spdim = disc->getNumDim(), neq = disc->getNumEq();
+  int const spdim = disc->getNumDim(), neq = disc->getNumEq();
   for (int i = 0; i < x.size(); i += neq)
     for (int j = 0; j < spdim; ++j) x[i + j] += s[i + j];
 }
@@ -986,7 +986,7 @@ Manager::testProjector(
 }
 
 const Teuchos::RCP<Thyra_MultiVector>&
-Manager::getNodalField(const Field& f, const int g_idx, const bool overlapped)
+Manager::getNodalField(const Field& f, int const g_idx, const bool overlapped)
     const
 {
   ALBANY_PANIC(!overlapped, "must be overlapped");
@@ -1271,7 +1271,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
 
       if (test == 0) {  // Compare with true values at NP.
         auto      indexer = Albany::createGlobalLocalIndexer(pc.get_node_vs());
-        const int ncol = 9, nverts = pc.get_node_vs()->dim();
+        int const ncol = 9, nverts = pc.get_node_vs()->dim();
         std::vector<RealType> f_true(ncol * nverts);
         {
           std::vector<bool> evaled(nverts, false);
@@ -1301,7 +1301,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
             scale[k]  = std::max(scale[k], std::abs(f_true[ncol * iv + k]));
           }
         printf("err np (test %d):", test);
-        const int n = f_mdf.dimension(0) * f_mdf.dimension(1);
+        int const n = f_mdf.dimension(0) * f_mdf.dimension(1);
         for (int k = 0; k < 9; ++k)
           printf(
               " %1.2e %1.2e (%1.2e)",
@@ -1334,7 +1334,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
           scale[k]  = std::max(scale[k], std::abs(f_mdf(cell, qp, i, j)));
         }
         printf("err ip (test %d):", test);
-        const int n = f_mdf.dimension(0) * f_mdf.dimension(1);
+        int const n = f_mdf.dimension(0) * f_mdf.dimension(1);
         for (int k = 0; k < 9; ++k)
           printf(
               " %1.2e %1.2e (%1.2e)",
@@ -1416,7 +1416,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
   {
     if (d->finished) { return; }
-    const int num_qp = coord_qp.dimension(1);
+    int const num_qp = coord_qp.dimension(1);
     if (workset.numCells > 0 && num_qp > 0) {
       Impl::Point p;
       for (int i = 0; i < 3; ++i) p.x[i] = coord_qp(0, 0, i);
@@ -1446,7 +1446,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       const Manager::BasisField&                          wbf,
       const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
   {
-    const int num_qp = coord_qp.dimension(1), num_dim = coord_qp.dimension(2);
+    int const num_qp = coord_qp.dimension(1), num_dim = coord_qp.dimension(2);
 
     typedef PHX::MDALayout<Cell, QuadPoint, Dim, Dim> Layout;
     Teuchos::RCP<Layout>                              layout =
@@ -1503,7 +1503,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       const Manager::BasisField&                          bf,
       const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
   {
-    const int num_qp = coord_qp.dimension(1), num_dim = coord_qp.dimension(2);
+    int const num_qp = coord_qp.dimension(1), num_dim = coord_qp.dimension(2);
 
     // Quick exit if we've already done this workset.
     if (workset.numCells > 0 && num_qp > 0) {
@@ -1575,7 +1575,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 9, err1, gerr1);
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 9, errmax, gerrmax);
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 9, scale, gscale);
-      const int n = td.f_true_qp.size();
+      int const n = td.f_true_qp.size();
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_SUM, 1, &n, &gn);
 
       if (comm->getRank() == 0) {

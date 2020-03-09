@@ -92,8 +92,8 @@ AdaptiveSolutionManager::AdaptiveSolutionManager(
   auto                           wsElNodeEqID = disc_->getWsElNodeEqID();
   auto                           coords       = disc_->getCoords();
   Teuchos::ArrayRCP<std::string> wsEBNames    = disc_->getWsEBNames();
-  const int                      numDim       = disc_->getNumDim();
-  const int                      neq          = disc_->getNumEq();
+  int const                      numDim       = disc_->getNumDim();
+  int const                      neq          = disc_->getNumEq();
 
   Teuchos::RCP<Teuchos::ParameterList> pbParams =
       Teuchos::sublist(appParams_, "Problem", true);

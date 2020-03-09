@@ -816,7 +816,7 @@ checkDerivatives(
     const Teuchos::Array<ParamVec>&           p,
     Teuchos::RCP<Thyra_Vector const> const&   fi,
     const Teuchos::RCP<const Thyra_LinearOp>& jacobian,
-    const int                                 check_lvl)
+    int const                                 check_lvl)
 {
   if (check_lvl <= 0) { return; }
 
@@ -1076,7 +1076,7 @@ void
 Application::writePhalanxGraph(
     Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm,
     const std::string&                                  evalName,
-    const int&                                          phxGraphVisDetail)
+    int const&                                          phxGraphVisDetail)
 {
   if (phxGraphVisDetail > 0) {
     const bool detail = (phxGraphVisDetail > 1) ? true : false;
@@ -1850,7 +1850,7 @@ Application::setScaleBCDofs(
 }
 
 void
-Application::loadWorksetSidesetInfo(PHAL::Workset& workset, const int ws)
+Application::loadWorksetSidesetInfo(PHAL::Workset& workset, int const ws)
 {
   workset.sideSets = Teuchos::rcpFromRef(disc->getSideSets(ws));
 }

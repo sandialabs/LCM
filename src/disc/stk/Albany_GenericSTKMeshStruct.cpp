@@ -57,7 +57,7 @@ only_keep_connectivity_to_specified_ranks(
       stk::mesh::Entity const*              rels = mesh.begin(entity, r);
       stk::mesh::ConnectivityOrdinal const* ords =
           mesh.begin_ordinals(entity, r);
-      const int num_rels = mesh.num_connectivity(entity, r);
+      int const num_rels = mesh.num_connectivity(entity, r);
       for (int c = 0; c < num_rels; ++c) {
         del_relations.push_back(rels[c]);
         del_ids.push_back(ords[c]);
@@ -146,10 +146,10 @@ GenericSTKMeshStruct::GenericSTKMeshStruct(
 void
 GenericSTKMeshStruct::SetupFieldData(
     const Teuchos::RCP<const Teuchos_Comm>&                   comm,
-    const int                                                 neq_,
+    int const                                                 neq_,
     const AbstractFieldContainer::FieldContainerRequirements& req,
     const Teuchos::RCP<StateInfoStruct>&                      sis,
-    const int                                                 worksetSize)
+    int const                                                 worksetSize)
 {
   ALBANY_PANIC(
       !metaData->is_initialized(),
@@ -488,14 +488,14 @@ GenericSTKMeshStruct::getMeshSpecs() const
 
 int
 GenericSTKMeshStruct::computeWorksetSize(
-    const int worksetSizeMax,
-    const int ebSizeMax) const
+    int const worksetSizeMax,
+    int const ebSizeMax) const
 {
   if (worksetSizeMax > ebSizeMax || worksetSizeMax < 1)
     return ebSizeMax;
   else {
     // compute numWorksets, and shrink workset size to minimize padding
-    const int numWorksets = 1 + (ebSizeMax - 1) / worksetSizeMax;
+    int const numWorksets = 1 + (ebSizeMax - 1) / worksetSizeMax;
     return (1 + (ebSizeMax - 1) / numWorksets);
   }
 }
@@ -910,7 +910,7 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
       stk::io::set_field_role(*side_to_cell_map, Ioss::Field::TRANSIENT);
       // We need to create the 2D cell -> (3D cell, side_node_ids) map in the
       // side mesh now
-      const int num_nodes =
+      int const num_nodes =
           sideSetMeshStructs[ss_name]->getMeshSpecs()[0]->ctd.node_count;
       typedef AbstractSTKFieldContainer::IntVectorFieldType IVFT;
       IVFT*                                                 side_nodes_ids =
@@ -1033,7 +1033,7 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
   }
 
   const stk::topology::rank_t SIDE_RANK = metaData->side_rank();
-  const int num_nodes = side_mesh->bulkData->num_nodes(cells2D[0]);
+  int const num_nodes = side_mesh->bulkData->num_nodes(cells2D[0]);
   int*      cell3D_id;
   int*      side_nodes_ids;
   GO        cell2D_GID, side3D_GID;

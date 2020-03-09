@@ -14,7 +14,7 @@
 Albany::ConstitutiveDriverProblem::ConstitutiveDriverProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
     const Teuchos::RCP<ParamLib>&               param_lib,
-    const int                                   num_dims,
+    int const                                   num_dims,
     Teuchos::RCP<const Teuchos::Comm<int>>&     commT)
     : Albany::AbstractProblem(params, param_lib),
       have_temperature_(false),

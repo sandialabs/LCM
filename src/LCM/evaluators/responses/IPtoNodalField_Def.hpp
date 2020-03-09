@@ -254,7 +254,7 @@ void
 IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     typename Traits::PreEvalData workset)
 {
-  const int  ctr      = this->mgr_->incrPreCounter();
+  int const  ctr      = this->mgr_->incrPreCounter();
   const bool am_first = ctr == 1;
   if (!am_first) return;
 
@@ -364,7 +364,7 @@ void
 IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
     typename Traits::PostEvalData workset)
 {
-  const int  ctr     = this->mgr_->incrPostCounter();
+  int const  ctr     = this->mgr_->incrPostCounter();
   const bool am_last = ctr == this->mgr_->nWorker();
   if (!am_last) return;
   this->mgr_->initCounters();
@@ -393,7 +393,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
 
   const auto num_nodes =
       Albany::getSpmdVectorSpace(overlap_node_space)->localSubDim();
-  const int blocksize = node_data->getVecSize();
+  int const blocksize = node_data->getVecSize();
 
   // Get weight info.
   int node_weight_offset;

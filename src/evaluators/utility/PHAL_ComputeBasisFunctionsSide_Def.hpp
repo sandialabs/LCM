@@ -158,8 +158,8 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(
       workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell
-    const int cell = it_side.elem_LID;
-    const int side = it_side.side_local_id;
+    int const cell = it_side.elem_LID;
+    int const side = it_side.side_local_id;
 
     cellsOnSides[side](numCellsOnSide[side]++) = cell;
 

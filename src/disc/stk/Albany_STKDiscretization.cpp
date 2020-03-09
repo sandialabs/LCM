@@ -123,7 +123,7 @@ point_inside(
 }
 
 const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
-Basis(const int C)
+Basis(int const C)
 {
   // Static types
   typedef Kokkos::DynRankView<RealType, PHX::Device>        Field_t;
@@ -153,11 +153,11 @@ Basis(const int C)
 double
 value(const std::vector<double>& soln, const std::pair<double, double>& ref)
 {
-  const int C = soln.size();
+  int const C = soln.size();
   const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
       HGRAD_Basis = Basis(C);
 
-  const int                                  numPoints = 1;
+  int const                                  numPoints = 1;
   Kokkos::DynRankView<RealType, PHX::Device> basisVals("SSS", C, numPoints);
   Kokkos::DynRankView<RealType, PHX::Device> tempPoints("SSS", numPoints, 2);
   tempPoints(0, 0) = ref.first;
@@ -176,11 +176,11 @@ value(
     const Teuchos::ArrayRCP<double*>& coords,
     const std::pair<double, double>&  ref)
 {
-  const int C = coords.size();
+  int const C = coords.size();
   const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
       HGRAD_Basis = Basis(C);
 
-  const int                                  numPoints = 1;
+  int const                                  numPoints = 1;
   Kokkos::DynRankView<RealType, PHX::Device> basisVals("SSS", C, numPoints);
   Kokkos::DynRankView<RealType, PHX::Device> tempPoints("SSS", numPoints, 2);
   tempPoints(0, 0) = ref.first;
@@ -200,11 +200,11 @@ grad(
     const Teuchos::ArrayRCP<double*>& coords,
     const std::pair<double, double>&  ref)
 {
-  const int C = coords.size();
+  int const C = coords.size();
   const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
       HGRAD_Basis = Basis(C);
 
-  const int                                  numPoints = 1;
+  int const                                  numPoints = 1;
   Kokkos::DynRankView<RealType, PHX::Device> basisGrad("SSS", C, numPoints, 2);
   Kokkos::DynRankView<RealType, PHX::Device> tempPoints("SSS", numPoints, 2);
   tempPoints(0, 0) = ref.first;
@@ -447,7 +447,7 @@ STKDiscretization::~STKDiscretization()
 {
   if (stkMeshStruct->cdfOutput) {
     if (netCDFp) {
-      const int ierr = nc_close(netCDFp);
+      int const ierr = nc_close(netCDFp);
       ALBANY_ASSERT(
           ierr == 0,
           "nc_close returned error code " << ierr << " - "
@@ -532,7 +532,7 @@ STKDiscretization::getCoordinates() const
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field =
       stkMeshStruct->getCoordinatesField();
 
-  const int meshDim         = stkMeshStruct->numDim;
+  int const meshDim         = stkMeshStruct->numDim;
   auto      ov_node_indexer = createGlobalLocalIndexer(m_overlap_node_vs);
   for (int i = 0; i < numOverlapNodes; i++) {
     GO  node_gid = gid(overlapnodes[i]);
@@ -579,7 +579,7 @@ STKDiscretization::transformMesh()
   } else if (transformType == "Spherical") {
     // This form takes a mesh of a square / cube and transforms it into a mesh
     // of a circle/sphere
-    const int numDim = stkMeshStruct->numDim;
+    int const numDim = stkMeshStruct->numDim;
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       double  r = 0.0;
@@ -597,7 +597,7 @@ STKDiscretization::transformMesh()
     double zshift = stkMeshStruct->zShift;
     //*out << "xshift, yshift, zshift = " << xshift << ", " << yshift << ", " <<
     // zshift << '\n';
-    const int numDim = stkMeshStruct->numDim;
+    int const numDim = stkMeshStruct->numDim;
     //*out << "numDim = " << numDim << '\n';
     if (numDim >= 0) {
       for (int i = 0; i < numOverlapNodes; i++) {
@@ -632,7 +632,7 @@ STKDiscretization::transformMesh()
    applied.*/
 
     Teuchos::Array<double> betas  = stkMeshStruct->betas_BLtransform;
-    const int              numDim = stkMeshStruct->numDim;
+    int const              numDim = stkMeshStruct->numDim;
     ALBANY_ASSERT(
         betas.length() >= numDim,
         "\n Length of Betas BL Transform array (= "
@@ -836,7 +836,7 @@ STKDiscretization::setupMLCoords()
     return;
   }
 
-  const int                                   numDim = stkMeshStruct->numDim;
+  int const                                   numDim = stkMeshStruct->numDim;
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field =
       stkMeshStruct->getCoordinatesField();
   coordMV           = Thyra::createMembers(m_node_vs, numDim);
@@ -1013,7 +1013,7 @@ STKDiscretization::writeSolutionToFile(
       !(outputInterval % stkMeshStruct->cdfOutputInterval)) {
     double time_label = monotonicTimeLabel(time);
 
-    const int out_step = processNetCDFOutputRequest(soln);
+    int const out_step = processNetCDFOutputRequest(soln);
 
     if (comm->getRank() == 0) {
       *out << "STKDiscretization::writeSolution: writing time " << time;
@@ -1086,7 +1086,7 @@ STKDiscretization::writeSolutionMVToFile(
       !(outputInterval % stkMeshStruct->cdfOutputInterval)) {
     double time_label = monotonicTimeLabel(time);
 
-    const int out_step = processNetCDFOutputRequestMV(soln);
+    int const out_step = processNetCDFOutputRequestMV(soln);
 
     if (comm->getRank() == 0) {
       *out << "STKDiscretization::writeSolution: writing time " << time;
@@ -1411,7 +1411,7 @@ STKDiscretization::gid(const stk::mesh::Entity node) const
 }
 
 int
-STKDiscretization::getOwnedDOF(const int inode, const int eq) const
+STKDiscretization::getOwnedDOF(int const inode, int const eq) const
 {
   if (interleavedOrdering) {
     return inode * neq + eq;
@@ -1421,7 +1421,7 @@ STKDiscretization::getOwnedDOF(const int inode, const int eq) const
 }
 
 int
-STKDiscretization::getOverlapDOF(const int inode, const int eq) const
+STKDiscretization::getOverlapDOF(int const inode, int const eq) const
 {
   if (interleavedOrdering) {
     return inode * neq + eq;
@@ -1431,7 +1431,7 @@ STKDiscretization::getOverlapDOF(const int inode, const int eq) const
 }
 
 GO
-STKDiscretization::getGlobalDOF(const GO inode, const int eq) const
+STKDiscretization::getGlobalDOF(const GO inode, int const eq) const
 {
   if (interleavedOrdering) {
     return inode * neq + eq;
@@ -1441,7 +1441,7 @@ STKDiscretization::getGlobalDOF(const GO inode, const int eq) const
 }
 
 int
-STKDiscretization::nonzeroesPerRow(const int num_eq) const
+STKDiscretization::nonzeroesPerRow(int const num_eq) const
 {
   int numDim = stkMeshStruct->numDim;
   int estNonzeroesPerRow;
@@ -1539,7 +1539,7 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
     // Now that the node_vs is created, we can loop over the dofs struct on this
     // part
     for (auto& it2 : it1.second) {
-      const int        numComponents = it2.first;
+      int const        numComponents = it2.first;
       DOFsStruct*      dofs_struct   = it2.second;
       NodalDOFManager& dofManager =
           (overlapped ? dofs_struct->overlap_dofManager :
@@ -1967,9 +1967,9 @@ STKDiscretization::computeWorksetInfo()
     // Note: Assumes nodes_per_element is the same across all elements in a
     // workset
     {
-      const int         buckSize          = buck.size();
+      int const         buckSize          = buck.size();
       stk::mesh::Entity element           = buck[0];
-      const int         nodes_per_element = bulkData.num_nodes(element);
+      int const         nodes_per_element = bulkData.num_nodes(element);
       wsElNodeEqID[b] =
           WorksetConn("wsElNodeEqID", buckSize, nodes_per_element, neq);
     }
@@ -2104,7 +2104,7 @@ STKDiscretization::computeWorksetInfo()
           for (int k = 0; k < nComp; k++) {
             const GO node_gid = it->second.overlap_dofManager.getGlobalDOF(
                 bulkData.identifier(node) - 1, k);
-            const int node_lid = ov_indexer->getLocalElement(node_gid);
+            int const node_lid = ov_indexer->getLocalElement(node_gid);
             wsElNodeEqID_array((int)i, j, k) = node_lid;
           }
         }
@@ -2261,7 +2261,7 @@ STKDiscretization::computeWorksetInfo()
       stateArrays.elemStateArrays[b][(*qpts)->name()] = ar;
     }
     for (size_t i = 0; i < scalarValue_states.size(); i++) {
-      const int                                         size = 1;
+      int const                                         size = 1;
       shards::Array<double, shards::NaturalOrder, Cell> array(
           &time[*scalarValue_states[i]], size);
       MDArray ar                                             = array;
@@ -2628,7 +2628,7 @@ STKDiscretization::setupNetCDFOutput()
     MPI_Comm theMPIComm = getMpiCommFromTeuchosComm(comm);
     MPI_Info info;
     MPI_Info_create(&info);
-    if (const int ierr = nc_create_par(
+    if (int const ierr = nc_create_par(
             name.c_str(),
             NC_NETCDF4 | NC_MPIIO | NC_CLOBBER | NC_64BIT_OFFSET,
             theMPIComm,
@@ -2640,7 +2640,7 @@ STKDiscretization::setupNetCDFOutput()
     MPI_Info_free(&info);
 #else
     if (!rank)
-      if (const int ierr = nc_create(
+      if (int const ierr = nc_create(
               name.c_str(),
               NC_CLOBBER | NC_SHARE | NC_64BIT_OFFSET | NC_CLASSIC_MODEL,
               &netCDFp))
@@ -2656,7 +2656,7 @@ STKDiscretization::setupNetCDFOutput()
 
     for (unsigned i = 0; i < 4; ++i) {
       if (netCDFp)
-        if (const int ierr =
+        if (int const ierr =
                 nc_def_dim(netCDFp, dimnames[i], dimlen[i], &dimID[i]))
           ALBANY_ABORT(
               "nc_def_dim returned error code "
@@ -2669,7 +2669,7 @@ STKDiscretization::setupNetCDFOutput()
       var << "variable_" << n;
       const char* field_name = var.str().c_str();
       if (netCDFp)
-        if (const int ierr = nc_def_var(
+        if (int const ierr = nc_def_var(
                 netCDFp, field_name, NC_DOUBLE, 4, dimID, &varSolns[n]))
           ALBANY_ABORT(
               "nc_def_var " << field_name << " returned error code " << ierr
@@ -2677,7 +2677,7 @@ STKDiscretization::setupNetCDFOutput()
 
       const double fillVal = -9999.0;
       if (netCDFp)
-        if (const int ierr = nc_put_att(
+        if (int const ierr = nc_put_att(
                 netCDFp, varSolns[n], "FillValue", NC_DOUBLE, 1, &fillVal))
           ALBANY_ABORT(
               "nc_put_att FillValue returned error code "
@@ -2690,19 +2690,19 @@ STKDiscretization::setupNetCDFOutput()
     const char lon_unit[] = "degrees_east";
     int        latVarID   = 0;
     if (netCDFp)
-      if (const int ierr =
+      if (int const ierr =
               nc_def_var(netCDFp, "lat", NC_DOUBLE, 1, &dimID[2], &latVarID))
         ALBANY_ABORT(
             "nc_def_var lat returned error code "
             << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
-      if (const int ierr = nc_put_att_text(
+      if (int const ierr = nc_put_att_text(
               netCDFp, latVarID, "long_name", sizeof(lat_name), lat_name))
         ALBANY_ABORT(
             "nc_put_att_text " << lat_name << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
-      if (const int ierr = nc_put_att_text(
+      if (int const ierr = nc_put_att_text(
               netCDFp, latVarID, "units", sizeof(lat_unit), lat_unit))
         ALBANY_ABORT(
             "nc_put_att_text " << lat_unit << " returned error code " << ierr
@@ -2710,19 +2710,19 @@ STKDiscretization::setupNetCDFOutput()
 
     int lonVarID = 0;
     if (netCDFp)
-      if (const int ierr =
+      if (int const ierr =
               nc_def_var(netCDFp, "lon", NC_DOUBLE, 1, &dimID[3], &lonVarID))
         ALBANY_ABORT(
             "nc_def_var lon returned error code "
             << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
-      if (const int ierr = nc_put_att_text(
+      if (int const ierr = nc_put_att_text(
               netCDFp, lonVarID, "long_name", sizeof(lon_name), lon_name))
         ALBANY_ABORT(
             "nc_put_att_text " << lon_name << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
-      if (const int ierr = nc_put_att_text(
+      if (int const ierr = nc_put_att_text(
               netCDFp, lonVarID, "units", sizeof(lon_unit), lon_unit))
         ALBANY_ABORT(
             "nc_put_att_text " << lon_unit << " returned error code " << ierr
@@ -2730,14 +2730,14 @@ STKDiscretization::setupNetCDFOutput()
 
     const char history[] = "Created by Albany";
     if (netCDFp)
-      if (const int ierr = nc_put_att_text(
+      if (int const ierr = nc_put_att_text(
               netCDFp, NC_GLOBAL, "history", sizeof(history), history))
         ALBANY_ABORT(
             "nc_put_att_text " << history << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
 
     if (netCDFp)
-      if (const int ierr = nc_enddef(netCDFp))
+      if (int const ierr = nc_enddef(netCDFp))
         ALBANY_ABORT(
             "nc_enddef returned error code " << ierr << " - "
                                              << nc_strerror(ierr) << std::endl);
@@ -2750,12 +2750,12 @@ STKDiscretization::setupNetCDFOutput()
       deglat[i] = (-pi / 2 + i * pi / (nlat - 1)) * (180 / pi);
 
     if (netCDFp)
-      if (const int ierr = nc_put_var(netCDFp, lonVarID, &deglon[0]))
+      if (int const ierr = nc_put_var(netCDFp, lonVarID, &deglon[0]))
         ALBANY_ABORT(
             "nc_put_var lon returned error code "
             << ierr << " - " << nc_strerror(ierr) << std::endl);
     if (netCDFp)
-      if (const int ierr = nc_put_var(netCDFp, latVarID, &deglat[0]))
+      if (int const ierr = nc_put_var(netCDFp, latVarID, &deglat[0]))
         ALBANY_ABORT(
             "nc_put_var lat returned error code "
             << ierr << " - " << nc_strerror(ierr) << std::endl);

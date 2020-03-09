@@ -39,7 +39,7 @@ template <>
 int
 getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
     const Albany::Application* app,
-    const int                  ebi)
+    int const                  ebi)
 {
   const Teuchos::RCP<const Teuchos::ParameterList> pl = app->getProblemPL();
   if (Teuchos::nonnull(pl)) {
@@ -57,7 +57,7 @@ struct A2V
   std::vector<ScalarT>& v;
   A2V(std::vector<ScalarT>& v) : v(v) {}
   void
-  operator()(typename Ref<const ScalarT>::type a, const int i)
+  operator()(typename Ref<const ScalarT>::type a, int const i)
   {
     v[i] = a;
   }
@@ -69,7 +69,7 @@ struct V2A
   const std::vector<ScalarT>& v;
   V2A(const std::vector<ScalarT>& v) : v(v) {}
   void
-  operator()(typename Ref<ScalarT>::type a, const int i)
+  operator()(typename Ref<ScalarT>::type a, int const i)
   {
     a = v[i];
   }
@@ -101,7 +101,7 @@ myReduceAll(
 {
   typedef typename ScalarT::value_type ValueT;
   // Size of array to hold one Fad's derivatives.
-  const int sz = v[0].size();
+  int const sz = v[0].size();
   // Pack into a vector of values.
   std::vector<ValueT> pack;
   for (int i = 0; i < v.size(); ++i) {
@@ -168,7 +168,7 @@ template <typename ScalarT>
 void
 broadcast(
     const Teuchos_Comm&    comm,
-    const int              root_rank,
+    int const              root_rank,
     PHX::MDField<ScalarT>& a)
 {
   std::vector<ScalarT> v;
@@ -196,7 +196,7 @@ apply_to_all_ad_types(eti)
 #undef eti
 #define eti(T)                \
   template void broadcast<T>( \
-      const Teuchos_Comm&, const int root_rank, PHX::MDField<T>&);
+      const Teuchos_Comm&, int const root_rank, PHX::MDField<T>&);
         apply_to_all_ad_types(eti)
 #undef eti
 #undef apply_to_all_ad_types

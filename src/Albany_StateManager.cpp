@@ -790,7 +790,7 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
 }
 
 Albany::StateArray&
-Albany::StateManager::getStateArray(SAType type, const int ws) const
+Albany::StateManager::getStateArray(SAType type, int const ws) const
 {
   ALBANY_ASSERT(stateVarsAreAllocated == true);
 

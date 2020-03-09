@@ -40,8 +40,8 @@ class EquilibriumConcentrationBC_Base
   RealType applied_conc_, pressure_fac_;
 
  protected:
-  const int coffset_;
-  const int poffset_;
+  int const coffset_;
+  int const poffset_;
 };
 
 //------------------------------------------------------------------------------

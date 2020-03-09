@@ -748,8 +748,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::QuickOverlapTest_2D(
 {
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** snode = sseg.Nodes();
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** mnode = mseg.Nodes();
-  const int nsnode                                = sseg.Nnode();
-  const int nmnode                                = mseg.Nnode();
+  int const nsnode                                = sseg.Nnode();
+  int const nmnode                                = mseg.Nnode();
 
   double mcen[3], scen[3], mrad[3], srad[3], vec[3], mdiam, sdiam, length;
 

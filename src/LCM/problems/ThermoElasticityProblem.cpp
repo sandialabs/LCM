@@ -14,7 +14,7 @@
 Albany::ThermoElasticityProblem::ThermoElasticityProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
-    const int                                   numDim_)
+    int const                                   numDim_)
     : Albany::AbstractProblem(params_, paramLib_, numDim_ + 1),
       haveSource(false),
       use_sdbcs_(false),

@@ -12,7 +12,7 @@
 Albany::ElasticityProblem::ElasticityProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
-    const int                                   numDim_,
+    int const                                   numDim_,
     const Teuchos::RCP<AAdapt::rc::Manager>&    rc_mgr_)
     : Albany::AbstractProblem(params_, paramLib_, numDim_),
       params(params_),

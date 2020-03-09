@@ -197,41 +197,41 @@ class ConstitutiveModelParameters
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const is_constant_map_Tag& tag, const int& i) const;
+  operator()(const is_constant_map_Tag& tag, int const& i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const no_const_map_Tag& tag, const int& i) const;
+  operator()(const no_const_map_Tag& tag, int const& i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const is_const_map_have_temperature_Linear_Tag& tag, const int& i)
+  operator()(const is_const_map_have_temperature_Linear_Tag& tag, int const& i)
       const;
   KOKKOS_INLINE_FUNCTION
   void
   operator()(
       const is_const_map_have_temperature_Arrhenius_Tag& tag,
-      const int&                                         i) const;
+      int const&                                         i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const no_const_map_have_temperature_Linear_Tag& tag, const int& i)
+  operator()(const no_const_map_have_temperature_Linear_Tag& tag, int const& i)
       const;
   KOKKOS_INLINE_FUNCTION
   void
   operator()(
       const no_const_map_have_temperature_Arrhenius_Tag& tag,
-      const int&                                         i) const;
+      int const&                                         i) const;
 
   KOKKOS_INLINE_FUNCTION
   void
-  compute_second_constMap(const int cell) const;
+  compute_second_constMap(int const cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  compute_second_no_constMap(const int cell) const;
+  compute_second_no_constMap(int const cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  compute_temperature_Linear(const int cell) const;
+  compute_temperature_Linear(int const cell) const;
   KOKKOS_INLINE_FUNCTION
   void
-  compute_temperature_Arrhenius(const int cell) const;
+  compute_temperature_Arrhenius(int const cell) const;
 };
 }  // namespace LCM
 

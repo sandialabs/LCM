@@ -213,8 +213,8 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(
         std::vector<Albany::SideStruct>::const_iterator iter_s;
         for (iter_s = sideSet.begin(); iter_s != sideSet.end(); ++iter_s) {
           // Get the local data of side and cell
-          const int cell = iter_s->elem_LID;
-          const int side = iter_s->side_local_id;
+          int const cell = iter_s->elem_LID;
+          int const side = iter_s->side_local_id;
 
           for (int i(0); i < dims[2]; ++i) {
             norm = 0;

@@ -109,7 +109,7 @@ class FunctionT
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     TEUCHOS_ASSERT_EQUALITY(valdim, traits_type::valdim);
@@ -156,13 +156,13 @@ phi_2,xi = 0 <br>
 
 struct Constant1D
 {
-  static const int valdim = 2;
+  static int const valdim = 2;
 
   static void
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     // for this linear function, we get 2 values and 2 derivatives
@@ -196,13 +196,13 @@ phi_2,xi = 0.5 <br>
 */
 struct Linear1D
 {
-  static const int valdim = 2;
+  static int const valdim = 2;
 
   static void
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     // for this linear function, we get 2 values and 2 derivatives
@@ -235,13 +235,13 @@ phi_2,xi = 1.5 <br>
 */
 struct DualLinear1D
 {
-  static const int valdim = 2;
+  static int const valdim = 2;
 
   static void
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     // for this linear function, we get 2 values and 2 derivatives
@@ -278,13 +278,13 @@ phi_3,xi_2 = 1 <br>
 */
 struct LinearTri
 {
-  static const int valdim = 3;
+  static int const valdim = 3;
 
   static void
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     // for this function, we get 3 values and six derivatives
@@ -328,13 +328,13 @@ phi_3,xi_2 = 4 <br>
 */
 struct DualLinearTri
 {
-  static const int valdim = 3;
+  static int const valdim = 3;
 
   static void
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     // for this function, we get 3 values and six derivatives
@@ -378,13 +378,13 @@ phi_3,xi_2 = 0 <br>
 */
 struct ConstantTri
 {
-  static const int valdim = 3;
+  static int const valdim = 3;
 
   static void
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     // for this function, we get 3 values and six derivatives
@@ -410,13 +410,13 @@ struct ConstantTri
 
 struct BiLinearQuad
 {
-  static const int valdim = 4;
+  static int const valdim = 4;
 
   static void
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     if (val) {
@@ -442,13 +442,13 @@ struct BiLinearQuad
 
 struct DualBiLinearQuad
 {
-  static const int valdim = 4;
+  static int const valdim = 4;
 
   static void
   EvaluateFunction(
       const double* xi,
       double*       val,
-      const int     valdim,
+      int const     valdim,
       double*       deriv)
   {
     const double onemxi  = 1.0 - xi[0];

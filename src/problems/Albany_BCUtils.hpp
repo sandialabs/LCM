@@ -241,7 +241,7 @@ class BCUtils
       const std::vector<std::string>&      bcNames,
       Teuchos::RCP<Teuchos::ParameterList> params,
       Teuchos::RCP<ParamLib>               paramLib,
-      const int                            numEqn = 0);
+      int const                            numEqn = 0);
 
   //! Specific implementation for Dirichlet BC Evaluator below
 
@@ -285,7 +285,7 @@ class BCUtils
       const std::vector<std::string>&      bcNames,
       Teuchos::RCP<Teuchos::ParameterList> params,
       Teuchos::RCP<ParamLib>               paramLib,
-      const int                            numEqn);
+      int const                            numEqn);
 
   //! Creates the list of evaluators (together with their parameter lists) to
   //! build
@@ -329,7 +329,7 @@ BCUtils<DirichletTraits>::constructBCEvaluators(
     const std::vector<std::string>&      bcNames,
     Teuchos::RCP<Teuchos::ParameterList> params,
     Teuchos::RCP<ParamLib>               paramLib,
-    const int                            numEqn);
+    int const                            numEqn);
 
 //! Specific implementation for Dirichlet BC Evaluator
 

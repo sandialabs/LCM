@@ -49,13 +49,13 @@ PopulateMesh::buildProblem(
   cellCubature = cubFactory.create<PHX::Device, RealType, RealType>(
       *cellTopology, meshSpecs[0]->cubatureDegree);
 
-  const int worksetSize     = meshSpecs[0]->worksetSize;
-  const int numCellSides    = cellTopology->getFaceCount();
-  const int numCellVertices = cellTopology->getNodeCount();
-  const int numCellNodes    = cellBasis->getCardinality();
-  const int numCellQPs      = cellCubature->getNumPoints();
-  const int numCellDim      = meshSpecs[0]->numDim;
-  const int numCellVecDim   = -1;
+  int const worksetSize     = meshSpecs[0]->worksetSize;
+  int const numCellSides    = cellTopology->getFaceCount();
+  int const numCellVertices = cellTopology->getNodeCount();
+  int const numCellNodes    = cellBasis->getCardinality();
+  int const numCellQPs      = cellCubature->getNumPoints();
+  int const numCellDim      = meshSpecs[0]->numDim;
+  int const numCellVecDim   = -1;
 
   dl = Teuchos::rcp(new Layouts(
       worksetSize,
@@ -87,11 +87,11 @@ PopulateMesh::buildProblem(
           cubFactory.create<PHX::Device, RealType, RealType>(
               *sideTopology[ss_name], ssMeshSpecs.cubatureDegree);
 
-      const int numSideVertices = sideTopology[ss_name]->getNodeCount();
-      const int numSideNodes    = sideBasis[ss_name]->getCardinality();
-      const int numSideDim      = ssMeshSpecs.numDim;
-      const int numSideQPs      = sideCubature[ss_name]->getNumPoints();
-      const int numSideVecDim   = -1;
+      int const numSideVertices = sideTopology[ss_name]->getNodeCount();
+      int const numSideNodes    = sideBasis[ss_name]->getCardinality();
+      int const numSideDim      = ssMeshSpecs.numDim;
+      int const numSideQPs      = sideCubature[ss_name]->getNumPoints();
+      int const numSideVecDim   = -1;
 
       dl->side_layouts[ss_name] = Teuchos::rcp(new Layouts(
           worksetSize,

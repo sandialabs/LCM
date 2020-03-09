@@ -27,7 +27,7 @@ class LameProblem : public Albany::AbstractProblem
   LameProblem(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
-      const int                                   numEqm,
+      int const                                   numEqm,
       Teuchos::RCP<const Teuchos::Comm<int>>&     commT);
 
   //! Destructor
@@ -147,8 +147,8 @@ Albany::LameProblem::constructEvaluators(
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
       Albany::getIntrepid2Basis(meshSpecs.ctd);
 
-  const int numNodes    = intrepidBasis->getCardinality();
-  const int worksetSize = meshSpecs.worksetSize;
+  int const numNodes    = intrepidBasis->getCardinality();
+  int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>>> cubature =
@@ -156,9 +156,9 @@ Albany::LameProblem::constructEvaluators(
           *cellType, meshSpecs.cubatureDegree);
 
   numDim                = cubature->getDimension();
-  const int numQPts     = cubature->getNumPoints();
-  const int numVertices = cellType->getNodeCount();
-  //   const int numVertices = cellType->getVertexCount();
+  int const numQPts     = cubature->getNumPoints();
+  int const numVertices = cellType->getNodeCount();
+  //   int const numVertices = cellType->getVertexCount();
 
   *out << "Field Dimensions: Workset=" << worksetSize
        << ", Vertices= " << numVertices << ", Nodes= " << numNodes

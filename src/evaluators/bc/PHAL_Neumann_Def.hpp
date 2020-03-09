@@ -393,8 +393,8 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
   std::vector<std::vector<Kokkos::DynRankView<int, PHX::Device>>>
       cellsOnSidesOnBlocks;
   for (auto const& it_side : sideSet) {
-    const int ebIndex   = it_side.elem_ebIndex;
-    const int elem_side = it_side.side_local_id;
+    int const ebIndex   = it_side.elem_ebIndex;
+    int const elem_side = it_side.side_local_id;
 
     if (ordinalEbIndex
             .insert(std::pair<int, int>(ebIndex, ordinalEbIndex.size()))
@@ -416,9 +416,9 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
   }
 
   for (auto const& it_side : sideSet) {
-    const int iBlock    = ordinalEbIndex[it_side.elem_ebIndex];
-    const int elem_LID  = it_side.elem_LID;
-    const int elem_side = it_side.side_local_id;
+    int const iBlock    = ordinalEbIndex[it_side.elem_ebIndex];
+    int const elem_LID  = it_side.elem_LID;
+    int const elem_side = it_side.side_local_id;
 
     cellsOnSidesOnBlocks[iBlock][elem_side](
         numCellsOnSidesOnBlocks[iBlock][elem_side]++) = elem_LID;

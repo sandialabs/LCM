@@ -23,7 +23,7 @@ gatherAllV(
     const Teuchos::ArrayView<const GO>&     myVals,
     Teuchos::Array<GO>&                     allVals)
 {
-  const int myCount = myVals.size();
+  int const myCount = myVals.size();
 #if defined(ALBANY_MPI)
   if (const Teuchos::MpiComm<int>* mpiComm =
           dynamic_cast<const Teuchos::MpiComm<int>*>(comm.get())) {
@@ -33,9 +33,9 @@ gatherAllV(
     MPI_Allreduce(&myCount, &allCount, 1, MPI_INT, MPI_SUM, rawComm);
     allVals.resize(allCount);
 
-    const int           cpuCount = mpiComm->getSize();
+    int const           cpuCount = mpiComm->getSize();
     Teuchos::Array<int> allValCounts(cpuCount);
-    const int           ierr = MPI_Allgather(
+    int const           ierr = MPI_Allgather(
         &myCount, 1, MPI_INT, allValCounts.getRawPtr(), 1, MPI_INT, rawComm);
     ALBANY_PANIC(ierr != 0);
 
@@ -76,7 +76,7 @@ gatherV(
     Teuchos::Array<GO>&                     allVals,
     const LO                                root_rank)
 {
-  const int myCount = myVals.size();
+  int const myCount = myVals.size();
 #if defined(ALBANY_MPI)
   if (const Teuchos::MpiComm<int>* mpiComm =
           dynamic_cast<const Teuchos::MpiComm<int>*>(comm.get())) {
@@ -89,9 +89,9 @@ gatherV(
     int myAllCount = (myRank == root_rank ? allCount : 0);
     allVals.resize(myAllCount);
 
-    const int           cpuCount = mpiComm->getSize();
+    int const           cpuCount = mpiComm->getSize();
     Teuchos::Array<int> allValCounts(cpuCount);
-    const int           ierr = MPI_Gather(
+    int const           ierr = MPI_Gather(
         &myCount,
         1,
         MPI_INT,

@@ -52,9 +52,9 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     const Teuchos::RCP<Teuchos::ParameterList>&               params_,
     const Teuchos::RCP<stk::mesh::MetaData>&                  metaData_,
     const Teuchos::RCP<stk::mesh::BulkData>&                  bulkData_,
-    const int                                                 neq_,
+    int const                                                 neq_,
     const AbstractFieldContainer::FieldContainerRequirements& req,
-    const int                                                 numDim_,
+    int const                                                 numDim_,
     const Teuchos::RCP<StateInfoStruct>&                      sis)
     : GenericSTKFieldContainer<Interleaved>(
           params_,
@@ -508,7 +508,7 @@ OrdinarySTKFieldContainer<Interleaved>::fillVectorImpl(
   ALBANY_EXPECT(
       raw_field != nullptr,
       "Error! Something went wrong while retrieving a field.\n");
-  const int rank = raw_field->field_array_rank();
+  int const rank = raw_field->field_array_rank();
 
   // Iterate over the on-processor nodes by getting node buckets and iterating
   // over each bucket.
@@ -570,7 +570,7 @@ OrdinarySTKFieldContainer<Interleaved>::saveVectorImpl(
   ALBANY_EXPECT(
       raw_field != nullptr,
       "Error! Something went wrong while retrieving a field.\n");
-  const int rank = raw_field->field_array_rank();
+  int const rank = raw_field->field_array_rank();
 
   // Iterate over the on-processor nodes by getting node buckets and iterating
   // over each bucket.

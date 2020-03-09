@@ -26,13 +26,13 @@ TEUCHOS_UNIT_TEST(LocalNonlinearSolver, Instantiation)
   std::vector<ScalarT>                     X(numLocalVars);
   LCM::LocalNonlinearSolver<EvalT, Traits> solver;
 
-  const int n      = 2;
-  const int nrhs   = 1;
+  int const n      = 2;
+  int const nrhs   = 1;
   RealType  A[]    = {1.1, 0.1, .01, 0.9};
-  const int lda    = 2;
+  int const lda    = 2;
   int       IPIV[] = {0, 0};
   RealType  B[]    = {0.1, 0.2};
-  const int ldb    = 2;
+  int const ldb    = 2;
   int       info(0);
 
   const RealType refX[] = {0.088978766430738, 0.212335692618807};

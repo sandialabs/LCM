@@ -28,7 +28,7 @@ class ElasticityProblem : public Albany::AbstractProblem
   ElasticityProblem(
       const Teuchos::RCP<Teuchos::ParameterList>& params_,
       const Teuchos::RCP<ParamLib>&               paramLib_,
-      const int                                   numDim_,
+      int const                                   numDim_,
       const Teuchos::RCP<AAdapt::rc::Manager>&    rc_mgr);
 
   //! Destructor
@@ -174,18 +174,18 @@ Albany::ElasticityProblem::constructEvaluators(
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
       Albany::getIntrepid2Basis(meshSpecs.ctd);
 
-  const int numNodes    = intrepidBasis->getCardinality();
-  const int worksetSize = meshSpecs.worksetSize;
+  int const numNodes    = intrepidBasis->getCardinality();
+  int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(
           *cellType, meshSpecs.cubatureDegree);
 
-  const int numDim      = cubature->getDimension();
-  const int numQPts     = cubature->getNumPoints();
-  const int numVertices = cellType->getNodeCount();
-  //   const int numVertices = cellType->getVertexCount();
+  int const numDim      = cubature->getDimension();
+  int const numQPts     = cubature->getNumPoints();
+  int const numVertices = cellType->getNodeCount();
+  //   int const numVertices = cellType->getVertexCount();
 
   *out << "Field Dimensions: Workset=" << worksetSize
        << ", Vertices= " << numVertices << ", Nodes= " << numNodes

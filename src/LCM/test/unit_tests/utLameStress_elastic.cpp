@@ -23,9 +23,9 @@ namespace {
 TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
 {
   // Set up the data layout
-  const int                                     worksetSize = 1;
-  const int                                     numQPts     = 1;
-  const int                                     numDim      = 3;
+  int const                                     worksetSize = 1;
+  int const                                     numQPts     = 1;
+  int const                                     numDim      = 3;
   Teuchos::RCP<PHX::MDALayout<Cell, QuadPoint>> qp_scalar =
       Teuchos::rcp(new PHX::MDALayout<Cell, QuadPoint>(worksetSize, numQPts));
   Teuchos::RCP<PHX::MDALayout<Cell, QuadPoint, Dim, Dim>> qp_tensor =

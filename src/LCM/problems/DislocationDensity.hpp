@@ -10,11 +10,11 @@ namespace LCM {
 
 namespace DislocationDensity {
 
-const int NUM_SLIP_D1 = 2;
+int const NUM_SLIP_D1 = 2;
 
-const int NUM_SLIP_D2 = 4;
+int const NUM_SLIP_D2 = 4;
 
-const int NUM_SLIP_D3 = 24;
+int const NUM_SLIP_D3 = 24;
 
 constexpr int
 get_num_slip(int const num_dims)

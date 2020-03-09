@@ -56,7 +56,7 @@ class PointT
   \param xi : Coordinates of point in a segment (2D)
   \param out : Level of output information written to stdout ( 0 - 10 )
   */
-  PointT(const int id, const double* xi, int out);
+  PointT(int const id, const double* xi, int out);
 
   /*!
   \brief Destructor

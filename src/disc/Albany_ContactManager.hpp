@@ -78,7 +78,7 @@ class ContactManager
   virtual ~ContactManager() {}
 
   void
-  fillInMortarResidual(const int, Teuchos::ArrayRCP<ST>&);
+  fillInMortarResidual(int const, Teuchos::ArrayRCP<ST>&);
 
  private:
   ContactManager();
@@ -90,7 +90,7 @@ class ContactManager
 
   void
   processSS(
-      const int          ctr,
+      int const          ctr,
       const std::string& sideSetName,
       int                s_or_mortar,
       int                mortarside,

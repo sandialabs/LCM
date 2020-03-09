@@ -941,28 +941,7 @@ SchwarzCoupled::evalModelImpl(
 
   for (auto m = 0; m < num_models_; ++m) {
     if (apps_[m]->is_adjoint) {
-      const Thyra_Derivative f_deriv(
-          solver_outargs_[m].get_f(),
-          Thyra::ModelEvaluatorBase::DERIV_TRANS_MV_BY_ROW);
-
-      const Thyra_Derivative dummy_deriv;
-
-      // need to add capability for sending this in
-      int const response_index = 0;
-
-      apps_[m]->evaluateResponseDerivative(
-          response_index,
-          curr_time,
-          xs[m],
-          x_dots[m],
-          x_dotdot,
-          sacado_param_vecs_[m],
-          NULL,
-          Teuchos::null,
-          f_deriv,
-          dummy_deriv,
-          dummy_deriv,
-          dummy_deriv);
+      ALBANY_ABORT("This functionality no longer exists.");
     } else {
       if (Teuchos::nonnull(fs_out[m]) && fs_already_computed[m] == false) {
         apps_[m]->computeGlobalResidual(

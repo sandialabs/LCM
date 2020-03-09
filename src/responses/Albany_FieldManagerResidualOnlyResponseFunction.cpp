@@ -23,32 +23,6 @@ Albany::FieldManagerResidualOnlyResponseFunction::
 }
 
 void
-Albany::FieldManagerResidualOnlyResponseFunction::evaluateTangent(
-    const double /*alpha*/,
-    const double /*beta*/,
-    const double /*omega*/,
-    const double current_time,
-    bool /*sum_derivs*/,
-    Teuchos::RCP<Thyra_Vector const> const& x,
-    Teuchos::RCP<Thyra_Vector const> const& xdot,
-    Teuchos::RCP<Thyra_Vector const> const& xdotdot,
-    const Teuchos::Array<ParamVec>&         p,
-    ParamVec* /*deriv_p*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vx*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdot*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdotdot*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vp*/,
-    const Teuchos::RCP<Thyra_Vector>& g,
-    const Teuchos::RCP<Thyra_MultiVector>& /*gx*/,
-    const Teuchos::RCP<Thyra_MultiVector>& /*gp*/)
-{
-  // Evaluate just the response if it is requested.
-  if (!g.is_null()) {
-    this->evaluateResponse(current_time, x, xdot, xdotdot, p, g);
-  }
-}
-
-void
 Albany::FieldManagerResidualOnlyResponseFunction::evaluateGradient(
     const double                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
@@ -65,17 +39,4 @@ Albany::FieldManagerResidualOnlyResponseFunction::evaluateGradient(
   if (!g.is_null()) {
     this->evaluateResponse(current_time, x, xdot, xdotdot, p, g);
   }
-}
-
-void
-Albany::FieldManagerResidualOnlyResponseFunction::evaluateDistParamDeriv(
-    const double /*current_time*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*x*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
-    const Teuchos::Array<ParamVec>& /*param_array*/,
-    const std::string& /*dist_param_name*/,
-    const Teuchos::RCP<Thyra_MultiVector>& /*dg_dp*/)
-{
-  // Do nothing
 }

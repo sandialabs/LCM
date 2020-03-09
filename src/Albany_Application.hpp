@@ -249,49 +249,6 @@ class Application
       const double                            dt = 0.0);
 
  public:
-  //! Compute global Preconditioner
-  /*!
-   * Set xdot to NULL for steady-state problems
-   */
-
-  void
-  computeGlobalTangent(
-      const double                                 alpha,
-      const double                                 beta,
-      const double                                 omega,
-      const double                                 current_time,
-      bool                                         sum_derivs,
-      Teuchos::RCP<Thyra_Vector const> const&      x,
-      Teuchos::RCP<Thyra_Vector const> const&      xdot,
-      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-      const Teuchos::Array<ParamVec>&              par,
-      ParamVec*                                    deriv_par,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vp,
-      const Teuchos::RCP<Thyra_Vector>&            f,
-      const Teuchos::RCP<Thyra_MultiVector>&       JV,
-      const Teuchos::RCP<Thyra_MultiVector>&       fp);
-
- public:
-  //! Compute df/dp*V or (df/dp)^T*V for distributed parameter p
-  /*!
-   * Set xdot to NULL for steady-state problems
-   */
-
-  void
-  applyGlobalDistParamDerivImpl(
-      const double                                 current_time,
-      Teuchos::RCP<Thyra_Vector const> const&      x,
-      Teuchos::RCP<Thyra_Vector const> const&      xdot,
-      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-      const Teuchos::Array<ParamVec>&              p,
-      const std::string&                           dist_param_name,
-      const bool                                   trans,
-      const Teuchos::RCP<const Thyra_MultiVector>& V,
-      const Teuchos::RCP<Thyra_MultiVector>&       fpV);
-
   //! Evaluate response functions
   /*!
    * Set xdot to NULL for steady-state problems
@@ -305,61 +262,6 @@ class Application
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       g);
-
-  //! Evaluate tangent = alpha*dg/dx*Vx + beta*dg/dxdot*Vxdot + dg/dp*Vp
-  /*!
-   * Set xdot, dxdot_dp to NULL for steady-state problems
-   */
-  void
-  evaluateResponseTangent(
-      int                                          response_index,
-      const double                                 alpha,
-      const double                                 beta,
-      const double                                 omega,
-      const double                                 current_time,
-      bool                                         sum_derivs,
-      Teuchos::RCP<Thyra_Vector const> const&      x,
-      Teuchos::RCP<Thyra_Vector const> const&      xdot,
-      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-      const Teuchos::Array<ParamVec>&              p,
-      ParamVec*                                    deriv_p,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vp,
-      const Teuchos::RCP<Thyra_Vector>&            g,
-      const Teuchos::RCP<Thyra_MultiVector>&       gx,
-      const Teuchos::RCP<Thyra_MultiVector>&       gp);
-
-  //! Evaluate gradient = dg/dx, dg/dxdot, dg/dp
-  /*!
-   * Set xdot, dg_dxdot to NULL for steady-state problems
-   */
-  void
-  evaluateResponseDerivative(
-      int                                     response_index,
-      const double                            current_time,
-      Teuchos::RCP<Thyra_Vector const> const& x,
-      Teuchos::RCP<Thyra_Vector const> const& xdot,
-      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
-      const Teuchos::Array<ParamVec>&         p,
-      ParamVec*                               deriv_p,
-      const Teuchos::RCP<Thyra_Vector>&       g,
-      const Thyra_Derivative&                 dg_dx,
-      const Thyra_Derivative&                 dg_dxdot,
-      const Thyra_Derivative&                 dg_dxdotdot,
-      const Thyra_Derivative&                 dg_dp);
-
-  void
-  evaluateResponseDistParamDeriv(
-      int                                     response_index,
-      const double                            current_time,
-      Teuchos::RCP<Thyra_Vector const> const& x,
-      Teuchos::RCP<Thyra_Vector const> const& xdot,
-      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
-      const Teuchos::Array<ParamVec>&         param_array,
-      const std::string&                      dist_param_name,
-      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp);
 
   //! Provide access to shapeParameters -- no AD
   PHAL::AlbanyTraits::Residual::ScalarT&
@@ -485,21 +387,6 @@ class Application
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p);
-
-  void
-  setupTangentWorksetInfo(
-      PHAL::Workset&                               workset,
-      double                                       current_time,
-      bool                                         sum_derivs,
-      Teuchos::RCP<Thyra_Vector const> const&      x,
-      Teuchos::RCP<Thyra_Vector const> const&      xdot,
-      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-      const Teuchos::Array<ParamVec>&              p,
-      ParamVec*                                    deriv_p,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vp);
 
  private:
   template <typename EvalT>

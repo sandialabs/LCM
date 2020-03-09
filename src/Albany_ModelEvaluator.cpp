@@ -7,7 +7,6 @@
 #include "Albany_ModelEvaluator.hpp"
 
 #include "Albany_Application.hpp"
-#include "Albany_DistributedParameterDerivativeOp.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
@@ -457,14 +456,8 @@ ModelEvaluator::create_W_prec() const
 Teuchos::RCP<Thyra_LinearOp>
 ModelEvaluator::create_DfDp_op_impl(int j) const
 {
-  ALBANY_PANIC(
-      j >= num_param_vecs + num_dist_param_vecs || j < num_param_vecs,
-      std::endl
-          << "Error!  Albany::ModelEvaluator::create_DfDp_op_impl():  "
-          << "Invalid parameter index j = " << j << std::endl);
-
-  return Teuchos::rcp(new DistributedParameterDerivativeOp(
-      app, dist_param_names[j - num_param_vecs]));
+  ALBANY_ABORT("Not implemented.");
+  return Teuchos::null;
 }
 
 Teuchos::RCP<const Thyra_LOWS_Factory>
@@ -810,29 +803,7 @@ ModelEvaluator::evalModelImpl(
         outArgs.get_DfDp(l).getMultiVector();
 
     if (Teuchos::nonnull(dfdp_out)) {
-      const Teuchos::RCP<ParamVec> p_vec =
-          Teuchos::rcpFromRef(sacado_param_vec[l]);
-
-      app->computeGlobalTangent(
-          0.0,
-          0.0,
-          0.0,
-          curr_time,
-          false,
-          x,
-          x_dot,
-          x_dotdot,
-          sacado_param_vec,
-          p_vec.get(),
-          Teuchos::null,
-          Teuchos::null,
-          Teuchos::null,
-          Teuchos::null,
-          f_out,
-          Teuchos::null,
-          dfdp_out);
-
-      f_already_computed = true;
+      ALBANY_ABORT("This functionality is no longer supported.");
     }
   }
 
@@ -841,38 +812,13 @@ ModelEvaluator::evalModelImpl(
     const Teuchos::RCP<Thyra_LinearOp> dfdp_out =
         outArgs.get_DfDp(i + num_param_vecs).getLinearOp();
     if (dfdp_out != Teuchos::null) {
-      Teuchos::RCP<DistributedParameterDerivativeOp> dfdp_op =
-          Teuchos::rcp_dynamic_cast<DistributedParameterDerivativeOp>(dfdp_out);
-      dfdp_op->set(
-          curr_time,
-          x,
-          x_dot,
-          x_dotdot,
-          Teuchos::rcp(&sacado_param_vec, false));
+      ALBANY_ABORT("This functionality is no longer supported.");
     }
   }
 
   // f
   if (app->is_adjoint) {
-    const Thyra_Derivative f_deriv(
-        outArgs.get_f(), Thyra_ModelEvaluator::DERIV_TRANS_MV_BY_ROW);
-
-    const Thyra_Derivative dummy_deriv;
-
-    const int response_index = 0;  // need to add capability for sending this in
-    app->evaluateResponseDerivative(
-        response_index,
-        curr_time,
-        x,
-        x_dot,
-        x_dotdot,
-        sacado_param_vec,
-        NULL,
-        Teuchos::null,
-        f_deriv,
-        dummy_deriv,
-        dummy_deriv,
-        dummy_deriv);
+    ALBANY_ABORT("This functionality is no longer supported.");
   } else if (Teuchos::nonnull(f_out) && !f_already_computed) {
     app->computeGlobalResidual(
         curr_time, x, x_dot, x_dotdot, sacado_param_vec, f_out, dt);
@@ -895,22 +841,7 @@ ModelEvaluator::evalModelImpl(
 
     // dg/dx, dg/dxdot
     if (!dgdx_out.isEmpty() || !dgdxdot_out.isEmpty()) {
-      const Thyra_Derivative dummy_deriv;
-      app->evaluateResponseDerivative(
-          j,
-          curr_time,
-          x,
-          x_dot,
-          x_dotdot,
-          sacado_param_vec,
-          NULL,
-          g_out,
-          dgdx_out,
-          dgdxdot_out,
-          dgdxdotdot_out,
-          dummy_deriv);
-      // Set g_out to null to indicate that g_out was evaluated.
-      g_out = Teuchos::null;
+      ALBANY_ABORT("This functionality is no longer supported.");
     }
 
     // dg/dp
@@ -919,30 +850,7 @@ ModelEvaluator::evalModelImpl(
           outArgs.get_DgDp(j, l).getMultiVector();
 
       if (Teuchos::nonnull(dgdp_out)) {
-        const Teuchos::RCP<ParamVec> p_vec =
-            Teuchos::rcpFromRef(sacado_param_vec[l]);
-
-        app->evaluateResponseTangent(
-            j,
-            alpha,
-            beta,
-            omega,
-            curr_time,
-            false,
-            x,
-            x_dot,
-            x_dotdot,
-            sacado_param_vec,
-            p_vec.get(),
-            Teuchos::null,
-            Teuchos::null,
-            Teuchos::null,
-            Teuchos::null,
-            g_out,
-            Teuchos::null,
-            dgdp_out);
-        // Set g_out to null to indicate that g_out was evaluated.
-        g_out = Teuchos::null;
+        ALBANY_ABORT("This functionality is no longer supported.");
       }
     }
 
@@ -952,16 +860,7 @@ ModelEvaluator::evalModelImpl(
           outArgs.get_DgDp(j, l + num_param_vecs).getMultiVector();
 
       if (Teuchos::nonnull(dgdp_out)) {
-        dgdp_out->assign(0.);
-        app->evaluateResponseDistParamDeriv(
-            j,
-            curr_time,
-            x,
-            x_dot,
-            x_dotdot,
-            sacado_param_vec,
-            dist_param_names[l],
-            dgdp_out);
+        ALBANY_ABORT("This functionality is no longer supported.");
       }
     }
 

@@ -45,27 +45,6 @@ class SolutionMinValueResponseFunction
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       g);
 
-  //! Evaluate tangent = dg/dx*dx/dp + dg/dxdot*dxdot/dp + dg/dp
-  void
-  evaluateTangent(
-      const double                                 alpha,
-      const double                                 beta,
-      const double                                 omega,
-      const double                                 current_time,
-      bool                                         sum_derivs,
-      Teuchos::RCP<Thyra_Vector const> const&      x,
-      Teuchos::RCP<Thyra_Vector const> const&      xdot,
-      Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-      const Teuchos::Array<ParamVec>&              p,
-      ParamVec*                                    deriv_p,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-      const Teuchos::RCP<const Thyra_MultiVector>& Vp,
-      const Teuchos::RCP<Thyra_Vector>&            g,
-      const Teuchos::RCP<Thyra_MultiVector>&       gx,
-      const Teuchos::RCP<Thyra_MultiVector>&       gp);
-
   //! Evaluate gradient = dg/dx, dg/dxdot, dg/dp
   void
   evaluateGradient(
@@ -79,17 +58,6 @@ class SolutionMinValueResponseFunction
       const Teuchos::RCP<Thyra_MultiVector>&  dg_dx,
       const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdot,
       const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdotdot,
-      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp);
-
-  //! Evaluate distributed parameter derivative dg/dp
-  void
-  evaluateDistParamDeriv(
-      const double                            current_time,
-      Teuchos::RCP<Thyra_Vector const> const& x,
-      Teuchos::RCP<Thyra_Vector const> const& xdot,
-      Teuchos::RCP<Thyra_Vector const> const& xdotdot,
-      const Teuchos::Array<ParamVec>&         param_array,
-      const std::string&                      dist_param_name,
       const Teuchos::RCP<Thyra_MultiVector>&  dg_dp);
 
  protected:

@@ -210,6 +210,7 @@ createSolutionCullingStrategy(
 
   const bool unsupportedCullingStrategy = true;
   ALBANY_PANIC(unsupportedCullingStrategy);
+  return Teuchos::null;
 }
 
 }  // namespace Albany

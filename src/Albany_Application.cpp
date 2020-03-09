@@ -176,13 +176,9 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   } else if (solutionMethod == "Continuation") {
     solMethod            = Continuation;
     bool const have_piro = params->isSublist("Piro");
-
     ALBANY_ASSERT(have_piro == true, "Error! Piro sublist not found.");
-
     Teuchos::ParameterList& piro_params = params->sublist("Piro");
-
-    bool const have_nox = piro_params.isSublist("NOX");
-
+    bool const              have_nox    = piro_params.isSublist("NOX");
     if (have_nox) {
       Teuchos::ParameterList nox_params = piro_params.sublist("NOX");
       std::string            nonlinear_solver =
@@ -200,21 +196,13 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
 
     // Add NOX pre-post-operator for debugging.
     bool const have_piro = params->isSublist("Piro");
-
     ALBANY_ASSERT(have_piro == true, "Error! Piro sublist not found.\n");
-
     Teuchos::ParameterList& piro_params = params->sublist("Piro");
-
     bool const have_dbcs = problemParams->isSublist("Dirichlet BCs");
-
     if (have_dbcs == false) no_dir_bcs_ = true;
-
     bool const have_tempus = piro_params.isSublist("Tempus");
-
     ALBANY_ASSERT(have_tempus == true, "Error! Tempus sublist not found.\n");
-
     Teuchos::ParameterList& tempus_params = piro_params.sublist("Tempus");
-
     bool const have_tempus_stepper = tempus_params.isSublist("Tempus Stepper");
 
     ALBANY_ASSERT(
@@ -245,11 +233,8 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
           tempus_stepper_params.sublist(solver_name);
 
       bool const have_nox = solver_name_params.isSublist("NOX");
-
       ALBANY_ASSERT(have_nox == true, "Error! Nox sublist not found.\n");
-
       nox_params = solver_name_params.sublist("NOX");
-
       std::string nonlinear_solver =
           nox_params.get<std::string>("Nonlinear Solver");
 
@@ -1539,42 +1524,6 @@ Application::computeGlobalJacobian(
 }
 
 void
-Application::computeGlobalTangent(
-    const double                                 alpha,
-    const double                                 beta,
-    const double                                 omega,
-    const double                                 current_time,
-    bool                                         sum_derivs,
-    Teuchos::RCP<Thyra_Vector const> const&      x,
-    Teuchos::RCP<Thyra_Vector const> const&      xdot,
-    Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-    const Teuchos::Array<ParamVec>&              par,
-    ParamVec*                                    deriv_par,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vp,
-    const Teuchos::RCP<Thyra_Vector>&            f,
-    const Teuchos::RCP<Thyra_MultiVector>&       JV,
-    const Teuchos::RCP<Thyra_MultiVector>&       fp)
-{
-}
-
-void
-Application::applyGlobalDistParamDerivImpl(
-    const double                                 current_time,
-    Teuchos::RCP<Thyra_Vector const> const&      x,
-    Teuchos::RCP<Thyra_Vector const> const&      xdot,
-    Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-    const Teuchos::Array<ParamVec>&              p,
-    const std::string&                           dist_param_name,
-    const bool                                   trans,
-    const Teuchos::RCP<const Thyra_MultiVector>& V,
-    const Teuchos::RCP<Thyra_MultiVector>&       fpV)
-{
-}
-
-void
 Application::evaluateResponse(
     int                                     response_index,
     const double                            current_time,
@@ -1588,114 +1537,6 @@ Application::evaluateResponse(
   double const this_time = fixTime(current_time);
   responses[response_index]->evaluateResponse(
       this_time, x, xdot, xdotdot, p, g);
-}
-
-void
-Application::evaluateResponseTangent(
-    int                                          response_index,
-    const double                                 alpha,
-    const double                                 beta,
-    const double                                 omega,
-    const double                                 current_time,
-    bool                                         sum_derivs,
-    Teuchos::RCP<Thyra_Vector const> const&      x,
-    Teuchos::RCP<Thyra_Vector const> const&      xdot,
-    Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-    const Teuchos::Array<ParamVec>&              p,
-    ParamVec*                                    deriv_p,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vp,
-    const Teuchos::RCP<Thyra_Vector>&            g,
-    const Teuchos::RCP<Thyra_MultiVector>&       gx,
-    const Teuchos::RCP<Thyra_MultiVector>&       gp)
-{
-  TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response Tangent");
-  double const this_time = fixTime(current_time);
-  responses[response_index]->evaluateTangent(
-      alpha,
-      beta,
-      omega,
-      this_time,
-      sum_derivs,
-      x,
-      xdot,
-      xdotdot,
-      p,
-      deriv_p,
-      Vx,
-      Vxdot,
-      Vxdotdot,
-      Vp,
-      g,
-      gx,
-      gp);
-}
-
-void
-Application::evaluateResponseDerivative(
-    int                                              response_index,
-    const double                                     current_time,
-    Teuchos::RCP<Thyra_Vector const> const&          x,
-    Teuchos::RCP<Thyra_Vector const> const&          xdot,
-    Teuchos::RCP<Thyra_Vector const> const&          xdotdot,
-    const Teuchos::Array<ParamVec>&                  p,
-    ParamVec*                                        deriv_p,
-    const Teuchos::RCP<Thyra_Vector>&                g,
-    const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dx,
-    const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdot,
-    const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdotdot,
-    const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dp)
-{
-  TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response Derivative");
-  double const this_time = fixTime(current_time);
-
-  responses[response_index]->evaluateDerivative(
-      this_time,
-      x,
-      xdot,
-      xdotdot,
-      p,
-      deriv_p,
-      g,
-      dg_dx,
-      dg_dxdot,
-      dg_dxdotdot,
-      dg_dp);
-}
-
-void
-Application::evaluateResponseDistParamDeriv(
-    int                                     response_index,
-    const double                            current_time,
-    Teuchos::RCP<Thyra_Vector const> const& x,
-    Teuchos::RCP<Thyra_Vector const> const& xdot,
-    Teuchos::RCP<Thyra_Vector const> const& xdotdot,
-    const Teuchos::Array<ParamVec>&         param_array,
-    const std::string&                      dist_param_name,
-    const Teuchos::RCP<Thyra_MultiVector>&  dg_dp)
-{
-  TEUCHOS_FUNC_TIME_MONITOR(
-      "Albany Fill: Response Distributed Parameter Derivative");
-  double const this_time = fixTime(current_time);
-
-  responses[response_index]->evaluateDistParamDeriv(
-      this_time, x, xdot, xdotdot, param_array, dist_param_name, dg_dp);
-
-  if (!dg_dp.is_null()) {
-    std::stringstream sensitivity_name;
-    sensitivity_name << dist_param_name << "_sensitivity";
-    // TODO: make distParamLib Thyra
-    if (distParamLib->has(sensitivity_name.str())) {
-      auto sensitivity_vec =
-          distParamLib->get(sensitivity_name.str())->vector();
-      // FIXME This is not correct if the part of sensitivity due to the
-      // Lagrange multiplier (fpV) is computed first.
-      scale_and_update(sensitivity_vec, 0.0, dg_dp->col(0), 1.0);
-      distParamLib->get(sensitivity_name.str())->scatter();
-    }
-  }
 }
 
 void
@@ -2070,110 +1911,6 @@ Application::setupBasicWorksetInfo(
   workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot);
   workset.comm              = comm;
   workset.x_cas_manager     = solMgr->get_cas_manager();
-}
-
-void
-Application::setupTangentWorksetInfo(
-    PHAL::Workset&                               workset,
-    double                                       current_time,
-    bool                                         sum_derivs,
-    Teuchos::RCP<Thyra_Vector const> const&      x,
-    Teuchos::RCP<Thyra_Vector const> const&      xdot,
-    Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-    const Teuchos::Array<ParamVec>&              p,
-    ParamVec*                                    deriv_p,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vp)
-{
-  setupBasicWorksetInfo(workset, current_time, x, xdot, xdotdot, p);
-
-  // Scatter Vx dot the overlapped distribution
-  RCP<Thyra_MultiVector> overlapped_Vx;
-  if (Vx != Teuchos::null) {
-    overlapped_Vx = Thyra::createMembers(
-        disc->getOverlapVectorSpace(), Vx->domain()->dim());
-    overlapped_Vx->assign(0.0);
-    solMgr->get_cas_manager()->scatter(Vx, overlapped_Vx, CombineMode::INSERT);
-  }
-
-  // Scatter Vx dot the overlapped distribution
-  RCP<Thyra_MultiVector> overlapped_Vxdot;
-  if (Vxdot != Teuchos::null) {
-    overlapped_Vxdot = Thyra::createMembers(
-        disc->getOverlapVectorSpace(), Vxdot->domain()->dim());
-    overlapped_Vxdot->assign(0.0);
-    solMgr->get_cas_manager()->scatter(
-        Vxdot, overlapped_Vxdot, CombineMode::INSERT);
-  }
-  RCP<Thyra_MultiVector> overlapped_Vxdotdot;
-  if (Vxdotdot != Teuchos::null) {
-    overlapped_Vxdotdot = Thyra::createMembers(
-        disc->getOverlapVectorSpace(), Vxdotdot->domain()->dim());
-    overlapped_Vxdotdot->assign(0.0);
-    solMgr->get_cas_manager()->scatter(
-        Vxdotdot, overlapped_Vxdotdot, CombineMode::INSERT);
-  }
-
-  RCP<ParamVec> params = rcp(deriv_p, false);
-
-  // Number of x & xdot tangent directions
-  int num_cols_x = 0;
-  if (Vx != Teuchos::null) {
-    num_cols_x = Vx->domain()->dim();
-  } else if (Vxdot != Teuchos::null) {
-    num_cols_x = Vxdot->domain()->dim();
-  } else if (Vxdotdot != Teuchos::null) {
-    num_cols_x = Vxdotdot->domain()->dim();
-  }
-
-  // Number of parameter tangent directions
-  int num_cols_p = 0;
-  if (params != Teuchos::null) {
-    if (Vp != Teuchos::null) {
-      num_cols_p = Vp->domain()->dim();
-    } else {
-      num_cols_p = params->size();
-    }
-  }
-
-  // Whether x and param tangent components are added or separate
-  int param_offset = 0;
-  if (!sum_derivs)
-    param_offset = num_cols_x;  // offset of parameter derivs in deriv array
-
-  ALBANY_PANIC(
-      sum_derivs && (num_cols_x != 0) && (num_cols_p != 0) &&
-          (num_cols_x != num_cols_p),
-      "Seed matrices Vx and Vp must have the same number "
-          << " of columns when sum_derivs is true and both are "
-          << "non-null!" << std::endl);
-
-  // Initialize
-  if (params != Teuchos::null) {
-    TanFadType p_val;
-    int        num_cols_tot = param_offset + num_cols_p;
-    for (unsigned int i = 0; i < params->size(); i++) {
-      p_val = TanFadType(num_cols_tot, (*params)[i].baseValue);
-      if (Vp != Teuchos::null) {
-        auto Vp_constView = getLocalData(Vp);
-        for (int k = 0; k < num_cols_p; k++) {
-          p_val.fastAccessDx(param_offset + k) = Vp_constView[k][i];
-        }
-      } else
-        p_val.fastAccessDx(param_offset + i) = 1.0;
-    }
-  }
-
-  workset.params       = params;
-  workset.Vx           = overlapped_Vx;
-  workset.Vxdot        = overlapped_Vxdot;
-  workset.Vxdotdot     = overlapped_Vxdotdot;
-  workset.Vp           = Vp;
-  workset.num_cols_x   = num_cols_x;
-  workset.num_cols_p   = num_cols_p;
-  workset.param_offset = param_offset;
 }
 
 void

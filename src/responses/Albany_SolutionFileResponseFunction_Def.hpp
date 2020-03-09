@@ -71,30 +71,6 @@ SolutionFileResponseFunction<Norm>::evaluateResponse(
 
 template <class Norm>
 void
-SolutionFileResponseFunction<Norm>::evaluateTangent(
-    const double /*alpha*/,
-    const double /*beta*/,
-    const double /*omega*/,
-    const double /*current_time*/,
-    bool /*sum_derivs*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*x*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
-    const Teuchos::Array<ParamVec>& /*p*/,
-    ParamVec* /*deriv_p*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vx*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdot*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdotdot*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vp*/,
-    const Teuchos::RCP<Thyra_Vector>& /*g*/,
-    const Teuchos::RCP<Thyra_MultiVector>& /*gx*/,
-    const Teuchos::RCP<Thyra_MultiVector>& /*gp*/)
-{
-  // Do nothing
-}
-
-template <class Norm>
-void
 SolutionFileResponseFunction<Norm>::evaluateGradient(
     const double /*current_time*/,
     Teuchos::RCP<Thyra_Vector const> const& x,
@@ -159,21 +135,6 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
   if (!dg_dxdotdot.is_null()) { dg_dxdotdot->assign(0.0); }
 
   // Evaluate dg/dp
-  if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
-}
-
-//! Evaluate distributed parameter derivative dg/dp
-template <class Norm>
-void
-SolutionFileResponseFunction<Norm>::evaluateDistParamDeriv(
-    const double /*current_time*/,
-    Teuchos::RCP<Thyra_Vector const> const& /* x */,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
-    const Teuchos::Array<ParamVec>& /*param_array*/,
-    const std::string& /*dist_param_name*/,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dp)
-{
   if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
 }
 

@@ -241,55 +241,6 @@ FieldManagerScalarResponseFunction::evaluateResponse(
 }
 
 void
-FieldManagerScalarResponseFunction::evaluateTangent(
-    const double /* alpha */,
-    const double /* beta */,
-    const double /* omega */,
-    const double                                 current_time,
-    bool                                         sum_derivs,
-    Teuchos::RCP<Thyra_Vector const> const&      x,
-    Teuchos::RCP<Thyra_Vector const> const&      xdot,
-    Teuchos::RCP<Thyra_Vector const> const&      xdotdot,
-    const Teuchos::Array<ParamVec>&              p,
-    ParamVec*                                    deriv_p,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vxdotdot,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vp,
-    const Teuchos::RCP<Thyra_Vector>&            g,
-    const Teuchos::RCP<Thyra_MultiVector>&       gx,
-    const Teuchos::RCP<Thyra_MultiVector>&       gp)
-{
-  ALBANY_PANIC(
-      !performedPostRegSetup,
-      std::endl
-          << "Post registration setup not performed in field manager "
-          << std::endl
-          << "Forgot to call \"postRegSetup\"? ");
-
-  // Set data in Workset struct
-  PHAL::Workset workset;
-  application->setupTangentWorksetInfo(
-      workset,
-      current_time,
-      sum_derivs,
-      x,
-      xdot,
-      xdotdot,
-      p,
-      deriv_p,
-      Vx,
-      Vxdot,
-      Vxdotdot,
-      Vp);
-  workset.g    = g;
-  workset.dgdx = gx;
-  workset.dgdp = gp;
-
-  // Perform fill via field manager
-}
-
-void
 FieldManagerScalarResponseFunction::evaluateGradient(
     const double                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
@@ -355,41 +306,6 @@ FieldManagerScalarResponseFunction::evaluateGradient(
         workset.x_cas_manager->getOverlappedVectorSpace(),
         dg_dxdotdot->domain()->dim());
     evaluate<PHAL::AlbanyTraits::Jacobian>(workset);
-  }
-}
-
-void
-FieldManagerScalarResponseFunction::evaluateDistParamDeriv(
-    const double                            current_time,
-    Teuchos::RCP<Thyra_Vector const> const& x,
-    Teuchos::RCP<Thyra_Vector const> const& xdot,
-    Teuchos::RCP<Thyra_Vector const> const& xdotdot,
-    const Teuchos::Array<ParamVec>&         param_array,
-    const std::string&                      dist_param_name,
-    const Teuchos::RCP<Thyra_MultiVector>&  dg_dp)
-{
-  ALBANY_PANIC(
-      !performedPostRegSetup,
-      std::endl
-          << "Post registration setup not performed in field manager "
-          << std::endl
-          << "Forgot to call \"postRegSetup\"? ");
-
-  // Set data in Workset struct
-  PHAL::Workset workset;
-
-  application->setupBasicWorksetInfo(
-      workset, current_time, x, xdot, xdotdot, param_array);
-
-  // Perform fill via field manager (dg/dx)
-  if (!dg_dp.is_null()) {
-    workset.dist_param_deriv_name = dist_param_name;
-    workset.p_cas_manager =
-        workset.distParamLib->get(dist_param_name)->get_cas_manager();
-    workset.dgdp            = dg_dp;
-    workset.overlapped_dgdp = Thyra::createMembers(
-        workset.p_cas_manager->getOverlappedVectorSpace(),
-        dg_dp->domain()->dim());
   }
 }
 

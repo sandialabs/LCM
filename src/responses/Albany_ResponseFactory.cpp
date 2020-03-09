@@ -127,10 +127,6 @@ Albany::ResponseFactory::createResponseFunction(
       name == "Surface Velocity Mismatch" ||
       name == "Surface Mass Balance Mismatch" ||
       name == "Grounding Line Flux" || name == "Boundary Squared L2 Norm" ||
-      name == "Aeras Shallow Water L2 Error" ||
-      name == "Aeras Shallow Water L2 Norm" ||
-      name == "Aeras Hydrostatic L2 Norm" ||
-      name == "Aeras Hydrostatic L2 Error" || name == "Aeras Total Volume" ||
       name == "Center Of Mass" || name == "Save Field" ||
       name == "Region Boundary" || name == "Element Size Field" ||
       name == "Save Nodal Fields" || name == "Stiffness Objective" ||

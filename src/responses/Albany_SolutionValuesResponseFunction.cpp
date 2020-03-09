@@ -181,68 +181,6 @@ SolutionValuesResponseFunction::evaluateResponse(
 }
 
 void
-SolutionValuesResponseFunction::evaluateTangent(
-    const double /*alpha*/,
-    const double beta,
-    const double /* omega */,
-    const double /*current_time*/,
-    bool /*sum_derivs*/,
-    Teuchos::RCP<Thyra_Vector const> const& x,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
-    const Teuchos::Array<ParamVec>& /*p*/,
-    ParamVec* /*deriv_p*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& Vx,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdot*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vxdotdot*/,
-    const Teuchos::RCP<const Thyra_MultiVector>& /*Vp*/,
-    const Teuchos::RCP<Thyra_Vector>&      g,
-    const Teuchos::RCP<Thyra_MultiVector>& gx,
-    const Teuchos::RCP<Thyra_MultiVector>& gp)
-{
-  this->updateCASManager();
-
-  if (!g.is_null()) {
-    // Import the selected gids
-    cas_manager->scatter(*x, *culledVec, CombineMode::INSERT);
-    getNonconstLocalData(g).deepCopy(getLocalData(culledVec.getConst())());
-    if (Teuchos::nonnull(sol_printer_)) {
-      sol_printer_->print(
-          g, cullingStrategy_->selectedGIDs(app_->getVectorSpace()));
-    }
-  }
-
-  if (!gx.is_null()) {
-    ALBANY_PANIC(Vx.is_null());
-    // Import the selected gids (only if not already done for the response)
-    if (g.is_null()) {
-      cas_manager->scatter(*x, *culledVec, CombineMode::INSERT);
-    }
-    for (int i = 0; i < Vx->domain()->dim(); ++i) {
-      getNonconstLocalData(gx->col(i))
-          .deepCopy(getLocalData(culledVec.getConst())());
-    }
-    if (beta != 1.0) { gx->scale(beta); }
-  }
-
-  if (!gp.is_null()) { gp->assign(0.0); }
-}
-
-//! Evaluate distributed parameter derivative dg/dp
-void
-SolutionValuesResponseFunction::evaluateDistParamDeriv(
-    const double /*current_time*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*x*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdot*/,
-    Teuchos::RCP<Thyra_Vector const> const& /*xdotdot*/,
-    const Teuchos::Array<ParamVec>& /*param_array*/,
-    const std::string& /*dist_param_name*/,
-    const Teuchos::RCP<Thyra_MultiVector>& dg_dp)
-{
-  if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
-}
-
-void
 SolutionValuesResponseFunction::evaluateGradient(
     const double /*current_time*/,
     Teuchos::RCP<Thyra_Vector const> const& x,

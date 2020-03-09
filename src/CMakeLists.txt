@@ -578,21 +578,7 @@ include_directories(
   ./LCM/parallel_models
   ./LCM/solvers
   ./LCM/utils
-  ./LCM/utils/topology
-  ./LandIce/problems
-  ./LandIce/evaluators
-  ./Tsunami/problems
-  ./Tsunami/evaluators
-  ./Aeras/problems
-  ./Aeras/evaluators
-  ./AMP
-  ./AMP/problems
-  ./AMP/evaluators
-  ./AMP/responses
-  ./ATO
-  ./ATO/problems
-  ./ATO/evaluators
-  ./ATO/utils)
+  ./LCM/utils/topology)
 
 link_directories(${Trilinos_LIBRARY_DIRS} ${Trilinos_TPL_LIBRARY_DIRS})
 

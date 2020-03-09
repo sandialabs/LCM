@@ -71,11 +71,6 @@ class AbstractDiscretization
   virtual Teuchos::RCP<Thyra_LinearOp>
   createOverlapJacobianOp() const = 0;
 
-  //! Returns boolean telling code whether explicit scheme is used (needed for
-  //! Aeras problems only)
-  virtual bool
-  isExplicitScheme() const = 0;
-
   //! Get Node set lists
   virtual const NodeSetList&
   getNodeSets() const = 0;

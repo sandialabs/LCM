@@ -20,27 +20,25 @@
 
 Albany::DiscretizationFactory::DiscretizationFactory(
     const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
-    const Teuchos::RCP<const Teuchos_Comm>&     commT_,
-    const bool                                  explicit_scheme_)
-    : commT(commT_), explicit_scheme(explicit_scheme_)
+    const Teuchos::RCP<const Teuchos_Comm>&     commT_)
+    : commT(commT_)
 {
   discParams = Teuchos::sublist(topLevelParams, "Discretization", true);
 
-  if (topLevelParams->isSublist("Piro"))
-
+  if (topLevelParams->isSublist("Piro")) {
     piroParams = Teuchos::sublist(topLevelParams, "Piro", true);
+  }
 
   if (topLevelParams->isSublist("Problem")) {
     Teuchos::RCP<Teuchos::ParameterList> problemParams =
         Teuchos::sublist(topLevelParams, "Problem", true);
 
-    if (problemParams->isSublist("Adaptation"))
-
+    if (problemParams->isSublist("Adaptation")) {
       adaptParams = Teuchos::sublist(problemParams, "Adaptation", true);
-
-    if (problemParams->isSublist("Catalyst"))
-
+    }
+    if (problemParams->isSublist("Catalyst")) {
       catalystParams = Teuchos::sublist(problemParams, "Catalyst", true);
+    }
   }
 }
 
@@ -171,7 +169,7 @@ Albany::DiscretizationFactory::createMeshStruct(
     Teuchos::RCP<const Teuchos_Comm>     comm)
 {
   std::string& method = disc_params->get("Method", "STK1D");
-  if (method == "STK1D" || method == "STK1D Aeras") {
+  if (method == "STK1D") {
     return Teuchos::rcp(
         new Albany::TmplSTKMeshStruct<1>(disc_params, adapt_params, comm));
   } else if (method == "STK0D") {
@@ -185,9 +183,7 @@ Albany::DiscretizationFactory::createMeshStruct(
         new Albany::TmplSTKMeshStruct<3>(disc_params, adapt_params, comm));
   } else if (method == "STK3DPoint") {
     return Teuchos::rcp(new Albany::STK3DPointStruct(disc_params, comm));
-  } else if (
-      method == "Ioss" || method == "Exodus" || method == "Pamgen" ||
-      method == "Ioss Aeras" || method == "Exodus Aeras") {
+  } else if (method == "Ioss" || method == "Exodus" || method == "Pamgen") {
     return Teuchos::rcp(
         new Albany::IossSTKMeshStruct(disc_params, adapt_params, comm));
   } else if (method == "Ascii") {

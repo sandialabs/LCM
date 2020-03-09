@@ -27,8 +27,7 @@ class DiscretizationFactory
   //! Default constructor
   DiscretizationFactory(
       const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
-      const Teuchos::RCP<const Teuchos_Comm>&     commT,
-      const bool                                  explicit_scheme_ = false);
+      const Teuchos::RCP<const Teuchos_Comm>&     commT);
 
   //! Destructor
   ~DiscretizationFactory() {}
@@ -133,13 +132,6 @@ class DiscretizationFactory
   Teuchos::RCP<Teuchos::ParameterList> catalystParams;
 
   Teuchos::RCP<const Teuchos_Comm> commT;
-
-  // The following are for Aeras hydrostatic problems
-  int numLevels{0};
-  int numTracers{0};
-
-  // Flag for explicit time-integration scheme, used in Aeras
-  bool explicit_scheme{false};
 
   Teuchos::RCP<Albany::AbstractMeshStruct> meshStruct;
 };

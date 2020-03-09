@@ -39,8 +39,7 @@ template <>
 int
 getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
     const Albany::Application* app,
-    const int                  ebi,
-    const bool                 explicit_scheme)
+    const int                  ebi)
 {
   const Teuchos::RCP<const Teuchos::ParameterList> pl = app->getProblemPL();
   if (Teuchos::nonnull(pl)) {

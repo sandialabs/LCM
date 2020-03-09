@@ -621,8 +621,6 @@ class Application
   // Phalanx Field Manager for states
   Teuchos::Array<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>> sfm;
 
-  bool explicit_scheme{false};
-
   // Data for Physics-Based Preconditioners
   bool                                 physicsBasedPreconditioner{false};
   Teuchos::RCP<Teuchos::ParameterList> precParams{Teuchos::null};

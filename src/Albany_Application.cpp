@@ -188,8 +188,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     solMethod = Transient;
   } else if (solutionMethod == "Eigensolve") {
     solMethod = Eigensolve;
-  } else if (solutionMethod == "Aeras Hyperviscosity") {
-    solMethod = Transient;
   } else if (
       solutionMethod == "Transient Tempus" || "Transient Tempus No Piro") {
     solMethod = TransientTempus;
@@ -261,11 +259,9 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     ALBANY_ABORT(
         "Solution Method must be Steady, Transient, Transient Tempus, "
         "Transient Tempus No Piro, "
-        << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : "
-        << solutionMethod);
+        << "Continuation, or Eigensolve, not : " << solutionMethod);
   }
 
-  bool        expl = false;
   std::string stepperType;
   if (solMethod == Transient) {
     // Get Piro PL
@@ -297,9 +293,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
           Teuchos::sublist(piroParams, "Rythmos", true);
       stepperType = rythmosParams->get("Stepper Type", "Backward Euler");
     }
-    // Search for "Explicit" in the stepperType name.  If it's found, set expl
-    // to true.
-    if (stepperType.find("Explicit") != std::string::npos) expl = true;
   } else if (solMethod == TransientTempus) {
     // Get Piro PL
     Teuchos::RCP<Teuchos::ParameterList> piroParams =
@@ -368,7 +361,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   countScale = 0;
 
   // Create discretization object
-  discFactory = rcp(new Albany::DiscretizationFactory(params, comm, expl));
+  discFactory = rcp(new Albany::DiscretizationFactory(params, comm));
 
   // Check for Schwarz parameters
   bool const has_app_array = params->isParameter("Application Array");
@@ -503,8 +496,6 @@ Application::createDiscretization()
       problem->getFieldRequirements(),
       problem->getSideSetFieldRequirements(),
       problem->getNullSpace());
-  // The following is for Aeras problems.
-  explicit_scheme = disc->isExplicitScheme();
 }
 
 void
@@ -680,10 +671,7 @@ Application::finalSetUp(
 
   // MPerego: Preforming post registration setup here to make sure that the
   // discretization is already created, so that  derivative dimensions are
-  // known. Cannot do post registration right before the evaluate , as done for
-  // other field managers.  because memoizer hack is needed by Aeras.
-  // TODO, determine when it's best to perform post setup registration and fix
-  // memoizer hack if needed.
+  // known.
   for (int i = 0; i < responses.size(); ++i) { responses[i]->postRegSetup(); }
 }
 
@@ -1038,7 +1026,7 @@ Application::postRegSetupDImpl()
 
     std::vector<PHX::index_size_type> derivative_dimensions;
     derivative_dimensions.push_back(
-        PHAL::getDerivativeDimensions<EvalT>(this, ps, explicit_scheme));
+        PHAL::getDerivativeDimensions<EvalT>(this, ps));
     fm[ps]->setKokkosExtendedDataTypeDimensions<EvalT>(derivative_dimensions);
     fm[ps]->postRegistrationSetupForType<EvalT>(*phxSetup);
 
@@ -1071,7 +1059,7 @@ Application::postRegSetupDImpl()
     // different element types?
     std::vector<PHX::index_size_type> derivative_dimensions;
     derivative_dimensions.push_back(
-        PHAL::getDerivativeDimensions<EvalT>(this, 0, explicit_scheme));
+        PHAL::getDerivativeDimensions<EvalT>(this, 0));
     dfm->setKokkosExtendedDataTypeDimensions<EvalT>(derivative_dimensions);
     dfm->postRegistrationSetupForType<EvalT>(*phxSetup);
 
@@ -1365,8 +1353,7 @@ Application::computeGlobalJacobianImpl(
     // fill Jacobian derivative dimensions:
     for (int ps = 0; ps < fm.size(); ps++) {
       (workset.Jacobian_deriv_dims)
-          .push_back(
-              PHAL::getDerivativeDimensions<EvalT>(this, ps, explicit_scheme));
+          .push_back(PHAL::getDerivativeDimensions<EvalT>(this, ps));
     }
 
     if (!workset.f.is_null()) {
@@ -1577,7 +1564,7 @@ Application::evaluateStateFieldManager(
         std::vector<PHX::index_size_type> derivative_dimensions;
         derivative_dimensions.push_back(
             PHAL::getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
-                this, ps, explicit_scheme));
+                this, ps));
         sfm[ps]
             ->setKokkosExtendedDataTypeDimensions<PHAL::AlbanyTraits::Jacobian>(
                 derivative_dimensions);

@@ -32,7 +32,7 @@ Ax=b
 */
 template <class LO, class ST>
 bool
-solve33T(const double A[][3], double* x, const double* b);
+solve33T(double const A[][3], double* x, double const* b);
 
 /*!
 \brief Add matrices A+B

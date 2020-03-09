@@ -15,7 +15,7 @@
 
 namespace AAdapt {
 
-const double pi = 3.141592653589793;
+double const pi = 3.141592653589793;
 
 Teuchos::RCP<const Teuchos::ParameterList>
 getValidInitialConditionParameters(
@@ -188,7 +188,7 @@ InitialConditions(
     for (int ws = 0; ws < wsElNodeEqID.size(); ws++) {
       for (unsigned el = 0; el < wsElNodeEqID[ws].extent(0); el++) {
         for (unsigned ln = 0; ln < wsElNodeEqID[ws].extent(1); ln++) {
-          const double* X = coords[ws][el][ln];
+          double const* X = coords[ws][el][ln];
           for (int j = 0; j < numDOFsPerDim; j++)
             for (int i = 0; i < numDim; i++)
               soln_data[wsElNodeEqID[ws](el, ln, j * numDim + i)] = X[i];
@@ -237,7 +237,7 @@ InitialConditions(
     for (int ws = 0; ws < wsElNodeEqID.size(); ws++) {
       for (unsigned el = 0; el < wsElNodeEqID[ws].extent(0); el++) {
         for (unsigned ln = 0; ln < wsElNodeEqID[ws].extent(1); ln++) {
-          const double* X = coords[ws][el][ln];
+          double const* X = coords[ws][el][ln];
           for (int i = 0; i < neq; i++) {
             x[i] = soln_data[wsElNodeEqID[ws](el, ln, i)];
           }

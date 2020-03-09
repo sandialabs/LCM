@@ -105,7 +105,7 @@ class PiroObserver : public Piro::ObserverBase<ST>
   std::vector<std::vector<double>> storedResponses;
   Teuchos::Array<unsigned int>     relative_responses;
   std::vector<bool>                is_relative;
-  const double                     tol = 1e-15;
+  double const                     tol = 1e-15;
 };
 
 }  // namespace Albany

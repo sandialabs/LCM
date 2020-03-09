@@ -107,7 +107,7 @@ struct StateStruct
     initType = type;
   }
   void
-  setInitValue(const double val)
+  setInitValue(double const val)
   {
     initValue = val;
   }

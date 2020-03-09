@@ -9,9 +9,9 @@
 
 namespace MOERTEL {
 
-const double Nodes_Identical_Epsilon   = 1.0e-15;
-const double Projection_Length_Epsilon = 1.0e-10;
-const double Rough_Search_Radius       = 2.5;
+double const Nodes_Identical_Epsilon   = 1.0e-15;
+double const Projection_Length_Epsilon = 1.0e-10;
+double const Rough_Search_Radius       = 2.5;
 
 }  // namespace MOERTEL
 

@@ -29,7 +29,7 @@ using namespace stk::rebalance;
 namespace {
 
 double
-static_zoltan_version(const double v = 0)
+static_zoltan_version(double const v = 0)
 {
   static double version = 0;
   if (v) { version = v; }
@@ -637,7 +637,7 @@ Zoltan::init(const vector<pair<std::string, std::string>>&
                  dynamicLoadRebalancingParameters)
 {
   if (0 == static_zoltan_version()) {
-    const double v = init_zoltan_library();
+    double const v = init_zoltan_library();
     static_zoltan_version(v);
   }
 

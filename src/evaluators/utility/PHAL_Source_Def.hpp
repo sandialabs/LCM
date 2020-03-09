@@ -20,7 +20,7 @@
 namespace PHAL {
 
 namespace Source_Functions {
-const double pi = 3.1415926535897932385;
+double const pi = 3.1415926535897932385;
 
 template <typename EvalT, typename Traits>
 class Source_Base
@@ -961,7 +961,7 @@ inline Gaussian<EvalT>::Gaussian(
   m_radius                          = paramList.get("Radius", 1.0);
   m_centroid      = source_list.get(Albany::strint("Center", num), m_centroid);
   m_sigma_sq      = 1.0 / (2.0 * std::pow(m_radius, 2));
-  const double pi = 3.1415926535897932385;
+  double const pi = 3.1415926535897932385;
   m_sigma_pi      = 1.0 / (m_radius * std::sqrt(2 * pi));
 }
 

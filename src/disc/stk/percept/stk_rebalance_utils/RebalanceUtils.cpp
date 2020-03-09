@@ -44,7 +44,7 @@ stk::rebalance::check_balance(
        elem_it != local_elems.end();
        ++elem_it) {
     if (load_measure) {
-      const double* load_val = mesh::field_data(*load_measure, *elem_it);
+      double const* load_val = mesh::field_data(*load_measure, *elem_it);
       my_load += *load_val;
     } else {
       my_load += 1;
@@ -57,9 +57,9 @@ stk::rebalance::check_balance(
   all_reduce(comm, ReduceMax<1>(&max_load) & ReduceSum<1>(&tot_load));
 
   int const    proc_size = parallel_machine_size(comm);
-  const double avg_load  = tot_load / proc_size;
+  double const avg_load  = tot_load / proc_size;
 
-  const double imbalance_threshold = max_load / avg_load;
+  double const imbalance_threshold = max_load / avg_load;
 
   return imbalance_threshold;
 }

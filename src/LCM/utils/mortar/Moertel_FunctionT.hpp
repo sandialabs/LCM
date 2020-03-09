@@ -107,7 +107,7 @@ class FunctionT
   */
   void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
@@ -160,7 +160,7 @@ struct Constant1D
 
   static void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
@@ -200,7 +200,7 @@ struct Linear1D
 
   static void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
@@ -239,7 +239,7 @@ struct DualLinear1D
 
   static void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
@@ -282,7 +282,7 @@ struct LinearTri
 
   static void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
@@ -332,7 +332,7 @@ struct DualLinearTri
 
   static void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
@@ -382,7 +382,7 @@ struct ConstantTri
 
   static void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
@@ -414,7 +414,7 @@ struct BiLinearQuad
 
   static void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
@@ -446,21 +446,21 @@ struct DualBiLinearQuad
 
   static void
   EvaluateFunction(
-      const double* xi,
+      double const* xi,
       double*       val,
       int const     valdim,
       double*       deriv)
   {
-    const double onemxi  = 1.0 - xi[0];
-    const double onepxi  = 1.0 + xi[0];
-    const double onemeta = 1.0 - xi[1];
-    const double onepeta = 1.0 + xi[1];
+    double const onemxi  = 1.0 - xi[0];
+    double const onepxi  = 1.0 + xi[0];
+    double const onemeta = 1.0 - xi[1];
+    double const onepeta = 1.0 + xi[1];
 
     if (val) {
-      const double phi0 = .25 * onemxi * onemeta;
-      const double phi1 = .25 * onepxi * onemeta;
-      const double phi2 = .25 * onepxi * onepeta;
-      const double phi3 = .25 * onemxi * onepeta;
+      double const phi0 = .25 * onemxi * onemeta;
+      double const phi1 = .25 * onepxi * onemeta;
+      double const phi2 = .25 * onepxi * onepeta;
+      double const phi3 = .25 * onemxi * onepeta;
       val[0]            = 4. * phi0 - 2. * phi1 - 2. * phi3 + phi2;
       val[1]            = 4. * phi1 - 2. * phi0 - 2. * phi2 + phi3;
       val[2]            = 4. * phi2 - 2. * phi1 - 2. * phi3 + phi0;
@@ -468,14 +468,14 @@ struct DualBiLinearQuad
     }
 
     if (deriv) {
-      const double phi0xi  = -.25 * onemeta;
-      const double phi0eta = -.25 * onemxi;
-      const double phi1xi  = .25 * onemeta;
-      const double phi1eta = -.25 * onepxi;
-      const double phi2xi  = .25 * onepeta;
-      const double phi2eta = .25 * onepxi;
-      const double phi3xi  = -.25 * onepeta;
-      const double phi3eta = .25 * onemxi;
+      double const phi0xi  = -.25 * onemeta;
+      double const phi0eta = -.25 * onemxi;
+      double const phi1xi  = .25 * onemeta;
+      double const phi1eta = -.25 * onepxi;
+      double const phi2xi  = .25 * onepeta;
+      double const phi2eta = .25 * onepxi;
+      double const phi3xi  = -.25 * onepeta;
+      double const phi3eta = .25 * onemxi;
       deriv[0]             = 4. * phi0xi - 2. * phi1xi - 2. * phi3xi + phi2xi;
       deriv[1] = 4. * phi0eta - 2. * phi1eta - 2. * phi3eta + phi2eta;
       deriv[2] = 4. * phi1xi - 2. * phi0xi - 2. * phi2xi + phi3xi;

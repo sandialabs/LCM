@@ -273,10 +273,10 @@ Albany::ContactManager::processSS(
           nodev[i]   = gnodeId;
           double* coords =
               &coordArray[3 * lnodeId];  // location of the first coordinate
-          //          const double coords[] = { coordArray[3 * lnodeId],
+          //          double const coords[] = { coordArray[3 * lnodeId],
           //               coordArray[3 * lnodeId + 1], 0.0 }; // Moertel node
           //               is 3 coords
-          //          const double coords[] = { coordArray[3 * lnodeId],
+          //          double const coords[] = { coordArray[3 * lnodeId],
           //               coordArray[3 * lnodeId + 1], coordArray[3 * lnodeid +
           //               2] }; // Moertel node is 3 coords
           stream << "         node_LID = " << lnodeId

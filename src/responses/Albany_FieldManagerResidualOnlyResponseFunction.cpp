@@ -24,7 +24,7 @@ Albany::FieldManagerResidualOnlyResponseFunction::
 
 void
 Albany::FieldManagerResidualOnlyResponseFunction::evaluateGradient(
-    const double                            current_time,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,

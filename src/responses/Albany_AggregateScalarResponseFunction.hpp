@@ -43,7 +43,7 @@ class AggregateScalarResponseFunction
   //! Evaluate response
   void
   evaluateResponse(
-      const double                            current_time,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
@@ -52,7 +52,7 @@ class AggregateScalarResponseFunction
 
   void
   evaluateGradient(
-      const double                            current_time,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,

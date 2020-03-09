@@ -186,24 +186,24 @@ class Application
 
   void
   computeGlobalResidual(
-      const double                            current_time,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& x_dot,
       Teuchos::RCP<Thyra_Vector const> const& x_dotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       f,
-      const double                            dt = 0.0);
+      double const                            dt = 0.0);
 
  private:
   void
   computeGlobalResidualImpl(
-      const double                           current_time,
+      double const                           current_time,
       Teuchos::RCP<Thyra_Vector const> const x,
       Teuchos::RCP<Thyra_Vector const> const x_dot,
       Teuchos::RCP<Thyra_Vector const> const x_dotdot,
       const Teuchos::Array<ParamVec>&        p,
       const Teuchos::RCP<Thyra_Vector>&      f,
-      const double                           dt = 0.0);
+      double const                           dt = 0.0);
 
   PHAL::Workset
   set_dfm_workset(
@@ -221,32 +221,32 @@ class Application
    */
   void
   computeGlobalJacobian(
-      const double                            alpha,
-      const double                            beta,
-      const double                            omega,
-      const double                            current_time,
+      double const                            alpha,
+      double const                            beta,
+      double const                            omega,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       f,
       const Teuchos::RCP<Thyra_LinearOp>&     jac,
-      const double                            dt = 0.0);
+      double const                            dt = 0.0);
 
  private:
   void
   computeGlobalJacobianImpl(
-      const double                            alpha,
-      const double                            beta,
-      const double                            omega,
-      const double                            current_time,
+      double const                            alpha,
+      double const                            beta,
+      double const                            omega,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
       const Teuchos::RCP<Thyra_Vector>&       f,
       const Teuchos::RCP<Thyra_LinearOp>&     jac,
-      const double                            dt = 0.0);
+      double const                            dt = 0.0);
 
  public:
   //! Evaluate response functions
@@ -256,7 +256,7 @@ class Application
   void
   evaluateResponse(
       int                                     response_index,
-      const double                            current_time,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
@@ -277,14 +277,14 @@ class Application
   //! Evaluate state field manager
   void
   evaluateStateFieldManager(
-      const double                     current_time,
+      double const                     current_time,
       Thyra_Vector const&              x,
       Teuchos::Ptr<Thyra_Vector const> xdot,
       Teuchos::Ptr<Thyra_Vector const> xdotdot);
 
   void
   evaluateStateFieldManager(
-      const double             current_time,
+      double const             current_time,
       const Thyra_MultiVector& x);
 
   //! Access to number of worksets - needed for working with StateManager
@@ -348,14 +348,14 @@ class Application
   loadBasicWorksetInfoSDBCs(
       PHAL::Workset&                          workset,
       Teuchos::RCP<Thyra_Vector const> const& owned_sol,
-      const double                            current_time);
+      double const                            current_time);
 
   void
   loadWorksetJacobianInfo(
       PHAL::Workset& workset,
-      const double   alpha,
-      const double   beta,
-      const double   omega);
+      double const   alpha,
+      double const   beta,
+      double const   omega);
 
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>
   getEnrichedMeshSpecs() const

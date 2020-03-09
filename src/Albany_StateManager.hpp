@@ -54,7 +54,7 @@ class StateManager
       const Teuchos::RCP<PHX::DataLayout>& dl,
       const std::string&                   ebName,
       const std::string&                   init_type           = "scalar",
-      const double                         init_val            = 0.0,
+      double const                         init_val            = 0.0,
       const bool                           registerOldState    = false,
       const bool                           outputToExodus      = true,
       const std::string&                   responseIDtoRequire = "",
@@ -67,7 +67,7 @@ class StateManager
       const Teuchos::RCP<PHX::DataLayout>& dl,
       const std::string&                   ebName,
       const std::string&                   init_type           = "scalar",
-      const double                         init_val            = 0.0,
+      double const                         init_val            = 0.0,
       const bool                           registerOldState    = false,
       const bool                           outputToExodus      = true,
       const std::string&                   responseIDtoRequire = "");
@@ -83,7 +83,7 @@ class StateManager
       const Teuchos::RCP<PHX::DataLayout>& dummy,
       const std::string&                   ebName,
       const std::string&                   init_type        = "scalar",
-      const double                         init_val         = 0.0,
+      double const                         init_val         = 0.0,
       const bool                           registerOldState = false);
 
   // Field entity is known. Useful for NodalDataToElemNode field. Input dl is of
@@ -105,7 +105,7 @@ class StateManager
       const Teuchos::RCP<PHX::DataLayout>& dummy,
       const std::string&                   ebName,
       const std::string&                   init_type,
-      const double                         init_val,
+      double const                         init_val,
       const bool                           registerOldState,
       const std::string&                   fieldName);
 
@@ -117,7 +117,7 @@ class StateManager
       const Teuchos::RCP<PHX::DataLayout>& dummy,
       const std::string&                   ebName,
       const std::string&                   init_type,
-      const double                         init_val,
+      double const                         init_val,
       const bool                           registerOldState,
       const bool                           outputToExodus);
 
@@ -128,7 +128,7 @@ class StateManager
       const Teuchos::RCP<PHX::DataLayout>& dummy,
       const std::string&                   ebName,
       const std::string&                   init_type,
-      const double                         init_val,
+      double const                         init_val,
       const bool                           registerOldState,
       const bool                           outputToExodus);
 
@@ -158,7 +158,7 @@ class StateManager
       const Teuchos::RCP<PHX::DataLayout>& dl,
       const std::string&                   ebName,
       const std::string&                   init_type,
-      const double                         init_val,
+      double const                         init_val,
       const bool                           registerOldState,
       const bool                           outputToExodus,
       const std::string&                   responseIDtoRequire,

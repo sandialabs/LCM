@@ -216,7 +216,7 @@ FieldManagerScalarResponseFunction::evaluate(PHAL::Workset& workset)
 
 void
 FieldManagerScalarResponseFunction::evaluateResponse(
-    const double                            current_time,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
@@ -242,7 +242,7 @@ FieldManagerScalarResponseFunction::evaluateResponse(
 
 void
 FieldManagerScalarResponseFunction::evaluateGradient(
-    const double                            current_time,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,

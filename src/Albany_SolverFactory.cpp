@@ -335,8 +335,8 @@ SolverFactory::checkSolveTestResults(
 
   int          failures    = 0;
   int          comparisons = 0;
-  const double relTol      = testParams->get<double>("Relative Tolerance");
-  const double absTol      = testParams->get<double>("Absolute Tolerance");
+  double const relTol      = testParams->get<double>("Relative Tolerance");
+  double const absTol      = testParams->get<double>("Absolute Tolerance");
 
   // Get number of responses (g) to test
   int const numResponseTests = testParams->get<int>("Number of Comparisons");
@@ -425,8 +425,8 @@ SolverFactory::checkDakotaTestResults(
 
   int          failures    = 0;
   int          comparisons = 0;
-  const double relTol      = testParams->get<double>("Relative Tolerance");
-  const double absTol      = testParams->get<double>("Absolute Tolerance");
+  double const relTol      = testParams->get<double>("Relative Tolerance");
+  double const absTol      = testParams->get<double>("Absolute Tolerance");
 
   int const numDakotaTests =
       testParams->get<int>("Number of Dakota Comparisons");
@@ -461,8 +461,8 @@ SolverFactory::checkAnalysisTestResults(
 
   int          failures    = 0;
   int          comparisons = 0;
-  const double relTol      = testParams->get<double>("Relative Tolerance");
-  const double absTol      = testParams->get<double>("Absolute Tolerance");
+  double const relTol      = testParams->get<double>("Relative Tolerance");
+  double const absTol      = testParams->get<double>("Absolute Tolerance");
 
   int numPiroTests =
       testParams->get<int>("Number of Piro Analysis Comparisons");

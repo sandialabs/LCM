@@ -500,7 +500,7 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
   DFadType dfn(0.0);
   //    DFadType An(0.0), eratio(0.0);
   //    eratio = -0.5 * (eqFad - eN_) * (eqFad - eN_) / sN_ / sN_;
-  //    const double pi = acos(-1.0);
+  //    double const pi = acos(-1.0);
   //    if (pFad >= 0.0) {
   //      An = fN_ / sN_ / (std::sqrt(2.0 * pi)) * std::exp(eratio);
   //    }

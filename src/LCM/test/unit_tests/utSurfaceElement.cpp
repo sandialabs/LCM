@@ -1129,7 +1129,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
   ArrayRCP<ScalarT> cohesiveTraction(numQPts * numDim);
   // manually fill the cohesiveTraction field
   for (int i(0); i < numQPts * numDim; ++i) cohesiveTraction[i] = 0.0;
-  const double T0      = 2.0;
+  double const T0      = 2.0;
   cohesiveTraction[1]  = T0;
   cohesiveTraction[4]  = 0.2 * T0;
   cohesiveTraction[7]  = 0.4 * T0;
@@ -1257,7 +1257,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
-  const double thickness = 0.01;
+  double const thickness = 0.01;
 
   //----------------------------------------------------------------------------
   // reference coordinates

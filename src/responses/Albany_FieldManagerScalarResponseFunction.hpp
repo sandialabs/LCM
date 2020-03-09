@@ -50,7 +50,7 @@ class FieldManagerScalarResponseFunction : public ScalarResponseFunction
   //! Evaluate responses
   void
   evaluateResponse(
-      const double                            current_time,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
@@ -59,7 +59,7 @@ class FieldManagerScalarResponseFunction : public ScalarResponseFunction
 
   void
   evaluateGradient(
-      const double                            current_time,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,

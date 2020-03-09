@@ -268,7 +268,7 @@ getValidProjectIPtoNodalFieldParameters()
 }
 
 void
-setDefaultSolverParameters(Teuchos::ParameterList& pl, const double solver_tol)
+setDefaultSolverParameters(Teuchos::ParameterList& pl, double const solver_tol)
 {
   pl.set<std::string>("Linear Solver Type", "Belos");
 
@@ -629,7 +629,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
 
   Teuchos::ParameterList* upl =
       p.get<Teuchos::ParameterList*>("Parameter List");
-  const double solver_tol = upl->isType<double>("Solver Tolerance") ?
+  double const solver_tol = upl->isType<double>("Solver Tolerance") ?
                                 upl->get<double>("Solver Tolerance") :
                                 1e-12;
   {  // Send parameters to the solver.
@@ -777,7 +777,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(
 // For Tet<10>, the rhs needs to be integrated with >= degree-3 quadrature to
 // recover a linear function exactly.
 static double
-test_fn(const double x, const double y, const double z)
+test_fn(double const x, double const y, double const z)
 {
   return 1.5 * x - 0.8 * y + 1.1 * z;
 }

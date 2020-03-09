@@ -342,7 +342,7 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointAfter(
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::CollapsePoints(
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
-    const double                                                           eps)
+    double const                                                           eps)
 {
   // we don't want to collapse on a polygon that has just three or less points
   if (p.size() <= 3) return true;

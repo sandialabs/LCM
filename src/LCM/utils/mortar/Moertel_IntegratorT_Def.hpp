@@ -1183,7 +1183,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
           x[j] += val[point] * points[point]->Node()->XCoords()[j];
           n[j] += val[point] * points[point]->Node()->Normal()[j];
         }
-      const double length = MoertelT::length(n, 3);
+      double const length = MoertelT::length(n, 3);
       for (int j = 0; j < 3; ++j) n[j] /= length;
       // std::cout << "x = " << x[0] << " / " << x[1] << " / " << x[2] <<
       // std::endl; std::cout << "n = " << n[0] << " / " << n[1] << " / " <<

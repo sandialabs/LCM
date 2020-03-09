@@ -22,7 +22,7 @@ Albany::StateManager::registerStateVariable(
     const Teuchos::RCP<PHX::DataLayout>& dummy,
     const std::string&                   ebName,
     const std::string&                   init_type,
-    const double                         init_val,
+    double const                         init_val,
     const bool                           registerOldState)
 {
   return registerStateVariable(
@@ -36,7 +36,7 @@ Albany::StateManager::registerStateVariable(
     const Teuchos::RCP<PHX::DataLayout>& dummy,
     const std::string&                   ebName,
     const std::string&                   init_type,
-    const double                         init_val,
+    double const                         init_val,
     const bool                           registerOldState,
     const std::string&                   fieldName)
 {
@@ -69,7 +69,7 @@ Albany::StateManager::registerStateVariable(
     const Teuchos::RCP<PHX::DataLayout>& dummy,
     const std::string&                   ebName,
     const std::string&                   init_type,
-    const double                         init_val,
+    double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus)
 {
@@ -101,7 +101,7 @@ Albany::StateManager::registerNodalVectorStateVariable(
     const Teuchos::RCP<PHX::DataLayout>& dummy,
     const std::string&                   ebName,
     const std::string&                   init_type,
-    const double                         init_val,
+    double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus)
 {
@@ -178,7 +178,7 @@ Albany::StateManager::registerStateVariable(
     const Teuchos::RCP<PHX::DataLayout>& dl,
     const std::string&                   ebName,
     const std::string&                   init_type,
-    const double                         init_val,
+    double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus,
     const std::string&                   responseIDtoRequire,
@@ -293,7 +293,7 @@ Albany::StateManager::registerNodalVectorStateVariable(
     const Teuchos::RCP<PHX::DataLayout>& dl,
     const std::string&                   ebName,
     const std::string&                   init_type,
-    const double                         init_val,
+    double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus,
     const std::string&                   responseIDtoRequire)
@@ -447,7 +447,7 @@ Albany::StateManager::registerSideSetStateVariable(
     const Teuchos::RCP<PHX::DataLayout>& dl,
     const std::string&                   ebName,
     const std::string&                   init_type,
-    const double                         init_val,
+    double const                         init_val,
     const bool                           registerOldState,
     const bool                           outputToExodus,
     const std::string&                   responseIDtoRequire,
@@ -957,7 +957,7 @@ Albany::StateManager::doSetStateArrays(
     const std::string& stateName    = (*stateInfoPtr)[i]->name;
     const std::string& init_type    = (*stateInfoPtr)[i]->initType;
     const std::string& ebName       = (*stateInfoPtr)[i]->ebName;
-    const double       init_val     = (*stateInfoPtr)[i]->initValue;
+    double const       init_val     = (*stateInfoPtr)[i]->initValue;
     bool               have_restart = (*stateInfoPtr)[i]->restartDataAvailable;
     Albany::StateStruct* pParentStruct = (*stateInfoPtr)[i]->pParentStateStruct;
 

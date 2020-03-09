@@ -10,7 +10,7 @@
 #include "Sacado.hpp"
 
 namespace PHAL {
-const double pi = 3.1415926535897932385;
+double const pi = 3.1415926535897932385;
 //*****
 
 template <typename EvalT, typename Traits>
@@ -83,12 +83,12 @@ ComprNSBodyForce<EvalT, Traits>::evaluateFields(
   } else if (bf_type == TAYLOR_GREEN_VORTEX) {  // source term for MMS
                                                 // Taylor-Vortex-like problem
     const RealType time      = workset.current_time;  // time
-    const double   Re        = 1.0;
-    const double   Pr        = 0.72;
-    const double   gamma_gas = 1.4;
-    const double   kappa     = 1.0;
-    const double   mu        = 1.0 / Re;
-    const double   Rgas      = 0.714285733;  // non-dimensional gas constant
+    double const   Re        = 1.0;
+    double const   Pr        = 0.72;
+    double const   gamma_gas = 1.4;
+    double const   kappa     = 1.0;
+    double const   mu        = 1.0 / Re;
+    double const   Rgas      = 0.714285733;  // non-dimensional gas constant
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
         MeshScalarT x2pi   = 2.0 * pi * coordVec(cell, qp, 0);

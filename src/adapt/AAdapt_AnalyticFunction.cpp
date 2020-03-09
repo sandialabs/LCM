@@ -13,7 +13,7 @@
 
 #include "Albany_Macros.hpp"
 
-const double pi = 3.141592653589793;
+double const pi = 3.141592653589793;
 
 // Factory method to build functions based on a string
 Teuchos::RCP<AAdapt::AnalyticFunction>
@@ -109,7 +109,7 @@ AAdapt::ConstantFunction::ConstantFunction(
           << neq << ", data.size() = " << data.size() << std::endl);
 }
 void
-AAdapt::ConstantFunction::compute(double* x, const double* X)
+AAdapt::ConstantFunction::compute(double* x, double const* X)
 {
   if (data.size() > 0)
     for (int i = 0; i < neq; i++) x[i] = data[i];
@@ -126,7 +126,7 @@ AAdapt::StepX::StepX(int neq_, int numDim_, Teuchos::Array<double> data_)
 }
 
 void
-AAdapt::StepX::compute(double* x, const double* X)
+AAdapt::StepX::compute(double* x, double const* X)
 {
   // Temperature bottom
   double T0 = data[0];
@@ -139,7 +139,7 @@ AAdapt::StepX::compute(double* x, const double* X)
   // top x-coordinate
   double X1 = data[4];
 
-  const double TOL = 1.0e-12;
+  double const TOL = 1.0e-12;
 
   // bottom
   if (X[0] < (X0 + TOL)) {
@@ -165,7 +165,7 @@ AAdapt::TemperatureStep::TemperatureStep(
 }
 
 void
-AAdapt::TemperatureStep::compute(double* x, const double* X)
+AAdapt::TemperatureStep::compute(double* x, double const* X)
 {
   // Temperature bottom
   double T0 = data[0];
@@ -188,7 +188,7 @@ AAdapt::TemperatureStep::compute(double* x, const double* X)
     ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
   }
 
-  const double TOL = 1.0e-12;
+  double const TOL = 1.0e-12;
 
   // bottom
   if (X[coord] < (Z0 + TOL)) {
@@ -214,7 +214,7 @@ AAdapt::DispConstTemperatureStep::DispConstTemperatureStep(
 }
 
 void
-AAdapt::DispConstTemperatureStep::compute(double* x, const double* X)
+AAdapt::DispConstTemperatureStep::compute(double* x, double const* X)
 {
   // Get displacement
   for (int i = 0; i < 3; i++) x[i] = data[i];
@@ -239,7 +239,7 @@ AAdapt::DispConstTemperatureStep::compute(double* x, const double* X)
     ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
   }
 
-  const double TOL = 1.0e-12;
+  double const TOL = 1.0e-12;
 
   // bottom
   if (X[coord] < (Z0 + TOL)) {
@@ -265,7 +265,7 @@ AAdapt::DispConstTemperatureLinear::DispConstTemperatureLinear(
 }
 
 void
-AAdapt::DispConstTemperatureLinear::compute(double* x, const double* X)
+AAdapt::DispConstTemperatureLinear::compute(double* x, double const* X)
 {
   // Get displacement
   for (int i = 0; i < 3; i++) x[i] = data[i];
@@ -288,7 +288,7 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, const double* X)
     ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
   }
 
-  const double TOL = 1.0e-12;
+  double const TOL = 1.0e-12;
 
   // check that temperatures are not equal
   if (std::abs(T0 - T1) <= TOL) {
@@ -323,7 +323,7 @@ AAdapt::TemperatureLinear::TemperatureLinear(
 }
 
 void
-AAdapt::TemperatureLinear::compute(double* x, const double* X)
+AAdapt::TemperatureLinear::compute(double* x, double const* X)
 {
   // Temperature bottom
   double T0 = data[0];
@@ -344,7 +344,7 @@ AAdapt::TemperatureLinear::compute(double* x, const double* X)
     ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
   }
 
-  const double TOL = 1.0e-12;
+  double const TOL = 1.0e-12;
 
   // check that temperatures are not equal
   if (std::abs(T0 - T1) <= TOL) {
@@ -400,7 +400,7 @@ AAdapt::ConstantFunctionPerturbed::ConstantFunctionPerturbed(
 }
 
 void
-AAdapt::ConstantFunctionPerturbed::compute(double* x, const double* X)
+AAdapt::ConstantFunctionPerturbed::compute(double* x, double const* X)
 {
   for (int i = 0; i < neq; i++)
     x[i] = data[i] + udrand(-pert_mag[i], pert_mag[i]);
@@ -410,7 +410,7 @@ AAdapt::ConstantFunctionPerturbed::compute(double* x, const double* X)
 double
 AAdapt::ConstantFunctionPerturbed::udrand(double lo, double hi)
 {
-  static const double base    = 1.0 / (RAND_MAX + 1.0);
+  static double const base    = 1.0 / (RAND_MAX + 1.0);
   double              deviate = std::rand() * base;
   return lo + deviate * (hi - lo);
 }
@@ -450,7 +450,7 @@ AAdapt::ConstantFunctionGaussianPerturbed::ConstantFunctionGaussianPerturbed(
 }
 
 void
-AAdapt::ConstantFunctionGaussianPerturbed::compute(double* x, const double* X)
+AAdapt::ConstantFunctionGaussianPerturbed::compute(double* x, double const* X)
 {
   for (int i = 0; i < neq; i++)
     if (var_nor[i] != Teuchos::null)
@@ -469,7 +469,7 @@ AAdapt::GaussSin::GaussSin(int neq_, int numDim_, Teuchos::Array<double> data_)
                                               << data.size() << std::endl);
 }
 void
-AAdapt::GaussSin::compute(double* x, const double* X)
+AAdapt::GaussSin::compute(double* x, double const* X)
 {
   x[0] = sin(pi * X[0]) + 0.5 * data[0] * X[0] * (1.0 - X[0]);
 }
@@ -483,7 +483,7 @@ AAdapt::GaussCos::GaussCos(int neq_, int numDim_, Teuchos::Array<double> data_)
                                               << data.size() << std::endl);
 }
 void
-AAdapt::GaussCos::compute(double* x, const double* X)
+AAdapt::GaussCos::compute(double* x, double const* X)
 {
   x[0] = 1 + cos(2 * pi * X[0]) + 0.5 * data[0] * X[0] * (1.0 - X[0]);
 }
@@ -497,7 +497,7 @@ AAdapt::LinearY::LinearY(int neq_, int numDim_, Teuchos::Array<double> data_)
                                              << data.size() << std::endl);
 }
 void
-AAdapt::LinearY::compute(double* x, const double* X)
+AAdapt::LinearY::compute(double* x, double const* X)
 {
   x[0] = 0.0;
   x[1] = data[0] * X[0];
@@ -514,7 +514,7 @@ AAdapt::Linear::Linear(int neq_, int numDim_, Teuchos::Array<double> data_)
                                             << data.size() << std::endl);
 }
 void
-AAdapt::Linear::compute(double* x, const double* X)
+AAdapt::Linear::compute(double* x, double const* X)
 {
   for (auto eq = 0; eq < neq; ++eq) {
     double s{0.0};
@@ -537,7 +537,7 @@ AAdapt::ConstantBox::ConstantBox(
                                             << data.size() << std::endl);
 }
 void
-AAdapt::ConstantBox::compute(double* x, const double* X)
+AAdapt::ConstantBox::compute(double* x, double const* X)
 {
   bool in_box{true};
   for (auto dim = 0; dim < numDim; ++dim) {
@@ -560,7 +560,7 @@ AAdapt::AboutZ::AboutZ(int neq_, int numDim_, Teuchos::Array<double> data_)
                                             << data.size() << std::endl);
 }
 void
-AAdapt::AboutZ::compute(double* x, const double* X)
+AAdapt::AboutZ::compute(double* x, double const* X)
 {
   x[0] = -data[0] * X[1];
   x[1] = data[0] * X[0];
@@ -577,7 +577,7 @@ AAdapt::RadialZ::RadialZ(int neq_, int numDim_, Teuchos::Array<double> data_)
                                              << data.size() << std::endl);
 }
 void
-AAdapt::RadialZ::compute(double* x, const double* X)
+AAdapt::RadialZ::compute(double* x, double const* X)
 {
   x[0] = data[0] * X[0];
   x[1] = data[0] * X[1];
@@ -597,7 +597,7 @@ AAdapt::AboutLinearZ::AboutLinearZ(
           << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
-AAdapt::AboutLinearZ::compute(double* x, const double* X)
+AAdapt::AboutLinearZ::compute(double* x, double const* X)
 {
   x[0] = -data[0] * X[1] * X[2];
   x[1] = data[0] * X[0] * X[2];
@@ -616,7 +616,7 @@ AAdapt::GaussianZ::GaussianZ(
                                                << data.size() << std::endl);
 }
 void
-AAdapt::GaussianZ::compute(double* x, const double* X)
+AAdapt::GaussianZ::compute(double* x, double const* X)
 {
   double const a = data[0];
   double const b = data[1];
@@ -639,7 +639,7 @@ AAdapt::Circle::Circle(int neq_, int numDim_, Teuchos::Array<double> data_)
                                             << data.size() << std::endl);
 }
 void
-AAdapt::Circle::compute(double* x, const double* X)
+AAdapt::Circle::compute(double* x, double const* X)
 {
   if (((X[0] - .5) * (X[0] - .5) + (X[1] - .5) * (X[1] - .5)) < 1.0 / 16.0)
     x[0] = 1.0;
@@ -666,7 +666,7 @@ AAdapt::GaussianPress::GaussianPress(
           << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
-AAdapt::GaussianPress::compute(double* x, const double* X)
+AAdapt::GaussianPress::compute(double* x, double const* X)
 {
   for (int i = 0; i < neq - 1; i++) { x[i] = 0.0; }
 
@@ -683,7 +683,7 @@ AAdapt::SinCos::SinCos(int neq_, int numDim_, Teuchos::Array<double> data_)
                                             << data.size() << std::endl);
 }
 void
-AAdapt::SinCos::compute(double* x, const double* X)
+AAdapt::SinCos::compute(double* x, double const* X)
 {
   x[0] = sin(2.0 * pi * X[0]) * cos(2.0 * pi * X[1]);
   x[1] = cos(2.0 * pi * X[0]) * sin(2.0 * pi * X[1]);
@@ -702,7 +702,7 @@ AAdapt::SinScalar::SinScalar(
                                                << data.size() << std::endl);
 }
 void
-AAdapt::SinScalar::compute(double* x, const double* X)
+AAdapt::SinScalar::compute(double* x, double const* X)
 {
   x[0] = 1.0;
   for (int dim{0}; dim < numDim; ++dim) {
@@ -722,7 +722,7 @@ AAdapt::TaylorGreenVortex::TaylorGreenVortex(
           << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
-AAdapt::TaylorGreenVortex::compute(double* x, const double* X)
+AAdapt::TaylorGreenVortex::compute(double* x, double const* X)
 {
   x[0] = 1.0;                                           // initial density
   x[1] = -cos(2.0 * pi * X[0]) * sin(2.0 * pi * X[1]);  // initial u-velocity
@@ -742,11 +742,11 @@ AAdapt::AcousticWave::AcousticWave(
           << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
-AAdapt::AcousticWave::compute(double* x, const double* X)
+AAdapt::AcousticWave::compute(double* x, double const* X)
 {
-  const double U0 = data[0];
-  const double n  = data[1];
-  const double L  = data[2];
+  double const U0 = data[0];
+  double const n  = data[1];
+  double const L  = data[2];
   x[0]            = U0 * cos(n * X[0] / L);
 
   for (int i = 1; i < numDim; i++) x[i] = 0.0;

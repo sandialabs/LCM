@@ -116,7 +116,7 @@ class AbstractDiscretization
   getCoordinates() const = 0;
   //! Set coordinates (overlap map) for mesh adaptation.
   virtual void
-  setCoordinates(const Teuchos::ArrayRCP<const double>& c) = 0;
+  setCoordinates(const Teuchos::ArrayRCP<double const>& c) = 0;
 
   //! The reference configuration manager handles updating the reference
   //! configuration. This is only relevant, and also only optional, in the
@@ -265,61 +265,61 @@ class AbstractDiscretization
   virtual void
   writeSolution(
       Thyra_Vector const& solution,
-      const double        time,
+      double const        time,
       const bool          overlapped = false) = 0;
   virtual void
   writeSolution(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
-      const double        time,
+      double const        time,
       const bool          overlapped = false) = 0;
   virtual void
   writeSolution(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       Thyra_Vector const& solution_dotdot,
-      const double        time,
+      double const        time,
       const bool          overlapped = false) = 0;
   virtual void
   writeSolutionMV(
       const Thyra_MultiVector& solution,
-      const double             time,
+      double const             time,
       const bool               overlapped = false) = 0;
   //! Write the solution to the mesh database.
   virtual void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
-      const double        time,
+      double const        time,
       const bool          overlapped = false) = 0;
   virtual void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
-      const double        time,
+      double const        time,
       const bool          overlapped = false) = 0;
   virtual void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       Thyra_Vector const& solution_dotdot,
-      const double        time,
+      double const        time,
       const bool          overlapped = false) = 0;
   virtual void
   writeSolutionMVToMeshDatabase(
       const Thyra_MultiVector& solution,
-      const double             time,
+      double const             time,
       const bool               overlapped = false) = 0;
 
   //! Write the solution to file. Must call writeSolution first.
   virtual void
   writeSolutionToFile(
       Thyra_Vector const& solution,
-      const double        time,
+      double const        time,
       const bool          overlapped = false) = 0;
   virtual void
   writeSolutionMVToFile(
       const Thyra_MultiVector& solution,
-      const double             time,
+      double const             time,
       const bool               overlapped = false) = 0;
 };
 

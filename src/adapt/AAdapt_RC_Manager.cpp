@@ -843,7 +843,7 @@ Manager::init_x_if_not(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 static void
 update_x(
     const Teuchos::ArrayRCP<double>&                    x,
-    const Teuchos::ArrayRCP<const double>&              s,
+    const Teuchos::ArrayRCP<double const>&              s,
     const Teuchos::RCP<Albany::AbstractDiscretization>& disc)
 {
   int const spdim = disc->getNumDim(), neq = disc->getNumEq();
@@ -1074,7 +1074,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
   typedef minitensor::Tensor<RealType> Tensor;
 
   // Some deformation gradient tensors with det(F) > 0 for use in testing.
-  static const double Fs[3][3][3] = {
+  static double const Fs[3][3][3] = {
       {{-7.382752820294219e-01, -1.759182226321058e+00, 1.417301043170359e+00},
        {7.999093048231801e-01, 5.295155264305610e-01, -3.075207765325406e-02},
        {6.283454283198379e-02, 4.117063384659416e-01, -1.243061703605918e-01}},
@@ -1090,9 +1090,9 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
   // Some sample functions. Only the constant and linear ones should be
   // interpolated exactly.
   double
-  eval_f(const double x, const double y, const double z, int ivec)
+  eval_f(double const x, double const y, double const z, int ivec)
   {
-    static const double R = 0.15;
+    static double const R = 0.15;
     switch (ivec + 1) {
       case 1: return 2;
       case 2: return 1.5 * x + 2 * y + 3 * z;
@@ -1295,7 +1295,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         for (int k = 0; k < ncol; ++k) { err1[k] = errmax[k] = scale[k] = 0; }
         for (int iv = 0; iv < nverts; ++iv)
           for (int k = 0; k < ncol; ++k) {
-            const double d = std::abs(data[k][iv] - f_true[ncol * iv + k]);
+            double const d = std::abs(data[k][iv] - f_true[ncol * iv + k]);
             err1[k] += d;
             errmax[k] = std::max(errmax[k], d);
             scale[k]  = std::max(scale[k], std::abs(f_true[ncol * iv + k]));
@@ -1327,7 +1327,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
                               j < static_cast<int>(f_mdf.dimension(3));
                               ++j, ++k)
         {
-          const double d = std::abs(
+          double const d = std::abs(
               mda[0]((int)cell, (int)qp, i, j) - f_mdf(cell, qp, i, j));
           err1[k] += d;
           errmax[k] = std::max(errmax[k], d);
@@ -1561,7 +1561,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         if (it_interp == td.f_interp_qp.end()) { break; }
         const Impl::FValues& fv_interp = it_interp->second;
         for (int k = 0; k < 9; ++k) {
-          const double diff = std::abs(fv_true.f[k] - fv_interp.f[k]);
+          double const diff = std::abs(fv_true.f[k] - fv_interp.f[k]);
           err1[k] += diff;
           errmax[k] = std::max(errmax[k], diff);
           scale[k]  = std::max(scale[k], std::abs(fv_true.f[k]));

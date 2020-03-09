@@ -809,7 +809,7 @@ dfm_set(
 void
 checkDerivatives(
     Application&                              app,
-    const double                              time,
+    double const                              time,
     Teuchos::RCP<Thyra_Vector const> const&   x,
     Teuchos::RCP<Thyra_Vector const> const&   xdot,
     Teuchos::RCP<Thyra_Vector const> const&   xdotdot,
@@ -830,7 +830,7 @@ checkDerivatives(
   if (check_lvl > 1) { mv = Thyra::createMembers(x->space(), 5); }
 
   // Construct a perturbation.
-  const double               delta = 1e-7;
+  double const               delta = 1e-7;
   Teuchos::RCP<Thyra_Vector> xd    = w1;
   xd->randomize(
       -Teuchos::ScalarTraits<ST>::rmax(), Teuchos::ScalarTraits<ST>::rmax());
@@ -900,10 +900,10 @@ checkDerivatives(
   Teuchos::RCP<Thyra_Vector> d = fd;
   scale_and_update(d, 1.0, Jxd, -1.0);
   if (Teuchos::nonnull(mv)) { scale_and_update(mv->col(4), 0.0, d, 1.0); }
-  const double dn = d->norm_inf();
+  double const dn = d->norm_inf();
 
   // Assess.
-  const double den = std::max(fdn, Jxdn), e = dn / den;
+  double const den = std::max(fdn, Jxdn), e = dn / den;
   *Teuchos::VerboseObjectBase::getDefaultOStream()
       << "Albany::Application Check Derivatives level " << check_lvl << ":\n"
       << "   reldif(f(x + dx) - f(x), J(x) dx) = " << e
@@ -1237,13 +1237,13 @@ Application::computeGlobalResidualImpl(
 
 void
 Application::computeGlobalResidual(
-    const double                            current_time,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& x_dot,
     Teuchos::RCP<Thyra_Vector const> const& x_dotdot,
     const Teuchos::Array<ParamVec>&         p,
     const Teuchos::RCP<Thyra_Vector>&       f,
-    const double                            dt)
+    double const                            dt)
 {
   this->computeGlobalResidualImpl(current_time, x, x_dot, x_dotdot, p, f, dt);
 
@@ -1279,17 +1279,17 @@ Application::computeGlobalResidual(
 
 void
 Application::computeGlobalJacobianImpl(
-    const double                            alpha,
-    const double                            beta,
-    const double                            omega,
-    const double                            current_time,
+    double const                            alpha,
+    double const                            beta,
+    double const                            omega,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p,
     const Teuchos::RCP<Thyra_Vector>&       f,
     const Teuchos::RCP<Thyra_LinearOp>&     jac,
-    const double                            dt)
+    double const                            dt)
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Jacobian");
   using EvalT = PHAL::AlbanyTraits::Jacobian;
@@ -1469,17 +1469,17 @@ Application::computeGlobalJacobianImpl(
 
 void
 Application::computeGlobalJacobian(
-    const double                            alpha,
-    const double                            beta,
-    const double                            omega,
-    const double                            current_time,
+    double const                            alpha,
+    double const                            beta,
+    double const                            omega,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p,
     const Teuchos::RCP<Thyra_Vector>&       f,
     const Teuchos::RCP<Thyra_LinearOp>&     jac,
-    const double                            dt)
+    double const                            dt)
 {
   this->computeGlobalJacobianImpl(
       alpha, beta, omega, current_time, x, xdot, xdotdot, p, f, jac, dt);
@@ -1513,7 +1513,7 @@ Application::computeGlobalJacobian(
 void
 Application::evaluateResponse(
     int                                     response_index,
-    const double                            current_time,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
@@ -1528,7 +1528,7 @@ Application::evaluateResponse(
 
 void
 Application::evaluateStateFieldManager(
-    const double             current_time,
+    double const             current_time,
     const Thyra_MultiVector& x)
 {
   int num_vecs = x.domain()->dim();
@@ -1547,7 +1547,7 @@ Application::evaluateStateFieldManager(
 
 void
 Application::evaluateStateFieldManager(
-    const double                     current_time,
+    double const                     current_time,
     Thyra_Vector const&              x,
     Teuchos::Ptr<Thyra_Vector const> xdot,
     Teuchos::Ptr<Thyra_Vector const> xdotdot)
@@ -1715,7 +1715,7 @@ void
 Application::loadBasicWorksetInfoSDBCs(
     PHAL::Workset&                          workset,
     Teuchos::RCP<Thyra_Vector const> const& owned_sol,
-    const double                            current_time)
+    double const                            current_time)
 {
   // Scatter owned solution into the overlapped one
   auto overlapped_MV  = solMgr->getOverlappedSolution();
@@ -1740,9 +1740,9 @@ Application::loadBasicWorksetInfoSDBCs(
 void
 Application::loadWorksetJacobianInfo(
     PHAL::Workset& workset,
-    const double   alpha,
-    const double   beta,
-    const double   omega)
+    double const   alpha,
+    double const   beta,
+    double const   omega)
 {
   workset.m_coeff         = alpha;
   workset.n_coeff         = omega;
@@ -1887,7 +1887,7 @@ Application::setupBasicWorksetInfo(
     }
   }
 
-  const double this_time    = fixTime(current_time);
+  double const this_time    = fixTime(current_time);
   workset.current_time      = this_time;
   workset.x                 = overlapped_x;
   workset.xdot              = overlapped_xdot;

@@ -10,7 +10,7 @@
 #include "Sacado.hpp"
 
 namespace PHAL {
-const double pi = 3.1415926535897932385;
+double const pi = 3.1415926535897932385;
 //*****
 
 template <typename EvalT, typename Traits>
@@ -88,11 +88,11 @@ LinComprNSBodyForce<EvalT, Traits>::evaluateFields(
       for (std::size_t qp = 0; qp < numQPs; ++qp)
         for (std::size_t i = 0; i < vecDim; ++i) force(cell, qp, i) = 0.0;
   } else if (bf_type == STEADYEUL) {
-    const double ubar      = 1.0;
-    const double vbar      = 1.0;
-    const double zetabar   = 1.0;
-    const double pbar      = 0.0;
-    const double gamma_gas = 1.4;
+    double const ubar      = 1.0;
+    double const vbar      = 1.0;
+    double const zetabar   = 1.0;
+    double const pbar      = 0.0;
+    double const gamma_gas = 1.4;
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
         MeshScalarT x2pi   = 2.0 * pi * coordVec(cell, qp, 0);
@@ -109,12 +109,12 @@ LinComprNSBodyForce<EvalT, Traits>::evaluateFields(
       }
     }
   } else if (bf_type == UNSTEADYEULMMS) {
-    const double   ubar      = 0.0;
-    const double   vbar      = 0.0;
-    const double   zetabar   = 1.0;
-    const double   pbar      = 0.7142857;
-    const double   a         = 1.0;
-    const double   gamma_gas = 1.4;
+    double const   ubar      = 0.0;
+    double const   vbar      = 0.0;
+    double const   zetabar   = 1.0;
+    double const   pbar      = 0.7142857;
+    double const   a         = 1.0;
+    double const   gamma_gas = 1.4;
     const RealType time      = workset.current_time;
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
@@ -142,7 +142,7 @@ LinComprNSBodyForce<EvalT, Traits>::evaluateFields(
     }
   } else if (bf_type == DRIVENPULSE) {
     const RealType time = workset.current_time;
-    const double   tref = 1.0 / 347.9693;
+    double const   tref = 1.0 / 347.9693;
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
         MeshScalarT x      = coordVec(cell, qp, 0);

@@ -168,33 +168,33 @@ class OverlapT
   // test whether a point is inside or outside of a clip edge
   bool
   Clip_TestPoint(
-      const double* N,
-      const double* PE,
-      const double* P,
+      double const* N,
+      double const* PE,
+      double const* P,
       double        eps);
   // find intersection of clipping edge with line
   bool
   Clip_Intersect(
-      const double* N,
-      const double* PE,
-      const double* P0,
-      const double* P1,
+      double const* N,
+      double const* PE,
+      double const* P0,
+      double const* P1,
       double*       xi);
   // find intersection of clipping edge with line when one knows that P0 and P1
   // are on opposite sides of the clipping plane
   bool
   Guarded_Clip_Intersect(
-      const double* N,
-      const double* PE,
-      const double* P0,
-      const double* P1,
+      double const* N,
+      double const* PE,
+      double const* P0,
+      double const* P1,
       double*       xi);
   // find parameterization alpha for point on line
   double
   Clip_ParameterPointOnLine(
-      const double* P0,
-      const double* P1,
-      const double* P);
+      double const* P0,
+      double const* P1,
+      double const* P);
 
   // -------------------------------------finding a convex hull for the polygon
   // create a convex hull of a set of given points in 2D
@@ -230,7 +230,7 @@ class OverlapT
   bool
   CollapsePoints(
       std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
-      const double eps);
+      double const eps);
 
  protected:
   // @{ \name Methods to construct triangulation of overlap region
@@ -254,15 +254,15 @@ class OverlapT
 
   // add a point to the polygon
   bool
-  AddPointtoPolygon(int const id, const double* P);
+  AddPointtoPolygon(int const id, double const* P);
   bool
   AddPointtoPolygon(
       std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
       int const                                                              id,
-      const double*                                                          P);
+      double const*                                                          P);
   // remove a point from the polygon
   bool
-  RemovePointfromPolygon(int const id, const double* P);
+  RemovePointfromPolygon(int const id, double const* P);
   // get the size of the nodal polygon
   int
   SizePointPolygon()

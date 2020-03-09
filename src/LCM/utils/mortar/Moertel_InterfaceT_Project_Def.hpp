@@ -203,7 +203,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode = scurr->second;
     if (NodePID(snode->Id()) != lcomm_->getRank()) continue;
 
-    const double*                                         sx = snode->XCoords();
+    double const*                                         sx = snode->XCoords();
     double                                                mindist = 1.0e+20;
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> closenode =
         Teuchos::null;
@@ -214,7 +214,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     for (mcurr = rnode_[mside].begin(); mcurr != rnode_[mside].end(); ++mcurr) {
       Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> mnode =
           mcurr->second;
-      const double* mx = mnode->XCoords();
+      double const* mx = mnode->XCoords();
 
       // build distance | mnode->XCoords() - snode->XCoords() |
       double dist = 0.0;
@@ -256,7 +256,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     // loop these segments and project onto them along snode's normal vector
     double       bestdist[2];
     double       gap, bestgap = 0.0;
-    const double tol = 0.2;
+    double const tol = 0.2;
     bestdist[0] = bestdist[1]                           = 1.0e+20;
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)* bestseg = NULL;
     for (int i = 0; i < nseg; ++i) {
@@ -351,7 +351,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
             snode->GetProjectedNode();
         if (pnode == Teuchos::null)
           continue;  // this node does not have a projection
-        const double* xi = pnode->Xi();
+        double const* xi = pnode->Xi();
         bcast[blength]   = (double)pnode->Id();
         ++blength;
         if (pnode->Segment())
@@ -501,7 +501,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> mnode = mcurr->second;
     if (NodePID(mnode->Id()) != lcomm_->getRank()) continue;
 
-    const double*                   mx        = mnode->XCoords();
+    double const*                   mx        = mnode->XCoords();
     double                          mindist   = 1.0e+20;
     Teuchos::RCP<MoertelT::(NodeT)> closenode = Teuchos::null;
 
@@ -511,7 +511,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     for (scurr = rnode_[sside].begin(); scurr != rnode_[sside].end(); ++scurr) {
       Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode =
           scurr->second;
-      const double* sx = snode->XCoords();
+      double const* sx = snode->XCoords();
 
       // build distance | snode->XCoords() - mnode->XCoords() |
       double dist = 0.0;
@@ -547,7 +547,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
 
     // loop these segments and find best projection
     double       bestdist[2];
-    const double tol     = 0.2;
+    double const tol     = 0.2;
     double       bestgap = 0.0, gap;
     bestdist[0] = bestdist[1]                           = 1.0e+20;
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)* bestseg = NULL;
@@ -620,7 +620,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
       double NN[3];
       NN[0] = NN[1] = NN[2] = 0.0;
       for (int i = 0; i < nsnode; ++i) {
-        const double* Normal = snodes[i]->Normal();
+        double const* Normal = snodes[i]->Normal();
         for (int j = 0; j < 3; ++j) NN[j] -= val[i] * Normal[j];
       }
       val.clear();
@@ -658,8 +658,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
             mnode->GetProjectedNode();
         if (pnode == Teuchos::null)
           continue;  // this node does not have a projection
-        const double* xi     = pnode->Xi();
-        const double* Normal = mnode->Normal();
+        double const* xi     = pnode->Xi();
+        double const* Normal = mnode->Normal();
         bcast[blength]       = (double)pnode->Id();
         ++blength;
         if (pnode->Segment())
@@ -795,7 +795,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> mnode = mcurr->second;
     if (NodePID(mnode->Id()) != lcomm_->getRank()) continue;
 
-    const double*                                         mx = mnode->XCoords();
+    double const*                                         mx = mnode->XCoords();
     double                                                mindist = 1.0e+20;
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> closenode =
         Teuchos::null;
@@ -806,7 +806,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     for (scurr = rnode_[sside].begin(); scurr != rnode_[sside].end(); ++scurr) {
       Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode =
           scurr->second;
-      const double* sx = snode->XCoords();
+      double const* sx = snode->XCoords();
 
       // build distance | snode->XCoords() - mnode->XCoords() |
       double dist = 0.0;
@@ -912,7 +912,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
             mnode->GetProjectedNode();
         if (pnode == Teuchos::null)
           continue;  // this node does not have a projection
-        const double* xi = pnode->Xi();
+        double const* xi = pnode->Xi();
         bcast[blength]   = (double)pnode->Id();
         ++blength;
         bcast[blength] = (double)pnode->Segment()->Id();
@@ -1014,7 +1014,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
 
     if (NodePID(snode->Id()) != lcomm_->getRank()) continue;
 
-    const double*                                         sx = snode->XCoords();
+    double const*                                         sx = snode->XCoords();
     double                                                mindist = 1.0e+20;
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> closenode =
         Teuchos::null;
@@ -1025,7 +1025,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     for (mcurr = rnode_[mside].begin(); mcurr != rnode_[mside].end(); ++mcurr) {
       Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> mnode =
           mcurr->second;
-      const double* mx = mnode->XCoords();
+      double const* mx = mnode->XCoords();
 
       // build distance | mnode->XCoords() - snode->XCoords() |
       double dist = 0.0;
@@ -1123,7 +1123,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
           for (int j = 0; j < npnode; ++j) {
             bcast[blength] = (double)pnode[j]->Segment()->Id();
             ++blength;
-            const double* xi = pnode[j]->Xi();
+            double const* xi = pnode[j]->Xi();
             bcast[blength]   = xi[0];
             ++blength;
             bcast[blength] = xi[1];

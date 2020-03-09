@@ -65,7 +65,7 @@ Albany::CumulativeScalarResponseFunction::numResponses() const
 
 void
 Albany::CumulativeScalarResponseFunction::evaluateResponse(
-    const double                            current_time,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
@@ -89,7 +89,7 @@ Albany::CumulativeScalarResponseFunction::evaluateResponse(
 
 void
 Albany::CumulativeScalarResponseFunction::evaluateGradient(
-    const double                            current_time,
+    double const                            current_time,
     Teuchos::RCP<Thyra_Vector const> const& x,
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,

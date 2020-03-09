@@ -33,7 +33,7 @@ class DistributedResponseFunction : public AbstractResponseFunction
   //! Evaluate gradient = dg/dx, dg/dxdot, dg/dp
   virtual void
   evaluateGradient(
-      const double                            current_time,
+      double const                            current_time,
       Teuchos::RCP<Thyra_Vector const> const& x,
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
@@ -61,7 +61,7 @@ class DistributedResponseFunction : public AbstractResponseFunction
   //! Evaluate derivative dg/dx, dg/dxdot, dg/dp
   virtual void
   evaluateDerivative(
-      const double                                     current_time,
+      double const                                     current_time,
       Teuchos::RCP<Thyra_Vector const> const&          x,
       Teuchos::RCP<Thyra_Vector const> const&          xdot,
       Teuchos::RCP<Thyra_Vector const> const&          xdotdot,

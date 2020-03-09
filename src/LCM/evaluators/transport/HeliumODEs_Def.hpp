@@ -116,7 +116,7 @@ HeliumODEs<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   minitensor::Vector<ScalarT> increment(3);
 
   // tolarences and iterations for newton
-  const double tolerance = 1.0e-12, tolerance_2 = tolerance * tolerance;
+  double const tolerance = 1.0e-12, tolerance_2 = tolerance * tolerance;
   int const    maxIterations =
       20;  // FIXME: Currently a maximum, need relative measures
   // subincrementation for explicit predictor //FIXME: No guarantee of stability
@@ -159,22 +159,22 @@ HeliumODEs<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   // loop over cells and points for implicit time integration
 
   // constants for computations
-  const double pi       = acos(-1.0);
-  const double onethrd  = 1.0 / 3.0;
-  const double twothrd  = 2.0 / 3.0;
-  const double cub_tfpi = std::cbrt(3.0 / 4.0 / pi);
+  double const pi       = acos(-1.0);
+  double const onethrd  = 1.0 / 3.0;
+  double const twothrd  = 2.0 / 3.0;
+  double const cub_tfpi = std::cbrt(3.0 / 4.0 / pi);
 
   // temporary variables
   ScalarT n1_old, nb_old, sb_old, n1, nb, sb;
   ScalarT n1_exp, nb_exp, sb_exp;
   ScalarT d, g_old, g;
 
-  const double pi2             = pi * pi;
-  const double cube_root_pi2   = std::cbrt(pi2);
-  const double cube_root_2     = std::cbrt(2.0);
-  const double cube_root_6     = std::cbrt(6.0);
-  const double cube_root_9     = std::cbrt(9.0);
-  const double cube_root_pi2_9 = std::cbrt(pi2 / 9.0);
+  double const pi2             = pi * pi;
+  double const cube_root_pi2   = std::cbrt(pi2);
+  double const cube_root_2     = std::cbrt(2.0);
+  double const cube_root_6     = std::cbrt(6.0);
+  double const cube_root_9     = std::cbrt(9.0);
+  double const cube_root_pi2_9 = std::cbrt(pi2 / 9.0);
 
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t pt = 0; pt < num_pts_; ++pt) {

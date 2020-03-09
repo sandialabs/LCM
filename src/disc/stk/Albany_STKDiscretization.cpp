@@ -55,7 +55,7 @@ namespace {
 std::vector<double>
 spherical_to_cart(const std::pair<double, double>& sphere)
 {
-  const double        radius_of_earth = 1;
+  double const        radius_of_earth = 1;
   std::vector<double> cart(3);
 
   cart[0] = radius_of_earth * std::cos(sphere.first) * std::cos(sphere.second);
@@ -66,9 +66,9 @@ spherical_to_cart(const std::pair<double, double>& sphere)
 }
 
 double
-distance(const double* x, const double* y)
+distance(double const* x, double const* y)
 {
-  const double d = std::sqrt(
+  double const d = std::sqrt(
       (x[0] - y[0]) * (x[0] - y[0]) + (x[1] - y[1]) * (x[1] - y[1]) +
       (x[2] - y[2]) * (x[2] - y[2]));
   return d;
@@ -77,7 +77,7 @@ distance(const double* x, const double* y)
 double
 distance(const std::vector<double>& x, const std::vector<double>& y)
 {
-  const double d = std::sqrt(
+  double const d = std::sqrt(
       (x[0] - y[0]) * (x[0] - y[0]) + (x[1] - y[1]) * (x[1] - y[1]) +
       (x[2] - y[2]) * (x[2] - y[2]));
   return d;
@@ -89,8 +89,8 @@ point_inside(
     const std::vector<double>&        sphere_xyz)
 {
   // first check if point is near the element:
-  const double tol_inside = 1e-12;
-  const double elem_diam  = std::max(
+  double const tol_inside = 1e-12;
+  double const elem_diam  = std::max(
       ::distance(coords[0], coords[2]), ::distance(coords[1], coords[3]));
   std::vector<double> center(3, 0);
   for (unsigned i = 0; i < 4; ++i) {
@@ -112,7 +112,7 @@ point_inside(
     cross[1] = -(coords[i][0] * coords[j][2] - coords[i][2] * coords[j][0]);
     cross[2] = coords[i][0] * coords[j][1] - coords[i][1] * coords[j][0];
     j        = i;
-    const double dotprod = cross[0] * sphere_xyz[0] + cross[1] * sphere_xyz[1] +
+    double const dotprod = cross[0] * sphere_xyz[0] + cross[1] * sphere_xyz[1] +
                            cross[2] * sphere_xyz[2];
 
     // dot product is proportional to elem_diam. positive means outside,
@@ -226,12 +226,12 @@ ref2sphere(
     const Teuchos::ArrayRCP<double*>& coords,
     const std::pair<double, double>&  ref)
 {
-  static const double DIST_THRESHOLD = 1.0e-9;
+  static double const DIST_THRESHOLD = 1.0e-9;
 
   double x[3];
   value(x, coords, ref);
 
-  const double r = std::sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
+  double const r = std::sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
 
   for (unsigned i = 0; i < 3; ++i) { x[i] /= r; }
 
@@ -265,16 +265,16 @@ Dmap(
     const std::pair<double, double>&  ref,
     double                            D[][2])
 {
-  const double th     = sphere.first;
-  const double lam    = sphere.second;
-  const double sinlam = std::sin(lam);
-  const double sinth  = std::sin(th);
-  const double coslam = std::cos(lam);
-  const double costh  = std::cos(th);
+  double const th     = sphere.first;
+  double const lam    = sphere.second;
+  double const sinlam = std::sin(lam);
+  double const sinth  = std::sin(th);
+  double const coslam = std::cos(lam);
+  double const costh  = std::cos(th);
 
-  const double D1[2][3] = {{-sinlam, coslam, 0}, {0, 0, 1}};
+  double const D1[2][3] = {{-sinlam, coslam, 0}, {0, 0, 1}};
 
-  const double D2[3][3] = {{sinlam * sinlam * costh * costh + sinth * sinth,
+  double const D2[3][3] = {{sinlam * sinlam * costh * costh + sinth * sinth,
                             -sinlam * coslam * costh * costh,
                             -coslam * sinth * costh},
                            {-sinlam * coslam * costh * costh,
@@ -308,7 +308,7 @@ parametric_coordinates(
     const Teuchos::ArrayRCP<double*>& coords,
     const std::pair<double, double>&  sphere)
 {
-  static const double       tol_sq      = 1e-26;
+  static double const       tol_sq      = 1e-26;
   static const unsigned     MAX_NR_ITER = 10;
   double                    costh       = std::cos(sphere.first);
   double                    D[2][2], Dinv[2][2];
@@ -327,7 +327,7 @@ parametric_coordinates(
     if (resb < -pi) { resb += 2 * pi; }
 
     Dmap(coords, sph, ref, D);
-    const double detD = D[0][0] * D[1][1] - D[0][1] * D[1][0];
+    double const detD = D[0][0] * D[1][1] - D[0][1] * D[1][0];
     Dinv[0][0]        = D[1][1] / detD;
     Dinv[0][1]        = -D[0][1] / detD;
     Dinv[1][0]        = -D[1][0] / detD;
@@ -374,7 +374,7 @@ point_in_element(
 void
 setup_latlon_interp(
     const unsigned nlat,
-    const double   nlon,
+    double const   nlon,
     const Albany::WorksetArray<
         Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type&   coords,
     Albany::WorksetArray<Teuchos::ArrayRCP<
@@ -550,7 +550,7 @@ STKDiscretization::getCoordinates() const
 // These methods were added to support mesh adaptation
 void
 STKDiscretization::setCoordinates(
-    const Teuchos::ArrayRCP<const double>& /* c */)
+    const Teuchos::ArrayRCP<double const>& /* c */)
 {
   ALBANY_ABORT("STKDiscretization::setCoordinates is not implemented.");
 }
@@ -881,7 +881,7 @@ STKDiscretization::writeCoordsToMatrixMarket() const
 void
 STKDiscretization::writeSolution(
     Thyra_Vector const& soln,
-    const double        time,
+    double const        time,
     const bool          overlapped)
 {
   writeSolutionToMeshDatabase(soln, time, overlapped);
@@ -892,7 +892,7 @@ void
 STKDiscretization::writeSolution(
     Thyra_Vector const& soln,
     Thyra_Vector const& soln_dot,
-    const double        time,
+    double const        time,
     const bool          overlapped)
 {
   writeSolutionToMeshDatabase(soln, soln_dot, time, overlapped);
@@ -905,7 +905,7 @@ STKDiscretization::writeSolution(
     Thyra_Vector const& soln,
     Thyra_Vector const& soln_dot,
     Thyra_Vector const& soln_dotdot,
-    const double        time,
+    double const        time,
     const bool          overlapped)
 {
   writeSolutionToMeshDatabase(soln, soln_dot, soln_dotdot, time, overlapped);
@@ -916,7 +916,7 @@ STKDiscretization::writeSolution(
 void
 STKDiscretization::writeSolutionMV(
     const Thyra_MultiVector& soln,
-    const double             time,
+    double const             time,
     const bool               overlapped)
 {
   writeSolutionMVToMeshDatabase(soln, time, overlapped);
@@ -926,7 +926,7 @@ STKDiscretization::writeSolutionMV(
 void
 STKDiscretization::writeSolutionToMeshDatabase(
     Thyra_Vector const& soln,
-    const double /* time */,
+    double const /* time */,
     const bool overlapped)
 {
   // Put solution into STK Mesh
@@ -937,7 +937,7 @@ void
 STKDiscretization::writeSolutionToMeshDatabase(
     Thyra_Vector const& soln,
     Thyra_Vector const& soln_dot,
-    const double /* time */,
+    double const /* time */,
     const bool overlapped)
 {
   // Put solution into STK Mesh
@@ -949,7 +949,7 @@ STKDiscretization::writeSolutionToMeshDatabase(
     Thyra_Vector const& soln,
     Thyra_Vector const& soln_dot,
     Thyra_Vector const& soln_dotdot,
-    const double /* time */,
+    double const /* time */,
     const bool overlapped)
 {
   // Put solution into STK Mesh
@@ -959,7 +959,7 @@ STKDiscretization::writeSolutionToMeshDatabase(
 void
 STKDiscretization::writeSolutionMVToMeshDatabase(
     const Thyra_MultiVector& soln,
-    const double /* time */,
+    double const /* time */,
     const bool overlapped)
 {
   // Put solution into STK Mesh
@@ -969,7 +969,7 @@ STKDiscretization::writeSolutionMVToMeshDatabase(
 void
 STKDiscretization::writeSolutionToFile(
     Thyra_Vector const& soln,
-    const double        time,
+    double const        time,
     const bool          overlapped)
 {
   if (stkMeshStruct->exoOutput && stkMeshStruct->transferSolutionToCoords) {
@@ -1042,7 +1042,7 @@ STKDiscretization::writeSolutionToFile(
 void
 STKDiscretization::writeSolutionMVToFile(
     const Thyra_MultiVector& soln,
-    const double             time,
+    double const             time,
     const bool               overlapped)
 {
   if (stkMeshStruct->exoOutput && stkMeshStruct->transferSolutionToCoords) {
@@ -1115,7 +1115,7 @@ STKDiscretization::writeSolutionMVToFile(
 }
 
 double
-STKDiscretization::monotonicTimeLabel(const double time)
+STKDiscretization::monotonicTimeLabel(double const time)
 {
   // If increasing, then all is good
   if (time > previous_time_label) {
@@ -2675,7 +2675,7 @@ STKDiscretization::setupNetCDFOutput()
               "nc_def_var " << field_name << " returned error code " << ierr
                             << " - " << nc_strerror(ierr) << std::endl);
 
-      const double fillVal = -9999.0;
+      double const fillVal = -9999.0;
       if (netCDFp)
         if (int const ierr = nc_put_att(
                 netCDFp, varSolns[n], "FillValue", NC_DOUBLE, 1, &fillVal))

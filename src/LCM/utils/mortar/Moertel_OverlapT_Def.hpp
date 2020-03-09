@@ -582,7 +582,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Clipelements()
       bool ok = true;
       // std::cout << "OVERLAP Clipelements: now clipping point " <<
       // point[p]->Id() << endl;
-      const double* P = point[p]->Xi();
+      double const* P = point[p]->Xi();
 
       for (int clipedge = 0; clipedge < nsnode; ++clipedge) {
         // point on that clip edge (dim 2)
@@ -1272,7 +1272,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
     xi[0] = xi[1] = 0.0;
     for (int i=0; i<np; ++i)
     {
-      const double* pxi = points[i]->Xi();
+      double const* pxi = points[i]->Xi();
       xi[0] += pxi[0];
       xi[1] += pxi[1];
     }
@@ -1312,7 +1312,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
         x[k] += val[j] * snodes[j]->XCoords()[k];
         n[k] += val[j] * snodes[j]->Normal()[k];
       }
-    const double length = MoertelT::length(n, 3);
+    double const length = MoertelT::length(n, 3);
     for (int j = 0; j < 3; ++j) n[j] /= length;
     // create a node with this coords and normal;
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)* node =
@@ -1351,8 +1351,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
         double xi[2];
         xi[0] = xi[1] = 0.;
 
-        const double* node_norm = node->Normal();
-        const double* seg_norm  = mseg_.BuildNormal(xi);
+        double const* node_norm = node->Normal();
+        double const* seg_norm  = mseg_.BuildNormal(xi);
 
         double mag_projection = fabs(MoertelT::dot(node_norm, seg_norm, 3));
 

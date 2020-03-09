@@ -122,12 +122,12 @@ apply_rotation(std::vector<double>& coor)
   // from the model coordinates.  This causes the RCB axis cuts
   // to be "disaligned" from straight lines of the model.
 
-  static const double tS = 0.0001; /* sin( angle / 2 ), angle = 0.012 deg */
-  static const double tC = sqrt((double)(1.0 - tS * tS));
-  static const double tQ = tS / sqrt((double)3.0);
-  static const double t1 = tC * tC - tQ * tQ;
-  static const double t2 = 2.0 * tQ * (tC + tQ);
-  static const double t3 = -2.0 * tQ * (tC - tQ);
+  static double const tS = 0.0001; /* sin( angle / 2 ), angle = 0.012 deg */
+  static double const tC = sqrt((double)(1.0 - tS * tS));
+  static double const tQ = tS / sqrt((double)3.0);
+  static double const t1 = tC * tC - tQ * tQ;
+  static double const t2 = 2.0 * tQ * (tC + tQ);
+  static double const t3 = -2.0 * tQ * (tC - tQ);
 
   std::vector<double> temp(coor);
   const size_t        nd = temp.size();

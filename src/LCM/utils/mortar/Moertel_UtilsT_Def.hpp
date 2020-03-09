@@ -22,7 +22,7 @@
  *----------------------------------------------------------------------*/
 template <class LO, class ST>
 bool
-MoertelT::solve33T(const double A[][3], double* x, const double* b)
+MoertelT::solve33T(double const A[][3], double* x, double const* b)
 {
   Teuchos::SerialDenseMatrix<LO, ST> AA(3, 3, false);
   Teuchos::SerialDenseMatrix<LO, ST> XX(3, 1, false);
@@ -146,7 +146,7 @@ MoertelT::StripZeros(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, double eps)
     }
     int           numentries;
     int const*    lindices;
-    const double* values;
+    double const* values;
     //    int err  = A.ExtractMyRowView(lrow,numentries,values,lindices);
     LO err = A.getLocalRowViewRaw(lrow, numentries, lindices, values);
     if (err) {
@@ -259,7 +259,7 @@ MoertelT::Print_Vector(
   name                                    = name + mypidc + ".vec";
   const char*                     nameptr = &name[0];
   FILE*                           out     = fopen(nameptr, "w");
-  Teuchos::ArrayRCP<const double> vv      = v.get1dView();
+  Teuchos::ArrayRCP<double const> vv      = v.get1dView();
 
   if (!out) {
     std::cout << "***ERR*** MoertelT::Print_Vector:\n"

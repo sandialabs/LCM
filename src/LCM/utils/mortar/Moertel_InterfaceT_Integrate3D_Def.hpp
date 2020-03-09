@@ -15,7 +15,7 @@
 #include "Moertel_SegmentT.hpp"
 #include "Moertel_UtilsT.hpp"
 
-const double CONSTRAINT_MATRIX_ZERO = 1.0e-11;
+double const CONSTRAINT_MATRIX_ZERO = 1.0e-11;
 
 /*----------------------------------------------------------------------*
   |  make mortar integration of this interface (3D problem)           |

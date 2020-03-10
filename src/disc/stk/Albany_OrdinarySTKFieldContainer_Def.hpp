@@ -19,31 +19,31 @@
 
 namespace Albany {
 
-static const char* sol_tag_name[3] = {"Exodus Solution Name",
+static char const* sol_tag_name[3] = {"Exodus Solution Name",
                                       "Exodus SolutionDot Name",
                                       "Exodus SolutionDotDot Name"};
 
-static const char* sol_id_name[3] = {"solution",
+static char const* sol_id_name[3] = {"solution",
                                      "solution_dot",
                                      "solution_dotdot"};
 
 #if defined(ALBANY_DTK)
-static const char* sol_dtk_id_name[3] = {"solution dtk",
+static char const* sol_dtk_id_name[3] = {"solution dtk",
                                          "solution_dot dtk",
                                          "solution_dotdot dtk"};
 #endif
 
-static const char* res_tag_name[1] = {
+static char const* res_tag_name[1] = {
     "Exodus Residual Name",
 };
 
 #if defined(ALBANY_DTK)
-static const char* sol_dtk_tag_name[3] = {"Exodus Solution DTK Name",
+static char const* sol_dtk_tag_name[3] = {"Exodus Solution DTK Name",
                                           "Exodus SolutionDot DTK Name",
                                           "Exodus SolutionDotDot DTK Name"};
 #endif
 
-static const char* res_id_name[1] = {
+static char const* res_id_name[1] = {
     "residual",
 };
 

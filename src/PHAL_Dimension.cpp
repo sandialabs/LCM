@@ -6,10 +6,10 @@
 
 #include "PHAL_Dimension.hpp"
 
-const char*
+char const*
 Dim::name() const
 {
-  static const char n[] = "Dim";
+  static char const n[] = "Dim";
   return n;
 }
 const Dim&
@@ -19,10 +19,10 @@ Dim::tag()
   return myself;
 }
 
-const char*
+char const*
 VecDim::name() const
 {
-  static const char n[] = "VecDim";
+  static char const n[] = "VecDim";
   return n;
 }
 const VecDim&
@@ -32,10 +32,10 @@ VecDim::tag()
   return myself;
 }
 
-const char*
+char const*
 LayerDim::name() const
 {
-  static const char n[] = "LayerDim";
+  static char const n[] = "LayerDim";
   return n;
 }
 const LayerDim&
@@ -45,10 +45,10 @@ LayerDim::tag()
   return myself;
 }
 
-const char*
+char const*
 QuadPoint::name() const
 {
-  static const char n[] = "QuadPoint";
+  static char const n[] = "QuadPoint";
   return n;
 }
 const QuadPoint&
@@ -58,10 +58,10 @@ QuadPoint::tag()
   return myself;
 }
 
-const char*
+char const*
 Node::name() const
 {
-  static const char n[] = "Node";
+  static char const n[] = "Node";
   return n;
 }
 const Node&
@@ -71,10 +71,10 @@ Node::tag()
   return myself;
 }
 
-const char*
+char const*
 Vertex::name() const
 {
-  static const char n[] = "Vertex";
+  static char const n[] = "Vertex";
   return n;
 }
 const Vertex&
@@ -84,10 +84,10 @@ Vertex::tag()
   return myself;
 }
 
-const char*
+char const*
 Point::name() const
 {
-  static const char n[] = "Point";
+  static char const n[] = "Point";
   return n;
 }
 const Point&
@@ -97,10 +97,10 @@ Point::tag()
   return myself;
 }
 
-const char*
+char const*
 Cell::name() const
 {
-  static const char n[] = "Cell";
+  static char const n[] = "Cell";
   return n;
 }
 const Cell&
@@ -110,10 +110,10 @@ Cell::tag()
   return myself;
 }
 
-const char*
+char const*
 Side::name() const
 {
-  static const char n[] = "Side";
+  static char const n[] = "Side";
   return n;
 }
 const Side&
@@ -123,10 +123,10 @@ Side::tag()
   return myself;
 }
 
-const char*
+char const*
 Dummy::name() const
 {
-  static const char n[] = "Dummy";
+  static char const n[] = "Dummy";
   return n;
 }
 const Dummy&

@@ -2650,7 +2650,7 @@ STKDiscretization::setupNetCDFOutput()
 #endif
 
     const size_t nlev       = 1;
-    const char*  dimnames[] = {"time", "lev", "lat", "lon"};
+    char const*  dimnames[] = {"time", "lev", "lat", "lon"};
     const size_t dimlen[]   = {NC_UNLIMITED, nlev, nlat, nlon};
     int          dimID[4]   = {0, 0, 0, 0};
 
@@ -2667,7 +2667,7 @@ STKDiscretization::setupNetCDFOutput()
     for (unsigned n = 0; n < neq; ++n) {
       std::ostringstream var;
       var << "variable_" << n;
-      const char* field_name = var.str().c_str();
+      char const* field_name = var.str().c_str();
       if (netCDFp)
         if (int const ierr = nc_def_var(
                 netCDFp, field_name, NC_DOUBLE, 4, dimID, &varSolns[n]))
@@ -2684,10 +2684,10 @@ STKDiscretization::setupNetCDFOutput()
               << ierr << " - " << nc_strerror(ierr) << std::endl);
     }
 
-    const char lat_name[] = "latitude";
-    const char lat_unit[] = "degrees_north";
-    const char lon_name[] = "longitude";
-    const char lon_unit[] = "degrees_east";
+    char const lat_name[] = "latitude";
+    char const lat_unit[] = "degrees_north";
+    char const lon_name[] = "longitude";
+    char const lon_unit[] = "degrees_east";
     int        latVarID   = 0;
     if (netCDFp)
       if (int const ierr =
@@ -2728,7 +2728,7 @@ STKDiscretization::setupNetCDFOutput()
             "nc_put_att_text " << lon_unit << " returned error code " << ierr
                                << " - " << nc_strerror(ierr) << std::endl);
 
-    const char history[] = "Created by Albany";
+    char const history[] = "Created by Albany";
     if (netCDFp)
       if (int const ierr = nc_put_att_text(
               netCDFp, NC_GLOBAL, "history", sizeof(history), history))

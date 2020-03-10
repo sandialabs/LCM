@@ -22,19 +22,19 @@
 
 namespace Albany {
 
-static const char* sol_tag_name[3] = {"Exodus Solution Name",
+static char const* sol_tag_name[3] = {"Exodus Solution Name",
                                       "Exodus SolutionDot Name",
                                       "Exodus SolutionDotDot Name"};
 
-static const char* sol_id_name[3] = {"solution",
+static char const* sol_id_name[3] = {"solution",
                                      "solution_dot",
                                      "solution_dotdot"};
 
-static const char* res_tag_name = {
+static char const* res_tag_name = {
     "Exodus Residual Name",
 };
 
-static const char* res_id_name = {
+static char const* res_id_name = {
     "residual",
 };
 

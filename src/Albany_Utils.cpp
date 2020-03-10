@@ -135,7 +135,7 @@ AbsRowSum(
 }
 
 std::string
-strint(std::string const s, int const i, const char delim)
+strint(std::string const s, int const i, char const delim)
 {
   std::ostringstream ss;
   ss << s << delim << i;
@@ -449,7 +449,7 @@ do_stack_trace()
 }
 
 void
-safe_fscanf(int nitems, FILE* file, const char* format, ...)
+safe_fscanf(int nitems, FILE* file, char const* format, ...)
 {
   va_list ap;
   va_start(ap, format);
@@ -462,7 +462,7 @@ safe_fscanf(int nitems, FILE* file, const char* format, ...)
 }
 
 void
-safe_sscanf(int nitems, const char* str, const char* format, ...)
+safe_sscanf(int nitems, char const* str, char const* format, ...)
 {
   va_list ap;
   va_start(ap, format);

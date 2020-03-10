@@ -66,7 +66,7 @@ FieldManagerScalarResponseFunction::setup(
   // then an exception will be thrown. Quick and dirty fix:
   // Remove the option if it already exists before building
   // the evaluators, it will be added again below anyhow.
-  const char* phx_graph_parm = "Phalanx Graph Visualization Detail";
+  char const* phx_graph_parm = "Phalanx Graph Visualization Detail";
   const bool  phx_graph_parm_present =
       responseParams.isType<int>(phx_graph_parm);
   if (phx_graph_parm_present) {
@@ -85,7 +85,7 @@ FieldManagerScalarResponseFunction::setup(
       ::tolower);
 
   // Restrict to the element block?
-  const char* reb_parm         = "Restrict to Element Block";
+  char const* reb_parm         = "Restrict to Element Block";
   const bool  reb_parm_present = responseParams.isType<bool>(reb_parm),
              reb =
                  reb_parm_present && responseParams.get<bool>(reb_parm, false);

@@ -21,10 +21,10 @@ namespace Albany {
 
 struct EntityDimension : public shards::ArrayDimTag
 {
-  const char*
+  char const*
   name() const
   {
-    static const char n[] = "EntityDimension";
+    static char const n[] = "EntityDimension";
     return n;
   }
 

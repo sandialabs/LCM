@@ -13,7 +13,7 @@
 struct Dim : public shards::ArrayDimTag
 {
   Dim(){};
-  const char*
+  char const*
   name() const;
   static const Dim&
   tag();
@@ -22,7 +22,7 @@ struct Dim : public shards::ArrayDimTag
 struct VecDim : public shards::ArrayDimTag
 {
   VecDim(){};
-  const char*
+  char const*
   name() const;
   static const VecDim&
   tag();
@@ -31,7 +31,7 @@ struct VecDim : public shards::ArrayDimTag
 struct LayerDim : public shards::ArrayDimTag
 {
   LayerDim(){};
-  const char*
+  char const*
   name() const;
   static const LayerDim&
   tag();
@@ -40,7 +40,7 @@ struct LayerDim : public shards::ArrayDimTag
 struct QuadPoint : public shards::ArrayDimTag
 {
   QuadPoint(){};
-  const char*
+  char const*
   name() const;
   static const QuadPoint&
   tag();
@@ -49,7 +49,7 @@ struct QuadPoint : public shards::ArrayDimTag
 struct Node : public shards::ArrayDimTag
 {
   Node(){};
-  const char*
+  char const*
   name() const;
   static const Node&
   tag();
@@ -58,7 +58,7 @@ struct Node : public shards::ArrayDimTag
 struct Vertex : public shards::ArrayDimTag
 {
   Vertex(){};
-  const char*
+  char const*
   name() const;
   static const Vertex&
   tag();
@@ -67,7 +67,7 @@ struct Vertex : public shards::ArrayDimTag
 struct Point : public shards::ArrayDimTag
 {
   Point(){};
-  const char*
+  char const*
   name() const;
   static const Point&
   tag();
@@ -76,7 +76,7 @@ struct Point : public shards::ArrayDimTag
 struct Cell : public shards::ArrayDimTag
 {
   Cell(){};
-  const char*
+  char const*
   name() const;
   static const Cell&
   tag();
@@ -85,7 +85,7 @@ struct Cell : public shards::ArrayDimTag
 struct Side : public shards::ArrayDimTag
 {
   Side(){};
-  const char*
+  char const*
   name() const;
   static const Side&
   tag();
@@ -94,7 +94,7 @@ struct Side : public shards::ArrayDimTag
 struct Dummy : public shards::ArrayDimTag
 {
   Dummy(){};
-  const char*
+  char const*
   name() const;
   static const Dummy&
   tag();

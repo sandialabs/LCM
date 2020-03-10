@@ -141,7 +141,7 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
 template <class Norm>
 int
 SolutionFileResponseFunction<Norm>::MatrixMarketFile(
-    const char*                            filename,
+    char const*                            filename,
     const Teuchos::RCP<Thyra_MultiVector>& mv)
 {
   int const lineLength  = 1025;

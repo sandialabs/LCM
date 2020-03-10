@@ -50,7 +50,7 @@ class BadParameterEnumException : std::exception
       std::string const&      key,
       ParameterEnum<T> const& e);
 
-  virtual const char*
+  virtual char const*
   what() const noexcept
   {
     return m_msg.c_str();

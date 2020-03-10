@@ -54,7 +54,7 @@ ReplaceDiagonalEntries(
 //! strint("dog",2,' ') = "dog 2"
 //! The default delimiter is ' '. Potential delimiters include '_' - "dog_2"
 std::string
-strint(std::string const s, int const i, const char delim = ' ');
+strint(std::string const s, int const i, char const delim = ' ');
 
 //! Returns true of the given string is a valid initialization string of the
 //! format "initial value 1.54"
@@ -180,9 +180,9 @@ do_stack_trace();
 // Check returns codes and throw Teuchos exceptions
 // Useful for silencing compiler warnings about unused return codes
 void
-safe_fscanf(int nitems, FILE* file, const char* format, ...);
+safe_fscanf(int nitems, FILE* file, char const* format, ...);
 void
-safe_sscanf(int nitems, const char* str, const char* format, ...);
+safe_sscanf(int nitems, char const* str, char const* format, ...);
 void
 safe_fgets(char* str, int size, FILE* stream);
 void

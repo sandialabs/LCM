@@ -67,7 +67,7 @@ convert_param_to_string(
 }
 
 inline void
-fill_parameters(const char* T[][2], int const i, Parameters& Entry)
+fill_parameters(char const* T[][2], int const i, Parameters& Entry)
 {
   for (int j = 0; j < i; ++j) Entry.set(T[j][0], T[j][1]);
 }

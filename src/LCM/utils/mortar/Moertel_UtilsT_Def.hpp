@@ -188,7 +188,7 @@ MoertelT::Print_Matrix(
   char mypidc[100];
   sprintf(mypidc, "%d", A.Comm().getRank());
   name                = name + mypidc + ".mtx";
-  const char* nameptr = &name[0];
+  char const* nameptr = &name[0];
   FILE*       out     = fopen(nameptr, "w");
   if (!out) {
     std::cout << "***ERR*** MoertelT::Print_Matrix:\n"
@@ -257,7 +257,7 @@ MoertelT::Print_Vector(
   char mypidc[100];
   sprintf(mypidc, "%d", v.Comm().getRank());
   name                                    = name + mypidc + ".vec";
-  const char*                     nameptr = &name[0];
+  char const*                     nameptr = &name[0];
   FILE*                           out     = fopen(nameptr, "w");
   Teuchos::ArrayRCP<double const> vv      = v.get1dView();
 
@@ -290,7 +290,7 @@ MoertelT::Print_Graph(
   char mypidc[100];
   sprintf(mypidc, "%d", A.Comm().getRank());
   name                = name + mypidc + ".mtx";
-  const char* nameptr = &name[0];
+  char const* nameptr = &name[0];
   FILE*       out     = fopen(nameptr, "w");
   if (!out) {
     std::cout << "***ERR*** MoertelT::Print_Graph:\n"

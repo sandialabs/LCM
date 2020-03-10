@@ -43,7 +43,7 @@ DisplayTable::write(std::ostream& strm)
 }
 
 std::ostream&
-DisplayTable::writeCSV(std::ostream& strm, const char delim)
+DisplayTable::writeCSV(std::ostream& strm, char const delim)
 {
   for (auto& row : rows_) {
     if (row.empty()) continue;

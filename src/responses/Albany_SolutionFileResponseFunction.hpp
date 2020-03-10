@@ -63,7 +63,7 @@ class SolutionFileResponseFunction : public SamplingBasedScalarResponseFunction
  private:
   int
   MatrixMarketFile(
-      const char*                            filename,
+      char const*                            filename,
       const Teuchos::RCP<Thyra_MultiVector>& mv);
 
   //! Reference Vector - Thyra

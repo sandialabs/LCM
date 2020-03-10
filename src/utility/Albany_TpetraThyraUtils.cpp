@@ -15,7 +15,7 @@ struct BadThyraTpetraCast : public std::bad_cast
 {
   BadThyraTpetraCast(std::string const& msg) : m_msg(msg) {}
 
-  const char*
+  char const*
   what() const noexcept
   {
     return m_msg.c_str();

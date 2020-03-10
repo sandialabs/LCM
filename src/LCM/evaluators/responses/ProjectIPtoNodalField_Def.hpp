@@ -290,7 +290,7 @@ setDefaultSolverParameters(Teuchos::ParameterList& pl, double const solver_tol)
   // problem. I'll have to wait to see other problems before I decided whether:
   // (a) Diagonal is always sufficient; (b) ILU(0) with ovl=0 is good; or (c)
   // something more powerful is required (ILUTP or overlap > 0, say).
-  const char* prec_type[] = {"RILUK", "Diagonal"};
+  char const* prec_type[] = {"RILUK", "Diagonal"};
   ifpack_types.set<std::string>("Prec Type", prec_type[0]);
 
   Teuchos::ParameterList& ifpack_settings =

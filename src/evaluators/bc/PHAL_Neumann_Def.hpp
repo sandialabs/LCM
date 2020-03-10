@@ -171,7 +171,7 @@ NeumannBase<EvalT, Traits>::NeumannBase(const Teuchos::ParameterList& p)
   side_type.resize(numSidesOnElem);
 
   // Build containers that depend on side topology
-  const char* sideTypeName;
+  char const* sideTypeName;
 
   maxSideDim = maxNumQpSide = 0;
   for (int i = 0; i < numSidesOnElem; ++i) {

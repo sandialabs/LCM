@@ -151,7 +151,7 @@ Albany::ResponseFactory::createResponseFunction(
       // Skip if dealing with interface block
       // if (meshSpecs[i]->ebName == "Surface Element") continue;
       // For these RFs, default to true for this parm.
-      const char* reb_parm = "Restrict to Element Block";
+      char const* reb_parm = "Restrict to Element Block";
       if (!responseParams.isType<bool>(reb_parm) &&
           (name == "IP to Nodal Field" || name == "Project IP to Nodal Field"))
         responseParams.set<bool>(reb_parm, true);

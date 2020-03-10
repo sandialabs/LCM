@@ -33,7 +33,7 @@ class DisplayTable
   std::ostream&
   write(std::ostream& strm);
   std::ostream&
-  writeCSV(std::ostream& strm, const char delim = ',');
+  writeCSV(std::ostream& strm, char const delim = ',');
 
  private:
   typedef std::vector<string> TableRow;

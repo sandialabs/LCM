@@ -46,7 +46,7 @@ imposeOrder(
   typedef std::map<std::string, int>                                  S2int;
 
   std::string const parm_name("BCOrder");
-  const char*       parm_val = "BCOrder_";
+  char const*       parm_val = "BCOrder_";
 
   // Get the order of the BCs as they are written in the input file.
   // ParameterList::ConstIterator preserves the text ordering.

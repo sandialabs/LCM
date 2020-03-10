@@ -31,7 +31,7 @@ template <typename EvalT>
 int
 getDerivativeDimensions(
     Albany::Application const*     app,
-    const Albany::MeshSpecsStruct* ms);
+    Albany::MeshSpecsStruct const* ms);
 //! Get derivative dimensions for Phalanx fields. Convenience wrapper. Can call
 //! this once app has the discretization.
 template <typename EvalT>

@@ -57,7 +57,7 @@ template <typename EvalT, typename Traits>
 IPtoNodalFieldBase<EvalT, Traits>::IPtoNodalFieldBase(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl,
-    const Albany::MeshSpecsStruct*       mesh_specs)
+    Albany::MeshSpecsStruct const*       mesh_specs)
     : weights_("Weights", dl->qp_scalar)
 {
   Teuchos::ParameterList* plist =
@@ -138,7 +138,7 @@ template <typename Traits>
 IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::IPtoNodalField(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl,
-    const Albany::MeshSpecsStruct*       mesh_specs)
+    Albany::MeshSpecsStruct const*       mesh_specs)
     : IPtoNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>(
           p,
           dl,

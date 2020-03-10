@@ -82,7 +82,7 @@ SideLaplacian::buildProblem(
             << "building the side mesh specs. (Did you forget to specify side "
                "set discretizations in the input file?)\n");
 
-    const Albany::MeshSpecsStruct& sideMeshSpecs =
+    Albany::MeshSpecsStruct const& sideMeshSpecs =
         *meshSpecs[0]->sideSetMeshSpecs.at(sideSetName)[0];
 
     // Building also side structures
@@ -135,7 +135,7 @@ SideLaplacian::buildProblem(
 Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
 SideLaplacian::buildEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    const Albany::MeshSpecsStruct&              meshSpecs,
+    Albany::MeshSpecsStruct const&              meshSpecs,
     Albany::StateManager&                       stateMgr,
     Albany::FieldManagerChoice                  fmchoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
@@ -151,7 +151,7 @@ SideLaplacian::buildEvaluators(
 
 void
 SideLaplacian::constructDirichletEvaluators(
-    const Albany::MeshSpecsStruct& meshSpecs)
+    Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(1, "U");

@@ -55,7 +55,7 @@ class ODEProblem : public AbstractProblem
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
   buildEvaluators(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      const Albany::MeshSpecsStruct&              meshSpecs,
+      Albany::MeshSpecsStruct const&              meshSpecs,
       Albany::StateManager&                       stateMgr,
       Albany::FieldManagerChoice                  fmchoice,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
@@ -79,13 +79,13 @@ class ODEProblem : public AbstractProblem
   Teuchos::RCP<const PHX::FieldTag>
   constructEvaluators(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      const Albany::MeshSpecsStruct&              meshSpecs,
+      Albany::MeshSpecsStruct const&              meshSpecs,
       Albany::StateManager&                       stateMgr,
       Albany::FieldManagerChoice                  fmchoice,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
 
   void
-  constructDirichletEvaluators(const Albany::MeshSpecsStruct& meshSpecs);
+  constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs);
 
  protected:
   int numDim;
@@ -107,7 +107,7 @@ template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>
 Albany::ODEProblem::constructEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    const Albany::MeshSpecsStruct&              meshSpecs,
+    Albany::MeshSpecsStruct const&              meshSpecs,
     Albany::StateManager&                       stateMgr,
     Albany::FieldManagerChoice                  fieldManagerChoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)

@@ -71,7 +71,7 @@ class ProjectIPtoNodalField : public ProjectIPtoNodalFieldBase<EvalT, Traits>
   ProjectIPtoNodalField(
       Teuchos::ParameterList& /* p */,
       const Teuchos::RCP<Albany::Layouts>& dl,
-      const Albany::MeshSpecsStruct* /* mesh_specs */)
+      Albany::MeshSpecsStruct const* /* mesh_specs */)
       : ProjectIPtoNodalFieldBase<EvalT, Traits>(dl)
   {
   }
@@ -100,7 +100,7 @@ class ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
   ProjectIPtoNodalField(
       Teuchos::ParameterList&              p,
       const Teuchos::RCP<Albany::Layouts>& dl,
-      const Albany::MeshSpecsStruct*       mesh_specs);
+      Albany::MeshSpecsStruct const*       mesh_specs);
   void
   postRegistrationSetup(
       typename Traits::SetupData d,

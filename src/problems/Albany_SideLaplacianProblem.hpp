@@ -61,7 +61,7 @@ class SideLaplacian : public Albany::AbstractProblem
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
   buildEvaluators(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      const Albany::MeshSpecsStruct&              meshSpecs,
+      Albany::MeshSpecsStruct const&              meshSpecs,
       Albany::StateManager&                       stateMgr,
       Albany::FieldManagerChoice                  fmchoice,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
@@ -76,7 +76,7 @@ class SideLaplacian : public Albany::AbstractProblem
   Teuchos::RCP<const PHX::FieldTag>
   constructEvaluators(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      const Albany::MeshSpecsStruct&              meshSpecs,
+      Albany::MeshSpecsStruct const&              meshSpecs,
       Albany::StateManager&                       stateMgr,
       Albany::FieldManagerChoice                  fmchoice,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
@@ -85,7 +85,7 @@ class SideLaplacian : public Albany::AbstractProblem
   Teuchos::RCP<const PHX::FieldTag>
   constructEvaluators2D(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      const Albany::MeshSpecsStruct&              meshSpecs,
+      Albany::MeshSpecsStruct const&              meshSpecs,
       Albany::StateManager&                       stateMgr,
       Albany::FieldManagerChoice                  fmchoice,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
@@ -94,13 +94,13 @@ class SideLaplacian : public Albany::AbstractProblem
   Teuchos::RCP<const PHX::FieldTag>
   constructEvaluators3D(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      const Albany::MeshSpecsStruct&              meshSpecs,
+      Albany::MeshSpecsStruct const&              meshSpecs,
       Albany::StateManager&                       stateMgr,
       Albany::FieldManagerChoice                  fmchoice,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
 
   void
-  constructDirichletEvaluators(const Albany::MeshSpecsStruct& meshSpecs);
+  constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs);
 
  protected:
   int numDim;
@@ -134,7 +134,7 @@ template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>
 SideLaplacian::constructEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    const Albany::MeshSpecsStruct&              meshSpecs,
+    Albany::MeshSpecsStruct const&              meshSpecs,
     Albany::StateManager&                       stateMgr,
     Albany::FieldManagerChoice                  fieldManagerChoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
@@ -151,7 +151,7 @@ template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>
 SideLaplacian::constructEvaluators2D(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    const Albany::MeshSpecsStruct&              meshSpecs,
+    Albany::MeshSpecsStruct const&              meshSpecs,
     Albany::StateManager&                       stateMgr,
     Albany::FieldManagerChoice                  fieldManagerChoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
@@ -222,9 +222,9 @@ SideLaplacian::constructEvaluators2D(
       Teuchos::rcp(new Teuchos::ParameterList("Param List"));
   {
     // response
-    Teuchos::RCP<const Albany::MeshSpecsStruct> meshSpecsPtr =
+    Teuchos::RCP<Albany::MeshSpecsStruct const> meshSpecsPtr =
         Teuchos::rcpFromRef(meshSpecs);
-    paramList->set<Teuchos::RCP<const Albany::MeshSpecsStruct>>(
+    paramList->set<Teuchos::RCP<Albany::MeshSpecsStruct const>>(
         "Mesh Specs Struct", meshSpecsPtr);
     paramList->set<Teuchos::RCP<ParamLib>>("Parameter Library", paramLib);
   }
@@ -247,7 +247,7 @@ template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>
 SideLaplacian::constructEvaluators3D(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    const Albany::MeshSpecsStruct&              meshSpecs,
+    Albany::MeshSpecsStruct const&              meshSpecs,
     Albany::StateManager&                       stateMgr,
     Albany::FieldManagerChoice                  fieldManagerChoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
@@ -349,9 +349,9 @@ SideLaplacian::constructEvaluators3D(
       Teuchos::rcp(new Teuchos::ParameterList("Param List"));
   {
     // response
-    Teuchos::RCP<const Albany::MeshSpecsStruct> meshSpecsPtr =
+    Teuchos::RCP<Albany::MeshSpecsStruct const> meshSpecsPtr =
         Teuchos::rcpFromRef(meshSpecs);
-    paramList->set<Teuchos::RCP<const Albany::MeshSpecsStruct>>(
+    paramList->set<Teuchos::RCP<Albany::MeshSpecsStruct const>>(
         "Mesh Specs Struct", meshSpecsPtr);
     paramList->set<Teuchos::RCP<ParamLib>>("Parameter Library", paramLib);
   }

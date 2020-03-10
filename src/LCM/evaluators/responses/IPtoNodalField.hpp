@@ -33,7 +33,7 @@ class IPtoNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   IPtoNodalFieldBase(
       Teuchos::ParameterList&              p,
       const Teuchos::RCP<Albany::Layouts>& dl,
-      const Albany::MeshSpecsStruct*       mesh_specs);
+      Albany::MeshSpecsStruct const*       mesh_specs);
 
   void
   postRegistrationSetup(
@@ -89,7 +89,7 @@ class IPtoNodalField : public IPtoNodalFieldBase<EvalT, Traits>
   IPtoNodalField(
       Teuchos::ParameterList&              p,
       const Teuchos::RCP<Albany::Layouts>& dl,
-      const Albany::MeshSpecsStruct*       mesh_specs)
+      Albany::MeshSpecsStruct const*       mesh_specs)
       : IPtoNodalFieldBase<EvalT, Traits>(p, dl, mesh_specs)
   {
   }
@@ -132,7 +132,7 @@ class IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
   IPtoNodalField(
       Teuchos::ParameterList&              p,
       const Teuchos::RCP<Albany::Layouts>& dl,
-      const Albany::MeshSpecsStruct*       mesh_specs);
+      Albany::MeshSpecsStruct const*       mesh_specs);
   void
   preEvaluate(typename Traits::PreEvalData d);
   void

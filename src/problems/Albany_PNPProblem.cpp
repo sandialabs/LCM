@@ -72,7 +72,7 @@ Albany::PNPProblem::buildProblem(
 Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
 Albany::PNPProblem::buildEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    const Albany::MeshSpecsStruct&              meshSpecs,
+    Albany::MeshSpecsStruct const&              meshSpecs,
     Albany::StateManager&                       stateMgr,
     Albany::FieldManagerChoice                  fmchoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
@@ -87,7 +87,7 @@ Albany::PNPProblem::buildEvaluators(
 
 void
 Albany::PNPProblem::constructDirichletEvaluators(
-    const Albany::MeshSpecsStruct& meshSpecs)
+    Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);

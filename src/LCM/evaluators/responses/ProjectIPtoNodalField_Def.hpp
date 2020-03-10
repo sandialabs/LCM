@@ -208,7 +208,7 @@ static Teuchos::RCP<ProjectIPtoNodalFieldQuadrature>
 initQuadMgr(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl,
-    const Albany::MeshSpecsStruct*       mesh_specs)
+    Albany::MeshSpecsStruct const*       mesh_specs)
 {
   int const min_quad_deg =
       mesh_specs->ctd.node_count > mesh_specs->ctd.vertex_count ? 4 : 2;
@@ -484,7 +484,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
     ProjectIPtoNodalField(
         Teuchos::ParameterList&              p,
         const Teuchos::RCP<Albany::Layouts>& dl,
-        const Albany::MeshSpecsStruct*       mesh_specs)
+        Albany::MeshSpecsStruct const*       mesh_specs)
     : ProjectIPtoNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>(dl),
       wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       BF(p.get<std::string>("BF Name"), dl->node_qp_scalar),

@@ -28,7 +28,7 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
     Teuchos::ParameterList&                responseParams,
     Teuchos::RCP<Teuchos::ParameterList>   paramsFromProblem,
     Albany::StateManager&                  stateMgr,
-    const Albany::MeshSpecsStruct*         meshSpecs)
+    Albany::MeshSpecsStruct const*         meshSpecs)
 {
   using PHX::DataLayout;
   using Teuchos::ParameterList;

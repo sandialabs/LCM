@@ -70,7 +70,7 @@ Albany::ThermoElasticityProblem::buildProblem(
 Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
 Albany::ThermoElasticityProblem::buildEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    const Albany::MeshSpecsStruct&              meshSpecs,
+    Albany::MeshSpecsStruct const&              meshSpecs,
     Albany::StateManager&                       stateMgr,
     Albany::FieldManagerChoice                  fmchoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
@@ -85,7 +85,7 @@ Albany::ThermoElasticityProblem::buildEvaluators(
 
 void
 Albany::ThermoElasticityProblem::constructDirichletEvaluators(
-    const Albany::MeshSpecsStruct& meshSpecs)
+    Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);

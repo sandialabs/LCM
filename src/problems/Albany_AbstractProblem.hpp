@@ -110,7 +110,7 @@ class AbstractProblem
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
   buildEvaluators(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      const Albany::MeshSpecsStruct&              meshSpecs,
+      Albany::MeshSpecsStruct const&              meshSpecs,
       Albany::StateManager&                       stateMgr,
       Albany::FieldManagerChoice                  fmchoice,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList) = 0;
@@ -259,7 +259,7 @@ struct ConstructEvaluatorsOp
 {
   ProblemType&                                                    prob;
   PHX::FieldManager<PHAL::AlbanyTraits>&                          fm;
-  const Albany::MeshSpecsStruct&                                  meshSpecs;
+  Albany::MeshSpecsStruct const&                                  meshSpecs;
   Albany::StateManager&                                           stateMgr;
   Albany::FieldManagerChoice                                      fmchoice;
   Teuchos::RCP<Teuchos::ParameterList>                            responseList;
@@ -267,7 +267,7 @@ struct ConstructEvaluatorsOp
   ConstructEvaluatorsOp(
       ProblemType&                                prob_,
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm_,
-      const Albany::MeshSpecsStruct&              meshSpecs_,
+      Albany::MeshSpecsStruct const&              meshSpecs_,
       Albany::StateManager&                       stateMgr_,
       Albany::FieldManagerChoice                  fmchoice_ = BUILD_RESID_FM,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList_ = Teuchos::null)

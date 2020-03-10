@@ -64,7 +64,7 @@ Albany::ConstitutiveDriverProblem::buildProblem(
 Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
 Albany::ConstitutiveDriverProblem::buildEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    const Albany::MeshSpecsStruct&              meshSpecs,
+    Albany::MeshSpecsStruct const&              meshSpecs,
     Albany::StateManager&                       stateMgr,
     Albany::FieldManagerChoice                  fmchoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)

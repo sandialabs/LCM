@@ -15,7 +15,7 @@ template <>
 int
 getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
     Albany::Application const*     app,
-    const Albany::MeshSpecsStruct* ms)
+    Albany::MeshSpecsStruct const* ms)
 {
   const Teuchos::RCP<const Teuchos::ParameterList> pl = app->getProblemPL();
   if (Teuchos::nonnull(pl)) {

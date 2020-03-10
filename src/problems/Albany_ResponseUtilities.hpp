@@ -43,7 +43,7 @@ class ResponseUtilities
       // response function needs to know whether there are separate field
       // managers for each element block. We can't use an RCP here because at
       // the caller's level meshSpecs is a raw ref, so ownership is unknown.
-      const Albany::MeshSpecsStruct* meshSpecs = NULL);
+      Albany::MeshSpecsStruct const* meshSpecs = NULL);
 
   //! Utility for parsing response requests and creating response field manager
   //! (Convenience overload in the absence of parameters list from problem)

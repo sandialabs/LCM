@@ -427,7 +427,7 @@ STKDiscretization::STKDiscretization(
     Teuchos::RCP<Albany::AbstractSTKMeshStruct>&   stkMeshStruct_,
     const Teuchos::RCP<const Teuchos_Comm>&        comm_,
     const Teuchos::RCP<Albany::RigidBodyModes>&    rigidBodyModes_,
-    const std::map<int, std::vector<std::string>>& sideSetEquations_)
+    std::map<int, std::vector<std::string>> const& sideSetEquations_)
     : previous_time_label(-1.0e32),
       out(Teuchos::VerboseObjectBase::getDefaultOStream()),
       metaData(*stkMeshStruct_->metaData),
@@ -2942,8 +2942,8 @@ STKDiscretization::buildSideSetProjectors()
     ov_graphP = Teuchos::rcp(
         new ThyraCrsMatrixFactory(getOverlapVectorSpace(), ss_ov_vs, 1));
 
-    const std::map<GO, GO>& side_cell_map = sideToSideSetCellMap.at(it.first);
-    const std::map<GO, std::vector<int>>& node_numeration_map =
+    std::map<GO, GO> const& side_cell_map = sideToSideSetCellMap.at(it.first);
+    std::map<GO, std::vector<int>> const& node_numeration_map =
         sideNodeNumerationMap.at(it.first);
     std::set<GO> processed_node;
     GO           node_gid, ss_node_gid, side_gid, ss_cell_gid;

@@ -609,7 +609,7 @@ Albany::StateManager::getStateInfoStruct() const
   return stateInfo;
 }
 
-const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>&
+std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
 Albany::StateManager::getSideSetStateInfoStruct() const
 {
   return sideSetStateInfo;

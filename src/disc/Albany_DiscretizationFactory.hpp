@@ -61,15 +61,16 @@ class DiscretizationFactory
   Teuchos::RCP<Albany::AbstractDiscretization>
   createDiscretization(
       unsigned int                                   num_equations,
-      const std::map<int, std::vector<std::string>>& sideSetEquations,
+      std::map<int, std::vector<std::string>> const& sideSetEquations,
       const Teuchos::RCP<Albany::StateInfoStruct>&   sis,
-      const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>&
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
                                                                 side_set_sis,
       const AbstractFieldContainer::FieldContainerRequirements& req,
-      const std::map<
+      std::map<
           std::string,
-          AbstractFieldContainer::FieldContainerRequirements>& side_set_req,
-      const Teuchos::RCP<Albany::RigidBodyModes>&              rigidBodyModes =
+          AbstractFieldContainer::FieldContainerRequirements> const&
+                                                  side_set_req,
+      const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes =
           Teuchos::null);
 
   void
@@ -82,12 +83,13 @@ class DiscretizationFactory
   setupInternalMeshStruct(
       unsigned int                                 neq,
       const Teuchos::RCP<Albany::StateInfoStruct>& sis,
-      const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>&
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
                                                                 side_set_sis,
       const AbstractFieldContainer::FieldContainerRequirements& req,
-      const std::map<
+      std::map<
           std::string,
-          AbstractFieldContainer::FieldContainerRequirements>& side_set_req);
+          AbstractFieldContainer::FieldContainerRequirements> const&
+          side_set_req);
 
   Teuchos::RCP<Albany::AbstractDiscretization>
   createDiscretizationFromInternalMeshStruct(
@@ -95,7 +97,7 @@ class DiscretizationFactory
 
   Teuchos::RCP<Albany::AbstractDiscretization>
   createDiscretizationFromInternalMeshStruct(
-      const std::map<int, std::vector<std::string>>& sideSetEquations,
+      std::map<int, std::vector<std::string>> const& sideSetEquations,
       const Teuchos::RCP<Albany::RigidBodyModes>&    rigidBodyModes);
 
   /* This function overwrite previous discretization parameter list */
@@ -110,8 +112,8 @@ class DiscretizationFactory
   DiscretizationFactory&
   operator=(const DiscretizationFactory&);
 
-  const std::map<int, std::vector<std::string>> empty_side_set_equations;
-  const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>
+  std::map<int, std::vector<std::string>> const empty_side_set_equations;
+  std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const
       empty_side_set_sis;
   const std::
       map<std::string, AbstractFieldContainer::FieldContainerRequirements>

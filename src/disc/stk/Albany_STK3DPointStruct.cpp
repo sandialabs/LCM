@@ -60,11 +60,11 @@ Albany::STK3DPointStruct::setFieldAndBulkData(
     const AbstractFieldContainer::FieldContainerRequirements& req,
     const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
     const unsigned int                                        worksetSize,
-    const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>&
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
         side_set_sis,
-    const std::map<
+    std::map<
         std::string,
-        AbstractFieldContainer::FieldContainerRequirements>& side_set_req)
+        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   std::cout << "---3DPoint::setFieldAndBulkData---" << std::endl;
   SetupFieldData(commT, neq_, req, sis, worksetSize);

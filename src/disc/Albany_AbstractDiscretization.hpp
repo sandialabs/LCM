@@ -186,11 +186,11 @@ class AbstractDiscretization
   getSideSetDiscretizations() const = 0;
 
   //! Get the map side_id->side_set_elem_id
-  virtual const std::map<std::string, std::map<GO, GO>>&
+  virtual std::map<std::string, std::map<GO, GO>> const&
   getSideToSideSetCellMap() const = 0;
 
   //! Get the map side_node_id->side_set_cell_node_id
-  virtual const std::map<std::string, std::map<GO, std::vector<int>>>&
+  virtual std::map<std::string, std::map<GO, std::vector<int>>> const&
   getSideNodeNumerationMap() const = 0;
 
   //! Get MeshStruct

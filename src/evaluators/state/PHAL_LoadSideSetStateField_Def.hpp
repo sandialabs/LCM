@@ -79,7 +79,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
       "Error! Side discretization is invalid for side set " << sideSetName
                                                             << ".\n");
 
-  const std::map<std::string, std::map<GO, GO>>& ss_maps =
+  std::map<std::string, std::map<GO, GO>> const& ss_maps =
       workset.disc->getSideToSideSetCellMap();
 
   ALBANY_PANIC(
@@ -87,7 +87,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
       "Error! Something is off: the mesh has side discretization but no "
       "sideId-to-sideSetElemId map.\n");
 
-  const std::map<GO, GO>& ss_map = ss_maps.at(sideSetName);
+  std::map<GO, GO> const& ss_map = ss_maps.at(sideSetName);
 
   // Get states from STK mesh
   Albany::StateArrays&   state_arrays = ss_disc->getStateArrays();
@@ -100,7 +100,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
       workset.disc->getSideNodeNumerationMap().find(sideSetName) ==
           workset.disc->getSideNodeNumerationMap().end(),
       "Error! Sideset " << sideSetName << " has no sideNodeNumeration map.\n");
-  const std::map<GO, std::vector<int>>& sideNodeNumerationMap =
+  std::map<GO, std::vector<int>> const& sideNodeNumerationMap =
       workset.disc->getSideNodeNumerationMap().at(sideSetName);
 
   // Establishing the kind of field layout

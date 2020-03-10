@@ -138,10 +138,11 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   void
   finalizeSideSetMeshStructs(
       const Teuchos::RCP<const Teuchos_Comm>& commT,
-      const std::map<
+      std::map<
           std::string,
-          AbstractFieldContainer::FieldContainerRequirements>& side_set_req,
-      const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>&
+          AbstractFieldContainer::FieldContainerRequirements> const&
+          side_set_req,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
           side_set_sis,
       int worksetSize);
 

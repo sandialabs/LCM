@@ -358,17 +358,17 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
 template <unsigned Dim, class traits>
 void
 Albany::TmplSTKMeshStruct<Dim, traits>::setFieldAndBulkData(
-    const Teuchos::RCP<const Teuchos_Comm>&                   commT,
-    const Teuchos::RCP<Teuchos::ParameterList>&               params,
-    const unsigned int                                        neq_,
-    const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-    const unsigned int                                        worksetSize,
-    const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>&
+    Teuchos::RCP<const Teuchos_Comm> const&                   commT,
+    Teuchos::RCP<Teuchos::ParameterList> const&               params,
+    unsigned int const                                        neq_,
+    AbstractFieldContainer::FieldContainerRequirements const& req,
+    Teuchos::RCP<Albany::StateInfoStruct> const&              sis,
+    unsigned int const                                        worksetSize,
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
         side_set_sis,
-    const std::map<
+    std::map<
         std::string,
-        AbstractFieldContainer::FieldContainerRequirements>& side_set_req)
+        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   // Create global mesh: Dim-D structured, rectangular
 
@@ -653,13 +653,13 @@ Albany::TmplSTKMeshStruct<0, Albany::albany_stk_mesh_traits<0>>::
         const AbstractFieldContainer::FieldContainerRequirements& req,
         const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
         const unsigned int                                        worksetSize,
-        const std::map<
+        std::map<
             std::string,
-            Teuchos::RCP<Albany::StateInfoStruct>>& /*side_set_sis*/,
-        const std::map<
+            Teuchos::RCP<Albany::StateInfoStruct>> const& /*side_set_sis*/,
+        std::map<
             std::string,
             AbstractFieldContainer::
-                FieldContainerRequirements>& /*side_set_req*/)
+                FieldContainerRequirements> const& /*side_set_req*/)
 {
   SetupFieldData(commT, neq_, req, sis, worksetSize);
 

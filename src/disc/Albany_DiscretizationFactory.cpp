@@ -251,15 +251,15 @@ Albany::DiscretizationFactory::createDiscretization(
 Teuchos::RCP<Albany::AbstractDiscretization>
 Albany::DiscretizationFactory::createDiscretization(
     unsigned int                                   neq,
-    const std::map<int, std::vector<std::string>>& sideSetEquations,
+    std::map<int, std::vector<std::string>> const& sideSetEquations,
     const Teuchos::RCP<Albany::StateInfoStruct>&   sis,
-    const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>&
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
                                                               side_set_sis,
     const AbstractFieldContainer::FieldContainerRequirements& req,
-    const std::map<
+    std::map<
         std::string,
-        AbstractFieldContainer::FieldContainerRequirements>& side_set_req,
-    const Teuchos::RCP<Albany::RigidBodyModes>&              rigidBodyModes)
+        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req,
+    const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes)
 {
   ALBANY_PANIC(
       meshStruct == Teuchos::null,
@@ -297,12 +297,12 @@ void
 Albany::DiscretizationFactory::setupInternalMeshStruct(
     unsigned int                                 neq,
     const Teuchos::RCP<Albany::StateInfoStruct>& sis,
-    const std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>&
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
                                                               side_set_sis,
     const AbstractFieldContainer::FieldContainerRequirements& req,
-    const std::map<
+    std::map<
         std::string,
-        AbstractFieldContainer::FieldContainerRequirements>& side_set_req)
+        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   meshStruct->setFieldAndBulkData(
       commT,
@@ -325,7 +325,7 @@ Albany::DiscretizationFactory::createDiscretizationFromInternalMeshStruct(
 
 Teuchos::RCP<Albany::AbstractDiscretization>
 Albany::DiscretizationFactory::createDiscretizationFromInternalMeshStruct(
-    const std::map<int, std::vector<std::string>>& sideSetEquations,
+    std::map<int, std::vector<std::string>> const& sideSetEquations,
     const Teuchos::RCP<Albany::RigidBodyModes>&    rigidBodyModes)
 {
   if (!piroParams.is_null() && !rigidBodyModes.is_null()) {

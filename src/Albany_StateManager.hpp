@@ -171,14 +171,14 @@ class StateManager
   importStateData(Albany::StateArrays& statesToCopyFrom);
 
   /// Method to get the Names of the state variables
-  const std::map<std::string, RegisteredStates>&
+  std::map<std::string, RegisteredStates> const&
   getRegisteredStates() const
   {
     return statesToStore;
   }
 
   /// Method to get the Names of the state variables
-  const std::map<std::string, std::map<std::string, RegisteredStates>>&
+  std::map<std::string, std::map<std::string, RegisteredStates>> const&
   getRegisteredSideSetStates() const
   {
     return sideSetStatesToStore;
@@ -201,7 +201,7 @@ class StateManager
   getStateInfoStruct() const;
 
   /// Equivalent of previous method for the sideSets states
-  const std::map<std::string, Teuchos::RCP<StateInfoStruct>>&
+  std::map<std::string, Teuchos::RCP<StateInfoStruct>> const&
   getSideSetStateInfoStruct() const;
 
   /// Method to set discretization object

@@ -170,7 +170,7 @@ main(int ac, char* av[])
     Albany::MDArray stk_partition = state_array["Partition"];
 
     for (Albany::MDArray::size_type j = 0; j < stk_partition.size(); ++j) {
-      const std::map<int, int>::const_iterator partitions_iterator =
+      std::map<int, int>::const_iterator const partitions_iterator =
           partitions.find(element);
 
       if (partitions_iterator == partitions.end()) {

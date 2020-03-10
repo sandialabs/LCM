@@ -107,7 +107,7 @@ class STKDiscretization : public AbstractDiscretization
       Teuchos::RCP<AbstractSTKMeshStruct>&        stkMeshStruct,
       const Teuchos::RCP<const Teuchos_Comm>&     comm,
       const Teuchos::RCP<RigidBodyModes>& rigidBodyModes = Teuchos::null,
-      const std::map<int, std::vector<std::string>>& sideSetEquations =
+      std::map<int, std::vector<std::string>> const& sideSetEquations =
           std::map<int, std::vector<std::string>>());
 
   //! Destructor
@@ -386,13 +386,13 @@ class STKDiscretization : public AbstractDiscretization
     return sideSetDiscretizations;
   }
 
-  const std::map<std::string, std::map<GO, GO>>&
+  std::map<std::string, std::map<GO, GO>> const&
   getSideToSideSetCellMap() const
   {
     return sideToSideSetCellMap;
   }
 
-  const std::map<std::string, std::map<GO, std::vector<int>>>&
+  std::map<std::string, std::map<GO, std::vector<int>>> const&
   getSideNodeNumerationMap() const
   {
     return sideNodeNumerationMap;

@@ -462,10 +462,10 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
     const AbstractFieldContainer::FieldContainerRequirements&   req,
     const Teuchos::RCP<StateInfoStruct>&                        sis,
     const unsigned int                                          worksetSize,
-    const std::map<std::string, Teuchos::RCP<StateInfoStruct>>& side_set_sis,
-    const std::map<
+    std::map<std::string, Teuchos::RCP<StateInfoStruct>> const& side_set_sis,
+    std::map<
         std::string,
-        AbstractFieldContainer::FieldContainerRequirements>& side_set_req)
+        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   this->SetupFieldData(comm, neq_, req, sis, worksetSize);
 

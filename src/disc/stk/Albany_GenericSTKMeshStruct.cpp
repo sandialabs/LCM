@@ -939,11 +939,11 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
 void
 GenericSTKMeshStruct::finalizeSideSetMeshStructs(
     const Teuchos::RCP<const Teuchos_Comm>& comm,
-    const std::map<
+    std::map<
         std::string,
-        AbstractFieldContainer::FieldContainerRequirements>&    side_set_req,
-    const std::map<std::string, Teuchos::RCP<StateInfoStruct>>& side_set_sis,
-    int                                                         worksetSize)
+        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req,
+    std::map<std::string, Teuchos::RCP<StateInfoStruct>> const&    side_set_sis,
+    int                                                            worksetSize)
 {
   if (this->sideSetMeshStructs.size() > 0) {
     // Dummy sis/req if not present in the maps for a given side set.

@@ -116,7 +116,7 @@ SideSetSTKMeshStruct::~SideSetSTKMeshStruct()
 
 void
 SideSetSTKMeshStruct::setParentMeshInfo(
-    const AbstractSTKMeshStruct& parentMeshStruct_,
+    AbstractSTKMeshStruct const& parentMeshStruct_,
     std::string const&           sideSetName)
 {
   parentMeshStruct      = Teuchos::rcpFromRef(parentMeshStruct_);
@@ -125,17 +125,18 @@ SideSetSTKMeshStruct::setParentMeshInfo(
 
 void
 SideSetSTKMeshStruct::setFieldAndBulkData(
-    const Teuchos::RCP<const Teuchos_Comm>& commT,
-    const Teuchos::RCP<Teuchos::ParameterList>& /*params*/,
-    const unsigned int                                        neq_,
-    const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<StateInfoStruct>&                      sis,
-    const unsigned int                                        worksetSize,
-    const std::
-        map<std::string, Teuchos::RCP<StateInfoStruct>>& /*side_set_sis*/,
-    const std::map<
+    Teuchos::RCP<const Teuchos_Comm> const& commT,
+    Teuchos::RCP<Teuchos::ParameterList> const& /*params*/,
+    unsigned int const                                        neq_,
+    AbstractFieldContainer::FieldContainerRequirements const& req,
+    Teuchos::RCP<StateInfoStruct> const&                      sis,
+    unsigned int const                                        worksetSize,
+    std::
+        map<std::string, Teuchos::RCP<StateInfoStruct>> const& /*side_set_sis*/,
+    std::map<
         std::string,
-        AbstractFieldContainer::FieldContainerRequirements>& /*side_set_req*/)
+        AbstractFieldContainer::
+            FieldContainerRequirements> const& /*side_set_req*/)
 {
   this->SetupFieldData(commT, neq_, req, sis, worksetSize);
 

@@ -155,7 +155,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
       "Error! Side discretization is invalid for side set " << sideSetName
                                                             << ".\n");
 
-  const std::map<std::string, std::map<GO, GO>>& ss_maps =
+  std::map<std::string, std::map<GO, GO>> const& ss_maps =
       workset.disc->getSideToSideSetCellMap();
 
   ALBANY_PANIC(
@@ -163,7 +163,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
       "Error! Something is off: the mesh has side discretization but no "
       "sideId-to-sideSetElemId map.\n");
 
-  const std::map<GO, GO>& ss_map = ss_maps.at(sideSetName);
+  std::map<GO, GO> const& ss_map = ss_maps.at(sideSetName);
 
   // Get states from STK mesh
   Albany::StateArrays&   state_arrays = ss_disc->getStateArrays();
@@ -176,7 +176,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
       workset.disc->getSideNodeNumerationMap().find(sideSetName) ==
           workset.disc->getSideNodeNumerationMap().end(),
       "Error! Sideset " << sideSetName << " has no sideNodeNumeration map.\n");
-  const std::map<GO, std::vector<int>>& sideNodeNumerationMap =
+  std::map<GO, std::vector<int>> const& sideNodeNumerationMap =
       workset.disc->getSideNodeNumerationMap().at(sideSetName);
 
   // Establishing the kind of field layout
@@ -318,7 +318,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   Teuchos::RCP<Albany::AbstractDiscretization> ss_disc =
       ssDiscs.at(sideSetName);
 
-  const std::map<std::string, std::map<GO, GO>>& ss_maps =
+  std::map<std::string, std::map<GO, GO>> const& ss_maps =
       disc->getSideToSideSetCellMap();
 
   ALBANY_PANIC(

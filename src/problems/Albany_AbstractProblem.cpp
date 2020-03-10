@@ -74,7 +74,7 @@ Albany::AbstractProblem::numEquations() const
   return neq;
 }
 
-const std::map<int, std::vector<std::string>>&
+std::map<int, std::vector<std::string>> const&
 Albany::AbstractProblem::getSideSetEquations() const
 {
   return sideSetEquations;

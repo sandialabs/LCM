@@ -80,7 +80,7 @@ class AbstractProblem
   //! Get the number of equations
   unsigned int
   numEquations() const;
-  const std::map<int, std::vector<std::string>>&
+  std::map<int, std::vector<std::string>> const&
   getSideSetEquations() const;
   void
   setNumEquations(int const neq_);

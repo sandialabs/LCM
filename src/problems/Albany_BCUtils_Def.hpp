@@ -37,7 +37,7 @@ plName(std::string const& name)
 void
 imposeOrder(
     const Teuchos::ParameterList& bc_pl,
-    const std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>>&
+    std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>> const&
         evname2pl)
 {
   using Teuchos::ParameterList;

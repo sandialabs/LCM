@@ -17,7 +17,7 @@ getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
     Albany::Application const*     app,
     Albany::MeshSpecsStruct const* ms)
 {
-  const Teuchos::RCP<Teuchos::ParameterList const> pl = app->getProblemPL();
+  Teuchos::RCP<Teuchos::ParameterList const> const pl = app->getProblemPL();
   if (Teuchos::nonnull(pl)) {
     bool const extrudedColumnCoupled =
         pl->isParameter("Extruded Column Coupled in 2D Response") ?
@@ -41,7 +41,7 @@ getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
     Albany::Application const* app,
     int const                  ebi)
 {
-  const Teuchos::RCP<Teuchos::ParameterList const> pl = app->getProblemPL();
+  Teuchos::RCP<Teuchos::ParameterList const> const pl = app->getProblemPL();
   if (Teuchos::nonnull(pl)) {
     std::string const problemName =
         pl->isType<std::string>("Name") ? pl->get<std::string>("Name") : "";

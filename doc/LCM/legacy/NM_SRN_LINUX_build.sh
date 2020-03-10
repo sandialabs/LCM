@@ -357,7 +357,6 @@ rm CMakeCache.txt
 cmake  \\
     -D ALBANY_TRILINOS_DIR:FILEPATH=$INSTALL_DIR \\
     -D CMAKE_VERBOSE_MAKEFILE:BOOL=OFF \\
-    -D ENABLE_LCM:BOOL=ON \\
     ../" > albany_config.sh
 chmod a+x albany_config.sh
 echo " -- configuring $TARGET"

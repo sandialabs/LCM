@@ -491,7 +491,6 @@ else()
   set(ALBANY_DEMO_PDES FALSE)
 endif()
 
-option(ENABLE_LCM_TEST_EXES "Flag to turn on LCM Mechanics test executables" ON)
 option(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS
        "Flag to turn off LCM exodiff sensitive tests" OFF)
 set(LCM_TEST_EXES TRUE)
@@ -720,16 +719,12 @@ message("\nMiscellaneous Albany Options:")
 
 # Optional OpenMP settings
 if(ALBANY_ENABLE_OPENMP)
-  if(ENABLE_LARGE_TESTS AND ENABLE_LCM)
     message(
       "---> LCM WARNING: turning off OrientationOnMesh tests since KokkosNode = OpenMP (see issue #339)!"
     )
-  endif(ENABLE_LARGE_TESTS AND ENABLE_LCM)
-  if(ENABLE_LCM)
     message(
       "---> LCM WARNING: turning off ACE tests since KokkosNode = OpenMP (see issue #501)!"
     )
-  endif(ENABLE_LCM)
 endif()
 
 # set optional dependency on the BGL, defaults to Enabled This option is added

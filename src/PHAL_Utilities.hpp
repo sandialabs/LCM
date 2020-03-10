@@ -107,14 +107,14 @@ template <typename T>
 void
 reduceAll(
     Teuchos_Comm const&           comm,
-    const Teuchos::EReductionType reduct_type,
+    Teuchos::EReductionType const reduct_type,
     PHX::MDField<T>&              a);
 //! Reduce on a ScalarT.
 template <typename T>
 void
 reduceAll(
     Teuchos_Comm const&           comm,
-    const Teuchos::EReductionType reduct_type,
+    Teuchos::EReductionType const reduct_type,
     T&                            a);
 //! Broadcast an MDField.
 template <typename T>

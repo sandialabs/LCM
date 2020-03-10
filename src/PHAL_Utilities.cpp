@@ -96,7 +96,7 @@ template <typename ScalarT>
 void
 myReduceAll(
     Teuchos_Comm const&           comm,
-    const Teuchos::EReductionType reduct_type,
+    Teuchos::EReductionType const reduct_type,
     std::vector<ScalarT>&         v)
 {
   typedef typename ScalarT::value_type ValueT;
@@ -129,7 +129,7 @@ template <>
 void
 myReduceAll<RealType>(
     Teuchos_Comm const&           comm,
-    const Teuchos::EReductionType reduct_type,
+    Teuchos::EReductionType const reduct_type,
     std::vector<RealType>&        v)
 {
   std::vector<RealType> send(v);
@@ -143,7 +143,7 @@ template <typename ScalarT>
 void
 reduceAll(
     Teuchos_Comm const&           comm,
-    const Teuchos::EReductionType reduct_type,
+    Teuchos::EReductionType const reduct_type,
     PHX::MDField<ScalarT>&        a)
 {
   std::vector<ScalarT> v;
@@ -156,7 +156,7 @@ template <typename ScalarT>
 void
 reduceAll(
     Teuchos_Comm const&           comm,
-    const Teuchos::EReductionType reduct_type,
+    Teuchos::EReductionType const reduct_type,
     ScalarT&                      a)
 {
   ScalarT b = a;
@@ -186,12 +186,12 @@ broadcast(
 
 #define eti(T)                \
   template void reduceAll<T>( \
-      Teuchos_Comm const&, const Teuchos::EReductionType, PHX::MDField<T>&);
+      Teuchos_Comm const&, Teuchos::EReductionType const, PHX::MDField<T>&);
 apply_to_all_ad_types(eti)
 #undef eti
 #define eti(T)                \
   template void reduceAll<T>( \
-      Teuchos_Comm const&, const Teuchos::EReductionType, T&);
+      Teuchos_Comm const&, Teuchos::EReductionType const, T&);
     apply_to_all_ad_types(eti)
 #undef eti
 #define eti(T)                \

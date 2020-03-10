@@ -176,7 +176,7 @@ STKAdapt<SizeField>::adaptMesh(
 
 #if 0
     std::vector<stk::mesh::Entity> elems;
-    const std::vector<stk::mesh::Bucket*>& buckets = eMesh->get_bulk_data()->buckets(eMesh->element_rank());
+    std::vector<stk::mesh::Bucket*> const& buckets = eMesh->get_bulk_data()->buckets(eMesh->element_rank());
 
     for(std::vector<stk::mesh::Bucket*>::const_iterator k = buckets.begin() ; k != buckets.end() ; ++k) {
       stk::mesh::Bucket& bucket = **k ;

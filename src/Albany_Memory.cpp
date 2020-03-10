@@ -152,7 +152,7 @@ class MemoryAnalyzer
   }
 
   void
-  calcStats(const std::vector<Int>& d)
+  calcStats(std::vector<Int> const& d)
   {
     if (comm_->getRank() != 0) return;
 

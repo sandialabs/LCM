@@ -244,7 +244,7 @@ Topology::getDistanceNodeAndPoint(
 //  intersects the ellipsoid.
 //
 std::vector<std::vector<double>>
-Topology::getCoordinatesOfTriangle(const std::vector<double> normalToPlane)
+Topology::getCoordinatesOfTriangle(std::vector<double> const normalToPlane)
 {
   // vectorA, vectorB, and vectorC are vectors of magnitude R (radius
   // of the circle).  vectors B1, B2, and C1 are component unit vectors
@@ -550,8 +550,8 @@ Topology::meshEdgesShortestPath()
 //
 std::vector<std::vector<int>>
 Topology::shortestpathOnBoundaryFaces(
-    const std::vector<stk::mesh::Entity>& nodes,
-    const std::vector<stk::mesh::Entity>& MeshEdgesShortestPath)
+    std::vector<stk::mesh::Entity> const& nodes,
+    std::vector<stk::mesh::Entity> const& MeshEdgesShortestPath)
 {
   typedef float                                              Weight;
   typedef boost::property<boost::edge_weight_t, Weight>      WeightProperty;
@@ -722,7 +722,7 @@ Topology::shortestpathOnBoundaryFaces(
 //
 //
 std::vector<std::vector<int>>
-Topology::shortestpath(const std::vector<stk::mesh::Entity>& nodes)
+Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
 {
   typedef float                                              Weight;
   typedef boost::property<boost::edge_weight_t, Weight>      WeightProperty;

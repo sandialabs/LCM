@@ -176,7 +176,7 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
   Albany::SideSetList::const_iterator it     = ssList.find(sideset);
 
   if (it != ssList.end()) {
-    const std::vector<Albany::SideStruct>& sideSet = it->second;
+    std::vector<Albany::SideStruct> const& sideSet = it->second;
 
     auto overlapNodeVS   = workset.disc->getOverlapNodeVectorSpace();
     auto ov_node_indexer = Albany::createGlobalLocalIndexer(overlapNodeVS);

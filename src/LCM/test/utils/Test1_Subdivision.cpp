@@ -27,8 +27,8 @@ return_number_entities(LCM::Topology& topology_);
 //
 std::string
 verify_subdivision(
-    const std::vector<int>& former_num_entities,
-    const std::vector<int>& final_num_entities);
+    std::vector<int> const& former_num_entities,
+    std::vector<int> const& final_num_entities);
 
 int
 main(int ac, char* av[])
@@ -144,8 +144,8 @@ return_number_entities(LCM::Topology& topology_)
 //
 std::string
 verify_subdivision(
-    const std::vector<int>& former_num_entities,
-    const std::vector<int>& final_num_entities)
+    std::vector<int> const& former_num_entities,
+    std::vector<int> const& final_num_entities)
 {
   // Verify the number of nodes
   int final_number_nodes = former_num_entities[0] + former_num_entities[1] +

@@ -87,7 +87,7 @@ class CahnHillProblem : public AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
 
   void
-  constructDirichletEvaluators(const std::vector<std::string>& nodeSetIDs);
+  constructDirichletEvaluators(std::vector<std::string> const& nodeSetIDs);
 
  protected:
   int numDim;

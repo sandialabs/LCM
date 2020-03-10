@@ -50,8 +50,8 @@ void
 get_entities_through_relations(
     stk::mesh::BulkData&                                 bulk_data,
     percept::MyPairIterRelation&                         rel,
-    const std::vector<stk::mesh::Entity>::const_iterator i_beg,
-    const std::vector<stk::mesh::Entity>::const_iterator i_end,
+    std::vector<stk::mesh::Entity>::const_iterator const i_beg,
+    std::vector<stk::mesh::Entity>::const_iterator const i_end,
     std::vector<stk::mesh::Entity>&                      entities_related)
 {
   for (unsigned ii = 0; ii < rel.size(); ++ii) {
@@ -77,7 +77,7 @@ get_entities_through_relations(
 void
 get_entities_through_relations(
     stk::mesh::BulkData&                  bulk_data,
-    const std::vector<stk::mesh::Entity>& entities,
+    std::vector<stk::mesh::Entity> const& entities,
     stk::mesh::EntityRank                 entities_related_rank,
     std::vector<stk::mesh::Entity>&       entities_related)
 {
@@ -85,7 +85,7 @@ get_entities_through_relations(
 
   if (!entities.empty()) {
     std::vector<stk::mesh::Entity>::const_iterator       i = entities.begin();
-    const std::vector<stk::mesh::Entity>::const_iterator j = entities.end();
+    std::vector<stk::mesh::Entity>::const_iterator const j = entities.end();
 
     percept::MyPairIterRelation rel(bulk_data, (*i), entities_related_rank);
     ++i;

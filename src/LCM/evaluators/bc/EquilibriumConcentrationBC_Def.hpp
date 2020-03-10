@@ -53,7 +53,7 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
   Teuchos::ArrayRCP<ST>       f_nonconstView = Albany::getNonconstLocalData(f);
 
   // Grab the vector of node GIDs for this Node Set ID from the std::map
-  const std::vector<std::vector<int>>& nsNodes =
+  std::vector<std::vector<int>> const& nsNodes =
       dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
 
   int     cunk, punk;
@@ -92,7 +92,7 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::
   Teuchos::ArrayRCP<ST>       f_nonconstView;
 
   const RealType                       j_coeff = dirichletWorkset.j_coeff;
-  const std::vector<std::vector<int>>& nsNodes =
+  std::vector<std::vector<int>> const& nsNodes =
       dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
 
   bool fillResid = (f != Teuchos::null);

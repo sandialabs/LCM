@@ -43,7 +43,7 @@ struct EBSpecsStruct
   // Note that elemNo is the logical lower left corner of the element being
   // queried
   bool
-  inEB(const std::vector<GO>& elemNo)
+  inEB(std::vector<GO> const& elemNo)
   {
     for (std::size_t i = 0; i < elemNo.size(); i++) {
       if (elemNo[i] < min[i]) return false;

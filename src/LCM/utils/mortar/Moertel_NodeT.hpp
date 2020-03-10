@@ -69,7 +69,7 @@ class NodeT
   explicit NodeT(
       GO                     Id,
       std::array<ST, DIM>&   x,
-      const std::vector<LO>& dof,
+      std::vector<LO> const& dof,
       bool                   isonboundary,
       int                    out);
 

@@ -167,7 +167,7 @@ Albany::NavierStokes::buildEvaluators(
 
 void
 Albany::NavierStokes::constructDirichletEvaluators(
-    const std::vector<std::string>& nodeSetIDs)
+    std::vector<std::string> const& nodeSetIDs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);

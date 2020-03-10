@@ -116,7 +116,7 @@ class Zoltan : public GeomDecomp
 
   virtual void
   set_mesh_info(
-      const std::vector<mesh::Entity>& mesh_entities,
+      std::vector<mesh::Entity> const& mesh_entities,
       const VectorField*               nodal_coord_ref,
       const ScalarField*               elem_weight_ref = NULL);
 
@@ -366,7 +366,7 @@ class Zoltan : public GeomDecomp
   void
   init_default_parameters();
   void
-  init(const std::vector<std::pair<std::string, std::string>>&
+  init(std::vector<std::pair<std::string, std::string>> const&
            dynamicLoadRebalancingParameters);
   static double
   init_zoltan_library();

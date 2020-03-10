@@ -179,7 +179,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       const Teuchos::ParameterList&                params,
       Teuchos::RCP<Thyra_MultiVector>&             field_mv,
       Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
-      const std::vector<stk::mesh::Entity>&        entities,
+      std::vector<stk::mesh::Entity> const&        entities,
       bool                                         node,
       bool                                         scalar,
       bool                                         layered,

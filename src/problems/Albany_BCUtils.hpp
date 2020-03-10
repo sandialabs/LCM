@@ -96,8 +96,8 @@ struct DirichletTraits
 
   static Teuchos::RCP<const Teuchos::ParameterList>
   getValidBCParameters(
-      const std::vector<std::string>& nodeSetIDs,
-      const std::vector<std::string>& bcNames);
+      std::vector<std::string> const& nodeSetIDs,
+      std::vector<std::string> const& bcNames);
 
   static std::string
   constructBCName(std::string const& ns, std::string const& dof);
@@ -176,9 +176,9 @@ struct NeumannTraits
 
   static Teuchos::RCP<const Teuchos::ParameterList>
   getValidBCParameters(
-      const std::vector<std::string>& sideSetIDs,
-      const std::vector<std::string>& bcNames,
-      const std::vector<std::string>& conditions);
+      std::vector<std::string> const& sideSetIDs,
+      std::vector<std::string> const& bcNames,
+      std::vector<std::string> const& conditions);
 
   static std::string
   constructBCName(
@@ -237,8 +237,8 @@ class BCUtils
 
   Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>
   constructBCEvaluators(
-      const std::vector<std::string>&      nodeSetIDs,
-      const std::vector<std::string>&      bcNames,
+      std::vector<std::string> const&      nodeSetIDs,
+      std::vector<std::string> const&      bcNames,
       Teuchos::RCP<Teuchos::ParameterList> params,
       Teuchos::RCP<ParamLib>               paramLib,
       int const                            numEqn = 0);
@@ -248,11 +248,11 @@ class BCUtils
   Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>
   constructBCEvaluators(
       const Teuchos::RCP<Albany::MeshSpecsStruct>&  meshSpecs,
-      const std::vector<std::string>&               bcNames,
+      std::vector<std::string> const&               bcNames,
       const Teuchos::ArrayRCP<std::string>&         dof_names,
       bool                                          isVectorField,
       int                                           offsetToFirstDOF,
-      const std::vector<std::string>&               conditions,
+      std::vector<std::string> const&               conditions,
       const Teuchos::Array<Teuchos::Array<int>>&    offsets,
       const Teuchos::RCP<Albany::Layouts>&          dl,
       Teuchos::RCP<Teuchos::ParameterList>          params,
@@ -262,16 +262,16 @@ class BCUtils
   Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>
   constructBCEvaluators(
       const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs,
-      const std::vector<std::string>&              bcNames,
+      std::vector<std::string> const&              bcNames,
       const Teuchos::ArrayRCP<std::string>&        dof_names,
       bool                                         isVectorField,
       int                                          offsetToFirstDOF,
-      const std::vector<std::string>&              conditions,
+      std::vector<std::string> const&              conditions,
       const Teuchos::Array<Teuchos::Array<int>>&   offsets,
       const Teuchos::RCP<Albany::Layouts>&         dl,
       Teuchos::RCP<Teuchos::ParameterList>         params,
       Teuchos::RCP<ParamLib>                       paramLib,
-      const std::vector<Teuchos::RCP<PHX::Evaluator<PHAL::AlbanyTraits>>>&
+      std::vector<Teuchos::RCP<PHX::Evaluator<PHAL::AlbanyTraits>>> const&
                                                     extra_evaluators,
       const Teuchos::RCP<Albany::MaterialDatabase>& materialDB = Teuchos::null);
 
@@ -281,8 +281,8 @@ class BCUtils
   buildEvaluatorsList(
       std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>>&
                                            evaluatorss_to_build,
-      const std::vector<std::string>&      nodeSetIDs,
-      const std::vector<std::string>&      bcNames,
+      std::vector<std::string> const&      nodeSetIDs,
+      std::vector<std::string> const&      bcNames,
       Teuchos::RCP<Teuchos::ParameterList> params,
       Teuchos::RCP<ParamLib>               paramLib,
       int const                            numEqn);
@@ -294,11 +294,11 @@ class BCUtils
       std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>>&
                                                     evaluators_to_build,
       const Teuchos::RCP<Albany::MeshSpecsStruct>&  meshSpecs,
-      const std::vector<std::string>&               bcNames,
+      std::vector<std::string> const&               bcNames,
       const Teuchos::ArrayRCP<std::string>&         dof_names,
       bool                                          isVectorField,
       int                                           offsetToFirstDOF,
-      const std::vector<std::string>&               conditions,
+      std::vector<std::string> const&               conditions,
       const Teuchos::Array<Teuchos::Array<int>>&    offsets,
       const Teuchos::RCP<Albany::Layouts>&          dl,
       Teuchos::RCP<Teuchos::ParameterList>          params,
@@ -325,8 +325,8 @@ class BCUtils
 template <>
 Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>
 BCUtils<DirichletTraits>::constructBCEvaluators(
-    const std::vector<std::string>&      nodeSetIDs,
-    const std::vector<std::string>&      bcNames,
+    std::vector<std::string> const&      nodeSetIDs,
+    std::vector<std::string> const&      bcNames,
     Teuchos::RCP<Teuchos::ParameterList> params,
     Teuchos::RCP<ParamLib>               paramLib,
     int const                            numEqn);
@@ -337,11 +337,11 @@ template <>
 Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>
 BCUtils<NeumannTraits>::constructBCEvaluators(
     const Teuchos::RCP<Albany::MeshSpecsStruct>&  meshSpecs,
-    const std::vector<std::string>&               bcNames,
+    std::vector<std::string> const&               bcNames,
     const Teuchos::ArrayRCP<std::string>&         dof_names,
     bool                                          isVectorField,
     int                                           offsetToFirstDOF,
-    const std::vector<std::string>&               conditions,
+    std::vector<std::string> const&               conditions,
     const Teuchos::Array<Teuchos::Array<int>>&    offsets,
     const Teuchos::RCP<Albany::Layouts>&          dl,
     Teuchos::RCP<Teuchos::ParameterList>          params,
@@ -352,16 +352,16 @@ template <>
 Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>
 BCUtils<NeumannTraits>::constructBCEvaluators(
     const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs,
-    const std::vector<std::string>&              bcNames,
+    std::vector<std::string> const&              bcNames,
     const Teuchos::ArrayRCP<std::string>&        dof_names,
     bool                                         isVectorField,
     int                                          offsetToFirstDOF,
-    const std::vector<std::string>&              conditions,
+    std::vector<std::string> const&              conditions,
     const Teuchos::Array<Teuchos::Array<int>>&   offsets,
     const Teuchos::RCP<Albany::Layouts>&         dl,
     Teuchos::RCP<Teuchos::ParameterList>         params,
     Teuchos::RCP<ParamLib>                       paramLib,
-    const std::vector<Teuchos::RCP<PHX::Evaluator<PHAL::AlbanyTraits>>>&
+    std::vector<Teuchos::RCP<PHX::Evaluator<PHAL::AlbanyTraits>>> const&
                                                   extra_evaluators,
     const Teuchos::RCP<Albany::MaterialDatabase>& materialDB);
 
@@ -370,8 +370,8 @@ void
 BCUtils<DirichletTraits>::buildEvaluatorsList(
     std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>>&
                                          evaluators_to_build,
-    const std::vector<std::string>&      nodeSetIDs,
-    const std::vector<std::string>&      bcNames,
+    std::vector<std::string> const&      nodeSetIDs,
+    std::vector<std::string> const&      bcNames,
     Teuchos::RCP<Teuchos::ParameterList> params,
     Teuchos::RCP<ParamLib>               paramLib,
     int                                  numEqn);
@@ -382,11 +382,11 @@ BCUtils<NeumannTraits>::buildEvaluatorsList(
     std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>>&
                                                   evaluators_to_build,
     const Teuchos::RCP<Albany::MeshSpecsStruct>&  meshSpecs,
-    const std::vector<std::string>&               bcNames,
+    std::vector<std::string> const&               bcNames,
     const Teuchos::ArrayRCP<std::string>&         dof_names,
     bool                                          isVectorField,
     int                                           offsetToFirstDOF,
-    const std::vector<std::string>&               conditions,
+    std::vector<std::string> const&               conditions,
     const Teuchos::Array<Teuchos::Array<int>>&    offsets,
     const Teuchos::RCP<Albany::Layouts>&          dl,
     Teuchos::RCP<Teuchos::ParameterList>          params,

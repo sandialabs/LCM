@@ -87,7 +87,7 @@ Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   Teuchos::ArrayRCP<ST>       f_nonconstView = Albany::getNonconstLocalData(f);
 
   // Grab the vector off node GIDs for this Node Set ID from the std::map
-  const std::vector<std::vector<int>>& nsNodes =
+  std::vector<std::vector<int>> const& nsNodes =
       dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
 
   for (unsigned int inode = 0; inode < nsNodes.size(); inode++) {
@@ -122,7 +122,7 @@ Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   Teuchos::ArrayRCP<ST>       f_nonconstView;
 
   const RealType                       j_coeff = dirichletWorkset.j_coeff;
-  const std::vector<std::vector<int>>& nsNodes =
+  std::vector<std::vector<int>> const& nsNodes =
       dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
 
   bool fillResid = (f != Teuchos::null);
@@ -164,7 +164,7 @@ DirichletAggregator<EvalT, Traits>::DirichletAggregator(
   Teuchos::RCP<PHX::DataLayout> dl =
       p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
 
-  const std::vector<std::string>& dbcs =
+  std::vector<std::string> const& dbcs =
       *p.get<Teuchos::RCP<std::vector<std::string>>>("DBC Names");
 
   for (unsigned int i = 0; i < dbcs.size(); i++) {

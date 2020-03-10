@@ -403,7 +403,7 @@ Topology::facesShareTwoPoints(
 //
 std::vector<stk::mesh::Entity>
 Topology::findAdjacentSegmentsFromFace(
-    const std::vector<std::vector<stk::mesh::Entity>>& faces_inside_element,
+    std::vector<std::vector<stk::mesh::Entity>> const& faces_inside_element,
     const stk::mesh::Entity                            face,
     int const                                          element_number)
 {
@@ -456,7 +456,7 @@ Topology::getEntityCoordinates(stk::mesh::Entity entity)
 std::vector<stk::mesh::Entity>
 Topology::getFormerElementNodes(
     const stk::mesh::Entity                            element,
-    const std::vector<std::vector<stk::mesh::Entity>>& entities)
+    std::vector<std::vector<stk::mesh::Entity>> const& entities)
 {
   std::vector<stk::mesh::Entity>           vector_nodes_;
   std::vector<stk::mesh::Entity>           boundary_nodes;
@@ -480,7 +480,7 @@ Topology::getFormerElementNodes(
 //
 void
 Topology::computeBarycentricCoordinates(
-    const std::vector<stk::mesh::Entity>& entities,
+    std::vector<stk::mesh::Entity> const& entities,
     stk::mesh::Entity                     barycenter)
 {
   // vector of pointers

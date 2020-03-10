@@ -918,7 +918,7 @@ class Spatial_Base
   virtual ~Spatial_Base() {}
   typedef typename EvalT::MeshScalarT MeshScalarT;
   virtual MeshScalarT
-  evaluateFields(const std::vector<MeshScalarT>& coords) = 0;
+  evaluateFields(std::vector<MeshScalarT> const& coords) = 0;
 };
 
 template <typename EvalT>
@@ -931,7 +931,7 @@ class Gaussian : public Spatial_Base<EvalT>
   Gaussian(Teuchos::ParameterList& source_list, std::size_t num);
   virtual ~Gaussian() {}
   virtual MeshScalarT
-  evaluateFields(const std::vector<MeshScalarT>& coords);
+  evaluateFields(std::vector<MeshScalarT> const& coords);
 
  private:
   double                 m_amplitude;
@@ -968,7 +968,7 @@ inline Gaussian<EvalT>::Gaussian(
 template <typename EvalT>
 typename EvalT::MeshScalarT
 Gaussian<EvalT>::evaluateFields(
-    const std::vector<typename EvalT::MeshScalarT>& coords)
+    std::vector<typename EvalT::MeshScalarT> const& coords)
 {
   MeshScalarT       exponent = 0;
   std::size_t const nsd      = coords.size();

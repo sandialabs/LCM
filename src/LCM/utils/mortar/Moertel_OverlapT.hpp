@@ -295,7 +295,7 @@ class OverlapT
   bool
   Centroid(
       double xi[],
-      const std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
+      std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> const&
                 points,
       int const np);
 

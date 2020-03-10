@@ -149,9 +149,9 @@ KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   Teuchos::ArrayRCP<ST>       f_nonconstView = Albany::getNonconstLocalData(f);
 
   // Grab the vector off node GIDs for this Node Set ID from the std::map
-  const std::vector<std::vector<int>>& nsNodes =
+  std::vector<std::vector<int>> const& nsNodes =
       dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-  const std::vector<double*>& nsNodeCoords =
+  std::vector<double*> const& nsNodeCoords =
       dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   RealType time = dirichletWorkset.current_time;
@@ -201,9 +201,9 @@ KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   RealType time = dirichletWorkset.current_time;
 
   const RealType                       j_coeff = dirichletWorkset.j_coeff;
-  const std::vector<std::vector<int>>& nsNodes =
+  std::vector<std::vector<int>> const& nsNodes =
       dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-  const std::vector<double*>& nsNodeCoords =
+  std::vector<double*> const& nsNodeCoords =
       dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   bool fillResid = (f != Teuchos::null);

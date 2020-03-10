@@ -160,7 +160,7 @@ template <
     typename Tag6,
     typename Tag7>
 Teuchos::RCP<PHX::DataLayout>
-createMDALayout(const std::vector<PHX::Device::size_type>& dims)
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
   ALBANY_PANIC(
       dims.size() != 8,
@@ -186,7 +186,7 @@ template <
     typename Tag5,
     typename Tag6>
 Teuchos::RCP<PHX::DataLayout>
-createMDALayout(const std::vector<PHX::Device::size_type>& dims)
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
   ALBANY_PANIC(
       dims.size() != 7,
@@ -204,7 +204,7 @@ template <
     typename Tag4,
     typename Tag5>
 Teuchos::RCP<PHX::DataLayout>
-createMDALayout(const std::vector<PHX::Device::size_type>& dims)
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
   ALBANY_PANIC(
       dims.size() != 6,
@@ -220,7 +220,7 @@ template <
     typename Tag3,
     typename Tag4>
 Teuchos::RCP<PHX::DataLayout>
-createMDALayout(const std::vector<PHX::Device::size_type>& dims)
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
   ALBANY_PANIC(
       dims.size() != 5,
@@ -231,7 +231,7 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 
 template <typename Tag0, typename Tag1, typename Tag2, typename Tag3>
 Teuchos::RCP<PHX::DataLayout>
-createMDALayout(const std::vector<PHX::Device::size_type>& dims)
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
   ALBANY_PANIC(
       dims.size() != 4,
@@ -242,7 +242,7 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 
 template <typename Tag0, typename Tag1, typename Tag2>
 Teuchos::RCP<PHX::DataLayout>
-createMDALayout(const std::vector<PHX::Device::size_type>& dims)
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
   ALBANY_PANIC(
       dims.size() != 3,
@@ -253,7 +253,7 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 
 template <typename Tag0, typename Tag1>
 Teuchos::RCP<PHX::DataLayout>
-createMDALayout(const std::vector<PHX::Device::size_type>& dims)
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
   ALBANY_PANIC(
       dims.size() != 2,
@@ -263,7 +263,7 @@ createMDALayout(const std::vector<PHX::Device::size_type>& dims)
 
 template <typename Tag0>
 Teuchos::RCP<PHX::DataLayout>
-createMDALayout(const std::vector<PHX::Device::size_type>& dims)
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
   ALBANY_PANIC(
       dims.size() != 1,
@@ -313,7 +313,7 @@ class MDFieldMemoizer
   bool
   have_saved_data(
       const typename Traits::EvalData                 workset,
-      const std::vector<Teuchos::RCP<PHX::FieldTag>>& evalFields)
+      std::vector<Teuchos::RCP<PHX::FieldTag>> const& evalFields)
   {
     if (!_memoizerEnabled) return false;
 

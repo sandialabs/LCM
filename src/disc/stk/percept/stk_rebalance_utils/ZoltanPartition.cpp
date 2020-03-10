@@ -601,7 +601,7 @@ Zoltan::Zoltan(
 
 void
 Zoltan::set_mesh_info(
-    const std::vector<mesh::Entity>& mesh_entities,
+    std::vector<mesh::Entity> const& mesh_entities,
     const VectorField*               nodal_coord_ref,
     const ScalarField*               elem_weight_ref)
 {

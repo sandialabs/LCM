@@ -65,7 +65,7 @@ Albany::CahnHillProblem::buildEvaluators(
 // Dirichlet BCs
 void
 Albany::CahnHillProblem::constructDirichletEvaluators(
-    const std::vector<std::string>& nodeSetIDs)
+    std::vector<std::string> const& nodeSetIDs)
 {
   // Construct BC evaluators for all node sets and names
   std::vector<std::string> bcNames(neq);

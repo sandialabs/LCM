@@ -349,7 +349,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
   const Albany::SideSetList&          ssList = *(workset.sideSets);
   Albany::SideSetList::const_iterator it     = ssList.find(this->sideSetID);
 
-  const std::vector<Albany::SideStruct>& sideSet = it->second;
+  std::vector<Albany::SideStruct> const& sideSet = it->second;
 
   if (it == ssList.end())
     return;  // This sideset does not exist in this workset (GAH - this can go
@@ -1053,7 +1053,7 @@ NeumannAggregator<EvalT, Traits>::NeumannAggregator(
   Teuchos::RCP<PHX::DataLayout> dl =
       p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
 
-  const std::vector<std::string>& nbcs =
+  std::vector<std::string> const& nbcs =
       *p.get<Teuchos::RCP<std::vector<std::string>>>("NBC Names");
 
   for (unsigned int i = 0; i < nbcs.size(); i++) {

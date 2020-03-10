@@ -115,7 +115,7 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::evaluateFields(
 {
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
 
-  const std::vector<Albany::SideStruct>& sideSet =
+  std::vector<Albany::SideStruct> const& sideSet =
       workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell

@@ -37,7 +37,7 @@ class AbstractSTKNodeFieldContainer : public AbstractNodeFieldContainer
 Teuchos::RCP<AbstractNodeFieldContainer>
 buildSTKNodeField(
     std::string const&                             name,
-    const std::vector<PHX::DataLayout::size_type>& dim,
+    std::vector<PHX::DataLayout::size_type> const& dim,
     const Teuchos::RCP<stk::mesh::MetaData>&       metaData,
     const bool                                     output);
 
@@ -62,7 +62,7 @@ class STKNodeField : public AbstractSTKNodeFieldContainer
 
   STKNodeField(
       std::string const&                             name,
-      const std::vector<PHX::DataLayout::size_type>& dim,
+      std::vector<PHX::DataLayout::size_type> const& dim,
       const Teuchos::RCP<stk::mesh::MetaData>&       metaData,
       const bool                                     output = false);
 
@@ -96,7 +96,7 @@ struct NodeData_Traits<T, 1>
   static field_type*
   createField(
       std::string const& name,
-      const std::vector<PHX::DataLayout::size_type>& /* dim */,
+      std::vector<PHX::DataLayout::size_type> const& /* dim */,
       stk::mesh::MetaData* metaData)
   {
     field_type* fld =
@@ -148,7 +148,7 @@ struct NodeData_Traits<T, 2>
   static field_type*
   createField(
       std::string const&                             name,
-      const std::vector<PHX::DataLayout::size_type>& dim,
+      std::vector<PHX::DataLayout::size_type> const& dim,
       stk::mesh::MetaData*                           metaData)
   {
     field_type* fld =
@@ -206,7 +206,7 @@ struct NodeData_Traits<T, 3>
   static field_type*
   createField(
       std::string const&                             name,
-      const std::vector<PHX::DataLayout::size_type>& dim,
+      std::vector<PHX::DataLayout::size_type> const& dim,
       stk::mesh::MetaData*                           metaData)
   {
     field_type* fld =

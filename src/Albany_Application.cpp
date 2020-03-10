@@ -1832,7 +1832,7 @@ Application::setScaleBCDofs(
   for (size_t ns = 0; ns < nodeSetIDs_.size(); ns++) {
     std::string key = nodeSetIDs_[ns];
 
-    const std::vector<std::vector<int>>& nsNodes =
+    std::vector<std::vector<int>> const& nsNodes =
         workset.nodeSets->find(key)->second;
     for (unsigned int i = 0; i < nsNodes.size(); i++) {
       for (unsigned j = 0; j < offsets_[ns].size(); j++) {

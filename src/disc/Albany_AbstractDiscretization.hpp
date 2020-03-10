@@ -95,7 +95,7 @@ class AbstractDiscretization
 
   //! Get IDArray for (Ws, Local Node, nComps) -> (local) NodeLID, works for
   //! both scalar and vector fields
-  virtual const std::vector<IDArray>&
+  virtual std::vector<IDArray> const&
   getElNodeEqID(std::string const& field_name) const = 0;
 
   //! Get Dof Manager of field field_name

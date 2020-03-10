@@ -2722,7 +2722,7 @@ DualGraph::DualGraph() : number_edges_(0) { return; }
 //
 DualGraph::DualGraph(ConnectivityArray const& connectivity_array)
 {
-  const std::vector<std::vector<int>> face_connectivity =
+  std::vector<std::vector<int>> const face_connectivity =
       getFaceConnectivity(connectivity_array.getType());
 
   const AdjacencyMap connectivity = connectivity_array.getConnectivity();
@@ -2739,7 +2739,7 @@ DualGraph::DualGraph(ConnectivityArray const& connectivity_array)
   for (auto&& element_conn : connectivity) {
     int const element = element_conn.first;
 
-    const std::vector<int> element_nodes = element_conn.second;
+    std::vector<int> const element_nodes = element_conn.second;
 
     // All elements go into graph, regardless of number of internal faces
     // attached to them. This clearing will allocate space for all of them.
@@ -3413,7 +3413,7 @@ operator>>(std::istream& input_stream, ZoltanHyperGraph& zoltan_hypergraph)
   //
   // First line must contain the number of vertices and hyperedges
   //
-  const std::vector<char>::size_type MaxChar = 256;
+  std::vector<char>::size_type const MaxChar = 256;
 
   char line[MaxChar];
   input_stream.getline(line, MaxChar);

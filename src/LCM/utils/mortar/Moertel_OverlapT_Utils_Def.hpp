@@ -588,7 +588,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::QuickOverlapTest()
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Centroid(
     double xi[],
-    const std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
+    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> const&
               points,
     int const np)
 {

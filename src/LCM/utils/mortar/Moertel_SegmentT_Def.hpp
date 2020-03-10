@@ -40,7 +40,7 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(
 
 SEGMENT_TEMPLATE_STATEMENT
 MoertelT::SEGMENT_TEMPLATE_CLASS(
-    SegmentT)::Segment(int id, const std::vector<int>& nodev, int outlevel)
+    SegmentT)::Segment(int id, std::vector<int> const& nodev, int outlevel)
     : Id_(id),
       outputlevel_(outlevel),
       stype_(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none),

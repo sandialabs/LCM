@@ -96,8 +96,8 @@ Setup::contain_eval(std::string const& eval) const
 
 void
 Setup::fill_field_dependencies(
-    const std::vector<Teuchos::RCP<PHX::FieldTag>>& depFields,
-    const std::vector<Teuchos::RCP<PHX::FieldTag>>& evalFields,
+    std::vector<Teuchos::RCP<PHX::FieldTag>> const& depFields,
+    std::vector<Teuchos::RCP<PHX::FieldTag>> const& evalFields,
     const bool                                      saved)
 {
   if (_enableMemoization) {
@@ -126,7 +126,7 @@ Setup::update_fields()
 
 void
 Setup::check_fields(
-    const std::vector<Teuchos::RCP<PHX::FieldTag>>& fields) const
+    std::vector<Teuchos::RCP<PHX::FieldTag>> const& fields) const
 {
   if (_enableMemoization) {
     StringSet missingFields;

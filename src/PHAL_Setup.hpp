@@ -63,8 +63,8 @@ class Setup
   //! for memoization
   void
   fill_field_dependencies(
-      const std::vector<Teuchos::RCP<PHX::FieldTag>>& depFields,
-      const std::vector<Teuchos::RCP<PHX::FieldTag>>& evalFields,
+      std::vector<Teuchos::RCP<PHX::FieldTag>> const& depFields,
+      std::vector<Teuchos::RCP<PHX::FieldTag>> const& evalFields,
       const bool                                      saved = true);
 
   //! Update list of _saved/_unsaved MDFields based on _unsaved MDFields and
@@ -76,7 +76,7 @@ class Setup
   //! (used to ensure all MDFields have been gathered by
   //! fill_field_dependencies())
   void
-  check_fields(const std::vector<Teuchos::RCP<PHX::FieldTag>>& fields) const;
+  check_fields(std::vector<Teuchos::RCP<PHX::FieldTag>> const& fields) const;
 
   //! Print Setup information
   void

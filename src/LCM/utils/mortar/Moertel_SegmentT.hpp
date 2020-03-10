@@ -75,7 +75,7 @@ class SegmentT
   */
   SegmentT(int id, int nnode, int* nodeId, int outlevel);
 
-  SegmentT(int id, const std::vector<int>& nodeId, int outlevel);
+  SegmentT(int id, std::vector<int> const& nodeId, int outlevel);
 
   /*!
   \brief Empty Constructor

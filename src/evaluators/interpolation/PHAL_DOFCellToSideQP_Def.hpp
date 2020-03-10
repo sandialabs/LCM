@@ -119,7 +119,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
     return;
   }
 
-  const std::vector<Albany::SideStruct>& sideSet =
+  std::vector<Albany::SideStruct> const& sideSet =
       workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell

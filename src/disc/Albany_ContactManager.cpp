@@ -218,7 +218,7 @@ Albany::ContactManager::processSS(
       std::set<int>                            inserted_nodes;
       std::pair<std::set<int>::iterator, bool> ret;
 
-      const std::vector<Albany::SideStruct>& theSideSet = it_side_set->second;
+      std::vector<Albany::SideStruct> const& theSideSet = it_side_set->second;
 
       for (std::size_t side = 0; side < theSideSet.size(); ++side) {
         // Get the data that corresponds to the side.

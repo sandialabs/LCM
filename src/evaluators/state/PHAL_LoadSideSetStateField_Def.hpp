@@ -114,7 +114,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
       "Error! Invalid field layout in LoadSideSetStateField.\n");
 
   // Loop on the sides of this sideSet that are in this workset
-  const std::vector<Albany::SideStruct>& sideSet =
+  std::vector<Albany::SideStruct> const& sideSet =
       workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the data that corresponds to the side
@@ -149,7 +149,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
                                 << " in PHAL_LoadSideSetStateField_Def.\n");
     Albany::MDArray state = esa[wsIndex2D].at(stateName);
 
-    const std::vector<int>& nodeMap = sideNodeNumerationMap.at(side_GID);
+    std::vector<int> const& nodeMap = sideNodeNumerationMap.at(side_GID);
 
     // Now we have the two arrays: 3D and 2D. We need to take the 2D one
     // and put it at the right place in the 3D one

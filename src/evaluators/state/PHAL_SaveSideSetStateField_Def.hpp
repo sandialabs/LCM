@@ -189,7 +189,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
       "Error! Invalid field layout in SaveSideSetStateField.\n");
 
   // Loop on the sides of this sideSet that are in this workset
-  const std::vector<Albany::SideStruct>& sideSet =
+  std::vector<Albany::SideStruct> const& sideSet =
       workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the data that corresponds to the side
@@ -224,7 +224,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
                                 << " in PHAL_SaveSideSetStateField_Def.\n");
     Albany::MDArray state = esa[wsIndex2D].at(stateName);
 
-    const std::vector<int>& nodeMap = sideNodeNumerationMap.at(side_GID);
+    std::vector<int> const& nodeMap = sideNodeNumerationMap.at(side_GID);
 
     // Now we have the two arrays: 3D and 2D. We need to take the part we need
     // from the 3D and put it in the 2D one
@@ -379,7 +379,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
     // nodes.
 
     // Loop on the sides of this sideSet that are in this workset
-    const std::vector<Albany::SideStruct>& sideSet =
+    std::vector<Albany::SideStruct> const& sideSet =
         workset.sideSets->at(sideSetName);
     for (auto const& it_side : sideSet) {
       // Get the data that corresponds to the side
@@ -431,7 +431,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
     LO nodeId2d, layer_id;
 
     // Loop on the sides of this sideSet that are in this workset
-    const std::vector<Albany::SideStruct>& sideSet =
+    std::vector<Albany::SideStruct> const& sideSet =
         workset.sideSets->at(sideSetName);
     for (auto const& it_side : sideSet) {
       // Get the data that corresponds to the side

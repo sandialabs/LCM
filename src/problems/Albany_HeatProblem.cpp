@@ -130,7 +130,7 @@ Albany::HeatProblem::buildEvaluators(
 // Dirichlet BCs
 void
 Albany::HeatProblem::constructDirichletEvaluators(
-    const std::vector<std::string>& nodeSetIDs)
+    std::vector<std::string> const& nodeSetIDs)
 {
   // Construct BC evaluators for all node sets and names
   std::vector<std::string> bcNames(neq);

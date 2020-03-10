@@ -66,8 +66,8 @@ struct A2V
 template <typename ScalarT>
 struct V2A
 {
-  const std::vector<ScalarT>& v;
-  V2A(const std::vector<ScalarT>& v) : v(v) {}
+  std::vector<ScalarT> const& v;
+  V2A(std::vector<ScalarT> const& v) : v(v) {}
   void
   operator()(typename Ref<ScalarT>::type a, int const i)
   {
@@ -86,7 +86,7 @@ copy(const PHX::MDField<ScalarT>& a, std::vector<ScalarT>& v)
 
 template <typename ScalarT>
 void
-copy(const std::vector<ScalarT>& v, PHX::MDField<ScalarT>& a)
+copy(std::vector<ScalarT> const& v, PHX::MDField<ScalarT>& a)
 {
   V2A<ScalarT> v2a(v);
   loop(v2a, a);

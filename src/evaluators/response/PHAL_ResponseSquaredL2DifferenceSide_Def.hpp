@@ -171,7 +171,7 @@ PHAL::ResponseSquaredL2DifferenceSideBase<
     diff_2.resize(dims[3], std::vector<ScalarT>(dims[3]));
 
   if (workset.sideSets->find(sideSetName) != workset.sideSets->end()) {
-    const std::vector<Albany::SideStruct>& sideSet =
+    std::vector<Albany::SideStruct> const& sideSet =
         workset.sideSets->at(sideSetName);
     for (auto const& it_side : sideSet) {
       // Get the local data of side and cell

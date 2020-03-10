@@ -37,7 +37,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   // Gather all node IDs from all the stored nodesets
   std::set<int> nodeSetsRows;
   for (int ins(0); ins < nodeSets.size(); ++ins) {
-    const std::vector<std::vector<int>>& nsNodes =
+    std::vector<std::vector<int>> const& nsNodes =
         dirichletWorkset.nodeSets->find(nodeSets[ins])->second;
     for (int inode = 0; inode < nsNodes.size(); ++inode) {
       nodeSetsRows.insert(nsNodes[inode][this->offset]);
@@ -79,7 +79,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   // Gather all node IDs from all the stored nodesets
   std::set<int> nodeSetsRows;
   for (int ins(0); ins < nodeSets.size(); ++ins) {
-    const std::vector<std::vector<int>>& nsNodes =
+    std::vector<std::vector<int>> const& nsNodes =
         dirichletWorkset.nodeSets->find(nodeSets[ins])->second;
     for (int inode = 0; inode < nsNodes.size(); ++inode) {
       nodeSetsRows.insert(nsNodes[inode][this->offset]);

@@ -209,7 +209,7 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(
 
         if (it_ss == ssList.end()) return;
 
-        const std::vector<Albany::SideStruct>&          sideSet = it_ss->second;
+        std::vector<Albany::SideStruct> const&          sideSet = it_ss->second;
         std::vector<Albany::SideStruct>::const_iterator iter_s;
         for (iter_s = sideSet.begin(); iter_s != sideSet.end(); ++iter_s) {
           // Get the local data of side and cell

@@ -75,7 +75,7 @@ distance(double const* x, double const* y)
 }
 
 double
-distance(const std::vector<double>& x, const std::vector<double>& y)
+distance(std::vector<double> const& x, std::vector<double> const& y)
 {
   double const d = std::sqrt(
       (x[0] - y[0]) * (x[0] - y[0]) + (x[1] - y[1]) * (x[1] - y[1]) +
@@ -86,7 +86,7 @@ distance(const std::vector<double>& x, const std::vector<double>& y)
 bool
 point_inside(
     const Teuchos::ArrayRCP<double*>& coords,
-    const std::vector<double>&        sphere_xyz)
+    std::vector<double> const&        sphere_xyz)
 {
   // first check if point is near the element:
   double const tol_inside = 1e-12;
@@ -151,7 +151,7 @@ Basis(int const C)
 }
 
 double
-value(const std::vector<double>& soln, const std::pair<double, double>& ref)
+value(std::vector<double> const& soln, const std::pair<double, double>& ref)
 {
   int const C = soln.size();
   const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
@@ -349,7 +349,7 @@ point_in_element(
         Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type& coords,
     std::pair<double, double>&                                parametric)
 {
-  const std::vector<double> sphere_xyz = spherical_to_cart(sphere);
+  std::vector<double> const sphere_xyz = spherical_to_cart(sphere);
   std::pair<bool, std::pair<unsigned, unsigned>> element(
       false, std::pair<unsigned, unsigned>(0, 0));
 
@@ -400,9 +400,9 @@ setup_latlon_interp(
         // interpolation point:
         const unsigned            b = element.second.first;
         const unsigned            e = element.second.second;
-        const std::vector<double> sphere2_xyz =
+        std::vector<double> const sphere2_xyz =
             spherical_to_cart(ref2sphere(coords[b][e], paramtric));
-        const std::vector<double> sphere_xyz = spherical_to_cart(sphere);
+        std::vector<double> const sphere_xyz = spherical_to_cart(sphere);
         err = std::max(err, ::distance(&sphere2_xyz[0], &sphere_xyz[0]));
         Albany::STKDiscretization::interp interp;
         interp.parametric_coords  = paramtric;
@@ -2823,7 +2823,7 @@ STKDiscretization::meshToGraph()
         // In the case of degenerate elements, where a node can be entered into
         // the connect table twice, need to check to make sure that this element
         // is not already listed as surrounding this node.
-        const std::vector<stk::mesh::Entity> sur_elem_node_lid =
+        std::vector<stk::mesh::Entity> const sur_elem_node_lid =
             sur_elem[nodeLID];
         if (sur_elem[nodeLID].empty() || !in_list(e, sur_elem_node_lid)) {
           sur_elem[nodeLID].push_back(e);

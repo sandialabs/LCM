@@ -30,7 +30,7 @@ template <unsigned Dim, class traits>
 Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
     const Teuchos::RCP<Teuchos::ParameterList>& adaptParams_,
-    const Teuchos::RCP<const Teuchos_Comm>&     commT)
+    const Teuchos::RCP<Teuchos_Comm const>&     commT)
     : GenericSTKMeshStruct(params, adaptParams_, traits_type::size),
       periodic_x(params->get("Periodic_x BC", false)),
       periodic_y(params->get("Periodic_y BC", false)),
@@ -358,7 +358,7 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
 template <unsigned Dim, class traits>
 void
 Albany::TmplSTKMeshStruct<Dim, traits>::setFieldAndBulkData(
-    Teuchos::RCP<const Teuchos_Comm> const&                   commT,
+    Teuchos::RCP<Teuchos_Comm const> const&                   commT,
     Teuchos::RCP<Teuchos::ParameterList> const&               params,
     unsigned int const                                        neq_,
     AbstractFieldContainer::FieldContainerRequirements const& req,
@@ -620,7 +620,7 @@ Albany::EBSpecsStruct<3>::Initialize(
 template <>
 void
 Albany::TmplSTKMeshStruct<0>::buildMesh(
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   stk::mesh::PartVector nodePartVec;
   stk::mesh::PartVector singlePartVec(1);
@@ -647,7 +647,7 @@ template <>
 void
 Albany::TmplSTKMeshStruct<0, Albany::albany_stk_mesh_traits<0>>::
     setFieldAndBulkData(
-        const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+        const Teuchos::RCP<Teuchos_Comm const>&                   commT,
         const Teuchos::RCP<Teuchos::ParameterList>&               params,
         const unsigned int                                        neq_,
         const AbstractFieldContainer::FieldContainerRequirements& req,
@@ -678,7 +678,7 @@ Albany::TmplSTKMeshStruct<0, Albany::albany_stk_mesh_traits<0>>::
 template <>
 void
 Albany::TmplSTKMeshStruct<1>::buildMesh(
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   stk::mesh::PartVector nodePartVec;
   stk::mesh::PartVector singlePartVec(1);
@@ -781,7 +781,7 @@ Albany::TmplSTKMeshStruct<1>::buildMesh(
 template <>
 void
 Albany::TmplSTKMeshStruct<2>::buildMesh(
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   // STK
   stk::mesh::PartVector nodePartVec;
@@ -1080,7 +1080,7 @@ Albany::TmplSTKMeshStruct<2>::buildMesh(
 template <>
 void
 Albany::TmplSTKMeshStruct<3>::buildMesh(
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   stk::mesh::PartVector nodePartVec;
   stk::mesh::PartVector singlePartVec(1);

@@ -20,7 +20,7 @@ class SolutionTwoNormResponseFunction
  public:
   //! Default constructor
   SolutionTwoNormResponseFunction(
-      const Teuchos::RCP<const Teuchos_Comm>& commT);
+      const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Destructor
   virtual ~SolutionTwoNormResponseFunction();

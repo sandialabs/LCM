@@ -97,14 +97,14 @@ class TmplSTKMeshStruct : public GenericSTKMeshStruct
   TmplSTKMeshStruct(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<Teuchos::ParameterList>& adaptParams,
-      const Teuchos::RCP<const Teuchos_Comm>&     commT);
+      const Teuchos::RCP<Teuchos_Comm const>&     commT);
 
   ~TmplSTKMeshStruct(){};
 
   //! Sets mesh generation parameters
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
       const Teuchos::RCP<Teuchos::ParameterList>&               params,
       const unsigned int                                        neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,
@@ -134,7 +134,7 @@ class TmplSTKMeshStruct : public GenericSTKMeshStruct
  private:
   //! Build the mesh
   void
-  buildMesh(const Teuchos::RCP<const Teuchos_Comm>& commT);
+  buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Build a parameter list that contains valid input parameters
   Teuchos::RCP<const Teuchos::ParameterList>
@@ -233,21 +233,21 @@ EBSpecsStruct<3>::Initialize(
 
 template <>
 void
-TmplSTKMeshStruct<0>::buildMesh(const Teuchos::RCP<const Teuchos_Comm>& commT);
+TmplSTKMeshStruct<0>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 template <>
 void
-TmplSTKMeshStruct<1>::buildMesh(const Teuchos::RCP<const Teuchos_Comm>& commT);
+TmplSTKMeshStruct<1>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 template <>
 void
-TmplSTKMeshStruct<2>::buildMesh(const Teuchos::RCP<const Teuchos_Comm>& commT);
+TmplSTKMeshStruct<2>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 template <>
 void
-TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<const Teuchos_Comm>& commT);
+TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
 template <>
 void
 TmplSTKMeshStruct<0, albany_stk_mesh_traits<0>>::setFieldAndBulkData(
-    const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+    const Teuchos::RCP<Teuchos_Comm const>&                   commT,
     const Teuchos::RCP<Teuchos::ParameterList>&               params,
     const unsigned int                                        neq_,
     const AbstractFieldContainer::FieldContainerRequirements& req,

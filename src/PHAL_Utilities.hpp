@@ -106,20 +106,20 @@ class MDFieldIterator
 template <typename T>
 void
 reduceAll(
-    const Teuchos_Comm&           comm,
+    Teuchos_Comm const&           comm,
     const Teuchos::EReductionType reduct_type,
     PHX::MDField<T>&              a);
 //! Reduce on a ScalarT.
 template <typename T>
 void
 reduceAll(
-    const Teuchos_Comm&           comm,
+    Teuchos_Comm const&           comm,
     const Teuchos::EReductionType reduct_type,
     T&                            a);
 //! Broadcast an MDField.
 template <typename T>
 void
-broadcast(const Teuchos_Comm& comm, int const root_rank, PHX::MDField<T>& a);
+broadcast(Teuchos_Comm const& comm, int const root_rank, PHX::MDField<T>& a);
 
 /*! \brief Loop over an array and apply a functor.
  *

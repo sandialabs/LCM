@@ -88,7 +88,7 @@ struct AbstractMeshStruct
 
   virtual void
   setFieldAndBulkData(
-      const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
       const Teuchos::RCP<Teuchos::ParameterList>&               params,
       const unsigned int                                        neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,

@@ -20,7 +20,7 @@ class SolutionFileResponseFunction : public SamplingBasedScalarResponseFunction
 {
  public:
   //! Default constructor
-  SolutionFileResponseFunction(const Teuchos::RCP<const Teuchos_Comm>& comm);
+  SolutionFileResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm);
 
   //! Destructor
   ~SolutionFileResponseFunction() = default;

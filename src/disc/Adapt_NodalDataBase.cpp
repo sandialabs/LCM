@@ -86,7 +86,7 @@ NodalDataBase::replaceOwnedVectorSpace(
 void
 NodalDataBase::replaceOverlapVectorSpace(
     const Teuchos::Array<GO>&               overlap_nodeGIDs,
-    const Teuchos::RCP<const Teuchos_Comm>& comm_)
+    const Teuchos::RCP<Teuchos_Comm const>& comm_)
 {
   initialize();
 
@@ -98,7 +98,7 @@ NodalDataBase::replaceOverlapVectorSpace(
 void
 NodalDataBase::replaceOwnedVectorSpace(
     const Teuchos::Array<GO>&               local_nodeGIDs,
-    const Teuchos::RCP<const Teuchos_Comm>& comm_)
+    const Teuchos::RCP<Teuchos_Comm const>& comm_)
 {
   initialize();
 

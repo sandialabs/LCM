@@ -91,7 +91,7 @@ main(int argc, char* argv[])
     auto setupTimer = Teuchos::rcp(new Teuchos::TimeMonitor(
         *Teuchos::TimeMonitor::getNewTimer("Albany: Setup Time")));
 
-    RCP<const Teuchos_Comm> comm = Albany::getDefaultComm();
+    RCP<Teuchos_Comm const> comm = Albany::getDefaultComm();
 
     // Connect vtune for performance profiling
     if (cmd.vtune) { Albany::connect_vtune(comm->getRank()); }

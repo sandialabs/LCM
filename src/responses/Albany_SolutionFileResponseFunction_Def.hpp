@@ -13,7 +13,7 @@ namespace Albany {
 
 template <class Norm>
 SolutionFileResponseFunction<Norm>::SolutionFileResponseFunction(
-    const Teuchos::RCP<const Teuchos_Comm>& comm)
+    const Teuchos::RCP<Teuchos_Comm const>& comm)
     : SamplingBasedScalarResponseFunction(comm), solutionLoaded(false)
 {
   // Nothing to be done here

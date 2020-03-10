@@ -20,7 +20,7 @@
 
 Albany::DiscretizationFactory::DiscretizationFactory(
     const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
-    const Teuchos::RCP<const Teuchos_Comm>&     commT_)
+    const Teuchos::RCP<Teuchos_Comm const>&     commT_)
     : commT(commT_)
 {
   discParams = Teuchos::sublist(topLevelParams, "Discretization", true);
@@ -166,7 +166,7 @@ Teuchos::RCP<Albany::AbstractMeshStruct>
 Albany::DiscretizationFactory::createMeshStruct(
     Teuchos::RCP<Teuchos::ParameterList> disc_params,
     Teuchos::RCP<Teuchos::ParameterList> adapt_params,
-    Teuchos::RCP<const Teuchos_Comm>     comm)
+    Teuchos::RCP<Teuchos_Comm const>     comm)
 {
   std::string& method = disc_params->get("Method", "STK1D");
   if (method == "STK1D") {

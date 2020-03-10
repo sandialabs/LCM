@@ -32,7 +32,7 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
       const Teuchos::RCP<ParamLib>&               param_lib,
       const Albany::StateManager&                 StateMgr,
       const Teuchos::RCP<rc::Manager>&            rc_mgr,
-      const Teuchos::RCP<const Teuchos_Comm>&     comm);
+      const Teuchos::RCP<Teuchos_Comm const>&     comm);
 
   //! Method called by the solver implementation to determine if the mesh needs
   //! adapting
@@ -132,7 +132,7 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
   const Teuchos::RCP<Albany::AbstractDiscretization> disc_;
   const Teuchos::RCP<ParamLib>&                      paramLib_;
   const Albany::StateManager&                        stateMgr_;
-  const Teuchos::RCP<const Teuchos_Comm>             comm_;
+  const Teuchos::RCP<Teuchos_Comm const>             comm_;
 
   //! Output stream, defaults to printing just Proc 0
   Teuchos::RCP<Teuchos::FancyOStream> out;

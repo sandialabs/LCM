@@ -15,21 +15,21 @@
 
 namespace Albany {
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 getDefaultComm();
 
 Albany_MPI_Comm
-getMpiCommFromTeuchosComm(Teuchos::RCP<const Teuchos_Comm>& tc);
+getMpiCommFromTeuchosComm(Teuchos::RCP<Teuchos_Comm const>& tc);
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc);
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromThyraComm(
     const Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>& tc_in);
 
 Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>
-createThyraCommFromTeuchosComm(const Teuchos::RCP<const Teuchos_Comm>& tc_in);
+createThyraCommFromTeuchosComm(const Teuchos::RCP<Teuchos_Comm const>& tc_in);
 
 }  // namespace Albany
 

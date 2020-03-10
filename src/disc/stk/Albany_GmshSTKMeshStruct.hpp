@@ -22,13 +22,13 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
  public:
   GmshSTKMeshStruct(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<const Teuchos_Comm>&     commT);
+      const Teuchos::RCP<Teuchos_Comm const>&     commT);
 
   ~GmshSTKMeshStruct();
 
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
       const Teuchos::RCP<Teuchos::ParameterList>&               params,
       const unsigned int                                        neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,
@@ -59,7 +59,7 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
   // Includes sideset and nodeset names and counts.
   void
   set_boundaries(
-      const Teuchos::RCP<const Teuchos_Comm>& commT,
+      const Teuchos::RCP<Teuchos_Comm const>& commT,
       std::vector<std::string>&               ssNames,
       std::vector<std::string>&               nsNames);
 
@@ -92,13 +92,13 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
   void
   get_physical_names(
       std::map<std::string, int>&             physical_names,
-      const Teuchos::RCP<const Teuchos_Comm>& commT);
+      const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   // Share physical_names map with all other proccesses
   void
   broadcast_physical_names(
       std::map<std::string, int>&             physical_names,
-      const Teuchos::RCP<const Teuchos_Comm>& commT);
+      const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   // Read the physical names for Gmsh V 4.1
   // to populate the physical_names map
@@ -117,7 +117,7 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
 
   // Broadcast topology of the mesh from 0 to all over procs
   void
-  broadcast_topology(const Teuchos::RCP<const Teuchos_Comm>& commT);
+  broadcast_topology(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   // Sets NumNodes for ascii msh files
   void
@@ -187,7 +187,7 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
       std::vector<std::string>                names,
       int*                                    tags_array,
       int                                     pair_number,
-      const Teuchos::RCP<const Teuchos_Comm>& commT,
+      const Teuchos::RCP<Teuchos_Comm const>& commT,
       std::map<std::string, int>&             physical_names);
 
   // Reads a single physical name from ifile.

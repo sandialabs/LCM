@@ -145,7 +145,7 @@ GenericSTKMeshStruct::GenericSTKMeshStruct(
 
 void
 GenericSTKMeshStruct::SetupFieldData(
-    const Teuchos::RCP<const Teuchos_Comm>&                   comm,
+    const Teuchos::RCP<Teuchos_Comm const>&                   comm,
     int const                                                 neq_,
     const AbstractFieldContainer::FieldContainerRequirements& req,
     const Teuchos::RCP<StateInfoStruct>&                      sis,
@@ -582,7 +582,7 @@ GenericSTKMeshStruct::setDefaultCoordinates3d()
 
 void
 GenericSTKMeshStruct::uniformRefineMesh(
-    const Teuchos::RCP<const Teuchos_Comm>& comm)
+    const Teuchos::RCP<Teuchos_Comm const>& comm)
 {
 #if defined(ALBANY_STK_PERCEPT)
   // Refine if requested
@@ -783,7 +783,7 @@ GenericSTKMeshStruct::checkNodeSetsFromSideSetsIntegrity()
 
 void
 GenericSTKMeshStruct::initializeSideSetMeshSpecs(
-    const Teuchos::RCP<const Teuchos_Comm>& comm)
+    const Teuchos::RCP<Teuchos_Comm const>& comm)
 {
   // Loop on all mesh specs
   for (auto ms : this->getMeshSpecs()) {
@@ -839,7 +839,7 @@ GenericSTKMeshStruct::initializeSideSetMeshSpecs(
 
 void
 GenericSTKMeshStruct::initializeSideSetMeshStructs(
-    const Teuchos::RCP<const Teuchos_Comm>& comm)
+    const Teuchos::RCP<Teuchos_Comm const>& comm)
 {
   if (params->isSublist("Side Set Discretizations")) {
     const Teuchos::ParameterList& ssd_list =
@@ -938,7 +938,7 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
 
 void
 GenericSTKMeshStruct::finalizeSideSetMeshStructs(
-    const Teuchos::RCP<const Teuchos_Comm>& comm,
+    const Teuchos::RCP<Teuchos_Comm const>& comm,
     std::map<
         std::string,
         AbstractFieldContainer::FieldContainerRequirements> const& side_set_req,
@@ -1168,7 +1168,7 @@ GenericSTKMeshStruct::printParts(stk::mesh::MetaData* metaData)
 void
 GenericSTKMeshStruct::loadRequiredInputFields(
     const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<const Teuchos_Comm>&                   comm)
+    const Teuchos::RCP<Teuchos_Comm const>&                   comm)
 {
   Teuchos::RCP<Teuchos::FancyOStream> out =
       Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
@@ -1503,7 +1503,7 @@ GenericSTKMeshStruct::loadField(
     const Teuchos::ParameterList&             field_params,
     Teuchos::RCP<Thyra_MultiVector>&          field_mv,
     const CombineAndScatterManager&           cas_manager,
-    const Teuchos::RCP<const Teuchos_Comm>&   comm,
+    const Teuchos::RCP<Teuchos_Comm const>&   comm,
     bool                                      node,
     bool                                      scalar,
     bool                                      layered,
@@ -1761,7 +1761,7 @@ GenericSTKMeshStruct::readScalarFileSerial(
     std::string const&                           fname,
     Teuchos::RCP<Thyra_MultiVector>&             mvec,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::RCP<const Teuchos_Comm>&      comm) const
+    const Teuchos::RCP<Teuchos_Comm const>&      comm) const
 {
   // It's a scalar, so we already know MultiVector has only 1 vector
   mvec = Thyra::createMembers(vs, 1);
@@ -1799,7 +1799,7 @@ GenericSTKMeshStruct::readVectorFileSerial(
     std::string const&                           fname,
     Teuchos::RCP<Thyra_MultiVector>&             mvec,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::RCP<const Teuchos_Comm>&      comm) const
+    const Teuchos::RCP<Teuchos_Comm const>&      comm) const
 {
   int           numComponents;
   GO            numNodes;
@@ -1840,7 +1840,7 @@ GenericSTKMeshStruct::readLayeredScalarFileSerial(
     Teuchos::RCP<Thyra_MultiVector>&             mvec,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     std::vector<double>&                         normalizedLayersCoords,
-    const Teuchos::RCP<const Teuchos_Comm>&      comm) const
+    const Teuchos::RCP<Teuchos_Comm const>&      comm) const
 {
   size_t        numLayers = 0;
   GO            numNodes;
@@ -1892,7 +1892,7 @@ GenericSTKMeshStruct::readLayeredVectorFileSerial(
     Teuchos::RCP<Thyra_MultiVector>&             mvec,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs,
     std::vector<double>&                         normalizedLayersCoords,
-    const Teuchos::RCP<const Teuchos_Comm>&      comm) const
+    const Teuchos::RCP<Teuchos_Comm const>&      comm) const
 {
   int           numVectors = 0;
   int           numLayers, numComponents;

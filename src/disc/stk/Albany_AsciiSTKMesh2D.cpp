@@ -27,7 +27,7 @@
 
 Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<const Teuchos_Comm>&     commT)
+    const Teuchos::RCP<Teuchos_Comm const>&     commT)
     : GenericSTKMeshStruct(params, Teuchos::null, 2), periodic(false)
 {
   NumElemNodes = NumNodes = NumElems = NumBdEdges = 0;
@@ -265,7 +265,7 @@ Albany::AsciiSTKMesh2D::~AsciiSTKMesh2D() {}
 
 void
 Albany::AsciiSTKMesh2D::setFieldAndBulkData(
-    const Teuchos::RCP<const Teuchos_Comm>& commT,
+    const Teuchos::RCP<Teuchos_Comm const>& commT,
     const Teuchos::RCP<Teuchos::ParameterList>& /*params_*/,
     const unsigned int                                        neq_,
     const AbstractFieldContainer::FieldContainerRequirements& req,

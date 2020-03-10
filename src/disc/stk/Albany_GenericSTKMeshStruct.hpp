@@ -75,7 +75,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
 
   void
   SetupFieldData(
-      const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
       int const                                                 neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,
       const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
@@ -115,7 +115,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
 
   //! Perform initial uniform refinement of the mesh
   void
-  uniformRefineMesh(const Teuchos::RCP<const Teuchos_Comm>& commT);
+  uniformRefineMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Creates a node set from a side set
   void
@@ -127,17 +127,17 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
 
   //! Creates empty mesh structs if required (and not already present)
   void
-  initializeSideSetMeshSpecs(const Teuchos::RCP<const Teuchos_Comm>& commT);
+  initializeSideSetMeshSpecs(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Creates empty mesh structs if required (and not already present)
   void
-  initializeSideSetMeshStructs(const Teuchos::RCP<const Teuchos_Comm>& commT);
+  initializeSideSetMeshStructs(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Completes the creation of the side set mesh structs (if of type
   //! SideSetSTKMeshStruct)
   void
   finalizeSideSetMeshStructs(
-      const Teuchos::RCP<const Teuchos_Comm>& commT,
+      const Teuchos::RCP<Teuchos_Comm const>& commT,
       std::map<
           std::string,
           AbstractFieldContainer::FieldContainerRequirements> const&
@@ -150,7 +150,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   void
   loadRequiredInputFields(
       const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<const Teuchos_Comm>&                   commT);
+      const Teuchos::RCP<Teuchos_Comm const>&                   commT);
 
   // Routines to load, fill, or compute a field
   void
@@ -159,7 +159,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       const Teuchos::ParameterList&             params,
       Teuchos::RCP<Thyra_MultiVector>&          field_mv,
       const CombineAndScatterManager&           cas_manager,
-      const Teuchos::RCP<const Teuchos_Comm>&   commT,
+      const Teuchos::RCP<Teuchos_Comm const>&   commT,
       bool                                      node,
       bool                                      scalar,
       bool                                      layered,
@@ -192,14 +192,14 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       std::string const&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
       Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-      const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
+      const Teuchos::RCP<Teuchos_Comm const>&      comm) const;
 
   void
   readVectorFileSerial(
       std::string const&                           fname,
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
       Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-      const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
+      const Teuchos::RCP<Teuchos_Comm const>&      comm) const;
 
   void
   readLayeredScalarFileSerial(
@@ -207,7 +207,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
       Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       std::vector<double>&                         normalizedLayersCoords,
-      const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
+      const Teuchos::RCP<Teuchos_Comm const>&      comm) const;
 
   void
   readLayeredVectorFileSerial(
@@ -215,7 +215,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
       Teuchos::RCP<Thyra_MultiVector>&             contentVec,
       Teuchos::RCP<Thyra_VectorSpace const> const& vs,
       std::vector<double>&                         normalizedLayersCoords,
-      const Teuchos::RCP<const Teuchos_Comm>&      comm) const;
+      const Teuchos::RCP<Teuchos_Comm const>&      comm) const;
 
   void
   checkFieldIsInMesh(std::string const& fname, std::string const& ftype) const;

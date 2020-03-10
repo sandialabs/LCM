@@ -69,7 +69,7 @@ namespace Albany {
 
 SolverFactory::SolverFactory(
     std::string const&                      inputFile,
-    const Teuchos::RCP<const Teuchos_Comm>& comm)
+    const Teuchos::RCP<Teuchos_Comm const>& comm)
     : out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   // Set up application parameters: read and broadcast input file, and set
@@ -113,7 +113,7 @@ SolverFactory::SolverFactory(
 
 SolverFactory::SolverFactory(
     const Teuchos::RCP<Teuchos::ParameterList>& input_appParams,
-    const Teuchos::RCP<const Teuchos_Comm>&     comm)
+    const Teuchos::RCP<Teuchos_Comm const>&     comm)
     : appParams(input_appParams),
       out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
@@ -138,8 +138,8 @@ SolverFactory::SolverFactory(
 
 Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
 SolverFactory::create(
-    const Teuchos::RCP<const Teuchos_Comm>& appComm,
-    const Teuchos::RCP<const Teuchos_Comm>& solverComm,
+    const Teuchos::RCP<Teuchos_Comm const>& appComm,
+    const Teuchos::RCP<Teuchos_Comm const>& solverComm,
     Teuchos::RCP<Thyra_Vector const> const& initial_guess)
 {
   Teuchos::RCP<Application> dummyAlbanyApp;
@@ -150,8 +150,8 @@ SolverFactory::create(
 Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
 SolverFactory::createAndGetAlbanyApp(
     Teuchos::RCP<Application>&              albanyApp,
-    const Teuchos::RCP<const Teuchos_Comm>& appComm,
-    const Teuchos::RCP<const Teuchos_Comm>& solverComm,
+    const Teuchos::RCP<Teuchos_Comm const>& appComm,
+    const Teuchos::RCP<Teuchos_Comm const>& solverComm,
     Teuchos::RCP<Thyra_Vector const> const& initial_guess,
     bool                                    createAlbanyApp)
 {
@@ -268,7 +268,7 @@ SolverFactory::createAndGetAlbanyApp(
 Teuchos::RCP<Thyra_ModelEvaluator>
 SolverFactory::createAlbanyAppAndModel(
     Teuchos::RCP<Application>&              albanyApp,
-    const Teuchos::RCP<const Teuchos_Comm>& appComm,
+    const Teuchos::RCP<Teuchos_Comm const>& appComm,
     Teuchos::RCP<Thyra_Vector const> const& initial_guess,
     const bool                              createAlbanyApp)
 {

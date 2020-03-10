@@ -76,7 +76,7 @@ class NodeSetSolutionCullingStrategy : public SolutionCullingStrategyBase
  private:
   std::string                      nodeSetLabel_;
   Teuchos::RCP<const Application>  app_;
-  Teuchos::RCP<const Teuchos_Comm> comm;
+  Teuchos::RCP<Teuchos_Comm const> comm;
 
   Teuchos::RCP<const AbstractDiscretization> disc_;
 };
@@ -147,7 +147,7 @@ class NodeGIDsSolutionCullingStrategy : public SolutionCullingStrategyBase
  private:
   Teuchos::Array<int>              nodeGIDs_;
   Teuchos::RCP<const Application>  app_;
-  Teuchos::RCP<const Teuchos_Comm> comm;
+  Teuchos::RCP<Teuchos_Comm const> comm;
 
   Teuchos::RCP<const AbstractDiscretization> disc_;
 };

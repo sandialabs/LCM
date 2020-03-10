@@ -43,7 +43,7 @@ NodalDataVector::replaceOverlapVectorSpace(
 void
 NodalDataVector::replaceOverlapVectorSpace(
     const Teuchos::Array<GO>&               overlap_nodeGIDs,
-    const Teuchos::RCP<const Teuchos_Comm>& comm_)
+    const Teuchos::RCP<Teuchos_Comm const>& comm_)
 {
   auto vs = Albany::createVectorSpace(comm_, overlap_nodeGIDs());
   replaceOverlapVectorSpace(vs);
@@ -64,7 +64,7 @@ NodalDataVector::replaceOwnedVectorSpace(
 void
 NodalDataVector::replaceOwnedVectorSpace(
     const Teuchos::Array<GO>&               owned_nodeGIDs,
-    const Teuchos::RCP<const Teuchos_Comm>& comm_)
+    const Teuchos::RCP<Teuchos_Comm const>& comm_)
 {
   auto vs = Albany::createVectorSpace(comm_, owned_nodeGIDs());
   replaceOwnedVectorSpace(vs);

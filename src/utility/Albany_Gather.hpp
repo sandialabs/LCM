@@ -21,7 +21,7 @@ namespace Albany {
 // this routine (or turn it into a wrapper of Teuchos routines).
 void
 gatherAllV(
-    const Teuchos::RCP<const Teuchos_Comm>& comm,
+    const Teuchos::RCP<Teuchos_Comm const>& comm,
     const Teuchos::ArrayView<const GO>&     myVals,
     Teuchos::Array<GO>&                     allVals);
 
@@ -34,7 +34,7 @@ gatherAllV(
 // ordinal is LO).
 void
 gatherV(
-    const Teuchos::RCP<const Teuchos_Comm>& comm,
+    const Teuchos::RCP<Teuchos_Comm const>& comm,
     const Teuchos::ArrayView<const GO>&     myVals,
     Teuchos::Array<GO>&                     allVals,
     const LO                                root_rank);

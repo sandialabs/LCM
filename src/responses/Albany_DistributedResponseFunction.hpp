@@ -85,7 +85,7 @@ class DistributedResponseFunction : public AbstractResponseFunction
 
  protected:
   //! Comm for forming response map
-  Teuchos::RCP<const Teuchos_Comm> commT;
+  Teuchos::RCP<Teuchos_Comm const> commT;
 };
 
 }  // namespace Albany

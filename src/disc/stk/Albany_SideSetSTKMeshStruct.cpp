@@ -21,7 +21,7 @@ namespace Albany {
 SideSetSTKMeshStruct::SideSetSTKMeshStruct(
     const MeshSpecsStruct&                      inputMeshSpecs,
     const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<const Teuchos_Comm>&     commT)
+    const Teuchos::RCP<Teuchos_Comm const>&     commT)
     : GenericSTKMeshStruct(params, Teuchos::null)
 {
   params->validateParameters(*getValidDiscretizationParameters(), 0);
@@ -125,7 +125,7 @@ SideSetSTKMeshStruct::setParentMeshInfo(
 
 void
 SideSetSTKMeshStruct::setFieldAndBulkData(
-    Teuchos::RCP<const Teuchos_Comm> const& commT,
+    Teuchos::RCP<Teuchos_Comm const> const& commT,
     Teuchos::RCP<Teuchos::ParameterList> const& /*params*/,
     unsigned int const                                        neq_,
     AbstractFieldContainer::FieldContainerRequirements const& req,

@@ -55,12 +55,12 @@ class NodalDataBase
   void
   replaceOwnedVectorSpace(
       const Teuchos::Array<GO>&               local_nodeGIDs,
-      const Teuchos::RCP<const Teuchos_Comm>& comm_);
+      const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   void
   replaceOverlapVectorSpace(
       const Teuchos::Array<GO>&               overlap_nodeGIDs,
-      const Teuchos::RCP<const Teuchos_Comm>& comm_);
+      const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   bool
   isNodeDataPresent()

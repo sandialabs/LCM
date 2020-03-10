@@ -379,7 +379,7 @@ setup_latlon_interp(
         Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type&   coords,
     Albany::WorksetArray<Teuchos::ArrayRCP<
         std::vector<Albany::STKDiscretization::interp>>>::type& interpdata,
-    const Teuchos::RCP<const Teuchos_Comm>                      comm)
+    const Teuchos::RCP<Teuchos_Comm const>                      comm)
 {
   double                   err  = 0;
   const long long unsigned rank = comm->getRank();
@@ -425,7 +425,7 @@ namespace Albany {
 STKDiscretization::STKDiscretization(
     const Teuchos::RCP<Teuchos::ParameterList>&    discParams_,
     Teuchos::RCP<Albany::AbstractSTKMeshStruct>&   stkMeshStruct_,
-    const Teuchos::RCP<const Teuchos_Comm>&        comm_,
+    const Teuchos::RCP<Teuchos_Comm const>&        comm_,
     const Teuchos::RCP<Albany::RigidBodyModes>&    rigidBodyModes_,
     std::map<int, std::vector<std::string>> const& sideSetEquations_)
     : previous_time_label(-1.0e32),

@@ -28,11 +28,11 @@ class SolverFactory
   //! Default constructor
   SolverFactory(
       std::string const&                      inputfile,
-      const Teuchos::RCP<const Teuchos_Comm>& comm);
+      const Teuchos::RCP<Teuchos_Comm const>& comm);
 
   SolverFactory(
       const Teuchos::RCP<Teuchos::ParameterList>& input_appParams,
-      const Teuchos::RCP<const Teuchos_Comm>&     comm);
+      const Teuchos::RCP<Teuchos_Comm const>&     comm);
 
   //! Destructor
   virtual ~SolverFactory() = default;
@@ -40,16 +40,16 @@ class SolverFactory
   // Thyra version of above
   virtual Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
   create(
-      const Teuchos::RCP<const Teuchos_Comm>& appComm,
-      const Teuchos::RCP<const Teuchos_Comm>& solverComm,
+      const Teuchos::RCP<Teuchos_Comm const>& appComm,
+      const Teuchos::RCP<Teuchos_Comm const>& solverComm,
       Teuchos::RCP<Thyra_Vector const> const& initial_guess = Teuchos::null);
 
   // Thyra version of above
   Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>
   createAndGetAlbanyApp(
       Teuchos::RCP<Application>&              albanyApp,
-      const Teuchos::RCP<const Teuchos_Comm>& appComm,
-      const Teuchos::RCP<const Teuchos_Comm>& solverComm,
+      const Teuchos::RCP<Teuchos_Comm const>& appComm,
+      const Teuchos::RCP<Teuchos_Comm const>& solverComm,
       Teuchos::RCP<Thyra_Vector const> const& initial_guess   = Teuchos::null,
       bool                                    createAlbanyApp = true);
 
@@ -57,7 +57,7 @@ class SolverFactory
   Teuchos::RCP<Thyra::ModelEvaluator<ST>>
   createAlbanyAppAndModel(
       Teuchos::RCP<Application>&              albanyApp,
-      const Teuchos::RCP<const Teuchos_Comm>& appComm,
+      const Teuchos::RCP<Teuchos_Comm const>& appComm,
       Teuchos::RCP<Thyra_Vector const> const& initial_guess   = Teuchos::null,
       const bool                              createAlbanyApp = true);
 

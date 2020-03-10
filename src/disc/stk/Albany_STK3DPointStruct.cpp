@@ -10,7 +10,7 @@
 // Constructor for meshes read from ASCII file
 Albany::STK3DPointStruct::STK3DPointStruct(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<const Teuchos_Comm>&     commT)
+    const Teuchos::RCP<Teuchos_Comm const>&     commT)
     : GenericSTKMeshStruct(params, Teuchos::null, 3)
 {
   partVec[0] = &metaData->declare_part("Block0", stk::topology::ELEMENT_RANK);
@@ -54,7 +54,7 @@ Albany::STK3DPointStruct::~STK3DPointStruct(){};
 
 void
 Albany::STK3DPointStruct::setFieldAndBulkData(
-    const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+    const Teuchos::RCP<Teuchos_Comm const>&                   commT,
     const Teuchos::RCP<Teuchos::ParameterList>&               params,
     const unsigned int                                        neq_,
     const AbstractFieldContainer::FieldContainerRequirements& req,
@@ -94,7 +94,7 @@ Albany::STK3DPointStruct::setFieldAndBulkData(
 
 void
 Albany::STK3DPointStruct::buildMesh(
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   std::cout << "---3DPoint::buildMesh---" << std::endl;
 }

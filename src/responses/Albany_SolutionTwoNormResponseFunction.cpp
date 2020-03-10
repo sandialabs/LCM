@@ -9,7 +9,7 @@
 #include "Thyra_VectorStdOps.hpp"
 
 Albany::SolutionTwoNormResponseFunction::SolutionTwoNormResponseFunction(
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
     : SamplingBasedScalarResponseFunction(commT)
 {
 }

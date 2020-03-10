@@ -30,7 +30,7 @@ class GlobalLocalIndexer
   virtual GO
   getNumGlobalElements() const = 0;
 
-  virtual Teuchos::RCP<const Teuchos_Comm>
+  virtual Teuchos::RCP<Teuchos_Comm const>
   getComm() const = 0;
 
   virtual bool

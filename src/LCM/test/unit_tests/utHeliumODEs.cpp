@@ -42,7 +42,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
 {
   // A mpi object must be instantiated
   Teuchos::GlobalMPISession        mpi_session(void);
-  Teuchos::RCP<const Teuchos_Comm> commT =
+  Teuchos::RCP<Teuchos_Comm const> commT =
       Albany::createTeuchosCommFromMpiComm(Albany_MPI_COMM_WORLD);
 
   // Get the name of the material model to be used (and make sure there is one)

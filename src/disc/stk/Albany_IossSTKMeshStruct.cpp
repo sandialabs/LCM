@@ -45,7 +45,7 @@ get_element_block_sizes(
 Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<Teuchos::ParameterList>& adaptParams_,
-    const Teuchos::RCP<const Teuchos_Comm>&     commT)
+    const Teuchos::RCP<Teuchos_Comm const>&     commT)
     : GenericSTKMeshStruct(params_, adaptParams_),
       out(Teuchos::VerboseObjectBase::getDefaultOStream()),
       useSerialMesh(false),
@@ -336,7 +336,7 @@ Albany::IossSTKMeshStruct::~IossSTKMeshStruct()
 
 void
 Albany::IossSTKMeshStruct::setFieldAndBulkData(
-    const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+    const Teuchos::RCP<Teuchos_Comm const>&                   commT,
     const Teuchos::RCP<Teuchos::ParameterList>&               params,
     const unsigned int                                        neq_,
     const AbstractFieldContainer::FieldContainerRequirements& req,

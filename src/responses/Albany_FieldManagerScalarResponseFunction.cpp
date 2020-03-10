@@ -54,7 +54,7 @@ void
 FieldManagerScalarResponseFunction::setup(
     Teuchos::ParameterList& responseParams)
 {
-  Teuchos::RCP<const Teuchos_Comm> commT = application->getComm();
+  Teuchos::RCP<Teuchos_Comm const> commT = application->getComm();
 
   // FIXME: The adding of the Phalanx Graph Viz parameter
   // below causes problems if this function is called with

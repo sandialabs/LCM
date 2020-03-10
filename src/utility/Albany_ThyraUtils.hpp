@@ -17,9 +17,9 @@ namespace Albany {
 Teuchos::RCP<Thyra_VectorSpace const>
 createLocallyReplicatedVectorSpace(
     int const                              size,
-    const Teuchos::RCP<const Teuchos_Comm> comm);
+    const Teuchos::RCP<Teuchos_Comm const> comm);
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 getComm(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 Teuchos::Array<GO>
 getGlobalElements(
@@ -60,7 +60,7 @@ createSubspace(
 // Create a vector space, given the ids of the space components
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
 createVectorSpace(
-    const Teuchos::RCP<const Teuchos_Comm>& comm,
+    const Teuchos::RCP<Teuchos_Comm const>& comm,
     const Teuchos::ArrayView<const GO>&     gids,
     const GO globalDim = Teuchos::OrdinalTraits<GO>::invalid());
 
@@ -69,7 +69,7 @@ Teuchos::RCP<Thyra_VectorSpace const>
 createVectorSpacesIntersection(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
-    const Teuchos::RCP<const Teuchos_Comm>&      comm);
+    const Teuchos::RCP<Teuchos_Comm const>&      comm);
 
 // Complement of a vector spaces to another
 // NOTE: elements in vs2 that are not in vs1 are ignored.
@@ -77,7 +77,7 @@ Teuchos::RCP<Thyra_VectorSpace const>
 createVectorSpacesDifference(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
-    const Teuchos::RCP<const Teuchos_Comm>&      comm);
+    const Teuchos::RCP<Teuchos_Comm const>&      comm);
 
 // ========= Thyra_LinearOp utilities ========= //
 

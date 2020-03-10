@@ -105,7 +105,7 @@ class STKDiscretization : public AbstractDiscretization
   STKDiscretization(
       const Teuchos::RCP<Teuchos::ParameterList>& discParams,
       Teuchos::RCP<AbstractSTKMeshStruct>&        stkMeshStruct,
-      const Teuchos::RCP<const Teuchos_Comm>&     comm,
+      const Teuchos::RCP<Teuchos_Comm const>&     comm,
       const Teuchos::RCP<RigidBodyModes>& rigidBodyModes = Teuchos::null,
       std::map<int, std::vector<std::string>> const& sideSetEquations =
           std::map<int, std::vector<std::string>>());
@@ -652,7 +652,7 @@ class STKDiscretization : public AbstractDiscretization
   stk::mesh::BulkData& bulkData;
 
   //! Teuchos communicator
-  Teuchos::RCP<const Teuchos_Comm> comm;
+  Teuchos::RCP<Teuchos_Comm const> comm;
 
   //! Unknown map and node map
   Teuchos::RCP<Thyra_VectorSpace const> m_vs;

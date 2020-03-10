@@ -19,14 +19,14 @@ namespace Albany {
 Teuchos::RCP<Thyra_VectorSpace const>
 createLocallyReplicatedVectorSpace(
     int const                              size,
-    const Teuchos::RCP<const Teuchos_Comm> comm)
+    const Teuchos::RCP<Teuchos_Comm const> comm)
 {
   Teuchos::RCP<const Tpetra_Map> tmap(
       new Tpetra_Map(size, 0, comm, Tpetra::LocalGlobal::LocallyReplicated));
   return createThyraVectorSpace(tmap);
 }
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 getComm(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
@@ -207,7 +207,7 @@ createSubspace(
 // Create a vector space, given the ids of the space components
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
 createVectorSpace(
-    const Teuchos::RCP<const Teuchos_Comm>& comm,
+    const Teuchos::RCP<Teuchos_Comm const>& comm,
     const Teuchos::ArrayView<const GO>&     gids,
     const GO                                globalDim)
 {
@@ -226,7 +226,7 @@ Teuchos::RCP<Thyra_VectorSpace const>
 createVectorSpacesIntersection(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
-    const Teuchos::RCP<const Teuchos_Comm>&      comm)
+    const Teuchos::RCP<Teuchos_Comm const>&      comm)
 {
   auto gids1 = getGlobalElements(vs1);
   auto gids2 = getGlobalElements(vs2);
@@ -247,7 +247,7 @@ Teuchos::RCP<Thyra_VectorSpace const>
 createVectorSpacesDifference(
     Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
     Teuchos::RCP<Thyra_VectorSpace const> const& vs2,
-    const Teuchos::RCP<const Teuchos_Comm>&      comm)
+    const Teuchos::RCP<Teuchos_Comm const>&      comm)
 {
   auto gids1 = getGlobalElements(vs1);
   auto gids2 = getGlobalElements(vs2);

@@ -30,7 +30,7 @@ class AbstractAdapter
       const Teuchos::RCP<Teuchos::ParameterList>& params_,
       const Teuchos::RCP<ParamLib>&               paramLib_,
       const Albany::StateManager&                 StateMgr_,
-      const Teuchos::RCP<const Teuchos_Comm>&     comm_);
+      const Teuchos::RCP<Teuchos_Comm const>&     comm_);
 
   ///
   /// Destructor
@@ -93,7 +93,7 @@ class AbstractAdapter
   ///
   /// Teuchos communicator
   ///
-  Teuchos::RCP<const Teuchos_Comm> teuchos_comm_;
+  Teuchos::RCP<Teuchos_Comm const> teuchos_comm_;
 };
 
 }  // namespace AAdapt

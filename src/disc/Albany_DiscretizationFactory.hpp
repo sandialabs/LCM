@@ -27,7 +27,7 @@ class DiscretizationFactory
   //! Default constructor
   DiscretizationFactory(
       const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
-      const Teuchos::RCP<const Teuchos_Comm>&     commT);
+      const Teuchos::RCP<Teuchos_Comm const>&     commT);
 
   //! Destructor
   ~DiscretizationFactory() {}
@@ -36,7 +36,7 @@ class DiscretizationFactory
   createMeshStruct(
       Teuchos::RCP<Teuchos::ParameterList> disc_params,
       Teuchos::RCP<Teuchos::ParameterList> adapt_params,
-      Teuchos::RCP<const Teuchos_Comm>     comm);
+      Teuchos::RCP<Teuchos_Comm const>     comm);
 
   Teuchos::RCP<Albany::AbstractMeshStruct>
   getMeshStruct()
@@ -133,7 +133,7 @@ class DiscretizationFactory
   //! Parameter list specifying parameters for Catalyst
   Teuchos::RCP<Teuchos::ParameterList> catalystParams;
 
-  Teuchos::RCP<const Teuchos_Comm> commT;
+  Teuchos::RCP<Teuchos_Comm const> commT;
 
   Teuchos::RCP<Albany::AbstractMeshStruct> meshStruct;
 };

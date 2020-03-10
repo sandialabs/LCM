@@ -46,7 +46,7 @@ class GlobalLocalIndexerTpetra : public GlobalLocalIndexer
     return m_tmap->isNodeGlobalElement(gid);
   }
 
-  Teuchos::RCP<const Teuchos_Comm>
+  Teuchos::RCP<Teuchos_Comm const>
   getComm() const
   {
     return m_tmap->getComm();

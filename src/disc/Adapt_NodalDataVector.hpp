@@ -40,14 +40,14 @@ class NodalDataVector
   void
   replaceOwnedVectorSpace(
       const Teuchos::Array<GO>&               owned_nodeGIDs,
-      const Teuchos::RCP<const Teuchos_Comm>& comm_);
+      const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   void
   replaceOverlapVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
   void
   replaceOverlapVectorSpace(
       const Teuchos::Array<GO>&               overlap_nodeGIDs,
-      const Teuchos::RCP<const Teuchos_Comm>& comm_);
+      const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   // Methods to get multivectors (or their data)
   const Teuchos::RCP<Thyra_MultiVector>&

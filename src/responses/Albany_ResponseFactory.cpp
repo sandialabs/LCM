@@ -32,7 +32,7 @@ Albany::ResponseFactory::createResponseFunction(
   using Teuchos::RCP;
   using Teuchos::rcp;
 
-  RCP<const Teuchos_Comm> comm = app->getComm();
+  RCP<Teuchos_Comm const> comm = app->getComm();
 
   if (name == "Solution Average") {
     responses.push_back(rcp(new Albany::SolutionAverageResponseFunction(comm)));

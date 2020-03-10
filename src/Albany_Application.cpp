@@ -68,7 +68,7 @@ calcTangentDerivDimension(
 namespace Albany {
 
 Application::Application(
-    const RCP<const Teuchos_Comm>&     comm_,
+    const RCP<Teuchos_Comm const>&     comm_,
     const RCP<Teuchos::ParameterList>& params,
     RCP<Thyra_Vector const> const&     initial_guess,
     const bool                         schwarz)
@@ -93,7 +93,7 @@ Application::Application(
   finalSetUp(params, initial_guess);
 }
 
-Application::Application(const RCP<const Teuchos_Comm>& comm_)
+Application::Application(const RCP<Teuchos_Comm const>& comm_)
     : no_dir_bcs_(false),
       requires_sdbcs_(false),
       requires_orig_dbcs_(false),
@@ -687,7 +687,7 @@ Application::getProblem() const
   return problem;
 }
 
-RCP<const Teuchos_Comm>
+RCP<Teuchos_Comm const>
 Application::getComm() const
 {
   return comm;

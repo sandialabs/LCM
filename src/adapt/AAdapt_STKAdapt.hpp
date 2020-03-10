@@ -26,7 +26,7 @@ class STKAdapt : public AbstractAdapter
       const Teuchos::RCP<Teuchos::ParameterList>& params_,
       const Teuchos::RCP<ParamLib>&               paramLib_,
       const Albany::StateManager&                 StateMgr_,
-      const Teuchos::RCP<const Teuchos_Comm>&     comm_);
+      const Teuchos::RCP<Teuchos_Comm const>&     comm_);
   //! Destructor
   ~STKAdapt() = delete;
 

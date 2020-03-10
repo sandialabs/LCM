@@ -18,7 +18,7 @@ class SolutionAverageResponseFunction : public ScalarResponseFunction
 {
  public:
   //! Default constructor
-  SolutionAverageResponseFunction(const Teuchos::RCP<const Teuchos_Comm>& comm);
+  SolutionAverageResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm);
 
   //! Destructor
   ~SolutionAverageResponseFunction() = default;

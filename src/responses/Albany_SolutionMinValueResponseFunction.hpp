@@ -20,7 +20,7 @@ class SolutionMinValueResponseFunction
  public:
   //! Default constructor
   SolutionMinValueResponseFunction(
-      const Teuchos::RCP<const Teuchos_Comm>& comm,
+      const Teuchos::RCP<Teuchos_Comm const>& comm,
       int                                     neq                 = 1,
       int                                     eq                  = 0,
       bool                                    interleavedOrdering = true);
@@ -71,7 +71,7 @@ class SolutionMinValueResponseFunction
   //! Equation we want to get the max value from
   int eq;
 
-  Teuchos::RCP<const Teuchos_Comm> comm_;
+  Teuchos::RCP<Teuchos_Comm const> comm_;
 
   //! Flag for interleaved verus blocked unknown ordering
   bool interleavedOrdering;

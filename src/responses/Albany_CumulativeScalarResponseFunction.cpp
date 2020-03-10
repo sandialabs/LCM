@@ -13,7 +13,7 @@ using Teuchos::RCP;
 using Teuchos::rcp;
 
 Albany::CumulativeScalarResponseFunction::CumulativeScalarResponseFunction(
-    const Teuchos::RCP<const Teuchos_Comm>&                     commT,
+    const Teuchos::RCP<Teuchos_Comm const>&                     commT,
     const Teuchos::Array<Teuchos::RCP<ScalarResponseFunction>>& responses_)
     : SamplingBasedScalarResponseFunction(commT),
       responses(responses_),

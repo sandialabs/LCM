@@ -14,7 +14,7 @@
 namespace Albany {
 
 AggregateScalarResponseFunction::AggregateScalarResponseFunction(
-    const Teuchos::RCP<const Teuchos_Comm>&                     comm,
+    const Teuchos::RCP<Teuchos_Comm const>&                     comm,
     const Teuchos::Array<Teuchos::RCP<ScalarResponseFunction>>& responses_)
     : SamplingBasedScalarResponseFunction(comm), responses(responses_)
 {

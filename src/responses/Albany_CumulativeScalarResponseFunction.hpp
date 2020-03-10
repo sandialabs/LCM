@@ -22,7 +22,7 @@ class CumulativeScalarResponseFunction
  public:
   //! Default constructor
   CumulativeScalarResponseFunction(
-      const Teuchos::RCP<const Teuchos_Comm>&                     commT,
+      const Teuchos::RCP<Teuchos_Comm const>&                     commT,
       const Teuchos::Array<Teuchos::RCP<ScalarResponseFunction>>& responses);
 
   //! Setup response function

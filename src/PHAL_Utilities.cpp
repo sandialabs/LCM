@@ -95,7 +95,7 @@ copy(std::vector<ScalarT> const& v, PHX::MDField<ScalarT>& a)
 template <typename ScalarT>
 void
 myReduceAll(
-    const Teuchos_Comm&           comm,
+    Teuchos_Comm const&           comm,
     const Teuchos::EReductionType reduct_type,
     std::vector<ScalarT>&         v)
 {
@@ -128,7 +128,7 @@ myReduceAll(
 template <>
 void
 myReduceAll<RealType>(
-    const Teuchos_Comm&           comm,
+    Teuchos_Comm const&           comm,
     const Teuchos::EReductionType reduct_type,
     std::vector<RealType>&        v)
 {
@@ -142,7 +142,7 @@ myReduceAll<RealType>(
 template <typename ScalarT>
 void
 reduceAll(
-    const Teuchos_Comm&           comm,
+    Teuchos_Comm const&           comm,
     const Teuchos::EReductionType reduct_type,
     PHX::MDField<ScalarT>&        a)
 {
@@ -155,7 +155,7 @@ reduceAll(
 template <typename ScalarT>
 void
 reduceAll(
-    const Teuchos_Comm&           comm,
+    Teuchos_Comm const&           comm,
     const Teuchos::EReductionType reduct_type,
     ScalarT&                      a)
 {
@@ -167,7 +167,7 @@ reduceAll(
 template <typename ScalarT>
 void
 broadcast(
-    const Teuchos_Comm&    comm,
+    Teuchos_Comm const&    comm,
     int const              root_rank,
     PHX::MDField<ScalarT>& a)
 {
@@ -186,17 +186,17 @@ broadcast(
 
 #define eti(T)                \
   template void reduceAll<T>( \
-      const Teuchos_Comm&, const Teuchos::EReductionType, PHX::MDField<T>&);
+      Teuchos_Comm const&, const Teuchos::EReductionType, PHX::MDField<T>&);
 apply_to_all_ad_types(eti)
 #undef eti
 #define eti(T)                \
   template void reduceAll<T>( \
-      const Teuchos_Comm&, const Teuchos::EReductionType, T&);
+      Teuchos_Comm const&, const Teuchos::EReductionType, T&);
     apply_to_all_ad_types(eti)
 #undef eti
 #define eti(T)                \
   template void broadcast<T>( \
-      const Teuchos_Comm&, int const root_rank, PHX::MDField<T>&);
+      Teuchos_Comm const&, int const root_rank, PHX::MDField<T>&);
         apply_to_all_ad_types(eti)
 #undef eti
 #undef apply_to_all_ad_types

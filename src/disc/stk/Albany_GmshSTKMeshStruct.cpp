@@ -24,7 +24,7 @@
 
 Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<const Teuchos_Comm>&     commT)
+    const Teuchos::RCP<Teuchos_Comm const>&     commT)
     : GenericSTKMeshStruct(params, Teuchos::null)
 {
   fname = params->get("Gmsh Input Mesh File Name", "mesh.msh");
@@ -244,7 +244,7 @@ Albany::GmshSTKMeshStruct::init_pointers_to_null()
 
 void
 Albany::GmshSTKMeshStruct::broadcast_topology(
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   Teuchos::broadcast(*commT, 0, 1, &this->numDim);
   Teuchos::broadcast(*commT, 0, 1, &NumElemNodes);
@@ -257,7 +257,7 @@ Albany::GmshSTKMeshStruct::broadcast_topology(
 
 void
 Albany::GmshSTKMeshStruct::setFieldAndBulkData(
-    const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+    const Teuchos::RCP<Teuchos_Comm const>&                   commT,
     const Teuchos::RCP<Teuchos::ParameterList>&               params,
     const unsigned int                                        neq_,
     const AbstractFieldContainer::FieldContainerRequirements& req,
@@ -1372,7 +1372,7 @@ Albany::GmshSTKMeshStruct::set_all_sides_boundary(
 
 void
 Albany::GmshSTKMeshStruct::set_boundaries(
-    const Teuchos::RCP<const Teuchos_Comm>& commT,
+    const Teuchos::RCP<Teuchos_Comm const>& commT,
     std::vector<std::string>&               ssNames,
     std::vector<std::string>&               nsNames)
 {
@@ -1664,7 +1664,7 @@ Albany::GmshSTKMeshStruct::broadcast_name_tag_pair(
     std::vector<std::string>                names,
     int*                                    tags_array,
     int                                     pair_number,
-    const Teuchos::RCP<const Teuchos_Comm>& commT,
+    const Teuchos::RCP<Teuchos_Comm const>& commT,
     std::map<std::string, int>&             physical_names)
 {
   std::string name;
@@ -1694,7 +1694,7 @@ Albany::GmshSTKMeshStruct::broadcast_name_tag_pair(
 void
 Albany::GmshSTKMeshStruct::broadcast_physical_names(
     std::map<std::string, int>&             physical_names,
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   // Broadcast the number of name-tag pairs
   int num_pairs = physical_names.size();
@@ -1730,7 +1730,7 @@ Albany::GmshSTKMeshStruct::broadcast_physical_names(
 void
 Albany::GmshSTKMeshStruct::get_physical_names(
     std::map<std::string, int>&             physical_names,
-    const Teuchos::RCP<const Teuchos_Comm>& commT)
+    const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   if (commT->getRank() == 0) { read_physical_names_from_file(physical_names); }
   broadcast_physical_names(physical_names, commT);

@@ -55,12 +55,12 @@ class Application
 
   //! Constructor(s) and Destructor
   Application(
-      const Teuchos::RCP<const Teuchos_Comm>&     comm,
+      const Teuchos::RCP<Teuchos_Comm const>&     comm,
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       Teuchos::RCP<Thyra_Vector const> const&     initial_guess = Teuchos::null,
       const bool                                  schwarz       = false);
 
-  Application(const Teuchos::RCP<const Teuchos_Comm>& comm);
+  Application(const Teuchos::RCP<Teuchos_Comm const>& comm);
 
   Application(const Application&) = delete;
 
@@ -96,7 +96,7 @@ class Application
   getProblem() const;
 
   //! Get communicator
-  Teuchos::RCP<const Teuchos_Comm>
+  Teuchos::RCP<Teuchos_Comm const>
   getComm() const;
 
   //! Get Thyra DOF vector space
@@ -590,7 +590,7 @@ class Application
   bool requires_sdbcs_{false};
   bool requires_orig_dbcs_{false};
 
-  Teuchos::RCP<const Teuchos_Comm>             comm{Teuchos::null};
+  Teuchos::RCP<Teuchos_Comm const>             comm{Teuchos::null};
   Teuchos::RCP<Teuchos::FancyOStream>          out{Teuchos::null};
   Teuchos::RCP<Albany::AbstractDiscretization> disc{Teuchos::null};
   Teuchos::RCP<Albany::DiscretizationFactory>  discFactory{Teuchos::null};

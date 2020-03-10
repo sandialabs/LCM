@@ -13,7 +13,7 @@
 namespace Albany {
 
 SolutionMinValueResponseFunction::SolutionMinValueResponseFunction(
-    const Teuchos::RCP<const Teuchos_Comm>& comm,
+    const Teuchos::RCP<Teuchos_Comm const>& comm,
     int                                     neq_,
     int                                     eq_,
     bool                                    interleavedOrdering_)

@@ -23,7 +23,7 @@ class ScalarResponseFunction : public AbstractResponseFunction
 {
  public:
   //! Default constructor
-  ScalarResponseFunction(const Teuchos::RCP<const Teuchos_Comm>& comm_)
+  ScalarResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm_)
       : comm(comm_)
   {
     // Nothing to be done here
@@ -43,7 +43,7 @@ class ScalarResponseFunction : public AbstractResponseFunction
   }
 
   //! Get the comm
-  Teuchos::RCP<const Teuchos_Comm>
+  Teuchos::RCP<Teuchos_Comm const>
   getComm() const
   {
     return comm;
@@ -111,7 +111,7 @@ class ScalarResponseFunction : public AbstractResponseFunction
 
  protected:
   //! Comm for forming response map
-  Teuchos::RCP<const Teuchos_Comm> comm;
+  Teuchos::RCP<Teuchos_Comm const> comm;
 };
 
 }  // namespace Albany

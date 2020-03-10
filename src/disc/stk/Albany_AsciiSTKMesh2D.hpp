@@ -49,13 +49,13 @@ class AsciiSTKMesh2D : public GenericSTKMeshStruct
  public:
   AsciiSTKMesh2D(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<const Teuchos_Comm>&     commT);
+      const Teuchos::RCP<Teuchos_Comm const>&     commT);
 
   ~AsciiSTKMesh2D();
 
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
       const Teuchos::RCP<Teuchos::ParameterList>&               params,
       const unsigned int                                        neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,

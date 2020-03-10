@@ -12,7 +12,7 @@ namespace Albany {
 
 #if defined(ALBANY_MPI)
 Albany_MPI_Comm
-getMpiCommFromTeuchosComm(Teuchos::RCP<const Teuchos_Comm>& tc)
+getMpiCommFromTeuchosComm(Teuchos::RCP<Teuchos_Comm const>& tc)
 {
   Teuchos::Ptr<const Teuchos::MpiComm<int>> mpiComm =
       Teuchos::ptr_dynamic_cast<const Teuchos::MpiComm<int>>(
@@ -20,7 +20,7 @@ getMpiCommFromTeuchosComm(Teuchos::RCP<const Teuchos_Comm>& tc)
   return *mpiComm->getRawMpiComm();
 }
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc)
 {
   // The default tag in the MpiComm is used in Teuchos send/recv operations
@@ -32,7 +32,7 @@ createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc)
 
 #else
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc)
 {
   return Teuchos::rcp(new Teuchos::SerialComm<int>());
@@ -40,13 +40,13 @@ createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc)
 
 #endif  // defined(ALBANY_MPI)
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 getDefaultComm()
 {
   return Teuchos::DefaultComm<int>::getComm();
 }
 
-Teuchos::RCP<const Teuchos_Comm>
+Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromThyraComm(
     const Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>& tc_in)
 {
@@ -67,7 +67,7 @@ createTeuchosCommFromThyraComm(
 }
 
 Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>
-createThyraCommFromTeuchosComm(const Teuchos::RCP<const Teuchos_Comm>& tc_in)
+createThyraCommFromTeuchosComm(const Teuchos::RCP<Teuchos_Comm const>& tc_in)
 {
 #if defined(HAVE_MPI)
   const Teuchos::RCP<const Teuchos::MpiComm<int>> mpiCommIn =

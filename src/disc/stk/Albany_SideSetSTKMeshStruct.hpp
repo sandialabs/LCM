@@ -17,13 +17,13 @@ class SideSetSTKMeshStruct : public GenericSTKMeshStruct
   SideSetSTKMeshStruct(
       const MeshSpecsStruct&                      inputMeshSpecs,
       const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<const Teuchos_Comm>&     commT);
+      const Teuchos::RCP<Teuchos_Comm const>&     commT);
 
   virtual ~SideSetSTKMeshStruct();
 
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<const Teuchos_Comm>&                   comm,
+      const Teuchos::RCP<Teuchos_Comm const>&                   comm,
       const Teuchos::RCP<Teuchos::ParameterList>&               params,
       const unsigned int                                        neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,

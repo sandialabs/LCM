@@ -63,7 +63,7 @@ Topology::Topology(
   Teuchos::RCP<Teuchos::ParameterList> adapt_params =
       Teuchos::sublist(problem_params, "Adaptation");
 
-  Teuchos::RCP<const Teuchos_Comm> communicator = Albany::getDefaultComm();
+  Teuchos::RCP<Teuchos_Comm const> communicator = Albany::getDefaultComm();
   adapt_params->set<std::string>("Method", "Topmod");
   std::string const bulk_block_name = "Bulk Element";
   adapt_params->set<std::string>("Bulk Block Name", bulk_block_name);

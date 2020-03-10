@@ -21,14 +21,14 @@ class STK3DPointStruct : public GenericSTKMeshStruct
   //! Default constructor
   STK3DPointStruct(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<const Teuchos_Comm>&     commT);
+      const Teuchos::RCP<Teuchos_Comm const>&     commT);
 
   ~STK3DPointStruct();
 
   //! Sets mesh generation parameters
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<const Teuchos_Comm>&                   commT,
+      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
       const Teuchos::RCP<Teuchos::ParameterList>&               params,
       const unsigned int                                        neq_,
       const AbstractFieldContainer::FieldContainerRequirements& req,
@@ -57,7 +57,7 @@ class STK3DPointStruct : public GenericSTKMeshStruct
  private:
   //! Build the mesh
   void
-  buildMesh(const Teuchos::RCP<const Teuchos_Comm>& commT);
+  buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Build a parameter list that contains valid input parameters
   Teuchos::RCP<const Teuchos::ParameterList>

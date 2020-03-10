@@ -208,7 +208,7 @@ createSolutionCullingStrategy(
     return Teuchos::rcp(new NodeGIDsSolutionCullingStrategy(nodeGIDs, app));
   }
 
-  const bool unsupportedCullingStrategy = true;
+  bool const unsupportedCullingStrategy = true;
   ALBANY_PANIC(unsupportedCullingStrategy);
   return Teuchos::null;
 }

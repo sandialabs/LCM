@@ -21,7 +21,7 @@ buildSTKNodeField(
     std::string const&                             name,
     std::vector<PHX::DataLayout::size_type> const& dim,
     const Teuchos::RCP<stk::mesh::MetaData>&       metaData,
-    const bool                                     output)
+    bool const                                     output)
 {
   Teuchos::RCP<AbstractNodeFieldContainer> nfc;
   switch (dim.size()) {
@@ -50,7 +50,7 @@ STKNodeField<DataType, ArrayDim, traits>::STKNodeField(
     std::string const&                             name_,
     std::vector<PHX::DataLayout::size_type> const& dims_,
     const Teuchos::RCP<stk::mesh::MetaData>&       metaData_,
-    const bool                                     output)
+    bool const                                     output)
     : name(name_), dims(dims_), metaData(metaData_)
 {
   // amb-leak Look into this later.

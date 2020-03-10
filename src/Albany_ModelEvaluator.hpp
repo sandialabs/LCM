@@ -88,7 +88,7 @@ class ModelEvaluator
   createInArgs() const;
 
   void
-  reportFinalPoint(const Thyra_InArgs& finalPoint, const bool wasSolved);
+  reportFinalPoint(const Thyra_InArgs& finalPoint, bool const wasSolved);
 
   void
   allocateVectors();

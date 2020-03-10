@@ -64,7 +64,7 @@ gatherAllV(
     std::copy(
         myVals.getRawPtr(), myVals.getRawPtr() + myCount, allVals.getRawPtr());
   } else {
-    const bool commTypeNotSupported = true;
+    bool const commTypeNotSupported = true;
     ALBANY_PANIC(commTypeNotSupported);
   }
 }
@@ -129,7 +129,7 @@ gatherV(
     std::copy(
         myVals.getRawPtr(), myVals.getRawPtr() + myCount, allVals.getRawPtr());
   } else {
-    const bool commTypeNotSupported = true;
+    bool const commTypeNotSupported = true;
     ALBANY_PANIC(commTypeNotSupported);
   }
 }

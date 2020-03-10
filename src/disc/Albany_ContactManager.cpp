@@ -253,7 +253,7 @@ Albany::ContactManager::processSS(
         stream << "    element block side is in = " << elem_block << std::endl;
 
         // gather nodes from sideset and if unique then create moertel node
-        const bool on_boundary =
+        bool const on_boundary =
             false;  // will eventually want to allow boundaries to be
                     // intersected by contact surfaces
         int const contact_pair_id =

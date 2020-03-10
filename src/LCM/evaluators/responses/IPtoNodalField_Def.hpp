@@ -255,7 +255,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     typename Traits::PreEvalData workset)
 {
   int const  ctr      = this->mgr_->incrPreCounter();
-  const bool am_first = ctr == 1;
+  bool const am_first = ctr == 1;
   if (!am_first) return;
 
   const Teuchos::RCP<Adapt::NodalDataVector> node_data =
@@ -365,7 +365,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
     typename Traits::PostEvalData workset)
 {
   int const  ctr     = this->mgr_->incrPostCounter();
-  const bool am_last = ctr == this->mgr_->nWorker();
+  bool const am_last = ctr == this->mgr_->nWorker();
   if (!am_last) return;
   this->mgr_->initCounters();
 

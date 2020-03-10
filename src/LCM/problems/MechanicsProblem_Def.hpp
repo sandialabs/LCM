@@ -1756,17 +1756,17 @@ MechanicsProblem::constructEvaluators(
             material_db_->getElementBlockParam<RealType>(eb_name, "Density"));
       }
 
-      const bool resid_using_cub = material_db_->getElementBlockParam<bool>(
+      bool const resid_using_cub = material_db_->getElementBlockParam<bool>(
           eb_name, "Residual Computed Using Cubature", false);
       p->set<bool>("Residual Computed Using Cubature", resid_using_cub);
 
       p->set<bool>("Use Composite Tet 10", composite_);
 
-      const bool use_analytic_mass = material_db_->getElementBlockParam<bool>(
+      bool const use_analytic_mass = material_db_->getElementBlockParam<bool>(
           eb_name, "Use Analytic Mass", false);
       p->set<bool>("Use Analytic Mass", use_analytic_mass);
 
-      const bool lump_analytic_mass = material_db_->getElementBlockParam<bool>(
+      bool const lump_analytic_mass = material_db_->getElementBlockParam<bool>(
           eb_name, "Lump Analytic Mass", false);
       p->set<bool>("Lump Analytic Mass", lump_analytic_mass);
 
@@ -1790,7 +1790,7 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Acceleration Name", "Acceleration");
       p->set<std::string>("Body Force Name", "Body Force");
       p->set<std::string>("Analytic Mass Name", "Analytic Mass Residual");
-      const bool use_analytic_mass = material_db_->getElementBlockParam<bool>(
+      bool const use_analytic_mass = material_db_->getElementBlockParam<bool>(
           eb_name, "Use Analytic Mass", false);
       p->set<bool>("Use Analytic Mass", use_analytic_mass);
       if (Teuchos::nonnull(rc_mgr_)) {

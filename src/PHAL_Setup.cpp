@@ -98,7 +98,7 @@ void
 Setup::fill_field_dependencies(
     std::vector<Teuchos::RCP<PHX::FieldTag>> const& depFields,
     std::vector<Teuchos::RCP<PHX::FieldTag>> const& evalFields,
-    const bool                                      saved)
+    bool const                                      saved)
 {
   if (_enableMemoization) {
     // Fill dependencies as Dependency -> list of Evaluated

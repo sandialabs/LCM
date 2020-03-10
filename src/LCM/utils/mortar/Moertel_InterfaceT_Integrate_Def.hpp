@@ -454,7 +454,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D_Section(
   std::vector<double> mxi(mseg.Nnode());
   std::vector<double> mgap(mseg.Nnode());
   for (int i = 0; i < mseg.Nnode(); ++i) {
-    const bool ok = projector.ProjectNodetoSegment_SegmentNormal(
+    bool const ok = projector.ProjectNodetoSegment_SegmentNormal(
         *mnodes[i], sseg, &mxi[i], mgap[i]);
     if (!ok) mxi[i] = 10;  // Large enough to be out of bounds below.
   }
@@ -464,7 +464,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D_Section(
   std::vector<double> sxi(sseg.Nnode());
   std::vector<double> sgap(sseg.Nnode());
   for (int i = 0; i < sseg.Nnode(); ++i) {
-    const bool ok = projector.ProjectNodetoSegment_NodalNormal(
+    bool const ok = projector.ProjectNodetoSegment_NodalNormal(
         *snodes[i], mseg, &sxi[i], sgap[i]);
     if (!ok) sxi[i] = 10;  // Large enough to be out of bounds below.
   }

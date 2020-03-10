@@ -410,11 +410,11 @@ Albany::ElasticityProblem::constructEvaluators(
     RCP<ParameterList> p = rcp(new ParameterList("DefGrad"));
 
     // Inputs: flags, weights, GradU
-    const bool avgJ = params->get("avgJ", false);
+    bool const avgJ = params->get("avgJ", false);
     p->set<bool>("avgJ Name", avgJ);
-    const bool volavgJ = params->get("volavgJ", false);
+    bool const volavgJ = params->get("volavgJ", false);
     p->set<bool>("volavgJ Name", volavgJ);
-    const bool weighted_Volume_Averaged_J =
+    bool const weighted_Volume_Averaged_J =
         params->get("weighted_Volume_Averaged_J", false);
     p->set<bool>("weighted_Volume_Averaged_J Name", weighted_Volume_Averaged_J);
     p->set<std::string>("Weights Name", "Weights");

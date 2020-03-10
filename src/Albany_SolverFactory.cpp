@@ -270,7 +270,7 @@ SolverFactory::createAlbanyAppAndModel(
     Teuchos::RCP<Application>&              albanyApp,
     const Teuchos::RCP<Teuchos_Comm const>& appComm,
     Teuchos::RCP<Thyra_Vector const> const& initial_guess,
-    const bool                              createAlbanyApp)
+    bool const                              createAlbanyApp)
 {
   if (createAlbanyApp) {
     // Create application

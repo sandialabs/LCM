@@ -46,7 +46,7 @@ namespace {
 //   It appears that the output boolean is used only in this file in the context
 // of role type, so for now I'm applying this fix only to this file.
 inline Ioss::Field::RoleType
-role_type(const bool output)
+role_type(bool const output)
 {
   return output ? Ioss::Field::TRANSIENT : Ioss::Field::INFORMATION;
 }

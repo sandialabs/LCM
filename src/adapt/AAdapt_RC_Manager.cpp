@@ -520,8 +520,8 @@ struct Manager::Impl
  public:
   Impl(
       const Teuchos::RCP<Albany::StateManager>& state_mgr,
-      const bool                                use_projection,
-      const bool                                do_transform)
+      bool const                                use_projection,
+      bool const                                do_transform)
       : state_mgr_(state_mgr)
   {
     init(use_projection, do_transform);
@@ -691,7 +691,7 @@ struct Manager::Impl
   }
 
   void
-  set_building_sfm(const bool value)
+  set_building_sfm(bool const value)
   {
     building_sfm_ = value;
   }
@@ -702,7 +702,7 @@ struct Manager::Impl
   }
 
   void
-  set_evaluating_sfm(const bool before)
+  set_evaluating_sfm(bool const before)
   {
     if (before && Teuchos::nonnull(proj_)) {
       // Zero the nodal values in prep for fillRhs.
@@ -727,7 +727,7 @@ struct Manager::Impl
 
  private:
   void
-  init(const bool use_projection, const bool do_transform)
+  init(bool const use_projection, bool const do_transform)
   {
     transform_    = do_transform;
     building_sfm_ = false;
@@ -760,7 +760,7 @@ struct Manager::Impl
   }
 
   void
-  init_g(int const n, const bool is_g)
+  init_g(int const n, bool const is_g)
   {
     is_g_.clear();
     is_g_.resize(n, is_g ? 0 : fields_.size());
@@ -805,9 +805,9 @@ Manager::create(
 
   if (adapt_params.isType<bool>("Reference Configuration: Update")) {
     if (adapt_params.get<bool>("Reference Configuration: Update")) {
-      const bool use_projection =
+      bool const use_projection =
           adapt_params.get<bool>("Reference Configuration: Project", false);
-      const bool do_transform =
+      bool const do_transform =
           adapt_params.get<bool>("Reference Configuration: Transform", false);
       return Teuchos::rcp(new Manager(state_mgr, use_projection, do_transform));
     }
@@ -986,7 +986,7 @@ Manager::testProjector(
 }
 
 const Teuchos::RCP<Thyra_MultiVector>&
-Manager::getNodalField(const Field& f, int const g_idx, const bool overlapped)
+Manager::getNodalField(const Field& f, int const g_idx, bool const overlapped)
     const
 {
   ALBANY_PANIC(!overlapped, "must be overlapped");
@@ -1055,8 +1055,8 @@ Manager::usingProjection() const
 
 Manager::Manager(
     const Teuchos::RCP<Albany::StateManager>& state_mgr,
-    const bool                                use_projection,
-    const bool                                do_transform)
+    bool const                                use_projection,
+    bool const                                do_transform)
     : impl_(Teuchos::rcp(new Impl(state_mgr, use_projection, do_transform)))
 {
 }

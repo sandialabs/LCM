@@ -342,7 +342,7 @@ RigidBodyModes::setParameters(
     int const  numElasticityDim_,
     int const  numScalar_,
     int const  nullSpaceDim_,
-    const bool setNonElastRBM_)
+    bool const setNonElastRBM_)
 {
   numPDEs          = numPDEs_;
   numElasticityDim = numElasticityDim_;

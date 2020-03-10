@@ -67,7 +67,7 @@ FieldManagerScalarResponseFunction::setup(
   // Remove the option if it already exists before building
   // the evaluators, it will be added again below anyhow.
   char const* phx_graph_parm = "Phalanx Graph Visualization Detail";
-  const bool  phx_graph_parm_present =
+  bool const  phx_graph_parm_present =
       responseParams.isType<int>(phx_graph_parm);
   if (phx_graph_parm_present) {
     vis_response_graph = responseParams.get(phx_graph_parm, 0);
@@ -86,7 +86,7 @@ FieldManagerScalarResponseFunction::setup(
 
   // Restrict to the element block?
   char const* reb_parm         = "Restrict to Element Block";
-  const bool  reb_parm_present = responseParams.isType<bool>(reb_parm),
+  bool const  reb_parm_present = responseParams.isType<bool>(reb_parm),
              reb =
                  reb_parm_present && responseParams.get<bool>(reb_parm, false);
   element_block_index = reb ? meshSpecs->ebNameToIndex[meshSpecs->ebName] : -1;
@@ -168,7 +168,7 @@ FieldManagerScalarResponseFunction::writePhalanxGraph(
     std::string const& evalName)
 {
   if (vis_response_graph > 0) {
-    const bool detail = (vis_response_graph > 1) ? true : false;
+    bool const detail = (vis_response_graph > 1) ? true : false;
     Teuchos::RCP<Teuchos::FancyOStream> out =
         Teuchos::VerboseObjectBase::getDefaultOStream();
     *out << "Phalanx writing graphviz file for graph of " << evalName

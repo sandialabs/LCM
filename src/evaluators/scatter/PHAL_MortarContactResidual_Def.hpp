@@ -448,7 +448,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   nunk = neq * this->numNodes;
 
   // Get Tpetra vector view and local matrix
-  const bool loadResid = Teuchos::nonnull(workset.f);
+  bool const loadResid = Teuchos::nonnull(workset.f);
   if (loadResid) { f_kokkos = Albany::getNonconstDeviceData(workset.f); }
   Jac_kokkos = Albany::getNonconstDeviceData(workset.Jac);
 

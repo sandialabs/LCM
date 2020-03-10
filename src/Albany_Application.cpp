@@ -71,7 +71,7 @@ Application::Application(
     const RCP<Teuchos_Comm const>&     comm_,
     const RCP<Teuchos::ParameterList>& params,
     RCP<Thyra_Vector const> const&     initial_guess,
-    const bool                         schwarz)
+    bool const                         schwarz)
     : is_schwarz_{schwarz},
       no_dir_bcs_(false),
       requires_sdbcs_(false),
@@ -661,7 +661,7 @@ Application::finalSetUp(
   // "Compute Sensitivity" flag as a default value for the new flag location
   // when the latter has been left undefined
   std::string const              sensitivityToken = "Compute Sensitivities";
-  const Teuchos::Ptr<const bool> oldSensitivityFlag(
+  const Teuchos::Ptr<bool const> oldSensitivityFlag(
       problemParams->getPtr<bool>(sensitivityToken));
   if (Teuchos::nonnull(oldSensitivityFlag)) {
     Teuchos::ParameterList& solveParams =
@@ -1079,7 +1079,7 @@ Application::writePhalanxGraph(
     int const&                                          phxGraphVisDetail)
 {
   if (phxGraphVisDetail > 0) {
-    const bool detail = (phxGraphVisDetail > 1) ? true : false;
+    bool const detail = (phxGraphVisDetail > 1) ? true : false;
     *out << "Phalanx writing graphviz file for graph of " << evalName
          << " (detail = " << phxGraphVisDetail << ")" << std::endl;
     std::string const graphName = "phalanxGraph" + evalName;

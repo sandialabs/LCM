@@ -81,7 +81,7 @@ bool
 Constant<EvalT, Traits>::check_for_existance(
     Teuchos::ParameterList* source_list)
 {
-  const bool exists = source_list->getEntryPtr("Constant");
+  bool const exists = source_list->getEntryPtr("Constant");
   return exists;
 }
 
@@ -186,7 +186,7 @@ template <typename EvalT, typename Traits>
 bool
 Table<EvalT, Traits>::check_for_existance(Teuchos::ParameterList* source_list)
 {
-  const bool exists = source_list->getEntryPtr("Table");
+  bool const exists = source_list->getEntryPtr("Table");
   return exists;
 }
 
@@ -363,7 +363,7 @@ bool
 Trigonometric<EvalT, Traits>::check_for_existance(
     Teuchos::ParameterList* source_list)
 {
-  const bool exists = source_list->getEntryPtr("Trigonometric");
+  bool const exists = source_list->getEntryPtr("Trigonometric");
   return exists;
 }
 
@@ -494,7 +494,7 @@ bool
 Quadratic<EvalT, Traits>::check_for_existance(
     Teuchos::ParameterList* source_list)
 {
-  const bool exists = source_list->getEntryPtr("Quadratic");
+  bool const exists = source_list->getEntryPtr("Quadratic");
   return exists;
 }
 
@@ -690,7 +690,7 @@ bool
 MVQuadratic<EvalT, Traits>::check_for_existance(
     Teuchos::ParameterList* source_list)
 {
-  const bool exists = source_list->getEntryPtr("Multivariate Quadratic");
+  bool const exists = source_list->getEntryPtr("Multivariate Quadratic");
   return exists;
 }
 
@@ -818,7 +818,7 @@ bool
 MVExponential<EvalT, Traits>::check_for_existance(
     Teuchos::ParameterList* source_list)
 {
-  const bool exists = source_list->getEntryPtr("Multivariate Exponential");
+  bool const exists = source_list->getEntryPtr("Multivariate Exponential");
   return exists;
 }
 
@@ -1060,7 +1060,7 @@ bool
 PointSource<EvalT, Traits>::check_for_existance(
     Teuchos::ParameterList* source_list)
 {
-  const bool exists = source_list->getEntryPtr("Point");
+  bool const exists = source_list->getEntryPtr("Point");
   return exists;
 }
 

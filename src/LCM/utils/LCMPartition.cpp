@@ -2760,7 +2760,7 @@ DualGraph::DualGraph(ConnectivityArray const& connectivity_array)
       std::map<std::set<int>, int>::const_iterator face_map_iter =
           face_nodes_faceID_map.find(face_nodes);
 
-      const bool face_is_new = face_map_iter == face_nodes_faceID_map.end();
+      bool const face_is_new = face_map_iter == face_nodes_faceID_map.end();
 
       // If face is new then assign new ID to it and add to face map
       int faceID = -1;

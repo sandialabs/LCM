@@ -58,7 +58,7 @@ class Application
       const Teuchos::RCP<Teuchos_Comm const>&     comm,
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       Teuchos::RCP<Thyra_Vector const> const&     initial_guess = Teuchos::null,
-      const bool                                  schwarz       = false);
+      bool const                                  schwarz       = false);
 
   Application(const Teuchos::RCP<Teuchos_Comm const>& comm);
 

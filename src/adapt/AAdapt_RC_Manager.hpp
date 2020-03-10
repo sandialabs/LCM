@@ -189,7 +189,7 @@ class Manager
   //! MeshAdapt uses this method to read and write nodal data from the mesh
   // database before and after adaptation.
   const Teuchos::RCP<Thyra_MultiVector>&
-  getNodalField(const Field& f, int const g_idx, const bool overlapped) const;
+  getNodalField(const Field& f, int const g_idx, bool const overlapped) const;
   //! MeshAdapt does this if usingProjection(). In the future, I may switch to
   //  keeping an RCP<AbstractDiscretization>, and then this call would be
   //  unnecessary.
@@ -231,8 +231,8 @@ class Manager
 
   Manager(
       const Teuchos::RCP<Albany::StateManager>& state_mgr,
-      const bool                                use_projection,
-      const bool                                do_transform);
+      bool const                                use_projection,
+      bool const                                do_transform);
 };
 
 }  // namespace rc

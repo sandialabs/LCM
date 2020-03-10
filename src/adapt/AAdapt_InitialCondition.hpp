@@ -25,7 +25,7 @@ InitialConditions(
     int const               neq,
     int const               numDim,
     Teuchos::ParameterList& icParams,
-    const bool              gasRestartSolution = false);
+    bool const              gasRestartSolution = false);
 
 }  // namespace AAdapt
 

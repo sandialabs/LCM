@@ -55,8 +55,8 @@ class StateManager
       std::string const&                   ebName,
       std::string const&                   init_type           = "scalar",
       double const                         init_val            = 0.0,
-      const bool                           registerOldState    = false,
-      const bool                           outputToExodus      = true,
+      bool const                           registerOldState    = false,
+      bool const                           outputToExodus      = true,
       std::string const&                   responseIDtoRequire = "",
       StateStruct::MeshFieldEntity const*  fieldEntity         = 0,
       std::string const&                   meshPartName        = "");
@@ -68,8 +68,8 @@ class StateManager
       std::string const&                   ebName,
       std::string const&                   init_type           = "scalar",
       double const                         init_val            = 0.0,
-      const bool                           registerOldState    = false,
-      const bool                           outputToExodus      = true,
+      bool const                           registerOldState    = false,
+      bool const                           outputToExodus      = true,
       std::string const&                   responseIDtoRequire = "");
 
   /// Method to call multiple times (before allocate) to register which states
@@ -84,7 +84,7 @@ class StateManager
       std::string const&                   ebName,
       std::string const&                   init_type        = "scalar",
       double const                         init_val         = 0.0,
-      const bool                           registerOldState = false);
+      bool const                           registerOldState = false);
 
   // Field entity is known. Useful for NodalDataToElemNode field. Input dl is of
   // ElemNode type
@@ -93,7 +93,7 @@ class StateManager
       std::string const&                   stateName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
       std::string const&                   ebName,
-      const bool                           outputToExodus,
+      bool const                           outputToExodus,
       StateStruct::MeshFieldEntity const*  fieldEntity,
       std::string const&                   meshPartName = "");
 
@@ -106,7 +106,7 @@ class StateManager
       std::string const&                   ebName,
       std::string const&                   init_type,
       double const                         init_val,
-      const bool                           registerOldState,
+      bool const                           registerOldState,
       std::string const&                   fieldName);
 
   /// If you want to give more control over whether or not to output to Exodus
@@ -118,8 +118,8 @@ class StateManager
       std::string const&                   ebName,
       std::string const&                   init_type,
       double const                         init_val,
-      const bool                           registerOldState,
-      const bool                           outputToExodus);
+      bool const                           registerOldState,
+      bool const                           outputToExodus);
 
   Teuchos::RCP<Teuchos::ParameterList>
   registerNodalVectorStateVariable(
@@ -129,8 +129,8 @@ class StateManager
       std::string const&                   ebName,
       std::string const&                   init_type,
       double const                         init_val,
-      const bool                           registerOldState,
-      const bool                           outputToExodus);
+      bool const                           registerOldState,
+      bool const                           outputToExodus);
 
   /// Very basic
   void
@@ -146,7 +146,7 @@ class StateManager
       std::string const&                   fieldName,
       const Teuchos::RCP<PHX::DataLayout>& dl,
       std::string const&                   ebName,
-      const bool                           outputToExodus,
+      bool const                           outputToExodus,
       StateStruct::MeshFieldEntity const*  fieldEntity  = NULL,
       std::string const&                   meshPartName = "");
 
@@ -159,8 +159,8 @@ class StateManager
       std::string const&                   ebName,
       std::string const&                   init_type,
       double const                         init_val,
-      const bool                           registerOldState,
-      const bool                           outputToExodus,
+      bool const                           registerOldState,
+      bool const                           outputToExodus,
       std::string const&                   responseIDtoRequire,
       StateStruct::MeshFieldEntity const*  fieldEntity,
       std::string const&                   meshPartName = "");

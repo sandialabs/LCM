@@ -34,7 +34,7 @@ class RigidBodyModes
       int const  numElasticityDim,
       int const  numScalar,
       int const  nullSpaceDim,
-      const bool setNonElastRBM = false);
+      bool const setNonElastRBM = false);
 
   //! Set Piro solver parameter list.
   void

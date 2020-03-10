@@ -23,7 +23,7 @@ Albany::StateManager::registerStateVariable(
     std::string const&                   ebName,
     std::string const&                   init_type,
     double const                         init_val,
-    const bool                           registerOldState)
+    bool const                           registerOldState)
 {
   return registerStateVariable(
       name, dl, dummy, ebName, init_type, init_val, registerOldState, name);
@@ -37,10 +37,10 @@ Albany::StateManager::registerStateVariable(
     std::string const&                   ebName,
     std::string const&                   init_type,
     double const                         init_val,
-    const bool                           registerOldState,
+    bool const                           registerOldState,
     std::string const&                   fieldName)
 {
-  const bool bOutputToExodus = true;
+  bool const bOutputToExodus = true;
   registerStateVariable(
       stateName,
       dl,
@@ -70,8 +70,8 @@ Albany::StateManager::registerStateVariable(
     std::string const&                   ebName,
     std::string const&                   init_type,
     double const                         init_val,
-    const bool                           registerOldState,
-    const bool                           outputToExodus)
+    bool const                           registerOldState,
+    bool const                           outputToExodus)
 {
   registerStateVariable(
       stateName,
@@ -102,8 +102,8 @@ Albany::StateManager::registerNodalVectorStateVariable(
     std::string const&                   ebName,
     std::string const&                   init_type,
     double const                         init_val,
-    const bool                           registerOldState,
-    const bool                           outputToExodus)
+    bool const                           registerOldState,
+    bool const                           outputToExodus)
 {
   registerNodalVectorStateVariable(
       stateName,
@@ -131,7 +131,7 @@ Albany::StateManager::registerStateVariable(
     std::string const&                   stateName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
     std::string const&                   ebName,
-    const bool                           outputToExodus,
+    bool const                           outputToExodus,
     StateStruct::MeshFieldEntity const*  fieldEntity,
     std::string const&                   meshPartName)
 {
@@ -179,8 +179,8 @@ Albany::StateManager::registerStateVariable(
     std::string const&                   ebName,
     std::string const&                   init_type,
     double const                         init_val,
-    const bool                           registerOldState,
-    const bool                           outputToExodus,
+    bool const                           registerOldState,
+    bool const                           outputToExodus,
     std::string const&                   responseIDtoRequire,
     StateStruct::MeshFieldEntity const*  fieldEntity,
     std::string const&                   meshPartName)
@@ -294,8 +294,8 @@ Albany::StateManager::registerNodalVectorStateVariable(
     std::string const&                   ebName,
     std::string const&                   init_type,
     double const                         init_val,
-    const bool                           registerOldState,
-    const bool                           outputToExodus,
+    bool const                           registerOldState,
+    bool const                           outputToExodus,
     std::string const&                   responseIDtoRequire)
 
 {
@@ -419,7 +419,7 @@ Albany::StateManager::registerSideSetStateVariable(
     std::string const&                   fieldName,
     const Teuchos::RCP<PHX::DataLayout>& dl,
     std::string const&                   ebName,
-    const bool                           outputToExodus,
+    bool const                           outputToExodus,
     StateStruct::MeshFieldEntity const*  fieldEntity,
     std::string const&                   meshPartName)
 
@@ -448,8 +448,8 @@ Albany::StateManager::registerSideSetStateVariable(
     std::string const&                   ebName,
     std::string const&                   init_type,
     double const                         init_val,
-    const bool                           registerOldState,
-    const bool                           outputToExodus,
+    bool const                           registerOldState,
+    bool const                           outputToExodus,
     std::string const&                   responseIDtoRequire,
     StateStruct::MeshFieldEntity const*  fieldEntity,
     std::string const&                   meshPartName)

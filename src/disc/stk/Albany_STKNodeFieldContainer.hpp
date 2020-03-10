@@ -39,7 +39,7 @@ buildSTKNodeField(
     std::string const&                             name,
     std::vector<PHX::DataLayout::size_type> const& dim,
     const Teuchos::RCP<stk::mesh::MetaData>&       metaData,
-    const bool                                     output);
+    bool const                                     output);
 
 // Helper class for NodeData
 template <typename DataType, unsigned ArrayDim>
@@ -64,7 +64,7 @@ class STKNodeField : public AbstractSTKNodeFieldContainer
       std::string const&                             name,
       std::vector<PHX::DataLayout::size_type> const& dim,
       const Teuchos::RCP<stk::mesh::MetaData>&       metaData,
-      const bool                                     output = false);
+      bool const                                     output = false);
 
   virtual ~STKNodeField() = default;
 

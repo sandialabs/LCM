@@ -65,7 +65,7 @@ class Setup
   fill_field_dependencies(
       std::vector<Teuchos::RCP<PHX::FieldTag>> const& depFields,
       std::vector<Teuchos::RCP<PHX::FieldTag>> const& evalFields,
-      const bool                                      saved = true);
+      bool const                                      saved = true);
 
   //! Update list of _saved/_unsaved MDFields based on _unsaved MDFields and
   //! field dependencies

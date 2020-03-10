@@ -266,61 +266,61 @@ class AbstractDiscretization
   writeSolution(
       Thyra_Vector const& solution,
       double const        time,
-      const bool          overlapped = false) = 0;
+      bool const          overlapped = false) = 0;
   virtual void
   writeSolution(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       double const        time,
-      const bool          overlapped = false) = 0;
+      bool const          overlapped = false) = 0;
   virtual void
   writeSolution(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       Thyra_Vector const& solution_dotdot,
       double const        time,
-      const bool          overlapped = false) = 0;
+      bool const          overlapped = false) = 0;
   virtual void
   writeSolutionMV(
       const Thyra_MultiVector& solution,
       double const             time,
-      const bool               overlapped = false) = 0;
+      bool const               overlapped = false) = 0;
   //! Write the solution to the mesh database.
   virtual void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
       double const        time,
-      const bool          overlapped = false) = 0;
+      bool const          overlapped = false) = 0;
   virtual void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       double const        time,
-      const bool          overlapped = false) = 0;
+      bool const          overlapped = false) = 0;
   virtual void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       Thyra_Vector const& solution_dotdot,
       double const        time,
-      const bool          overlapped = false) = 0;
+      bool const          overlapped = false) = 0;
   virtual void
   writeSolutionMVToMeshDatabase(
       const Thyra_MultiVector& solution,
       double const             time,
-      const bool               overlapped = false) = 0;
+      bool const               overlapped = false) = 0;
 
   //! Write the solution to file. Must call writeSolution first.
   virtual void
   writeSolutionToFile(
       Thyra_Vector const& solution,
       double const        time,
-      const bool          overlapped = false) = 0;
+      bool const          overlapped = false) = 0;
   virtual void
   writeSolutionMVToFile(
       const Thyra_MultiVector& solution,
       double const             time,
-      const bool               overlapped = false) = 0;
+      bool const               overlapped = false) = 0;
 };
 
 }  // namespace Albany

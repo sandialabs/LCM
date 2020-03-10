@@ -54,7 +54,7 @@ InitialConditions(
     int const               neq,
     int const               numDim,
     Teuchos::ParameterList& icParams,
-    const bool              hasRestartSolution)
+    bool const              hasRestartSolution)
 {
   auto soln_data = Albany::getNonconstLocalData(soln);
 

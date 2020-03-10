@@ -302,7 +302,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
       deta = (-F) / dF;
       eta += deta;
     }
-    const bool ok = abs(F) <= 1.0e-9;
+    bool const ok = abs(F) <= 1.0e-9;
     if (!ok) {
       if (OutLevel() > 3)
         std::cout

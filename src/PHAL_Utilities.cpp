@@ -19,7 +19,7 @@ getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
 {
   const Teuchos::RCP<const Teuchos::ParameterList> pl = app->getProblemPL();
   if (Teuchos::nonnull(pl)) {
-    const bool extrudedColumnCoupled =
+    bool const extrudedColumnCoupled =
         pl->isParameter("Extruded Column Coupled in 2D Response") ?
             pl->get<bool>("Extruded Column Coupled in 2D Response") :
             false;

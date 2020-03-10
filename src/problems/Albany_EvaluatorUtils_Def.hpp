@@ -560,7 +560,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::
                                                              intrepidBasisSide,
         const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubatureSide,
         std::string const&                                   sideSetName,
-        const bool                                           buildNormals) const
+        bool const                                           buildNormals) const
 {
   ALBANY_PANIC(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),

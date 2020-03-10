@@ -1234,7 +1234,7 @@ writeMatrixMarket<Thyra_VectorSpace>(
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
 getSpmdVectorSpace(
     Teuchos::RCP<Thyra_VectorSpace const> const vs,
-    const bool                                  throw_on_failure)
+    bool const                                  throw_on_failure)
 {
   Teuchos::RCP<const Thyra_SpmdVectorSpace> spmd_vs;
   spmd_vs = Teuchos::rcp_dynamic_cast<const Thyra_SpmdVectorSpace>(
@@ -1247,7 +1247,7 @@ getSpmdVectorSpace(
 Teuchos::RCP<const Thyra_ProductVectorSpace>
 getProductVectorSpace(
     Teuchos::RCP<Thyra_VectorSpace const> const vs,
-    const bool                                  throw_on_failure)
+    bool const                                  throw_on_failure)
 {
   Teuchos::RCP<const Thyra_ProductVectorSpace> pvs;
   pvs = Teuchos::rcp_dynamic_cast<const Thyra_ProductVectorSpace>(
@@ -1258,7 +1258,7 @@ getProductVectorSpace(
 Teuchos::RCP<Thyra_ProductVector>
 getProductVector(
     const Teuchos::RCP<Thyra_Vector> v,
-    const bool                       throw_on_failure)
+    bool const                       throw_on_failure)
 {
   Teuchos::RCP<Thyra_ProductVector> pv;
   pv = Teuchos::rcp_dynamic_cast<Thyra_ProductVector>(v, throw_on_failure);
@@ -1268,7 +1268,7 @@ getProductVector(
 Teuchos::RCP<const Thyra_ProductVector>
 getConstProductVector(
     Teuchos::RCP<Thyra_Vector const> const v,
-    const bool                             throw_on_failure)
+    bool const                             throw_on_failure)
 {
   Teuchos::RCP<const Thyra_ProductVector> pv;
   pv =
@@ -1279,7 +1279,7 @@ getConstProductVector(
 Teuchos::RCP<Thyra_ProductMultiVector>
 getProductMultiVector(
     const Teuchos::RCP<Thyra_MultiVector> mv,
-    const bool                            throw_on_failure)
+    bool const                            throw_on_failure)
 {
   Teuchos::RCP<Thyra_ProductMultiVector> pmv;
   pmv =
@@ -1290,7 +1290,7 @@ getProductMultiVector(
 Teuchos::RCP<const Thyra_ProductMultiVector>
 getConstProductMultiVector(
     const Teuchos::RCP<const Thyra_MultiVector> mv,
-    const bool                                  throw_on_failure)
+    bool const                                  throw_on_failure)
 {
   Teuchos::RCP<const Thyra_ProductMultiVector> pmv;
   pmv = Teuchos::rcp_dynamic_cast<const Thyra_ProductMultiVector>(

@@ -487,7 +487,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   nunk = neq * this->numNodes;
 
   // Get Kokkos vector view and local matrix
-  const bool loadResid = Teuchos::nonnull(workset.f);
+  bool const loadResid = Teuchos::nonnull(workset.f);
   if (loadResid) { f_kokkos = workset.f_kokkos; }
   Jac_kokkos = workset.Jac_kokkos;
 

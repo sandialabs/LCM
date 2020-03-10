@@ -476,9 +476,9 @@ class STKDiscretization : public AbstractDiscretization
   // --- Get/set solution/residual/field vectors to/from mesh --- //
 
   Teuchos::RCP<Thyra_Vector>
-  getSolutionField(const bool overlapped = false) const;
+  getSolutionField(bool const overlapped = false) const;
   Teuchos::RCP<Thyra_MultiVector>
-  getSolutionMV(const bool overlapped = false) const;
+  getSolutionMV(bool const overlapped = false) const;
 
   void
   setResidualField(Thyra_Vector const& residual);
@@ -489,7 +489,7 @@ class STKDiscretization : public AbstractDiscretization
   setField(
       Thyra_Vector const& field_vector,
       std::string const&  field_name,
-      const bool          overlapped = false);
+      bool const          overlapped = false);
 
   // --- Methods to write solution in the output file --- //
 
@@ -497,62 +497,62 @@ class STKDiscretization : public AbstractDiscretization
   writeSolution(
       Thyra_Vector const& solution,
       double const        time,
-      const bool          overlapped = false);
+      bool const          overlapped = false);
   void
   writeSolution(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       double const        time,
-      const bool          overlapped = false);
+      bool const          overlapped = false);
   void
   writeSolution(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       Thyra_Vector const& solution_dotdot,
       double const        time,
-      const bool          overlapped = false);
+      bool const          overlapped = false);
   void
   writeSolutionMV(
       const Thyra_MultiVector& solution,
       double const             time,
-      const bool               overlapped = false);
+      bool const               overlapped = false);
 
   //! Write the solution to the mesh database.
   void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
       double const /* time */,
-      const bool overlapped = false);
+      bool const overlapped = false);
   void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       double const /* time */,
-      const bool overlapped = false);
+      bool const overlapped = false);
   void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
       Thyra_Vector const& solution_dot,
       Thyra_Vector const& solution_dotdot,
       double const /* time */,
-      const bool overlapped = false);
+      bool const overlapped = false);
   void
   writeSolutionMVToMeshDatabase(
       const Thyra_MultiVector& solution,
       double const /* time */,
-      const bool overlapped = false);
+      bool const overlapped = false);
 
   //! Write the solution to file. Must call writeSolution first.
   void
   writeSolutionToFile(
       Thyra_Vector const& solution,
       double const        time,
-      const bool          overlapped = false);
+      bool const          overlapped = false);
   void
   writeSolutionMVToFile(
       const Thyra_MultiVector& solution,
       double const             time,
-      const bool               overlapped = false);
+      bool const               overlapped = false);
 
   //! used when NetCDF output on a latitude-longitude grid is requested.
   // Each struct contains a latitude/longitude index and it's parametric
@@ -570,20 +570,20 @@ class STKDiscretization : public AbstractDiscretization
   getSolutionMV(Thyra_MultiVector& result, bool overlapped) const;
 
   void
-  setSolutionField(Thyra_Vector const& soln, const bool overlapped);
+  setSolutionField(Thyra_Vector const& soln, bool const overlapped);
   void
   setSolutionField(
       Thyra_Vector const& soln,
       Thyra_Vector const& soln_dot,
-      const bool          overlapped);
+      bool const          overlapped);
   void
   setSolutionField(
       Thyra_Vector const& soln,
       Thyra_Vector const& soln_dot,
       Thyra_Vector const& soln_dotdot,
-      const bool          overlapped);
+      bool const          overlapped);
   void
-  setSolutionFieldMV(const Thyra_MultiVector& solnT, const bool overlapped);
+  setSolutionFieldMV(const Thyra_MultiVector& solnT, bool const overlapped);
 
   double
   monotonicTimeLabel(double const time);

@@ -618,7 +618,7 @@ template <bool Interleaved>
 void
 MultiSTKFieldContainer<Interleaved>::transferSolutionToCoords()
 {
-  const bool MultiSTKFieldContainer_transferSolutionToCoords_not_implemented =
+  bool const MultiSTKFieldContainer_transferSolutionToCoords_not_implemented =
       true;
   ALBANY_PANIC(MultiSTKFieldContainer_transferSolutionToCoords_not_implemented);
 }

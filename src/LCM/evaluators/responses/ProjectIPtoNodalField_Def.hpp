@@ -148,7 +148,7 @@ ProjectIPtoNodalFieldQuadrature::ProjectIPtoNodalFieldQuadrature(
   const Teuchos::RCP<Teuchos::ParameterList>& pfp =
       p.get<Teuchos::RCP<Teuchos::ParameterList>>(
           "Parameters From Problem", Teuchos::null);
-  const bool composite =
+  bool const composite =
       pfp.is_null() ? false : pfp->get<bool>("Use Composite Tet 10", false);
 
   ALBANY_ASSERT(
@@ -364,7 +364,7 @@ class ProjectIPtoNodalFieldManager::FullMassLinearOp
       const PHX::MDField<const RealType, Cell, Node, QuadPoint>& wbf)
   {
     int const  num_nodes = bf.extent(1), num_pts = bf.extent(2);
-    const bool is_static_graph = this->is_static();
+    bool const is_static_graph = this->is_static();
     for (unsigned int cell = 0; cell < workset.numCells; ++cell) {
       for (int rnode = 0; rnode < num_nodes; ++rnode) {
         GO                 global_row = workset.wsElNodeID[cell][rnode];
@@ -411,7 +411,7 @@ class ProjectIPtoNodalFieldManager::LumpedMassLinearOp
       const PHX::MDField<const RealType, Cell, Node, QuadPoint>& wbf)
   {
     int const  num_nodes = bf.extent(1), num_pts = bf.extent(2);
-    const bool is_static_graph = this->is_static();
+    bool const is_static_graph = this->is_static();
     for (unsigned int cell = 0; cell < workset.numCells; ++cell) {
       for (int rnode = 0; rnode < num_nodes; ++rnode) {
         const GO                 global_row = workset.wsElNodeID[cell][rnode];
@@ -458,7 +458,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::initManager(
 {
   std::string const key = "ProjectIPtoNodalField_" + key_suffix;
   Teuchos::RCP<Adapt::NodalDataBase> ndb = p_state_mgr_->getNodalDataBase();
-  const bool                         isr = ndb->isManagerRegistered(key);
+  bool const                         isr = ndb->isManagerRegistered(key);
   if (isr)
     mgr_ = Teuchos::rcp_dynamic_cast<ProjectIPtoNodalFieldManager>(
         ndb->getManager(key));
@@ -539,7 +539,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
       (num_fields_ > 0 ?
            plist->get<std::string>(Albany::strint("IP Field Name", 0)) :
            "");
-  const bool first = initManager(plist, key_suffix);
+  bool const first = initManager(plist, key_suffix);
 
   // Resize field vectors.
   ip_field_names_.resize(num_fields_);
@@ -672,7 +672,7 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
     typename Traits::PreEvalData /* workset */)
 {
   int const  ctr      = mgr_->incrPreCounter();
-  const bool am_first = ctr == 1;
+  bool const am_first = ctr == 1;
   if (!am_first) return;
 
   // Reallocate the mass matrix for assembly. Since the matrix is overwritten by
@@ -812,7 +812,7 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
     typename Traits::PostEvalData /* workset */)
 {
   int const  ctr     = mgr_->incrPostCounter();
-  const bool am_last = ctr == mgr_->nWorker();
+  bool const am_last = ctr == mgr_->nWorker();
   if (!am_last) return;
   mgr_->initCounters();
 

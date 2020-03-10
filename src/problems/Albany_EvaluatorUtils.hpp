@@ -380,7 +380,7 @@ class EvaluatorUtilsBase
                                                                intrepidBasisSide,
           const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubatureSide,
           std::string const&                                   sideSetName,
-          const bool buildNormals = false) const = 0;
+          bool const buildNormals = false) const = 0;
 
  protected:
   Teuchos::ArrayRCP<std::string>
@@ -728,7 +728,7 @@ class EvaluatorUtilsImpl : public EvaluatorUtilsBase<Traits>
                                                            intrepidBasisSide,
       const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubatureSide,
       std::string const&                                   sideSetName,
-      const bool buildNormals = false) const;
+      bool const buildNormals = false) const;
 
  private:
   //! Evaluator Utils with different ScalarType. Mutable, so we can have getters

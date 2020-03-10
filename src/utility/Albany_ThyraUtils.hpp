@@ -265,7 +265,7 @@ describe(
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
 getSpmdVectorSpace(
     Teuchos::RCP<Thyra_VectorSpace const> const vs,
-    const bool                                  throw_on_failure = true);
+    bool const                                  throw_on_failure = true);
 
 // ========= Thyra_ProductXYZ utilities ========== //
 
@@ -275,27 +275,27 @@ getSpmdVectorSpace(
 Teuchos::RCP<const Thyra_ProductVectorSpace>
 getProductVectorSpace(
     Teuchos::RCP<Thyra_VectorSpace const> const vs,
-    const bool                                  throw_on_failure = true);
+    bool const                                  throw_on_failure = true);
 
 Teuchos::RCP<Thyra_ProductVector>
 getProductVector(
     const Teuchos::RCP<Thyra_Vector> v,
-    const bool                       throw_on_failure = true);
+    bool const                       throw_on_failure = true);
 
 Teuchos::RCP<const Thyra_ProductVector>
 getConstProductVector(
     Teuchos::RCP<Thyra_Vector const> const v,
-    const bool                             throw_on_failure = true);
+    bool const                             throw_on_failure = true);
 
 Teuchos::RCP<Thyra_ProductMultiVector>
 getProductMultiVector(
     const Teuchos::RCP<Thyra_MultiVector> mv,
-    const bool                            throw_on_failure = true);
+    bool const                            throw_on_failure = true);
 
 Teuchos::RCP<const Thyra_ProductMultiVector>
 getConstProductMultiVector(
     const Teuchos::RCP<const Thyra_MultiVector> mv,
-    const bool                                  throw_on_failure = true);
+    bool const                                  throw_on_failure = true);
 
 }  // namespace Albany
 

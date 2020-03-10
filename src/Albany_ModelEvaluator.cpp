@@ -475,7 +475,7 @@ ModelEvaluator::createInArgs() const
 void
 ModelEvaluator::reportFinalPoint(
     const Thyra_ModelEvaluator::InArgs<ST>& finalPoint,
-    const bool                              wasSolved)
+    bool const                              wasSolved)
 {
   // Set nominal values to the final point, if the model was solved
   if (overwriteNominalValuesWithFinalPoint && wasSolved) {

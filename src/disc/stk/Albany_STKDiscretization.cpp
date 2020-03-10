@@ -355,7 +355,7 @@ point_in_element(
 
   for (unsigned i = 0; i < coords.size() && !element.first; ++i) {
     for (unsigned j = 0; j < coords[i].size() && !element.first; ++j) {
-      const bool found = point_inside(coords[i][j], sphere_xyz);
+      bool const found = point_inside(coords[i][j], sphere_xyz);
       if (found) {
         parametric = parametric_coordinates(coords[i][j], sphere);
         if (parametric.first < -1) parametric.first = -1;
@@ -882,7 +882,7 @@ void
 STKDiscretization::writeSolution(
     Thyra_Vector const& soln,
     double const        time,
-    const bool          overlapped)
+    bool const          overlapped)
 {
   writeSolutionToMeshDatabase(soln, time, overlapped);
   writeSolutionToFile(soln, time, overlapped);
@@ -893,7 +893,7 @@ STKDiscretization::writeSolution(
     Thyra_Vector const& soln,
     Thyra_Vector const& soln_dot,
     double const        time,
-    const bool          overlapped)
+    bool const          overlapped)
 {
   writeSolutionToMeshDatabase(soln, soln_dot, time, overlapped);
   // IKT, FIXME? extend writeSolutionToFile to take in soln_dot?
@@ -906,7 +906,7 @@ STKDiscretization::writeSolution(
     Thyra_Vector const& soln_dot,
     Thyra_Vector const& soln_dotdot,
     double const        time,
-    const bool          overlapped)
+    bool const          overlapped)
 {
   writeSolutionToMeshDatabase(soln, soln_dot, soln_dotdot, time, overlapped);
   // IKT, FIXME? extend writeSolutionToFile to take in soln_dot and soln_dotdot?
@@ -917,7 +917,7 @@ void
 STKDiscretization::writeSolutionMV(
     const Thyra_MultiVector& soln,
     double const             time,
-    const bool               overlapped)
+    bool const               overlapped)
 {
   writeSolutionMVToMeshDatabase(soln, time, overlapped);
   writeSolutionMVToFile(soln, time, overlapped);
@@ -927,7 +927,7 @@ void
 STKDiscretization::writeSolutionToMeshDatabase(
     Thyra_Vector const& soln,
     double const /* time */,
-    const bool overlapped)
+    bool const overlapped)
 {
   // Put solution into STK Mesh
   setSolutionField(soln, overlapped);
@@ -938,7 +938,7 @@ STKDiscretization::writeSolutionToMeshDatabase(
     Thyra_Vector const& soln,
     Thyra_Vector const& soln_dot,
     double const /* time */,
-    const bool overlapped)
+    bool const overlapped)
 {
   // Put solution into STK Mesh
   setSolutionField(soln, soln_dot, overlapped);
@@ -950,7 +950,7 @@ STKDiscretization::writeSolutionToMeshDatabase(
     Thyra_Vector const& soln_dot,
     Thyra_Vector const& soln_dotdot,
     double const /* time */,
-    const bool overlapped)
+    bool const overlapped)
 {
   // Put solution into STK Mesh
   setSolutionField(soln, soln_dot, soln_dotdot, overlapped);
@@ -960,7 +960,7 @@ void
 STKDiscretization::writeSolutionMVToMeshDatabase(
     const Thyra_MultiVector& soln,
     double const /* time */,
-    const bool overlapped)
+    bool const overlapped)
 {
   // Put solution into STK Mesh
   setSolutionFieldMV(soln, overlapped);
@@ -970,7 +970,7 @@ void
 STKDiscretization::writeSolutionToFile(
     Thyra_Vector const& soln,
     double const        time,
-    const bool          overlapped)
+    bool const          overlapped)
 {
   if (stkMeshStruct->exoOutput && stkMeshStruct->transferSolutionToCoords) {
     Teuchos::RCP<AbstractSTKFieldContainer> container =
@@ -1043,7 +1043,7 @@ void
 STKDiscretization::writeSolutionMVToFile(
     const Thyra_MultiVector& soln,
     double const             time,
-    const bool               overlapped)
+    bool const               overlapped)
 {
   if (stkMeshStruct->exoOutput && stkMeshStruct->transferSolutionToCoords) {
     Teuchos::RCP<AbstractSTKFieldContainer> container =
@@ -1259,7 +1259,7 @@ STKDiscretization::getField(Thyra_Vector& result, std::string const& name) const
 }
 
 void
-STKDiscretization::getSolutionField(Thyra_Vector& result, const bool overlapped)
+STKDiscretization::getSolutionField(Thyra_Vector& result, bool const overlapped)
     const
 {
   ALBANY_PANIC(overlapped, "Not implemented.");
@@ -1277,7 +1277,7 @@ STKDiscretization::getSolutionField(Thyra_Vector& result, const bool overlapped)
 void
 STKDiscretization::getSolutionMV(
     Thyra_MultiVector& result,
-    const bool         overlapped) const
+    bool const         overlapped) const
 {
   ALBANY_PANIC(overlapped, "Not implemented.");
 
@@ -1340,7 +1340,7 @@ STKDiscretization::setField(
 void
 STKDiscretization::setSolutionField(
     Thyra_Vector const& soln,
-    const bool          overlapped)
+    bool const          overlapped)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1357,7 +1357,7 @@ void
 STKDiscretization::setSolutionField(
     Thyra_Vector const& soln,
     Thyra_Vector const& soln_dot,
-    const bool          overlapped)
+    bool const          overlapped)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1375,7 +1375,7 @@ STKDiscretization::setSolutionField(
     Thyra_Vector const& soln,
     Thyra_Vector const& soln_dot,
     Thyra_Vector const& soln_dotdot,
-    const bool          overlapped)
+    bool const          overlapped)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();
@@ -1391,7 +1391,7 @@ STKDiscretization::setSolutionField(
 void
 STKDiscretization::setSolutionFieldMV(
     const Thyra_MultiVector& soln,
-    const bool               overlapped)
+    bool const               overlapped)
 {
   Teuchos::RCP<AbstractSTKFieldContainer> container =
       stkMeshStruct->getFieldContainer();

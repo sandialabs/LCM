@@ -59,7 +59,7 @@ class SolverFactory
       Teuchos::RCP<Application>&              albanyApp,
       const Teuchos::RCP<Teuchos_Comm const>& appComm,
       Teuchos::RCP<Thyra_Vector const> const& initial_guess   = Teuchos::null,
-      const bool                              createAlbanyApp = true);
+      bool const                              createAlbanyApp = true);
 
   Teuchos::ParameterList&
   getAnalysisParameters() const
@@ -74,7 +74,7 @@ class SolverFactory
   }
 
   void
-  setSchwarz(const bool schwarz)
+  setSchwarz(bool const schwarz)
   {
     is_schwarz_ = schwarz;
   }

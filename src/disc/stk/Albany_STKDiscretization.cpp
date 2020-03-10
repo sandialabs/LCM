@@ -53,7 +53,7 @@ constexpr double pi = 3.1415926535897932385;
 
 namespace {
 std::vector<double>
-spherical_to_cart(const std::pair<double, double>& sphere)
+spherical_to_cart(std::pair<double, double> const& sphere)
 {
   double const        radius_of_earth = 1;
   std::vector<double> cart(3);
@@ -151,7 +151,7 @@ Basis(int const C)
 }
 
 double
-value(std::vector<double> const& soln, const std::pair<double, double>& ref)
+value(std::vector<double> const& soln, std::pair<double, double> const& ref)
 {
   int const C = soln.size();
   const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
@@ -174,7 +174,7 @@ void
 value(
     double                            x[3],
     const Teuchos::ArrayRCP<double*>& coords,
-    const std::pair<double, double>&  ref)
+    std::pair<double, double> const&  ref)
 {
   int const C = coords.size();
   const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
@@ -198,7 +198,7 @@ void
 grad(
     double                            x[3][2],
     const Teuchos::ArrayRCP<double*>& coords,
-    const std::pair<double, double>&  ref)
+    std::pair<double, double> const&  ref)
 {
   int const C = coords.size();
   const Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
@@ -224,7 +224,7 @@ grad(
 std::pair<double, double>
 ref2sphere(
     const Teuchos::ArrayRCP<double*>& coords,
-    const std::pair<double, double>&  ref)
+    std::pair<double, double> const&  ref)
 {
   static double const DIST_THRESHOLD = 1.0e-9;
 
@@ -261,8 +261,8 @@ ref2sphere(
 void
 Dmap(
     const Teuchos::ArrayRCP<double*>& coords,
-    const std::pair<double, double>&  sphere,
-    const std::pair<double, double>&  ref,
+    std::pair<double, double> const&  sphere,
+    std::pair<double, double> const&  ref,
     double                            D[][2])
 {
   double const th     = sphere.first;
@@ -306,7 +306,7 @@ Dmap(
 std::pair<double, double>
 parametric_coordinates(
     const Teuchos::ArrayRCP<double*>& coords,
-    const std::pair<double, double>&  sphere)
+    std::pair<double, double> const&  sphere)
 {
   static double const       tol_sq      = 1e-26;
   static const unsigned     MAX_NR_ITER = 10;
@@ -319,7 +319,7 @@ parametric_coordinates(
   for (unsigned i = 0;
        i < MAX_NR_ITER && tol_sq < (costh * resb * resb + resa * resa);
        ++i) {
-    const std::pair<double, double> sph = ref2sphere(coords, ref);
+    std::pair<double, double> const sph = ref2sphere(coords, ref);
     resa                                = sph.first - sphere.first;
     resb                                = sph.second - sphere.second;
 
@@ -333,7 +333,7 @@ parametric_coordinates(
     Dinv[1][0]        = -D[1][0] / detD;
     Dinv[1][1]        = D[0][0] / detD;
 
-    const std::pair<double, double> del(
+    std::pair<double, double> const del(
         Dinv[0][0] * costh * resb + Dinv[0][1] * resa,
         Dinv[1][0] * costh * resb + Dinv[1][1] * resa);
     ref.first -= del.first;
@@ -342,9 +342,9 @@ parametric_coordinates(
   return ref;
 }
 
-const std::pair<bool, std::pair<unsigned, unsigned>>
+std::pair<bool, std::pair<unsigned, unsigned>> const
 point_in_element(
-    const std::pair<double, double>& sphere,
+    std::pair<double, double> const& sphere,
     const Albany::WorksetArray<
         Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type& coords,
     std::pair<double, double>&                                parametric)
@@ -391,9 +391,9 @@ setup_latlon_interp(
   for (unsigned j = 0; j < nlon; ++j) lon[j] = 2 * j * pi / nlon;
   for (unsigned i = 0; i < nlat; ++i) {
     for (unsigned j = 0; j < nlon; ++j) {
-      const std::pair<double, double> sphere(lat[i], lon[j]);
+      std::pair<double, double> const sphere(lat[i], lon[j]);
       std::pair<double, double>       paramtric;
-      const std::pair<bool, std::pair<unsigned, unsigned>> element =
+      std::pair<bool, std::pair<unsigned, unsigned>> const element =
           point_in_element(sphere, coords, paramtric);
       if (element.first) {
         // compute error: map 'cart' back to sphere and compare with original

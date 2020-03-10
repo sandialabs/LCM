@@ -14,7 +14,7 @@ namespace PHAL {
 template <>
 int
 getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
-    const Albany::Application*     app,
+    Albany::Application const*     app,
     const Albany::MeshSpecsStruct* ms)
 {
   const Teuchos::RCP<const Teuchos::ParameterList> pl = app->getProblemPL();
@@ -38,7 +38,7 @@ getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
 template <>
 int
 getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
-    const Albany::Application* app,
+    Albany::Application const* app,
     int const                  ebi)
 {
   const Teuchos::RCP<const Teuchos::ParameterList> pl = app->getProblemPL();

@@ -46,7 +46,7 @@ class MonitorBase
 
   void
   summarize(
-      Teuchos::Ptr<const Teuchos::Comm<int>> comm,
+      Teuchos::Ptr<Teuchos::Comm<int> const> comm,
       std::ostream&                          out = std::cout);
 
   void
@@ -86,7 +86,7 @@ inline typename MonitorBase<MonitoredType>::pointer_type
 template <class MonitoredType>
 inline void
 MonitorBase<MonitoredType>::summarize(
-    Teuchos::Ptr<const Teuchos::Comm<int>> comm,
+    Teuchos::Ptr<Teuchos::Comm<int> const> comm,
     std::ostream&                          out)
 {
   using std::vector;
@@ -119,7 +119,7 @@ inline void
 MonitorBase<MonitoredType>::summarize(std::ostream& out)
 {
   // MPI should be initialized before this call
-  Teuchos::RCP<const Teuchos::Comm<int>> comm =
+  Teuchos::RCP<Teuchos::Comm<int> const> comm =
       Teuchos::DefaultComm<int>::getComm();
 
   summarize(comm.ptr(), out);

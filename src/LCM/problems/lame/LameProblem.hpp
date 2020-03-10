@@ -28,7 +28,7 @@ class LameProblem : public Albany::AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
       int const                                   numEqm,
-      Teuchos::RCP<const Teuchos::Comm<int>>&     commT);
+      Teuchos::RCP<Teuchos::Comm<int> const>&     commT);
 
   //! Destructor
   virtual ~LameProblem();

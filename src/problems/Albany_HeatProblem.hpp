@@ -31,7 +31,7 @@ class HeatProblem : public AbstractProblem
       const Teuchos::RCP<ParamLib>&               paramLib,
       // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib,
       int const                               numDim_,
-      Teuchos::RCP<const Teuchos::Comm<int>>& commT_);
+      Teuchos::RCP<Teuchos::Comm<int> const>& commT_);
 
   //! Destructor
   ~HeatProblem();
@@ -108,7 +108,7 @@ class HeatProblem : public AbstractProblem
   const Teuchos::RCP<Teuchos::ParameterList> params;
 
   Teuchos::RCP<Albany::MaterialDatabase> materialDB;
-  Teuchos::RCP<const Teuchos::Comm<int>> commT;
+  Teuchos::RCP<Teuchos::Comm<int> const> commT;
 
   Teuchos::RCP<Albany::Layouts> dl;
 

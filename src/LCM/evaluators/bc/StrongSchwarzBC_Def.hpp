@@ -575,7 +575,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData dbc_workset)
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>
       bcs_disp = bcs_array[0];
 
-  Teuchos::RCP<const Teuchos::Comm<int>> commT = bcs_disp->getMap()->getComm();
+  Teuchos::RCP<Teuchos::Comm<int> const> commT = bcs_disp->getMap()->getComm();
   Teuchos::ArrayRCP<ST const> bcs_disp_const_view_x = bcs_disp->getData(0);
   Teuchos::ArrayRCP<ST const> bcs_disp_const_view_y = bcs_disp->getData(1);
   Teuchos::ArrayRCP<ST const> bcs_disp_const_view_z = bcs_disp->getData(2);

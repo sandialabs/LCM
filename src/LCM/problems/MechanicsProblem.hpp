@@ -41,7 +41,7 @@ class MechanicsProblem : public AbstractProblem
       Teuchos::RCP<ParamLib> const&               param_lib,
       int const                                   num_dims,
       Teuchos::RCP<AAdapt::rc::Manager> const&    rc_mgr,
-      Teuchos::RCP<const Teuchos::Comm<int>>&     commT);
+      Teuchos::RCP<Teuchos::Comm<int> const>&     commT);
   ///
   /// Destructor
   ///

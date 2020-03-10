@@ -467,7 +467,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
       Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> const
       schwarz_bcs = sbc.computeBCsDTK();
 
-  Teuchos::RCP<const Teuchos::Comm<int>> commT =
+  Teuchos::RCP<Teuchos::Comm<int> const> commT =
       schwarz_bcs->getMap()->getComm();
 
   Teuchos::ArrayRCP<ST const> schwarz_bcs_const_view_x =

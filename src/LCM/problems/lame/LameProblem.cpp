@@ -12,7 +12,7 @@ Albany::LameProblem::LameProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_,
-    Teuchos::RCP<const Teuchos::Comm<int>>&     commT)
+    Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
     : Albany::AbstractProblem(params_, paramLib_, numDim_),
       haveSource(false),
       haveMatDB(false),

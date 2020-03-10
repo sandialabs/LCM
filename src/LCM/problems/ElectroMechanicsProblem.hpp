@@ -34,7 +34,7 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               param_lib,
       int const                                   num_dims,
-      Teuchos::RCP<const Teuchos::Comm<int>>&     commT);
+      Teuchos::RCP<Teuchos::Comm<int> const>&     commT);
   ///
   /// Destructor
   ///

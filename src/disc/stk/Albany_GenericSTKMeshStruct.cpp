@@ -626,7 +626,7 @@ GenericSTKMeshStruct::uniformRefineMesh(
 
 void
 GenericSTKMeshStruct::rebalanceInitialMeshT(
-    const Teuchos::RCP<const Teuchos::Comm<int>>& comm)
+    const Teuchos::RCP<Teuchos::Comm<int> const>& comm)
 {
   bool rebalance     = params->get<bool>("Rebalance Mesh", false);
   bool useSerialMesh = params->get<bool>("Use Serial Mesh", false);
@@ -639,7 +639,7 @@ GenericSTKMeshStruct::rebalanceInitialMeshT(
 void
 GenericSTKMeshStruct::rebalanceAdaptedMeshT(
     const Teuchos::RCP<Teuchos::ParameterList>&   params_,
-    const Teuchos::RCP<const Teuchos::Comm<int>>& comm)
+    const Teuchos::RCP<Teuchos::Comm<int> const>& comm)
 {
 // Zoltan is required here
 #if defined(ALBANY_ZOLTAN)

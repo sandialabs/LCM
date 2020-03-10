@@ -64,7 +64,7 @@
 template <typename FieldType>
 void
 interp_and_calc_error(
-    Teuchos::RCP<const Teuchos::Comm<int>> comm,
+    Teuchos::RCP<Teuchos::Comm<int> const> comm,
     Teuchos::RCP<Teuchos::ParameterList>   plist)
 {
   Teuchos::RCP<Teuchos::FancyOStream> out =
@@ -629,7 +629,7 @@ main(int argc, char* argv[])
   // Setup communication.
   Teuchos::GlobalMPISession mpiSession(&argc, &argv);
 
-  Teuchos::RCP<const Teuchos::Comm<int>> comm =
+  Teuchos::RCP<Teuchos::Comm<int> const> comm =
       Teuchos::DefaultComm<int>::getComm();
 
   // Read in command line options.

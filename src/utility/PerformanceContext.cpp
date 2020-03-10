@@ -21,7 +21,7 @@ PerformanceContext::instance()
 
 void
 PerformanceContext::summarizeAll(
-    Teuchos::Ptr<const Teuchos::Comm<int>> comm,
+    Teuchos::Ptr<Teuchos::Comm<int> const> comm,
     std::ostream&                          out)
 {
   timeMonitor_.summarize(comm, out);
@@ -33,7 +33,7 @@ void
 PerformanceContext::summarizeAll(std::ostream& out)
 {
   // MPI should be initialized before this call
-  Teuchos::RCP<const Teuchos::Comm<int>> comm =
+  Teuchos::RCP<Teuchos::Comm<int> const> comm =
       Teuchos::DefaultComm<int>::getComm();
 
   summarizeAll(comm.ptr(), out);

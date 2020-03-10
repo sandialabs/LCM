@@ -139,7 +139,7 @@ struct Workset
   bool is_adjoint{false};
 
   // New field manager response stuff
-  Teuchos::RCP<const Teuchos::Comm<int>> comm;
+  Teuchos::RCP<Teuchos::Comm<int> const> comm;
 
   // Combine and Scatter manager (for import-export of responses derivatives),
   // for both solution (x) and distributed parameter (p)

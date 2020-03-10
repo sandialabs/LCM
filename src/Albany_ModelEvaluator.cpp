@@ -140,7 +140,7 @@ ModelEvaluator::ModelEvaluator(
   param_vss.resize(num_param_vecs);
   thyra_response_vec.resize(num_response_vecs);
 
-  Teuchos::RCP<const Teuchos::Comm<int>> commT = app->getComm();
+  Teuchos::RCP<Teuchos::Comm<int> const> commT = app->getComm();
   for (int l = 0; l < param_vecs.size(); ++l) {
     try {
       // Initialize Sacado parameter vector

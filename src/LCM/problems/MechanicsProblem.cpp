@@ -17,7 +17,7 @@ MechanicsProblem::MechanicsProblem(
     Teuchos::RCP<ParamLib> const&               param_lib,
     int const                                   num_dims,
     Teuchos::RCP<AAdapt::rc::Manager> const&    rc_mgr,
-    Teuchos::RCP<const Teuchos::Comm<int>>&     commT)
+    Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
     : AbstractProblem(params, param_lib),
       params_(params),
       have_source_(false),

@@ -72,7 +72,7 @@ class MemoryAnalyzer
     gms_mmap
   };
 
-  Teuchos::RCP<const Teuchos::Comm<int>> comm_;
+  Teuchos::RCP<Teuchos::Comm<int> const> comm_;
   static int const                       ndata_ = gms_mmap + 1;
   Int                                    data_[ndata_];
   struct
@@ -180,7 +180,7 @@ class MemoryAnalyzer
   }
 
  public:
-  MemoryAnalyzer(const Teuchos::RCP<const Teuchos::Comm<int>>& comm)
+  MemoryAnalyzer(const Teuchos::RCP<Teuchos::Comm<int> const>& comm)
       : comm_(comm)
   {
   }
@@ -266,7 +266,7 @@ class MemoryAnalyzer
 void
 printMemoryAnalysis(
     std::ostream&                                 os,
-    const Teuchos::RCP<const Teuchos::Comm<int>>& comm)
+    const Teuchos::RCP<Teuchos::Comm<int> const>& comm)
 {
   MemoryAnalyzer ma(comm);
   ma.collect();

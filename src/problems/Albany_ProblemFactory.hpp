@@ -30,7 +30,7 @@ class ProblemFactory
   ProblemFactory(
       const Teuchos::RCP<Teuchos::ParameterList>&   topLevelParams,
       const Teuchos::RCP<ParamLib>&                 paramLib,
-      const Teuchos::RCP<const Teuchos::Comm<int>>& commT_);
+      const Teuchos::RCP<Teuchos::Comm<int> const>& commT_);
 
   //! Destructor
   virtual ~ProblemFactory() {}
@@ -62,7 +62,7 @@ class ProblemFactory
   Teuchos::RCP<ParamLib> paramLib;
 
   //! MPI Communicator
-  Teuchos::RCP<const Teuchos::Comm<int>> commT;
+  Teuchos::RCP<Teuchos::Comm<int> const> commT;
 
   Teuchos::RCP<AAdapt::rc::Manager> rc_mgr;
 };

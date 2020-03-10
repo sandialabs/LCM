@@ -28,7 +28,7 @@ class CahnHillProblem : public AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
       int const                                   numDim_,
-      Teuchos::RCP<const Teuchos::Comm<int>>&     commT_);
+      Teuchos::RCP<Teuchos::Comm<int> const>&     commT_);
 
   //! Destructor
   ~CahnHillProblem();
@@ -94,7 +94,7 @@ class CahnHillProblem : public AbstractProblem
 
   bool haveNoise;  // Langevin noise present
 
-  Teuchos::RCP<const Teuchos::Comm<int>> commT;
+  Teuchos::RCP<Teuchos::Comm<int> const> commT;
 
   Teuchos::RCP<Albany::Layouts> dl;
 

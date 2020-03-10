@@ -14,7 +14,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 SaveCellStateField<EvalT, Traits>::SaveCellStateField(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   // States Not Saved for Generic Type, only Specializations
   this->setName("Save Cell State Field");
@@ -42,7 +42,7 @@ SaveCellStateField<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename Traits>
 SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveCellStateField(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : weights(
           p.get<std::string>("Weights Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Weights Layout"))

@@ -12,7 +12,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-NSTauT<EvalT, Traits>::NSTauT(const Teuchos::ParameterList& p)
+NSTauT<EvalT, Traits>::NSTauT(Teuchos::ParameterList const& p)
     : V(p.get<std::string>("Velocity QP Variable Name"),
         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       ThermalCond(

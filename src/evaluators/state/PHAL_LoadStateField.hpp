@@ -25,7 +25,7 @@ class LoadStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                            public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  LoadStateFieldBase(const Teuchos::ParameterList& p);
+  LoadStateFieldBase(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(
@@ -46,7 +46,7 @@ class LoadStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
                        public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  LoadStateField(const Teuchos::ParameterList& p);
+  LoadStateField(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

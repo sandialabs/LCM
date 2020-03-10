@@ -14,7 +14,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 TLPoroPlasticityResidMomentum<EvalT, Traits>::TLPoroPlasticityResidMomentum(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : TotalStress(
           p.get<std::string>("Total Stress Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),

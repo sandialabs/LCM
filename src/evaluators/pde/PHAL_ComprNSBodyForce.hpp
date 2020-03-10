@@ -27,7 +27,7 @@ class ComprNSBodyForce : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  ComprNSBodyForce(const Teuchos::ParameterList& p);
+  ComprNSBodyForce(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

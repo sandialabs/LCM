@@ -22,7 +22,7 @@ Field<rank>::Field() : valid_(false)
 
 template <int rank>
 bool
-Field<rank>::init(const Teuchos::ParameterList& p, std::string const& name)
+Field<rank>::init(Teuchos::ParameterList const& p, std::string const& name)
 {
   std::string const name_rc      = Manager::decorate(name),
                     name_rc_name = name_rc + " Name";

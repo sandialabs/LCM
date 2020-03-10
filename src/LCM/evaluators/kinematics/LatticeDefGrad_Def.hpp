@@ -13,7 +13,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(const Teuchos::ParameterList& p)
+LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(Teuchos::ParameterList const& p)
     : weights(
           p.get<std::string>("Weights Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),

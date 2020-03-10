@@ -17,7 +17,7 @@ namespace LCM {
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 BifurcationCheck<EvalT, Traits>::BifurcationCheck(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : parametrization_type_(p.get<std::string>("Parametrization Type Name")),
       parametrization_interval_(p.get<double>("Parametrization Interval Name")),

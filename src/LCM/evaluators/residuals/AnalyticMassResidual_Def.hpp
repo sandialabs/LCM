@@ -21,7 +21,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : w_bf_(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       weights_("Weights", dl->qp_scalar),
@@ -769,7 +769,7 @@ AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(
 template <typename Traits>
 AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::
     AnalyticMassResidual(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl)
 {
@@ -804,7 +804,7 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 template <typename Traits>
 AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::
     AnalyticMassResidual(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl)
 {

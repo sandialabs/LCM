@@ -57,7 +57,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT  MeshScalarT;
   typedef typename EvalT::ParamScalarT ParamScalarT;
 
-  NeumannBase(const Teuchos::ParameterList& p);
+  NeumannBase(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(
@@ -256,7 +256,7 @@ class NeumannAggregator : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::ScalarT ScalarT;
 
  public:
-  NeumannAggregator(const Teuchos::ParameterList& p);
+  NeumannAggregator(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

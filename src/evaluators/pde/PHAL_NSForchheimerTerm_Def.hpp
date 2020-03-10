@@ -13,7 +13,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 NSForchheimerTerm<EvalT, Traits>::NSForchheimerTerm(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : V(p.get<std::string>("Velocity QP Variable Name"),
         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       rho(p.get<std::string>("Density QP Variable Name"),

@@ -12,7 +12,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 ComputeBasisFunctions<EvalT, Traits>::ComputeBasisFunctions(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : coordVec(
           p.get<std::string>("Coordinate Vector Name"),

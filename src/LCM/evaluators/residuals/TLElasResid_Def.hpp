@@ -14,7 +14,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-TLElasResid<EvalT, Traits>::TLElasResid(const Teuchos::ParameterList& p)
+TLElasResid<EvalT, Traits>::TLElasResid(Teuchos::ParameterList const& p)
     : stress(
           p.get<std::string>("Stress Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),

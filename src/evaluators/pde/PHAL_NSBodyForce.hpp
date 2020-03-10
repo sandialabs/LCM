@@ -27,7 +27,7 @@ class NSBodyForce : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  NSBodyForce(const Teuchos::ParameterList& p);
+  NSBodyForce(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

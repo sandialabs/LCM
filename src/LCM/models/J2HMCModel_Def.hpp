@@ -41,7 +41,7 @@ J2HMCModel<EvalT, Traits>::J2HMCModel(
   doubleIsotropicModulus.resize(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
     std::string mySublist                 = Albany::strint("Microscale", i + 1);
-    const Teuchos::ParameterList& msModel = p->sublist(mySublist);
+    Teuchos::ParameterList const& msModel = p->sublist(mySublist);
     lengthScale[i]       = msModel.get<RealType>("Length Scale");
     betaParameter[i]     = msModel.get<RealType>("Beta Constant");
     microYieldStress0[i] = msModel.get<RealType>("Initial Micro Yield Stress");

@@ -25,7 +25,7 @@ class NSContinuityResid : public PHX::EvaluatorWithBaseImpl<Traits>,
                           public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  NSContinuityResid(const Teuchos::ParameterList& p);
+  NSContinuityResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

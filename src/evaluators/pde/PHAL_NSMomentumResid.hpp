@@ -27,7 +27,7 @@ class NSMomentumResid : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  NSMomentumResid(const Teuchos::ParameterList& p);
+  NSMomentumResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

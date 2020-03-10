@@ -16,7 +16,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 GatherScalarNodalParameterBase<EvalT, Traits>::GatherScalarNodalParameterBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : numNodes(dl->node_scalar->extent(1)),
       param_name(p.get<std::string>("Parameter Name"))
@@ -46,7 +46,7 @@ GatherScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : GatherScalarNodalParameterBase<EvalT, Traits>(p, dl)
 {
@@ -57,7 +57,7 @@ GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : GatherScalarNodalParameterBase<EvalT, Traits>(
           p,
           p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct"))
@@ -91,7 +91,7 @@ GatherScalarNodalParameter<EvalT, Traits>::evaluateFields(
 template <typename EvalT, typename Traits>
 GatherScalarExtruded2DNodalParameter<EvalT, Traits>::
     GatherScalarExtruded2DNodalParameter(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : GatherScalarNodalParameterBase<EvalT, Traits>(p, dl),
       fieldLevel(p.get<int>("Field Level"))

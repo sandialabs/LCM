@@ -30,7 +30,7 @@ class SurfaceL2ProjectionResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   SurfaceL2ProjectionResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

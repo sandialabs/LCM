@@ -79,7 +79,7 @@ class ThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
  private:
   //! Validate the name strings under "ThermalConductivity" section in xml input
   //! file,
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;
 
   bool is_constant;

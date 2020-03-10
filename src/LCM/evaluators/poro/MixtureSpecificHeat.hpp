@@ -27,7 +27,7 @@ class MixtureSpecificHeat : public PHX::EvaluatorWithBaseImpl<Traits>,
                             public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  MixtureSpecificHeat(const Teuchos::ParameterList& p);
+  MixtureSpecificHeat(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

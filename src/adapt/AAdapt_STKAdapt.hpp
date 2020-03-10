@@ -42,7 +42,7 @@ class STKAdapt : public AbstractAdapter
       const Teuchos::RCP<const Tpetra_Vector>& ovlp_solution);
 
   //! Each adapter must generate it's list of valid parameters
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidAdapterParameters() const;
 
  private:

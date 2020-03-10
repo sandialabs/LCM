@@ -14,7 +14,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 SurfaceCohesiveResidual<EvalT, Traits>::SurfaceCohesiveResidual(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : cubature_(
           p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),

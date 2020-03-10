@@ -24,7 +24,7 @@ class LoadSideSetStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                   public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  LoadSideSetStateFieldBase(const Teuchos::ParameterList& p);
+  LoadSideSetStateFieldBase(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

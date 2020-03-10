@@ -28,7 +28,7 @@ class CahnHillRhoResid : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  CahnHillRhoResid(const Teuchos::ParameterList& p);
+  CahnHillRhoResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

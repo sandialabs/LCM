@@ -13,7 +13,7 @@ namespace HMC {
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 StrainDifference<EvalT, Traits>::StrainDifference(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : macroStrain(p.get<std::string>("Macro Strain Name"), dl->qp_tensor),
       microStrain(p.get<std::string>("Micro Strain Name"), dl->qp_tensor),

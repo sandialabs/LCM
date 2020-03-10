@@ -194,7 +194,7 @@ AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
         << *adaptParams_);
   }
 
-  // Teuchos::RCP<const Teuchos::ParameterList> valid_params =
+  // Teuchos::RCP<Teuchos::ParameterList const> valid_params =
   //  adapter_->getValidAdapterParameters();
   // adaptParams_->validateParameters(*valid_params);
 

@@ -25,7 +25,7 @@ class NSThermalEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
                          public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  NSThermalEqResid(const Teuchos::ParameterList& p);
+  NSThermalEqResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

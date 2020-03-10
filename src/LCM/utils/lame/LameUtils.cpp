@@ -30,7 +30,7 @@ namespace LameUtils {
 Teuchos::RCP<LameMaterial>
 constructLameMaterialModel(
     std::string const             lameMaterialModelName,
-    const Teuchos::ParameterList& lameMaterialParameters)
+    Teuchos::ParameterList const& lameMaterialParameters)
 {
   // Strings should be all upper case with spaces replaced with underscores
   std::string materialModelName = lameMaterialModelName;
@@ -94,7 +94,7 @@ constructLameMaterialModel(
 std::vector<std::string>
 getStateVariableNames(
     std::string const&            lameMaterialModelName,
-    const Teuchos::ParameterList& lameMaterialParameters)
+    Teuchos::ParameterList const& lameMaterialParameters)
 {
   Teuchos::RCP<LameMaterial> materialModel =
       constructLameMaterialModel(lameMaterialModelName, lameMaterialParameters);
@@ -125,7 +125,7 @@ getStateVariableNames(
 std::vector<double>
 getStateVariableInitialValues(
     std::string const&            lameMaterialModelName,
-    const Teuchos::ParameterList& lameMaterialParameters)
+    Teuchos::ParameterList const& lameMaterialParameters)
 {
   Teuchos::RCP<LameMaterial> materialModel =
       constructLameMaterialModel(lameMaterialModelName, lameMaterialParameters);

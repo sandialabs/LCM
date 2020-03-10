@@ -51,7 +51,7 @@ class SideSetSTKMeshStruct : public GenericSTKMeshStruct
     return 0.;
   }
 
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidDiscretizationParameters() const;
 
  private:

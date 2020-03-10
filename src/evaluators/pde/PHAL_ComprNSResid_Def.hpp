@@ -12,7 +12,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-ComprNSResid<EvalT, Traits>::ComprNSResid(const Teuchos::ParameterList& p)
+ComprNSResid<EvalT, Traits>::ComprNSResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       wGradBF(

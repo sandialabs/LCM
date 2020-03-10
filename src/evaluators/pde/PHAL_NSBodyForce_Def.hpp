@@ -12,7 +12,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-NSBodyForce<EvalT, Traits>::NSBodyForce(const Teuchos::ParameterList& p)
+NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
     : force(
           p.get<std::string>("Body Force Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),

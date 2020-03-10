@@ -1467,7 +1467,7 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(
 }
 
 template <>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::TmplSTKMeshStruct<0>::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -1477,7 +1477,7 @@ Albany::TmplSTKMeshStruct<0>::getValidDiscretizationParameters() const
 }
 
 template <>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::TmplSTKMeshStruct<1>::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -1509,7 +1509,7 @@ Albany::TmplSTKMeshStruct<1>::getValidDiscretizationParameters() const
 }
 
 template <>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::TmplSTKMeshStruct<2>::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -1554,7 +1554,7 @@ Albany::TmplSTKMeshStruct<2>::getValidDiscretizationParameters() const
 }
 
 template <>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::TmplSTKMeshStruct<3>::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

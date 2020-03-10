@@ -19,7 +19,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   std::string fieldName      = p.get<std::string>("Field Name");
   std::string noisyFieldName = p.get<std::string>("Noisy Field Name");

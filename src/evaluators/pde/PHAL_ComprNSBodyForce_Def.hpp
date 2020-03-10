@@ -15,7 +15,7 @@ double const pi = 3.1415926535897932385;
 
 template <typename EvalT, typename Traits>
 ComprNSBodyForce<EvalT, Traits>::ComprNSBodyForce(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : force(
           p.get<std::string>("Body Force Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"))

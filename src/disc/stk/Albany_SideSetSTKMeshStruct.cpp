@@ -237,7 +237,7 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
   bulkData->modification_end();
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 SideSetSTKMeshStruct::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

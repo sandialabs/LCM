@@ -16,7 +16,7 @@ namespace LCM {
 
 template<typename EvalT, typename Traits>
 ParallelSetField<EvalT, Traits>::
-ParallelSetField(const Teuchos::ParameterList& p) :
+ParallelSetField(Teuchos::ParameterList const& p) :
   evaluatedFieldName( p.get<std::string>("Evaluated Field Name") ),
   evaluatedField( p.get<std::string>("Evaluated Field Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Evaluated Field Data Layout") ),
   fieldValues( p.get<Teuchos::ArrayRCP<ScalarT>>("Field Values"))

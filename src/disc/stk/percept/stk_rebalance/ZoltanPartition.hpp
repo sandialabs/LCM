@@ -231,7 +231,7 @@ class Zoltan : public GeomDecomp
    */
   static void
   merge_default_values(
-      const Teuchos::ParameterList& from,
+      Teuchos::ParameterList const& from,
       Teuchos::ParameterList&       to);
 
   /** \brief Name Conversion Functions.
@@ -241,7 +241,7 @@ class Zoltan : public GeomDecomp
    */
   static void
   convert_names_and_values(
-      const Teuchos::ParameterList& from,
+      Teuchos::ParameterList const& from,
       Teuchos::ParameterList&       to);
 
   /** \brief determine New Partition.

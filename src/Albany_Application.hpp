@@ -295,7 +295,7 @@ class Application
   }
 
   //! Const access to problem parameter list
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getProblemPL() const
   {
     return problemParams;
@@ -309,7 +309,7 @@ class Application
   }
 
   //! Const access to app parameter list
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getAppPL() const
   {
     return params_;

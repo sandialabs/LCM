@@ -106,7 +106,7 @@ MechanicsProblem::buildEvaluators(
 //
 //
 //
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 MechanicsProblem::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

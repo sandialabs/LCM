@@ -30,7 +30,7 @@ class SurfaceScalarGradientOperatorPorePressure
 {
  public:
   SurfaceScalarGradientOperatorPorePressure(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

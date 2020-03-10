@@ -101,7 +101,7 @@ Albany::ThermoElasticityProblem::constructDirichletEvaluators(
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ThermoElasticityProblem::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

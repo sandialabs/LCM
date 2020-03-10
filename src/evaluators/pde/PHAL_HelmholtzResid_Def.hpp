@@ -13,7 +13,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-HelmholtzResid<EvalT, Traits>::HelmholtzResid(const Teuchos::ParameterList& p)
+HelmholtzResid<EvalT, Traits>::HelmholtzResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       U(p.get<std::string>("U Variable Name"),

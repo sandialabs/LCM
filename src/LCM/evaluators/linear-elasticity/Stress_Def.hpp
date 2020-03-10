@@ -12,7 +12,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-Stress<EvalT, Traits>::Stress(const Teuchos::ParameterList& p)
+Stress<EvalT, Traits>::Stress(Teuchos::ParameterList const& p)
     : strain(
           p.get<std::string>("Strain Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),

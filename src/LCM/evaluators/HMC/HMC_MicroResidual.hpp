@@ -25,7 +25,7 @@ class MicroResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
                       public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  MicroResidual(const Teuchos::ParameterList& p);
+  MicroResidual(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

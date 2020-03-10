@@ -17,7 +17,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 GatherEigenvectors<EvalT, Traits>::GatherEigenvectors(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   char buf[200];

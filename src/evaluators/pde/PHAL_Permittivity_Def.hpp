@@ -34,7 +34,7 @@ Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
   Teuchos::ParameterList* cond_list =
       p.get<Teuchos::ParameterList*>("Parameter List");
 
-  Teuchos::RCP<const Teuchos::ParameterList> reflist =
+  Teuchos::RCP<Teuchos::ParameterList const> reflist =
       this->getValidPermittivityParameters();
 
   // Check the parameters contained in the input file. Do not check the defaults
@@ -172,7 +172,7 @@ Permittivity<EvalT, Traits>::getValue(std::string const& n)
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Permittivity<EvalT, Traits>::getValidPermittivityParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

@@ -33,7 +33,7 @@ class BifurcationCheck : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Constructor
   ///
   BifurcationCheck(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///

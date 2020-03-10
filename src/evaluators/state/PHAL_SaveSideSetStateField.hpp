@@ -26,7 +26,7 @@ class SaveSideSetStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   SaveSideSetStateField(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -47,7 +47,7 @@ class SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   SaveSideSetStateField(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

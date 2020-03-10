@@ -77,7 +77,7 @@ Albany::ConstitutiveDriverProblem::buildEvaluators(
   return *op.tags;
 }
 //------------------------------------------------------------------------------
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ConstitutiveDriverProblem::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

@@ -29,7 +29,7 @@ class DOFInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   DOFInterpolationSideBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl_side);
 
   void

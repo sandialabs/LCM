@@ -28,7 +28,7 @@ class DOFVecInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   DOFVecInterpolationSideBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

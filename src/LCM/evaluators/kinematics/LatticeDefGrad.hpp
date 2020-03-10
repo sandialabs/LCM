@@ -29,7 +29,7 @@ class LatticeDefGrad : public PHX::EvaluatorWithBaseImpl<Traits>,
                        public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  LatticeDefGrad(const Teuchos::ParameterList& p);
+  LatticeDefGrad(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

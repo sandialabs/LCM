@@ -22,7 +22,7 @@ constexpr double pi = 3.1415926535897932385;
 
 //*****
 template <typename EvalT, typename Traits>
-NeumannBase<EvalT, Traits>::NeumannBase(const Teuchos::ParameterList& p)
+NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList const& p)
     :
 
       dl(p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct")),
@@ -1048,7 +1048,7 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 
 template <typename EvalT, typename Traits>
 NeumannAggregator<EvalT, Traits>::NeumannAggregator(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   Teuchos::RCP<PHX::DataLayout> dl =
       p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");

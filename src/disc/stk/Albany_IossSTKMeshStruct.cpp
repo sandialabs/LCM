@@ -677,7 +677,7 @@ Albany::IossSTKMeshStruct::loadSolutionFieldHistory(int step)
   mesh_data->read_defined_input_fields(index);
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::IossSTKMeshStruct::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

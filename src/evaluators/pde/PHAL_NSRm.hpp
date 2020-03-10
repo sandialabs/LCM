@@ -27,7 +27,7 @@ class NSRm : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  NSRm(const Teuchos::ParameterList& p);
+  NSRm(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

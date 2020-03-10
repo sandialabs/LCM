@@ -511,7 +511,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
   // Get and validate ProjectIPtoNodalField parameter list.
   Teuchos::ParameterList* plist =
       p.get<Teuchos::ParameterList*>("Parameter List");
-  Teuchos::RCP<const Teuchos::ParameterList> reflist =
+  Teuchos::RCP<Teuchos::ParameterList const> reflist =
       getValidProjectIPtoNodalFieldParameters();
   plist->validateParameters(*reflist, 0);
 

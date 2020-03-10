@@ -35,7 +35,7 @@ class ScatterResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   ScatterResidualBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -73,7 +73,7 @@ class ScatterResidualWithExtrudedParams : public ScatterResidual<EvalT, Traits>
 {
  public:
   ScatterResidualWithExtrudedParams(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : ScatterResidual<EvalT, Traits>(p, dl)
   {
@@ -115,7 +115,7 @@ class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ScatterResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);
@@ -173,7 +173,7 @@ class ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   ScatterResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);

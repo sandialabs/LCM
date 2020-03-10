@@ -13,7 +13,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-TLPoroStress<EvalT, Traits>::TLPoroStress(const Teuchos::ParameterList& p)
+TLPoroStress<EvalT, Traits>::TLPoroStress(Teuchos::ParameterList const& p)
     : stress(
           p.get<std::string>("Stress Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),

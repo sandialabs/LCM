@@ -13,7 +13,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : rho(p.get<std::string>("Rho QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       noiseTerm(

@@ -79,7 +79,7 @@ Albany::ReactDiffSystem::constructDirichletEvaluators(
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ReactDiffSystem::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

@@ -16,7 +16,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 ScatterScalarResponseBase<EvalT, Traits>::ScatterScalarResponseBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   setup(p, dl);
@@ -35,7 +35,7 @@ ScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
 template <typename EvalT, typename Traits>
 void
 ScatterScalarResponseBase<EvalT, Traits>::setup(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   stand_alone = p.get<bool>("Stand-alone Evaluator");
@@ -60,7 +60,7 @@ ScatterScalarResponseBase<EvalT, Traits>::setup(
   Teuchos::ParameterList* plist =
       p.get<Teuchos::ParameterList*>("Parameter List");
   if (stand_alone) {
-    Teuchos::RCP<const Teuchos::ParameterList> reflist =
+    Teuchos::RCP<Teuchos::ParameterList const> reflist =
         this->getValidResponseParameters();
     plist->validateParameters(*reflist, 0);
   }
@@ -69,7 +69,7 @@ ScatterScalarResponseBase<EvalT, Traits>::setup(
 }
 
 template <typename EvalT, typename Traits>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 ScatterScalarResponseBase<EvalT, Traits>::getValidResponseParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -83,7 +83,7 @@ ScatterScalarResponseBase<EvalT, Traits>::getValidResponseParameters() const
 template <typename Traits>
 ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>::
     ScatterScalarResponse(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
 {
   this->setup(p, dl);

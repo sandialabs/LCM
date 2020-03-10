@@ -28,7 +28,7 @@ class NSContravarientMetricTensor : public PHX::EvaluatorWithBaseImpl<Traits>,
                                     public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  NSContravarientMetricTensor(const Teuchos::ParameterList& p);
+  NSContravarientMetricTensor(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

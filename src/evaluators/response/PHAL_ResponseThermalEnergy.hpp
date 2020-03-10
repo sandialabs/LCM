@@ -43,7 +43,7 @@ class ResponseThermalEnergy
   postEvaluate(typename Traits::PostEvalData d);
 
  private:
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidResponseParameters() const;
 
   // temperature

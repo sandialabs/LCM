@@ -137,7 +137,7 @@ class TmplSTKMeshStruct : public GenericSTKMeshStruct
   buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Build a parameter list that contains valid input parameters
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidDiscretizationParameters() const;
 
   //! Build STK parts and nodesets that correspond to the dimension of the
@@ -261,16 +261,16 @@ TmplSTKMeshStruct<0, albany_stk_mesh_traits<0>>::setFieldAndBulkData(
         side_set_req);
 
 template <>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 TmplSTKMeshStruct<0>::getValidDiscretizationParameters() const;
 template <>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 TmplSTKMeshStruct<1>::getValidDiscretizationParameters() const;
 template <>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 TmplSTKMeshStruct<2>::getValidDiscretizationParameters() const;
 template <>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 TmplSTKMeshStruct<3>::getValidDiscretizationParameters() const;
 
 }  // namespace Albany

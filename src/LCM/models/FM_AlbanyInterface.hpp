@@ -99,25 +99,25 @@ class FerroicDriver : public LCM::ConstitutiveModel<EvalT, Traits>
 
 void
 parseBasis(
-    const Teuchos::ParameterList&              pBasis,
+    Teuchos::ParameterList const&              pBasis,
     minitensor::Tensor<RealType, FM::THREE_D>& R);
 void
 parseTensor4(
-    const Teuchos::ParameterList&               pConsts,
+    Teuchos::ParameterList const&               pConsts,
     minitensor::Tensor4<RealType, FM::THREE_D>& tensor);
 void
 parseTensor3(
-    const Teuchos::ParameterList&               pConsts,
+    Teuchos::ParameterList const&               pConsts,
     minitensor::Tensor3<RealType, FM::THREE_D>& tensor);
 void
 parseTensor(
-    const Teuchos::ParameterList&              pConsts,
+    Teuchos::ParameterList const&              pConsts,
     minitensor::Tensor<RealType, FM::THREE_D>& tensor);
 
 FM::CrystalVariant
 parseCrystalVariant(
     const Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& phases,
-    const Teuchos::ParameterList&                         vParam);
+    Teuchos::ParameterList const&                         vParam);
 
 }  // namespace LCM
 

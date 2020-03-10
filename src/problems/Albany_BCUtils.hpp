@@ -94,7 +94,7 @@ struct DirichletTraits
 
   typedef PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits> factory_type;
 
-  static Teuchos::RCP<const Teuchos::ParameterList>
+  static Teuchos::RCP<Teuchos::ParameterList const>
   getValidBCParameters(
       std::vector<std::string> const& nodeSetIDs,
       std::vector<std::string> const& bcNames);
@@ -174,7 +174,7 @@ struct NeumannTraits
 
   typedef PHAL::NeumannFactoryTraits<PHAL::AlbanyTraits> factory_type;
 
-  static Teuchos::RCP<const Teuchos::ParameterList>
+  static Teuchos::RCP<Teuchos::ParameterList const>
   getValidBCParameters(
       std::vector<std::string> const& sideSetIDs,
       std::vector<std::string> const& bcNames,

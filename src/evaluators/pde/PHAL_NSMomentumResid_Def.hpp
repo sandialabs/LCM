@@ -12,7 +12,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-NSMomentumResid<EvalT, Traits>::NSMomentumResid(const Teuchos::ParameterList& p)
+NSMomentumResid<EvalT, Traits>::NSMomentumResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       wGradBF(

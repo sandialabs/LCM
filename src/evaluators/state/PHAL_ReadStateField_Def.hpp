@@ -20,7 +20,7 @@ namespace PHAL {
 //
 //
 template <typename EvalT, typename Traits>
-ReadStateField<EvalT, Traits>::ReadStateField(const Teuchos::ParameterList&)
+ReadStateField<EvalT, Traits>::ReadStateField(Teuchos::ParameterList const&)
 {
   // States not read for generic type, only specializations
   this->setName("Read State Field");
@@ -53,7 +53,7 @@ void ReadStateField<EvalT, Traits>::evaluateFields(
 //
 template <typename Traits>
 ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::ReadStateField(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   field_name  = p.get<std::string>("Field Name");
   state_name  = p.get<std::string>("State Name");

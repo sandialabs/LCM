@@ -63,7 +63,7 @@ class IPtoNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   }
 
  protected:
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidIPtoNodalFieldParameters() const;
 
   PHX::MDField<MeshScalarT const, Cell, QuadPoint> weights_;

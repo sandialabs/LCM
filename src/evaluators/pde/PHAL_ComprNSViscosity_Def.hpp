@@ -14,7 +14,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 ComprNSViscosity<EvalT, Traits>::ComprNSViscosity(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : qFluct(
           p.get<std::string>("QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),

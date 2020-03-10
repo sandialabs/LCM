@@ -71,7 +71,7 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
   void
   loadOrSetCoordinates3d(int index);
 
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidDiscretizationParameters() const;
 
   Teuchos::RCP<Teuchos::FancyOStream>    out;

@@ -15,7 +15,7 @@ namespace PHAL {
 template <typename EvalT, typename Traits, typename ScalarT>
 SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::
     SideQuadPointsToSideInterpolationBase(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl_side)
     : w_measure(p.get<std::string>("Weighted Measure Name"), dl_side->qp_scalar)
 {

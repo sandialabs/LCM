@@ -116,7 +116,7 @@ PopulateMesh::buildProblem(
       discParams->sublist("Required Fields Info");
   int num_fields = req_fields_info.get<int>("Number Of Fields", 0);
   for (int ifield = 0; ifield < num_fields; ++ifield) {
-    const Teuchos::ParameterList& thisFieldList =
+    Teuchos::ParameterList const& thisFieldList =
         req_fields_info.sublist(strint("Field", ifield));
 
     fname   = thisFieldList.get<std::string>("Field Name");
@@ -180,7 +180,7 @@ PopulateMesh::buildProblem(
       int num_fields = req_fields_info.get<int>("Number Of Fields", 0);
 
       for (int ifield = 0; ifield < num_fields; ++ifield) {
-        const Teuchos::ParameterList& thisFieldList =
+        Teuchos::ParameterList const& thisFieldList =
             req_fields_info.sublist(strint("Field", ifield));
 
         fname   = thisFieldList.get<std::string>("Field Name");
@@ -259,7 +259,7 @@ PopulateMesh::buildEvaluators(
   return *op.tags;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 PopulateMesh::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

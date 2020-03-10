@@ -605,7 +605,7 @@ SolverFactory::setSolverParamDefaults(
   maxiters.set("Maximum Iterations", 10);
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 SolverFactory::getValidAppParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -642,7 +642,7 @@ SolverFactory::getValidAppParameters() const
   return validPL;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 SolverFactory::getValidDebugParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -684,7 +684,7 @@ SolverFactory::getValidDebugParameters() const
   return validPL;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 SolverFactory::getValidScalingParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -700,7 +700,7 @@ SolverFactory::getValidScalingParameters() const
   return validPL;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 SolverFactory::getValidRegressionResultsParameters() const
 {
   using Teuchos::Array;
@@ -814,7 +814,7 @@ SolverFactory::getValidRegressionResultsParameters() const
   return validPL;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 SolverFactory::getValidParameterParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -829,7 +829,7 @@ SolverFactory::getValidParameterParameters() const
   return validPL;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 SolverFactory::getValidResponseParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

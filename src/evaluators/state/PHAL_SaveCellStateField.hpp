@@ -24,7 +24,7 @@ class SaveCellStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
                            public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  SaveCellStateField(const Teuchos::ParameterList& p);
+  SaveCellStateField(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(
@@ -45,7 +45,7 @@ class SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>
       public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  SaveCellStateField(const Teuchos::ParameterList& p);
+  SaveCellStateField(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

@@ -55,7 +55,7 @@ class Field
   Field();
 
   bool
-  init(const Teuchos::ParameterList& p, std::string const& name);
+  init(Teuchos::ParameterList const& p, std::string const& name);
 
   //! \c init has been called.
   operator bool() const;

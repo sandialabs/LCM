@@ -24,7 +24,7 @@ class DummyResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::ScalarT ScalarT;
 
   DummyResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

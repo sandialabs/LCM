@@ -27,7 +27,7 @@ class DefGrad : public PHX::EvaluatorWithBaseImpl<Traits>,
                 public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DefGrad(const Teuchos::ParameterList& p);
+  DefGrad(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

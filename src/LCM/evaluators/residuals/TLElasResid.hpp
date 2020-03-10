@@ -30,7 +30,7 @@ class TLElasResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   using ScalarT     = typename EvalT::ScalarT;
   using MeshScalarT = typename EvalT::MeshScalarT;
 
-  TLElasResid(const Teuchos::ParameterList& p);
+  TLElasResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

@@ -168,7 +168,7 @@ main(int argc, char* argv[])
     Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>> param_names;
     param_names.resize(num_param_vecs);
     for (int l = 0; l < num_param_vecs; ++l) {
-      const Teuchos::ParameterList* pList =
+      Teuchos::ParameterList const* pList =
           using_old_parameter_list ?
               &parameterParams :
               &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
@@ -192,7 +192,7 @@ main(int argc, char* argv[])
     Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>> response_names;
     response_names.resize(num_response_vecs);
     for (int l = 0; l < num_response_vecs; ++l) {
-      const Teuchos::ParameterList* pList =
+      Teuchos::ParameterList const* pList =
           using_old_response_list ?
               &responseParams :
               &(responseParams.sublist(Albany::strint("Response Vector", l)));

@@ -12,7 +12,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-NSRm<EvalT, Traits>::NSRm(const Teuchos::ParameterList& p)
+NSRm<EvalT, Traits>::NSRm(Teuchos::ParameterList const& p)
     : pGrad(
           p.get<std::string>("Pressure Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),

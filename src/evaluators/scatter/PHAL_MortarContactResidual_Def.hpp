@@ -18,7 +18,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   scatter_operation =
@@ -66,7 +66,7 @@ MortarContactResidualBase<EvalT, Traits>::postRegistrationSetup(
 template <typename Traits>
 MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::
     MortarContactResidual(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : MortarContactResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl),
       numFields(
@@ -161,7 +161,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 template <typename Traits>
 MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::
     MortarContactResidual(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : MortarContactResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl),
       numFields(

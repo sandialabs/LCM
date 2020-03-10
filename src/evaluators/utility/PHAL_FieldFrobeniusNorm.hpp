@@ -27,7 +27,7 @@ class FieldFrobeniusNormBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   FieldFrobeniusNormBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

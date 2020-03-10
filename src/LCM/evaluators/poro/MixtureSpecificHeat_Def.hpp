@@ -13,7 +13,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 MixtureSpecificHeat<EvalT, Traits>::MixtureSpecificHeat(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : porosity(
           p.get<std::string>("Porosity Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),

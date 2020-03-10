@@ -27,7 +27,7 @@ class CurrentCoords : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   CurrentCoords(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

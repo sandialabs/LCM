@@ -13,7 +13,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 NSThermalEqResid<EvalT, Traits>::NSThermalEqResid(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       Temperature(

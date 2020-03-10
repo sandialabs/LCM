@@ -18,7 +18,7 @@ template <
     typename InputType,
     typename OutputType>
 ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   std::string input_field_name, output_field_name;
   if (p.isParameter("Input Field Name") && p.isParameter("Output Field Name")) {

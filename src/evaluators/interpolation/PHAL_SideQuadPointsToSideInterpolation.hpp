@@ -30,7 +30,7 @@ class SideQuadPointsToSideInterpolationBase
 {
  public:
   SideQuadPointsToSideInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl_side);
 
   void

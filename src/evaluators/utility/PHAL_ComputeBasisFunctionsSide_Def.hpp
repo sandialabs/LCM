@@ -14,7 +14,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   // Get side set name and side set layouts

@@ -421,7 +421,7 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
   fieldAndBulkDataSet = true;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::AsciiSTKMesh2D::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

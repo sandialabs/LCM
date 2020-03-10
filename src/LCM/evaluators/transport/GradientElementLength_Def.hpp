@@ -11,7 +11,7 @@ namespace LCM {
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 GradientElementLength<EvalT, Traits>::GradientElementLength(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : grad_bf_(p.get<std::string>("Gradient BF Name"), dl->node_qp_vector),
       unit_grad_(

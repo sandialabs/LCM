@@ -23,7 +23,7 @@ class SeparableScatterScalarResponseBase
 {
  public:
   SeparableScatterScalarResponseBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -40,7 +40,7 @@ class SeparableScatterScalarResponseBase
   // Child classes should call setup once p is filled out
   void
   setup(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
  protected:
@@ -62,7 +62,7 @@ class SeparableScatterScalarResponse
 {
  public:
   SeparableScatterScalarResponse(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : ScatterScalarResponse<EvalT, Traits>(p, dl)
   {
@@ -92,7 +92,7 @@ class SeparableScatterScalarResponse
   SeparableScatterScalarResponse() {}
   void
   setup(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
   {
     ScatterScalarResponse<EvalT, Traits>::setup(p, dl);
@@ -109,7 +109,7 @@ class SeparableScatterScalarResponseWithExtrudedParams
 {
  public:
   SeparableScatterScalarResponseWithExtrudedParams(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : SeparableScatterScalarResponse<EvalT, Traits>(p, dl){
             //    extruded_params_levels = p.get<
@@ -138,7 +138,7 @@ class SeparableScatterScalarResponseWithExtrudedParams
   SeparableScatterScalarResponseWithExtrudedParams() {}
   void
   setup(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
   {
     SeparableScatterScalarResponse<EvalT, Traits>::setup(p, dl);
@@ -163,7 +163,7 @@ class SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   SeparableScatterScalarResponse(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   postRegistrationSetup(
@@ -191,7 +191,7 @@ class SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>
   SeparableScatterScalarResponse() {}
   void
   setup(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
   {
     ScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);

@@ -98,7 +98,7 @@ CopyRemesh::adaptMesh()
 }
 
 //----------------------------------------------------------------------------
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 CopyRemesh::getValidAdapterParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

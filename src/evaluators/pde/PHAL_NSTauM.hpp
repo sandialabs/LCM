@@ -25,7 +25,7 @@ class NSTauM : public PHX::EvaluatorWithBaseImpl<Traits>,
                public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  NSTauM(const Teuchos::ParameterList& p);
+  NSTauM(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

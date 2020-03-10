@@ -14,7 +14,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 MapToPhysicalFrame<EvalT, Traits>::MapToPhysicalFrame(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : coords_vertices(
           p.get<std::string>("Coordinate Vector Name"),

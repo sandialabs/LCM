@@ -12,7 +12,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 SurfaceDiffusionResidual<EvalT, Traits>::SurfaceDiffusionResidual(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(

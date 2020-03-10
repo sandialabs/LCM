@@ -156,7 +156,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   void
   loadField(
       std::string const&                        field_name,
-      const Teuchos::ParameterList&             params,
+      Teuchos::ParameterList const&             params,
       Teuchos::RCP<Thyra_MultiVector>&          field_mv,
       const CombineAndScatterManager&           cas_manager,
       const Teuchos::RCP<Teuchos_Comm const>&   commT,
@@ -167,7 +167,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   void
   fillField(
       std::string const&                           field_name,
-      const Teuchos::ParameterList&                params,
+      Teuchos::ParameterList const&                params,
       Teuchos::RCP<Thyra_MultiVector>&             field_mv,
       Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
       bool                                         node,
@@ -177,7 +177,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   void
   computeField(
       std::string const&                           field_name,
-      const Teuchos::ParameterList&                params,
+      Teuchos::ParameterList const&                params,
       Teuchos::RCP<Thyra_MultiVector>&             field_mv,
       Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
       std::vector<stk::mesh::Entity> const&        entities,

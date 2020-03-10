@@ -40,7 +40,7 @@ class ResponseFieldIntegral
   postEvaluate(typename Traits::PostEvalData d);
 
  private:
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidResponseParameters() const;
 
   PHX::MDField<const ScalarT>             field;

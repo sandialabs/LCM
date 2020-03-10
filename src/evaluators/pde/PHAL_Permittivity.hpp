@@ -78,7 +78,7 @@ class Permittivity : public PHX::EvaluatorWithBaseImpl<Traits>,
 
  private:
   //! Validate the name strings under "Permittivity" section in xml input file,
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidPermittivityParameters() const;
 
   bool is_constant;

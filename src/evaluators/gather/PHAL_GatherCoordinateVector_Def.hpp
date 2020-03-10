@@ -14,7 +14,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 GatherCoordinateVector<EvalT, Traits>::GatherCoordinateVector(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : coordVec(
           p.get<std::string>("Coordinate Vector Name"),
@@ -40,7 +40,7 @@ GatherCoordinateVector<EvalT, Traits>::GatherCoordinateVector(
 
 template <typename EvalT, typename Traits>
 GatherCoordinateVector<EvalT, Traits>::GatherCoordinateVector(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : coordVec(
           p.get<std::string>("Coordinate Vector Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Coordinate Data Layout")),

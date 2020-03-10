@@ -25,7 +25,7 @@ class NSNeutronEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
                          public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  NSNeutronEqResid(const Teuchos::ParameterList& p);
+  NSNeutronEqResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

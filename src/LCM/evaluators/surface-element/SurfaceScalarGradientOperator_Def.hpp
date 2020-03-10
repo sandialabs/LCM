@@ -13,7 +13,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 SurfaceScalarGradientOperator<EvalT, Traits>::SurfaceScalarGradientOperator(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(

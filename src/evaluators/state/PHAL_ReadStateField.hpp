@@ -23,7 +23,7 @@ class ReadStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
                        public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ReadStateField(const Teuchos::ParameterList& p);
+  ReadStateField(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(
@@ -40,7 +40,7 @@ class ReadStateField<PHAL::AlbanyTraits::Residual, Traits>
       public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  ReadStateField(const Teuchos::ParameterList& p);
+  ReadStateField(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

@@ -60,7 +60,7 @@ class STK3DPointStruct : public GenericSTKMeshStruct
   buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Build a parameter list that contains valid input parameters
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidDiscretizationParameters() const;
 };
 }  // namespace Albany

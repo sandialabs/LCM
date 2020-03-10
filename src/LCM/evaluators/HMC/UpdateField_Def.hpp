@@ -14,7 +14,7 @@ namespace LCM {
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-UpdateField<EvalT, Traits>::UpdateField(const Teuchos::ParameterList& p)
+UpdateField<EvalT, Traits>::UpdateField(Teuchos::ParameterList const& p)
     : field_Nplus1(
           p.get<std::string>("Updated Field Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout")),

@@ -27,7 +27,7 @@ class ParallelSetField : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 public:
 
-  ParallelSetField(const Teuchos::ParameterList& p);
+  ParallelSetField(Teuchos::ParameterList const& p);
 
   void postRegistrationSetup(typename Traits::SetupData d,
                       PHX::FieldManager<Traits>& vm);

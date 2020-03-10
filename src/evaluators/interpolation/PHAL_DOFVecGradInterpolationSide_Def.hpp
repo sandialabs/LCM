@@ -13,7 +13,7 @@ namespace PHAL {
 template <typename EvalT, typename Traits, typename ScalarT>
 DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::
     DOFVecGradInterpolationSideBase(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl_side)
     : sideSetName(p.get<std::string>("Side Set Name")),
       val_node(p.get<std::string>("Variable Name"), dl_side->node_vector),

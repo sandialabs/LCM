@@ -14,7 +14,7 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 SurfaceScalarGradientOperatorHydroStress<EvalT, Traits>::
     SurfaceScalarGradientOperatorHydroStress(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(

@@ -27,7 +27,7 @@ class AddNoiseBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  AddNoiseBase(const Teuchos::ParameterList& p);
+  AddNoiseBase(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

@@ -78,7 +78,7 @@ Albany::CahnHillProblem::constructDirichletEvaluators(
   nodeSetIDs_ = bcUtils.getNodeSetIDs();
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::CahnHillProblem::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

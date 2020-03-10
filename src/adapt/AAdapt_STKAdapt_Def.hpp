@@ -217,7 +217,7 @@ STKAdapt<SizeField>::adaptMesh(
 }
 
 template <class SizeField>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 STKAdapt<SizeField>::getValidAdapterParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

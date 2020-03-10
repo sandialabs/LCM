@@ -16,7 +16,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 SaveSideSetStateField<EvalT, Traits>::SaveSideSetStateField(
-    const Teuchos::ParameterList& /* p */,
+    Teuchos::ParameterList const& /* p */,
     const Teuchos::RCP<Albany::Layouts>& /* dl */)
 {
   // States Not Saved for Generic Type, only Specializations
@@ -46,7 +46,7 @@ void SaveSideSetStateField<EvalT, Traits>::evaluateFields(
 template <typename Traits>
 SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::
     SaveSideSetStateField(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
 {
   sideSetName = p.get<std::string>("Side Set Name");

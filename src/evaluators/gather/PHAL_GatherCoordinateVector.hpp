@@ -31,10 +31,10 @@ class GatherCoordinateVector : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   GatherCoordinateVector(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   // Old constructor, still needed by BCs that use PHX Factory
-  GatherCoordinateVector(const Teuchos::ParameterList& p);
+  GatherCoordinateVector(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

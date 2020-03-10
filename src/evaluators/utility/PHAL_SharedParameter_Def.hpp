@@ -14,7 +14,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-SharedParameter<EvalT, Traits>::SharedParameter(const Teuchos::ParameterList& p)
+SharedParameter<EvalT, Traits>::SharedParameter(Teuchos::ParameterList const& p)
 {
   paramName  = p.get<std::string>("Parameter Name");
   paramValue = p.get<double>("Parameter Value");
@@ -68,7 +68,7 @@ SharedParameter<EvalT, Traits>::getValue(std::string const& n)
 
 template <typename EvalT, typename Traits>
 SharedParameterVec<EvalT, Traits>::SharedParameterVec(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   Teuchos::RCP<PHX::DataLayout> layout =
       p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");

@@ -13,7 +13,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 NSPermeabilityTerm<EvalT, Traits>::NSPermeabilityTerm(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : V(p.get<std::string>("Velocity QP Variable Name"),
         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       mu(p.get<std::string>("Viscosity QP Variable Name"),

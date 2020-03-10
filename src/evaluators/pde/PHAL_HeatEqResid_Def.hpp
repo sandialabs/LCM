@@ -13,7 +13,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-HeatEqResid<EvalT, Traits>::HeatEqResid(const Teuchos::ParameterList& p)
+HeatEqResid<EvalT, Traits>::HeatEqResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       Temperature(

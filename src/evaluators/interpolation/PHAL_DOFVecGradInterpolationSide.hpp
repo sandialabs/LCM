@@ -30,7 +30,7 @@ class DOFVecGradInterpolationSideBase
 {
  public:
   DOFVecGradInterpolationSideBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl_side);
 
   void

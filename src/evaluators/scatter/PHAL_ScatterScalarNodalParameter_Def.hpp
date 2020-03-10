@@ -16,7 +16,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 ScatterScalarNodalParameterBase<EvalT, Traits>::ScatterScalarNodalParameterBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   param_name             = p.get<std::string>("Parameter Name");
@@ -69,7 +69,7 @@ void ScatterScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
 template <typename Traits>
 ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
     ScatterScalarNodalParameter(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>(
           p,
@@ -115,7 +115,7 @@ ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
 template <typename Traits>
 ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
     ScatterScalarExtruded2DNodalParameter(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>(
           p,

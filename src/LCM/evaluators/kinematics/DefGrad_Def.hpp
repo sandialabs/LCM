@@ -16,7 +16,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-DefGrad<EvalT, Traits>::DefGrad(const Teuchos::ParameterList& p)
+DefGrad<EvalT, Traits>::DefGrad(Teuchos::ParameterList const& p)
     : GradU(
           p.get<std::string>("Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),

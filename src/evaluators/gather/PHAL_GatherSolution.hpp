@@ -38,7 +38,7 @@ class GatherSolutionBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   GatherSolutionBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -96,10 +96,10 @@ class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   GatherSolution(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   // Old constructor, still needed by BCs that use PHX Factory
-  GatherSolution(const Teuchos::ParameterList& p);
+  GatherSolution(Teuchos::ParameterList const& p);
   void
   evaluateFields(typename Traits::EvalData d);
 
@@ -219,9 +219,9 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   GatherSolution(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
-  GatherSolution(const Teuchos::ParameterList& p);
+  GatherSolution(Teuchos::ParameterList const& p);
   void
   evaluateFields(typename Traits::EvalData d);
 

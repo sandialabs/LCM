@@ -69,7 +69,7 @@ class IsoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
   /// Constructor
   ///
   IsoMeshSizeField(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : MeshSizeFieldBase<EvalT, Traits>(dl)
   {
@@ -112,7 +112,7 @@ class IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   /// Constructor
   ///
   IsoMeshSizeField(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
@@ -196,7 +196,7 @@ class AnisoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
   /// Constructor
   ///
   AnisoMeshSizeField(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : MeshSizeFieldBase<EvalT, Traits>(dl)
   {
@@ -239,7 +239,7 @@ class AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   /// Constructor
   ///
   AnisoMeshSizeField(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///

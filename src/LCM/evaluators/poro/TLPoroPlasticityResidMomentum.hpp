@@ -27,7 +27,7 @@ class TLPoroPlasticityResidMomentum
       public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  TLPoroPlasticityResidMomentum(const Teuchos::ParameterList& p);
+  TLPoroPlasticityResidMomentum(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

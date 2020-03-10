@@ -15,7 +15,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits, typename ScalarType>
 LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::LoadSideSetStateFieldBase(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   sideSetName = p.get<std::string>("Side Set Name");
 

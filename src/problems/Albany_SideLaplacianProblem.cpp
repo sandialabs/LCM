@@ -162,7 +162,7 @@ SideLaplacian::constructDirichletEvaluators(
   use_sdbcs_ = dirUtils.useSDBCs();
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 SideLaplacian::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

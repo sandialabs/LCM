@@ -16,7 +16,7 @@ namespace PHAL {
 //**********************************************************************
 template <typename EvalT, typename Traits>
 MapToPhysicalFrameSide<EvalT, Traits>::MapToPhysicalFrameSide(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl_side)
 {
   sideSetName = p.get<std::string>("Side Set Name");

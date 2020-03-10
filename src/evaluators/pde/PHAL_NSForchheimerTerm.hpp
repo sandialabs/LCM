@@ -27,7 +27,7 @@ class NSForchheimerTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  NSForchheimerTerm(const Teuchos::ParameterList& p);
+  NSForchheimerTerm(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

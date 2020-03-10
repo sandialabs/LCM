@@ -27,7 +27,7 @@ class PotentialResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   PotentialResid(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

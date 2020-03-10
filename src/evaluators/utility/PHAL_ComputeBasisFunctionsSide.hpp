@@ -29,7 +29,7 @@ class ComputeBasisFunctionsSide : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   ComputeBasisFunctionsSide(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

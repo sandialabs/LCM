@@ -23,7 +23,7 @@ class UpdateField : public PHX::EvaluatorWithBaseImpl<Traits>,
                     public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  UpdateField(const Teuchos::ParameterList& p);
+  UpdateField(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

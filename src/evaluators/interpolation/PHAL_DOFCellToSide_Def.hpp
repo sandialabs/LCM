@@ -13,7 +13,7 @@ namespace PHAL {
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : sideSetName(p.get<std::string>("Side Set Name"))
 {

@@ -17,7 +17,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 GatherSolutionBase<EvalT, Traits>::GatherSolutionBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : numNodes(0)
 {
@@ -196,7 +196,7 @@ GatherSolutionBase<EvalT, Traits>::postRegistrationSetup(
 
 template <typename Traits>
 GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::GatherSolution(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : GatherSolutionBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl),
       numFields(GatherSolutionBase<PHAL::AlbanyTraits::Residual, Traits>::
@@ -206,7 +206,7 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::GatherSolution(
 
 template <typename Traits>
 GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::GatherSolution(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : GatherSolutionBase<PHAL::AlbanyTraits::Residual, Traits>(
           p,
           p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct")),
@@ -442,7 +442,7 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 
 template <typename Traits>
 GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::GatherSolution(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : GatherSolutionBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl),
       numFields(GatherSolutionBase<PHAL::AlbanyTraits::Jacobian, Traits>::
@@ -452,7 +452,7 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::GatherSolution(
 
 template <typename Traits>
 GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::GatherSolution(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : GatherSolutionBase<PHAL::AlbanyTraits::Jacobian, Traits>(
           p,
           p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct")),

@@ -27,7 +27,7 @@ class TLPoroStress : public PHX::EvaluatorWithBaseImpl<Traits>,
                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  TLPoroStress(const Teuchos::ParameterList& p);
+  TLPoroStress(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

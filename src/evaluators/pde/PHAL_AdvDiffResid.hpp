@@ -25,7 +25,7 @@ class AdvDiffResid : public PHX::EvaluatorWithBaseImpl<Traits>,
                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  AdvDiffResid(const Teuchos::ParameterList& p);
+  AdvDiffResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

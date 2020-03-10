@@ -38,7 +38,7 @@ class GatherScalarNodalParameterBase
 {
  public:
   GatherScalarNodalParameterBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   postRegistrationSetup(
@@ -67,10 +67,10 @@ class GatherScalarNodalParameter
 {
  public:
   GatherScalarNodalParameter(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   // Old constructor, still needed by BCs that use PHX Factory
-  GatherScalarNodalParameter(const Teuchos::ParameterList& p);
+  GatherScalarNodalParameter(Teuchos::ParameterList const& p);
   //  void postRegistrationSetup(typename Traits::SetupData d,
   //  PHX::FieldManager<Traits>& vm);
   void
@@ -87,7 +87,7 @@ class GatherScalarExtruded2DNodalParameter
 {
  public:
   GatherScalarExtruded2DNodalParameter(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);

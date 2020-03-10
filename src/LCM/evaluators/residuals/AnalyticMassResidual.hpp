@@ -37,7 +37,7 @@ class AnalyticMassResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   AnalyticMassResidualBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -160,7 +160,7 @@ class AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   AnalyticMassResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);
@@ -179,7 +179,7 @@ class AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   AnalyticMassResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);

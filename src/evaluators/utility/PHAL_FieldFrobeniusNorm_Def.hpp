@@ -14,7 +14,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::FieldFrobeniusNormBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   std::string fieldName     = p.get<std::string>("Field Name");

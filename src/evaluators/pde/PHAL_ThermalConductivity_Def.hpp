@@ -35,7 +35,7 @@ ThermalConductivity<EvalT, Traits>::ThermalConductivity(
   Teuchos::ParameterList* cond_list =
       p.get<Teuchos::ParameterList*>("Parameter List");
 
-  Teuchos::RCP<const Teuchos::ParameterList> reflist =
+  Teuchos::RCP<Teuchos::ParameterList const> reflist =
       this->getValidThermalCondParameters();
 
   // Check the parameters contained in the input file. Do not check the defaults
@@ -159,7 +159,7 @@ ThermalConductivity<EvalT, Traits>::getValue(std::string const& n)
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 ThermalConductivity<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

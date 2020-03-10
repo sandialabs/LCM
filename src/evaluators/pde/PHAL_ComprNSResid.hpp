@@ -25,7 +25,7 @@ class ComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>,
                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ComprNSResid(const Teuchos::ParameterList& p);
+  ComprNSResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

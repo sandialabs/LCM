@@ -27,7 +27,7 @@ class CahnHillChemTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  CahnHillChemTerm(const Teuchos::ParameterList& p);
+  CahnHillChemTerm(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

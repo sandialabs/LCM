@@ -78,7 +78,7 @@ class HMCProblem : public virtual Albany::AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
 
   //! Each problem must generate it's list of valid parameters
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidProblemParameters() const;
 
   void

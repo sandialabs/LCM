@@ -29,7 +29,7 @@ class SurfaceHDiffusionDefResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   SurfaceHDiffusionDefResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

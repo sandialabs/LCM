@@ -14,7 +14,7 @@ namespace Albany {
 
 SolutionResponseFunction::SolutionResponseFunction(
     const Teuchos::RCP<Albany::Application>& application,
-    const Teuchos::ParameterList&            responseParams)
+    Teuchos::ParameterList const&            responseParams)
     : solution_vs(getSpmdVectorSpace(application->getVectorSpace()))
 {
   // Build list of DOFs we want to keep

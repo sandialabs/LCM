@@ -29,7 +29,7 @@ class Strain : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Constructor
   ///
   Strain(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///

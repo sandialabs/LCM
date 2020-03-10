@@ -27,7 +27,7 @@ class CahnHillWResid : public PHX::EvaluatorWithBaseImpl<Traits>,
                        public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  CahnHillWResid(const Teuchos::ParameterList& p);
+  CahnHillWResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

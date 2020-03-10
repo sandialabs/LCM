@@ -36,7 +36,7 @@ class GatherEigenDataBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   GatherEigenDataBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -63,7 +63,7 @@ class GatherEigenData : public GatherEigenDataBase<EvalT, Traits>
 {
  public:
   GatherEigenData(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   // void evaluateFields(typename Traits::EvalData d);
@@ -86,7 +86,7 @@ class GatherEigenData<AlbanyTraits::Residual, Traits>
 {
  public:
   GatherEigenData(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   // void evaluateFields(typename Traits::EvalData d);
@@ -103,7 +103,7 @@ class GatherEigenData<AlbanyTraits::Jacobian, Traits>
 {
  public:
   GatherEigenData(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

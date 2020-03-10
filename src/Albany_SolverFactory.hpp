@@ -86,15 +86,15 @@ class SolverFactory
   //    apart from Albany::SolverFactory.  It may be better to relocate these
   //    to the Application class, or as functions "related to"
   //    Albany::Application.
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidAppParameters() const;
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidDebugParameters() const;
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidScalingParameters() const;
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidParameterParameters() const;
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidResponseParameters() const;
 
  private:
@@ -102,7 +102,7 @@ class SolverFactory
   void
   setSolverParamDefaults(Teuchos::ParameterList* appParams, int myRank);
 
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidRegressionResultsParameters() const;
 
  public:

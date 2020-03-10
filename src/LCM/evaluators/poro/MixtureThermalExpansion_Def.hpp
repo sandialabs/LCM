@@ -13,7 +13,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : biotCoefficient(
           p.get<std::string>("Biot Coefficient Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),

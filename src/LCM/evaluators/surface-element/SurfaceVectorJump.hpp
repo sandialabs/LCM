@@ -30,7 +30,7 @@ class SurfaceVectorJump : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   SurfaceVectorJump(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

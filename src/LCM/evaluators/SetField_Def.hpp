@@ -12,7 +12,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-SetField<EvalT, Traits>::SetField(const Teuchos::ParameterList& p)
+SetField<EvalT, Traits>::SetField(Teuchos::ParameterList const& p)
     : evaluatedFieldName(p.get<std::string>("Evaluated Field Name")),
       evaluatedField(
           p.get<std::string>("Evaluated Field Name"),

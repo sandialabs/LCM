@@ -60,7 +60,7 @@ class Helmholtz2DProblem : public Albany::AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& responseList);
 
   //! Each problem must generate it's list of valide parameters
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidProblemParameters() const;
 
  private:

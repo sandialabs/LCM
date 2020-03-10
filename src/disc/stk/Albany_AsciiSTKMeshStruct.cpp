@@ -802,7 +802,7 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
       comm, side_set_req, side_set_sis, worksetSize);
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 AsciiSTKMeshStruct::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

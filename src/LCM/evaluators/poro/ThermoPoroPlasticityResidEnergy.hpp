@@ -28,7 +28,7 @@ class ThermoPoroPlasticityResidEnergy
       public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ThermoPoroPlasticityResidEnergy(const Teuchos::ParameterList& p);
+  ThermoPoroPlasticityResidEnergy(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

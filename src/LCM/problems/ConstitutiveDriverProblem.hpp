@@ -83,7 +83,7 @@ class ConstitutiveDriverProblem : public Albany::AbstractProblem
   ///
   /// Each problem must generate it's list of valid parameters
   ///
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidProblemParameters() const;
 
   ///

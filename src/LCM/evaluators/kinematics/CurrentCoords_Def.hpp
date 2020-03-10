@@ -13,7 +13,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 CurrentCoords<EvalT, Traits>::CurrentCoords(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : refCoords(
           p.get<std::string>("Reference Coordinates Name"),

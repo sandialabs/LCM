@@ -22,7 +22,7 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 SeparableScatterScalarResponseBase<EvalT, Traits>::
     SeparableScatterScalarResponseBase(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
 {
   setup(p, dl);
@@ -41,7 +41,7 @@ SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
 template <typename EvalT, typename Traits>
 void
 SeparableScatterScalarResponseBase<EvalT, Traits>::setup(
-    const Teuchos::ParameterList& p,
+    Teuchos::ParameterList const& p,
     const Teuchos::RCP<Albany::Layouts>& /* dl */)
 {
   this->stand_alone = p.get<bool>("Stand-alone Evaluator");
@@ -65,7 +65,7 @@ SeparableScatterScalarResponseBase<EvalT, Traits>::setup(
 template <typename Traits>
 SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
     SeparableScatterScalarResponse(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
 {
   this->setup(p, dl);

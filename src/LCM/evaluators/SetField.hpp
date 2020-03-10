@@ -22,7 +22,7 @@ class SetField : public PHX::EvaluatorWithBaseImpl<Traits>,
                  public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  SetField(const Teuchos::ParameterList& p);
+  SetField(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

@@ -34,7 +34,7 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
   //! get and validate ElementSizeField parameter list
   Teuchos::ParameterList* plist =
       p.get<Teuchos::ParameterList*>("Parameter List");
-  Teuchos::RCP<const Teuchos::ParameterList> reflist =
+  Teuchos::RCP<Teuchos::ParameterList const> reflist =
       this->getValidSizeFieldParameters();
   plist->validateParameters(*reflist, 0);
 
@@ -423,7 +423,7 @@ ElementSizeFieldBase<EvalT, Traits>::getCellRadius(
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 ElementSizeFieldBase<EvalT, Traits>::getValidSizeFieldParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

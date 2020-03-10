@@ -29,7 +29,7 @@ class SurfaceTLPoroMassResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   SurfaceTLPoroMassResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

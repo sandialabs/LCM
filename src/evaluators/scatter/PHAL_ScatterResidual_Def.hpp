@@ -23,7 +23,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   std::string fieldName;
@@ -113,7 +113,7 @@ ScatterResidualBase<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename Traits>
 ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::ScatterResidual(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl),
       numFields(ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>::
@@ -217,7 +217,7 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 
 template <typename Traits>
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::ScatterResidual(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl),
       numFields(ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::

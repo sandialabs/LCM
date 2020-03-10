@@ -13,7 +13,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : coordVec(
           p.get<std::string>("Coordinate Vector Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Coordinate Data Layout")),

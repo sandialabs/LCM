@@ -16,7 +16,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 SaveStateField<EvalT, Traits>::SaveStateField(
-    const Teuchos::ParameterList& /* p */)
+    Teuchos::ParameterList const& /* p */)
 {
   // States Not Saved for Generic Type, only Specializations
   this->setName("Save State Field");
@@ -43,7 +43,7 @@ void SaveStateField<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename Traits>
 SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveStateField(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");

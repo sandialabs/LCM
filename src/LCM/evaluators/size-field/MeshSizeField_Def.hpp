@@ -20,7 +20,7 @@ namespace LCM {
 //----------------------------------------------------------------------------
 template <typename Traits>
 IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::IsoMeshSizeField(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>(dl),
       currentCoords(
@@ -147,7 +147,7 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 //----------------------------------------------------------------------------
 template <typename Traits>
 AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::AnisoMeshSizeField(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>(dl),
       currentCoords(

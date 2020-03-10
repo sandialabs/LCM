@@ -36,7 +36,7 @@ plName(std::string const& name)
 // order is the order the BC is listed in the input file.
 void
 imposeOrder(
-    const Teuchos::ParameterList& bc_pl,
+    Teuchos::ParameterList const& bc_pl,
     std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>> const&
         evname2pl)
 {
@@ -1361,7 +1361,7 @@ Albany::BCUtils<BCTraits>::buildFieldManager(
 
 // Various specializations
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::DirichletTraits::getValidBCParameters(
     std::vector<std::string> const& nodeSetIDs,
     std::vector<std::string> const& bcNames)
@@ -1453,7 +1453,7 @@ Albany::DirichletTraits::getValidBCParameters(
   return validPL;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::NeumannTraits::getValidBCParameters(
     std::vector<std::string> const& sideSetIDs,
     std::vector<std::string> const& bcNames,

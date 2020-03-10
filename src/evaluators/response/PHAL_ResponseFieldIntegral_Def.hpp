@@ -29,7 +29,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   // get and validate Response parameter list
   Teuchos::ParameterList* plist =
       p.get<Teuchos::ParameterList*>("Parameter List");
-  Teuchos::RCP<const Teuchos::ParameterList> reflist =
+  Teuchos::RCP<Teuchos::ParameterList const> reflist =
       this->getValidResponseParameters();
   plist->validateParameters(*reflist, 0);
 
@@ -238,12 +238,12 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::postEvaluate(
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 PHAL::ResponseFieldIntegral<EvalT, Traits>::getValidResponseParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
       rcp(new Teuchos::ParameterList("Valid ResponseFieldIntegral Params"));
-  Teuchos::RCP<const Teuchos::ParameterList> baseValidPL =
+  Teuchos::RCP<Teuchos::ParameterList const> baseValidPL =
       PHAL::SeparableScatterScalarResponse<EvalT, Traits>::
           getValidResponseParameters();
   validPL->setParameters(*baseValidPL);

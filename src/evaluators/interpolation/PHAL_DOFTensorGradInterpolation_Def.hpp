@@ -14,7 +14,7 @@ namespace PHAL {
 template <typename EvalT, typename Traits, typename ScalarT>
 DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::
     DOFTensorGradInterpolationBase(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : val_node(p.get<std::string>("Variable Name"), dl->node_tensor),
       GradBF(p.get<std::string>("Gradient BF Name"), dl->node_qp_gradient),

@@ -14,7 +14,7 @@ namespace HMC {
 //----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 TotalStress<EvalT, Traits>::TotalStress(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : macroStress(p.get<std::string>("Macro Stress Name"), dl->qp_tensor),
       totalStress(p.get<std::string>("Total Stress Name"), dl->qp_tensor),

@@ -202,7 +202,7 @@ Albany::HMCProblem::constructNeumannEvaluators(
       this->paramLib);
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::HMCProblem::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
@@ -237,7 +237,7 @@ Albany::HMCProblem::parseMaterialModel(
 
   for (int i = 0; i < numMicroScales; i++) {
     std::string scaleName = Albany::strint("Microscale", i + 1);
-    const Teuchos::ParameterList& scaleList = modelList.sublist(scaleName);
+    Teuchos::ParameterList const& scaleList = modelList.sublist(scaleName);
     p->sublist(scaleName);
     p->set(scaleName, scaleList);
   }

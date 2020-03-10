@@ -17,7 +17,7 @@ namespace AAdapt {
 
 double const pi = 3.141592653589793;
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 getValidInitialConditionParameters(
     const Teuchos::ArrayRCP<std::string>& wsEBNames)
 {

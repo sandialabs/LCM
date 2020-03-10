@@ -16,7 +16,7 @@ namespace PHAL {
 //**********************************************************************
 template <typename EvalT, typename Traits>
 SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : residual(p.get<std::string>("Residual Variable Name"), dl->node_scalar)
 {

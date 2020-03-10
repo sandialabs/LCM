@@ -13,7 +13,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : cubature_(
           p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),

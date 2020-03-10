@@ -27,7 +27,7 @@ class DOFTensorInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   DOFTensorInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -69,7 +69,7 @@ class FastSolutionTensorInterpolationBase
 {
  public:
   FastSolutionTensorInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFTensorInterpolationBase<EvalT, Traits, ScalarT>(p, dl)
   {
@@ -106,7 +106,7 @@ class FastSolutionTensorInterpolationBase<
 {
  public:
   FastSolutionTensorInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFTensorInterpolationBase<
             PHAL::AlbanyTraits::Jacobian,

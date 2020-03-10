@@ -25,7 +25,7 @@ class ReactDiffSystemResid : public PHX::EvaluatorWithBaseImpl<Traits>,
                              public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ReactDiffSystemResid(const Teuchos::ParameterList& p);
+  ReactDiffSystemResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

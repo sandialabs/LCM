@@ -53,7 +53,7 @@ class AsciiSTKMeshStruct : public GenericSTKMeshStruct
   }
 
  private:
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidDiscretizationParameters() const;
 
   Teuchos::RCP<Teuchos::FancyOStream> out;

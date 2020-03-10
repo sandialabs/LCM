@@ -207,7 +207,7 @@ Albany::HeatProblem::constructNeumannEvaluators(
       materialDB);
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::HeatProblem::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

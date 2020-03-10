@@ -32,7 +32,7 @@ class HelmholtzResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  HelmholtzResid(const Teuchos::ParameterList& p);
+  HelmholtzResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

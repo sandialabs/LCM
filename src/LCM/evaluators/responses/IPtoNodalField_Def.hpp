@@ -147,7 +147,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::IPtoNodalField(
   //! get and validate IPtoNodalField parameter list
   Teuchos::ParameterList* plist =
       p.get<Teuchos::ParameterList*>("Parameter List");
-  Teuchos::RCP<const Teuchos::ParameterList> reflist =
+  Teuchos::RCP<Teuchos::ParameterList const> reflist =
       this->getValidIPtoNodalFieldParameters();
   plist->validateParameters(*reflist, 0);
 
@@ -427,7 +427,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
 
 //------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 IPtoNodalFieldBase<EvalT, Traits>::getValidIPtoNodalFieldParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

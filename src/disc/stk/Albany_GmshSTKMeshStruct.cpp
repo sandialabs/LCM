@@ -389,7 +389,7 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
   fieldAndBulkDataSet = true;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::GmshSTKMeshStruct::getValidDiscretizationParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

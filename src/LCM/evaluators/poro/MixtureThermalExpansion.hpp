@@ -26,7 +26,7 @@ class MixtureThermalExpansion : public PHX::EvaluatorWithBaseImpl<Traits>,
                                 public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  MixtureThermalExpansion(const Teuchos::ParameterList& p);
+  MixtureThermalExpansion(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

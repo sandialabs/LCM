@@ -28,7 +28,7 @@ class ScalarL2ProjectionResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
                                    public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ScalarL2ProjectionResidual(const Teuchos::ParameterList& p);
+  ScalarL2ProjectionResidual(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

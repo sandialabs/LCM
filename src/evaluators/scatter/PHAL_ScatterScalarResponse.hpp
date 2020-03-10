@@ -28,7 +28,7 @@ class ScatterScalarResponseBase
 {
  public:
   ScatterScalarResponseBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -59,10 +59,10 @@ class ScatterScalarResponseBase
   // Child classes should call setup once p is filled out
   void
   setup(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidResponseParameters() const;
 
  protected:
@@ -93,7 +93,7 @@ class ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ScatterScalarResponse(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   postEvaluate(typename Traits::PostEvalData d);
@@ -103,7 +103,7 @@ class ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>
   ScatterScalarResponse() {}
   void
   setup(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
   {
     ScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);

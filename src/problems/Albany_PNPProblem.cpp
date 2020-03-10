@@ -165,7 +165,7 @@ Albany::PNPProblem::constructNeumannEvaluators(
       this->paramLib);
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::PNPProblem::getValidProblemParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =

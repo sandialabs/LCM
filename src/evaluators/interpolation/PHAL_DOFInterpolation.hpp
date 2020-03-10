@@ -27,7 +27,7 @@ class DOFInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   DOFInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

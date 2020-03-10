@@ -32,7 +32,7 @@ class MortarContactResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   MortarContactResidualBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -78,7 +78,7 @@ class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   MortarContactResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);
@@ -136,7 +136,7 @@ class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   MortarContactResidual(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);

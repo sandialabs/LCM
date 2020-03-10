@@ -99,7 +99,7 @@ Albany::STK3DPointStruct::buildMesh(
   std::cout << "---3DPoint::buildMesh---" << std::endl;
 }
 
-Teuchos::RCP<const Teuchos::ParameterList>
+Teuchos::RCP<Teuchos::ParameterList const>
 Albany::STK3DPointStruct::getValidDiscretizationParameters() const
 {
   std::cout << "---3DPoint::getValidDiscretizationParameters---" << std::endl;

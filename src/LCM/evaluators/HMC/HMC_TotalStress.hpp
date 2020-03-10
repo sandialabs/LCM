@@ -24,7 +24,7 @@ class TotalStress : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Constructor
   ///
   TotalStress(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///

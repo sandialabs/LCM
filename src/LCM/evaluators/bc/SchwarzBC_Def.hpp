@@ -360,7 +360,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
       Teuchos::rcpFromRef(coupled_stk_disc->getSTKMetaData());
 
   // Get coupled_app parameter list
-  Teuchos::RCP<const Teuchos::ParameterList> coupled_app_params =
+  Teuchos::RCP<Teuchos::ParameterList const> coupled_app_params =
       coupled_app.getAppPL();
 
   // Get discretization sublist from coupled_app parameter list

@@ -27,7 +27,7 @@ class NSPermeabilityTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  NSPermeabilityTerm(const Teuchos::ParameterList& p);
+  NSPermeabilityTerm(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

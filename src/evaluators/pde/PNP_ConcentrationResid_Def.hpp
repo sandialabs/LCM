@@ -11,7 +11,7 @@
 //*****
 template <typename EvalT, typename Traits>
 PNP::ConcentrationResid<EvalT, Traits>::ConcentrationResid(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       wGradBF(

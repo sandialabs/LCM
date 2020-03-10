@@ -29,7 +29,7 @@ class DOFCellToSideQPBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   DOFCellToSideQPBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

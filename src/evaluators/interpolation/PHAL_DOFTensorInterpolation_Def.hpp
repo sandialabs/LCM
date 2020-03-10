@@ -13,7 +13,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::DOFTensorInterpolationBase(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : val_node(p.get<std::string>("Variable Name"), dl->node_tensor),
       BF(p.get<std::string>("BF Name"), dl->node_qp_scalar),

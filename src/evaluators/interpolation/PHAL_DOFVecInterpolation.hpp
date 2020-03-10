@@ -27,7 +27,7 @@ class DOFVecInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   DOFVecInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -69,7 +69,7 @@ class FastSolutionVecInterpolationBase
 {
  public:
   FastSolutionVecInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFVecInterpolationBase<EvalT, Traits, ScalarT>(p, dl)
   {
@@ -106,7 +106,7 @@ class FastSolutionVecInterpolationBase<
 {
  public:
   FastSolutionVecInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFVecInterpolationBase<
             PHAL::AlbanyTraits::Jacobian,

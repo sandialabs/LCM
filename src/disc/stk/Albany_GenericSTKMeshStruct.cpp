@@ -842,7 +842,7 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(
     const Teuchos::RCP<Teuchos_Comm const>& comm)
 {
   if (params->isSublist("Side Set Discretizations")) {
-    const Teuchos::ParameterList& ssd_list =
+    Teuchos::ParameterList const& ssd_list =
         params->sublist("Side Set Discretizations");
     const Teuchos::Array<std::string>& sideSets =
         ssd_list.get<Teuchos::Array<std::string>>("Side Sets");
@@ -954,7 +954,7 @@ GenericSTKMeshStruct::finalizeSideSetMeshStructs(
     AbstractFieldContainer::FieldContainerRequirements dummy_req;
 
     Teuchos::RCP<Teuchos::ParameterList> params_ss;
-    const Teuchos::ParameterList&        ssd_list =
+    Teuchos::ParameterList const&        ssd_list =
         params->sublist("Side Set Discretizations");
     for (auto it : sideSetMeshStructs) {
       Teuchos::RCP<SideSetSTKMeshStruct> sideMesh;
@@ -1500,7 +1500,7 @@ GenericSTKMeshStruct::loadRequiredInputFields(
 void
 GenericSTKMeshStruct::loadField(
     std::string const&                        field_name,
-    const Teuchos::ParameterList&             field_params,
+    Teuchos::ParameterList const&             field_params,
     Teuchos::RCP<Thyra_MultiVector>&          field_mv,
     const CombineAndScatterManager&           cas_manager,
     const Teuchos::RCP<Teuchos_Comm const>&   comm,
@@ -1610,7 +1610,7 @@ GenericSTKMeshStruct::loadField(
 void
 GenericSTKMeshStruct::fillField(
     std::string const&                           field_name,
-    const Teuchos::ParameterList&                field_params,
+    Teuchos::ParameterList const&                field_params,
     Teuchos::RCP<Thyra_MultiVector>&             field_mv,
     Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
     bool                                         nodal,
@@ -1742,7 +1742,7 @@ GenericSTKMeshStruct::fillField(
 void
 GenericSTKMeshStruct::computeField(
     std::string const&                           field_name,
-    const Teuchos::ParameterList&                field_params,
+    Teuchos::ParameterList const&                field_params,
     Teuchos::RCP<Thyra_MultiVector>&             field_mv,
     Teuchos::RCP<Thyra_VectorSpace const> const& entities_vs,
     std::vector<stk::mesh::Entity> const&        entities,

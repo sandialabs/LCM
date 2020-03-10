@@ -26,7 +26,7 @@ class HeatEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
                     public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  HeatEqResid(const Teuchos::ParameterList& p);
+  HeatEqResid(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

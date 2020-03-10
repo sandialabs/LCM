@@ -35,7 +35,7 @@ class GatherAuxData : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   GatherAuxData(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

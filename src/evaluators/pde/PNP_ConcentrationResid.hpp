@@ -27,7 +27,7 @@ class ConcentrationResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   ConcentrationResid(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

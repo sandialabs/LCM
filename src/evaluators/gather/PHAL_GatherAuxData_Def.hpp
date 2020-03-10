@@ -14,7 +14,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 GatherAuxData<EvalT, Traits>::GatherAuxData(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   std::string field_name = p.get<std::string>("Field Name");

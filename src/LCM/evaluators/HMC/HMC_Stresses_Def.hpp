@@ -16,7 +16,7 @@ namespace HMC {
 
 //*****
 template <typename EvalT, typename Traits>
-Stresses<EvalT, Traits>::Stresses(const Teuchos::ParameterList& p)
+Stresses<EvalT, Traits>::Stresses(Teuchos::ParameterList const& p)
     : strain(
           p.get<std::string>("Strain Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")),
@@ -64,7 +64,7 @@ Stresses<EvalT, Traits>::Stresses(const Teuchos::ParameterList& p)
   betaParameter.resize(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
     std::string mySublist                 = Albany::strint("Microscale", i + 1);
-    const Teuchos::ParameterList& msModel = p.sublist(mySublist);
+    Teuchos::ParameterList const& msModel = p.sublist(mySublist);
     lengthScale[i]   = msModel.get<RealType>("Length Scale");
     betaParameter[i] = msModel.get<RealType>("Beta Constant");
   }

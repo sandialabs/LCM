@@ -32,7 +32,7 @@ class MapToPhysicalFrame : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   MapToPhysicalFrame(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

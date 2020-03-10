@@ -12,7 +12,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-NSTauM<EvalT, Traits>::NSTauM(const Teuchos::ParameterList& p)
+NSTauM<EvalT, Traits>::NSTauM(Teuchos::ParameterList const& p)
     : V(p.get<std::string>("Velocity QP Variable Name"),
         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       Gc(p.get<std::string>("Contravarient Metric Tensor Name"),

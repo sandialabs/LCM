@@ -19,7 +19,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 ScalarL2ProjectionResidual<EvalT, Traits>::ScalarL2ProjectionResidual(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       wGradBF(

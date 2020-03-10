@@ -11,7 +11,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 DummyResidual<EvalT, Traits>::DummyResidual(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : solution(p.get<std::string>("Solution Variable Name"), dl->node_scalar),
       residual(p.get<std::string>("Residual Variable Name"), dl->node_scalar)

@@ -65,7 +65,7 @@ class ElementSizeFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
     VECTOR
   } ScalingType;
 
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidSizeFieldParameters() const;
 
   void

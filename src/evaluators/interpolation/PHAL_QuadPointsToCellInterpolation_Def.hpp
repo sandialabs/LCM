@@ -13,7 +13,7 @@ namespace PHAL {
 template <typename EvalT, typename Traits, typename ScalarT>
 QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::
     QuadPointsToCellInterpolationBase(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl,
         const Teuchos::RCP<PHX::DataLayout>& qp_layout,
         const Teuchos::RCP<PHX::DataLayout>& cell_layout)

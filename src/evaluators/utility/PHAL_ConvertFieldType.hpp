@@ -30,7 +30,7 @@ class ConvertFieldType : public PHX::EvaluatorWithBaseImpl<Traits>,
                          public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ConvertFieldType(const Teuchos::ParameterList& p);
+  ConvertFieldType(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

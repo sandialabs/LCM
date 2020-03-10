@@ -12,7 +12,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-CahnHillWResid<EvalT, Traits>::CahnHillWResid(const Teuchos::ParameterList& p)
+CahnHillWResid<EvalT, Traits>::CahnHillWResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       BF(p.get<std::string>("BF Name"),

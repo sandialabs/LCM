@@ -85,7 +85,7 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
       std::string&   line,
       std::string    line_of_interest);
 
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidDiscretizationParameters() const;
 
   // Gets the physical name-tag pairs for version 4.1 meshes

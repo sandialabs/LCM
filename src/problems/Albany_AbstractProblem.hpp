@@ -142,7 +142,7 @@ class AbstractProblem
   }
 
   //! Each problem must generate it's list of valide parameters
-  virtual Teuchos::RCP<const Teuchos::ParameterList>
+  virtual Teuchos::RCP<Teuchos::ParameterList const>
   getValidProblemParameters() const
   {
     return getGenericProblemParams("Generic Problem List");

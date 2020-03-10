@@ -13,7 +13,7 @@ namespace PHAL {
 template <typename EvalT, typename Traits, typename ScalarT>
 NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::
     NodesToCellInterpolationBase(
-        const Teuchos::ParameterList&        p,
+        Teuchos::ParameterList const&        p,
         const Teuchos::RCP<Albany::Layouts>& dl)
     : BF(p.get<std::string>("BF Variable Name"), dl->node_qp_scalar),
       w_measure(p.get<std::string>("Weighted Measure Name"), dl->qp_scalar)

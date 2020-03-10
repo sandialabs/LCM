@@ -29,7 +29,7 @@ class SurfaceScalarGradient : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   SurfaceScalarGradient(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

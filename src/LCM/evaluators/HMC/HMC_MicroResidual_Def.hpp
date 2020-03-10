@@ -12,7 +12,7 @@ namespace HMC {
 
 //*****
 template <typename EvalT, typename Traits>
-MicroResidual<EvalT, Traits>::MicroResidual(const Teuchos::ParameterList& p)
+MicroResidual<EvalT, Traits>::MicroResidual(Teuchos::ParameterList const& p)
     : microStress(
           p.get<std::string>("Micro Stress Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),

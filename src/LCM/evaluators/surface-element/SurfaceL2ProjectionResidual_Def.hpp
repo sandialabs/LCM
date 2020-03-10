@@ -18,7 +18,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 SurfaceL2ProjectionResidual<EvalT, Traits>::SurfaceL2ProjectionResidual(
-    const Teuchos::ParameterList&        p,
+    Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(

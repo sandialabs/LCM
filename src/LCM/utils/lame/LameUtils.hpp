@@ -34,7 +34,7 @@ namespace LameUtils {
 //! Convert a Teuchos::ParameterList into a lame(nt)::MatProps structure.
 inline void
 parameterListToMatProps(
-    const Teuchos::ParameterList& lameMaterialParameters,
+    Teuchos::ParameterList const& lameMaterialParameters,
     LameMatProps&                 matProps)
 {
   // load the material properties into the lame(nt)::MatProps container.
@@ -80,7 +80,7 @@ parameterListToMatProps(
 Teuchos::RCP<LameMaterial>
 constructLameMaterialModel(
     std::string const             lameMaterialModelName,
-    const Teuchos::ParameterList& lameMaterialParameters);
+    Teuchos::ParameterList const& lameMaterialParameters);
 
 #if defined(ALBANY_LAMENT)
 //! Instantiate a lament::MaterialModel<ADType> given the model name and a set
@@ -89,7 +89,7 @@ template <typename ScalarT>
 inline Teuchos::RCP<lament::Material<ScalarT>>
 constructLamentMaterialModel(
     std::string const&            lameMaterialModelName,
-    const Teuchos::ParameterList& lameMaterialParameters)
+    Teuchos::ParameterList const& lameMaterialParameters)
 {
   // Strings should be all upper case with spaces replaced with underscores
   std::string materialModelName = lameMaterialModelName;
@@ -125,14 +125,14 @@ constructLamentMaterialModel(
 std::vector<std::string>
 getStateVariableNames(
     std::string const&            lameMaterialModelName,
-    const Teuchos::ParameterList& lameMaterialParameters);
+    Teuchos::ParameterList const& lameMaterialParameters);
 
 //! Return a vector containing the initial values for the state variables
 //! associated with the given LAME material model and material parameters.
 std::vector<double>
 getStateVariableInitialValues(
     std::string const&            lameMaterialModelName,
-    const Teuchos::ParameterList& lameMaterialParameters);
+    Teuchos::ParameterList const& lameMaterialParameters);
 
 }  // namespace LameUtils
 

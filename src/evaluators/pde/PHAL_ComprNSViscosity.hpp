@@ -27,7 +27,7 @@ class ComprNSViscosity : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  ComprNSViscosity(const Teuchos::ParameterList& p);
+  ComprNSViscosity(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

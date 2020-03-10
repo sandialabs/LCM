@@ -25,7 +25,7 @@ class Stress : public PHX::EvaluatorWithBaseImpl<Traits>,
                public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  Stress(const Teuchos::ParameterList& p);
+  Stress(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

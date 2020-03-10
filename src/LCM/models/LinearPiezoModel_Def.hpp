@@ -40,7 +40,7 @@ LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(
   R.set_dimension(num_dims_);
   R.clear();
   if (p->isType<Teuchos::ParameterList>("Material Basis")) {
-    const Teuchos::ParameterList& pBasis =
+    Teuchos::ParameterList const& pBasis =
         p->get<Teuchos::ParameterList>("Material Basis");
     if (pBasis.isType<Teuchos::Array<double>>("X axis")) {
       Teuchos::Array<double> Xhat =

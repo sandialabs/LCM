@@ -29,7 +29,7 @@ class DOFTensorGradInterpolationBase
 {
  public:
   DOFTensorGradInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
@@ -77,7 +77,7 @@ class FastSolutionTensorGradInterpolationBase
 {
  public:
   FastSolutionTensorGradInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>(p, dl)
   {
@@ -115,7 +115,7 @@ class FastSolutionTensorGradInterpolationBase<
 {
  public:
   FastSolutionTensorGradInterpolationBase(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFTensorGradInterpolationBase<
             PHAL::AlbanyTraits::Jacobian,

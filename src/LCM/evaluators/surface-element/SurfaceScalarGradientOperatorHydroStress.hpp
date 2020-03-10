@@ -30,7 +30,7 @@ class SurfaceScalarGradientOperatorHydroStress
 {
  public:
   SurfaceScalarGradientOperatorHydroStress(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

@@ -21,7 +21,7 @@ class PoissonResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 {
  public:
   PoissonResid(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   void

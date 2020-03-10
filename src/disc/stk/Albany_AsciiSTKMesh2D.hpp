@@ -84,7 +84,7 @@ class AsciiSTKMesh2D : public GenericSTKMeshStruct
  private:
   // Ioss::Init::Initializer ioInit;
 
-  Teuchos::RCP<const Teuchos::ParameterList>
+  Teuchos::RCP<Teuchos::ParameterList const>
   getValidDiscretizationParameters() const;
 
   bool periodic;

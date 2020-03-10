@@ -29,7 +29,7 @@ class SharedParameter : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  SharedParameter(const Teuchos::ParameterList& p);
+  SharedParameter(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(
@@ -56,7 +56,7 @@ class SharedParameterVec : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  SharedParameterVec(const Teuchos::ParameterList& p);
+  SharedParameterVec(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

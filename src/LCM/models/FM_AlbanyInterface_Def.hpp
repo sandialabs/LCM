@@ -30,7 +30,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   R.set_dimension(FM::THREE_D);
   R.clear();
   if (p->isType<Teuchos::ParameterList>("Material Basis")) {
-    const Teuchos::ParameterList& pBasis =
+    Teuchos::ParameterList const& pBasis =
         p->get<Teuchos::ParameterList>("Material Basis");
     LCM::parseBasis(pBasis, R);
   } else {
@@ -95,7 +95,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   Teuchos::Array<RealType>& tBarrier  = ferroicModel->getTransitionBarrier();
   tBarrier.resize(nVariants * nVariants);
   if (p->isType<Teuchos::ParameterList>("Critical Values")) {
-    const Teuchos::ParameterList& cParams =
+    Teuchos::ParameterList const& cParams =
         p->get<Teuchos::ParameterList>("Critical Values");
     int transitionIndex = 0;
     for (int i = 0; i < nVariants; i++) {
@@ -260,7 +260,7 @@ FerroicDriver<EvalT, Traits>::computeStateParallel(
 /******************************************************************************/
 void
 parseBasis(
-    const Teuchos::ParameterList&              pBasis,
+    Teuchos::ParameterList const&              pBasis,
     minitensor::Tensor<RealType, FM::THREE_D>& R)
 /******************************************************************************/
 {
@@ -290,7 +290,7 @@ parseBasis(
 /******************************************************************************/
 void
 parseTensor4(
-    const Teuchos::ParameterList&               cParam,
+    Teuchos::ParameterList const&               cParam,
     minitensor::Tensor4<RealType, FM::THREE_D>& C)
 /******************************************************************************/
 {
@@ -327,7 +327,7 @@ parseTensor4(
 /******************************************************************************/
 void
 parseTensor3(
-    const Teuchos::ParameterList&               cParam,
+    Teuchos::ParameterList const&               cParam,
     minitensor::Tensor3<RealType, FM::THREE_D>& h)
 /******************************************************************************/
 {
@@ -352,7 +352,7 @@ parseTensor3(
 /******************************************************************************/
 void
 parseTensor(
-    const Teuchos::ParameterList&              cParam,
+    Teuchos::ParameterList const&              cParam,
     minitensor::Tensor<RealType, FM::THREE_D>& e)
 /******************************************************************************/
 {
@@ -374,7 +374,7 @@ parseTensor(
 FM::CrystalVariant
 parseCrystalVariant(
     const Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& phases,
-    const Teuchos::ParameterList&                         vParam)
+    Teuchos::ParameterList const&                         vParam)
 /******************************************************************************/
 {
   ALBANY_PANIC(
@@ -397,7 +397,7 @@ parseCrystalVariant(
 
   if (vParam.isType<Teuchos::ParameterList>("Crystallographic Basis")) {
     cv.R.set_dimension(phases[phaseIndex]->C.get_dimension());
-    const Teuchos::ParameterList& pBasis =
+    Teuchos::ParameterList const& pBasis =
         vParam.get<Teuchos::ParameterList>("Crystallographic Basis");
     LCM::parseBasis(pBasis, cv.R);
   } else

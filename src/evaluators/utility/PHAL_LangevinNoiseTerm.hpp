@@ -33,7 +33,7 @@ class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  LangevinNoiseTerm(const Teuchos::ParameterList& p);
+  LangevinNoiseTerm(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(

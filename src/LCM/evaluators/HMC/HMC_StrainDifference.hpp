@@ -24,7 +24,7 @@ class StrainDifference : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Constructor
   ///
   StrainDifference(
-      const Teuchos::ParameterList&        p,
+      Teuchos::ParameterList const&        p,
       const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///

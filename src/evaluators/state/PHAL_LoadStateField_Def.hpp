@@ -16,7 +16,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits, typename ScalarType>
 LoadStateFieldBase<EvalT, Traits, ScalarType>::LoadStateFieldBase(
-    const Teuchos::ParameterList& p)
+    Teuchos::ParameterList const& p)
 {
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");
@@ -58,7 +58,7 @@ LoadStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 }
 
 template <typename EvalT, typename Traits>
-LoadStateField<EvalT, Traits>::LoadStateField(const Teuchos::ParameterList& p)
+LoadStateField<EvalT, Traits>::LoadStateField(Teuchos::ParameterList const& p)
 {
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");

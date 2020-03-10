@@ -43,24 +43,24 @@ class TLPoroPlasticityResidMass : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                porePressure;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Tdot;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                ThermalCond;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                kcPermeability;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                porosity;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                biotCoefficient;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                biotModulus;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                porePressure;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Tdot;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                ThermalCond;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                kcPermeability;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                porosity;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                biotCoefficient;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                biotModulus;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           TGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Source;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           TGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Source;
   Teuchos::Array<double>                                      convectionVels;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                rhoCp;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Absorption;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim>      strain;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                rhoCp;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Absorption;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim>      strain;
 
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> defgrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           J;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           elementLength;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> defgrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           J;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           elementLength;
 
   // stabilization term
   PHX::MDField<const MeshScalarT, Cell, Vertex, Dim> coordVec;
@@ -69,7 +69,7 @@ class TLPoroPlasticityResidMass : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<const MeshScalarT, Cell, QuadPoint>   weights;
 
   // Time
-  PHX::MDField<const ScalarT, Dummy> deltaTime;
+  PHX::MDField<ScalarT const, Dummy> deltaTime;
 
   // Data from previous time step
   std::string strainName, porePressureName, porosityName, JName;

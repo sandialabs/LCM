@@ -49,7 +49,7 @@ class DOFGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT, Cell, Side, Node> val_node;
+  PHX::MDField<ScalarT const, Cell, Side, Node> val_node;
   //! Basis Functions
   PHX::MDField<const MeshScalarT, Cell, Side, Node, QuadPoint, Dim> gradBF;
 

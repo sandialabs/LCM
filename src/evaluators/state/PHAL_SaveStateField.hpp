@@ -66,7 +66,7 @@ class SaveStateField<PHAL::AlbanyTraits::Residual, Traits>
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
 
   Teuchos::RCP<PHX::FieldTag> savestate_operation;
-  PHX::MDField<const ScalarT> field;
+  PHX::MDField<ScalarT const> field;
   std::string                 fieldName;
   std::string                 stateName;
 

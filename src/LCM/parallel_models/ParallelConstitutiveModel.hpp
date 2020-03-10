@@ -29,7 +29,7 @@ struct ParallelKernel
   using MeshScalarT      = typename EvalT::MeshScalarT;
   using Workset          = typename Traits::EvalData;
   using ScalarField      = PHX::MDField<ScalarT>;
-  using ConstScalarField = PHX::MDField<const ScalarT>;
+  using ConstScalarField = PHX::MDField<ScalarT const>;
 
  protected:
   ParallelKernel(ConstitutiveModel<EvalT, Traits>& model)
@@ -163,25 +163,25 @@ struct ParallelKernel
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
 
   /// optional temperature field
-  PHX::MDField<const ScalarT, Cell, QuadPoint> temperature_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> temperature_;
 
   /// Optional total concentration field
-  PHX::MDField<const ScalarT, Cell, QuadPoint> total_concentration_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> total_concentration_;
 
   /// Optional total (He) bubble density field
-  PHX::MDField<const ScalarT, Cell, QuadPoint> total_bubble_density_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> total_bubble_density_;
 
   /// Optional (He) bubble volume fraction field
-  PHX::MDField<const ScalarT, Cell, QuadPoint> bubble_volume_fraction_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> bubble_volume_fraction_;
 
   /// optional scalar damage field
-  PHX::MDField<const ScalarT, Cell, QuadPoint> damage_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> damage_;
 
   /// optional integration weights field
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> weights_;
 
   ///< optional J field
-  PHX::MDField<const ScalarT, Cell, QuadPoint> j_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> j_;
 
   ///< Thermal Expansion Coefficient
   RealType expansion_coeff_;
@@ -219,13 +219,13 @@ class ParallelConstitutiveModel : public LCM::ConstitutiveModel<EvalT, Traits>
   void
   computeState(
       typename Traits::EvalData workset,
-      FieldMap<const ScalarT>   dep_fields,
+      FieldMap<ScalarT const>   dep_fields,
       FieldMap<ScalarT>         eval_fields) final;
 
   virtual void
   computeStateParallel(
       typename Traits::EvalData workset,
-      FieldMap<const ScalarT>   dep_fields,
+      FieldMap<ScalarT const>   dep_fields,
       FieldMap<ScalarT>         eval_fields) override
   {
     ALBANY_ABORT("Not implemented.");

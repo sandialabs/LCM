@@ -55,32 +55,32 @@ class StabilizedPressureResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: Shear Modulus
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> shear_modulus_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> shear_modulus_;
 
   ///
   /// Input: Bulk Modulus
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> bulk_modulus_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> bulk_modulus_;
 
   ///
   /// Input: Deformation Gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> def_grad_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> def_grad_;
 
   ///
   /// Input: Cauchy Stress
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> stress_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> stress_;
 
   ///
   /// Input: Pressure
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> pressure_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> pressure_;
 
   ///
   /// Input: Pressure Gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> pressure_grad_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> pressure_grad_;
 
   ///
   /// Input: Weighted Basis Function Gradients
@@ -95,7 +95,7 @@ class StabilizedPressureResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: Weighted Basis Functions
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> h_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> h_;
 
   ///
   /// Output: Residual Forces

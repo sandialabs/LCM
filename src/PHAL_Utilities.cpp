@@ -57,7 +57,7 @@ struct A2V
   std::vector<ScalarT>& v;
   A2V(std::vector<ScalarT>& v) : v(v) {}
   void
-  operator()(typename Ref<const ScalarT>::type a, int const i)
+  operator()(typename Ref<ScalarT const>::type a, int const i)
   {
     v[i] = a;
   }

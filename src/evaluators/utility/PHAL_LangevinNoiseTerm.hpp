@@ -50,7 +50,7 @@ class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint> rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> rho;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint> noiseTerm;

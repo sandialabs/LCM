@@ -53,10 +53,10 @@ class SurfaceScalarGradient : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// for the parallel gradient term
   Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   // nodal value used to construct in-plan gradient
-  PHX::MDField<const ScalarT, Cell, Node> nodalScalar;
+  PHX::MDField<ScalarT const, Cell, Node> nodalScalar;
 
   //! Vector to take the jump of
-  PHX::MDField<const ScalarT, Cell, QuadPoint> jump;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> jump;
 
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim, Dim> refDualBasis;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim>      refNormal;

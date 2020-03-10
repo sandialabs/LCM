@@ -41,11 +41,11 @@ class NSForchheimerTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> V;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>      rho;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>      phi;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>      K;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>      F;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> V;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>      rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>      phi;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>      K;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>      F;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> ForchTerm;

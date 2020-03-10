@@ -46,7 +46,7 @@ class SeparableScatterScalarResponseBase
  protected:
   typedef typename EvalT::ScalarT ScalarT;
   bool                            stand_alone;
-  PHX::MDField<const ScalarT>     local_response;
+  PHX::MDField<ScalarT const>     local_response;
   PHX::MDField<ScalarT>           local_response_eval;
 };
 

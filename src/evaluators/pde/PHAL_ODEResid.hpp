@@ -36,10 +36,10 @@ class ODEResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::ScalarT ScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, Node> X;
-  PHX::MDField<const ScalarT, Cell, Node> X_dot;
-  PHX::MDField<const ScalarT, Cell, Node> Y;
-  PHX::MDField<const ScalarT, Cell, Node> Y_dot;
+  PHX::MDField<ScalarT const, Cell, Node> X;
+  PHX::MDField<ScalarT const, Cell, Node> X_dot;
+  PHX::MDField<ScalarT const, Cell, Node> Y;
+  PHX::MDField<ScalarT const, Cell, Node> Y_dot;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> Xoderesid;

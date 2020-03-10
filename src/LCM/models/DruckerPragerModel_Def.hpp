@@ -270,11 +270,11 @@ DruckerPragerModel<EvalT, Traits>::ResidualJacobian(
     std::vector<ScalarT>& X,
     std::vector<ScalarT>& R,
     std::vector<ScalarT>& dRdX,
-    const ScalarT         ptr,
-    const ScalarT         qtr,
-    const ScalarT         eqN,
-    const ScalarT         mu,
-    const ScalarT         kappa)
+    ScalarT const         ptr,
+    ScalarT const         qtr,
+    ScalarT const         eqN,
+    ScalarT const         mu,
+    ScalarT const         kappa)
 {
   std::vector<DFadType> Rfad(4);
   std::vector<DFadType> Xfad(4);

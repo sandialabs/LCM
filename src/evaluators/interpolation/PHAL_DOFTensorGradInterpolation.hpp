@@ -47,7 +47,7 @@ class DOFTensorGradInterpolationBase
 
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT, Cell, Node, VecDim, VecDim> val_node;
+  PHX::MDField<ScalarT const, Cell, Node, VecDim, VecDim> val_node;
   //! Basis Functions
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> GradBF;
 

@@ -63,11 +63,11 @@ class SurfaceL2ProjectionResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Reference configuration area
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> refArea;
   //! Cauchy Stress
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> Cauchy_stress_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> Cauchy_stress_;
   //! Determinant of deformation gradient
-  PHX::MDField<const ScalarT, Cell, QuadPoint> detF_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> detF_;
   //! Porjected hydrostatic Kirchhoff stress
-  PHX::MDField<const ScalarT, Cell, QuadPoint> projected_tau_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> projected_tau_;
 
   //! Reference Cell Views
   Kokkos::DynRankView<RealType, PHX::Device> refValues;

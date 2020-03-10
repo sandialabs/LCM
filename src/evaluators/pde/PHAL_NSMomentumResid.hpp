@@ -43,14 +43,14 @@ class NSMomentumResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   // Input:
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           pGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim>      VGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           V;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                P;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           Rm;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                TauM;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                mu;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           pGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim>      VGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           V;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                P;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           Rm;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                TauM;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                mu;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                rho;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node, VecDim> MResidual;

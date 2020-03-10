@@ -486,7 +486,7 @@ class Quadratic : public Source_Base<EvalT, Traits>,
   std::size_t                              m_num_qp;
   Teuchos::ParameterList*                  m_source_list;
   PHX::MDField<ScalarT, Cell, Point>       m_source;
-  PHX::MDField<const ScalarT, Cell, Point> m_baseField;
+  PHX::MDField<ScalarT const, Cell, Point> m_baseField;
 };
 
 template <typename EvalT, typename Traits>
@@ -646,9 +646,9 @@ class NeutronFission : public Source_Base<EvalT, Traits>
   std::size_t                              m_num_qp;
   Teuchos::ParameterList*                  m_source_list;
   PHX::MDField<ScalarT, Cell, Point>       m_source;
-  PHX::MDField<const ScalarT, Cell, Point> m_phi;
-  PHX::MDField<const ScalarT, Cell, Point> m_sigma_f;
-  PHX::MDField<const ScalarT, Cell, Point> m_E_f;
+  PHX::MDField<ScalarT const, Cell, Point> m_phi;
+  PHX::MDField<ScalarT const, Cell, Point> m_sigma_f;
+  PHX::MDField<ScalarT const, Cell, Point> m_E_f;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -682,7 +682,7 @@ class MVQuadratic : public Source_Base<EvalT, Traits>,
   std::size_t                              m_num_qp;
   Teuchos::ParameterList*                  m_source_list;
   PHX::MDField<ScalarT, Cell, Point>       m_source;
-  PHX::MDField<const ScalarT, Cell, Point> m_baseField;
+  PHX::MDField<ScalarT const, Cell, Point> m_baseField;
 };
 
 template <typename EvalT, typename Traits>
@@ -810,7 +810,7 @@ class MVExponential : public Source_Base<EvalT, Traits>,
   std::size_t                              m_num_qp;
   Teuchos::ParameterList*                  m_source_list;
   PHX::MDField<ScalarT, Cell, Point>       m_source;
-  PHX::MDField<const ScalarT, Cell, Point> m_baseField;
+  PHX::MDField<ScalarT const, Cell, Point> m_baseField;
 };
 
 template <typename EvalT, typename Traits>

@@ -33,7 +33,7 @@ class ConstitutiveModel
 
   using FieldMap = std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT>>>;
   using DepFieldMap =
-      std::map<std::string, Teuchos::RCP<PHX::MDField<const ScalarT>>>;
+      std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT const>>>;
   using DataLayoutMap = std::map<std::string, Teuchos::RCP<PHX::DataLayout>>;
 
   ///
@@ -262,7 +262,7 @@ class ConstitutiveModel
   /// set the Temperature field
   ///
   void
-  setTemperatureField(PHX::MDField<const ScalarT, Cell, QuadPoint> temperature)
+  setTemperatureField(PHX::MDField<ScalarT const, Cell, QuadPoint> temperature)
   {
     temperature_ = temperature;
   }
@@ -271,7 +271,7 @@ class ConstitutiveModel
   /// set the damage field
   ///
   void
-  setDamageField(PHX::MDField<const ScalarT, Cell, QuadPoint> damage)
+  setDamageField(PHX::MDField<ScalarT const, Cell, QuadPoint> damage)
   {
     damage_ = damage;
   }
@@ -281,7 +281,7 @@ class ConstitutiveModel
   ///
   void
   setTotalConcentrationField(
-      PHX::MDField<const ScalarT, Cell, QuadPoint> total_concentration)
+      PHX::MDField<ScalarT const, Cell, QuadPoint> total_concentration)
   {
     total_concentration_ = total_concentration;
   }
@@ -291,7 +291,7 @@ class ConstitutiveModel
   ///
   void
   setTotalBubbleDensityField(
-      PHX::MDField<const ScalarT, Cell, QuadPoint> total_bubble_density)
+      PHX::MDField<ScalarT const, Cell, QuadPoint> total_bubble_density)
   {
     total_bubble_density_ = total_bubble_density;
   }
@@ -301,7 +301,7 @@ class ConstitutiveModel
   ///
   void
   setBubbleVolumeFractionField(
-      PHX::MDField<const ScalarT, Cell, QuadPoint> bubble_volume_fraction)
+      PHX::MDField<ScalarT const, Cell, QuadPoint> bubble_volume_fraction)
   {
     bubble_volume_fraction_ = bubble_volume_fraction;
   }
@@ -319,7 +319,7 @@ class ConstitutiveModel
   /// set the J field
   ///
   void
-  setJField(PHX::MDField<const ScalarT, Cell, QuadPoint> j)
+  setJField(PHX::MDField<ScalarT const, Cell, QuadPoint> j)
   {
     j_ = j;
   }
@@ -411,27 +411,27 @@ class ConstitutiveModel
   ///
   /// optional temperature field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> temperature_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> temperature_;
 
   ///
   /// Optional total concentration field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> total_concentration_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> total_concentration_;
 
   ///
   /// Optional total (He) bubble density field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> total_bubble_density_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> total_bubble_density_;
 
   ///
   /// Optional bubble volume fraction field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> bubble_volume_fraction_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> bubble_volume_fraction_;
 
   ///
   /// optional damage field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> damage_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> damage_;
 
   ///
   /// optional weights field
@@ -441,7 +441,7 @@ class ConstitutiveModel
   ///
   /// optional J field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> j_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> j_;
 
   ///
   /// Thermal Expansion Coefficient

@@ -53,7 +53,7 @@ class Strain : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: displacement gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> GradU;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> GradU;
 
   ///
   /// Output: Strain

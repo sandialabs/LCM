@@ -68,7 +68,7 @@ class ScatterScalarResponseBase
  protected:
   typedef typename EvalT::ScalarT ScalarT;
   bool                            stand_alone;
-  PHX::MDField<const ScalarT>     global_response;
+  PHX::MDField<ScalarT const>     global_response;
   PHX::MDField<ScalarT>           global_response_eval;
   Teuchos::RCP<PHX::FieldTag>     scatter_operation;
 };

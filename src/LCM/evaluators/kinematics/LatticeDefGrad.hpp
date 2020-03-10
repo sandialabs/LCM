@@ -44,13 +44,13 @@ class LatticeDefGrad : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> defgrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           J;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> VH;  // partial molar volume
-  PHX::MDField<const ScalarT, Cell, QuadPoint> VM;  // molar volume of Fe
-  PHX::MDField<const ScalarT, Cell, QuadPoint>
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> defgrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           J;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> VH;  // partial molar volume
+  PHX::MDField<ScalarT const, Cell, QuadPoint> VM;  // molar volume of Fe
+  PHX::MDField<ScalarT const, Cell, QuadPoint>
       CtotalRef;  // stress free concentration
-  PHX::MDField<const ScalarT, Cell, QuadPoint>
+  PHX::MDField<ScalarT const, Cell, QuadPoint>
                                                    Ctotal;  // current total concentration
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> weights;
 

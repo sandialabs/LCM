@@ -52,11 +52,11 @@ class SurfaceTLPoroMassResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Finite element basis for the midplane
   Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   //! Scalar Gradient
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> scalarGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> scalarGrad;
   //! Scalar Gradient Operator
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> surface_Grad_BF;
   //! Scalar Jump
-  PHX::MDField<const ScalarT, Cell, QuadPoint> scalarJump;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> scalarJump;
   //! Reference configuration dual basis
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim, Dim> refDualBasis;
   //! Reference configuration normal
@@ -64,21 +64,21 @@ class SurfaceTLPoroMassResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Reference configuration area
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> refArea;
   //! Determinant of the surface deformation gradient
-  PHX::MDField<const ScalarT, Cell, QuadPoint> J;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> J;
   //! Pore Pressure at the 2D integration point location
-  PHX::MDField<const ScalarT, Cell, QuadPoint> porePressure;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> porePressure;
   //! Nodal Pore Pressure at the 2D integration point location
-  PHX::MDField<const ScalarT, Cell, Node> nodalPorePressure;
+  PHX::MDField<ScalarT const, Cell, Node> nodalPorePressure;
   //! Biot Coefficient at the 2D integration point location
-  PHX::MDField<const ScalarT, Cell, QuadPoint> biotCoefficient;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> biotCoefficient;
   //! Biot Modulus at the 2D integration point location
-  PHX::MDField<const ScalarT, Cell, QuadPoint> biotModulus;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> biotModulus;
   //! Permeability at the 2D integration point location
-  PHX::MDField<const ScalarT, Cell, QuadPoint> kcPermeability;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> kcPermeability;
   //! Deformation Gradient
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> defGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> defGrad;
   //! Time
-  PHX::MDField<const ScalarT, Dummy> deltaTime;
+  PHX::MDField<ScalarT const, Dummy> deltaTime;
 
   //! Data from previous time step
   std::string porePressureName, JName;

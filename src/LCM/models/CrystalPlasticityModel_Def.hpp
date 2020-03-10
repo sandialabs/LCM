@@ -454,7 +454,7 @@ template <typename EvalT, typename Traits>
 void
 CrystalPlasticityKernel<EvalT, Traits>::init(
     Workset&                 workset,
-    FieldMap<const ScalarT>& dep_fields,
+    FieldMap<ScalarT const>& dep_fields,
     FieldMap<ScalarT>&       eval_fields)
 {
   if (verbosity_ == CP::Verbosity::EXTREME) {

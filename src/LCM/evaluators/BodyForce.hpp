@@ -48,7 +48,7 @@ class BodyForce : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordinates_;
 
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> weights_;
-  // PHX::MDField<const ScalarT, Cell> density_;
+  // PHX::MDField<ScalarT const, Cell> density_;
   const RealType density_;
 
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> body_force_;

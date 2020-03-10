@@ -41,11 +41,11 @@ class MixtureThermalExpansion : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint> biotCoefficient;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> porosity;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> J;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> alphaSkeleton;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> alphaPoreFluid;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> biotCoefficient;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> porosity;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> J;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> alphaSkeleton;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> alphaPoreFluid;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint> mixtureThermalExpansion;

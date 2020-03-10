@@ -52,17 +52,17 @@ class DamageCoefficients : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: damage
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> damage_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> damage_;
 
   ///
   /// Input: time step
   ///
-  PHX::MDField<const ScalarT, Dummy> delta_time_;
+  PHX::MDField<ScalarT const, Dummy> delta_time_;
 
   ///
   /// Optional Input: deformation gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> def_grad_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> def_grad_;
 
   ///
   /// Output: damage transient coefficient

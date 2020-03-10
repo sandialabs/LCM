@@ -40,9 +40,9 @@ class Stress : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> strain;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           elasticModulus;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           poissonsRatio;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> strain;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           elasticModulus;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           poissonsRatio;
 
   unsigned int numQPs;
   unsigned int numDims;

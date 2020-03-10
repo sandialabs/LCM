@@ -30,7 +30,7 @@ template <typename EvalT, typename Traits, typename Kernel>
 inline void
 ParallelConstitutiveModel<EvalT, Traits, Kernel>::computeState(
     typename Traits::EvalData workset,
-    FieldMap<const ScalarT>   dep_fields,
+    FieldMap<ScalarT const>   dep_fields,
     FieldMap<ScalarT>         eval_fields)
 {
   util::TimeMonitor& tmonitor =

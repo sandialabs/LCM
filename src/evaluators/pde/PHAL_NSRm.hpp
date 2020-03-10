@@ -41,16 +41,16 @@ class NSRm : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      pGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> VGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      V;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      V_Dot;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           T;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           rho;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           phi;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      force;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      permTerm;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      ForchTerm;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>      pGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> VGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>      V;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>      V_Dot;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           T;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           phi;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>      force;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>      permTerm;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>      ForchTerm;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> Rm;

@@ -53,7 +53,7 @@ class GradientElementLength : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: unit scalar gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> unit_grad_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> unit_grad_;
 
   ///
   /// Input: basis function gradients

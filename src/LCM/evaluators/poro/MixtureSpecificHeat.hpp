@@ -42,12 +42,12 @@ class MixtureSpecificHeat : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint> porosity;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> gammaSkeleton;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> gammaPoreFluid;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> densitySkeleton;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> densityPoreFluid;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> J;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> porosity;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> gammaSkeleton;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> gammaPoreFluid;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> densitySkeleton;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> densityPoreFluid;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> J;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint> mixtureSpecificHeat;

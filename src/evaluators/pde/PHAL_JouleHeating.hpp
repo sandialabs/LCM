@@ -44,8 +44,8 @@ class JouleHeating : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::size_t numDims;
 
   // Inputs
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> potentialGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> potentialFlux;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> potentialGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> potentialFlux;
 
   // Outputs
   PHX::MDField<ScalarT, Cell, QuadPoint> jouleHeating;

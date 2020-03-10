@@ -39,9 +39,9 @@ class Stresses : public PHX::EvaluatorWithBaseImpl<Traits>,
   using ScalarT     = typename EvalT::ScalarT;
   using MeshScalarT = typename EvalT::MeshScalarT;
 
-  typedef PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> cHMC2Tensor;
+  typedef PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> cHMC2Tensor;
   typedef PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim>       HMC2Tensor;
-  typedef PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim, Dim>
+  typedef PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim, Dim>
                                                                 cHMC3Tensor;
   typedef PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim, Dim> HMC3Tensor;
   typedef PHX::MDField<ScalarT, Cell, QuadPoint>                HMCScalar;

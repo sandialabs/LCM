@@ -571,7 +571,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
         break;
     }
     ip_fields_[field] =
-        PHX::MDField<const ScalarT>(ip_field_names_[field], qp_layout);
+        PHX::MDField<ScalarT const>(ip_field_names_[field], qp_layout);
     // Incoming integration point field to transfer.
     this->addDependentField(ip_fields_[field].fieldTag());
     this->p_state_mgr_->registerNodalVectorStateVariable(
@@ -592,7 +592,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::
   test_ip_field_ =
       decltype(test_ip_field_)(ip_field_names_.back(), dl->qp_scalar);
   ip_fields_.push_back(
-      PHX::MDField<const ScalarT>(ip_field_names_.back(), dl->qp_scalar));
+      PHX::MDField<ScalarT const>(ip_field_names_.back(), dl->qp_scalar));
   auto& f = ip_fields_.back();
   typedef PHX::
       KokkosViewFactory<ScalarT, PHX::Device::array_layout, PHX::Device>

@@ -301,7 +301,7 @@ template <typename EvalT, typename Traits>
 void
 ACEpermafrostMiniKernel<EvalT, Traits>::init(
     Workset&                 workset,
-    FieldMap<const ScalarT>& input_fields,
+    FieldMap<ScalarT const>& input_fields,
     FieldMap<ScalarT>&       output_fields)
 {
   auto const cauchy_string       = field_name_map_["Cauchy_Stress"];

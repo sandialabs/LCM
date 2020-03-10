@@ -41,19 +41,19 @@ class NSThermalEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Temperature;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Tdot;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                ThermalCond;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Temperature;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Tdot;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                ThermalCond;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           TGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           V;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Source;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                TauT;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                rho;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Cp;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                phi;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Fission;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                PropConst;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           TGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           V;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Source;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                TauT;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Cp;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                phi;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Fission;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                PropConst;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> TResidual;

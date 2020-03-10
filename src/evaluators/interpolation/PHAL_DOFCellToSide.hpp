@@ -48,7 +48,7 @@ class DOFCellToSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT> val_cell;
+  PHX::MDField<ScalarT const> val_cell;
 
   // Output:
   //! Values on side

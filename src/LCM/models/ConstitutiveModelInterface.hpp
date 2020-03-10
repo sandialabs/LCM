@@ -139,7 +139,7 @@ class ConstitutiveModelInterface : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Dependent MDFields
   ///
-  std::map<std::string, Teuchos::RCP<PHX::MDField<const ScalarT>>>
+  std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT const>>>
       dep_fields_map_;
 
   ///
@@ -165,27 +165,27 @@ class ConstitutiveModelInterface : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Optional temperature field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> temperature_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> temperature_;
 
   ///
   /// Optional total concentration field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> total_concentration_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> total_concentration_;
 
   ///
   /// Optional total (He) bubble density field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> total_bubble_density_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> total_bubble_density_;
 
   ///
   /// Optional bubble volume fraction field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> bubble_volume_fraction_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> bubble_volume_fraction_;
 
   ///
   /// Optional damage field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> damage_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> damage_;
 
   ///
   /// Optional Integration Weights
@@ -195,7 +195,7 @@ class ConstitutiveModelInterface : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Optional J
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> j_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> j_;
 
   ///
   /// flag to indicate we have temperature

@@ -98,12 +98,12 @@ class Porosity : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Optional dependence on strain and porePressure
   ///
   /// porosity holds linear relation to volumetric strain
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> strain;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> strain;
 
   ///
   /// Optional dependence on det(F)
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> J;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> J;
 
   ///
   /// flag to indicated usage in poroelastic context
@@ -128,12 +128,12 @@ class Porosity : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// For compressible grain
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> biotCoefficient;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> biotCoefficient;
 
   ///
   /// For compressible grain
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> porePressure;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> porePressure;
 
   ///
   /// For compressible grain
@@ -143,17 +143,17 @@ class Porosity : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// For THM porous media
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> Temperature;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> Temperature;
 
   ///
   /// For THM porous media
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> skeletonThermalExpansion;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> skeletonThermalExpansion;
 
   ///
   /// For THM porous media
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> refTemperature;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> refTemperature;
 
   ///
   /// Values of the random variables

@@ -171,11 +171,11 @@ FieldFrobeniusNormBase<EvalT, Traits, ScalarT>::evaluateFields(
 {
   if (regularization_type == GIVEN_PARAMETER)
     regularization =
-        Albany::convertScalar<const ScalarT>(regularizationParam(0));
+        Albany::convertScalar<ScalarT const>(regularizationParam(0));
   else if (regularization_type == PARAMETER_EXPONENTIAL)
     regularization = pow(
         10.0,
-        -10.0 * Albany::convertScalar<const ScalarT>(regularizationParam(0)));
+        -10.0 * Albany::convertScalar<ScalarT const>(regularizationParam(0)));
 
   ScalarT norm;
   switch (numDims) {

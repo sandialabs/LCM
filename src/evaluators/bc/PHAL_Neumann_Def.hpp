@@ -606,7 +606,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(
       // to allocate neumann correctly.
       switch (bc_type) {
         case INTJUMP: {
-          const ScalarT elem_scale = matScaling[ebIndexVec[iblock]];
+          ScalarT const elem_scale = matScaling[ebIndexVec[iblock]];
           calc_dudn_const(data, elem_scale);
           break;
         }
@@ -784,8 +784,8 @@ NeumannBase<EvalT, Traits>::calc_dudn_robin(
       0);  // How many cell's worth of data is being computed?
   int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
 
-  const ScalarT& dof_value = robin_vals[0];
-  const ScalarT& coeff     = robin_vals[1];
+  ScalarT const& dof_value = robin_vals[0];
+  ScalarT const& coeff     = robin_vals[1];
 
   for (int side = 0; side < numCells_; side++) {
     for (int pt = 0; pt < numPoints; pt++) {
@@ -807,9 +807,9 @@ NeumannBase<EvalT, Traits>::calc_dudn_radiate(
   int numCells_ = qp_data_returned.extent(
       0);  // How many cell's worth of data is being computed?
 
-  const ScalarT& dof_value  = robin_vals[0];
-  const ScalarT  dof_value4 = dof_value * dof_value * dof_value * dof_value;
-  const ScalarT& coeff      = robin_vals[1];
+  ScalarT const& dof_value  = robin_vals[0];
+  ScalarT const  dof_value4 = dof_value * dof_value * dof_value * dof_value;
+  ScalarT const& coeff      = robin_vals[1];
 
   for (int cell = 0; cell < numCells_; cell++) {
     for (int pt = 0; pt < numPoints; pt++) {

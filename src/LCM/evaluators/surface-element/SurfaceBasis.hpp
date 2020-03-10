@@ -159,7 +159,7 @@ class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Optional Input: Coordinates in the current configuration
   ///
-  PHX::MDField<const ScalarT, Cell, Vertex, Dim> current_coords_;
+  PHX::MDField<ScalarT const, Cell, Vertex, Dim> current_coords_;
 
   ///
   /// Optional Output: Current basis

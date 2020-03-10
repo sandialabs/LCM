@@ -48,8 +48,8 @@ class StrainDifference : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: displacement gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> macroStrain;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> microStrain;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> macroStrain;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> microStrain;
 
   ///
   /// Output: strainDifference

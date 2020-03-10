@@ -139,7 +139,7 @@ class ConstitutiveModelParameters
   /// Optional dependence on Temperature
   ///
   bool                                         have_temperature_;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> temperature_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> temperature_;
   std::map<std::string, std::string>           temp_type_map_;
   std::map<std::string, RealType>              dparam_dtemp_map_;
   std::map<std::string, RealType>              ref_temp_map_;

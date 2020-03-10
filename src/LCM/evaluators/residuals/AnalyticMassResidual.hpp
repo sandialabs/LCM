@@ -96,9 +96,9 @@ class AnalyticMassResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Input: Weighted Basis Functions
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint> w_bf_;
   /// Input: acceleration at quad points
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> accel_qps_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> accel_qps_;
   /// Input: acceleration at nodes
-  PHX::MDField<const ScalarT, Cell, Node, Dim> accel_nodes_;
+  PHX::MDField<ScalarT const, Cell, Node, Dim> accel_nodes_;
   /// Input: integration weights
   PHX::MDField<const MeshScalarT> weights_;
   /// Output: mass contribution to residual/Jacobian

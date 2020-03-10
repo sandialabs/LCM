@@ -57,17 +57,17 @@ class HeliumODEs : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Input: total_concentration - addition of lattice and trapped
   ///        concentration
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> total_concentration_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> total_concentration_;
 
   ///
   /// Input: time step
   ///
-  PHX::MDField<const ScalarT, Dummy> delta_time_;
+  PHX::MDField<ScalarT const, Dummy> delta_time_;
 
   ///
   /// Input: temperature dependent diffusion coefficient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> diffusion_coefficient_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> diffusion_coefficient_;
 
   ///
   /// Input: spatial dimension and number of integration points

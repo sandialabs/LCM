@@ -54,7 +54,7 @@ class SurfaceVectorJump : public PHX::EvaluatorWithBaseImpl<Traits>,
       intrepid_basis_;
 
   //! Vector to take the jump of
-  PHX::MDField<const ScalarT, Cell, Vertex, Dim> vector_;
+  PHX::MDField<ScalarT const, Cell, Vertex, Dim> vector_;
 
   // Reference Cell Views
   Kokkos::DynRankView<RealType, PHX::Device> ref_values_;

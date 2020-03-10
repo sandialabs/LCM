@@ -40,12 +40,12 @@ class ElasticityResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim>      Stress;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim>      Stress;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
 
-  PHX::MDField<const ScalarT, Cell>                      density;
+  PHX::MDField<ScalarT const, Cell>                      density;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint> wBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>      uDotDot;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>      uDotDot;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node, Dim> ExResidual;

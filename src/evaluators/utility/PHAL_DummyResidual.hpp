@@ -37,7 +37,7 @@ class DummyResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
 
  private:
   // Input:
-  PHX::MDField<const ScalarT, Cell, Node> solution;
+  PHX::MDField<ScalarT const, Cell, Node> solution;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> residual;

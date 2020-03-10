@@ -52,7 +52,7 @@ class ElectrostaticResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: Electric Displacement
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> edisp_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> edisp_;
 
   ///
   /// Input: Weighted Basis Function Gradients

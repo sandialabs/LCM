@@ -53,22 +53,22 @@ class TransportCoefficients : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: lattice concentration
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> c_lattice_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> c_lattice_;
 
   ///
   /// Input: Temperature
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> temperature_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> temperature_;
 
   ///
   /// Input: deformation gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> F_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> F_;
 
   ///
   /// Input: determinant of deformation gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> J_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> J_;
 
   ///
   /// Output: concentration equilibrium parameter

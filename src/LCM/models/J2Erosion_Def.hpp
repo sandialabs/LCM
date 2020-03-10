@@ -150,7 +150,7 @@ template <typename EvalT, typename Traits>
 void
 J2ErosionKernel<EvalT, Traits>::init(
     Workset&                 workset,
-    FieldMap<const ScalarT>& dep_fields,
+    FieldMap<ScalarT const>& dep_fields,
     FieldMap<ScalarT>&       eval_fields)
 {
   std::string cauchy_string       = field_name_map_["Cauchy_Stress"];

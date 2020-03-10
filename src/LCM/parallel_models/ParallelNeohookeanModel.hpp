@@ -33,7 +33,7 @@ struct NeohookeanKernel : public ParallelKernel<EvalT, Traits>
   using ScalarT          = typename EvalT::ScalarT;
   using MeshScalarT      = typename EvalT::MeshScalarT;
   using ScalarField      = PHX::MDField<ScalarT>;
-  using ConstScalarField = PHX::MDField<const ScalarT>;
+  using ConstScalarField = PHX::MDField<ScalarT const>;
   using BaseKernel       = ParallelKernel<EvalT, Traits>;
   using Workset          = typename BaseKernel::Workset;
 
@@ -63,7 +63,7 @@ struct NeohookeanKernel : public ParallelKernel<EvalT, Traits>
   void
   init(
       Workset&                 workset,
-      FieldMap<const ScalarT>& dep_fields,
+      FieldMap<ScalarT const>& dep_fields,
       FieldMap<ScalarT>&       eval_fields);
 
   KOKKOS_INLINE_FUNCTION

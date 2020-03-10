@@ -52,7 +52,7 @@ class NodesToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   bool isVectorField;
 
   // Input:
-  PHX::MDField<const ScalarT>                         field_node;
+  PHX::MDField<ScalarT const>                         field_node;
   PHX::MDField<const RealType, Cell, Node, QuadPoint> BF;
   PHX::MDField<const MeshScalarT, Cell, Node>         w_measure;
 

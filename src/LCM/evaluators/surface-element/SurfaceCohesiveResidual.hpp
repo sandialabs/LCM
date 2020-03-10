@@ -51,10 +51,10 @@ class SurfaceCohesiveResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
       intrepid_basis_;
 
   // Reference area
-  PHX::MDField<const ScalarT, Cell, QuadPoint> ref_area_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> ref_area_;
 
   // Traction vector based on cohesive-separation law
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> cohesive_traction_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> cohesive_traction_;
 
   // Reference Cell Views
   Kokkos::DynRankView<RealType, PHX::Device> ref_values_;

@@ -51,10 +51,10 @@ class NSMaterialProperty : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::string                             name_mp;
   Teuchos::RCP<PHX::DataLayout>           layout;
   PHX::MDField<const MeshScalarT>         coordVec;
-  PHX::MDField<const ScalarT>             T;
-  PHX::MDField<const ScalarT>             sigma_a;
-  PHX::MDField<const ScalarT>             sigma_s;
-  PHX::MDField<const ScalarT>             mu;
+  PHX::MDField<ScalarT const>             T;
+  PHX::MDField<ScalarT const>             sigma_a;
+  PHX::MDField<ScalarT const>             sigma_s;
+  PHX::MDField<ScalarT const>             mu;
   PHX::MDField<ScalarT>                   matprop;
   PHX::index_size_type                    rank;
   std::vector<PHX::DataLayout::size_type> dims;

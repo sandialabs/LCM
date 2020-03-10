@@ -402,16 +402,16 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
     std::vector<ScalarT>&        X,
     std::vector<ScalarT>&        R,
     std::vector<ScalarT>&        dRdX,
-    const ScalarT&               p,
-    const ScalarT&               fvoid,
-    const ScalarT&               es,
+    ScalarT const&               p,
+    ScalarT const&               fvoid,
+    ScalarT const&               es,
     minitensor::Tensor<ScalarT>& s,
-    const ScalarT&               mu,
-    const ScalarT&               kappa,
-    const ScalarT&               H,
-    const ScalarT&               Y,
-    const ScalarT&               Rd,
-    const ScalarT&               jacobian)
+    ScalarT const&               mu,
+    ScalarT const&               kappa,
+    ScalarT const&               H,
+    ScalarT const&               Y,
+    ScalarT const&               Rd,
+    ScalarT const&               jacobian)
 {
   ScalarT               sq32 = std::sqrt(3.0 / 2.0);
   ScalarT               sq23 = std::sqrt(2.0 / 3.0);

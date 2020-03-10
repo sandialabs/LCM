@@ -44,7 +44,7 @@ class CurrentCoords : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   PHX::MDField<const MeshScalarT, Cell, Vertex, Dim> refCoords;
-  PHX::MDField<const ScalarT, Cell, Vertex, Dim>     displacement;
+  PHX::MDField<ScalarT const, Cell, Vertex, Dim>     displacement;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Vertex, Dim> currentCoords;

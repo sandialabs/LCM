@@ -40,12 +40,12 @@ class MicroResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim>      microStress;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim, Dim> doubleStress;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim>      microStress;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim, Dim> doubleStress;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
 
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> epsDotDot;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> epsDotDot;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node, Dim, Dim> ExResidual;

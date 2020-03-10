@@ -58,8 +58,8 @@ class BiotModulus : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   //! Optional dependence on Temperature (E = E_const + dEdT * T)
   // PHX::MDField<ScalarT,Cell,QuadPoint> Temperature;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> porosity;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> biotCoefficient;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> porosity;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> biotCoefficient;
   // bool isThermoElastic;
   bool isPoroElastic;
   // ScalarT dEdT_value;

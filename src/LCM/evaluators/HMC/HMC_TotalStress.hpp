@@ -44,12 +44,12 @@ class TotalStress : public PHX::EvaluatorWithBaseImpl<Traits>,
  private:
   using ScalarT     = typename EvalT::ScalarT;
   using MeshScalarT = typename EvalT::MeshScalarT;
-  typedef PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> cHMC2Tensor;
+  typedef PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> cHMC2Tensor;
 
   ///
   /// Input: macro stress and micro stresses
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> macroStress;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> macroStress;
   Teuchos::ArrayRCP<Teuchos::RCP<cHMC2Tensor>>           microStress;
 
   ///

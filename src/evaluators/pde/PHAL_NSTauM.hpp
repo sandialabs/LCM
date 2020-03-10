@@ -40,10 +40,10 @@ class NSTauM : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>          V;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>          V;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim, Dim> Gc;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>               rho;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>               mu;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>               rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>               mu;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> TauM;

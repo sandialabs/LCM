@@ -56,10 +56,10 @@ class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
       intrepid_basis_;
 
   /// First PK Stress
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> stress_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> stress_;
 
   /// Current configuration basis
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> current_basis_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> current_basis_;
 
   /// Reference configuration dual basis
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim, Dim> ref_dual_basis_;
@@ -71,7 +71,7 @@ class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> ref_area_;
 
   /// Determinant of deformation gradient
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> detF_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> detF_;
 
   /// Reference Cell Views
   Kokkos::DynRankView<RealType, PHX::Device> ref_values_;
@@ -83,7 +83,7 @@ class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   Kokkos::DynRankView<RealType, PHX::Device> ref_weights_;
 
   /// Optional Cohesive Traction
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> traction_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> traction_;
 
   // Output:
   /// Force

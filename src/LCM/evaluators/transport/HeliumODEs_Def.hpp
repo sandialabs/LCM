@@ -208,8 +208,8 @@ HeliumODEs<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
           nb_exp      = nb_old;
           sb_exp      = sb_old;
 
-          const ScalarT nb_exp2           = nb_exp * nb_exp;
-          const ScalarT cube_root_nb_exp2 = lcm_cbrt(nb_exp2);
+          ScalarT const nb_exp2           = nb_exp * nb_exp;
+          ScalarT const cube_root_nb_exp2 = lcm_cbrt(nb_exp2);
 
           for (int sub_increment = 0; sub_increment < explicit_sub_increments;
                sub_increment++) {

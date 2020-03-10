@@ -47,7 +47,7 @@ class ResponseThermalEnergy
   getValidResponseParameters() const;
 
   // temperature
-  PHX::MDField<const ScalarT> field;
+  PHX::MDField<ScalarT const> field;
   // time
   //    PHX::MDField<ScalarT,Dummy> time;
   //    PHX::MDField<ScalarT,Dummy> deltaTime;

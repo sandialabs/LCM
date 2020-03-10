@@ -41,10 +41,10 @@ class NSPermeabilityTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> V;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>      mu;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>      phi;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>      K;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> V;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>      mu;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>      phi;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>      K;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> permTerm;

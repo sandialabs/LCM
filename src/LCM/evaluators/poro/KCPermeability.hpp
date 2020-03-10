@@ -61,7 +61,7 @@ class KCPermeability : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   //! Optional dependence on porosity
 
-  PHX::MDField<const ScalarT, Cell, QuadPoint> porosity;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> porosity;
   bool                                         isPoroElastic;
 
   //! Values of the random variables

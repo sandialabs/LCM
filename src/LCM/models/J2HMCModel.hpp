@@ -79,9 +79,9 @@ class J2HMCModel : public LCM::ConstitutiveModel<EvalT, Traits>
   computeTrialState(
       typename Traits::EvalData workset,
       /* increments */
-      PHX::MDField<const ScalarT>&              delta_macroStrain,
-      std::vector<PHX::MDField<const ScalarT>>& delta_strainDifference,
-      std::vector<PHX::MDField<const ScalarT>>& delta_microStrainGradient,
+      PHX::MDField<ScalarT const>&              delta_macroStrain,
+      std::vector<PHX::MDField<ScalarT const>>& delta_strainDifference,
+      std::vector<PHX::MDField<ScalarT const>>& delta_microStrainGradient,
       /* updated state */
       PHX::MDField<ScalarT>&              updated_macroStress,
       std::vector<PHX::MDField<ScalarT>>& updated_microStress,

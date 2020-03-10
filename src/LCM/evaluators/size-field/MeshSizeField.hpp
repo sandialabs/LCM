@@ -146,7 +146,7 @@ class IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   ///
   /// Input: current coordinates of the nodes
   ///
-  PHX::MDField<const ScalarT, Cell, Vertex, Dim> currentCoords;
+  PHX::MDField<ScalarT const, Cell, Vertex, Dim> currentCoords;
 
   ///
   /// Output: MeshSizeField (isotropic scalar)
@@ -272,7 +272,7 @@ class AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   ///
   /// Input: current coordinates of the nodes
   ///
-  PHX::MDField<const ScalarT, Cell, Vertex, Dim> currentCoords;
+  PHX::MDField<ScalarT const, Cell, Vertex, Dim> currentCoords;
 
   ///
   /// Output: MeshSizeField (anisotropic scalar)

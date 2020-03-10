@@ -87,8 +87,8 @@ LinearHMCModel<EvalT, Traits>::computeState(
 {
   // extract independent MDFields
   auto macroStrain = *dep_fields[macroStrainName];
-  std::vector<PHX::MDField<const ScalarT>> strainDifference(numMicroScales);
-  std::vector<PHX::MDField<const ScalarT>> microStrainGradient(numMicroScales);
+  std::vector<PHX::MDField<ScalarT const>> strainDifference(numMicroScales);
+  std::vector<PHX::MDField<ScalarT const>> microStrainGradient(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
     strainDifference[i]    = *dep_fields[strainDifferenceName[i]];
     microStrainGradient[i] = *dep_fields[microStrainGradientName[i]];
@@ -130,7 +130,7 @@ LinearHMCModel<EvalT, Traits>::computeState(
         ScalarT beta = betaParameter[i];
         for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
           for (std::size_t qp = 0; qp < num_pts_; ++qp) {
-            const ScalarT e1 = sd(cell, qp, 0, 0), e2 = sd(cell, qp, 1, 1),
+            ScalarT const e1 = sd(cell, qp, 0, 0), e2 = sd(cell, qp, 1, 1),
                           e3 = sd(cell, qp, 0, 1), e4 = sd(cell, qp, 1, 0);
             ms(cell, qp, 0, 0) = beta * (C11 * e1 + C12 * e2);
             ms(cell, qp, 1, 1) = beta * (C12 * e1 + C11 * e2);

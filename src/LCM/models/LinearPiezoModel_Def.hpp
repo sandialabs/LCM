@@ -156,13 +156,13 @@ LinearPiezoModel<EvalT, Traits>::computeState(
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < num_pts_; ++qp) {
         if (test) {
-          const ScalarT &x1 = strain(cell, qp, 0, 0),
+          ScalarT const &x1 = strain(cell, qp, 0, 0),
                         &x2 = strain(cell, qp, 1, 1),
                         &x3 = strain(cell, qp, 2, 2),
                         &x4 = strain(cell, qp, 1, 2),
                         &x5 = strain(cell, qp, 0, 2),
                         &x6 = strain(cell, qp, 0, 1);
-          const ScalarT &E1 = -Gradp(cell, qp, 0), &E2 = -Gradp(cell, qp, 1),
+          ScalarT const &E1 = -Gradp(cell, qp, 0), &E2 = -Gradp(cell, qp, 1),
                         &E3 = -Gradp(cell, qp, 2);
 
           stress(cell, qp, 0, 0) = C11 * x1 + C12 * x2 + C23 * x3 - e31 * E3;

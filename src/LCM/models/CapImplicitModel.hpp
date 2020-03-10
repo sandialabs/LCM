@@ -110,7 +110,7 @@ class CapImplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
       std::vector<ScalarT>&               dRdX,
       const minitensor::Tensor<ScalarT>&  sigmaVal,
       const minitensor::Tensor<ScalarT>&  alphaVal,
-      const ScalarT&                      kappaVal,
+      ScalarT const&                      kappaVal,
       minitensor::Tensor4<ScalarT> const& Celastic,
       bool                                kappa_flag);
 

@@ -43,7 +43,7 @@ class ResponseFieldIntegral
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidResponseParameters() const;
 
-  PHX::MDField<const ScalarT>             field;
+  PHX::MDField<ScalarT const>             field;
   PHX::MDField<const MeshScalarT>         coordVec;
   PHX::MDField<const MeshScalarT>         weights;
   PHX::index_size_type                    field_rank;

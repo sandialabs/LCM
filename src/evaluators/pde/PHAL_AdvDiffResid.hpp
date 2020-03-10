@@ -43,9 +43,9 @@ class AdvDiffResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
 
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim>      U;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim, Dim> UGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim>      UDot;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>      U;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim, Dim> UGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>      UDot;
 
   double mu;          // viscosity coefficient
   double a;           // advection coefficient

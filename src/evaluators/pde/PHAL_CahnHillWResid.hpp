@@ -44,10 +44,10 @@ class CahnHillWResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   // Input:
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
   PHX::MDField<const RealType, Cell, Node, QuadPoint>         BF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                rhoDot;
-  PHX::MDField<const ScalarT, Cell, Node>                     rhoDotNode;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                rhoDot;
+  PHX::MDField<ScalarT const, Cell, Node>                     rhoDotNode;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           wGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           wGrad;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> wResidual;

@@ -53,7 +53,7 @@ class Kinematics : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   //! Input: displacement gradient
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> grad_u_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> grad_u_;
 
   //! Input: integration weights
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> weights_;
@@ -91,7 +91,7 @@ class Kinematics : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///! Input, if RCU.
   AAdapt::rc::Field<2> def_grad_rc_;
   // For debugging.
-  PHX::MDField<const ScalarT, Cell, Vertex, Dim> u_;
+  PHX::MDField<ScalarT const, Cell, Vertex, Dim> u_;
   bool
   check_det(typename Traits::EvalData d, int cell, int pt);
 };

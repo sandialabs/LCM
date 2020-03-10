@@ -44,8 +44,8 @@ class CahnHillChemTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint> rho;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> w;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> w;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint> chemTerm;

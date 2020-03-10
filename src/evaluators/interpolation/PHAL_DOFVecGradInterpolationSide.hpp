@@ -49,7 +49,7 @@ class DOFVecGradInterpolationSideBase
 
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT, Side, Cell, Node, VecDim> val_node;
+  PHX::MDField<ScalarT const, Side, Cell, Node, VecDim> val_node;
   //! Basis Functions
   PHX::MDField<const MeshScalarT, Side, Cell, Node, QuadPoint, Dim> gradBF;
 

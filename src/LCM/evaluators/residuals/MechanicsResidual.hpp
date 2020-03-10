@@ -57,7 +57,7 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: Cauchy Stress
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> stress_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> stress_;
 
   ///
   /// Input: Weighted Basis Function Gradients
@@ -72,18 +72,18 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: body force vector
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> body_force_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> body_force_;
 
   ///
   /// Input: acceleration
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> acceleration_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> acceleration_;
 
   ///
   /// Input: mass contribution to residual/Jacobian (if not using AD to compute
   /// mass matrix)
   ///
-  PHX::MDField<const ScalarT, Cell, Node, Dim> mass_;
+  PHX::MDField<ScalarT const, Cell, Node, Dim> mass_;
 
   ///
   /// Output: Residual Forces

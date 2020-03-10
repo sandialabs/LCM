@@ -47,7 +47,7 @@ class DOFCellToSideQPBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   int                           num_side_nodes;
 
   // Input:
-  PHX::MDField<const ScalarT>                               val_cell;
+  PHX::MDField<ScalarT const>                               val_cell;
   PHX::MDField<const RealType, Cell, Side, Node, QuadPoint> BF;
 
   // Output:

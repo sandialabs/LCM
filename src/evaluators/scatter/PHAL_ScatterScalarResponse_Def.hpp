@@ -98,7 +98,7 @@ ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
   Teuchos::RCP<Thyra_Vector> g = workset.g;  // Tpetra version
   if (g != Teuchos::null) {
     Teuchos::ArrayRCP<ST> g_nonconstView = Albany::getNonconstLocalData(g);
-    for (PHAL::MDFieldIterator<const ScalarT> gr(this->global_response);
+    for (PHAL::MDFieldIterator<ScalarT const> gr(this->global_response);
          !gr.done();
          ++gr) {
       g_nonconstView[gr.idx()] = *gr;

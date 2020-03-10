@@ -40,11 +40,11 @@ class NSTauT : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>          V;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>               ThermalCond;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>          V;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>               ThermalCond;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim, Dim> Gc;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>               rho;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>               Cp;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>               rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>               Cp;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> TauT;

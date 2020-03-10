@@ -41,15 +41,15 @@ class NSNeutronEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Neutron;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                NeutronDiff;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Neutron;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                NeutronDiff;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           NGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Absorp;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Fission;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                nu;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           NGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Absorp;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Fission;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                nu;
 
-  PHX::MDField<const ScalarT, Cell, QuadPoint> Source;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> Source;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> NResidual;

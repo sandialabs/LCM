@@ -52,7 +52,7 @@ class SideQuadPointsToSideInterpolationBase
   std::string sideSetName;
 
   // Input:
-  PHX::MDField<const ScalarT>                            field_qp;
+  PHX::MDField<ScalarT const>                            field_qp;
   PHX::MDField<const MeshScalarT, Cell, Side, QuadPoint> w_measure;
 
   // Output:

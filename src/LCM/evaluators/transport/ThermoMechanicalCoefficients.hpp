@@ -52,22 +52,22 @@ class ThermoMechanicalCoefficients : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: temperature
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> temperature_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> temperature_;
 
   ///
   /// Input: thermal conductivity
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> thermal_cond_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> thermal_cond_;
 
   ///
   /// Input: time step
   ///
-  PHX::MDField<const ScalarT, Dummy> delta_time_;
+  PHX::MDField<ScalarT const, Dummy> delta_time_;
 
   ///
   /// Optional deformation gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> def_grad_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> def_grad_;
 
   ///
   /// Output: thermal transient coefficient

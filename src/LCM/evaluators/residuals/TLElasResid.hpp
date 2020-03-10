@@ -45,9 +45,9 @@ class TLElasResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 
  private:
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim>      stress;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                J;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim>      defgrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim>      stress;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                J;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim>      defgrad;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
   ScalarT                                                     zGrav;

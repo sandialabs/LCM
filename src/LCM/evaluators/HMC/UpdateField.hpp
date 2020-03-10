@@ -38,7 +38,7 @@ class UpdateField : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   PHX::MDField<ScalarT>       field_Nplus1;
-  PHX::MDField<const ScalarT> field_Inc;
+  PHX::MDField<ScalarT const> field_Inc;
 
   std::string name_N;
 };

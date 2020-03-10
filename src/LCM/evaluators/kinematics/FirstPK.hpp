@@ -53,12 +53,12 @@ class FirstPK : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: Cauchy Stress
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> stress_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> stress_;
 
   ///
   /// Input: Deformation Gradient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> def_grad_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> def_grad_;
 
   ///
   /// Output: First PK stress
@@ -69,19 +69,19 @@ class FirstPK : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Optional
   /// Input: Pore Pressure
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> pore_pressure_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> pore_pressure_;
 
   ///
   /// Optional
   /// Input: Biot Coefficient
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> biot_coeff_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> biot_coeff_;
 
   ///
   /// Optional
   /// Input: Stabilized Pressure
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> stab_pressure_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> stab_pressure_;
 
   ///
   /// Number of integration points

@@ -42,11 +42,11 @@ class TLPoroStress : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> defGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           J;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> stress;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           biotCoefficient;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>           porePressure;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> defGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           J;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> stress;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           biotCoefficient;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           porePressure;
 
   unsigned int numQPs;
   unsigned int numDims;

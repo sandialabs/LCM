@@ -56,7 +56,7 @@ class MortarContactResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
  protected:
   Albany::AbstractDiscretization::WorksetConn nodeID;
   Albany::DeviceView1d<ST>                    f_kokkos;
-  Kokkos::vector<Kokkos::DynRankView<const ScalarT, PHX::Device>, PHX::Device>
+  Kokkos::vector<Kokkos::DynRankView<ScalarT const, PHX::Device>, PHX::Device>
       val_kokkos;
 };
 

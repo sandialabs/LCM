@@ -38,11 +38,11 @@ class PoissonResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   PHX::MDField<const MeshScalarT> wBF;
-  PHX::MDField<const ScalarT>     Potential;
-  PHX::MDField<const ScalarT>     Permittivity;
+  PHX::MDField<ScalarT const>     Potential;
+  PHX::MDField<ScalarT const>     Permittivity;
   PHX::MDField<const MeshScalarT> wGradBF;
-  PHX::MDField<const ScalarT>     PhiGrad;
-  PHX::MDField<const ScalarT>     Source;
+  PHX::MDField<ScalarT const>     PhiGrad;
+  PHX::MDField<ScalarT const>     Source;
 
   bool haveSource;
 

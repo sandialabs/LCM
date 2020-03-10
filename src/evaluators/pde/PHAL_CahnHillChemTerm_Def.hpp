@@ -10,7 +10,7 @@
 
 template <typename ScalarT>
 inline ScalarT
-Sqr(const ScalarT& num)
+Sqr(ScalarT const& num)
 {
   return num * num;
 }

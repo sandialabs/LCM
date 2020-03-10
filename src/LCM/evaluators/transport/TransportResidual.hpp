@@ -52,10 +52,10 @@ class TransportResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Stress field
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> stress_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> stress_;
 
   // velocity gradient (Lagrangian)
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> vel_grad_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> vel_grad_;
 
   // Temporal container used to store P : F_dot
   Kokkos::DynRankView<ScalarT, PHX::Device> term1_;
@@ -63,22 +63,22 @@ class TransportResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Scalar field for transport variable
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> scalar_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> scalar_;
 
   ///
   /// Scalar dot field for transport variable
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> scalar_dot_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> scalar_dot_;
 
   ///
   /// Input: time step
   ///
-  PHX::MDField<const ScalarT, Dummy> delta_time_;
+  PHX::MDField<ScalarT const, Dummy> delta_time_;
 
   ///
   /// Scalar field for transport variable
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> scalar_grad_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> scalar_grad_;
 
   ///
   /// Integrations weights
@@ -98,38 +98,38 @@ class TransportResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Source term(s)
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> source_;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> second_source_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> source_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> second_source_;
 
   ///
   /// M operator for contact
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> M_operator_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> M_operator_;
 
   ///
   /// Scalar coefficient on the transient transport term
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> transient_coeff_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> transient_coeff_;
 
   ///
   /// Tensor diffusivity
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> diffusivity_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> diffusivity_;
 
   ///
   /// Vector convection term
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> convection_vector_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> convection_vector_;
 
   ///
   /// Species coupling term
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> species_coupling_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> species_coupling_;
 
   ///
   /// Stabilization term
   ///
-  PHX::MDField<const ScalarT, Cell, QuadPoint> stabilization_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> stabilization_;
 
   ///
   /// Output residual

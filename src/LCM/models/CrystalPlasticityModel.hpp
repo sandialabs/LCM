@@ -74,7 +74,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
   void
   init(
       Workset&                 workset,
-      FieldMap<const ScalarT>& dep_fields,
+      FieldMap<ScalarT const>& dep_fields,
       FieldMap<ScalarT>&       eval_fields);
 
   ///

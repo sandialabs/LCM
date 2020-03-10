@@ -42,7 +42,7 @@ class DefGrad : public PHX::EvaluatorWithBaseImpl<Traits>,
   using MeshScalarT = typename EvalT::MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim> GradU;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> GradU;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint>       weights;
 
   // Output:

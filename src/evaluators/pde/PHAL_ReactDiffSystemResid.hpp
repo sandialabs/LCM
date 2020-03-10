@@ -43,8 +43,8 @@ class ReactDiffSystemResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
 
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim>      U;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim, Dim> UGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>      U;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim, Dim> UGrad;
 
   double mu0, mu1, mu2;  // viscosity coefficients
 

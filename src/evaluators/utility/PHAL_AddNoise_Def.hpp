@@ -105,7 +105,7 @@ void
 AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  PHAL::MDFieldIterator<const ScalarT> in(field);
+  PHAL::MDFieldIterator<ScalarT const> in(field);
   PHAL::MDFieldIterator<ScalarT>       out(noisy_field);
 
   if (noise_free) {

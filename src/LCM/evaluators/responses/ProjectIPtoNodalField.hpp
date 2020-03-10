@@ -140,7 +140,7 @@ class ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
 
   int ndb_start_, num_fields_, num_pts_, num_dims_, num_nodes_;
 
-  std::vector<PHX::MDField<const ScalarT>>               ip_fields_;
+  std::vector<PHX::MDField<ScalarT const>>               ip_fields_;
   PHX::MDField<const RealType, Cell, Node, QuadPoint>    BF;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint> wBF;
 

@@ -67,7 +67,7 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
   auto dependent_map = model_->getDependentFieldMap();
   for (auto& pair : dependent_map) {
     auto temp_field =
-        Teuchos::rcp(new PHX::MDField<const ScalarT>(pair.first, pair.second));
+        Teuchos::rcp(new PHX::MDField<ScalarT const>(pair.first, pair.second));
     dep_fields_map_.insert(std::make_pair(pair.first, temp_field));
   }
 

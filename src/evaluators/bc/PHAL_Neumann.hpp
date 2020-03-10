@@ -144,7 +144,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   // Input:
   //! Coordinate vector at vertices
   PHX::MDField<const MeshScalarT, Cell, Vertex, Dim> coordVec;
-  PHX::MDField<const ScalarT>                        dof;
+  PHX::MDField<ScalarT const>                        dof;
 
   Teuchos::RCP<shards::CellTopology>                    cellType;
   Teuchos::ArrayRCP<Teuchos::RCP<shards::CellTopology>> sideType;

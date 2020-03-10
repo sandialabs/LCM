@@ -42,7 +42,7 @@ class AddNoiseBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
  private:
   // Input:
-  PHX::MDField<const ScalarT> field;
+  PHX::MDField<ScalarT const> field;
 
   // Output:
   PHX::MDField<ScalarT> noisy_field;

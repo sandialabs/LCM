@@ -56,7 +56,7 @@ class ConstitutiveModelDriverPre : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// solution field
   ///
-  PHX::MDField<const ScalarT, Cell, Node, Dim, Dim> solution_;
+  PHX::MDField<ScalarT const, Cell, Node, Dim, Dim> solution_;
 
   ///
   /// def grad field
@@ -76,7 +76,7 @@ class ConstitutiveModelDriverPre : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// time field
   ///
-  PHX::MDField<const ScalarT, Dummy> time_;
+  PHX::MDField<ScalarT const, Dummy> time_;
 
   ///
   /// problem final time

@@ -42,14 +42,14 @@ class HeatEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Temperature;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Tdot;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                ThermalCond;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Temperature;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Tdot;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                ThermalCond;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           TGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Source;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                rhoCp;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                Absorption;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           TGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Source;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                rhoCp;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                Absorption;
   Teuchos::Array<double>                                      convectionVels;
 
   // Output:

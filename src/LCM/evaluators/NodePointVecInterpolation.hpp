@@ -41,7 +41,7 @@ class NodePointVecInterpolation : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT, Cell, Node, VecDim> nodal_value_;
+  PHX::MDField<ScalarT const, Cell, Node, VecDim> nodal_value_;
 
   //! Basis Functions
   PHX::MDField<const RealType, Cell, Node, Point> basis_fn_;
@@ -81,7 +81,7 @@ class NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>
 
   // Input:
   //! Values at nodes
-  PHX::MDField<const ScalarT, Cell, Node, VecDim> nodal_value_;
+  PHX::MDField<ScalarT const, Cell, Node, VecDim> nodal_value_;
 
   //! Basis Functions
   PHX::MDField<const RealType, Cell, Node> basis_fn_;

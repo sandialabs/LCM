@@ -41,9 +41,9 @@ class NSBodyForce : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint> T;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> rho;
-  PHX::MDField<const ScalarT, Cell, QuadPoint> beta;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> T;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> rho;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> beta;
   Teuchos::Array<double>                       gravity;
 
   // Output:

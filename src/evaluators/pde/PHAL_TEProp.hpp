@@ -54,7 +54,7 @@ class TEProp : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT, Cell, QuadPoint>                rhoCp;
   PHX::MDField<ScalarT, Cell, QuadPoint>                permittivity;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermalCond;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>          Temp;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>          Temp;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordVec;
 
   int                     mats;

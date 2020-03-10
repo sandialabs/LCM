@@ -161,7 +161,7 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       for (int pt(0); pt < num_pts_; ++pt) {
         weighted_jbar = (1 - alpha_) * jbar + alpha_ * j_(cell, pt);
         F.fill(def_grad_, cell, pt, 0, 0);
-        const ScalarT p = std::pow((weighted_jbar / j_(cell, pt)), 1. / 3.);
+        ScalarT const p = std::pow((weighted_jbar / j_(cell, pt)), 1. / 3.);
         F *= p;
         j_(cell, pt) = weighted_jbar;
         for (int i(0); i < num_dims_; ++i) {

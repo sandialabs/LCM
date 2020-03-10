@@ -350,15 +350,15 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
     std::vector<ScalarT>&        X,
     std::vector<ScalarT>&        R,
     std::vector<ScalarT>&        dRdX,
-    const ScalarT&               p,
-    const ScalarT&               fvoid,
-    const ScalarT&               eq,
+    ScalarT const&               p,
+    ScalarT const&               fvoid,
+    ScalarT const&               eq,
     minitensor::Tensor<ScalarT>& s,
-    const ScalarT&               mu,
-    const ScalarT&               kappa,
-    const ScalarT&               K,
-    const ScalarT&               Y,
-    const ScalarT&               jacobian)
+    ScalarT const&               mu,
+    ScalarT const&               kappa,
+    ScalarT const&               K,
+    ScalarT const&               Y,
+    ScalarT const&               jacobian)
 {
   ScalarT               sq32 = std::sqrt(3.0 / 2.0);
   ScalarT               sq23 = std::sqrt(2.0 / 3.0);

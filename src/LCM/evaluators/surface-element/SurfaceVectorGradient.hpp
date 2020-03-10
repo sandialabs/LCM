@@ -51,9 +51,9 @@ class SurfaceVectorGradient : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature;
   //! Vector to take the jump of
   PHX::MDField<const MeshScalarT, Cell, Vertex, Dim> vector;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>  jump;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>  jump;
 
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim, Dim>     currentBasis;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim>     currentBasis;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim, Dim> refDualBasis;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim>      refNormal;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint>           weights;

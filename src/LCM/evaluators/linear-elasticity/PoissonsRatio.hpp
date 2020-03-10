@@ -58,7 +58,7 @@ class PoissonsRatio : public PHX::EvaluatorWithBaseImpl<Traits>,
   ScalarT constant_value;
 
   //! Optional dependence on Temperature (nu = nu_0 + dnudT * T)
-  PHX::MDField<const ScalarT, Cell, QuadPoint> Temperature;
+  PHX::MDField<ScalarT const, Cell, QuadPoint> Temperature;
   bool                                         isThermoElastic;
   ScalarT                                      dnudT_value;
   RealType                                     refTemp;

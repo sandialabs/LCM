@@ -63,7 +63,7 @@ class FieldFrobeniusNormBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Input:
   PHX::MDField<const EScalarT, Dim> regularizationParam;
-  PHX::MDField<const ScalarT>       field;
+  PHX::MDField<ScalarT const>       field;
 
   // Output:
   PHX::MDField<ScalarT> field_norm;

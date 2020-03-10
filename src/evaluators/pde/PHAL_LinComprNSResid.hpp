@@ -43,11 +43,11 @@ class LinComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
 
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim>
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>
                                                             qFluct;  // vector q' containing fluid fluctuations in primitive variables
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim, Dim> qFluctGrad;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim>      qFluctDot;
-  PHX::MDField<const ScalarT, Cell, QuadPoint, VecDim>      force;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim, Dim> qFluctGrad;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>      qFluctDot;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>      force;
 
   Teuchos::Array<double> baseFlowData;
   double                 gamma_gas;  // 1.4 typically

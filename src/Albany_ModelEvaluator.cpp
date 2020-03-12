@@ -803,7 +803,7 @@ ModelEvaluator::evalModelImpl(
         outArgs.get_DfDp(l).getMultiVector();
 
     if (Teuchos::nonnull(dfdp_out)) {
-      ALBANY_ABORT("This functionality is no longer supported.");
+      //ALBANY_ABORT("This functionality is no longer supported.");
     }
   }
 

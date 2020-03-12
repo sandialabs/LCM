@@ -108,6 +108,7 @@ add_subdirectory(TransientHeat1D)
 add_subdirectory(TransientHeat2D)
 add_subdirectory(Thermal1D)
 add_subdirectory(Thermal2D)
+add_subdirectory(Thermal3D)
 
 if(ALBANY_PAMGEN)
   add_subdirectory(Heat3DPamgen)

@@ -797,29 +797,9 @@ ModelEvaluator::evalModelImpl(
     f_already_computed = true;
   }
 
-  // df/dp
-  for (int l = 0; l < num_param_vecs; ++l) {
-    const Teuchos::RCP<Thyra_MultiVector> dfdp_out =
-        outArgs.get_DfDp(l).getMultiVector();
+  // f, df/dp and distributed df/dp not suppoerted anymore
 
-    if (Teuchos::nonnull(dfdp_out)) {
-      //ALBANY_ABORT("This functionality is no longer supported.");
-    }
-  }
-
-  // distributed df/dp
-  for (int i = 0; i < num_dist_param_vecs; i++) {
-    const Teuchos::RCP<Thyra_LinearOp> dfdp_out =
-        outArgs.get_DfDp(i + num_param_vecs).getLinearOp();
-    if (dfdp_out != Teuchos::null) {
-      ALBANY_ABORT("This functionality is no longer supported.");
-    }
-  }
-
-  // f
-  if (app->is_adjoint) {
-    ALBANY_ABORT("This functionality is no longer supported.");
-  } else if (Teuchos::nonnull(f_out) && !f_already_computed) {
+  if (Teuchos::nonnull(f_out) && !f_already_computed) {
     app->computeGlobalResidual(
         curr_time, x, x_dot, x_dotdot, sacado_param_vec, f_out, dt);
   }

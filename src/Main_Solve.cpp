@@ -340,11 +340,14 @@ main(int argc, char* argv[])
   if (!success) status += 10000;
 
   stackedTimer->stop("Albany Total Time");
-  Teuchos::StackedTimer::OutputOptions options;
-  options.output_fraction = true;
-  options.output_minmax   = true;
-  stackedTimer->report(
-      std::cout, Teuchos::DefaultComm<int>::getComm(), options);
+  bool const report_timings{false};
+  if (report_timings == true) {
+    Teuchos::StackedTimer::OutputOptions options;
+    options.output_fraction = true;
+    options.output_minmax   = true;
+    stackedTimer->report(
+        std::cout, Teuchos::DefaultComm<int>::getComm(), options);
+  }
 
   Kokkos::finalize_all();
 

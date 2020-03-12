@@ -12,7 +12,7 @@ ALBANY:
       Function: Expression Parser
       Function Expressions: ['250']
       #Function Expressions: ['250 * cosh(5.421312110550360e-02*x)']
-    Thermal Conductivity: 1.6 
+    Thermal Conductivity: [1.6, 1.6, 1.6] 
     Heat Capacity: 2.09e3 
     Response Functions: 
       Number: 1

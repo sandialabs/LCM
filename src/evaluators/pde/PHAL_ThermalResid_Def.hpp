@@ -28,7 +28,7 @@ ThermalResid<EvalT, Traits>::ThermalResid(Teuchos::ParameterList const& p)
       TResidual(
           p.get<std::string>("Residual Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
-      kappa(p.get<double>("Thermal Conductivity")),
+      kappa(p.get<Teuchos::Array<double>>("Thermal Conductivity")),
       C(p.get<double>("Heat Capacity"))
 {
   this->addDependentField(wBF);
@@ -46,7 +46,6 @@ ThermalResid<EvalT, Traits>::ThermalResid(Teuchos::ParameterList const& p)
   numQPs      = dims[2];
   numDims     = dims[3];
   this->setName("ThermalResid");
-  //std::cout << "IKT kappa, C = " << kappa << ", " << C << "\n"; 
 }
 
 //*****
@@ -72,7 +71,7 @@ ThermalResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
 
   //We are solving the following PDE:
-  //C*dT/dt - kappa*\Delta T = 0 
+  //C*dT/dt - kappa_1*dT/dx + kappa_2*dT/dy + kappa_3*dT/dz = 0 in 3D 
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t node = 0; node < numNodes; ++node) {
         TResidual(cell, node) = 0.0;
@@ -82,7 +81,7 @@ ThermalResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
                C * Tdot(cell, qp) * wBF(cell, node, qp); 
           //Diffusion part of residual 
           for (std::size_t ndim = 0; ndim < numDims; ++ndim) {
-              TResidual(cell,node) += kappa * TGrad(cell, qp, ndim) * wGradBF(cell, node, qp, ndim);
+              TResidual(cell,node) += kappa[ndim] * TGrad(cell, qp, ndim) * wGradBF(cell, node, qp, ndim);
           } 
         }
      }

@@ -45,7 +45,7 @@ class ThermalResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT const, Cell, QuadPoint>                Tdot;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           TGrad;
-  double kappa; //Thermal Conductivity
+  Teuchos::Array<double> kappa; //Thermal Conductivity array
   double C; //Heat Capacity 
 
   // Output:

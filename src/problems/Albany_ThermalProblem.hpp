@@ -96,9 +96,9 @@ class ThermalProblem : public AbstractProblem
       const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
 
  protected:
-  int         numDim; //number spatial dimensions
-  double      kappa; //thermal conductivity 
-  double      C;     //heat capacity 
+  int                     numDim; //number spatial dimensions
+  Teuchos::Array<double>  kappa; //thermal conductivity 
+  double                  C;     //heat capacity 
 
   const Teuchos::RCP<Teuchos::ParameterList> params;
 
@@ -224,7 +224,7 @@ Albany::ThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl->qp_vector);
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl->node_qp_vector);
     
-    p->set<double>("Thermal Conductivity", kappa);
+    p->set<Teuchos::Array<double>>("Thermal Conductivity", kappa);
     p->set<double>("Heat Capacity", C);
     
     // Output

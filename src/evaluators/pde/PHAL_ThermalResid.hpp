@@ -52,9 +52,6 @@ class ThermalResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT, Cell, Node> TResidual;
 
   unsigned int numQPs, numDims, numNodes, worksetSize;
-  Kokkos::DynRankView<ScalarT, PHX::Device> flux;
-  Kokkos::DynRankView<ScalarT, PHX::Device> aterm;
-  Kokkos::DynRankView<ScalarT, PHX::Device> convection;
 };
 }  // namespace PHAL
 

@@ -276,9 +276,9 @@ Topology::is_erodible(stk::mesh::Entity face)
   minitensor::Vector<double, 3> norms(0.0, 0.0, 0.0);
   for (auto i = 0; i < num_relations; ++i) {
     auto const diff = points[i] - avg;
-    norms(0)        = diff(0) * diff(0);
-    norms(1)        = diff(1) * diff(1);
-    norms(2)        = diff(2) * diff(2);
+    norms(0)        += diff(0) * diff(0);
+    norms(1)        += diff(1) * diff(1);
+    norms(2)        += diff(2) * diff(2);
   }
   norms(0) = std::sqrt(norms(0));
   norms(1) = std::sqrt(norms(1));
@@ -1978,7 +1978,7 @@ Topology::is_boundary_node(stk::mesh::Entity e)
   size_t const num_relations         = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
-    if (is_erodible(face_entity) == true) return true;
+    if (is_external(face_entity) == true) return true;
   }
   return false;
 }

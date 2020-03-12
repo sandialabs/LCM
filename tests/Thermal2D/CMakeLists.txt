@@ -9,5 +9,5 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # Create the test with this name and standard executable
   add_test(${testName} ${Albany.exe} input.yaml)
   set_tests_properties(${testName} PROPERTIES LABELS
-                                              "Demo;Tpetra;Forward;Serial")
+                                              "Demo;Tpetra;Forward")
 endif()

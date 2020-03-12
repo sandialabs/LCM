@@ -104,12 +104,22 @@ Topology::Topology(
     Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc,
     std::string const&                            bulk_block_name,
     std::string const&                            interface_block_name,
-    double                                        bluff_width)
+    double const xm,
+    double const ym,
+    double const zm,
+    double const xp,
+    double const yp,
+    double const zp)
     : discretization_(Teuchos::null),
       stk_mesh_struct_(Teuchos::null),
       failure_criterion_(Teuchos::null),
       output_type_(UNIDIRECTIONAL_UNILEVEL),
-      bluff_width_(bluff_width)
+      xm_(xm),
+      ym_(ym),
+      zm_(zm),
+      xp_(xp),
+      yp_(yp),
+      zp_(zp)
 {
   auto& stk_disc = static_cast<Albany::STKDiscretization&>(*abstract_disc);
   auto  stk_mesh_struct = stk_disc.getSTKMeshStruct();
@@ -275,19 +285,17 @@ Topology::is_erodible(stk::mesh::Entity face)
   norms(2) = std::sqrt(norms(2));
 
   double const eps   = 0.001;
-  double const yplus = bluff_width_;
 
-  bool const is_x_minus = std::abs(avg(0)) <= eps && std::abs(norms(0)) <= eps;
+  bool const is_x_minus = std::abs(avg(0) - xm_) <= eps && std::abs(norms(0)) <= eps;
   if (is_x_minus == true) return false;
 
-  bool const is_y_minus = std::abs(avg(1)) <= eps && std::abs(norms(1)) <= eps;
+  bool const is_y_minus = std::abs(avg(1) - ym_) <= eps && std::abs(norms(1)) <= eps;
   if (is_y_minus == true) return false;
 
-  avg(1) -= yplus;
-  bool const is_y_plus = std::abs(avg(1)) <= eps && std::abs(norms(1)) <= eps;
+  bool const is_y_plus = std::abs(avg(1) - yp_) <= eps && std::abs(norms(1)) <= eps;
   if (is_y_plus == true) return false;
 
-  bool const is_z_minus = std::abs(avg(2)) <= eps && std::abs(norms(2)) <= eps;
+  bool const is_z_minus = std::abs(avg(2) - zm_) <= eps && std::abs(norms(2)) <= eps;
   if (is_z_minus == true) return false;
 
   return true;

@@ -36,9 +36,16 @@ AAdapt::Erosion::Erosion(
   // Save the initial output file name
   base_exo_filename_     = stk_mesh_struct_->exoOutFile;
   cross_section_         = params->get<double>("Cross Section", 1.0);
-  auto const bluff_width = params->get<double>("Bluff Width", 1.0);
-  topology_ =
-      Teuchos::rcp(new LCM::Topology(discretization_, "", "", bluff_width));
+  auto const lower_corner = params->get<Teuchos::Array<double>>("Lower Corner", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+  auto const upper_corner = params->get<Teuchos::Array<double>>("Upper Corner", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+  auto const xm = lower_corner[0];
+  auto const ym = lower_corner[1];
+  auto const zm = lower_corner[2];
+  auto const xp = upper_corner[0];
+  auto const yp = upper_corner[1];
+  auto const zp = upper_corner[2];
+    topology_ =
+      Teuchos::rcp(new LCM::Topology(discretization_, "", "", xm, ym, zm, xp, yp, zp));
   std::string const failure_indicator_name = "Failure Indicator";
   failure_criterion_                       = Teuchos::rcp(
       new LCM::BulkFailureCriterion(*topology_, failure_indicator_name));

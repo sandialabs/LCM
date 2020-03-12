@@ -104,12 +104,12 @@ Topology::Topology(
     Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc,
     std::string const&                            bulk_block_name,
     std::string const&                            interface_block_name,
-    double const xm,
-    double const ym,
-    double const zm,
-    double const xp,
-    double const yp,
-    double const zp)
+    double const                                  xm,
+    double const                                  ym,
+    double const                                  zm,
+    double const                                  xp,
+    double const                                  yp,
+    double const                                  zp)
     : discretization_(Teuchos::null),
       stk_mesh_struct_(Teuchos::null),
       failure_criterion_(Teuchos::null),
@@ -284,19 +284,22 @@ Topology::is_erodible(stk::mesh::Entity face)
   norms(1) = std::sqrt(norms(1));
   norms(2) = std::sqrt(norms(2));
 
-  double const eps   = 0.001;
+  double const eps = 0.001;
 
-  bool const is_x_minus = std::abs(avg(0) - xm_) <= eps && std::abs(norms(0)) <= eps;
+  bool const is_x_minus = std::abs(avg(0) - xm_) <= eps && norms(0) <= eps;
   if (is_x_minus == true) return false;
 
-  bool const is_y_minus = std::abs(avg(1) - ym_) <= eps && std::abs(norms(1)) <= eps;
+  bool const is_y_minus = std::abs(avg(1) - ym_) <= eps && norms(1) <= eps;
   if (is_y_minus == true) return false;
 
-  bool const is_y_plus = std::abs(avg(1) - yp_) <= eps && std::abs(norms(1)) <= eps;
+  bool const is_y_plus = std::abs(avg(1) - yp_) <= eps && norms(1) <= eps;
   if (is_y_plus == true) return false;
 
-  bool const is_z_minus = std::abs(avg(2) - zm_) <= eps && std::abs(norms(2)) <= eps;
+  bool const is_z_minus = std::abs(avg(2) - zm_) <= eps && norms(2) <= eps;
   if (is_z_minus == true) return false;
+
+  bool const is_z_plus = std::abs(avg(2) - zp_) <= eps && norms(2) <= eps;
+  if (is_z_plus == true) return false;
 
   return true;
 }
@@ -1975,7 +1978,7 @@ Topology::is_boundary_node(stk::mesh::Entity e)
   size_t const num_relations         = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
-    if (is_external(face_entity) == true) return true;
+    if (is_erodible(face_entity) == true) return true;
   }
   return false;
 }

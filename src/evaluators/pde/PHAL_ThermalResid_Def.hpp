@@ -46,6 +46,7 @@ ThermalResid<EvalT, Traits>::ThermalResid(Teuchos::ParameterList const& p)
   numQPs      = dims[2];
   numDims     = dims[3];
   this->setName("ThermalResid");
+  //std::cout << "IKT kappa, C = " << kappa << ", " << C << "\n"; 
 }
 
 //*****
@@ -78,10 +79,10 @@ ThermalResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         for (std::size_t qp = 0; qp < numQPs; ++qp) {
           //Time-derivative contribution to residual
           TResidual(cell, node) +=
-               Tdot(cell, qp) * wBF(cell, node, qp); 
+               C * Tdot(cell, qp) * wBF(cell, node, qp); 
           //Diffusion part of residual 
           for (std::size_t ndim = 0; ndim < numDims; ++ndim) {
-              TResidual(cell,node) += TGrad(cell, qp, ndim) * wGradBF(cell, node, qp, ndim);
+              TResidual(cell,node) += kappa * TGrad(cell, qp, ndim) * wGradBF(cell, node, qp, ndim);
           } 
         }
      }

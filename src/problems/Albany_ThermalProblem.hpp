@@ -96,10 +96,10 @@ class ThermalProblem : public AbstractProblem
       const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
 
  protected:
-  int numDim;                    // number spatial dimensions
-  Teuchos::Array<double> kappa;  // thermal conductivity
-  double                 C;      // heat capacity
-  double                 rho;    // density
+  int                    numDim;  // number spatial dimensions
+  Teuchos::Array<double> kappa;   // thermal conductivity
+  double                 C;       // heat capacity
+  double                 rho;     // density
 
   const Teuchos::RCP<Teuchos::ParameterList> params;
 

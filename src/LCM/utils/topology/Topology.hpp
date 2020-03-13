@@ -988,6 +988,9 @@ class Topology
   is_boundary_node(stk::mesh::Entity e);
 
   bool
+  is_erodible_node(stk::mesh::Entity e);
+
+  bool
   is_failed_boundary_cell(stk::mesh::Entity e)
   {
     return is_boundary_cell(e) == true && is_open(e) == true;

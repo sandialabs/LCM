@@ -239,7 +239,9 @@ Topology::setNodeBoundaryIndicator()
   stk::mesh::get_entities(bulk_data, node_rank, nodes);
 
   for (auto node : nodes) {
-    auto const bi = is_boundary_node(node) == true ? EXTERIOR : INTERIOR;
+    auto const bi = is_erodible_node(node) == true ?
+                        ERODIBLE :
+                        (is_boundary_node(node) == true ? EXTERIOR : INTERIOR);
     set_node_boundary_indicator(node, bi);
   }
 }
@@ -1979,6 +1981,22 @@ Topology::is_boundary_node(stk::mesh::Entity e)
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
     if (is_external(face_entity) == true) return true;
+  }
+  return false;
+}
+
+bool
+Topology::is_erodible_node(stk::mesh::Entity e)
+{
+  stk::mesh::EntityRank const node_rank = stk::topology::NODE_RANK;
+  stk::mesh::EntityRank const face_rank = get_boundary_rank();
+  auto&                       bulk_data = get_bulk_data();
+  assert(bulk_data.entity_rank(e) == node_rank);
+  stk::mesh::Entity const* relations = bulk_data.begin(e, face_rank);
+  size_t const num_relations         = bulk_data.num_connectivity(e, face_rank);
+  for (size_t i = 0; i < num_relations; ++i) {
+    stk::mesh::Entity face_entity = relations[i];
+    if (is_erodible(face_entity) == true) return true;
   }
   return false;
 }

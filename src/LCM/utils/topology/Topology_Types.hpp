@@ -90,7 +90,8 @@ enum FailureState
 enum BoundaryIndicator
 {
   INTERIOR = 0,
-  EXTERIOR = 1
+  EXTERIOR = 1,
+  ERODIBLE = 2
 };
 
 enum VTKCellType

@@ -276,9 +276,9 @@ Topology::is_erodible(stk::mesh::Entity face)
   minitensor::Vector<double, 3> norms(0.0, 0.0, 0.0);
   for (auto i = 0; i < num_relations; ++i) {
     auto const diff = points[i] - avg;
-    norms(0)        += diff(0) * diff(0);
-    norms(1)        += diff(1) * diff(1);
-    norms(2)        += diff(2) * diff(2);
+    norms(0) += diff(0) * diff(0);
+    norms(1) += diff(1) * diff(1);
+    norms(2) += diff(2) * diff(2);
   }
   norms(0) = std::sqrt(norms(0));
   norms(1) = std::sqrt(norms(1));

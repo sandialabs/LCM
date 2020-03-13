@@ -25,17 +25,17 @@ Albany::ThermalProblem::ThermalProblem(
       use_sdbcs_(false)
 {
   this->setNumEquations(1);
-  //We just have 1 PDE/node 
-  neq = 1; 
+  // We just have 1 PDE/node
+  neq = 1;
 
-  Teuchos::Array<double>      defaultData;
-  defaultData.resize(numDim, 1.0); 
-  kappa = params->get<Teuchos::Array<double>>("Thermal Conductivity", defaultData);
+  Teuchos::Array<double> defaultData;
+  defaultData.resize(numDim, 1.0);
+  kappa =
+      params->get<Teuchos::Array<double>>("Thermal Conductivity", defaultData);
   if (kappa.size() != numDim) {
     ALBANY_ABORT("Thermal Conductivity array must have length = numDim!");
   }
   C = params->get<double>("Heat Capacity", 1.0);
-
 }
 
 Albany::ThermalProblem::~ThermalProblem() {}
@@ -167,7 +167,7 @@ Albany::ThermalProblem::constructNeumannEvaluators(
       offsets,
       dl,
       this->params,
-      this->paramLib); 
+      this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
@@ -176,10 +176,14 @@ Albany::ThermalProblem::getValidProblemParameters() const
   Teuchos::RCP<Teuchos::ParameterList> validPL =
       this->getGenericProblemParams("ValidThermalProblemParams");
 
-  Teuchos::Array<double>      defaultData;
-  defaultData.resize(numDim, 1.0); 
-  validPL->set<Teuchos::Array<double>>("Thermal Conductivity", defaultData, "Arrays of values of thermal conductivities in x, y, z [required]");
-  validPL->set<double>("Heat Capacity", 1.0, "Value of heat capacity [required]");
+  Teuchos::Array<double> defaultData;
+  defaultData.resize(numDim, 1.0);
+  validPL->set<Teuchos::Array<double>>(
+      "Thermal Conductivity",
+      defaultData,
+      "Arrays of values of thermal conductivities in x, y, z [required]");
+  validPL->set<double>(
+      "Heat Capacity", 1.0, "Value of heat capacity [required]");
 
   return validPL;
 }

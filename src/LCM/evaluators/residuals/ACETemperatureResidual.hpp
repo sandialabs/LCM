@@ -62,8 +62,6 @@ class ACETemperatureResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Workspace:
   unsigned int num_qp_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
-  Kokkos::DynRankView<ScalarT, PHX::Device> heat_flux_;
-  Kokkos::DynRankView<ScalarT, PHX::Device> accumulation_;
 };
 
 }  // namespace LCM

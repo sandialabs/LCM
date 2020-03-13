@@ -10,9 +10,9 @@
 
 // Always enable HeatProblem and SideLaplacianProblem
 #include "Albany_HeatProblem.hpp"
-#include "Albany_ThermalProblem.hpp"
 #include "Albany_PopulateMesh.hpp"
 #include "Albany_SideLaplacianProblem.hpp"
+#include "Albany_ThermalProblem.hpp"
 
 #if defined(ALBANY_DEMO_PDES)
 #include "Albany_AdvDiffProblem.hpp"
@@ -77,11 +77,14 @@ Albany::ProblemFactory::create()
   } else if (method == "Heat 3D") {
     strategy = rcp(new Albany::HeatProblem(problemParams, paramLib, 3, commT));
   } else if (method == "Thermal 1D") {
-    strategy = rcp(new Albany::ThermalProblem(problemParams, paramLib, 1, commT));
+    strategy =
+        rcp(new Albany::ThermalProblem(problemParams, paramLib, 1, commT));
   } else if (method == "Thermal 2D") {
-    strategy = rcp(new Albany::ThermalProblem(problemParams, paramLib, 2, commT));
+    strategy =
+        rcp(new Albany::ThermalProblem(problemParams, paramLib, 2, commT));
   } else if (method == "Thermal 3D") {
-    strategy = rcp(new Albany::ThermalProblem(problemParams, paramLib, 3, commT));
+    strategy =
+        rcp(new Albany::ThermalProblem(problemParams, paramLib, 3, commT));
   } else if (method == "Populate Mesh") {
     strategy = rcp(new Albany::PopulateMesh(
         problemParams, discretizationParams, paramLib));

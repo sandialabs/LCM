@@ -96,9 +96,9 @@ class ThermalProblem : public AbstractProblem
       const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
 
  protected:
-  int                     numDim; //number spatial dimensions
-  Teuchos::Array<double>  kappa; //thermal conductivity 
-  double                  C;     //heat capacity 
+  int numDim;                    // number spatial dimensions
+  Teuchos::Array<double> kappa;  // thermal conductivity
+  double                 C;      // heat capacity
 
   const Teuchos::RCP<Teuchos::ParameterList> params;
 
@@ -118,8 +118,8 @@ class ThermalProblem : public AbstractProblem
 #include "Albany_Utils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
 #include "PHAL_Absorption.hpp"
-#include "PHAL_ThermalResid.hpp"
 #include "PHAL_ThermalConductivity.hpp"
+#include "PHAL_ThermalResid.hpp"
 #include "Shards_CellTopology.hpp"
 
 template <typename EvalT>
@@ -182,8 +182,8 @@ Albany::ThermalProblem::constructEvaluators(
   resid_names[0] = "Temperature Residual";
 
   fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator(
-            false, dof_names, dof_names_dot));
+      evalUtils.constructGatherSolutionEvaluator(
+          false, dof_names, dof_names_dot));
 
   fm0.template registerEvaluator<EvalT>(
       evalUtils.constructScatterResidualEvaluator(false, resid_names));
@@ -203,12 +203,11 @@ Albany::ThermalProblem::constructEvaluators(
         evalUtils.constructDOFInterpolationEvaluator(dof_names[i]));
 
     fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i]));
+        evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i]));
 
     fm0.template registerEvaluator<EvalT>(
         evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
-
 
   {  // Temperature Resid
     RCP<ParameterList> p = rcp(new ParameterList("Temperature Resid"));
@@ -218,15 +217,15 @@ Albany::ThermalProblem::constructEvaluators(
     p->set<string>("QP Time Derivative Variable Name", "Temperature_dot");
     p->set<string>("Gradient QP Variable Name", "Temperature Gradient");
     p->set<string>("Weighted Gradient BF Name", "wGrad BF");
-    
+
     p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl->node_qp_scalar);
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl->qp_scalar);
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl->qp_vector);
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl->node_qp_vector);
-    
+
     p->set<Teuchos::Array<double>>("Thermal Conductivity", kappa);
     p->set<double>("Heat Capacity", C);
-    
+
     // Output
     p->set<string>("Residual Name", "Temperature Residual");
     p->set<RCP<DataLayout>>("Node Scalar Data Layout", dl->node_scalar);

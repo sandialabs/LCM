@@ -83,14 +83,6 @@ ACETemperatureResidual<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(thermal_inertia_, fm);
 
   this->utils.setFieldData(residual_, fm);
-
-  // Allocate workspace:
-  heat_flux_ = Kokkos::createDynRankView(
-      tdot_.get_view(), "HF", workset_size_, num_qp_, num_dims_);
-  accumulation_ = Kokkos::createDynRankView(
-      tdot_.get_view(), "ACC", workset_size_, num_qp_);
-
-  return;
 }
 
 //
@@ -100,33 +92,22 @@ template <typename EvalT, typename Traits>
 void ACETemperatureResidual<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData)
 {
-  using FST = Intrepid2::FunctionSpaceTools<PHX::Device>;
-
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
-    for (std::size_t qp = 0; qp < num_qp_; ++qp) {
-      // heat flux term:
-      for (std::size_t i = 0; i < num_dims_; ++i) {
-        heat_flux_(cell, qp, i) =
-            thermal_conductivity_(cell, qp) * tgrad_(cell, qp, i);
+    for (std::size_t node = 0; node < num_nodes_; ++node) {
+      residual_(cell, node) = 0.0;
+      for (std::size_t qp = 0; qp < num_qp_; ++qp) {
+        // Time-derivative contribution to residual
+        residual_(cell, node) +=
+            thermal_inertia_(cell, qp) * tdot_(cell, qp) * wbf_(cell, node, qp);
+        // Diffusion part of residual
+        for (std::size_t i = 0; i < num_dims_; ++i) {
+          residual_(cell, node) += thermal_conductivity_(cell, qp) *
+                                   tgrad_(cell, qp, i) *
+                                   wgradbf_(cell, node, qp, i);
+        }
       }
-      // accumulation term:
-      accumulation_(cell, qp) = thermal_inertia_(cell, qp) * tdot_(cell, qp);
     }
   }
-
-  FST::integrate(
-      residual_.get_view(),
-      heat_flux_,
-      wgradbf_.get_view(),
-      false);  // "false" overwrites
-
-  FST::integrate(
-      residual_.get_view(),
-      accumulation_,
-      wbf_.get_view(),
-      true);  // "true" sums into
-
-  return;
 }
 
 }  // namespace LCM

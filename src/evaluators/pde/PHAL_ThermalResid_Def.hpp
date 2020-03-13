@@ -60,7 +60,6 @@ ThermalResid<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(wGradBF, fm);
   this->utils.setFieldData(Tdot, fm);
   this->utils.setFieldData(TResidual, fm);
-
 }
 
 //*****
@@ -70,23 +69,22 @@ ThermalResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
 
-  //We are solving the following PDE:
-  //C*dT/dt - kappa_1*dT/dx + kappa_2*dT/dy + kappa_3*dT/dz = 0 in 3D 
+  // We are solving the following PDE:
+  // C*dT/dt - kappa_1*dT/dx + kappa_2*dT/dy + kappa_3*dT/dz = 0 in 3D
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t node = 0; node < numNodes; ++node) {
-        TResidual(cell, node) = 0.0;
-        for (std::size_t qp = 0; qp < numQPs; ++qp) {
-          //Time-derivative contribution to residual
-          TResidual(cell, node) +=
-               C * Tdot(cell, qp) * wBF(cell, node, qp); 
-          //Diffusion part of residual 
-          for (std::size_t ndim = 0; ndim < numDims; ++ndim) {
-              TResidual(cell,node) += kappa[ndim] * TGrad(cell, qp, ndim) * wGradBF(cell, node, qp, ndim);
-          } 
+      TResidual(cell, node) = 0.0;
+      for (std::size_t qp = 0; qp < numQPs; ++qp) {
+        // Time-derivative contribution to residual
+        TResidual(cell, node) += C * Tdot(cell, qp) * wBF(cell, node, qp);
+        // Diffusion part of residual
+        for (std::size_t ndim = 0; ndim < numDims; ++ndim) {
+          TResidual(cell, node) += kappa[ndim] * TGrad(cell, qp, ndim) *
+                                   wGradBF(cell, node, qp, ndim);
         }
-     }
+      }
+    }
   }
-
 }
 
 //*****

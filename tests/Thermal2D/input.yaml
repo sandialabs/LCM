@@ -6,14 +6,15 @@ ALBANY:
     Name: Thermal 2D
     Solution Method: Transient Tempus
     Dirichlet BCs: 
-      ExpressionEvaluated SDBC on NS NodeSet3 for DOF T: '250.0 + 5.0e-04 * t'
+      ExpressionEvaluated SDBC on NS NodeSet3 for DOF T: '200.0 + 5.0e-04 * t'
       #ExpressionEvaluated SDBC on NS NodeSet3 for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
     Initial Condition:
       Function: Expression Parser
-      Function Expressions: ['250']
+      Function Expressions: ['200']
       #Function Expressions: ['250 * cosh(5.421312110550360e-02*x)']
     Thermal Conductivity: [1.6, 1.6]  
     Heat Capacity: 2.09e3 
+    Density: 920.0 
     Response Functions: 
       Number: 1
       Response 0: Solution Average
@@ -27,7 +28,7 @@ ALBANY:
     Exodus Output File Name: thermal2D_out.exo
   Regression Results: 
     Number of Comparisons: 1
-    Test Values: [2.997850130154e+02]
+    Test Values: [2.122588137382e+02]
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
   Piro: 

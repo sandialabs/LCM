@@ -14,6 +14,7 @@ ALBANY:
       Function Expressions: ['250 * cosh(5.421312110550360e-02*x)']
     Thermal Conductivity: [1.6] 
     Heat Capacity: 2.09e3 
+    Density: 1.0 
     Response Functions: 
       Number: 1
       Response 0: Solution Average

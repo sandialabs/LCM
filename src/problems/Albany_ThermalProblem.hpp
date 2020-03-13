@@ -99,6 +99,7 @@ class ThermalProblem : public AbstractProblem
   int numDim;                    // number spatial dimensions
   Teuchos::Array<double> kappa;  // thermal conductivity
   double                 C;      // heat capacity
+  double                 rho;    // density
 
   const Teuchos::RCP<Teuchos::ParameterList> params;
 
@@ -225,6 +226,7 @@ Albany::ThermalProblem::constructEvaluators(
 
     p->set<Teuchos::Array<double>>("Thermal Conductivity", kappa);
     p->set<double>("Heat Capacity", C);
+    p->set<double>("Density", rho);
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");

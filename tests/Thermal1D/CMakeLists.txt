@@ -7,6 +7,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/compute_errs.m
                  ${CMAKE_CURRENT_BINARY_DIR}/compute_errs.m COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/compute_errs_no_movie2avi.m
+                 ${CMAKE_CURRENT_BINARY_DIR}/compute_errs_no_movie2avi.m COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plot_exact_soln.m
                  ${CMAKE_CURRENT_BINARY_DIR}/plot_exact_soln.m COPYONLY)
 

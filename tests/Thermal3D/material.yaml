@@ -1,0 +1,107 @@
+LCM:
+  ElementBlocks:
+    cube:
+      material: Ice
+  Materials:
+    Permafrost:
+      Material Model:
+      #=======================================#
+      # This material describes an ice wedge  #
+      # within a permafrost polygon.          #
+      #=======================================#
+        Model Name: ACE permafrost
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 9.0e+09
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.30
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 5.0e+06
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 0.0
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      Density: 920.0
+      Body Force:
+        Body Force Type: Constant
+        Value: [0.0, 0.0, -9.20e+03]
+      Output Cauchy Stress: true
+      Output eqps: true
+      Output ACE Ice Saturation: true
+      Output ACE Water Saturation: true
+      Output ACE Temperature Dot: true
+      ACE Soil Yield Strength: 1.0e+06
+      ACE Ice Density: 920.0  #[kg/m3]
+      ACE Water Density: 1000.0 #[kg/m3]
+      ACE Sediment Density: 2700.0 #[kg/m3]
+      ACE Ice Thermal Conductivity: 1.60  #[W/K/m]
+      ACE Water Thermal Conductivity: 0.58 #[W/K/m]
+      ACE Sediment Thermal Conductivity: 4.365 #[W/K/m]
+      ACE Ice Heat Capacity: 2.09e+03  #[J/kg/K]
+      ACE Water Heat Capacity: 4.18e+03  #[J/kg/K]
+      ACE Sediment Heat Capacity: 0.75e+03  #[J/kg/K]
+      ACE Freezing Curve Width: 2.0  # Used if fcurvewidth.txt is not given
+      ACE Base Salinity: 5.0  # Used if salinity vector is not given
+      ACE Ice Initial Saturation: 1.0
+      ACE Ice Maximum Saturation: 1.0
+      ACE Water Minimum Saturation: 0.0
+      ACE Initial Temperature: 265.0
+      ACE Surface Porosity: 0.50  # Used if porosity.txt is not given
+      ACE Latent Heat: 334.0e+03 #[J/kg]
+      ACE Time File: 'time.txt'
+      ACE Sea Level File: 'level.txt'
+      ACE Ocean Salinity File: 'ocean_salinity.txt'
+      ACE Element Size: 1.00
+      ACE Critical Angle: 0.02
+
+    Ice:
+      Material Model:
+      #=======================================#
+      # This material describes permafrost    #
+      # soil within a permafrost polygon.     #
+      #=======================================#
+        Model Name: ACE permafrost
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 9.0e+09
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.30
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 5.0e+06
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 0.0
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      Body Force:
+        Body Force Type: Constant
+        Value: [0.0, 0.0, -9.20e+03]
+      Output Cauchy Stress: true
+      Output eqps: true
+      Output ACE Ice Saturation: true
+      Output ACE Water Saturation: true
+      Output ACE Temperature Dot: true
+      ACE Ice Density: 920.0  #[kg/m3]
+      ACE Water Density: 1000.0 #[kg/m3]
+      ACE Sediment Density: 2700.0 #[kg/m3]
+      ACE Ice Thermal Conductivity: 1.60  #[W/K/m]
+      ACE Water Thermal Conductivity: 0.58 #[W/K/m]
+      ACE Sediment Thermal Conductivity: 4.365 #[W/K/m]
+      ACE Ice Heat Capacity: 2.09e+03  #[J/kg/K]
+      ACE Water Heat Capacity: 4.18e+03  #[J/kg/K]
+      ACE Sediment Heat Capacity: 0.75e+03  #[J/kg/K]
+      ACE Freezing Curve Width: 2.0  # Used if fcurvewidth.txt is not given
+      ACE Base Salinity: 5.0  # Used if salinity vector is not given
+      ACE Ice Initial Saturation: 1.0
+      ACE Ice Maximum Saturation: 1.0
+      ACE Water Minimum Saturation: 0.0
+      ACE Initial Temperature: 250.0
+      ACE Surface Porosity: 1.0  # Used if porosity.txt is not given
+      ACE Latent Heat: 334.0e+03 #[J/kg]
+      ACE Element Size: 0.0625  # [m]
+      ACE Critical Angle: 1.0

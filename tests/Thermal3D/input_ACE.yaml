@@ -1,0 +1,199 @@
+LCM:
+  Debug Output:
+    Write Jacobian to MatrixMarket: 0
+    Write Jacobian to Standard Output: 0
+    Write Residual to MatrixMarket: 0
+    Write Residual to Standard Output: 0
+    Write Solution to MatrixMarket: false
+    Write Solution to Standard Output: false
+  Problem:
+    Name: Mechanics 3D
+    Parameters:
+      Number: 1
+      Parameter 0: Time
+    Solution Method: Continuation
+    MaterialDB Filename: 'material.yaml'
+    Displacement:
+      Variable Type: DOF
+    ACE Temperature:
+      Variable Type: DOF
+    Neumann BCs:
+      NBC on SS bottom for DOF T set dudn: [0.0]
+    Dirichlet BCs:
+      SDBC on NS -z for DOF Z: 0.0
+      ExpressionEvaluated SDBC on NS +z for DOF T: '200.0 + 5.0e-04 * t'
+    Initial Condition:
+      Function: Expression Parser
+      Function Expressions: ['0.0', '0.0', '0.0', '200.0']
+    #Adaptation:
+    #  Method: Erosion
+    #  Rebalance: true
+    #  Equilibrate: false
+    #  Bluff Width: 1.0
+    #  Cross Section: 1.0
+    Response Functions:
+      Number: 2
+      Response 0: Project IP to Nodal Field
+      ResponseParams 0:
+        Number of Fields: 6
+        IP Field Name 0: ACE Temperature
+        IP Field Layout 0: Scalar
+        IP Field Name 1: ACE Temperature Dot
+        IP Field Layout 1: Scalar
+        IP Field Name 2: ACE Ice Saturation
+        IP Field Layout 2: Scalar
+        IP Field Name 3: ACE Water Saturation
+        IP Field Layout 3: Scalar
+        IP Field Name 4: Cauchy_Stress
+        IP Field Layout 4: Tensor
+        IP Field Name 5: eqps
+        IP Field Layout 5: Scalar
+        Output to File: true
+      Response 1: Solution Average
+  Regression Results: 
+    Number of Comparisons: 2
+    Test Values: [0, -2403.44934599]
+    Relative Tolerance: 1.00000000000000002e-03
+  Discretization:
+    Method: Ioss
+    Exodus Input File Name: 'cube.g'
+    Exodus Output File Name: 'ACE_thermal3D_out.e'
+    Solution Vector Components: [disp, V, temp, S]
+    SolutionDot Vector Components: [velo, V, tdot, S]
+    Residual Vector Components: [force, V, tresid, S]
+    Separate Evaluators by Element Block: true
+    Number Of Time Derivatives: 1
+    Exodus Write Interval: 1
+    Required Fields Info:
+      Number Of Fields: 2
+      Field 0:
+        Field Name: cell_boundary_indicator
+        Field Type: Elem Scalar
+        Field Origin: Mesh
+      Field 1:
+        Field Name: node_boundary_indicator
+        Field Type: Node Scalar
+        Field Origin: Mesh
+  Piro:
+    LOCA:
+      Bifurcation: { }
+      Constraints: { }
+      Predictor:
+        Method: Constant
+      Stepper:
+        Continuation Method: Natural
+        Initial Value: 0.0
+        Continuation Parameter: Time
+        Max Steps: 100000000
+        Min Value: 0.0
+        Max Value: 1.0e+05
+        Return Failed on Reaching Max Steps: false
+        Hit Continuation Bound: false
+      Step Size:
+        Initial Step Size: 5.0e+01
+        Method: Constant #Adaptive
+        #Max Step Size: 1.0e+04
+        #Min Step Size: 1.0e-20
+        #Failed Step Reduction Factor: 0.5
+        #Aggressiveness: 0.1
+    NOX:
+      Direction:
+        Method: Newton
+        Newton:
+          Forcing Term Method: Constant
+          Rescue Bad Newton Solve: true
+          Linear Solver:
+            Tolerance: 1.0e-06
+          Stratimikos Linear Solver:
+            NOX Stratimikos Options: { }
+            Stratimikos:
+              Linear Solver Type: Belos
+              Linear Solver Types:
+                Belos:
+                  VerboseObject:
+                    Verbosity Level: none
+                  Solver Type: Block GMRES
+                  Solver Types:
+                    Block GMRES:
+                      Convergence Tolerance: 1.0e-06
+                      Output Frequency: 1
+                      Output Style: 1
+                      Verbosity: 0
+                      Maximum Iterations: 200
+                      Block Size: 1
+                      Num Blocks: 200
+                      Flexible Gmres: false
+              Preconditioner Type: MueLu
+              Preconditioner Types:
+                Ifpack2:
+                  Prec Type: ILUT
+                  Overlap: 1
+                  Ifpack2 Settings:
+                    'fact: ilut level-of-fill': 3.0
+                MueLu:
+                  verbosity: none
+                  number of equations: 3
+                  'coarse: max size': 500
+                  multigrid algorithm: sa
+                  max levels: 4
+                  'aggregation: type': uncoupled
+                  'aggregation: drop scheme': classical
+                  'smoother: type': CHEBYSHEV
+                  'smoother: params':
+                    'chebyshev: degree': 2
+                    'chebyshev: ratio eigenvalue': 7.0
+                    'chebyshev: min eigenvalue': 1.0
+                    'chebyshev: zero starting solution': true
+                  'smoother: pre or post': both
+                  'repartition: enable': true
+                  'repartition: partitioner': zoltan2
+                  'repartition: start level': 2
+                  'repartition: min rows per proc': 800
+                  'repartition: max imbalance': 1.1
+                  'repartition: remap parts': false
+      Line Search:
+        Method: Backtrack
+        Full Step:
+          Full Step: 1.0
+      Nonlinear Solver: Line Search Based
+      Printing:
+        Output Precision: 3
+        Output Processor: 0
+        Output Information:
+          Error: true
+          Warning: false
+          Outer Iteration: true
+          Parameters: false
+          Details: false
+          Linear Solver Details: false
+          Stepper Iteration: true
+          Stepper Details: false
+          Stepper Parameters: false
+      Solver Options:
+        Status Test Check Type: Complete
+      Status Tests:
+        Test Type: Combo
+        Combo Type: OR
+        Number of Tests: 5
+        Test 0:
+          Test Type: RelativeNormF
+          Tolerance: 1.0e-08
+        Test 1:
+          Test Type: MaxIters
+          Maximum Iterations: 10
+        Test 2:
+          Test Type: Combo
+          Combo Type: AND
+          Number of Tests: 2
+          Test 0:
+            Test Type: NStep
+            Number of Nonlinear Iterations: 2
+          Test 1:
+            Test Type: NormF
+            Tolerance: 1.0e-06
+        Test 3:
+          Test Type: FiniteValue
+        Test 4:
+          Test Type: NormF
+          Tolerance: 1.0e-06
+...

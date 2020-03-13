@@ -6,7 +6,7 @@ ALBANY:
     Name: Thermal 3D
     Solution Method: Transient Tempus
     Dirichlet BCs: 
-      ExpressionEvaluated SDBC on NS NodeSet5 for DOF T: '200.0 + 5.0e-04 * t'
+      ExpressionEvaluated SDBC on NS +z for DOF T: '200.0 + 5.0e-04 * t'
       #ExpressionEvaluated SDBC on NS NodeSet5 for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
     Initial Condition:
       Function: Expression Parser
@@ -19,15 +19,10 @@ ALBANY:
       Number: 1
       Response 0: Solution Average
   Discretization: 
-    1D Elements: 8
-    2D Elements: 8
-    3D Elements: 8
-    1D Scale: 1.00000000000000000e+00
-    2D Scale: 1.00000000000000000e+00
-    3D Scale: 1.00000000000000000e+00
     Workset Size: -1
-    Method: STK3D
-    Exodus Output File Name: thermal3D_out.exo
+    Method: Ioss
+    Exodus Input File Name: 'cube.g'
+    Exodus Output File Name: thermal3D_out.e
   Regression Results: 
     Number of Comparisons: 1
     Test Values: [2.125838018737e+02]

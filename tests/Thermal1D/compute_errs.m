@@ -3,8 +3,9 @@ clear all;
 
 %define parameters 
 kappa = 1.6; %thermal conductivity
-c = 2.09e3; %heat capacity 
-k = sqrt(kappa/c);
+c = 2.09e3; %heat capacity
+rho = 1.0; %density 
+k = sqrt(kappa/c/rho);
 w = 0.0015; %parameter
 a = 250;
 dt = 1.0e3; %time step

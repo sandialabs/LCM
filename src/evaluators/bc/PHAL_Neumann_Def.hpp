@@ -943,6 +943,8 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   auto f             = workset.f;
   auto f_view        = Albany::getNonconstLocalData(f);
   auto const has_nbi = stk_disc->hasNodeBoundaryIndicator();
+  auto const ss_id   = this->sideSetID;
+  auto const is_erodible = ss_id.find("erodible") != std::string::npos;
 
   // Fill in "neumann" array
   this->evaluateNeumannContribution(workset);
@@ -956,6 +958,7 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
         auto const  it       = bi_field.find(gid);
         if (it == bi_field.end()) continue;
         auto const nbi = *(it->second);
+        if (is_erodible == true && nbi != 2.0) continue;
         if (nbi == 0.0) continue;
       }
       for (auto dim = 0; dim < this->numDOFsSet; ++dim) {
@@ -990,8 +993,10 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   auto f             = workset.f;
   auto jac           = workset.Jac;
   auto const has_nbi = stk_disc->hasNodeBoundaryIndicator();
-  auto const fill    = f != Teuchos::null;
-  auto       f_view  = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
+  auto const ss_id   = this->sideSetID;
+  auto const is_erodible = ss_id.find("erodible") != std::string::npos;
+  auto const fill        = f != Teuchos::null;
+  auto       f_view = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
 
   // Fill in "neumann" array
   this->evaluateNeumannContribution(workset);
@@ -1007,6 +1012,7 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
         auto const  it       = bi_field.find(gid);
         if (it == bi_field.end()) continue;
         auto const nbi = *(it->second);
+        if (is_erodible == true && nbi != 2.0) continue;
         if (nbi == 0.0) continue;
       }
       for (auto dim = 0; dim < this->numDOFsSet; ++dim) {

@@ -36,29 +36,31 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(
 template <typename Traits>
 void
 ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
-    typename Traits::EvalData dbc_workset)
+    typename Traits::EvalData workset)
 {
-  auto const          dim = dbc_workset.spatial_dimension_;
+  auto const          dim = workset.spatial_dimension_;
   stk::expreval::Eval expr_eval(expression);
   expr_eval.parse();
-  expr_eval.bindVariable("t", dbc_workset.current_time);
-  auto rcp_disc = dbc_workset.disc;
+  expr_eval.bindVariable("t", workset.current_time);
+  auto rcp_disc = workset.disc;
   auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto x        = dbc_workset.x;
+  auto x        = workset.x;
   auto x_view   = Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x));
-  auto const  has_nbi   = stk_disc->hasNodeBoundaryIndicator();
-  auto const  ns_id     = this->nodeSetID;
-  auto const& ns_nodes  = dbc_workset.nodeSets->find(ns_id)->second;
-  auto const& ns_coords = dbc_workset.nodeSetCoords->find(ns_id)->second;
+  auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
+  auto const  ns_id       = this->nodeSetID;
+  auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
+  auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
+  auto const& ns_coords   = workset.nodeSetCoords->find(ns_id)->second;
 
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
     if (has_nbi == true) {
       auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+      auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
       auto const  gid      = ns_gids[ns_node] + 1;
       auto const  it       = bi_field.find(gid);
       if (it == bi_field.end()) continue;
       auto const nbi = *(it->second);
+      if (is_erodible == true && nbi != 2.0) continue;
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
@@ -75,29 +77,31 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
 template <typename Traits>
 void
 ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData dbc_workset)
+    typename Traits::EvalData workset)
 {
-  auto rcp_disc = dbc_workset.disc;
+  auto rcp_disc = workset.disc;
   auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto f        = dbc_workset.f;
+  auto f        = workset.f;
   auto f_view   = Albany::getNonconstLocalData(f);
-  auto const  has_nbi  = stk_disc->hasNodeBoundaryIndicator();
-  auto const  ns_id    = this->nodeSetID;
-  auto const& ns_nodes = dbc_workset.nodeSets->find(ns_id)->second;
+  auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
+  auto const  ns_id       = this->nodeSetID;
+  auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
+  auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
     if (has_nbi == true) {
       auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+      auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
       auto const  gid      = ns_gids[ns_node] + 1;
       auto const  it       = bi_field.find(gid);
       if (it == bi_field.end()) continue;
       auto const nbi = *(it->second);
+      if (is_erodible == true && nbi != 2.0) continue;
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
     f_view[dof]    = 0.0;
     // Record DOFs to avoid setting Schwarz BCs on them.
-    dbc_workset.fixed_dofs_.insert(dof);
+    workset.fixed_dofs_.insert(dof);
   }
 }
 
@@ -117,41 +121,43 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::ExprEvalSDBC(
 template <typename Traits>
 void
 ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
-    typename Traits::EvalData dbc_workset)
+    typename Traits::EvalData workset)
 {
-  auto rcp_disc = dbc_workset.disc;
+  auto rcp_disc = workset.disc;
   auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto J        = dbc_workset.Jac;
+  auto J        = workset.Jac;
   auto range_vs = J->range();
   auto col_vs   = Albany::getColumnSpace(J);
-  auto const  has_nbi   = stk_disc->hasNodeBoundaryIndicator();
-  auto const  ns_id     = this->nodeSetID;
-  auto const& ns_nodes  = dbc_workset.nodeSets->find(ns_id)->second;
-  auto const  domain_vs = range_vs;  // we are assuming this!
+  auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
+  auto const  ns_id       = this->nodeSetID;
+  auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
+  auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
+  auto const  domain_vs   = range_vs;  // we are assuming this!
 
   row_is_dbc_ = Thyra::createMember(range_vs);
   col_is_dbc_ = Thyra::createMember(col_vs);
   row_is_dbc_->assign(0.0);
   col_is_dbc_->assign(0.0);
 
-  auto const& fixed_dofs      = dbc_workset.fixed_dofs_;
+  auto const& fixed_dofs      = workset.fixed_dofs_;
   auto        row_is_dbc_data = Albany::getNonconstLocalData(row_is_dbc_);
-  if (dbc_workset.is_schwarz_bc_ == false) {  // regular SDBC
+  if (workset.is_schwarz_bc_ == false) {  // regular SDBC
     for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
       if (has_nbi == true) {
         auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-        auto const  ns_gids  = dbc_workset.nodeSetGIDs->find(ns_id)->second;
+        auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
         auto const  gid      = ns_gids[ns_node] + 1;
         auto const  it       = bi_field.find(gid);
         if (it == bi_field.end()) continue;
         auto const nbi = *(it->second);
+        if (is_erodible == true && nbi != 2.0) continue;
         if (nbi == 0.0) continue;
       }
       auto dof             = ns_nodes[ns_node][this->offset];
       row_is_dbc_data[dof] = 1;
     }
   } else {  // special case for Schwarz SDBC
-    auto const spatial_dimension = dbc_workset.spatial_dimension_;
+    auto const spatial_dimension = workset.spatial_dimension_;
 
     for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
       for (int offset = 0; offset < spatial_dimension; ++offset) {
@@ -172,11 +178,11 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
 template <typename Traits>
 void
 ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData dbc_workset)
+    typename Traits::EvalData workset)
 {
-  auto       x      = dbc_workset.x;
-  auto       f      = dbc_workset.f;
-  auto       J      = dbc_workset.Jac;
+  auto       x      = workset.x;
+  auto       f      = workset.f;
+  auto       J      = workset.Jac;
   auto const fill   = f != Teuchos::null;
   auto       f_view = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
   auto x_view = fill ? Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x)) :
@@ -188,9 +194,9 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   Teuchos::Array<ST> entries;
   Teuchos::Array<LO> indices;
 
-  auto const& fixed_dofs = dbc_workset.fixed_dofs_;
+  auto const& fixed_dofs = workset.fixed_dofs_;
 
-  this->set_row_and_col_is_dbc(dbc_workset);
+  this->set_row_and_col_is_dbc(workset);
 
   auto     col_is_dbc_data = Albany::getLocalData(col_is_dbc_.getConst());
   auto     range_spmd_vs   = Albany::getSpmdVectorSpace(J->range());

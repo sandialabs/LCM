@@ -447,17 +447,17 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
 //
 template <typename SchwarzBC, typename Traits>
 void
-fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
+fillResidual(SchwarzBC& sbc, typename Traits::EvalData workset)
 {
   // Solution
-  Teuchos::RCP<Thyra_Vector const> x            = dbc_workset.x;
+  Teuchos::RCP<Thyra_Vector const> x            = workset.x;
   Teuchos::ArrayRCP<ST const>      x_const_view = Albany::getLocalData(x);
 
   // Residual
-  Teuchos::RCP<Thyra_Vector>           f      = dbc_workset.f;
+  Teuchos::RCP<Thyra_Vector>           f      = workset.f;
   Teuchos::ArrayRCP<ST>                f_view = Albany::getNonconstLocalData(f);
   std::vector<std::vector<int>> const& ns_dof =
-      dbc_workset.nodeSets->find(sbc.nodeSetID)->second;
+      workset.nodeSets->find(sbc.nodeSetID)->second;
 
   auto const ns_number_nodes = ns_dof.size();
 
@@ -485,7 +485,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
     auto const z_dof = ns_dof[ns_node][2];
     auto const dof   = x_dof / 3;
 
-    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       f_view[x_dof] = x_const_view[x_dof] - schwarz_bcs_const_view_x[dof];
@@ -504,7 +504,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData dbc_workset)
     auto const           x_dof      = ns_dof[ns_node][0];
     auto const           y_dof      = ns_dof[ns_node][1];
     auto const           z_dof      = ns_dof[ns_node][2];
-    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       f_view[x_dof] = x_const_view[x_dof] - x_val;
@@ -537,10 +537,10 @@ SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::SchwarzBC(
 template <typename Traits>
 void
 SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData dbc_workset)
+    typename Traits::EvalData workset)
 {
   fillResidual<SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>, Traits>(
-      *this, dbc_workset);
+      *this, workset);
   return;
 }
 
@@ -560,19 +560,19 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::SchwarzBC(
 template <typename Traits>
 void
 SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData dbc_workset)
+    typename Traits::EvalData workset)
 {
-  Teuchos::RCP<Thyra_Vector const> x   = dbc_workset.x;
-  Teuchos::RCP<Thyra_Vector>       f   = dbc_workset.f;
-  Teuchos::RCP<Thyra_LinearOp>     jac = dbc_workset.Jac;
+  Teuchos::RCP<Thyra_Vector const> x   = workset.x;
+  Teuchos::RCP<Thyra_Vector>       f   = workset.f;
+  Teuchos::RCP<Thyra_LinearOp>     jac = workset.Jac;
 
   Teuchos::ArrayRCP<ST const> x_const_view = Albany::getLocalData(x);
   Teuchos::ArrayRCP<ST>       f_view;
 
-  RealType const j_coeff = dbc_workset.j_coeff;
+  RealType const j_coeff = workset.j_coeff;
 
   std::vector<std::vector<int>> const& ns_nodes =
-      dbc_workset.nodeSets->find(this->nodeSetID)->second;
+      workset.nodeSets->find(this->nodeSetID)->second;
 
   Teuchos::Array<LO> index(1);
   Teuchos::Array<ST> value(1);
@@ -591,7 +591,7 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     auto const y_dof = ns_nodes[ns_node][1];
     auto const z_dof = ns_nodes[ns_node][2];
 
-    std::set<int> const& fixed_dofs = dbc_workset.fixed_dofs_;
+    std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       // replace jac values for the X dof
@@ -623,7 +623,7 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 
   if (fill_residual == true) {
     fillResidual<SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>, Traits>(
-        *this, dbc_workset);
+        *this, workset);
   }
 }
 

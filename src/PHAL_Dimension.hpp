@@ -15,7 +15,7 @@ struct Dim : public shards::ArrayDimTag
   Dim(){};
   char const*
   name() const;
-  static const Dim&
+  static Dim const&
   tag();
 };
 
@@ -24,7 +24,7 @@ struct VecDim : public shards::ArrayDimTag
   VecDim(){};
   char const*
   name() const;
-  static const VecDim&
+  static VecDim const&
   tag();
 };
 
@@ -33,7 +33,7 @@ struct LayerDim : public shards::ArrayDimTag
   LayerDim(){};
   char const*
   name() const;
-  static const LayerDim&
+  static LayerDim const&
   tag();
 };
 
@@ -42,7 +42,7 @@ struct QuadPoint : public shards::ArrayDimTag
   QuadPoint(){};
   char const*
   name() const;
-  static const QuadPoint&
+  static QuadPoint const&
   tag();
 };
 

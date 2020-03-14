@@ -12,10 +12,10 @@ Dim::name() const
   static char const n[] = "Dim";
   return n;
 }
-const Dim&
+Dim const&
 Dim::tag()
 {
-  static const Dim myself;
+  static Dim const myself;
   return myself;
 }
 
@@ -25,10 +25,10 @@ VecDim::name() const
   static char const n[] = "VecDim";
   return n;
 }
-const VecDim&
+VecDim const&
 VecDim::tag()
 {
-  static const VecDim myself;
+  static VecDim const myself;
   return myself;
 }
 
@@ -38,10 +38,10 @@ LayerDim::name() const
   static char const n[] = "LayerDim";
   return n;
 }
-const LayerDim&
+LayerDim const&
 LayerDim::tag()
 {
-  static const LayerDim myself;
+  static LayerDim const myself;
   return myself;
 }
 
@@ -51,10 +51,10 @@ QuadPoint::name() const
   static char const n[] = "QuadPoint";
   return n;
 }
-const QuadPoint&
+QuadPoint const&
 QuadPoint::tag()
 {
-  static const QuadPoint myself;
+  static QuadPoint const myself;
   return myself;
 }
 

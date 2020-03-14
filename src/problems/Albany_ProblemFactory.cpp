@@ -37,7 +37,7 @@
 Albany::ProblemFactory::ProblemFactory(
     const Teuchos::RCP<Teuchos::ParameterList>&   topLevelParams,
     const Teuchos::RCP<ParamLib>&                 paramLib_,
-    const Teuchos::RCP<Teuchos::Comm<int> const>& commT_)
+    Teuchos::RCP<Teuchos::Comm<int> const> const& commT_)
     : problemParams(Teuchos::sublist(topLevelParams, "Problem", true)),
       discretizationParams(Teuchos::sublist(topLevelParams, "Discretization")),
       paramLib(paramLib_),

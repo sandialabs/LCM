@@ -50,7 +50,7 @@ namespace Albany {
 void
 printMemoryAnalysis(
     std::ostream&                                 os,
-    const Teuchos::RCP<Teuchos::Comm<int> const>& comm);
+    Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
 }  // namespace Albany
 
 #endif  // ALBANY_MEMORY_HPP

@@ -46,7 +46,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   void
   rebalanceAdaptedMeshT(
       const Teuchos::RCP<Teuchos::ParameterList>&   params,
-      const Teuchos::RCP<Teuchos::Comm<int> const>& comm);
+      Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
 
   bool
   useCompositeTet()
@@ -102,7 +102,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
 
   //! Re-load balance mesh
   void
-  rebalanceInitialMeshT(const Teuchos::RCP<Teuchos::Comm<int> const>& comm);
+  rebalanceInitialMeshT(Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
 
   //! Sets all mesh parts as IO parts (will be written to file)
   void

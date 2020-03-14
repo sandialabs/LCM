@@ -30,7 +30,7 @@ class ProblemFactory
   ProblemFactory(
       const Teuchos::RCP<Teuchos::ParameterList>&   topLevelParams,
       const Teuchos::RCP<ParamLib>&                 paramLib,
-      const Teuchos::RCP<Teuchos::Comm<int> const>& commT_);
+      Teuchos::RCP<Teuchos::Comm<int> const> const& commT_);
 
   //! Destructor
   virtual ~ProblemFactory() {}

@@ -180,7 +180,7 @@ class MemoryAnalyzer
   }
 
  public:
-  MemoryAnalyzer(const Teuchos::RCP<Teuchos::Comm<int> const>& comm)
+  MemoryAnalyzer(Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
       : comm_(comm)
   {
   }
@@ -266,7 +266,7 @@ class MemoryAnalyzer
 void
 printMemoryAnalysis(
     std::ostream&                                 os,
-    const Teuchos::RCP<Teuchos::Comm<int> const>& comm)
+    Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
 {
   MemoryAnalyzer ma(comm);
   ma.collect();

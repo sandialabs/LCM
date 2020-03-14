@@ -1570,7 +1570,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
 
       double gerr1[9], gerrmax[9], gscale[9];
       int    gn;
-      const Teuchos::RCP<Teuchos::Comm<int> const> comm =
+      Teuchos::RCP<Teuchos::Comm<int> const> const comm =
           Teuchos::DefaultComm<int>::getComm();
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 9, err1, gerr1);
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 9, errmax, gerrmax);

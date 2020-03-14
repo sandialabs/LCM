@@ -26,7 +26,7 @@ MeshSpecsStruct::MeshSpecsStruct(
     std::map<std::string, int> ebNameToIndex_,
     bool                       interleavedOrdering_,
     bool const                 sepEvalsByEB_,
-    const Intrepid2::EPolyType cubatureRule_)
+    Intrepid2::EPolyType const cubatureRule_)
     : ctd(ctd_),
       numDim(numDim_),
       cubatureDegree(cubatureDegree_),

@@ -156,7 +156,7 @@ class MemoryAnalyzer
   {
     if (comm_->getRank() != 0) return;
 
-    const Int* pd    = &d[0];
+    Int const* pd    = &d[0];
     int const  nproc = d.size() / ndata_;
     for (int i = 0; i < nproc; ++i) {
       for (int j = 0; j < ndata_; ++j) {

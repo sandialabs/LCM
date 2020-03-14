@@ -50,7 +50,7 @@ struct MeshSpecsStruct
       std::map<std::string, int> ebNameToIndex_,
       bool                       interleavedOrdering_,
       bool const                 sepEvalsByEB_ = false,
-      const Intrepid2::EPolyType cubatureRule_ = Intrepid2::POLYTYPE_GAUSS);
+      Intrepid2::EPolyType const cubatureRule_ = Intrepid2::POLYTYPE_GAUSS);
 
   // nonconst to allow replacement when the mesh adapts
   CellTopologyData ctd;

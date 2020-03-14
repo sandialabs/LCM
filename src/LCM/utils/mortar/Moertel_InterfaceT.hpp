@@ -909,7 +909,7 @@ class InterfaceT
  private:
   // don't want = operator
   InterfaceT
-  operator=(const InterfaceT& old);
+  operator=(InterfaceT const& old);
 
   // print local segment information to std::cout
   bool

@@ -924,7 +924,7 @@ MechanicsProblem::constructEvaluators(
 
     p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
-    p->set<const Intrepid2Basis>("Intrepid2 Basis", intrepidBasis);
+    p->set<Intrepid2Basis const>("Intrepid2 Basis", intrepidBasis);
     ev = Teuchos::rcp(
         new LCM::IsoMeshSizeField<EvalT, PHAL::AlbanyTraits>(*p, dl_));
     fm0.template registerEvaluator<EvalT>(ev);

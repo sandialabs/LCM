@@ -55,16 +55,16 @@ class SolutionFileResponseFunction : public SamplingBasedScalarResponseFunction
       const Teuchos::Array<ParamVec>&         p,
       ParamVec*                               deriv_p,
       Teuchos::RCP<Thyra_Vector> const&       g,
-      const Teuchos::RCP<Thyra_MultiVector>&  dg_dx,
-      const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdot,
-      const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdotdot,
-      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp);
+      Teuchos::RCP<Thyra_MultiVector> const&  dg_dx,
+      Teuchos::RCP<Thyra_MultiVector> const&  dg_dxdot,
+      Teuchos::RCP<Thyra_MultiVector> const&  dg_dxdotdot,
+      Teuchos::RCP<Thyra_MultiVector> const&  dg_dp);
 
  private:
   int
   MatrixMarketFile(
       char const*                            filename,
-      const Teuchos::RCP<Thyra_MultiVector>& mv);
+      Teuchos::RCP<Thyra_MultiVector> const& mv);
 
   //! Reference Vector - Thyra
   Teuchos::RCP<Thyra_Vector> RefSoln;

@@ -71,13 +71,13 @@ class SolutionResponseFunction : public DistributedResponseFunction
       const Teuchos::RCP<Thyra_LinearOp>&     dg_dx,
       const Teuchos::RCP<Thyra_LinearOp>&     dg_dxdot,
       const Teuchos::RCP<Thyra_LinearOp>&     dg_dxdotdot,
-      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp) override;
+      Teuchos::RCP<Thyra_MultiVector> const&  dg_dp) override;
 
  protected:
   void
   cullSolution(
       const Teuchos::RCP<const Thyra_MultiVector>& x,
-      const Teuchos::RCP<Thyra_MultiVector>&       x_culled) const;
+      Teuchos::RCP<Thyra_MultiVector> const&       x_culled) const;
 
   //! Mask for DOFs to keep
   Teuchos::Array<bool> keepDOF;

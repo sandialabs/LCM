@@ -140,7 +140,7 @@ getConstTpetraVector(
 
 Teuchos::RCP<Tpetra_MultiVector>
 getTpetraMultiVector(
-    const Teuchos::RCP<Thyra_MultiVector>& mv,
+    Teuchos::RCP<Thyra_MultiVector> const& mv,
     bool const                             throw_if_not_tpetra)
 {
   Teuchos::RCP<Tpetra_MultiVector> mv_tpetra;

@@ -277,7 +277,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   // and summed
 
   // Get the node data block container
-  const Teuchos::RCP<Thyra_MultiVector>&   data       = this->mgr_->nodal_field;
+  Teuchos::RCP<Thyra_MultiVector> const&   data       = this->mgr_->nodal_field;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID = workset.wsElNodeID;
   Teuchos::RCP<Thyra_VectorSpace const>    local_node_space =
       data->col(0)->space();
@@ -378,7 +378,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
   // Export the data from the local to overlapped decomposition.
   Teuchos::RCP<Thyra_VectorSpace const> const overlap_node_space =
       node_data->getOverlappedVectorSpace();
-  const Teuchos::RCP<Thyra_MultiVector> data =
+  Teuchos::RCP<Thyra_MultiVector> const data =
       Thyra::createMembers(overlap_node_space, this->mgr_->ndb_numvecs);
   data->assign(0.0);
   // IKT, note to self: cas_manager arguments are (owned, overlapped)

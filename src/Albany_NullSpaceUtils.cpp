@@ -21,7 +21,7 @@ namespace {
 template <class Traits>
 void
 Coord2RBM(
-    const Teuchos::RCP<Thyra_MultiVector>& coordMV,
+    Teuchos::RCP<Thyra_MultiVector> const& coordMV,
     int const                              Ndof,
     int const                              NscalarDof,
     int const                              NSdim,
@@ -133,7 +133,7 @@ Coord2RBM(
 template <class Traits>
 void
 Coord2RBM_nonElasticity(
-    const Teuchos::RCP<Thyra_MultiVector>& coordMV,
+    Teuchos::RCP<Thyra_MultiVector> const& coordMV,
     int const                              Ndof,
     int const                              NscalarDof,
     int const                              NSdim,
@@ -200,7 +200,7 @@ Coord2RBM_nonElasticity(
 } /*Coord2RBM_nonElasticity*/
 
 void
-subtractCentroid(const Teuchos::RCP<Thyra_MultiVector>& coordMV)
+subtractCentroid(Teuchos::RCP<Thyra_MultiVector> const& coordMV)
 {
   auto      spmd_vs = getSpmdVectorSpace(coordMV->range());
   int const nnodes  = spmd_vs->localSubDim();  // local length of each vector
@@ -352,7 +352,7 @@ RigidBodyModes::setParameters(
 }
 
 void
-RigidBodyModes::setCoordinates(const Teuchos::RCP<Thyra_MultiVector>& coordMV_)
+RigidBodyModes::setCoordinates(Teuchos::RCP<Thyra_MultiVector> const& coordMV_)
 {
   coordMV = coordMV_;
 
@@ -386,7 +386,7 @@ RigidBodyModes::setCoordinates(const Teuchos::RCP<Thyra_MultiVector>& coordMV_)
 
 void
 RigidBodyModes::setCoordinatesAndNullspace(
-    const Teuchos::RCP<Thyra_MultiVector>&       coordMV_in,
+    Teuchos::RCP<Thyra_MultiVector> const&       coordMV_in,
     Teuchos::RCP<Thyra_VectorSpace const> const& soln_vs,
     Teuchos::RCP<Thyra_VectorSpace const> const& soln_overlap_vs)
 {

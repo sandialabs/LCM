@@ -64,14 +64,14 @@ class RigidBodyModes
   //! 0. Both maps are nonoverlapping.
   void
   setCoordinatesAndNullspace(
-      const Teuchos::RCP<Thyra_MultiVector>&       coordMV,
+      Teuchos::RCP<Thyra_MultiVector> const&       coordMV,
       Teuchos::RCP<Thyra_VectorSpace const> const& soln_vs = Teuchos::null,
       Teuchos::RCP<Thyra_VectorSpace const> const& soln_overlap_vs =
           Teuchos::null);
 
   //! Pass only the coordinates.
   void
-  setCoordinates(const Teuchos::RCP<Thyra_MultiVector>& coordMV);
+  setCoordinates(Teuchos::RCP<Thyra_MultiVector> const& coordMV);
 
  private:
   int  numPDEs, numElasticityDim, numScalar, nullSpaceDim;

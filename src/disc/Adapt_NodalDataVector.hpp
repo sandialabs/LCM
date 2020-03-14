@@ -50,12 +50,12 @@ class NodalDataVector
       const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   // Methods to get multivectors (or their data)
-  const Teuchos::RCP<Thyra_MultiVector>&
+  Teuchos::RCP<Thyra_MultiVector> const&
   getOwnedNodeVector() const
   {
     return owned_node_vec;
   }
-  const Teuchos::RCP<Thyra_MultiVector>&
+  Teuchos::RCP<Thyra_MultiVector> const&
   getOverlapNodeVector() const
   {
     return overlap_node_vec;

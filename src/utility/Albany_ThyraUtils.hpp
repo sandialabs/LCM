@@ -203,7 +203,7 @@ getNonconstLocalData(Teuchos::RCP<Thyra_Vector> const& v);
 Teuchos::ArrayRCP<const ST>
 getLocalData(Teuchos::RCP<Thyra_Vector const> const& v);
 Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>
-getNonconstLocalData(const Teuchos::RCP<Thyra_MultiVector>& mv);
+getNonconstLocalData(Teuchos::RCP<Thyra_MultiVector> const& mv);
 Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>>
 getLocalData(const Teuchos::RCP<const Thyra_MultiVector>& mv);
 
@@ -289,7 +289,7 @@ getConstProductVector(
 
 Teuchos::RCP<Thyra_ProductMultiVector>
 getProductMultiVector(
-    const Teuchos::RCP<Thyra_MultiVector> mv,
+    Teuchos::RCP<Thyra_MultiVector> const mv,
     bool const                            throw_on_failure = true);
 
 Teuchos::RCP<const Thyra_ProductMultiVector>

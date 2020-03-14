@@ -826,7 +826,7 @@ ModelEvaluator::evalModelImpl(
 
     // dg/dp
     for (int l = 0; l < num_param_vecs; ++l) {
-      const Teuchos::RCP<Thyra_MultiVector> dgdp_out =
+      Teuchos::RCP<Thyra_MultiVector> const dgdp_out =
           outArgs.get_DgDp(j, l).getMultiVector();
 
       if (Teuchos::nonnull(dgdp_out)) {
@@ -836,7 +836,7 @@ ModelEvaluator::evalModelImpl(
 
     // Need to handle dg/dp for distributed p
     for (int l = 0; l < num_dist_param_vecs; l++) {
-      const Teuchos::RCP<Thyra_MultiVector> dgdp_out =
+      Teuchos::RCP<Thyra_MultiVector> const dgdp_out =
           outArgs.get_DgDp(j, l + num_param_vecs).getMultiVector();
 
       if (Teuchos::nonnull(dgdp_out)) {

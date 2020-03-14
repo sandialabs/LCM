@@ -873,7 +873,7 @@ getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv)
 }
 
 Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>
-getNonconstLocalData(const Teuchos::RCP<Thyra_MultiVector>& mv)
+getNonconstLocalData(Teuchos::RCP<Thyra_MultiVector> const& mv)
 {
   if (mv.is_null()) { return Teuchos::null; }
 
@@ -1160,7 +1160,7 @@ writeMatrixMarket<const Thyra_MultiVector>(
 template <>
 void
 writeMatrixMarket<Thyra_MultiVector>(
-    const Teuchos::RCP<Thyra_MultiVector>& mv,
+    Teuchos::RCP<Thyra_MultiVector> const& mv,
     std::string const&                     prefix,
     int const                              counter)
 {
@@ -1278,7 +1278,7 @@ getConstProductVector(
 
 Teuchos::RCP<Thyra_ProductMultiVector>
 getProductMultiVector(
-    const Teuchos::RCP<Thyra_MultiVector> mv,
+    Teuchos::RCP<Thyra_MultiVector> const mv,
     bool const                            throw_on_failure)
 {
   Teuchos::RCP<Thyra_ProductMultiVector> pmv;

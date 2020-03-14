@@ -985,7 +985,7 @@ Manager::testProjector(
   (void)coord_qp;
 }
 
-const Teuchos::RCP<Thyra_MultiVector>&
+Teuchos::RCP<Thyra_MultiVector> const&
 Manager::getNodalField(const Field& f, int const g_idx, bool const overlapped)
     const
 {

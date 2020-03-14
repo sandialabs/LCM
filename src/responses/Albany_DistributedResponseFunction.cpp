@@ -26,7 +26,7 @@ Albany::DistributedResponseFunction::evaluateDerivative(
   const Teuchos::RCP<Thyra_LinearOp> dg_dxdotdot_op = dg_dxdotdot.getLinearOp();
 
   // Get the stored multivector pointer (note: it may be null)
-  const Teuchos::RCP<Thyra_MultiVector>& dg_dp_mv = dg_dp.getMultiVector();
+  Teuchos::RCP<Thyra_MultiVector> const& dg_dp_mv = dg_dp.getMultiVector();
 
   this->evaluateGradient(
       current_time,

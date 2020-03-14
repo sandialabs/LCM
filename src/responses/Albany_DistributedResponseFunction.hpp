@@ -43,7 +43,7 @@ class DistributedResponseFunction : public AbstractResponseFunction
       const Teuchos::RCP<Thyra_LinearOp>&     dg_dx,
       const Teuchos::RCP<Thyra_LinearOp>&     dg_dxdot,
       const Teuchos::RCP<Thyra_LinearOp>&     dg_dxdotdot,
-      const Teuchos::RCP<Thyra_MultiVector>&  dg_dp) = 0;
+      Teuchos::RCP<Thyra_MultiVector> const&  dg_dp) = 0;
 
   //! \name Implementation of AbstractResponseFunction virtual methods
   //@{

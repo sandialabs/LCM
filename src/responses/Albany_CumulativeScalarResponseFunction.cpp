@@ -96,10 +96,10 @@ Albany::CumulativeScalarResponseFunction::evaluateGradient(
     const Teuchos::Array<ParamVec>&         p,
     ParamVec*                               deriv_p,
     Teuchos::RCP<Thyra_Vector> const&       g,
-    const Teuchos::RCP<Thyra_MultiVector>&  dg_dx,
-    const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdot,
-    const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdotdot,
-    const Teuchos::RCP<Thyra_MultiVector>&  dg_dp)
+    Teuchos::RCP<Thyra_MultiVector> const&  dg_dx,
+    Teuchos::RCP<Thyra_MultiVector> const&  dg_dxdot,
+    Teuchos::RCP<Thyra_MultiVector> const&  dg_dxdotdot,
+    Teuchos::RCP<Thyra_MultiVector> const&  dg_dp)
 {
   if (!g.is_null()) { g->assign(0.0); }
   if (!dg_dx.is_null()) { dg_dx->assign(0.0); }

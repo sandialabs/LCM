@@ -70,7 +70,7 @@ Albany::CumulativeScalarResponseFunction::evaluateResponse(
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p,
-    const Teuchos::RCP<Thyra_Vector>&       g)
+    Teuchos::RCP<Thyra_Vector> const&       g)
 {
   g->assign(0);
 
@@ -95,7 +95,7 @@ Albany::CumulativeScalarResponseFunction::evaluateGradient(
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p,
     ParamVec*                               deriv_p,
-    const Teuchos::RCP<Thyra_Vector>&       g,
+    Teuchos::RCP<Thyra_Vector> const&       g,
     const Teuchos::RCP<Thyra_MultiVector>&  dg_dx,
     const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdot,
     const Teuchos::RCP<Thyra_MultiVector>&  dg_dxdotdot,

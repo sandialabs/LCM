@@ -925,7 +925,7 @@ Application::set_dfm_workset(
     Teuchos::RCP<Thyra_Vector const> const  x,
     Teuchos::RCP<Thyra_Vector const> const  x_dot,
     Teuchos::RCP<Thyra_Vector const> const  x_dotdot,
-    const Teuchos::RCP<Thyra_Vector>&       f,
+    Teuchos::RCP<Thyra_Vector> const&       f,
     Teuchos::RCP<Thyra_Vector const> const& x_post_SDBCs)
 {
   PHAL::Workset workset;
@@ -1098,7 +1098,7 @@ Application::computeGlobalResidualImpl(
     Teuchos::RCP<Thyra_Vector const> const x_dot,
     Teuchos::RCP<Thyra_Vector const> const x_dotdot,
     Teuchos::Array<ParamVec> const&        p,
-    const Teuchos::RCP<Thyra_Vector>&      f,
+    Teuchos::RCP<Thyra_Vector> const&      f,
     double                                 dt)
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Residual");
@@ -1111,7 +1111,7 @@ Application::computeGlobalResidualImpl(
 
   int const numWorksets = wsElNodeEqID.size();
 
-  const Teuchos::RCP<Thyra_Vector> overlapped_f = solMgr->get_overlapped_f();
+  Teuchos::RCP<Thyra_Vector> const overlapped_f = solMgr->get_overlapped_f();
 
   Teuchos::RCP<const CombineAndScatterManager> cas_manager =
       solMgr->get_cas_manager();
@@ -1242,7 +1242,7 @@ Application::computeGlobalResidual(
     Teuchos::RCP<Thyra_Vector const> const& x_dot,
     Teuchos::RCP<Thyra_Vector const> const& x_dotdot,
     const Teuchos::Array<ParamVec>&         p,
-    const Teuchos::RCP<Thyra_Vector>&       f,
+    Teuchos::RCP<Thyra_Vector> const&       f,
     double const                            dt)
 {
   this->computeGlobalResidualImpl(current_time, x, x_dot, x_dotdot, p, f, dt);
@@ -1287,7 +1287,7 @@ Application::computeGlobalJacobianImpl(
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p,
-    const Teuchos::RCP<Thyra_Vector>&       f,
+    Teuchos::RCP<Thyra_Vector> const&       f,
     const Teuchos::RCP<Thyra_LinearOp>&     jac,
     double const                            dt)
 {
@@ -1477,7 +1477,7 @@ Application::computeGlobalJacobian(
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p,
-    const Teuchos::RCP<Thyra_Vector>&       f,
+    Teuchos::RCP<Thyra_Vector> const&       f,
     const Teuchos::RCP<Thyra_LinearOp>&     jac,
     double const                            dt)
 {
@@ -1518,7 +1518,7 @@ Application::evaluateResponse(
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p,
-    const Teuchos::RCP<Thyra_Vector>&       g)
+    Teuchos::RCP<Thyra_Vector> const&       g)
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response");
   double const this_time = fixTime(current_time);

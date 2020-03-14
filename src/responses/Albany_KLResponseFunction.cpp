@@ -28,7 +28,7 @@ KLResponseFunction::evaluateResponse(
     Teuchos::RCP<Thyra_Vector const> const& xdot,
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p,
-    const Teuchos::RCP<Thyra_Vector>&       g)
+    Teuchos::RCP<Thyra_Vector> const&       g)
 {
   response->evaluateResponse(current_time, x, xdot, xdotdot, p, g);
 }
@@ -41,7 +41,7 @@ KLResponseFunction::evaluateDerivative(
     Teuchos::RCP<Thyra_Vector const> const&          xdotdot,
     const Teuchos::Array<ParamVec>&                  p,
     ParamVec*                                        deriv_p,
-    const Teuchos::RCP<Thyra_Vector>&                g,
+    Teuchos::RCP<Thyra_Vector> const&                g,
     const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dx,
     const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdot,
     const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdotdot,

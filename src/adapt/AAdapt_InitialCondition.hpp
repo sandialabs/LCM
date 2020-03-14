@@ -17,7 +17,7 @@ namespace AAdapt {
 
 void
 InitialConditions(
-    const Teuchos::RCP<Thyra_Vector>&     solnT,
+    Teuchos::RCP<Thyra_Vector> const&     solnT,
     const Albany::Conn&                   wsElNodeEqID,
     const Teuchos::ArrayRCP<std::string>& wsEBNames,
     const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>

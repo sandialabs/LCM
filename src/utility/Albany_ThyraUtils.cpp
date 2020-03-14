@@ -806,7 +806,7 @@ getNonconstDeviceData(Teuchos::RCP<Thyra_LinearOp>& lop)
 // ========= Thyra_Vector utilities ========== //
 
 Teuchos::ArrayRCP<ST>
-getNonconstLocalData(const Teuchos::RCP<Thyra_Vector>& v)
+getNonconstLocalData(Teuchos::RCP<Thyra_Vector> const& v)
 {
   Teuchos::ArrayRCP<ST> vals;
 
@@ -994,7 +994,7 @@ getDeviceData(Teuchos::RCP<Thyra_Vector const> const& v)
 }
 
 DeviceView1d<ST>
-getNonconstDeviceData(const Teuchos::RCP<Thyra_Vector>& v)
+getNonconstDeviceData(Teuchos::RCP<Thyra_Vector> const& v)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tv = getTpetraVector(v, false);
@@ -1016,7 +1016,7 @@ getNonconstDeviceData(const Teuchos::RCP<Thyra_Vector>& v)
 
 void
 scale_and_update(
-    const Teuchos::RCP<Thyra_Vector>       y,
+    Teuchos::RCP<Thyra_Vector> const       y,
     const ST                               y_coeff,
     Teuchos::RCP<Thyra_Vector const> const x,
     const ST                               x_coeff)
@@ -1130,7 +1130,7 @@ writeMatrixMarket<Thyra_Vector const>(
 template <>
 void
 writeMatrixMarket<Thyra_Vector>(
-    const Teuchos::RCP<Thyra_Vector>& v,
+    Teuchos::RCP<Thyra_Vector> const& v,
     std::string const&                prefix,
     int const                         counter)
 {
@@ -1257,7 +1257,7 @@ getProductVectorSpace(
 
 Teuchos::RCP<Thyra_ProductVector>
 getProductVector(
-    const Teuchos::RCP<Thyra_Vector> v,
+    Teuchos::RCP<Thyra_Vector> const v,
     bool const                       throw_on_failure)
 {
   Teuchos::RCP<Thyra_ProductVector> pv;

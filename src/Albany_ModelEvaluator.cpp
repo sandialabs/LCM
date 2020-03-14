@@ -349,13 +349,13 @@ ModelEvaluator::allocateVectors()
 
   // Create non-const versions of x_init [and x_dot_init [and x_dotdot_init]]
   Teuchos::RCP<Thyra_Vector const> const x_init          = xMV->col(0);
-  const Teuchos::RCP<Thyra_Vector>       x_init_nonconst = x_init->clone_v();
+  Teuchos::RCP<Thyra_Vector> const       x_init_nonconst = x_init->clone_v();
   nominalValues.set_x(x_init_nonconst);
 
   // Have xdot
   if (xMV->domain()->dim() > 1) {
     Teuchos::RCP<Thyra_Vector const> const x_dot_init = xMV->col(1);
-    const Teuchos::RCP<Thyra_Vector>       x_dot_init_nonconst =
+    Teuchos::RCP<Thyra_Vector> const       x_dot_init_nonconst =
         x_dot_init->clone_v();
     nominalValues.set_x_dot(x_dot_init_nonconst);
   }
@@ -367,7 +367,7 @@ ModelEvaluator::allocateVectors()
     // GAH set x_dotdot for transient simulations. Note that xDotDot is a member
     // of Piro::TransientDecorator<ST, LO, GO, KokkosNode>
     Teuchos::RCP<Thyra_Vector const> const x_dotdot_init = xMV->col(2);
-    const Teuchos::RCP<Thyra_Vector>       x_dotdot_init_nonconst =
+    Teuchos::RCP<Thyra_Vector> const       x_dotdot_init_nonconst =
         x_dotdot_init->clone_v();
     // IKT, 3/30/17: set x_dotdot in nominalValues for Tempus, now that
     // it is available in Thyra::ModelEvaluator

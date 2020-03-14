@@ -46,7 +46,7 @@ getValidInitialConditionParameters(
 
 void
 InitialConditions(
-    const Teuchos::RCP<Thyra_Vector>&     soln,
+    Teuchos::RCP<Thyra_Vector> const&     soln,
     const Albany::Conn&                   wsElNodeEqID,
     const Teuchos::ArrayRCP<std::string>& wsEBNames,
     const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>

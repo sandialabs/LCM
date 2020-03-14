@@ -191,7 +191,7 @@ class Application
       Teuchos::RCP<Thyra_Vector const> const& x_dot,
       Teuchos::RCP<Thyra_Vector const> const& x_dotdot,
       const Teuchos::Array<ParamVec>&         p,
-      const Teuchos::RCP<Thyra_Vector>&       f,
+      Teuchos::RCP<Thyra_Vector> const&       f,
       double const                            dt = 0.0);
 
  private:
@@ -202,7 +202,7 @@ class Application
       Teuchos::RCP<Thyra_Vector const> const x_dot,
       Teuchos::RCP<Thyra_Vector const> const x_dotdot,
       const Teuchos::Array<ParamVec>&        p,
-      const Teuchos::RCP<Thyra_Vector>&      f,
+      Teuchos::RCP<Thyra_Vector> const&      f,
       double const                           dt = 0.0);
 
   PHAL::Workset
@@ -211,7 +211,7 @@ class Application
       Teuchos::RCP<Thyra_Vector const> const  x,
       Teuchos::RCP<Thyra_Vector const> const  x_dot,
       Teuchos::RCP<Thyra_Vector const> const  x_dotdot,
-      const Teuchos::RCP<Thyra_Vector>&       f,
+      Teuchos::RCP<Thyra_Vector> const&       f,
       Teuchos::RCP<Thyra_Vector const> const& x_post_SDBCs = Teuchos::null);
 
  public:
@@ -229,7 +229,7 @@ class Application
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
-      const Teuchos::RCP<Thyra_Vector>&       f,
+      Teuchos::RCP<Thyra_Vector> const&       f,
       const Teuchos::RCP<Thyra_LinearOp>&     jac,
       double const                            dt = 0.0);
 
@@ -244,7 +244,7 @@ class Application
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
-      const Teuchos::RCP<Thyra_Vector>&       f,
+      Teuchos::RCP<Thyra_Vector> const&       f,
       const Teuchos::RCP<Thyra_LinearOp>&     jac,
       double const                            dt = 0.0);
 
@@ -261,7 +261,7 @@ class Application
       Teuchos::RCP<Thyra_Vector const> const& xdot,
       Teuchos::RCP<Thyra_Vector const> const& xdotdot,
       const Teuchos::Array<ParamVec>&         p,
-      const Teuchos::RCP<Thyra_Vector>&       g);
+      Teuchos::RCP<Thyra_Vector> const&       g);
 
   //! Provide access to shapeParameters -- no AD
   PHAL::AlbanyTraits::Residual::ScalarT&

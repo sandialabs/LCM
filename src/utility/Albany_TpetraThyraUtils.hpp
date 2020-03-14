@@ -41,7 +41,7 @@ getTpetraMap(
 
 Teuchos::RCP<Tpetra_Vector>
 getTpetraVector(
-    const Teuchos::RCP<Thyra_Vector>& v,
+    Teuchos::RCP<Thyra_Vector> const& v,
     bool const                        throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_Vector>

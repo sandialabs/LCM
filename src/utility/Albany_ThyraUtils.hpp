@@ -199,7 +199,7 @@ getNonconstDeviceData(Teuchos::RCP<Thyra_LinearOp>& lop);
 // Const and nonconst version of a getter of local data in a Thyra
 // vector/multivector
 Teuchos::ArrayRCP<ST>
-getNonconstLocalData(const Teuchos::RCP<Thyra_Vector>& v);
+getNonconstLocalData(Teuchos::RCP<Thyra_Vector> const& v);
 Teuchos::ArrayRCP<const ST>
 getLocalData(Teuchos::RCP<Thyra_Vector const> const& v);
 Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>
@@ -219,7 +219,7 @@ getLocalData(const Thyra_MultiVector& mv);
 DeviceView1d<const ST>
 getDeviceData(Teuchos::RCP<Thyra_Vector const> const& v);
 DeviceView1d<ST>
-getNonconstDeviceData(const Teuchos::RCP<Thyra_Vector>& v);
+getNonconstDeviceData(Teuchos::RCP<Thyra_Vector> const& v);
 
 int
 getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv);
@@ -235,7 +235,7 @@ getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv);
 // one with a nicer name. Performs y = y_coeff*y + x_coeff*x;
 void
 scale_and_update(
-    const Teuchos::RCP<Thyra_Vector>       y,
+    Teuchos::RCP<Thyra_Vector> const       y,
     const ST                               y_coeff,
     Teuchos::RCP<Thyra_Vector const> const x,
     const ST                               x_coeff);
@@ -279,7 +279,7 @@ getProductVectorSpace(
 
 Teuchos::RCP<Thyra_ProductVector>
 getProductVector(
-    const Teuchos::RCP<Thyra_Vector> v,
+    Teuchos::RCP<Thyra_Vector> const v,
     bool const                       throw_on_failure = true);
 
 Teuchos::RCP<const Thyra_ProductVector>

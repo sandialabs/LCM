@@ -33,7 +33,7 @@ class CombineAndScatterManagerTpetra : public CombineAndScatterManager
   void
   combine(
       Teuchos::RCP<Thyra_Vector const> const& src,
-      const Teuchos::RCP<Thyra_Vector>&       dst,
+      Teuchos::RCP<Thyra_Vector> const&       dst,
       const CombineMode                       CM) const override;
   void
   combine(
@@ -62,7 +62,7 @@ class CombineAndScatterManagerTpetra : public CombineAndScatterManager
   void
   scatter(
       Teuchos::RCP<Thyra_Vector const> const& src,
-      const Teuchos::RCP<Thyra_Vector>&       dst,
+      Teuchos::RCP<Thyra_Vector> const&       dst,
       const CombineMode                       CM) const override;
   void
   scatter(

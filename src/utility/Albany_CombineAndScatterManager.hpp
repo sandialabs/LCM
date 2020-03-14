@@ -88,7 +88,7 @@ class CombineAndScatterManager
   virtual void
   combine(
       Teuchos::RCP<Thyra_Vector const> const& src,
-      const Teuchos::RCP<Thyra_Vector>&       dst,
+      Teuchos::RCP<Thyra_Vector> const&       dst,
       const CombineMode                       CM) const = 0;
   virtual void
   combine(
@@ -117,7 +117,7 @@ class CombineAndScatterManager
   virtual void
   scatter(
       Teuchos::RCP<Thyra_Vector const> const& src,
-      const Teuchos::RCP<Thyra_Vector>&       dst,
+      Teuchos::RCP<Thyra_Vector> const&       dst,
       const CombineMode                       CM) const = 0;
   virtual void
   scatter(

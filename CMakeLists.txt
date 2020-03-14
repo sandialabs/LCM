@@ -717,16 +717,6 @@ endif()
 # Other Miscellaneous Albany Options here:
 message("\nMiscellaneous Albany Options:")
 
-# Optional OpenMP settings
-if(ALBANY_ENABLE_OPENMP)
-    message(
-      "---> LCM WARNING: turning off OrientationOnMesh tests since KokkosNode = OpenMP (see issue #339)!"
-    )
-    message(
-      "---> LCM WARNING: turning off ACE tests since KokkosNode = OpenMP (see issue #501)!"
-    )
-endif()
-
 # set optional dependency on the BGL, defaults to Enabled This option is added
 # due to issued with compiling BGL with the intel compilers see Trilinos
 # bugzilla bug #6343

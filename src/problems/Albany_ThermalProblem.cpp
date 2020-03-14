@@ -36,7 +36,7 @@ Albany::ThermalProblem::ThermalProblem(
     ALBANY_ABORT("Thermal Conductivity array must have length = numDim!");
   }
   rho = params->get<double>("Density", 1.0);
-  C = params->get<double>("Heat Capacity", 1.0);
+  C   = params->get<double>("Heat Capacity", 1.0);
 }
 
 Albany::ThermalProblem::~ThermalProblem() {}
@@ -185,8 +185,7 @@ Albany::ThermalProblem::getValidProblemParameters() const
       "Arrays of values of thermal conductivities in x, y, z [required]");
   validPL->set<double>(
       "Heat Capacity", 1.0, "Value of heat capacity [required]");
-  validPL->set<double>(
-      "Density", 1.0, "Value of density [required]");
+  validPL->set<double>("Density", 1.0, "Value of density [required]");
 
   return validPL;
 }

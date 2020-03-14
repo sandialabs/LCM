@@ -7,6 +7,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_ACE.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/input_ACE.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/material.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.g
                  ${CMAKE_CURRENT_BINARY_DIR}/cube.g COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.g.4.0
@@ -32,10 +34,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/time.txt COPYONLY)
 
-
   # Create the test with this name and standard executable
   add_test(${testName} ${Albany.exe} input.yaml)
   add_test(${testName}_ACE ${Albany.exe} input_ACE.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS
-                                              "Demo;Tpetra;Forward")
+  set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
 endif()

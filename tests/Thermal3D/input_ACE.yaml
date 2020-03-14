@@ -17,20 +17,14 @@ LCM:
       Variable Type: DOF
     ACE Temperature:
       Variable Type: DOF
-    Neumann BCs:
-      NBC on SS bottom for DOF T set dudn: [0.0]
     Dirichlet BCs:
+      SDBC on NS -z for DOF X: 0.0
+      SDBC on NS -z for DOF Y: 0.0
       SDBC on NS -z for DOF Z: 0.0
       ExpressionEvaluated SDBC on NS +z for DOF T: '200.0 + 5.0e-04 * t'
     Initial Condition:
       Function: Expression Parser
       Function Expressions: ['0.0', '0.0', '0.0', '200.0']
-    #Adaptation:
-    #  Method: Erosion
-    #  Rebalance: true
-    #  Equilibrate: false
-    #  Bluff Width: 1.0
-    #  Cross Section: 1.0
     Response Functions:
       Number: 2
       Response 0: Project IP to Nodal Field
@@ -52,7 +46,7 @@ LCM:
       Response 1: Solution Average
   Regression Results: 
     Number of Comparisons: 2
-    Test Values: [0, -2403.44934599]
+    Test Values: [0, 5.322885114730e+01]
     Relative Tolerance: 1.00000000000000002e-03
   Discretization:
     Method: Ioss
@@ -64,16 +58,6 @@ LCM:
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 1
     Exodus Write Interval: 1
-    Required Fields Info:
-      Number Of Fields: 2
-      Field 0:
-        Field Name: cell_boundary_indicator
-        Field Type: Elem Scalar
-        Field Origin: Mesh
-      Field 1:
-        Field Name: node_boundary_indicator
-        Field Type: Node Scalar
-        Field Origin: Mesh
   Piro:
     LOCA:
       Bifurcation: { }
@@ -90,12 +74,12 @@ LCM:
         Return Failed on Reaching Max Steps: false
         Hit Continuation Bound: false
       Step Size:
-        Initial Step Size: 5.0e+01
-        Method: Constant #Adaptive
-        #Max Step Size: 1.0e+04
-        #Min Step Size: 1.0e-20
-        #Failed Step Reduction Factor: 0.5
-        #Aggressiveness: 0.1
+        Initial Step Size: 1.0e+04
+        Method: Adaptive
+        Max Step Size: 1.0e+04
+        Min Step Size: 1.0e-20
+        Failed Step Reduction Factor: 0.5
+        Aggressiveness: 0.1
     NOX:
       Direction:
         Method: Newton

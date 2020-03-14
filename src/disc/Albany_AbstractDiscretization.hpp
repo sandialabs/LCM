@@ -72,11 +72,11 @@ class AbstractDiscretization
   createOverlapJacobianOp() const = 0;
 
   //! Get Node set lists
-  virtual const NodeSetList&
+  virtual NodeSetList const&
   getNodeSets() const = 0;
-  virtual const NodeSetGIDsList&
+  virtual NodeSetGIDsList const&
   getNodeSetGIDs() const = 0;
-  virtual const NodeSetCoordList&
+  virtual NodeSetCoordList const&
   getNodeSetCoords() const = 0;
   virtual const NodeGID2LIDMap&
   getNodeGID2LIDMap() const = 0;

@@ -90,17 +90,17 @@ NodeSetSolutionCullingStrategy::selectedGIDs(
   // Gather gids on given nodeset on this rank
   Teuchos::Array<GO> mySelectedGIDs;
 
-  const NodeSetList& nodeSets = disc_->getNodeSets();
+  NodeSetList const& nodeSets = disc_->getNodeSets();
   auto               it       = nodeSets.find(nodeSetLabel_);
   if (it != nodeSets.end()) {
     typedef NodeSetList::mapped_type NodeSetEntryList;
-    const NodeSetEntryList&          sampleNodeEntries = it->second;
+    NodeSetEntryList const&          sampleNodeEntries = it->second;
 
     for (NodeSetEntryList::const_iterator jt = sampleNodeEntries.begin();
          jt != sampleNodeEntries.end();
          ++jt) {
       typedef NodeSetEntryList::value_type NodeEntryList;
-      const NodeEntryList&                 sampleEntries = *jt;
+      NodeEntryList const&                 sampleEntries = *jt;
       for (NodeEntryList::const_iterator kt = sampleEntries.begin();
            kt != sampleEntries.end();
            ++kt) {

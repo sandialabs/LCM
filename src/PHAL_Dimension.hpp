@@ -51,7 +51,7 @@ struct Node : public shards::ArrayDimTag
   Node(){};
   char const*
   name() const;
-  static const Node&
+  static Node const&
   tag();
 };
 
@@ -60,7 +60,7 @@ struct Vertex : public shards::ArrayDimTag
   Vertex(){};
   char const*
   name() const;
-  static const Vertex&
+  static Vertex const&
   tag();
 };
 
@@ -69,7 +69,7 @@ struct Point : public shards::ArrayDimTag
   Point(){};
   char const*
   name() const;
-  static const Point&
+  static Point const&
   tag();
 };
 
@@ -78,7 +78,7 @@ struct Cell : public shards::ArrayDimTag
   Cell(){};
   char const*
   name() const;
-  static const Cell&
+  static Cell const&
   tag();
 };
 
@@ -87,7 +87,7 @@ struct Side : public shards::ArrayDimTag
   Side(){};
   char const*
   name() const;
-  static const Side&
+  static Side const&
   tag();
 };
 
@@ -96,7 +96,7 @@ struct Dummy : public shards::ArrayDimTag
   Dummy(){};
   char const*
   name() const;
-  static const Dummy&
+  static Dummy const&
   tag();
 };
 

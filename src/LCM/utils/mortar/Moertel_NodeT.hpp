@@ -558,7 +558,7 @@ class NodeT
  protected:
   // don't want = operator
   NodeT
-  operator=(const NodeT& old);
+  operator=(NodeT const& old);
 
  protected:
   GO                  Id_;  // Id of this node

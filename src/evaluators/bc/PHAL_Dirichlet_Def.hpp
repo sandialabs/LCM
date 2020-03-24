@@ -23,19 +23,16 @@ DirichletBase<EvalT, Traits>::DirichletBase(Teuchos::ParameterList& p)
 {
   value = p.get<RealType>("Dirichlet Value");
 
-  std::string name = p.get<std::string>("Dirichlet Name");
-  const Teuchos::RCP<PHX::DataLayout> dummy =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
-  const PHX::Tag<ScalarT> fieldTag(name, dummy);
+  auto const name  = p.get<std::string>("Dirichlet Name");
+  auto const dummy = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
+  PHX::Tag<ScalarT> const fieldTag(name, dummy);
 
   this->addEvaluatedField(fieldTag);
-
   this->setName(name + PHX::print<EvalT>());
 
   // Set up values as parameters for parameter library
-  Teuchos::RCP<ParamLib> paramLib =
+  auto paramLib =
       p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
-
   this->registerSacadoParameter(name, paramLib);
 
   {
@@ -80,21 +77,20 @@ void
 Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     typename Traits::EvalData dirichletWorkset)
 {
-  Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
-  Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
-
-  Teuchos::ArrayRCP<const ST> x_constView    = Albany::getLocalData(x);
-  Teuchos::ArrayRCP<ST>       f_nonconstView = Albany::getNonconstLocalData(f);
+  auto const x      = dirichletWorkset.x;
+  auto       f      = dirichletWorkset.f;
+  auto const x_view = Albany::getLocalData(x);
+  auto       f_view = Albany::getNonconstLocalData(f);
 
   // Grab the vector off node GIDs for this Node Set ID from the std::map
-  std::vector<std::vector<int>> const& nsNodes =
+  std::vector<std::vector<int>> const& ns_nodes =
       dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
 
-  for (unsigned int inode = 0; inode < nsNodes.size(); inode++) {
-    int lunk             = nsNodes[inode][this->offset];
-    f_nonconstView[lunk] = x_constView[lunk] - this->value;
+  for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
+    auto const dof = ns_nodes[ns_node][this->offset];
+    f_view[dof]    = x_view[dof] - this->value;
     // Record DOFs to avoid setting Schwarz BCs on them.
-    dirichletWorkset.fixed_dofs_.insert(lunk);
+    dirichletWorkset.fixed_dofs_.insert(dof);
   }
 }
 
@@ -114,42 +110,33 @@ void
 Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     typename Traits::EvalData dirichletWorkset)
 {
-  Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
-  Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;
-  Teuchos::RCP<Thyra_LinearOp>     jac = dirichletWorkset.Jac;
-
-  Teuchos::ArrayRCP<const ST> x_constView;
-  Teuchos::ArrayRCP<ST>       f_nonconstView;
-
-  const RealType                       j_coeff = dirichletWorkset.j_coeff;
-  std::vector<std::vector<int>> const& nsNodes =
+  auto        x       = dirichletWorkset.x;
+  auto        f       = dirichletWorkset.f;
+  auto        J       = dirichletWorkset.Jac;
+  auto const  fill    = f != Teuchos::null;
+  auto        f_view  = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
+  auto        x_view  = fill ? Albany::getLocalData(x) : Teuchos::null;
+  auto const  j_coeff = dirichletWorkset.j_coeff;
+  auto const& ns_nodes =
       dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-
-  bool fillResid = (f != Teuchos::null);
-  if (fillResid) {
-    x_constView    = Albany::getLocalData(x);
-    f_nonconstView = Albany::getNonconstLocalData(f);
-  }
 
   Teuchos::Array<LO> index(1);
   Teuchos::Array<ST> value(1);
+  Teuchos::Array<ST> entries;
+  Teuchos::Array<LO> indices;
   value[0] = j_coeff;
-  Teuchos::Array<ST> matrixEntries;
-  Teuchos::Array<LO> matrixIndices;
 
-  for (unsigned int inode = 0; inode < nsNodes.size(); inode++) {
-    int lunk = nsNodes[inode][this->offset];
-    index[0] = lunk;
+  for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
+    auto const dof = ns_nodes[ns_node][this->offset];
+    index[0]       = dof;
 
     // Extract the row, zero it out, then put j_coeff on diagonal
-    Albany::getLocalRowValues(jac, lunk, matrixIndices, matrixEntries);
-    for (auto& val : matrixEntries) { val = 0.0; }
-    Albany::setLocalRowValues(jac, lunk, matrixIndices(), matrixEntries());
-    Albany::setLocalRowValues(jac, lunk, index(), value());
+    Albany::getLocalRowValues(J, dof, indices, entries);
+    for (auto& val : entries) { val = 0.0; }
+    Albany::setLocalRowValues(J, dof, indices(), entries());
+    Albany::setLocalRowValues(J, dof, index(), value());
 
-    if (fillResid) {
-      f_nonconstView[lunk] = x_constView[lunk] - this->value.val();
-    }
+    if (fill == true) { f_view[dof] = x_view[dof] - this->value.val(); }
   }
 }
 
@@ -161,20 +148,17 @@ template <typename EvalT, typename Traits>
 DirichletAggregator<EvalT, Traits>::DirichletAggregator(
     Teuchos::ParameterList& p)
 {
-  Teuchos::RCP<PHX::DataLayout> dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
-
-  std::vector<std::string> const& dbcs =
+  auto        dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
+  auto const& dbcs =
       *p.get<Teuchos::RCP<std::vector<std::string>>>("DBC Names");
 
-  for (unsigned int i = 0; i < dbcs.size(); i++) {
+  for (auto i = 0; i < dbcs.size(); ++i) {
     PHX::Tag<ScalarT> fieldTag(dbcs[i], dl);
     this->addDependentField(fieldTag);
   }
 
   PHX::Tag<ScalarT> fieldTag(p.get<std::string>("DBC Aggregator Name"), dl);
   this->addEvaluatedField(fieldTag);
-
   this->setName("Dirichlet Aggregator" + PHX::print<EvalT>());
 }
 

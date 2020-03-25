@@ -36,9 +36,9 @@ AAdapt::Erosion::Erosion(
   // Save the initial output file name
   base_exo_filename_      = stk_mesh_struct_->exoOutFile;
   auto const lower_corner = params->get<Teuchos::Array<double>>(
-      "Lower Corner", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+      "Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
   auto const upper_corner = params->get<Teuchos::Array<double>>(
-      "Upper Corner", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+      "Maximal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
   auto const xm           = lower_corner[0];
   auto const ym           = lower_corner[1];
   auto const zm           = lower_corner[2];

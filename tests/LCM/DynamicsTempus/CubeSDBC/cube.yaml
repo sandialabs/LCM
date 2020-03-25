@@ -4,8 +4,8 @@ LCM:
     #Write Jacobian to Standard Output: 0
     #Write Residual to MatrixMarket: -1
     #Write Residual to Standard Output: -1
-    #Write Solution to MatrixMarket: true
-    Write Solution to Standard Output: false
+    #Write Solution to MatrixMarket: 0
+    Write Solution to Standard Output: 0
   Problem:
     Name: Mechanics 3D
     Phalanx Graph Visualization Detail: 0

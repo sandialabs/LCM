@@ -1,7 +1,7 @@
 LCM:
   Debug Output:
-    Write Solution to MatrixMarket: false
-    Write Solution to Standard Output: false
+    Write Solution to MatrixMarket: 0
+    Write Solution to Standard Output: 0
   Problem:
     Name: Mechanics 3D
     Parameters:

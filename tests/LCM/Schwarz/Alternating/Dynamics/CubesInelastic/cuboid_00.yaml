@@ -13,8 +13,8 @@ LCM:
     Search:
       Track Missed Range Entities: true
   Debug Output:
-    Write Solution to MatrixMarket: true
-    Write Solution to Standard Output: true
+    Write Solution to MatrixMarket: 0
+    Write Solution to Standard Output: 0
   Problem:
     Name: Mechanics 3D
     Parameters:

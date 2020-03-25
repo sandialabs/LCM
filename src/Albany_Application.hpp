@@ -636,12 +636,14 @@ class Application
   // arises writeToMatrixMarketJac = N: write N^th Jacobian to MatrixMarket
   // ...and similarly for writeToMatrixMarketRes (integer specifying whether
   // user wants to write residual to MatrixMarket file)
-  int writeToMatrixMarketJac{0};
+  int writeToMatrixMarketSol{0};
   int writeToMatrixMarketRes{0};
+  int writeToMatrixMarketJac{0};
   //! Integer specifying whether user wants to write Jacobian and residual to
   //! Standard output (cout)
-  int writeToCoutJac{0};
+  int writeToCoutSol{0};
   int writeToCoutRes{0};
+  int writeToCoutJac{0};
 
   // Value to scale Jacobian/Residual by to possibly improve conditioning
   double scale{0.0};

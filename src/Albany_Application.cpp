@@ -33,8 +33,9 @@ using Teuchos::rcp_dynamic_cast;
 using Teuchos::rcpFromRef;
 using Teuchos::TimeMonitor;
 
-int countJac;  // counter which counts instances of Jacobian (for debug output)
+int countSol;  // counter which counts instances of solution (for debug output)
 int countRes;  // counter which counts instances of residual (for debug output)
+int countJac;  // counter which counts instances of Jacobian (for debug output)
 int countScale;
 
 namespace {
@@ -313,51 +314,64 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   }
 
   // Create debug output object
-  RCP<Teuchos::ParameterList> debugParams =
-      Teuchos::sublist(params, "Debug Output", true);
-  writeToMatrixMarketJac =
-      debugParams->get("Write Jacobian to MatrixMarket", 0);
+  auto debugParams = Teuchos::sublist(params, "Debug Output", true);
+  writeToMatrixMarketSol =
+      debugParams->get("Write Solution to MatrixMarket", 0);
   writeToMatrixMarketRes =
       debugParams->get("Write Residual to MatrixMarket", 0);
-  writeToCoutJac     = debugParams->get("Write Jacobian to Standard Output", 0);
+  writeToMatrixMarketJac =
+      debugParams->get("Write Jacobian to MatrixMarket", 0);
+  writeToCoutSol     = debugParams->get("Write Solution to Standard Output", 0);
   writeToCoutRes     = debugParams->get("Write Residual to Standard Output", 0);
+  writeToCoutJac     = debugParams->get("Write Jacobian to Standard Output", 0);
   derivatives_check_ = debugParams->get<int>("Derivative Check", 0);
-  // the above 4 parameters cannot have values < -1
-  if (writeToMatrixMarketJac < -1) {
+  // the above parameters cannot have values < -1
+  if (writeToMatrixMarketSol < -1) {
     ALBANY_ABORT(
         std::endl
-        << "Error in Albany::Application constructor:  "
-        << "Invalid Parameter Write Jacobian to MatrixMarket.  Acceptable "
+        << "Invalid Parameter Write Solution to MatrixMarket.  Acceptable "
            "values are -1, 0, 1, 2, ... "
         << std::endl);
   }
   if (writeToMatrixMarketRes < -1) {
     ALBANY_ABORT(
         std::endl
-        << "Error in Albany::Application constructor:  "
         << "Invalid Parameter Write Residual to MatrixMarket.  Acceptable "
            "values are -1, 0, 1, 2, ... "
         << std::endl);
   }
-  if (writeToCoutJac < -1) {
+  if (writeToMatrixMarketJac < -1) {
     ALBANY_ABORT(
         std::endl
-        << "Error in Albany::Application constructor:  "
-        << "Invalid Parameter Write Jacobian to Standard Output.  "
+        << "Invalid Parameter Write Jacobian to MatrixMarket.  Acceptable "
+           "values are -1, 0, 1, 2, ... "
+        << std::endl);
+  }
+  if (writeToCoutSol < -1) {
+    ALBANY_ABORT(
+        std::endl
+        << "Invalid Parameter Write Solution to Standard Output.  "
            "Acceptable values are -1, 0, 1, 2, ... "
         << std::endl);
   }
   if (writeToCoutRes < -1) {
     ALBANY_ABORT(
         std::endl
-        << "Error in Albany::Application constructor:  "
         << "Invalid Parameter Write Residual to Standard Output.  "
            "Acceptable values are -1, 0, 1, 2, ... "
         << std::endl);
   }
+  if (writeToCoutJac < -1) {
+    ALBANY_ABORT(
+        std::endl
+        << "Invalid Parameter Write Jacobian to Standard Output.  "
+           "Acceptable values are -1, 0, 1, 2, ... "
+        << std::endl);
+  }
 
-  countJac   = 0;  // initiate counter that counts instances of Jacobian matrix
+  countSol   = 0;  // initiate counter that counts instances of solution vector
   countRes   = 0;  // initiate counter that counts instances of residual vector
+  countJac   = 0;  // initiate counter that counts instances of Jacobian matrix
   countScale = 0;
 
   // Create discretization object
@@ -1247,34 +1261,31 @@ Application::computeGlobalResidual(
 {
   this->computeGlobalResidualImpl(current_time, x, x_dot, x_dotdot, p, f, dt);
 
-  // Debut output
-  if (writeToMatrixMarketRes !=
-      0) {  // If requesting writing to MatrixMarket of residual...
-    if (writeToMatrixMarketRes ==
-        -1) {  // write residual to MatrixMarket every time it arises
-      writeMatrixMarket(f, "rhs", countRes);
-    } else {
-      if (countRes ==
-          writeToMatrixMarketRes) {  // write residual only at requested count#
-        writeMatrixMarket(f, "rhs", countRes);
-      }
-    }
+  // Debut output write residual or solution to MatrixMarket
+  // every time it arises or at requested count#
+  auto const write_sol_mm =
+      writeToMatrixMarketSol != 0 &&
+      (writeToMatrixMarketSol == -1 || countSol == writeToMatrixMarketSol);
+  if (write_sol_mm == true) { writeMatrixMarket(x, "sol", countSol); }
+  auto const write_sol_co = writeToCoutSol != 0 && (writeToCoutSol == -1 ||
+                                                    countSol == writeToCoutSol);
+  if (write_sol_co == true) {
+    std::cout << "Global Solution #" << countSol << ": " << std::endl;
+    describe(x.getConst(), *out, Teuchos::VERB_EXTREME);
   }
-  if (writeToCoutRes != 0) {     // If requesting writing of residual to cout...
-    if (writeToCoutRes == -1) {  // cout residual time it arises
-      std::cout << "Global Residual #" << countRes << ": " << std::endl;
-      describe(f.getConst(), *out, Teuchos::VERB_EXTREME);
-    } else {
-      if (countRes == writeToCoutRes) {  // cout residual only at requested
-                                         // count#
-        std::cout << "Global Residual #" << countRes << ": " << std::endl;
-        describe(f.getConst(), *out, Teuchos::VERB_EXTREME);
-      }
-    }
+  if (writeToMatrixMarketSol != 0 || writeToCoutSol != 0) { countSol++; }
+
+  auto const write_red_mm =
+      writeToMatrixMarketRes != 0 &&
+      (writeToMatrixMarketRes == -1 || countRes == writeToMatrixMarketRes);
+  if (write_red_mm == true) { writeMatrixMarket(f, "rhs", countRes); }
+  auto const write_red_co = writeToCoutRes != 0 && (writeToCoutRes == -1 ||
+                                                    countRes == writeToCoutRes);
+  if (write_red_co == true) {
+    std::cout << "Global Residual #" << countRes << ": " << std::endl;
+    describe(f.getConst(), *out, Teuchos::VERB_EXTREME);
   }
-  if (writeToMatrixMarketRes != 0 || writeToCoutRes != 0) {
-    countRes++;  // increment residual counter
-  }
+  if (writeToMatrixMarketRes != 0 || writeToCoutRes != 0) { countRes++; }
 }
 
 void

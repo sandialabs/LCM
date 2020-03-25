@@ -310,27 +310,17 @@ main(int argc, char* argv[])
     if (thyraResponses.size() > 0) {
       Teuchos::ParameterList& debugParams =
           slvrfctry.getParameters().sublist("Debug Output", true);
-      bool writeToMatrixMarketSoln =
-          debugParams.get("Write Solution to MatrixMarket", false);
       bool writeToMatrixMarketDistrSolnMap = debugParams.get(
           "Write Distributed Solution and Map to MatrixMarket", false);
-      bool writeToCoutSoln =
-          debugParams.get("Write Solution to Standard Output", false);
 
       RCP<Thyra_Vector const> const xfinal = thyraResponses.back();
       auto                          mnv    = Albany::mean(xfinal);
       *out << "\nMain_Solve: MeanValue of final solution " << mnv << std::endl;
       *out << "\nNumber of Failed Comparisons: " << status << std::endl;
-      if (writeToCoutSoln == true) {
-        Albany::printThyraVector(*out << "\nxfinal:\n", xfinal);
-      }
 
       if (debugParams.get<bool>("Analyze Memory", false))
         Albany::printMemoryAnalysis(std::cout, comm);
 
-      if (writeToMatrixMarketSoln == true) {
-        Albany::writeMatrixMarket(xfinal, "xfinal");
-      }
       if (writeToMatrixMarketDistrSolnMap == true) {
         Albany::writeMatrixMarket(xfinal->space(), "xfinal_distributed_map");
       }

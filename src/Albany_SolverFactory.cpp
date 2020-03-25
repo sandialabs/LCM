@@ -668,18 +668,18 @@ SolverFactory::getValidDebugParameters() const
       0,
       "Residual Number to Dump to Standard Output");
   validPL->set<int>("Derivative Check", 0, "Derivative check");
-  validPL->set<bool>(
+  validPL->set<int>(
       "Write Solution to MatrixMarket",
-      false,
-      "Flag to Write Solution to MatrixMarket");
+      0,
+      "Solution Number to Dump to MatrixMarket");
   validPL->set<bool>(
       "Write Distributed Solution and Map to MatrixMarket",
       false,
       "Flag to Write Distributed Solution and Map to MatrixMarket");
-  validPL->set<bool>(
+  validPL->set<int>(
       "Write Solution to Standard Output",
-      false,
-      "Flag to Write Sotion to Standard Output");
+      0,
+      "Solution Number to Dump to  Standard Output");
   validPL->set<bool>("Analyze Memory", false, "Flag to Analyze Memory");
   return validPL;
 }

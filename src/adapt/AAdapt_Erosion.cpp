@@ -39,6 +39,7 @@ AAdapt::Erosion::Erosion(
       "Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
   auto const upper_corner = params->get<Teuchos::Array<double>>(
       "Maximal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+  params->validateParameters(*(getValidAdapterParameters()));
   auto const xm           = lower_corner[0];
   auto const ym           = lower_corner[1];
   auto const zm           = lower_corner[2];
@@ -319,8 +320,20 @@ AAdapt::Erosion::postAdapt()
 Teuchos::RCP<Teuchos::ParameterList const>
 AAdapt::Erosion::getValidAdapterParameters() const
 {
-  auto valid_pl_ = this->getGenericAdapterParams("ValidErosionParams");
-  return valid_pl_;
+  auto valid_pl = this->getGenericAdapterParams("Valid Erosion Params");
+  valid_pl->set<bool>(
+      "Equilibrate", false, "Perform a steady solve after adaptation");
+  valid_pl->set<bool>(
+      "Rebalance", true, "Rebalance mesh after adaptation in parallel runs");
+  valid_pl->set<Teuchos::Array<double>>(
+      "Minimal Point",
+      Teuchos::tuple<double>(0.0, 0.0, 0.0),
+      "Minimal coordinates defining erosion block");
+  valid_pl->set<Teuchos::Array<double>>(
+      "Maximal Point",
+      Teuchos::tuple<double>(0.0, 0.0, 0.0),
+      "Maximal coordinates defining erosion block");
+  return valid_pl;
 }
 
 }  // namespace AAdapt

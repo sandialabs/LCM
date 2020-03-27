@@ -22,9 +22,6 @@
 #define ALBANY_ASSERT_IMPL(cond, msg, ...)                              \
   do {                                                                  \
     if (!(cond)) {                                                      \
-      std::ostringstream omsg;                                          \
-      omsg << #cond " ALBANY_ASSERT failed at ";                        \
-      omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
       std::cerr << #cond " ALBANY_ASSERT failed at ";                   \
       std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
       abort();                                                          \
@@ -34,9 +31,6 @@
 #define ALBANY_PANIC_IMPL(cond, msg, ...)                               \
   do {                                                                  \
     if ((cond)) {                                                       \
-      std::ostringstream omsg;                                          \
-      omsg << #cond " ALBANY_PANIC condition at ";                      \
-      omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
       std::cerr << #cond " ALBANY_PANIC condition at ";                 \
       std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
       abort();                                                          \
@@ -45,9 +39,6 @@
 
 #define ALBANY_ABORT_IMPL(msg, ...)                                   \
   do {                                                                \
-    std::ostringstream omsg;                                          \
-    omsg << " ALBANY_ABORT statement at ";                            \
-    omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
     std::cerr << " ALBANY_ABORT statement at ";                       \
     std::cerr << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
     abort();                                                          \
@@ -55,11 +46,9 @@
 
 #define ALBANY_TRACE_IMPL(msg, ...)                                   \
   do {                                                                \
-    std::ostringstream omsg;                                          \
-    omsg << "********** ALBANY_TRACE at ";                            \
-    omsg << __FILE__ << " +" << __LINE__ << '\n' << msg << '\n';      \
-    std::cout << "********** ALBANY_TRACE at ";                       \
-    std::cout << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n'; \
+    auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream();     \
+    fos << "********** ALBANY_TRACE at ";                             \
+    fos << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n';       \
   } while (0)
 
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")

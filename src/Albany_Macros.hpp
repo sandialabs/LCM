@@ -51,10 +51,17 @@
     fos << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n';       \
   } while (0)
 
+#define ALBANY_DUMP_IMPL(msg, ...)                                    \
+  do {                                                                \
+    auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream();     \
+    fos << "\n" << msg << '\n';                                       \
+  } while (0)
+
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")
 #define ALBANY_PANIC(...) ALBANY_PANIC_IMPL(__VA_ARGS__, "")
 #define ALBANY_ABORT(...) ALBANY_ABORT_IMPL(__VA_ARGS__, "")
 #define ALBANY_TRACE(...) ALBANY_TRACE_IMPL(__VA_ARGS__, "")
+#define ALBANY_DUMP(...) ALBANY_DUMP_IMPL(__VA_ARGS__, "")
 
 #if defined(NDEBUG)
 #define ALBANY_EXPECT(...)

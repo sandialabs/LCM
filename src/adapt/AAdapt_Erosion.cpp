@@ -271,8 +271,8 @@ AAdapt::Erosion::adaptMesh()
   // adding the remesh_file_index_ ahead of the period
   std::ostringstream ss;
   std::string        str = base_exo_filename_;
-  ss << "_" << remesh_file_index_ << ".";
-  str.replace(str.find('.'), 1, ss.str());
+  ss << ".e-s." << remesh_file_index_;
+  str.replace(str.find('.'), std::string::npos, ss.str());
   *output_stream_ << "Remeshing: renaming output file to - " << str << '\n';
 
   // Open the new exodus file for results

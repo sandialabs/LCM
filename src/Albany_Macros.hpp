@@ -44,17 +44,17 @@
     abort();                                                          \
   } while (0)
 
-#define ALBANY_TRACE_IMPL(msg, ...)                                   \
-  do {                                                                \
-    auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream();     \
-    fos << "********** ALBANY_TRACE at ";                             \
-    fos << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n';       \
+#define ALBANY_TRACE_IMPL(msg, ...)                               \
+  do {                                                            \
+    auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream(); \
+    fos << "********** ALBANY_TRACE at ";                         \
+    fos << __FILE__ << " +" << __LINE__ << "\n" << msg << '\n';   \
   } while (0)
 
-#define ALBANY_DUMP_IMPL(msg, ...)                                    \
-  do {                                                                \
-    auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream();     \
-    fos << "\n" << msg << '\n';                                       \
+#define ALBANY_DUMP_IMPL(msg, ...)                                \
+  do {                                                            \
+    auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream(); \
+    fos << "\n" << msg << '\n';                                   \
   } while (0)
 
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")

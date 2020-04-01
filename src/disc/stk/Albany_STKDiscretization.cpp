@@ -2995,44 +2995,34 @@ STKDiscretization::buildSideSetProjectors()
 void
 STKDiscretization::updateMesh()
 {
-  const StateInfoStruct& nodal_param_states =
+  auto const& nodal_param_states =
       stkMeshStruct->getFieldContainer()->getNodalParameterSIS();
   nodalDOFsStructContainer.addEmptyDOFsStruct("ordinary_solution", "", neq);
   nodalDOFsStructContainer.addEmptyDOFsStruct("mesh_nodes", "", 1);
-  for (size_t is = 0; is < nodal_param_states.size(); is++) {
-    const StateStruct&            param_state = *nodal_param_states[is];
-    const StateStruct::FieldDims& dim         = param_state.dim;
-    int                           numComps    = 1;
+  for (auto is = 0; is < nodal_param_states.size(); ++is) {
+    auto const& param_state = *nodal_param_states[is];
+    auto const& dim         = param_state.dim;
+    auto        num_comps   = 1;
     if (dim.size() == 3) {  // vector
-      numComps = dim[2];
+      num_comps = dim[2];
     } else if (dim.size() == 4) {  // tensor
-      numComps = dim[2] * dim[3];
+      num_comps = dim[2] * dim[3];
     }
 
     nodalDOFsStructContainer.addEmptyDOFsStruct(
-        param_state.name, param_state.meshPart, numComps);
+        param_state.name, param_state.meshPart, num_comps);
   }
 
   computeNodalVectorSpaces(false);
-
   computeOwnedNodesAndUnknowns();
-
   computeNodalVectorSpaces(true);
-
   computeOverlapNodesAndUnknowns();
-
   setupMLCoords();
-
   transformMesh();
-
   computeGraphs();
-
   computeWorksetInfo();
-
   computeNodeSets();
-
   computeSideSets();
-
   setupExodusOutput();
 
   // Build the node graph needed for the mass matrix for solution transfer and
@@ -3048,7 +3038,7 @@ STKDiscretization::updateMesh()
   // If the mesh struct stores sideSet mesh structs, we update them
   if (stkMeshStruct->sideSetMeshStructs.size() > 0) {
     for (auto it : stkMeshStruct->sideSetMeshStructs) {
-      Teuchos::RCP<STKDiscretization> side_disc =
+      auto side_disc =
           Teuchos::rcp(new STKDiscretization(discParams, it.second, comm));
       side_disc->updateMesh();
       sideSetDiscretizations.insert(std::make_pair(it.first, side_disc));
@@ -3059,7 +3049,6 @@ STKDiscretization::updateMesh()
           sideToSideSetCellMap[it.first],
           sideNodeNumerationMap[it.first]);
     }
-
     buildSideSetProjectors();
   }
 }

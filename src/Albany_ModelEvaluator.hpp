@@ -19,8 +19,7 @@ namespace Albany {
 class Application;
 class DistributedParameterLibrary;
 
-class ModelEvaluator
-    : public Piro::TransientDecorator<ST>
+class ModelEvaluator : public Piro::TransientDecorator<ST>
 {
  public:
   // Constructor

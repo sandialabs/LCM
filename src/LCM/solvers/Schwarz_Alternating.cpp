@@ -679,8 +679,7 @@ SchwarzAlternating::SchwarzLoopDynamics() const
             *(solvers_[subdomain]);
 
         Piro::TempusSolver<ST>& piro_tempus_solver =
-            dynamic_cast<Piro::TempusSolver<ST>&>(
-                solver);
+            dynamic_cast<Piro::TempusSolver<ST>&>(solver);
 
         piro_tempus_solver.setStartTime(current_time);
         piro_tempus_solver.setFinalTime(next_time);

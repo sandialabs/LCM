@@ -20,7 +20,7 @@ class Application;
 class DistributedParameterLibrary;
 
 class ModelEvaluator
-    : public Piro::TransientDecorator<ST, LO, Tpetra_GO, KokkosNode>
+    : public Piro::TransientDecorator<ST>
 {
  public:
   // Constructor

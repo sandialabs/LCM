@@ -198,7 +198,7 @@ SolverFactory::createAndGetAlbanyApp(
 
     // WARNING: Coupled Schwarz does not contain a primary Application
     // instance and so albanyApp is null.
-    return piroFactory.createSolver<ST, LO, Tpetra_GO, KokkosNode>(
+    return piroFactory.createSolver<ST>(
         piroParams, coupled_model_with_solve, Teuchos::null, observer_);
   }
 
@@ -249,10 +249,10 @@ SolverFactory::createAndGetAlbanyApp(
   Piro::SolverFactory piroFactory;
   observer_ = Teuchos::rcp(new PiroObserver(albanyApp, modelWithSolve));
   if (solMgr->isAdaptive()) {
-    return piroFactory.createSolver<ST, LO, Tpetra_GO, KokkosNode>(
+    return piroFactory.createSolver<ST>(
         piroParams, modelWithSolve, solMgr, observer_);
   } else {
-    return piroFactory.createSolver<ST, LO, Tpetra_GO, KokkosNode>(
+    return piroFactory.createSolver<ST>(
         piroParams, modelWithSolve, Teuchos::null, observer_);
   }
   ALBANY_ABORT(

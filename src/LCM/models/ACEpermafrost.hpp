@@ -132,6 +132,7 @@ struct ACEpermafrostMiniKernel : public ParallelKernel<EvalT, Traits>
   std::vector<RealType> sand_from_file_;  // sand fraction
   std::vector<RealType> clay_from_file_;  // clay fraction
   std::vector<RealType> silt_from_file_;  // silt fraction
+  std::vector<RealType> peat_from_file_;  // peat fraction
 
   // Sea level arrays
   std::vector<RealType> time_;

@@ -117,6 +117,14 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
         "*** ERROR: Number of z values and number of silt values in "
         "ACE Silt File must match.");
   }
+  if (p->isParameter("ACE Peat File") == true) {
+    auto const filename = p->get<std::string>("ACE Peat File");
+    peat_from_file_     = vectorFromFile(filename);
+    ALBANY_ASSERT(
+        z_above_mean_sea_level_.size() == peat_from_file_.size(),
+        "*** ERROR: Number of z values and number of peat values in "
+        "ACE Peat File must match.");
+  }
 
   ALBANY_ASSERT(
       time_.size() == sea_level_.size(),
@@ -540,9 +548,10 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   ScalarT calc_soil_heat_capacity;
   ScalarT calc_soil_thermal_cond;
+  ScalarT calc_soil_density;
   bool    sediment_given = false;
   if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) &&
-      (silt_from_file_.size() > 0)) {
+      (silt_from_file_.size() > 0) && (peat_from_file_.size() > 0)) {
     sediment_given = true;
     auto sand_frac =
         interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
@@ -550,20 +559,39 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
         interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
     auto silt_frac =
         interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
+    auto peat_frac =
+        interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height);
     // THERMAL PROPERTIES OF ROCKS, E.C. Robertson, U.S. Geological Survey
     // Open-File Report 88-441 (1988).
+    // AGU presentation (2019) --> peat K value
+    // Gnatowski, Tomasz (2016) Thermal properties of degraded lowland peat-moorsh 
+    // soils, EGU General Assembly 2016, held 17-22 April, 2016 in Vienna Austria, 
+    // id. EPSC2016-8105 --> peat Cp value
     // Cp values in [J/kg/K]
     calc_soil_heat_capacity =
-        (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac);
+        (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac) +
+        (1.9e3 * peat_frac);
     // K values in [W/K/m]
     calc_soil_thermal_cond =
-        (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac);
+        (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + 
+        (0.08 * peat_frac);
+    // Rho values in [kg/m3]
+    // Peat density from Emily Bristol
+    calc_soil_density = ((1.0 - peat_frac) * soil_density_) + 
+        (peat_frac * 250.0);
   }
 
   // Update the effective material density
-  density_(cell, pt) =
-      (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
-      ((1.0 - porosity) * soil_density_);
+  if (sediment_given == true) {
+      density_(cell, pt) =
+          (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
+          ((1.0 - porosity) * calc_soil_density);
+          
+  } else {
+      density_(cell, pt) =
+          (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
+          ((1.0 - porosity) * soil_density_);
+  }
 
   // Update the effective material heat capacity
   if (sediment_given == true) {

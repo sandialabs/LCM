@@ -328,12 +328,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&& exposure_time = exposure_time_(cell, pt);
 
   // Determine if erosion has occurred.
-  auto const erosion_rate = erosion_rate_;
   auto const element_size = element_size_;
-  bool const is_erodible  = erosion_rate > 0.0;
-  auto const critical_exposure_time =
-      is_erodible == true ? element_size / erosion_rate : 0.0;
-
   auto const sea_level =
       sea_level_.size() > 0 ?
           interpolateVectors(time_, sea_level_, current_time) :

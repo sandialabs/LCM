@@ -339,29 +339,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
           interpolateVectors(time_, sea_level_, current_time) :
           0.0;
   bool const is_exposed_to_water = (height <= sea_level);
-  bool const is_at_boundary =
-      have_cell_boundary_indicator_ == true ?
-          static_cast<bool>(*(cell_boundary_indicator_[cell])) :
-          false;
-
-  bool const is_erodible_at_boundary = is_erodible && is_at_boundary;
-  if (is_erodible_at_boundary == true) {
-    if (is_exposed_to_water == true) { exposure_time += delta_time; }
-    if (exposure_time >= critical_exposure_time) {
-      failed += 1.0;
-      exposure_time = 0.0;
-    }
-  }
-
-  // if (is_at_boundary == true) {
-  //   auto const proc_rank = Albany::getProcRank();
-  //   auto       ws_lid    = std::make_pair(ws_index_, cell);
-  //   auto       iter      = elemWsLIDGIDMap_.find(ws_lid);
-  //   ALBANY_ASSERT(iter != elemWsLIDGIDMap_.end());
-  //   auto gid = iter->second;
-  //   std::cout << "**** DEBUG MATE PROC GID: " << proc_rank << " "
-  //             << std::setw(3) << std::setfill('0') << gid << "\n";
-  // }
+  bool const is_erodible         = have_cell_boundary_indicator_ == true ?
+                               *(cell_boundary_indicator_[cell]) == 2.0 :
+                               false;
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);
@@ -397,8 +377,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
               sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
 
   RealType constexpr yield_tolerance = 1.0e-12;
+  bool const yielded                 = f > yield_tolerance;
 
-  if (f > yield_tolerance) {
+  if (yielded == true) {
     // Use minimization equivalent to return mapping
     using ValueT = typename Sacado::ValueType<ScalarT>::type;
     using NLS    = J2ErosionNLS<EvalT>;
@@ -477,13 +458,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   //
   // Determine if critical stress is exceeded
   //
-
-  // sigma_XX component for now
-  auto const critical_stress = critical_stress_;
-  if (critical_stress > 0.0) {
-    auto const stress_test = Sacado::Value<ScalarT>::eval(sigma(0, 0));
-    if (std::abs(stress_test) >= critical_stress) failed += 1.0;
-  }
+  if (yielded == true) failed += 1.0;
 
   //
   // Determine if kinematic failure occurred

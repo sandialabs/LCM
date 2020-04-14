@@ -596,33 +596,30 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // THERMAL PROPERTIES OF ROCKS, E.C. Robertson, U.S. Geological Survey
     // Open-File Report 88-441 (1988).
     // AGU presentation (2019) --> peat K value
-    // Gnatowski, Tomasz (2016) Thermal properties of degraded lowland peat-moorsh 
-    // soils, EGU General Assembly 2016, held 17-22 April, 2016 in Vienna Austria, 
-    // id. EPSC2016-8105 --> peat Cp value
-    // Cp values in [J/kg/K]
-    calc_soil_heat_capacity =
-        (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac) +
-        (1.9e3 * peat_frac);
+    // Gnatowski, Tomasz (2016) Thermal properties of degraded lowland
+    // peat-moorsh soils, EGU General Assembly 2016, held 17-22 April, 2016 in
+    // Vienna Austria, id. EPSC2016-8105 --> peat Cp value Cp values in [J/kg/K]
+    calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) +
+                              (0.7e3 * silt_frac) + (1.9e3 * peat_frac);
     // K values in [W/K/m]
-    calc_soil_thermal_cond =
-        (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + 
-        (0.08 * peat_frac);
+    calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) +
+                             (4.9 * silt_frac) + (0.08 * peat_frac);
     // Rho values in [kg/m3]
     // Peat density from Emily Bristol
-    calc_soil_density = ((1.0 - peat_frac) * soil_density_) + 
-        (peat_frac * 250.0);
+    calc_soil_density =
+        ((1.0 - peat_frac) * soil_density_) + (peat_frac * 250.0);
   }
 
   // Update the effective material density
   if (sediment_given == true) {
-      density_(cell, pt) =
-          (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
-          ((1.0 - porosity) * calc_soil_density);
-          
+    density_(cell, pt) =
+        (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
+        ((1.0 - porosity) * calc_soil_density);
+
   } else {
-      density_(cell, pt) =
-          (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
-          ((1.0 - porosity) * soil_density_);
+    density_(cell, pt) =
+        (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
+        ((1.0 - porosity) * soil_density_);
   }
 
   // Update the effective material heat capacity

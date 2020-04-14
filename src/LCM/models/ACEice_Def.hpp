@@ -79,16 +79,6 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
         "*** ERROR: Number of z values and number of porosity values in "
         "ACE Porosity File must match.");
   }
-  if (p->isParameter("ACE Freezing Curve Width File") == true) {
-    auto const filename = p->get<std::string>("ACE Freezing Curve Width File");
-    freezing_curve_width_ = vectorFromFile(filename);
-    ALBANY_ASSERT(
-        z_above_mean_sea_level_.size() == freezing_curve_width_.size(),
-        "*** ERROR: Number of z values and number of freezing curve width "
-        "values "
-        "in "
-        "ACE Freezing Curve Width File must match.");
-  }
 
   ALBANY_ASSERT(
       time_.size() == sea_level_.size(),
@@ -466,6 +456,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // f(T) = 1 / (1 + e^(-(8/W)((T-T0) + (b*W))))
   // W = true width of freezing curve (in Celsius)
   // b = shift to left or right (+ is left, - is right)
+  /*
   ScalarT W = freeze_curve_width_;  // constant value
   if (freezing_curve_width_.size() > 0) {
     W = interpolateVectors(
@@ -500,6 +491,22 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
       icurr              = 1.0 - 1.0 / etp1;
     }
   }
+  */
+  ScalarT const Tdiff = Tcurr - Tmelt;
+  ScalarT       icurr{1.0};
+  ScalarT       dfdT{0.0};
+  
+  ScalarT const A = 0.0;
+  ScalarT const G = 1.0;
+  ScalarT const C = 1.0;
+  ScalarT const Q = 0.001;
+  ScalarT const B = 10.0;
+  ScalarT const v = 5.0;  // assume its like sand
+  
+  ScalarT const qebt = Q * std::exp(-B * Tdiff);
+  
+  icurr = A + ((G - A) / (pow(C + qebt,1.0/v)));
+  dfdT = ((B * Q * (G - A)) * pow(C + qebt,-1.0/v) + (qebt / Q)) / (v * (C + qebt));
 
   // Update the water saturation
   ScalarT wcurr = 1.0 - icurr;

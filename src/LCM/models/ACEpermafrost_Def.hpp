@@ -83,16 +83,6 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
         "*** ERROR: Number of z values and number of porosity values in "
         "ACE Porosity File must match.");
   }
-  if (p->isParameter("ACE Freezing Curve Width File") == true) {
-    auto const filename = p->get<std::string>("ACE Freezing Curve Width File");
-    freezing_curve_width_ = vectorFromFile(filename);
-    ALBANY_ASSERT(
-        z_above_mean_sea_level_.size() == freezing_curve_width_.size(),
-        "*** ERROR: Number of z values and number of freezing curve width "
-        "values "
-        "in "
-        "ACE Freezing Curve Width File must match.");
-  }
   if (p->isParameter("ACE Sand File") == true) {
     auto const filename = p->get<std::string>("ACE Sand File");
     sand_from_file_     = vectorFromFile(filename);

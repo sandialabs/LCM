@@ -491,12 +491,12 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // f(T) = 1 / (1 + e^(-(8/W)((T-T0) + (b*W))))
   // W = true width of freezing curve (in Celsius)
   // b = shift to left or right (+ is left, - is right)
-  /*
-  ScalarT W = freeze_curve_width_;  // constant value
-  if (freezing_curve_width_.size() > 0) {
-    W = interpolateVectors(
-        z_above_mean_sea_level_, freezing_curve_width_, height);
-  }
+  
+  ScalarT W = 4.0;  // constant value
+  //if (freezing_curve_width_.size() > 0) {
+  //  W = interpolateVectors(
+  //      z_above_mean_sea_level_, freezing_curve_width_, height);
+  //}
 
   ScalarT const Tdiff = Tcurr - Tmelt;
   ScalarT const arg   = -(8.0 / W) * (Tdiff + (f_shift_ * W));
@@ -526,7 +526,15 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
       icurr              = 1.0 - 1.0 / etp1;
     }
   }
-  */
+  
+  bool sediment_given = false;
+  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) &&
+      (silt_from_file_.size() > 0) && (peat_from_file_.size() > 0)) {
+    sediment_given = true;
+  }
+  
+  /*
+  // BEGIN NEW CURVE //
   ScalarT const Tdiff = Tcurr - Tmelt;
   
   RealType const A = 0.0;
@@ -536,10 +544,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   RealType const B = 10.0;
   RealType       v = 25.0;
   
-  bool sediment_given = false;
-  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) &&
-      (silt_from_file_.size() > 0) && (peat_from_file_.size() > 0)) {
-    sediment_given = true;
+  if (sediment_given = true) {
     auto sand_frac =
         interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
     auto clay_frac =
@@ -556,6 +561,8 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   
   ScalarT icurr = A + ((G - A) / (pow(C + qebt, 1.0/v)));
   ScalarT dfdT = ((B * Q * (G - A)) * pow(C + qebt, -1.0/v) + (qebt / Q)) / (v * (C + qebt));
+  // END NEW CURVE //
+  */
   
   // Update the water saturation
   ScalarT wcurr = 1.0 - icurr;

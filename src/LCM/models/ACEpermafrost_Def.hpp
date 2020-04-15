@@ -529,15 +529,13 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   */
   ScalarT const Tdiff = Tcurr - Tmelt;
-  ScalarT       icurr{1.0};
-  ScalarT       dfdT{0.0};
   
-  ScalarT const A = 0.0;
-  ScalarT const G = 1.0;
-  ScalarT const C = 1.0;
-  ScalarT const Q = 0.001;
-  ScalarT const B = 10.0;
-  ScalarT       v;
+  RealType const A = 0.0;
+  RealType const G = 1.0;
+  RealType const C = 1.0;
+  RealType const Q = 0.001;
+  RealType const B = 10.0;
+  RealType       v = 25.0;
   
   bool sediment_given = false;
   if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) &&
@@ -553,14 +551,12 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
         interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height);
     v = (peat_frac * 5.0) + (sand_frac * 5.0) + (silt_frac * 25.0) +
         (clay_frac * 70.0);
-  } else {
-      v = 25.0;
   }
   
   ScalarT const qebt = Q * std::exp(-B * Tdiff);
   
-  icurr = A + ((G - A) / (pow(C + qebt,1.0/v)));
-  dfdT = ((B * Q * (G - A)) * pow(C + qebt,-1.0/v) + (qebt / Q)) / (v * (C + qebt));
+  ScalarT icurr = A + ((G - A) / (pow(C + qebt, 1.0/v)));
+  ScalarT dfdT = ((B * Q * (G - A)) * pow(C + qebt, -1.0/v) + (qebt / Q)) / (v * (C + qebt));
   
   // Update the water saturation
   ScalarT wcurr = 1.0 - icurr;

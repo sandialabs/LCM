@@ -493,20 +493,18 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   */
   ScalarT const Tdiff = Tcurr - Tmelt;
-  ScalarT       icurr{1.0};
-  ScalarT       dfdT{0.0};
   
-  ScalarT const A = 0.0;
-  ScalarT const G = 1.0;
-  ScalarT const C = 1.0;
-  ScalarT const Q = 0.001;
-  ScalarT const B = 10.0;
-  ScalarT const v = 5.0;  // assume its like sand
+  RealType const A = 0.0;
+  RealType const G = 1.0;
+  RealType const C = 1.0;
+  RealType const Q = 0.001;
+  RealType const B = 10.0;
+  RealType const v = 5.0;  // assume its like sand
   
   ScalarT const qebt = Q * std::exp(-B * Tdiff);
   
-  icurr = A + ((G - A) / (pow(C + qebt,1.0/v)));
-  dfdT = ((B * Q * (G - A)) * pow(C + qebt,-1.0/v) + (qebt / Q)) / (v * (C + qebt));
+  ScalarT icurr = A + ((G - A) / (pow(C + qebt,1.0/v)));
+  ScalarT dfdT = ((B * Q * (G - A)) * pow(C + qebt,-1.0/v) + (qebt / Q)) / (v * (C + qebt));
 
   // Update the water saturation
   ScalarT wcurr = 1.0 - icurr;

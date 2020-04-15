@@ -36,7 +36,6 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   water_saturation_min_ = p->get<RealType>("ACE Water Minimum Saturation", 0.0);
   salinity_base_        = p->get<RealType>("ACE Base Salinity", 0.0);
   salt_enhanced_D_      = p->get<RealType>("ACE Salt Enhanced D", 0.0);
-  freeze_curve_width_   = p->get<RealType>("ACE Freezing Curve Width", 1.0);
   f_shift_              = p->get<RealType>("ACE Freezing Curve Shift", 0.25);
   latent_heat_          = p->get<RealType>("ACE Latent Heat", 0.0);
   porosity0_            = p->get<RealType>("ACE Surface Porosity", 0.0);

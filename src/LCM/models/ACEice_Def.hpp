@@ -451,9 +451,9 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // f(T) = 1 / (1 + e^(-(8/W)((T-T0) + (b*W))))
   // W = true width of freezing curve (in Celsius)
   // b = shift to left or right (+ is left, - is right)
-  
+
   ScalarT W = 4.0;  // constant value
-  //if (freezing_curve_width_.size() > 0) {
+  // if (freezing_curve_width_.size() > 0) {
   //  W = interpolateVectors(
   //      z_above_mean_sea_level_, freezing_curve_width_, height);
   //}
@@ -486,22 +486,23 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
       icurr              = 1.0 - 1.0 / etp1;
     }
   }
-  
+
   /*
   // BEGIN NEW CURVE //
   ScalarT const Tdiff = Tcurr - Tmelt;
-  
+
   RealType const A = 0.0;
   RealType const G = 1.0;
   RealType const C = 1.0;
   RealType const Q = 0.001;
   RealType const B = 10.0;
   RealType const v = 5.0;  // assume its like sand
-  
+
   ScalarT const qebt = Q * std::exp(-B * Tdiff);
-  
+
   ScalarT icurr = A + ((G - A) / (pow(C + qebt,1.0/v)));
-  ScalarT dfdT = ((B * Q * (G - A)) * pow(C + qebt,-1.0/v) + (qebt / Q)) / (v * (C + qebt));
+  ScalarT dfdT = ((B * Q * (G - A)) * pow(C + qebt,-1.0/v) + (qebt / Q)) / (v *
+  (C + qebt));
   // END NEW CURVE //
   */
 

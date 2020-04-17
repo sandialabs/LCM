@@ -22,9 +22,9 @@ ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(
 {
   // Read elastic coefficients
   Teuchos::ParameterList e_list = p->sublist("Relaxation time");
-  tau1_ = e_list.get<RealType>("tau1");
-  tau2_ = e_list.get<RealType>("tau2");
-  tau3_ = e_list.get<RealType>("tau3");
+  tau1_                         = e_list.get<RealType>("tau1");
+  tau2_                         = e_list.get<RealType>("tau2");
+  tau3_                         = e_list.get<RealType>("tau3");
 
   // Read stiffness ratio
   e_list     = p->sublist("Stiffness ratio");
@@ -255,7 +255,7 @@ ViscoElasticModel<EvalT, Traits>::computeState(
       Jac_old = J_old(cell, pt);
       // get Jac23 at Gauss point
       Jac23_inv = std::pow(Jac, -2.0 / 3.0);
-      Jac23 = std::pow(Jac, 2.0 / 3.0);
+      Jac23     = std::pow(Jac, 2.0 / 3.0);
       Jac23_old = std::pow(Jac_old, 2.0 / 3.0);
       // Fill deformation gradient
       F.fill(def_grad, cell, pt, 0, 0);

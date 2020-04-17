@@ -720,7 +720,6 @@ main(int ac, char* av[])
       break;
     }
 
-
   }  // end loading steps
 
   // Summarize with AlbanyUtil performance monitors

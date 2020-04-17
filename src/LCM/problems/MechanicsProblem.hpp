@@ -128,7 +128,6 @@ class MechanicsProblem : public AbstractProblem
   void
   constructNeumannEvaluators(Teuchos::RCP<MeshSpecsStruct> const& meshSpecs);
 
-
  private:
   ///
   /// Private to prohibit copying
@@ -140,7 +139,6 @@ class MechanicsProblem : public AbstractProblem
   ///
   MechanicsProblem&
   operator=(const MechanicsProblem&);
-
 
  protected:
   ///

@@ -295,7 +295,6 @@ MechanicsProblem::MechanicsProblem(
   }
 }  // MechanicsProblem
 
-
 void
 MechanicsProblem::buildProblem(
     Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> meshSpecs,
@@ -335,7 +334,6 @@ MechanicsProblem::buildProblem(
   }
 }
 
-
 void
 MechanicsProblem::getAllocatedStates(
     Teuchos::ArrayRCP<Teuchos::ArrayRCP<
@@ -347,7 +345,6 @@ MechanicsProblem::getAllocatedStates(
   old_state = old_state_;
   new_state = new_state_;
 }
-
 
 void
 MechanicsProblem::applyProblemSpecificSolverSettings(
@@ -424,7 +421,6 @@ MechanicsProblem::applyProblemSpecificSolverSettings(
   }
 }
 
-
 void
 MechanicsProblem::constructDirichletEvaluators(MeshSpecsStruct const& meshSpecs)
 {
@@ -470,7 +466,6 @@ MechanicsProblem::constructDirichletEvaluators(MeshSpecsStruct const& meshSpecs)
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
 }
-
 
 // Neumann (Traction) BCs
 void
@@ -576,7 +571,6 @@ MechanicsProblem::constructNeumannEvaluators(
       this->paramLib);
 }
 
-
 ///
 /// Protected methods for MechanicsProblem class
 ///
@@ -606,7 +600,6 @@ MechanicsProblem::getVariableType(
   have_variable = (variable_type != MECH_VAR_TYPE_NONE);
   have_equation = (variable_type == MECH_VAR_TYPE_DOF);
 }
-
 
 std::string
 MechanicsProblem::variableTypeToString(

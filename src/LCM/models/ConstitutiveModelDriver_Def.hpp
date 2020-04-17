@@ -85,5 +85,4 @@ ConstitutiveModelDriver<EvalT, Traits>::evaluateFields(
   }
 }
 
-
 }  // namespace LCM

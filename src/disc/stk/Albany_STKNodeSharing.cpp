@@ -7,7 +7,6 @@
 
 #include "Teuchos_TimeMonitor.hpp"
 
-
 // AGS 03/2015: This is code from STK that was deprecated, so I moved it here
 //              as part of Albany.
 

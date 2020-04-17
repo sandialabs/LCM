@@ -14,7 +14,6 @@
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_util/parallel/ParallelReduce.hpp>
 
-
 double
 stk::rebalance::check_balance(
     mesh::BulkData&             bulk_data,

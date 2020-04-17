@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(LCM_CrystalPlasticityModel_hpp)
 #define LCM_CrystalPlasticityModel_hpp
@@ -235,9 +233,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
 
   std::vector<Teuchos::RCP<ScalarField>> shears_;
 
-  //
   // Field strings
-  //
   std::string const eqps_string_ = field_name_map_["eqps"];
 
   std::string const Re_string_ = field_name_map_["Re"];

@@ -1,12 +1,8 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
-//
 // Factory returning a pointer to a hardening paremeter object
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
 std::shared_ptr<CP::HardeningParameterBase<NumDimT, NumSlipT>>
 CP::hardeningParameterFactory(CP::HardeningLawType type_hardening_law)
@@ -83,9 +79,7 @@ CP::HardeningLawFactory<NumDimT, NumSlipT>::createHardeningLaw(
   return nullptr;
 }
 
-//
 // Linear hardening with recovery
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
 void
 CP::LinearMinusRecoveryHardeningParameters<NumDimT, NumSlipT>::
@@ -99,9 +93,6 @@ CP::LinearMinusRecoveryHardeningParameters<NumDimT, NumSlipT>::
   return;
 }
 
-//
-//
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
 void
 CP::LinearMinusRecoveryHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
@@ -177,9 +168,7 @@ CP::LinearMinusRecoveryHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
   return;
 }
 
-//
 // Saturation hardening
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
 void
 CP::SaturationHardeningParameters<NumDimT, NumSlipT>::createLatentMatrix(
@@ -210,9 +199,6 @@ CP::SaturationHardeningParameters<NumDimT, NumSlipT>::createLatentMatrix(
   return;
 }
 
-//
-//
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
 void
 CP::SaturationHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
@@ -326,9 +312,7 @@ CP::SaturationHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
   return;
 }
 
-//
 // Dislocation-density based hardening
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
 void
 CP::DislocationDensityHardeningParameters<NumDimT, NumSlipT>::
@@ -385,9 +369,6 @@ CP::DislocationDensityHardeningParameters<NumDimT, NumSlipT>::
   return;
 }
 
-//
-//
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
 void
 CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
@@ -404,9 +385,7 @@ CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
 
   minitensor::Index const num_slip_sys = slip_family.num_slip_sys_;
 
-  //
   // Compute the effective dislocation density at step n
-  //
   bool dd_negative = false;
   for (minitensor::Index ss_index_i(0); ss_index_i < num_slip_sys;
        ++ss_index_i) {
@@ -422,9 +401,7 @@ CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
   minitensor::Vector<ArgT, NumSlipT> densities_forest =
       slip_family.latent_matrix_ * state_hardening_np1;
 
-  //
   // Update dislocation densities
-  //
   auto const phardening_params = slip_family.phardening_parameters_;
 
   auto const param_map = phardening_params->param_map_;
@@ -491,9 +468,7 @@ CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
   }
 }
 
-//
 // No hardening
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
 void
 CP::NoHardeningParameters<NumDimT, NumSlipT>::createLatentMatrix(
@@ -506,9 +481,6 @@ CP::NoHardeningParameters<NumDimT, NumSlipT>::createLatentMatrix(
   return;
 }
 
-//
-//
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
 void
 CP::NoHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(

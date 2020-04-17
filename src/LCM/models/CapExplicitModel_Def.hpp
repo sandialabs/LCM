@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include <MiniTensor.h>
 
 #include <Intrepid2_FunctionSpaceTools.hpp>
@@ -59,7 +57,6 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
       std::make_pair("Material Tangent", dl->qp_tensor4));
 
   // define the state variables
-  //
   // strain
   this->num_state_variables_++;
   this->state_var_names_.push_back(strain_string);
@@ -68,7 +65,6 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // stress
   this->num_state_variables_++;
   this->state_var_names_.push_back(cauchy_string);
@@ -77,7 +73,6 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // backStress
   this->num_state_variables_++;
   this->state_var_names_.push_back(backStress_string);
@@ -86,7 +81,6 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // capParameter
   this->num_state_variables_++;
   this->state_var_names_.push_back(capParameter_string);
@@ -95,7 +89,6 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
   this->state_var_init_values_.push_back(kappa0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // eqps
   this->num_state_variables_++;
   this->state_var_names_.push_back(eqps_string);
@@ -104,7 +97,6 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // volPlasticStrain
   this->num_state_variables_++;
   this->state_var_names_.push_back(volPlasticStrain_string);
@@ -115,7 +107,6 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
   this->state_var_output_flags_.push_back(true);
 
   // initialize tensor
-  //
   I             = minitensor::eye<ScalarT>(num_dims_);
   id1           = minitensor::identity_1<ScalarT>(num_dims_);
   id2           = minitensor::identity_2<ScalarT>(num_dims_);

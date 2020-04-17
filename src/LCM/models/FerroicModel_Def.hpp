@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include <MiniTensor.h>
 
 #include <MiniNonlinearSolver.hpp>
@@ -27,7 +25,6 @@ FerroicModel<EvalT>::PostParseInitialize()
 /******************************************************************************/
 {
   // create transitions
-  //
   int nVariants = crystalVariants.size();
   transitions.resize(nVariants * nVariants);
   int transIndex = 0;
@@ -44,7 +41,6 @@ FerroicModel<EvalT>::PostParseInitialize()
     }
 
   // create/initialize transition matrix
-  //
   int nTransitions = transitions.size();
   aMatrix = Kokkos::DynRankView<RealType>("aMatrix", nVariants, nTransitions);
   for (int I = 0; I < nVariants; I++) {
@@ -69,7 +65,6 @@ FerroicModel<EvalT>::computeState(
 /******************************************************************************/
 {
   // create non-linear system
-  //
   using NLS = FM::DomainSwitching<EvalT>;
   NLS domainSwitching(
       crystalVariants,
@@ -82,11 +77,9 @@ FerroicModel<EvalT>::computeState(
       /* dt= */ 1.0);
 
   // solution variable
-  //
   minitensor::Vector<ScalarT, FM::MAX_TRNS> xi;
 
   // solve for xi
-  //
   switch (m_integrationType) {
     default: break;
 
@@ -128,7 +121,6 @@ FerroicModel<EvalT>::computeState(
   }
 
   // update based on new xi values
-  //
 }
 
 }  // namespace FM

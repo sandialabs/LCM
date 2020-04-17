@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_ModelEvaluator.hpp"
 
@@ -603,9 +601,7 @@ ModelEvaluator::evalModelImpl(
     const Thyra_OutArgs& outArgs) const
 {
   Teuchos::TimeMonitor Timer(*timer);  // start timer
-  //
   // Get the input arguments
-  //
 
   //! If a parameter has changed in value, saved/unsaved fields must be updated
   auto out            = Teuchos::VerboseObjectBase::getDefaultOStream();
@@ -715,15 +711,11 @@ ModelEvaluator::evalModelImpl(
     }
   }
 
-  //
   // Get the output arguments
-  //
   auto f_out    = outArgs.get_f();
   auto W_op_out = outArgs.get_W_op();
 
-  //
   // Compute the functions
-  //
 
   // Setup Phalanx data before functions are computed
   app->getPhxSetup()->pre_eval();

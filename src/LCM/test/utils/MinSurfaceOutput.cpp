@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,9 +47,7 @@ main(int ac, char* av[])
     return 1;
   }
 
-  //
   // Read the mesh
-  //
   // Copied from Partition.cc
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
   LCM::Topology             topology(input_file, output_file);

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(Projection_hpp)
 #define Projection_hpp
@@ -11,11 +9,9 @@
 
 namespace LCM {
 
-//
 // Class to manage the projection of a variable from quadrature points
 // to the element nodes.
 // variable may be: scalar, vector, or tensor in 1D, 2D, or 3D.
-//
 
 class Projection
 {

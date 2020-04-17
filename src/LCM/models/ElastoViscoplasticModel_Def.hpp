@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -82,7 +80,6 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   }
 
   // define the state variables
-  //
   // stress
   this->num_state_variables_++;
   this->state_var_names_.push_back(cauchy_string);
@@ -92,7 +89,6 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Cauchy Stress", false));
-  //
   // Fp
   this->num_state_variables_++;
   this->state_var_names_.push_back(Fp_string);
@@ -101,7 +97,6 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output Fp", false));
-  //
   // eqps
   this->num_state_variables_++;
   this->state_var_names_.push_back(eqps_string);
@@ -110,7 +105,6 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output eqps", false));
-  //
   // epsilon_ss, statisically stored dislocations
   this->num_state_variables_++;
   this->state_var_names_.push_back(eps_ss_string);
@@ -119,7 +113,6 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output eps_ss", false));
-  //
   // kappa - isotropic hardening
   this->num_state_variables_++;
   this->state_var_names_.push_back(kappa_string);
@@ -128,7 +121,6 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output kappa", false));
-  //
   // void volume fraction
   this->num_state_variables_++;
   this->state_var_names_.push_back(void_volume_fraction_string);
@@ -138,7 +130,6 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output void volume fraction", false));
-  //
   // mechanical source
   if (have_temperature_) {
     this->num_state_variables_++;
@@ -152,9 +143,7 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   }
 }
 
-//
 // ElastoViscoplastic nonlinear system
-//
 // template<typename EvalT>
 // class EVNLS:
 //     public minitensor::Function_Base<EVNLS<EvalT>, typename EvalT::ScalarT>
@@ -296,7 +285,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
     FieldMap                  eval_fields)
 {
   // get strings from field_name_map in order to extract MDFields
-  //
   std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
   std::string Fp_string     = (*field_name_map_)["Fp"];
   std::string eqps_string   = (*field_name_map_)["eqps"];
@@ -309,7 +297,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
       (*field_name_map_)["void_volume_fraction"];
 
   // extract dependent MDFields
-  //
   auto def_grad_field    = *dep_fields[F_string];
   auto J                 = *dep_fields[J_string];
   auto poissons_ratio    = *dep_fields["Poissons Ratio"];
@@ -322,7 +309,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
   auto delta_time        = *dep_fields["Delta Time"];
 
   // extract evaluated MDFields
-  //
   auto stress_field               = *eval_fields[cauchy_string];
   auto Fp_field                   = *eval_fields[Fp_string];
   auto eqps_field                 = *eval_fields[eqps_string];
@@ -333,7 +319,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
   if (have_temperature_) { source_field = *eval_fields[source_string]; }
 
   // get State Variables
-  //
   Albany::MDArray Fp_field_old = (*workset.stateArrayPtr)[Fp_string + "_old"];
   Albany::MDArray eqps_field_old =
       (*workset.stateArrayPtr)[eqps_string + "_old"];
@@ -345,7 +330,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
       (*workset.stateArrayPtr)[void_volume_fraction_string + "_old"];
 
   // define constants
-  //
   const RealType sq23(std::sqrt(2. / 3.));
   const RealType sq32(std::sqrt(3. / 2.));
   const RealType pi = 3.141592653589793;
@@ -356,7 +340,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
   ScalarT H_mean_eps_ss(eHN_), He_void_vol_frac_nuc(fHeN_);
 
   // pre-define some tensors that will be re-used below
-  //
   minitensor::Tensor<ScalarT> F(num_dims_), be(num_dims_), bebar(num_dims_);
   minitensor::Tensor<ScalarT> s(num_dims_), sigma(num_dims_);
   minitensor::Tensor<ScalarT> N(num_dims_), A(num_dims_);
@@ -374,14 +357,12 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
       ScalarT Y = yield_strength(cell, pt);
 
       // adjustment to the yield strength in the presence of hydrogen
-      //
       if (have_total_concentration_) {
         Y += alpha1_ * total_concentration_(cell, pt);
         H_mean_eps_ss = eHN_ + eHN_coeff_ * total_concentration_(cell, pt);
       }
 
       // adjustment to the yield strength in the presence of helium
-      //
       if (have_total_bubble_density_ && have_bubble_volume_fraction_) {
         if (total_bubble_density_(cell, pt) > 0.0 &&
             bubble_volume_fraction_(cell, pt) > 0.0) {
@@ -399,7 +380,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
       // kappa is a scalar internal strength = 2 mu * eps_ss
       // eqps is equivalent plastic strain
       // void volume fraction ~ damage
-      //
       ScalarT kappa_old  = kappa_field_old(cell, pt);
       ScalarT eps_ss     = eps_ss_field(cell, pt);
       ScalarT eps_ss_old = eps_ss_field_old(cell, pt);
@@ -409,14 +389,12 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
 
       // check to see if this point has exceeded its critical void volume
       // fraction if so, skip and set stress to zero (below)
-      //
       bool failed(false);
       if (Sacado::ScalarValue<ScalarT>::eval(void_volume_fraction_old) >= ff_)
         failed = true;
 
       if (!failed) {
         // fill local tensors
-        //
         F.fill(def_grad_field, cell, pt, 0, 0);
 
         // Mechanical deformation gradient
@@ -424,13 +402,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
         if (have_temperature_) {
           // Compute the mechanical deformation gradient Fm based on the
           // multiplicative decomposition of the deformation gradient
-          //
           //            F = Fm.Ft => Fm = F.inv(Ft)
-          //
           // where Ft is the thermal part of F, given as
-          //
           //     Ft = Le * I = exp(alpha * dtemp) * I
-          //
           // Le = exp(alpha*dtemp) is the thermal stretch and alpha the
           // coefficient of thermal expansion.
           ScalarT dtemp           = temperature_(cell, pt) - ref_temperature_;
@@ -446,35 +420,28 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
 
         // compute trial state
         // compute the Kirchhoff stress in the current configuration
-        //
         // calculate \f$ Cp_n^{-1} \f$
-        //
         Cpinv = minitensor::inverse(Fpn) *
                 minitensor::transpose(minitensor::inverse(Fpn));
 
         // calculate \f$ b^{e} = F {C^{p}}^{-1} F^{T} \f$
-        //
         be = Fm * Cpinv * minitensor::transpose(Fm);
 
         // calculate the determinant of the deformation gradient: \f$ J = det[F]
         // \f$
-        //
         ScalarT Je    = std::sqrt(minitensor::det(be));
         bebar         = std::pow(Je, -2.0 / 3.0) * be;
         ScalarT mubar = minitensor::trace(be) * mu / (num_dims_);
 
         // calculate trial deviatoric stress \f$ s^{tr} = \mu dev(b^{e}) \f$
-        //
         s            = mu * minitensor::dev(bebar);
         ScalarT smag = minitensor::norm(s);
 
         // calculate trial (Kirchhoff) pressure
-        //
         ScalarT p = 0.5 * bulk * (Je * Je - 1.0);
 
         // check yield condition
         // assumes no rate effects
-        //
         ScalarT Ybar  = Je * (Y + kappa_old);
         ScalarT arg   = 1.5 * q2_ * p / Ybar;
         ScalarT fstar = compute_fstar(void_volume_fraction_old, fc_, ff_, q1_);
@@ -482,36 +449,28 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
         ScalarT psi = 1.0 + q3_ * fstar * fstar - 2.0 * q1_ * fstar * cosh_arg;
 
         // Gurson quadratic yield surface
-        //
         ScalarT Phi = 0.5 * minitensor::dotdot(s, s) - psi * Ybar * Ybar / 3.0;
 
-        //
         // check yield condition
-        //
         if (Phi > std::numeric_limits<RealType>::epsilon()) {
           // return mapping algorithm
-          //
           bool      converged = false;
           int       iter(0);
           int const max_iter(30);
           RealType  init_norm = Sacado::ScalarValue<ScalarT>::eval(Phi);
 
           // hardening and recovery parameters
-          //
           ScalarT H  = hardening_modulus(cell, pt);
           ScalarT Rd = recovery_modulus(cell, pt);
 
           // flow rule temperature dependent parameters
-          //
           ScalarT f = flow_coeff(cell, pt);
           ScalarT n = flow_exp(cell, pt);
 
           // This solver deals with Sacado type info
-          //
           LocalNonlinearSolver<EvalT, Traits> solver;
 
           // create some vectors to store solver data
-          //
           int const            num_vars(5);
           std::vector<ScalarT> R(num_vars);
           std::vector<ScalarT> dRdX(num_vars * num_vars);
@@ -519,7 +478,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
 
           // FIXME: the initial guess needs some work, not active
           // initial guess
-          //
           // ScalarT dgam_tr = std::sqrt(smag/(2.0 * mubar * Phi));
           // ScalarT eps_ss_tr = eps_ss_old + delta_time(0) * (H - Rd *
           // eps_ss_old) * dgam_tr; ScalarT kappa_tr = 2.0 * mu * eps_ss_tr;
@@ -544,7 +502,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
           // now below we introduce a local 'Fad' type
           // this is specifically for the nonlinear solve for our constitutive
           // model create a copy of be as a Fad
-          //
           minitensor::Tensor<Fad> beF(num_dims_);
           for (std::size_t i = 0; i < num_dims_; ++i) {
             for (std::size_t j = 0; j < num_dims_; ++j) {
@@ -556,11 +513,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
           // FIXME this seems to be necessary to get PhiF to compile below
           // need to look into this more, it appears to be a conflict
           // between the minitensor::norm and FadType operations
-          //
           Fad smagF = smag;
 
           // check for convergence
-          //
           while (!converged) {
             // set up data types
             // again inside this loop everything is a local 'Fad'
@@ -579,7 +534,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             // p - pressure
             // void_volume_fraction
             // eqps
-            //
             Fad dgamF                 = XFad[0];
             Fad eps_ssF               = XFad[1];
             Fad pF                    = XFad[2];
@@ -592,11 +546,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
               void_volume_fractionF.val() = 0.0;
 
             // account for void coalescence
-            //
             Fad fstarF = compute_fstar(void_volume_fractionF, fc_, ff_, q1_);
 
             // compute yield stress and rate terms
-            //
             Fad eqps_rateF = 0.0;
             Fad rate_termF;
             if (delta_time(0) > 0 && dgamF > 0.0) {
@@ -609,7 +561,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             Fad YbarF  = Je * (Y + kappaF) * rate_termF;
 
             // arguments that feed into the yield function
-            //
             Fad argF      = (1.5 * q2_ * pF) / YbarF;
             Fad cosh_argF = std::min(std::cosh(argF), max_value);
             Fad psiF =
@@ -617,7 +568,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             Fad factor = 1.0 / (1.0 + (two_mubarF * dgamF));
 
             // deviatoric stress
-            //
             minitensor::Tensor<Fad> sF(num_dims_);
             for (int k(0); k < num_dims_; ++k) {
               for (int l(0); l < num_dims_; ++l) {
@@ -626,7 +576,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             }
 
             // shear dependent term for void growth
-            //
             Fad omega(0.0), taue(0.0), smag(0.0);
             Fad J3    = minitensor::det(sF);
             Fad smag2 = minitensor::dotdot(sF, sF);
@@ -642,7 +591,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             }
 
             // increment in equivalent plastic strain
-            //
             // Fad sinh_argF = std::copysign(std::min(std::abs(std::sinh(argF)),
             // max_value), argF);
             Fad sinh_argF = std::sinh(argF);
@@ -656,18 +604,15 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             if (smag != 0.0) { deq += dgamF * smag2 / (1.0 - fstarF) / YbarF; }
 
             // compute the hardening residual
-            //
             Fad deps_ssF = (H - Rd * eps_ssF) * deq;
             Fad eps_resF = eps_ssF - eps_ss_old - deps_ssF;
 
             // void nucleation
-            //
             Fad eratio = -0.5 * (eqpsF - eN_) * (eqpsF - eN_) / sN_ / sN_;
             Fad Anuc   = fN_ / sN_ / (std::sqrt(2.0 * pi)) * std::exp(eratio);
             Fad dfnuc  = Anuc * deq;
 
             // void nucleation with H, He
-            //
             Fad Heratio = -0.5 * (eps_ssF - H_mean_eps_ss) *
                           (eps_ssF - H_mean_eps_ss) / sHN_ / sHN_;
             Fad HAnuc = He_void_vol_frac_nuc / sHN_ / (std::sqrt(2.0 * pi)) *
@@ -675,7 +620,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             Fad dHfnuc = HAnuc * deps_ssF;
 
             // void growth
-            //
             Fad dfg =
                 dgamF * q1_ * q2_ * (1.0 - fstarF) * fstarF * YbarF * sinh_argF;
             if (taue > 0.0) {
@@ -683,11 +627,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             }
 
             // yield surface
-            //
             Fad PhiF = 0.5 * smag2 - psiF * YbarF * YbarF / 3.0;
 
             // for convenience put the residuals into a container
-            //
             RFad[0] = PhiF;
             RFad[1] = eps_resF;
             RFad[2] = (pF - p +
@@ -698,11 +640,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             RFad[4] = eqpsF - eqps_old - deq;
 
             // extract the values of the residuals
-            //
             for (int i = 0; i < num_vars; ++i) { R[i] = RFad[i].val(); }
 
             // compute the norm of the residual
-            //
             // (ahh! this hurts my eyes!)
             RealType R0 = Sacado::ScalarValue<ScalarT>::eval(R[0]);
             RealType R1 = Sacado::ScalarValue<ScalarT>::eval(R[1]);
@@ -713,14 +653,11 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
                 std::sqrt(R0 * R0 + R1 * R1 + R2 * R2 + R3 * R3 + R4 * R4);
             // max_norm = std::max(norm_res, max_norm);
 
-            //
             // check against too many iterations and failure
-            //
             // if we have iterated the maximum number of times, just quit.
             // we are banking on the global (NOX/LOCA) solver strategy to detect
             // global convergence failure and cut back if necessary.
             // this is not ideal and needs more work.
-            //
             if (iter == max_iter) {
               if (void_volume_fractionF.val() >= ff_) {
                 failed = true;
@@ -767,7 +704,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             }
 
             // check for a sufficiently small residual
-            //
             if ((norm_res / init_norm < 1.e-12) || (norm_res < 1.e-12)) {
               converged = true;
               if (print_)
@@ -776,13 +712,11 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             }
 
             // extract the sensitivities of the residuals
-            //
             for (int i = 0; i < num_vars; ++i)
               for (int j = 0; j < num_vars; ++j)
                 dRdX[i + num_vars * j] = RFad[i].dx(j);
 
             // this call invokes the solver and updates the solution in X
-            //
             solver.solve(dRdX, X, R);
 
             // check sanity of solution increments
@@ -793,17 +727,14 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             if (X[4] < eqps_old) X[4] = eqps_old;
 
             // increment the iteration counter
-            //
             iter++;
           }
 
           // patch local sensistivities into global
           // (magic!)
-          //
           solver.computeFadInfo(dRdX, X, R);
 
           // extract solution
-          //
           ScalarT dgam                 = X[0];
           ScalarT eps_ss               = X[1];
           ScalarT kappa                = 2.0 * mubar * eps_ss;
@@ -812,23 +743,19 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
           ScalarT eqps                 = X[4];
 
           // compute modified void volume fraction
-          //
           fstar = compute_fstar(void_volume_fraction, fc_, ff_, q1_);
 
           // return mapping of stress state
-          //
           s = (1.0 / (1.0 + 2.0 * mubar * dgam)) * s;
 
           // mechanical source
           // FIXME this is not correct, just a placeholder
-          //
           if (have_temperature_ && delta_time(0) > 0) {
             source_field(cell, pt) = (sq23 * dgam / delta_time(0)) *
                                      (Y + kappa) / (density_ * heat_capacity_);
           }
 
           // exponential map to get Fpnew
-          //
           Ybar             = Je * (Y + kappa);
           arg              = 1.5 * q2_ * p / Ybar;
           ScalarT sinh_arg = std::min(std::sinh(arg), max_value);
@@ -842,7 +769,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
           }
 
           // update other plasticity state variables
-          //
           eps_ss_field(cell, pt)               = eps_ss;
           eqps_field(cell, pt)                 = eqps;
           kappa_field(cell, pt)                = kappa;
@@ -850,7 +776,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
 
         } else {
           // we are not yielding, variables do not evolve
-          //
           eps_ss_field(cell, pt)               = eps_ss_old;
           eqps_field(cell, pt)                 = eqps_old;
           kappa_field(cell, pt)                = kappa_old;
@@ -864,7 +789,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
         }
 
         // compute stress
-        //
         sigma = p / Je * I + s / Je;
         for (std::size_t i(0); i < num_dims_; ++i) {
           for (std::size_t j(0); j < num_dims_; ++j) {

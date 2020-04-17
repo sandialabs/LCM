@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Projection.hpp"
 
@@ -36,12 +34,10 @@ Projection::Projection(
 int
 Projection::getProjectedComponents()
 {
-  //
   // The number of components is not necessarily determined solely
   // by the variable rank and spatial dimension of the problem.
   // For now, assume that the number of components is passed to the class
   // from the input file
-  //
 
   /*
    int projectedComp;

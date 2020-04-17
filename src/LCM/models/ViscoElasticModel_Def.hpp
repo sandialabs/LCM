@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 // Author: Mario J. Juha (juham@rpi.edu)
 
@@ -24,7 +22,6 @@ ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(
 {
   // Read elastic coefficients
   Teuchos::ParameterList e_list = p->sublist("Relaxation time");
-  //
   tau1_ = e_list.get<RealType>("tau1");
   tau2_ = e_list.get<RealType>("tau2");
   tau3_ = e_list.get<RealType>("tau3");
@@ -113,7 +110,6 @@ ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output H_3", false));
-  //
 }
 
 //----------------------------------------------------------------------------
@@ -137,16 +133,12 @@ ViscoElasticModel<EvalT, Traits>::computeState(
   // std::cout << workset.previous_time << std::endl;
   // ScalarT dt = 1.0e-7;
 
-  //
   // extract dependent MDFields
-  //
   auto def_grad   = *dep_fields[F_string];
   auto J          = *dep_fields[J_string];
   auto delta_time = *dep_fields["Delta Time"];
 
-  //
   // extract evaluated MDFields
-  //
   auto stress = *eval_fields[cauchy];
   // S_0
   auto stress_0 = *eval_fields[S0_string];
@@ -157,9 +149,7 @@ ViscoElasticModel<EvalT, Traits>::computeState(
   // time
   auto time = *eval_fields["Time"];
 
-  //
   // Extract previous values (state variables)
-  //
   Albany::MDArray J_old        = (*workset.stateArrayPtr)[J_string + "_old"];
   Albany::MDArray stress_0_old = (*workset.stateArrayPtr)[S0_string + "_old"];
   Albany::MDArray H1_old       = (*workset.stateArrayPtr)[H1_string + "_old"];
@@ -222,7 +212,6 @@ ViscoElasticModel<EvalT, Traits>::computeState(
   minitensor::Tensor<ScalarT> h2_alpha(num_dims_);
   minitensor::Tensor<ScalarT> h3_alpha(num_dims_);
 
-  //
   //    // Temporal variables
   //    minitensor::Tensor<ScalarT> tmp1(num_dims_);
 
@@ -266,9 +255,7 @@ ViscoElasticModel<EvalT, Traits>::computeState(
       Jac_old = J_old(cell, pt);
       // get Jac23 at Gauss point
       Jac23_inv = std::pow(Jac, -2.0 / 3.0);
-      //
       Jac23 = std::pow(Jac, 2.0 / 3.0);
-      //
       Jac23_old = std::pow(Jac_old, 2.0 / 3.0);
       // Fill deformation gradient
       F.fill(def_grad, cell, pt, 0, 0);

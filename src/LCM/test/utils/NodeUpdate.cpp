@@ -1,11 +1,8 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 // Test of mesh manipulation.
 // Separate all elements of a mesh by nodal replacement
-//
 
 #include "topology/Topology.hpp"
 #include "topology/Topology_Utils.hpp"
@@ -13,9 +10,7 @@
 int
 main(int ac, char* av[])
 {
-  //
   // Create a command line processor and parse command line options
-  //
   Teuchos::CommandLineProcessor command_line_processor;
 
   command_line_processor.setDocString(
@@ -46,9 +41,7 @@ main(int ac, char* av[])
     return 1;
   }
 
-  //
   // Read the mesh
-  //
   // Copied from Partition.cc
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
 

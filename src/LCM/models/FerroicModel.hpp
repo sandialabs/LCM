@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(FerroicModel_hpp)
 #define FerroicModel_hpp
@@ -18,15 +16,12 @@ class FerroicModel
   using ScalarT = typename EvalT::ScalarT;
 
   // Constructor
-  //
   FerroicModel();
 
   // Virtual Denstructor
-  //
   ~FerroicModel() {}
 
   // Method to compute the state
-  //
   void
   computeState(
       const minitensor::Tensor<ScalarT, FM::THREE_D>& x,
@@ -37,7 +32,6 @@ class FerroicModel
       Teuchos::Array<ScalarT>&                        newfractions);
 
   // Accessors
-  //
   minitensor::Tensor<RealType, FM::THREE_D>&
   getBasis()
   {
@@ -90,7 +84,6 @@ class FerroicModel
   operator=(const FerroicModel&);
 
   // parameters
-  //
   minitensor::Tensor<RealType, FM::THREE_D>      R;
   Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>> crystalPhases;
   Teuchos::Array<FM::CrystalVariant>             crystalVariants;
@@ -100,7 +93,6 @@ class FerroicModel
   Kokkos::DynRankView<RealType>                  aMatrix;
 
   // Solution options
-  //
   IntegrationType      m_integrationType;
   ExplicitMethod       m_explicitMethod;
   minitensor::StepType m_step_type;

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #ifndef MOERTEL_FUNCTIONT_HPP
 #define MOERTEL_FUNCTIONT_HPP
@@ -166,7 +164,6 @@ struct Constant1D
       double*       deriv)
   {
     // for this linear function, we get 2 values and 2 derivatives
-    //
 
     if (val) {
       val[0] = 1.;
@@ -206,7 +203,6 @@ struct Linear1D
       double*       deriv)
   {
     // for this linear function, we get 2 values and 2 derivatives
-    //
 
     if (val) {
       val[0] = 0.5 * (1.0 - xi[0]);

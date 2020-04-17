@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include <time.h>
 
 #include <cstdarg>
@@ -281,9 +279,6 @@ printThyraMultiVector(
   }
 }
 
-//
-//
-//
 template <>
 void
 writeMatrixMarket<const Tpetra_Map>(
@@ -305,9 +300,6 @@ writeMatrixMarket<const Tpetra_Map>(
   Tpetra::MatrixMarket::Writer<Tpetra_CrsMatrix>::writeMapFile(filename, *map);
 }
 
-//
-//
-//
 template <>
 void
 writeMatrixMarket<const Tpetra_Vector>(
@@ -330,9 +322,6 @@ writeMatrixMarket<const Tpetra_Vector>(
   Tpetra::MatrixMarket::Writer<Tpetra_CrsMatrix>::writeDenseFile(filename, v);
 }
 
-//
-//
-//
 template <>
 void
 writeMatrixMarket<const Tpetra_MultiVector>(
@@ -355,9 +344,6 @@ writeMatrixMarket<const Tpetra_MultiVector>(
   Tpetra::MatrixMarket::Writer<Tpetra_CrsMatrix>::writeDenseFile(filename, mv);
 }
 
-//
-//
-//
 template <>
 void
 writeMatrixMarket<const Tpetra_CrsMatrix>(
@@ -499,9 +485,6 @@ assert_fail(std::string const& msg)
   abort();
 }
 
-//
-//
-//
 int
 getProcRank()
 {

@@ -1,12 +1,9 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 // Test 1 of barycentric subdivision. Input file has to be specified.
 // Checks the proper operation of the barycentric_subdivision() function.
 // Restricted to simplicial complexes.
-//
 
 #include "time.h"
 #include "topology/Topology.hpp"
@@ -22,9 +19,7 @@ typedef stk::mesh::Entity Entity;
 std::vector<int>
 return_number_entities(LCM::Topology& topology_);
 
-//
 // Checks if the subdivision was done correctly
-//
 std::string
 verify_subdivision(
     std::vector<int> const& former_num_entities,
@@ -33,9 +28,7 @@ verify_subdivision(
 int
 main(int ac, char* av[])
 {
-  //
   // Create a command line processor and parse command line options
-  //
   Teuchos::CommandLineProcessor command_line_processor;
 
   command_line_processor.setDocString(
@@ -67,9 +60,7 @@ main(int ac, char* av[])
     return 1;
   }
 
-  //
   // Read the mesh
-  //
   // Copied from Partition.cc
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
   LCM::Topology             topology(input_file, output_file);
@@ -86,9 +77,7 @@ main(int ac, char* av[])
   // Prepares mesh for barycentric subdivision
   topology.removeNodeRelations();
 
-  //
   // Here starts the barycentric subdivision.
-  //
   // Carry out barycentric subdivision on the mesh
   topology.barycentricSubdivision();
   std::cout << "*************************" << std::endl;
@@ -139,9 +128,7 @@ return_number_entities(LCM::Topology& topology_)
 
   return output_vector;
 }
-//
 // Checks if the subdivision was done correctly
-//
 std::string
 verify_subdivision(
     std::vector<int> const& former_num_entities,

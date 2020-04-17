@@ -1,7 +1,5 @@
-//
 // Copyright 2001, 2002, 2010 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS)
-//
 #include <percept/PerceptMesh.hpp>
 #include <stk_mesh/base/Selector.hpp>
 #include <stk_mesh/base/Types.hpp>

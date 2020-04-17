@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -16,15 +14,10 @@
 #include "Albany_ThyraUtils.hpp"
 #include "SchwarzBC.hpp"
 
-//
 // Generic Template Code for Constructor and PostRegistrationSetup
-//
 
 namespace LCM {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 SchwarzBC_Base<EvalT, Traits>::SchwarzBC_Base(Teuchos::ParameterList& p)
     : PHAL::DirichletBase<EvalT, Traits>(p),
@@ -50,9 +43,6 @@ SchwarzBC_Base<EvalT, Traits>::SchwarzBC_Base(Teuchos::ParameterList& p)
   setCoupledAppIndex(coupled_app_index);
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 template <typename T>
 void
@@ -318,9 +308,6 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(
   z_val = value(2);
 }
 
-//
-//
-//
 #if defined(ALBANY_DTK)
 template <typename EvalT, typename Traits>
 Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>
@@ -442,9 +429,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
 }
 #endif  // ALBANY_DTK
 
-//
 // Fill residual, used in both residual and Jacobian
-//
 template <typename SchwarzBC, typename Traits>
 void
 fillResidual(SchwarzBC& sbc, typename Traits::EvalData workset)
@@ -521,9 +506,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData workset)
   return;
 }
 
-//
 // Specialization: Residual
-//
 template <typename Traits>
 SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::SchwarzBC(
     Teuchos::ParameterList& p)
@@ -531,9 +514,6 @@ SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::SchwarzBC(
 {
 }
 
-//
-//
-//
 template <typename Traits>
 void
 SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
@@ -544,9 +524,7 @@ SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   return;
 }
 
-//
 // Specialization: Jacobian
-//
 template <typename Traits>
 SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::SchwarzBC(
     Teuchos::ParameterList& p)
@@ -554,9 +532,6 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::SchwarzBC(
 {
 }
 
-//
-//
-//
 template <typename Traits>
 void
 SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #ifndef LAMESTRESS_HPP
 #define LAMESTRESS_HPP
@@ -24,7 +22,6 @@ namespace LCM {
 // and specialized cases below. Implements a dummy evaluateFields that
 // just throw's a Not Implemented
 // (2) Implements private functions with calls to Lame with doubles.
-//
 template <typename EvalT, typename Traits>
 class LameStressBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                        public PHX::EvaluatorDerived<EvalT, Traits>

@@ -162,11 +162,9 @@ computeResidual(
 // Host-independent Models
 /******************************************************************************/
 
-//
 //! Nonlinear Solver (NLS) class for the domain switching / phase transition
 //! model.
 //  Unknowns: transition rates
-//
 template <typename EvalT, minitensor::Index M = FM::MAX_TRNS>
 class DomainSwitching
     : public minitensor::

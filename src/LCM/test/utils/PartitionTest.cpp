@@ -1,12 +1,8 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
-//
 // Simple mesh partitioning program
-//
 #include <LCMPartition.hpp>
 #include <Teuchos_CommandLineProcessor.hpp>
 #include <algorithm>
@@ -16,16 +12,12 @@
 int
 main(int ac, char* av[])
 {
-  //
   // Initialize Zoltan
-  //
   float version;
 
   Zoltan_Initialize(ac, av, &version);
 
-  //
   // Create a command line processor and parse command line options
-  //
   Teuchos::CommandLineProcessor command_line_processor;
 
   command_line_processor.setDocString(
@@ -120,22 +112,16 @@ main(int ac, char* av[])
     return 1;
   }
 
-  //
   // Read mesh
-  //
   LCM::ConnectivityArray connectivity_array(input_file, output_file);
 
-  //
   // Set extra parameters
-  //
   connectivity_array.setTolerance(tolerance);
   connectivity_array.setCellSize(requested_cell_size);
   connectivity_array.setMaximumIterations(maximum_iterations);
   connectivity_array.setInitializerScheme(initializer_scheme);
 
-  //
   // Partition mesh
-  //
   auto start = std::chrono::system_clock::now();
 
   std::map<int, int> const partitions =
@@ -151,9 +137,7 @@ main(int ac, char* av[])
   Albany::STKDiscretization& stk_discretization =
       static_cast<Albany::STKDiscretization&>(discretization);
 
-  //
   // Output partitions
-  //
 
   // Convert partition map to format used by Albany to set internal variables.
   // Assumption: numbering of elements is contiguous.

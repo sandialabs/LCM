@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Schwarz_Alternating.hpp"
 
@@ -16,9 +14,6 @@
 
 namespace LCM {
 
-//
-//
-//
 SchwarzAlternating::SchwarzAlternating(
     Teuchos::RCP<Teuchos::ParameterList> const&   app_params,
     Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
@@ -246,18 +241,14 @@ SchwarzAlternating::SchwarzAlternating(
     curr_disp_[subdomain] = Teuchos::null;
   }
 
-  //
   // Parameters
-  //
   Teuchos::ParameterList& problem_params = app_params->sublist("Problem");
 
   bool const have_parameters = problem_params.isSublist("Parameters");
 
   ALBANY_ASSERT(have_parameters == false, "Parameters not supported.");
 
-  //
   // Responses
-  //
   bool const have_responses = problem_params.isSublist("Response Functions");
 
   ALBANY_ASSERT(have_responses == false, "Responses not supported.");
@@ -265,59 +256,38 @@ SchwarzAlternating::SchwarzAlternating(
   return;
 }
 
-//
-//
-//
 SchwarzAlternating::~SchwarzAlternating() { return; }
 
-//
-//
-//
 Teuchos::RCP<Thyra_VectorSpace const>
 SchwarzAlternating::get_x_space() const
 {
   return Teuchos::null;
 }
 
-//
-//
-//
 Teuchos::RCP<Thyra_VectorSpace const>
 SchwarzAlternating::get_f_space() const
 {
   return Teuchos::null;
 }
 
-//
-//
-//
 Teuchos::RCP<Thyra_VectorSpace const>
 SchwarzAlternating::get_p_space(int) const
 {
   return Teuchos::null;
 }
 
-//
-//
-//
 Teuchos::RCP<Thyra_VectorSpace const>
 SchwarzAlternating::get_g_space(int) const
 {
   return Teuchos::null;
 }
 
-//
-//
-//
 Teuchos::RCP<const Teuchos::Array<std::string>>
 SchwarzAlternating::get_p_names(int) const
 {
   return Teuchos::null;
 }
 
-//
-//
-//
 Teuchos::ArrayView<std::string const>
 SchwarzAlternating::get_g_names(int) const
 {
@@ -325,81 +295,54 @@ SchwarzAlternating::get_g_names(int) const
   return Teuchos::ArrayView<std::string const>(Teuchos::null);
 }
 
-//
-//
-//
 Thyra_ModelEvaluator::InArgs<ST>
 SchwarzAlternating::getNominalValues() const
 {
   return this->createInArgsImpl();
 }
 
-//
-//
-//
 Thyra_ModelEvaluator::InArgs<ST>
 SchwarzAlternating::getLowerBounds() const
 {
   return Thyra_ModelEvaluator::InArgs<ST>();  // Default value
 }
 
-//
-//
-//
 Thyra_ModelEvaluator::InArgs<ST>
 SchwarzAlternating::getUpperBounds() const
 {
   return Thyra_ModelEvaluator::InArgs<ST>();  // Default value
 }
 
-//
-//
-//
 Teuchos::RCP<Thyra::LinearOpBase<ST>>
 SchwarzAlternating::create_W_op() const
 {
   return Teuchos::null;
 }
 
-//
-//
-//
 Teuchos::RCP<Thyra::PreconditionerBase<ST>>
 SchwarzAlternating::create_W_prec() const
 {
   return Teuchos::null;
 }
 
-//
-//
-//
 Teuchos::RCP<const Thyra::LinearOpWithSolveFactoryBase<ST>>
 SchwarzAlternating::get_W_factory() const
 {
   return Teuchos::null;
 }
 
-//
-//
-//
 Thyra_ModelEvaluator::InArgs<ST>
 SchwarzAlternating::createInArgs() const
 {
   return this->createInArgsImpl();
 }
 
-//
-//
-//
 Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>
 SchwarzAlternating::getApps() const
 {
   return apps_;
 }
 
-//
-//
-//
 void
 SchwarzAlternating::set_failed(char const* msg)
 {
@@ -408,9 +351,6 @@ SchwarzAlternating::set_failed(char const* msg)
   return;
 }
 
-//
-//
-//
 void
 SchwarzAlternating::clear_failed()
 {
@@ -418,36 +358,27 @@ SchwarzAlternating::clear_failed()
   return;
 }
 
-//
-//
-//
 bool
 SchwarzAlternating::get_failed() const
 {
   return failed_;
 }
 
-//
 // Create operator form of dg/dx for distributed responses
-//
 Teuchos::RCP<Thyra::LinearOpBase<ST>>
 SchwarzAlternating::create_DgDx_op_impl(int /* j */) const
 {
   return Teuchos::null;
 }
 
-//
 // Create operator form of dg/dx_dot for distributed responses
-//
 Teuchos::RCP<Thyra::LinearOpBase<ST>>
 SchwarzAlternating::create_DgDx_dot_op_impl(int /* j */) const
 {
   return Teuchos::null;
 }
 
-//
 // Create InArgs
-//
 Thyra_InArgs
 SchwarzAlternating::createInArgsImpl() const
 {
@@ -466,9 +397,7 @@ SchwarzAlternating::createInArgsImpl() const
   return static_cast<Thyra_InArgs>(ias);
 }
 
-//
 // Create OutArgs
-//
 Thyra_OutArgs
 SchwarzAlternating::createOutArgsImpl() const
 {
@@ -488,9 +417,7 @@ SchwarzAlternating::createOutArgsImpl() const
   return static_cast<Thyra_OutArgs>(oas);
 }
 
-//
 // Evaluate model on InArgs
-//
 void
 SchwarzAlternating::evalModelImpl(
     Thyra_ModelEvaluator::InArgs<ST> const&,
@@ -517,9 +444,6 @@ centered(std::string const& str, int width)
 
 }  // namespace
 
-//
-//
-//
 void
 SchwarzAlternating::updateConvergenceCriterion() const
 {
@@ -547,9 +471,6 @@ SchwarzAlternating::updateConvergenceCriterion() const
   }
 }
 
-//
-//
-//
 bool
 SchwarzAlternating::continueSolve() const
 {
@@ -581,9 +502,6 @@ SchwarzAlternating::continueSolve() const
   return continue_solve;
 }
 
-//
-//
-//
 void
 SchwarzAlternating::reportFinals(std::ostream& os) const
 {
@@ -601,9 +519,7 @@ SchwarzAlternating::reportFinals(std::ostream& os) const
   os << std::endl;
 }
 
-//
 // Schwarz Alternating loop, dynamic
-//
 void
 SchwarzAlternating::SchwarzLoopDynamics() const
 {
@@ -1086,9 +1002,7 @@ SchwarzAlternating::doQuasistaticOutput(ST const time) const
   }
 }
 
-//
 // Schwarz Alternating loop, quasistatic
-//
 void
 SchwarzAlternating::SchwarzLoopQuasistatics() const
 {

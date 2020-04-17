@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <fstream>
 
@@ -44,11 +42,9 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
   //	  is_constant = true; // this means no stochastic nature
   //	  is_field = true;
   //	  constant_value = elmd_list->get("Value", 1.0);
-  //
   //	  // Add Elastic Modulus as a Sacado-ized parameter
   //	  new Sacado::ParameterRegistration<EvalT, SPL_Traits>(
   //	  	"Elastic Modulus", this, paramLib);
-  //
   //  }
   else {
     ALBANY_ABORT("Invalid elastic modulus type " << type);

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #if !defined(LCM_StateVarUtils_hpp)
 #define LCM_StateVarUtils_hpp
 
@@ -14,14 +12,12 @@
 #include "Albany_StateManager.hpp"
 namespace LCM {
 
-//
 // These are to mirror Albany::StateArrays, which are shards:Arrays
 // under the hood, which in turn use for storage a raw pointer that comes
 // from the depths of STK. Thus, to make a copy of the states without
 // touching that pointer, we create these so that the values can be
 // passed back and forth between LCM::StateArrays and Albany::StateArrays
 // whenever we need to reset states.
-//
 using StateArray    = std::map<std::string, std::vector<ST>>;
 using StateArrayVec = std::vector<StateArray>;
 

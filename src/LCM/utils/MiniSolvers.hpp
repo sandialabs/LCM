@@ -1,22 +1,15 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #if !defined(LCM_MiniSolvers_hpp)
 #define LCM_MiniSolvers_hpp
 
 #include "MiniNonlinearSolver.hpp"
 #include "MiniTensor_Solvers.h"
 
-//
 // Define some nonlinear systems (NLS) to test nonlinear solution methods.
-//
 namespace LCM {
 
-//
-//
-//
 template <typename S, minitensor::Index M = 2>
 class Banana : public minitensor::Function_Base<Banana<S, M>, S, M>
 {
@@ -61,9 +54,6 @@ class Banana : public minitensor::Function_Base<Banana<S, M>, S, M>
   }
 };
 
-//
-//
-//
 template <typename EvalT, minitensor::Index M = 2>
 class Banana_Traits
     : public minitensor::
@@ -120,9 +110,6 @@ class Banana_Traits
   S b_{100.0};
 };
 
-//
-//
-//
 template <typename EvalT, minitensor::Index M = 2>
 class Paraboloid_Traits
     : public minitensor::

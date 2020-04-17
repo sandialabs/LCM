@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Schwarz_PiroObserver.hpp"
 
@@ -11,9 +9,6 @@
 
 namespace LCM {
 
-//
-//
-//
 Schwarz_PiroObserver::Schwarz_PiroObserver(
     Teuchos::RCP<SchwarzCoupled> const& cs_model)
 {
@@ -22,18 +17,12 @@ Schwarz_PiroObserver::Schwarz_PiroObserver(
   impl_     = Teuchos::rcp(new ObserverImpl(apps_));
 }
 
-//
-//
-//
 void
 Schwarz_PiroObserver::observeSolution(Thyra::VectorBase<ST> const& solution)
 {
   this->observeSolutionImpl(solution, Teuchos::ScalarTraits<ST>::zero());
 }
 
-//
-//
-//
 void
 Schwarz_PiroObserver::observeSolution(
     Thyra::VectorBase<ST> const& solution,
@@ -42,9 +31,6 @@ Schwarz_PiroObserver::observeSolution(
   this->observeSolutionImpl(solution, stamp);
 }
 
-//
-//
-//
 void
 Schwarz_PiroObserver::observeSolution(
     Thyra::VectorBase<ST> const& solution,
@@ -56,9 +42,6 @@ Schwarz_PiroObserver::observeSolution(
 
 namespace {  // anonymous
 
-//
-//
-//
 Teuchos::Array<Teuchos::RCP<Thyra_Vector const>>
 arrayVecsFromVec(Thyra::VectorBase<double> const& v, int n_models)
 {
@@ -79,9 +62,6 @@ arrayVecsFromVec(Thyra::VectorBase<double> const& v, int n_models)
 
 }  // anonymous namespace
 
-//
-//
-//
 void
 Schwarz_PiroObserver::observeSolutionImpl(
     Thyra::VectorBase<ST> const& solution,
@@ -97,9 +77,6 @@ Schwarz_PiroObserver::observeSolutionImpl(
   impl_->observeSolution(default_stamp, solutions, null_array);
 }
 
-//
-//
-//
 void
 Schwarz_PiroObserver::observeSolutionImpl(
     Thyra::VectorBase<ST> const& solution,
@@ -115,7 +92,4 @@ Schwarz_PiroObserver::observeSolutionImpl(
   impl_->observeSolution(default_stamp, solutions, solutions_dot);
 }
 
-//
-//
-//
 }  // namespace LCM

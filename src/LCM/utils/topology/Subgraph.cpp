@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Subgraph.hpp"
 
 #include "Topology.hpp"
@@ -10,9 +8,7 @@
 
 namespace LCM {
 
-//
 // Create a subgraph given a vertex list and an edge list.
-//
 Subgraph::Subgraph(
     Topology&                             topology,
     std::set<stk::mesh::Entity>::iterator first_entity,
@@ -87,9 +83,7 @@ Subgraph::Subgraph(
   return;
 }
 
-//
 // Accessors and mutators
-//
 Topology&
 Subgraph::get_topology()
 {
@@ -162,9 +156,7 @@ Subgraph::is_internal_and_open(stk::mesh::Entity e)
   return get_topology().is_internal_and_open(e);
 }
 
-//
 // Map a vertex in the subgraph to a entity in the stk mesh.
-//
 stk::mesh::Entity
 Subgraph::entityFromVertex(Vertex vertex)
 {
@@ -178,9 +170,7 @@ Subgraph::entityFromVertex(Vertex vertex)
   return entity;
 }
 
-//
 // Map a entity in the stk mesh to a vertex in the subgraph.
-//
 Vertex
 Subgraph::vertexFromEntity(stk::mesh::Entity entity)
 {
@@ -194,9 +184,7 @@ Subgraph::vertexFromEntity(stk::mesh::Entity entity)
   return vertex;
 }
 
-//
 // Add a vertex in the subgraph.
-//
 Vertex
 Subgraph::addVertex(stk::mesh::EntityRank vertex_rank, stk::mesh::Entity entity)
 {
@@ -271,9 +259,7 @@ Subgraph::addVertex(stk::mesh::EntityRank vertex_rank, stk::mesh::Entity entity)
   return new_vertex;
 }
 
-//
 // Remove vertex in subgraph
-//
 void
 Subgraph::removeVertex(Vertex const vertex)
 {
@@ -299,9 +285,7 @@ Subgraph::removeVertex(Vertex const vertex)
   return;
 }
 
-//
 // Add edge to local graph.
-//
 std::pair<Edge, bool>
 Subgraph::addEdge(
     EdgeId const edge_id,
@@ -336,9 +320,6 @@ Subgraph::addEdge(
   return graph_edge;
 }
 
-//
-//
-//
 void
 Subgraph::removeEdge(Vertex const source_vertex, Vertex const target_vertex)
 {
@@ -366,9 +347,6 @@ Subgraph::removeEdge(Vertex const source_vertex, Vertex const target_vertex)
   return;
 }
 
-//
-//
-//
 stk::mesh::EntityRank
 Subgraph::getVertexRank(Vertex const vertex)
 {
@@ -376,9 +354,6 @@ Subgraph::getVertexRank(Vertex const vertex)
   return boost::get(vertex_property_map, vertex);
 }
 
-//
-//
-//
 EdgeId
 Subgraph::getEdgeId(Edge const edge)
 {
@@ -420,10 +395,8 @@ writeGraphviz(std::string const& output_filename, UGraph const& graph)
 
 }  // anonymous namespace
 
-//
 // Function determines whether the input vertex is an articulation
 // point of the subgraph.
-//
 void
 Subgraph::testArticulationPoint(
     Vertex const        articulation_vertex,
@@ -519,10 +492,8 @@ Subgraph::testArticulationPoint(
   return;
 }
 
-//
 // Clones a boundary vertex from the subgraph and separates the in-edges
 // of the entity.
-//
 Vertex
 Subgraph::cloneBoundaryVertex(Vertex boundary_vertex)
 {
@@ -582,9 +553,7 @@ Subgraph::cloneBoundaryVertex(Vertex boundary_vertex)
   return vertex_clone;
 }
 
-//
 // Restore element to node connectivity needed by STK.
-//
 void
 Subgraph::updateEntityPointConnectivity(
     stk::mesh::Entity old_point,
@@ -626,9 +595,7 @@ Subgraph::updateEntityPointConnectivity(
   return;
 }
 
-//
 // Splits an articulation point.
-//
 EntityEntityMap
 Subgraph::splitArticulation(Vertex articulation_vertex)
 {
@@ -774,9 +741,7 @@ Subgraph::splitArticulation(Vertex articulation_vertex)
   return entity_split_point_map;
 }
 
-//
 // Clone all out edges of a vertex to a new vertex.
-//
 void
 Subgraph::cloneOutEdges(Vertex old_vertex, Vertex new_vertex)
 {
@@ -833,20 +798,15 @@ Subgraph::cloneOutEdges(Vertex old_vertex, Vertex new_vertex)
   return;
 }
 
-//
 // \brief Output the graph associated with the mesh to graphviz .dot
 // file for visualization purposes.
-//
 // \param[in] output file
-//
 // Similar to outputToGraphviz function in Topology class.
 // If fracture criterion for entity is satisfied, the entity and all
 // associated lower order entities are marked open. All open entities are
 // displayed as such in output file.
-//
 // To create final output figure, run command below from terminal:
 //   dot -Tpng <gviz_output>.dot -o <gviz_output>.png
-//
 void
 Subgraph::outputToGraphviz(std::string const& output_filename)
 {

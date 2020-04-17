@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(PHAL_SDirichlet_hpp)
 #define PHAL_SDirichlet_hpp
@@ -27,13 +25,9 @@ class SDirichlet
 {
 };
 
-//
 // Specializations for different Albany Traits.
-//
 
-//
 // Residual
-//
 template <typename Traits>
 class SDirichlet<PHAL::AlbanyTraits::Residual, Traits>
     : public PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
@@ -50,9 +44,7 @@ class SDirichlet<PHAL::AlbanyTraits::Residual, Traits>
   evaluateFields(typename Traits::EvalData d);
 };
 
-//
 // Jacobian
-//
 template <typename Traits>
 class SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>
     : public PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>

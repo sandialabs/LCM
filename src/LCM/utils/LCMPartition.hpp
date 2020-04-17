@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 // Define only if Zoltan is enabled
 #if !defined(LCM_Partition_hpp)
@@ -63,9 +61,7 @@ enum class Scheme
 
 }
 
-//
 /// Forward declarations
-//
 class ConnectivityArray;
 class DualGraph;
 class ZoltanHyperGraph;
@@ -630,73 +626,49 @@ class ConnectivityArray
       int*          ierr);
 
  private:
-  //
   // The type of elements in the mesh (assumed that all are of same type)
-  //
   minitensor::ELEMENT::Type type_;
 
-  //
   // Node list
-  //
   PointMap nodes_;
 
-  //
   // Element - nodes connectivity
-  //
   AdjacencyMap connectivity_;
 
-  //
   // Space dimension
-  //
   minitensor::Index dimension_;
 
-  //
   // Teuchos pointer to corresponding discretization
-  //
   Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr_;
 
-  //
   // Partitions if mesh is partitioned; otherwise empty
-  //
   std::map<int, int> partitions_;
 
-  //
   // Background grid of the domain for fast determination
   // of whether a point is inside the domain or not.
-  //
   std::vector<std::vector<std::vector<bool>>> grid_;
 
-  //
   // Points in the domain according to the grid.
-  //
   std::vector<minitensor::Vector<double>> domain_points_;
 
   bool has_grid_{false};
 
-  //
   // Size of background grid cell
-  //
   minitensor::Vector<double> cell_size_;
 
-  //
   // Parameters for kmeans partitioning
-  //
   double tolerance_;
 
   double requested_cell_size_;
 
   minitensor::Index maximum_iterations_;
 
-  //
   // Limits of the bounding box for coordinate array
-  //
   minitensor::Vector<double> lower_corner_;
 
   minitensor::Vector<double> upper_corner_;
 
-  //
   // Initializer scheme, if any.
-  //
   PARTITION::Scheme initializer_scheme_;
 };
 
@@ -773,27 +745,19 @@ class DualGraph
   print() const;
 
  private:
-  //
   // Given a connectivity array type, return local numbering of
   // proper faces
-  //
   std::vector<std::vector<int>>
   getFaceConnectivity(minitensor::ELEMENT::Type const type) const;
 
  private:
-  //
   // Number of edges in dual graph
-  //
   int number_edges_;
 
-  //
   // Graph data structure
-  //
   AdjacencyMap graph_;
 
-  //
   // Vertex weights
-  //
   ScalarMap vertex_weights_;
 };
 
@@ -1038,24 +1002,16 @@ class ZoltanHyperGraph
       int*          ierr);
 
  private:
-  //
   // Number of vertices
-  //
   int number_vertices_;
 
-  //
   // Number of hyperedges
-  //
   int number_hyperedges_;
 
-  //
   // Graph data structure
-  //
   AdjacencyMap graph_;
 
-  //
   // Vertex weights
-  //
   ScalarMap vertex_weights_;
 };
 

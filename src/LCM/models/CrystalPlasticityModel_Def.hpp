@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_Macros.hpp"
 /*
@@ -133,7 +131,6 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
     std::cout << ">>> parameter list:\n" << *p << std::endl;
   }
 
-  //
   // Obtain crystal elasticity constants and populate elasticity tensor
   // assuming cubic symmetry (fcc, bcc) or transverse isotropy (hcp)
   // Constants C11, C12, and C44 must be defined for either symmetry
@@ -166,17 +163,13 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
     std::cout << ">>> Unrotated C :" << std::endl << C_unrotated_ << std::endl;
   }
 
-  //
   // Get slip families
-  //
   slip_families_.reserve(num_family_);
   for (int num_fam(0); num_fam < num_family_; ++num_fam) {
     slip_families_.emplace_back(preader.getSlipFamily(num_fam));
   }
 
-  //
   // Get slip system information
-  //
   for (int num_ss = 0; num_ss < num_slip_; ++num_ss) {
     Teuchos::ParameterList ss_list =
         p->sublist(Albany::strint("Slip System", num_ss + 1));
@@ -194,9 +187,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
     slip_family.num_slip_sys_++;
 
-    //
     // Read and normalize slip directions. Miller indices need to be normalized.
-    //
     std::vector<RealType> s_temp =
         ss_list.get<Teuchos::Array<RealType>>("Slip Direction").toVector();
 
@@ -207,9 +198,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
     slip_systems_.at(num_ss).s_.set_dimension(CP::MAX_DIM);
     slip_systems_.at(num_ss).s_ = s_temp_normalized;
 
-    //
     // Read and normalize slip normals. Miller indices need to be normalized.
-    //
     std::vector<RealType> n_temp =
         ss_list.get<Teuchos::Array<RealType>>("Slip Normal").toVector();
 
@@ -257,17 +246,13 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
     }
   }
 
-  //
   // Define the dependent fields required for calculation
-  //
   setDependentField(F_string_, dl->qp_tensor);
   setDependentField(J_string_, dl->qp_scalar);
   setDependentField(dt_string_, dl->workset_scalar);
   if (write_data_file_) { setDependentField(time_string_, dl->workset_scalar); }
 
-  //
   // Define the evaluated fields
-  //
   setEvaluatedField(eqps_string_, dl->qp_scalar);
   setEvaluatedField(Re_string_, dl->qp_tensor);
   setEvaluatedField(cauchy_string_, dl->qp_tensor);
@@ -282,9 +267,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
     setEvaluatedField(source_string_, dl->qp_scalar);
   }
 
-  //
   // define the state variables
-  //
 
   // eqps
   addStateVariable(
@@ -447,9 +430,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
       p->get<bool>("Output CP_Residual_Iter", false));
 }
 
-//
 // Initialize state for computing the constitutive response of the material
-//
 template <typename EvalT, typename Traits>
 void
 CrystalPlasticityKernel<EvalT, Traits>::init(
@@ -474,9 +455,7 @@ CrystalPlasticityKernel<EvalT, Traits>::init(
         "Rotation matrix not found on genesis mesh");
   }
 
-  //
   // extract dependent MDFields
-  //
   def_grad_ = *dep_fields[F_string_];
   if (write_data_file_) { time_ = *dep_fields[time_string_]; }
   delta_time_ = *dep_fields[dt_string_];
@@ -485,9 +464,7 @@ CrystalPlasticityKernel<EvalT, Traits>::init(
     source_      = *eval_fields[source_string_];
   }
 
-  //
   // extract evaluated MDFields
-  //
   eqps_                      = *eval_fields[eqps_string_];
   xtal_rotation_             = *eval_fields[Re_string_];
   stress_                    = *eval_fields[cauchy_string_];
@@ -549,9 +526,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // use cudaMalloc.
   utility::StaticAllocator allocator(1024 * 1024);
 
-  //
   // Known quantities
-  //
   minitensor::Tensor<RealType, CP::MAX_DIM> Fp_n(num_dims_);
 
   minitensor::Vector<RealType, CP::MAX_SLIP> slip_n(num_slip_);
@@ -564,9 +539,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   minitensor::Tensor<RealType, CP::MAX_DIM> F_n(num_dims_);
 
-  //
   // Unknown quantities
-  //
   minitensor::Tensor<ScalarT, CP::MAX_DIM> Lp_np1(num_dims_);
 
   minitensor::Tensor<ScalarT, CP::MAX_DIM> Fp_np1(num_dims_);
@@ -666,10 +639,8 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
     state_hardening_np1[s] = state_hardening_n[s];
   }
 
-  //
   // Set up slip predictor to assign isochoric part of F_increment to
   // Fp_increment
-  //
   minitensor::Vector<ScalarT, CP::MAX_SLIP> slip_resistance(
       num_slip_, minitensor::Filler::ZEROS);
 

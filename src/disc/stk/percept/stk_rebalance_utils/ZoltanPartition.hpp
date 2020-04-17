@@ -7,10 +7,8 @@
 /*                                                                      */
 /*----------------------------------------------------------------------*/
 
-//
 // Copyright 2001, 2002, 2010 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS)
-//
 
 #ifndef STK_REBALANCE_ZOLTANPARTITION_HPP
 #define STK_REBALANCE_ZOLTANPARTITION_HPP

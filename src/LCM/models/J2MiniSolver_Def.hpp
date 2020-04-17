@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Albany_Utils.hpp"
 #include "J2MiniSolver.hpp"
 #include "MiniNonlinearSolver.hpp"
@@ -83,7 +81,6 @@ J2MiniKernel<EvalT, Traits>::J2MiniKernel(
       0.0,
       false,
       p->get<bool>("Output Yield Surface", false));
-  //
   // mechanical source
   if (have_temperature_ == true) {
     addStateVariable(
@@ -150,9 +147,7 @@ static RealType const SQ23{std::sqrt(2.0 / 3.0)};
 
 }  // anonymous namespace
 
-//
 // J2 nonlinear system
-//
 template <typename EvalT, minitensor::Index M = 1>
 class J2NLS : public minitensor::
                   Function_Base<J2NLS<EvalT, M>, typename EvalT::ScalarT, M>
@@ -270,13 +265,9 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (have_temperature_) {
     // Compute the mechanical deformation gradient Fm based on the
     // multiplicative decomposition of the deformation gradient
-    //
     //            F = Fm.Ft => Fm = F.inv(Ft)
-    //
     // where Ft is the thermal part of F, given as
-    //
     //     Ft = Le * I = exp(alpha * dtemp) * I
-    //
     // Le = exp(alpha*dtemp) is the thermal stretch and alpha the
     // coefficient of thermal expansion.
     ScalarT dtemp           = temperature_(cell, pt) - ref_temperature_;

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Albany_Macros.hpp"
 #include "MiniTensor.h"
 #include "Phalanx_DataLayout.hpp"
@@ -10,9 +8,6 @@
 
 namespace LCM {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 SurfaceBasis<EvalT, Traits>::SurfaceBasis(
     Teuchos::ParameterList const&        p,
@@ -85,9 +80,6 @@ SurfaceBasis<EvalT, Traits>::SurfaceBasis(
   this->setName("SurfaceBasis" + PHX::print<EvalT>());
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 SurfaceBasis<EvalT, Traits>::postRegistrationSetup(
@@ -136,9 +128,6 @@ SurfaceBasis<EvalT, Traits>::postRegistrationSetup(
   intrepid_basis_->getValues(ref_grads_, ref_points_, Intrepid2::OPERATOR_GRAD);
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 SurfaceBasis<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -169,9 +158,6 @@ SurfaceBasis<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   }
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 template <typename ST>
 void
@@ -192,9 +178,6 @@ SurfaceBasis<EvalT, Traits>::computeMidplaneCoords(
   }
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 template <typename ST>
 void
@@ -236,9 +219,6 @@ SurfaceBasis<EvalT, Traits>::computeBasisVectors(
   }
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 SurfaceBasis<EvalT, Traits>::computeDualBasisVectors(
@@ -289,9 +269,6 @@ SurfaceBasis<EvalT, Traits>::computeDualBasisVectors(
   }
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 SurfaceBasis<EvalT, Traits>::computeJacobian(

@@ -1,10 +1,7 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 // Simple mesh partitioning program
-//
 
 #include <MiniTensor.h>
 
@@ -40,9 +37,7 @@ typedef PHAL::AlbanyTraits                          Traits;
 typedef Sacado::mpl::apply<FadType, ScalarT>::type  DFadType;
 typedef Sacado::mpl::apply<FadType, DFadType>::type D2FadType;
 
-//
 // Spherical parametrization sweep
-//
 void
 spherical_sweep(minitensor::Tensor4<double, 3> const& CC)
 {
@@ -97,9 +92,7 @@ spherical_sweep(minitensor::Tensor4<double, 3> const& CC)
   return;
 }
 
-//
 // Stereographic parametrization sweep
-//
 void
 stereographic_sweep(minitensor::Tensor4<double, 3> const& CC)
 {
@@ -152,9 +145,7 @@ stereographic_sweep(minitensor::Tensor4<double, 3> const& CC)
   return;
 }
 
-//
 // Projective parametrization sweep
-//
 void
 projective_sweep(minitensor::Tensor4<double, 3> const& CC)
 {
@@ -213,9 +204,7 @@ projective_sweep(minitensor::Tensor4<double, 3> const& CC)
   return;
 }
 
-//
 // Tangent parametrization sweep
-//
 void
 tangent_sweep(minitensor::Tensor4<double, 3> const& CC)
 {
@@ -268,9 +257,7 @@ tangent_sweep(minitensor::Tensor4<double, 3> const& CC)
   return;
 }
 
-//
 // Cartesian parametrization sweep
-//
 void
 cartesian_sweep(minitensor::Tensor4<double, 3> const& CC)
 {
@@ -966,9 +953,7 @@ cartesian_newton_raphson(
 
 }  // Function end
 
-//
 // Simple tests for parametrizations of the bifurcation tensor.
-//
 int
 main(int ac, char* av[])
 {

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(BODY_FORCE_HPP)
 #define BODY_FORCE_HPP
@@ -19,9 +17,7 @@
 
 namespace LCM {
 
-//
 // Body force evaluator
-//
 template <typename EvalT, typename Traits>
 class BodyForce : public PHX::EvaluatorWithBaseImpl<Traits>,
                   public PHX::EvaluatorDerived<EvalT, Traits>

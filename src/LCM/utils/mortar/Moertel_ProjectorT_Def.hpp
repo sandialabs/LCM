@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Moertel_InterfaceT.hpp"
 #include "Moertel_NodeT.hpp"
@@ -201,7 +199,6 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_NodalNormal(
   gap = Nx[0] * n[0] + Nx[1] * n[1];
 
   // Do we need to divide by the length of the normal???  GAH
-  //
 //  gap = (Nx[0] * n[0] + Nx[1] * n[1])
 //		  / sqrt(n[0] * n[0] + n[1] * n[1]);  // ||gap|| cos theta
 #if 0

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Schwarz_BoundaryJacobian.hpp"
 
 #include <Teuchos_ParameterListExceptions.hpp>
@@ -14,9 +12,6 @@
 
 namespace LCM {
 
-//
-//
-//
 Schwarz_BoundaryJacobian::Schwarz_BoundaryJacobian(
     Teuchos::RCP<Teuchos_Comm const> const&                     comm,
     Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> const& ca,
@@ -36,18 +31,14 @@ Schwarz_BoundaryJacobian::Schwarz_BoundaryJacobian(
   range_vs_  = ca[this_app_index]->getVectorSpace();
 }
 
-//
 // Initialize the operator with everything needed to apply it
-//
 void
 Schwarz_BoundaryJacobian::initialize()
 {
   return;
 }
 
-//
 // Returns explicit matrix representation of operator if available.
-//
 Teuchos::RCP<Thyra_LinearOp>
 Schwarz_BoundaryJacobian::getExplicitOperator() const
 {
@@ -66,10 +57,8 @@ Schwarz_BoundaryJacobian::getExplicitOperator() const
   return K;
 }
 
-//
 // Returns the result of a Thyra_Operator applied to a
 // Thyra_MultiVector X in Y.
-//
 void
 Schwarz_BoundaryJacobian::applyImpl(
     const Thyra::EOpTransp /* M_trans */,

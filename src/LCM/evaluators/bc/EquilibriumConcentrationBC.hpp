@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(LCM_EquilibriumConcentrationBC_hpp)
 #define LCM_EquilibriumConcentrationBC_hpp
@@ -23,7 +21,6 @@ namespace LCM {
 
 //------------------------------------------------------------------------------
 // Specialization of the DirichletBase class
-//
 template <typename EvalT, typename Traits>
 class EquilibriumConcentrationBC;
 
@@ -46,7 +43,6 @@ class EquilibriumConcentrationBC_Base
 
 //------------------------------------------------------------------------------
 // Residual
-//
 template <typename Traits>
 class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>
     : public EquilibriumConcentrationBC_Base<
@@ -62,7 +58,6 @@ class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>
 
 //------------------------------------------------------------------------------
 // Jacobian
-//
 template <typename Traits>
 class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>
     : public EquilibriumConcentrationBC_Base<

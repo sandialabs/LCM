@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -173,7 +171,6 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       // std::cout << "QP: " << qp << std::endl;
 
       // Fill the following entries in matParams for call to LAMENT
-      //
       // nelements     - number of elements
       // dt            - time step, this one is tough because Albany does not
       // currently have a concept of time step for implicit integration time -
@@ -188,9 +185,7 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       // data for current time step (material dependent, none for
       // lament::Elastic) stress_old    - stress at previous time step
       // stress_new    - stress at current time step, filled by material model
-      //
       // The total deformation gradient is available as field data
-      //
       // The velocity gradient is not available but can be computed at the
       // logarithm of the incremental deformation gradient divided by deltaT The
       // incremental deformation gradient is computed as F_new F_old^-1

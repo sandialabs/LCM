@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include <MiniTensor.h>
 
 #include "Albany_Macros.hpp"
@@ -25,7 +23,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   ferroicModel = Teuchos::rcp(new FM::FerroicModel<EvalT>());
 
   // PARSE MATERIAL BASIS
-  //
   minitensor::Tensor<RealType, FM::THREE_D>& R = ferroicModel->getBasis();
   R.set_dimension(FM::THREE_D);
   R.clear();
@@ -40,7 +37,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   }
 
   // PARSE INITIAL BIN FRACTIONS
-  //
   Teuchos::Array<RealType>& initialBinFractions =
       ferroicModel->getInitialBinFractions();
   if (p->isType<Teuchos::Array<RealType>>("Bin Fractions"))
@@ -49,7 +45,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
     initialBinFractions.resize(0);
 
   // PARSE PHASES
-  //
   Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& crystalPhases =
       ferroicModel->getCrystalPhases();
   int nphases = p->get<int>("Number of Phases");
@@ -66,7 +61,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   }
 
   // PARSE VARIANTS
-  //
   Teuchos::Array<FM::CrystalVariant>& crystalVariants =
       ferroicModel->getCrystalVariants();
   if (initialBinFractions.size() > 0) {
@@ -90,7 +84,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   }
 
   // PARSE CRITICAL ENERGIES
-  //
   int                       nVariants = crystalVariants.size();
   Teuchos::Array<RealType>& tBarrier  = ferroicModel->getTransitionBarrier();
   tBarrier.resize(nVariants * nVariants);
@@ -113,7 +106,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   }
 
   // DEFINE THE EVALUATED FIELDS
-  //
   stressName = "Stress";
   this->eval_field_map_.insert(std::make_pair(stressName, dl->qp_tensor));
 
@@ -121,7 +113,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   this->eval_field_map_.insert(std::make_pair(edispName, dl->qp_vector));
 
   // DEFINE THE DEPENDENT FIELDS
-  //
   strainName = "Strain";
   this->dep_field_map_.insert(std::make_pair(strainName, dl->qp_tensor));
 
@@ -129,7 +120,6 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   this->dep_field_map_.insert(std::make_pair(efieldName, dl->qp_vector));
 
   // DEFINE STATE VARIABLES (output)
-  //
   for (int i = 0; i < nVariants; i++) {
     std::string binName = Albany::strint("Bin Fraction", i + 1);
     binNames.push_back(binName);
@@ -298,7 +288,6 @@ parseTensor4(
   // symmetries.
 
   // parse
-  //
   RealType C11 = cParam.get<RealType>("C11");
   RealType C33 = cParam.get<RealType>("C33");
   RealType C12 = cParam.get<RealType>("C12");
@@ -335,7 +324,6 @@ parseTensor3(
   // symmetries.
 
   // parse
-  //
   RealType h31 = cParam.get<RealType>("h31");
   RealType h33 = cParam.get<RealType>("h33");
   RealType h15 = cParam.get<RealType>("h15");
@@ -360,7 +348,6 @@ parseTensor(
   // symmetries.
 
   // parse
-  //
   RealType E11 = cParam.get<RealType>("Eps11");
   RealType E33 = cParam.get<RealType>("Eps33");
 

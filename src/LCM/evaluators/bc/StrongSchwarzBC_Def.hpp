@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -18,9 +16,6 @@
 
 namespace LCM {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 StrongSchwarzBC_Base<EvalT, Traits>::StrongSchwarzBC_Base(
     Teuchos::ParameterList& p)
@@ -48,9 +43,6 @@ StrongSchwarzBC_Base<EvalT, Traits>::StrongSchwarzBC_Base(
   setCoupledAppIndex(coupled_app_index);
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 template <typename T>
 void
@@ -309,9 +301,6 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(
   z_val = value(2);
 }
 
-//
-//
-//
 #if defined(ALBANY_DTK)
 template <typename EvalT, typename Traits>
 Teuchos::Array<
@@ -513,9 +502,7 @@ StrongSchwarzBC_Base<EvalT, Traits>::doDTKInterpolation(
 }
 #endif  // ALBANY_DTK
 
-//
 // Fill solution with Dirichlet values
-//
 template <typename StrongSchwarzBC, typename Traits>
 void
 fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
@@ -657,9 +644,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
 #endif  // ALBANY_DTK
 }
 
-//
 // Fill residual, used in both residual and Jacobian
-//
 template <typename StrongSchwarzBC, typename Traits>
 void
 fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
@@ -686,9 +671,7 @@ fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
   }
 }
 
-//
 // Specialization: Residual
-//
 template <typename Traits>
 StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::StrongSchwarzBC(
     Teuchos::ParameterList& p)
@@ -696,9 +679,6 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::StrongSchwarzBC(
 {
 }
 
-//
-//
-//
 template <typename Traits>
 void
 StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
@@ -709,9 +689,6 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
   return;
 }
 
-//
-//
-//
 template <typename Traits>
 void
 StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
@@ -722,9 +699,7 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   return;
 }
 
-//
 // Specialization: Jacobian
-//
 template <typename Traits>
 StrongSchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::StrongSchwarzBC(
     Teuchos::ParameterList& p)
@@ -732,9 +707,6 @@ StrongSchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::StrongSchwarzBC(
 {
 }
 
-//
-//
-//
 template <typename Traits>
 void
 StrongSchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <fstream>
 #include <iostream>
@@ -1127,7 +1125,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
   //========================================================================
   //========================================================================
   // use exact values at gaussian points
-  //
   else {  // if(exactvalues)
     // compute local coordinates of actseg's nodes in slave element
     double psxi[3][2];
@@ -1211,7 +1208,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
 
       //-------------------------------------------------------------------
       // loop over all slave nodes (lm loop)
-      //
       for (int lm = 0; lm < sseg.Nnode(); ++lm) {
         // loop over all nodes (dof loop master)
         for (int dof = 0; dof < mseg.Nnode(); ++dof)

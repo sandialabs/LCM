@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Topology.hpp"
 
 #include <Albany_CommUtils.hpp>
@@ -19,9 +17,7 @@
 
 namespace LCM {
 
-//
 // Default constructor
-//
 Topology::Topology()
     : discretization_(Teuchos::null),
       stk_mesh_struct_(Teuchos::null),
@@ -31,9 +27,7 @@ Topology::Topology()
   return;
 }
 
-//
 // Constructor with input and output files.
-//
 Topology::Topology(
     std::string const& input_file,
     std::string const& output_file)
@@ -97,9 +91,7 @@ Topology::Topology(
   Topology::graphInitialization();
 }
 
-//
 // Construct by using given discretization.
-//
 Topology::Topology(
     Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc,
     std::string const&                            bulk_block_name,
@@ -130,9 +122,6 @@ Topology::Topology(
   graphInitialization();
 }
 
-//
-//
-//
 stk::mesh::EntityId
 Topology::get_entity_id(stk::mesh::Entity const entity)
 {
@@ -145,19 +134,15 @@ Topology::get_entity_id(stk::mesh::Entity const entity)
   return low_id;
 }
 
-//
 // Check fracture criterion
-//
 bool
 Topology::checkOpen(stk::mesh::Entity e)
 {
   return failure_criterion_->check(get_bulk_data(), e);
 }
 
-//
 // Initialize failure state field
 // It exists for all entities
-//
 void
 Topology::initializeFailureState()
 {
@@ -172,9 +157,7 @@ Topology::initializeFailureState()
   }
 }
 
-//
 // Initialize cell failure state field
-//
 void
 Topology::initializeCellFailureState()
 {
@@ -185,9 +168,7 @@ Topology::initializeCellFailureState()
   for (auto cell : cells) { set_failure_state(cell, INTACT); }
 }
 
-//
 // Set boundary indicators
-//
 void
 Topology::setCellBoundaryIndicator()
 {
@@ -246,9 +227,6 @@ Topology::setNodeBoundaryIndicator()
   }
 }
 
-//
-//
-//
 bool
 Topology::is_erodible(stk::mesh::Entity face)
 {
@@ -306,9 +284,7 @@ Topology::is_erodible(stk::mesh::Entity face)
   return true;
 }
 
-//
 // Compute volume of given cell
-//
 double
 Topology::getCellVolume(stk::mesh::Entity const cell)
 {
@@ -352,9 +328,7 @@ Topology::getCellVolume(stk::mesh::Entity const cell)
   return volume;
 }
 
-//
 // Create boundary
-//
 void
 Topology::createBoundary()
 {
@@ -374,10 +348,8 @@ Topology::createBoundary()
   for (auto face : boundary_faces) { boundary_.emplace(face); }
 }
 
-//
 // Create the full mesh representation. This must be done prior to
 // the adaptation query.
-//
 void
 Topology::graphInitialization()
 {
@@ -395,9 +367,6 @@ Topology::graphInitialization()
   initializeHighestIds();
 }
 
-//
-//
-//
 void
 Topology::createAllLevelsRelations()
 {
@@ -406,10 +375,8 @@ Topology::createAllLevelsRelations()
   stk::mesh::create_adjacent_entities(bulk_data, add_parts);
 }
 
-//
 // Creates temporary nodal connectivity for the elements and removes
 // the relationships between the elements and nodes.
-//
 void
 Topology::removeNodeRelations()
 {
@@ -441,9 +408,7 @@ Topology::removeNodeRelations()
   return;
 }
 
-//
 // Removes multilevel relations.
-//
 void
 Topology::removeMultiLevelRelations()
 {
@@ -497,10 +462,8 @@ Topology::removeMultiLevelRelations()
   modification_end();
 }
 
-//
 // Remove all entities but the ones representing elements and nodes.
 // Only 3D for now.
-//
 void
 Topology::removeMidLevelEntities()
 {
@@ -551,10 +514,8 @@ Topology::removeMidLevelEntities()
   modification_end();
 }
 
-//
 // After mesh manipulations are complete, need to recreate a stk
 // mesh understood by Albany::STKDiscretization.
-//
 void
 Topology::restoreElementToNodeConnectivity()
 {
@@ -583,9 +544,7 @@ Topology::restoreElementToNodeConnectivity()
   return;
 }
 
-//
 // Determine nodes associated with a boundary entity
-//
 stk::mesh::EntityVector
 Topology::getBoundaryEntityNodes(stk::mesh::Entity boundary_entity)
 {
@@ -632,9 +591,7 @@ Topology::getBoundaryEntityNodes(stk::mesh::Entity boundary_entity)
   return nodes;
 }
 
-//
 // Get nodal coordinates
-//
 std::vector<minitensor::Vector<double>>
 Topology::getNodalCoordinates()
 {
@@ -672,9 +629,7 @@ Topology::getNodalCoordinates()
   return coordinates;
 }
 
-//
 // Output of boundary
-//
 void
 Topology::outputBoundary(std::string const& output_filename)
 {
@@ -768,9 +723,7 @@ Topology::outputBoundary(std::string const& output_filename)
   return;
 }
 
-//
 // Create boundary mesh
-//
 Connectivity
 Topology::getBoundary()
 {
@@ -915,9 +868,7 @@ Topology::get_normal(stk::mesh::Entity boundary_entity)
   return normal;
 }
 
-//
 // Create cohesive connectivity
-//
 stk::mesh::EntityVector
 Topology::createSurfaceElementConnectivity(
     stk::mesh::Entity face_top,
@@ -1003,10 +954,8 @@ Topology::createSurfaceElementConnectivity(
   return nodes;
 }
 
-//
 // Create vectors describing the vertices and edges of the star of
 // an entity in the stk mesh.
-//
 void
 Topology::createStar(
     stk::mesh::Entity                entity,
@@ -1047,9 +996,7 @@ Topology::createStar(
   return;
 }
 
-//
 // Fractures all open boundary entities of the mesh.
-//
 void
 Topology::splitOpenFaces()
 {
@@ -1237,9 +1184,6 @@ Topology::splitOpenFaces()
   return;
 }
 
-//
-//
-//
 void
 Topology::printFailureState()
 {
@@ -1257,9 +1201,7 @@ Topology::printFailureState()
   }
 }
 
-//
 // Destroy upward relations of an entity
-//
 void
 Topology::remove_entity_and_up_relations(stk::mesh::Entity entity)
 {
@@ -1296,9 +1238,7 @@ Topology::numberCells()
   return cells.size();
 }
 
-//
 // Remove failed elements from the mesh
-//
 double
 Topology::erodeFailedElements()
 {
@@ -1364,9 +1304,6 @@ Topology::erodeFailedElements()
   return eroded_volume;
 }
 
-//
-//
-//
 bool
 Topology::isIsolatedNode(stk::mesh::Entity entity)
 {
@@ -1389,9 +1326,7 @@ Topology::isIsolatedNode(stk::mesh::Entity entity)
   }
   return true;
 }
-//
-//
-//
+
 void
 Topology::insertSurfaceElements(std::set<EntityPair> const& fractured_faces)
 {
@@ -1447,9 +1382,6 @@ Topology::insertSurfaceElements(std::set<EntityPair> const& fractured_faces)
   return;
 }
 
-//
-//
-//
 size_t
 Topology::setEntitiesOpen()
 {
@@ -1525,10 +1457,8 @@ Topology::setEntitiesOpen()
   return counter;
 }
 
-//
 // Output the graph associated with the mesh to graphviz .dot
 // file for visualization purposes.
-//
 void
 Topology::outputToGraphviz(std::string const& output_filename)
 {
@@ -1669,9 +1599,6 @@ Topology::outputToGraphviz(std::string const& output_filename)
   return;
 }
 
-//
-//
-//
 void
 Topology::initializeTopologies()
 {
@@ -1688,10 +1615,8 @@ Topology::initializeTopologies()
   return;
 }
 
-//
 // Place the entity in the root part that has the stk::topology
 // associated with the given rank.
-//
 void
 Topology::AssignTopology(
     stk::mesh::EntityRank const rank,
@@ -1713,9 +1638,7 @@ Topology::AssignTopology(
   return;
 }
 
-//
 // \brief This returns the number of entities of a given rank
-//
 EntityVectorIndex
 Topology::get_num_entities(stk::mesh::EntityRank const entity_rank)
 {
@@ -1731,10 +1654,8 @@ Topology::get_num_entities(stk::mesh::EntityRank const entity_rank)
   return number_entities;
 }
 
-//
 // \brief Determine highest id number for each entity rank.
 // Used to assign unique ids to newly created entities
-//
 void
 Topology::initializeHighestIds()
 {
@@ -1751,18 +1672,13 @@ Topology::initializeHighestIds()
   return;
 }
 
-//
-//
-//
 stk::mesh::EntityId
 Topology::get_highest_id(stk::mesh::EntityRank const rank)
 {
   return highest_ids_[rank];
 }
 
-//
 // Set failure state.
-//
 void
 Topology::set_failure_state_0(stk::mesh::Entity e, FailureState const fs)
 {
@@ -1772,9 +1688,6 @@ Topology::set_failure_state_0(stk::mesh::Entity e, FailureState const fs)
   *(stk::mesh::field_data(failure_field, e)) = static_cast<int>(fs);
 }
 
-//
-//
-//
 void
 Topology::set_failure_state(stk::mesh::Entity e, FailureState const fs)
 {
@@ -1786,9 +1699,7 @@ Topology::set_failure_state(stk::mesh::Entity e, FailureState const fs)
   *(stk::mesh::field_data(failure_field, e)) = static_cast<int>(fs);
 }
 
-//
 // Get failure state.
-//
 FailureState
 Topology::get_failure_state_0(stk::mesh::Entity e)
 {
@@ -1798,9 +1709,6 @@ Topology::get_failure_state_0(stk::mesh::Entity e)
   return static_cast<FailureState>(*(stk::mesh::field_data(failure_field, e)));
 }
 
-//
-//
-//
 FailureState
 Topology::get_failure_state(stk::mesh::Entity e)
 {
@@ -1812,9 +1720,7 @@ Topology::get_failure_state(stk::mesh::Entity e)
   return static_cast<FailureState>(*(stk::mesh::field_data(failure_field, e)));
 }
 
-//
 // Set boundary indicators.
-//
 void
 Topology::set_cell_boundary_indicator(
     stk::mesh::Entity       e,
@@ -1867,9 +1773,7 @@ Topology::set_node_boundary_indicator(
   *node_boundary_indicator = static_cast<double>(bi);
 }
 
-//
 // Get boundary indicators.
-//
 BoundaryIndicator
 Topology::get_cell_boundary_indicator(stk::mesh::Entity e)
 {

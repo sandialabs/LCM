@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Albany_Macros.hpp"
 #include "Albany_Utils.hpp"
 #include "MiniTensor.h"
@@ -41,7 +39,6 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->eval_field_map_.insert(std::make_pair("Max_Jump", dl->qp_scalar));
 
   // define the state variables
-  //
   // cohesive traction
   this->num_state_variables_++;
   this->state_var_names_.push_back("Cohesive_Traction");
@@ -51,7 +48,6 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Cohesive Traction", false));
-  //
   // normal traction
   this->num_state_variables_++;
   this->state_var_names_.push_back("Normal_Traction");
@@ -61,7 +57,6 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Normal Traction", false));
-  //
   // shear traction
   this->num_state_variables_++;
   this->state_var_names_.push_back("Shear_Traction");
@@ -71,7 +66,6 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Shear Traction", false));
-  //
   // normal jump
   this->num_state_variables_++;
   this->state_var_names_.push_back("Normal_Jump");
@@ -81,7 +75,6 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Normal Jump", false));
-  //
   // shear jump
   this->num_state_variables_++;
   this->state_var_names_.push_back("Shear_Jump");
@@ -91,7 +84,6 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Shear Jump", false));
-  //
   // max jump
   this->num_state_variables_++;
   this->state_var_names_.push_back("Max_Jump");
@@ -101,7 +93,6 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Max Jump", false));
-  //
 }
 //------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>

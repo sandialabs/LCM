@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 inline std::shared_ptr<CP::FlowParameterBase>
 CP::flowParameterFactory(CP::FlowRuleType type_flow_rule)
@@ -36,9 +34,7 @@ CP::flowParameterFactory(CP::FlowRuleType type_flow_rule)
   return FPUP(nullptr);
 }
 
-//
 // Factory returning a pointer to a flow rule object
-//
 template <typename ArgT>
 utility::StaticPointer<CP::FlowRuleBase<ArgT>>
 CP::FlowRuleFactory::createFlowRule(FlowRuleType type_flow_rule) const
@@ -70,9 +66,7 @@ CP::FlowRuleFactory::createFlowRule(FlowRuleType type_flow_rule) const
   return nullptr;
 }
 
-//
 // Power law flow rule
-//
 template <typename ArgT>
 ArgT
 CP::PowerLawFlowRule<ArgT>::computeRateSlip(
@@ -114,9 +108,7 @@ CP::PowerLawFlowRule<ArgT>::computeRateSlip(
   return rate_slip;
 }
 
-//
 // Thermally-activated flow rule
-//
 template <typename ArgT>
 ArgT
 CP::ThermalActivationFlowRule<ArgT>::computeRateSlip(
@@ -127,9 +119,7 @@ CP::ThermalActivationFlowRule<ArgT>::computeRateSlip(
 {
   using Params = ThermalActivationFlowParameters;
 
-  //
   // Material properties
-  //
   RealType const g0 =
       pflow_parameters->getParameter(Params::RATE_SLIP_REFERENCE);
 
@@ -162,9 +152,7 @@ CP::ThermalActivationFlowRule<ArgT>::computeRateSlip(
   return rate_slip;
 }
 
-//
 // Power law with Drag flow rule
-//
 template <typename ArgT>
 ArgT
 CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
@@ -194,7 +182,6 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   ArgT power_law{0.0 * ratio_stress};
 
   // Ultra-low stress regime:
-  //
   // if ratio_stress < min_tol, computation of pow_ratio_stress will introduce
   // denormalized numbers into subsequent computations, so retun power_law = 0.0
   if (std::fabs(ratio_stress) < min_tol) { return power_law; }
@@ -205,7 +192,6 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   ArgT const viscous_drag = ratio_stress / coefficient_drag;
 
   // High stress regime:
-  //
   // if ratio_stress > max_tol, computation of pow_ratio_stress will introduce
   // denormalized numbers into subsequent computations. Additionally, such a
   // large stress value indicates that we are in the viscous drag-dominated
@@ -221,13 +207,11 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   bool const vd_active = std::fabs(pl_vd_ratio) > CP::MACHINE_EPS;
 
   // Low stress regime:
-  //
   // Initialize effective to power_law, because in the low stress regime, the
   // constitutive calculation depends only on the power law value
   ArgT effective{power_law};
 
   // Intermediate stress regime:
-  //
   // The power law and viscous drag terms are both significant in the
   // intermediate stress regime, so the full consitutive calculation is
   // performed
@@ -239,9 +223,7 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   return g0 * effective;
 }
 
-//
 // No flow rule
-//
 template <typename ArgT>
 ArgT
 CP::NoFlowRule<ArgT>::computeRateSlip(

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(LCM_Topology_Topology_hpp)
 #define LCM_Topology_Topology_hpp
@@ -900,26 +898,20 @@ class Topology
            is_in_interface(e);
   }
 
-  //
   // Set failure state.
-  //
   void
   set_failure_state_0(stk::mesh::Entity e, FailureState const fs);
 
   void
   set_failure_state(stk::mesh::Entity e, FailureState const fs);
-  //
   // Get failure state.
-  //
   FailureState
   get_failure_state_0(stk::mesh::Entity e);
 
   FailureState
   get_failure_state(stk::mesh::Entity e);
 
-  //
   // Set boundary indicators.
-  //
   void
   set_cell_boundary_indicator(stk::mesh::Entity e, BoundaryIndicator const bi);
   void
@@ -929,9 +921,7 @@ class Topology
   void
   set_node_boundary_indicator(stk::mesh::Entity e, BoundaryIndicator const bi);
 
-  //
   // Get boundary indicators.
-  //
   BoundaryIndicator
   get_cell_boundary_indicator(stk::mesh::Entity e);
   BoundaryIndicator
@@ -1072,8 +1062,6 @@ class Topology
   void
   initializeTopologies();
 
-  //
-  //
   Teuchos::RCP<Albany::AbstractDiscretization> discretization_{Teuchos::null};
   Teuchos::RCP<Albany::AbstractSTKMeshStruct>  stk_mesh_struct_{Teuchos::null};
   Teuchos::RCP<AbstractFailureCriterion> failure_criterion_{Teuchos::null};

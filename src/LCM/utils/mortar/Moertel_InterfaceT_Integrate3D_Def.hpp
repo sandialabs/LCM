@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <ctime>
 #include <vector>
@@ -1013,7 +1011,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
         if (abs(val) < CONSTRAINT_MATRIX_ZERO) continue;
 
           // std::cout << "Current colmnode: " << colnode << std::endl;
-          //
 #if defined(PDANDM)  // Save the row, col, and value
         Mmat.insertGlobalValues(curr->second->Id(), 1, &val, &colnode);
 #endif
@@ -1079,7 +1076,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 
       for (int lrow = 0; lrow < (int)Mmod->size(); ++lrow) {
         //        std::map<int,double>& Mmodrow = (*Mmod)[lrow];
-        //
         int row = slmdof[lrow];
 
         // loop over the columns in that row

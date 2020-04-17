@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <Albany_STKNodeSharing.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
@@ -16,9 +14,7 @@
 namespace LCM {
 
 //----------------------------------------------------------------------------
-//
 // \brief Adds a new entity of rank 3 to the mesh
-//
 void
 Topology::add_element(stk::mesh::EntityRank entity_rank)
 {
@@ -31,11 +27,9 @@ Topology::add_element(stk::mesh::EntityRank entity_rank)
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief creates several entities at a time. The information about
 // the type of entity and and the amount of entities is contained
 // in the input vector called: "requests"
-//
 void
 Topology::add_entities(std::vector<size_t>& requests)
 {
@@ -45,9 +39,7 @@ Topology::add_entities(std::vector<size_t>& requests)
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Removes an entity and all its connections
-//
 void
 Topology::remove_entity(stk::mesh::Entity entity)
 {
@@ -58,9 +50,7 @@ Topology::remove_entity(stk::mesh::Entity entity)
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Adds a relation between two entities
-//
 void
 Topology::add_relation(
     stk::mesh::Entity source_entity,
@@ -73,9 +63,7 @@ Topology::add_relation(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Removes the relation between two entities
-//
 void
 Topology::remove_relation(
     stk::mesh::Entity source_entity,
@@ -88,10 +76,8 @@ Topology::remove_relation(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns a vector with all the actual mesh entities of a
 // specific rank
-//
 std::vector<stk::mesh::Entity>
 Topology::get_rank_entities(
     const stk::mesh::BulkData& mesh,
@@ -103,9 +89,7 @@ Topology::get_rank_entities(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Gets the local relation id (0,1,2,...) between two entities
-//
 EdgeId
 Topology::getLocalRelationId(
     const stk::mesh::Entity source_entity,
@@ -142,10 +126,8 @@ Topology::getLocalRelationId(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns the total number of lower rank entities connected
 // to a specific entity
-//
 int
 Topology::getNumberLowerRankEntities(const stk::mesh::Entity entity)
 {
@@ -162,10 +144,8 @@ Topology::getNumberLowerRankEntities(const stk::mesh::Entity entity)
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns a group of entities connected directly to a given
 //  entity. The input rank is the rank of the returned entities.
-//
 std::vector<stk::mesh::Entity>
 Topology::getDirectlyConnectedEntities(
     const stk::mesh::Entity entity,
@@ -181,10 +161,8 @@ Topology::getDirectlyConnectedEntities(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Checks if an entity exists inside a specific
 // vector. returns "true" if the entity exists in the vector of entities
-//
 bool
 Topology::findEntityInVector(
     std::vector<stk::mesh::Entity>& entities,
@@ -204,14 +182,11 @@ Topology::findEntityInVector(
 }
 
 //----------------------------------------------------------------------------
-//
 //  \brief Returns a group of entities connected indirectly to a
 //  given entity.  e.g. of returns: nodes that belong to a face
 //  segments or nodes that belong to an element The input rank is
 //  the rank of the returned entities.  The input rank must be lower
 //  than that of the input entity
-//
-//
 std::vector<stk::mesh::Entity>
 Topology::getBoundaryEntities(
     const stk::mesh::Entity entity,
@@ -249,10 +224,8 @@ Topology::getBoundaryEntities(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Checks if a segment is connected to an input node. Returns
 // "true" if segment is connected to the node.
-//
 bool
 Topology::segmentIsConnected(
     const stk::mesh::Entity segment,
@@ -275,11 +248,9 @@ Topology::segmentIsConnected(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Finds the adjacent segments to a given segment. The
 // adjacent segments are connected to a given common point.  it
 // returns adjacent segments
-//
 std::vector<stk::mesh::Entity>
 Topology::findAdjacentSegments(
     const stk::mesh::Entity segment,
@@ -313,9 +284,7 @@ Topology::findAdjacentSegments(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns all the 3D entities connected to a given face
-//
 std::vector<stk::mesh::Entity>
 Topology::findCellRelations(const stk::mesh::Entity face)
 {
@@ -326,11 +295,9 @@ Topology::findCellRelations(const stk::mesh::Entity face)
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns all the segments at the boundary of a given
 // element. Including those connected between the faces barycenters
 // and the faces boundary nodes
-//
 std::vector<stk::mesh::Entity>
 Topology::findSegmentsFromElement(const stk::mesh::Entity element)
 {
@@ -368,9 +335,7 @@ Topology::findSegmentsFromElement(const stk::mesh::Entity element)
 
 // FIXME - I don't know what to do with this.
 //----------------------------------------------------------------------------
-//
 // \brief Returns true if the input faces have two points in common
-//
 bool
 Topology::facesShareTwoPoints(
     const stk::mesh::Entity face1,
@@ -398,9 +363,7 @@ Topology::facesShareTwoPoints(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief returns the adjacent segments from a given face
-//
 std::vector<stk::mesh::Entity>
 Topology::findAdjacentSegmentsFromFace(
     std::vector<std::vector<stk::mesh::Entity>> const& faces_inside_element,
@@ -427,9 +390,7 @@ Topology::findAdjacentSegmentsFromFace(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns a pointer with the coordinates of a given entity
-//
 double*
 Topology::getEntityCoordinates(stk::mesh::Entity entity)
 {
@@ -448,10 +409,8 @@ Topology::getEntityCoordinates(stk::mesh::Entity entity)
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns a vector with the corresponding former boundary
 // nodes of an input entity of rank 3
-//
 
 std::vector<stk::mesh::Entity>
 Topology::getFormerElementNodes(
@@ -472,12 +431,10 @@ Topology::getFormerElementNodes(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Generates the coordinate of a given barycenter "entities"
 // is a vector with the entities of rank "0" that belong to the same
 // higher rank entity connected to the barycenter(e.g segment, face,
 // or element)
-//
 void
 Topology::computeBarycentricCoordinates(
     std::vector<stk::mesh::Entity> const& entities,
@@ -516,9 +473,7 @@ Topology::computeBarycentricCoordinates(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Barycentric subdivision of simplicial meshes
-//
 void
 Topology::barycentricSubdivision()
 {
@@ -1090,12 +1045,10 @@ Topology::barycentricSubdivision()
     add_relation(modified2_entities_2D[ii], All_boundary_segments[ii], 0);
     add_relation(modified2_entities_2D[ii], adjacent_segments_inside[0], 1);
     add_relation(modified2_entities_2D[ii], adjacent_segments_inside[1], 2);
-    //
     // faces_inside_elements is a vector of vectors that contains the
     // faces inside each element. Each row contains the faces of one
     // specific element. The first row corresponds to the first
     // element, the second one to the second element, and so forth.
-    //
     faces_inside_elements[ii / Number_new_triangles_inside_element].push_back(
         modified2_entities_2D[ii]);
   }
@@ -1109,7 +1062,6 @@ Topology::barycentricSubdivision()
 
   //--------------------------------------------------------------------------
   // IX. Delete the former elements
-  //
   //--------------------------------------------------------------------------
   // MEASURING TIME
   clock_t start9, end9;

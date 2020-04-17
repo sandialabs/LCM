@@ -1,12 +1,8 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
-//
 // Program for testing material models in LCM
 // Reads in material.xml file and runs at single material point
-//
 
 #include <MiniTensor.h>
 
@@ -58,9 +54,7 @@ main(int ac, char* av[])
   typedef PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
   typedef PHAL::AlbanyTraits                    Traits;
   std::cout.precision(15);
-  //
   // Create a command line processor and parse command line options
-  //
   Teuchos::CommandLineProcessor command_line_processor;
 
   command_line_processor.setDocString(
@@ -109,10 +103,8 @@ main(int ac, char* av[])
   Teuchos::RCP<Teuchos::Time> total_time   = tmonitor["MPS: Total Time"];
   Teuchos::RCP<Teuchos::Time> compute_time = tmonitor["MPS: Compute Time"];
 
-  //
   // Process material.xml file
   // Read into materialDB and get material model name
-  //
 
   // A mpi object must be instantiated before using the comm to read
   // material file
@@ -133,10 +125,8 @@ main(int ac, char* av[])
       material_model_name.length() == 0,
       "A material model must be defined for block: " + element_block_name);
 
-  //
   // Preloading stage setup
   // set up evaluators, create field and state managers
-  //
 
   // Set up the data layout
   // int const workset_size = 1;
@@ -446,7 +436,6 @@ main(int ac, char* av[])
   fieldManager.registerEvaluator<Residual>(ev);
   stateFieldManager.registerEvaluator<Residual>(ev);
   //---------------------------------------------------------------------------
-  //
   PHAL::Setup setupData;
   // std::cout << "Calling postRegistrationSetup" << std::endl;
   fieldManager.postRegistrationSetup(setupData);
@@ -473,13 +462,11 @@ main(int ac, char* av[])
 
   //---------------------------------------------------------------------------
   // grab the output file name
-  //
   std::string output_file =
       mpsParams.get<std::string>("Output File Name", "output.exo");
 
   //---------------------------------------------------------------------------
   // Create discretization, as required by the StateManager
-  //
   Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList =
       Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
   discretizationParameterList->set<int>("1D Elements", workset_size);
@@ -520,12 +507,10 @@ main(int ac, char* av[])
 
   //---------------------------------------------------------------------------
   // Associate the discretization with the StateManager
-  //
   stateMgr.setupStateArrays(discretization);
 
   //---------------------------------------------------------------------------
   // Create a workset
-  //
   PHAL::Workset workset;
   workset.numCells = workset_size;
   workset.stateArrayPtr =
@@ -564,9 +549,7 @@ main(int ac, char* av[])
   std::cout << "F\n" << F_tensor << std::endl;
   // std::cout << "log F\n" << log_F_tensor << std::endl;
 
-  //
   // Setup loading scenario and instantiate evaluatFields
-  //
   PHX::MDField<ScalarT, Cell, QuadPoint> minDetA("Min detA", dl->qp_scalar);
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> direction(
       "Direction", dl->qp_vector);
@@ -732,13 +715,11 @@ main(int ac, char* av[])
 
     stateMgr.updateStates();
 
-    //
     if (bifurcation_flag) {
       // break the loading step after adaptive time step loop
       break;
     }
 
-    //
 
   }  // end loading steps
 

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -72,7 +70,6 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   }
 
   // define the state variables
-  //
   // stress
   this->num_state_variables_++;
   this->state_var_names_.push_back(cauchy_string);
@@ -81,7 +78,6 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(true);
-  //
   // matrix energy
   this->num_state_variables_++;
   this->state_var_names_.push_back(matrix_energy_string);
@@ -90,7 +86,6 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // fiber 1 energy
   this->num_state_variables_++;
   this->state_var_names_.push_back(f1_energy_string);
@@ -99,7 +94,6 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // fiber 2 energy
   this->num_state_variables_++;
   this->state_var_names_.push_back(f2_energy_string);
@@ -108,7 +102,6 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // matrix damage
   this->num_state_variables_++;
   this->state_var_names_.push_back(matrix_damage_string);
@@ -117,7 +110,6 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // fiber 1 damage
   this->num_state_variables_++;
   this->state_var_names_.push_back(f1_damage_string);
@@ -126,7 +118,6 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // fiber 2 damage
   this->num_state_variables_++;
   this->state_var_names_.push_back(f2_damage_string);
@@ -301,7 +292,6 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
       //-----------compute quantities in Fibers------------
 
       // Fiber orientation vectors
-      //
       // fiber 1
       for (int i = 0; i < num_dims_; ++i) { M1(i) = direction_f1_[i]; }
       M1 = M1 / norm(M1);

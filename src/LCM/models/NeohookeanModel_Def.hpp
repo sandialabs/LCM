@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -11,9 +9,6 @@
 
 namespace LCM {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 NeohookeanModel<EvalT, Traits>::NeohookeanModel(
     Teuchos::ParameterList*              p,
@@ -47,9 +42,6 @@ NeohookeanModel<EvalT, Traits>::NeohookeanModel(
       p->get<bool>("Output Cauchy Stress", false));
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 NeohookeanModel<EvalT, Traits>::computeState(
@@ -103,13 +95,9 @@ NeohookeanModel<EvalT, Traits>::computeState(
       if (have_temperature_) {
         // Compute the mechanical deformation gradient Fm based on the
         // multiplicative decomposition of the deformation gradient
-        //
         //            F = Fm.Ft => Fm = F.inv(Ft)
-        //
         // where Ft is the thermal part of F, given as
-        //
         //     Ft = Le * I = exp(alpha * dtemp) * I
-        //
         // Le = exp(alpha*dtemp) is the thermal stretch and alpha the
         // coefficient of thermal expansion.
         ScalarT dtemp           = temperature_(cell, pt) - ref_temperature_;

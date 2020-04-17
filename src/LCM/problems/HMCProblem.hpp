@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #ifndef HMCPROBLEM_HPP
 #define HMCPROBLEM_HPP
@@ -1145,7 +1143,6 @@ Albany::HMCProblem::registerStateVariables(
   for (int sv(0); sv < cmiEv->getNumStateVars(); ++sv) {
     cmiEv->fillStateVariableStruct(sv);
 
-    //
     // QUAD POINT SCALARS
     if ((cmiEv->getLayout() == dl->qp_scalar) &&
         (cmiEv->getOutputFlag() == true)) {
@@ -1183,7 +1180,6 @@ Albany::HMCProblem::registerStateVariables(
 
     } else
 
-        //
         // QUAD POINT TENSORS
         if ((cmiEv->getLayout() == dl->qp_tensor) &&
             (cmiEv->getOutputFlag() == true)) {
@@ -1233,7 +1229,6 @@ Albany::HMCProblem::registerStateVariables(
 
     } else
 
-        //
         // QUAD POINT THIRD RANK TENSORS
         if ((cmiEv->getLayout() == dl->qp_tensor3) &&
             (cmiEv->getOutputFlag() == true)) {

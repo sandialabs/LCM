@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #ifndef PHAL_EXPREVALSDBC_DEF_HPP
 #define PHAL_EXPREVALSDBC_DEF_HPP
@@ -19,9 +17,7 @@
 
 namespace PHAL {
 
-//
 // Specialization: Residual
-//
 template <typename Traits>
 ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(
     Teuchos::ParameterList& p)
@@ -30,9 +26,6 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(
   expression = p.get<std::string>("Dirichlet Expression");
 }
 
-//
-//
-//
 template <typename Traits>
 void
 ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
@@ -71,9 +64,6 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
   }
 }
 
-//
-//
-//
 template <typename Traits>
 void
 ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
@@ -105,9 +95,7 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   }
 }
 
-//
 // Specialization: Jacobian
-//
 template <typename Traits>
 ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::ExprEvalSDBC(
     Teuchos::ParameterList& p)
@@ -115,9 +103,6 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::ExprEvalSDBC(
 {
 }
 
-//
-//
-//
 template <typename Traits>
 void
 ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
@@ -172,9 +157,6 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
   cas_manager->scatter(row_is_dbc_, col_is_dbc_, Albany::CombineMode::INSERT);
 }
 
-//
-//
-//
 template <typename Traits>
 void
 ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(

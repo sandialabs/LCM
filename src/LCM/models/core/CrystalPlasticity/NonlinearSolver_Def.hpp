@@ -1,16 +1,10 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
-//
 // ResidualSlipNLS
-//
 
-//
 // Define nonlinear system based on residual of slip values
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
 CP::ResidualSlipNLS<NumDimT, NumSlipT, EvalT>::ResidualSlipNLS(
     minitensor::Tensor4<ScalarT, NumDimT> const&          C,
@@ -177,9 +171,7 @@ CP::ResidualSlipNLS<NumDimT, NumSlipT, EvalT>::hessian(
   return Base::hessian(*this, x);
 }
 
-//
 // Define nonlinear system for plastic power for slip update
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
 CP::Dissipation<NumDimT, NumSlipT, EvalT>::Dissipation(
     std::vector<CP::SlipSystem<NumDimT>> const&           slip_systems,
@@ -277,13 +269,9 @@ CP::Dissipation<NumDimT, NumSlipT, EvalT>::hessian(
   return Base::hessian(*this, x);
 }
 
-//
 // ResidualSlipHardnessNLS
-//
 
-//
 // Define nonlinear system based on residual of slip and hardness values
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
 CP::ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>::ResidualSlipHardnessNLS(
     minitensor::Tensor4<ScalarT, NumDimT> const&          C,

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -31,7 +29,6 @@ NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
 
   // define the state variables
-  //
   // F
   this->num_state_variables_++;
   this->state_var_names_.push_back(F_string);
@@ -40,7 +37,6 @@ NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output F", false));
-  //
   // stress
   this->num_state_variables_++;
   this->state_var_names_.push_back(cauchy_string);

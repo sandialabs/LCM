@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(LCM_SchwarzBC_hpp)
 #define LCM_SchwarzBC_hpp
@@ -24,13 +22,9 @@
 
 namespace LCM {
 
-//
 // \brief Schwarz for models BC Dirichlet evaluator
-//
 
-//
 // Specialization of the DirichletBase class
-//
 template <typename EvalT, typename Traits>
 class SchwarzBC;
 
@@ -129,16 +123,12 @@ class SchwarzBC_Base : public PHAL::DirichletBase<EvalT, Traits>
   int coupled_app_index_{-1};
 };
 
-//
 // Fill residual, used in both residual and Jacobian
-//
 template <typename SchwarzBC, typename Traits>
 void
 fillResidual(SchwarzBC& sbc, typename Traits::EvalData d);
 
-//
 // Residual
-//
 template <typename Traits>
 class SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>
     : public SchwarzBC_Base<PHAL::AlbanyTraits::Residual, Traits>
@@ -150,9 +140,7 @@ class SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>
   evaluateFields(typename Traits::EvalData d);
 };
 
-//
 // Jacobian
-//
 template <typename Traits>
 class SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>
     : public SchwarzBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>

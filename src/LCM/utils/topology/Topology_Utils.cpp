@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Topology_Utils.hpp"
 
@@ -10,13 +8,10 @@
 
 namespace LCM {
 
-//
 // \brief Output the mesh connectivity
-//
 // Outputs the nodal connectivity of the elements as stored by
 // bulkData. Assumes that relationships between the elements and
 // nodes exist.
-//
 void
 display_connectivity(Topology& topology, stk::mesh::EntityRank cell_rank)
 {
@@ -55,12 +50,9 @@ display_connectivity(Topology& topology, stk::mesh::EntityRank cell_rank)
   return;
 }
 
-//
 // \brief Output relations associated with entity
 //        The entity may be of any rank
-//
 // \param[in] entity
-//
 void
 display_relation(Topology& topology, stk::mesh::Entity entity)
 {
@@ -92,12 +84,9 @@ display_relation(Topology& topology, stk::mesh::Entity entity)
   return;
 }
 
-//
 // \brief Output relations of a given rank associated with entity
-//
 // \param[in] entity
 // \param[in] the rank of the entity
-//
 void
 display_relation(
     Topology&                   topology,
@@ -131,11 +120,9 @@ display_relation(
   return;
 }
 
-//
 // Test whether a given source entity and relation are
 // needed in STK to maintain connectivity information.
 // These are relations that connect cells to points.
-//
 bool
 is_needed_for_stk(
     stk::mesh::BulkData&        bulk_data,
@@ -150,10 +137,8 @@ is_needed_for_stk(
          (target_rank == stk::topology::NODE_RANK);
 }
 
-//
 // Add a dash and processor rank to a string. Useful for output
 // file names.
-//
 std::string
 parallelize_string(std::string const& string)
 {
@@ -175,9 +160,7 @@ parallelize_string(std::string const& string)
   return oss.str();
 }
 
-//
 // Auxiliary for graphviz output
-//
 std::string
 entity_label(stk::mesh::EntityRank const rank)
 {
@@ -200,9 +183,7 @@ entity_label(stk::mesh::EntityRank const rank)
   return oss.str();
 }
 
-//
 // Auxiliary for graphviz output
-//
 std::string
 entity_string(Topology& topology, stk::mesh::Entity entity)
 {
@@ -220,9 +201,7 @@ entity_string(Topology& topology, stk::mesh::Entity entity)
   return oss.str();
 }
 
-//
 // Auxiliary for graphviz output
-//
 std::string
 entity_color(stk::mesh::EntityRank const rank, FailureState const failure_state)
 {
@@ -273,9 +252,7 @@ entity_color(stk::mesh::EntityRank const rank, FailureState const failure_state)
   return oss.str();
 }
 
-//
 // Auxiliary for graphviz output
-//
 std::string
 dot_header()
 {
@@ -287,18 +264,14 @@ dot_header()
   return header;
 }
 
-//
 // Auxiliary for graphviz output
-//
 std::string
 dot_footer()
 {
   return "}";
 }
 
-//
 // Auxiliary for graphviz output
-//
 std::string
 dot_entity(
     size_t const                space_dimension,
@@ -332,9 +305,7 @@ dot_entity(
   return oss.str();
 }
 
-//
 // Auxiliary for graphviz output
-//
 std::string
 relation_color(unsigned int const relation_id)
 {
@@ -353,9 +324,7 @@ relation_color(unsigned int const relation_id)
   return oss.str();
 }
 
-//
 // Auxiliary for graphviz output
-//
 std::string
 dot_relation(
     stk::mesh::EntityId const   source_id,
@@ -381,11 +350,9 @@ dot_relation(
   return oss.str();
 }
 
-//
 // The entity id has now some very high number.
 // Change it to something reasonable for debugging purposes.
 // See formula for creating high id in CreateFaces.cpp
-//
 stk::mesh::EntityId
 new_id_from_old_id(
     size_t const                dimension,
@@ -434,9 +401,6 @@ new_id_from_old_id(
   return new_id;
 }
 
-//
-//
-//
 stk::mesh::EntityId
 low_id_from_high_id(
     size_t const                dimension,
@@ -450,9 +414,6 @@ low_id_from_high_id(
       dimension, parallel_rank, rank, high_id, is_lo_from_hi);
 }
 
-//
-//
-//
 stk::mesh::EntityId
 high_id_from_low_id(
     size_t const                dimension,

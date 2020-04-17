@@ -1,18 +1,12 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license
 // detailed in the file license.txt in the top-level Albany directory.
-//
 
 namespace LCM {
 
-//
 // Specializations
-//
 
-//
 // Residual
-//
 template <minitensor::Index N>
 void
 MiniLinearSolver<PHAL::AlbanyTraits::Residual, N>::solve(
@@ -24,9 +18,7 @@ MiniLinearSolver<PHAL::AlbanyTraits::Residual, N>::solve(
   return;
 }
 
-//
 // Jacobian
-//
 template <minitensor::Index N>
 void
 MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N>::solve(
@@ -34,9 +26,7 @@ MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N>::solve(
     minitensor::Vector<ScalarT, N> const& b,
     minitensor::Vector<ScalarT, N>&       x)
 {
-  //
   // First deal with values
-  //
   auto const                    dimension = b.get_dimension();
   minitensor::Vector<ValueT, N> Df(dimension);
   minitensor::Tensor<ValueT, N> DfDx(dimension);
@@ -49,9 +39,7 @@ MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N>::solve(
   minitensor::Vector<ValueT, N> const Dx = minitensor::solve(DfDx, Df);
   for (auto i = 0; i < dimension; ++i) { x(i).val() = Dx(i); }
 
-  //
   // Then deal with derivatives
-  //
   minitensor::Tensor<ValueT> DbDx(dimension);
 
   // extract the jacobian

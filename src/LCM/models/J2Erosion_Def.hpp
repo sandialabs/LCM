@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "ACEcommon.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "J2Erosion.hpp"
@@ -107,7 +105,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
       0.0,
       false,
       p->get<bool>("Output Yield Surface", false));
-  //
   // mechanical source
   if (have_temperature_ == true) {
     addStateVariable(
@@ -207,9 +204,7 @@ J2ErosionKernel<EvalT, Traits>::init(
   for (auto cell = 0; cell < num_cells; ++cell) { failed_(cell, 0) = 0.0; }
 }
 
-//
 // J2 nonlinear system
-//
 template <typename EvalT, minitensor::Index M = 1>
 class J2ErosionNLS
     : public minitensor::
@@ -450,14 +445,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
   }
 
-  //
   // Determine if critical stress is exceeded
-  //
   if (yielded == true) failed += 1.0;
 
-  //
   // Determine if kinematic failure occurred
-  //
   auto const critical_angle = critical_angle_;
   if (critical_angle > 0.0) {
     auto const Fval   = Sacado::Value<decltype(F)>::eval(F);

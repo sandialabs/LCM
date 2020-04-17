@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Schwarz_Coupled.hpp"
 
 #include <Teuchos_VerboseObject.hpp>
@@ -882,9 +880,7 @@ SchwarzCoupled::evalModelImpl(
       }
     }
   }
-  //
   // Get the output arguments
-  //
   Teuchos::RCP<Thyra_ProductVector> f_out;
   if (!out_args.get_f().is_null()) {
     f_out = Albany::getProductVector(out_args.get_f());

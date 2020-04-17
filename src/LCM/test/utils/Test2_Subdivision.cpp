@@ -1,12 +1,9 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 // Test 2 of barycentric subdivision. Input file has to be specified.
 // Checks that the final output file contains the subdivision.
 // Restricted to simplicial complexes.
-//
 
 #include "time.h"
 #include "topology/Topology.hpp"
@@ -22,9 +19,7 @@ typedef stk::mesh::Entity Entity;
 std::vector<int>
 return_number_entities(LCM::Topology& topology_);
 
-//
 // Checks if the subdivision was done correctly
-//
 std::string
 verify_subdivision(
     std::vector<int> const& former_num_entities,
@@ -33,9 +28,7 @@ verify_subdivision(
 int
 main(int ac, char* av[])
 {
-  //
   // Create a command line processor and parse command line options
-  //
   Teuchos::CommandLineProcessor command_line_processor;
 
   command_line_processor.setDocString(
@@ -67,9 +60,7 @@ main(int ac, char* av[])
     return 1;
   }
 
-  //
   // Read the mesh
-  //
   // Copied from Partition.cc
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
   LCM::Topology             topology(input_file, output_file);
@@ -85,9 +76,7 @@ main(int ac, char* av[])
   // Prepares mesh for barycentric subdivision
   topology.removeNodeRelations();
 
-  //
   // Here starts the barycentric subdivision.
-  //
   // Carry out barycentric subdivision on the mesh
   topology.barycentricSubdivision();
   std::cout << "*************************" << std::endl;
@@ -100,9 +89,7 @@ main(int ac, char* av[])
   topology.restoreElementToNodeConnectivity();
   LCM::display_connectivity(topology, stk::topology::ELEMENT_RANK);
 
-  //
   // Generate the output (exodus) file
-  //
   Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr =
       topology.get_discretization();
   Albany::STKDiscretization& stk_discretization =
@@ -114,9 +101,7 @@ main(int ac, char* av[])
   // second arg to output is (pseudo)time
   stk_discretization.writeSolution(*solution_field, 1.0);
 
-  //
   // Read the output mesh after the subdivision and check that it is correct
-  //
   std::cout << "*************************************" << std::endl;
   std::cout << "Checking final mesh after subdivision" << std::endl;
   std::cout << "*************************************" << std::endl;
@@ -159,9 +144,7 @@ return_number_entities(LCM::Topology& topology_)
 
   return output_vector;
 }
-//
 // Checks if the subdivision was done correctly
-//
 std::string
 verify_subdivision(
     std::vector<int> const& former_num_entities,

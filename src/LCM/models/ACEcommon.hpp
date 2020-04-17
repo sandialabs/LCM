@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #if !defined(LCM_ACEcommon_hpp)
 #define LCM_ACEcommon_hpp
 
@@ -26,9 +24,7 @@ static RealType const SQ23{std::sqrt(2.0 / 3.0)};
 
 }  // anonymous namespace
 
-//
 // ACE nonlinear system for ice and permafrost material models (J2)
-//
 template <typename EvalT, minitensor::Index M = 1>
 class ACE_NLS : public minitensor::
                     Function_Base<ACE_NLS<EvalT, M>, typename EvalT::ScalarT, M>

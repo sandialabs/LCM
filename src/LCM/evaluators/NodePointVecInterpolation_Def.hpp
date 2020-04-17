@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_Macros.hpp"
 #include "Intrepid2_FunctionSpaceTools.hpp"
@@ -10,9 +8,6 @@
 
 namespace LCM {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 NodePointVecInterpolation<EvalT, Traits>::NodePointVecInterpolation(
     Teuchos::ParameterList const&        p,
@@ -36,9 +31,6 @@ NodePointVecInterpolation<EvalT, Traits>::NodePointVecInterpolation(
   dimension_ = dimensions[2];
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 NodePointVecInterpolation<EvalT, Traits>::postRegistrationSetup(
@@ -50,9 +42,6 @@ NodePointVecInterpolation<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(point_value_, fm);
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 NodePointVecInterpolation<EvalT, Traits>::evaluateFields(
@@ -75,9 +64,6 @@ NodePointVecInterpolation<EvalT, Traits>::evaluateFields(
   }
 }
 
-//
-//
-//
 template <typename Traits>
 NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
     NodePointVecInterpolation(
@@ -105,9 +91,6 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
   offset_ = p.get<int>("Offset of First DOF");
 }
 
-//
-//
-//
 template <typename Traits>
 void
 NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
@@ -120,9 +103,6 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
   this->utils.setFieldData(point_value_, fm);
 }
 
-//
-//
-//
 template <typename Traits>
 void
 NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(

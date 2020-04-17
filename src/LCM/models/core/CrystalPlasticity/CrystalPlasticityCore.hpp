@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(CrystalPlasticityCore_hpp)
 #define CrystalPlasticityCore_hpp
@@ -15,9 +13,7 @@
 
 namespace CP {
 
-//
 //! Struct containing slip system information.
-//
 template <minitensor::Index NumDimT>
 struct SlipSystem
 {
@@ -33,14 +29,11 @@ struct SlipSystem
   //! Schmid Tensor.
   minitensor::Tensor<RealType, MAX_DIM> projector_;
 
-  //
   RealType state_hardening_initial_;
 };
 
-//
 // Slip system family - collection of slip systems grouped by flow and
 // hardening characteristics
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
 class SlipFamily
 {
@@ -180,9 +173,7 @@ template <typename T, minitensor::Index N>
 void
 expectFiniteTensor(minitensor::Tensor<T, N> const& A, std::string const& msg);
 
-//
 //! Compute Lp_np1 and Fp_np1 based on computed slip increment.
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
 void
 applySlipIncrement(
@@ -194,9 +185,7 @@ applySlipIncrement(
     minitensor::Tensor<ArgT, NumDimT>&            Lp_np1,
     minitensor::Tensor<ArgT, NumDimT>&            Fp_np1);
 
-//
 //! Update the hardness.
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
 void
 updateHardness(
@@ -224,9 +213,7 @@ updateSlip(
     minitensor::Vector<ArgT, NumSlipT>&               slip_np1,
     bool&                                             failed);
 
-//
 //! Compute stress.
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
 void
 computeStress(
@@ -239,9 +226,7 @@ computeStress(
     minitensor::Vector<ArgT, NumSlipT>&       shear,
     bool&                                     failed);
 
-//
 //! Construct elasticity tensor
-//
 template <minitensor::Index NumDimT, typename DataT, typename ArgT>
 void
 computeElasticityTensor(

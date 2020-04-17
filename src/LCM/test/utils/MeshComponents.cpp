@@ -1,12 +1,8 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
-//
 // Find connected components in a mesh by using the dual graph
-//
 #include <LCMPartition.hpp>
 #include <Teuchos_CommandLineProcessor.hpp>
 #include <iomanip>
@@ -14,9 +10,7 @@
 int
 main(int ac, char* av[])
 {
-  //
   // Create a command line processor and parse command line options
-  //
   Teuchos::GlobalMPISession     mpiSession(&ac, &av);
   Teuchos::CommandLineProcessor command_line_processor;
 
@@ -47,19 +41,13 @@ main(int ac, char* av[])
     return 1;
   }
 
-  //
   // Read mesh
-  //
   LCM::ConnectivityArray connectivity_array(input_file, output_file);
 
-  //
   // Create dual graph
-  //
   LCM::DualGraph dual_graph(connectivity_array);
 
-  //
   // Compute connected components
-  //
   std::vector<int> components;
 
   int const number_components = dual_graph.getConnectedComponents(components);
@@ -76,9 +64,7 @@ main(int ac, char* av[])
   Albany::MDArray stk_component =
       stk_discretization.getStateArrays().elemStateArrays[0]["Partition"];
 
-  //
   // Output components
-  //
 
   // Assumption: numbering of elements is contiguous.
   for (std::vector<int>::size_type element = 0; element < components.size();

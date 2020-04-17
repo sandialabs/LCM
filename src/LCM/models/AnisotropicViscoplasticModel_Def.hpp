@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -55,7 +53,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
   }
 
   // define the state variables
-  //
   // stress
   this->num_state_variables_++;
   this->state_var_names_.push_back(cauchy_string);
@@ -65,7 +62,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Cauchy Stress", false));
-  //
   // Fp
   this->num_state_variables_++;
   this->state_var_names_.push_back(Fp_string);
@@ -74,7 +70,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output Fp", false));
-  //
   // eqps
   this->num_state_variables_++;
   this->state_var_names_.push_back(eqps_string);
@@ -83,7 +78,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output eqps", false));
-  //
   // ess
   this->num_state_variables_++;
   this->state_var_names_.push_back(ess_string);
@@ -92,7 +86,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output ess", false));
-  //
   // kappa - isotropic hardening
   this->num_state_variables_++;
   this->state_var_names_.push_back(kappa_string);
@@ -101,7 +94,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output kappa", false));
-  //
   // mechanical source
   if (have_temperature_) {
     this->num_state_variables_++;
@@ -185,13 +177,9 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
       if (have_temperature_) {
         // Compute the mechanical deformation gradient Fm based on the
         // multiplicative decomposition of the deformation gradient
-        //
         //            F = Fm.Ft => Fm = F.inv(Ft)
-        //
         // where Ft is the thermal part of F, given as
-        //
         //     Ft = Le * I = exp(alpha * dtemp) * I
-        //
         // Le is the thermal stretch and alpha the coefficient of thermal
         // expansion.
         ScalarT dtemp           = temperature_(cell, pt) - ref_temperature_;
@@ -208,7 +196,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
 
       // compute trial state
       // compute the Kirchhoff stress in the current configuration
-      //
       Fe    = Fm * minitensor::inverse(Fpn);
       Cpinv = minitensor::inverse(Fpn) *
               minitensor::transpose(minitensor::inverse(Fpn));
@@ -220,7 +207,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
 
       // pull back the Kirchhoff stress to the intermediate configuration
       // this is the Mandel stress
-      //
       M = minitensor::transpose(Fe) * tau *
           minitensor::inverse(minitensor::transpose(Fe));
 

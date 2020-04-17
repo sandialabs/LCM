@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(PHAL_ExprEvalSDBC_hpp)
 #define PHAL_ExprEvalSDBC_hpp
@@ -27,13 +25,9 @@ class ExprEvalSDBC
 {
 };
 
-//
 // Specializations for different Albany Traits.
-//
 
-//
 // Residual
-//
 template <typename Traits>
 class ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>
     : public PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
@@ -53,9 +47,7 @@ class ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>
   std::string expression{""};
 };
 
-//
 // Jacobian
-//
 template <typename Traits>
 class ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>
     : public PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>

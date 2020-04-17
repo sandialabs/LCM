@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -51,7 +49,6 @@ J2Model<EvalT, Traits>::J2Model(
   }
 
   // define the state variables
-  //
   // stress
   this->num_state_variables_++;
   this->state_var_names_.push_back(cauchy_string);
@@ -61,7 +58,6 @@ J2Model<EvalT, Traits>::J2Model(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Cauchy Stress", false));
-  //
   // Fp
   this->num_state_variables_++;
   this->state_var_names_.push_back(Fp_string);
@@ -70,7 +66,6 @@ J2Model<EvalT, Traits>::J2Model(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output Fp", false));
-  //
   // eqps
   this->num_state_variables_++;
   this->state_var_names_.push_back(eqps_string);
@@ -79,7 +74,6 @@ J2Model<EvalT, Traits>::J2Model(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(p->get<bool>("Output eqps", false));
-  //
   // yield surface
   this->num_state_variables_++;
   this->state_var_names_.push_back(yieldSurface_string);
@@ -89,7 +83,6 @@ J2Model<EvalT, Traits>::J2Model(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Yield Surface", false));
-  //
   // mechanical source
   if (have_temperature_) {
     this->num_state_variables_++;
@@ -167,13 +160,9 @@ J2Model<EvalT, Traits>::computeState(
       if (have_temperature_) {
         // Compute the mechanical deformation gradient Fm based on the
         // multiplicative decomposition of the deformation gradient
-        //
         //            F = Fm.Ft => Fm = F.inv(Ft)
-        //
         // where Ft is the thermal part of F, given as
-        //
         //     Ft = Le * I = exp(alpha * dtemp) * I
-        //
         // Le = exp(alpha*dtemp) is the thermal stretch and alpha the
         // coefficient of thermal expansion.
         ScalarT dtemp           = temperature_(cell, pt) - ref_temperature_;

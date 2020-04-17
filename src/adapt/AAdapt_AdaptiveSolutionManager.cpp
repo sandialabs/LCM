@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "AAdapt_AdaptiveSolutionManager.hpp"
 
@@ -355,20 +353,13 @@ AdaptiveSolutionManager::scatterX(
 void
 AdaptiveSolutionManager::projectCurrentSolution()
 {
-  //
   // grp->getNOXThyraVecRCPX() is the current solution on the old mesh
-  //
   // TO provide an example, assume that the meshes are identical and we can just
   // copy the data between them (a Copy Remesh)
-  //
-  //
   //  const Teuchos::RCP<const Tpetra_Vector> testSolution =
   //  ConverterT::getConstTpetraVector(
   //    grp_->getNOXThyraVecRCPX()->getThyraRCPVector());
-  //
-  //
   //    *initial_xT = *testSolution;
-  //
 }
 
 }  // namespace AAdapt

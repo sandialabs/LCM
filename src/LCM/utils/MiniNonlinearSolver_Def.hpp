@@ -1,14 +1,10 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license
 // detailed in the file license.txt in the top-level Albany directory.
-//
 
 namespace LCM {
 
-//
 // Native MiniSolver
-//
 template <
     typename MIN,
     typename STEP,
@@ -77,9 +73,7 @@ MiniSolver<MIN, STEP, FN, PHAL::AlbanyTraits::Jacobian, N>::MiniSolver(
   return;
 }
 
-//
 // MiniSolver through ROL.
-//
 template <typename MIN, typename FN, typename EvalT, minitensor::Index N>
 MiniSolverROL<MIN, FN, EvalT, N>::MiniSolverROL(
     MIN&                                            minimizer,
@@ -146,9 +140,7 @@ MiniSolverROL<MIN, FN, PHAL::AlbanyTraits::Jacobian, N>::MiniSolverROL(
   return;
 }
 
-//
 // MiniSolver through ROL with bound constraints.
-//
 template <
     typename MIN,
     typename FN,
@@ -225,9 +217,7 @@ MiniSolverBoundsROL<MIN, FN, BC, PHAL::AlbanyTraits::Jacobian, N>::
   return;
 }
 
-//
 // MiniSolver through ROL with inequality constraints.
-//
 template <
     typename MIN,
     typename FN,
@@ -324,9 +314,6 @@ MiniSolverEqIneqROL<MIN, FN, EIC, PHAL::AlbanyTraits::Jacobian, N, NC>::
   return;
 }
 
-//
-//
-//
 template <typename T, typename S, minitensor::Index N>
 void
 computeFADInfo(

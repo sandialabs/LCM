@@ -1,14 +1,10 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
-//
 // Define nonlinear system for EV with a Gurson failure surface
-//
 template <typename EvalT, minitensor::Index M>
 EV::ElastoViscoplasticNLS<EvalT, M>::ElastoViscoplasticNLS(
     RealType                              dt,

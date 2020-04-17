@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "AAdapt_AnalyticFunction.hpp"
 
@@ -302,7 +300,6 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, double const* X)
   // We interpolate Temperature as a linear function of z-ccordinate: T = b +
   // m*z
   double b = (T1 * Z0 - T0 * Z1) / (Z0 - Z1);
-  //
   double m = (T0 - T1) / (Z0 - Z1);
 
   // assign temperature
@@ -358,7 +355,6 @@ AAdapt::TemperatureLinear::compute(double* x, double const* X)
   // We interpolate Temperature as a linear function of z-ccordinate: T = b +
   // m*z
   double b = (T1 * Z0 - T0 * Z1) / (Z0 - Z1);
-  //
   double m = (T0 - T1) / (Z0 - Z1);
 
   // assign temperature

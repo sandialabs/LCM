@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_AbstractSTKFieldContainer.hpp"
@@ -16,9 +14,6 @@
 
 namespace PHAL {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 ReadStateField<EvalT, Traits>::ReadStateField(Teuchos::ParameterList const&)
 {
@@ -26,9 +21,6 @@ ReadStateField<EvalT, Traits>::ReadStateField(Teuchos::ParameterList const&)
   this->setName("Read State Field");
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 ReadStateField<EvalT, Traits>::postRegistrationSetup(
@@ -38,9 +30,6 @@ ReadStateField<EvalT, Traits>::postRegistrationSetup(
   // States not read for generic type, only specializations
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void ReadStateField<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData /* workset */)
@@ -48,9 +37,6 @@ void ReadStateField<EvalT, Traits>::evaluateFields(
   // States not read for generic type, only specializations
 }
 
-//
-//
-//
 template <typename Traits>
 ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::ReadStateField(
     Teuchos::ParameterList const& p)
@@ -71,9 +57,6 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::ReadStateField(
       "Read Field " + field_name + " to State " + state_name + "Residual");
 }
 
-//
-//
-//
 template <typename Traits>
 void
 ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
@@ -83,9 +66,6 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
   this->utils.setFieldData(field, fm);
 }
 
-//
-//
-//
 template <typename Traits>
 void
 ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(

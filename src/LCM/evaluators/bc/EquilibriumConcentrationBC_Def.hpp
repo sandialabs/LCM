@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_Macros.hpp"
 #include "Albany_ThyraUtils.hpp"
@@ -21,7 +19,6 @@ EquilibriumConcentrationBC_Base<EvalT, Traits>::EquilibriumConcentrationBC_Base(
 {
 }
 //------------------------------------------------------------------------------
-//
 template <typename EvalT, typename Traits>
 void
 EquilibriumConcentrationBC_Base<EvalT, Traits>::computeBCs(
@@ -32,7 +29,6 @@ EquilibriumConcentrationBC_Base<EvalT, Traits>::computeBCs(
 }
 //------------------------------------------------------------------------------
 // Specialization: Residual
-//
 template <typename Traits>
 EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
     EquilibriumConcentrationBC(Teuchos::ParameterList& p)
@@ -40,7 +36,6 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
 {
 }
 //------------------------------------------------------------------------------
-//
 template <typename Traits>
 void
 EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
@@ -71,7 +66,6 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
 }
 //------------------------------------------------------------------------------
 // Specialization: Jacobian
-//
 template <typename Traits>
 EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::
     EquilibriumConcentrationBC(Teuchos::ParameterList& p)

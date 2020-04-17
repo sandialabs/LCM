@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -78,7 +76,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
 
   // define the state variables
-  //
   // stress
   this->num_state_variables_++;
   this->state_var_names_.push_back(cauchy_string);
@@ -87,7 +84,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(true);
-  //
   // Fp
   this->num_state_variables_++;
   this->state_var_names_.push_back(Fp_string);
@@ -96,7 +92,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_init_values_.push_back(1.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(false);
-  //
   // eqps
   this->num_state_variables_++;
   this->state_var_names_.push_back(eqps_string);
@@ -105,7 +100,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // matrix energy
   this->num_state_variables_++;
   this->state_var_names_.push_back(matrix_energy_string);
@@ -114,7 +108,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // fiber 1 energy
   this->num_state_variables_++;
   this->state_var_names_.push_back(f1_energy_string);
@@ -123,7 +116,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // fiber 2 energy
   this->num_state_variables_++;
   this->state_var_names_.push_back(f2_energy_string);
@@ -132,7 +124,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // matrix damage
   this->num_state_variables_++;
   this->state_var_names_.push_back(matrix_damage_string);
@@ -141,7 +132,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // fiber 1 damage
   this->num_state_variables_++;
   this->state_var_names_.push_back(f1_damage_string);
@@ -150,7 +140,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // fiber 2 damage
   this->num_state_variables_++;
   this->state_var_names_.push_back(f2_damage_string);

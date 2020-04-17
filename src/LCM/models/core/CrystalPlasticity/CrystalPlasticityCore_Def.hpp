@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
@@ -33,9 +31,7 @@ CP::SlipFamily<NumDimT, NumSlipT>::setFlowRuleType(CP::FlowRuleType rule)
   pflow_parameters_ = CP::flowParameterFactory(type_flow_rule_);
 }
 
-//
 // Verify that constitutive update has preserved finite values
-//
 template <typename T, minitensor::Index N>
 void
 CP::expectFiniteTensor(
@@ -70,9 +66,7 @@ CP::applySlipIncrement(
 
   minitensor::Index const num_dim = Fp_n.get_dimension();
 
-  //
   // calculate plastic velocity gradient
-  //
   Lp_np1.fill(minitensor::Filler::ZEROS);
   Lp_np1 = 0. * Lp_np1;
 
@@ -288,9 +282,7 @@ CP::computeStress(
   }
 }
 
-//
 //! Construct elasticity tensor
-//
 template <minitensor::Index NumDimT, typename DataT, typename ArgT>
 void
 CP::computeElasticityTensor(

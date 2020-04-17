@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(LCM_MeshSizeField_hpp)
 #define LCM_MeshSizeField_hpp
@@ -177,7 +175,6 @@ class IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   unsigned int numNodes;
 
   // pointer to the Adaptation PL
-  //
   Teuchos::ParameterList* adapt_PL;
 };
 
@@ -302,7 +299,6 @@ class AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   unsigned int numNodes;
 
   // pointer to the Adaptation PL
-  //
   Teuchos::ParameterList* adapt_PL;
 };
 }  // namespace LCM

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -10,9 +8,6 @@
 
 namespace LCM {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(
     Teuchos::ParameterList*              p,
@@ -58,9 +53,7 @@ ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(
   }
 }
 
-//
 // Kokkos Kernel for computeVolumeAverage
-//
 template <typename ScalarT, class ArrayStress, class ArrayWeights, class ArrayJ>
 class computeVolumeAverageKernel
 {
@@ -126,9 +119,6 @@ class computeVolumeAverageKernel
   }
 };
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModel<EvalT, Traits>::computeVolumeAverage(

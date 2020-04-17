@@ -1,15 +1,10 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Schwarz_ObserverImpl.hpp"
 
 namespace LCM {
 
-//
-//
-//
 ObserverImpl::ObserverImpl(
     Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps)
     : StatelessObserverImpl(apps)
@@ -17,14 +12,8 @@ ObserverImpl::ObserverImpl(
   return;
 }
 
-//
-//
-//
 ObserverImpl::~ObserverImpl() { return; }
 
-//
-//
-//
 void
 ObserverImpl::observeSolution(
     double                                           stamp,

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_PNPProblem.hpp"
 
@@ -123,7 +121,6 @@ Albany::PNPProblem::constructNeumannEvaluators(
   // Construct BC evaluators for all side sets and names
   // Note that the string index sets up the equation offset, so ordering is
   // important
-  //
   // Currently we aren't exactly doing this right.  I think to do this
   // correctly we need different neumann evaluators for each DOF (velocity,
   // pressure, temperature, flux) since velocity is a vector and the

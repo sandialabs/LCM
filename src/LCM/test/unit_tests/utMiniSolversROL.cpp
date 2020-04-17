@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "MiniNonlinearSolver.hpp"
 #include "MiniSolvers.hpp"
 #include "MiniTensor_FunctionSet.h"
@@ -25,9 +23,7 @@ main(int ac, char* av[])
   return retval;
 }
 
-//
 // Test the LCM ROL mini minimizer.
-//
 namespace {
 
 template <typename EvalT>

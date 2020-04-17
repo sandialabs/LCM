@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "ACEcommon.hpp"
 #include "ACEice.hpp"
@@ -388,9 +386,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
   }
 
-  //
   // Thermal calculation
-  //
 
   // Calculate the depth-dependent porosity
   // NOTE: The porosity does not change in time so this calculation only needs
@@ -538,9 +534,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ice_saturation_(cell, pt)   = icurr;
   water_saturation_(cell, pt) = wcurr;
 
-  //
   // Mechanical calculation
-  //
 
   // Compute effective yield strength
   Y = icurr * Y;
@@ -646,14 +640,10 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
   }
 
-  //
   // Determine if critical stress is exceeded
-  //
   if (yielded == true) failed += 1.0;
 
-  //
   // Determine if kinematic failure occurred
-  //
   auto const critical_angle = critical_angle_;
   if (critical_angle > 0.0) {
     auto const Fval   = Sacado::Value<decltype(F)>::eval(F);

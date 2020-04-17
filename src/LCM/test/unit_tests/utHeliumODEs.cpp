@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_Layouts.hpp"
 #include "Albany_STKDiscretization.hpp"
@@ -157,7 +155,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   Albany::StateManager stateMgr;
 
   // register the states
-  //
   Teuchos::RCP<Teuchos::ParameterList> p;
   Teuchos::RCP<PHX::Evaluator<Traits>> ev;
   p = stateMgr.registerStateVariable(
@@ -237,12 +234,10 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
 
   //---------------------------------------------------------------------------
   // grab the output file name
-  //
   std::string output_file = "output.exo";
 
   //---------------------------------------------------------------------------
   // Create discretization, as required by the StateManager
-  //
   Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList =
       Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
   discretizationParameterList->set<int>("1D Elements", workset_size);
@@ -280,7 +275,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
 
   //---------------------------------------------------------------------------
   // Associate the discretization with the StateManager
-  //
   stateMgr.setupStateArrays(discretization);
 
   //--------------------------------------------------------------------------

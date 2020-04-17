@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 /******************************************************************************/
 template <typename EvalT, minitensor::Index M>
@@ -25,27 +23,23 @@ FM::DomainSwitching<EvalT, M>::DomainSwitching(
 /******************************************************************************/
 {
   // compute trial state
-  //
   minitensor::Tensor<ArgT, FM::THREE_D> X, linear_x;
   minitensor::Vector<ArgT, FM::THREE_D> linear_D;
   FM::computeInitialState(
       m_binFractions, m_crystalVariants, m_x, X, linear_x, E, m_D, linear_D);
 
   // set all transitions active for first residual eval
-  //
   int nTransitions = m_transitions.size();
   m_transitionMap.resize(nTransitions);
   for (int J = 0; J < nTransitions; J++) { m_transitionMap[J] = J; }
 
   // evaluate residual at current bin fractions
-  //
   minitensor::Vector<ArgT, FM::MAX_TRNS> zero;
   zero.set_dimension(nTransitions);
   zero.clear();
   minitensor::Vector<ArgT, FM::MAX_TRNS> residual = this->gradient(zero);
 
   // find active transitions
-  //
   int nVariants  = m_binFractions.size();
   int transition = 0, nActive = 0;
   for (int J = 0; J < nTransitions; J++) m_transitionMap[J] = -1;
@@ -91,7 +85,6 @@ FM::DomainSwitching<EvalT, M>::gradient(
   linear_D.clear();
 
   // apply transition increment
-  //
   Teuchos::Array<T> fractionsNew(m_binFractions.size());
   computeBinFractions(
       xi, fractionsNew, m_binFractions, m_transitionMap, m_aMatrix);
@@ -103,7 +96,6 @@ FM::DomainSwitching<EvalT, M>::gradient(
       LCM::peel_vector<EvalT, T, N, FM::THREE_D>()(m_D);
 
   // compute new state
-  //
   computeRelaxedState(
       fractionsNew,
       m_crystalVariants,
@@ -115,7 +107,6 @@ FM::DomainSwitching<EvalT, M>::gradient(
       linear_D);
 
   // compute new residual
-  //
   auto const               num_unknowns = xi.get_dimension();
   minitensor::Vector<T, N> residual(num_unknowns);
   computeResidual(

@@ -1,12 +1,9 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 // Test of barycentric subdivision.
 // Reads in a mesh and applies the barycentric subdivision algorithm
 // to it. Restricted to simplicial complexes.
-//
 
 #include "time.h"
 #include "topology/Topology.hpp"
@@ -15,9 +12,7 @@
 int
 main(int ac, char* av[])
 {
-  //
   // Create a command line processor and parse command line options
-  //
   Teuchos::CommandLineProcessor command_line_processor;
 
   command_line_processor.setDocString(
@@ -49,9 +44,7 @@ main(int ac, char* av[])
     return 1;
   }
 
-  //
   // Read the mesh
-  //
   // Copied from Partition.cc
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
 
@@ -78,9 +71,7 @@ main(int ac, char* av[])
   std::string gviz_output = LCM::parallelize_string("before") + ".dot";
   topology.outputToGraphviz(gviz_output);
 
-  //
   // Here starts the barycentric subdivision.
-  //
   //-----------------------------------------------------------------------------------------------------------------------------------
   // Generate the output file
   //-----------------------------------------------------------------------------------------------------------------------------------

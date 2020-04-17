@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "FieldNameMap.hpp"
 
@@ -45,9 +43,7 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(
       std::make_pair("Velocity_Gradient_Plastic", "Velocity_Gradient_Plastic"));
 
-  //
   // Crystal plasticity model
-  //
   int const max_slip_systems = 48;
 
   // field names for slip on each slip system
@@ -83,18 +79,14 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   // field name for crystallographic rotation tensor
   name_map->insert(std::make_pair("Re", "Re"));
 
-  //
   // ViscoElastic model
-  //
   name_map->insert(std::make_pair("H_1", "H_1"));
   name_map->insert(std::make_pair("H_2", "H_2"));
   name_map->insert(std::make_pair("H_3", "H_3"));
   name_map->insert(
       std::make_pair("Instantaneous Stress", "Instantaneous Stress"));
 
-  //
   // Poroplasticity model
-  //
   name_map->insert(std::make_pair("Total_Stress", "Total_Stress"));
   name_map->insert(std::make_pair("KCPermeability", "KCPermeability"));
   name_map->insert(std::make_pair("Biot_Modulus", "Biot_Modulus"));
@@ -102,9 +94,7 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(std::make_pair("Porosity", "Porosity"));
   name_map->insert(std::make_pair("Pore_Pressure", "Pore_Pressure"));
 
-  //
   // Hydrogen transport model
-  //
   name_map->insert(std::make_pair("Transport", "Transport"));
   name_map->insert(std::make_pair("HydroStress", "HydroStress"));
   name_map->insert(
@@ -124,18 +114,14 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(
       std::make_pair("Gradient_Element_Length", "Gradient_Element_Length"));
 
-  //
   // Helium ODEs
-  //
   name_map->insert(std::make_pair("He_Concentration", "He_Concentration"));
   name_map->insert(
       std::make_pair("Total_Bubble_Density", "Total_Bubble_Density"));
   name_map->insert(
       std::make_pair("Bubble_Volume_Fraction", "Bubble_Volume_Fraction"));
 
-  //
   // Geo-models
-  //
   name_map->insert(std::make_pair("Back_Stress", "Back_Stress"));
   name_map->insert(std::make_pair("Cap_Parameter", "Cap_Parameter"));
   name_map->insert(std::make_pair("volPlastic_Strain", "volPlastic_Strain"));

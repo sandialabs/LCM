@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #ifndef ALBANY_STATE_INFO_STRUCT
 #define ALBANY_STATE_INFO_STRUCT
@@ -27,12 +25,10 @@
 
 namespace Albany {
 
-//
 // Using these most of the Albany code compiles, but there are some errors
 // with converting from STK data structures.
 // In any case, the operator= still does a shallow copym which was the
 // motivation to try Kokkos::View
-//
 // using MDArray = Kokkos::View<double*, PHX::Device>;
 // using IDArray = Kokkos::View<LO*, PHX::Device>;
 // using StateArray = std::map<std::string, MDArray>;

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_STKDiscretization.hpp"
 
@@ -239,14 +237,10 @@ ref2sphere(
 
   // ==========================================================
   // enforce three facts:
-  //
   // 1) lon at poles is defined to be zero
-  //
   // 2) Grid points must be separated by about .01 Meter (on earth)
   //   from pole to be considered "not the pole".
-  //
   // 3) range of lon is { 0<= lon < 2*PI }
-  //
   // ==========================================================
 
   if (std::abs(std::abs(sphere.first) - pi / 2) < DIST_THRESHOLD) {

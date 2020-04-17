@@ -1,9 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
-//
 // To do:
 //  1.  Expand to symmetry group (See Nye).
 
@@ -36,7 +33,6 @@ LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(
 /******************************************************************************/
 {
   // PARSE MATERIAL BASIS
-  //
   R.set_dimension(num_dims_);
   R.clear();
   if (p->isType<Teuchos::ParameterList>("Material Basis")) {
@@ -77,7 +73,6 @@ LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(
   initializeConstants();
 
   // DEFINE THE EVALUATED FIELDS
-  //
   stressName = "Stress";
   this->eval_field_map_.insert(std::make_pair(stressName, dl->qp_tensor));
 
@@ -85,7 +80,6 @@ LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(
   this->eval_field_map_.insert(std::make_pair(edispName, dl->qp_vector));
 
   // DEFINE THE DEPENDENT FIELDS
-  //
   strainName = "Strain";
   this->dep_field_map_.insert(std::make_pair(strainName, dl->qp_tensor));
 
@@ -93,7 +87,6 @@ LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(
   this->dep_field_map_.insert(std::make_pair(efieldName, dl->qp_vector));
 
   // DEFINE STATE VARIABLES (output)
-  //
 
   // stress
   this->num_state_variables_++;

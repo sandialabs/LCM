@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <fstream>
 
@@ -13,9 +11,6 @@
 
 namespace LCM {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 BodyForce<EvalT, Traits>::BodyForce(
     Teuchos::ParameterList&       p,
@@ -65,9 +60,6 @@ BodyForce<EvalT, Traits>::BodyForce(
   this->setName("Body Force" + PHX::print<EvalT>());
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 BodyForce<EvalT, Traits>::postRegistrationSetup(
@@ -79,9 +71,6 @@ BodyForce<EvalT, Traits>::postRegistrationSetup(
   if (is_constant_ == false) this->utils.setFieldData(weights_, fm);
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 BodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)

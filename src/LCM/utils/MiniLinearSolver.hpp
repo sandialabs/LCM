@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(LCM_MiniLinearSolver_hpp)
 #define LCM_MiniLinearSolver_hpp
@@ -33,15 +31,11 @@ class MiniLinearSolver_Base
   }
 };
 
-//
 // Specializations
-//
 template <typename EvalT, minitensor::Index N = minitensor::DYNAMIC>
 class MiniLinearSolver;
 
-//
 // Residual
-//
 template <minitensor::Index N>
 class MiniLinearSolver<PHAL::AlbanyTraits::Residual, N>
     : public MiniLinearSolver_Base<PHAL::AlbanyTraits::Residual, N>
@@ -57,9 +51,7 @@ class MiniLinearSolver<PHAL::AlbanyTraits::Residual, N>
       minitensor::Vector<ScalarT, N>&       x) override;
 };
 
-//
 // Jacobian
-//
 template <minitensor::Index N>
 class MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N>
     : public MiniLinearSolver_Base<PHAL::AlbanyTraits::Jacobian, N>

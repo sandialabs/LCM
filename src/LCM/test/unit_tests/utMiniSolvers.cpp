@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "MiniLinearSolver.hpp"
 #include "MiniNonlinearSolver.hpp"
 #include "MiniSolvers.hpp"
@@ -24,9 +22,7 @@ main(int ac, char* av[])
   return retval;
 }
 
-//
 // Test the LCM mini minimizer.
-//
 TEST(AlbanyResidual, NewtonBanana)
 {
   bool const print_output = ::testing::GTEST_FLAG(print_time);
@@ -70,9 +66,7 @@ TEST(AlbanyResidual, NewtonBanana)
   ASSERT_EQ(minimizer.converged, true);
 }
 
-//
 // Test the LCM mini minimizer.
-//
 TEST(AlbanyJacobian, NewtonBanana)
 {
   bool const print_output = ::testing::GTEST_FLAG(print_time);

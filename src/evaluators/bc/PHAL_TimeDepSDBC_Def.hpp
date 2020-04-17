@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_Utils.hpp"
 #include "PHAL_SDirichlet_Def.hpp"
@@ -11,9 +9,6 @@
 
 namespace PHAL {
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 TimeDepSDBC_Base<EvalT, Traits>::TimeDepSDBC_Base(Teuchos::ParameterList& p)
     : PHAL::SDirichlet<EvalT, Traits>(p)
@@ -27,9 +22,6 @@ TimeDepSDBC_Base<EvalT, Traits>::TimeDepSDBC_Base(Teuchos::ParameterList& p)
       "Number of times and number of values must match");
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 typename TimeDepSDBC_Base<EvalT, Traits>::ScalarT
 TimeDepSDBC_Base<EvalT, Traits>::computeVal(RealType time)
@@ -50,18 +42,12 @@ TimeDepSDBC_Base<EvalT, Traits>::computeVal(RealType time)
   return 0.0;
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 TimeDepSDBC<EvalT, Traits>::TimeDepSDBC(Teuchos::ParameterList& p)
     : TimeDepSDBC_Base<EvalT, Traits>(p)
 {
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 TimeDepSDBC<EvalT, Traits>::preEvaluate(typename Traits::EvalData workset)
@@ -70,9 +56,6 @@ TimeDepSDBC<EvalT, Traits>::preEvaluate(typename Traits::EvalData workset)
   PHAL::SDirichlet<EvalT, Traits>::preEvaluate(workset);
 }
 
-//
-//
-//
 template <typename EvalT, typename Traits>
 void
 TimeDepSDBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)

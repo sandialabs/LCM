@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(ElastoViscoplasticCore_hpp)
 #define ElastoViscoplasticCore_hpp
@@ -13,9 +11,7 @@ namespace EV {
 
 static constexpr minitensor::Index MAX_DIM = 3;
 
-//
 //! Nonlinear Solver (NLS) class for the ElastoViscoplastic model
-//
 template <typename EvalT, minitensor::Index M = MAX_DIM>
 class ElastoViscoplasticNLS : public minitensor::Function_Base<
                                   ElastoViscoplasticNLS<EvalT, M>,

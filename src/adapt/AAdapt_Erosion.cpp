@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "AAdapt_Erosion.hpp"
 
@@ -14,9 +12,6 @@
 #include "Topology_FailureCriterion.hpp"
 
 namespace AAdapt {
-//
-//
-//
 AAdapt::Erosion::Erosion(
     Teuchos::RCP<Teuchos::ParameterList> const& params,
     Teuchos::RCP<ParamLib> const&               param_lib,
@@ -57,9 +52,6 @@ AAdapt::Erosion::Erosion(
   topology_->set_failure_criterion(failure_criterion_);
 }
 
-//
-//
-//
 bool
 AAdapt::Erosion::queryAdaptationCriteria(int)
 {
@@ -107,9 +99,6 @@ copyStateArray(
 
 }  // anonymous namespace
 
-//
-//
-//
 void
 AAdapt::Erosion::copyStateArrays(Albany::StateArrays const& sa)
 {
@@ -121,9 +110,6 @@ AAdapt::Erosion::copyStateArrays(Albany::StateArrays const& sa)
   copyStateArray(src_nsa, dst_nsa, node_state_store_);
 }
 
-//
-//
-//
 void
 AAdapt::Erosion::transferStateArrays()
 {
@@ -256,9 +242,6 @@ AAdapt::Erosion::transferStateArrays()
   }
 }
 
-//
-//
-//
 bool
 AAdapt::Erosion::adaptMesh()
 {
@@ -307,16 +290,11 @@ AAdapt::Erosion::adaptMesh()
   return true;
 }
 
-//
-//
-//
 void
 AAdapt::Erosion::postAdapt()
 {
 }
-//
-//
-//
+
 Teuchos::RCP<Teuchos::ParameterList const>
 AAdapt::Erosion::getValidAdapterParameters() const
 {

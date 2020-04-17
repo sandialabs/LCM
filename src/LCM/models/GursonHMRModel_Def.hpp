@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <MiniTensor.h>
 
@@ -60,7 +58,6 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->eval_field_map_.insert(std::make_pair(void_string, dl->qp_scalar));
 
   // define the state variables
-  //
   // stress
   this->num_state_variables_++;
   this->state_var_names_.push_back(cauchy_string);
@@ -69,7 +66,6 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(true);
-  //
   // Fp
   this->num_state_variables_++;
   this->state_var_names_.push_back(Fp_string);
@@ -78,7 +74,6 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->state_var_init_values_.push_back(1.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(false);
-  //
   // eqps
   this->num_state_variables_++;
   this->state_var_names_.push_back(eqps_string);
@@ -87,7 +82,6 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // ess
   this->num_state_variables_++;
   this->state_var_names_.push_back(ess_string);
@@ -96,7 +90,6 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // isoHardening
   this->num_state_variables_++;
   this->state_var_names_.push_back(isoHardening_string);
@@ -105,7 +98,6 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
-  //
   // void volume
   this->num_state_variables_++;
   this->state_var_names_.push_back(void_string);
@@ -435,7 +427,6 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
 
   // accounts for void coalescence
   //    DFadType fvoidFad_star = fvoidFad;
-  //
   //    if ((fvoidFad > fc_) && (fvoidFad < ff_)) {
   //      if ((ff_ - fc_) != 0.0) {
   //        fvoidFad_star = fc_ + (fvoidFad - fc_) * (1. / q1_ - fc_) / (ff_ -
@@ -504,7 +495,6 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
   //    if (pFad >= 0.0) {
   //      An = fN_ / sN_ / (std::sqrt(2.0 * pi)) * std::exp(eratio);
   //    }
-  //
   //    dfn = An * deq;
 
   // void growth

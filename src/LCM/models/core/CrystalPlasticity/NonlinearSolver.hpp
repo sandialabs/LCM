@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #if !defined(Core_NonlinearSolver_hpp)
 #define Core_NonlinearSolver_hpp
@@ -85,10 +83,8 @@ class ResidualSlipNLS : public minitensor::Function_Base<
   Verbosity verbosity_;
 };
 
-//
 //  Dissipation class for the CrystalPlasticity model; slip
 //  increments as unknowns.
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
 class Dissipation : public minitensor::Function_Base<
                         Dissipation<NumDimT, NumSlipT, EvalT>,
@@ -154,10 +150,8 @@ class Dissipation : public minitensor::Function_Base<
   Verbosity verbosity_;
 };
 
-//
 //! Nonlinear Solver (NLS) class for the CrystalPlasticity model; slip
 //  increments and hardnesses as unknowns.
-//
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
 class ResidualSlipHardnessNLS
     : public minitensor::Function_Base<

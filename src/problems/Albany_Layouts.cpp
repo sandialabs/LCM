@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #include "Albany_Layouts.hpp"
 
 #include "PHAL_Dimension.hpp"
@@ -26,7 +24,6 @@ Albany::Layouts::Layouts(
   using PHX::MDALayout;
   using Teuchos::rcp;
 
-  //
   if (vecDim == -1) vecDim = numCellDim;
   if (vecDim == numCellDim) {
     vectorAndGradientLayoutsAreEquivalent = true;
@@ -152,7 +149,6 @@ Albany::Layouts::Layouts(
   using PHX::MDALayout;
   using Teuchos::rcp;
 
-  //
   if (vecDim == -1) vecDim = numSideDim;
   if (vecDim == numSideDim) {
     vectorAndGradientLayoutsAreEquivalent = true;

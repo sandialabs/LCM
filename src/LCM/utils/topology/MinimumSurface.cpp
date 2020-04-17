@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "Albany_config.h"
 
@@ -34,10 +32,8 @@
 
 namespace LCM {
 
-//
 // \brief Finds the closest nodes(Entities of rank 0) to each of the
 // three points in the input vector
-//
 std::vector<stk::mesh::Entity>
 Topology::getClosestNodes(std::vector<std::vector<double>> points)
 {
@@ -97,11 +93,9 @@ Topology::getClosestNodes(std::vector<std::vector<double>> points)
   return closestNodes;
 }
 
-//
 // \brief Finds the closest nodes(Entities of rank 0) to each
 //        of the three points in the input vectorThese nodes
 //        lie over the surface of the mesh
-//
 std::vector<stk::mesh::Entity>
 Topology::getClosestNodesOnSurface(std::vector<std::vector<double>> points)
 {
@@ -208,9 +202,7 @@ Topology::getClosestNodesOnSurface(std::vector<std::vector<double>> points)
   return closestNodes;
 }
 
-//
 // \brief calculates the distance between a node and a point
-//
 double
 Topology::getDistanceNodeAndPoint(
     stk::mesh::Entity   node,
@@ -238,11 +230,9 @@ Topology::getDistanceNodeAndPoint(
   return sqrt(x_dist * x_dist + y_dist * y_dist + z_dist * z_dist);
 }
 
-//
 // \brief Returns the coordinates of the points that form a
 //  equilateral triangle.  This triangle lies on the plane that
 //  intersects the ellipsoid.
-//
 std::vector<std::vector<double>>
 Topology::getCoordinatesOfTriangle(std::vector<double> const normalToPlane)
 {
@@ -401,9 +391,7 @@ Topology::getCoordinatesOfTriangle(std::vector<double> const normalToPlane)
   return VectorOfPoints;
 }
 
-//
 // \brief Return a random number between two given numbers
-//
 double
 Topology::randomNumber(double valMin, double valMax)
 {
@@ -411,9 +399,7 @@ Topology::randomNumber(double valMin, double valMax)
   return valMin + value * (valMax - valMin);
 }
 
-//
 // \brief Returns the distance between two entities of rank 0 (nodes)
-//
 double
 Topology::getDistanceBetweenNodes(
     stk::mesh::Entity node1,
@@ -437,11 +423,9 @@ Topology::getDistanceBetweenNodes(
   return distance;
 }
 
-//
 // \brief Returns the coordinates of the max and min of x y and z in
 // the order max of x, min of x, max of y, min of y, max of z, min of
 // z
-//
 std::vector<double>
 Topology::getCoordinatesOfMaxAndMin()
 {
@@ -499,10 +483,8 @@ Topology::getCoordinatesOfMaxAndMin()
   return coordOfMaxAndMin;
 }
 
-//
 // \brief Returns the edges necessary to compute the shortest path on
 //        the outer surface of the mesh
-//
 std::vector<stk::mesh::Entity>
 Topology::meshEdgesShortestPath()
 {
@@ -543,11 +525,9 @@ Topology::meshEdgesShortestPath()
   return MeshEdges;
 }
 
-//
 // \brief Returns the shortest path over the boundary faces given
 //        three input nodes and the edges that belong to the outer
 //        surface
-//
 std::vector<std::vector<int>>
 Topology::shortestpathOnBoundaryFaces(
     std::vector<stk::mesh::Entity> const& nodes,
@@ -606,7 +586,6 @@ Topology::shortestpathOnBoundaryFaces(
   // NOTE: The dijkstra_shortest_paths function returns the nodes
   // corresponding to the shortest path starting from the end node to
   // the start node
-  //
   // Compute the  shortest path between nodes[0] and nodes[1]
 
   // Source from where the distance and path are calculated
@@ -717,10 +696,7 @@ Topology::shortestpathOnBoundaryFaces(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns the shortest path between three input nodes
-//
-//
 std::vector<std::vector<int>>
 Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
 {
@@ -811,7 +787,6 @@ Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
   // NOTE: The dijkstra_shortest_paths function returns the nodes
   // corresponding to the shortest path starting from the end node to
   // the start node
-  //
   // Compute the  shortest path between nodes[0] and nodes[1]
 
   // Source from where the distance and path are calculated
@@ -922,9 +897,7 @@ Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns the directions of all the edges of the input mesh
-//
 std::vector<std::vector<int>>
 Topology::edgesDirections()
 {
@@ -963,9 +936,7 @@ Topology::edgesDirections()
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns the directions of all the boundary edges of the input mesh
-//
 std::vector<std::vector<int>>
 Topology::edgesDirectionsOuterSurface()
 {
@@ -1034,9 +1005,7 @@ Topology::edgesDirectionsOuterSurface()
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns the directions of all of the faces of the input mesh
-//
 std::vector<std::vector<int>>
 Topology::facesDirections()
 {
@@ -1078,9 +1047,7 @@ Topology::facesDirections()
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns a vector with the areas of each of the faces of the input mesh
-//
 std::vector<double>
 Topology::facesAreas()
 {
@@ -1126,10 +1093,8 @@ Topology::facesAreas()
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns the boundary operator of the input mesh.
 //        matrix that has nonzeros only
-//
 std::vector<std::vector<int>>
 Topology::boundaryOperator()
 {
@@ -1195,10 +1160,8 @@ Topology::boundaryOperator()
   return boundaryOp;
 }
 
-//
 // \brief returns the boundary operator along with the faces areas
 //        to create the columns of an mps file
-//
 std::vector<std::vector<double>>
 Topology::outputForMpsFile()
 {
@@ -1263,11 +1226,9 @@ Topology::outputForMpsFile()
   return matrixForMpsFile;
 }
 
-//
 // \brief Returns the 1-D boundary required to compute the minimum
 //        surface of the input mesh. The input to this function is a
 //        shortest path (composed by egdes) between three nodes
-//
 std::vector<std::vector<int>>
 Topology::boundaryVector(std::vector<std::vector<int>>& shortPath)
 {
@@ -1316,12 +1277,10 @@ Topology::boundaryVector(std::vector<std::vector<int>>& shortPath)
   return rVector;
 }
 
-//
 // \brief Returns the 1-D boundary required to compute the minimum
 //        surface of the input mesh boundary faces. The input to this
 //        function is a shortest path (composed by edges) between
 //        three nodes
-//
 std::vector<std::vector<int>>
 Topology::boundaryVectorOuterSurface(std::vector<std::vector<int>>& shortPath)
 {
@@ -1370,11 +1329,9 @@ Topology::boundaryVectorOuterSurface(std::vector<std::vector<int>>& shortPath)
   return rVector;
 }
 
-//
 // \brief Returns the corresponding entities of rank 2 that build the
 //        minimum surface.  It takes as an input the resulting vector
 //        taken from the solution of the linear programming solver
-//
 std::vector<stk::mesh::Entity>
 Topology::minimumSurfaceFaces(std::vector<int> VectorFromLPSolver)
 {
@@ -1410,7 +1367,6 @@ Topology::minimumSurfaceFaces(std::vector<int> VectorFromLPSolver)
 
 //----------------------------------------------------------------------------
 // \brief Returns the number of times an entity is repeated in a vector
-//
 int
 Topology::numberOfRepetitions(
     std::vector<stk::mesh::Entity>& entities,
@@ -1427,10 +1383,8 @@ Topology::numberOfRepetitions(
 }
 
 //----------------------------------------------------------------------------
-//
 // \brief Returns the coordinates of an input node.
 //        The input is the identifier of a node
-//
 std::vector<double>
 Topology::findCoordinates(unsigned int nodeIdentifier)
 {

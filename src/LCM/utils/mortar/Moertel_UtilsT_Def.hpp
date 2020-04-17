@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include <Teuchos_SerialDenseMatrix.hpp>
 #include <Teuchos_SerialDenseSolver.hpp>
@@ -62,7 +60,6 @@ MoertelT::MatrixMatrixAdd(
     Tpetra::CrsMatrix<ST, LO, GO, N>&       B,
     double                                  scalarB)
 {
-  //
   // This method forms the matrix-matrix sum B = scalarA * op(A) + scalarB * B,
   // where
 

@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 #if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
@@ -47,7 +45,6 @@ ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(
   }
 
   // step through the possible parameters, registering as necessary
-  //
   // elastic modulus
   std::string e_mod("Elastic Modulus");
   if (mat_params->isSublist(e_mod)) {

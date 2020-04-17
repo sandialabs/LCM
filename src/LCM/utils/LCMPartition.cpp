@@ -1,8 +1,6 @@
-//
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-//
 
 #include "LCMPartition.hpp"
 
@@ -20,15 +18,11 @@
 
 namespace LCM {
 
-//
 // Anonymous namespace for helper functions
-//
 namespace {
 
-//
 // Print parameters and partitions computed by Zoltan.
 // Used for debugging.
-//
 void
 PrintPartitionInfo(
     std::ostream&  output_stream,
@@ -95,11 +89,9 @@ PrintPartitionInfo(
   return;
 }
 
-//
 // Given a vector of points and a set of indices to this vector:
 // 1) Find the bounding box of the indexed points.
 // 2) Compute the vector sum of the indexed points.
-//
 boost::tuple<
     minitensor::Vector<double>,
     minitensor::Vector<double>,
@@ -135,11 +127,9 @@ bounds_and_sum_subset(
   return boost::make_tuple(lower_corner, upper_corner, sum);
 }
 
-//
 // Given point, a vector of centers and a set of indices into this vector:
 // Return the index of the center closest to the point among the
 // indexed centers.
-//
 minitensor::Index
 closest_subset(
     minitensor::Vector<double> const&  point,
@@ -169,12 +159,10 @@ closest_subset(
   return index_minimum;
 }
 
-//
 // Given a vector of points and a set of indices:
 // 1) Find the bounding box of the indexed points.
 // 2) Divide the bounding box along its largest dimension, using median.
 // 3) Assign points to one side or the other, and return index sets.
-//
 std::pair<std::set<minitensor::Index>, std::set<minitensor::Index>>
 split_box(
     std::vector<minitensor::Vector<double>> const& points,
@@ -183,9 +171,7 @@ split_box(
   ALBANY_EXPECT(points.size() > 0);
   ALBANY_EXPECT(indices.size() > 0);
 
-  //
   // Compute bounding box
-  //
   minitensor::Index const first = *indices.begin();
 
   minitensor::Vector<double> lower_corner = points[first];
@@ -203,9 +189,7 @@ split_box(
     }
   }
 
-  //
   // Find largest dimension
-  //
   minitensor::Vector<double> const span = upper_corner - lower_corner;
 
   ALBANY_EXPECT(norm_square(span) > 0.0);
@@ -223,9 +207,7 @@ split_box(
     }
   }
 
-  //
   // Find median coordinate along largest dimension
-  //
   std::vector<double> coordinates;
 
   for (auto index : indices) {
@@ -239,11 +221,9 @@ split_box(
   double split_coordinate =
       minitensor::median<double>(coordinates.begin(), coordinates.end());
 
-  //
   // Check whether splitting the box will result in one box of
   // the same volume as the original and another one of zero volume.
   // If so, split the original box into two of equal volume.
-  //
   bool const box_unchanged =
       split_coordinate == lower_corner(largest_dimension) ||
       split_coordinate == upper_corner(largest_dimension);
@@ -255,9 +235,7 @@ split_box(
         0.5 * (coordinates[0] + coordinates[coordinates.size() - 1]);
   }
 
-  //
   // Assign points to lower or upper half.
-  //
   std::set<minitensor::Index> indices_lower;
 
   std::set<minitensor::Index> indices_upper;
@@ -281,18 +259,14 @@ split_box(
 
 }  // anonymous namespace
 
-//
 // Build KD tree of list of points.
 // \param point list
 // \return Boost shared pointer to root node of tree.
-//
 template <typename Node>
 std::shared_ptr<Node>
 buildKDTree(std::vector<minitensor::Vector<double>> const& points)
 {
-  //
   // Initially all points are in the index set.
-  //
   minitensor::Index const number_points = points.size();
 
   std::set<minitensor::Index> points_indices;
@@ -311,11 +285,9 @@ buildKDTree(std::vector<minitensor::Vector<double>> const& points)
   return root;
 }
 
-//
 // Create KD tree node.
 // \param point list
 // \return Boost shared pointer to node of tree if created, 0 otherwise.
-//
 template <typename Node>
 std::shared_ptr<Node>
 createKDTreeNode(
@@ -328,9 +300,7 @@ createKDTreeNode(
     std::cout << "Name is too long: " << name << '\n';
   }
 
-  //
   // Create and fill in node.
-  //
   std::shared_ptr<Node> node(new Node);
 
   node->name = name;
@@ -380,9 +350,7 @@ createKDTreeNode(
   return node;
 }
 
-//
 // KdTree constructor with list of points.
-//
 template <typename Node>
 KDTree<Node>::KDTree(
     std::vector<minitensor::Vector<double>> const& points,
@@ -402,10 +370,8 @@ KDTree<Node>::KDTree(
   return;
 }
 
-//
 // Visit Tree nodes recursively and
 // perform the action defined by the Visitor object.
-//
 template <typename Node, typename Visitor>
 void
 visitTreeNode(Node& node, Visitor const& visitor)
@@ -422,9 +388,7 @@ visitTreeNode(Node& node, Visitor const& visitor)
   return;
 }
 
-//
 // Traverse a Tree and perform the action defined by the Visitor object.
-//
 template <typename Tree, typename Visitor>
 void
 traverseTree(Tree& tree, Visitor const& visitor)
@@ -433,9 +397,7 @@ traverseTree(Tree& tree, Visitor const& visitor)
   return;
 }
 
-//
 // Output visitor for KDTree node.
-//
 template <typename Node>
 void
 OutputVisitor<Node>::operator()(Node const& node) const
@@ -452,9 +414,7 @@ OutputVisitor<Node>::operator()(Node const& node) const
   return;
 }
 
-//
 // Pre-visit stopping criterion for traversing the tree.
-//
 template <typename Node>
 bool
 OutputVisitor<Node>::pre_stop(Node const& node) const
@@ -462,9 +422,7 @@ OutputVisitor<Node>::pre_stop(Node const& node) const
   return node.get() == nullptr;
 }
 
-//
 // Post-visit stopping criterion for traversing the tree.
-//
 template <typename Node>
 bool
 OutputVisitor<Node>::post_stop(Node const& node) const
@@ -472,9 +430,7 @@ OutputVisitor<Node>::post_stop(Node const& node) const
   return false;
 }
 
-//
 // Constructor for filtering visitor
-//
 template <typename Node, typename Center>
 FilterVisitor<Node, Center>::FilterVisitor(
     std::vector<minitensor::Vector<double>>& p,
@@ -514,7 +470,6 @@ closest_center_from_subset(
   return closest_index;
 }
 
-//
 // Given the corners of a box, a vector of centers and
 // a subset of indices to the centers:
 // Determine the closest center among the subset to the midcell.
@@ -522,7 +477,6 @@ closest_center_from_subset(
 // equidistant to them and the closest center to the midcell.
 // Determine whether the box lies entirely on the side of the hyperplane
 // where the closest center to the midcell lies as well.
-//
 template <typename Center>
 std::pair<minitensor::Index, std::set<minitensor::Index>>
 box_proximity_to_centers(
@@ -586,9 +540,7 @@ box_proximity_to_centers(
 
 }  // anonymous namespace
 
-//
 // Filtering visitor for KDTree node
-//
 template <typename Node, typename Center>
 void
 FilterVisitor<Node, Center>::operator()(Node const& node) const
@@ -653,9 +605,7 @@ FilterVisitor<Node, Center>::operator()(Node const& node) const
   return;
 }
 
-//
 // Pre-visit stopping criterion for traversing the tree.
-//
 template <typename Node, typename Center>
 bool
 FilterVisitor<Node, Center>::pre_stop(Node const& node) const
@@ -665,9 +615,7 @@ FilterVisitor<Node, Center>::pre_stop(Node const& node) const
   return has_no_centers == true;
 }
 
-//
 // Post-visit stopping criterion for traversing the tree.
-//
 template <typename Node, typename Center>
 bool
 FilterVisitor<Node, Center>::post_stop(Node const& node) const
@@ -681,9 +629,7 @@ FilterVisitor<Node, Center>::post_stop(Node const& node) const
   return stop_traversal == true;
 }
 
-//
 // Default constructor for Connectivity Array
-//
 ConnectivityArray::ConnectivityArray()
     : type_(minitensor::ELEMENT::UNKNOWN),
       dimension_(0),
@@ -696,11 +642,9 @@ ConnectivityArray::ConnectivityArray()
   return;
 }
 
-//
 // Build array specifying input and output
 // \param input_file Exodus II input fine name
 // \param output_file Exodus II output fine name
-//
 ConnectivityArray::ConnectivityArray(
     std::string const& input_file,
     std::string const& output_file)
@@ -842,146 +786,114 @@ ConnectivityArray::ConnectivityArray(
   return;
 }
 
-//
 // \return Number of nodes on the array
-//
 minitensor::Index
 ConnectivityArray::getNumberNodes() const
 {
   return nodes_.size();
 }
 
-//
 // \return Number of elements in the array
-//
 minitensor::Index
 ConnectivityArray::getNumberElements() const
 {
   return connectivity_.size();
 }
 
-//
 // \return Space dimension
-//
 minitensor::Index
 ConnectivityArray::getDimension() const
 {
   return dimension_;
 }
 
-//
 // \return K-means tolerance
-//
 double
 ConnectivityArray::getTolerance() const
 {
   return tolerance_;
 }
 
-//
 // \return requested cell size for voxelization
-//
 double
 ConnectivityArray::getCellSize() const
 {
   return requested_cell_size_;
 }
 
-//
 // \return maximum iterations for K-means
-//
 minitensor::Index
 ConnectivityArray::getMaximumIterations() const
 {
   return maximum_iterations_;
 }
 
-//
 // \param K-means tolerance
-//
 void
 ConnectivityArray::setTolerance(double tolerance)
 {
   tolerance_ = tolerance;
 }
 
-//
 // \return requested cell size for voxelization
-//
 void
 ConnectivityArray::setCellSize(double requested_cell_size)
 {
   requested_cell_size_ = requested_cell_size;
 }
 
-//
 // \param maximum itearions for K-means
-//
 void
 ConnectivityArray::setMaximumIterations(minitensor::Index maximum_iterarions)
 {
   maximum_iterations_ = maximum_iterarions;
 }
 
-//
 // \param Initializer scheme
-//
 void
 ConnectivityArray::setInitializerScheme(PARTITION::Scheme initializer_scheme)
 {
   initializer_scheme_ = initializer_scheme;
 }
 
-//
 // \return Initializer scheme
-//
 PARTITION::Scheme
 ConnectivityArray::getInitializerScheme() const
 {
   return initializer_scheme_;
 }
 
-//
 // \return Type of finite element in the array
 // (assume same type for all elements)
-//
 minitensor::ELEMENT::Type
 ConnectivityArray::getType() const
 {
   return type_;
 }
 
-//
 // \return Node ID and associated point in space
-//
 PointMap
 ConnectivityArray::getNodeList() const
 {
   return nodes_;
 }
 
-//
 // \return Element - nodes connectivity
-//
 AdjacencyMap
 ConnectivityArray::getConnectivity() const
 {
   return connectivity_;
 }
 
-//
 // \return Albany abstract discretization corresponding to array
-//
 Albany::AbstractDiscretization&
 ConnectivityArray::getDiscretization()
 {
   return (*discretization_ptr_.get());
 }
 
-//
 // \return Number of nodes that define element topology
 // (assume same type for all elements)
-//
 minitensor::Index
 ConnectivityArray::getNodesPerElement() const
 {
@@ -1008,9 +920,7 @@ ConnectivityArray::getNodesPerElement() const
   return nodes_per_element;
 }
 
-//
 // \return Volume for each element
-//
 ScalarMap
 ConnectivityArray::getVolumes() const
 {
@@ -1073,9 +983,7 @@ ConnectivityArray::getVolumes() const
   return volumes;
 }
 
-//
 // \return Total volume of the array
-//
 double
 ConnectivityArray::getVolume() const
 {
@@ -1088,18 +996,14 @@ ConnectivityArray::getVolume() const
   return volume;
 }
 
-//
 // \return Partitions when partitioned
-//
 std::map<int, int>
 ConnectivityArray::getPartitions() const
 {
   return partitions_;
 }
 
-//
 // \return Volume for each partition when partitioned
-//
 ScalarMap
 ConnectivityArray::getPartitionVolumes() const
 {
@@ -1135,9 +1039,7 @@ ConnectivityArray::getPartitionVolumes() const
   return partition_volumes;
 }
 
-//
 // \return Partition centroids
-//
 std::vector<minitensor::Vector<double>>
 ConnectivityArray::getPartitionCentroids() const
 {
@@ -1208,9 +1110,7 @@ ConnectivityArray::getPartitionCentroids() const
   return partition_centroids;
 }
 
-//
 // \return Centroids for each element
-//
 PointMap
 ConnectivityArray::getCentroids() const
 {
@@ -1317,10 +1217,8 @@ parametric_limits(minitensor::ELEMENT::Type const element_type)
 
 }  // namespace
 
-//
 // Background of the domain for fast determination
 // of points being inside or outside the domain.
-//
 void
 ConnectivityArray::createGrid()
 {
@@ -1344,9 +1242,7 @@ ConnectivityArray::createGrid()
 
   double const delta = getCellSize();
 
-  //
   // Determine number of points for each dimension.
-  //
   minitensor::Vector<minitensor::Index> points_per_dim(dimension);
 
   cell_size_.set_dimension(dimension);
@@ -1359,11 +1255,9 @@ ConnectivityArray::createGrid()
     cell_size_(i)     = bounding_box_span(i) / number_cells;
   }
 
-  //
   // Set up the grid array.
   // Generalization to N dimensions fails here.
   // This is specific to 3D.
-  //
   grid_.resize(points_per_dim(0));
   for (minitensor::Index i = 0; i < points_per_dim(0); ++i) {
     grid_[i].resize(points_per_dim(1));
@@ -1509,9 +1403,7 @@ ConnectivityArray::createGrid()
   return;
 }
 
-//
 // Convert point to index into voxel array
-//
 minitensor::Vector<int>
 ConnectivityArray::pointToIndex(minitensor::Vector<double> const& point) const
 {
@@ -1524,10 +1416,8 @@ ConnectivityArray::pointToIndex(minitensor::Vector<double> const& point) const
   return minitensor::Vector<int>(i, j, k);
 }
 
-//
 // Determine if a given point is inside the mesh.
 // 3D only for now.
-//
 bool
 ConnectivityArray::isInsideMesh(minitensor::Vector<double> const& point) const
 {
@@ -1554,12 +1444,10 @@ ConnectivityArray::isInsideMesh(minitensor::Vector<double> const& point) const
   return grid_[i][j][k];
 }
 
-//
 // Determine is a given point is inside the mesh
 // doing it element by element. Slow but useful
 // to set up an initial data structure that will
 // be used on a faster method.
-//
 bool
 ConnectivityArray::isInsideMeshByElement(
     minitensor::Vector<double> const& point) const
@@ -1608,12 +1496,10 @@ ConnectivityArray::isInsideMeshByElement(
   return false;
 }
 
-//
 // \param length_scale Length scale for partitioning for
 // variational non-local regularization
 // \return Number of partitions defined as total volume
 // of the array divided by the cube of the length scale
-//
 minitensor::Index
 ConnectivityArray::getNumberPartitions(double const length_scale) const
 {
@@ -1625,15 +1511,11 @@ ConnectivityArray::getNumberPartitions(double const length_scale) const
   return number_partitions;
 }
 
-//
 // Anonymous namespace for helper functions
-//
 namespace {
 
-//
 // Helper function that return a deterministic pseudo random
 // sequence 0,..,N-1 for visualization purposes.
-//
 std::vector<int>
 shuffled_sequence(int number_elements)
 {
@@ -1665,13 +1547,11 @@ shuffled_sequence(int number_elements)
   return shuffled;
 }
 
-//
 // Helper function to renumber partitions to avoid gaps in numbering.
 // Also for better color contrast in visualization programs, shuffle
 // the partition number so that it is less likely that partitions
 // with very close numbers are next to each other, leading to almost
 // the same color in output.
-//
 std::map<int, int>
 RenumberPartitions(std::map<int, int> const& old_partitions)
 {
@@ -1749,13 +1629,11 @@ ConnectivityArray::checkNullVolume() const
   return;
 }
 
-//
 // Partition mesh according to the specified algorithm and length scale
 // \param partition_scheme The partition algorithm to use
 // \param length_scale The length scale for variational nonlocal
 // regularization
 // \return Partition number for each element
-//
 std::map<int, int>
 ConnectivityArray::partition(
     const PARTITION::Scheme partition_scheme,
@@ -1802,11 +1680,9 @@ ConnectivityArray::partition(
   return partitions_;
 }
 
-//
 // \param Collection of centers
 // \return Partition map that assigns each element to the
 // closest center to its centroid
-//
 std::map<int, int>
 ConnectivityArray::partitionByCenters(
     std::vector<minitensor::Vector<double>> const& centers)
@@ -1879,12 +1755,10 @@ ConnectivityArray::partitionByCenters(
   return partitions;
 }
 
-//
 // Partition mesh with Zoltan Hypergraph algortithm
 // \param length_scale The length scale for variational nonlocal
 // regularization
 // \return Partition number for each element
-//
 std::map<int, int>
 ConnectivityArray::partitionHyperGraph(double const length_scale)
 {
@@ -1913,9 +1787,7 @@ ConnectivityArray::partitionHyperGraph(double const length_scale)
   zoltan.Set_Param("IMBALANCE_TOL", "1.01");
   zoltan.Set_Param("PHG_CUT_OBJECTIVE", "HYPEREDGES");
 
-  //
   // Partition
-  //
   DualGraph dual_graph(*this);
 
   ZoltanHyperGraph zoltan_hypergraph(dual_graph);
@@ -1997,12 +1869,10 @@ ConnectivityArray::partitionHyperGraph(double const length_scale)
   return partitions;
 }
 
-//
 /// Partition mesh with Zoltan Recursive Inertial Bisection algortithm
 // \param length_scale The length scale for variational nonlocal
 // regularization
 // \return Partition number for each element
-//
 std::map<int, int>
 ConnectivityArray::partitionGeometric(double const length_scale)
 {
@@ -2032,9 +1902,7 @@ ConnectivityArray::partitionGeometric(double const length_scale)
   zoltan.Set_Param("REDUCE_DIMENSIONS", "1");
   zoltan.Set_Param("DEGENERATE_RATIO", "10");
 
-  //
   // Partition
-  //
 
   // Set up recursive inertial bisection (RIB)
   zoltan.Set_Num_Obj_Fn(LCM::ConnectivityArray::getNumberOfObjects, this);
@@ -2097,18 +1965,14 @@ ConnectivityArray::partitionGeometric(double const length_scale)
   return partitions;
 }
 
-//
 /// Partition mesh with K-means algortithm
 // \param length_scale The length scale for variational nonlocal
 // regularization
 // \return Partition number for each element
-//
 std::map<int, int>
 ConnectivityArray::partitionKMeans(double const length_scale)
 {
-  //
   // Create initial centers
-  //
   std::cout << '\n';
   std::cout << "Partition with initializer ..." << '\n';
 
@@ -2134,9 +1998,7 @@ ConnectivityArray::partitionKMeans(double const length_scale)
 
   createGrid();
 
-  //
   // K-means iteration
-  //
   std::cout << "Main K-means Iteration." << '\n';
 
   minitensor::Index const max_iterations = getMaximumIterations();
@@ -2212,18 +2074,14 @@ ConnectivityArray::partitionKMeans(double const length_scale)
   return partitions;
 }
 
-//
 /// Partition mesh with K-means algortithm and triangle inequality
 // \param length_scale The length scale for variational nonlocal
 // regularization
 // \return Partition number for each element
-//
 std::map<int, int>
 ConnectivityArray::partitionKDTree(double const length_scale)
 {
-  //
   // Create initial centers
-  //
   std::cout << '\n';
   std::cout << "Partition with initializer ..." << '\n';
 
@@ -2261,17 +2119,13 @@ ConnectivityArray::partitionKDTree(double const length_scale)
 
   createGrid();
 
-  //
   // Create KDTree
-  //
   KDTree<KDTreeNode> kdtree(domain_points_, number_partitions);
 
   FilterVisitor<std::shared_ptr<KDTreeNode>, ClusterCenter> filter_visitor(
       domain_points_, centers);
 
-  //
   // K-means iteration
-  //
   minitensor::Index const max_iterations = getMaximumIterations();
 
   minitensor::Index number_iterations = 0;
@@ -2338,12 +2192,10 @@ ConnectivityArray::partitionKDTree(double const length_scale)
   return partitions;
 }
 
-//
 // Partition mesh with sequential K-means algortithm
 // \param length_scale The length scale for variational nonlocal
 // regularization
 // \return Partition number for each element
-//
 std::map<int, int>
 ConnectivityArray::partitionSequential(double const length_scale)
 {
@@ -2358,9 +2210,7 @@ ConnectivityArray::partitionSequential(double const length_scale)
   lower_corner_ = lower_corner;
   upper_corner_ = upper_corner;
 
-  //
   // Create initial centers
-  //
 
   // Partition with initializer
   const PARTITION::Scheme initializer_scheme = getInitializerScheme();
@@ -2438,13 +2288,11 @@ ConnectivityArray::partitionSequential(double const length_scale)
   return partitions;
 }
 
-//
 // Partition mesh with randomly generated centers.
 // Mostly used to initialize other schemes.
 // \param length_scale The length scale for variational nonlocal
 // regularization
 // \return Partition number for each element
-//
 std::map<int, int>
 ConnectivityArray::partitionRandom(double const length_scale)
 {
@@ -2460,9 +2308,7 @@ ConnectivityArray::partitionRandom(double const length_scale)
   upper_corner_ = upper_corner;
 
   createGrid();
-  //
   // Create initial centers
-  //
   int number_generators = 0;
 
   std::vector<minitensor::Vector<double>> centers;
@@ -2486,18 +2332,13 @@ ConnectivityArray::partitionRandom(double const length_scale)
   return partitions;
 }
 
-//
 // Zoltan interface query function that returns the number of values
 // needed to express the geometry of an object.
 // For a three-dimensional object, the return value should be three.
-//
 // \param   data  Pointer to user-defined data.
-//
 // \param   ierr  Error code to be set by function.
-//
 // \return  The number of values needed to express the
 // geometry of an object.
-//
 int
 ConnectivityArray::getNumberGeometry(void* data, int* ierr)
 {
@@ -2511,9 +2352,7 @@ ConnectivityArray::getNumberGeometry(void* data, int* ierr)
   return dimension;
 }
 
-//
 // Zoltan interface, return number of objects
-//
 int
 ConnectivityArray::getNumberOfObjects(void* data, int* ierr)
 {
@@ -2527,9 +2366,7 @@ ConnectivityArray::getNumberOfObjects(void* data, int* ierr)
   return num_objects;
 }
 
-//
 // Zoltan interface, return relevant object properties
-//
 void
 ConnectivityArray::getObjectList(
     void*         data,
@@ -2572,44 +2409,33 @@ ConnectivityArray::getObjectList(
   return;
 }
 
-//
 // Zoltan interface query function that returns a vector of geometry
 // values for a list of given objects. The geometry vector is allocated
 // by Zoltan to be of size num_obj * num_dim;
 // its format is described below.
-//
 // \param data Pointer to user-defined data.
-//
 // \param sizeGID The number of array entries used to describe a
 // single global ID.  This value is the maximum value over all processors
 // of the parameter NUM_GID_ENTRIES.
-//
 // \param sizeLID The number of array entries used to describe a
 // single local ID.  This value is the maximum value over all processors
 // of the parameter NUM_LID_ENTRIES. (It should be zero if local ids
 // are not used.)
-//
 // \param num_obj The number of object IDs in arrays
 // globalID and localID
-//
 // \param globalID  Upon return, an array of unique global IDs for
 // all objects assigned to the processor.
-//
 // \param localID Upon return, an array of local IDs, the meaning
 // of which can be determined by the application, for all objects
 // assigned to the processor. (Optional.)
-//
 // \param num_dim Number of coordinate entries per object
 // (typically 1, 2, or 3).
-//
 // \param geom_vec  Upon return, an array containing geometry values.
 // For object i (specified by globalID[i*sizeGID] and
 // localID[i*sizeLID], i=0,1,...,num_obj-1),
 // coordinate values should be stored in
 // geom_vec[i*num_dim:(i+1)*num_dim-1].
-//
 // \param ierr Error code to be set by function.
-//
 void
 ConnectivityArray::getGeometry(
     void*         data,
@@ -2644,9 +2470,7 @@ ConnectivityArray::getGeometry(
   return;
 }
 
-//
 // Write a Connectivity Array to an output stream
-//
 std::ostream&
 operator<<(
     std::ostream&            output_stream,
@@ -2711,15 +2535,11 @@ operator<<(
   return output_stream;
 }
 
-//
 // Default constructor for dual graph
-//
 DualGraph::DualGraph() : number_edges_(0) { return; }
 
-//
 // Build dual graph from connectivity array
 // The term face is used as in "proper face" in algebraic topology
-//
 DualGraph::DualGraph(ConnectivityArray const& connectivity_array)
 {
   std::vector<std::vector<int>> const face_connectivity =
@@ -2846,9 +2666,7 @@ DualGraph::getGraph() const
   return graph_;
 }
 
-//
 // \return Edge list to create boost graph
-//
 AdjacencyMap
 DualGraph::getEdgeList() const
 {
@@ -2882,9 +2700,7 @@ DualGraph::getVertexWeights() const
   return vertex_weights_;
 }
 
-//
 // \return Connected components in the dual graph
-//
 int
 DualGraph::getConnectedComponents(std::vector<int>& components) const
 {
@@ -2935,9 +2751,7 @@ DualGraph::getConnectedComponents(std::vector<int>& components) const
   return number_components;
 }
 
-//
 // Print graph for debugging
-//
 void
 DualGraph::print() const
 {
@@ -3016,9 +2830,6 @@ DualGraph::print() const
   return;
 }
 
-//
-//
-//
 std::vector<std::vector<int>>
 DualGraph::getFaceConnectivity(minitensor::ELEMENT::Type const type) const
 {
@@ -3147,18 +2958,14 @@ DualGraph::getFaceConnectivity(minitensor::ELEMENT::Type const type) const
   return face_connectivity;
 }
 
-//
 // Default constructor for Zoltan hyperedge graph (or hypergraph)
-//
 ZoltanHyperGraph::ZoltanHyperGraph()
     : number_vertices_(0), number_hyperedges_(0)
 {
   return;
 }
 
-//
 // Build Zoltan Hypergraph from FE mesh Dual Graph
-//
 ZoltanHyperGraph::ZoltanHyperGraph(DualGraph const& dual_graph)
 {
   graph_             = dual_graph.getGraph();
@@ -3213,9 +3020,7 @@ ZoltanHyperGraph::getVertexWeights() const
   return vertex_weights_;
 }
 
-//
 // minitensor::Vector with edge IDs
-//
 std::vector<ZOLTAN_ID_TYPE>
 ZoltanHyperGraph::getEdgeIDs() const
 {
@@ -3230,9 +3035,7 @@ ZoltanHyperGraph::getEdgeIDs() const
   return edges;
 }
 
-//
 // minitensor::Vector with edge pointers
-//
 std::vector<int>
 ZoltanHyperGraph::getEdgePointers() const
 {
@@ -3251,9 +3054,7 @@ ZoltanHyperGraph::getEdgePointers() const
   return pointers;
 }
 
-//
 // Vector with vertex IDs
-//
 std::vector<ZOLTAN_ID_TYPE>
 ZoltanHyperGraph::getVertexIDs() const
 {
@@ -3267,9 +3068,7 @@ ZoltanHyperGraph::getVertexIDs() const
   return vertices;
 }
 
-//
 // Zoltan interface, return number of objects
-//
 int
 ZoltanHyperGraph::getNumberOfObjects(void* data, int* ierr)
 {
@@ -3282,9 +3081,7 @@ ZoltanHyperGraph::getNumberOfObjects(void* data, int* ierr)
   return num_objects;
 }
 
-//
 // Zoltan interface, return relevant object properties
-//
 void
 ZoltanHyperGraph::getObjectList(
     void*         data,
@@ -3326,9 +3123,7 @@ ZoltanHyperGraph::getObjectList(
   return;
 }
 
-//
 // Zoltan interface, get size of hypergraph
-//
 void
 ZoltanHyperGraph::getHyperGraphSize(
     void* data,
@@ -3352,9 +3147,7 @@ ZoltanHyperGraph::getHyperGraphSize(
   return;
 }
 
-//
 // Zoltan interface, get the hypergraph itself
-//
 void
 ZoltanHyperGraph::getHyperGraph(
     void*         data,
@@ -3404,15 +3197,11 @@ ZoltanHyperGraph::getHyperGraph(
   return;
 }
 
-//
 // Read a Zoltan Hyperedge Graph from an input stream
-//
 std::istream&
 operator>>(std::istream& input_stream, ZoltanHyperGraph& zoltan_hypergraph)
 {
-  //
   // First line must contain the number of vertices and hyperedges
-  //
   std::vector<char>::size_type const MaxChar = 256;
 
   char line[MaxChar];
@@ -3464,9 +3253,7 @@ operator>>(std::istream& input_stream, ZoltanHyperGraph& zoltan_hypergraph)
   return input_stream;
 }
 
-//
 // Write a Zoltan Hyperedge Graph to an output stream
-//
 std::ostream&
 operator<<(
     std::ostream&           output_stream,

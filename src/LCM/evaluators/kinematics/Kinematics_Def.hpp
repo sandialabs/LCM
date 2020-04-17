@@ -15,7 +15,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 Kinematics<EvalT, Traits>::Kinematics(
     Teuchos::ParameterList&              p,
@@ -65,7 +64,6 @@ Kinematics<EvalT, Traits>::Kinematics(
   }
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 Kinematics<EvalT, Traits>::postRegistrationSetup(
@@ -82,7 +80,6 @@ Kinematics<EvalT, Traits>::postRegistrationSetup(
   if (def_grad_rc_) this->utils.setFieldData(u_, fm);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 bool
 Kinematics<EvalT, Traits>::check_det(
@@ -200,5 +197,4 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     }
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

@@ -13,7 +13,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 // \brief Adds a new entity of rank 3 to the mesh
 void
 Topology::add_element(stk::mesh::EntityRank entity_rank)
@@ -26,7 +25,6 @@ Topology::add_element(stk::mesh::EntityRank entity_rank)
   return;
 }
 
-//----------------------------------------------------------------------------
 // \brief creates several entities at a time. The information about
 // the type of entity and and the amount of entities is contained
 // in the input vector called: "requests"
@@ -38,7 +36,6 @@ Topology::add_entities(std::vector<size_t>& requests)
   return;
 }
 
-//----------------------------------------------------------------------------
 // \brief Removes an entity and all its connections
 void
 Topology::remove_entity(stk::mesh::Entity entity)
@@ -49,7 +46,6 @@ Topology::remove_entity(stk::mesh::Entity entity)
   return;
 }
 
-//----------------------------------------------------------------------------
 // \brief Adds a relation between two entities
 void
 Topology::add_relation(
@@ -62,7 +58,6 @@ Topology::add_relation(
   return;
 }
 
-//----------------------------------------------------------------------------
 // \brief Removes the relation between two entities
 void
 Topology::remove_relation(
@@ -75,7 +70,6 @@ Topology::remove_relation(
   return;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns a vector with all the actual mesh entities of a
 // specific rank
 std::vector<stk::mesh::Entity>
@@ -88,7 +82,6 @@ Topology::get_rank_entities(
   return entities;
 }
 
-//----------------------------------------------------------------------------
 // \brief Gets the local relation id (0,1,2,...) between two entities
 EdgeId
 Topology::getLocalRelationId(
@@ -125,7 +118,6 @@ Topology::getLocalRelationId(
   return local_id;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns the total number of lower rank entities connected
 // to a specific entity
 int
@@ -143,7 +135,6 @@ Topology::getNumberLowerRankEntities(const stk::mesh::Entity entity)
   return count;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns a group of entities connected directly to a given
 //  entity. The input rank is the rank of the returned entities.
 std::vector<stk::mesh::Entity>
@@ -160,7 +151,6 @@ Topology::getDirectlyConnectedEntities(
   return std::vector<stk::mesh::Entity>(relations, relations + num_relations);
 }
 
-//----------------------------------------------------------------------------
 // \brief Checks if an entity exists inside a specific
 // vector. returns "true" if the entity exists in the vector of entities
 bool
@@ -181,7 +171,6 @@ Topology::findEntityInVector(
   return is_in_vector;
 }
 
-//----------------------------------------------------------------------------
 //  \brief Returns a group of entities connected indirectly to a
 //  given entity.  e.g. of returns: nodes that belong to a face
 //  segments or nodes that belong to an element The input rank is
@@ -223,7 +212,6 @@ Topology::getBoundaryEntities(
   return boundary_entities[entity_rank];
 }
 
-//----------------------------------------------------------------------------
 // \brief Checks if a segment is connected to an input node. Returns
 // "true" if segment is connected to the node.
 bool
@@ -247,7 +235,6 @@ Topology::segmentIsConnected(
   return is_connected;
 }
 
-//----------------------------------------------------------------------------
 // \brief Finds the adjacent segments to a given segment. The
 // adjacent segments are connected to a given common point.  it
 // returns adjacent segments
@@ -283,7 +270,6 @@ Topology::findAdjacentSegments(
   return adjacent_segments_final;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns all the 3D entities connected to a given face
 std::vector<stk::mesh::Entity>
 Topology::findCellRelations(const stk::mesh::Entity face)
@@ -294,7 +280,6 @@ Topology::findCellRelations(const stk::mesh::Entity face)
   return std::vector<stk::mesh::Entity>(relations, relations + num_relations);
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns all the segments at the boundary of a given
 // element. Including those connected between the faces barycenters
 // and the faces boundary nodes
@@ -334,7 +319,6 @@ Topology::findSegmentsFromElement(const stk::mesh::Entity element)
 }
 
 // FIXME - I don't know what to do with this.
-//----------------------------------------------------------------------------
 // \brief Returns true if the input faces have two points in common
 bool
 Topology::facesShareTwoPoints(
@@ -362,7 +346,6 @@ Topology::facesShareTwoPoints(
   return num;
 }
 
-//----------------------------------------------------------------------------
 // \brief returns the adjacent segments from a given face
 std::vector<stk::mesh::Entity>
 Topology::findAdjacentSegmentsFromFace(
@@ -389,7 +372,6 @@ Topology::findAdjacentSegmentsFromFace(
   return adjacent_faces;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns a pointer with the coordinates of a given entity
 double*
 Topology::getEntityCoordinates(stk::mesh::Entity entity)
@@ -408,7 +390,6 @@ Topology::getEntityCoordinates(stk::mesh::Entity entity)
   return pointer_coordinates;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns a vector with the corresponding former boundary
 // nodes of an input entity of rank 3
 
@@ -430,7 +411,6 @@ Topology::getFormerElementNodes(
   return boundary_nodes;
 }
 
-//----------------------------------------------------------------------------
 // \brief Generates the coordinate of a given barycenter "entities"
 // is a vector with the entities of rank "0" that belong to the same
 // higher rank entity connected to the barycenter(e.g segment, face,
@@ -472,7 +452,6 @@ Topology::computeBarycentricCoordinates(
   return;
 }
 
-//----------------------------------------------------------------------------
 // \brief Barycentric subdivision of simplicial meshes
 void
 Topology::barycentricSubdivision()
@@ -483,7 +462,6 @@ Topology::barycentricSubdivision()
   // Begin mesh update
   modification_begin();
 
-  //--------------------------------------------------------------------------
   // I. Divide all the segments of the mesh by half
   // initial_entities_0D: Vector with all the entities of rank "0"
   // (nodes) required to divide the original mesh segments by half
@@ -613,7 +591,6 @@ Topology::barycentricSubdivision()
   cpu_time_used1 = ((double)(end1 - start1)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
   std::cout << "First part takes " << cpu_time_used1 << " seconds" << std::endl;
-  //--------------------------------------------------------------------------
   // II.Connect the new center nodes to the center of the face
   // mofified1_entities_0D: Vector of nodes that includes all the ones
   // up the "node centers of the faces" initial_entities_2D: Vector
@@ -653,7 +630,6 @@ Topology::barycentricSubdivision()
   std::cout << std::endl;
   std::cout << "The second part takes " << cpu_time_used2 << " seconds"
             << std::endl;
-  //--------------------------------------------------------------------------
   // III. For each face start creating new segments that will connect
   // the center point of the face with with all the points at its
   // boundary modified2_entities_1D: Vector with all the segments up
@@ -739,7 +715,6 @@ Topology::barycentricSubdivision()
   std::cout << std::endl;
   std::cout << "The Third part takes " << cpu_time_used3 << " seconds"
             << std::endl;
-  //--------------------------------------------------------------------------
   // IV. Define the new faces at the boundary of the elements
   // modified1_entities_2D: Vector that contains all the faces up to
   // the new ones at the boundary of the elements
@@ -825,7 +800,6 @@ Topology::barycentricSubdivision()
   std::cout << "The Fourth part takes " << cpu_time_used4 << " seconds"
             << std::endl;
 
-  //--------------------------------------------------------------------------
   // V. Delete former mesh faces initial_entities_3d: Vector that
   // contains all the former elements of the mesh
   // All_boundary_faces:vector with all the boundary faces of all
@@ -892,7 +866,6 @@ Topology::barycentricSubdivision()
   std::cout << std::endl;
   std::cout << "The Fifth part takes " << cpu_time_used5 << " seconds"
             << std::endl;
-  //--------------------------------------------------------------------------
   // VI. Add a point to each element. Each point represents the
   // centroid of each element modified2_entities_0D: Vector that
   // contains all the nodes up to the centroids of all the elements
@@ -944,7 +917,6 @@ Topology::barycentricSubdivision()
   std::cout << "The Sixth part takes " << cpu_time_used6 << " seconds"
             << std::endl;
 
-  //--------------------------------------------------------------------------
   // VII. For each element create new segments to connect its center
   // point to all the points that compose its boundary
   // modified3_entities_1D: Vector that contains all the segments up
@@ -1060,9 +1032,7 @@ Topology::barycentricSubdivision()
   std::cout << "The Eight part takes " << cpu_time_used8 << " seconds"
             << std::endl;
 
-  //--------------------------------------------------------------------------
   // IX. Delete the former elements
-  //--------------------------------------------------------------------------
   // MEASURING TIME
   clock_t start9, end9;
   double  cpu_time_used9;
@@ -1085,7 +1055,6 @@ Topology::barycentricSubdivision()
   std::cout << "The Ninth part takes " << cpu_time_used9 << " seconds"
             << std::endl;
 
-  //--------------------------------------------------------------------------
   // X. Create the new elements modified1_entities_3d: Vector with
   // all the elements required to carry out the barycentric
   // subdivision
@@ -1125,9 +1094,7 @@ Topology::barycentricSubdivision()
   std::cout << "The tenth part takes " << cpu_time_used10 << "seconds"
             << std::endl;
 
-  //--------------------------------------------------------------------------
   // XI. Update the vector: connectivity_temp
-  //--------------------------------------------------------------------------
   // MEASURING TIME
   clock_t start11, end11;
   double  cpu_time_used11;

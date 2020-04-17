@@ -10,7 +10,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 J2Model<EvalT, Traits>::J2Model(
     Teuchos::ParameterList*              p,
@@ -95,7 +94,6 @@ J2Model<EvalT, Traits>::J2Model(
         p->get<bool>("Output Mechanical Source", false));
   }
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 J2Model<EvalT, Traits>::computeState(
@@ -292,7 +290,6 @@ J2Model<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 // computeState parallel function, which calls Kokkos::parallel_for
 template <typename EvalT, typename Traits>
 void
@@ -303,5 +300,4 @@ J2Model<EvalT, Traits>::computeStateParallel(
 {
   return;
 }
-//-------------------------------------------------------------------------------
 }  // namespace LCM

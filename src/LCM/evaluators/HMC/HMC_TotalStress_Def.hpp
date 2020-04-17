@@ -9,7 +9,6 @@
 
 namespace HMC {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 TotalStress<EvalT, Traits>::TotalStress(
     Teuchos::ParameterList const&        p,
@@ -41,7 +40,6 @@ TotalStress<EvalT, Traits>::TotalStress(
   numDims = dims[2];
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 TotalStress<EvalT, Traits>::postRegistrationSetup(
@@ -54,7 +52,6 @@ TotalStress<EvalT, Traits>::postRegistrationSetup(
   for (int i = 0; i < n; i++) this->utils.setFieldData(*(microStress[i]), fm);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 TotalStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -72,5 +69,4 @@ TotalStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     }
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace HMC

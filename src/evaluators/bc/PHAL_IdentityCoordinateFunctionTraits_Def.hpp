@@ -6,7 +6,6 @@
 
 namespace PHAL {
 
-//----------------------------------------------------------------------------
 template <typename EvalT>
 IdentityCoordFunctionTraits<EvalT>::IdentityCoordFunctionTraits(
     Teuchos::ParameterList& p)

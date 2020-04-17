@@ -6,7 +6,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 GradientElementLength<EvalT, Traits>::GradientElementLength(
     Teuchos::ParameterList const&        p,
@@ -30,7 +29,6 @@ GradientElementLength<EvalT, Traits>::GradientElementLength(
   num_dims_  = dims[3];
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 GradientElementLength<EvalT, Traits>::postRegistrationSetup(
@@ -42,7 +40,6 @@ GradientElementLength<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(element_length_, fm);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 GradientElementLength<EvalT, Traits>::evaluateFields(
@@ -63,5 +60,4 @@ GradientElementLength<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

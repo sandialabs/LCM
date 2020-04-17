@@ -5,7 +5,6 @@
 #ifndef ALBANY_STKNODESHARING
 #define ALBANY_STKNODESHARING
 
-//----------------------------------------------------------------------
 
 #include <stk_mesh/base/BulkData.hpp>
 
@@ -14,6 +13,5 @@ void
 fix_node_sharing(stk::mesh::BulkData& bulk_data);
 }
 
-//----------------------------------------------------------------------
 
 #endif

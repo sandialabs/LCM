@@ -49,16 +49,12 @@ main(int ac, char* av[])
     return 1;
   }
 
-  //--------------------------------------------------------------------------------------------------------
   // Read the mesh
-  //--------------------------------------------------------------------------------------------------------
   // Copied from Partition.cc
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
   LCM::Topology             topology(input_file, output_file);
 
-  //--------------------------------------------------------------------------------------------------------
   // Extract the input file name
-  //--------------------------------------------------------------------------------------------------------
   stringstream ss;
   std::string  file_name_;
   ss << av[1];       // insert the char
@@ -70,9 +66,7 @@ main(int ac, char* av[])
   std::string file_name2 = file_name_.substr(
       0, Position);  // sets part of the name of the output file
 
-  //--------------------------------------------------------------------------------------------------------
   // Create the contour of the minimum surface
-  //--------------------------------------------------------------------------------------------------------
 
   ifstream normals_(
       normals_file.c_str());  // Read the text file that contains all normals

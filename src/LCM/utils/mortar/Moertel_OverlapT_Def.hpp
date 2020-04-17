@@ -1335,7 +1335,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
       Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> node =
           points[i]->Node();
 
-      //-----------------
       // GAH - found by kimliegeois
       // Moertel occasionally trys to project a slave segment on a master
       // segment which can be perpendicular. Compute the dot product of the
@@ -1355,7 +1354,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
 
         if (mag_projection <= Projection_Length_Epsilon) return false;
       }
-      //-----------------
 
       projector.ProjectNodetoSegment_NodalNormal(*node, mseg_, mxi, gap);
       // create a projected node and set it in node

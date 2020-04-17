@@ -13,7 +13,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(
     Teuchos::ParameterList*              p,
@@ -112,7 +111,6 @@ ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(
   this->state_var_output_flags_.push_back(p->get<bool>("Output H_3", false));
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ViscoElasticModel<EvalT, Traits>::computeState(
@@ -338,6 +336,5 @@ ViscoElasticModel<EvalT, Traits>::computeState(
     }  // end pt
   }    // end cell
 }
-//----------------------------------------------------------------------------
 
 }  // namespace LCM

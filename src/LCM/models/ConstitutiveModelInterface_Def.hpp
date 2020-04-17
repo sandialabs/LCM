@@ -44,7 +44,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
     Teuchos::ParameterList&              p,
@@ -147,7 +146,6 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
   this->setName("ConstitutiveModelInterface" + PHX::print<EvalT>());
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
@@ -226,7 +224,6 @@ ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
   }
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelInterface<EvalT, Traits>::evaluateFields(
@@ -238,7 +235,6 @@ ConstitutiveModelInterface<EvalT, Traits>::evaluateFields(
   }
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelInterface<EvalT, Traits>::fillStateVariableStruct(
@@ -252,7 +248,6 @@ ConstitutiveModelInterface<EvalT, Traits>::fillStateVariableStruct(
   sv_struct_.output_to_exodus   = model_->getStateVarOutputFlag(state_var);
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
@@ -349,5 +344,4 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
   this->model_ = model;
 }
 
-//------------------------------------------------------------------------------
 }  // namespace LCM

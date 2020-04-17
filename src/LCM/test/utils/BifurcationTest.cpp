@@ -316,7 +316,6 @@ cartesian_sweep(minitensor::Tensor4<double, 3> const& CC)
   return;
 }
 
-//----------------------------------------------------------------------------
 minitensor::Vector<D2FadType, 3>
 spherical_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
@@ -328,7 +327,6 @@ spherical_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
   return normal;
 }
 
-//----------------------------------------------------------------------------
 minitensor::Vector<D2FadType, 3>
 stereographic_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
@@ -341,7 +339,6 @@ stereographic_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
   return normal;
 }
 
-//----------------------------------------------------------------------------
 minitensor::Vector<D2FadType, 3>
 projective_get_normal(minitensor::Vector<D2FadType, 3>& parameters)
 {
@@ -368,7 +365,6 @@ projective_get_normal(minitensor::Vector<D2FadType, 3>& parameters)
   return normal;
 }
 
-//----------------------------------------------------------------------------
 minitensor::Vector<D2FadType, 3>
 tangent_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
@@ -390,7 +386,6 @@ tangent_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
   return normal;
 }
 
-//----------------------------------------------------------------------------
 minitensor::Vector<D2FadType, 3>
 cartesian_get_normal1(minitensor::Vector<D2FadType, 2>& parameters)
 {
@@ -519,7 +514,6 @@ spherical_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 void
 stereographic_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,
@@ -623,7 +617,6 @@ stereographic_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 void
 projective_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,
@@ -739,7 +732,6 @@ projective_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 void
 tangent_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,
@@ -843,7 +835,6 @@ tangent_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 void
 cartesian_newton_raphson(
     minitensor::Tensor4<ScalarT, 3>& tangent,

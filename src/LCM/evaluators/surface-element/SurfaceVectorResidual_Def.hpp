@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 SurfaceVectorResidual<EvalT, Traits>::SurfaceVectorResidual(
     Teuchos::ParameterList&              p,
@@ -89,7 +88,6 @@ SurfaceVectorResidual<EvalT, Traits>::SurfaceVectorResidual(
   num_plane_dims_ = num_dims_ - 1;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 SurfaceVectorResidual<EvalT, Traits>::postRegistrationSetup(
@@ -127,7 +125,6 @@ SurfaceVectorResidual<EvalT, Traits>::postRegistrationSetup(
   intrepid_basis_->getValues(ref_grads_, ref_points_, Intrepid2::OPERATOR_GRAD);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 SurfaceVectorResidual<EvalT, Traits>::evaluateFields(
@@ -259,5 +256,4 @@ SurfaceVectorResidual<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

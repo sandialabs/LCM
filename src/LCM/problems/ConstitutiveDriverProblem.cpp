@@ -8,7 +8,6 @@
 #include "Albany_Utils.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 
-//------------------------------------------------------------------------------
 Albany::ConstitutiveDriverProblem::ConstitutiveDriverProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
     const Teuchos::RCP<ParamLib>&               param_lib,
@@ -36,9 +35,7 @@ Albany::ConstitutiveDriverProblem::ConstitutiveDriverProblem(
   rigidBodyModes->setParameters(
       num_PDEs, num_elasticity_dim, num_scalar, null_space_dim);
 }
-//------------------------------------------------------------------------------
 Albany::ConstitutiveDriverProblem::~ConstitutiveDriverProblem() {}
-//------------------------------------------------------------------------------
 void
 Albany::ConstitutiveDriverProblem::buildProblem(
     Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
@@ -58,7 +55,6 @@ Albany::ConstitutiveDriverProblem::buildProblem(
     if (meshSpecs[ps]->ssNames.size() > 0) haveSidesets = true;
   }
 }
-//------------------------------------------------------------------------------
 Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
 Albany::ConstitutiveDriverProblem::buildEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
@@ -74,7 +70,6 @@ Albany::ConstitutiveDriverProblem::buildEvaluators(
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
-//------------------------------------------------------------------------------
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ConstitutiveDriverProblem::getValidProblemParameters() const
 {
@@ -90,7 +85,6 @@ Albany::ConstitutiveDriverProblem::getValidProblemParameters() const
 
   return validPL;
 }
-//------------------------------------------------------------------------------
 void
 Albany::ConstitutiveDriverProblem::getAllocatedStates(
     Teuchos::ArrayRCP<Teuchos::ArrayRCP<
@@ -102,4 +96,3 @@ Albany::ConstitutiveDriverProblem::getAllocatedStates(
   old_state = old_state_;
   new_state = new_state_;
 }
-//------------------------------------------------------------------------------

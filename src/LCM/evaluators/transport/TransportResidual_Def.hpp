@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 TransportResidual<EvalT, Traits>::TransportResidual(
     Teuchos::ParameterList&              p,
@@ -125,7 +124,6 @@ TransportResidual<EvalT, Traits>::TransportResidual(
   this->setName("TransportResidual" + PHX::print<EvalT>());
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 TransportResidual<EvalT, Traits>::postRegistrationSetup(
@@ -172,7 +170,6 @@ TransportResidual<EvalT, Traits>::postRegistrationSetup(
       scalar_.get_view(), "XXX", num_cells_, num_pts_);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 TransportResidual<EvalT, Traits>::evaluateFields(

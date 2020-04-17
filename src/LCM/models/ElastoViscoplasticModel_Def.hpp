@@ -10,7 +10,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
     Teuchos::ParameterList*              p,
@@ -276,7 +275,6 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
 //   Y_;
 // };
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ElastoViscoplasticModel<EvalT, Traits>::computeState(
@@ -810,7 +808,6 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 template <typename T>
 T
@@ -832,5 +829,4 @@ ElastoViscoplasticModel<EvalT, Traits>::compute_fstar(
   if (fstar > 1.0) fstar = 1.0;
   return fstar;
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

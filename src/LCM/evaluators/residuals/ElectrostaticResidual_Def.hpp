@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ElectrostaticResidual<EvalT, Traits>::ElectrostaticResidual(
     Teuchos::ParameterList&              p,
@@ -34,7 +33,6 @@ ElectrostaticResidual<EvalT, Traits>::ElectrostaticResidual(
   num_dims_  = dims[3];
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ElectrostaticResidual<EvalT, Traits>::postRegistrationSetup(
@@ -62,5 +60,4 @@ ElectrostaticResidual<EvalT, Traits>::evaluateFields(
               edisp_(cell, pt, i) * w_grad_bf_(cell, node, pt, i);
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

@@ -28,7 +28,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
     return true;
   }
 
-  //-------------------------------------------------------------------
   // check for NULL entries in maps
   bool ok = true;
   for (int i = 0; i < 2; ++i) {
@@ -64,7 +63,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
   Teuchos::reduceAll<LO, int>(*gcomm_, Teuchos::REDUCE_MIN, 1, &lok, &gok);
   if (!gok) return false;
 
-    //-------------------------------------------------------------------
     // check whether all nodes for segments are present
     // (take in account that node might be on different processor)
     // this test is expensive and does not scale. It is therefore only performed
@@ -135,7 +133,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
     }    // for (int proc=0; proc<gcomm_->NumProc(); ++proc)
   }
 #endif
-  //-------------------------------------------------------------------
   // find all procs that have business on this interface (own nodes/segments)
   // build a Teuchos_comm that contains only those procs
   // this intra-communicator will be used to handle most stuff on this
@@ -203,7 +200,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
 #endif
   }
 
-  //-------------------------------------------------------------------
   // create a map of all nodes to there PID (process id)
   if (lcomm_ != Teuchos::null)
     for (int proc = 0; proc < lcomm_->getSize(); ++proc) {
@@ -226,7 +222,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
       ids.clear();
     }
 
-  //-------------------------------------------------------------------
   // create a map of all segments to there PID (process id)
   if (lcomm_ != Teuchos::null)
     for (int proc = 0; proc < lcomm_->getSize(); ++proc) {
@@ -249,13 +244,11 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
       ids.clear();
     }
 
-  //-------------------------------------------------------------------
   // set isComplete_ flag
   // we set it here already as we will be using some methods that require it
   // from now on
   isComplete_ = true;
 
-  //-------------------------------------------------------------------
   // make the nodes know there adjacent segments
   // find max number of nodes to a segment
   if (lcomm_ != Teuchos::null) {
@@ -334,7 +327,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
     }  // for (int proc=0; proc<lcomm_->NumProc(); ++proc)
   }    // if (lComm())
 
-  //-------------------------------------------------------------------
   // build redundant segments and nodes
   if (lcomm_ != Teuchos::null) {
     int ok = 0;
@@ -351,18 +343,15 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
     }
   }
 
-  //-------------------------------------------------------------------
   // make topology segments <-> nodes for each side
   if (lcomm_ != Teuchos::null) BuildNodeSegmentTopology();
 
-  //-------------------------------------------------------------------
   // delete distributed nodes and segments
   for (int i = 0; i < 2; ++i) {
     seg_[i].clear();
     node_[i].clear();
   }
 
-  //-------------------------------------------------------------------
   // we are done
   // note that there might not be any functions on the interface yet
   // they still have to be set

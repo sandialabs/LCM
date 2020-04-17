@@ -72,9 +72,7 @@ main(int ac, char* av[])
   topology.outputToGraphviz(gviz_output);
 
   // Here starts the barycentric subdivision.
-  //-----------------------------------------------------------------------------------------------------------------------------------
   // Generate the output file
-  //-----------------------------------------------------------------------------------------------------------------------------------
 
   // Measure the time computing the barycentric subdivision
   clock_t start, end;

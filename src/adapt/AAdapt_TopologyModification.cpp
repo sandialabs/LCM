@@ -125,7 +125,6 @@ TopologyMod::getValidAdapterParameters() const
   return valid_pl_;
 }
 
-//----------------------------------------------------------------------------
 void
 AAdapt::TopologyMod::showRelations()
 {
@@ -158,7 +157,6 @@ AAdapt::TopologyMod::showRelations()
 }
 
 #if defined(ALBANY_MPI)
-//----------------------------------------------------------------------------
 int
 AAdapt::TopologyMod::accumulateFractured(int num_fractured)
 {
@@ -170,7 +168,6 @@ AAdapt::TopologyMod::accumulateFractured(int num_fractured)
   return total_fractured;
 }
 
-//----------------------------------------------------------------------------
 // Parallel all-gatherv function. Communicates local open list to
 // all processors to form global open list.
 void
@@ -279,14 +276,12 @@ AAdapt::TopologyMod::getGlobalOpenList(
 }
 
 #else
-//----------------------------------------------------------------------------
 int
 AAdapt::TopologyMod::accumulateFractured(int num_fractured)
 {
   return num_fractured;
 }
 
-//----------------------------------------------------------------------------
 // Parallel all-gatherv function. Communicates local open list to
 // all processors to form global open list.
 void

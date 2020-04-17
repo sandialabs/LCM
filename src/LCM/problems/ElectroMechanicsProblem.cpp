@@ -9,7 +9,6 @@
 #include "Albany_Utils.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 
-//------------------------------------------------------------------------------
 Albany::ElectroMechanicsProblem::ElectroMechanicsProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
     const Teuchos::RCP<ParamLib>&               param_lib,
@@ -53,9 +52,7 @@ Albany::ElectroMechanicsProblem::ElectroMechanicsProblem(
   rigidBodyModes->setParameters(
       num_PDEs, num_dims_, num_scalar, null_space_dim);
 }
-//------------------------------------------------------------------------------
 Albany::ElectroMechanicsProblem::~ElectroMechanicsProblem() {}
-//------------------------------------------------------------------------------
 void
 Albany::ElectroMechanicsProblem::buildProblem(
     Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
@@ -86,7 +83,6 @@ Albany::ElectroMechanicsProblem::buildProblem(
 
   if (haveSidesets) constructNeumannEvaluators(meshSpecs[0]);
 }
-//------------------------------------------------------------------------------
 Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
 Albany::ElectroMechanicsProblem::buildEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
@@ -102,7 +98,6 @@ Albany::ElectroMechanicsProblem::buildEvaluators(
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
-//------------------------------------------------------------------------------
 void
 Albany::ElectroMechanicsProblem::constructDirichletEvaluators(
     Albany::MeshSpecsStruct const& meshSpecs)
@@ -122,7 +117,6 @@ Albany::ElectroMechanicsProblem::constructDirichletEvaluators(
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
 }
-//------------------------------------------------------------------------------
 // Traction BCs
 void
 Albany::ElectroMechanicsProblem::constructNeumannEvaluators(
@@ -198,7 +192,6 @@ Albany::ElectroMechanicsProblem::constructNeumannEvaluators(
       this->params,
       this->paramLib);
 }
-//------------------------------------------------------------------------------
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ElectroMechanicsProblem::getValidProblemParameters() const
 {

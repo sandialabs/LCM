@@ -19,7 +19,6 @@ namespace LCM {
 /** \brief Equilibrium Concentration BC Dirichlet evaluator
  */
 
-//------------------------------------------------------------------------------
 // Specialization of the DirichletBase class
 template <typename EvalT, typename Traits>
 class EquilibriumConcentrationBC;
@@ -41,7 +40,6 @@ class EquilibriumConcentrationBC_Base
   int const poffset_;
 };
 
-//------------------------------------------------------------------------------
 // Residual
 template <typename Traits>
 class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>
@@ -56,7 +54,6 @@ class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>
   evaluateFields(typename Traits::EvalData d);
 };
 
-//------------------------------------------------------------------------------
 // Jacobian
 template <typename Traits>
 class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>

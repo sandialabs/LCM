@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 AnisotropicHyperelasticDamageModel<EvalT, Traits>::
     AnisotropicHyperelasticDamageModel(
@@ -130,7 +129,6 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Fiber 2 Damage", false));
 }
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 AnisotropicHyperelasticDamageModel<EvalT, Traits>::computeState(
@@ -298,5 +296,4 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::computeState(
     }  // pt
   }    // cell
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

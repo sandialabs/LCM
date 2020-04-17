@@ -10,7 +10,6 @@
 #include <stk_mesh/base/Selector.hpp>
 #include <stk_mesh/base/Types.hpp>
 
-//----------------------------------------------------------------------
 
 namespace stk {
 namespace rebalance {

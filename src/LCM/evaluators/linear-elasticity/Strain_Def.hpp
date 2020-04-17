@@ -8,7 +8,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 Strain<EvalT, Traits>::Strain(
     Teuchos::ParameterList const&        p,
@@ -28,7 +27,6 @@ Strain<EvalT, Traits>::Strain(
   numDims = dims[2];
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 Strain<EvalT, Traits>::postRegistrationSetup(
@@ -39,7 +37,6 @@ Strain<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(GradU, fm);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 Strain<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -56,5 +53,4 @@ Strain<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     }
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

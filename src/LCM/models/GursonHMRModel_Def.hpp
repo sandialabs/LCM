@@ -10,7 +10,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 GursonHMRModel<EvalT, Traits>::GursonHMRModel(
     Teuchos::ParameterList*              p,
@@ -107,7 +106,6 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 GursonHMRModel<EvalT, Traits>::computeState(
@@ -338,7 +336,6 @@ GursonHMRModel<EvalT, Traits>::computeState(
 
 }  // end of compute state
 
-//------------------------------------------------------------------------------
 // all local functions for compute state
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
@@ -527,5 +524,4 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
     for (int j = 0; j < 4; j++) dRdX[i + 4 * j] = Rfad[i].dx(j);
 
 }  // end of ResidualJacobian
-//------------------------------------------------------------------------------
 }  // namespace LCM

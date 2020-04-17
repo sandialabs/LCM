@@ -22,7 +22,6 @@ static int dir_count = 0;  // counter for registration of dirichlet_field
 
 namespace Albany {
 
-//------------------------------------------------------------------------------
 ///
 /// \brief Definition for the Mechanics Problem
 ///
@@ -129,7 +128,6 @@ class MechanicsProblem : public AbstractProblem
   void
   constructNeumannEvaluators(Teuchos::RCP<MeshSpecsStruct> const& meshSpecs);
 
-  //----------------------------------------------------------------------------
 
  private:
   ///
@@ -143,7 +141,6 @@ class MechanicsProblem : public AbstractProblem
   MechanicsProblem&
   operator=(const MechanicsProblem&);
 
-  //----------------------------------------------------------------------------
 
  protected:
   ///

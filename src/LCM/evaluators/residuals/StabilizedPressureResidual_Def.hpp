@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 StabilizedPressureResidual<EvalT, Traits>::StabilizedPressureResidual(
     Teuchos::ParameterList&              p,
@@ -53,7 +52,6 @@ StabilizedPressureResidual<EvalT, Traits>::StabilizedPressureResidual(
   num_dims_  = dims[3];
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 StabilizedPressureResidual<EvalT, Traits>::postRegistrationSetup(
@@ -72,7 +70,6 @@ StabilizedPressureResidual<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(residual_, fm);
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 StabilizedPressureResidual<EvalT, Traits>::evaluateFields(
@@ -148,5 +145,4 @@ StabilizedPressureResidual<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

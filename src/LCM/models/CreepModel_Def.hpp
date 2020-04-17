@@ -11,7 +11,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 CreepModel<EvalT, Traits>::CreepModel(
     Teuchos::ParameterList*              p,
@@ -116,7 +115,6 @@ CreepModel<EvalT, Traits>::CreepModel(
 //  fprintf(stderr, "\n");
 //}
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 CreepModel<EvalT, Traits>::computeState(

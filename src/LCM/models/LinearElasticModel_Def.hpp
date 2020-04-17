@@ -10,7 +10,6 @@
 #include "Phalanx_DataLayout.hpp"
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 LinearElasticModel<EvalT, Traits>::LinearElasticModel(
     Teuchos::ParameterList*              p,
@@ -35,7 +34,6 @@ LinearElasticModel<EvalT, Traits>::LinearElasticModel(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(true);
 }
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 LinearElasticModel<EvalT, Traits>::computeState(
@@ -118,5 +116,4 @@ LinearElasticModel<EvalT, Traits>::computeState(
     }
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

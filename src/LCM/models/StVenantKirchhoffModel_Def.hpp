@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 StVenantKirchhoffModel<EvalT, Traits>::StVenantKirchhoffModel(
     Teuchos::ParameterList*              p,
@@ -35,7 +34,6 @@ StVenantKirchhoffModel<EvalT, Traits>::StVenantKirchhoffModel(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(true);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 StVenantKirchhoffModel<EvalT, Traits>::computeState(
@@ -77,5 +75,4 @@ StVenantKirchhoffModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

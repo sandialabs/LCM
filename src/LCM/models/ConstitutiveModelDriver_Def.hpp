@@ -10,7 +10,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ConstitutiveModelDriver<EvalT, Traits>::ConstitutiveModelDriver(
     Teuchos::ParameterList&              p,
@@ -35,7 +34,6 @@ ConstitutiveModelDriver<EvalT, Traits>::ConstitutiveModelDriver(
   this->setName("ConstitutiveModelDriver" + PHX::print<EvalT>());
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelDriver<EvalT, Traits>::postRegistrationSetup(
@@ -48,7 +46,6 @@ ConstitutiveModelDriver<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(residual_, fm);
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelDriver<EvalT, Traits>::evaluateFields(
@@ -88,6 +85,5 @@ ConstitutiveModelDriver<EvalT, Traits>::evaluateFields(
   }
 }
 
-//------------------------------------------------------------------------------
 
 }  // namespace LCM

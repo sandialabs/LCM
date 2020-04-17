@@ -13,7 +13,6 @@
 MOERTEL_TEMPLATE_STATEMENT
 bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNormals()
 {
-  //-------------------------------------------------------------------
   // interface needs to be complete
   if (!IsComplete()) {
     if (gcomm_->getRank() == 0)
@@ -25,11 +24,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNormals()
     return false;
   }
 
-  //-------------------------------------------------------------------
   // send all procs not member of this interface's intra-comm out of here
   if (lcomm_ == Teuchos::null) return true;
 
-  //-------------------------------------------------------------------
   // interface segments need to have at least one function on each side
   std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
       iterator curr;
@@ -46,7 +43,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNormals()
       }
     }
 
-  //-------------------------------------------------------------------
   // build nodal normals on both sides
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator
       ncurr;
@@ -75,7 +71,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Project()
 {
   bool ok = false;
 
-  //-------------------------------------------------------------------
   // interface needs to be complete
   if (!IsComplete()) {
     if (gcomm_->getRank() == 0)
@@ -87,11 +82,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Project()
     return false;
   }
 
-  //-------------------------------------------------------------------
   // send all procs not member of this interface's intra-comm out of here
   if (lcomm_ == Teuchos::null) return true;
 
-  //-------------------------------------------------------------------
   // interface segments need to have at least one function on each side
   std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
       iterator curr;
@@ -107,7 +100,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Project()
         return false;
       }
 
-  //-------------------------------------------------------------------
   // build nodal normals on both sides
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator
       ncurr;
@@ -122,7 +114,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Project()
 #endif
     }
 
-  //-------------------------------------------------------------------
   // check the type of projection to be used and project nodes
   // projection along the normal field:
   // uses the slave side's interpolated normal field to

@@ -54,7 +54,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
-  //--------------------------------------------------------------------------
   // reference coordinates
   ArrayRCP<ScalarT> referenceCoords(24);
   // Node 0
@@ -100,7 +99,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   RCP<LCM::SetField<Residual, Traits>> setFieldRefCoords =
       rcp(new LCM::SetField<Residual, Traits>(rcPL));
 
-  //--------------------------------------------------------------------------
   // current coordinates
   ArrayRCP<ScalarT> currentCoords(24);
   double            eps = 0.01;
@@ -147,7 +145,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   RCP<LCM::SetField<Residual, Traits>> setFieldCurCoords =
       rcp(new LCM::SetField<Residual, Traits>(ccPL));
 
-  //--------------------------------------------------------------------------
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   intrepidBasis =
@@ -159,7 +156,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
 
-  //--------------------------------------------------------------------------
   // SurfaceBasis evaluator
   Teuchos::ParameterList sbPL;
   sbPL.set<std::string>("Reference Coordinates Name", "Reference Coordinates");
@@ -203,7 +199,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   fieldManager.evaluateFields<Residual>(workset);
   fieldManager.postEvaluate<Residual>(workset);
 
-  //--------------------------------------------------------------------------
   // Pull the current basis from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim> curBasis(
       "Current Basis", dl->qp_tensor);
@@ -221,7 +216,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
               <=,
               tolerance);
 
-  //--------------------------------------------------------------------------
   // Pull the reference basis from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim> refBasis(
       "Reference Basis", dl->qp_tensor);
@@ -239,7 +233,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
               <=,
               tolerance);
 
-  //--------------------------------------------------------------------------
   // Pull the reference dual basis from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim> refDualBasis(
       "Reference Dual Basis", dl->qp_tensor);
@@ -258,7 +251,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
               <=,
               tolerance);
 
-  //--------------------------------------------------------------------------
   // Pull the reference normal from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> refNormal(
       "Reference Normal", dl->qp_vector);
@@ -273,7 +265,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
         TEST_COMPARE(
             fabs(refNormal(cell, pt, i) - expectedRefNormal(i)), <=, tolerance);
 
-  //--------------------------------------------------------------------------
   // Pull the reference area from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint> refArea(
       "Reference Area", dl->qp_scalar);
@@ -286,7 +277,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
     for (size_type pt = 0; pt < numQPts; ++pt)
       TEST_COMPARE(fabs(refArea(cell, pt) - expectedRefArea), <=, tolerance);
 
-  //--------------------------------------------------------------------------
   // compute a deformation gradient for the membrane
   for (size_type cell = 0; cell < worksetSize; ++cell) {
     for (size_type pt = 0; pt < numQPts; ++pt) {
@@ -302,9 +292,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
     }
   }
 
-  //-----------------------------------------------------------------------------------
   // Now test in-plane shear
-  //-----------------------------------------------------------------------------------
   // Node 0
   currentCoords[0] = referenceCoords[0];
   currentCoords[1] = referenceCoords[1];
@@ -343,12 +331,10 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   fieldManager.evaluateFields<Residual>(workset);
   fieldManager.postEvaluate<Residual>(workset);
 
-  //--------------------------------------------------------------------------
   // Grab the current basis and the ref dual basis
   fieldManager.getFieldData<Residual>(curBasis);
   fieldManager.getFieldData<Residual>(refDualBasis);
 
-  //--------------------------------------------------------------------------
   // compute a deformation gradient for the membrane
   for (size_type cell = 0; cell < worksetSize; ++cell) {
     for (size_type pt = 0; pt < numQPts; ++pt) {
@@ -377,7 +363,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
-  //--------------------------------------------------------------------------
   // nodal value of the scalar (usually a scalar solution field such as
   // pressure, temperature..etc)
   ArrayRCP<ScalarT> currentScalar(8);
@@ -402,7 +387,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
   RCP<LCM::SetField<Residual, Traits>> setFieldCurrentScalar =
       rcp(new LCM::SetField<Residual, Traits>(csPL));
 
-  //--------------------------------------------------------------------------
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   intrepidBasis =
@@ -414,7 +398,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
 
-  //--------------------------------------------------------------------------
   // SurfaceScalarJump evaluator
   Teuchos::ParameterList sjPL;
   sjPL.set<std::string>("Nodal Temperature Name", "Temperature");
@@ -483,7 +466,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
   }
   std::cout << std::endl;
 
-  //--------------------------------------------------------------------------
   // now test a different scalar field
   eps              = 0.05;
   currentScalar[0] = 0.5;
@@ -541,7 +523,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorJump)
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
-  //--------------------------------------------------------------------------
   // nodal displacement jump
   ArrayRCP<ScalarT> referenceCoords(24);
   referenceCoords[0] = -0.5;
@@ -620,7 +601,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorJump)
   RCP<LCM::SetField<Residual, Traits>> setFieldCurrentCoords =
       rcp(new LCM::SetField<Residual, Traits>(ccPL));
 
-  //--------------------------------------------------------------------------
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   intrepidBasis =
@@ -632,7 +612,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorJump)
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
 
-  //--------------------------------------------------------------------------
   // SurfaceVectorJump evaluator
   Teuchos::ParameterList svjPL;
   svjPL.set<std::string>("Vector Name", "Current Coordinates");
@@ -717,7 +696,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
-  //--------------------------------------------------------------------------
   // reference basis
   ArrayRCP<ScalarT> referenceDualBasis(numQPts * numDim * numDim);
   for (int i(0); i < numQPts; ++i) {
@@ -744,7 +722,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldRefDualBasis =
       rcp(new LCM::SetField<Residual, Traits>(rdbPL));
 
-  //----------------------------------------------------------------------------
   // reference normal
   ArrayRCP<ScalarT> refNormal(numQPts * numDim);
   for (int i(0); i < refNormal.size(); ++i) refNormal[i] = 0.0;
@@ -759,7 +736,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldRefNormal =
       rcp(new LCM::SetField<Residual, Traits>(rnPL));
 
-  //--------------------------------------------------------------------------
   // Nodal value of the scalar in localization element
   ArrayRCP<ScalarT> nodalScalar(numVertices);
   for (int i(0); i < nodalScalar.size(); ++i) nodalScalar[i] = 0.0;
@@ -775,7 +751,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldNodalScalar =
       rcp(new LCM::SetField<Residual, Traits>(nsvPL));
 
-  //--------------------------------------------------------------------------
   // jump
   ArrayRCP<ScalarT> jump(numQPts);
   for (int i(0); i < jump.size(); ++i) jump[i] = 1.0;
@@ -789,7 +764,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldJump =
       rcp(new LCM::SetField<Residual, Traits>(jPL));
 
-  //--------------------------------------------------------------------------
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   intrepidBasis =
@@ -801,7 +775,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
 
-  //--------------------------------------------------------------------------
   // SurfaceScalarGradient evaluator
   Teuchos::ParameterList ssgPL;
   ssgPL.set<std::string>("Reference Dual Basis Name", "Reference Dual Basis");
@@ -847,7 +820,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   fieldManager.evaluateFields<Residual>(workset);
   fieldManager.postEvaluate<Residual>(workset);
 
-  //--------------------------------------------------------------------------
   // Pull the scalar gradient from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> scalarGrad(
       "Surface Scalar Gradient", dl->qp_vector);
@@ -873,11 +845,9 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
             <=,
             tolerance);
 
-  //--------------------------------------------------------------------------
   // Now test  gradient in parallel direction
 
   double pert(0.3);
-  //--------------------------------------------------------------------------
   // Nodal value of the scalar in localization element
   for (int i(0); i < nodalScalar.size(); ++i) nodalScalar[i] = 0.0;
   nodalScalar[1] = nodalScalar[2] = nodalScalar[5] = nodalScalar[6] = pert;
@@ -890,7 +860,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   fieldManager.evaluateFields<Residual>(workset);
   fieldManager.postEvaluate<Residual>(workset);
 
-  //--------------------------------------------------------------------------
   // Pull the scalar gradient from the FieldManager
   fieldManager.getFieldData<Residual>(scalarGrad);
 
@@ -929,7 +898,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   const RCP<Albany::Layouts> dl          = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
-  //--------------------------------------------------------------------------
   // current basis
   ArrayRCP<ScalarT> currentBasis(numQPts * numDim * numDim);
   for (int i(0); i < numQPts; ++i) {
@@ -956,7 +924,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldCurBasis =
       rcp(new LCM::SetField<Residual, Traits>(cbPL));
 
-  //--------------------------------------------------------------------------
   // reference dual basis
   ArrayRCP<ScalarT> refDualBasis(numQPts * numDim * numDim);
   for (int i(0); i < numQPts; ++i) {
@@ -983,7 +950,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldRefDualBasis =
       rcp(new LCM::SetField<Residual, Traits>(rdbPL));
 
-  //-----------------------------------------------------------------------------------
   // reference normal
   ArrayRCP<ScalarT> refNormal(numQPts * numDim);
   for (int i(0); i < refNormal.size(); ++i) refNormal[i] = 0.0;
@@ -998,7 +964,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldRefNormal =
       rcp(new LCM::SetField<Residual, Traits>(rnPL));
 
-  //--------------------------------------------------------------------------
   // jump
   ArrayRCP<ScalarT> jump(numQPts * numDim);
   for (int i(0); i < jump.size(); ++i) jump[i] = 0.0;
@@ -1013,7 +978,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldJump =
       rcp(new LCM::SetField<Residual, Traits>(jPL));
 
-  //--------------------------------------------------------------------------
   // weights (reference area)
   ArrayRCP<ScalarT> weights(numQPts);
   weights[0] = weights[1] = weights[2] = weights[3] = 0.5;
@@ -1027,7 +991,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   RCP<LCM::SetField<Residual, Traits>> setFieldWeights =
       rcp(new LCM::SetField<Residual, Traits>(wPL));
 
-  //--------------------------------------------------------------------------
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   intrepidBasis =
@@ -1039,7 +1002,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
 
-  //--------------------------------------------------------------------------
   // SurfaceVectorGradient evaluator
   Teuchos::ParameterList svgPL;
   svgPL.set<std::string>("Current Basis Name", "Current Basis");
@@ -1085,7 +1047,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   fieldManager.evaluateFields<Residual>(workset);
   fieldManager.postEvaluate<Residual>(workset);
 
-  //--------------------------------------------------------------------------
   // Pull the deformation gradient from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim> defGrad("F", dl->qp_tensor);
   fieldManager.getFieldData<Residual>(defGrad);
@@ -1122,7 +1083,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
   const RCP<Albany::Layouts> dl            = rcp(
       new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
-  //--------------------------------------------------------------------------
   // manually create evaluator field for cohesive traction
   ArrayRCP<ScalarT> cohesiveTraction(numQPts * numDim);
   // manually fill the cohesiveTraction field
@@ -1142,7 +1102,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
   RCP<LCM::SetField<Residual, Traits>> setFieldCohesiveTraction =
       rcp(new LCM::SetField<Residual, Traits>(ctPL));
 
-  //--------------------------------------------------------------------------
   // manually create evaluator field for refArea
   ArrayRCP<ScalarT> refArea(numQPts);
   // manually fill the refArea field, for this unit squre, refArea = 0.25;
@@ -1158,7 +1117,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
   RCP<LCM::SetField<Residual, Traits>> setFieldRefArea =
       rcp(new LCM::SetField<Residual, Traits>(refAPL));
 
-  //----------------------------------------------------------------------------
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   intrepidBasis =
@@ -1170,7 +1128,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
 
-  //----------------------------------------------------------------------------
   // SurfaceCohesiveResidual evaluator
   Teuchos::ParameterList scrPL;
   scrPL.set<std::string>("Reference Area Name", "Reference Area");
@@ -1257,7 +1214,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
 
   double const thickness = 0.01;
 
-  //----------------------------------------------------------------------------
   // reference coordinates
   ArrayRCP<ScalarT> referenceCoords(24);
   // Node 0
@@ -1303,7 +1259,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   RCP<LCM::SetField<Residual, Traits>> setFieldRefCoords =
       rcp(new LCM::SetField<Residual, Traits>(rcPL));
 
-  //----------------------------------------------------------------------------
   // current coordinates
   ArrayRCP<ScalarT> currentCoords(24);
   // Node 0
@@ -1349,7 +1304,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   RCP<LCM::SetField<Residual, Traits>> setFieldCurCoords =
       rcp(new LCM::SetField<Residual, Traits>(ccPL));
 
-  //----------------------------------------------------------------------------
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
   intrepidBasis =
@@ -1365,7 +1319,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   Kokkos::DynRankView<RealType, PHX::Device> refWeights("RRR", numQPts);
   cubature->getCubature(refPoints, refWeights);
 
-  //----------------------------------------------------------------------------
   // SurfaceBasis evaluator
   Teuchos::ParameterList sbPL;
   sbPL.set<std::string>("Reference Coordinates Name", "Reference Coordinates");
@@ -1381,7 +1334,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   RCP<LCM::SurfaceBasis<Residual, Traits>> sb =
       rcp(new LCM::SurfaceBasis<Residual, Traits>(sbPL, dl));
 
-  //----------------------------------------------------------------------------
   // SurfaceVectorJump evaluator
   Teuchos::ParameterList svjP;
   svjP.set<std::string>("Vector Name", "Current Coordinates");
@@ -1392,7 +1344,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   RCP<LCM::SurfaceVectorJump<Residual, Traits>> svj =
       rcp(new LCM::SurfaceVectorJump<Residual, Traits>(svjP, dl));
 
-  //----------------------------------------------------------------------------
   // SurfaceVectorGradient evaluator
   Teuchos::ParameterList svgPL;
   svgPL.set<std::string>("Current Basis Name", "Current Basis");
@@ -1407,13 +1358,11 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   RCP<LCM::SurfaceVectorGradient<Residual, Traits>> svg =
       rcp(new LCM::SurfaceVectorGradient<Residual, Traits>(svgPL, dl));
 
-  //----------------------------------------------------------------------------
   // create field name strings
   LCM::FieldNameMap                                field_name_map(false);
   Teuchos::RCP<std::map<std::string, std::string>> fnm =
       field_name_map.getMap();
 
-  //----------------------------------------------------------------------------
   // Constitutive Model Parameters
   Teuchos::ParameterList  paramList("Material Parameters");
   Teuchos::ParameterList& modelList = paramList.sublist("Material Model");
@@ -1432,7 +1381,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   RCP<LCM::ConstitutiveModelParameters<Residual, Traits>> CMP =
       rcp(new LCM::ConstitutiveModelParameters<Residual, Traits>(cmpPL, dl));
 
-  //----------------------------------------------------------------------------
   // Constitutive Model Interface Evaluator
   Teuchos::ParameterList cmiPL;
   cmiPL.set<Teuchos::ParameterList*>("Material Parameters", &paramList);
@@ -1440,7 +1388,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
       Teuchos::rcp(
           new LCM::ConstitutiveModelInterface<Residual, Traits>(cmiPL, dl));
 
-  //----------------------------------------------------------------------------
   // SurfaceVectorResidual evaluator
   Teuchos::ParameterList svrPL;
   svrPL.set<double>("thickness", thickness);
@@ -1518,7 +1465,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   }
   std::cout << std::endl;
 
-  //----------------------------------------------------------------------------
   // perturbing the current coordinates
   double eps = 0.01;
 
@@ -1575,7 +1521,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   // Pull the forces
   fieldManager.getFieldData<Residual>(forceField);
 
-  //----------------------------------------------------------------------------
   // Record the expected current basis vectors
   std::vector<Tensor<ScalarT>> expectedg(numQPts);
   expectedg[0] = Tensor<ScalarT>(0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -1589,7 +1534,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
               <=,
               tolerance);
 
-  //----------------------------------------------------------------------------
   // Record the expected ref dual basis vectors
   std::vector<Tensor<ScalarT>> expectedDG(numQPts);
   expectedDG[0] = Tensor<ScalarT>(0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -1603,7 +1547,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
               <=,
               tolerance);
 
-  //----------------------------------------------------------------------------
   // Record the expected reference Normal
   std::vector<Vector<ScalarT>> expectedN(numQPts);
   expectedN[0] = Vector<ScalarT>(0.0, 1.0, 0.0);
@@ -1615,7 +1558,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
         TEST_COMPARE(
             fabs(refNormalField(cell, pt, i) - expectedN[0](i)), <=, tolerance);
 
-  //----------------------------------------------------------------------------
   // Record the expected reference area
   std::vector<ScalarT> expectedA(numQPts);
   expectedA[0] = 0.25;
@@ -1625,7 +1567,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
     for (size_type pt = 0; pt < numQPts; ++pt)
       TEST_COMPARE(fabs(refAreaField(cell, pt) - expectedA[0]), <=, tolerance);
 
-  //----------------------------------------------------------------------------
   // Record the expected deformation gradient
   std::vector<Tensor<ScalarT>> expectedF(numQPts);
   expectedF[0] = Tensor<ScalarT>(1.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0);
@@ -1639,7 +1580,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
               <=,
               tolerance);
 
-  //----------------------------------------------------------------------------
   // Record the expected stress
   std::vector<Tensor<ScalarT>> expectedStress(numQPts);
   expectedStress[0] =
@@ -1654,7 +1594,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
               <=,
               tolerance);
 
-  //----------------------------------------------------------------------------
   // Record the expected nodal forces, which will be used to check the
   // computed force
   std::vector<Vector<ScalarT>> expectedForce(numNodes);

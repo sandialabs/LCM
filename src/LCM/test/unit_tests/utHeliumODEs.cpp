@@ -57,7 +57,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   const RCP<Albany::Layouts> dl           = rcp(new Albany::Layouts(
       workset_size, num_vertices, num_nodes, num_pts, num_dims));
 
-  //--------------------------------------------------------------------------
   // total concentration
   ArrayRCP<ScalarT> total_concentration(1);
   total_concentration[0] = 5.6e-4;
@@ -69,7 +68,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   RCP<LCM::SetField<Residual, Traits>> setFieldTotalConcentration =
       rcp(new LCM::SetField<Residual, Traits>(tcPL));
 
-  //--------------------------------------------------------------------------
   // delta time
   ArrayRCP<ScalarT> delta_time(1);
   delta_time[0] = 0.001;
@@ -82,7 +80,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   RCP<LCM::SetField<Residual, Traits>> setFieldDeltaTime =
       rcp(new LCM::SetField<Residual, Traits>(dtPL));
 
-  //--------------------------------------------------------------------------
   // diffusion coeffecient
   ArrayRCP<ScalarT> diff_coeff(1);
   diff_coeff[0] = 1.0;
@@ -94,7 +91,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   RCP<LCM::SetField<Residual, Traits>> setFieldDiffCoeff =
       rcp(new LCM::SetField<Residual, Traits>(dcPL));
 
-  //--------------------------------------------------------------------------
   // helium ODEs evaluator
   Teuchos::ParameterList hoPL;
   hoPL.set<std::string>("Total Concentration Name", "Total Concentration");
@@ -124,7 +120,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   RCP<LCM::HeliumODEs<Residual, Traits>> HeODEs =
       rcp(new LCM::HeliumODEs<Residual, Traits>(hoPL, dl));
 
-  //--------------------------------------------------------------------------
   // Instantiate a field manager.
   PHX::FieldManager<Traits> field_manager;
 
@@ -150,7 +145,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
        it++)
     field_manager.requireField<Residual>(**it);
 
-  //--------------------------------------------------------------------------
   // Instantiate a state manager
   Albany::StateManager stateMgr;
 
@@ -209,7 +203,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   field_manager.registerEvaluator<Residual>(ev);
   state_field_manager.registerEvaluator<Residual>(ev);
 
-  //--------------------------------------------------------------------------
   // Call postRegistrationSetup on the evaluators
   PHAL::Setup setupData;
   field_manager.postRegistrationSetup(setupData);
@@ -232,11 +225,9 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   field_manager.writeGraphvizFile<Residual>("FM", true, true);
   state_field_manager.writeGraphvizFile<Residual>("SFM", true, true);
 
-  //---------------------------------------------------------------------------
   // grab the output file name
   std::string output_file = "output.exo";
 
-  //---------------------------------------------------------------------------
   // Create discretization, as required by the StateManager
   Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList =
       Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
@@ -273,30 +264,25 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discretization);
   stk_disc.updateMesh();
 
-  //---------------------------------------------------------------------------
   // Associate the discretization with the StateManager
   stateMgr.setupStateArrays(discretization);
 
-  //--------------------------------------------------------------------------
   // Create a workset
   PHAL::Workset workset;
   workset.numCells = workset_size;
   workset.stateArrayPtr =
       &stateMgr.getStateArray(Albany::StateManager::ELEM, 0);
 
-  //--------------------------------------------------------------------------
   // loop over time and call evaluators
   double end_time = 100.0;
   for (double time(0.0); time < end_time; time += delta_time[0]) {
     total_concentration[0] = 0.005;
 
-    //--------------------------------------------------------------------------
     // Call the evaluators, evaluateFields() computes things
     field_manager.preEvaluate<Residual>(workset);
     field_manager.evaluateFields<Residual>(workset);
     field_manager.postEvaluate<Residual>(workset);
 
-    //--------------------------------------------------------------------------
     // Call the evaluators, evaluateFields() computes things
     state_field_manager.preEvaluate<Residual>(workset);
     state_field_manager.evaluateFields<Residual>(workset);
@@ -308,7 +294,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
     discretization->writeSolution(*solution_vector, time);
   }
 
-  //--------------------------------------------------------------------------
   // Pull the He concentration
   PHX::MDField<ScalarT, Cell, QuadPoint> he_conc(
       "He Concentration", dl->qp_scalar);
@@ -320,7 +305,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
     for (size_type pt = 0; pt < num_pts; ++pt)
       TEST_COMPARE(fabs(he_conc(cell, pt) - expected_conc), <=, tolerance);
 
-  //--------------------------------------------------------------------------
   // Pull the total bubble density
   PHX::MDField<ScalarT, Cell, QuadPoint> tot_bub_density(
       "Total Bubble Density", dl->qp_scalar);
@@ -333,7 +317,6 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
       TEST_COMPARE(
           fabs(tot_bub_density(cell, pt) - expected_density), <=, tolerance);
 
-  //--------------------------------------------------------------------------
   // Pull the bubble volume fraction
   PHX::MDField<ScalarT, Cell, QuadPoint> bub_vol_frac(
       "Bubble Volume Fraction", dl->qp_scalar);

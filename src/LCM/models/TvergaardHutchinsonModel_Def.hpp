@@ -8,12 +8,10 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 // See Klein, Theoretical and Applied Fracture Mechanics (2001)
 // for details regarding implementation
 // NOTE: beta_0, beta_1 and beta_2 are parameters that enable one to favor
 // tension or shear. The default tensor should be identity.
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
     Teuchos::ParameterList*              p,
@@ -87,7 +85,6 @@ TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Shear Jump", false));
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 TvergaardHutchinsonModel<EvalT, Traits>::computeState(
@@ -213,5 +210,4 @@ TvergaardHutchinsonModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

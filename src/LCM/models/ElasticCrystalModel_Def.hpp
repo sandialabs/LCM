@@ -13,7 +13,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ElasticCrystalModel<EvalT, Traits>::ElasticCrystalModel(
     Teuchos::ParameterList*              p,
@@ -163,7 +162,6 @@ ElasticCrystalModel<EvalT, Traits>::ElasticCrystalModel(
       p->get<bool>("Output Cauchy Stress", false));
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ElasticCrystalModel<EvalT, Traits>::computeState(
@@ -295,6 +293,5 @@ ElasticCrystalModel<EvalT, Traits>::computeState(
     }  // end pt
   }    // end cell
 }
-//----------------------------------------------------------------------------
 
 }  // namespace LCM

@@ -13,7 +13,6 @@ typedef stk::mesh::EntityRank         EntityRank;
 typedef stk::mesh::RelationIdentifier EdgeId;
 typedef stk::mesh::EntityKey          EntityKey;
 
-//----------------------------------------------------------------------------
 CopyRemesh::CopyRemesh(
     Teuchos::RCP<Teuchos::ParameterList> const& params,
     Teuchos::RCP<ParamLib> const&               param_lib,
@@ -37,7 +36,6 @@ CopyRemesh::CopyRemesh(
   base_exo_filename_ = stk_mesh_struct_->exoOutFile;
 }
 
-//----------------------------------------------------------------------------
 bool
 CopyRemesh::queryAdaptationCriteria(int iter)
 {
@@ -60,7 +58,6 @@ CopyRemesh::queryAdaptationCriteria(int iter)
   return false;
 }
 
-//----------------------------------------------------------------------------
 bool
 CopyRemesh::adaptMesh()
 {
@@ -95,7 +92,6 @@ CopyRemesh::adaptMesh()
   return true;
 }
 
-//----------------------------------------------------------------------------
 Teuchos::RCP<Teuchos::ParameterList const>
 CopyRemesh::getValidAdapterParameters() const
 {
@@ -115,6 +111,5 @@ CopyRemesh::getValidAdapterParameters() const
 
   return validPL;
 }
-//----------------------------------------------------------------------------
 
 }  // namespace AAdapt

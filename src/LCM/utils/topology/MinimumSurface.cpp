@@ -695,7 +695,6 @@ Topology::shortestpathOnBoundaryFaces(
   return ShortestPathOutput;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns the shortest path between three input nodes
 std::vector<std::vector<int>>
 Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
@@ -896,7 +895,6 @@ Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
   return ShortestPathOutput;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns the directions of all the edges of the input mesh
 std::vector<std::vector<int>>
 Topology::edgesDirections()
@@ -935,7 +933,6 @@ Topology::edgesDirections()
   return edgesDirec;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns the directions of all the boundary edges of the input mesh
 std::vector<std::vector<int>>
 Topology::edgesDirectionsOuterSurface()
@@ -1004,7 +1001,6 @@ Topology::edgesDirectionsOuterSurface()
   return edgesDirec;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns the directions of all of the faces of the input mesh
 std::vector<std::vector<int>>
 Topology::facesDirections()
@@ -1046,7 +1042,6 @@ Topology::facesDirections()
   return facesDirec;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns a vector with the areas of each of the faces of the input mesh
 std::vector<double>
 Topology::facesAreas()
@@ -1092,7 +1087,6 @@ Topology::facesAreas()
   return facesAreas;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns the boundary operator of the input mesh.
 //        matrix that has nonzeros only
 std::vector<std::vector<int>>
@@ -1365,7 +1359,6 @@ Topology::minimumSurfaceFaces(std::vector<int> VectorFromLPSolver)
   return MinSurfaceEntities;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns the number of times an entity is repeated in a vector
 int
 Topology::numberOfRepetitions(
@@ -1382,7 +1375,6 @@ Topology::numberOfRepetitions(
   return count;
 }
 
-//----------------------------------------------------------------------------
 // \brief Returns the coordinates of an input node.
 //        The input is the identifier of a node
 std::vector<double>

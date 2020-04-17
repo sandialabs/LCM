@@ -15,7 +15,6 @@ Sqr(ScalarT const& num)
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename Traits>
 IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::IsoMeshSizeField(
     Teuchos::ParameterList const&        p,
@@ -59,7 +58,6 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::IsoMeshSizeField(
   numNodes = dims2[1];
 }
 
-//----------------------------------------------------------------------------
 template <typename Traits>
 void
 IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
@@ -86,7 +84,6 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
       grad_at_cub_points, refPoints, Intrepid2::OPERATOR_GRAD);
 }
 
-//----------------------------------------------------------------------------
 template <typename Traits>
 void
 IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
@@ -140,9 +137,7 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     }
   }
 }
-//----------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
 template <typename Traits>
 AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::AnisoMeshSizeField(
     Teuchos::ParameterList const&        p,
@@ -186,7 +181,6 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::AnisoMeshSizeField(
   numNodes = dims2[1];
 }
 
-//----------------------------------------------------------------------------
 template <typename Traits>
 void
 AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
@@ -211,7 +205,6 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
       grad_at_cub_points, refPoints, Intrepid2::OPERATOR_GRAD);
 }
 
-//----------------------------------------------------------------------------
 template <typename Traits>
 void
 AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
@@ -261,5 +254,4 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
       "NOTE: Please remember that the Anisotropic size field is defined as a "
       "vector in xi, etc, zeta space not x, y, z!!!");
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

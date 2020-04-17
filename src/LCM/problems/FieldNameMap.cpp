@@ -8,7 +8,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 FieldNameMap::FieldNameMap(bool surface_flag)
 {
   Teuchos::RCP<std::map<std::string, std::string>> name_map =
@@ -139,6 +138,5 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   field_name_map_ = name_map;
 }
 
-//----------------------------------------------------------------------------
 FieldNameMap::~FieldNameMap() {}
 }  // namespace LCM

@@ -7,7 +7,6 @@
 
 namespace LCM {
 
-//-----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 AAAModel<EvalT, Traits>::AAAModel(
     Teuchos::ParameterList*              p,
@@ -35,7 +34,6 @@ AAAModel<EvalT, Traits>::AAAModel(
   this->state_var_output_flags_.push_back(true);
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 AAAModel<EvalT, Traits>::computeState(
@@ -79,5 +77,4 @@ AAAModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

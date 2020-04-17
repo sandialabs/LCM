@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ElasticDamageModel<EvalT, Traits>::ElasticDamageModel(
     Teuchos::ParameterList*              p,
@@ -65,7 +64,6 @@ ElasticDamageModel<EvalT, Traits>::ElasticDamageModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ElasticDamageModel<EvalT, Traits>::computeState(
@@ -173,5 +171,4 @@ ElasticDamageModel<EvalT, Traits>::computeState(
     }  // pt
   }    // cell
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

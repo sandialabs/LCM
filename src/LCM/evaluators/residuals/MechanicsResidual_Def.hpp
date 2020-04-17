@@ -16,7 +16,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 MechanicsResidual<EvalT, Traits>::MechanicsResidual(
     Teuchos::ParameterList&              p,
@@ -72,7 +71,6 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(
   if (def_grad_rc_.init(p, "F")) this->addDependentField(def_grad_rc_());
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 MechanicsResidual<EvalT, Traits>::postRegistrationSetup(

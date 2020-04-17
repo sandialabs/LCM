@@ -11,7 +11,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 Porosity<EvalT, Traits>::Porosity(
     Teuchos::ParameterList&              p,
@@ -118,7 +117,6 @@ Porosity<EvalT, Traits>::Porosity(
   this->setName("Porosity" + PHX::print<EvalT>());
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 Porosity<EvalT, Traits>::postRegistrationSetup(
@@ -137,7 +135,6 @@ Porosity<EvalT, Traits>::postRegistrationSetup(
   if (isCompressibleFluidPhase) this->utils.setFieldData(porePressure, fm);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
@@ -245,7 +242,6 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   }
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename Porosity<EvalT, Traits>::ScalarT&
 Porosity<EvalT, Traits>::getValue(std::string const& n)
@@ -263,5 +259,4 @@ Porosity<EvalT, Traits>::getValue(std::string const& n)
   return constant_value;
 }
 
-//----------------------------------------------------------------------------
 }  // namespace LCM

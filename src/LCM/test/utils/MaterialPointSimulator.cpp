@@ -141,7 +141,6 @@ main(int ac, char* av[])
   Teuchos::RCP<std::map<std::string, std::string>> fnm =
       field_name_map.getMap();
 
-  //---------------------------------------------------------------------------
   // Deformation gradient
   // initially set the deformation gradient to the identity
 
@@ -166,7 +165,6 @@ main(int ac, char* av[])
   auto setFieldDefGrad =
       Teuchos::rcp(new LCM::SetField<Residual, Traits>(setDefGradP));
 
-  //---------------------------------------------------------------------------
   // Det(deformation gradient)
   Teuchos::ArrayRCP<ScalarT> detdefgrad(workset_size * num_pts);
   for (int i = 0; i < workset_size * num_pts; ++i) detdefgrad[i] = 1.0;
@@ -180,7 +178,6 @@ main(int ac, char* av[])
   auto setFieldDetDefGrad =
       Teuchos::rcp(new LCM::SetField<Residual, Traits>(setDetDefGradP));
 
-  //---------------------------------------------------------------------------
   // Small strain tensor
   // initially set the strain tensor to zeros
 
@@ -201,7 +198,6 @@ main(int ac, char* av[])
   setStrainP.set<Teuchos::ArrayRCP<ScalarT>>("Field Values", strain);
   auto setFieldStrain =
       Teuchos::rcp(new LCM::SetField<Residual, Traits>(setStrainP));
-  //---------------------------------------------------------------------------
   // Instantiate a field manager
   PHX::FieldManager<Traits> fieldManager;
 
@@ -242,7 +238,6 @@ main(int ac, char* av[])
   // determine if temperature is being used
   bool have_temperature = mpsParams.get<bool>("Use Temperature", false);
   std::cout << "have_temp: " << have_temperature << std::endl;
-  //---------------------------------------------------------------------------
   // Temperature (optional)
   if (have_temperature) {
     Teuchos::ArrayRCP<ScalarT> temperature(workset_size);
@@ -261,7 +256,6 @@ main(int ac, char* av[])
     stateFieldManager.registerEvaluator<Residual>(setFieldTemperature);
   }
 
-  //---------------------------------------------------------------------------
   // Time step
   Teuchos::ArrayRCP<ScalarT> delta_time(1);
   delta_time[0] = step_size;
@@ -281,7 +275,6 @@ main(int ac, char* av[])
 
   std::cout << "Check stability = " << check_stability << std::endl;
 
-  //---------------------------------------------------------------------------
   // std::cout << "// Constitutive Model Parameters"
   //<< std::endl;
   Teuchos::ParameterList cmpPL;
@@ -297,7 +290,6 @@ main(int ac, char* av[])
   fieldManager.registerEvaluator<Residual>(CMP);
   stateFieldManager.registerEvaluator<Residual>(CMP);
 
-  //---------------------------------------------------------------------------
   // std::cout << "// Constitutive Model Interface Evaluator"
   // << std::endl;
   Teuchos::ParameterList cmiPL;
@@ -338,7 +330,6 @@ main(int ac, char* av[])
     stateFieldManager.registerEvaluator<Residual>(ev);
   }
 
-  //---------------------------------------------------------------------------
   if (check_stability) {
     std::string parametrization_type =
         mpsParams.get<std::string>("Parametrization Type", "Spherical");
@@ -405,7 +396,6 @@ main(int ac, char* av[])
     stateFieldManager.registerEvaluator<Residual>(ev);
   }
 
-  //---------------------------------------------------------------------------
   // std::cout << "// register deformation gradient"
   // << std::endl;
   p = stateMgr.registerStateVariable(
@@ -420,7 +410,6 @@ main(int ac, char* av[])
   ev = Teuchos::rcp(new PHAL::SaveStateField<Residual, Traits>(*p));
   fieldManager.registerEvaluator<Residual>(ev);
   stateFieldManager.registerEvaluator<Residual>(ev);
-  //---------------------------------------------------------------------------
   // std::cout << "// register small strain tensor"
   // << std::endl;
   p = stateMgr.registerStateVariable(
@@ -435,7 +424,6 @@ main(int ac, char* av[])
   ev = Teuchos::rcp(new PHAL::SaveStateField<Residual, Traits>(*p));
   fieldManager.registerEvaluator<Residual>(ev);
   stateFieldManager.registerEvaluator<Residual>(ev);
-  //---------------------------------------------------------------------------
   PHAL::Setup setupData;
   // std::cout << "Calling postRegistrationSetup" << std::endl;
   fieldManager.postRegistrationSetup(setupData);
@@ -460,12 +448,10 @@ main(int ac, char* av[])
   fieldManager.writeGraphvizFile<Residual>("FM", true, true);
   stateFieldManager.writeGraphvizFile<Residual>("SFM", true, true);
 
-  //---------------------------------------------------------------------------
   // grab the output file name
   std::string output_file =
       mpsParams.get<std::string>("Output File Name", "output.exo");
 
-  //---------------------------------------------------------------------------
   // Create discretization, as required by the StateManager
   Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList =
       Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
@@ -505,11 +491,9 @@ main(int ac, char* av[])
   auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discretization);
   stk_disc.updateMesh();
 
-  //---------------------------------------------------------------------------
   // Associate the discretization with the StateManager
   stateMgr.setupStateArrays(discretization);
 
-  //---------------------------------------------------------------------------
   // Create a workset
   PHAL::Workset workset;
   workset.numCells = workset_size;

@@ -8,7 +8,6 @@
 
 namespace AAdapt {
 
-//----------------------------------------------------------------------------
 AbstractAdapter::AbstractAdapter(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
     const Teuchos::RCP<ParamLib>&               param_lib,
@@ -23,7 +22,6 @@ AbstractAdapter::AbstractAdapter(
   // Nothing to do here
 }
 
-//----------------------------------------------------------------------------
 Teuchos::RCP<Teuchos::ParameterList>
 AbstractAdapter::getGenericAdapterParams(std::string listname) const
 {
@@ -34,6 +32,5 @@ AbstractAdapter::getGenericAdapterParams(std::string listname) const
 
   return valid_pl;
 }
-//----------------------------------------------------------------------------
 
 }  // namespace AAdapt

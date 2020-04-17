@@ -12,7 +12,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 BifurcationCheck<EvalT, Traits>::BifurcationCheck(
     Teuchos::ParameterList const&        p,
@@ -41,7 +40,6 @@ BifurcationCheck<EvalT, Traits>::BifurcationCheck(
   this->setName("BifurcationCheck" + PHX::print<EvalT>());
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 BifurcationCheck<EvalT, Traits>::postRegistrationSetup(
@@ -54,7 +52,6 @@ BifurcationCheck<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(min_detA_, fm);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 BifurcationCheck<EvalT, Traits>::evaluateFields(
@@ -168,7 +165,6 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(
   }
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
 BifurcationCheck<EvalT, Traits>::spherical_sweep(
@@ -243,7 +239,6 @@ BifurcationCheck<EvalT, Traits>::spherical_sweep(
   return min_detA;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
 BifurcationCheck<EvalT, Traits>::stereographic_sweep(
@@ -320,7 +315,6 @@ BifurcationCheck<EvalT, Traits>::stereographic_sweep(
   return min_detA;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
 BifurcationCheck<EvalT, Traits>::projective_sweep(
@@ -401,7 +395,6 @@ BifurcationCheck<EvalT, Traits>::projective_sweep(
 
   return min_detA;
 }
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
 BifurcationCheck<EvalT, Traits>::tangent_sweep(
@@ -475,7 +468,6 @@ BifurcationCheck<EvalT, Traits>::tangent_sweep(
 
   return min_detA;
 }
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
 BifurcationCheck<EvalT, Traits>::cartesian_sweep(
@@ -619,7 +611,6 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
   return min_detA;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 BifurcationCheck<EvalT, Traits>::spherical_newton_raphson(
@@ -724,7 +715,6 @@ BifurcationCheck<EvalT, Traits>::spherical_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 BifurcationCheck<EvalT, Traits>::stereographic_newton_raphson(
@@ -829,7 +819,6 @@ BifurcationCheck<EvalT, Traits>::stereographic_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
@@ -946,7 +935,6 @@ BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 BifurcationCheck<EvalT, Traits>::tangent_newton_raphson(
@@ -1051,7 +1039,6 @@ BifurcationCheck<EvalT, Traits>::tangent_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 BifurcationCheck<EvalT, Traits>::cartesian_newton_raphson(
@@ -1165,7 +1152,6 @@ BifurcationCheck<EvalT, Traits>::cartesian_newton_raphson(
 
 }  // Function end
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
 BifurcationCheck<EvalT, Traits>::stereographic_pso(
@@ -1283,7 +1269,6 @@ BifurcationCheck<EvalT, Traits>::stereographic_pso(
   return detA_gbest;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 BifurcationCheck<EvalT, Traits>::spherical_get_normal(
@@ -1297,7 +1282,6 @@ BifurcationCheck<EvalT, Traits>::spherical_get_normal(
   return normal;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 BifurcationCheck<EvalT, Traits>::stereographic_get_normal(
@@ -1312,7 +1296,6 @@ BifurcationCheck<EvalT, Traits>::stereographic_get_normal(
   return normal;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 BifurcationCheck<EvalT, Traits>::projective_get_normal(
@@ -1340,7 +1323,6 @@ BifurcationCheck<EvalT, Traits>::projective_get_normal(
   return normal;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 BifurcationCheck<EvalT, Traits>::tangent_get_normal(
@@ -1364,7 +1346,6 @@ BifurcationCheck<EvalT, Traits>::tangent_get_normal(
   return normal;
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 BifurcationCheck<EvalT, Traits>::cartesian_get_normal1(

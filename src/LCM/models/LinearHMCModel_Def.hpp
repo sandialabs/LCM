@@ -10,7 +10,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 LinearHMCModel<EvalT, Traits>::LinearHMCModel(
     Teuchos::ParameterList*              p,
@@ -75,7 +74,6 @@ LinearHMCModel<EvalT, Traits>::LinearHMCModel(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(true);
 }
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 LinearHMCModel<EvalT, Traits>::computeState(
@@ -240,5 +238,4 @@ LinearHMCModel<EvalT, Traits>::computeState(
       break;
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(
     Teuchos::ParameterList*              p,
@@ -47,7 +46,6 @@ NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Cauchy Stress", false));
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 NewtonianFluidModel<EvalT, Traits>::computeState(
@@ -120,5 +118,4 @@ NewtonianFluidModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

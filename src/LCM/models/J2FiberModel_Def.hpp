@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 J2FiberModel<EvalT, Traits>::J2FiberModel(
     Teuchos::ParameterList*              p,
@@ -149,7 +148,6 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 J2FiberModel<EvalT, Traits>::computeState(
@@ -424,5 +422,4 @@ J2FiberModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

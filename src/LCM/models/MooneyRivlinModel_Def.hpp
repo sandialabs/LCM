@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 MooneyRivlinModel<EvalT, Traits>::MooneyRivlinModel(
     Teuchos::ParameterList*              p,
@@ -36,7 +35,6 @@ MooneyRivlinModel<EvalT, Traits>::MooneyRivlinModel(
   this->state_var_old_state_flags_.push_back(false);
   this->state_var_output_flags_.push_back(true);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 MooneyRivlinModel<EvalT, Traits>::computeState(
@@ -71,5 +69,4 @@ MooneyRivlinModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

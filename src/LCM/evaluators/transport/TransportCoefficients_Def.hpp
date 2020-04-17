@@ -11,7 +11,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 TransportCoefficients<EvalT, Traits>::TransportCoefficients(
     Teuchos::ParameterList&              p,
@@ -99,7 +98,6 @@ TransportCoefficients<EvalT, Traits>::TransportCoefficients(
   num_dims_   = dims[2];
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 TransportCoefficients<EvalT, Traits>::postRegistrationSetup(
@@ -122,7 +120,6 @@ TransportCoefficients<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(convection_coefficient_, fm);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 TransportCoefficients<EvalT, Traits>::evaluateFields(
@@ -289,5 +286,4 @@ TransportCoefficients<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

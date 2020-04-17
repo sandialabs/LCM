@@ -15,7 +15,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 NeohookeanKernel<EvalT, Traits>::NeohookeanKernel(
     ConstitutiveModel<EvalT, Traits>&    model,

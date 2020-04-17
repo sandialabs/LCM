@@ -113,7 +113,6 @@ get_size<stk::mesh::Cartesian>(stk::mesh::Bucket const& b)
   return b.mesh().mesh_meta_data().spatial_dimension();
 }
 
-//----------------------------------------------------------------------
 /** \brief  \ref stk::mesh::Field "Field" data \ref shards::Array "Array"
  *          for a given array field and bucket
  */

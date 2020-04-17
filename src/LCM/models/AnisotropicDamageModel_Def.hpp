@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
     Teuchos::ParameterList*              p,
@@ -127,7 +126,6 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
 }
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 AnisotropicDamageModel<EvalT, Traits>::computeState(
@@ -444,5 +442,4 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
     }  // pt
   }    // cell
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

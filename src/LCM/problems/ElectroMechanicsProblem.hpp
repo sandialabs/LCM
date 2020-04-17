@@ -16,7 +16,6 @@
 
 namespace Albany {
 
-//------------------------------------------------------------------------------
 ///
 /// \brief Definition for the Mechanics Problem
 ///
@@ -93,7 +92,6 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
       Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> old_state,
       Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> new_state) const;
 
-  //----------------------------------------------------------------------------
  private:
   ///
   /// Private to prohibit copying
@@ -106,7 +104,6 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
   ElectroMechanicsProblem&
   operator=(const ElectroMechanicsProblem&);
 
-  //----------------------------------------------------------------------------
  public:
   ///
   /// Main problem setup routine.
@@ -134,7 +131,6 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
   constructNeumannEvaluators(
       const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
 
-  //----------------------------------------------------------------------------
  protected:
   ///
   /// num of dimensions
@@ -191,7 +187,6 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
       std::string                            eb_name,
       int                                    numDim);
 };
-//------------------------------------------------------------------------------
 }  // namespace Albany
 
 #include "Albany_EvaluatorUtils.hpp"
@@ -213,7 +208,6 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
 #include "FirstPK.hpp"
 #include "Kinematics.hpp"
 
-//------------------------------------------------------------------------------
 template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>
 Albany::ElectroMechanicsProblem::constructEvaluators(

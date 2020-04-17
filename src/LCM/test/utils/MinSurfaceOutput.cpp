@@ -52,7 +52,6 @@ main(int ac, char* av[])
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
   LCM::Topology             topology(input_file, output_file);
 
-  //------------------------------------------------------------------------------------------------------------------------------------
   // Obtain the results from the solver
   // BASED ON THE OUTPUT USING CLP LINEAR SOLVER (./clp mps_file -dualsimplex
   // -solu outputFileName)

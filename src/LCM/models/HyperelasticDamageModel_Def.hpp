@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 HyperelasticDamageModel<EvalT, Traits>::HyperelasticDamageModel(
     Teuchos::ParameterList*              p,
@@ -54,7 +53,6 @@ HyperelasticDamageModel<EvalT, Traits>::HyperelasticDamageModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 HyperelasticDamageModel<EvalT, Traits>::computeState(
@@ -152,5 +150,4 @@ HyperelasticDamageModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

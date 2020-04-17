@@ -318,7 +318,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Mortar_Integrate()
  *----------------------------------------------------------------------*/
 bool MoertelT::Manager::Mortar_Integrate_2D()
 {
-  //-------------------------------------------------------------------
   // check for problem dimension
   if (Dimension() != MoertelT::Manager::manager_2D)
   {
@@ -328,13 +327,11 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
     return false;
   }
 
-  //-------------------------------------------------------------------
   // check whether we have interfaces
   int ninter = Ninterfaces();
   if (!ninter)
     return true;
 
-  //-------------------------------------------------------------------
   // check whether we have an input map
   if (problemmap_==Teuchos::null)
   {
@@ -344,7 +341,6 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
     return false;
   }
   
-  //-------------------------------------------------------------------
   // check whether we have a mortar side chosen on each interface or 
   // whether we have to chose it here
   {
@@ -363,7 +359,6 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
       ChooseMortarSide();
   }  
 
-  //-------------------------------------------------------------------
   // check whether functions have been set on interfaces
   // if not, check for functions flag and set them
   {
@@ -385,7 +380,6 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
     }
   } 
   
-  //-------------------------------------------------------------------
   // build projections for all interfaces
   {
 	std::map<int,Teuchos::RCP<MoertelT::Interface> >::iterator curr;
@@ -402,7 +396,6 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
     }
   }  
 
-  //-------------------------------------------------------------------
   // this is probably the place to put detection of end segments
   // for each end segment, the order of the lagrange multiplier shape
   // function will be reduced by one
@@ -423,7 +416,6 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
   }
 #endif
 
-  //-------------------------------------------------------------------
   // choose dofs for lagrange multipliers and set them to slave nodes
   // build the rowmap for the coupling matrices M and D
   {
@@ -437,7 +429,6 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
     }
   }
     
-  //-------------------------------------------------------------------
   // build the map for the saddle point problem
   {
     bool ok = BuildSaddleMap();
@@ -451,12 +442,10 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
   }
 
 
-  //-------------------------------------------------------------------
   // build the Tpetra_CrsMatrix D and M
   D_ = rcp(new Tpetra_CrsMatrix(saddlemap_,5));
   M_ = rcp(new Tpetra_CrsMatrix(saddlemap_,40));
 
-  //-------------------------------------------------------------------
   // integrate all interfaces
   {
 	std::map<int,Teuchos::RCP<MoertelT::Interface> >::iterator curr;
@@ -473,14 +462,12 @@ bool MoertelT::Manager::Mortar_Integrate_2D()
     }
   }
   
-  //-------------------------------------------------------------------
   // call FillComplete() on M_ and D_ 
   D_->fillComplete(saddlemap_, saddlemap_);
 //  D_->OptimizeStorage();
   M_->fillComplete(saddlemap_, saddlemap_);
 //  M_->OptimizeStorage();
   
-  //-------------------------------------------------------------------
   // print this
   if (OutLevel()>9)
     std::cout << *this;
@@ -497,12 +484,10 @@ template <class ST, class LO, class GO, class N>
 bool
 MoertelT::ManagerT<2, ST, LO, GO, N>::Build_MD()
 {
-  //-------------------------------------------------------------------
   // build the Tpetra_CrsMatrix D and M
   D_ = Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(saddlemap_, 5));
   M_ = Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(saddlemap_, 40));
 
-  //-------------------------------------------------------------------
   // now that we have all maps and dofs we can assemble from the nodes
   {
     typename std::map<
@@ -522,7 +507,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Build_MD()
     }
   }
 
-  //-------------------------------------------------------------------
   // call FillComplete() on M_ and D_
   D_->fillComplete(saddlemap_, saddlemap_);
   D_ = MoertelT::StripZeros(*D_, 1.e-9);
@@ -530,7 +514,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Build_MD()
   M_->fillComplete(saddlemap_, saddlemap_);
   //  M_->OptimizeStorage();
 
-  //-------------------------------------------------------------------
   // print this
   if (OutLevel() > 9) std::cout << *this;
 
@@ -545,12 +528,10 @@ template <class ST, class LO, class GO, class N>
 bool
 MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
 {
-  //-------------------------------------------------------------------
   // check whether we have interfaces
   int ninter = Ninterfaces();
   if (!ninter) return true;
 
-  //-------------------------------------------------------------------
   // check whether we have an input map
   if (problemmap_ == Teuchos::null) {
     std::cout
@@ -560,7 +541,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
     return false;
   }
 
-  //-------------------------------------------------------------------
   // check whether we have a mortar side chosen on each interface or
   // whether we have to chose it here
   {
@@ -580,7 +560,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
       ChooseMortarSide();
   }
 
-  //-------------------------------------------------------------------
   // check whether functions have been set on interfaces
   // if not, check for functions flag and set them
   {
@@ -603,7 +582,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // build normals for all interfaces
   {
     typename std::map<
@@ -623,7 +601,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // prepare the boundary modification for 2D interfaces
   // Nodes on the edge of an interface will not carry LMs so they
   // do not conflict with other interfaces
@@ -647,7 +624,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // integrate all interfaces
   // NOTE: 2D and 3D integration differ:
   // the 3D integration works without choosing Lagrange multipliers
@@ -672,7 +648,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // choose dofs for lagrange multipliers and set them to slave nodes
   // build the rowmap for the coupling matrices M and D
   {
@@ -686,7 +661,6 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // build the map for the saddle point problem
   {
     bool ok = BuildSaddleMap();
@@ -710,12 +684,10 @@ template <class ST, class LO, class GO, class N>
 bool
 MoertelT::ManagerT<3, ST, LO, GO, N>::Build_MD()
 {
-  //-------------------------------------------------------------------
   // build the Tpetra_CrsMatrix D and M
   D_ = Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(saddlemap_, 50));
   M_ = Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(saddlemap_, 100));
 
-  //-------------------------------------------------------------------
   // now that we have all maps and dofs we can assemble from the nodes
   {
     typename std::map<
@@ -735,7 +707,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Build_MD()
     }
   }
 
-  //-------------------------------------------------------------------
   // call FillComplete() on M_ and D_
   D_->fillComplete(saddlemap_, saddlemap_);
   // GAH - found by kimliegeois
@@ -746,7 +717,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Build_MD()
   M_->fillComplete(saddlemap_, saddlemap_);
   //  M_->OptimizeStorage();
 
-  //-------------------------------------------------------------------
   // print this
   if (OutLevel() > 9) std::cout << *this;
 
@@ -761,12 +731,10 @@ template <class ST, class LO, class GO, class N>
 bool
 MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
 {
-  //-------------------------------------------------------------------
   // check whether we have interfaces
   int ninter = Ninterfaces();
   if (!ninter) return true;
 
-  //-------------------------------------------------------------------
   // check whether we have an input map
   if (problemmap_ == Teuchos::null) {
     std::cout
@@ -776,7 +744,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
     return false;
   }
 
-  //-------------------------------------------------------------------
   // check whether we have a mortar side chosen on each interface or
   // whether we have to chose it here
   {
@@ -796,7 +763,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
       ChooseMortarSide();
   }
 
-  //-------------------------------------------------------------------
   // check whether functions have been set on interfaces
   // if not, check for functions flags and set functions from them
   {
@@ -819,7 +785,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // build normals for all interfaces
   {
     typename std::map<
@@ -839,7 +804,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // prepare the boundary modification for 3D interfaces
   // Nodes on the edge of an interface will not carry LMs so they
   // do not conflict with other interfaces
@@ -863,7 +827,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // integrate all interfaces
   {
     typename std::map<
@@ -884,7 +847,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // choose dofs for lagrange multipliers and set them to slave nodes
   // build the rowmap for the coupling matrices M and D
   {
@@ -898,7 +860,6 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
     }
   }
 
-  //-------------------------------------------------------------------
   // build the map for the saddle point problem
   {
     bool ok = BuildSaddleMap();
@@ -921,7 +882,6 @@ MOERTEL_TEMPLATE_STATEMENT
 bool MoertelT::MOERTEL_TEMPLATE_CLASS(
     ManagerT)::AssembleInterfacesIntoResidual()
 {
-  //-------------------------------------------------------------------
   // now that we have all maps and dofs we can assemble from the nodes
   {
     typename std::map<

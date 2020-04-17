@@ -13,7 +13,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 DruckerPragerModel<EvalT, Traits>::DruckerPragerModel(
     Teuchos::ParameterList*              p,
@@ -79,7 +78,6 @@ DruckerPragerModel<EvalT, Traits>::DruckerPragerModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
 }
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 DruckerPragerModel<EvalT, Traits>::computeState(
@@ -257,7 +255,6 @@ DruckerPragerModel<EvalT, Traits>::computeState(
     }  // end loop over pt
   }    //  end loop over cell
 }
-//----------------------------------------------------------------------------
 // all local functions for compute state
 template <typename EvalT, typename Traits>
 void
@@ -314,5 +311,4 @@ DruckerPragerModel<EvalT, Traits>::ResidualJacobian(
     for (int j = 0; j < 4; j++) dRdX[i + 4 * j] = Rfad[i].dx(j);
 
 }  // end of ResidualJacobian
-//------------------------------------------------------------------------------
 }  // namespace LCM

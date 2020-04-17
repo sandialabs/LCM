@@ -9,7 +9,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 CapExplicitModel<EvalT, Traits>::CapExplicitModel(
     Teuchos::ParameterList*              p,
@@ -137,7 +136,6 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
   dJ3dsigma     = minitensor::Tensor<ScalarT>(num_dims_);
   eps_dev       = minitensor::Tensor<ScalarT>(num_dims_);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 CapExplicitModel<EvalT, Traits>::computeState(
@@ -459,7 +457,6 @@ CapExplicitModel<EvalT, Traits>::computeState(
   }  // loop over cell
 
 }  // end of evaluateFields
-//------------------------------------------------------------------------------
 // all local functions
 template <typename EvalT, typename Traits>
 typename CapExplicitModel<EvalT, Traits>::ScalarT
@@ -498,7 +495,6 @@ CapExplicitModel<EvalT, Traits>::compute_f(
 
   return Gamma * Gamma * J2 - Fc * (Ff_I1 - N) * (Ff_I1 - N);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapExplicitModel<EvalT, Traits>::ScalarT>
 CapExplicitModel<EvalT, Traits>::compute_dfdsigma(
@@ -566,7 +562,6 @@ CapExplicitModel<EvalT, Traits>::compute_dfdsigma(
 
   return dfdsigma;
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapExplicitModel<EvalT, Traits>::ScalarT>
 CapExplicitModel<EvalT, Traits>::compute_dgdsigma(
@@ -634,7 +629,6 @@ CapExplicitModel<EvalT, Traits>::compute_dgdsigma(
 
   return dgdsigma;
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename CapExplicitModel<EvalT, Traits>::ScalarT
 CapExplicitModel<EvalT, Traits>::compute_dfdkappa(
@@ -673,7 +667,6 @@ CapExplicitModel<EvalT, Traits>::compute_dfdkappa(
 
   return dfdkappa;
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename CapExplicitModel<EvalT, Traits>::ScalarT
 CapExplicitModel<EvalT, Traits>::compute_Galpha(ScalarT& J2_alpha)
@@ -683,7 +676,6 @@ CapExplicitModel<EvalT, Traits>::compute_Galpha(ScalarT& J2_alpha)
   else
     return 0.0;
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapExplicitModel<EvalT, Traits>::ScalarT>
 CapExplicitModel<EvalT, Traits>::compute_halpha(
@@ -702,7 +694,6 @@ CapExplicitModel<EvalT, Traits>::compute_halpha(
 
   return halpha;
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename CapExplicitModel<EvalT, Traits>::ScalarT
 CapExplicitModel<EvalT, Traits>::compute_dedkappa(ScalarT& kappa)
@@ -722,5 +713,4 @@ CapExplicitModel<EvalT, Traits>::compute_dedkappa(ScalarT& kappa)
 
   return dedX * dXdkappa;
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

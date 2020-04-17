@@ -15,7 +15,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(
     Teuchos::ParameterList&              p,
@@ -155,7 +154,6 @@ ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(
   this->setName("Constitutive Model Parameters" + PHX::print<EvalT>());
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelParameters<EvalT, Traits>::postRegistrationSetup(
@@ -171,7 +169,6 @@ ConstitutiveModelParameters<EvalT, Traits>::postRegistrationSetup(
 
   if (have_temperature_) this->utils.setFieldData(temperature_, fm);
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(
@@ -217,7 +214,6 @@ ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 typename ConstitutiveModelParameters<EvalT, Traits>::ScalarT&
 ConstitutiveModelParameters<EvalT, Traits>::getValue(std::string const& n)
@@ -239,7 +235,6 @@ ConstitutiveModelParameters<EvalT, Traits>::getValue(std::string const& n)
   return dummy;
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ConstitutiveModelParameters<EvalT, Traits>::parseParameters(
@@ -276,5 +271,4 @@ ConstitutiveModelParameters<EvalT, Traits>::parseParameters(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

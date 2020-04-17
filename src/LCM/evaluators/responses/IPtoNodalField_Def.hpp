@@ -115,7 +115,6 @@ IPtoNodalFieldBase<EvalT, Traits>::IPtoNodalFieldBase(
   this->addEvaluatedField(*field_tag_);
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 IPtoNodalFieldBase<EvalT, Traits>::postRegistrationSetup(
@@ -128,10 +127,7 @@ IPtoNodalFieldBase<EvalT, Traits>::postRegistrationSetup(
   }
 }
 
-//------------------------------------------------------------------------------
 // Specialization: Residual
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 template <typename Traits>
 IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::IPtoNodalField(
     Teuchos::ParameterList&              p,
@@ -246,7 +242,6 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::IPtoNodalField(
   }
 }
 
-//------------------------------------------------------------------------------
 template <typename Traits>
 void
 IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
@@ -265,7 +260,6 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
   (this->mgr_->nodal_field)->assign(0.0);
 }
 
-//------------------------------------------------------------------------------
 template <typename Traits>
 void
 IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
@@ -356,7 +350,6 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   }    // end field loop
 }
 
-//------------------------------------------------------------------------------
 template <typename Traits>
 void
 IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
@@ -423,7 +416,6 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
   node_data->saveNodalDataState(data, this->mgr_->ndb_start);
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 Teuchos::RCP<Teuchos::ParameterList const>
 IPtoNodalFieldBase<EvalT, Traits>::getValidIPtoNodalFieldParameters() const
@@ -485,5 +477,4 @@ IPtoNodalFieldBase<EvalT, Traits>::getValidIPtoNodalFieldParameters() const
   return validPL;
 }
 
-//------------------------------------------------------------------------------
 }  // namespace LCM

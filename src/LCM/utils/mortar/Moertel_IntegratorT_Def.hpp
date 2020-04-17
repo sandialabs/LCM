@@ -1150,7 +1150,6 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
       double* eta    = Coordinate(&gp);
       double  weight = area * Weight(gp);
 
-      //-------------------------------------------------------------------
       // compute the local coord of the gaussian point in the slave element
       double val[3];
       actseg->EvaluateFunction(0, eta, val, actseg->Nnode(), NULL);
@@ -1163,14 +1162,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
       }
       // std::cout << "sxi = " << sxi[0] << " / " << sxi[1] << std::endl;
 
-      //-------------------------------------------------------------------
       // get shape function values from function 0 and 1 from slave element here
       double val_sfunc0[20];
       double val_sfunc1[20];
       sseg.EvaluateFunction(0, sxi, val_sfunc0, sseg.Nnode(), NULL);
       sseg.EvaluateFunction(1, sxi, val_sfunc1, sseg.Nnode(), NULL);
 
-      //-------------------------------------------------------------------
       // compute the global coordinate of the gaussian point and project it
       // to the master element
       x[0] = x[1] = x[2] = 0.0;
@@ -1201,12 +1198,10 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
       }
       // std::cout << "mxi = " << mxi[0] << " / " << mxi[1] << std::endl;
 
-      //-------------------------------------------------------------------
       // get shape function value from mseg
       double val_mfunc0[20];
       mseg.EvaluateFunction(0, mxi, val_mfunc0, mseg.Nnode(), NULL);
 
-      //-------------------------------------------------------------------
       // loop over all slave nodes (lm loop)
       for (int lm = 0; lm < sseg.Nnode(); ++lm) {
         // loop over all nodes (dof loop master)

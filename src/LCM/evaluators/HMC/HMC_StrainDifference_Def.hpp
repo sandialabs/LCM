@@ -8,7 +8,6 @@
 
 namespace HMC {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 StrainDifference<EvalT, Traits>::StrainDifference(
     Teuchos::ParameterList const&        p,
@@ -32,7 +31,6 @@ StrainDifference<EvalT, Traits>::StrainDifference(
   numDims = dims[2];
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 StrainDifference<EvalT, Traits>::postRegistrationSetup(
@@ -44,7 +42,6 @@ StrainDifference<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(strainDifference, fm);
 }
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 StrainDifference<EvalT, Traits>::evaluateFields(
@@ -62,5 +59,4 @@ StrainDifference<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//----------------------------------------------------------------------------
 }  // namespace HMC

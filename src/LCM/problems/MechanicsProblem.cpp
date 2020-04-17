@@ -295,7 +295,6 @@ MechanicsProblem::MechanicsProblem(
   }
 }  // MechanicsProblem
 
-//------------------------------------------------------------------------------
 
 void
 MechanicsProblem::buildProblem(
@@ -336,7 +335,6 @@ MechanicsProblem::buildProblem(
   }
 }
 
-//------------------------------------------------------------------------------
 
 void
 MechanicsProblem::getAllocatedStates(
@@ -350,7 +348,6 @@ MechanicsProblem::getAllocatedStates(
   new_state = new_state_;
 }
 
-//------------------------------------------------------------------------------
 
 void
 MechanicsProblem::applyProblemSpecificSolverSettings(
@@ -427,7 +424,6 @@ MechanicsProblem::applyProblemSpecificSolverSettings(
   }
 }
 
-//------------------------------------------------------------------------------
 
 void
 MechanicsProblem::constructDirichletEvaluators(MeshSpecsStruct const& meshSpecs)
@@ -475,7 +471,6 @@ MechanicsProblem::constructDirichletEvaluators(MeshSpecsStruct const& meshSpecs)
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
 }
 
-//------------------------------------------------------------------------------
 
 // Neumann (Traction) BCs
 void
@@ -581,7 +576,6 @@ MechanicsProblem::constructNeumannEvaluators(
       this->paramLib);
 }
 
-//------------------------------------------------------------------------------
 
 ///
 /// Protected methods for MechanicsProblem class
@@ -613,7 +607,6 @@ MechanicsProblem::getVariableType(
   have_equation = (variable_type == MECH_VAR_TYPE_DOF);
 }
 
-//------------------------------------------------------------------------------
 
 std::string
 MechanicsProblem::variableTypeToString(

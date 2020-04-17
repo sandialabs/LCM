@@ -8,7 +8,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 ThermoMechanicalCoefficients<EvalT, Traits>::ThermoMechanicalCoefficients(
     Teuchos::ParameterList&              p,
@@ -69,7 +68,6 @@ ThermoMechanicalCoefficients<EvalT, Traits>::ThermoMechanicalCoefficients(
   temperature_name_ = p.get<std::string>("Temperature Name") + "_old";
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ThermoMechanicalCoefficients<EvalT, Traits>::postRegistrationSetup(
@@ -89,7 +87,6 @@ ThermoMechanicalCoefficients<EvalT, Traits>::postRegistrationSetup(
   if (have_mech_) { this->utils.setFieldData(def_grad_, fm); }
 }
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 ThermoMechanicalCoefficients<EvalT, Traits>::evaluateFields(
@@ -156,5 +153,4 @@ ThermoMechanicalCoefficients<EvalT, Traits>::evaluateFields(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

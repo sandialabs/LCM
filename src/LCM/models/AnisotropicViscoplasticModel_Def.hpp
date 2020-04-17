@@ -10,7 +10,6 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
     Teuchos::ParameterList*              p,
@@ -106,7 +105,6 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
         p->get<bool>("Output Mechanical Source", false));
   }
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
@@ -303,5 +301,4 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

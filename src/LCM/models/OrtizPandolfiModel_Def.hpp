@@ -8,11 +8,9 @@
 
 namespace LCM {
 
-//------------------------------------------------------------------------------
 // See Ortiz and Pandolfi, IJNME (1999)
 // Finite-deformation irreversible cohesive elements for 3-D crack
 // propagation analysis
-//------------------------------------------------------------------------------
 
 template <typename EvalT, typename Traits>
 OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
@@ -94,7 +92,6 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_output_flags_.push_back(
       p->get<bool>("Output Max Jump", false));
 }
-//------------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 OrtizPandolfiModel<EvalT, Traits>::computeState(
@@ -264,5 +261,4 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
     }
   }
 }
-//------------------------------------------------------------------------------
 }  // namespace LCM

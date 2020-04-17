@@ -33,7 +33,6 @@ main(int ac, char* av[])
   typedef stk::mesh::Entity                        Entity;
   typedef std::pair<int, int>                      Edge;
 
-  //---------------------------------------------------------------------------------------------------------
   // Create a command line processor and parse command line options
   Teuchos::CommandLineProcessor command_line_processor;
 
@@ -71,9 +70,7 @@ main(int ac, char* av[])
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
   LCM::Topology             topology(input_file, output_file);
 
-  //-----------------------------------------------------------------------------------------
   // GET THE 1D BUNDARY FROM THE INPUT MESH USING dijkstra_shortest_paths
-  //-----------------------------------------------------------------------------------------
   stk::mesh::BulkData&           bulk_data = topology.get_bulk_data();
   std::vector<stk::mesh::Entity> MeshNodes =
       topology.get_rank_entities(bulk_data, 0);
@@ -127,9 +124,7 @@ main(int ac, char* av[])
   delete[] EdgesArray;    // Deallocate memory
   delete[] EdgesWeights;  // Deallocate memory
 
-  //-------------------------------------------------------------------------------
   // Presenting the final output
-  //-------------------------------------------------------------------------------
   std::cout << "Display distances to all graph vertices from source"
             << std::endl;
   graph_traits<graph_t>::vertex_iterator VertexIterator, vend;

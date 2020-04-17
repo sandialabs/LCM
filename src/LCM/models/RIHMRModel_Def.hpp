@@ -10,7 +10,6 @@
 
 namespace LCM {
 
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 RIHMRModel<EvalT, Traits>::RIHMRModel(
     Teuchos::ParameterList*              p,
@@ -77,7 +76,6 @@ RIHMRModel<EvalT, Traits>::RIHMRModel(
   this->state_var_old_state_flags_.push_back(true);
   this->state_var_output_flags_.push_back(true);
 }
-//----------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 void
 RIHMRModel<EvalT, Traits>::computeState(
@@ -281,7 +279,6 @@ RIHMRModel<EvalT, Traits>::computeState(
   }
 
 }  // end of compute state
-//----------------------------------------------------------------------------
 // all local functions for compute state
 template <typename EvalT, typename Traits>
 void
@@ -350,5 +347,4 @@ RIHMRModel<EvalT, Traits>::ResidualJacobian(
   dRdX[1 + 2 * 0] = Rfad[1].dx(0);
   dRdX[1 + 2 * 1] = Rfad[1].dx(1);
 }
-//----------------------------------------------------------------------------
 }  // namespace LCM

@@ -61,18 +61,13 @@ main(int ac, char* av[])
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
   LCM::Topology             topology(input_file, output_file);
 
-  //--------------------------------------------------------------------------------------------------------
   //                        mps file OUTPUT for the MinsurfaceSolver.cpp
-  //--------------------------------------------------------------------------------------------------------
   // NOTE: When analyzing a single mesh, the coefficientsObjFunction, and the
   // BoundaryOperator remain the same. This is set in the first part of the MPS
   // file.The only one parameter that varies is the BoundaryVector, which is
   // defined in the second part of the MPS file
-  //--------------------------------------------------------------------------------------------------------
 
-  //--------------------------------------------------------------------------------------------------------
   // CREATE THE MPS FILE
-  //--------------------------------------------------------------------------------------------------------
   stringstream ss;
   std::string  file_name_;
   ss << av[1];       // insert the char

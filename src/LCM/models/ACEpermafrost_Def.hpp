@@ -396,31 +396,16 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&&      exposure_time = exposure_time_(cell, pt);
 
   // Determine if erosion has occurred.
-  auto const erosion_rate = erosion_rate_;
   auto const element_size = element_size_;
-  bool const is_erodible  = erosion_rate > 0.0;
-  auto const critical_exposure_time =
-      is_erodible == true ? element_size / erosion_rate : 0.0;
-
+  auto const cell_bi      = have_cell_boundary_indicator_ == true ?
+                           *(cell_boundary_indicator_[cell]) :
+                           0.0;
+  auto const is_at_boundary = cell_bi == 1.0;
+  auto const is_erodible    = cell_bi == 2.0;
   auto const sea_level =
       sea_level_.size() > 0 ?
           interpolateVectors(time_, sea_level_, current_time) :
           0.0;
-  bool const is_exposed_to_water = (height <= sea_level);
-  bool const is_at_boundary =
-      have_cell_boundary_indicator_ == true ?
-          static_cast<bool>(*(cell_boundary_indicator_[cell])) :
-          false;
-
-  bool const is_erodible_at_boundary = is_erodible && is_at_boundary;
-  if (is_erodible_at_boundary == true) {
-    if (is_exposed_to_water == true) { exposure_time += delta_time; }
-    if (exposure_time >= critical_exposure_time) {
-      // Disable temporarily
-      failed += 0.0;
-      exposure_time = 0.0;
-    }
-  }
 
   // Thermal calculation
 
@@ -434,16 +419,13 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   porosity_(cell, pt) = porosity;
 
-  // A boundary cell (this is a hack): porosity = -1.0 (set in input deck)
-  bool const b_cell = porosity < 0.0;
-
   // Calculate the salinity of the grid cell
   if (is_at_boundary == true) {
     RealType const cell_half_width    = 0.5 * element_size;
     RealType const cell_exposed_area  = element_size * element_size;
     RealType const cell_volume        = cell_exposed_area * element_size;
     RealType const per_exposed_length = 1.0 / element_size;
-    RealType const factor = per_exposed_length * salt_enhanced_D_;
+    RealType const factor             = per_exposed_length * salt_enhanced_D_;
     ScalarT const  zero_sal(0.0);
     ScalarT const  sal_curr  = bluff_salinity_(cell, pt);
     ScalarT        ocean_sal = salinity_base_;
@@ -564,12 +546,6 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Update the water saturation
   ScalarT wcurr = 1.0 - icurr;
 
-  // Correct ice/water saturation if b_cell
-  if (b_cell == true) {
-    icurr = 0.0;
-    wcurr = 0.0;
-  }
-
   ScalarT calc_soil_heat_capacity;
   ScalarT calc_soil_thermal_cond;
   ScalarT calc_soil_density;
@@ -636,23 +612,6 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Update the material thermal inertia term
   thermal_inertia_(cell, pt) = (density_(cell, pt) * heat_capacity_(cell, pt)) -
                                (ice_density_ * latent_heat_ * dfdT);
-
-  // Correct the thermal properties if b_cell
-  // Note: The units here must be consistent with input deck units.
-  if (b_cell == true) {
-    if (is_exposed_to_water == true) {
-      // These are values for seawater:
-      density_(cell, pt)       = 1027.3;     // [kg/m3]
-      heat_capacity_(cell, pt) = 4.000e+03;  // [J/kg/K]
-      thermal_cond_(cell, pt)  = 0.59;       // [W/K/m]
-    } else {
-      // These are values for air:
-      density_(cell, pt)       = 1.225;      // [kg/m3]
-      heat_capacity_(cell, pt) = 1.006e+03;  // [J/kg/K]
-      thermal_cond_(cell, pt)  = 0.0255;     // [W/K/m]
-    }
-    thermal_inertia_(cell, pt) = density_(cell, pt) * heat_capacity_(cell, pt);
-  }
 
   // Return values
   ice_saturation_(cell, pt)   = icurr;

@@ -439,10 +439,10 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Calculate the salinity of the grid cell
   if (is_at_boundary == true) {
-    RealType constexpr cell_half_width    = 0.1;
-    RealType constexpr cell_exposed_area  = 0.04;
-    RealType constexpr cell_volume        = 0.008;
-    RealType constexpr per_exposed_length = cell_exposed_area / cell_volume;
+    RealType const cell_half_width    = 0.5 * element_size;
+    RealType const cell_exposed_area  = element_size * element_size;
+    RealType const cell_volume        = cell_exposed_area * element_size;
+    RealType const per_exposed_length = 1.0 / element_size;
     RealType const factor = per_exposed_length * salt_enhanced_D_;
     ScalarT const  zero_sal(0.0);
     ScalarT const  sal_curr  = bluff_salinity_(cell, pt);

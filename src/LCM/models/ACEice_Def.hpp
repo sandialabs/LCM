@@ -398,8 +398,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
     ScalarT const sal_diff = ocean_sal - sal_curr;
     ScalarT const sal_grad = sal_diff / cell_half_width;
-    // TODO: factor == 0, should be a factor here but leads to Sacado FPE (!!??)
-    ScalarT const sal_update = sal_grad * delta_time;
+    ScalarT const sal_update = sal_grad * delta_time * factor;
     ScalarT       sal_trial  = sal_curr + sal_update;
     if (sal_trial < zero_sal) sal_trial = zero_sal;
     if (sal_trial > ocean_sal) sal_trial = ocean_sal;

@@ -420,7 +420,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   porosity_(cell, pt) = porosity;
 
   // Calculate the salinity of the grid cell
-  if ((is_at_boundary == true) && (height <= sea_level)) {
+  if ((is_erodible == true) && (height <= sea_level)) {
     RealType const cell_half_width    = 0.5 * element_size;
     RealType const cell_exposed_area  = element_size * element_size;
     RealType const cell_volume        = cell_exposed_area * element_size;
@@ -470,7 +470,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // b = shift to left or right (+ is left, - is right)
 
   ScalarT W = 10.0;  // constant value
-  //if (freezing_curve_width_.size() > 0) {
+  // if (freezing_curve_width_.size() > 0) {
   //  W = interpolateVectors(
   //      z_above_mean_sea_level_, freezing_curve_width_, height);
   //}

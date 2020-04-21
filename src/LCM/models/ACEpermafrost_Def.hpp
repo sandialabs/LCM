@@ -405,7 +405,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const sea_level =
       sea_level_.size() > 0 ?
           interpolateVectors(time_, sea_level_, current_time) :
-          0.0;
+          -999.0;
 
   // Thermal calculation
 
@@ -469,8 +469,8 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // W = true width of freezing curve (in Celsius)
   // b = shift to left or right (+ is left, - is right)
 
-  ScalarT W = 4.0;  // constant value
-  // if (freezing_curve_width_.size() > 0) {
+  ScalarT W = 10.0;  // constant value
+  //if (freezing_curve_width_.size() > 0) {
   //  W = interpolateVectors(
   //      z_above_mean_sea_level_, freezing_curve_width_, height);
   //}

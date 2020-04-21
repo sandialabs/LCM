@@ -369,7 +369,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const sea_level =
       sea_level_.size() > 0 ?
           interpolateVectors(time_, sea_level_, current_time) :
-          0.0;
+          -999.0;
 
   // Thermal calculation
 

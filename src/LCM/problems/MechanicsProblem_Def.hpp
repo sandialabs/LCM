@@ -2489,12 +2489,16 @@ MechanicsProblem::constructEvaluators(
 
   // Equation for ACE temperature
   if (have_ace_temperature_eq_ == true && (surface_element == false)) {
+    auto const scale_residual_factor =
+        param_list.get<double>("ACE Residual Scale Factor", 1.0);
+
     Teuchos::RCP<Teuchos::ParameterList> p =
         Teuchos::rcp(new Teuchos::ParameterList("ACE Temperature Residual"));
 
     p->set<Teuchos::ParameterList*>("Material Parameters", &param_list);
 
     // Input
+    p->set<double>("ACE Residual Scale Factor", scale_residual_factor);
     p->set<std::string>("Weighted BF Name", "wBF");
     p->set<std::string>("Weighted Gradient BF Name", "wGrad BF");
     p->set<std::string>("ACE Temperature Name", "ACE Temperature");

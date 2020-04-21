@@ -396,8 +396,8 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     if (ocean_salinity_.size() > 0) {
       ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
     }
-    ScalarT const sal_diff = ocean_sal - sal_curr;
-    ScalarT const sal_grad = sal_diff / cell_half_width;
+    ScalarT const sal_diff   = ocean_sal - sal_curr;
+    ScalarT const sal_grad   = sal_diff / cell_half_width;
     ScalarT const sal_update = sal_grad * delta_time * factor;
     ScalarT       sal_trial  = sal_curr + sal_update;
     if (sal_trial < zero_sal) sal_trial = zero_sal;

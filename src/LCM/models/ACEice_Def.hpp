@@ -384,7 +384,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   porosity_(cell, pt) = porosity;
 
   // Calculate the salinity of the grid cell
-  if (is_erodible == true) {
+  if ((is_at_boundary == true) && (height <= sea_level)) {
     RealType const cell_half_width    = 0.5 * element_size;
     RealType const cell_exposed_area  = element_size * element_size;
     RealType const cell_volume        = cell_exposed_area * element_size;

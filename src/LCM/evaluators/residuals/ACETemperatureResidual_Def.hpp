@@ -32,7 +32,8 @@ ACETemperatureResidual<EvalT, Traits>::ACETemperatureResidual(
           dl->qp_scalar),
       residual_(  // evaluated
           p.get<std::string>("ACE Residual Name"),
-          dl->node_scalar)
+          dl->node_scalar),
+      scale_residual_factor(p.get<double>("ACE Residual Scale Factor"))
 {
   // List dependent fields
   this->addDependentField(wbf_);
@@ -95,6 +96,7 @@ void ACETemperatureResidual<EvalT, Traits>::evaluateFields(
                                    wgradbf_(cell, node, qp, i);
         }
       }
+      residual_(cell, node) *= scale_residual_factor;
     }
   }
 }

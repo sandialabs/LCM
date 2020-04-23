@@ -2,7 +2,7 @@
 
 NUM_PROCS=`nproc`
 export LCM_DIR=`pwd`
-export MODULEPATH=$LCM_DIR/Albany/doc/LCM/modulefiles
+export MODULEPATH=$LCM_DIR/LCM/doc/LCM/modulefiles
 unset https_proxy
 unset http_proxy
 

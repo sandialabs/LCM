@@ -55,7 +55,7 @@ else
   (cd Albany; git pull)
 fi
 
-ln -sf Albany/doc/LCM/build/build.sh .
+ln -sf LCM/doc/LCM/build/build.sh .
 ln -sf build.sh clean.sh
 ln -sf build.sh config.sh
 ln -sf build.sh test.sh
@@ -69,7 +69,7 @@ if [[ -z $LCM_DIR ]]; then
   echo "ERROR: Top level LCM directory not defined."
   exit
 fi
-if [[ $MODULEPATH != "$LCM_DIR/Albany/doc/LCM/modulefiles" ]]; then
+if [[ $MODULEPATH != "$LCM_DIR/LCM/doc/LCM/modulefiles" ]]; then
   echo "ERROR: Path to LCM modules set incorrectly."
   echo "MODULEPATH: $MODULEPATH"
   exit

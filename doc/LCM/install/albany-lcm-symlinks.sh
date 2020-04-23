@@ -1,10 +1,10 @@
 cd "$LCM_DIR"
-ln -s Albany/doc/LCM/build/env-single.sh .
-ln -s Albany/doc/LCM/build/env-all.sh .
-ln -s Albany/doc/LCM/build/trilinos-config.sh .
-ln -s Albany/doc/LCM/build/albany-config.sh .
-ln -s Albany/doc/LCM/build/build.sh .
-ln -s Albany/doc/LCM/build/build-all.sh .
+ln -s LCM/doc/LCM/build/env-single.sh .
+ln -s LCM/doc/LCM/build/env-all.sh .
+ln -s LCM/doc/LCM/build/trilinos-config.sh .
+ln -s LCM/doc/LCM/build/albany-config.sh .
+ln -s LCM/doc/LCM/build/build.sh .
+ln -s LCM/doc/LCM/build/build-all.sh .
 ln -s build.sh clean-config-build-test-dash.sh
 ln -s build.sh clean-config-build-test.sh
 ln -s build.sh config-build-test.sh

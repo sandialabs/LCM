@@ -37,12 +37,6 @@ if [ -e DataTransferKit ]; then
     cp -p -r DataTransferKit Trilinos
 fi
 
-# Clone wiki too to update info for latest known good commits.
-if [ -d "Albany.wiki" ]; then
-    rm "Albany.wiki" -rf
-fi
-git clone git@github.com:SNLComputation/LCM.wiki.git
-
 ./clean-config-build-test-dash-all.sh
 
 cd "$LCM_DIR"

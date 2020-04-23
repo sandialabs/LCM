@@ -1,32 +1,5 @@
 #!/bin/bash
 
-update_wiki () {
-    echo "IN UPDATE WIKI"
-    cd "$LCM_DIR"
-    STATUS_LOG="$PACKAGE-$ARCH-$TOOL_CHAIN-$BUILD_TYPE-status.log"
-    echo "STATUS_LOG=$STATUS_LOG"
-    if [[ -f "$STATUS_LOG" && -d "$LCM_DIR/Albany.wiki" ]]; then
-        echo "IN IF UPDATE"
-	SRC="$LCM_DIR/LCM/doc/LCM/test/$WIKI_TEMPLATE"
-	DEST="$LCM_DIR/Albany.wiki/$WIKI_TEMPLATE"
-	cd "$LCM_DIR/Albany.wiki"
-        git pull
-	cp -p "$SRC" "$DEST"
-	cd "$LCM_DIR/Trilinos"
-	TRILINOS_TAG=`git rev-parse HEAD`
-	sed -i -e "s|ttag|$TRILINOS_TAG|g;" "$DEST"
-	cd "$LCM_DIR/Albany"
-	ALBANY_TAG=`git rev-parse HEAD`
-	sed -i -e "s|atag|$ALBANY_TAG|g;" "$DEST"
-	MSG="Update latest known good commits"
-	cd "$LCM_DIR/Albany.wiki"
-	git add "$DEST"
-	git commit -m "$MSG"
-	git push
-	cd "$LCM_DIR"
-    fi
-}
-
 source ./env-all.sh
 
 cd "$LCM_DIR"
@@ -69,7 +42,6 @@ case "$SCRIPT_NAME" in
 	exit 1
 	;;
 esac
-WIKI_TEMPLATE="LCM-Status-Last-known-commits-that-work.md"
 
 KERNEL_VERSION=`uname -r`
 PLATFORM="unknown"
@@ -95,38 +67,10 @@ for P in $PACKAGES; do
             for BT in $BUILD_TYPES; do
                 MODULE="$A"-"$TC"-"$BT"
                 echo "MODULE: $MODULE"
-		echo "PLATFORM: $PLATFORM"
+		            echo "PLATFORM: $PLATFORM"
                 module purge
                 module load "$MODULE"
                 "$COMMAND" "$P" "$NUM_PROCS"
-                # Update wiki after compiling Albany with gcc release only.
-                case "$P" in
-                    albany)
-	                case "$A" in
-	                    serial)
-		                case "$BT" in
-		                    release)
-			                case "$TC" in
-			                    gcc)
-                                                # PACKAGE is not set in modules
-                                                PACKAGE="$P"
-				                update_wiki
-				                ;;
-			                    *)
-				                ;;
-			                esac
-			                ;;
-		                    *)
-			                ;;
-		                esac
-		                ;;
-	                    *)
-		                ;;
-	                esac
-	                ;;
-                    *)
-	                ;;
-                esac
             done
         done
     done

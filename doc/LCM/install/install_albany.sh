@@ -49,10 +49,10 @@ else
   (cd Trilinos; git pull)
 fi
 if [ ! -d Albany ]; then
-  git clone git@github.com:SNLComputation/LCM.git Albany
+  git clone git@github.com:SNLComputation/LCM.git LCM
 else
   echo ">>> Albany exists, freshening it <<<"
-  (cd Albany; git pull)
+  (cd LCM; git pull)
 fi
 
 ln -sf LCM/doc/LCM/build/build.sh .

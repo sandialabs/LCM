@@ -50,7 +50,7 @@ function(lcm_do_albany)
   snl_do_subproject(${ARG_BOOL_OPTS}
       DO_PROJECT
       "PROJECT" "Albany"
-      SOURCE_DIR "$ENV{LCM_DIR}/Albany"
+      SOURCE_DIR "$ENV{LCM_DIR}/LCM"
       BUILD_DIR "$ENV{LCM_DIR}/albany-build-${ARG_BUILD_ID_STRING}"
       CONFIG_OPTS "${CONFIG_OPTS}"
       BUILD_THREADS "${ARG_BUILD_THREADS}"

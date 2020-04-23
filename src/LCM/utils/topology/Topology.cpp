@@ -649,7 +649,7 @@ Topology::outputBoundary(std::string const& output_filename)
 
   // Header
   ofs << "# vtk DataFile Version 3.0\n";
-  ofs << "Albany/LCM\n";
+  ofs << "LCM/LCM\n";
   ofs << "ASCII\n";
   ofs << "DATASET UNSTRUCTURED_GRID\n";
 

@@ -644,7 +644,7 @@ if(INSTALL_ALBANY)
     AlbanyConfig.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/AlbanyConfig.cmake
     INSTALL_DESTINATION
-    ${LIB_INSTALL_DIR}/Albany/cmake
+    ${LIB_INSTALL_DIR}/LCM/cmake
     PATH_VARS
     INCLUDE_INSTALL_DIR
     LIB_INSTALL_DIR)
@@ -652,7 +652,7 @@ if(INSTALL_ALBANY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Albany_config.h
           DESTINATION ${INCLUDE_INSTALL_DIR})
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/AlbanyConfig.cmake
-          DESTINATION ${LIB_INSTALL_DIR}/Albany/cmake)
+          DESTINATION ${LIB_INSTALL_DIR}/LCM/cmake)
   # Install each binary in the list
   install(TARGETS ${ALBANY_EXECUTABLES}
           RUNTIME DESTINATION ${BINARY_INSTALL_DIR})
@@ -670,7 +670,7 @@ if(INSTALL_ALBANY)
   endif()
   install(
     EXPORT albany-export
-    DESTINATION ${LIB_INSTALL_DIR}/Albany/cmake
+    DESTINATION ${LIB_INSTALL_DIR}/LCM/cmake
     FILE "albany-targets.cmake")
 
   set(TMP1 ${ALBANY_LIBRARIES} ${ALL_LIBRARIES})

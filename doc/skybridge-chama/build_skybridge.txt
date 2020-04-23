@@ -202,7 +202,7 @@ make install
 
 ---
 cd $REMOTE/src
-git clone git@github.com:gahansen/Albany.git
+git clone git@github.com:SNLComputation/LCM.git
 ---
 
 Configure the Albany build

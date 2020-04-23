@@ -198,13 +198,13 @@ git clone git@github.com:trilinos/Trilinos.git Trilinos
 
 Finally, check out the latest version of \albany{}:
 \begin{verbatim}
-git clone git@github.com:lxmota/Albany.git Albany
+git clone git@github.com:SNLComputation/LCM.git LCM
 \end{verbatim}
 
 At this point, the directory structure should look like this:
 \begin{verbatim}
 LCM
-  |- Albany
+  |- LCM
   |- Trilinos
 \end{verbatim}
 
@@ -212,7 +212,7 @@ LCM
 In \verb+~/.bashrc+, the following variables are needed:
 \begin{verbatim}
 export LCM_DIR=~/LCM
-module use --append $LCM_DIR/Albany/doc/LCM/modulefiles
+module use --append $LCM_DIR/LCM/doc/LCM/modulefiles
 \end{verbatim}
 The \verb+LCM_DIR+ variable should contain the location of the
 top-level \verb+LCM+ directory.
@@ -226,7 +226,7 @@ module() { eval `/usr/bin/modulecmd $modules_shell $*`; }
 
 \section{Build Script}
 Create a symbolic link to the build script
-\verb+LCM/Albany/doc/LCM/build/build.sh+ to the top-level \verb+LCM+
+\verb+LCM/LCM/doc/LCM/build/build.sh+ to the top-level \verb+LCM+
 directory. Make sure that the build script is executable and
 read only:
 \begin{verbatim}
@@ -272,7 +272,7 @@ ln -s build.sh config-build.sh
 ln -s build.sh config-build-test.sh
 \end{verbatim}
 There is also a script
-\verb+LCM/Albany/doc/LCM/install/albany-lcm-symlinks.sh+
+\verb+LCM/LCM/doc/LCM/install/albany-lcm-symlinks.sh+
 that will create the appropriate symbolic links.
 
 The build system is based on CMake. Thus the ouput verbosity level can be
@@ -289,7 +289,7 @@ ignored.
 The current parallel implementation of the Schwarz method requires \verb+DTK+,
 which is tightly integrated to \trilinos{}, specifically \verb+STK+. Go to the
 the top-level \verb+LCM+ directory and create a symbolic link to the \verb+DTK+
-CMake fragment that resides in \verb+LCM/Albany/doc/LCM/build+, then download
+CMake fragment that resides in \verb+LCM/LCM/doc/LCM/build+, then download
 the \verb+DTK+ package from
 
 \begin{verbatim}
@@ -301,14 +301,14 @@ and place inside the \verb+~/LCM/Trilinos+ directory. Expand the package and
 rename it:
 \begin{verbatim}
 cd ~/LCM
-ln -s Albany/doc/LCM/build/dtk-frag.sh .
+ln -s LCM/doc/LCM/build/dtk-frag.sh .
 cd Trilinos
 tar zxf 2.0.0.tar.gz
 mv DataTransferKit-2.0.0 DataTransferKit
 \end{verbatim}
 The configuration scripts will detect the presence of \verb+DTK+ and
 configure it appropriately. Also, parallel Schwarz will be enabled when
-compiling Albany.
+compiling LCM.
 
 \section{Modules}
 \label{sec:modules}
@@ -322,7 +322,7 @@ module avail
 \end{verbatim}
 This results in something like:
 \begin{verbatim}
------------------ /home/amota/LCM/Albany/doc/LCM/modulefiles ------------------
+----------------- /home/amota/LCM/LCM/doc/LCM/modulefiles ------------------
 debug           lcm-scientific-linux  serial-clang-small    
 lcm-clang       lcm-sems              serial-gcc-debug      
 lcm-cluster     lcm-serial            serial-gcc-mixed      
@@ -418,7 +418,7 @@ script. For example:
 ./build.sh albany 16
 \end{verbatim}
 There are times when it is necessary to reconfigure, for example when
-adding or deleting files under the \verb+LCM/Albany/src/LCM+
+adding or deleting files under the \verb+LCM/LCM/src/LCM+
 directory. This is generally announced in the commit notices.
 
 Also, note that both \trilinos{} and \albany{} are heavily templetized
@@ -443,7 +443,7 @@ the master git repository. We only ask that you don't break
 compilation or testing. So please make sure that the tests pass before
 you commit changes. Also, follow the development discussion here:
 \begin{verbatim}
-https://github.com/lxmota/Albany/issues
+https://github.com/SNLComputation/LCM/issues
 \end{verbatim}
 
 In addition, within \lcm{} we strongly encourage you to follow the C++
@@ -456,7 +456,7 @@ syntactic elements of C++. This in turn makes reading code easier and
 helps to avoid coding errors.
 
 The \verb+clang-format+ tool can be used for this. There is a
-\verb+.clang-format+ file in the \verb+Albany/src/LCM+ directory that conforms
+\verb+.clang-format+ file in the \verb+LCM/src/LCM+ directory that conforms
 to the C++ Google coding standard. Thus, all that is needed to reformat a
 source file in place is the command:
 \begin{verbatim}

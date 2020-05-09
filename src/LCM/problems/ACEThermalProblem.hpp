@@ -17,7 +17,7 @@
 namespace Albany {
 
 /*!
- * \brief Abstract interface for representing a 1-D finite element
+ * \brief Abstract interface for representing finite element
  * problem.
  */
 class ACEThermalProblem : public AbstractProblem
@@ -117,8 +117,8 @@ class ACEThermalProblem : public AbstractProblem
 #include "Albany_Utils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
 #include "PHAL_Absorption.hpp"
-#include "PHAL_ThermalConductivity.hpp"
-#include "PHAL_ThermalResid.hpp"
+//#include "PHAL_ThermalConductivity.hpp"
+#include "ACETempStandAloneResid.hpp"
 #include "Shards_CellTopology.hpp"
 
 template <typename EvalT>
@@ -159,7 +159,7 @@ Albany::ACEThermalProblem::constructEvaluators(
   // Problem is steady or transient
   ALBANY_PANIC(
       number_of_time_deriv != 1,
-      "Albany_ACEThermalProblem must be defined as transient "
+      "ACETempStandAloneProblem must be defined as transient "
       "calculation.");
 
   *out << "Field Dimensions: Workset=" << worksetSize
@@ -230,7 +230,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("Residual Name", "Temperature Residual");
     p->set<RCP<DataLayout>>("Node Scalar Data Layout", dl->node_scalar);
 
-    ev = rcp(new PHAL::ThermalResid<EvalT, AlbanyTraits>(*p));
+    ev = rcp(new LCM::ACETempStandAloneResid<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
 

@@ -30,6 +30,7 @@
 #include "LCM/problems/ElectroMechanicsProblem.hpp"
 #include "LCM/problems/HMCProblem.hpp"
 #include "LCM/problems/MechanicsProblem.hpp"
+#include "LCM/problems/ACEThermalProblem.hpp"
 #include "LCM/problems/ThermoElasticityProblem.hpp"
 
 Albany::ProblemFactory::ProblemFactory(
@@ -141,6 +142,15 @@ Albany::ProblemFactory::create()
   else if (getName(method) == "Mechanics") {
     strategy = rcp(new Albany::MechanicsProblem(
         problemParams, paramLib, getNumDim(method), rc_mgr, commT));
+  } else if (method == "ACE Thermal 1D") {
+    strategy =
+        rcp(new ACEThermalProblem(problemParams, paramLib, 1, commT));
+  } else if (method == "ACE Thermal 2D") {
+    strategy =
+        rcp(new ACEThermalProblem(problemParams, paramLib, 2, commT));
+  } else if (method == "ACE Thermal 3D") {
+    strategy =
+        rcp(new ACEThermalProblem(problemParams, paramLib, 3, commT));
   } else if (getName(method) == "Elasticity") {
     strategy = rcp(new Albany::ElasticityProblem(
         problemParams, paramLib, getNumDim(method), rc_mgr));

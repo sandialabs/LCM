@@ -11,6 +11,7 @@ set(LCM_DIR ${Albany_SOURCE_DIR}/src/LCM)
 set(problem-sources
     "${LCM_DIR}/problems/ConstitutiveDriverProblem.cpp"
     "${LCM_DIR}/problems/ElasticityProblem.cpp"
+    "${LCM_DIR}/problems/ACEThermalProblem.cpp"
     "${LCM_DIR}/problems/ElectroMechanicsProblem.cpp"
     "${LCM_DIR}/problems/FieldNameMap.cpp"
     "${LCM_DIR}/problems/HMCProblem.cpp"
@@ -19,6 +20,7 @@ set(problem-sources
 set(problem-headers
     "${LCM_DIR}/problems/ConstitutiveDriverProblem.hpp"
     "${LCM_DIR}/problems/ElasticityProblem.hpp"
+    "${LCM_DIR}/problems/ACEThermalProblem.hpp"
     "${LCM_DIR}/problems/ElectroMechanicsProblem.hpp"
     "${LCM_DIR}/problems/FieldNameMap.hpp"
     "${LCM_DIR}/problems/HMCProblem.hpp"
@@ -206,6 +208,7 @@ set(residual-sources
     "${LCM_DIR}/evaluators/residuals/ElectrostaticResidual.cpp"
     "${LCM_DIR}/evaluators/residuals/HDiffusionDeformationMatterResidual.cpp"
     "${LCM_DIR}/evaluators/residuals/ACETemperatureResidual.cpp"
+    "${LCM_DIR}/evaluators/residuals/ACETempStandAloneResid.cpp"
     "${LCM_DIR}/evaluators/residuals/MechanicsResidual.cpp"
     "${LCM_DIR}/evaluators/residuals/StabilizedPressureResidual.cpp"
     "${LCM_DIR}/evaluators/residuals/TLElasResid.cpp")
@@ -220,6 +223,8 @@ set(residual-headers
     "${LCM_DIR}/evaluators/residuals/HDiffusionDeformationMatterResidual_Def.hpp"
     "${LCM_DIR}/evaluators/residuals/ACETemperatureResidual.hpp"
     "${LCM_DIR}/evaluators/residuals/ACETemperatureResidual_Def.hpp"
+    "${LCM_DIR}/evaluators/residuals/ACETempStandAloneResid.hpp"
+    "${LCM_DIR}/evaluators/residuals/ACETempStandAloneResid_Def.hpp"
     "${LCM_DIR}/evaluators/residuals/MechanicsResidual.hpp"
     "${LCM_DIR}/evaluators/residuals/MechanicsResidual_Def.hpp"
     "${LCM_DIR}/evaluators/residuals/StabilizedPressureResidual.hpp"

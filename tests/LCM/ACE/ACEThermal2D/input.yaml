@@ -27,6 +27,7 @@ ALBANY:
     Method: Ioss
     Exodus Input File Name: square.e
     Exodus Output File Name: square_out.exo
+    Separate Evaluators by Element Block: true
     Workset Size: -1
   Regression Results: 
     Number of Comparisons: 1

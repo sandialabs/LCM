@@ -6,8 +6,10 @@ ALBANY:
     Name: ACE Thermal 2D
     Solution Method: Transient Tempus
     Dirichlet BCs: 
-      ExpressionEvaluated SDBC on NS NodeSet3 for DOF T: '200.0 + 5.0e-04 * t'
-      #ExpressionEvaluated SDBC on NS NodeSet3 for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
+      ExpressionEvaluated SDBC on NS nodelist_5 for DOF T: '200.0 + 5.0e-04 * t'
+      ExpressionEvaluated SDBC on NS nodelist_6 for DOF T: '200.0 + 5.0e-04 * t'
+      #ExpressionEvaluated SDBC on NS nodelist_5 for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
+      #ExpressionEvaluated SDBC on NS nodelist_6 for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
     ACE Thermal Conductivity:
       ACE Thermal Conductivity Type: Constant
       Value: 1.6
@@ -22,16 +24,13 @@ ALBANY:
       Number: 1
       Response 0: Solution Average
   Discretization: 
-    1D Elements: 10
-    2D Elements: 10
-    1D Scale: 1.00000000000000000e+00
-    2D Scale: 1.00000000000000000e+00
+    Method: Ioss
+    Exodus Input File Name: square.e
+    Exodus Output File Name: square_out.exo
     Workset Size: -1
-    Method: STK2D
-    Exodus Output File Name: thermal2D_out.exo
   Regression Results: 
     Number of Comparisons: 1
-    Test Values: [2.122588137382e+02]
+    Test Values: [2.118151805082e+02]
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
   Piro: 

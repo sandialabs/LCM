@@ -5,6 +5,10 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # Copy Input file from source to binary dir
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_block_dept.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/input_block_dept.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/square.e
                  ${CMAKE_CURRENT_BINARY_DIR}/square.e COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/square.e.4.0

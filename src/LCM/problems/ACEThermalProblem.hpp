@@ -27,7 +27,6 @@ class ACEThermalProblem : public AbstractProblem
   ACEThermalProblem(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
-      // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib,
       int const                               num_dim,
       Teuchos::RCP<Teuchos::Comm<int> const>& comm);
 

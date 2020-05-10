@@ -70,12 +70,13 @@ ACEThermalConductivity<EvalT, Traits>::ACEThermalConductivity(Teuchos::Parameter
 
     if (typ == "Constant") {
       ScalarT value = subList.get("Value", 1.0);
+      std::cout << "IKT eb_name, thermal cond value = " << eb_name << ", " << value << "\n"; 
       init_constant(value, p);
     }
   }  // Block dependent
 
   else {
-    ALBANY_ABORT("Invalid thermal conductivity type " << type_);
+    ALBANY_ABORT("ACEThermalConductivity: Invalid thermal conductivity type " << type_ << "!  Valid options are currently 'Constant' and 'Block Depdendent'.");
   }
 
   this->addEvaluatedField(thermal_conductivity_);

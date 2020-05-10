@@ -17,12 +17,12 @@ merge all
 mesh surface 2 1
 
 block 1 surface 1
-
 block 1 element type QUAD4
+block 1 name "Ice"
 
 block 2 surface 2
-
 block 2 element type QUAD4
+block 2 name "Permafrost"
 
 nodeset 1 curve 4
 nodeset 2 curve 6
@@ -35,4 +35,4 @@ Sideset 1 curve 2
 
 set large exodus file off
 
-export mesh "square.exo" overwrite
+export mesh "square.e" overwrite

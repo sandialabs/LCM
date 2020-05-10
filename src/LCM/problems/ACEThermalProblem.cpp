@@ -13,7 +13,6 @@
 Albany::ACEThermalProblem::ACEThermalProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
     const Teuchos::RCP<ParamLib>&               param_lib,
-    // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib_,
     int const                               num_dim,
     Teuchos::RCP<Teuchos::Comm<int> const>& comm)
     : Albany::AbstractProblem(params, param_lib /*, distParamLib_*/),

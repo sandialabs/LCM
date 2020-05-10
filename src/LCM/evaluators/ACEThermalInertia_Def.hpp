@@ -70,12 +70,13 @@ ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p)
 
     if (typ == "Constant") {
       ScalarT value = subList.get("Value", 1.0);
+      std::cout << "IKT eb_name, thermal inertia value = " << eb_name << ", " << value << "\n"; 
       init_constant(value, p);
     }
   }  // Block dependent
 
   else {
-    ALBANY_ABORT("Invalid thermal inertia type " << type_);
+    ALBANY_ABORT("ACEThermalInertia: Invalid thermal inertia type " << type_ << "!  Valid options are currently 'Constant' and 'Block Depdendent'.");
   }
 
   this->addEvaluatedField(thermal_inertia_);

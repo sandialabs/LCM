@@ -28,13 +28,14 @@ Albany::ACEThermalProblem::ACEThermalProblem(
 
   Teuchos::Array<double> defaultData;
   defaultData.resize(numDim, 1.0);
-  kappa =
-      params->get<Teuchos::Array<double>>("Thermal Conductivity", defaultData);
-  if (kappa.size() != numDim) {
-    ALBANY_ABORT("Thermal Conductivity array must have length = numDim!");
-  }
   rho = params->get<double>("Density", 1.0);
   C   = params->get<double>("Heat Capacity", 1.0);
+
+  if (params->isType<std::string>("MaterialDB Filename")) {
+    std::string mtrlDbFilename = params->get<std::string>("MaterialDB Filename");
+ // Create Material Database
+    materialDB = Teuchos::rcp(new Albany::MaterialDatabase(mtrlDbFilename, commT));
+  }
 }
 
 Albany::ACEThermalProblem::~ACEThermalProblem() {}
@@ -177,13 +178,11 @@ Albany::ACEThermalProblem::getValidProblemParameters() const
 
   Teuchos::Array<double> defaultData;
   defaultData.resize(numDim, 1.0);
-  validPL->set<Teuchos::Array<double>>(
-      "Thermal Conductivity",
-      defaultData,
-      "Arrays of values of thermal conductivities in x, y, z [required]");
   validPL->set<double>(
       "Heat Capacity", 1.0, "Value of heat capacity [required]");
   validPL->set<double>("Density", 1.0, "Value of density [required]");
+  validPL->sublist("ACEThermalConductivity", false, "");
+  validPL->set<std::string>("MaterialDB Filename","materials.xml","Filename of material database xml file");
 
   return validPL;
 }

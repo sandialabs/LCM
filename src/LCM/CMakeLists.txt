@@ -34,6 +34,7 @@ set(HEADERS)
 set(evaluator-sources
     "${LCM_DIR}/evaluators/BifurcationCheck.cpp"
     "${LCM_DIR}/evaluators/BodyForce.cpp"
+    "${LCM_DIR}/evaluators/ACEThermalConductivity.cpp"
     "${LCM_DIR}/evaluators/Density.cpp"
     "${LCM_DIR}/evaluators/NodePointVecInterpolation.cpp"
     "${LCM_DIR}/evaluators/SetField.cpp"
@@ -44,6 +45,8 @@ set(evaluator-headers
     "${LCM_DIR}/evaluators/BifurcationCheck.hpp"
     "${LCM_DIR}/evaluators/BodyForce_Def.hpp"
     "${LCM_DIR}/evaluators/BodyForce.hpp"
+    "${LCM_DIR}/evaluators/ACEThermalConductivity_Def.hpp"
+    "${LCM_DIR}/evaluators/ACEThermalConductivity.hpp"
     "${LCM_DIR}/evaluators/Density_Def.hpp"
     "${LCM_DIR}/evaluators/Density.hpp"
     "${LCM_DIR}/evaluators/NodePointVecInterpolation_Def.hpp"

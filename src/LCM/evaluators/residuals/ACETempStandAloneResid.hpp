@@ -46,6 +46,7 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::Array<double> kappa;  // Thermal Conductivity array
   double                 C;      // Heat Capacity
   double                 rho;    // Density
+  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_conductivity;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> TResidual;

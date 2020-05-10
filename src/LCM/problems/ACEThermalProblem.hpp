@@ -95,9 +95,9 @@ class ACEThermalProblem : public AbstractProblem
 
  protected:
   int                    numDim;  // number spatial dimensions
-  Teuchos::Array<double> kappa;   // thermal conductivity
   double                 C;       // heat capacity
   double                 rho;     // density
+  Teuchos::RCP<Albany::MaterialDatabase> materialDB;
 
   const Teuchos::RCP<Teuchos::ParameterList> params;
 
@@ -116,8 +116,7 @@ class ACEThermalProblem : public AbstractProblem
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
-#include "PHAL_Absorption.hpp"
-//#include "PHAL_ThermalConductivity.hpp"
+#include "ACEThermalConductivity.hpp"
 #include "ACETempStandAloneResid.hpp"
 #include "Shards_CellTopology.hpp"
 
@@ -208,6 +207,30 @@ Albany::ACEThermalProblem::constructEvaluators(
         evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
 
+  { // ACE thermal conductivity
+    RCP<ParameterList> p = rcp(new ParameterList);
+
+    p->set<string>("QP Variable Name", "ACE ThermalConductivity");
+    p->set<string>("QP Coordinate Vector Name", "Coord Vec");
+    p->set< RCP<DataLayout> >("Node Data Layout", dl->node_scalar);
+    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl->qp_scalar);
+    p->set< RCP<DataLayout> >("QP Vector Data Layout", dl->qp_vector);
+
+    p->set<RCP<ParamLib> >("Parameter Library", paramLib);
+    Teuchos::ParameterList& paramList = params->sublist("ACEThermalConductivity");
+    p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
+
+    // Here we assume that the instance of this problem applies on a single element block
+    p->set<string>("Element Block Name", meshSpecs.ebName);
+
+    if(materialDB != Teuchos::null)
+      p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", materialDB);
+
+    ev = rcp(new LCM::ACEThermalConductivity<EvalT,AlbanyTraits>(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+  }
+              
+
   {  // Temperature Resid
     RCP<ParameterList> p = rcp(new ParameterList("Temperature Resid"));
 
@@ -222,9 +245,11 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl->qp_vector);
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl->node_qp_vector);
 
-    p->set<Teuchos::Array<double>>("Thermal Conductivity", kappa);
     p->set<double>("Heat Capacity", C);
     p->set<double>("Density", rho);
+
+    p->set<string>("ACE ThermalConductivity Name", "ACE ThermalConductivity");
+    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl->qp_scalar);
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");

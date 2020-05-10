@@ -182,6 +182,7 @@ Albany::ACEThermalProblem::getValidProblemParameters() const
       "Heat Capacity", 1.0, "Value of heat capacity [required]");
   validPL->set<double>("Density", 1.0, "Value of density [required]");
   validPL->sublist("ACEThermalConductivity", false, "");
+  validPL->sublist("ACEThermalInertia", false, "");
   validPL->set<std::string>("MaterialDB Filename","materials.xml","Filename of material database xml file");
 
   return validPL;

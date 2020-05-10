@@ -117,6 +117,7 @@ class ACEThermalProblem : public AbstractProblem
 #include "Albany_Utils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
 #include "ACEThermalConductivity.hpp"
+#include "ACEThermalInertia.hpp"
 #include "ACETempStandAloneResid.hpp"
 #include "Shards_CellTopology.hpp"
 
@@ -207,7 +208,8 @@ Albany::ACEThermalProblem::constructEvaluators(
         evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
 
-  { // ACE thermal conductivity
+  // ACE thermal conductivity
+  {
     RCP<ParameterList> p = rcp(new ParameterList);
 
     p->set<string>("QP Variable Name", "ACE ThermalConductivity");
@@ -230,7 +232,30 @@ Albany::ACEThermalProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
               
+  // ACE thermal inertia
+  {
+    RCP<ParameterList> p = rcp(new ParameterList);
 
+    p->set<string>("QP Variable Name", "ACE ThermalInertia");
+    p->set<string>("QP Coordinate Vector Name", "Coord Vec");
+    p->set< RCP<DataLayout> >("Node Data Layout", dl->node_scalar);
+    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl->qp_scalar);
+    p->set< RCP<DataLayout> >("QP Vector Data Layout", dl->qp_vector);
+
+    p->set<RCP<ParamLib> >("Parameter Library", paramLib);
+    Teuchos::ParameterList& paramList = params->sublist("ACEThermalInertia");
+    p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
+
+    // Here we assume that the instance of this problem applies on a single element block
+    p->set<string>("Element Block Name", meshSpecs.ebName);
+
+    if(materialDB != Teuchos::null)
+      p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", materialDB);
+
+    ev = rcp(new LCM::ACEThermalInertia<EvalT,AlbanyTraits>(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+  }
+              
   {  // Temperature Resid
     RCP<ParameterList> p = rcp(new ParameterList("Temperature Resid"));
 
@@ -249,6 +274,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<double>("Density", rho);
 
     p->set<string>("ACE ThermalConductivity Name", "ACE ThermalConductivity");
+    p->set<string>("ACE ThermalInertia Name", "ACE ThermalInertia");
     p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl->qp_scalar);
 
     // Output

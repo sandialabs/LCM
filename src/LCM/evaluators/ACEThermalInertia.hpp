@@ -2,8 +2,8 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#ifndef ACETHERMALCONDUCTIVITY_HPP
-#define ACETHERMALCONDUCTIVITY_HPP
+#ifndef ACETHERMALINERTIA_HPP
+#define ACETHERMALINERTIA_HPP
 
 #include "Albany_MaterialDatabase.hpp"
 #include "Albany_Types.hpp"
@@ -18,19 +18,19 @@
 
 namespace LCM {
 /**
- * \brief Evaluates thermal conductivity.
+ * \brief Evaluates thermal inertia.
 
 This class may be used in two ways.
 
-1. The simplest is to use a constant thermal conductivity across the entire
+1. The simplest is to use a constant thermal inertia across the entire
 domain (one element block, one material), say with a value of 5.0. In this case,
-one would declare at the "Problem" level, that a constant thermal conductivity
+one would declare at the "Problem" level, that a constant thermal inertia
 was being used, and its value was 5.0:
 
 <ParameterList name="Problem">
    ...
-    <ParameterList name="ACEThermalConductivity">
-       <Parameter name="ACEThermalConductivity Type" type="string"
+    <ParameterList name="ACEThermalInertia">
+       <Parameter name="ACEThermalInertia Type" type="string"
 value="Constant"/> <Parameter name="Value" type="double" value="5.0"/>
     </ParameterList>
 </ParameterList>
@@ -42,7 +42,7 @@ field manager, and different evaluators are used in each element block.
  */
 
 template <typename EvalT, typename Traits>
-class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
+class ACEThermalInertia : public PHX::EvaluatorWithBaseImpl<Traits>,
                             public PHX::EvaluatorDerived<EvalT, Traits>,
                             public Sacado::ParameterAccessor<EvalT, SPL_Traits>
 {
@@ -50,7 +50,7 @@ class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  ACEThermalConductivity(Teuchos::ParameterList& p);
+  ACEThermalInertia(Teuchos::ParameterList& p);
 
   void
   postRegistrationSetup(
@@ -64,7 +64,7 @@ class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   getValue(std::string const& n);
 
  private:
-  //! Validate the name strings under "ACEThermalConductivity" section in xml input
+  //! Validate the name strings under "ACEThermalInertia" section in xml input
   //! file,
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;
@@ -74,10 +74,9 @@ class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::size_t                                           numQPs;
   std::size_t                                           numDims;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordVec;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia;
 
-  //! Conductivity type
+  //! Inertia type
   std::string type;
 
   //! Constant value
@@ -86,10 +85,10 @@ class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Values of the random variables
   Teuchos::Array<ScalarT> rv;
 
-  //! Material database - holds thermal conductivity among other quantities
+  //! Material database - holds thermal inertia among other quantities
   Teuchos::RCP<Albany::MaterialDatabase> materialDB;
 
-  //! Convenience function to initialize constant thermal conductivity
+  //! Convenience function to initialize constant thermal inertia
   void
   init_constant(ScalarT value, Teuchos::ParameterList& p);
 

@@ -43,10 +43,8 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT const, Cell, QuadPoint>                Tdot;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           TGrad;
-  Teuchos::Array<double> kappa;  // Thermal Conductivity array
-  double                 C;      // Heat Capacity
-  double                 rho;    // Density
-  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_conductivity;
+  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_conductivity; //thermal conductivity
+  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_inertia; //thermal inertia = rho * C
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> TResidual;

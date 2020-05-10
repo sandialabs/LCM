@@ -26,11 +26,6 @@ Albany::ACEThermalProblem::ACEThermalProblem(
   // We just have 1 PDE/node
   neq = 1;
 
-  Teuchos::Array<double> defaultData;
-  defaultData.resize(numDim, 1.0);
-  rho = params->get<double>("Density", 1.0);
-  C   = params->get<double>("Heat Capacity", 1.0);
-
   if (params->isType<std::string>("MaterialDB Filename")) {
     std::string mtrlDbFilename = params->get<std::string>("MaterialDB Filename");
  // Create Material Database
@@ -176,11 +171,6 @@ Albany::ACEThermalProblem::getValidProblemParameters() const
   Teuchos::RCP<Teuchos::ParameterList> validPL =
       this->getGenericProblemParams("ValidACEThermalProblemParams");
 
-  Teuchos::Array<double> defaultData;
-  defaultData.resize(numDim, 1.0);
-  validPL->set<double>(
-      "Heat Capacity", 1.0, "Value of heat capacity [required]");
-  validPL->set<double>("Density", 1.0, "Value of density [required]");
   validPL->sublist("ACE Thermal Conductivity", false, "");
   validPL->sublist("ACE Thermal Inertia", false, "");
   validPL->set<std::string>("MaterialDB Filename","materials.xml","Filename of material database xml file");

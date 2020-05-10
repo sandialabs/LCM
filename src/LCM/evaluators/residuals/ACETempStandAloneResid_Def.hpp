@@ -12,41 +12,41 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::ParameterList const& p)
-    : wBF(p.get<std::string>("Weighted BF Name"),
+    : wbf_(p.get<std::string>("Weighted BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      Tdot(
+      tdot_(
           p.get<std::string>("QP Time Derivative Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      wGradBF(
+      wgradbf_(
           p.get<std::string>("Weighted Gradient BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      TGrad(
+      tgrad_(
           p.get<std::string>("Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      TResidual(
+      residual_(
           p.get<std::string>("Residual Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
-      thermal_conductivity(p.get<std::string>   ("ACE Thermal Conductivity Name"),
+      thermal_conductivity_(p.get<std::string>   ("ACE Thermal Conductivity Name"),
                p.get<Teuchos::RCP<PHX::DataLayout> >("QP Scalar Data Layout") ),
-      thermal_inertia(p.get<std::string>   ("ACE Thermal Inertia Name"),
+      thermal_inertia_(p.get<std::string>   ("ACE Thermal Inertia Name"),
                p.get<Teuchos::RCP<PHX::DataLayout> >("QP Scalar Data Layout") )
 {
-  this->addDependentField(wBF);
-  this->addDependentField(Tdot);
-  this->addDependentField(TGrad);
-  this->addDependentField(wGradBF);
-  this->addDependentField(thermal_conductivity);
-  this->addDependentField(thermal_inertia);
-  this->addEvaluatedField(TResidual);
+  this->addDependentField(wbf_);
+  this->addDependentField(tdot_);
+  this->addDependentField(tgrad_);
+  this->addDependentField(wgradbf_);
+  this->addDependentField(thermal_conductivity_);
+  this->addDependentField(thermal_inertia_);
+  this->addEvaluatedField(residual_);
 
   Teuchos::RCP<PHX::DataLayout> vector_dl =
       p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
-  worksetSize = dims[0];
-  numNodes    = dims[1];
-  numQPs      = dims[2];
-  numDims     = dims[3];
+  workset_size_ = dims[0];
+  num_nodes_    = dims[1];
+  num_qps_      = dims[2];
+  num_dims_      = dims[3];
   this->setName("ACETempStandAloneResid");
 }
 
@@ -57,13 +57,13 @@ ACETempStandAloneResid<EvalT, Traits>::postRegistrationSetup(
     typename Traits::SetupData d,
     PHX::FieldManager<Traits>& fm)
 {
-  this->utils.setFieldData(wBF, fm);
-  this->utils.setFieldData(TGrad, fm);
-  this->utils.setFieldData(wGradBF, fm);
-  this->utils.setFieldData(Tdot, fm);
-  this->utils.setFieldData(TResidual, fm);
-  this->utils.setFieldData(thermal_conductivity, fm);
-  this->utils.setFieldData(thermal_inertia, fm);
+  this->utils.setFieldData(wbf_, fm);
+  this->utils.setFieldData(tgrad_, fm);
+  this->utils.setFieldData(wgradbf_, fm);
+  this->utils.setFieldData(tdot_, fm);
+  this->utils.setFieldData(residual_, fm);
+  this->utils.setFieldData(thermal_conductivity_, fm);
+  this->utils.setFieldData(thermal_inertia_, fm);
 }
 
 //*****
@@ -71,20 +71,18 @@ template <typename EvalT, typename Traits>
 void
 ACETempStandAloneResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
-
   // We are solving the following PDE:
-  // thermal_inertia * dT/dt - thermal_conductivity * \nabla T = 0 in 3D
-  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    for (std::size_t node = 0; node < numNodes; ++node) {
-      TResidual(cell, node) = 0.0;
-      for (std::size_t qp = 0; qp < numQPs; ++qp) {
+  // thermal_inertia_ * dT/dt - thermal_conductivity_ * \nabla T = 0 in 3D
+  for (std::size_t cell = 0; cell < workset_size_; ++cell) {
+    for (std::size_t node = 0; node < num_nodes_; ++node) {
+      residual_(cell, node) = 0.0;
+      for (std::size_t qp = 0; qp < num_qps_; ++qp) {
         // Time-derivative contribution to residual
-        TResidual(cell, node) += thermal_inertia(cell, qp) * Tdot(cell, qp) * wBF(cell, node, qp);
+        residual_(cell, node) += thermal_inertia_(cell, qp) * tdot_(cell, qp) * wbf_(cell, node, qp);
         // Diffusion part of residual
-        for (std::size_t ndim = 0; ndim < numDims; ++ndim) {
-          TResidual(cell, node) += thermal_conductivity(cell, qp) * TGrad(cell, qp, ndim) *
-                                   wGradBF(cell, node, qp, ndim);
+        for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
+          residual_(cell, node) += thermal_conductivity_(cell, qp) * tgrad_(cell, qp, ndim) *
+                                   wgradbf_(cell, node, qp, ndim);
         }
       }
     }

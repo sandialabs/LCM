@@ -71,22 +71,19 @@ class ACEThermalInertia : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   bool is_constant;
 
-  std::size_t                                           numQPs;
-  std::size_t                                           numDims;
-  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordVec;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia;
+  std::size_t                                           num_qps_;
+  std::size_t                                           num_dims_;
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia_;
 
   //! Inertia type
-  std::string type;
+  std::string type_;
 
   //! Constant value
-  ScalarT constant_value;
-
-  //! Values of the random variables
-  Teuchos::Array<ScalarT> rv;
+  ScalarT constant_value_;
 
   //! Material database - holds thermal inertia among other quantities
-  Teuchos::RCP<Albany::MaterialDatabase> materialDB;
+  Teuchos::RCP<Albany::MaterialDatabase> material_db_;
 
   //! Convenience function to initialize constant thermal inertia
   void

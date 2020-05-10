@@ -95,8 +95,6 @@ class ACEThermalProblem : public AbstractProblem
 
  protected:
   int                    numDim;  // number spatial dimensions
-  double                 C;       // heat capacity
-  double                 rho;     // density
   Teuchos::RCP<Albany::MaterialDatabase> materialDB;
 
   const Teuchos::RCP<Teuchos::ParameterList> params;
@@ -269,9 +267,6 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl->qp_scalar);
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl->qp_vector);
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl->node_qp_vector);
-
-    p->set<double>("Heat Capacity", C);
-    p->set<double>("Density", rho);
 
     p->set<string>("ACE Thermal Conductivity Name", "ACE Thermal Conductivity");
     p->set<string>("ACE Thermal Inertia Name", "ACE Thermal Inertia");

@@ -39,17 +39,17 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wBF;
-  PHX::MDField<ScalarT const, Cell, QuadPoint>                Tdot;
-  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
-  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           TGrad;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_conductivity; //thermal conductivity
-  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_inertia; //thermal inertia = rho * C
+  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wbf_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                tdot_;
+  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wgradbf_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           tgrad_;
+  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_conductivity_; //thermal conductivity
+  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_inertia_; //thermal inertia = rho * C
 
   // Output:
-  PHX::MDField<ScalarT, Cell, Node> TResidual;
+  PHX::MDField<ScalarT, Cell, Node> residual_;
 
-  unsigned int numQPs, numDims, numNodes, worksetSize;
+  unsigned int num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
 };
 }  // namespace LCM
 

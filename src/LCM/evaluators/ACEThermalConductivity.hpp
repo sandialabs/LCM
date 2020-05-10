@@ -29,8 +29,8 @@ was being used, and its value was 5.0:
 
 <ParameterList name="Problem">
    ...
-    <ParameterList name="ACEThermalConductivity">
-       <Parameter name="ACEThermalConductivity Type" type="string"
+    <ParameterList name="ACE Thermal Conductivity">
+       <Parameter name="ACE Thermal Conductivity Type" type="string"
 value="Constant"/> <Parameter name="Value" type="double" value="5.0"/>
     </ParameterList>
 </ParameterList>
@@ -64,30 +64,27 @@ class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   getValue(std::string const& n);
 
  private:
-  //! Validate the name strings under "ACEThermalConductivity" section in xml input
+  //! Validate the name strings under "ACE Thermal Conductivity" section in xml input
   //! file,
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;
 
   bool is_constant;
 
-  std::size_t                                           numQPs;
-  std::size_t                                           numDims;
-  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordVec;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia;
+  std::size_t                                           num_qps_;
+  std::size_t                                           num_dims_;
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia_;
 
   //! Conductivity type
-  std::string type;
+  std::string type_;
 
   //! Constant value
-  ScalarT constant_value;
-
-  //! Values of the random variables
-  Teuchos::Array<ScalarT> rv;
+  ScalarT constant_value_;
 
   //! Material database - holds thermal conductivity among other quantities
-  Teuchos::RCP<Albany::MaterialDatabase> materialDB;
+  Teuchos::RCP<Albany::MaterialDatabase> material_db_;
 
   //! Convenience function to initialize constant thermal conductivity
   void

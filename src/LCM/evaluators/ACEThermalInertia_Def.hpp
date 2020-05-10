@@ -64,9 +64,9 @@ ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p)
     // DB (the material in the elem block ebName.
 
     Teuchos::ParameterList& subList =
-        materialDB->getElementBlockSublist(ebName, "ACEThermalInertia");
+        materialDB->getElementBlockSublist(ebName, "ACE Thermal Inertia");
 
-    std::string typ = subList.get("ACEThermalInertia Type", "Constant");
+    std::string typ = subList.get("ACE Thermal Inertia Type", "Constant");
 
     if (typ == "Constant") {
       ScalarT value = subList.get("Value", 1.0);
@@ -79,7 +79,7 @@ ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p)
   }
 
   this->addEvaluatedField(thermal_inertia);
-  this->setName("ACEThermalInertia");
+  this->setName("ACE Thermal Inertia");
 }
 
 template <typename EvalT, typename Traits>
@@ -96,7 +96,7 @@ ACEThermalInertia<EvalT, Traits>::init_constant(
   Teuchos::RCP<ParamLib> paramLib =
       p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
-  this->registerSacadoParameter("ACEThermalInertia", paramLib);
+  this->registerSacadoParameter("ACE Thermal Inertia", paramLib);
 
 }  // init_constant
 
@@ -145,10 +145,10 @@ Teuchos::RCP<Teuchos::ParameterList const>
 ACEThermalInertia<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
-      rcp(new Teuchos::ParameterList("Valid ACEThermalInertia Params"));
+      rcp(new Teuchos::ParameterList("Valid ACE Thermal Inertia Params"));
   ;
 
-  validPL->set<std::string>("ACEThermalInertia Type", "Constant",
+  validPL->set<std::string>("ACE Thermal Inertia Type", "Constant",
       "Constant thermal inertia across the entire domain");
   validPL->set<double>("Value", 1.0, "Constant thermal inertia value");
 

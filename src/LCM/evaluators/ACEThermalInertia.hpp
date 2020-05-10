@@ -29,8 +29,8 @@ was being used, and its value was 5.0:
 
 <ParameterList name="Problem">
    ...
-    <ParameterList name="ACEThermalInertia">
-       <Parameter name="ACEThermalInertia Type" type="string"
+    <ParameterList name="ACE Thermal Inertia">
+       <Parameter name="ACE Thermal Inertia Type" type="string"
 value="Constant"/> <Parameter name="Value" type="double" value="5.0"/>
     </ParameterList>
 </ParameterList>
@@ -64,7 +64,7 @@ class ACEThermalInertia : public PHX::EvaluatorWithBaseImpl<Traits>,
   getValue(std::string const& n);
 
  private:
-  //! Validate the name strings under "ACEThermalInertia" section in xml input
+  //! Validate the name strings under "ACE Thermal Inertia" section in xml input
   //! file,
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;

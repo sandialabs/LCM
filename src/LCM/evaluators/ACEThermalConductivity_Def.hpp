@@ -39,7 +39,7 @@ ACEThermalConductivity<EvalT, Traits>::ACEThermalConductivity(Teuchos::Parameter
 
   std::string ebName = p.get<std::string>("Element Block Name", "Missing");
 
-  type = cond_list->get("ACEThermalConductivity Type", "Constant");
+  type = cond_list->get("ACE Thermal Conductivity Type", "Constant");
   if (type == "Constant") {
     ScalarT value = cond_list->get("Value", 1.0);
     init_constant(value, p);
@@ -64,9 +64,9 @@ ACEThermalConductivity<EvalT, Traits>::ACEThermalConductivity(Teuchos::Parameter
     // DB (the material in the elem block ebName.
 
     Teuchos::ParameterList& subList =
-        materialDB->getElementBlockSublist(ebName, "ACEThermalConductivity");
+        materialDB->getElementBlockSublist(ebName, "ACE Thermal Conductivity");
 
-    std::string typ = subList.get("ACEThermalConductivity Type", "Constant");
+    std::string typ = subList.get("ACE Thermal Conductivity Type", "Constant");
 
     if (typ == "Constant") {
       ScalarT value = subList.get("Value", 1.0);
@@ -79,7 +79,7 @@ ACEThermalConductivity<EvalT, Traits>::ACEThermalConductivity(Teuchos::Parameter
   }
 
   this->addEvaluatedField(thermal_conductivity);
-  this->setName("ACEThermalConductivity");
+  this->setName("ACE Thermal Conductivity");
 }
 
 template <typename EvalT, typename Traits>
@@ -96,7 +96,7 @@ ACEThermalConductivity<EvalT, Traits>::init_constant(
   Teuchos::RCP<ParamLib> paramLib =
       p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
-  this->registerSacadoParameter("ACEThermalConductivity", paramLib);
+  this->registerSacadoParameter("ACE Thermal Conductivity", paramLib);
 
 }  // init_constant
 
@@ -135,7 +135,7 @@ ACEThermalConductivity<EvalT, Traits>::getValue(std::string const& n)
   ALBANY_ABORT(
       std::endl
       << "Error! Logic error in getting parameter " << n
-      << " in ACEThermalConductivity::getValue()" << std::endl);
+      << " in ACE Thermal Conductivity::getValue()" << std::endl);
   return constant_value;
 }
 
@@ -145,10 +145,10 @@ Teuchos::RCP<Teuchos::ParameterList const>
 ACEThermalConductivity<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL =
-      rcp(new Teuchos::ParameterList("Valid ACEThermalConductivity Params"));
+      rcp(new Teuchos::ParameterList("Valid ACE Thermal Conductivity Params"));
   ;
 
-  validPL->set<std::string>("ACEThermalConductivity Type", "Constant",
+  validPL->set<std::string>("ACE Thermal Conductivity Type", "Constant",
       "Constant thermal conductivity across the entire domain");
   validPL->set<double>("Value", 1.0, "Constant thermal conductivity value");
 

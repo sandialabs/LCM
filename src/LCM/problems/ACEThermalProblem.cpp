@@ -11,15 +11,15 @@
 #include "Shards_CellTopology.hpp"
 
 Albany::ACEThermalProblem::ACEThermalProblem(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<ParamLib>&               paramLib_,
+    const Teuchos::RCP<Teuchos::ParameterList>& params,
+    const Teuchos::RCP<ParamLib>&               param_lib,
     // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib_,
-    int const                               numDim_,
-    Teuchos::RCP<Teuchos::Comm<int> const>& commT_)
-    : Albany::AbstractProblem(params_, paramLib_ /*, distParamLib_*/),
-      params(params_),
-      numDim(numDim_),
-      commT(commT_),
+    int const                               num_dim,
+    Teuchos::RCP<Teuchos::Comm<int> const>& comm)
+    : Albany::AbstractProblem(params, param_lib /*, distParamLib_*/),
+      params_(params),
+      num_dim_(num_dim),
+      comm_(comm),
       use_sdbcs_(false)
 {
   this->setNumEquations(1);
@@ -27,9 +27,9 @@ Albany::ACEThermalProblem::ACEThermalProblem(
   neq = 1;
 
   if (params->isType<std::string>("MaterialDB Filename")) {
-    std::string mtrlDbFilename = params->get<std::string>("MaterialDB Filename");
+    std::string mtrl_db_filename = params->get<std::string>("MaterialDB Filename");
  // Create Material Database
-    materialDB = Teuchos::rcp(new Albany::MaterialDatabase(mtrlDbFilename, commT));
+    material_db_ = Teuchos::rcp(new Albany::MaterialDatabase(mtrl_db_filename, comm_));
   }
 }
 
@@ -37,51 +37,51 @@ Albany::ACEThermalProblem::~ACEThermalProblem() {}
 
 void
 Albany::ACEThermalProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> mesh_specs,
+    Albany::StateManager&                                    state_mgr)
 {
   /* Construct All Phalanx Evaluators */
-  int physSets = meshSpecs.size();
-  std::cout << "Heat Problem Num MeshSpecs: " << physSets << std::endl;
-  fm.resize(physSets);
+  int phys_sets = mesh_specs.size();
+  std::cout << "ACE Thermal Problem Num MeshSpecs: " << phys_sets << "\n"; 
+  fm.resize(phys_sets);
 
-  for (int ps = 0; ps < physSets; ps++) {
+  for (int ps = 0; ps < phys_sets; ps++) {
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
     buildEvaluators(
-        *fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
+        *fm[ps], *mesh_specs[ps], state_mgr, BUILD_RESID_FM, Teuchos::null);
   }
 
-  if (meshSpecs[0]->nsNames.size() >
+  if (mesh_specs[0]->nsNames.size() >
       0) {  // Build a nodeset evaluator if nodesets are present
-    constructDirichletEvaluators(meshSpecs[0]->nsNames);
+    constructDirichletEvaluators(mesh_specs[0]->nsNames);
   }
 
   // Check if have Neumann sublist; throw error if attempting to specify
   // Neumann BCs, but there are no sidesets in the input mesh
-  bool isNeumannPL = params->isSublist("Neumann BCs");
-  if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
+  bool is_neumann_pl = params->isSublist("Neumann BCs");
+  if (is_neumann_pl && !(mesh_specs[0]->ssNames.size() > 0)) {
     ALBANY_ABORT(
         "You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() >
+  if (mesh_specs[0]->ssNames.size() >
       0) {  // Build a sideset evaluator if sidesets are present
-    constructNeumannEvaluators(meshSpecs[0]);
+    constructNeumannEvaluators(mesh_specs[0]);
   }
 }
 
 Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
 Albany::ACEThermalProblem::buildEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    Albany::MeshSpecsStruct const&              meshSpecs,
-    Albany::StateManager&                       stateMgr,
+    Albany::MeshSpecsStruct const&              mesh_specs,
+    Albany::StateManager&                       state_mgr,
     Albany::FieldManagerChoice                  fmchoice,
-    const Teuchos::RCP<Teuchos::ParameterList>& responseList)
+    const Teuchos::RCP<Teuchos::ParameterList>& response_list)
 {
-  // Call constructEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
+  // Call constructEvaluators<EvalT>(*rfm[0], *mesh_specs[0], state_mgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
   ConstructEvaluatorsOp<ACEThermalProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+      *this, fm0, mesh_specs, state_mgr, fmchoice, response_list);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
@@ -89,42 +89,42 @@ Albany::ACEThermalProblem::buildEvaluators(
 // Dirichlet BCs
 void
 Albany::ACEThermalProblem::constructDirichletEvaluators(
-    std::vector<std::string> const& nodeSetIDs)
+    std::vector<std::string> const& node_set_ids)
 {
   // Construct BC evaluators for all node sets and names
-  std::vector<std::string> bcNames(neq);
-  bcNames[0] = "T";
-  Albany::BCUtils<Albany::DirichletTraits> bcUtils;
-  dfm = bcUtils.constructBCEvaluators(
-      nodeSetIDs, bcNames, this->params, this->paramLib);
-  use_sdbcs_  = bcUtils.useSDBCs();
-  offsets_    = bcUtils.getOffsets();
-  nodeSetIDs_ = bcUtils.getNodeSetIDs();
+  std::vector<std::string> bc_names(neq);
+  bc_names[0] = "T";
+  Albany::BCUtils<Albany::DirichletTraits> bc_utils;
+  dfm = bc_utils.constructBCEvaluators(
+      node_set_ids, bc_names, this->params, this->paramLib);
+  use_sdbcs_  = bc_utils.useSDBCs();
+  offsets_    = bc_utils.getOffsets();
+  nodeSetIDs_ = bc_utils.getNodeSetIDs();
 }
 
 // Neumann BCs
 void
 Albany::ACEThermalProblem::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
+    const Teuchos::RCP<Albany::MeshSpecsStruct>& mesh_specs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
-  // i.e. meshSpecs.ssNames.size() > 0
+  // i.e. mesh_specs.ssNames.size() > 0
 
-  Albany::BCUtils<Albany::NeumannTraits> bcUtils;
+  Albany::BCUtils<Albany::NeumannTraits> bc_utils;
 
   // Check to make sure that Neumann BCs are given in the input file
 
-  if (!bcUtils.haveBCSpecified(this->params)) return;
+  if (!bc_utils.haveBCSpecified(this->params)) return;
 
   // Construct BC evaluators for all side sets and names
   // Note that the string index sets up the equation offset, so ordering is
   // important
-  std::vector<std::string>            bcNames(neq);
+  std::vector<std::string>            bc_names(neq);
   Teuchos::ArrayRCP<std::string>      dof_names(neq);
   Teuchos::Array<Teuchos::Array<int>> offsets;
   offsets.resize(neq);
 
-  bcNames[0]   = "T";
+  bc_names[0]   = "T";
   dof_names[0] = "Temperature";
   offsets[0].resize(1);
   offsets[0][0] = 0;
@@ -132,35 +132,33 @@ Albany::ACEThermalProblem::constructNeumannEvaluators(
   // Construct BC evaluators for all possible names of conditions
   // Should only specify flux vector components (dudx, dudy, dudz), or dudn, not
   // both
-  std::vector<std::string> condNames(5);
+  std::vector<std::string> cond_names(5);
   // dudx, dudy, dudz, dudn, scaled jump (internal surface), or robin (like DBC
   // plus scaled jump)
 
   // Note that sidesets are only supported for two and 3D currently
-  if (numDim == 2)
-    condNames[0] = "(dudx, dudy)";
-  else if (numDim == 3)
-    condNames[0] = "(dudx, dudy, dudz)";
+  if (num_dim_ == 2)
+    cond_names[0] = "(dudx, dudy)";
+  else if (num_dim_ == 3)
+    cond_names[0] = "(dudx, dudy, dudz)";
   else
-    ALBANY_ABORT(
-        std::endl
-        << "Error: Sidesets only supported in 2 and 3D." << std::endl);
+    ALBANY_ABORT("\nError: Sidesets only supported in 2 and 3D.\n");
 
-  condNames[1] = "dudn";
-  condNames[2] = "scaled jump";
-  condNames[3] = "robin";
-  condNames[4] = "radiate";
+  cond_names[1] = "dudn";
+  cond_names[2] = "scaled jump";
+  cond_names[3] = "robin";
+  cond_names[4] = "radiate";
 
   nfm.resize(1);  // Heat problem only has one physics set
-  nfm[0] = bcUtils.constructBCEvaluators(
-      meshSpecs,
-      bcNames,
+  nfm[0] = bc_utils.constructBCEvaluators(
+      mesh_specs,
+      bc_names,
       dof_names,
       false,
       0,
-      condNames,
+      cond_names,
       offsets,
-      dl,
+      dl_,
       this->params,
       this->paramLib);
 }
@@ -168,12 +166,12 @@ Albany::ACEThermalProblem::constructNeumannEvaluators(
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ACEThermalProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
+  Teuchos::RCP<Teuchos::ParameterList> valid_pl =
       this->getGenericProblemParams("ValidACEThermalProblemParams");
 
-  validPL->sublist("ACE Thermal Conductivity", false, "");
-  validPL->sublist("ACE Thermal Inertia", false, "");
-  validPL->set<std::string>("MaterialDB Filename","materials.xml","Filename of material database xml file");
+  valid_pl->sublist("ACE Thermal Conductivity", false, "");
+  valid_pl->sublist("ACE Thermal Inertia", false, "");
+  valid_pl->set<std::string>("MaterialDB Filename","materials.xml","Filename of material database xml file");
 
-  return validPL;
+  return valid_pl;
 }

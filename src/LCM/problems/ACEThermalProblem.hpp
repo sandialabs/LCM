@@ -28,8 +28,8 @@ class ACEThermalProblem : public AbstractProblem
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
       // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib,
-      int const                               numDim_,
-      Teuchos::RCP<Teuchos::Comm<int> const>& commT_);
+      int const                               num_dim,
+      Teuchos::RCP<Teuchos::Comm<int> const>& comm);
 
   //! Destructor
   ~ACEThermalProblem();
@@ -38,7 +38,7 @@ class ACEThermalProblem : public AbstractProblem
   virtual int
   spatialDimension() const
   {
-    return numDim;
+    return num_dim_;
   }
 
   //! Get boolean telling code if SDBCs are utilized
@@ -51,17 +51,17 @@ class ACEThermalProblem : public AbstractProblem
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
   buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr);
+      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> mesh_specs,
+      StateManager&                                            state_mgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
   buildEvaluators(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      Albany::MeshSpecsStruct const&              meshSpecs,
-      Albany::StateManager&                       stateMgr,
+      Albany::MeshSpecsStruct const&              mesh_specs,
+      Albany::StateManager&                       state_mgr,
       Albany::FieldManagerChoice                  fmchoice,
-      const Teuchos::RCP<Teuchos::ParameterList>& responseList);
+      const Teuchos::RCP<Teuchos::ParameterList>& response_list);
 
   //! Each problem must generate it's list of valide parameters
   Teuchos::RCP<Teuchos::ParameterList const>
@@ -82,26 +82,26 @@ class ACEThermalProblem : public AbstractProblem
   Teuchos::RCP<const PHX::FieldTag>
   constructEvaluators(
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-      Albany::MeshSpecsStruct const&              meshSpecs,
-      Albany::StateManager&                       stateMgr,
+      Albany::MeshSpecsStruct const&              mesh_specs,
+      Albany::StateManager&                       state_mgr,
       Albany::FieldManagerChoice                  fmchoice,
-      const Teuchos::RCP<Teuchos::ParameterList>& responseList);
+      const Teuchos::RCP<Teuchos::ParameterList>& response_list);
 
   void
-  constructDirichletEvaluators(std::vector<std::string> const& nodeSetIDs);
+  constructDirichletEvaluators(std::vector<std::string> const& node_set_ids);
   void
   constructNeumannEvaluators(
-      const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
+      const Teuchos::RCP<Albany::MeshSpecsStruct>& mesh_specs);
 
  protected:
-  int                    numDim;  // number spatial dimensions
-  Teuchos::RCP<Albany::MaterialDatabase> materialDB;
+  int num_dim_;  // number spatial dimensions
+  Teuchos::RCP<Albany::MaterialDatabase> material_db_;
 
-  const Teuchos::RCP<Teuchos::ParameterList> params;
+  const Teuchos::RCP<Teuchos::ParameterList> params_;
 
-  Teuchos::RCP<Teuchos::Comm<int> const> commT;
+  Teuchos::RCP<Teuchos::Comm<int> const> comm_;
 
-  Teuchos::RCP<Albany::Layouts> dl;
+  Teuchos::RCP<Albany::Layouts> dl_;
 
   /// Boolean marking whether SDBCs are used
   bool use_sdbcs_;
@@ -123,10 +123,10 @@ template <typename EvalT>
 Teuchos::RCP<const PHX::FieldTag>
 Albany::ACEThermalProblem::constructEvaluators(
     PHX::FieldManager<PHAL::AlbanyTraits>&      fm0,
-    Albany::MeshSpecsStruct const&              meshSpecs,
-    Albany::StateManager&                       stateMgr,
-    Albany::FieldManagerChoice                  fieldManagerChoice,
-    const Teuchos::RCP<Teuchos::ParameterList>& responseList)
+    Albany::MeshSpecsStruct const&              mesh_specs,
+    Albany::StateManager&                       state_mgr,
+    Albany::FieldManagerChoice                  field_manager_choice,
+    const Teuchos::RCP<Teuchos::ParameterList>& response_list)
 {
   using PHAL::AlbanyTraits;
   using PHX::DataLayout;
@@ -137,22 +137,22 @@ Albany::ACEThermalProblem::constructEvaluators(
   using Teuchos::RCP;
   using Teuchos::rcp;
 
-  const CellTopologyData* const elem_top = &meshSpecs.ctd;
+  const CellTopologyData* const elem_top = &mesh_specs.ctd;
 
-  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
+  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepid_basis =
       Albany::getIntrepid2Basis(*elem_top);
-  RCP<shards::CellTopology> cellType = rcp(new shards::CellTopology(elem_top));
+  RCP<shards::CellTopology> cell_type = rcp(new shards::CellTopology(elem_top));
 
-  int const numNodes    = intrepidBasis->getCardinality();
-  int const worksetSize = meshSpecs.worksetSize;
+  int const num_nodes    = intrepid_basis->getCardinality();
+  int const workset_size = mesh_specs.worksetSize;
 
-  Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cellCubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(
-          *cellType, meshSpecs.cubatureDegree);
+  Intrepid2::DefaultCubatureFactory     cub_factory;
+  RCP<Intrepid2::Cubature<PHX::Device>> cell_cubature =
+      cub_factory.create<PHX::Device, RealType, RealType>(
+          *cell_type, mesh_specs.cubatureDegree);
 
-  int const numQPtsCell = cellCubature->getNumPoints();
-  int const numVertices = cellType->getNodeCount();
+  int const num_qps_cell = cell_cubature->getNumPoints();
+  int const num_vertices = cell_type->getNodeCount();
 
   // Problem is steady or transient
   ALBANY_PANIC(
@@ -160,13 +160,13 @@ Albany::ACEThermalProblem::constructEvaluators(
       "ACETempStandAloneProblem must be defined as transient "
       "calculation.");
 
-  *out << "Field Dimensions: Workset=" << worksetSize
-       << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPtsCell << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << workset_size
+       << ", Vertices= " << num_vertices << ", Nodes= " << num_nodes
+       << ", QuadPts= " << num_qps_cell << ", Dim= " << num_dim_ << "\n"; 
 
-  dl = rcp(new Albany::Layouts(
-      worksetSize, numVertices, numNodes, numQPtsCell, numDim));
-  Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
+  dl_ = rcp(new Albany::Layouts(
+      workset_size, num_vertices, num_nodes, num_qps_cell, num_dim_));
+  Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
 
   // Temporary variable used numerous times below
   Teuchos::RCP<PHX::Evaluator<AlbanyTraits>> ev;
@@ -189,11 +189,11 @@ Albany::ACEThermalProblem::constructEvaluators(
       evalUtils.constructGatherCoordinateVectorEvaluator());
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature));
+      evalUtils.constructMapToPhysicalFrameEvaluator(cell_type, cell_cubature));
 
   fm0.template registerEvaluator<EvalT>(
       evalUtils.constructComputeBasisFunctionsEvaluator(
-          cellType, intrepidBasis, cellCubature));
+          cell_type, intrepid_basis, cell_cubature));
 
   for (unsigned int i = 0; i < neq; i++) {
     fm0.template registerEvaluator<EvalT>(
@@ -212,19 +212,19 @@ Albany::ACEThermalProblem::constructEvaluators(
 
     p->set<string>("QP Variable Name", "ACE Thermal Conductivity");
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
-    p->set< RCP<DataLayout> >("Node Data Layout", dl->node_scalar);
-    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl->qp_scalar);
-    p->set< RCP<DataLayout> >("QP Vector Data Layout", dl->qp_vector);
+    p->set< RCP<DataLayout> >("Node Data Layout", dl_->node_scalar);
+    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set< RCP<DataLayout> >("QP Vector Data Layout", dl_->qp_vector);
 
     p->set<RCP<ParamLib> >("Parameter Library", paramLib);
     Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Conductivity");
     p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
     // Here we assume that the instance of this problem applies on a single element block
-    p->set<string>("Element Block Name", meshSpecs.ebName);
+    p->set<string>("Element Block Name", mesh_specs.ebName);
 
-    if(materialDB != Teuchos::null)
-      p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", materialDB);
+    if(material_db_ != Teuchos::null)
+      p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);
 
     ev = rcp(new LCM::ACEThermalConductivity<EvalT,AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
@@ -236,19 +236,19 @@ Albany::ACEThermalProblem::constructEvaluators(
 
     p->set<string>("QP Variable Name", "ACE Thermal Inertia");
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
-    p->set< RCP<DataLayout> >("Node Data Layout", dl->node_scalar);
-    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl->qp_scalar);
-    p->set< RCP<DataLayout> >("QP Vector Data Layout", dl->qp_vector);
+    p->set< RCP<DataLayout> >("Node Data Layout", dl_->node_scalar);
+    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set< RCP<DataLayout> >("QP Vector Data Layout", dl_->qp_vector);
 
     p->set<RCP<ParamLib> >("Parameter Library", paramLib);
     Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Inertia");
     p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
     // Here we assume that the instance of this problem applies on a single element block
-    p->set<string>("Element Block Name", meshSpecs.ebName);
+    p->set<string>("Element Block Name", mesh_specs.ebName);
 
-    if(materialDB != Teuchos::null)
-      p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", materialDB);
+    if(material_db_ != Teuchos::null)
+      p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);
 
     ev = rcp(new LCM::ACEThermalInertia<EvalT,AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
@@ -263,33 +263,33 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("Gradient QP Variable Name", "Temperature Gradient");
     p->set<string>("Weighted Gradient BF Name", "wGrad BF");
 
-    p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl->node_qp_scalar);
-    p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl->qp_scalar);
-    p->set<RCP<DataLayout>>("QP Vector Data Layout", dl->qp_vector);
-    p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl->node_qp_vector);
+    p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl_->node_qp_scalar);
+    p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
+    p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
 
     p->set<string>("ACE Thermal Conductivity Name", "ACE Thermal Conductivity");
     p->set<string>("ACE Thermal Inertia Name", "ACE Thermal Inertia");
-    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl->qp_scalar);
+    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");
-    p->set<RCP<DataLayout>>("Node Scalar Data Layout", dl->node_scalar);
+    p->set<RCP<DataLayout>>("Node Scalar Data Layout", dl_->node_scalar);
 
     ev = rcp(new LCM::ACETempStandAloneResid<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
-  if (fieldManagerChoice == Albany::BUILD_RESID_FM) {
-    PHX::Tag<typename EvalT::ScalarT> res_tag("Scatter", dl->dummy);
+  if (field_manager_choice == Albany::BUILD_RESID_FM) {
+    PHX::Tag<typename EvalT::ScalarT> res_tag("Scatter", dl_->dummy);
     fm0.requireField<EvalT>(res_tag);
     return res_tag.clone();
   }
 
-  else if (fieldManagerChoice == Albany::BUILD_RESPONSE_FM) {
-    Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> respUtils(dl);
-    return respUtils.constructResponses(
-        fm0, *responseList, Teuchos::null, stateMgr);
+  else if (field_manager_choice == Albany::BUILD_RESPONSE_FM) {
+    Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> resp_utils(dl_);
+    return resp_utils.constructResponses(
+        fm0, *response_list, Teuchos::null, state_mgr);
   }
 
   return Teuchos::null;

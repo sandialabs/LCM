@@ -94,7 +94,10 @@ class ACEThermalProblem : public AbstractProblem
 
  protected:
   int num_dim_;  // number spatial dimensions
+ 
   Teuchos::RCP<Albany::MaterialDatabase> material_db_;
+
+  Teuchos::ArrayRCP<std::string> eb_names_;
 
   const Teuchos::RCP<Teuchos::ParameterList> params_;
 
@@ -204,7 +207,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(
         evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
-
+   
   // ACE thermal conductivity
   {
     RCP<ParameterList> p = rcp(new ParameterList);
@@ -219,8 +222,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Conductivity");
     p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
-    // Here we assume that the instance of this problem applies on a single element block
-    p->set<string>("Element Block Name", mesh_specs.ebName);
+    p->set<Teuchos::ArrayRCP<string>>("Element Block Names", eb_names_ );
 
     if(material_db_ != Teuchos::null)
       p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);
@@ -243,8 +245,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Inertia");
     p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
-    // Here we assume that the instance of this problem applies on a single element block
-    p->set<string>("Element Block Name", mesh_specs.ebName);
+    p->set<Teuchos::ArrayRCP<string>>("Element Block Names", eb_names_ );
 
     if(material_db_ != Teuchos::null)
       p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);

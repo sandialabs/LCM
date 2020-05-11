@@ -37,9 +37,7 @@ ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p)
   num_qps_  = dims[1];
   num_dims_ = dims[2];
 
-  std::string eb_name = p.get<std::string>("Element Block Name", "Missing");
-
-  type_ = cond_list->get("ACEThermalInertia Type", "Constant");
+  type_ = cond_list->get("ACE Thermal Inertia Type", "Constant");
   if (type_ == "Constant") {
     ScalarT value = cond_list->get("Value", 1.0);
     init_constant(value, p);
@@ -50,28 +48,32 @@ ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p)
     // We have a multiple material problem and need to map element blocks to
     // material data
 
+    Teuchos::ArrayRCP<std::string> eb_names = p.get<Teuchos::ArrayRCP<std::string>>("Element Block Names", {});
+    
     if (p.isType<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB")) {
       material_db_ = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
-    } else {
-      ALBANY_ABORT(
-          std::endl
-          << "Error! Must specify a material database if using block "
-             "dependent "
-          << "thermal inertia" << std::endl);
+    } 
+    else {
+      ALBANY_ABORT("\nError! Must specify a material database if using block "
+                   "dependent thermal inertia\n.");
     }
 
     // Get the sublist for thermal inertia for the element block in the mat
     // DB (the material in the elem block eb_name.
 
-    Teuchos::ParameterList& subList =
-        material_db_->getElementBlockSublist(eb_name, "ACE Thermal Inertia");
+    Teuchos::ArrayRCP<Teuchos::ParameterList> sublists(eb_names.size()); 
+    for (int i=0; i<eb_names.size(); i++) {
+      std::string eb_name = eb_names[i]; 
+      sublists[i] = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Inertia"); 
+      //Teuchos::ParameterList& subList =
+      // material_db_->getElementBlockSublist(eb_name, "ACE Thermal Inertia");
 
-    std::string typ = subList.get("ACE Thermal Inertia Type", "Constant");
+      std::string typ = sublists[i].get("ACE Thermal Inertia Type", "Constant");
 
-    if (typ == "Constant") {
-      ScalarT value = subList.get("Value", 1.0);
-      std::cout << "IKT eb_name, thermal inertia value = " << eb_name << ", " << value << "\n"; 
-      init_constant(value, p);
+      if (typ == "Constant") {
+        ScalarT value = sublists[i].get("Value", 1.0);
+        init_constant(value, p);
+      }
     }
   }  // Block dependent
 

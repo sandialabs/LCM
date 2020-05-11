@@ -40,32 +40,40 @@ Albany::ACEThermalProblem::buildProblem(
     Albany::StateManager&                                    state_mgr)
 {
   /* Construct All Phalanx Evaluators */
-  int phys_sets = mesh_specs.size();
-  std::cout << "ACE Thermal Problem Num MeshSpecs: " << phys_sets << "\n"; 
+  int phys_sets = mesh_specs.size(); //number of blocks
+  Teuchos::RCP<Teuchos::FancyOStream> out =
+      Teuchos::VerboseObjectBase::getDefaultOStream();
+  *out << "ACE Thermal Problem Num MeshSpecs: " << phys_sets << "\n"; 
   fm.resize(phys_sets);
-
+  eb_names_.resize(phys_sets); 
+  bool init_step = true; 
   for (int ps = 0; ps < phys_sets; ps++) {
+    if (init_step == true) { //IKT, 5/10/2020: this is a hack.  Need to verify that it works for >2 blocks.
+      eb_names_.resize(1); 
+    }
+    std::string element_block_name = mesh_specs[ps]->ebName;
+    eb_names_[ps] = element_block_name;
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
     buildEvaluators(
         *fm[ps], *mesh_specs[ps], state_mgr, BUILD_RESID_FM, Teuchos::null);
-  }
 
-  if (mesh_specs[0]->nsNames.size() >
-      0) {  // Build a nodeset evaluator if nodesets are present
-    constructDirichletEvaluators(mesh_specs[0]->nsNames);
-  }
+    if (mesh_specs[ps]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
+      constructDirichletEvaluators(mesh_specs[ps]->nsNames);
+    }
 
-  // Check if have Neumann sublist; throw error if attempting to specify
-  // Neumann BCs, but there are no sidesets in the input mesh
-  bool is_neumann_pl = params->isSublist("Neumann BCs");
-  if (is_neumann_pl && !(mesh_specs[0]->ssNames.size() > 0)) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
-  }
+    // Check if have Neumann sublist; throw error if attempting to specify
+    // Neumann BCs, but there are no sidesets in the input mesh
+    bool is_neumann_pl = params->isSublist("Neumann BCs");
+    if (is_neumann_pl && !(mesh_specs[ps]->ssNames.size() > 0)) {
+      ALBANY_ABORT(
+          "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    }
 
-  if (mesh_specs[0]->ssNames.size() >
-      0) {  // Build a sideset evaluator if sidesets are present
-    constructNeumannEvaluators(mesh_specs[0]);
+    if (mesh_specs[ps]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
+      constructNeumannEvaluators(mesh_specs[ps]);
+    }
+    init_step = false; 
+    eb_names_.resize(phys_sets); 
   }
 }
 

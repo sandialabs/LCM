@@ -6,10 +6,10 @@ ALBANY:
     Name: ACE Thermal 2D
     Solution Method: Transient Tempus
     Dirichlet BCs: 
-      ExpressionEvaluated SDBC on NS nodelist_5 for DOF T: '200.0 + 5.0e-04 * t'
-      ExpressionEvaluated SDBC on NS nodelist_6 for DOF T: '200.0 + 5.0e-04 * t'
-      #ExpressionEvaluated SDBC on NS nodelist_5 for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
-      #ExpressionEvaluated SDBC on NS nodelist_6 for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
+      ExpressionEvaluated SDBC on NS top_right for DOF T: '200.0 + 5.0e-04 * t'
+      ExpressionEvaluated SDBC on NS top_left for DOF T: '200.0 + 5.0e-04 * t'
+      #ExpressionEvaluated SDBC on NS top_right for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
+      #ExpressionEvaluated SDBC on NS top_left for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
     ACE Thermal Conductivity:
       ACE Thermal Conductivity Type: Constant
       Value: 1.6
@@ -25,7 +25,7 @@ ALBANY:
       Response 0: Solution Average
   Discretization: 
     Method: Ioss
-    Exodus Input File Name: square.e
+    Exodus Input File Name: square_2blocks.e
     Exodus Output File Name: square_out.exo
     Separate Evaluators by Element Block: true
     Workset Size: -1

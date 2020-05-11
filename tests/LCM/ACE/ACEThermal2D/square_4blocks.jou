@@ -1,0 +1,69 @@
+create curve spline location 0 0 0 location 0.5 0 0 
+create curve spline location 0.5 0 0 location 0.5 0.5 0 
+create curve spline location 0.5 0.5 0 location 0 0.5 0 
+create curve spline location 0 0.5 0 location 0 0 0 
+
+create curve spline location 0.5 0 0 location 1 0 0 
+create curve spline location 1 0 0 location 1 0.5 0 
+create curve spline location 1 0.5 0 location 0.5 0.5 0 
+
+create curve spline location 1 0.5 0 location 1 1 0 
+create curve spline location 1 1 0 location 0.5 1 0 
+create curve spline location 0.5 1 0 location 0.5 0.5 0 
+
+create curve spline location 0.5 1 0 location 0 1 0 
+create curve spline location 0 1 0 location 0 0.5 0 
+
+create surface curve 1 2 3 4 interval 5
+create surface curve 5 6 7 2 interval 5
+create surface curve 7 8 9 10 interval 5
+create surface curve 3 10 11 12 interval 5 
+
+imprint all
+
+merge all
+
+mesh surface 2 1 
+mesh surface 3 2 
+mesh surface 4 3 
+mesh surface 1 4 
+#mesh surface 6 5 
+#mesh surface 8 7 
+#mesh surface 10 3 
+
+block 1 surface 1
+block 1 element type QUAD4
+block 1 name "IceBottom"
+
+block 2 surface 2
+block 2 element type QUAD4
+block 2 name "PermafrostBottom"
+
+block 3 surface 3
+block 3 element type QUAD4
+block 3 name "IceTop"
+
+block 4 surface 4
+block 4 element type QUAD4
+block 4 name "PermafrostTop"
+
+nodeset 1 curve 1
+nodeset 1 name "bottom_left"
+nodeset 2 curve 5
+nodeset 2 name "bottom_right"
+nodeset 3 curve 6
+nodeset 3 name "right_bottom"
+nodeset 4 curve 8
+nodeset 4 name "right_top"
+nodeset 5 curve 9
+nodeset 5 name "top_right"
+nodeset 6 curve 11
+nodeset 6 name "top_left"
+nodeset 7 curve 12
+nodeset 7 name "left_top"
+nodeset 8 curve 4
+nodeset 8 name "left_bottom" 
+
+set large exodus file off
+
+export mesh "square_4blocks.e" overwrite

@@ -46,8 +46,11 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   void 
   createElementBlockParameterMaps();
 
-  ScalarT 
-  queryElementBlockParameterMap(const std::string eb_name, const std::map<std::string, ScalarT> map);  
+  RealType
+  queryElementBlockParameterMap(const std::string eb_name, const std::map<std::string, RealType> map);  
+  
+  std::vector<RealType>
+  queryElementBlockParameterMap(const std::string eb_name, const std::map<std::string, std::vector<RealType>> map);  
 
  private:
   //! Validate the name strings under "ACE Thermal Parameters" section in input file
@@ -60,7 +63,7 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia_;
 
-  //! Constant value
+  //! Constant value - not used but required from design of evaluator
   ScalarT constant_value_{0.0};
 
   //! Material database - holds thermal conductivity and inertia, among other quantities
@@ -69,9 +72,13 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Array containing the names of the element blocks present in the materials file 
   Teuchos::ArrayRCP<std::string> eb_names_; 
 
-  //! Block-dependent constants read in from materials.yaml file
-  std::map<std::string, ScalarT> sat_mod_map_;
+  //! Block-dependent saturation hardening constants read in from materials.yaml file
+  std::map<std::string, RealType> sat_mod_map_;
+  
+  //! Block-dependent params with depth read in from materials.yaml file 
+  std::map<std::string, std::vector<RealType>> z_above_mean_sea_level_map_;
   //IKT FIXME - add others 
+
 };
 }  // namespace LCM
 

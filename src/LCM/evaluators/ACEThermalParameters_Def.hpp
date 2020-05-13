@@ -8,6 +8,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
+#include "ACEcommon.hpp" 
 
 namespace LCM {
 
@@ -117,8 +118,7 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
   valid_pl->set<double>("ACE Thermal Inertia Value", 1.0,
       "Constant thermal inertia value across element block");
   valid_pl->set<double>("Saturation Modulus", 0.0, 
-      "Saturation modulus in element block"); 
-
+      "Saturation modulus in element block");
   return valid_pl;
 }
 
@@ -130,18 +130,36 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
   for (int i=0; i<eb_names_.size(); i++) {
     Teuchos::ParameterList& sublist
           = material_db_->getElementBlockSublist(eb_names_[i], "ACE Thermal Parameters");
-    sat_mod_map_[eb_names_[i]] = sublist.get("Saturation Modulus", 0.0); 
+    sat_mod_map_[eb_names_[i]] = sublist.get("Saturation Modulus", 0.0);
+    if (sublist.isParameter("ACE Z Depth File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Z Depth File");
+      z_above_mean_sea_level_map_[eb_names_[i]] = vectorFromFile(filename); 
+    }
     //IKT FIXME: fill in other parameters 
   }
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-typename ACEThermalParameters<EvalT, Traits>::ScalarT
+RealType
 ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(const std::string eb_name, 
-		                                                   const std::map<std::string, ScalarT> map)
+		                                                   const std::map<std::string, RealType> map)
 {
-  typename std::map<std::string, ScalarT>::const_iterator it; 
+  typename std::map<std::string, RealType>::const_iterator it; 
+  it = map.find(eb_name); 
+  if (it == map.end()) {
+    ALBANY_ABORT("\nError! Element block = " << eb_name << " was not found in map!\n");
+  } 
+  return it->second; 
+}
+// **********************************************************************
+
+template <typename EvalT, typename Traits>
+std::vector<RealType>
+ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(const std::string eb_name, 
+		                                                   const std::map<std::string, std::vector<RealType>> map)
+{
+  typename std::map<std::string, std::vector<RealType>>::const_iterator it; 
   it = map.find(eb_name); 
   if (it == map.end()) {
     ALBANY_ABORT("\nError! Element block = " << eb_name << " was not found in map!\n");

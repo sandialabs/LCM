@@ -69,19 +69,14 @@ class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;
 
-  bool is_constant_;
-
   std::size_t                                           num_qps_;
   std::size_t                                           num_dims_;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia_;
 
-  //! Conductivity type
-  std::string type_;
-
   //! Constant value
-  ScalarT constant_value_;
+  ScalarT constant_value_{0.0};
 
   //! Material database - holds thermal conductivity among other quantities
   Teuchos::RCP<Albany::MaterialDatabase> material_db_;

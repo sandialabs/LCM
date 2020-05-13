@@ -14,8 +14,7 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p)
     : thermal_inertia_(p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      is_constant_(false)
+          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   Teuchos::ParameterList* cond_list =
       p.get<Teuchos::ParameterList*>("Parameter List");
@@ -33,54 +32,25 @@ ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p)
 
   Teuchos::RCP<PHX::DataLayout> vector_dl =
       p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  coord_vec_ = decltype(coord_vec_)(p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   num_qps_  = dims[1];
   num_dims_ = dims[2];
 
-  type_ = cond_list->get("ACE Thermal Inertia Type", "Constant");
-  if (type_ == "Constant") {
-    constant_value_ = cond_list->get("Value", 1.0);
-    is_constant_ = true; 
-  }
+  // We have a multiple material problem and need to map element blocks to
+  // material data
 
-  else if (type_ == "Block Dependent") {
-    // We have a multiple material problem and need to map element blocks to
-    // material data
-
-    Teuchos::ArrayRCP<std::string> eb_names = p.get<Teuchos::ArrayRCP<std::string>>("Element Block Names", {});
+  Teuchos::ArrayRCP<std::string> eb_names = p.get<Teuchos::ArrayRCP<std::string>>("Element Block Names", {});
     
-    if (p.isType<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB")) {
-      material_db_ = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
-    } 
-    else {
-      ALBANY_ABORT("\nError! Must specify a material database if using block "
-                   "dependent thermal inertia\n.");
-    }
-
-    // Get the sublist for thermal inertia for the element block in the mat
-    // DB (the material in the elem block eb_name.
-
-    Teuchos::ArrayRCP<Teuchos::ParameterList> sublists(eb_names.size()); 
-    for (int i=0; i<eb_names.size(); i++) {
-      std::string eb_name = eb_names[i]; 
-      sublists[i] = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Inertia"); 
-      //Teuchos::ParameterList& subList =
-      // material_db_->getElementBlockSublist(eb_name, "ACE Thermal Inertia");
-
-      std::string typ = sublists[i].get("ACE Thermal Inertia Type", "Constant");
-
-      if (typ == "Constant") {
-        constant_value_ = sublists[i].get("Value", 1.0);
-        is_constant_ = true; 
-      }
-    }
-  }  // Block dependent
-
+  if (p.isType<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB")) {
+    material_db_ = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
+  } 
   else {
-    ALBANY_ABORT("ACEThermalInertia: Invalid thermal inertia type " << type_ << "!  Valid options are currently 'Constant' and 'Block Depdendent'.");
+    ALBANY_ABORT("\nError! Must specify a material database for thermal inertia\n.");
   }
 
+  this->addDependentField(coord_vec_);
   this->addEvaluatedField(thermal_inertia_);
   this->setName("ACE Thermal Inertia");
 }
@@ -94,7 +64,7 @@ ACEThermalInertia<EvalT, Traits>::postRegistrationSetup(
     PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(thermal_inertia_, fm);
-  if (!is_constant_) this->utils.setFieldData(coord_vec_, fm);
+  this->utils.setFieldData(coord_vec_, fm);
 }
 
 // **********************************************************************
@@ -103,11 +73,13 @@ void
 ACEThermalInertia<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  if (is_constant_) {
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t qp = 0; qp < num_qps_; ++qp) {
-        thermal_inertia_(cell, qp) = constant_value_;
-      }
+  std::string eb_name = workset.EBName; 
+  Teuchos::ParameterList& sublist 
+	  = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Inertia"); 
+  ScalarT value_eb  = sublist.get("ACE Thermal Inertia Value", 1.0);
+  for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
+    for (std::size_t qp = 0; qp < num_qps_; ++qp) {
+      thermal_inertia_(cell, qp) = value_eb; 
     }
   }
 }
@@ -117,11 +89,8 @@ template <typename EvalT, typename Traits>
 typename ACEThermalInertia<EvalT, Traits>::ScalarT&
 ACEThermalInertia<EvalT, Traits>::getValue(std::string const& n)
 {
-  if (is_constant_) { return constant_value_; }
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting parameter " << n
-      << " in ACEThermalInertia::getValue()" << std::endl);
+  ALBANY_ABORT("\nError! Logic error in getting parameter " << n
+      << " in ACEThermalInertia::getValue()!\n");
   return constant_value_;
 }
 
@@ -132,11 +101,9 @@ ACEThermalInertia<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> valid_pl =
       rcp(new Teuchos::ParameterList("Valid ACE Thermal Inertia Params"));
-  ;
 
-  valid_pl->set<std::string>("ACE Thermal Inertia Type", "Constant",
-      "Constant thermal inertia across the entire domain");
-  valid_pl->set<double>("Value", 1.0, "Constant thermal inertia value");
+  valid_pl->set<double>("ACE Thermal Inertia Value", 1.0,
+      "Constant thermal inertia value across the entire domain");
 
   return valid_pl;
 }

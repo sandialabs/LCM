@@ -11,10 +11,6 @@ ALBANY:
       ExpressionEvaluated SDBC on NS top_left for DOF T: '200.0 + 5.0e-04 * t'
       #ExpressionEvaluated SDBC on NS top_right for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
       #ExpressionEvaluated SDBC on NS top_left for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
-    ACE Thermal Conductivity:
-      ACE Thermal Conductivity Type: Block Dependent
-    ACE Thermal Inertia:
-      ACE Thermal Inertia Type: Block Dependent
     Initial Condition:
       Function: Expression Parser
       Function Expressions: ['200']

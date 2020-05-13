@@ -43,6 +43,12 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   ScalarT&
   getValue(std::string const& n);
 
+  void 
+  createElementBlockParameterMaps();
+
+  ScalarT 
+  queryElementBlockParameterMap(const std::string eb_name, const std::map<std::string, ScalarT> map);  
+
  private:
   //! Validate the name strings under "ACE Thermal Parameters" section in input file
   Teuchos::RCP<Teuchos::ParameterList const>
@@ -60,6 +66,12 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Material database - holds thermal conductivity and inertia, among other quantities
   Teuchos::RCP<Albany::MaterialDatabase> material_db_;
 
+  //! Array containing the names of the element blocks present in the materials file 
+  Teuchos::ArrayRCP<std::string> eb_names_; 
+
+  //! Block-dependent constants read in from materials.yaml file
+  std::map<std::string, ScalarT> sat_mod_map_;
+  //IKT FIXME - add others 
 };
 }  // namespace LCM
 

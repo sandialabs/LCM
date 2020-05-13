@@ -44,8 +44,7 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
   // We have a multiple material problem and need to map element blocks to
   // material data
  
-  Teuchos::ArrayRCP<std::string> eb_names 
-      = p.get<Teuchos::ArrayRCP<std::string>>("Element Block Names", {});
+  eb_names_ = p.get<Teuchos::ArrayRCP<std::string>>("Element Block Names", {});
 
   if (p.isType<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB")) {
     material_db_ = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
@@ -53,6 +52,8 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
   else {
     ALBANY_ABORT("\nError! Must specify a material database for thermal parameters.\n"); 
   }
+ 
+  this->createElementBlockParameterMaps(); 
 
   this->addDependentField(coord_vec_);
   this->addEvaluatedField(thermal_conductivity_);
@@ -84,6 +85,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
 	  = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Parameters"); 
   ScalarT thermal_conduct_eb  = sublist.get("ACE Thermal Conductivity Value", 1.0);
   ScalarT thermal_inertia_eb  = sublist.get("ACE Thermal Inertia Value", 1.0);
+  ScalarT sat_mod_eb = this->queryElementBlockParameterMap(eb_name, sat_mod_map_);
+  //IKT FIXME: add similar calls to above, as needed  
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
       thermal_conductivity_(cell, qp) = thermal_conduct_eb; 
@@ -110,13 +113,40 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
   Teuchos::RCP<Teuchos::ParameterList> valid_pl =
       rcp(new Teuchos::ParameterList("Valid ACE Thermal Parameters"));
   valid_pl->set<double>("ACE Thermal Conductivity Value", 1.0,
-      "Constant thermal conductivity value across the entire domain");
+      "Constant thermal conductivity value across element block");
   valid_pl->set<double>("ACE Thermal Inertia Value", 1.0,
-      "Constant thermal inertia value across the entire domain");
+      "Constant thermal inertia value across element block");
+  valid_pl->set<double>("Saturation Modulus", 0.0, 
+      "Saturation modulus in element block"); 
 
   return valid_pl;
 }
 
 // **********************************************************************
+template <typename EvalT, typename Traits>
+void 
+ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps() 
+{
+  for (int i=0; i<eb_names_.size(); i++) {
+    Teuchos::ParameterList& sublist
+          = material_db_->getElementBlockSublist(eb_names_[i], "ACE Thermal Parameters");
+    sat_mod_map_[eb_names_[i]] = sublist.get("Saturation Modulus", 0.0); 
+    //IKT FIXME: fill in other parameters 
+  }
+}
+
+// **********************************************************************
+template <typename EvalT, typename Traits>
+typename ACEThermalParameters<EvalT, Traits>::ScalarT
+ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(const std::string eb_name, 
+		                                                   const std::map<std::string, ScalarT> map)
+{
+  typename std::map<std::string, ScalarT>::const_iterator it; 
+  it = map.find(eb_name); 
+  if (it == map.end()) {
+    ALBANY_ABORT("\nError! Element block = " << eb_name << " was not found in map!\n");
+  } 
+  return it->second; 
+}
 // **********************************************************************
 }  // namespace PHAL

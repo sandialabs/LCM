@@ -26,9 +26,9 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
       residual_(
           p.get<std::string>("Residual Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
-      thermal_conductivity_(p.get<std::string>   ("ACE Thermal Conductivity Name"),
+      thermal_conductivity_(p.get<std::string>   ("ACE Thermal Conductivity QP Variable Name"),
                p.get<Teuchos::RCP<PHX::DataLayout> >("QP Scalar Data Layout") ),
-      thermal_inertia_(p.get<std::string>   ("ACE Thermal Inertia Name"),
+      thermal_inertia_(p.get<std::string>   ("ACE Thermal Inertia QP Variable Name"),
                p.get<Teuchos::RCP<PHX::DataLayout> >("QP Scalar Data Layout") )
 {
   this->addDependentField(wbf_);

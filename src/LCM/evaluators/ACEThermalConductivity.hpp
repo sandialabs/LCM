@@ -30,7 +30,7 @@ class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  ACEThermalConductivity(Teuchos::ParameterList& p);
+  ACEThermalConductivity(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
   postRegistrationSetup(
@@ -44,8 +44,7 @@ class ACEThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   getValue(std::string const& n);
 
  private:
-  //! Validate the name strings under "ACE Thermal Conductivity" section in xml input
-  //! file,
+  //! Validate the name strings under "ACE Thermal Conductivity" section in input file
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;
 

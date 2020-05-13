@@ -12,9 +12,10 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p)
-    : thermal_inertia_(p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+ACEThermalInertia<EvalT, Traits>::ACEThermalInertia(Teuchos::ParameterList& p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
+    : thermal_inertia_(p.get<std::string> ("ACE Thermal Inertia QP Variable Name"), 
+		            dl->qp_scalar)
 {
   Teuchos::ParameterList* cond_list =
       p.get<Teuchos::ParameterList*>("Parameter List");

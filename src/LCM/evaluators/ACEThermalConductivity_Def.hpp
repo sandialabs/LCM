@@ -12,9 +12,10 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ACEThermalConductivity<EvalT, Traits>::ACEThermalConductivity(Teuchos::ParameterList& p)
-    : thermal_conductivity_(p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+ACEThermalConductivity<EvalT, Traits>::ACEThermalConductivity(Teuchos::ParameterList& p, 
+    const Teuchos::RCP<Albany::Layouts>& dl)
+    : thermal_conductivity_(p.get<std::string> ("ACE Thermal Conductivity QP Variable Name"), 
+		            dl->qp_scalar)
 {
   Teuchos::ParameterList* cond_list =
       p.get<Teuchos::ParameterList*>("Parameter List");

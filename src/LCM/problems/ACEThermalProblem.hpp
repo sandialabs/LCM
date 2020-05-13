@@ -212,7 +212,7 @@ Albany::ACEThermalProblem::constructEvaluators(
   {
     RCP<ParameterList> p = rcp(new ParameterList);
 
-    p->set<string>("QP Variable Name", "ACE Thermal Conductivity");
+    p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
     p->set< RCP<DataLayout> >("Node Data Layout", dl_->node_scalar);
     p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
@@ -227,7 +227,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     if(material_db_ != Teuchos::null)
       p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);
 
-    ev = rcp(new LCM::ACEThermalConductivity<EvalT,AlbanyTraits>(*p));
+    ev = rcp(new LCM::ACEThermalConductivity<EvalT,AlbanyTraits>(*p, dl_));
     fm0.template registerEvaluator<EvalT>(ev);
   }
               
@@ -235,7 +235,7 @@ Albany::ACEThermalProblem::constructEvaluators(
   {
     RCP<ParameterList> p = rcp(new ParameterList);
 
-    p->set<string>("QP Variable Name", "ACE Thermal Inertia");
+    p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
     p->set< RCP<DataLayout> >("Node Data Layout", dl_->node_scalar);
     p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
@@ -250,7 +250,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     if(material_db_ != Teuchos::null)
       p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);
 
-    ev = rcp(new LCM::ACEThermalInertia<EvalT,AlbanyTraits>(*p));
+    ev = rcp(new LCM::ACEThermalInertia<EvalT,AlbanyTraits>(*p, dl_));
     fm0.template registerEvaluator<EvalT>(ev);
   }
               
@@ -268,8 +268,8 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
 
-    p->set<string>("ACE Thermal Conductivity Name", "ACE Thermal Conductivity");
-    p->set<string>("ACE Thermal Inertia Name", "ACE Thermal Inertia");
+    p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
+    p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
 
     // Output

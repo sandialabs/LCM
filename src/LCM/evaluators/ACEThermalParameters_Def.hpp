@@ -12,9 +12,11 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ACEThermalConductivity<EvalT, Traits>::ACEThermalConductivity(Teuchos::ParameterList& p, 
+ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList& p, 
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thermal_conductivity_(p.get<std::string> ("ACE Thermal Conductivity QP Variable Name"), 
+		            dl->qp_scalar),
+      thermal_inertia_(p.get<std::string> ("ACE Thermal Inertia QP Variable Name"), 
 		            dl->qp_scalar)
 {
   Teuchos::ParameterList* cond_list =
@@ -49,63 +51,68 @@ ACEThermalConductivity<EvalT, Traits>::ACEThermalConductivity(Teuchos::Parameter
     material_db_ = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
   } 
   else {
-    ALBANY_ABORT("\nError! Must specify a material database for thermal conductivity.\n"); 
+    ALBANY_ABORT("\nError! Must specify a material database for thermal parameters.\n"); 
   }
 
   this->addDependentField(coord_vec_);
   this->addEvaluatedField(thermal_conductivity_);
-  this->setName("ACE Thermal Conductivity");
+  this->addEvaluatedField(thermal_inertia_);
+  this->setName("ACE Thermal Parameters");
 }
 
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-ACEThermalConductivity<EvalT, Traits>::postRegistrationSetup(
+ACEThermalParameters<EvalT, Traits>::postRegistrationSetup(
     typename Traits::SetupData d,
     PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(thermal_conductivity_, fm);
+  this->utils.setFieldData(thermal_inertia_, fm);
   this->utils.setFieldData(coord_vec_, fm);
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-ACEThermalConductivity<EvalT, Traits>::evaluateFields(
+ACEThermalParameters<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
   std::string eb_name = workset.EBName; 
   Teuchos::ParameterList& sublist 
-	  = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Conductivity"); 
-  ScalarT value_eb  = sublist.get("ACE Thermal Conductivity Value", 1.0);
+	  = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Parameters"); 
+  ScalarT thermal_conduct_eb  = sublist.get("ACE Thermal Conductivity Value", 1.0);
+  ScalarT thermal_inertia_eb  = sublist.get("ACE Thermal Inertia Value", 1.0);
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
-      thermal_conductivity_(cell, qp) = value_eb; 
+      thermal_conductivity_(cell, qp) = thermal_conduct_eb; 
+      thermal_inertia_(cell, qp) = thermal_inertia_eb; 
     }
   }
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-typename ACEThermalConductivity<EvalT, Traits>::ScalarT&
-ACEThermalConductivity<EvalT, Traits>::getValue(std::string const& n)
+typename ACEThermalParameters<EvalT, Traits>::ScalarT&
+ACEThermalParameters<EvalT, Traits>::getValue(std::string const& n)
 {
   ALBANY_ABORT("\nError! Logic error in getting parameter " << n
-      << " in ACE Thermal Conductivity::getValue()!\n");
+      << " in ACE Thermal Parameters::getValue()!\n");
   return constant_value_;
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
 Teuchos::RCP<Teuchos::ParameterList const>
-ACEThermalConductivity<EvalT, Traits>::getValidThermalCondParameters() const
+ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> valid_pl =
-      rcp(new Teuchos::ParameterList("Valid ACE Thermal Conductivity Params"));
-
+      rcp(new Teuchos::ParameterList("Valid ACE Thermal Parameters"));
   valid_pl->set<double>("ACE Thermal Conductivity Value", 1.0,
       "Constant thermal conductivity value across the entire domain");
+  valid_pl->set<double>("ACE Thermal Inertia Value", 1.0,
+      "Constant thermal inertia value across the entire domain");
 
   return valid_pl;
 }

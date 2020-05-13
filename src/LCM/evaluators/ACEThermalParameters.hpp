@@ -2,8 +2,8 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#ifndef ACETHERMALINERTIA_HPP
-#define ACETHERMALINERTIA_HPP
+#ifndef ACETHERMALPARAMETERS_HPP
+#define ACETHERMALPARAMETERS_HPP
 
 #include "Albany_MaterialDatabase.hpp"
 #include "Albany_Types.hpp"
@@ -18,11 +18,11 @@
 
 namespace LCM {
 /**
- * \brief Evaluates thermal inertia for ACE stand-alone thermal problem.
+ * \brief Evaluates thermal parameters (e.g. conductivity, inertia) for ACE stand-alone thermal problem.
  */
 
 template <typename EvalT, typename Traits>
-class ACEThermalInertia : public PHX::EvaluatorWithBaseImpl<Traits>,
+class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
                             public PHX::EvaluatorDerived<EvalT, Traits>,
                             public Sacado::ParameterAccessor<EvalT, SPL_Traits>
 {
@@ -30,7 +30,7 @@ class ACEThermalInertia : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  ACEThermalInertia(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl); 
+  ACEThermalParameters(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
   postRegistrationSetup(
@@ -44,24 +44,23 @@ class ACEThermalInertia : public PHX::EvaluatorWithBaseImpl<Traits>,
   getValue(std::string const& n);
 
  private:
-  //! Validate the name strings under "ACE Thermal Inertia" section in input file 
+  //! Validate the name strings under "ACE Thermal Parameters" section in input file
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;
 
   std::size_t                                           num_qps_;
   std::size_t                                           num_dims_;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia_;
 
   //! Constant value
   ScalarT constant_value_{0.0};
 
-  //! Material database - holds thermal inertia among other quantities
+  //! Material database - holds thermal conductivity and inertia, among other quantities
   Teuchos::RCP<Albany::MaterialDatabase> material_db_;
 
 };
-
-
 }  // namespace LCM
 
 #endif

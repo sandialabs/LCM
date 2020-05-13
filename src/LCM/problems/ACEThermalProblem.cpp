@@ -176,8 +176,6 @@ Albany::ACEThermalProblem::getValidProblemParameters() const
   Teuchos::RCP<Teuchos::ParameterList> valid_pl =
       this->getGenericProblemParams("ValidACEThermalProblemParams");
 
-  valid_pl->sublist("ACE Thermal Conductivity", false, "");
-  valid_pl->sublist("ACE Thermal Inertia", false, "");
   valid_pl->set<std::string>("MaterialDB Filename","materials.xml","Filename of material database xml file");
 
   return valid_pl;

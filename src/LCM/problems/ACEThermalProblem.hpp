@@ -116,8 +116,7 @@ class ACEThermalProblem : public AbstractProblem
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
-#include "ACEThermalConductivity.hpp"
-#include "ACEThermalInertia.hpp"
+#include "ACEThermalParameters.hpp"
 #include "ACETempStandAloneResid.hpp"
 #include "Shards_CellTopology.hpp"
 
@@ -208,33 +207,12 @@ Albany::ACEThermalProblem::constructEvaluators(
         evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
    
-  // ACE thermal conductivity
+  // ACE thermal parameters
+  // Currently thermal conductivity and inertia are evaluated here 
   {
     RCP<ParameterList> p = rcp(new ParameterList);
 
     p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
-    p->set<string>("QP Coordinate Vector Name", "Coord Vec");
-    p->set< RCP<DataLayout> >("Node Data Layout", dl_->node_scalar);
-    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
-    p->set< RCP<DataLayout> >("QP Vector Data Layout", dl_->qp_vector);
-
-    p->set<RCP<ParamLib> >("Parameter Library", paramLib);
-    Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Conductivity");
-    p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
-
-    p->set<Teuchos::ArrayRCP<string>>("Element Block Names", eb_names_ );
-
-    if(material_db_ != Teuchos::null)
-      p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);
-
-    ev = rcp(new LCM::ACEThermalConductivity<EvalT,AlbanyTraits>(*p, dl_));
-    fm0.template registerEvaluator<EvalT>(ev);
-  }
-              
-  // ACE thermal inertia
-  {
-    RCP<ParameterList> p = rcp(new ParameterList);
-
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
     p->set< RCP<DataLayout> >("Node Data Layout", dl_->node_scalar);
@@ -242,7 +220,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set< RCP<DataLayout> >("QP Vector Data Layout", dl_->qp_vector);
 
     p->set<RCP<ParamLib> >("Parameter Library", paramLib);
-    Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Inertia");
+    Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Parameters");
     p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
     p->set<Teuchos::ArrayRCP<string>>("Element Block Names", eb_names_ );
@@ -250,7 +228,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     if(material_db_ != Teuchos::null)
       p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);
 
-    ev = rcp(new LCM::ACEThermalInertia<EvalT,AlbanyTraits>(*p, dl_));
+    ev = rcp(new LCM::ACEThermalParameters<EvalT,AlbanyTraits>(*p, dl_));
     fm0.template registerEvaluator<EvalT>(ev);
   }
               

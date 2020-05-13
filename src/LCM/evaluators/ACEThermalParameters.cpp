@@ -2,9 +2,9 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#include "ACEThermalConductivity.hpp"
+#include "ACEThermalParameters.hpp"
 
 #include "PHAL_AlbanyTraits.hpp"
-#include "ACEThermalConductivity_Def.hpp"
+#include "ACEThermalParameters_Def.hpp"
 
-PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::ACEThermalConductivity)
+PHAL_INSTANTIATE_TEMPLATE_CLASS(LCM::ACEThermalParameters)

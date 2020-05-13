@@ -40,4 +40,7 @@ if(NOT ALBANY_PARALLEL_ONLY)
   
   add_test(${testName}_2Blocks ${Albany.exe} input_block_dept_2blks.yaml)
   set_tests_properties(${testName}_2Blocks PROPERTIES LABELS "Demo;Tpetra;Forward")
+  
+  add_test(${testName}_4Blocks ${Albany.exe} input_block_dept_4blks.yaml)
+  set_tests_properties(${testName}_4Blocks PROPERTIES LABELS "Demo;Tpetra;Forward")
 endif()

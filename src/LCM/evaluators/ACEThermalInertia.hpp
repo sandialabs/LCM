@@ -69,7 +69,7 @@ class ACEThermalInertia : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;
 
-  bool is_constant;
+  bool is_constant_;
 
   std::size_t                                           num_qps_;
   std::size_t                                           num_dims_;
@@ -84,10 +84,6 @@ class ACEThermalInertia : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   //! Material database - holds thermal inertia among other quantities
   Teuchos::RCP<Albany::MaterialDatabase> material_db_;
-
-  //! Convenience function to initialize constant thermal inertia
-  void
-  init_constant(ScalarT value, Teuchos::ParameterList& p);
 
 };
 }  // namespace LCM

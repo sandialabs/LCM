@@ -18,27 +18,7 @@
 
 namespace LCM {
 /**
- * \brief Evaluates thermal conductivity.
-
-This class may be used in two ways.
-
-1. The simplest is to use a constant thermal conductivity across the entire
-domain (one element block, one material), say with a value of 5.0. In this case,
-one would declare at the "Problem" level, that a constant thermal conductivity
-was being used, and its value was 5.0:
-
-<ParameterList name="Problem">
-   ...
-    <ParameterList name="ACE Thermal Conductivity">
-       <Parameter name="ACE Thermal Conductivity Type" type="string"
-value="Constant"/> <Parameter name="Value" type="double" value="5.0"/>
-    </ParameterList>
-</ParameterList>
-
-2. The other extreme is to have a multiple element block problem, say 3, with
-each element block corresponding to a material. Each element block has its own
-field manager, and different evaluators are used in each element block. 
-
+ * \brief Evaluates thermal conductivity for ACE stand-alone thermal problem.
  */
 
 template <typename EvalT, typename Traits>

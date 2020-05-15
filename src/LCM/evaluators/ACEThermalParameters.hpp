@@ -62,6 +62,12 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                bluff_salinity_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                ice_saturation_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                density_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                heat_capacity_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                water_saturation_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                porosity_;
 
   //! Constant value - not used but required from design of evaluator
   ScalarT constant_value_{0.0};
@@ -73,7 +79,26 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::ArrayRCP<std::string> eb_names_; 
 
   //! Block-dependent saturation hardening constants read in from materials.yaml file
+  //IKT, FIXME: may not need sat_mod and sat_exp - may be mechanics only; if so, remove  
   std::map<std::string, RealType> sat_mod_map_;
+  std::map<std::string, RealType> sat_exp_map_;
+  std::map<std::string, RealType> ice_density_map_;
+  std::map<std::string, RealType> water_density_map_;
+  std::map<std::string, RealType> soil_density_map_;
+  std::map<std::string, RealType> ice_thermal_cond_map_;
+  std::map<std::string, RealType> water_thermal_cond_map_;
+  std::map<std::string, RealType> soil_thermal_cond_map_;
+  std::map<std::string, RealType> ice_heat_capacity_map_;
+  std::map<std::string, RealType> water_heat_capacity_map_;
+  std::map<std::string, RealType> soil_heat_capacity_map_;
+  std::map<std::string, RealType> ice_saturation_init_map_;
+  std::map<std::string, RealType> ice_saturation_max_map_;
+  std::map<std::string, RealType> water_saturation_min_map_;
+  std::map<std::string, RealType> salinity_base_map_;
+  std::map<std::string, RealType> salinity_enhanced_D_map_;
+  std::map<std::string, RealType> f_shift_map_;
+  std::map<std::string, RealType> latent_heat_map_;
+  std::map<std::string, RealType> porosity0_map_;
   
   //! Block-dependent params with depth read in from materials.yaml file 
   std::map<std::string, std::vector<RealType>> z_above_mean_sea_level_map_;

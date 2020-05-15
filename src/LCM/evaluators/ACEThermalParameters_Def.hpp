@@ -18,6 +18,18 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
     : thermal_conductivity_(p.get<std::string> ("ACE Thermal Conductivity QP Variable Name"), 
 		            dl->qp_scalar),
       thermal_inertia_(p.get<std::string> ("ACE Thermal Inertia QP Variable Name"), 
+		            dl->qp_scalar),
+      bluff_salinity_(p.get<std::string> ("ACE Bluff Salinity QP Variable Name"), 
+		            dl->qp_scalar),
+      ice_saturation_(p.get<std::string> ("ACE Ice Saturation QP Variable Name"), 
+		            dl->qp_scalar),
+      density_(p.get<std::string> ("ACE Density QP Variable Name"), 
+		            dl->qp_scalar),
+      heat_capacity_(p.get<std::string> ("ACE Density QP Variable Name"), 
+		            dl->qp_scalar),
+      water_saturation_(p.get<std::string> ("ACE Water Saturation QP Variable Name"), 
+		            dl->qp_scalar),
+      porosity_(p.get<std::string> ("ACE Porosity QP Variable Name"), 
 		            dl->qp_scalar)
 {
   Teuchos::ParameterList* cond_list =
@@ -59,6 +71,13 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
   this->addDependentField(coord_vec_);
   this->addEvaluatedField(thermal_conductivity_);
   this->addEvaluatedField(thermal_inertia_);
+  this->addEvaluatedField(bluff_salinity_);
+  this->addEvaluatedField(ice_saturation_);
+  this->addEvaluatedField(density_);
+  this->addEvaluatedField(heat_capacity_);
+  this->addEvaluatedField(water_saturation_);
+  this->addEvaluatedField(porosity_);
+
   this->setName("ACE Thermal Parameters");
 }
 
@@ -72,6 +91,12 @@ ACEThermalParameters<EvalT, Traits>::postRegistrationSetup(
 {
   this->utils.setFieldData(thermal_conductivity_, fm);
   this->utils.setFieldData(thermal_inertia_, fm);
+  this->utils.setFieldData(bluff_salinity_, fm);
+  this->utils.setFieldData(ice_saturation_, fm);
+  this->utils.setFieldData(density_, fm);
+  this->utils.setFieldData(heat_capacity_, fm);
+  this->utils.setFieldData(water_saturation_, fm);
+  this->utils.setFieldData(porosity_, fm);
   this->utils.setFieldData(coord_vec_, fm);
 }
 
@@ -118,7 +143,43 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
   valid_pl->set<double>("ACE Thermal Inertia Value", 1.0,
       "Constant thermal inertia value across element block");
   valid_pl->set<double>("Saturation Modulus", 0.0, 
-      "Saturation modulus in element block");
+      "Constant value of saturation modulus in element block");
+  valid_pl->set<double>("Saturation Exponent", 0.0, 
+      "Constant value of saturation exponent in element block");
+  valid_pl->set<double>("ACE Ice Density", 0.0, 
+      "Constant value of ice density in element block");
+  valid_pl->set<double>("ACE Water Density", 0.0, 
+      "Constant value of water density in element block");
+  valid_pl->set<double>("ACE Sediment Density", 0.0, 
+      "Constant value of sediment density in element block");
+  valid_pl->set<double>("ACE Ice Thermal Conductivity", 0.0, 
+      "Constant value of ice thermal conductivity in element block");
+  valid_pl->set<double>("ACE Water Thermal Conductivity", 0.0, 
+      "Constant value of water thermal conductivity in element block");
+  valid_pl->set<double>("ACE Sediment Thermal Conductivity", 0.0, 
+      "Constant value of sediment thermal conductivity in element block");
+  valid_pl->set<double>("ACE Ice Heat Capacity", 0.0, 
+      "Constant value of ice heat capacity in element block");
+  valid_pl->set<double>("ACE Water Heat Capacity", 0.0, 
+      "Constant value of water heat capacity in element block");
+  valid_pl->set<double>("ACE Sediment Heat Capacity", 0.0, 
+      "Constant value of sediment heat capacity in element block");
+  valid_pl->set<double>("ACE Ice Initial Saturation", 0.0, 
+      "Constant value of ice initial saturation in element block");
+  valid_pl->set<double>("ACE Ice Maximum Saturation", 0.0, 
+      "Constant value of ice maximum saturation in element block");
+  valid_pl->set<double>("ACE Water Minimum Saturation", 0.0, 
+      "Constant value of water minimum saturation in element block");
+  valid_pl->set<double>("ACE Base Salinity", 0.0, 
+      "Constant value of base salinity in element block");
+  valid_pl->set<double>("ACE Salt Enhanced D", 0.0, 
+      "Constant value of salt enhanced D in element block");
+  valid_pl->set<double>("ACE Freezing Curve Shift", 0.25, 
+      "Value of freezing curve shift in element block");
+  valid_pl->set<double>("ACE Latent Heat", 0.0, 
+      "Constant value latent heat in element block");
+  valid_pl->set<double>("ACE Surface Porosity", 0.0, 
+      "Constant value surface porosity in element block");
   return valid_pl;
 }
 
@@ -130,7 +191,27 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
   for (int i=0; i<eb_names_.size(); i++) {
     Teuchos::ParameterList& sublist
           = material_db_->getElementBlockSublist(eb_names_[i], "ACE Thermal Parameters");
+    //IKT, FIXME: may not need sat_mod and sat_exp - may be mechanics only; if so, remove  
     sat_mod_map_[eb_names_[i]] = sublist.get("Saturation Modulus", 0.0);
+    sat_exp_map_[eb_names_[i]] = sublist.get("Saturation Exponent", 0.0);
+    ice_density_map_[eb_names_[i]] = sublist.get("ACE Ice Density", 0.0);
+    water_density_map_[eb_names_[i]] = sublist.get("ACE Water Density", 0.0);
+    soil_density_map_[eb_names_[i]] = sublist.get("ACE Sediment Density", 0.0);
+    ice_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Ice Thermal Conductivity", 0.0);
+    water_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Water Thermal Conductivity", 0.0);
+    soil_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Sediment Thermal Conductivity", 0.0);
+    ice_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Ice Heat Capacity", 0.0);
+    water_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Water Heat Capacity", 0.0);
+    soil_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Sediment Heat Capacity", 0.0);
+    ice_saturation_init_map_[eb_names_[i]] = sublist.get("ACE Ice Initial Saturation", 0.0);
+    ice_saturation_max_map_[eb_names_[i]] = sublist.get("ACE Ice Maximum Saturation", 0.0);
+    water_saturation_min_map_[eb_names_[i]] = sublist.get("ACE Water Minimum Saturation", 0.0);
+    salinity_base_map_[eb_names_[i]] = sublist.get("ACE Base Salinity", 0.0);
+    salinity_enhanced_D_map_[eb_names_[i]] = sublist.get("ACE Salt Enhanced D", 0.0);
+    f_shift_map_[eb_names_[i]] = sublist.get("ACE Freezing Curve Shift", 0.25);
+    latent_heat_map_[eb_names_[i]] = sublist.get("ACE Latent Heat", 0.0);
+    porosity0_map_[eb_names_[i]] = sublist.get("ACE Surface Porosity", 0.0);
+
     if (sublist.isParameter("ACE Z Depth File") == true) {
       const std::string filename = sublist.get<std::string>("ACE Z Depth File");
       z_above_mean_sea_level_map_[eb_names_[i]] = vectorFromFile(filename); 

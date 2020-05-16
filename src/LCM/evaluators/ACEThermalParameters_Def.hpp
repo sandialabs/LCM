@@ -115,6 +115,15 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
   //IKT FIXME: add similar calls to above, as needed  
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
+      auto const height = Sacado::Value<ScalarT>::eval(coord_vec_(cell, qp, 2));
+      ScalarT sal_eb = this->queryElementBlockParameterMap(eb_name, salinity_base_map_);
+      auto const salinity_eb = this->queryElementBlockParameterMap(eb_name, salinity_map_); 
+      auto const z_above_mean_sea_level_eb = this->queryElementBlockParameterMap(eb_name, 
+		                                        z_above_mean_sea_level_map_); 
+      if (salinity_eb.size() > 0) {
+        sal_eb = interpolateVectors(z_above_mean_sea_level_eb, salinity_eb, height);
+      }
+      bluff_salinity_(cell, qp) = sal_eb;
       thermal_conductivity_(cell, qp) = thermal_conduct_eb; 
       thermal_inertia_(cell, qp) = thermal_inertia_eb; 
     }
@@ -312,7 +321,10 @@ ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(const std::st
   typename std::map<std::string, std::vector<RealType>>::const_iterator it; 
   it = map.find(eb_name); 
   if (it == map.end()) {
-    ALBANY_ABORT("\nError! Element block = " << eb_name << " was not found in map!\n");
+    //Element block is not found in map - return std::vector of length 0
+    std::vector<RealType> vec;  
+    vec.resize(0); 
+    return vec; 
   } 
   return it->second; 
 }

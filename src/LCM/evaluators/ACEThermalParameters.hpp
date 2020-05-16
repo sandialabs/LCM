@@ -101,8 +101,16 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::map<std::string, RealType> porosity0_map_;
   
   //! Block-dependent params with depth read in from materials.yaml file 
+  std::map<std::string, std::vector<RealType>> time_map_;
   std::map<std::string, std::vector<RealType>> z_above_mean_sea_level_map_;
-  //IKT FIXME - add others 
+  std::map<std::string, std::vector<RealType>> sea_level_map_;
+  std::map<std::string, std::vector<RealType>> salinity_map_;
+  std::map<std::string, std::vector<RealType>> ocean_salinity_map_;
+  std::map<std::string, std::vector<RealType>> porosity_from_file_map_;
+  std::map<std::string, std::vector<RealType>> sand_from_file_map_;
+  std::map<std::string, std::vector<RealType>> clay_from_file_map_;
+  std::map<std::string, std::vector<RealType>> silt_from_file_map_;
+  std::map<std::string, std::vector<RealType>> peat_from_file_map_;
 
 };
 }  // namespace LCM

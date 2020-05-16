@@ -212,11 +212,80 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     latent_heat_map_[eb_names_[i]] = sublist.get("ACE Latent Heat", 0.0);
     porosity0_map_[eb_names_[i]] = sublist.get("ACE Surface Porosity", 0.0);
 
+    if (sublist.isParameter("ACE Time File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Time File");
+      time_map_[eb_names_[i]]  = vectorFromFile(filename);
+    }
+    if (sublist.isParameter("ACE Sea Level File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Sea Level File");
+      sea_level_map_[eb_names_[i]] = vectorFromFile(filename);
+    }
     if (sublist.isParameter("ACE Z Depth File") == true) {
       const std::string filename = sublist.get<std::string>("ACE Z Depth File");
       z_above_mean_sea_level_map_[eb_names_[i]] = vectorFromFile(filename); 
     }
-    //IKT FIXME: fill in other parameters 
+    if (sublist.isParameter("ACE Salinity File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Salinity File");
+      salinity_map_[eb_names_[i]] = vectorFromFile(filename);
+      ALBANY_ASSERT(
+          z_above_mean_sea_level_map_[eb_names_[i]].size() == salinity_map_[eb_names_[i]].size(),
+          "*** ERROR: Number of z values and number of salinity values in ACE "
+          "Salinity File must match.");
+    }
+    if (sublist.isParameter("ACE Ocean Salinity File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Ocean Salinity File");
+      ocean_salinity_map_[eb_names_[i]] = vectorFromFile(filename);
+      ALBANY_ASSERT(
+          time_map_[eb_names_[i]].size() == ocean_salinity_map_[eb_names_[i]].size(),
+          "*** ERROR: Number of time values and number of ocean salinity values "
+          "in "
+          "ACE Ocean Salinity File must match.");
+    }
+    if (sublist.isParameter("ACE Porosity File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Porosity File");
+      porosity_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+      ALBANY_ASSERT(
+          z_above_mean_sea_level_map_[eb_names_[i]].size() == porosity_from_file_map_[eb_names_[i]].size(),
+          "*** ERROR: Number of z values and number of porosity values in "
+          "ACE Porosity File must match.");
+    }
+    if (sublist.isParameter("ACE Sand File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Sand File");
+      sand_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+      ALBANY_ASSERT(
+          z_above_mean_sea_level_map_[eb_names_[i]].size() == sand_from_file_map_[eb_names_[i]].size(),
+          "*** ERROR: Number of z values and number of sand values in "
+          "ACE Sand File must match.");
+    }
+    if (sublist.isParameter("ACE Clay File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Clay File");
+      clay_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+      ALBANY_ASSERT(
+          z_above_mean_sea_level_map_[eb_names_[i]].size() == clay_from_file_map_[eb_names_[i]].size(),
+          "*** ERROR: Number of z values and number of clay values in "
+          "ACE Clay File must match.");
+    }
+    if (sublist.isParameter("ACE Silt File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Silt File");
+      silt_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+      ALBANY_ASSERT(
+          z_above_mean_sea_level_map_[eb_names_[i]].size() == silt_from_file_map_[eb_names_[i]].size(),
+          "*** ERROR: Number of z values and number of silt values in "
+          "ACE Silt File must match.");
+    }
+    if (sublist.isParameter("ACE Peat File") == true) {
+      const std::string filename = sublist.get<std::string>("ACE Peat File");
+      peat_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+      ALBANY_ASSERT(
+          z_above_mean_sea_level_map_[eb_names_[i]].size() == peat_from_file_map_[eb_names_[i]].size(),
+          "*** ERROR: Number of z values and number of peat values in "
+          "ACE Peat File must match.");
+    }
+
+    ALBANY_ASSERT(
+        time_map_[eb_names_[i]].size() == sea_level_map_[eb_names_[i]].size(),
+        "*** ERROR: Number of times and number of sea level values must match.");
+
   }
 }
 

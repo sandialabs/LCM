@@ -10,6 +10,7 @@
 #include "Sacado_ParameterRegistration.hpp"
 #include "ACEcommon.hpp" 
 #include "Albany_STKDiscretization.hpp"
+#include <MiniTensor.h>
 
 namespace LCM {
 
@@ -31,7 +32,9 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
       water_saturation_(p.get<std::string> ("ACE Water Saturation QP Variable Name"), 
 		            dl->qp_scalar),
       porosity_(p.get<std::string> ("ACE Porosity QP Variable Name"), 
-		            dl->qp_scalar)
+		            dl->qp_scalar),
+      temperature_(p.get<std::string>("ACE Temperature QP Variable Name"),
+		           dl->qp_scalar) 
 {
   Teuchos::ParameterList* cond_list =
       p.get<Teuchos::ParameterList*>("Parameter List");
@@ -66,10 +69,21 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
   else {
     ALBANY_ABORT("\nError! Must specify a material database for thermal parameters.\n"); 
   }
- 
+
+  //IKT FIXME: figure add these as output fields
+  /*bluff_salinity_   = *output_fields["ACE Bluff Salinity"];
+  ice_saturation_   = *output_fields["ACE Ice Saturation"];
+  density_          = *output_fields["ACE Density"];
+  heat_capacity_    = *output_fields["ACE Heat Capacity"];
+  thermal_cond_     = *output_fields["ACE Thermal Conductivity"];
+  thermal_inertia_  = *output_fields["ACE Thermal Inertia"];
+  water_saturation_ = *output_fields["ACE Water Saturation"];
+  porosity_         = *output_fields["ACE Porosity"];*/
+
   this->createElementBlockParameterMaps(); 
 
   this->addDependentField(coord_vec_);
+  this->addDependentField(temperature_);
   this->addEvaluatedField(thermal_conductivity_);
   this->addEvaluatedField(thermal_inertia_);
   this->addEvaluatedField(bluff_salinity_);
@@ -99,6 +113,7 @@ ACEThermalParameters<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(water_saturation_, fm);
   this->utils.setFieldData(porosity_, fm);
   this->utils.setFieldData(coord_vec_, fm);
+  this->utils.setFieldData(temperature_, fm);
 }
 
 // **********************************************************************
@@ -107,6 +122,22 @@ void
 ACEThermalParameters<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
+  std::string eb_name = workset.EBName; 
+  Teuchos::ParameterList& sublist 
+	  = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Parameters");
+  //IKT FIXME: throw error is non-physical value for following 2 parameters  
+  ScalarT thermal_conduct_eb  = sublist.get("ACE Thermal Conductivity Value", -1.0);
+  ScalarT thermal_inertia_eb  = sublist.get("ACE Thermal Inertia Value", -1.0);
+  if ((thermal_conduct_eb >= 0) || (thermal_inertia_eb >= 0)) {
+    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
+      for (std::size_t qp = 0; qp < num_qps_; ++qp) {
+        thermal_conductivity_(cell, qp) = thermal_conduct_eb; 
+        thermal_inertia_(cell, qp) = thermal_inertia_eb; 
+      }
+    }
+    return; 
+  }
+
   double current_time = workset.current_time;
   double delta_time = workset.time_step; 
 
@@ -121,12 +152,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
     ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
   }
 
-  std::string eb_name = workset.EBName; 
-  Teuchos::ParameterList& sublist 
-	  = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Parameters"); 
-  ScalarT thermal_conduct_eb  = sublist.get("ACE Thermal Conductivity Value", 1.0);
-  ScalarT thermal_inertia_eb  = sublist.get("ACE Thermal Inertia Value", 1.0);
-  ScalarT sat_mod_eb = this->queryElementBlockParameterMap(eb_name, sat_mod_map_);
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     double const cell_bi      = have_cell_boundary_indicator_ == true ?
                                 *(cell_boundary_indicator_[cell]) :
@@ -196,16 +221,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
                           0.0002154996 * sal * sal -
                           0.000753 / 10000.0 * pressure_fixed + 273.15;
       
-      //IKT, FIXME: the following does not make sense in the context of this 
-      //evaluator I think...  what does tdot_ mean here?  Anyway, it looks like 
-      //tdot_ is not used in ACEpermafrost_Def.hpp, so we don't need to define tdot_.
-      // Calculate temperature change
-      /*auto const dTemp = Tcurr - Told;
-      if (delta_time > 0.0) {
-        tdot_(cell, pt) = dTemp / delta_time;
-      } else {
-        tdot_(cell, pt) = 0.0;
-      }*/
+      // Set current temperature
+      ScalarT const& Tcurr = temperature_(cell, qp);
+
       // Calculate the freezing curve function df/dTemp
       // W term sets the width of the freezing curve.
       // Smaller W means steeper curve.
@@ -216,14 +234,15 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
       // W = true width of freezing curve (in Celsius)
       // b = shift to left or right (+ is left, - is right)
 
-      /*ScalarT W = 10.0;  // constant value
+      ScalarT W = 10.0;  // constant value
       // if (freezing_curve_width_.size() > 0) {
       //  W = interpolateVectors(
       //      z_above_mean_sea_level_, freezing_curve_width_, height);
       //}
 
       ScalarT const Tdiff = Tcurr - Tmelt;
-      ScalarT const arg   = -(8.0 / W) * (Tdiff + (f_shift_ * W));
+      auto f_shift_eb = this->queryElementBlockParameterMap(eb_name, f_shift_map_); 
+      ScalarT const arg   = -(8.0 / W) * (Tdiff + (f_shift_eb * W));
       ScalarT       icurr{1.0};
       ScalarT       dfdT{0.0};
       auto const    tol = 709.0;
@@ -256,55 +275,38 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
       }
 
       bool sediment_given = false;
-      if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) &&
-         (silt_from_file_.size() > 0) && (peat_from_file_.size() > 0)) {
+      auto sand_from_file_eb = this->queryElementBlockParameterMap(eb_name, sand_from_file_map_); 
+      auto clay_from_file_eb = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_); 
+      auto silt_from_file_eb = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_); 
+      auto peat_from_file_eb = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_); 
+      if ((sand_from_file_eb.size() > 0) && (clay_from_file_eb.size() > 0) &&
+         (silt_from_file_eb.size() > 0) && (peat_from_file_eb.size() > 0)) {
         sediment_given = true;
-      }*/
-       /*
-      // BEGIN NEW CURVE //
-      ScalarT const Tdiff = Tcurr - Tmelt;
-
-      RealType const A = 0.0;
-      RealType const G = 1.0;
-      RealType const C = 1.0;
-      RealType const Q = 0.001;
-      RealType const B = 10.0;
-      RealType       v = 25.0;
-
-      if (sediment_given = true) {
-        auto sand_frac =
-            interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
-        auto clay_frac =
-            interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
-        auto silt_frac =
-            interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
-        auto peat_frac =
-            interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height);
-        v = (peat_frac * 5.0) + (sand_frac * 5.0) + (silt_frac * 25.0) +
-            (clay_frac * 70.0);
       }
-      ScalarT const qebt = Q * std::exp(-B * Tdiff);
 
-      ScalarT icurr = A + ((G - A) / (pow(C + qebt, 1.0/v)));
-      ScalarT dfdT = ((B * Q * (G - A)) * pow(C + qebt, -1.0/v) + (qebt / Q)) / (v *
-                      (C + qebt));
+      // BEGIN NEW CURVE //
+      // TODO Jenn: FILL IN!
       // END NEW CURVE //
-     */
+     
       // Update the water saturation
-      /*ScalarT wcurr = 1.0 - icurr;
+      ScalarT wcurr = 1.0 - icurr;
 
       ScalarT calc_soil_heat_capacity;
       ScalarT calc_soil_thermal_cond;
       ScalarT calc_soil_density;
+      auto ice_density_eb = this->queryElementBlockParameterMap(eb_name, ice_density_map_); 
+      auto water_density_eb = this->queryElementBlockParameterMap(eb_name, water_density_map_); 
+      auto soil_density_eb = this->queryElementBlockParameterMap(eb_name, soil_density_map_); 
       if (sediment_given == true) {
+
         auto sand_frac =
-            interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
+            interpolateVectors(z_above_mean_sea_level_eb, sand_from_file_eb, height);
         auto clay_frac =
-            interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
+            interpolateVectors(z_above_mean_sea_level_eb, clay_from_file_eb, height);
         auto silt_frac =
-            interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
+            interpolateVectors(z_above_mean_sea_level_eb, silt_from_file_eb, height);
         auto peat_frac =
-            interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height);
+            interpolateVectors(z_above_mean_sea_level_eb, peat_from_file_eb, height);
 
        	// THERMAL PROPERTIES OF ROCKS, E.C. Robertson, U.S. Geological Survey
         // Open-File Report 88-441 (1988).
@@ -320,53 +322,55 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
         // Rho values in [kg/m3]
         // Peat density from Emily Bristol
         calc_soil_density =
-            ((1.0 - peat_frac) * soil_density_) + (peat_frac * 250.0);
-      }
-      // Update the effective material density
-      if (sediment_given == true) {
-        density_(cell, pt) =
-            (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
-            ((1.0 - porosity) * calc_soil_density);
+            ((1.0 - peat_frac) * soil_density_eb) + (peat_frac * 250.0);
+        // Update the effective material density
+        density_(cell, qp) =
+            (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) +
+            ((1.0 - porosity_eb) * calc_soil_density);
       } 
       else {
-        density_(cell, pt) =
-            (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
-            ((1.0 - porosity) * soil_density_);
+        density_(cell, qp) =
+            (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) +
+            ((1.0 - porosity_eb) * soil_density_eb);
       }
 
       // Update the effective material heat capacity
+      auto ice_heat_capacity_eb = this->queryElementBlockParameterMap(eb_name, ice_heat_capacity_map_); 
+      auto water_heat_capacity_eb = this->queryElementBlockParameterMap(eb_name, water_heat_capacity_map_); 
+      auto soil_heat_capacity_eb = this->queryElementBlockParameterMap(eb_name, soil_heat_capacity_map_); 
       if (sediment_given == true) {
-        heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
-                                               (water_heat_capacity_ * wcurr))) +
-                                   ((1.0 - porosity) * calc_soil_heat_capacity);
+        heat_capacity_(cell, qp) = (porosity_eb * ((ice_heat_capacity_eb * icurr) +
+                                               (water_heat_capacity_eb * wcurr))) +
+                                   ((1.0 - porosity_eb) * calc_soil_heat_capacity);
       } 
       else {
-        heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
-                                               (water_heat_capacity_ * wcurr))) +
-                                   ((1.0 - porosity) * soil_heat_capacity_);
+        heat_capacity_(cell, qp) = (porosity_eb * ((ice_heat_capacity_eb * icurr) +
+                                               (water_heat_capacity_eb * wcurr))) +
+                                   ((1.0 - porosity_eb) * soil_heat_capacity_eb);
       }
 
       // Update the effective material thermal conductivity
+      auto ice_thermal_cond_eb = this->queryElementBlockParameterMap(eb_name, ice_thermal_cond_map_); 
+      auto water_thermal_cond_eb = this->queryElementBlockParameterMap(eb_name, water_thermal_cond_map_); 
+      auto soil_thermal_cond_eb = this->queryElementBlockParameterMap(eb_name, soil_thermal_cond_map_); 
       if (sediment_given == true) {
-        thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
-                                  pow(water_thermal_cond_, (wcurr * porosity)) *
-                                  pow(calc_soil_thermal_cond, (1.0 - porosity));
+        thermal_conductivity_(cell, qp) = pow(ice_thermal_cond_eb, (icurr * porosity_eb)) *
+                                           pow(water_thermal_cond_eb, (wcurr * porosity_eb)) *
+                                           pow(calc_soil_thermal_cond, (1.0 - porosity_eb));
       } 
       else {
-        thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
-                                  pow(water_thermal_cond_, (wcurr * porosity)) *
-                                  pow(soil_thermal_cond_, (1.0 - porosity));
+        thermal_conductivity_(cell, qp) = pow(ice_thermal_cond_eb, (icurr * porosity_eb)) *
+                                          pow(water_thermal_cond_eb, (wcurr * porosity_eb)) *
+                                          pow(soil_thermal_cond_eb, (1.0 - porosity_eb));
       }
       // Update the material thermal inertia term
-      thermal_inertia_(cell, pt) = (density_(cell, pt) * heat_capacity_(cell, pt)) -
-                                   (ice_density_ * latent_heat_ * dfdT);
+      auto latent_heat_eb = this->queryElementBlockParameterMap(eb_name, latent_heat_map_); 
+      thermal_inertia_(cell, qp) = (density_(cell, qp) * heat_capacity_(cell, qp)) -
+                                   (ice_density_eb * latent_heat_eb * dfdT);
  
       // Return values
-      ice_saturation_(cell, pt)   = icurr;
-      water_saturation_(cell, pt) = wcurr;*/
-
-      thermal_conductivity_(cell, qp) = thermal_conduct_eb; 
-      thermal_inertia_(cell, qp) = thermal_inertia_eb; 
+      ice_saturation_(cell, qp)   = icurr;
+      water_saturation_(cell, qp) = wcurr;
     }
   }
 }
@@ -443,9 +447,6 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
   for (int i=0; i<eb_names_.size(); i++) {
     Teuchos::ParameterList& sublist
           = material_db_->getElementBlockSublist(eb_names_[i], "ACE Thermal Parameters");
-    //IKT, FIXME: may not need sat_mod and sat_exp - may be mechanics only; if so, remove  
-    sat_mod_map_[eb_names_[i]] = sublist.get("Saturation Modulus", 0.0);
-    sat_exp_map_[eb_names_[i]] = sublist.get("Saturation Exponent", 0.0);
     ice_density_map_[eb_names_[i]] = sublist.get("ACE Ice Density", 0.0);
     water_density_map_[eb_names_[i]] = sublist.get("ACE Water Density", 0.0);
     soil_density_map_[eb_names_[i]] = sublist.get("ACE Sediment Density", 0.0);

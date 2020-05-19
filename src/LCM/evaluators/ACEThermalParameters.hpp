@@ -68,6 +68,7 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT, Cell, QuadPoint>                heat_capacity_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                water_saturation_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                porosity_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                temperature_;
 
   //! Constant value - not used but required from design of evaluator
   ScalarT constant_value_{0.0};
@@ -79,9 +80,6 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::ArrayRCP<std::string> eb_names_; 
 
   //! Block-dependent saturation hardening constants read in from materials.yaml file
-  //IKT, FIXME: may not need sat_mod and sat_exp - may be mechanics only; if so, remove  
-  std::map<std::string, RealType> sat_mod_map_;
-  std::map<std::string, RealType> sat_exp_map_;
   std::map<std::string, RealType> ice_density_map_;
   std::map<std::string, RealType> water_density_map_;
   std::map<std::string, RealType> soil_density_map_;

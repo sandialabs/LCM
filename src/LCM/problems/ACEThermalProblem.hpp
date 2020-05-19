@@ -219,6 +219,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE Density QP Variable Name", "ACE Density");
     p->set<string>("ACE Water Saturation QP Variable Name", "ACE Water Saturation");
     p->set<string>("ACE Porosity QP Variable Name", "ACE Porosity");
+    p->set<string>("ACE Temperature QP Variable Name", "Temperature");
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
     p->set< RCP<DataLayout> >("Node Data Layout", dl_->node_scalar);
     p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);

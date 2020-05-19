@@ -9,6 +9,7 @@
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
 #include "ACEcommon.hpp" 
+#include "Albany_STKDiscretization.hpp"
 
 namespace LCM {
 
@@ -106,18 +107,35 @@ void
 ACEThermalParameters<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
-  double current_time = workset.current_time; 
+  double current_time = workset.current_time;
+  double delta_time = workset.time_step; 
+
+  auto& disc        = *workset.disc;
+  auto& stk_disc    = dynamic_cast<Albany::STKDiscretization&>(disc);
+  auto& mesh_struct = *(stk_disc.getSTKMeshStruct());
+  auto& field_cont  = *(mesh_struct.getFieldContainer());
+  have_cell_boundary_indicator_ = field_cont.hasCellBoundaryIndicatorField();
+
+  if (have_cell_boundary_indicator_ == true) {
+    cell_boundary_indicator_ = workset.cell_boundary_indicator;
+    ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
+  }
+
   std::string eb_name = workset.EBName; 
   Teuchos::ParameterList& sublist 
 	  = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Parameters"); 
   ScalarT thermal_conduct_eb  = sublist.get("ACE Thermal Conductivity Value", 1.0);
   ScalarT thermal_inertia_eb  = sublist.get("ACE Thermal Inertia Value", 1.0);
   ScalarT sat_mod_eb = this->queryElementBlockParameterMap(eb_name, sat_mod_map_);
-  //IKT FIXME: add similar calls to above, as needed  
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
+    double const cell_bi      = have_cell_boundary_indicator_ == true ?
+                                *(cell_boundary_indicator_[cell]) :
+                                0.0;
+    bool const is_erodible    = cell_bi == 2.0;
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
       auto const height = Sacado::Value<ScalarT>::eval(coord_vec_(cell, qp, 2));
-      ScalarT sal_eb = this->queryElementBlockParameterMap(eb_name, salinity_base_map_);
+      ScalarT salinity_base_eb = this->queryElementBlockParameterMap(eb_name, salinity_base_map_);
+      ScalarT sal_eb = salinity_base_eb; 
       auto const salinity_eb = this->queryElementBlockParameterMap(eb_name, salinity_map_); 
       auto const z_above_mean_sea_level_eb = this->queryElementBlockParameterMap(eb_name, 
 		                                        z_above_mean_sea_level_map_); 
@@ -141,21 +159,23 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
           z_above_mean_sea_level_eb, porosity_from_file_eb, height);
       }
       porosity_(cell, qp) = porosity_eb;
-      //IKT, FIXME: check with Jenn regarding the following block of code
-      //We don't have is_erodible anymore...  what should logic be? How should 
-      //factor be defined? 
       // Calculate the salinity of the grid cell
-      /*if ((is_erodible == true) && (height <= sea_level)) {
-        RealType const cell_half_width    = 0.5 * element_size;
-        RealType const cell_exposed_area  = element_size * element_size;
-        RealType const cell_volume        = cell_exposed_area * element_size;
-        RealType const per_exposed_length = 1.0 / element_size;
-        RealType const factor             = per_exposed_length * salt_enhanced_D_;
+      if ((is_erodible == true) && (height <= sea_level)) {
+	RealType const element_size_eb = this->queryElementBlockParameterMap(eb_name, element_size_map_); 
+	RealType const salt_enhanced_D_eb = this->queryElementBlockParameterMap(eb_name, salt_enhanced_D_map_); 
+        RealType const cell_half_width    = 0.5 * element_size_eb;
+        RealType const cell_exposed_area  = element_size_eb * element_size_eb;
+        RealType const cell_volume        = cell_exposed_area * element_size_eb;
+        RealType const per_exposed_length = 1.0 / element_size_eb;
+        RealType const factor             = per_exposed_length * salt_enhanced_D_eb;
         ScalarT const  zero_sal(0.0);
-        ScalarT const  sal_curr  = bluff_salinity_(cell, pt);
-        ScalarT        ocean_sal = salinity_base_;
-        if (ocean_salinity_.size() > 0) {
-          ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
+        ScalarT const  sal_curr  = bluff_salinity_(cell, qp);
+        ScalarT        ocean_sal = salinity_base_eb;
+	//IKT, FIXME?: ocean_salinity is not block-dependent, so we may want to make it just a 
+	//std::vector, to avoid creating and querying a map. 
+	auto ocean_salinity_eb = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_); 
+        if (ocean_salinity_eb.size() > 0) {
+          ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
         }
         ScalarT const sal_diff   = ocean_sal - sal_curr;
         ScalarT const sal_grad   = sal_diff / cell_half_width;
@@ -165,17 +185,17 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
         if (sal_trial > ocean_sal) sal_trial = ocean_sal;
         bluff_salinity_(cell, qp) = sal_trial;
       }
-      ScalarT const sal = bluff_salinity_(cell, qp);*/
+      ScalarT const sal = bluff_salinity_(cell, qp);
 
       // Calculate melting temperature
-      /*ScalarT sal15(0.0);
+      ScalarT sal15(0.0);
       if (sal > 0.0) { sal15 = std::sqrt(sal * sal * sal); }
       auto const pressure_fixed = 1.0;
       // Tmelt is in Kelvin
       ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 -
                           0.0002154996 * sal * sal -
                           0.000753 / 10000.0 * pressure_fixed + 273.15;
-       */
+      
       //IKT, FIXME: the following does not make sense in the context of this 
       //evaluator I think...  what does tdot_ mean here?  Anyway, it looks like 
       //tdot_ is not used in ACEpermafrost_Def.hpp, so we don't need to define tdot_.
@@ -410,6 +430,8 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
       "Constant value latent heat in element block");
   valid_pl->set<double>("ACE Surface Porosity", 0.0, 
       "Constant value surface porosity in element block");
+  valid_pl->set<double>("ACE Element Size", 0.0, 
+      "Constant value of element size in element block");
   return valid_pl;
 }
 
@@ -437,10 +459,11 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ice_saturation_max_map_[eb_names_[i]] = sublist.get("ACE Ice Maximum Saturation", 0.0);
     water_saturation_min_map_[eb_names_[i]] = sublist.get("ACE Water Minimum Saturation", 0.0);
     salinity_base_map_[eb_names_[i]] = sublist.get("ACE Base Salinity", 0.0);
-    salinity_enhanced_D_map_[eb_names_[i]] = sublist.get("ACE Salt Enhanced D", 0.0);
+    salt_enhanced_D_map_[eb_names_[i]] = sublist.get("ACE Salt Enhanced D", 0.0);
     f_shift_map_[eb_names_[i]] = sublist.get("ACE Freezing Curve Shift", 0.25);
     latent_heat_map_[eb_names_[i]] = sublist.get("ACE Latent Heat", 0.0);
     porosity0_map_[eb_names_[i]] = sublist.get("ACE Surface Porosity", 0.0);
+    element_size_map_[eb_names_[i]] = sublist.get("ACE Element Size", 0.0);
 
     if (sublist.isParameter("ACE Time File") == true) {
       const std::string filename = sublist.get<std::string>("ACE Time File");

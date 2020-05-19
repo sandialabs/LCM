@@ -95,22 +95,28 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::map<std::string, RealType> ice_saturation_max_map_;
   std::map<std::string, RealType> water_saturation_min_map_;
   std::map<std::string, RealType> salinity_base_map_;
-  std::map<std::string, RealType> salinity_enhanced_D_map_;
+  std::map<std::string, RealType> salt_enhanced_D_map_;
   std::map<std::string, RealType> f_shift_map_;
   std::map<std::string, RealType> latent_heat_map_;
   std::map<std::string, RealType> porosity0_map_;
+  std::map<std::string, RealType> element_size_map_; //IKT FIXME? this is not block dept currently unless have different
+                                                     //mesh resolution in different blocks, so can be RealType 
   
   //! Block-dependent params with depth read in from materials.yaml file 
-  std::map<std::string, std::vector<RealType>> time_map_;
+  std::map<std::string, std::vector<RealType>> time_map_; //IKT FIXME?: this is not block dept so can be std::vector 
   std::map<std::string, std::vector<RealType>> z_above_mean_sea_level_map_;
   std::map<std::string, std::vector<RealType>> sea_level_map_;
   std::map<std::string, std::vector<RealType>> salinity_map_;
-  std::map<std::string, std::vector<RealType>> ocean_salinity_map_;
+  std::map<std::string, std::vector<RealType>> ocean_salinity_map_; //IKT FIXME?: this is not block dept so can be a std::vector
   std::map<std::string, std::vector<RealType>> porosity_from_file_map_;
   std::map<std::string, std::vector<RealType>> sand_from_file_map_;
   std::map<std::string, std::vector<RealType>> clay_from_file_map_;
   std::map<std::string, std::vector<RealType>> silt_from_file_map_;
   std::map<std::string, std::vector<RealType>> peat_from_file_map_;
+
+  //! Variables keeping track of whether cells are on erodible boundary  
+  bool                       have_cell_boundary_indicator_{false};
+  Teuchos::ArrayRCP<double*> cell_boundary_indicator_;
 
 };
 }  // namespace LCM

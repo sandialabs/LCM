@@ -123,11 +123,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
     typename Traits::EvalData workset)
 {
   std::string eb_name = workset.EBName; 
-  Teuchos::ParameterList& sublist 
-	  = material_db_->getElementBlockSublist(eb_name, "ACE Thermal Parameters");
-  //IKT FIXME: throw error is non-physical value for following 2 parameters  
-  ScalarT thermal_conduct_eb  = sublist.get("ACE Thermal Conductivity Value", -1.0);
-  ScalarT thermal_inertia_eb  = sublist.get("ACE Thermal Inertia Value", -1.0);
+  ScalarT thermal_conduct_eb = this->queryElementBlockParameterMap(eb_name, const_thermal_conduct_map_);
+  ScalarT thermal_inertia_eb = this->queryElementBlockParameterMap(eb_name, const_thermal_inertia_map_);
   if ((thermal_conduct_eb >= 0) || (thermal_inertia_eb >= 0)) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < num_qps_; ++qp) {
@@ -447,24 +444,72 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
   for (int i=0; i<eb_names_.size(); i++) {
     Teuchos::ParameterList& sublist
           = material_db_->getElementBlockSublist(eb_names_[i], "ACE Thermal Parameters");
+    const_thermal_conduct_map_[eb_names_[i]] = sublist.get("ACE Thermal Conductivity Value", -1.0);
+    if (const_thermal_conduct_map_[eb_names_[i]] != -1.0) {
+      ALBANY_ASSERT(
+          (const_thermal_conduct_map_[eb_names_[i]] > 0.0), 
+          "*** ERROR: ACE Thermal Conductivity Value must be positive!"); 
+    }
+    const_thermal_inertia_map_[eb_names_[i]] = sublist.get("ACE Thermal Inertia Value", -1.0);
+    if (const_thermal_inertia_map_[eb_names_[i]] != -1.0) {
+      ALBANY_ASSERT(
+          (const_thermal_inertia_map_[eb_names_[i]] > 0.0), 
+          "*** ERROR: ACE Thermal Inertia Value must be positive!"); 
+    }
     ice_density_map_[eb_names_[i]] = sublist.get("ACE Ice Density", 0.0);
+    ALBANY_ASSERT((ice_density_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Ice Density must be non-negative!"); 
     water_density_map_[eb_names_[i]] = sublist.get("ACE Water Density", 0.0);
+    ALBANY_ASSERT((water_density_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Water Density must be non-negative!"); 
     soil_density_map_[eb_names_[i]] = sublist.get("ACE Sediment Density", 0.0);
+    ALBANY_ASSERT((soil_density_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Soil Density must be non-negative!"); 
     ice_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Ice Thermal Conductivity", 0.0);
+    ALBANY_ASSERT((ice_thermal_cond_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!"); 
     water_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Water Thermal Conductivity", 0.0);
+    ALBANY_ASSERT((water_thermal_cond_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Water Thermal Conductivity must be non-negative!"); 
     soil_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Sediment Thermal Conductivity", 0.0);
+    ALBANY_ASSERT((soil_thermal_cond_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!"); 
     ice_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Ice Heat Capacity", 0.0);
+    ALBANY_ASSERT((ice_heat_capacity_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Ice Heat Capacity must be non-negative!"); 
     water_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Water Heat Capacity", 0.0);
+    ALBANY_ASSERT((water_heat_capacity_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Water Heat Capacity must be non-negative!"); 
     soil_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Sediment Heat Capacity", 0.0);
+    ALBANY_ASSERT((soil_heat_capacity_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Sediment Heat Capacity must be non-negative!"); 
     ice_saturation_init_map_[eb_names_[i]] = sublist.get("ACE Ice Initial Saturation", 0.0);
+    ALBANY_ASSERT((ice_saturation_init_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Ice Initial Saturation must be non-negative!"); 
     ice_saturation_max_map_[eb_names_[i]] = sublist.get("ACE Ice Maximum Saturation", 0.0);
+    ALBANY_ASSERT((ice_saturation_max_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Ice Maximum Saturation must be non-negative!"); 
     water_saturation_min_map_[eb_names_[i]] = sublist.get("ACE Water Minimum Saturation", 0.0);
+    ALBANY_ASSERT((water_saturation_min_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Water Minimum Saturation must be non-negative!"); 
     salinity_base_map_[eb_names_[i]] = sublist.get("ACE Base Salinity", 0.0);
+    ALBANY_ASSERT((salinity_base_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Base Salinity must be non-negative!"); 
     salt_enhanced_D_map_[eb_names_[i]] = sublist.get("ACE Salt Enhanced D", 0.0);
+    ALBANY_ASSERT((salt_enhanced_D_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Salt Enhanced D must be non-negative!"); 
     f_shift_map_[eb_names_[i]] = sublist.get("ACE Freezing Curve Shift", 0.25);
+    ALBANY_ASSERT((f_shift_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Freezing Curve Shift must be non-negative!"); 
     latent_heat_map_[eb_names_[i]] = sublist.get("ACE Latent Heat", 0.0);
+    ALBANY_ASSERT((latent_heat_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Latent Heat must be non-negative!"); 
     porosity0_map_[eb_names_[i]] = sublist.get("ACE Surface Porosity", 0.0);
+    ALBANY_ASSERT((porosity0_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Surface Porosity must be non-negative!"); 
     element_size_map_[eb_names_[i]] = sublist.get("ACE Element Size", 0.0);
+    ALBANY_ASSERT((element_size_map_[eb_names_[i]] >= 0.0), 
+		    "*** ERROR: ACE Element Size must be non-negative!"); 
 
     if (sublist.isParameter("ACE Time File") == true) {
       const std::string filename = sublist.get<std::string>("ACE Time File");

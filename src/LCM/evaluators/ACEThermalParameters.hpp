@@ -80,6 +80,8 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::ArrayRCP<std::string> eb_names_; 
 
   //! Block-dependent saturation hardening constants read in from materials.yaml file
+  std::map<std::string, RealType> const_thermal_conduct_map_; 
+  std::map<std::string, RealType> const_thermal_inertia_map_;
   std::map<std::string, RealType> ice_density_map_;
   std::map<std::string, RealType> water_density_map_;
   std::map<std::string, RealType> soil_density_map_;

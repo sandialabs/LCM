@@ -442,147 +442,146 @@ void
 ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps() 
 {
   for (int i=0; i<eb_names_.size(); i++) {
-    Teuchos::ParameterList& sublist
-          = material_db_->getElementBlockSublist(eb_names_[i], "ACE Thermal Parameters");
-    const_thermal_conduct_map_[eb_names_[i]] = sublist.get("ACE Thermal Conductivity Value", -1.0);
-    if (const_thermal_conduct_map_[eb_names_[i]] != -1.0) {
+    std::string eb_name = eb_names_[i]; 
+    const_thermal_conduct_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Conductivity Value", -1.0);
+    if (const_thermal_conduct_map_[eb_name] != -1.0) {
       ALBANY_ASSERT(
-          (const_thermal_conduct_map_[eb_names_[i]] > 0.0), 
+          (const_thermal_conduct_map_[eb_name] > 0.0), 
           "*** ERROR: ACE Thermal Conductivity Value must be positive!"); 
     }
-    const_thermal_inertia_map_[eb_names_[i]] = sublist.get("ACE Thermal Inertia Value", -1.0);
-    if (const_thermal_inertia_map_[eb_names_[i]] != -1.0) {
+    const_thermal_inertia_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Inertia Value", -1.0);
+    if (const_thermal_inertia_map_[eb_name] != -1.0) {
       ALBANY_ASSERT(
-          (const_thermal_inertia_map_[eb_names_[i]] > 0.0), 
+          (const_thermal_inertia_map_[eb_name] > 0.0), 
           "*** ERROR: ACE Thermal Inertia Value must be positive!"); 
     }
-    ice_density_map_[eb_names_[i]] = sublist.get("ACE Ice Density", 0.0);
-    ALBANY_ASSERT((ice_density_map_[eb_names_[i]] >= 0.0), 
+    ice_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Density", 0.0);
+    ALBANY_ASSERT((ice_density_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Ice Density must be non-negative!"); 
-    water_density_map_[eb_names_[i]] = sublist.get("ACE Water Density", 0.0);
-    ALBANY_ASSERT((water_density_map_[eb_names_[i]] >= 0.0), 
+    water_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Density", 0.0);
+    ALBANY_ASSERT((water_density_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Water Density must be non-negative!"); 
-    soil_density_map_[eb_names_[i]] = sublist.get("ACE Sediment Density", 0.0);
-    ALBANY_ASSERT((soil_density_map_[eb_names_[i]] >= 0.0), 
+    soil_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Density", 0.0);
+    ALBANY_ASSERT((soil_density_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Soil Density must be non-negative!"); 
-    ice_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Ice Thermal Conductivity", 0.0);
-    ALBANY_ASSERT((ice_thermal_cond_map_[eb_names_[i]] >= 0.0), 
+    ice_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 0.0);
+    ALBANY_ASSERT((ice_thermal_cond_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!"); 
-    water_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Water Thermal Conductivity", 0.0);
-    ALBANY_ASSERT((water_thermal_cond_map_[eb_names_[i]] >= 0.0), 
+    water_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.0);
+    ALBANY_ASSERT((water_thermal_cond_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Water Thermal Conductivity must be non-negative!"); 
-    soil_thermal_cond_map_[eb_names_[i]] = sublist.get("ACE Sediment Thermal Conductivity", 0.0);
-    ALBANY_ASSERT((soil_thermal_cond_map_[eb_names_[i]] >= 0.0), 
+    soil_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity", 0.0);
+    ALBANY_ASSERT((soil_thermal_cond_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!"); 
-    ice_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Ice Heat Capacity", 0.0);
-    ALBANY_ASSERT((ice_heat_capacity_map_[eb_names_[i]] >= 0.0), 
+    ice_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Heat Capacity", 0.0);
+    ALBANY_ASSERT((ice_heat_capacity_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Ice Heat Capacity must be non-negative!"); 
-    water_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Water Heat Capacity", 0.0);
-    ALBANY_ASSERT((water_heat_capacity_map_[eb_names_[i]] >= 0.0), 
+    water_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Heat Capacity", 0.0);
+    ALBANY_ASSERT((water_heat_capacity_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Water Heat Capacity must be non-negative!"); 
-    soil_heat_capacity_map_[eb_names_[i]] = sublist.get("ACE Sediment Heat Capacity", 0.0);
-    ALBANY_ASSERT((soil_heat_capacity_map_[eb_names_[i]] >= 0.0), 
+    soil_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Heat Capacity", 0.0);
+    ALBANY_ASSERT((soil_heat_capacity_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Sediment Heat Capacity must be non-negative!"); 
-    ice_saturation_init_map_[eb_names_[i]] = sublist.get("ACE Ice Initial Saturation", 0.0);
-    ALBANY_ASSERT((ice_saturation_init_map_[eb_names_[i]] >= 0.0), 
+    ice_saturation_init_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Initial Saturation", 0.0);
+    ALBANY_ASSERT((ice_saturation_init_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Ice Initial Saturation must be non-negative!"); 
-    ice_saturation_max_map_[eb_names_[i]] = sublist.get("ACE Ice Maximum Saturation", 0.0);
-    ALBANY_ASSERT((ice_saturation_max_map_[eb_names_[i]] >= 0.0), 
+    ice_saturation_max_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Maximum Saturation", 0.0);
+    ALBANY_ASSERT((ice_saturation_max_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Ice Maximum Saturation must be non-negative!"); 
-    water_saturation_min_map_[eb_names_[i]] = sublist.get("ACE Water Minimum Saturation", 0.0);
-    ALBANY_ASSERT((water_saturation_min_map_[eb_names_[i]] >= 0.0), 
+    water_saturation_min_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Minimum Saturation", 0.0);
+    ALBANY_ASSERT((water_saturation_min_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Water Minimum Saturation must be non-negative!"); 
-    salinity_base_map_[eb_names_[i]] = sublist.get("ACE Base Salinity", 0.0);
-    ALBANY_ASSERT((salinity_base_map_[eb_names_[i]] >= 0.0), 
+    salinity_base_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Base Salinity", 0.0);
+    ALBANY_ASSERT((salinity_base_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Base Salinity must be non-negative!"); 
-    salt_enhanced_D_map_[eb_names_[i]] = sublist.get("ACE Salt Enhanced D", 0.0);
-    ALBANY_ASSERT((salt_enhanced_D_map_[eb_names_[i]] >= 0.0), 
+    salt_enhanced_D_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Salt Enhanced D", 0.0);
+    ALBANY_ASSERT((salt_enhanced_D_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Salt Enhanced D must be non-negative!"); 
-    f_shift_map_[eb_names_[i]] = sublist.get("ACE Freezing Curve Shift", 0.25);
-    ALBANY_ASSERT((f_shift_map_[eb_names_[i]] >= 0.0), 
+    f_shift_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Freezing Curve Shift", 0.25);
+    ALBANY_ASSERT((f_shift_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Freezing Curve Shift must be non-negative!"); 
-    latent_heat_map_[eb_names_[i]] = sublist.get("ACE Latent Heat", 0.0);
-    ALBANY_ASSERT((latent_heat_map_[eb_names_[i]] >= 0.0), 
+    latent_heat_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Latent Heat", 0.0);
+    ALBANY_ASSERT((latent_heat_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Latent Heat must be non-negative!"); 
-    porosity0_map_[eb_names_[i]] = sublist.get("ACE Surface Porosity", 0.0);
-    ALBANY_ASSERT((porosity0_map_[eb_names_[i]] >= 0.0), 
+    porosity0_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Surface Porosity", 0.0);
+    ALBANY_ASSERT((porosity0_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Surface Porosity must be non-negative!"); 
-    element_size_map_[eb_names_[i]] = sublist.get("ACE Element Size", 0.0);
-    ALBANY_ASSERT((element_size_map_[eb_names_[i]] >= 0.0), 
+    element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 0.0);
+    ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Element Size must be non-negative!"); 
 
-    if (sublist.isParameter("ACE Time File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Time File");
-      time_map_[eb_names_[i]]  = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Time File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");
+      time_map_[eb_name]  = vectorFromFile(filename);
     }
-    if (sublist.isParameter("ACE Sea Level File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Sea Level File");
-      sea_level_map_[eb_names_[i]] = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Sea Level File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Sea Level File");
+      sea_level_map_[eb_name] = vectorFromFile(filename);
     }
-    if (sublist.isParameter("ACE Z Depth File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Z Depth File");
-      z_above_mean_sea_level_map_[eb_names_[i]] = vectorFromFile(filename); 
+    if (material_db_->isElementBlockParam(eb_name, "ACE Z Depth File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Z Depth File");
+      z_above_mean_sea_level_map_[eb_name] = vectorFromFile(filename); 
     }
-    if (sublist.isParameter("ACE Salinity File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Salinity File");
-      salinity_map_[eb_names_[i]] = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Salinity File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Salinity File");
+      salinity_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
-          z_above_mean_sea_level_map_[eb_names_[i]].size() == salinity_map_[eb_names_[i]].size(),
+          z_above_mean_sea_level_map_[eb_name].size() == salinity_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of salinity values in ACE "
           "Salinity File must match.");
     }
-    if (sublist.isParameter("ACE Ocean Salinity File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Ocean Salinity File");
-      ocean_salinity_map_[eb_names_[i]] = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Ocean Salinity File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Ocean Salinity File");
+      ocean_salinity_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
-          time_map_[eb_names_[i]].size() == ocean_salinity_map_[eb_names_[i]].size(),
+          time_map_[eb_name].size() == ocean_salinity_map_[eb_name].size(),
           "*** ERROR: Number of time values and number of ocean salinity values "
           "in "
           "ACE Ocean Salinity File must match.");
     }
-    if (sublist.isParameter("ACE Porosity File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Porosity File");
-      porosity_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Porosity File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Porosity File");
+      porosity_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
-          z_above_mean_sea_level_map_[eb_names_[i]].size() == porosity_from_file_map_[eb_names_[i]].size(),
+          z_above_mean_sea_level_map_[eb_name].size() == porosity_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of porosity values in "
           "ACE Porosity File must match.");
     }
-    if (sublist.isParameter("ACE Sand File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Sand File");
-      sand_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Sand File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Sand File");
+      sand_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
-          z_above_mean_sea_level_map_[eb_names_[i]].size() == sand_from_file_map_[eb_names_[i]].size(),
+          z_above_mean_sea_level_map_[eb_name].size() == sand_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of sand values in "
           "ACE Sand File must match.");
     }
-    if (sublist.isParameter("ACE Clay File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Clay File");
-      clay_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Clay File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Clay File");
+      clay_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
-          z_above_mean_sea_level_map_[eb_names_[i]].size() == clay_from_file_map_[eb_names_[i]].size(),
+          z_above_mean_sea_level_map_[eb_name].size() == clay_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of clay values in "
           "ACE Clay File must match.");
     }
-    if (sublist.isParameter("ACE Silt File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Silt File");
-      silt_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Silt File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Silt File");
+      silt_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
-          z_above_mean_sea_level_map_[eb_names_[i]].size() == silt_from_file_map_[eb_names_[i]].size(),
+          z_above_mean_sea_level_map_[eb_name].size() == silt_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of silt values in "
           "ACE Silt File must match.");
     }
-    if (sublist.isParameter("ACE Peat File") == true) {
-      const std::string filename = sublist.get<std::string>("ACE Peat File");
-      peat_from_file_map_[eb_names_[i]] = vectorFromFile(filename);
+    if (material_db_->isElementBlockParam(eb_name, "ACE Peat File") == true) {
+      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Peat File");
+      peat_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
-          z_above_mean_sea_level_map_[eb_names_[i]].size() == peat_from_file_map_[eb_names_[i]].size(),
+          z_above_mean_sea_level_map_[eb_name].size() == peat_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of peat values in "
           "ACE Peat File must match.");
     }
 
     ALBANY_ASSERT(
-        time_map_[eb_names_[i]].size() == sea_level_map_[eb_names_[i]].size(),
+        time_map_[eb_name].size() == sea_level_map_[eb_name].size(),
         "*** ERROR: Number of times and number of sea level values must match.");
 
   }

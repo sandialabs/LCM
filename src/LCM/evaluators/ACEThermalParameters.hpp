@@ -46,7 +46,7 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   void 
   createElementBlockParameterMaps();
 
-  RealType
+  ScalarT
   queryElementBlockParameterMap(const std::string eb_name, const std::map<std::string, RealType> map);  
   
   std::vector<RealType>

@@ -142,15 +142,9 @@ Albany::ProblemFactory::create()
   else if (getName(method) == "Mechanics") {
     strategy = rcp(new Albany::MechanicsProblem(
         problemParams, paramLib, getNumDim(method), rc_mgr, commT));
-  } else if (method == "ACE Thermal 1D") {
+  } else if (getName(method) == "ACE Thermal") {
     strategy =
-        rcp(new ACEThermalProblem(problemParams, paramLib, 1, commT));
-  } else if (method == "ACE Thermal 2D") {
-    strategy =
-        rcp(new ACEThermalProblem(problemParams, paramLib, 2, commT));
-  } else if (method == "ACE Thermal 3D") {
-    strategy =
-        rcp(new ACEThermalProblem(problemParams, paramLib, 3, commT));
+        rcp(new ACEThermalProblem(problemParams, paramLib, getNumDim(method), commT));
   } else if (getName(method) == "Elasticity") {
     strategy = rcp(new Albany::ElasticityProblem(
         problemParams, paramLib, getNumDim(method), rc_mgr));

@@ -27,7 +27,7 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
 		            dl->qp_scalar),
       density_(p.get<std::string> ("ACE Density QP Variable Name"), 
 		            dl->qp_scalar),
-      heat_capacity_(p.get<std::string> ("ACE Density QP Variable Name"), 
+      heat_capacity_(p.get<std::string> ("ACE Heat Capacity QP Variable Name"), 
 		            dl->qp_scalar),
       water_saturation_(p.get<std::string> ("ACE Water Saturation QP Variable Name"), 
 		            dl->qp_scalar),

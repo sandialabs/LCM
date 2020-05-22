@@ -7,4 +7,5 @@
 set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
 add_subdirectory(Cube)
 add_subdirectory(Cuboid)
-add_subdirectory(ACEStandAloneThermal2D)
+add_subdirectory(StandAloneThermal2D)
+add_subdirectory(CuboidStandAloneThermal3D)

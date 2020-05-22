@@ -14,8 +14,28 @@ ALBANY:
       Function: Constant
       Function Data: [255.0]
     Response Functions:
-      Number: 1
-      Response 0: Solution Average
+      Number: 2
+      Response 0: Project IP to Nodal Field
+      ResponseParams 0:
+        Number of Fields: 8
+        IP Field Name 0: ACE Bluff Salinity
+        IP Field Layout 0: Scalar
+        IP Field Name 1: ACE Ice Saturation
+        IP Field Layout 1: Scalar
+        IP Field Name 2: ACE Density
+        IP Field Layout 2: Scalar
+        IP Field Name 3: ACE Heat Capacity
+        IP Field Layout 3: Scalar
+        IP Field Name 4: ACE Thermal Conductivity
+        IP Field Layout 4: Scalar
+        IP Field Name 5: ACE Thermal Inertia
+        IP Field Layout 5: Scalar
+        IP Field Name 6: ACE Water Saturation
+        IP Field Layout 6: Scalar
+        IP Field Name 7: ACE Porosity
+        IP Field Layout 7: Scalar
+        Output to File: true
+      Response 1: Solution Average
   Discretization: 
     Method: Ioss
     Exodus Input File Name: './grid.g'
@@ -23,8 +43,8 @@ ALBANY:
     Separate Evaluators by Element Block: true
     Workset Size: -1
   Regression Results: 
-    Number of Comparisons: 1
-    Test Values: [2.118151805082e+02]
+    Number of Comparisons: 0
+    Test Values: [0.0, 0.0, 2.118151805082e+02]
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
   Piro: 

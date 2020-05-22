@@ -139,6 +139,12 @@ Albany::ACEThermalProblem::constructEvaluators(
   using Teuchos::RCP;
   using Teuchos::rcp;
 
+  Albany::StateStruct::MeshFieldEntity entity; 
+  
+  // Collect problem-specific response parameters
+  Teuchos::RCP<Teuchos::ParameterList> params_from_prob = Teuchos::rcp(
+      new Teuchos::ParameterList("Response Parameters from Problem"));
+
   const CellTopologyData* const elem_top = &mesh_specs.ctd;
 
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepid_basis =
@@ -237,10 +243,10 @@ Albany::ACEThermalProblem::constructEvaluators(
 
     ev = rcp(new LCM::ACEThermalParameters<EvalT,AlbanyTraits>(*p, dl_));
     fm0.template registerEvaluator<EvalT>(ev);
-    // Save ACE Bluff Conductivity to the output Exodus file 
+    // Save ACE Bluff Salinity to the output Exodus file 
     {
       std::string stateName = "ACE Bluff Salinity";
-      auto entity = Albany::StateStruct::QuadPoint;
+      entity = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Bluff Salinity");
       p->set("Field Layout", dl_->qp_scalar);
@@ -256,7 +262,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     // Save ACE Ice Saturation to the output Exodus file 
     {
       std::string stateName = "ACE Ice Saturation";
-      auto entity = Albany::StateStruct::QuadPoint;
+      entity = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Ice Saturation");
       p->set("Field Layout", dl_->qp_scalar);
@@ -272,7 +278,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     // Save ACE Density to the output Exodus file 
     {
       std::string stateName = "ACE Density";
-      auto entity = Albany::StateStruct::QuadPoint;
+      entity = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Density");
       p->set("Field Layout", dl_->qp_scalar);
@@ -288,7 +294,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     // Save ACE Heat Capacity to the output Exodus file 
     {
       std::string stateName = "ACE Heat Capacity";
-      auto entity = Albany::StateStruct::QuadPoint;
+      entity = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Heat Capacity");
       p->set("Field Layout", dl_->qp_scalar);
@@ -304,7 +310,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     // Save ACE Thermal Conductivity to the output Exodus file 
     {
       std::string stateName = "ACE Thermal Conductivity";
-      auto entity = Albany::StateStruct::QuadPoint;
+      entity = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Thermal Conductivity");
       p->set("Field Layout", dl_->qp_scalar);
@@ -320,7 +326,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     // Save ACE Thermal Inertia to the output Exodus file 
     {
       std::string stateName = "ACE Thermal Inertia";
-      auto entity = Albany::StateStruct::QuadPoint;
+      entity = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Thermal Inertia");
       p->set("Field Layout", dl_->qp_scalar);
@@ -336,7 +342,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     // Save ACE Water Saturation to the output Exodus file 
     {
       std::string stateName = "ACE Water Saturation";
-      auto entity = Albany::StateStruct::QuadPoint;
+      entity = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Water Saturation");
       p->set("Field Layout", dl_->qp_scalar);
@@ -352,7 +358,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     // Save ACE Porosity to the output Exodus file 
     {
       std::string stateName = "ACE Porosity";
-      auto entity = Albany::StateStruct::QuadPoint;
+      entity = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Porosity");
       p->set("Field Layout", dl_->qp_scalar);
@@ -402,7 +408,7 @@ Albany::ACEThermalProblem::constructEvaluators(
   else if (field_manager_choice == Albany::BUILD_RESPONSE_FM) {
     Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> resp_utils(dl_);
     return resp_utils.constructResponses(
-        fm0, *response_list, Teuchos::null, state_mgr);
+        fm0, *response_list, params_from_prob, state_mgr, &mesh_specs);
   }
 
   return Teuchos::null;

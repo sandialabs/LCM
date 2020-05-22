@@ -70,16 +70,6 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
     ALBANY_ABORT("\nError! Must specify a material database for thermal parameters.\n"); 
   }
 
-  //IKT FIXME: figure add these as output fields
-  /*bluff_salinity_   = *output_fields["ACE Bluff Salinity"];
-  ice_saturation_   = *output_fields["ACE Ice Saturation"];
-  density_          = *output_fields["ACE Density"];
-  heat_capacity_    = *output_fields["ACE Heat Capacity"];
-  thermal_cond_     = *output_fields["ACE Thermal Conductivity"];
-  thermal_inertia_  = *output_fields["ACE Thermal Inertia"];
-  water_saturation_ = *output_fields["ACE Water Saturation"];
-  porosity_         = *output_fields["ACE Porosity"];*/
-
   this->createElementBlockParameterMaps(); 
 
   this->addDependentField(coord_vec_);

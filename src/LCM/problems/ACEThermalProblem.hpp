@@ -13,6 +13,7 @@
 #include "PHAL_Workset.hpp"
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
+#include "PHAL_SaveStateField.hpp"
 
 namespace Albany {
 
@@ -208,7 +209,6 @@ Albany::ACEThermalProblem::constructEvaluators(
   }
    
   // ACE thermal parameters
-  // Currently thermal conductivity and inertia are evaluated here 
   {
     RCP<ParameterList> p = rcp(new ParameterList);
 
@@ -236,6 +236,134 @@ Albany::ACEThermalProblem::constructEvaluators(
 
     ev = rcp(new LCM::ACEThermalParameters<EvalT,AlbanyTraits>(*p, dl_));
     fm0.template registerEvaluator<EvalT>(ev);
+    // Save ACE Bluff Conductivity to the output Exodus file 
+    {
+      std::string stateName = "ACE Bluff Salinity";
+      auto entity = Albany::StateStruct::QuadPoint;
+      p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE Bluff Salinity");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
+      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+        fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }
+    // Save ACE Ice Saturation to the output Exodus file 
+    {
+      std::string stateName = "ACE Ice Saturation";
+      auto entity = Albany::StateStruct::QuadPoint;
+      p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE Ice Saturation");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
+      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+        fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }
+    // Save ACE Density to the output Exodus file 
+    {
+      std::string stateName = "ACE Density";
+      auto entity = Albany::StateStruct::QuadPoint;
+      p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE Density");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
+      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+        fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }
+    // Save ACE Heat Capacity to the output Exodus file 
+    /*{
+      std::string stateName = "ACE Heat Capacity";
+      auto entity = Albany::StateStruct::QuadPoint;
+      p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE Heat Capacity");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
+      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+        fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }*/
+    // Save ACE Thermal Conductivity to the output Exodus file 
+    {
+      std::string stateName = "ACE Thermal Conductivity";
+      auto entity = Albany::StateStruct::QuadPoint;
+      p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE Thermal Conductivity");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
+      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+        fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }
+    // Save ACE Thermal Inertia to the output Exodus file 
+    {
+      std::string stateName = "ACE Thermal Inertia";
+      auto entity = Albany::StateStruct::QuadPoint;
+      p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE Thermal Inertia");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
+      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+        fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }
+    // Save ACE Water Saturation to the output Exodus file 
+    {
+      std::string stateName = "ACE Water Saturation";
+      auto entity = Albany::StateStruct::QuadPoint;
+      p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE Water Saturation");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
+      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+        fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }
+    // Save ACE Porosity to the output Exodus file 
+    {
+      std::string stateName = "ACE Porosity";
+      auto entity = Albany::StateStruct::QuadPoint;
+      p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE Porosity");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
+      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+        fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }
   }
               
   {  // Temperature Resid

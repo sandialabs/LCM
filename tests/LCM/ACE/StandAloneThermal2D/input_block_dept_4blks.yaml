@@ -5,7 +5,7 @@ ALBANY:
   Problem: 
     Name: ACE Thermal 2D
     Solution Method: Transient Tempus
-    MaterialDB Filename: materials_2blks.yaml
+    MaterialDB Filename: materials_4blks.yaml
     Dirichlet BCs: 
       ExpressionEvaluated SDBC on NS top_right for DOF T: '200.0 + 5.0e-04 * t'
       ExpressionEvaluated SDBC on NS top_left for DOF T: '200.0 + 5.0e-04 * t'
@@ -20,8 +20,8 @@ ALBANY:
       Response 0: Solution Average
   Discretization: 
     Method: Ioss
-    Exodus Input File Name: square_2blocks.e
-    Exodus Output File Name: square_2blocks_block_dept_out.exo
+    Exodus Input File Name: square_4blocks.e
+    Exodus Output File Name: square_4blocks_block_dept_out.exo
     Separate Evaluators by Element Block: true
     Workset Size: -1
   Regression Results: 

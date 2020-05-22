@@ -48,8 +48,8 @@ Albany::ACEThermalProblem::buildProblem(
   eb_names_.resize(phys_sets); 
   bool init_step = true; 
   for (int ps = 0; ps < phys_sets; ps++) {
-    if (init_step == true) { //IKT, 5/10/2020: this is a hack.  Need to verify that it works for >2 blocks.
-      eb_names_.resize(1); 
+    if (ps < phys_sets-1) {
+      eb_names_.resize(ps+1); 
     }
     std::string element_block_name = mesh_specs[ps]->ebName;
     eb_names_[ps] = element_block_name;
@@ -72,7 +72,6 @@ Albany::ACEThermalProblem::buildProblem(
     if (mesh_specs[ps]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
       constructNeumannEvaluators(mesh_specs[ps]);
     }
-    init_step = false; 
     eb_names_.resize(phys_sets); 
   }
 }

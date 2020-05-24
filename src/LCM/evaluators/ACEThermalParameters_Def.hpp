@@ -362,16 +362,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-typename ACEThermalParameters<EvalT, Traits>::ScalarT&
-ACEThermalParameters<EvalT, Traits>::getValue(std::string const& n)
-{
-  ALBANY_ABORT("\nError! Logic error in getting parameter " << n
-      << " in ACE Thermal Parameters::getValue()!\n");
-  return constant_value_;
-}
-
-// **********************************************************************
-template <typename EvalT, typename Traits>
 Teuchos::RCP<Teuchos::ParameterList const>
 ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
 {

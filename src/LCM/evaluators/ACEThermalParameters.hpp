@@ -12,7 +12,6 @@
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-#include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_Array.hpp"
 #include "Teuchos_ParameterList.hpp"
 
@@ -23,8 +22,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
-                            public PHX::EvaluatorDerived<EvalT, Traits>,
-                            public Sacado::ParameterAccessor<EvalT, SPL_Traits>
+                            public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT     ScalarT;
@@ -39,9 +37,6 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   void
   evaluateFields(typename Traits::EvalData d);
-
-  ScalarT&
-  getValue(std::string const& n);
 
   void 
   createElementBlockParameterMaps();
@@ -69,9 +64,6 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT, Cell, QuadPoint>                water_saturation_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                porosity_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                temperature_;
-
-  //! Constant value - not used but required from design of evaluator
-  ScalarT constant_value_{0.0};
 
   //! Material database - holds thermal conductivity and inertia, among other quantities
   Teuchos::RCP<Albany::MaterialDatabase> material_db_;

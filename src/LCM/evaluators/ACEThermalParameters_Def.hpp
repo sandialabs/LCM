@@ -371,10 +371,6 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
       "Constant thermal conductivity value across element block");
   valid_pl->set<double>("ACE Thermal Inertia Value", 1.0,
       "Constant thermal inertia value across element block");
-  valid_pl->set<double>("Saturation Modulus", 0.0, 
-      "Constant value of saturation modulus in element block");
-  valid_pl->set<double>("Saturation Exponent", 0.0, 
-      "Constant value of saturation exponent in element block");
   valid_pl->set<double>("ACE Ice Density", 0.0, 
       "Constant value of ice density in element block");
   valid_pl->set<double>("ACE Water Density", 0.0, 

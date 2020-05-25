@@ -83,14 +83,11 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::map<std::string, RealType> ice_heat_capacity_map_;
   std::map<std::string, RealType> water_heat_capacity_map_;
   std::map<std::string, RealType> soil_heat_capacity_map_;
-  std::map<std::string, RealType> ice_saturation_init_map_;
-  std::map<std::string, RealType> ice_saturation_max_map_;
-  std::map<std::string, RealType> water_saturation_min_map_;
   std::map<std::string, RealType> salinity_base_map_;
   std::map<std::string, RealType> salt_enhanced_D_map_;
   std::map<std::string, RealType> f_shift_map_;
   std::map<std::string, RealType> latent_heat_map_;
-  std::map<std::string, RealType> porosity0_map_;
+  std::map<std::string, RealType> porosity_bulk_map_;
   std::map<std::string, RealType> element_size_map_; //IKT FIXME? this is not block dept currently unless have different
                                                      //mesh resolution in different blocks, so can be RealType 
   

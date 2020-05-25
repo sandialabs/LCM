@@ -175,18 +175,18 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
       
       // Calculate the salinity of the grid cell
       if ((is_erodible == true) && (height <= sea_level)) {
-	ScalarT const element_size_eb = this->queryElementBlockParameterMap(eb_name, element_size_map_); 
-	ScalarT const salt_enhanced_D_eb = this->queryElementBlockParameterMap(eb_name, salt_enhanced_D_map_); 
+	    ScalarT const element_size_eb    = this->queryElementBlockParameterMap(eb_name, element_size_map_); 
+	    ScalarT const salt_enhanced_D_eb = this->queryElementBlockParameterMap(eb_name, salt_enhanced_D_map_); 
         ScalarT const cell_half_width    = 0.5 * element_size_eb;
         ScalarT const cell_exposed_area  = element_size_eb * element_size_eb;
         ScalarT const cell_volume        = cell_exposed_area * element_size_eb;
         ScalarT const per_exposed_length = 1.0 / element_size_eb;
         ScalarT const factor             = per_exposed_length * salt_enhanced_D_eb;
-        ScalarT const  zero_sal(0.0);
-        ScalarT const  sal_curr  = bluff_salinity_(cell, qp);
-        ScalarT        ocean_sal = salinity_base_eb;
+        ScalarT const sal_curr           = bluff_salinity_(cell, qp);
+        ScalarT       ocean_sal          = salinity_base_eb;
 	//IKT, FIXME?: ocean_salinity is not block-dependent, so we may want to make it just a 
 	//std::vector, to avoid creating and querying a map. 
+        ScalarT const zero_sal(0.0);
 	std::vector<RealType> ocean_salinity_eb = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_); 
         if (ocean_salinity_eb.size() > 0) {
           ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
@@ -373,23 +373,23 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
       "Constant thermal conductivity value across element block");
   valid_pl->set<double>("ACE Thermal Inertia Value", 1.0,
       "Constant thermal inertia value across element block");
-  valid_pl->set<double>("ACE Ice Density", 0.0, 
+  valid_pl->set<double>("ACE Ice Density", 920.0, 
       "Constant value of ice density in element block");
-  valid_pl->set<double>("ACE Water Density", 0.0, 
+  valid_pl->set<double>("ACE Water Density", 1000.0, 
       "Constant value of water density in element block");
-  valid_pl->set<double>("ACE Sediment Density", 0.0, 
+  valid_pl->set<double>("ACE Sediment Density", 2650.0, 
       "Constant value of sediment density in element block");
-  valid_pl->set<double>("ACE Ice Thermal Conductivity", 0.0, 
+  valid_pl->set<double>("ACE Ice Thermal Conductivity", 2.1, 
       "Constant value of ice thermal conductivity in element block");
-  valid_pl->set<double>("ACE Water Thermal Conductivity", 0.0, 
+  valid_pl->set<double>("ACE Water Thermal Conductivity", 0.6, 
       "Constant value of water thermal conductivity in element block");
-  valid_pl->set<double>("ACE Sediment Thermal Conductivity", 0.0, 
+  valid_pl->set<double>("ACE Sediment Thermal Conductivity", 4.3, 
       "Constant value of sediment thermal conductivity in element block");
-  valid_pl->set<double>("ACE Ice Heat Capacity", 0.0, 
+  valid_pl->set<double>("ACE Ice Heat Capacity", 2.0e+03, 
       "Constant value of ice heat capacity in element block");
-  valid_pl->set<double>("ACE Water Heat Capacity", 0.0, 
+  valid_pl->set<double>("ACE Water Heat Capacity", 4.0e+03, 
       "Constant value of water heat capacity in element block");
-  valid_pl->set<double>("ACE Sediment Heat Capacity", 0.0, 
+  valid_pl->set<double>("ACE Sediment Heat Capacity", 0.7e+03, 
       "Constant value of sediment heat capacity in element block");
   valid_pl->set<double>("ACE Base Salinity", 0.0, 
       "Constant value of base salinity in element block");
@@ -397,11 +397,11 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
       "Constant value of salt enhanced D in element block");
   valid_pl->set<double>("ACE Freezing Curve Shift", 0.25, 
       "Value of freezing curve shift in element block");
-  valid_pl->set<double>("ACE Latent Heat", 0.0, 
+  valid_pl->set<double>("ACE Latent Heat", 334.0, 
       "Constant value latent heat in element block");
-  valid_pl->set<double>("ACE Bulk Porosity", 0.0, 
+  valid_pl->set<double>("ACE Bulk Porosity", 0.60, 
       "Constant value bulk porosity in element block");
-  valid_pl->set<double>("ACE Element Size", 0.0, 
+  valid_pl->set<double>("ACE Element Size", 1.0, 
       "Constant value of element size in element block");
   return valid_pl;
 }
@@ -425,31 +425,31 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           (const_thermal_inertia_map_[eb_name] > 0.0), 
           "*** ERROR: ACE Thermal Inertia Value must be positive!"); 
     }
-    ice_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Density", 0.0);
+    ice_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Density", 920.0);
     ALBANY_ASSERT((ice_density_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Ice Density must be non-negative!"); 
-    water_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Density", 0.0);
+    water_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Density", 1000.0);
     ALBANY_ASSERT((water_density_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Water Density must be non-negative!"); 
-    soil_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Density", 0.0);
+    soil_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Density", 2650.0);
     ALBANY_ASSERT((soil_density_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Soil Density must be non-negative!"); 
-    ice_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 0.0);
+    ice_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 2.1);
     ALBANY_ASSERT((ice_thermal_cond_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!"); 
-    water_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.0);
+    water_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.6);
     ALBANY_ASSERT((water_thermal_cond_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Water Thermal Conductivity must be non-negative!"); 
-    soil_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity", 0.0);
+    soil_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity", 4.3);
     ALBANY_ASSERT((soil_thermal_cond_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!"); 
-    ice_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Heat Capacity", 0.0);
+    ice_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Heat Capacity", 2.0e+03);
     ALBANY_ASSERT((ice_heat_capacity_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Ice Heat Capacity must be non-negative!"); 
-    water_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Heat Capacity", 0.0);
+    water_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Heat Capacity", 4.0e+03);
     ALBANY_ASSERT((water_heat_capacity_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Water Heat Capacity must be non-negative!"); 
-    soil_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Heat Capacity", 0.0);
+    soil_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Heat Capacity", 0.7e+03);
     ALBANY_ASSERT((soil_heat_capacity_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Sediment Heat Capacity must be non-negative!");  
     salinity_base_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Base Salinity", 0.0);
@@ -461,13 +461,13 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     f_shift_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Freezing Curve Shift", 0.25);
     ALBANY_ASSERT((f_shift_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Freezing Curve Shift must be non-negative!"); 
-    latent_heat_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Latent Heat", 0.0);
+    latent_heat_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Latent Heat", 334.0);
     ALBANY_ASSERT((latent_heat_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Latent Heat must be non-negative!"); 
-    porosity_bulk_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Bulk Porosity", 0.0);
+    porosity_bulk_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Bulk Porosity", 0.60);
     ALBANY_ASSERT((porosity_bulk_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Bulk Porosity must be non-negative!"); 
-    element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 0.0);
+    element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 1.0);
     ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Element Size must be non-negative!"); 
 

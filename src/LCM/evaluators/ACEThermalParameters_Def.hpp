@@ -351,7 +351,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
         // peat-moorsh soils, EGU General Assembly 2016, held 17-22 April, 2016 in
         // Vienna Austria, id. EPSC2016-8105 --> peat Cp value Cp values in [J/kg/K]
         calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) +
-                                  (0.7e3 * silt_frac) + (1.9e3 * peat_frac);
+                                  (0.7e3 * silt_frac) + (1.93e3 * peat_frac);
         // K values in [W/K/m]
         calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) +
                                  (4.9 * silt_frac) + (0.08 * peat_frac);
@@ -390,15 +390,16 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
       ScalarT water_thermal_cond_eb = this->queryElementBlockParameterMap(eb_name, water_thermal_cond_map_); 
       ScalarT soil_thermal_cond_eb = this->queryElementBlockParameterMap(eb_name, soil_thermal_cond_map_); 
       if (sediment_given == true) {
-        thermal_conductivity_(cell, qp) = pow(ice_thermal_cond_eb, (icurr * porosity_eb)) *
-                                           pow(water_thermal_cond_eb, (wcurr * porosity_eb)) *
-                                           pow(calc_soil_thermal_cond, (1.0 - porosity_eb));
+        thermal_conductivity_(cell, qp) = (porosity_eb * ((ice_thermal_cond_eb * icurr) +
+                                                          (water_thermal_cond_eb * wcurr))) +
+                                          ((1.0 - porosity_eb) * calc_soil_thermal_cond);
       } 
       else {
-        thermal_conductivity_(cell, qp) = pow(ice_thermal_cond_eb, (icurr * porosity_eb)) *
-                                          pow(water_thermal_cond_eb, (wcurr * porosity_eb)) *
-                                          pow(soil_thermal_cond_eb, (1.0 - porosity_eb));
+        thermal_conductivity_(cell, qp) = (porosity_eb * ((ice_thermal_cond_eb * icurr) +
+                                                          (water_thermal_cond_eb * wcurr))) +
+                                          ((1.0 - porosity_eb) * soil_thermal_cond_eb);
       }
+  
       // Update the material thermal inertia term
       ScalarT latent_heat_eb = this->queryElementBlockParameterMap(eb_name, latent_heat_map_); 
       thermal_inertia_(cell, qp) = (density_(cell, qp) * heat_capacity_(cell, qp)) -
@@ -532,15 +533,15 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == salinity_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of salinity values in ACE "
-          "Salinity File must match.");
+          "Salinity File must match. \n"
+          "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Ocean Salinity File") == true) {
       const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Ocean Salinity File");
       ocean_salinity_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           time_map_[eb_name].size() == ocean_salinity_map_[eb_name].size(),
-          "*** ERROR: Number of time values and number of ocean salinity values "
-          "in "
+          "*** ERROR: Number of time values and number of ocean salinity values in "
           "ACE Ocean Salinity File must match.");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Porosity File") == true) {
@@ -549,7 +550,8 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == porosity_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of porosity values in "
-          "ACE Porosity File must match.");
+          "ACE Porosity File must match. \n"
+          "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Sand File") == true) {
       const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Sand File");
@@ -557,7 +559,8 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == sand_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of sand values in "
-          "ACE Sand File must match.");
+          "ACE Sand File must match. \n"
+          "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Clay File") == true) {
       const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Clay File");
@@ -565,7 +568,8 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == clay_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of clay values in "
-          "ACE Clay File must match.");
+          "ACE Clay File must match. \n"
+          "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Silt File") == true) {
       const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Silt File");
@@ -573,7 +577,8 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == silt_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of silt values in "
-          "ACE Silt File must match.");
+          "ACE Silt File must match. \n"
+          "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Peat File") == true) {
       const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Peat File");
@@ -581,7 +586,8 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == peat_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of peat values in "
-          "ACE Peat File must match.");
+          "ACE Peat File must match. \n"
+          "Hint: Did you provide the 'ACE Z Depth File'?");
     }
 
     ALBANY_ASSERT(

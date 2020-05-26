@@ -25,6 +25,16 @@ if(NOT ALBANY_PARALLEL_ONLY)
          	 ${CMAKE_CURRENT_BINARY_DIR}/depth.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/porosity.txt
          	 ${CMAKE_CURRENT_BINARY_DIR}/porosity.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bluff_salinity.txt
+         	 ${CMAKE_CURRENT_BINARY_DIR}/bluff_salinity.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sand_frac.txt
+         	 ${CMAKE_CURRENT_BINARY_DIR}/sand_frac.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/silt_frac.txt
+         	 ${CMAKE_CURRENT_BINARY_DIR}/silt_frac.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clay_frac.txt
+         	 ${CMAKE_CURRENT_BINARY_DIR}/clay_frac.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/peat_frac.txt
+         	 ${CMAKE_CURRENT_BINARY_DIR}/peat_frac.txt COPYONLY)
 
   # Create the test with this name and standard executable
   #add_test(${testName} ${Albany.exe} simulation.yaml)

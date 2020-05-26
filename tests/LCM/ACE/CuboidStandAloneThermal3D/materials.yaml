@@ -21,12 +21,12 @@ ALBANY:
       ACE Ice Heat Capacity: 2.0e+03  #[J/kg/K]
       ACE Water Heat Capacity: 4.0e+03  #[J/kg/K]
       ACE Sediment Heat Capacity: 0.70e+03  #[J/kg/K] Used if 'sand/silt/clay_frac.txt' not given.
-      #ACE Sand File: '../../external_files/sand_frac.txt'
-      #ACE Silt File: '../../external_files/silt_frac.txt'
-      #ACE Clay File: '../../external_files/clay_frac.txt'
-      #ACE Peat File: '../../external_files/peat_frac.txt'
+      ACE Sand File: './sand_frac.txt'
+      ACE Silt File: './silt_frac.txt'
+      ACE Clay File: './clay_frac.txt'
+      ACE Peat File: './peat_frac.txt'
       ACE Base Salinity: 5.0  # Used if 'bluff_salinity.txt' vector not given.
-      #ACE Salinity File: '../../external_files/bluff_salinity.txt'
+      ACE Salinity File: './bluff_salinity.txt'
       ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
       ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
       ACE Porosity File: './porosity.txt'
@@ -49,17 +49,10 @@ ALBANY:
       ACE Ice Heat Capacity: 2.0e+03  #[J/kg/K]
       ACE Water Heat Capacity: 4.0e+03  #[J/kg/K]
       ACE Sediment Heat Capacity: 0.70e+03  #[J/kg/K] Used if 'sand/silt/clay_frac.txt' not given.
-      #ACE Sand File: '../../external_files/sand_frac.txt'
-      #ACE Silt File: '../../external_files/silt_frac.txt'
-      #ACE Clay File: '../../external_files/clay_frac.txt'
-      #ACE Peat File: '../../external_files/peat_frac.txt'
       ACE Base Salinity: 1.0  # Used if 'bluff_salinity.txt' vector not given.
-      #ACE Salinity File: '../../external_files/bluff_salinity.txt'
       ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
       ACE Bulk Porosity: 1.0  # Used if porosity.txt not given.
-      #ACE Porosity File: './porosity_ice.txt'
       ACE Latent Heat: 334.0e+04 #[J/kg]
-      ACE Z Depth File: './depth.txt'
       ACE Time File: './time_fake.txt'  # {0.0, 10368000.0}
       ACE Sea Level File: './waterH_fake.txt'  # {-999.0, -999.0}
       ACE Element Size: 0.25  # [m]

@@ -85,7 +85,6 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
   std::map<std::string, RealType> soil_heat_capacity_map_;
   std::map<std::string, RealType> salinity_base_map_;
   std::map<std::string, RealType> salt_enhanced_D_map_;
-  std::map<std::string, RealType> f_shift_map_;
   std::map<std::string, RealType> latent_heat_map_;
   std::map<std::string, RealType> porosity_bulk_map_;
   std::map<std::string, RealType> element_size_map_; //IKT FIXME? this is not block dept currently unless have different

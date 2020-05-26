@@ -212,29 +212,37 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
       
       // Set current temperature
       ScalarT const& Tcurr = temperature_(cell, qp);
+      
+      // Check if sediment fractions were provided
+      bool sediment_given = false;
+      std::vector<RealType> sand_from_file_eb = this->queryElementBlockParameterMap(eb_name, sand_from_file_map_); 
+      std::vector<RealType> clay_from_file_eb = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_); 
+      std::vector<RealType> silt_from_file_eb = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_); 
+      std::vector<RealType> peat_from_file_eb = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_); 
+      if ((sand_from_file_eb.size() > 0) && (clay_from_file_eb.size() > 0) &&
+         (silt_from_file_eb.size() > 0) && (peat_from_file_eb.size() > 0)) {
+        sediment_given = true;
+      }
+      
+      // Use freezing curve to get icurr and dfdT
+      ScalarT const tol = 709.0;
+      ScalarT const Tdiff = Tcurr - Tmelt;
+      ScalarT       icurr{1.0};
+      ScalarT       dfdT{0.0};
 
+      /*
+       
+      // BEGIN OLD CURVE //
       // Calculate the freezing curve function df/dTemp
-      // W term sets the width of the freezing curve.
-      // Smaller W means steeper curve.
-      // f(T) = 1 / (1 + e^(-W*(T-T0)))
       // New curve, formulated by Siddharth, which shifts the
       // freezing point to left or right:
       // f(T) = 1 / (1 + e^(-(8/W)((T-T0) + (b*W))))
       // W = true width of freezing curve (in Celsius)
-      // b = shift to left or right (+ is left, - is right)
+      // f_shift = shift to left or right (+ is left, - is right)
 
-      ScalarT W = 10.0;  // constant value
-      // if (freezing_curve_width_.size() > 0) {
-      //  W = interpolateVectors(
-      //      z_above_mean_sea_level_, freezing_curve_width_, height);
-      //}
-
-      ScalarT const Tdiff = Tcurr - Tmelt;
-      ScalarT f_shift_eb = this->queryElementBlockParameterMap(eb_name, f_shift_map_); 
-      ScalarT const arg   = -(8.0 / W) * (Tdiff + (f_shift_eb * W));
-      ScalarT       icurr{1.0};
-      ScalarT       dfdT{0.0};
-      ScalarT const    tol = 709.0;
+      ScalarT W         = 10.0;
+      ScalarT f_shift   = 0.25; 
+      ScalarT const arg = -(8.0 / W) * (Tdiff + (f_shift_eb * W));
 
       // Update freeze curve slope and ice saturation
       if (arg < -tol) {
@@ -246,7 +254,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
         icurr = 1.0;
       } 
       else {
-        ScalarT const    eps = minitensor::machine_epsilon<RealType>();
+        ScalarT const eps = minitensor::machine_epsilon<RealType>();
         ScalarT const et  = std::exp(arg);
         if (et < eps) {  // etp1 ~ 1.0
           dfdT  = -(W / 8.0) * et;
@@ -262,19 +270,59 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
           icurr              = 1.0 - 1.0 / etp1;
         }
       }
-
-      bool sediment_given = false;
-      std::vector<RealType> sand_from_file_eb = this->queryElementBlockParameterMap(eb_name, sand_from_file_map_); 
-      std::vector<RealType> clay_from_file_eb = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_); 
-      std::vector<RealType> silt_from_file_eb = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_); 
-      std::vector<RealType> peat_from_file_eb = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_); 
-      if ((sand_from_file_eb.size() > 0) && (clay_from_file_eb.size() > 0) &&
-         (silt_from_file_eb.size() > 0) && (peat_from_file_eb.size() > 0)) {
-        sediment_given = true;
-      }
+      // END OLD CURVE //
+      
+      */
 
       // BEGIN NEW CURVE //
-      // TODO Jenn: FILL IN!
+
+      RealType const A = 0.0;
+      RealType const G = 1.0;
+      RealType const C = 1.0;
+      RealType const Q = 0.001;
+      RealType const B = 10.0;
+      RealType       v = 25.0;
+      
+      if (sediment_given = true) {
+        RealType sand_frac =
+          interpolateVectors(z_above_mean_sea_level_eb, sand_from_file_eb, height);
+        RealType clay_frac =
+          interpolateVectors(z_above_mean_sea_level_eb, clay_from_file_eb, height);
+        RealType silt_frac =
+          interpolateVectors(z_above_mean_sea_level_eb, silt_from_file_eb, height);
+        RealType peat_frac =
+          interpolateVectors(z_above_mean_sea_level_eb, peat_from_file_eb, height);
+        v = (peat_frac * 5.0) + (sand_frac * 5.0) + (silt_frac * 25.0) +
+            (clay_frac * 70.0);
+      }
+      
+      ScalarT const arg1 = -B * Tdiff;
+      ScalarT const qebt = Q * std::exp(-B * Tdiff);
+      
+      if (arg1 < -tol) {
+        dfdT  = 0.0;
+        icurr = 0.0;
+      } else if (arg1 > tol) {
+        dfdT  = 0.0;
+        icurr = 1.0;
+      } else {
+        auto const eps = minitensor::machine_epsilon<RealType>();
+        if (qebt < eps) {  // (C + et) ~ C :: occurs when totally melted
+          dfdT  = 0.0;
+          icurr = 1.0 - (A + ((G - A) / (pow(C, 1.0/v))));
+        } else if (1.0 / qebt < eps) {  // (C + et) ~ et :: occurs in deep frozen state
+          dfdT  = -1.0 * B * pow(qebt, -1.0/v) * (G - A) / v;
+          icurr = 1.0 - (A + ((G - A) / (pow(qebt, 1.0/v))));
+        } else {  // occurs when near melting temperature
+          icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0/v))));
+          dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0/v) * 
+                  (qebt / Q)) / (v * (C + qebt));
+        }
+      }
+  
+      std::min(icurr,1.0);
+      std::max(icurr,0.0);
+      
       // END NEW CURVE //
      
       // Update the water saturation
@@ -395,8 +443,6 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
       "Constant value of base salinity in element block");
   valid_pl->set<double>("ACE Salt Enhanced D", 0.0, 
       "Constant value of salt enhanced D in element block");
-  valid_pl->set<double>("ACE Freezing Curve Shift", 0.25, 
-      "Value of freezing curve shift in element block");
   valid_pl->set<double>("ACE Latent Heat", 334.0, 
       "Constant value latent heat in element block");
   valid_pl->set<double>("ACE Bulk Porosity", 0.60, 
@@ -458,9 +504,6 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     salt_enhanced_D_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Salt Enhanced D", 0.0);
     ALBANY_ASSERT((salt_enhanced_D_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Salt Enhanced D must be non-negative!"); 
-    f_shift_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Freezing Curve Shift", 0.25);
-    ALBANY_ASSERT((f_shift_map_[eb_name] >= 0.0), 
-		    "*** ERROR: ACE Freezing Curve Shift must be non-negative!"); 
     latent_heat_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Latent Heat", 334.0);
     ALBANY_ASSERT((latent_heat_map_[eb_name] >= 0.0), 
 		    "*** ERROR: ACE Latent Heat must be non-negative!"); 

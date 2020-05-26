@@ -8,11 +8,11 @@ ALBANY:
     Solution Method: Transient Tempus
     MaterialDB Filename: materials.yaml
     Dirichlet BCs: 
-      DBC on NS z- for DOF T: 255.0
-      DBC on NS z+ for DOF T: 280.0
+      DBC on NS z- for DOF T: 260.0
+      DBC on NS z+ for DOF T: 300.0
     Initial Condition:
       Function: Constant
-      Function Data: [255.0]
+      Function Data: [260.0]
     Response Functions:
       Number: 2
       Response 0: Project IP to Nodal Field
@@ -42,11 +42,11 @@ ALBANY:
     Exodus Output File Name: './grid.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
-  Regression Results: 
-    Number of Comparisons: 0
-    Test Values: [0.0, 0.0, 2.118151805082e+02]
-    Relative Tolerance: 1.00000000000000002e-03
-    Absolute Tolerance: 1.00000000000000008e-05
+  #Regression Results: 
+  #  Number of Comparisons: 0
+  #  Test Values: [0.0, 0.0, 2.118151805082e+02]
+  #  Relative Tolerance: 1.00000000000000002e-03
+  #  Absolute Tolerance: 1.00000000000000008e-05
   Piro: 
     Tempus: 
       Integrator Name: Tempus Integrator
@@ -61,10 +61,10 @@ ALBANY:
         Time Step Control: 
           Initial Time: 0.00000000000000000e+00
           Initial Time Index: 0
-          Initial Time Step: 3600.0 # 1 hr in seconds
+          Initial Time Step: 7200.0 # 2 hr in seconds
           Initial Order: 0
-          Final Time: 10368000.0 # 120 days in seconds
-          Final Time Index: 10000
+          Final Time: 17280000.0 # 200 days in seconds
+          Final Time Index: 20000
           Maximum Absolute Error: 1.00000000000000002e-08
           Maximum Relative Error: 1.00000000000000002e-08
           Integrator Step Type: Variable

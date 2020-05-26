@@ -3,7 +3,7 @@ ALBANY:
     permafrost1:
       material: Permafrost
     ice2:
-      material: Permafrost
+      material: Ice
     permafrost3:
       material: Permafrost
   Materials:
@@ -35,7 +35,6 @@ ALBANY:
       ACE Time File: './time_fake.txt'  # {0.0, 10368000.0}
       ACE Sea Level File: './waterH_fake.txt'  # {-999.0, -999.0}
       ACE Element Size: 0.25  # [m]
-      ACE Surface Porosity: 1.0  # Used if porosity.txt not given.
     Ice:
       #=======================================#
       # This material describes an ice wedge  #
@@ -58,7 +57,6 @@ ALBANY:
       #ACE Salinity File: '../../external_files/bluff_salinity.txt'
       ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
       ACE Bulk Porosity: 1.0  # Used if porosity.txt not given.
-      ACE Surface Porosity: 1.0  # Used if porosity.txt not given.
       #ACE Porosity File: '../../external_files/porosity.txt'
       ACE Latent Heat: 334.0e+04 #[J/kg]
       #ACE Z Depth File: '../../external_files/depth.txt'

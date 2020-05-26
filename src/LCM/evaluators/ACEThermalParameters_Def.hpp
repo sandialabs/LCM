@@ -214,11 +214,11 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
       ScalarT const& Tcurr = temperature_(cell, qp);
       
       // Check if sediment fractions were provided
-      bool sediment_given = false;
+      bool sediment_given{false};
       std::vector<RealType> sand_from_file_eb = this->queryElementBlockParameterMap(eb_name, sand_from_file_map_); 
       std::vector<RealType> clay_from_file_eb = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_); 
       std::vector<RealType> silt_from_file_eb = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_); 
-      std::vector<RealType> peat_from_file_eb = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_); 
+      std::vector<RealType> peat_from_file_eb = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_);
       if ((sand_from_file_eb.size() > 0) && (clay_from_file_eb.size() > 0) &&
          (silt_from_file_eb.size() > 0) && (peat_from_file_eb.size() > 0)) {
         sediment_given = true;
@@ -242,7 +242,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
 
       ScalarT W         = 10.0;
       ScalarT f_shift   = 0.25; 
-      ScalarT const arg = -(8.0 / W) * (Tdiff + (f_shift_eb * W));
+      ScalarT const arg = -(8.0 / W) * (Tdiff + (f_shift * W));
 
       // Update freeze curve slope and ice saturation
       if (arg < -tol) {
@@ -273,7 +273,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
       // END OLD CURVE //
       
       */
-
+      
       // BEGIN NEW CURVE //
 
       RealType const A = 0.0;
@@ -283,14 +283,14 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
       RealType const B = 10.0;
       RealType       v = 25.0;
       
-      if (sediment_given = true) {
-        RealType sand_frac =
+      if (sediment_given == true) {
+        auto sand_frac =
           interpolateVectors(z_above_mean_sea_level_eb, sand_from_file_eb, height);
-        RealType clay_frac =
+        auto clay_frac =
           interpolateVectors(z_above_mean_sea_level_eb, clay_from_file_eb, height);
-        RealType silt_frac =
+        auto silt_frac =
           interpolateVectors(z_above_mean_sea_level_eb, silt_from_file_eb, height);
-        RealType peat_frac =
+        auto peat_frac =
           interpolateVectors(z_above_mean_sea_level_eb, peat_from_file_eb, height);
         v = (peat_frac * 5.0) + (sand_frac * 5.0) + (silt_frac * 25.0) +
             (clay_frac * 70.0);
@@ -319,7 +319,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(
                   (qebt / Q)) / (v * (C + qebt));
         }
       }
-  
+      
       std::min(icurr,1.0);
       std::max(icurr,0.0);
       

@@ -43,9 +43,9 @@ mesh volume all
 #
 
 block 1 volume 1
-block 1 name "permafrost1"
+block 1 name "ice2"
 block 2 volume 2
-block 2 name "ice2"
+block 2 name "permafrost1"
 block 3 volume 3
 block 3 name "permafrost3"
 

@@ -20,7 +20,11 @@ if(NOT ALBANY_PARALLEL_ONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time_fake.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/time_fake.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/waterH_fake.txt
-         	  ${CMAKE_CURRENT_BINARY_DIR}/waterH_fake.txt COPYONLY)
+         	 ${CMAKE_CURRENT_BINARY_DIR}/waterH_fake.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/depth.txt
+         	 ${CMAKE_CURRENT_BINARY_DIR}/depth.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/porosity.txt
+         	 ${CMAKE_CURRENT_BINARY_DIR}/porosity.txt COPYONLY)
 
   # Create the test with this name and standard executable
   #add_test(${testName} ${Albany.exe} simulation.yaml)

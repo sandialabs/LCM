@@ -78,7 +78,6 @@ cmake \
  -D TPL_Netcdf_INCLUDE_DIRS:STRING="lcm_netcdf_inc" \
  -D TPL_Netcdf_LIBRARY_DIRS:STRING="lcm_netcdf_lib" \
  -D TPL_Netcdf_LIBRARIES:STRING="lcm_netcdf_lib/libnetcdf.so" \
- -D TPL_Netcdf_PARALLEL:BOOL=ON \
 \
  -D Trilinos_ENABLE_Amesos2:BOOL=ON \
  -D Trilinos_ENABLE_Amesos:BOOL=OFF \

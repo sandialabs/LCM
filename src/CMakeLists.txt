@@ -297,7 +297,6 @@ set(SOURCES
     evaluators/utility/PHAL_Constant.cpp
     evaluators/utility/PHAL_ConvertFieldType.cpp
     evaluators/utility/PHAL_DummyResidual.cpp
-    evaluators/utility/PHAL_FieldFrobeniusNorm.cpp
     evaluators/utility/PHAL_LangevinNoiseTerm.cpp
     evaluators/utility/PHAL_MapToPhysicalFrame.cpp
     evaluators/utility/PHAL_MapToPhysicalFrameSide.cpp
@@ -452,8 +451,6 @@ set(HEADERS
     evaluators/utility/PHAL_ConvertFieldType_Def.hpp
     evaluators/utility/PHAL_DummyResidual.hpp
     evaluators/utility/PHAL_DummyResidual_Def.hpp
-    evaluators/utility/PHAL_FieldFrobeniusNorm.hpp
-    evaluators/utility/PHAL_FieldFrobeniusNorm_Def.hpp
     evaluators/utility/PHAL_LangevinNoiseTerm.hpp
     evaluators/utility/PHAL_LangevinNoiseTerm_Def.hpp
     evaluators/utility/PHAL_MapToPhysicalFrame.hpp

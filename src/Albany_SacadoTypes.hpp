@@ -71,42 +71,6 @@ ADValue(const T& x)
   return Sacado::ScalarValue<T>::eval(x);
 }
 
-// Function to convert a ScalarType to a different one. This is used to convert
-// a ScalarT to a ParamScalarT.
-// Note, for all Evaluation types but one, ScalarT and ParamScalarT are the
-// same, and for those we want to keep the Fad derivatives (if any). The only
-// exception can be Jacobian (if mesh/param do not depend on solution), where
-// ParamScalarT=RealType and ScalarT=FadType. Notice also that if the two scalar
-// types are different, the conversion works only if the target type has a
-// constructor from the source type.
-template <typename ToST, typename FromST>
-struct ScalarConversionHelper
-{
-  static typename std::
-      enable_if<std::is_constructible<ToST, FromST>::value, ToST>::type
-      apply(const FromST& x)
-  {
-    return ToST(x);
-  }
-};
-
-template <typename FromST>
-struct ScalarConversionHelper<typename Sacado::ScalarType<FromST>::type, FromST>
-{
-  static typename Sacado::ScalarType<FromST>::type
-  apply(const FromST& x)
-  {
-    return ADValue(x);
-  }
-};
-
-template <typename ToST, typename FromST>
-ToST
-convertScalar(const FromST& x)
-{
-  return ScalarConversionHelper<ToST, FromST>::apply(x);
-}
-
 // Get the strongest type between ST1 and ST2, meaning the type that can
 // be constructed from the other. If no conversion is possible, return void.
 template <typename ST1, typename ST2>

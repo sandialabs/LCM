@@ -13,7 +13,6 @@ if { [is-loaded lcm-fedora] } {
   setenv                  MPI_INC         /usr/include/openmpi-x86_64
   setenv                  MPI_LIB         /usr/lib64/openmpi/lib
   setenv                  MPI_BIN         /usr/lib64/openmpi/bin
-  setenv                  LCM_NETCDF_PARALLEL OFF
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
@@ -33,7 +32,6 @@ if { [is-loaded lcm-scientific-linux] } {
   setenv                  MPI_INC         /usr/include/openmpi-x86_64
   setenv                  MPI_LIB         /usr/lib64/openmpi/lib
   setenv                  MPI_BIN         /usr/lib64/openmpi/bin
-  setenv                  LCM_NETCDF_PARALLEL OFF
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
@@ -52,7 +50,6 @@ if { [is-loaded lcm-ubuntu] } {
   setenv                  MPI_INC         /usr/lib/openmpi/include
   setenv                  MPI_LIB         /usr/lib/openmpi/lib
   setenv                  MPI_BIN         /usr/bin
-  setenv                  LCM_NETCDF_PARALLEL OFF
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
@@ -80,7 +77,6 @@ if { [is-loaded lcm-sems] } {
   setenv                  MPI_INC         $mpi_root/include
   setenv                  MPI_LIB         $mpi_root/lib
   setenv                  MPI_BIN         $mpi_root/bin
-  setenv                  LCM_NETCDF_PARALLEL ON
   setenv                  LCM_LINK_FLAGS  -L$boost_lib
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
@@ -105,7 +101,6 @@ if { [is-loaded lcm-cluster] } {
   setenv                  MPI_INC         $mpi_root/include
   setenv                  MPI_LIB         $mpi_root/lib
   setenv                  MPI_BIN         $mpi_root/bin
-  setenv                  LCM_NETCDF_PARALLEL ON
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib

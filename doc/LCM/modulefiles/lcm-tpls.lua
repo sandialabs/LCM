@@ -24,6 +24,5 @@ setenv("MPI_BIN", mpi_root .. "/bin")
 setenv("NETCDF", netcdf_root)
 setenv("NETCDF_INC", netcdf_inc)
 setenv("NETCDF_LIB", netcdf_lib)
-setenv("LCM_NETCDF_PARALLEL", "ON")
 -- PATHs for MPI are set by the modules
 prepend_path("LD_LIBRARY_PATH", netcdf_lib)

@@ -38,9 +38,7 @@ class CapExplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  CapExplicitModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  CapExplicitModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Destructor
@@ -51,16 +49,10 @@ class CapExplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
   /// Implementation of physics
   ///
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields)
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
   {
     ALBANY_ABORT("Not implemented.");
   }
@@ -81,28 +73,16 @@ class CapExplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
   /// functions for integrating cap model stress
   ///
   ScalarT
-  compute_f(
-      minitensor::Tensor<ScalarT>& sigma,
-      minitensor::Tensor<ScalarT>& alpha,
-      ScalarT&                     kappa);
+  compute_f(minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa);
 
   minitensor::Tensor<ScalarT>
-  compute_dfdsigma(
-      minitensor::Tensor<ScalarT>& sigma,
-      minitensor::Tensor<ScalarT>& alpha,
-      ScalarT&                     kappa);
+  compute_dfdsigma(minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa);
 
   minitensor::Tensor<ScalarT>
-  compute_dgdsigma(
-      minitensor::Tensor<ScalarT>& sigma,
-      minitensor::Tensor<ScalarT>& alpha,
-      ScalarT&                     kappa);
+  compute_dgdsigma(minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa);
 
   ScalarT
-  compute_dfdkappa(
-      minitensor::Tensor<ScalarT>& sigma,
-      minitensor::Tensor<ScalarT>& alpha,
-      ScalarT&                     kappa);
+  compute_dfdkappa(minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa);
 
   ScalarT
   compute_Galpha(ScalarT& J2_alpha);

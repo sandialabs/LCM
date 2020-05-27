@@ -22,19 +22,13 @@
 namespace {
 
 void
-get_element_block_sizes(
-    stk::io::StkMeshIoBroker& mesh_data,
-    std::vector<int>&         el_blocks)
+get_element_block_sizes(stk::io::StkMeshIoBroker& mesh_data, std::vector<int>& el_blocks)
 {
-  Ioss::Region&                      io = *mesh_data.get_input_io_region();
+  Ioss::Region&                      io          = *mesh_data.get_input_io_region();
   const Ioss::ElementBlockContainer& elem_blocks = io.get_element_blocks();
-  for (Ioss::ElementBlockContainer::const_iterator it = elem_blocks.begin();
-       it != elem_blocks.end();
-       ++it) {
+  for (Ioss::ElementBlockContainer::const_iterator it = elem_blocks.begin(); it != elem_blocks.end(); ++it) {
     Ioss::ElementBlock* entity = *it;
-    if (stk::io::include_entity(entity)) {
-      el_blocks.push_back(entity->get_property("entity_count").get_int());
-    }
+    if (stk::io::include_entity(entity)) { el_blocks.push_back(entity->get_property("entity_count").get_int()); }
   }
 }
 
@@ -56,18 +50,15 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
 
   usePamgen = (params->get("Method", "Exodus") == "Pamgen");
 
-  const Teuchos::MpiComm<int>* mpiComm =
-      dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
-  std::vector<std::string> entity_rank_names = stk::mesh::entity_rank_names();
+  const Teuchos::MpiComm<int>* mpiComm           = dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
+  std::vector<std::string>     entity_rank_names = stk::mesh::entity_rank_names();
 
   // eMesh needs "FAMILY_TREE" entity
   if (buildEMesh) { entity_rank_names.push_back("FAMILY_TREE"); }
 
-  const Teuchos::MpiComm<int>* theComm =
-      dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
+  const Teuchos::MpiComm<int>* theComm = dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
 
-  mesh_data =
-      Teuchos::rcp(new stk::io::StkMeshIoBroker(*theComm->getRawMpiComm()));
+  mesh_data = Teuchos::rcp(new stk::io::StkMeshIoBroker(*theComm->getRawMpiComm()));
 
   // Use Greg Sjaardema's capability to repartition on the fly.
   //    Several partitioning choices: rcb, rib, hsfc, kway, kway-gemo, linear,
@@ -85,20 +76,19 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   // Create input mesh
 
   mesh_data->set_rank_name_vector(entity_rank_names);
-  mesh_data->set_sideset_face_creation_behavior(
-      stk::io::StkMeshIoBroker::STK_IO_SIDESET_FACE_CREATION_CLASSIC);
+  mesh_data->set_sideset_face_creation_behavior(stk::io::StkMeshIoBroker::STK_IO_SIDESET_FACE_CREATION_CLASSIC);
   // StkMeshIoBroker::set_sideset_face_creation_behavior(stk::io::StkMeshIoBroker::STK_IO_SIDESET_FACE_CREATION_CLASSIC);
   std::string mesh_type;
   std::string file_name;
   if (!usePamgen) {
-    *out << "Albany_IOSS: Loading STKMesh from Exodus file  "
-         << params->get<std::string>("Exodus Input File Name") << std::endl;
+    *out << "Albany_IOSS: Loading STKMesh from Exodus file  " << params->get<std::string>("Exodus Input File Name")
+         << std::endl;
 
     mesh_type = "exodusII";
     file_name = params->get<std::string>("Exodus Input File Name");
   } else {
-    *out << "Albany_IOSS: Loading STKMesh from Pamgen file  "
-         << params->get<std::string>("Pamgen Input File Name") << std::endl;
+    *out << "Albany_IOSS: Loading STKMesh from Pamgen file  " << params->get<std::string>("Pamgen Input File Name")
+         << std::endl;
 
     mesh_type = "pamgen";
     file_name = params->get<std::string>("Pamgen Input File Name");
@@ -107,28 +97,19 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   mesh_data->add_mesh_database(file_name, mesh_type, stk::io::READ_MESH);
   mesh_data->create_input_mesh();
 
-  metaData =
-      mesh_data
-          ->meta_data_rcp();  // Teuchos::rcpFromRef(mesh_data->meta_data());
+  metaData = mesh_data->meta_data_rcp();  // Teuchos::rcpFromRef(mesh_data->meta_data());
 
   // End of creating input mesh
 
   typedef Teuchos::Array<std::string> StringArray;
-  const StringArray                   additionalNodeSets =
-      params->get("Additional Node Sets", StringArray());
-  for (StringArray::const_iterator it     = additionalNodeSets.begin(),
-                                   it_end = additionalNodeSets.end();
-       it != it_end;
+  const StringArray                   additionalNodeSets = params->get("Additional Node Sets", StringArray());
+  for (StringArray::const_iterator it = additionalNodeSets.begin(), it_end = additionalNodeSets.end(); it != it_end;
        ++it) {
-    stk::mesh::Part& newNodeSet =
-        metaData->declare_part(*it, stk::topology::NODE_RANK);
+    stk::mesh::Part& newNodeSet = metaData->declare_part(*it, stk::topology::NODE_RANK);
     if (!stk::io::is_part_io_part(newNodeSet)) {
       stk::mesh::Field<double>* const distrFactorfield =
-          metaData->get_field<stk::mesh::Field<double>>(
-              stk::topology::NODE_RANK, "distribution_factors");
-      if (distrFactorfield != NULL) {
-        stk::mesh::put_field_on_mesh(*distrFactorfield, newNodeSet, nullptr);
-      }
+          metaData->get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "distribution_factors");
+      if (distrFactorfield != NULL) { stk::mesh::put_field_on_mesh(*distrFactorfield, newNodeSet, nullptr); }
       stk::io::put_io_part_attribute(newNodeSet);
     }
   }
@@ -143,9 +124,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   std::vector<std::string>     nsNames;
   int                          numEB = 0;
 
-  for (stk::mesh::PartVector::const_iterator i = all_parts.begin();
-       i != all_parts.end();
-       ++i) {
+  for (stk::mesh::PartVector::const_iterator i = all_parts.begin(); i != all_parts.end(); ++i) {
     stk::mesh::Part* const part = *i;
 
     if (!stk::mesh::is_auto_declared_part(*part)) {
@@ -174,26 +153,19 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     auto& ssb = ss->get_side_blocks();
     if (ssb.size() == 0) { continue; }
     ALBANY_PANIC(
-        ssb.size() == 0,
-        "Error! There is a sideset (" + ss->name() +
-            ") in the input mesh with zero side sets.\n");
+        ssb.size() == 0, "Error! There is a sideset (" + ss->name() + ") in the input mesh with zero side sets.\n");
 
     const auto* ioss_topo = ssb[0]->topology();
-    ALBANY_PANIC(
-        ioss_topo == nullptr,
-        "I give up. No topology in the input mesh for side set " + ss->name()
-            << ".\n");
+    ALBANY_PANIC(ioss_topo == nullptr, "I give up. No topology in the input mesh for side set " + ss->name() << ".\n");
 
-    auto stk_topo = stk::io::map_ioss_topology_to_stk(
-        ioss_topo, metaData->spatial_dimension());
+    auto stk_topo = stk::io::map_ioss_topology_to_stk(ioss_topo, metaData->spatial_dimension());
 
     auto part = metaData->get_part(ss->name());
     stk::mesh::set_topology(*part, stk_topo);
   }
 
-  cullSubsetParts(
-      ssNames,
-      ssPartVec);  // Eliminate sidesets that are subsets of other sidesets
+  cullSubsetParts(ssNames,
+                  ssPartVec);  // Eliminate sidesets that are subsets of other sidesets
 
 #if 0
   // for debugging, print out the parts now
@@ -216,20 +188,16 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   if (cub_rule_string == "GAUSS")
     cub_rule = static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS);
   else if (cub_rule_string == "GAUSS_RADAU_LEFT")
-    cub_rule =
-        static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_RADAU_LEFT);
+    cub_rule = static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_RADAU_LEFT);
   else if (cub_rule_string == "GAUSS_RADAU_RIGHT")
-    cub_rule = static_cast<Intrepid2::EPolyType>(
-        Intrepid2::POLYTYPE_GAUSS_RADAU_RIGHT);
+    cub_rule = static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_RADAU_RIGHT);
   else if (cub_rule_string == "GAUSS_LOBATTO")
-    cub_rule =
-        static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_LOBATTO);
+    cub_rule = static_cast<Intrepid2::EPolyType>(Intrepid2::POLYTYPE_GAUSS_LOBATTO);
   else
     ALBANY_ABORT(
-        "Invalid Cubature Rule: "
-        << cub_rule_string
-        << "; valid options are GAUSS, GAUSS_RADAU_LEFT, "
-           "GAUSS_RADAU_RIGHT, and GAUSS_LOBATTO");
+        "Invalid Cubature Rule: " << cub_rule_string
+                                  << "; valid options are GAUSS, GAUSS_RADAU_LEFT, "
+                                     "GAUSS_RADAU_RIGHT, and GAUSS_LOBATTO");
 
   int worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
 
@@ -244,17 +212,14 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
 
   // Build a map to get the EB name given the index
   std::map<std::string, int> ebNameToIndex;
-  for (int eb = 0; eb < numEB; eb++) {
-    ebNameToIndex[partVec[eb]->name()] = eb;
-  }
+  for (int eb = 0; eb < numEB; eb++) { ebNameToIndex[partVec[eb]->name()] = eb; }
 
   // Construct MeshSpecsStruct
   if (!params->get("Separate Evaluators by Element Block", false)) {
-    stk::topology        stk_topo_data = metaData->get_topology(*partVec[0]);
-    shards::CellTopology shards_ctd =
-        stk::mesh::get_cell_topology(stk_topo_data);
-    const CellTopologyData& ctd = *shards_ctd.getCellTopologyData();
-    this->meshSpecs[0]          = Teuchos::rcp(new Albany::MeshSpecsStruct(
+    stk::topology           stk_topo_data = metaData->get_topology(*partVec[0]);
+    shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
+    const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
+    this->meshSpecs[0]                    = Teuchos::rcp(new Albany::MeshSpecsStruct(
         ctd,
         numDim,
         cub,
@@ -268,16 +233,14 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
         cub_rule));
 
   } else {
-    *out << "MULTIPLE Elem Block in Ioss: DO worksetSize[eb] max?? "
-         << std::endl;
+    *out << "MULTIPLE Elem Block in Ioss: DO worksetSize[eb] max?? " << std::endl;
     this->allElementBlocksHaveSamePhysics = false;
     this->meshSpecs.resize(numEB);
     for (int eb = 0; eb < numEB; eb++) {
-      stk::topology        stk_topo_data = metaData->get_topology(*partVec[eb]);
-      shards::CellTopology shards_ctd =
-          stk::mesh::get_cell_topology(stk_topo_data);
-      const CellTopologyData& ctd = *shards_ctd.getCellTopologyData();
-      this->meshSpecs[eb]         = Teuchos::rcp(new Albany::MeshSpecsStruct(
+      stk::topology           stk_topo_data = metaData->get_topology(*partVec[eb]);
+      shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
+      const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
+      this->meshSpecs[eb]                   = Teuchos::rcp(new Albany::MeshSpecsStruct(
           ctd,
           numDim,
           cub,
@@ -294,14 +257,11 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
 
   {
     const Ioss::Region& inputRegion = *(mesh_data->get_input_io_region());
-    m_solutionFieldHistoryDepth =
-        inputRegion.get_property("state_count").get_int();
+    m_solutionFieldHistoryDepth     = inputRegion.get_property("state_count").get_int();
   }
 
   // Upon request, add a nodeset for each sideset
-  if (params->get<bool>("Build Node Sets From Side Sets", false)) {
-    this->addNodeSetsFromSideSets();
-  }
+  if (params->get<bool>("Build Node Sets From Side Sets", false)) { this->addNodeSetsFromSideSets(); }
 
   // If requested, mark all parts as io parts
   if (params->get<bool>("Set All Parts IO", false)) this->setAllPartsIO();
@@ -334,17 +294,14 @@ Albany::IossSTKMeshStruct::~IossSTKMeshStruct()
 
 void
 Albany::IossSTKMeshStruct::setFieldAndBulkData(
-    const Teuchos::RCP<Teuchos_Comm const>&                   commT,
-    const Teuchos::RCP<Teuchos::ParameterList>&               params,
-    const unsigned int                                        neq_,
-    const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-    const unsigned int                                        worksetSize,
-    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-        side_set_sis,
-    std::map<
-        std::string,
-        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
+    const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+    const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+    const unsigned int                                                               neq_,
+    const AbstractFieldContainer::FieldContainerRequirements&                        req,
+    const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+    const unsigned int                                                               worksetSize,
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
+    std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   this->SetupFieldData(commT, neq_, req, sis, worksetSize);
 
@@ -359,10 +316,9 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
   metaData->commit();
 
   // Restart index to read solution from exodus file.
-  int    index = params->get("Restart Index", -1);  // Default to no restart
-  double res_time =
-      params->get<double>("Restart Time", -1.0);  // Default to no restart
-  Ioss::Region& region = *(mesh_data->get_input_io_region());
+  int           index    = params->get("Restart Index", -1);           // Default to no restart
+  double        res_time = params->get<double>("Restart Time", -1.0);  // Default to no restart
+  Ioss::Region& region   = *(mesh_data->get_input_io_region());
   /*
    * The following code block reads a single mesh on PE 0, then distributes the
    * mesh across the other processors. stk_rebalance is used, which requires
@@ -391,14 +347,12 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
 
       // Read solution from exodus file.
       if (index >= 0) {  // User has specified a time step to restart at
-        *out << "Restart Index set, reading solution index : " << index
-             << std::endl;
+        *out << "Restart Index set, reading solution index : " << index << std::endl;
         mesh_data->read_defined_input_fields(index, &missing);
         m_restartDataTime    = region.get_state_time(index);
         m_hasRestartSolution = true;
       } else if (res_time >= 0) {  // User has specified a time to restart at
-        *out << "Restart solution time set, reading solution time : "
-             << res_time << std::endl;
+        *out << "Restart solution time set, reading solution time : " << res_time << std::endl;
         mesh_data->read_defined_input_fields(res_time, &missing);
         m_restartDataTime    = res_time;
         m_hasRestartSolution = true;
@@ -437,20 +391,17 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
     if (!usePamgen) {
       // Read solution from exodus file.
       if (index >= 0) {  // User has specified a time step to restart at
-        *out << "Restart Index set, reading solution index : " << index
-             << std::endl;
+        *out << "Restart Index set, reading solution index : " << index << std::endl;
         mesh_data->read_defined_input_fields(index, &missing);
         m_restartDataTime    = region.get_state_time(index);
         m_hasRestartSolution = true;
       } else if (res_time >= 0) {  // User has specified a time to restart at
-        *out << "Restart solution time set, reading solution time : "
-             << res_time << std::endl;
+        *out << "Restart solution time set, reading solution time : " << res_time << std::endl;
         mesh_data->read_defined_input_fields(res_time, &missing);
         m_restartDataTime    = res_time;
         m_hasRestartSolution = true;
       } else {
-        *out << "Restart Index not set. Not reading solution from exodus ("
-             << index << ")" << std::endl;
+        *out << "Restart Index not set. Not reading solution from exodus (" << index << ")" << std::endl;
       }
     }
 
@@ -462,15 +413,13 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
     Teuchos::Array<std::string> default_field;
     default_field.push_back("solution");
     Teuchos::Array<std::string> restart_fields =
-        params->get<Teuchos::Array<std::string>>(
-            "Restart Fields", default_field);
+        params->get<Teuchos::Array<std::string>>("Restart Fields", default_field);
 
     // Get the fields to be used for restart
 
     // See what state data was initialized from the stk::io request
     // This should be propagated into stk::io
-    const Ioss::ElementBlockContainer& elem_blocks =
-        region.get_element_blocks();
+    const Ioss::ElementBlockContainer& elem_blocks = region.get_element_blocks();
 
     /*
     // Uncomment to print what fields are in the exodus file
@@ -487,8 +436,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
         for (std::size_t j = 0; j < restart_fields.size(); j++)
 
           if (boost::iequals(st.name, restart_fields[j])) {
-            *out << "Restarting from field \"" << st.name
-                 << "\" found in exodus file." << std::endl;
+            *out << "Restarting from field \"" << st.name << "\" found in exodus file." << std::endl;
             st.restartDataAvailable = true;
             break;
           }
@@ -501,8 +449,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
           it.second,
           false);  // Last variable is abort_if_not_found. We don't want that.
       if (!found)
-        *out << "  *** WARNING *** Mesh vector state '" << it.first
-             << "' was not found in the mesh database.\n";
+        *out << "  *** WARNING *** Mesh vector state '" << it.first << "' was not found in the mesh database.\n";
     }
     for (auto& it : fieldContainer->getMeshScalarIntegerStates()) {
       bool found = mesh_data->get_global(
@@ -520,28 +467,20 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
     int                 ordering, stride;
 
     std::string state_name = "layer_thickness_ratio";
-    hasLayeredStructure =
-        hasLayeredStructure && mesh_data->get_global(state_name, ltr, false);
-    if (hasLayeredStructure)
-      fieldContainer->getMeshVectorStates()[state_name] = ltr;
+    hasLayeredStructure    = hasLayeredStructure && mesh_data->get_global(state_name, ltr, false);
+    if (hasLayeredStructure) fieldContainer->getMeshVectorStates()[state_name] = ltr;
     state_name          = "ordering";
-    hasLayeredStructure = hasLayeredStructure &&
-                          mesh_data->get_global(state_name, ordering, false);
-    if (hasLayeredStructure)
-      fieldContainer->getMeshScalarIntegerStates()[state_name] = ordering;
-    state_name = "stride";
-    hasLayeredStructure =
-        hasLayeredStructure && mesh_data->get_global(state_name, stride, false);
-    if (hasLayeredStructure)
-      fieldContainer->getMeshScalarIntegerStates()[state_name] = stride;
+    hasLayeredStructure = hasLayeredStructure && mesh_data->get_global(state_name, ordering, false);
+    if (hasLayeredStructure) fieldContainer->getMeshScalarIntegerStates()[state_name] = ordering;
+    state_name          = "stride";
+    hasLayeredStructure = hasLayeredStructure && mesh_data->get_global(state_name, stride, false);
+    if (hasLayeredStructure) fieldContainer->getMeshScalarIntegerStates()[state_name] = stride;
 
     if (hasLayeredStructure) {
       Teuchos::ArrayRCP<double> layerThicknessRatio(ltr.size());
       for (int i = 0; i < ltr.size(); ++i) layerThicknessRatio[i] = ltr[i];
-      this->layered_mesh_numbering = Teuchos::rcp(new LayeredMeshNumbering<LO>(
-          stride,
-          static_cast<LayeredMeshOrdering>(ordering),
-          layerThicknessRatio));
+      this->layered_mesh_numbering = Teuchos::rcp(
+          new LayeredMeshNumbering<LO>(stride, static_cast<LayeredMeshOrdering>(ordering), layerThicknessRatio));
     }
   } else {
     // We put all the fields as 'missing'
@@ -558,11 +497,10 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
   side_maps_present = true;
   bool coherence    = true;
   for (const auto& it : missing) {
-    if (it.field()->name() == "side_to_cell_map" ||
-        it.field()->name() == "side_nodes_ids") {
+    if (it.field()->name() == "side_to_cell_map" || it.field()->name() == "side_nodes_ids") {
       side_maps_present = false;
-      coherence = !coherence;  // Both fields should be present or absent so
-                               // coherence should change exactly twice
+      coherence         = !coherence;  // Both fields should be present or absent so
+                                       // coherence should change exactly twice
     }
   }
   ALBANY_PANIC(
@@ -599,8 +537,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
 
   // Finally, perform the setup of the (possible) side set meshes (including
   // extraction if of type SideSetSTKMeshStruct)
-  this->finalizeSideSetMeshStructs(
-      commT, side_set_req, side_set_sis, worksetSize);
+  this->finalizeSideSetMeshStructs(commT, side_set_req, side_set_sis, worksetSize);
 
   fieldAndBulkDataSet = true;
 }
@@ -620,7 +557,7 @@ Albany::IossSTKMeshStruct::loadOrSetCoordinates3d(int index)
 {
   std::string const coords3d_name = "coordinates3d";
 
-  Teuchos::RCP<Ioss::Region>      region = mesh_data->get_input_io_region();
+  Teuchos::RCP<Ioss::Region>      region      = mesh_data->get_input_io_region();
   const Ioss::NodeBlockContainer& node_blocks = region->get_node_blocks();
   Ioss::NodeBlock*                nb          = node_blocks[0];
 
@@ -643,8 +580,7 @@ Albany::IossSTKMeshStruct::loadOrSetCoordinates3d(int index)
       region->begin_state(index);
     }
 
-    stk::io::field_data_from_ioss(
-        *bulkData, this->getCoordinatesField3d(), nodes, nb, coords3d_name);
+    stk::io::field_data_from_ioss(*bulkData, this->getCoordinatesField3d(), nodes, nb, coords3d_name);
     if (current_step != -1) { region->begin_state(index); }
   } else {
     if (nb->field_exists(coords3d_name)) {
@@ -678,33 +614,18 @@ Albany::IossSTKMeshStruct::loadSolutionFieldHistory(int step)
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::IossSTKMeshStruct::getValidDiscretizationParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getValidGenericSTKParameters("Valid IOSS_DiscParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getValidGenericSTKParameters("Valid IOSS_DiscParams");
   validPL->set<bool>("Periodic BC", false, "Flag to indicate periodic a mesh");
-  validPL->set<std::string>(
-      "Exodus Input File Name", "", "File Name For Exodus Mesh Input");
-  validPL->set<std::string>(
-      "Pamgen Input File Name", "", "File Name For Pamgen Mesh Input");
-  validPL->set<int>(
-      "Restart Index",
-      1,
-      "Exodus time index to read for inital guess/condition.");
-  validPL->set<double>(
-      "Restart Time",
-      1.0,
-      "Exodus solution time to read for inital guess/condition.");
-  validPL->set<Teuchos::ParameterList>(
-      "Required Fields Info", Teuchos::ParameterList());
-  validPL->set<bool>(
-      "Write points coordinates to ascii file",
-      "",
-      "Write the mesh points coordinates to file?");
+  validPL->set<std::string>("Exodus Input File Name", "", "File Name For Exodus Mesh Input");
+  validPL->set<std::string>("Pamgen Input File Name", "", "File Name For Pamgen Mesh Input");
+  validPL->set<int>("Restart Index", 1, "Exodus time index to read for inital guess/condition.");
+  validPL->set<double>("Restart Time", 1.0, "Exodus solution time to read for inital guess/condition.");
+  validPL->set<Teuchos::ParameterList>("Required Fields Info", Teuchos::ParameterList());
+  validPL->set<bool>("Write points coordinates to ascii file", "", "Write the mesh points coordinates to file?");
 
   Teuchos::Array<std::string> emptyStringArray;
   validPL->set<Teuchos::Array<std::string>>(
-      "Additional Node Sets",
-      emptyStringArray,
-      "Declare additional node sets not present in the input file");
+      "Additional Node Sets", emptyStringArray, "Declare additional node sets not present in the input file");
 
   return validPL;
 }

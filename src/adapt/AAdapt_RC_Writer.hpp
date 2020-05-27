@@ -24,15 +24,12 @@ class Manager;
  */
 
 template <typename EvalT, typename Traits>
-class WriterBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                   public PHX::EvaluatorDerived<EvalT, Traits>
+class WriterBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   WriterBase();
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm) = 0;
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm) = 0;
   void
   evaluateFields(typename Traits::EvalData d) = 0;
   const Teuchos::RCP<const PHX::FieldTag>&
@@ -47,26 +44,19 @@ class Writer : public WriterBase<EvalT, Traits>
 {
  public:
   void
-  postRegistrationSetup(
-      typename Traits::SetupData /* d */,
-      PHX::FieldManager<Traits>& /* fm */)
+  postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& /* fm */)
   {
   }
   void evaluateFields(typename Traits::EvalData /* d */) {}
 };
 
 template <typename Traits>
-class Writer<PHAL::AlbanyTraits::Residual, Traits>
-    : public WriterBase<PHAL::AlbanyTraits::Residual, Traits>
+class Writer<PHAL::AlbanyTraits::Residual, Traits> : public WriterBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  Writer(
-      const Teuchos::RCP<Manager>&         rc_mgr,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  Writer(const Teuchos::RCP<Manager>& rc_mgr, const Teuchos::RCP<Albany::Layouts>& dl);
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
   void
   evaluateFields(typename Traits::EvalData d);
 

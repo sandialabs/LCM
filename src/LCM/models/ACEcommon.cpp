@@ -19,10 +19,7 @@ LCM::vectorFromFile(std::string const& filename)
 }
 
 RealType
-LCM::interpolateVectors(
-    std::vector<RealType> const& xv,
-    std::vector<RealType> const& yv,
-    RealType const               x)
+LCM::interpolateVectors(std::vector<RealType> const& xv, std::vector<RealType> const& yv, RealType const x)
 {
   RealType y{0.0};
   size_t   i{0};

@@ -27,13 +27,10 @@ Setup::Setup()
 }
 
 void
-Setup::init_problem_params(
-    const Teuchos::RCP<Teuchos::ParameterList> problemParams)
+Setup::init_problem_params(const Teuchos::RCP<Teuchos::ParameterList> problemParams)
 {
-  _enableMemoization =
-      problemParams->get<bool>("Use MDField Memoization", false);
-  _enableMemoizationForParams =
-      problemParams->get<bool>("Use MDField Memoization For Parameters", false);
+  _enableMemoization          = problemParams->get<bool>("Use MDField Memoization", false);
+  _enableMemoizationForParams = problemParams->get<bool>("Use MDField Memoization For Parameters", false);
   if (_enableMemoizationForParams) _enableMemoization = true;
 }
 
@@ -42,8 +39,7 @@ Setup::init_unsaved_param(std::string const& param)
 {
   if (_enableMemoizationForParams) {
     auto out = Teuchos::VerboseObjectBase::getDefaultOStream();
-    *out << "Disabling memoization for " << param << " and its dependencies."
-         << std::endl;
+    *out << "Disabling memoization for " << param << " and its dependencies." << std::endl;
     _unsavedParams->insert(param);
     _unsavedParamsEvals = Teuchos::rcp(new StringSet(*_setupEvals));
   }
@@ -71,8 +67,7 @@ Setup::pre_eval()
 
     // If a parameter has changed and the saved/unsaved string sets haven't
     // been created yet then create the sets
-    if ((_unsavedParamsEvals->size() == _setupEvals->size()) &&
-        (!_isParamsSetsSaved)) {
+    if ((_unsavedParamsEvals->size() == _setupEvals->size()) && (!_isParamsSetsSaved)) {
       // Save param string sets for later use
       update_fields_with_unsaved_params();
       _isParamsSetsSaved = true;
@@ -108,8 +103,7 @@ Setup::fill_field_dependencies(
 
     // Fill MDField lists based on whether it should be saved/unsaved
     auto fields = saved ? _savedFields : _unsavedFields;
-    for (const auto& evalField : evalFields)
-      fields->insert(evalField->identifier());
+    for (const auto& evalField : evalFields) fields->insert(evalField->identifier());
   }
 }
 
@@ -123,22 +117,17 @@ Setup::update_fields()
 }
 
 void
-Setup::check_fields(
-    std::vector<Teuchos::RCP<PHX::FieldTag>> const& fields) const
+Setup::check_fields(std::vector<Teuchos::RCP<PHX::FieldTag>> const& fields) const
 {
   if (_enableMemoization) {
     StringSet missingFields;
     for (const auto& field : fields) {
       const auto& fieldId = field->identifier();
-      if (_savedFields->count(fieldId) == 0 &&
-          _unsavedFields->count(fieldId) == 0)
-        missingFields.insert(fieldId);
+      if (_savedFields->count(fieldId) == 0 && _unsavedFields->count(fieldId) == 0) missingFields.insert(fieldId);
     }
     if (!missingFields.empty()) {
       std::ostringstream os;
-      for (const auto& missingField : missingFields) {
-        os << missingField << "\n";
-      }
+      for (const auto& missingField : missingFields) { os << missingField << "\n"; }
       ALBANY_ABORT("The following fields could not be found:\n" + os.str());
     }
   }
@@ -156,8 +145,7 @@ Setup::print(std::ostream& os) const
     os << "********** MDField Dependencies **********" << std::endl;
     for (const auto& depField : *_dep2EvalFields) {
       os << "  " << depField.first << " is a dependency of:" << std::endl;
-      for (const auto& evalField : depField.second)
-        os << "    " << evalField << std::endl;
+      for (const auto& evalField : depField.second) os << "    " << evalField << std::endl;
     }
     os << std::endl;
     print_fields(os);
@@ -191,15 +179,12 @@ Setup::get_saved_fields(std::string const& eval) const
 }
 
 void
-Setup::update_fields(
-    Teuchos::RCP<StringSet> savedFields,
-    Teuchos::RCP<StringSet> unsavedFields)
+Setup::update_fields(Teuchos::RCP<StringSet> savedFields, Teuchos::RCP<StringSet> unsavedFields)
 {
   if (_enableMemoization) {
     // Start with list of unsaved fields
     std::stack<std::string> unsavedStack;
-    for (const auto& unsavedField : *unsavedFields)
-      unsavedStack.push(unsavedField);
+    for (const auto& unsavedField : *unsavedFields) unsavedStack.push(unsavedField);
 
     // Continue until all unsaved fields have been removed
     while (!unsavedStack.empty()) {
@@ -241,20 +226,15 @@ Setup::update_fields_with_unsaved_params()
 }
 
 void
-Setup::print_fields(
-    std::ostream&           os,
-    Teuchos::RCP<StringSet> savedFields,
-    Teuchos::RCP<StringSet> unsavedFields) const
+Setup::print_fields(std::ostream& os, Teuchos::RCP<StringSet> savedFields, Teuchos::RCP<StringSet> unsavedFields) const
 {
   if (_enableMemoization) {
     os << "Saved fields:" << std::endl;
-    for (const auto& savedField : *savedFields)
-      os << "  " << savedField << std::endl;
+    for (const auto& savedField : *savedFields) os << "  " << savedField << std::endl;
     os << std::endl;
 
     os << "Unsaved fields:" << std::endl;
-    for (const auto& unsavedField : *unsavedFields)
-      os << "  " << unsavedField << std::endl;
+    for (const auto& unsavedField : *unsavedFields) os << "  " << unsavedField << std::endl;
     os << std::endl;
   }
 }

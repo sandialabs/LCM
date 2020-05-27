@@ -14,9 +14,7 @@ TimeDepDBC_Base<EvalT, Traits>::TimeDepDBC_Base(Teuchos::ParameterList& p)
   timeValues = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
   BCValues   = p.get<Teuchos::Array<RealType>>("BC Values").toVector();
 
-  ALBANY_PANIC(
-      !(timeValues.size() == BCValues.size()),
-      "Dimension of \"Time Values\" and \"BC Values\" do not match");
+  ALBANY_PANIC(!(timeValues.size() == BCValues.size()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
 
 template <typename EvalT, typename Traits>
@@ -34,18 +32,15 @@ TimeDepDBC_Base<EvalT, Traits>::computeVal(RealType time)
   if (index == 0)
     val = BCValues[index];
   else {
-    slope =
-        ((BCValues[index] - BCValues[index - 1]) /
-         (timeValues[index] - timeValues[index - 1]));
-    val = BCValues[index - 1] + slope * (time - timeValues[index - 1]);
+    slope = ((BCValues[index] - BCValues[index - 1]) / (timeValues[index] - timeValues[index - 1]));
+    val   = BCValues[index - 1] + slope * (time - timeValues[index - 1]);
   }
 
   return val;
 }
 
 template <typename EvalT, typename Traits>
-TimeDepDBC<EvalT, Traits>::TimeDepDBC(Teuchos::ParameterList& p)
-    : TimeDepDBC_Base<EvalT, Traits>(p)
+TimeDepDBC<EvalT, Traits>::TimeDepDBC(Teuchos::ParameterList& p) : TimeDepDBC_Base<EvalT, Traits>(p)
 {
 }
 

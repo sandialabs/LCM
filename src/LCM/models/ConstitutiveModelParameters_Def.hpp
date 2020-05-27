@@ -28,18 +28,15 @@ ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(
   num_dims_ = dims[2];
 
   // get the Parameter Library
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
   // get the material parameter list
-  Teuchos::ParameterList* mat_params =
-      p.get<Teuchos::ParameterList*>("Material Parameters");
+  Teuchos::ParameterList* mat_params = p.get<Teuchos::ParameterList*>("Material Parameters");
 
   // Check for optional field: temperature
   if (p.isType<std::string>("Temperature Name")) {
     have_temperature_ = true;
-    temperature_      = decltype(temperature_)(
-        p.get<std::string>("Temperature Name"), dl_->qp_scalar);
+    temperature_      = decltype(temperature_)(p.get<std::string>("Temperature Name"), dl_->qp_scalar);
     this->addDependentField(temperature_);
   }
 
@@ -162,33 +159,26 @@ ConstitutiveModelParameters<EvalT, Traits>::postRegistrationSetup(
 {
   for (auto& pair : field_map_) {
     this->utils.setFieldData(pair.second, fm);
-    if (!is_constant_map_[pair.first]) {
-      this->utils.setFieldData(coord_vec_, fm);
-    }
+    if (!is_constant_map_[pair.first]) { this->utils.setFieldData(coord_vec_, fm); }
   }
 
   if (have_temperature_) this->utils.setFieldData(temperature_, fm);
 }
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   for (auto& pair : field_map_) {
     ScalarT constant_value = constant_value_map_[pair.first];
     if (is_constant_map_[pair.first]) {
       for (int cell(0); cell < workset.numCells; ++cell) {
-        for (int pt(0); pt < num_pts_; ++pt) {
-          pair.second(cell, pt) = constant_value;
-        }
+        for (int pt(0); pt < num_pts_; ++pt) { pair.second(cell, pt) = constant_value; }
       }
     } else {
       for (int cell(0); cell < workset.numCells; ++cell) {
         for (int pt(0); pt < num_pts_; ++pt) {
           Teuchos::Array<MeshScalarT> point(num_dims_);
-          for (int i(0); i < num_dims_; ++i)
-            point[i] =
-                Sacado::ScalarValue<MeshScalarT>::eval(coord_vec_(cell, pt, i));
+          for (int i(0); i < num_dims_; ++i) point[i] = Sacado::ScalarValue<MeshScalarT>::eval(coord_vec_(cell, pt, i));
         }
       }
     }
@@ -197,17 +187,14 @@ ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(
         RealType dPdT     = dparam_dtemp_map_[pair.first];
         RealType ref_temp = ref_temp_map_[pair.first];
         for (int cell(0); cell < workset.numCells; ++cell) {
-          for (int pt(0); pt < num_pts_; ++pt) {
-            pair.second(cell, pt) += dPdT * (temperature_(cell, pt) - ref_temp);
-          }
+          for (int pt(0); pt < num_pts_; ++pt) { pair.second(cell, pt) += dPdT * (temperature_(cell, pt) - ref_temp); }
         }
       } else if (temp_type_map_[pair.first] == "Arrhenius") {
         RealType pre_exp_   = pre_exp_map_[pair.first];
         RealType exp_param_ = exp_param_map_[pair.first];
         for (int cell(0); cell < workset.numCells; ++cell) {
           for (int pt(0); pt < num_pts_; ++pt) {
-            pair.second(cell, pt) =
-                pre_exp_ * std::exp(-exp_param_ / temperature_(cell, pt));
+            pair.second(cell, pt) = pre_exp_ * std::exp(-exp_param_ / temperature_(cell, pt));
           }
         }
       }
@@ -223,12 +210,10 @@ ConstitutiveModelParameters<EvalT, Traits>::getValue(std::string const& n)
   }
   typename std::map<std::string, Teuchos::Array<ScalarT>>::iterator it2;
   for (int i(0); i < rv_map_[it2->first].size(); ++i) {
-    if (n == Albany::strint(n + " KL Random Variable", i))
-      return rv_map_[it2->first][i];
+    if (n == Albany::strint(n + " KL Random Variable", i)) return rv_map_[it2->first][i];
   }
 
-  ALBANY_ABORT(
-      "Constituitive model " << n << " not supported in getValue" << std::endl);
+  ALBANY_ABORT("Constituitive model " << n << " not supported in getValue" << std::endl);
 
   // Need to return something here or the Clang compiler complains a couple
   // screenfuls of commentary
@@ -242,31 +227,23 @@ ConstitutiveModelParameters<EvalT, Traits>::parseParameters(
     Teuchos::ParameterList& p,
     Teuchos::RCP<ParamLib>  paramLib)
 {
-  Teuchos::ParameterList pl =
-      p.get<Teuchos::ParameterList*>("Material Parameters")->sublist(n);
-  std::string type_name(n + " Type");
-  std::string type = pl.get(type_name, "Constant");
+  Teuchos::ParameterList pl = p.get<Teuchos::ParameterList*>("Material Parameters")->sublist(n);
+  std::string            type_name(n + " Type");
+  std::string            type = pl.get(type_name, "Constant");
 
   if (type == "Constant") {
     is_constant_map_.insert(std::make_pair(n, true));
     constant_value_map_.insert(std::make_pair(n, pl.get("Value", 1.0)));
     this->registerSacadoParameter(n, paramLib);
     if (have_temperature_) {
-      if (pl.get<std::string>("Temperature Dependence Type", "Linear") ==
-          "Linear") {
+      if (pl.get<std::string>("Temperature Dependence Type", "Linear") == "Linear") {
         temp_type_map_.insert(std::make_pair(n, "Linear"));
-        dparam_dtemp_map_.insert(std::make_pair(
-            n, pl.get<RealType>("Linear Temperature Coefficient", 0.0)));
-        ref_temp_map_.insert(
-            std::make_pair(n, pl.get<RealType>("Reference Temperature", 0.0)));
-      } else if (
-          pl.get<std::string>("Temperature Dependence Type", "Linear") ==
-          "Arrhenius") {
+        dparam_dtemp_map_.insert(std::make_pair(n, pl.get<RealType>("Linear Temperature Coefficient", 0.0)));
+        ref_temp_map_.insert(std::make_pair(n, pl.get<RealType>("Reference Temperature", 0.0)));
+      } else if (pl.get<std::string>("Temperature Dependence Type", "Linear") == "Arrhenius") {
         temp_type_map_.insert(std::make_pair(n, "Arrhenius"));
-        pre_exp_map_.insert(
-            std::make_pair(n, pl.get<RealType>("Pre Exponential", 0.0)));
-        exp_param_map_.insert(
-            std::make_pair(n, pl.get<RealType>("Exponential Parameter", 0.0)));
+        pre_exp_map_.insert(std::make_pair(n, pl.get<RealType>("Pre Exponential", 0.0)));
+        exp_param_map_.insert(std::make_pair(n, pl.get<RealType>("Exponential Parameter", 0.0)));
       }
     }
   }

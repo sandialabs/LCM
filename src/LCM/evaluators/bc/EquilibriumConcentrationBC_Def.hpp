@@ -9,8 +9,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-EquilibriumConcentrationBC_Base<EvalT, Traits>::EquilibriumConcentrationBC_Base(
-    Teuchos::ParameterList& p)
+EquilibriumConcentrationBC_Base<EvalT, Traits>::EquilibriumConcentrationBC_Base(Teuchos::ParameterList& p)
     : coffset_(p.get<int>("Equation Offset")),
       poffset_(p.get<int>("Pressure Offset")),
       PHAL::DirichletBase<EvalT, Traits>(p),
@@ -20,23 +19,20 @@ EquilibriumConcentrationBC_Base<EvalT, Traits>::EquilibriumConcentrationBC_Base(
 }
 template <typename EvalT, typename Traits>
 void
-EquilibriumConcentrationBC_Base<EvalT, Traits>::computeBCs(
-    ScalarT& pressure,
-    ScalarT& Cval)
+EquilibriumConcentrationBC_Base<EvalT, Traits>::computeBCs(ScalarT& pressure, ScalarT& Cval)
 {
   Cval = applied_conc_ * std::exp(pressure_fac_ * pressure);
 }
 // Specialization: Residual
 template <typename Traits>
-EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
-    EquilibriumConcentrationBC(Teuchos::ParameterList& p)
+EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::EquilibriumConcentrationBC(Teuchos::ParameterList& p)
     : EquilibriumConcentrationBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
 template <typename Traits>
 void
-EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
-    evaluateFields(typename Traits::EvalData dirichletWorkset)
+EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
+    typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
@@ -45,8 +41,7 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
   Teuchos::ArrayRCP<ST>       f_nonconstView = Albany::getNonconstLocalData(f);
 
   // Grab the vector of node GIDs for this Node Set ID from the std::map
-  std::vector<std::vector<int>> const& nsNodes =
-      dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
+  std::vector<std::vector<int>> const& nsNodes = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
 
   int     cunk, punk;
   ScalarT Cval;
@@ -63,15 +58,14 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::
 }
 // Specialization: Jacobian
 template <typename Traits>
-EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::
-    EquilibriumConcentrationBC(Teuchos::ParameterList& p)
+EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::EquilibriumConcentrationBC(Teuchos::ParameterList& p)
     : EquilibriumConcentrationBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 template <typename Traits>
 void
-EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::
-    evaluateFields(typename Traits::EvalData dirichletWorkset)
+EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
+    typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;
@@ -81,8 +75,7 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::
   Teuchos::ArrayRCP<ST>       f_nonconstView;
 
   const RealType                       j_coeff = dirichletWorkset.j_coeff;
-  std::vector<std::vector<int>> const& nsNodes =
-      dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
+  std::vector<std::vector<int>> const& nsNodes = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
 
   bool fillResid = (f != Teuchos::null);
   if (fillResid) { f_nonconstView = Albany::getNonconstLocalData(f); }

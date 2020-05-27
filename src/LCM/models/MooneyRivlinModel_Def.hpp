@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-MooneyRivlinModel<EvalT, Traits>::MooneyRivlinModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+MooneyRivlinModel<EvalT, Traits>::MooneyRivlinModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       c1_(p->get<RealType>("c1", 0.0)),
       c2_(p->get<RealType>("c2", 0.0)),
@@ -60,8 +58,7 @@ MooneyRivlinModel<EvalT, Traits>::computeState(
       F.fill(defGrad, cell, pt, 0, 0);
       C = transpose(F) * F;
       S = 2.0 * (c1_ + c2_ * minitensor::I1(C)) * I - 2.0 * c2_ * C +
-          (2.0 * c_ * J(cell, pt) * (J(cell, pt) - 1.0) - d) *
-              minitensor::inverse(C);
+          (2.0 * c_ * J(cell, pt) * (J(cell, pt) - 1.0) - d) * minitensor::inverse(C);
       sigma = (1. / J(cell, pt)) * F * S * minitensor::transpose(F);
 
       for (int i(0); i < num_dims_; ++i)

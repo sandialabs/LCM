@@ -15,21 +15,13 @@ SurfaceScalarGradient<EvalT, Traits>::SurfaceScalarGradient(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepidBasis(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis")),
-      refDualBasis(
-          p.get<std::string>("Reference Dual Basis Name"),
-          dl->qp_tensor),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
+      refDualBasis(p.get<std::string>("Reference Dual Basis Name"), dl->qp_tensor),
       refNormal(p.get<std::string>("Reference Normal Name"), dl->qp_vector),
       jump(p.get<std::string>("Scalar Jump Name"), dl->qp_scalar),
       nodalScalar(p.get<std::string>("Nodal Scalar Name"), dl->node_scalar),
-      scalarGrad(
-          p.get<std::string>("Surface Scalar Gradient Name"),
-          dl->qp_vector)
+      scalarGrad(p.get<std::string>("Surface Scalar Gradient Name"), dl->qp_vector)
 {
   this->addDependentField(refDualBasis);
   this->addDependentField(refNormal);
@@ -56,19 +48,15 @@ SurfaceScalarGradient<EvalT, Traits>::SurfaceScalarGradient(
   std::cout << " numPlaneNodes: " << numPlaneNodes << std::endl;
   std::cout << " numPlaneDims: " << numPlaneDims << std::endl;
   std::cout << " numQPs: " << numQPs << std::endl;
-  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints()
-            << std::endl;
-  std::cout << " cubature->getDimension(): " << cubature->getDimension()
-            << std::endl;
+  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints() << std::endl;
+  std::cout << " cubature->getDimension(): " << cubature->getDimension() << std::endl;
 #endif
 }
 
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceScalarGradient<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceScalarGradient<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(refDualBasis, fm);
   this->utils.setFieldData(refNormal, fm);
@@ -77,12 +65,9 @@ SurfaceScalarGradient<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(scalarGrad, fm);
 
   // Allocate Temporary Views
-  refValues =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
-  refGrads = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", numPlaneNodes, numQPs, numPlaneDims);
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
+  refValues  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
+  refGrads   = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs, numPlaneDims);
+  refPoints  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
   refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
 
   // Pre-Calculate reference element quantitites
@@ -94,31 +79,25 @@ SurfaceScalarGradient<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceScalarGradient<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceScalarGradient<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   ScalarT midPlaneAvg;
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int pt = 0; pt < numQPs; ++pt) {
-      minitensor::Vector<MeshScalarT> G_0(
-          minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 0, 0);
+      minitensor::Vector<MeshScalarT> G_0(minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 0, 0);
 
-      minitensor::Vector<MeshScalarT> G_1(
-          minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 1, 0);
+      minitensor::Vector<MeshScalarT> G_1(minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 1, 0);
 
-      minitensor::Vector<MeshScalarT> G_2(
-          minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 2, 0);
+      minitensor::Vector<MeshScalarT> G_2(minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 2, 0);
 
-      minitensor::Vector<MeshScalarT> N(
-          minitensor::Source::ARRAY, 3, refNormal, cell, pt, 0);
+      minitensor::Vector<MeshScalarT> N(minitensor::Source::ARRAY, 3, refNormal, cell, pt, 0);
 
       minitensor::Vector<ScalarT> scalarGradPerpendicular(0, 0, 0);
       minitensor::Vector<ScalarT> scalarGradParallel(0, 0, 0);
 
       // Need to inverse basis [G_0 ; G_1; G_2] and none of them should be
       // normalized
-      minitensor::Tensor<MeshScalarT> gBasis(
-          minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 0, 0);
+      minitensor::Tensor<MeshScalarT> gBasis(minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 0, 0);
 
       minitensor::Tensor<MeshScalarT> invRefDualBasis(3);
 
@@ -134,24 +113,18 @@ SurfaceScalarGradient<EvalT, Traits>::evaluateFields(
       // in-plane (parallel) contribution
       for (int node(0); node < numPlaneNodes; ++node) {
         int topNode = node + numPlaneNodes;
-        midPlaneAvg =
-            0.5 * (nodalScalar(cell, node) + nodalScalar(cell, topNode));
+        midPlaneAvg = 0.5 * (nodalScalar(cell, node) + nodalScalar(cell, topNode));
         for (int i(0); i < numDims; ++i) {
           scalarGradParallel(i) +=
-              refGrads(node, pt, 0) * midPlaneAvg * invG_0(i) +
-              refGrads(node, pt, 1) * midPlaneAvg * invG_1(i);
+              refGrads(node, pt, 0) * midPlaneAvg * invG_0(i) + refGrads(node, pt, 1) * midPlaneAvg * invG_1(i);
         }
       }
 
       // normal (perpendicular) contribution
-      for (int i(0); i < numDims; ++i) {
-        scalarGradPerpendicular(i) = jump(cell, pt) / thickness * invG_2(i);
-      }
+      for (int i(0); i < numDims; ++i) { scalarGradPerpendicular(i) = jump(cell, pt) / thickness * invG_2(i); }
 
       // assign components to MDfield ScalarGrad
-      for (int i(0); i < numDims; ++i)
-        scalarGrad(cell, pt, i) =
-            scalarGradParallel(i) + scalarGradPerpendicular(i);
+      for (int i(0); i < numDims; ++i) scalarGrad(cell, pt, i) = scalarGradParallel(i) + scalarGradPerpendicular(i);
     }
   }
 }

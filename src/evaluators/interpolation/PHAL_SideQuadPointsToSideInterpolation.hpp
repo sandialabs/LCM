@@ -22,27 +22,21 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class SideQuadPointsToSideInterpolationBase
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<EvalT, Traits>
+class SideQuadPointsToSideInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                              public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  SideQuadPointsToSideInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl_side);
+  SideQuadPointsToSideInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl_side);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  private:
-  typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
-      OutputScalarT;
+  typedef typename EvalT::MeshScalarT                                      MeshScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type OutputScalarT;
 
   int              fieldDim;
   std::vector<int> dims;
@@ -59,24 +53,15 @@ class SideQuadPointsToSideInterpolationBase
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using SideQuadPointsToSideInterpolation = SideQuadPointsToSideInterpolationBase<
-    EvalT,
-    Traits,
-    typename EvalT::ScalarT>;
+using SideQuadPointsToSideInterpolation = SideQuadPointsToSideInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
 using SideQuadPointsToSideInterpolationMesh =
-    SideQuadPointsToSideInterpolationBase<
-        EvalT,
-        Traits,
-        typename EvalT::MeshScalarT>;
+    SideQuadPointsToSideInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
 using SideQuadPointsToSideInterpolationParam =
-    SideQuadPointsToSideInterpolationBase<
-        EvalT,
-        Traits,
-        typename EvalT::ParamScalarT>;
+    SideQuadPointsToSideInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

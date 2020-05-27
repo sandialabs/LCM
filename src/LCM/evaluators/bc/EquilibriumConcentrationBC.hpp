@@ -24,8 +24,7 @@ template <typename EvalT, typename Traits>
 class EquilibriumConcentrationBC;
 
 template <typename EvalT, typename Traits>
-class EquilibriumConcentrationBC_Base
-    : public PHAL::DirichletBase<EvalT, Traits>
+class EquilibriumConcentrationBC_Base : public PHAL::DirichletBase<EvalT, Traits>
 {
  public:
   using ScalarT = typename EvalT::ScalarT;
@@ -43,9 +42,7 @@ class EquilibriumConcentrationBC_Base
 // Residual
 template <typename Traits>
 class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>
-    : public EquilibriumConcentrationBC_Base<
-          PHAL::AlbanyTraits::Residual,
-          Traits>
+    : public EquilibriumConcentrationBC_Base<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   EquilibriumConcentrationBC(Teuchos::ParameterList& p);
@@ -57,9 +54,7 @@ class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 template <typename Traits>
 class EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public EquilibriumConcentrationBC_Base<
-          PHAL::AlbanyTraits::Jacobian,
-          Traits>
+    : public EquilibriumConcentrationBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   EquilibriumConcentrationBC(Teuchos::ParameterList& p);

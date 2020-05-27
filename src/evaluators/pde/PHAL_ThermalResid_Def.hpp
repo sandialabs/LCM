@@ -12,8 +12,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 ThermalResid<EvalT, Traits>::ThermalResid(Teuchos::ParameterList const& p)
-    : wBF(p.get<std::string>("Weighted BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
+    : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       Tdot(
           p.get<std::string>("QP Time Derivative Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
@@ -23,9 +22,7 @@ ThermalResid<EvalT, Traits>::ThermalResid(Teuchos::ParameterList const& p)
       TGrad(
           p.get<std::string>("Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      TResidual(
-          p.get<std::string>("Residual Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
+      TResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       kappa(p.get<Teuchos::Array<double>>("Thermal Conductivity")),
       rho(p.get<double>("Density")),
       C(p.get<double>("Heat Capacity"))
@@ -36,8 +33,7 @@ ThermalResid<EvalT, Traits>::ThermalResid(Teuchos::ParameterList const& p)
   this->addDependentField(wGradBF);
   this->addEvaluatedField(TResidual);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   worksetSize = dims[0];
@@ -50,9 +46,7 @@ ThermalResid<EvalT, Traits>::ThermalResid(Teuchos::ParameterList const& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-ThermalResid<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ThermalResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(wBF, fm);
   this->utils.setFieldData(TGrad, fm);
@@ -78,8 +72,7 @@ ThermalResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         TResidual(cell, node) += rho * C * Tdot(cell, qp) * wBF(cell, node, qp);
         // Diffusion part of residual
         for (std::size_t ndim = 0; ndim < numDims; ++ndim) {
-          TResidual(cell, node) += kappa[ndim] * TGrad(cell, qp, ndim) *
-                                   wGradBF(cell, node, qp, ndim);
+          TResidual(cell, node) += kappa[ndim] * TGrad(cell, qp, ndim) * wGradBF(cell, node, qp, ndim);
         }
       }
     }

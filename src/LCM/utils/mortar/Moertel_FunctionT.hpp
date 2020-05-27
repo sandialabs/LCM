@@ -104,11 +104,7 @@ class FunctionT
   \param deriv (out) : Derivative of functions at xi
   */
   void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     TEUCHOS_ASSERT_EQUALITY(valdim, traits_type::valdim);
     TEUCHOS_ASSERT(!xi);
@@ -157,11 +153,7 @@ struct Constant1D
   static int const valdim = 2;
 
   static void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     // for this linear function, we get 2 values and 2 derivatives
 
@@ -196,11 +188,7 @@ struct Linear1D
   static int const valdim = 2;
 
   static void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     // for this linear function, we get 2 values and 2 derivatives
 
@@ -234,11 +222,7 @@ struct DualLinear1D
   static int const valdim = 2;
 
   static void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     // for this linear function, we get 2 values and 2 derivatives
 
@@ -277,11 +261,7 @@ struct LinearTri
   static int const valdim = 3;
 
   static void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     // for this function, we get 3 values and six derivatives
 
@@ -327,11 +307,7 @@ struct DualLinearTri
   static int const valdim = 3;
 
   static void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     // for this function, we get 3 values and six derivatives
 
@@ -377,11 +353,7 @@ struct ConstantTri
   static int const valdim = 3;
 
   static void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     // for this function, we get 3 values and six derivatives
 
@@ -409,11 +381,7 @@ struct BiLinearQuad
   static int const valdim = 4;
 
   static void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     if (val) {
       val[0] = .25 * (1. - xi[0]) * (1. - xi[1]);
@@ -441,11 +409,7 @@ struct DualBiLinearQuad
   static int const valdim = 4;
 
   static void
-  EvaluateFunction(
-      double const* xi,
-      double*       val,
-      int const     valdim,
-      double*       deriv)
+  EvaluateFunction(double const* xi, double* val, int const valdim, double* deriv)
   {
     double const onemxi  = 1.0 - xi[0];
     double const onepxi  = 1.0 + xi[0];
@@ -473,13 +437,13 @@ struct DualBiLinearQuad
       double const phi3xi  = -.25 * onepeta;
       double const phi3eta = .25 * onemxi;
       deriv[0]             = 4. * phi0xi - 2. * phi1xi - 2. * phi3xi + phi2xi;
-      deriv[1] = 4. * phi0eta - 2. * phi1eta - 2. * phi3eta + phi2eta;
-      deriv[2] = 4. * phi1xi - 2. * phi0xi - 2. * phi2xi + phi3xi;
-      deriv[3] = 4. * phi1eta - 2. * phi0eta - 2. * phi2eta + phi3eta;
-      deriv[4] = 4. * phi2xi - 2. * phi1xi - 2. * phi3xi + phi0xi;
-      deriv[5] = 4. * phi2eta - 2. * phi1eta - 2. * phi3eta + phi0eta;
-      deriv[6] = 4. * phi3xi - 2. * phi2xi - 2. * phi0xi + phi1xi;
-      deriv[7] = 4. * phi3eta - 2. * phi2eta - 2. * phi0eta + phi1eta;
+      deriv[1]             = 4. * phi0eta - 2. * phi1eta - 2. * phi3eta + phi2eta;
+      deriv[2]             = 4. * phi1xi - 2. * phi0xi - 2. * phi2xi + phi3xi;
+      deriv[3]             = 4. * phi1eta - 2. * phi0eta - 2. * phi2eta + phi3eta;
+      deriv[4]             = 4. * phi2xi - 2. * phi1xi - 2. * phi3xi + phi0xi;
+      deriv[5]             = 4. * phi2eta - 2. * phi1eta - 2. * phi3eta + phi0eta;
+      deriv[6]             = 4. * phi3xi - 2. * phi2xi - 2. * phi0xi + phi1xi;
+      deriv[7]             = 4. * phi3eta - 2. * phi2eta - 2. * phi0eta + phi1eta;
     }
 
     return;

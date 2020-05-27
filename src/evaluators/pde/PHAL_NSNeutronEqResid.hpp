@@ -19,16 +19,13 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-class NSNeutronEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-                         public PHX::EvaluatorDerived<EvalT, Traits>
+class NSNeutronEqResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   NSNeutronEqResid(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

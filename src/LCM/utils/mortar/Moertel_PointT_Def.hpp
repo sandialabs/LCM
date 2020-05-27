@@ -10,9 +10,7 @@
  |  ctor (public)                                            mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(
-    PointT)::PointT(int const id, const double* xi, int out)
-    : id_(id), outputlevel_(out)
+MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)::PointT(int const id, const double* xi, int out) : id_(id), outputlevel_(out)
 {
   xi_[0] = xi[0];
   xi_[1] = xi[1];
@@ -37,9 +35,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)::~PointT()
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) & point)
+operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) & point)
 {
   point.Print();
   return (os);
@@ -50,8 +46,7 @@ operator<<(
 MOERTEL_TEMPLATE_STATEMENT
 void MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)::Print() const
 {
-  std::cout << "Point " << id_ << " xi[0]/[1] = " << xi_[0] << " / " << xi_[1]
-            << std::endl;
+  std::cout << "Point " << id_ << " xi[0]/[1] = " << xi_[0] << " / " << xi_[1] << std::endl;
   if (node_ != Teuchos::null) std::cout << *node_;
   return;
 }
@@ -60,8 +55,7 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)::Print() const
  |  store shape function values (public)                     mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-void MoertelT::MOERTEL_TEMPLATE_CLASS(
-    PointT)::StoreFunctionValues(int place, double* val, int valdim)
+void MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)::StoreFunctionValues(int place, double* val, int valdim)
 {
   vals_[place].resize(valdim);
   for (int i = 0; i < valdim; ++i) vals_[place][i] = val[i];

@@ -13,10 +13,7 @@ std::vector<RealType>
 vectorFromFile(std::string const& filename);
 
 RealType
-interpolateVectors(
-    std::vector<RealType> const& xv,
-    std::vector<RealType> const& yv,
-    RealType const               x);
+interpolateVectors(std::vector<RealType> const& xv, std::vector<RealType> const& yv, RealType const x);
 
 namespace {
 
@@ -26,34 +23,19 @@ static RealType const SQ23{std::sqrt(2.0 / 3.0)};
 
 // ACE nonlinear system for ice and permafrost material models (J2)
 template <typename EvalT, minitensor::Index M = 1>
-class ACE_NLS : public minitensor::
-                    Function_Base<ACE_NLS<EvalT, M>, typename EvalT::ScalarT, M>
+class ACE_NLS : public minitensor::Function_Base<ACE_NLS<EvalT, M>, typename EvalT::ScalarT, M>
 {
   using S = typename EvalT::ScalarT;
 
  public:
-  ACE_NLS(
-      RealType sat_mod,
-      RealType sat_exp,
-      RealType eqps_old,
-      S const& K,
-      S const& smag,
-      S const& mubar,
-      S const& Y)
-      : sat_mod_(sat_mod),
-        sat_exp_(sat_exp),
-        eqps_old_(eqps_old),
-        K_(K),
-        smag_(smag),
-        mubar_(mubar),
-        Y_(Y)
+  ACE_NLS(RealType sat_mod, RealType sat_exp, RealType eqps_old, S const& K, S const& smag, S const& mubar, S const& Y)
+      : sat_mod_(sat_mod), sat_exp_(sat_exp), eqps_old_(eqps_old), K_(K), smag_(smag), mubar_(mubar), Y_(Y)
   {
   }
 
   constexpr static char const* const NAME{"ACE NLS"};
 
-  using Base =
-      minitensor::Function_Base<ACE_NLS<EvalT, M>, typename EvalT::ScalarT, M>;
+  using Base = minitensor::Function_Base<ACE_NLS<EvalT, M>, typename EvalT::ScalarT, M>;
 
   // Default value.
   template <typename T, minitensor::Index N>

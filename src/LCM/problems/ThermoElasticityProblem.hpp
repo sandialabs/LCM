@@ -49,9 +49,7 @@ class ThermoElasticityProblem : public Albany::AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -68,11 +66,8 @@ class ThermoElasticityProblem : public Albany::AbstractProblem
 
   void
   getAllocatedStates(
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-          Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState_,
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-          Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState_)
-      const;
+      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState_,
+      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState_) const;
 
  private:
   //! Private to prohibit copying
@@ -108,12 +103,8 @@ class ThermoElasticityProblem : public Albany::AbstractProblem
   int  X_offset;  // Position of X unknown in nodal DOFs, followed by Y,Z
   int  numDim;    // Number of spatial dimensions and displacement variable
 
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-      Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>>
-      oldState;
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-      Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>>
-      newState;
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState;
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState;
 };
 }  // namespace Albany
 
@@ -158,34 +149,29 @@ Albany::ThermoElasticityProblem::constructEvaluators(
   // get the name of the current element block
   std::string elementBlockName = meshSpecs.ebName;
 
-  RCP<shards::CellTopology> cellType =
-      rcp(new shards::CellTopology(&meshSpecs.ctd));
-  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
-      Albany::getIntrepid2Basis(meshSpecs.ctd);
+  RCP<shards::CellTopology>                              cellType      = rcp(new shards::CellTopology(&meshSpecs.ctd));
+  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis = Albany::getIntrepid2Basis(meshSpecs.ctd);
 
   int const numNodes    = intrepidBasis->getCardinality();
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(
-          *cellType, meshSpecs.cubatureDegree);
+      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize
-       << ", Vertices= " << numVertices << ", Nodes= " << numNodes
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
        << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
 
   // Construct standard FEM evaluators with standard field names
-  RCP<Albany::Layouts> dl = rcp(
-      new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
   ALBANY_PANIC(
       dl->vectorAndGradientLayoutsAreEquivalent == false,
       "Data Layout Usage in Mechanics problems assume vecDim = numDim");
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
-  std::string scatterName = "Scatter Heat";
+  std::string                                       scatterName = "Scatter Heat";
 
   // Displacement Variable
   Teuchos::ArrayRCP<std::string> dof_names(1);
@@ -193,19 +179,14 @@ Albany::ThermoElasticityProblem::constructEvaluators(
   Teuchos::ArrayRCP<std::string> resid_names(1);
   resid_names[0] = dof_names[0] + " Residual";
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0], X_offset));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0], X_offset));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0], X_offset));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecGradInterpolationEvaluator(
-          dof_names[0], X_offset));
+      evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, X_offset));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator_noTransient(
-          true, dof_names, X_offset));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(true, resid_names, X_offset));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, resid_names, X_offset));
 
   // Temperature Variable
   Teuchos::ArrayRCP<std::string> tdof_names(1);
@@ -215,35 +196,25 @@ Albany::ThermoElasticityProblem::constructEvaluators(
   Teuchos::ArrayRCP<std::string> tresid_names(1);
   tresid_names[0] = tdof_names[0] + " Residual";
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFInterpolationEvaluator(tdof_names[0], T_offset));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(tdof_names[0], T_offset));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(tdof_names_dot[0], T_offset));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(tdof_names[0], T_offset));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFInterpolationEvaluator(
-          tdof_names_dot[0], T_offset));
+      evalUtils.constructGatherSolutionEvaluator(false, tdof_names, tdof_names_dot, T_offset));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFGradInterpolationEvaluator(
-          tdof_names[0], T_offset));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator(
-          false, tdof_names, tdof_names_dot, T_offset));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(
-          false, tresid_names, T_offset, scatterName));
+      evalUtils.constructScatterResidualEvaluator(false, tresid_names, T_offset, scatterName));
 
   // General FEM stuff
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherCoordinateVectorEvaluator());
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(
-          cellType, intrepidBasis, cubature));
+      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   // Temporary variable used numerous times below
   Teuchos::RCP<PHX::Evaluator<AlbanyTraits>> ev;
@@ -328,16 +299,14 @@ Albany::ThermoElasticityProblem::constructEvaluators(
     p->set<std::string>("Elastic Modulus Name", "Elastic Modulus");
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl->qp_scalar);
 
-    p->set<std::string>(
-        "Poissons Ratio Name", "Poissons Ratio");  // dl->qp_scalar also
+    p->set<std::string>("Poissons Ratio Name", "Poissons Ratio");  // dl->qp_scalar also
 
     // Output
     p->set<std::string>("Stress Name", "Stress");  // dl->qp_tensor also
 
     ev = rcp(new LCM::Stress<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
-    p = stateMgr.registerStateVariable(
-        "Stress", dl->qp_tensor, dl->dummy, elementBlockName, "zero");
+    p  = stateMgr.registerStateVariable("Stress", dl->qp_tensor, dl->dummy, elementBlockName, "zero");
     ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }

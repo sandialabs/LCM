@@ -16,20 +16,15 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-class SideLaplacianResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                              public PHX::EvaluatorDerived<EvalT, Traits>
+class SideLaplacianResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT ScalarT;
 
-  SideLaplacianResidual(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  SideLaplacianResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -43,18 +38,16 @@ class SideLaplacianResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<RealType>    BF;
-  PHX::MDField<MeshScalarT> GradBF;
-  PHX::MDField<MeshScalarT> w_measure;
-  PHX::MDField<MeshScalarT, Cell, Side, QuadPoint, Dim, Dim>
-      metric;  // Only used in 2D, so we know the layout
+  PHX::MDField<RealType>                                     BF;
+  PHX::MDField<MeshScalarT>                                  GradBF;
+  PHX::MDField<MeshScalarT>                                  w_measure;
+  PHX::MDField<MeshScalarT, Cell, Side, QuadPoint, Dim, Dim> metric;  // Only used in 2D, so we know the layout
 
   PHX::MDField<ScalarT> u;
   PHX::MDField<ScalarT> grad_u;
 
   // Output:
-  PHX::MDField<ScalarT, Cell, Node>
-      residual;  // Always a 3D residual, so we know the layout
+  PHX::MDField<ScalarT, Cell, Node> residual;  // Always a 3D residual, so we know the layout
 
   std::string                   sideSetName;
   std::vector<std::vector<int>> sideNodes;

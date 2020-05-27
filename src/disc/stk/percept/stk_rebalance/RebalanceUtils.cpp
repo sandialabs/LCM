@@ -28,18 +28,14 @@ stk::rebalance::check_balance(
 
   mesh::EntityVector local_elems;
   if (selector) {
-    mesh::get_selected_entities(
-        *selector, bulk_data.buckets(rank), local_elems);
+    mesh::get_selected_entities(*selector, bulk_data.buckets(rank), local_elems);
   } else {
     mesh::Selector select_owned(meta_data.locally_owned_part());
     // Determine imbalance based on current element decomposition
-    mesh::get_selected_entities(
-        select_owned, bulk_data.buckets(rank), local_elems);
+    mesh::get_selected_entities(select_owned, bulk_data.buckets(rank), local_elems);
   }
 
-  for (mesh::EntityVector::iterator elem_it = local_elems.begin();
-       elem_it != local_elems.end();
-       ++elem_it) {
+  for (mesh::EntityVector::iterator elem_it = local_elems.begin(); elem_it != local_elems.end(); ++elem_it) {
     if (load_measure) {
       double const* load_val = mesh::field_data(*load_measure, *elem_it);
       my_load += *load_val;
@@ -71,8 +67,8 @@ stk::rebalance::verify_dependent_ownership(
   for (size_t i = 0; i < entities.size(); ++i) {
     // is_with_elem = false;
 
-    stk::mesh::Entity entity     = entities[i];
-    unsigned          owner_proc = bulk_data.parallel_owner_rank(entity);
+    stk::mesh::Entity                 entity     = entities[i];
+    unsigned                          owner_proc = bulk_data.parallel_owner_rank(entity);
     const percept::MyPairIterRelation rel(bulk_data, entity, parent_rank);
     // const stk::mesh::PairIterRelation rel = entity->relations( parent_rank );
     const unsigned num_elems = rel.size();
@@ -92,22 +88,16 @@ stk::rebalance::verify_dependent_ownership(
 }
 
 void
-stk::rebalance::check_ownership(
-    mesh::BulkData&          bulk_data,
-    stk::mesh::EntityVector& entities,
-    std::string const&       msg)
+stk::rebalance::check_ownership(mesh::BulkData& bulk_data, stk::mesh::EntityVector& entities, std::string const& msg)
 {
   const unsigned entity_iter_len = entities.size();
-  std::cout << "P[" << bulk_data.parallel_rank()
-            << "] entity_iter_len= " << entity_iter_len << std::endl;
+  std::cout << "P[" << bulk_data.parallel_rank() << "] entity_iter_len= " << entity_iter_len << std::endl;
   for (unsigned entity_iter = 0; entity_iter < entity_iter_len; ++entity_iter) {
     mesh::Entity mesh_ent = entities[entity_iter];
     if (bulk_data.parallel_owner_rank(mesh_ent) != bulk_data.parallel_rank()) {
-      std::cout << "check_ownership: an input mesh entity is not owned msg= " +
-                       msg
+      std::cout << "check_ownership: an input mesh entity is not owned msg= " + msg
                 << " key= " << bulk_data.entity_key(mesh_ent) << std::endl;
-      throw std::runtime_error(
-          "check_ownership: an input mesh entity is not owned msg= " + msg);
+      throw std::runtime_error("check_ownership: an input mesh entity is not owned msg= " + msg);
     }
   }
 }

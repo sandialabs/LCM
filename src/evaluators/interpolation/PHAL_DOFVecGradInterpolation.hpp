@@ -25,22 +25,17 @@ class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                     public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFVecGradInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  DOFVecGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  protected:
-  typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
-      OutputScalarT;
+  typedef typename EvalT::MeshScalarT                                      MeshScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type OutputScalarT;
 
   // Input:
   //! Values at nodes
@@ -62,15 +57,12 @@ class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   struct DOFVecGradInterpolationBase_Residual_Tag
   {
   };
-  typedef Kokkos::
-      RangePolicy<ExecutionSpace, DOFVecGradInterpolationBase_Residual_Tag>
-          DOFVecGradInterpolationBase_Residual_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, DOFVecGradInterpolationBase_Residual_Tag>
+      DOFVecGradInterpolationBase_Residual_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(
-      const DOFVecGradInterpolationBase_Residual_Tag& tag,
-      const int&                                      cell) const;
+  operator()(const DOFVecGradInterpolationBase_Residual_Tag& tag, const int& cell) const;
 };
 
 /** \brief Fast Finite Element Interpolation Evaluator
@@ -83,25 +75,19 @@ class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
    solution It does not work when the mesh coordinates are of type ScalarT
 */
 template <typename EvalT, typename Traits, typename ScalarT>
-class FastSolutionVecGradInterpolationBase
-    : public DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>
+class FastSolutionVecGradInterpolationBase : public DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>
 {
  public:
-  FastSolutionVecGradInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  FastSolutionVecGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>(p, dl)
   {
     this->setName("FastSolutionVecGradInterpolationBase" + PHX::print<EvalT>());
   };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-        d, vm);
+    DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(d, vm);
   }
 
   void
@@ -124,29 +110,20 @@ class FastSolutionVecGradInterpolationBase<
           typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
  public:
-  FastSolutionVecGradInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  FastSolutionVecGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFVecGradInterpolationBase<
             PHAL::AlbanyTraits::Jacobian,
             Traits,
             typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
   {
-    this->setName(
-        "FastSolutionVecGradInterpolationBase" +
-        PHX::print<PHAL::AlbanyTraits::Jacobian>());
+    this->setName("FastSolutionVecGradInterpolationBase" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
   };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFVecGradInterpolationBase<
-        PHAL::AlbanyTraits::Jacobian,
-        Traits,
-        typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
+    DOFVecGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
         postRegistrationSetup(d, vm);
   }
 
@@ -165,16 +142,12 @@ class FastSolutionVecGradInterpolationBase<
   struct FastSolutionVecGradInterpolationBase_Jacobian_Tag
   {
   };
-  typedef Kokkos::RangePolicy<
-      ExecutionSpace,
-      FastSolutionVecGradInterpolationBase_Jacobian_Tag>
+  typedef Kokkos::RangePolicy<ExecutionSpace, FastSolutionVecGradInterpolationBase_Jacobian_Tag>
       FastSolutionVecGradInterpolationBase_Jacobian_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(
-      const FastSolutionVecGradInterpolationBase_Jacobian_Tag& tag,
-      const int&                                               cell) const;
+  operator()(const FastSolutionVecGradInterpolationBase_Jacobian_Tag& tag, const int& cell) const;
 
   int num_dof, neq;
 };
@@ -182,22 +155,16 @@ class FastSolutionVecGradInterpolationBase<
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFVecGradInterpolation =
-    DOFVecGradInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFVecGradInterpolation = DOFVecGradInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFVecGradInterpolationMesh =
-    DOFVecGradInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFVecGradInterpolationMesh = DOFVecGradInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFVecGradInterpolationParam =
-    DOFVecGradInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using DOFVecGradInterpolationParam = DOFVecGradInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
-using FastSolutionVecGradInterpolation = FastSolutionVecGradInterpolationBase<
-    EvalT,
-    Traits,
-    typename EvalT::ScalarT>;
+using FastSolutionVecGradInterpolation = FastSolutionVecGradInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 }  // Namespace PHAL
 
 #endif  // PHAL_DOFVECGRAD_INTERPOLATION_HPP

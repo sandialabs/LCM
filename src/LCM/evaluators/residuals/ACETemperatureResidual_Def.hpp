@@ -79,21 +79,17 @@ ACETemperatureResidual<EvalT, Traits>::postRegistrationSetup(
 }
 
 template <typename EvalT, typename Traits>
-void ACETemperatureResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData)
+void ACETemperatureResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData)
 {
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (std::size_t node = 0; node < num_nodes_; ++node) {
       residual_(cell, node) = 0.0;
       for (std::size_t qp = 0; qp < num_qp_; ++qp) {
         // Time-derivative contribution to residual
-        residual_(cell, node) +=
-            thermal_inertia_(cell, qp) * tdot_(cell, qp) * wbf_(cell, node, qp);
+        residual_(cell, node) += thermal_inertia_(cell, qp) * tdot_(cell, qp) * wbf_(cell, node, qp);
         // Diffusion part of residual
         for (std::size_t i = 0; i < num_dims_; ++i) {
-          residual_(cell, node) += thermal_conductivity_(cell, qp) *
-                                   tgrad_(cell, qp, i) *
-                                   wgradbf_(cell, node, qp, i);
+          residual_(cell, node) += thermal_conductivity_(cell, qp) * tgrad_(cell, qp, i) * wgradbf_(cell, node, qp, i);
         }
       }
       residual_(cell, node) *= scale_residual_factor;

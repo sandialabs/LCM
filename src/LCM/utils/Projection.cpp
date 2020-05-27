@@ -6,14 +6,7 @@
 
 namespace LCM {
 
-Projection::Projection()
-    : is_projected_(false),
-      rank_(0),
-      number_components_(0),
-      number_dimensions_(0)
-{
-  return;
-}
+Projection::Projection() : is_projected_(false), rank_(0), number_components_(0), number_dimensions_(0) { return; }
 
 Projection::Projection(
     std::string const& field_name,

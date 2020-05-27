@@ -16,9 +16,7 @@
 
 namespace Albany {
 
-MaterialDatabase::MaterialDatabase(
-    std::string const&                      input_file,
-    Teuchos::RCP<Teuchos::Comm<int> const>& tcomm)
+MaterialDatabase::MaterialDatabase(std::string const& input_file, Teuchos::RCP<Teuchos::Comm<int> const>& tcomm)
 {
   if (input_file.length() == 0) { return; }
 
@@ -29,33 +27,23 @@ MaterialDatabase::MaterialDatabase(
 
   auto input_extension = Albany::getFileExtension(input_file);
   if (input_extension == "yaml" || input_extension == "yml") {
-    Teuchos::updateParametersFromYamlFileAndBroadcast(
-        input_file, Teuchos::ptrFromRef(data_), *tcomm);
+    Teuchos::updateParametersFromYamlFileAndBroadcast(input_file, Teuchos::ptrFromRef(data_), *tcomm);
   } else {
-    Teuchos::updateParametersFromXmlFileAndBroadcast(
-        input_file, Teuchos::ptrFromRef(data_), *tcomm);
+    Teuchos::updateParametersFromXmlFileAndBroadcast(input_file, Teuchos::ptrFromRef(data_), *tcomm);
   }
 
   // Check for and set element block and materials sublists
-  ALBANY_ASSERT(
-      data_.isSublist("Materials"),
-      "\nMaterial Database Error: Materials sublist required\n");
-  ALBANY_ASSERT(
-      data_.isSublist("ElementBlocks"),
-      "\nMaterial Database Error: ElementBlocks sublist required\n");
+  ALBANY_ASSERT(data_.isSublist("Materials"), "\nMaterial Database Error: Materials sublist required\n");
+  ALBANY_ASSERT(data_.isSublist("ElementBlocks"), "\nMaterial Database Error: ElementBlocks sublist required\n");
 
   // The presence of NodeSet and SideSet info in the material database optional
 
   p_materials_list_ = &(data_.sublist("Materials"));
   p_eb_list_        = &(data_.sublist("ElementBlocks"));
 
-  if (data_.isSublist("NodeSets")) {
-    p_ns_list_ = &(data_.sublist("NodeSets"));
-  }
+  if (data_.isSublist("NodeSets")) { p_ns_list_ = &(data_.sublist("NodeSets")); }
 
-  if (data_.isSublist("SideSets")) {
-    p_ss_list_ = &(data_.sublist("SideSets"));
-  }
+  if (data_.isSublist("SideSets")) { p_ss_list_ = &(data_.sublist("SideSets")); }
 }
 
 bool
@@ -79,12 +67,9 @@ MaterialDatabase::getParam(std::string const& param_name, T def_value)
 }
 
 bool
-MaterialDatabase::isMaterialParam(
-    std::string const& material_name,
-    std::string const& param_name)
+MaterialDatabase::isMaterialParam(std::string const& material_name, std::string const& param_name)
 {
-  ALBANY_ASSERT(
-      p_materials_list_, "\nMaterialDB Error! param required but no DB.\n");
+  ALBANY_ASSERT(p_materials_list_, "\nMaterialDB Error! param required but no DB.\n");
 
   if (!p_materials_list_->isSublist(material_name)) return false;
   auto& sublist = p_materials_list_->sublist(material_name);
@@ -93,15 +78,11 @@ MaterialDatabase::isMaterialParam(
 
 template <typename T>
 T
-MaterialDatabase::getMaterialParam(
-    std::string const& material_name,
-    std::string const& param_name)
+MaterialDatabase::getMaterialParam(std::string const& material_name, std::string const& param_name)
 {
-  ALBANY_ASSERT(
-      p_materials_list_, "\nMaterialDB Error! param required but no DB.\n");
+  ALBANY_ASSERT(p_materials_list_, "\nMaterialDB Error! param required but no DB.\n");
 
-  ALBANY_ASSERT(
-      !material_name.empty(), "\nMaterialDB Error! Empty material name\n");
+  ALBANY_ASSERT(!material_name.empty(), "\nMaterialDB Error! Empty material name\n");
 
   ALBANY_ASSERT(
       p_materials_list_->isSublist(material_name),
@@ -113,15 +94,11 @@ MaterialDatabase::getMaterialParam(
 
 template <typename T>
 T
-MaterialDatabase::getMaterialParam(
-    std::string const& material_name,
-    std::string const& param_name,
-    T                  def_value)
+MaterialDatabase::getMaterialParam(std::string const& material_name, std::string const& param_name, T def_value)
 {
   if (!p_materials_list_) return def_value;
 
-  ALBANY_ASSERT(
-      !material_name.empty(), "\nMaterialDB Error! Empty material name\n");
+  ALBANY_ASSERT(!material_name.empty(), "\nMaterialDB Error! Empty material name\n");
 
   ALBANY_ASSERT(
       p_materials_list_->isSublist(material_name),
@@ -133,9 +110,7 @@ MaterialDatabase::getMaterialParam(
 }
 
 bool
-MaterialDatabase::isElementBlockParam(
-    std::string const& eb_name,
-    std::string const& param_name)
+MaterialDatabase::isElementBlockParam(std::string const& eb_name, std::string const& param_name)
 {
   ALBANY_ASSERT(p_eb_list_, "\nMaterialDB Error! param required but no DB.\n");
 
@@ -159,21 +134,15 @@ MaterialDatabase::isElementBlockParam(
 
 template <typename T>
 T
-MaterialDatabase::getElementBlockParam(
-    std::string const& eb_name,
-    std::string const& param_name)
+MaterialDatabase::getElementBlockParam(std::string const& eb_name, std::string const& param_name)
 {
   ALBANY_ASSERT(p_eb_list_, "\nMaterialDB Error! param required but no DB.\n");
 
-  ALBANY_ASSERT(
-      !eb_name.empty(), "\nMaterialDB Error! Empty element block name\n");
+  ALBANY_ASSERT(!eb_name.empty(), "\nMaterialDB Error! Empty element block name\n");
 
   auto new_name = translateDBSublistName(p_eb_list_, eb_name);
 
-  ALBANY_ASSERT(
-      !new_name.empty(),
-      "\nMaterialDB Error! Invalid element block name \"" << eb_name
-                                                          << "\".\n");
+  ALBANY_ASSERT(!new_name.empty(), "\nMaterialDB Error! Invalid element block name \"" << eb_name << "\".\n");
 
   // This call returns the sublist for the particular EB within the
   // "ElementBlocks" list
@@ -184,8 +153,7 @@ MaterialDatabase::getElementBlockParam(
   // check if related material exists (it always should)
   ALBANY_ASSERT(
       sublist.isParameter("material"),
-      "\nMaterialDB Error! Param " << param_name << " not found in " << eb_name
-                                   << " list and there"
+      "\nMaterialDB Error! Param " << param_name << " not found in " << eb_name << " list and there"
                                    << " is no related material.\n");
 
   // Parameter not directly in element block sublist, so try related material
@@ -193,30 +161,24 @@ MaterialDatabase::getElementBlockParam(
 
   ALBANY_ASSERT(
       p_materials_list_->isSublist(material_name),
-      "\nMaterialDB Error! Param "
-          << param_name << " not found in " << eb_name << " list, and related"
-          << " material " << material_name << " is invalid.\n");
+      "\nMaterialDB Error! Param " << param_name << " not found in " << eb_name << " list, and related"
+                                   << " material " << material_name << " is invalid.\n");
 
   auto& mat_sublist = p_materials_list_->sublist(material_name);
   ALBANY_ASSERT(
       mat_sublist.isParameter(param_name),
-      "\nMaterialDB Error! Param "
-          << param_name << " not found in " << eb_name << " list or related"
-          << " material " << material_name << " list.\n");
+      "\nMaterialDB Error! Param " << param_name << " not found in " << eb_name << " list or related"
+                                   << " material " << material_name << " list.\n");
   return mat_sublist.get<T>(param_name);
 }
 
 template <typename T>
 T
-MaterialDatabase::getElementBlockParam(
-    std::string const& eb_name,
-    std::string const& param_name,
-    T                  def_value)
+MaterialDatabase::getElementBlockParam(std::string const& eb_name, std::string const& param_name, T def_value)
 {
   if (!p_eb_list_) return def_value;
 
-  ALBANY_ASSERT(
-      !eb_name.empty(), "\nMaterialDB Error! Empty element block name\n");
+  ALBANY_ASSERT(!eb_name.empty(), "\nMaterialDB Error! Empty element block name\n");
 
   auto new_name = translateDBSublistName(p_eb_list_, eb_name);
 
@@ -235,18 +197,15 @@ MaterialDatabase::getElementBlockParam(
 
   ALBANY_ASSERT(
       p_materials_list_->isSublist(material_name),
-      "\nMaterialDB Error! Param "
-          << param_name << " not found in " << eb_name << " list, and related"
-          << " material " << material_name << " is invalid.\n");
+      "\nMaterialDB Error! Param " << param_name << " not found in " << eb_name << " list, and related"
+                                   << " material " << material_name << " is invalid.\n");
 
   auto& mat_sublist = p_materials_list_->sublist(material_name);
   return mat_sublist.get<T>(param_name, def_value);
 }
 
 bool
-MaterialDatabase::isElementBlockSublist(
-    std::string const& eb_name,
-    std::string const& sublist_name)
+MaterialDatabase::isElementBlockSublist(std::string const& eb_name, std::string const& sublist_name)
 {
   ALBANY_ASSERT(p_eb_list_, "\nMaterialDB Error! param required but no DB.\n");
 
@@ -270,21 +229,15 @@ MaterialDatabase::isElementBlockSublist(
 }
 
 Teuchos::ParameterList&
-MaterialDatabase::getElementBlockSublist(
-    std::string const& eb_name,
-    std::string const& sublist_name)
+MaterialDatabase::getElementBlockSublist(std::string const& eb_name, std::string const& sublist_name)
 {
   ALBANY_ASSERT(p_eb_list_, "\nMaterialDB Error! param required but no DB.\n");
 
-  ALBANY_ASSERT(
-      !eb_name.empty(), "\nMaterialDB Error! Empty element block name\n");
+  ALBANY_ASSERT(!eb_name.empty(), "\nMaterialDB Error! Empty element block name\n");
 
   auto new_name = translateDBSublistName(p_eb_list_, eb_name);
 
-  ALBANY_ASSERT(
-      !new_name.empty(),
-      "\nMaterialDB Error! Invalid element block name \"" << eb_name
-                                                          << "\".\n");
+  ALBANY_ASSERT(!new_name.empty(), "\nMaterialDB Error! Invalid element block name \"" << eb_name << "\".\n");
 
   // This call returns the sublist for the particular EB within the
   // "ElementBlocks" list
@@ -298,8 +251,7 @@ MaterialDatabase::getElementBlockSublist(
   // check if related material exists (it always should)
   ALBANY_ASSERT(
       sublist.isParameter("material"),
-      "\nMaterialDB Error! Param " << sublist_name << " not found in "
-                                   << eb_name << " list and there"
+      "\nMaterialDB Error! Param " << sublist_name << " not found in " << eb_name << " list and there"
                                    << " is no related material.\n");
 
   // Parameter not directly in element block sublist, so try related material
@@ -307,9 +259,8 @@ MaterialDatabase::getElementBlockSublist(
 
   ALBANY_ASSERT(
       p_materials_list_->isSublist(material_name),
-      "\nMaterialDB Error! Param "
-          << sublist_name << " not found in " << eb_name << " list, and related"
-          << " material " << material_name << " is invalid.\n");
+      "\nMaterialDB Error! Param " << sublist_name << " not found in " << eb_name << " list, and related"
+                                   << " material " << material_name << " is invalid.\n");
 
   auto& mat_sublist = p_materials_list_->sublist(material_name);
 
@@ -319,9 +270,8 @@ MaterialDatabase::getElementBlockSublist(
   // Does the requested sublist appear in the material sublist?
   ALBANY_ASSERT(
       mat_sublist.isParameter(sublist_name),
-      "\nMaterialDB Error! Sublist "
-          << sublist_name << " not found in " << eb_name << " list or related"
-          << " material " << material_name << " list.\n");
+      "\nMaterialDB Error! Sublist " << sublist_name << " not found in " << eb_name << " list or related"
+                                     << " material " << material_name << " list.\n");
 
   // If so, return the requested sublist
   return mat_sublist.sublist(sublist_name);
@@ -337,9 +287,7 @@ MaterialDatabase::getAllMatchingParams(std::string const& param_name)
 }
 
 bool
-MaterialDatabase::isNodeSetParam(
-    std::string const& ns_name,
-    std::string const& param_name)
+MaterialDatabase::isNodeSetParam(std::string const& ns_name, std::string const& param_name)
 {
   ALBANY_ASSERT(p_ns_list_, "\nMaterialDB Error! param required but no DB.\n");
 
@@ -350,17 +298,13 @@ MaterialDatabase::isNodeSetParam(
 
 template <typename T>
 T
-MaterialDatabase::getNodeSetParam(
-    std::string const& ns_name,
-    std::string const& param_name)
+MaterialDatabase::getNodeSetParam(std::string const& ns_name, std::string const& param_name)
 {
   ALBANY_ASSERT(p_ns_list_, "\nMaterialDB Error! param required but no DB.\n");
 
   ALBANY_ASSERT(!ns_name.empty(), "\nMaterialDB Error! Empty node set name\n");
 
-  ALBANY_ASSERT(
-      p_ns_list_->isSublist(ns_name),
-      "\nMaterialDB Error! Invalid node set name " << ns_name << '\n');
+  ALBANY_ASSERT(p_ns_list_->isSublist(ns_name), "\nMaterialDB Error! Invalid node set name " << ns_name << '\n');
 
   auto& sublist = p_ns_list_->sublist(ns_name);
   return sublist.get<T>(param_name);
@@ -368,27 +312,20 @@ MaterialDatabase::getNodeSetParam(
 
 template <typename T>
 T
-MaterialDatabase::getNodeSetParam(
-    std::string const& ns_name,
-    std::string const& param_name,
-    T                  def_value)
+MaterialDatabase::getNodeSetParam(std::string const& ns_name, std::string const& param_name, T def_value)
 {
   if (!p_ns_list_) return def_value;
 
   ALBANY_ASSERT(!ns_name.empty(), "\nMaterialDB Error! Empty node set name\n");
 
-  ALBANY_ASSERT(
-      p_ns_list_->isSublist(ns_name),
-      "\nMaterialDB Error! Invalid node set name " << ns_name << '\n');
+  ALBANY_ASSERT(p_ns_list_->isSublist(ns_name), "\nMaterialDB Error! Invalid node set name " << ns_name << '\n');
 
   auto& sublist = p_ns_list_->sublist(ns_name);
   return sublist.get<T>(param_name, def_value);
 }
 
 bool
-MaterialDatabase::isSideSetParam(
-    std::string const& ss_name,
-    std::string const& param_name)
+MaterialDatabase::isSideSetParam(std::string const& ss_name, std::string const& param_name)
 {
   ALBANY_ASSERT(p_ss_list_, "\nMaterialDB Error! param required but no DB.\n");
 
@@ -399,17 +336,13 @@ MaterialDatabase::isSideSetParam(
 
 template <typename T>
 T
-MaterialDatabase::getSideSetParam(
-    std::string const& ss_name,
-    std::string const& param_name)
+MaterialDatabase::getSideSetParam(std::string const& ss_name, std::string const& param_name)
 {
   ALBANY_ASSERT(p_ss_list_, "\nMaterialDB Error! param required but no DB.\n");
 
   ALBANY_ASSERT(!ss_name.empty(), "\nMaterialDB Error! Empty side set name\n");
 
-  ALBANY_ASSERT(
-      p_ss_list_->isSublist(ss_name),
-      "\nMaterialDB Error! Invalid side set name " << ss_name << '\n');
+  ALBANY_ASSERT(p_ss_list_->isSublist(ss_name), "\nMaterialDB Error! Invalid side set name " << ss_name << '\n');
 
   auto& sublist = p_ss_list_->sublist(ss_name);
   return sublist.get<T>(param_name);
@@ -417,18 +350,13 @@ MaterialDatabase::getSideSetParam(
 
 template <typename T>
 T
-MaterialDatabase::getSideSetParam(
-    std::string const& ss_name,
-    std::string const& param_name,
-    T                  def_value)
+MaterialDatabase::getSideSetParam(std::string const& ss_name, std::string const& param_name, T def_value)
 {
   if (!p_ss_list_) return def_value;
 
   ALBANY_ASSERT(!ss_name.empty(), "\nMaterialDB Error! Empty side set name\n");
 
-  ALBANY_ASSERT(
-      p_ss_list_->isSublist(ss_name),
-      "\nMaterialDB Error! Invalid side set name " << ss_name << '\n');
+  ALBANY_ASSERT(p_ss_list_->isSublist(ss_name), "\nMaterialDB Error! Invalid side set name " << ss_name << '\n');
 
   auto& sublist = p_ss_list_->sublist(ss_name);
   return sublist.get<T>(param_name, def_value);
@@ -449,15 +377,12 @@ MaterialDatabase::getAllMatchingParams_helper(
       getAllMatchingParams_helper(param_name, results, sublist);
       continue;
     }
-    if (it->second.isType<T>() && it->first == param_name)
-      results.push_back(it->second.getValue(param_type));
+    if (it->second.isType<T>() && it->first == param_name) results.push_back(it->second.getValue(param_type));
   }
 }
 
 std::string
-MaterialDatabase::translateDBSublistName(
-    Teuchos::ParameterList* list,
-    std::string const&      listname)
+MaterialDatabase::translateDBSublistName(Teuchos::ParameterList* list, std::string const& listname)
 {
   // NOTE: STK Ioss lowercases all names in the Exodus file,
   // including element block names. Let's lowercase the names
@@ -480,13 +405,9 @@ MaterialDatabase::translateDBSublistName(
 }
 
 Teuchos::RCP<Albany::MaterialDatabase>
-createMaterialDatabase(
-    Teuchos::RCP<Teuchos::ParameterList> const& params,
-    Teuchos::RCP<Teuchos_Comm const>&           commT)
+createMaterialDatabase(Teuchos::RCP<Teuchos::ParameterList> const& params, Teuchos::RCP<Teuchos_Comm const>& commT)
 {
-  ALBANY_ASSERT(
-      params->isType<std::string>("MaterialDB Filename"),
-      "A required material database cannot be found.");
+  ALBANY_ASSERT(params->isType<std::string>("MaterialDB Filename"), "A required material database cannot be found.");
 
   auto filename = params->get<std::string>("MaterialDB Filename");
   return Teuchos::rcp(new Albany::MaterialDatabase(filename, commT));
@@ -495,33 +416,24 @@ createMaterialDatabase(
 }  // namespace Albany
 
 // Explicit instantiation of functions above
-#define ALBANY_INST(T)                                                       \
-  template T Albany::MaterialDatabase::getParam<T>(                          \
-      std::string const& param_name);                                        \
-  template T Albany::MaterialDatabase::getParam<T>(                          \
-      std::string const& param_name, T def_val);                             \
-  template T Albany::MaterialDatabase::getMaterialParam<T>(                  \
-      std::string const& material_name, std::string const& param_name);      \
-  template T Albany::MaterialDatabase::getMaterialParam<T>(                  \
-      std::string const& material_name,                                      \
-      std::string const& param_name,                                         \
-      T                  def_val);                                                            \
-  template T Albany::MaterialDatabase::getElementBlockParam<T>(              \
-      std::string const& material_name, std::string const& param_name);      \
-  template T Albany::MaterialDatabase::getElementBlockParam<T>(              \
-      std::string const& material_name,                                      \
-      std::string const& param_name,                                         \
-      T                  def_val);                                                            \
-  template T Albany::MaterialDatabase::getNodeSetParam<T>(                   \
-      std::string const& ns_name, std::string const& param_name);            \
-  template T Albany::MaterialDatabase::getNodeSetParam<T>(                   \
-      std::string const& ns_name, std::string const& param_name, T def_val); \
-  template T Albany::MaterialDatabase::getSideSetParam<T>(                   \
-      std::string const& ss_name, std::string const& param_name);            \
-  template T Albany::MaterialDatabase::getSideSetParam<T>(                   \
-      std::string const& ss_name, std::string const& param_name, T def_val); \
-  template std::vector<T> Albany::MaterialDatabase::getAllMatchingParams<T>( \
-      std::string const& param_name);
+#define ALBANY_INST(T)                                                                                                \
+  template T Albany::MaterialDatabase::getParam<T>(std::string const& param_name);                                    \
+  template T Albany::MaterialDatabase::getParam<T>(std::string const& param_name, T def_val);                         \
+  template T Albany::MaterialDatabase::getMaterialParam<T>(                                                           \
+      std::string const& material_name, std::string const& param_name);                                               \
+  template T Albany::MaterialDatabase::getMaterialParam<T>(                                                           \
+      std::string const& material_name, std::string const& param_name, T def_val);                                    \
+  template T Albany::MaterialDatabase::getElementBlockParam<T>(                                                       \
+      std::string const& material_name, std::string const& param_name);                                               \
+  template T Albany::MaterialDatabase::getElementBlockParam<T>(                                                       \
+      std::string const& material_name, std::string const& param_name, T def_val);                                    \
+  template T Albany::MaterialDatabase::getNodeSetParam<T>(std::string const& ns_name, std::string const& param_name); \
+  template T Albany::MaterialDatabase::getNodeSetParam<T>(                                                            \
+      std::string const& ns_name, std::string const& param_name, T def_val);                                          \
+  template T Albany::MaterialDatabase::getSideSetParam<T>(std::string const& ss_name, std::string const& param_name); \
+  template T Albany::MaterialDatabase::getSideSetParam<T>(                                                            \
+      std::string const& ss_name, std::string const& param_name, T def_val);                                          \
+  template std::vector<T> Albany::MaterialDatabase::getAllMatchingParams<T>(std::string const& param_name);
 
 ALBANY_INST(double)
 ALBANY_INST(int)

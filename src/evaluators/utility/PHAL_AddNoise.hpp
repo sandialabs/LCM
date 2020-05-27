@@ -21,16 +21,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class AddNoiseBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                     public PHX::EvaluatorDerived<EvalT, Traits>
+class AddNoiseBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   AddNoiseBase(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   preEvaluate(typename Traits::PreEvalData d);

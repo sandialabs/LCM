@@ -15,19 +15,14 @@ namespace PHAL {
  * Base implementation useable by specializations below
  */
 template <typename EvalT, typename Traits>
-class SeparableScatterScalarResponseBase
-    : public virtual PHX::EvaluatorWithBaseImpl<Traits>,
-      public virtual PHX::EvaluatorDerived<EvalT, Traits>
+class SeparableScatterScalarResponseBase : public virtual PHX::EvaluatorWithBaseImpl<Traits>,
+                                           public virtual PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  SeparableScatterScalarResponseBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  SeparableScatterScalarResponseBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void evaluateFields(typename Traits::EvalData /* d */) {}
 
@@ -37,9 +32,7 @@ class SeparableScatterScalarResponseBase
 
   // Child classes should call setup once p is filled out
   void
-  setup(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  setup(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
  protected:
   typedef typename EvalT::ScalarT ScalarT;
@@ -54,26 +47,20 @@ class SeparableScatterScalarResponseBase
  * In this case we can compute the Jacobian in a generic fashion.
  */
 template <typename EvalT, typename Traits>
-class SeparableScatterScalarResponse
-    : public ScatterScalarResponse<EvalT, Traits>,
-      public SeparableScatterScalarResponseBase<EvalT, Traits>
+class SeparableScatterScalarResponse : public ScatterScalarResponse<EvalT, Traits>,
+                                       public SeparableScatterScalarResponseBase<EvalT, Traits>
 {
  public:
-  SeparableScatterScalarResponse(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  SeparableScatterScalarResponse(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : ScatterScalarResponse<EvalT, Traits>(p, dl)
   {
   }
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
     ScatterScalarResponse<EvalT, Traits>::postRegistrationSetup(d, vm);
-    SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
-        d, vm);
+    SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(d, vm);
   }
 
   void evaluateFields(typename Traits::EvalData /* d */) {}
@@ -89,9 +76,7 @@ class SeparableScatterScalarResponse
  protected:
   SeparableScatterScalarResponse() {}
   void
-  setup(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  setup(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
   {
     ScatterScalarResponse<EvalT, Traits>::setup(p, dl);
     SeparableScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);
@@ -102,8 +87,7 @@ template <typename EvalT, typename Traits>
 class SeparableScatterScalarResponse;
 
 template <typename EvalT, typename Traits>
-class SeparableScatterScalarResponseWithExtrudedParams
-    : public SeparableScatterScalarResponse<EvalT, Traits>
+class SeparableScatterScalarResponseWithExtrudedParams : public SeparableScatterScalarResponse<EvalT, Traits>
 {
  public:
   SeparableScatterScalarResponseWithExtrudedParams(
@@ -116,9 +100,7 @@ class SeparableScatterScalarResponseWithExtrudedParams
         };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
     SeparableScatterScalarResponse<EvalT, Traits>::postRegistrationSetup(d, vm);
   }
@@ -135,9 +117,7 @@ class SeparableScatterScalarResponseWithExtrudedParams
 
   SeparableScatterScalarResponseWithExtrudedParams() {}
   void
-  setup(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  setup(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
   {
     SeparableScatterScalarResponse<EvalT, Traits>::setup(p, dl);
   }
@@ -155,22 +135,15 @@ class SeparableScatterScalarResponseWithExtrudedParams
 template <typename Traits>
 class SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>
     : public ScatterScalarResponseBase<PHAL::AlbanyTraits::Jacobian, Traits>,
-      public SeparableScatterScalarResponseBase<
-          PHAL::AlbanyTraits::Jacobian,
-          Traits>
+      public SeparableScatterScalarResponseBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
-  SeparableScatterScalarResponse(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  SeparableScatterScalarResponse(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
     ScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(d, vm);
-    SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
-        d, vm);
+    SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(d, vm);
   }
   void
   preEvaluate(typename Traits::PreEvalData d);
@@ -188,9 +161,7 @@ class SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>
   typedef PHAL::AlbanyTraits::Jacobian EvalT;
   SeparableScatterScalarResponse() {}
   void
-  setup(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  setup(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
   {
     ScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);
     SeparableScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);

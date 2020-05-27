@@ -6,8 +6,7 @@
 
 namespace LCM {
 
-StatelessObserverImpl::StatelessObserverImpl(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps)
+StatelessObserverImpl::StatelessObserverImpl(Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps)
     : n_models_(apps.size()), apps_(apps)
 {
   sol_out_time_ = Teuchos::TimeMonitor::getNewTimer("Albany: Output to File");
@@ -26,38 +25,30 @@ StatelessObserverImpl::getTimeParamValueOrDefault(RealType default_value) const
 
   bool const have_time = apps_[0]->getParamLib()->isParameter(label);
 
-  return have_time == true ?
-             apps_[0]
-                 ->getParamLib()
-                 ->getRealValue<PHAL::AlbanyTraits::Residual>(label) :
-             default_value;
+  return have_time == true ? apps_[0]->getParamLib()->getRealValue<PHAL::AlbanyTraits::Residual>(label) : default_value;
 }
 
 void
 StatelessObserverImpl::observeSolution(
     double                                           stamp,
     Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> non_overlapped_solution,
-    Teuchos::Array<Teuchos::RCP<Thyra_Vector const>>
-        non_overlapped_solution_dot)
+    Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> non_overlapped_solution_dot)
 {
   Teuchos::TimeMonitor timer(*sol_out_time_);
 
   for (int m = 0; m < n_models_; m++) {
     Teuchos::RCP<Thyra_Vector const> const overlapped_solution =
-        apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolution(
-            *non_overlapped_solution[m]);
+        apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolution(*non_overlapped_solution[m]);
     if (non_overlapped_solution_dot[m] != Teuchos::null) {
       Teuchos::RCP<Thyra_Vector const> const overlapped_solution_dot =
-          apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolutionDot(
-              *non_overlapped_solution_dot[m]);
+          apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolutionDot(*non_overlapped_solution_dot[m]);
       apps_[m]->getDiscretization()->writeSolution(
           *overlapped_solution,
           *overlapped_solution_dot,
           stamp,
           /*overlapped =*/true);
     } else {
-      apps_[m]->getDiscretization()->writeSolution(
-          *overlapped_solution, stamp, true);
+      apps_[m]->getDiscretization()->writeSolution(*overlapped_solution, stamp, true);
     }
   }
 }

@@ -48,16 +48,10 @@ class AAAModel : public LCM::ConstitutiveModel<EvalT, Traits>
 
   /// Method to compute the state
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields)
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
   {
     ALBANY_ABORT("Not implemented.");
   }

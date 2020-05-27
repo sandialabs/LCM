@@ -23,9 +23,7 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
 {
  public:
   // Constructor
-  DistributedParameterDerivativeOp(
-      const Teuchos::RCP<Application>& app_,
-      std::string const&               param_name_)
+  DistributedParameterDerivativeOp(const Teuchos::RCP<Application>& app_, std::string const& param_name_)
       : app(app_), param_name(param_name_)
   {
   }
@@ -52,9 +50,7 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
   Teuchos::RCP<Thyra_VectorSpace const>
   domain() const
   {
-    return app->getDistributedParameterLibrary()
-        ->get(param_name)
-        ->vector_space();
+    return app->getDistributedParameterLibrary()->get(param_name)->vector_space();
   }
 
   //! Overrides Thyra::LinearOpBase purely virtual method

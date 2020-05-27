@@ -9,13 +9,8 @@
 #include "ParallelConstitutiveModel_Def.hpp"
 
 template <typename EvalT, typename Traits>
-LCM::ACEice<EvalT, Traits>::ACEice(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
-    : LCM::ParallelConstitutiveModel<
-          EvalT,
-          Traits,
-          ACEiceMiniKernel<EvalT, Traits>>(p, dl)
+LCM::ACEice<EvalT, Traits>::ACEice(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
+    : LCM::ParallelConstitutiveModel<EvalT, Traits, ACEiceMiniKernel<EvalT, Traits>>(p, dl)
 {
 }
 

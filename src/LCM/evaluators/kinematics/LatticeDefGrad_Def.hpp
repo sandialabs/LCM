@@ -12,16 +12,10 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(Teuchos::ParameterList const& p)
-    : weights(
-          p.get<std::string>("Weights Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      defgrad(
-          p.get<std::string>("DefGrad Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      J(p.get<std::string>("DetDefGrad Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      JH(p.get<std::string>("DetDefGradH Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+    : weights(p.get<std::string>("Weights Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      defgrad(p.get<std::string>("DefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      JH(p.get<std::string>("DetDefGradH Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       CtotalRef(
           p.get<std::string>("Stress Free Total Concentration Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
@@ -30,8 +24,7 @@ LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(Teuchos::ParameterList const& p)
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       VH(p.get<std::string>("Partial Molar Volume Name"),
          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      VM(p.get<std::string>("Molar Volume Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      VM(p.get<std::string>("Molar Volume Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       latticeDefGrad(
           p.get<std::string>("Lattice Deformation Gradient Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
@@ -43,8 +36,7 @@ LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(Teuchos::ParameterList const& p)
   if (p.isType<double>("Average J Stabilization Parameter Name"))
     alpha = p.get<double>("Average J Stabilization Parameter");
 
-  Teuchos::RCP<PHX::DataLayout> tensor_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
+  Teuchos::RCP<PHX::DataLayout> tensor_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
 
   std::vector<PHX::DataLayout::size_type> dims;
   tensor_dl->dimensions(dims);
@@ -69,9 +61,7 @@ LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(Teuchos::ParameterList const& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-LatticeDefGrad<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+LatticeDefGrad<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(weights, fm);
   this->utils.setFieldData(defgrad, fm);
@@ -93,9 +83,7 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
       for (int i = 0; i < numDims; ++i) {
-        for (int j = 0; j < numDims; ++j) {
-          latticeDefGrad(cell, qp, i, j) = defgrad(cell, qp, i, j);
-        }
+        for (int j = 0; j < numDims; ++j) { latticeDefGrad(cell, qp, i, j) = defgrad(cell, qp, i, j); }
       }
       JH(cell, qp) = J(cell, qp);
     }
@@ -113,10 +101,7 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       Jbar = 0.0;
       vol  = 0.0;
       for (int qp = 0; qp < numQPs; ++qp) {
-        Jbar +=
-            weights(cell, qp) *
-            std::log(
-                1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp)));
+        Jbar += weights(cell, qp) * std::log(1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp)));
         vol += weights(cell, qp);
       }
       Jbar /= vol;
@@ -125,10 +110,7 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         for (int i = 0; i < numDims; ++i) {
           for (int j = 0; j < numDims; ++j) {
             wJbar = std::exp(
-                (1 - alpha) * Jbar +
-                alpha * std::log(
-                            1 + VH(cell, qp) *
-                                    (Ctotal(cell, qp) - CtotalRef(cell, qp))));
+                (1 - alpha) * Jbar + alpha * std::log(1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp))));
             latticeDefGrad(cell, qp, i, j) *= std::pow(wJbar, -1. / 3.);
           }
         }
@@ -138,12 +120,9 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   } else {
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {
-        JH(cell, qp) *=
-            (1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp)));
+        JH(cell, qp) *= (1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp)));
         for (int i = 0; i < numDims; ++i) {
-          for (int j = 0; j < numDims; ++j) {
-            latticeDefGrad(cell, qp, i, j) *= std::pow(JH(cell, qp), -1. / 3.);
-          }
+          for (int j = 0; j < numDims; ++j) { latticeDefGrad(cell, qp, i, j) *= std::pow(JH(cell, qp), -1. / 3.); }
         }
       }
     }

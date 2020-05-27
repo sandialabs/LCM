@@ -19,24 +19,19 @@ namespace LCM {
 /// (cf. Tezduyar and Park CMAME 1986).
 ///
 template <typename EvalT, typename Traits>
-class GradientElementLength : public PHX::EvaluatorWithBaseImpl<Traits>,
-                              public PHX::EvaluatorDerived<EvalT, Traits>
+class GradientElementLength : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ///
   /// Constructor
   ///
-  GradientElementLength(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GradientElementLength(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics

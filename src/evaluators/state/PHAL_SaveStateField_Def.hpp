@@ -13,8 +13,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-SaveStateField<EvalT, Traits>::SaveStateField(
-    Teuchos::ParameterList const& /* p */)
+SaveStateField<EvalT, Traits>::SaveStateField(Teuchos::ParameterList const& /* p */)
 {
   // States Not Saved for Generic Type, only Specializations
   this->setName("Save State Field");
@@ -32,42 +31,36 @@ SaveStateField<EvalT, Traits>::postRegistrationSetup(
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-void SaveStateField<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData /* workset */)
+void SaveStateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData /* workset */)
 {
   // States Not Saved for Generic Type, only Specializations
 }
 // **********************************************************************
 // **********************************************************************
 template <typename Traits>
-SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveStateField(
-    Teuchos::ParameterList const& p)
+SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveStateField(Teuchos::ParameterList const& p)
 {
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");
 
-  Teuchos::RCP<PHX::DataLayout> layout =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("State Field Layout");
-  field = decltype(field)(fieldName, layout);
+  Teuchos::RCP<PHX::DataLayout> layout = p.get<Teuchos::RCP<PHX::DataLayout>>("State Field Layout");
+  field                                = decltype(field)(fieldName, layout);
 
   if (layout->name(0) != "Cell" && layout->name(0) != "Node") {
     worksetState = true;
     nodalState   = false;
   } else {
     worksetState = false;
-    nodalState =
-        p.isParameter("Nodal State") ? p.get<bool>("Nodal State") : false;
+    nodalState   = p.isParameter("Nodal State") ? p.get<bool>("Nodal State") : false;
   }
 
-  Teuchos::RCP<PHX::DataLayout> dummy =
-      Teuchos::rcp(new PHX::MDALayout<Dummy>(0));
-  savestate_operation = Teuchos::rcp(new PHX::Tag<ScalarT>(fieldName, dummy));
+  Teuchos::RCP<PHX::DataLayout> dummy = Teuchos::rcp(new PHX::MDALayout<Dummy>(0));
+  savestate_operation                 = Teuchos::rcp(new PHX::Tag<ScalarT>(fieldName, dummy));
 
   this->addDependentField(field.fieldTag());
   this->addEvaluatedField(*savestate_operation);
 
-  this->setName(
-      "Save Field " + fieldName + " to State " + stateName + "Residual");
+  this->setName("Save Field " + fieldName + " to State " + stateName + "Residual");
 }
 
 // **********************************************************************
@@ -94,8 +87,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename Traits>
 void
-SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   if (this->nodalState)
     saveNodeState(workset);
@@ -107,8 +99,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 
 template <typename Traits>
 void
-SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
-    typename Traits::EvalData workset)
+SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(typename Traits::EvalData workset)
 {
   // Get shards Array (from STK) for this state
   // Need to check if we can just copy full size -- can assume same ordering?
@@ -118,8 +109,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
   ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
       std::endl
-          << "Error: cannot locate " << stateName
-          << " in PHAL_SaveStateField_Def" << std::endl);
+          << "Error: cannot locate " << stateName << " in PHAL_SaveStateField_Def" << std::endl);
 
   Albany::MDArray                         sta = it->second;
   std::vector<PHX::DataLayout::size_type> dims;
@@ -128,8 +118,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
 
   switch (size) {
     case 1:
-      for (int cell = 0; cell < workset.numCells; ++cell)
-        sta(cell) = field(cell);
+      for (int cell = 0; cell < workset.numCells; ++cell) sta(cell) = field(cell);
       break;
     case 2:
       for (int cell = 0; cell < workset.numCells; ++cell)
@@ -139,35 +128,28 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(
     case 3:
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int qp = 0; qp < dims[1]; ++qp)
-          for (int i = 0; i < dims[2]; ++i)
-            sta(cell, qp, i) = field(cell, qp, i);
+          for (int i = 0; i < dims[2]; ++i) sta(cell, qp, i) = field(cell, qp, i);
       break;
     case 4:
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int qp = 0; qp < dims[1]; ++qp)
           for (int i = 0; i < dims[2]; ++i)
-            for (int j = 0; j < dims[3]; ++j)
-              sta(cell, qp, i, j) = field(cell, qp, i, j);
+            for (int j = 0; j < dims[3]; ++j) sta(cell, qp, i, j) = field(cell, qp, i, j);
       break;
     case 5:
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int qp = 0; qp < dims[1]; ++qp)
           for (int i = 0; i < dims[2]; ++i)
             for (int j = 0; j < dims[3]; ++j)
-              for (int k = 0; k < dims[4]; ++k)
-                sta(cell, qp, i, j, k) = field(cell, qp, i, j, k);
+              for (int k = 0; k < dims[4]; ++k) sta(cell, qp, i, j, k) = field(cell, qp, i, j, k);
       break;
-    default:
-      ALBANY_PANIC(
-          size < 1 || size > 5,
-          "Unexpected Array dimensions in SaveStateField: " << size);
+    default: ALBANY_PANIC(size < 1 || size > 5, "Unexpected Array dimensions in SaveStateField: " << size);
   }
 }
 
 template <typename Traits>
 void
-SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveWorksetState(
-    typename Traits::EvalData workset)
+SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveWorksetState(typename Traits::EvalData workset)
 {
   // Get shards Array (from STK) for this state
   // Need to check if we can just copy full size -- can assume same ordering?
@@ -177,8 +159,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveWorksetState(
   ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
       std::endl
-          << "Error: cannot locate " << stateName
-          << " in PHAL_SaveStateField_Def" << std::endl);
+          << "Error: cannot locate " << stateName << " in PHAL_SaveStateField_Def" << std::endl);
 
   Albany::MDArray                         sta = it->second;
   std::vector<PHX::DataLayout::size_type> dims;
@@ -194,17 +175,13 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveWorksetState(
         for (int qp = 0; qp < dims[1]; ++qp) sta(cell, qp) = field(cell, qp);
       ;
       break;
-    default:
-      ALBANY_PANIC(
-          size < 1 || size > 5,
-          "Unexpected (workset) Array dimensions in SaveStateField: " << size);
+    default: ALBANY_PANIC(size < 1 || size > 5, "Unexpected (workset) Array dimensions in SaveStateField: " << size);
   }
 }
 
 template <typename Traits>
 void
-SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
-    typename Traits::EvalData workset)
+SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typename Traits::EvalData workset)
 {
   // Note: to save nodal fields, we need to open up the mesh, and work directly
   // on it.
@@ -215,16 +192,11 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   //       data and use them to access the values of the stk field.
 
   Teuchos::RCP<Albany::AbstractDiscretization> disc = workset.disc;
-  ALBANY_PANIC(
-      disc == Teuchos::null,
-      "Error! Discretization is needed to save nodal state.\n");
+  ALBANY_PANIC(disc == Teuchos::null, "Error! Discretization is needed to save nodal state.\n");
 
   Teuchos::RCP<Albany::AbstractSTKMeshStruct> mesh =
-      Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(
-          disc->getMeshStruct());
-  ALBANY_PANIC(
-      mesh == Teuchos::null,
-      "Error! Save nodal states available only for stk meshes.\n");
+      Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(disc->getMeshStruct());
+  ALBANY_PANIC(mesh == Teuchos::null, "Error! Save nodal states available only for stk meshes.\n");
 
   stk::mesh::MetaData& metaData = *mesh->metaData;
   stk::mesh::BulkData& bulkData = *mesh->bulkData;
@@ -245,8 +217,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
   stk::mesh::Entity e;
   switch (dims.size()) {
     case 2:  // node_scalar
-      scalar_field =
-          metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
+      scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
       ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
@@ -257,8 +228,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(
         }
       break;
     case 3:  // node_vector
-      vector_field =
-          metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
+      vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
       ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {

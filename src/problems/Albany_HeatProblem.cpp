@@ -30,42 +30,33 @@ Albany::HeatProblem::HeatProblem(
     periodic = params->get("Periodic BC", false);
   else
     periodic = false;
-  if (periodic)
-    *out << " Periodic Boundary Conditions being used." << std::endl;
+  if (periodic) *out << " Periodic Boundary Conditions being used." << std::endl;
 
   haveAbsorption = params->isSublist("Absorption");
 
   if (params->isType<std::string>("MaterialDB Filename")) {
-    std::string mtrlDbFilename =
-        params->get<std::string>("MaterialDB Filename");
+    std::string mtrlDbFilename = params->get<std::string>("MaterialDB Filename");
     // Create Material Database
-    materialDB =
-        Teuchos::rcp(new Albany::MaterialDatabase(mtrlDbFilename, commT));
+    materialDB = Teuchos::rcp(new Albany::MaterialDatabase(mtrlDbFilename, commT));
   }
 
   conductivityIsDistParam = false;
   if (params->isSublist("Distributed Parameters")) {
-    int numDistParams = params->sublist("Distributed Parameters")
-                            .get<int>("Number of Parameter Vectors", 0);
+    int numDistParams = params->sublist("Distributed Parameters").get<int>("Number of Parameter Vectors", 0);
     for (int i = 0; i < numDistParams; ++i) {
       Teuchos::ParameterList p =
-          params->sublist("Distributed Parameters")
-              .sublist(Albany::strint("Distributed Parameter", i));
-      if (p.get<std::string>("Name", "") == "thermal_conductivity")
-        conductivityIsDistParam = true;
+          params->sublist("Distributed Parameters").sublist(Albany::strint("Distributed Parameter", i));
+      if (p.get<std::string>("Name", "") == "thermal_conductivity") conductivityIsDistParam = true;
       break;
     }
   }
   dirichletIsDistParam = false;
   if (params->isSublist("Distributed Parameters")) {
-    int numDistParams = params->sublist("Distributed Parameters")
-                            .get<int>("Number of Parameter Vectors", 0);
+    int numDistParams = params->sublist("Distributed Parameters").get<int>("Number of Parameter Vectors", 0);
     for (int i = 0; i < numDistParams; ++i) {
       Teuchos::ParameterList p =
-          params->sublist("Distributed Parameters")
-              .sublist(Albany::strint("Distributed Parameter", i));
-      if (p.get<std::string>("Name", "") == "dirichlet_field")
-        dirichletIsDistParam = true;
+          params->sublist("Distributed Parameters").sublist(Albany::strint("Distributed Parameter", i));
+      if (p.get<std::string>("Name", "") == "dirichlet_field") dirichletIsDistParam = true;
       meshPartDirichlet = p.get<std::string>("Mesh Part", "");
       break;
     }
@@ -86,12 +77,10 @@ Albany::HeatProblem::buildProblem(
 
   for (int ps = 0; ps < physSets; ps++) {
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-    buildEvaluators(
-        *fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
+    buildEvaluators(*fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
   }
 
-  if (meshSpecs[0]->nsNames.size() >
-      0) {  // Build a nodeset evaluator if nodesets are present
+  if (meshSpecs[0]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
     constructDirichletEvaluators(meshSpecs[0]->nsNames);
   }
 
@@ -99,12 +88,10 @@ Albany::HeatProblem::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() >
-      0) {  // Build a sideset evaluator if sidesets are present
+  if (meshSpecs[0]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
     constructNeumannEvaluators(meshSpecs[0]);
   }
 }
@@ -119,23 +106,20 @@ Albany::HeatProblem::buildEvaluators(
 {
   // Call constructEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<HeatProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<HeatProblem>                    op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 // Dirichlet BCs
 void
-Albany::HeatProblem::constructDirichletEvaluators(
-    std::vector<std::string> const& nodeSetIDs)
+Albany::HeatProblem::constructDirichletEvaluators(std::vector<std::string> const& nodeSetIDs)
 {
   // Construct BC evaluators for all node sets and names
   std::vector<std::string> bcNames(neq);
   bcNames[0] = "T";
   Albany::BCUtils<Albany::DirichletTraits> bcUtils;
-  dfm = bcUtils.constructBCEvaluators(
-      nodeSetIDs, bcNames, this->params, this->paramLib);
+  dfm         = bcUtils.constructBCEvaluators(nodeSetIDs, bcNames, this->params, this->paramLib);
   use_sdbcs_  = bcUtils.useSDBCs();
   offsets_    = bcUtils.getOffsets();
   nodeSetIDs_ = bcUtils.getNodeSetIDs();
@@ -143,8 +127,7 @@ Albany::HeatProblem::constructDirichletEvaluators(
 
 // Neumann BCs
 void
-Albany::HeatProblem::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
+Albany::HeatProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
   // i.e. meshSpecs.ssNames.size() > 0
@@ -181,9 +164,7 @@ Albany::HeatProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(dudx, dudy, dudz)";
   else
-    ALBANY_ABORT(
-        std::endl
-        << "Error: Sidesets only supported in 2 and 3D." << std::endl);
+    ALBANY_ABORT(std::endl << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 
   condNames[1] = "dudn";
   condNames[2] = "scaled jump";
@@ -192,35 +173,19 @@ Albany::HeatProblem::constructNeumannEvaluators(
 
   nfm.resize(1);  // Heat problem only has one physics set
   nfm[0] = bcUtils.constructBCEvaluators(
-      meshSpecs,
-      bcNames,
-      dof_names,
-      false,
-      0,
-      condNames,
-      offsets,
-      dl,
-      this->params,
-      this->paramLib,
-      materialDB);
+      meshSpecs, bcNames, dof_names, false, 0, condNames, offsets, dl, this->params, this->paramLib, materialDB);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::HeatProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidHeatProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidHeatProblemParams");
 
-  if (numDim == 1)
-    validPL->set<bool>(
-        "Periodic BC", false, "Flag to indicate periodic BC for 1D problems");
+  if (numDim == 1) validPL->set<bool>("Periodic BC", false, "Flag to indicate periodic BC for 1D problems");
   validPL->sublist("ThermalConductivity", false, "");
   validPL->set("Convection Velocity", "{0,0,0}", "");
   validPL->set<bool>("Have Rho Cp", false, "Flag to indicate if rhoCp is used");
-  validPL->set<std::string>(
-      "MaterialDB Filename",
-      "materials.xml",
-      "Filename of material database xml file");
+  validPL->set<std::string>("MaterialDB Filename", "materials.xml", "Filename of material database xml file");
 
   return validPL;
 }

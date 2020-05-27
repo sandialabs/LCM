@@ -18,24 +18,19 @@ namespace LCM {
 /// This evaluator computes the coefficients for the damage equation
 ///
 template <typename EvalT, typename Traits>
-class DamageCoefficients : public PHX::EvaluatorWithBaseImpl<Traits>,
-                           public PHX::EvaluatorDerived<EvalT, Traits>
+class DamageCoefficients : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ///
   /// Constructor
   ///
-  DamageCoefficients(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  DamageCoefficients(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics

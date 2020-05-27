@@ -16,24 +16,19 @@ namespace LCM {
 
 /// \brief Constitutive Model Driver
 template <typename EvalT, typename Traits>
-class ConstitutiveModelDriver : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                public PHX::EvaluatorDerived<EvalT, Traits>
+class ConstitutiveModelDriver : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ///
   /// Constructor
   ///
-  ConstitutiveModelDriver(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ConstitutiveModelDriver(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics

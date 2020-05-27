@@ -39,9 +39,7 @@ MeshSpecsStruct::MeshSpecsStruct(
       sepEvalsByEB(sepEvalsByEB_),
       cubatureRule(cubatureRule_)
 {
-  ALBANY_PANIC(
-      cubatureDegree < 0,
-      "Error! Invalid cubature degree on element block '" << ebName << "'.\n");
+  ALBANY_PANIC(cubatureDegree < 0, "Error! Invalid cubature degree on element block '" << ebName << "'.\n");
 }
 
 }  // namespace Albany

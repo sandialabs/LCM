@@ -20,19 +20,14 @@ namespace PHAL {
  * Base implementation useable by specializations below
  */
 template <typename EvalT, typename Traits>
-class ScatterScalarResponseBase
-    : public virtual PHX::EvaluatorWithBaseImpl<Traits>,
-      public virtual PHX::EvaluatorDerived<EvalT, Traits>
+class ScatterScalarResponseBase : public virtual PHX::EvaluatorWithBaseImpl<Traits>,
+                                  public virtual PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ScatterScalarResponseBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ScatterScalarResponseBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void evaluateFields(typename Traits::EvalData /* d */) {}
 
@@ -56,9 +51,7 @@ class ScatterScalarResponseBase
 
   // Child classes should call setup once p is filled out
   void
-  setup(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  setup(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidResponseParameters() const;
@@ -90,9 +83,7 @@ class ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>
     : public ScatterScalarResponseBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  ScatterScalarResponse(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ScatterScalarResponse(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
   postEvaluate(typename Traits::PostEvalData d);
 
@@ -100,9 +91,7 @@ class ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>
   typedef PHAL::AlbanyTraits::Residual EvalT;
   ScatterScalarResponse() {}
   void
-  setup(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  setup(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
   {
     ScatterScalarResponseBase<EvalT, Traits>::setup(p, dl);
   }

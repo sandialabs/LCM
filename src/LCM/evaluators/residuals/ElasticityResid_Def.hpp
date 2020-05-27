@@ -13,15 +13,11 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 ElasticityResid<EvalT, Traits>::ElasticityResid(Teuchos::ParameterList& p)
-    : Stress(
-          p.get<std::string>("Stress Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+    : Stress(p.get<std::string>("Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       wGradBF(
           p.get<std::string>("Weighted Gradient BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      ExResidual(
-          p.get<std::string>("Residual Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
+      ExResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
   this->addDependentField(Stress);
   this->addDependentField(wGradBF);
@@ -39,33 +35,26 @@ ElasticityResid<EvalT, Traits>::ElasticityResid(Teuchos::ParameterList& p)
     // Additional fields required for transient capability
 
     if (p.isParameter("Density Name")) {
-      hasDensity = true;
-      Teuchos::RCP<PHX::DataLayout> cell_scalar_dl =
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Cell Scalar Data Layout");
-      density =
-          decltype(density)(p.get<std::string>("Density Name"), cell_scalar_dl);
+      hasDensity                                   = true;
+      Teuchos::RCP<PHX::DataLayout> cell_scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Cell Scalar Data Layout");
+      density = decltype(density)(p.get<std::string>("Density Name"), cell_scalar_dl);
       this->addDependentField(density);
     }
 
-    Teuchos::RCP<PHX::DataLayout> vector_dl =
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
-    uDotDot = decltype(uDotDot)(
-        p.get<std::string>("Time Dependent Variable Name"), vector_dl);
+    Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+    uDotDot = decltype(uDotDot)(p.get<std::string>("Time Dependent Variable Name"), vector_dl);
     this->addDependentField(uDotDot);
   }
 
 #if defined(HARD_CODED_BODY_FORCE_ELASTICITY_RESID)
-  Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
-  wBF =
-      decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
+  Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
+  wBF = decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
   this->addDependentField(wBF);
 #else
   if (enableTransient) {
     Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl =
         p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
-    wBF = decltype(wBF)(
-        p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
+    wBF = decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
     this->addDependentField(wBF);
   }
 #endif
@@ -76,9 +65,7 @@ ElasticityResid<EvalT, Traits>::ElasticityResid(Teuchos::ParameterList& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-ElasticityResid<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ElasticityResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(Stress, fm);
   this->utils.setFieldData(wGradBF, fm);
@@ -105,21 +92,17 @@ ElasticityResid<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-ElasticityResid<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ElasticityResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < numNodes; ++node) {
-      for (int dim = 0; dim < numDims; dim++) {
-        ExResidual(cell, node, dim) = 0.0;
-      }
+      for (int dim = 0; dim < numDims; dim++) { ExResidual(cell, node, dim) = 0.0; }
       for (int qp = 0; qp < numQPs; ++qp) {
         for (int i = 0; i < numDims; i++) {
           for (int dim = 0; dim < numDims; dim++) {
-            ExResidual(cell, node, i) +=
-                Stress(cell, qp, i, dim) * wGradBF(cell, node, qp, dim);
+            ExResidual(cell, node, i) += Stress(cell, qp, i, dim) * wGradBF(cell, node, qp, dim);
           }
         }
       }
@@ -133,14 +116,11 @@ ElasticityResid<EvalT, Traits>::evaluateFields(
   body_force[2] = 0.0;
   std::cout << "****WARNING hard-coded body force being applied!  Body force "
                "density = ("
-            << body_force[0] << ", " << body_force[1] << ", " << body_force[2]
-            << ")" << std::endl;
+            << body_force[0] << ", " << body_force[1] << ", " << body_force[2] << ")" << std::endl;
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < numNodes; ++node) {
       for (int qp = 0; qp < numQPs; ++qp) {
-        for (int i = 0; i < numDims; i++) {
-          ExResidual(cell, node, i) += body_force[i] * wBF(cell, node, qp);
-        }
+        for (int i = 0; i < numDims; i++) { ExResidual(cell, node, i) += body_force[i] * wBF(cell, node, qp); }
       }
     }
   }
@@ -152,11 +132,9 @@ ElasticityResid<EvalT, Traits>::evaluateFields(
         for (int qp = 0; qp < numQPs; ++qp) {
           for (int i = 0; i < numDims; i++) {
             if (hasDensity) {
-              ExResidual(cell, node, i) +=
-                  density(cell) * uDotDot(cell, qp, i) * wBF(cell, node, qp);
+              ExResidual(cell, node, i) += density(cell) * uDotDot(cell, qp, i) * wBF(cell, node, qp);
             } else {
-              ExResidual(cell, node, i) +=
-                  uDotDot(cell, qp, i) * wBF(cell, node, qp);
+              ExResidual(cell, node, i) += uDotDot(cell, qp, i) * wBF(cell, node, qp);
             }
           }
         }

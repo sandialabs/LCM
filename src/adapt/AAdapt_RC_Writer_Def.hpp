@@ -15,9 +15,8 @@ WriterBase<EvalT, Traits>::WriterBase()
   this->setName("AAdapt::rc::Writer" + PHX::print<EvalT>());
   // Writer doesn't output anything, so make a no-output tag to give to the
   // field manager via getNoOutputTag().
-  nooutput_tag_ =
-      Teuchos::rcp(new PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT>(
-          "AAdapt::rc::Writer", Teuchos::rcp(new PHX::MDALayout<Dummy>(0))));
+  nooutput_tag_ = Teuchos::rcp(new PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT>(
+      "AAdapt::rc::Writer", Teuchos::rcp(new PHX::MDALayout<Dummy>(0))));
   this->addEvaluatedField(*nooutput_tag_);
 }
 
@@ -40,10 +39,7 @@ Writer<PHAL::AlbanyTraits::Residual, Traits>::Writer(
     this->addDependentField(bf_);
     this->addDependentField(wbf_);
   }
-  for (Manager::Field::iterator it  = rc_mgr_->fieldsBegin(),
-                                end = rc_mgr_->fieldsEnd();
-       it != end;
-       ++it) {
+  for (Manager::Field::iterator it = rc_mgr_->fieldsBegin(), end = rc_mgr_->fieldsEnd(); it != end; ++it) {
     fields_.push_back(PHX::MDField<const RealType>((*it)->name, (*it)->layout));
     this->addDependentField(fields_.back());
   }
@@ -59,18 +55,15 @@ Writer<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
     this->utils.setFieldData(bf_, fm);
     this->utils.setFieldData(wbf_, fm);
   }
-  for (FieldsIterator it = fields_.begin(); it != fields_.end(); ++it)
-    this->utils.setFieldData(*it, fm);
+  for (FieldsIterator it = fields_.begin(); it != fields_.end(); ++it) this->utils.setFieldData(*it, fm);
 }
 
 template <typename Traits>
 void
-Writer<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+Writer<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   rc_mgr_->beginQpWrite(workset, bf_, wbf_);
-  for (FieldsIterator it = fields_.begin(); it != fields_.end(); ++it)
-    rc_mgr_->writeQpField(*it, workset, wbf_);
+  for (FieldsIterator it = fields_.begin(); it != fields_.end(); ++it) rc_mgr_->writeQpField(*it, workset, wbf_);
   rc_mgr_->endQpWrite();
 }
 

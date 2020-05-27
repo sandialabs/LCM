@@ -30,7 +30,7 @@ struct ThyraCrsMatrixFactory
   ThyraCrsMatrixFactory(
       Teuchos::RCP<Thyra_VectorSpace const> const domain_vs,
       Teuchos::RCP<Thyra_VectorSpace const> const range_vs,
-      int const nonzeros_per_row = -1);  // currently not used
+      int const                                   nonzeros_per_row = -1);  // currently not used
 
   // Create a graph from an overlapped one
   ThyraCrsMatrixFactory(
@@ -42,9 +42,7 @@ struct ThyraCrsMatrixFactory
   // Indices that are not owned by callig processor are ignored
   // The actual graph is created when FillComplete is called
   void
-  insertGlobalIndices(
-      const GO                            row,
-      const Teuchos::ArrayView<const GO>& indices);
+  insertGlobalIndices(const GO row, const Teuchos::ArrayView<const GO>& indices);
 
   // Creates the CrsGraph,
   // inserting indices from the temporary local graph,

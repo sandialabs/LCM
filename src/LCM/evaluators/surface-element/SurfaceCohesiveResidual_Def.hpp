@@ -14,19 +14,11 @@ template <typename EvalT, typename Traits>
 SurfaceCohesiveResidual<EvalT, Traits>::SurfaceCohesiveResidual(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
-    : cubature_(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepid_basis_(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis")),
+    : cubature_(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepid_basis_(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
       ref_area_(p.get<std::string>("Reference Area Name"), dl->qp_scalar),
-      cohesive_traction_(
-          p.get<std::string>("Cohesive Traction Name"),
-          dl->qp_vector),
-      force_(
-          p.get<std::string>("Surface Cohesive Residual Name"),
-          dl->node_vector)
+      cohesive_traction_(p.get<std::string>("Cohesive Traction Name"), dl->qp_vector),
+      force_(p.get<std::string>("Surface Cohesive Residual Name"), dl->node_vector)
 {
   this->addDependentField(ref_area_);
   this->addDependentField(cohesive_traction_);
@@ -62,18 +54,14 @@ SurfaceCohesiveResidual<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(force_, fm);
 
   // Allocate Temporary Views
-  ref_values_ = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", num_surf_nodes_, num_qps_);
-  ref_grads_ = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", num_surf_nodes_, num_qps_, num_surf_dims_);
-  ref_points_ = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", num_qps_, num_surf_dims_);
+  ref_values_  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_surf_nodes_, num_qps_);
+  ref_grads_   = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_surf_nodes_, num_qps_, num_surf_dims_);
+  ref_points_  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_qps_, num_surf_dims_);
   ref_weights_ = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_qps_);
 
   // Pre-Calculate reference element quantitites
   cubature_->getCubature(ref_points_, ref_weights_);
-  intrepid_basis_->getValues(
-      ref_values_, ref_points_, Intrepid2::OPERATOR_VALUE);
+  intrepid_basis_->getValues(ref_values_, ref_points_, Intrepid2::OPERATOR_VALUE);
 
   intrepid_basis_->getValues(ref_grads_, ref_points_, Intrepid2::OPERATOR_GRAD);
 }
@@ -81,8 +69,7 @@ SurfaceCohesiveResidual<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceCohesiveResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceCohesiveResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   minitensor::Vector<ScalarT> f_plus(0, 0, 0);
 
@@ -96,12 +83,9 @@ SurfaceCohesiveResidual<EvalT, Traits>::evaluateFields(
       for (int pt(0); pt < num_qps_; ++pt) {
         // refValues(numPlaneNodes, numQPs) = shape function
         // refArea(numCells, numQPs) = |Jacobian|*weight
-        f_plus(0) += cohesive_traction_(cell, pt, 0) *
-                     ref_values_(bottom_node, pt) * ref_area_(cell, pt);
-        f_plus(1) += cohesive_traction_(cell, pt, 1) *
-                     ref_values_(bottom_node, pt) * ref_area_(cell, pt);
-        f_plus(2) += cohesive_traction_(cell, pt, 2) *
-                     ref_values_(bottom_node, pt) * ref_area_(cell, pt);
+        f_plus(0) += cohesive_traction_(cell, pt, 0) * ref_values_(bottom_node, pt) * ref_area_(cell, pt);
+        f_plus(1) += cohesive_traction_(cell, pt, 1) * ref_values_(bottom_node, pt) * ref_area_(cell, pt);
+        f_plus(2) += cohesive_traction_(cell, pt, 2) * ref_values_(bottom_node, pt) * ref_area_(cell, pt);
 
       }  // end of pt loop
 

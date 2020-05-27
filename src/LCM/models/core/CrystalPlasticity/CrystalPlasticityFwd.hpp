@@ -6,8 +6,7 @@
 #define CrystalPlasticityFwd_hpp
 
 namespace CP {
-static constexpr RealType MACHINE_EPS =
-    std::numeric_limits<RealType>::epsilon();
+static constexpr RealType MACHINE_EPS = std::numeric_limits<RealType>::epsilon();
 
 static constexpr RealType TINY = std::numeric_limits<RealType>::min();
 

@@ -18,17 +18,16 @@ main(int argc, char** argv)
   for (int i = 1; i < argc; ++i) {
     std::string xmlFileName(argv[i]);
     assert(ends_with(xmlFileName, ".xml"));
-    auto params       = Teuchos::getParametersFromXmlFile(xmlFileName);
-    auto baseName     = xmlFileName.substr(0, xmlFileName.length() - 4);
-    auto yamlFileName = baseName + ".yaml";
+    auto               params       = Teuchos::getParametersFromXmlFile(xmlFileName);
+    auto               baseName     = xmlFileName.substr(0, xmlFileName.length() - 4);
+    auto               yamlFileName = baseName + ".yaml";
     std::ostringstream yamlStringStream;
     yamlStringStream << std::scientific << std::setprecision(17);
     Teuchos::writeParameterListToYamlOStream(*params, yamlStringStream);
     auto yamlString = yamlStringStream.str();
     /* replace references to other XML files with the YAML extension
        (e.g. material data files) */
-    yamlString = std::regex_replace(
-        yamlString, std::regex("\\.xml"), std::string(".yaml"));
+    yamlString = std::regex_replace(yamlString, std::regex("\\.xml"), std::string(".yaml"));
     std::ofstream yamlFileStream(yamlFileName.c_str());
     assert(yamlFileStream.is_open());
     yamlFileStream << yamlString;

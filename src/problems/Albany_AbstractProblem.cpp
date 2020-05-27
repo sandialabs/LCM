@@ -44,9 +44,7 @@ Albany::AbstractProblem::AbstractProblem(
   } else if (solutionMethod == "Transient") {
     number_of_time_deriv = 1;
     SolutionMethodName   = Transient;
-  } else if (
-      solutionMethod == "Transient Tempus" ||
-      solutionMethod == "Transient Tempus No Piro") {
+  } else if (solutionMethod == "Transient Tempus" || solutionMethod == "Transient Tempus No Piro") {
     number_of_time_deriv = 1;
     SolutionMethodName   = TransientTempus;
   } else if (solutionMethod == "Eigensolve") {
@@ -58,8 +56,7 @@ Albany::AbstractProblem::AbstractProblem(
   } else
     ALBANY_ABORT(
         "Solution Method must be Steady, Transient, Transient Tempus, "
-        << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : "
-        << solutionMethod);
+        << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : " << solutionMethod);
 
   // Set the number in the Problem PL
   params->set<int>("Number Of Time Derivatives", number_of_time_deriv);
@@ -113,34 +110,23 @@ Albany::AbstractProblem::getNeumannFieldManager()
 Teuchos::RCP<Teuchos::ParameterList>
 Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      Teuchos::rcp(new Teuchos::ParameterList(listname));
+  Teuchos::RCP<Teuchos::ParameterList> validPL = Teuchos::rcp(new Teuchos::ParameterList(listname));
   ;
   validPL->set<std::string>("Name", "", "String to designate Problem Class");
   // The following is for LandIce problems.
   validPL->set<int>("Number RBMs for ML", 0, "Number of RBMs provided to ML");
+  validPL->set<int>("Number of Spatial Processors", -1, "Number of spatial processors in multi-level parallelism");
   validPL->set<int>(
-      "Number of Spatial Processors",
-      -1,
-      "Number of spatial processors in multi-level parallelism");
-  validPL->set<int>(
-      "Phalanx Graph Visualization Detail",
-      0,
-      "Flag to select outpuy of Phalanx Graph and level of detail");
+      "Phalanx Graph Visualization Detail", 0, "Flag to select outpuy of Phalanx Graph and level of detail");
   validPL->set<bool>(
       "Use Physics-Based Preconditioner",
       false,
       "Flag to create signal that this problem will creat its own "
       "preconditioner");
-  validPL->set<std::string>(
-      "Physics-Based Preconditioner",
-      "None",
-      "Type of preconditioner that problem will create");
+  validPL->set<std::string>("Physics-Based Preconditioner", "None", "Type of preconditioner that problem will create");
 
   validPL->set<Teuchos::Array<std::string>>(
-      "Required Fields",
-      Teuchos::Array<std::string>(),
-      "List of field requirements");
+      "Required Fields", Teuchos::Array<std::string>(), "List of field requirements");
   validPL->sublist("Initial Condition", false, "");
   validPL->sublist("Initial Condition Dot", false, "");
   validPL->sublist("Initial Condition DotDot", false, "");
@@ -161,15 +147,9 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
       false,
       "Whether 'reportFinalPoint' should be allowed to overwrite nominal "
       "values");
-  validPL->set<int>(
-      "Number Of Time Derivatives",
-      1,
-      "Number of time derivatives in use in the problem");
+  validPL->set<int>("Number Of Time Derivatives", 1, "Number of time derivatives in use in the problem");
 
-  validPL->set<bool>(
-      "Use MDField Memoization",
-      false,
-      "Use memoization to avoid recomputing MDFields");
+  validPL->set<bool>("Use MDField Memoization", false, "Use memoization to avoid recomputing MDFields");
   validPL->set<bool>(
       "Use MDField Memoization For Parameters",
       false,
@@ -185,26 +165,16 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
       "Add this (small) perturbation to the diagonal to prevent Mass Matrices "
       "from being singular for Dirichlets)");
 
-  validPL->sublist(
-      "Model Order Reduction",
-      false,
-      "Specify the options relative to model order reduction");
+  validPL->sublist("Model Order Reduction", false, "Specify the options relative to model order reduction");
 
   // Contact PL
   validPL->sublist("Contact", false, "");
 
   // Candidates for deprecation. Pertain to the solution rather than the problem
   // definition.
-  validPL->set<std::string>(
-      "Solution Method",
-      "Steady",
-      "Flag for Steady, Transient, or Continuation");
-  validPL->set<double>(
-      "Homotopy Restart Step", 1., "Flag for LandIce Homotopy Restart Step");
-  validPL->set<std::string>(
-      "Second Order",
-      "No",
-      "Flag to indicate that a transient problem has two time derivs");
+  validPL->set<std::string>("Solution Method", "Steady", "Flag for Steady, Transient, or Continuation");
+  validPL->set<double>("Homotopy Restart Step", 1., "Flag for LandIce Homotopy Restart Step");
+  validPL->set<std::string>("Second Order", "No", "Flag to indicate that a transient problem has two time derivs");
   validPL->set<bool>("Print Response Expansion", true, "");
 
   // Deprecated parameters, kept solely for backward compatibility

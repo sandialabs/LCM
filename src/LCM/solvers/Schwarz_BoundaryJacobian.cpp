@@ -17,7 +17,7 @@ Schwarz_BoundaryJacobian::Schwarz_BoundaryJacobian(
     Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> const& ca,
     Teuchos::Array<Teuchos::RCP<Thyra_LinearOp>>                jacs,
     int const                                                   this_app_index,
-    int const coupled_app_index)
+    int const                                                   coupled_app_index)
     : coupled_apps_(ca),
       jacs_(jacs),
       this_app_index_(this_app_index),
@@ -47,8 +47,7 @@ Schwarz_BoundaryJacobian::getExplicitOperator() const
   // IKT: there may be problems here in creating jac_factory - will need to
   // check
   Teuchos::RCP<Albany::ThyraCrsMatrixFactory> jac_factory =
-      Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(
-          this->range(), this->domain(), max_num_cols));
+      Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(this->range(), this->domain(), max_num_cols));
 
   jac_factory->fillComplete();
 

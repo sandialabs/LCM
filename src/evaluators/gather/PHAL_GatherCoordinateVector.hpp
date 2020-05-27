@@ -24,20 +24,15 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class GatherCoordinateVector : public PHX::EvaluatorWithBaseImpl<Traits>,
-                               public PHX::EvaluatorDerived<EvalT, Traits>
+class GatherCoordinateVector : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  GatherCoordinateVector(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GatherCoordinateVector(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   // Old constructor, still needed by BCs that use PHX Factory
   GatherCoordinateVector(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

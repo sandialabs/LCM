@@ -24,16 +24,12 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : coordVec(p.get<std::string>("Coordinate Vector Name"), dl->qp_vector),
-      coordVec_vertices(
-          p.get<std::string>("Coordinate Vector Name"),
-          dl->vertices_vector),
+      coordVec_vertices(p.get<std::string>("Coordinate Vector Name"), dl->vertices_vector),
       qp_weights("Weights", dl->qp_scalar)
 {
   //! get and validate ElementSizeField parameter list
-  Teuchos::ParameterList* plist =
-      p.get<Teuchos::ParameterList*>("Parameter List");
-  Teuchos::RCP<Teuchos::ParameterList const> reflist =
-      this->getValidSizeFieldParameters();
+  Teuchos::ParameterList*                    plist   = p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::RCP<Teuchos::ParameterList const> reflist = this->getValidSizeFieldParameters();
   plist->validateParameters(*reflist, 0);
 
   // Isotropic --> element size scalar corresponding to the nominal element
@@ -41,7 +37,7 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
   // length, and height of the element Weighted versions (upcoming) --> scale
   // the above sizes with a scalar or vector field
 
-  className = plist->get<std::string>("Size Field Name", "Element_Size_Field");
+  className         = plist->get<std::string>("Size Field Name", "Element_Size_Field");
   outputToExodus    = plist->get<bool>("Output to File", true);
   outputCellAverage = plist->get<bool>("Generate Cell Average", true);
   outputQPData      = plist->get<bool>("Generate QP Values", false);
@@ -66,38 +62,17 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
   if (outputCellAverage) {
     if (isAnisotropic)  // An-isotropic
       this->pStateMgr->registerStateVariable(
-          className + "_Cell",
-          dl->cell_vector,
-          dl->dummy,
-          "all",
-          "scalar",
-          0.0,
-          false,
-          outputToExodus);
+          className + "_Cell", dl->cell_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
     else
       this->pStateMgr->registerStateVariable(
-          className + "_Cell",
-          dl->cell_scalar,
-          dl->dummy,
-          "all",
-          "scalar",
-          0.0,
-          false,
-          outputToExodus);
+          className + "_Cell", dl->cell_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
   }
 
   if (outputQPData) {
     //    if(isAnisotropic) //An-isotropic
     //    Always anisotropic?
     this->pStateMgr->registerStateVariable(
-        className + "_QP",
-        dl->qp_vector,
-        dl->dummy,
-        "all",
-        "scalar",
-        0.0,
-        false,
-        outputToExodus);
+        className + "_QP", dl->qp_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
     //    else
     //      this->pStateMgr->registerStateVariable(className + "_QP",
     //      dl->qp_scalar, dl->dummy, "all",
@@ -113,39 +88,18 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
 
     if (isAnisotropic) {  // An-isotropic
       this->pStateMgr->registerNodalVectorStateVariable(
-          className + "_Node",
-          dl->node_node_vector,
-          dl->dummy,
-          "all",
-          "scalar",
-          0.0,
-          false,
-          outputToExodus);
+          className + "_Node", dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
 
     } else {
       this->pStateMgr->registerNodalVectorStateVariable(
-          className + "_Node",
-          dl->node_node_scalar,
-          dl->dummy,
-          "all",
-          "scalar",
-          0.0,
-          false,
-          outputToExodus);
+          className + "_Node", dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
     }
 
     // The value of the weights used in the projection
     // Initialize to zero - should give us nan's during the division step if
     // something is wrong
     this->pStateMgr->registerNodalVectorStateVariable(
-        className + "_NodeWgt",
-        dl->node_node_scalar,
-        dl->dummy,
-        "all",
-        "scalar",
-        0.0,
-        false,
-        outputToExodus);
+        className + "_NodeWgt", dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
   }
 
   // Create field tag
@@ -181,32 +135,27 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::ElementSizeField(
 }
 
 template <typename Traits>
-void ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
-    typename Traits::PreEvalData /* workset */)
+void ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits::PreEvalData /* workset */)
 {
   // Note that we only need to initialize the vectors when dealing with node
   // data, as we assume the vectors are initialized to zero
   if (this->outputNodeData) {
     Teuchos::RCP<NodalDataVector> node_data =
-        this->pStateMgr->getStateInfoStruct()
-            ->getNodalDataBase()
-            ->getNodalDataVector();
+        this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
     node_data->initializeVectors(0.0);
   }
 }
 
 template <typename Traits>
 void
-ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  typename ElementSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>::
-      MeshScalarT value;
+  typename ElementSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>::MeshScalarT value;
 
   if (this->outputCellAverage) {  // nominal radius
 
     // Get shards Array (from STK) for this workset
-    Albany::MDArray data = (*workset.stateArrayPtr)[this->className + "_Cell"];
+    Albany::MDArray                         data = (*workset.stateArrayPtr)[this->className + "_Cell"];
     std::vector<PHX::DataLayout::size_type> dims;
     data.dimensions(dims);
 
@@ -221,7 +170,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
                              // \cdot x_\zeta
 
     // Get shards Array (from STK) for this workset
-    Albany::MDArray data = (*workset.stateArrayPtr)[this->className + "_QP"];
+    Albany::MDArray                         data = (*workset.stateArrayPtr)[this->className + "_QP"];
     std::vector<PHX::DataLayout::size_type> dims;
     data.dimensions(dims);
 
@@ -252,12 +201,10 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 
     // Get the node data block container
     Teuchos::RCP<NodalDataVector> node_data =
-        this->pStateMgr->getStateInfoStruct()
-            ->getNodalDataBase()
-            ->getNodalDataVector();
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID = workset.wsElNodeID;
-    auto owned_node_vs = node_data->getOwnedVectorSpace();
-    auto node_indexer  = Albany::createGlobalLocalIndexer(owned_node_vs);
+        this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID    = workset.wsElNodeID;
+    auto                                     owned_node_vs = node_data->getOwnedVectorSpace();
+    auto                                     node_indexer  = Albany::createGlobalLocalIndexer(owned_node_vs);
 
     int l_nV = this->numVertices;
     int l_nD = this->numDims;
@@ -266,27 +213,20 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     int node_var_ndofs;
     int node_weight_offset;
     int node_weight_ndofs;
-    node_data->getNDofsAndOffset(
-        this->className + "_Node", node_var_offset, node_var_ndofs);
-    node_data->getNDofsAndOffset(
-        this->className + "_NodeWgt", node_weight_offset, node_weight_ndofs);
+    node_data->getNDofsAndOffset(this->className + "_Node", node_var_offset, node_var_ndofs);
+    node_data->getNDofsAndOffset(this->className + "_NodeWgt", node_weight_offset, node_weight_ndofs);
 
     auto data = Albany::getNonconstLocalData(node_data->getOwnedNodeVector());
-    for (int cell = 0; cell < workset.numCells;
-         ++cell) {  // loop over all elements in workset
+    for (int cell = 0; cell < workset.numCells; ++cell) {  // loop over all elements in workset
 
       std::vector<double> maxCoord(3, -1e10);
       std::vector<double> minCoord(3, +1e10);
 
       // Get element width in x, y, z
-      for (int v = 0; v < l_nV;
-           ++v) {  // loop over all the "corners" of each element
-        for (int k = 0; k < l_nD;
-             ++k) {  // loop over each dimension of the problem
-          if (maxCoord[k] < this->coordVec_vertices(cell, v, k))
-            maxCoord[k] = this->coordVec_vertices(cell, v, k);
-          if (minCoord[k] > this->coordVec_vertices(cell, v, k))
-            minCoord[k] = this->coordVec_vertices(cell, v, k);
+      for (int v = 0; v < l_nV; ++v) {    // loop over all the "corners" of each element
+        for (int k = 0; k < l_nD; ++k) {  // loop over each dimension of the problem
+          if (maxCoord[k] < this->coordVec_vertices(cell, v, k)) maxCoord[k] = this->coordVec_vertices(cell, v, k);
+          if (minCoord[k] > this->coordVec_vertices(cell, v, k)) minCoord[k] = this->coordVec_vertices(cell, v, k);
         }
       }
 
@@ -294,8 +234,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
         // Note: code assumes blocksize of blockmap is numDims + 1 - the last
         // entry accumulates the weight
 
-        for (int node = 0; node < l_nV;
-             ++node) {  // loop over all the "corners" of each element
+        for (int node = 0; node < l_nV; ++node) {  // loop over all the "corners" of each element
           const GO global_row = wsElNodeID[cell][node];
           if (!node_indexer->isLocallyOwnedElement(global_row)) { continue; }
 
@@ -313,8 +252,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
         // isotropic size field
         // Note: code assumes blocksize of blockmap is 1 + 1 = 2 - the last
         // entry accumulates the weight
-        for (int node = 0; node < l_nV;
-             ++node) {  // loop over all the "corners" of each element
+        for (int node = 0; node < l_nV; ++node) {  // loop over all the "corners" of each element
           const GO global_row = wsElNodeID[cell][node];
           if (!node_indexer->isLocallyOwnedElement(global_row)) { continue; }
 
@@ -336,28 +274,23 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 
 template <typename Traits>
 void
-ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
-    typename Traits::PostEvalData workset)
+ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(typename Traits::PostEvalData workset)
 {
   if (this->outputNodeData) {
     // Note: we are in postEvaluate so all PEs call this
 
     // Get the node data block container
     Teuchos::RCP<NodalDataVector> node_data =
-        this->pStateMgr->getStateInfoStruct()
-            ->getNodalDataBase()
-            ->getNodalDataVector();
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID = workset.wsElNodeID;
-    auto overlap_node_vs = node_data->getOverlappedVectorSpace();
+        this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID      = workset.wsElNodeID;
+    auto                                     overlap_node_vs = node_data->getOverlappedVectorSpace();
 
     int node_var_offset;
     int node_var_ndofs;
     int node_weight_offset;
     int node_weight_ndofs;
-    node_data->getNDofsAndOffset(
-        this->className + "_Node", node_var_offset, node_var_ndofs);
-    node_data->getNDofsAndOffset(
-        this->className + "_NodeWgt", node_weight_offset, node_weight_ndofs);
+    node_data->getNDofsAndOffset(this->className + "_Node", node_var_offset, node_var_ndofs);
+    node_data->getNDofsAndOffset(this->className + "_NodeWgt", node_weight_offset, node_weight_ndofs);
 
     // Build the CombineAndScatter manager
     node_data->initializeCASManager();
@@ -371,17 +304,12 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
     // all PEs divide the accumulated value(s) by the weights
     auto node_data_vector = node_data->getOverlapNodeVector();
 
-    Teuchos::ArrayRCP<const ST> weights = Albany::getLocalData(
-        node_data_vector->col(node_weight_offset).getConst());
-    int const numNodes =
-        Albany::getSpmdVectorSpace(overlap_node_vs)->localSubDim();
+    Teuchos::ArrayRCP<const ST> weights  = Albany::getLocalData(node_data_vector->col(node_weight_offset).getConst());
+    int const                   numNodes = Albany::getSpmdVectorSpace(overlap_node_vs)->localSubDim();
 
     for (int k = 0; k < node_var_ndofs; ++k) {
-      Teuchos::ArrayRCP<ST> v = Albany::getNonconstLocalData(
-          node_data_vector->col(node_var_offset + k));
-      for (int overlap_node = 0; overlap_node < numNodes; ++overlap_node) {
-        v[overlap_node] /= weights[overlap_node];
-      }
+      Teuchos::ArrayRCP<ST> v = Albany::getNonconstLocalData(node_data_vector->col(node_var_offset + k));
+      for (int overlap_node = 0; overlap_node < numNodes; ++overlap_node) { v[overlap_node] /= weights[overlap_node]; }
     }
 
     // Export the data from the local to overlapped decomposition
@@ -396,25 +324,21 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(
 
 template <typename EvalT, typename Traits>
 void
-ElementSizeFieldBase<EvalT, Traits>::getCellRadius(
-    std::size_t const            cell,
-    typename EvalT::MeshScalarT& cellRadius) const
+ElementSizeFieldBase<EvalT, Traits>::getCellRadius(std::size_t const cell, typename EvalT::MeshScalarT& cellRadius)
+    const
 {
   std::vector<MeshScalarT> maxCoord(3, -1e10);
   std::vector<MeshScalarT> minCoord(3, +1e10);
 
   for (int v = 0; v < numVertices; ++v) {
     for (int k = 0; k < numDims; ++k) {
-      if (maxCoord[k] < coordVec_vertices(cell, v, k))
-        maxCoord[k] = coordVec_vertices(cell, v, k);
-      if (minCoord[k] > coordVec_vertices(cell, v, k))
-        minCoord[k] = coordVec_vertices(cell, v, k);
+      if (maxCoord[k] < coordVec_vertices(cell, v, k)) maxCoord[k] = coordVec_vertices(cell, v, k);
+      if (minCoord[k] > coordVec_vertices(cell, v, k)) minCoord[k] = coordVec_vertices(cell, v, k);
     }
   }
 
   cellRadius = 0.0;
-  for (int k = 0; k < numDims; ++k)
-    cellRadius += (maxCoord[k] - minCoord[k]) * (maxCoord[k] - minCoord[k]);
+  for (int k = 0; k < numDims; ++k) cellRadius += (maxCoord[k] - minCoord[k]) * (maxCoord[k] - minCoord[k]);
 
   cellRadius = std::sqrt(cellRadius) / 2.0;
 }
@@ -424,33 +348,17 @@ template <typename EvalT, typename Traits>
 Teuchos::RCP<Teuchos::ParameterList const>
 ElementSizeFieldBase<EvalT, Traits>::getValidSizeFieldParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      rcp(new Teuchos::ParameterList("Valid ElementSizeField Params"));
+  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("Valid ElementSizeField Params"));
   ;
 
   validPL->set<std::string>("Name", "", "Name of size field Evaluator");
   validPL->set<std::string>("Size Field Name", "", "Size field prefix");
 
-  validPL->set<bool>(
-      "Output to File",
-      true,
-      "Whether size field info should be output to a file");
-  validPL->set<bool>(
-      "Generate Cell Average",
-      true,
-      "Whether cell average field should be generated");
-  validPL->set<bool>(
-      "Generate QP Values",
-      true,
-      "Whether values at the quadpoints should be generated");
-  validPL->set<bool>(
-      "Generate Nodal Values",
-      true,
-      "Whether values at the nodes should be generated");
-  validPL->set<bool>(
-      "Anisotropic Size Field",
-      true,
-      "Is this size field calculation anisotropic?");
+  validPL->set<bool>("Output to File", true, "Whether size field info should be output to a file");
+  validPL->set<bool>("Generate Cell Average", true, "Whether cell average field should be generated");
+  validPL->set<bool>("Generate QP Values", true, "Whether values at the quadpoints should be generated");
+  validPL->set<bool>("Generate Nodal Values", true, "Whether values at the nodes should be generated");
+  validPL->set<bool>("Anisotropic Size Field", true, "Is this size field calculation anisotropic?");
 
   return validPL;
 }

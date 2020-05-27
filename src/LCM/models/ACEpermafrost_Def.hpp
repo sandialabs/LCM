@@ -17,15 +17,14 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   this->setIntegrationPointLocationFlag(true);
 
   // Baseline constants
-  sat_mod_            = p->get<RealType>("Saturation Modulus", 0.0);
-  sat_exp_            = p->get<RealType>("Saturation Exponent", 0.0);
-  ice_density_        = p->get<RealType>("ACE Ice Density", 0.0);
-  water_density_      = p->get<RealType>("ACE Water Density", 0.0);
-  soil_density_       = p->get<RealType>("ACE Sediment Density", 0.0);
-  ice_thermal_cond_   = p->get<RealType>("ACE Ice Thermal Conductivity", 0.0);
-  water_thermal_cond_ = p->get<RealType>("ACE Water Thermal Conductivity", 0.0);
-  soil_thermal_cond_ =
-      p->get<RealType>("ACE Sediment Thermal Conductivity", 0.0);
+  sat_mod_              = p->get<RealType>("Saturation Modulus", 0.0);
+  sat_exp_              = p->get<RealType>("Saturation Exponent", 0.0);
+  ice_density_          = p->get<RealType>("ACE Ice Density", 0.0);
+  water_density_        = p->get<RealType>("ACE Water Density", 0.0);
+  soil_density_         = p->get<RealType>("ACE Sediment Density", 0.0);
+  ice_thermal_cond_     = p->get<RealType>("ACE Ice Thermal Conductivity", 0.0);
+  water_thermal_cond_   = p->get<RealType>("ACE Water Thermal Conductivity", 0.0);
+  soil_thermal_cond_    = p->get<RealType>("ACE Sediment Thermal Conductivity", 0.0);
   ice_heat_capacity_    = p->get<RealType>("ACE Ice Heat Capacity", 0.0);
   water_heat_capacity_  = p->get<RealType>("ACE Water Heat Capacity", 0.0);
   soil_heat_capacity_   = p->get<RealType>("ACE Sediment Heat Capacity", 0.0);
@@ -114,8 +113,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   }
 
   ALBANY_ASSERT(
-      time_.size() == sea_level_.size(),
-      "*** ERROR: Number of times and number of sea level values must match.");
+      time_.size() == sea_level_.size(), "*** ERROR: Number of times and number of sea level values must match.");
 
   // retrieve appropriate field name strings
   auto const cauchy_string       = field_name_map_["Cauchy_Stress"];
@@ -155,49 +153,21 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   // define the state variables
 
   // stress
-  addStateVariable(
-      cauchy_string,
-      dl->qp_tensor,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Cauchy Stress", false));
+  addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
 
   // Fp
-  addStateVariable(
-      Fp_string,
-      dl->qp_tensor,
-      "identity",
-      0.0,
-      true,
-      p->get<bool>("Output Fp", false));
+  addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
 
   // eqps
-  addStateVariable(
-      eqps_string,
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      true,
-      p->get<bool>("Output eqps", false));
+  addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
 
   // yield surface
   addStateVariable(
-      yieldSurface_string,
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Yield Surface", false));
+      yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
 
   // ACE Bluff salinity
   addStateVariable(
-      "ACE Bluff Salinity",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output ACE Bluff Salinity", false));
+      "ACE Bluff Salinity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Bluff Salinity", false));
 
   // ACE Ice saturation
   addStateVariable(
@@ -209,22 +179,11 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
       p->get<bool>("Output ACE Ice Saturation", false));
 
   // ACE Density
-  addStateVariable(
-      "ACE Density",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output ACE Density", false));
+  addStateVariable("ACE Density", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Density", false));
 
   // ACE Heat Capacity
   addStateVariable(
-      "ACE Heat Capacity",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output ACE Heat Capacity", false));
+      "ACE Heat Capacity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Heat Capacity", false));
 
   // ACE Thermal Conductivity
   addStateVariable(
@@ -237,59 +196,28 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
 
   // ACE Thermal Inertia
   addStateVariable(
-      "ACE Thermal Inertia",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output ACE Thermal Inertia", false));
+      "ACE Thermal Inertia", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Thermal Inertia", false));
 
   // ACE Water Saturation
   addStateVariable(
-      "ACE Water Saturation",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("ACE Water Saturation", false));
+      "ACE Water Saturation", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE Water Saturation", false));
 
   // ACE Porosity
-  addStateVariable(
-      "ACE Porosity",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("ACE Porosity", false));
+  addStateVariable("ACE Porosity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE Porosity", false));
 
   // ACE Temperature is already registered in Mechanics Problem.
 
   // ACE Temperature Dot
   addStateVariable(
-      "ACE Temperature Dot",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("ACE Temperature Dot", false));
+      "ACE Temperature Dot", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE Temperature Dot", false));
 
   // failed state
   addStateVariable(
-      "Failure Indicator",
-      dl->cell_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Failure Indicator", true));
+      "Failure Indicator", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output Failure Indicator", true));
 
   // exposure time
   addStateVariable(
-      "ACE Exposure Time",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output ACE Exposure Time", true));
+      "ACE Exposure Time", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Exposure Time", true));
 }
 
 template <typename EvalT, typename Traits>
@@ -337,10 +265,10 @@ ACEpermafrostMiniKernel<EvalT, Traits>::init(
   T_old_              = (*workset.stateArrayPtr)["ACE Temperature_old"];
   ice_saturation_old_ = (*workset.stateArrayPtr)["ACE Ice Saturation_old"];
 
-  auto& disc        = *workset.disc;
-  auto& stk_disc    = dynamic_cast<Albany::STKDiscretization&>(disc);
-  auto& mesh_struct = *(stk_disc.getSTKMeshStruct());
-  auto& field_cont  = *(mesh_struct.getFieldContainer());
+  auto& disc                    = *workset.disc;
+  auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
+  auto& mesh_struct             = *(stk_disc.getSTKMeshStruct());
+  auto& field_cont              = *(mesh_struct.getFieldContainer());
   have_cell_boundary_indicator_ = field_cont.hasCellBoundaryIndicatorField();
 
   if (have_cell_boundary_indicator_ == true) {
@@ -358,9 +286,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::init(
     for (auto pt = 0; pt < num_pts_; ++pt) {
       auto const height = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
       ScalarT    sal    = salinity_base_;
-      if (salinity_.size() > 0) {
-        sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
-      }
+      if (salinity_.size() > 0) { sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height); }
       bluff_salinity_(cell, pt) = sal;
     }
   }
@@ -396,16 +322,11 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&&      exposure_time = exposure_time_(cell, pt);
 
   // Determine if erosion has occurred.
-  auto const element_size = element_size_;
-  auto const cell_bi      = have_cell_boundary_indicator_ == true ?
-                           *(cell_boundary_indicator_[cell]) :
-                           0.0;
+  auto const element_size   = element_size_;
+  auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
   auto const is_at_boundary = cell_bi == 1.0;
   auto const is_erodible    = cell_bi == 2.0;
-  auto const sea_level =
-      sea_level_.size() > 0 ?
-          interpolateVectors(time_, sea_level_, current_time) :
-          -999.0;
+  auto const sea_level      = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
 
   // Thermal calculation
 
@@ -414,8 +335,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   //       to be done once, at the beginning of the simulation.
   auto porosity = porosity0_;
   if (porosity_from_file_.size() > 0) {
-    porosity = interpolateVectors(
-        z_above_mean_sea_level_, porosity_from_file_, height);
+    porosity = interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height);
   }
   porosity_(cell, pt) = porosity;
 
@@ -429,9 +349,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     ScalarT const  zero_sal(0.0);
     ScalarT const  sal_curr  = bluff_salinity_(cell, pt);
     ScalarT        ocean_sal = salinity_base_;
-    if (ocean_salinity_.size() > 0) {
-      ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
-    }
+    if (ocean_salinity_.size() > 0) { ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time); }
     ScalarT const sal_diff   = ocean_sal - sal_curr;
     ScalarT const sal_grad   = sal_diff / cell_half_width;
     ScalarT const sal_update = sal_grad * delta_time * factor;
@@ -447,9 +365,8 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (sal > 0.0) { sal15 = std::sqrt(sal * sal * sal); }
   auto const pressure_fixed = 1.0;
   // Tmelt is in Kelvin
-  ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 -
-                        0.0002154996 * sal * sal -
-                        0.000753 / 10000.0 * pressure_fixed + 273.15;
+  ScalarT const Tmelt =
+      -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal - 0.000753 / 10000.0 * pressure_fixed + 273.15;
 
   // Calculate temperature change
   auto const dTemp = Tcurr - Told;
@@ -505,8 +422,8 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   bool sediment_given = false;
-  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) &&
-      (silt_from_file_.size() > 0) && (peat_from_file_.size() > 0)) {
+  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) && (silt_from_file_.size() > 0) &&
+      (peat_from_file_.size() > 0)) {
     sediment_given = true;
   }
 
@@ -549,51 +466,40 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT calc_soil_thermal_cond;
   ScalarT calc_soil_density;
   if (sediment_given == true) {
-    auto sand_frac =
-        interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
-    auto clay_frac =
-        interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
-    auto silt_frac =
-        interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
-    auto peat_frac =
-        interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height);
+    auto sand_frac = interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
+    auto clay_frac = interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
+    auto silt_frac = interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
+    auto peat_frac = interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height);
     // THERMAL PROPERTIES OF ROCKS, E.C. Robertson, U.S. Geological Survey
     // Open-File Report 88-441 (1988).
     // AGU presentation (2019) --> peat K value
     // Gnatowski, Tomasz (2016) Thermal properties of degraded lowland
     // peat-moorsh soils, EGU General Assembly 2016, held 17-22 April, 2016 in
     // Vienna Austria, id. EPSC2016-8105 --> peat Cp value Cp values in [J/kg/K]
-    calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) +
-                              (0.7e3 * silt_frac) + (1.9e3 * peat_frac);
+    calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac) + (1.9e3 * peat_frac);
     // K values in [W/K/m]
-    calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) +
-                             (4.9 * silt_frac) + (0.08 * peat_frac);
+    calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.08 * peat_frac);
     // Rho values in [kg/m3]
     // Peat density from Emily Bristol
-    calc_soil_density =
-        ((1.0 - peat_frac) * soil_density_) + (peat_frac * 250.0);
+    calc_soil_density = ((1.0 - peat_frac) * soil_density_) + (peat_frac * 250.0);
   }
 
   // Update the effective material density
   if (sediment_given == true) {
     density_(cell, pt) =
-        (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
-        ((1.0 - porosity) * calc_soil_density);
+        (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) + ((1.0 - porosity) * calc_soil_density);
 
   } else {
     density_(cell, pt) =
-        (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) +
-        ((1.0 - porosity) * soil_density_);
+        (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) + ((1.0 - porosity) * soil_density_);
   }
 
   // Update the effective material heat capacity
   if (sediment_given == true) {
-    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
-                                            (water_heat_capacity_ * wcurr))) +
+    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) + (water_heat_capacity_ * wcurr))) +
                                ((1.0 - porosity) * calc_soil_heat_capacity);
   } else {
-    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) +
-                                            (water_heat_capacity_ * wcurr))) +
+    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) + (water_heat_capacity_ * wcurr))) +
                                ((1.0 - porosity) * soil_heat_capacity_);
   }
 
@@ -604,13 +510,11 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
                               pow(calc_soil_thermal_cond, (1.0 - porosity));
   } else {
     thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
-                              pow(water_thermal_cond_, (wcurr * porosity)) *
-                              pow(soil_thermal_cond_, (1.0 - porosity));
+                              pow(water_thermal_cond_, (wcurr * porosity)) * pow(soil_thermal_cond_, (1.0 - porosity));
   }
 
   // Update the material thermal inertia term
-  thermal_inertia_(cell, pt) = (density_(cell, pt) * heat_capacity_(cell, pt)) -
-                               (ice_density_ * latent_heat_ * dfdT);
+  thermal_inertia_(cell, pt) = (density_(cell, pt) * heat_capacity_(cell, pt)) - (ice_density_ * latent_heat_ * dfdT);
 
   // Return values
   ice_saturation_(cell, pt)   = icurr;
@@ -633,9 +537,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Tensor Fpn(num_dims_);
 
   for (int i{0}; i < num_dims_; ++i) {
-    for (int j{0}; j < num_dims_; ++j) {
-      Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j));
-    }
+    for (int j{0}; j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j)); }
   }
 
   // compute trial state
@@ -648,9 +550,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // check yield condition
   ScalarT const smag = minitensor::norm(s);
   ScalarT const f =
-      smag -
-      SQ23 * (Y + K * eqps_old_(cell, pt) +
-              sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+      smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
 
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;
@@ -673,8 +573,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
     x(0) = 0.0;
 
-    LCM::MiniSolver<MIN, STEP, NLS, EvalT, nls_dim> mini_solver(
-        minimizer, step, j2nls, x);
+    LCM::MiniSolver<MIN, STEP, NLS, EvalT, nls_dim> mini_solver(minimizer, step, j2nls, x);
 
     ScalarT const alpha = eqps_old_(cell, pt) + SQ23 * x(0);
     ScalarT const H     = K * alpha + sat_mod_ * (1.0 - exp(-sat_exp_ * alpha));
@@ -706,9 +605,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // update yield surface
-  yield_surf_(cell, pt) =
-      Y + K * eqps_(cell, pt) +
-      sat_mod_ * (1. - std::exp(-sat_exp_ * eqps_(cell, pt)));
+  yield_surf_(cell, pt) = Y + K * eqps_(cell, pt) + sat_mod_ * (1. - std::exp(-sat_exp_ * eqps_(cell, pt)));
 
   // compute pressure
   ScalarT const pressure = 0.5 * kappa * (J_(cell, pt) - 1. / (J_(cell, pt)));
@@ -717,9 +614,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   sigma = pressure * I + s / J_(cell, pt);
 
   for (int i(0); i < num_dims_; ++i) {
-    for (int j(0); j < num_dims_; ++j) {
-      stress_(cell, pt, i, j) = sigma(i, j);
-    }
+    for (int j(0); j < num_dims_; ++j) { stress_(cell, pt, i, j) = sigma(i, j); }
   }
 
   // Determine if critical stress is exceeded

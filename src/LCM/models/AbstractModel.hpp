@@ -24,15 +24,13 @@ class AbstractModel
   using MeshScalarT = typename EvalT::MeshScalarT;
   using Workset     = typename Traits::EvalData;
 
-  using FieldMap = std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT>>>;
+  using FieldMap      = std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT>>>;
   using DataLayoutMap = std::map<std::string, Teuchos::RCP<PHX::DataLayout>>;
 
   ///
   /// Constructor
   ///
-  AbstractModel(
-      Teuchos::ParameterList*              p,
-      Teuchos::RCP<Albany::Layouts> const& dl)
+  AbstractModel(Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl)
   {
     // extract number of integration points and dimensions
     std::vector<PHX::DataLayout::size_type> dims;
@@ -42,8 +40,7 @@ class AbstractModel
     num_pts_  = dims[1];
     num_dims_ = dims[2];
 
-    field_name_map_ =
-        p->get<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map");
+    field_name_map_ = p->get<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map");
 
     return;
   }
@@ -150,17 +147,13 @@ class AbstractModel
   }
 
   void
-  setDependentField(
-      std::string const&                   field_name,
-      Teuchos::RCP<PHX::DataLayout> const& field)
+  setDependentField(std::string const& field_name, Teuchos::RCP<PHX::DataLayout> const& field)
   {
     dep_field_map_.insert(std::make_pair(field_name, field));
   }
 
   void
-  setEvaluatedField(
-      std::string const&                   field_name,
-      Teuchos::RCP<PHX::DataLayout> const& field)
+  setEvaluatedField(std::string const& field_name, Teuchos::RCP<PHX::DataLayout> const& field)
   {
     eval_field_map_.insert(std::make_pair(field_name, field));
   }

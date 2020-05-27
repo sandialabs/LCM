@@ -63,12 +63,10 @@ spherical_sweep(minitensor::Tensor4<double, 3> const& CC)
 
   minitensor::Vector<double, 2> const sphere_max(phi_max, theta_max);
 
-  minitensor::Vector<minitensor::Index, 2> const sphere_num_points(
-      phi_num_points, theta_num_points);
+  minitensor::Vector<minitensor::Index, 2> const sphere_num_points(phi_num_points, theta_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<double, 2> sphere_grid(
-      sphere_min, sphere_max, sphere_num_points);
+  minitensor::ParametricGrid<double, 2> sphere_grid(sphere_min, sphere_max, sphere_num_points);
 
   // Build a spherical parametrization for this elasticity.
   minitensor::SphericalParametrization<double, 3> sphere_param(CC);
@@ -116,12 +114,10 @@ stereographic_sweep(minitensor::Tensor4<double, 3> const& CC)
 
   minitensor::Vector<double, 2> const stereo_max(x_max, y_max);
 
-  minitensor::Vector<minitensor::Index, 2> const stereo_num_points(
-      x_num_points, y_num_points);
+  minitensor::Vector<minitensor::Index, 2> const stereo_num_points(x_num_points, y_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<double, 2> stereo_grid(
-      stereo_min, stereo_max, stereo_num_points);
+  minitensor::ParametricGrid<double, 2> stereo_grid(stereo_min, stereo_max, stereo_num_points);
 
   // Build a stereographic parametrization for this elasticity.
   minitensor::StereographicParametrization<double, 3> stereo_param(CC);
@@ -175,12 +171,10 @@ projective_sweep(minitensor::Tensor4<double, 3> const& CC)
 
   minitensor::Vector<double, 3> const project_max(x_max, y_max, z_max);
 
-  minitensor::Vector<minitensor::Index, 3> const project_num_points(
-      x_num_points, y_num_points, z_num_points);
+  minitensor::Vector<minitensor::Index, 3> const project_num_points(x_num_points, y_num_points, z_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<double, 3> project_grid(
-      project_min, project_max, project_num_points);
+  minitensor::ParametricGrid<double, 3> project_grid(project_min, project_max, project_num_points);
 
   // Build a projective parametrization for this elasticity.
   minitensor::ProjectiveParametrization<double, 3> project_param(CC);
@@ -228,12 +222,10 @@ tangent_sweep(minitensor::Tensor4<double, 3> const& CC)
 
   minitensor::Vector<double, 2> const tangent_max(x_max, y_max);
 
-  minitensor::Vector<minitensor::Index, 2> const tangent_num_points(
-      x_num_points, y_num_points);
+  minitensor::Vector<minitensor::Index, 2> const tangent_num_points(x_num_points, y_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<double, 2> tangent_grid(
-      tangent_min, tangent_max, tangent_num_points);
+  minitensor::ParametricGrid<double, 2> tangent_grid(tangent_min, tangent_max, tangent_num_points);
 
   // Build a tangent parametrization for this elasticity.
   minitensor::TangentParametrization<double, 3> tangent_param(CC);
@@ -287,12 +279,10 @@ cartesian_sweep(minitensor::Tensor4<double, 3> const& CC)
 
   minitensor::Vector<double, 3> const cartesian_max(x_max, y_max, z_max);
 
-  minitensor::Vector<minitensor::Index, 3> const cartesian_num_points(
-      x_num_points, y_num_points, z_num_points);
+  minitensor::Vector<minitensor::Index, 3> const cartesian_num_points(x_num_points, y_num_points, z_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<double, 3> cartesian_grid(
-      cartesian_min, cartesian_max, cartesian_num_points);
+  minitensor::ParametricGrid<double, 3> cartesian_grid(cartesian_min, cartesian_max, cartesian_num_points);
 
   // Build a projective parametrization for this elasticity.
   minitensor::CartesianParametrization<double, 3> cartesian_param(CC);
@@ -320,9 +310,7 @@ minitensor::Vector<D2FadType, 3>
 spherical_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(
-      sin(parameters[0]) * sin(parameters[1]),
-      cos(parameters[0]),
-      sin(parameters[0]) * cos(parameters[1]));
+      sin(parameters[0]) * sin(parameters[1]), cos(parameters[0]), sin(parameters[0]) * cos(parameters[1]));
 
   return normal;
 }
@@ -332,8 +320,7 @@ stereographic_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
   D2FadType r2 = parameters[0] * parameters[0] + parameters[1] * parameters[1];
 
-  minitensor::Vector<D2FadType, 3> normal(
-      2.0 * parameters[0], 2.0 * parameters[1], r2 - 1.0);
+  minitensor::Vector<D2FadType, 3> normal(2.0 * parameters[0], 2.0 * parameters[1], r2 - 1.0);
   normal /= (r2 + 1.0);
 
   return normal;
@@ -342,8 +329,7 @@ stereographic_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 minitensor::Vector<D2FadType, 3>
 projective_get_normal(minitensor::Vector<D2FadType, 3>& parameters)
 {
-  minitensor::Vector<D2FadType, 3> normal(
-      parameters[0], parameters[1], parameters[2]);
+  minitensor::Vector<D2FadType, 3> normal(parameters[0], parameters[1], parameters[2]);
 
   D2FadType const n = minitensor::norm(normal);
 
@@ -368,8 +354,7 @@ projective_get_normal(minitensor::Vector<D2FadType, 3>& parameters)
 minitensor::Vector<D2FadType, 3>
 tangent_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
-  D2FadType const r =
-      sqrt(parameters[0] * parameters[0] + parameters[1] * parameters[1]);
+  D2FadType const r = sqrt(parameters[0] * parameters[0] + parameters[1] * parameters[1]);
 
   minitensor::Vector<D2FadType, 3> normal(3, minitensor::Filler::ZEROS);
 
@@ -478,8 +463,7 @@ spherical_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -581,8 +565,7 @@ stereographic_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -669,8 +652,7 @@ projective_newton_raphson(
     n = projective_get_normal(Xfad2_sub);
 
     detA = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n))) +
-           Xfad2[3] * (Xfad2[0] * Xfad2[0] + Xfad2[1] * Xfad2[1] +
-                       Xfad2[2] * Xfad2[2] - 1);
+           Xfad2[3] * (Xfad2[0] * Xfad2[0] + Xfad2[1] * Xfad2[1] + Xfad2[2] * Xfad2[2] - 1);
 
     std::cout << "parameters: " << Xval << std::endl;
     std::cout << "determinant: " << (detA.val()).val() << std::endl;
@@ -696,8 +678,7 @@ projective_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -799,8 +780,7 @@ tangent_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -908,8 +888,7 @@ cartesian_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -977,16 +956,13 @@ main(int ac, char* av[])
   double const mu = 7.6e10;
 
   minitensor::Tensor4<double, 3> const I1 =
-      minitensor::identity_1<double, 3>() +
-      0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
+      minitensor::identity_1<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
 
   minitensor::Tensor4<double, 3> const I2 =
-      minitensor::identity_2<double, 3>() +
-      0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
+      minitensor::identity_2<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
 
   minitensor::Tensor4<double, 3> const I3 =
-      minitensor::identity_3<double, 3>() +
-      0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
+      minitensor::identity_3<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
 
   tangent = lambda * I3 + mu * (I1 + I2);
 

@@ -18,11 +18,9 @@ ScatterScalarNodalParameterBase<EvalT, Traits>::ScatterScalarNodalParameterBase(
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
   param_name             = p.get<std::string>("Parameter Name");
-  std::string field_name = p.isParameter("Field Name") ?
-                               p.get<std::string>("Field Name") :
-                               param_name;
-  val      = decltype(val)(field_name, dl->node_scalar);
-  numNodes = 0;
+  std::string field_name = p.isParameter("Field Name") ? p.get<std::string>("Field Name") : param_name;
+  val                    = decltype(val)(field_name, dl->node_scalar);
+  numNodes               = 0;
 
   this->addDependentField(val);
 
@@ -42,8 +40,7 @@ ScatterScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-void ScatterScalarNodalParameter<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData /* workset */)
+void ScatterScalarNodalParameter<EvalT, Traits>::evaluateFields(typename Traits::EvalData /* workset */)
 {
   ALBANY_ABORT(
       "PHAL::ScatterScalarNodalParameter is supposed to be used only for "
@@ -52,8 +49,7 @@ void ScatterScalarNodalParameter<EvalT, Traits>::evaluateFields(
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-void ScatterScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData /* workset */)
+void ScatterScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(typename Traits::EvalData /* workset */)
 {
   ALBANY_ABORT(
       "PHAL::ScatterScalarNodalParameter is supposed to be used only for "
@@ -65,17 +61,13 @@ void ScatterScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 
 template <typename Traits>
-ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
-    ScatterScalarNodalParameter(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
-    : ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>(
-          p,
-          dl)
+ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::ScatterScalarNodalParameter(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
+    : ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl)
 {
   // Create field tag
-  nodal_field_tag =
-      Teuchos::rcp(new PHX::Tag<ParamScalarT>(className, dl->dummy));
+  nodal_field_tag = Teuchos::rcp(new PHX::Tag<ParamScalarT>(className, dl->dummy));
 
   this->addEvaluatedField(*nodal_field_tag);
 }
@@ -83,20 +75,16 @@ ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
 // **********************************************************************
 template <typename Traits>
 void
-ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
-    evaluateFields(typename Traits::EvalData workset)
+ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?
-  Teuchos::RCP<Thyra_Vector> pvec =
-      workset.distParamLib->get(this->param_name)->vector();
-  Teuchos::ArrayRCP<ST> pvec_view = Albany::getNonconstLocalData(pvec);
+  Teuchos::RCP<Thyra_Vector> pvec      = workset.distParamLib->get(this->param_name)->vector();
+  Teuchos::ArrayRCP<ST>      pvec_view = Albany::getNonconstLocalData(pvec);
 
-  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)
-                                        ->workset_elem_dofs()[workset.wsIndex];
-  auto param_overlap_vs =
-      workset.distParamLib->get(this->param_name)->overlap_vector_space();
-  auto param_vs = pvec->range();
+  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)->workset_elem_dofs()[workset.wsIndex];
+  auto                   param_overlap_vs = workset.distParamLib->get(this->param_name)->overlap_vector_space();
+  auto                   param_vs         = pvec->range();
 
   auto param_indexer    = Albany::createGlobalLocalIndexer(param_vs);
   auto param_ov_indexer = Albany::createGlobalLocalIndexer(param_overlap_vs);
@@ -111,41 +99,34 @@ ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
 }
 
 template <typename Traits>
-ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
-    ScatterScalarExtruded2DNodalParameter(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
-    : ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>(
-          p,
-          dl)
+ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::ScatterScalarExtruded2DNodalParameter(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
+    : ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl)
 {
   fieldLevel = p.get<int>("Field Level");
 
   // Create field tag
-  nodal_field_tag =
-      Teuchos::rcp(new PHX::Tag<ParamScalarT>(className, dl->dummy));
+  nodal_field_tag = Teuchos::rcp(new PHX::Tag<ParamScalarT>(className, dl->dummy));
 
   this->addEvaluatedField(*nodal_field_tag);
 }
 
 template <typename Traits>
 void
-ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::
-    evaluateFields(typename Traits::EvalData workset)
+ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
+    typename Traits::EvalData workset)
 {
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?
-  Teuchos::RCP<Thyra_Vector> pvec =
-      workset.distParamLib->get(this->param_name)->vector();
-  Teuchos::ArrayRCP<ST> pvec_view = Albany::getNonconstLocalData(pvec);
+  Teuchos::RCP<Thyra_Vector> pvec      = workset.distParamLib->get(this->param_name)->vector();
+  Teuchos::ArrayRCP<ST>      pvec_view = Albany::getNonconstLocalData(pvec);
 
-  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering =
-      *workset.disc->getLayeredMeshNumbering();
+  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering = *workset.disc->getLayeredMeshNumbering();
 
-  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID =
-      workset.disc->getWsElNodeID()[workset.wsIndex];
-  auto param_vs      = pvec->range();
-  auto overlapNodeVS = workset.disc->getOverlapNodeVectorSpace();
+  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID    = workset.disc->getWsElNodeID()[workset.wsIndex];
+  auto                                            param_vs      = pvec->range();
+  auto                                            overlapNodeVS = workset.disc->getOverlapNodeVectorSpace();
 
   auto param_indexer   = Albany::createGlobalLocalIndexer(param_vs);
   auto ov_node_indexer = Albany::createGlobalLocalIndexer(overlapNodeVS);

@@ -18,8 +18,7 @@ namespace LCM {
 /// \brief Electrostatic Residual
 ///
 template <typename EvalT, typename Traits>
-class ElectrostaticResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                              public PHX::EvaluatorDerived<EvalT, Traits>
+class ElectrostaticResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
@@ -28,17 +27,13 @@ class ElectrostaticResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Constructor
   ///
-  ElectrostaticResidual(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ElectrostaticResidual(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics

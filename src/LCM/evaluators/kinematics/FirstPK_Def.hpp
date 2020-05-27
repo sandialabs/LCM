@@ -13,14 +13,10 @@
 
 namespace LCM {
 template <typename EvalT, typename Traits>
-FirstPK<EvalT, Traits>::FirstPK(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+FirstPK<EvalT, Traits>::FirstPK(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : stress_(p.get<std::string>("Stress Name"), dl->qp_tensor),
       def_grad_(p.get<std::string>("DefGrad Name"), dl->qp_tensor),
-      first_pk_stress_(
-          p.get<std::string>("First PK Stress Name"),
-          dl->qp_tensor),
+      first_pk_stress_(p.get<std::string>("First PK Stress Name"), dl->qp_tensor),
       have_pore_pressure_(p.get<bool>("Have Pore Pressure", false)),
       have_stab_pressure_(p.get<bool>("Have Stabilized Pressure", false)),
       small_strain_(p.get<bool>("Small Strain", false))
@@ -35,19 +31,16 @@ FirstPK<EvalT, Traits>::FirstPK(
   // logic to modify stress in the presence of a pore pressure
   if (have_pore_pressure_) {
     // grab the pore pressure
-    pore_pressure_ = decltype(pore_pressure_)(
-        p.get<std::string>("Pore Pressure Name"), dl->qp_scalar);
+    pore_pressure_ = decltype(pore_pressure_)(p.get<std::string>("Pore Pressure Name"), dl->qp_scalar);
     // grab Biot's coefficient
-    biot_coeff_ = decltype(biot_coeff_)(
-        p.get<std::string>("Biot Coefficient Name"), dl->qp_scalar);
+    biot_coeff_ = decltype(biot_coeff_)(p.get<std::string>("Biot Coefficient Name"), dl->qp_scalar);
     this->addDependentField(pore_pressure_);
     this->addDependentField(biot_coeff_);
   }
 
   // deal with stabilized pressure
   if (have_stab_pressure_) {
-    stab_pressure_ = decltype(stab_pressure_)(
-        p.get<std::string>("Pressure Name"), dl->qp_scalar);
+    stab_pressure_ = decltype(stab_pressure_)(p.get<std::string>("Pressure Name"), dl->qp_scalar);
     this->addDependentField(stab_pressure_);
   }
 
@@ -56,15 +49,12 @@ FirstPK<EvalT, Traits>::FirstPK(
   num_pts_  = dims[1];
   num_dims_ = dims[2];
 
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library");
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library");
 }
 
 template <typename EvalT, typename Traits>
 void
-FirstPK<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+FirstPK<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(stress_, fm);
   this->utils.setFieldData(def_grad_, fm);
@@ -78,50 +68,39 @@ FirstPK<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-FirstPK<EvalT, Traits>::operator()(const small_strain_Tag& tag, const int& cell)
-    const
+FirstPK<EvalT, Traits>::operator()(const small_strain_Tag& tag, const int& cell) const
 {
   for (int pt = 0; pt < num_pts_; ++pt)
     for (int i = 0; i < num_dims_; ++i)
-      for (int j = 0; j < num_dims_; ++j)
-        first_pk_stress_(cell, pt, i, j) = stress_(cell, pt, i, j);
+      for (int j = 0; j < num_dims_; ++j) first_pk_stress_(cell, pt, i, j) = stress_(cell, pt, i, j);
 }
 
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-FirstPK<EvalT, Traits>::operator()(
-    const have_stab_pressure_Tag& tag,
-    const int&                    cell) const
+FirstPK<EvalT, Traits>::operator()(const have_stab_pressure_Tag& tag, const int& cell) const
 {
   for (int pt = 0; pt < num_pts_; ++pt) {
     ScalarT pressure = first_pk_stress_(cell, pt, 0, 0);
-    for (int k = 1; k < num_dims_; ++k)
-      pressure += first_pk_stress_(cell, pt, k, k);
+    for (int k = 1; k < num_dims_; ++k) pressure += first_pk_stress_(cell, pt, k, k);
     pressure /= num_dims_;
-    for (int k = 0; k < num_dims_; ++k)
-      first_pk_stress_(cell, pt, k, k) += stab_pressure_(cell, pt) - pressure;
+    for (int k = 0; k < num_dims_; ++k) first_pk_stress_(cell, pt, k, k) += stab_pressure_(cell, pt) - pressure;
   }
 }
 
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-FirstPK<EvalT, Traits>::operator()(
-    const have_pore_pressure_Tag& tag,
-    const int&                    cell) const
+FirstPK<EvalT, Traits>::operator()(const have_pore_pressure_Tag& tag, const int& cell) const
 {
   for (int pt = 0; pt < num_pts_; ++pt)
     for (int k = 0; k < num_dims_; ++k) {
       // Effective Stress theory
-      first_pk_stress_(cell, pt, k, k) -=
-          biot_coeff_(cell, pt) * pore_pressure_(cell, pt);
+      first_pk_stress_(cell, pt, k, k) -= biot_coeff_(cell, pt) * pore_pressure_(cell, pt);
     }
 }
 
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-FirstPK<EvalT, Traits>::operator()(
-    const no_small_strain_Tag& tag,
-    const int&                 cell) const
+FirstPK<EvalT, Traits>::operator()(const no_small_strain_Tag& tag, const int& cell) const
 {
   ScalarT sig[3][3], F[3][3], P[3][3];
   for (int pt = 0; pt < num_pts_; ++pt) {
@@ -182,8 +161,7 @@ FirstPK<EvalT, Traits>::operator()(
     }
 
     for (int i = 0; i < num_dims_; ++i)
-      for (int j = 0; j < num_dims_; ++j)
-        first_pk_stress_(cell, pt, i, j) = P[i][j];
+      for (int j = 0; j < num_dims_; ++j) first_pk_stress_(cell, pt, i, j) = P[i][j];
   }
 }
 
@@ -197,10 +175,8 @@ FirstPK<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   // Copy stress_ to first_pk_stress_.
   Kokkos::parallel_for(small_strain_Policy(0, workset.numCells), *this);
   // Optionally modify the stress tensor by pressure terms.
-  if (have_stab_pressure_)
-    Kokkos::parallel_for(have_stab_pressure_Policy(0, workset.numCells), *this);
-  if (have_pore_pressure_)
-    Kokkos::parallel_for(have_pore_pressure_Policy(0, workset.numCells), *this);
+  if (have_stab_pressure_) Kokkos::parallel_for(have_stab_pressure_Policy(0, workset.numCells), *this);
+  if (have_pore_pressure_) Kokkos::parallel_for(have_pore_pressure_Policy(0, workset.numCells), *this);
   if (!small_strain_) {
     // For large deformation, map Cauchy stress to 1st PK stress. In the
     // small-strain case, this transformation is Identity.
@@ -208,13 +184,10 @@ FirstPK<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   }
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "First_PK time = " << millisec << "  " << microseconds
-            << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "First_PK time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 }  // namespace LCM

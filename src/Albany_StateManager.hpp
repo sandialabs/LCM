@@ -274,17 +274,15 @@ class StateManager
 
   /// Container to hold the states that have been registered, by element block,
   /// to be allocated later
-  std::map<std::string, RegisteredStates> statesToStore;
-  std::map<std::string, std::map<std::string, RegisteredStates>>
-      sideSetStatesToStore;
+  std::map<std::string, RegisteredStates>                        statesToStore;
+  std::map<std::string, std::map<std::string, RegisteredStates>> sideSetStatesToStore;
 
   /// Discretization object which allows StateManager to perform input/output
   Teuchos::RCP<Albany::AbstractDiscretization> disc;
 
   /// NEW WAY
-  Teuchos::RCP<StateInfoStruct> stateInfo;
-  std::map<std::string, Teuchos::RCP<StateInfoStruct>>
-      sideSetStateInfo;  // A map sideSetName->stateInfoBd
+  Teuchos::RCP<StateInfoStruct>                        stateInfo;
+  std::map<std::string, Teuchos::RCP<StateInfoStruct>> sideSetStateInfo;  // A map sideSetName->stateInfoBd
 
   Teuchos::RCP<EigendataStructT>   eigenDataT;
   Teuchos::RCP<Tpetra_MultiVector> auxDataT;

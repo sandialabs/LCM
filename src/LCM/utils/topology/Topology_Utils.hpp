@@ -35,10 +35,7 @@ display_relation(Topology& topology, stk::mesh::Entity entity);
 /// \param[in] the rank of the entity
 ///
 void
-display_relation(
-    Topology&                   topology,
-    stk::mesh::Entity           entity,
-    stk::mesh::EntityRank const rank);
+display_relation(Topology& topology, stk::mesh::Entity entity, stk::mesh::EntityRank const rank);
 
 ///
 /// Test whether a given source entity and relation are
@@ -75,9 +72,7 @@ entity_string(Topology& topology, stk::mesh::Entity entity);
 /// Auxiliary for graphviz output
 ///
 std::string
-entity_color(
-    stk::mesh::EntityRank const rank,
-    FailureState const          failure_state);
+entity_color(stk::mesh::EntityRank const rank, FailureState const failure_state);
 
 ///
 /// Auxiliary for graphviz output
@@ -147,8 +142,7 @@ high_id_from_low_id(
 /// Determine surface element topology based on bulk element topology
 ///
 inline shards::CellTopology
-interfaceCellTopogyFromBulkCellTopogy(
-    shards::CellTopology const& bulk_cell_topology)
+interfaceCellTopogyFromBulkCellTopogy(shards::CellTopology const& bulk_cell_topology)
 {
   std::string const& bulk_cell_topology_name = bulk_cell_topology.getName();
 
@@ -167,10 +161,7 @@ interfaceCellTopogyFromBulkCellTopogy(
     ctd = shards::getCellTopologyData<shards::Hexahedron<8>>();
 
   } else {
-    ALBANY_PANIC(
-        false,
-        "LogicError: Interface cell topology not implemented for:"
-            << bulk_cell_topology_name << '\n');
+    ALBANY_PANIC(false, "LogicError: Interface cell topology not implemented for:" << bulk_cell_topology_name << '\n');
   }
 
   shards::CellTopology interface_cell_topology = shards::CellTopology(ctd);

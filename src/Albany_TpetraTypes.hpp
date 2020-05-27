@@ -37,9 +37,7 @@ typedef int Tpetra_LO;
 #if defined(HAVE_TPETRA_INST_INT_LONG_LONG)
 typedef long long Tpetra_GO;
 #elif defined(HAVE_TPETRA_INST_INT_LONG)
-static_assert(
-    sizeof(long) == sizeof(GO),
-    "Tpetra's biggest enabled GlobalOrdinal is long but thats not 64 bit");
+static_assert(sizeof(long) == sizeof(GO), "Tpetra's biggest enabled GlobalOrdinal is long but thats not 64 bit");
 typedef long Tpetra_GO;
 #elif defined(HAVE_TPETRA_INST_INT_UNSIGNED_LONG)
 static_assert(
@@ -51,17 +49,14 @@ typedef unsigned long Tpetra_GO;
 #error "Albany needs a 64-bit GlobalOrdinal enabled in Tpetra"
 #endif
 
-typedef Tpetra::Map<Tpetra_LO, Tpetra_GO, KokkosNode>      Tpetra_Map;
-typedef Tpetra::Export<Tpetra_LO, Tpetra_GO, KokkosNode>   Tpetra_Export;
-typedef Tpetra::Import<Tpetra_LO, Tpetra_GO, KokkosNode>   Tpetra_Import;
-typedef Tpetra::CrsGraph<Tpetra_LO, Tpetra_GO, KokkosNode> Tpetra_CrsGraph;
-typedef Tpetra::CrsMatrix<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
-    Tpetra_CrsMatrix;
-typedef Tpetra::RowMatrix<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
-                                                               Tpetra_RowMatrix;
-typedef Tpetra::Operator<ST, Tpetra_LO, Tpetra_GO, KokkosNode> Tpetra_Operator;
-typedef Tpetra::Vector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>   Tpetra_Vector;
-typedef Tpetra::MultiVector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
-    Tpetra_MultiVector;
+typedef Tpetra::Map<Tpetra_LO, Tpetra_GO, KokkosNode>             Tpetra_Map;
+typedef Tpetra::Export<Tpetra_LO, Tpetra_GO, KokkosNode>          Tpetra_Export;
+typedef Tpetra::Import<Tpetra_LO, Tpetra_GO, KokkosNode>          Tpetra_Import;
+typedef Tpetra::CrsGraph<Tpetra_LO, Tpetra_GO, KokkosNode>        Tpetra_CrsGraph;
+typedef Tpetra::CrsMatrix<ST, Tpetra_LO, Tpetra_GO, KokkosNode>   Tpetra_CrsMatrix;
+typedef Tpetra::RowMatrix<ST, Tpetra_LO, Tpetra_GO, KokkosNode>   Tpetra_RowMatrix;
+typedef Tpetra::Operator<ST, Tpetra_LO, Tpetra_GO, KokkosNode>    Tpetra_Operator;
+typedef Tpetra::Vector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>      Tpetra_Vector;
+typedef Tpetra::MultiVector<ST, Tpetra_LO, Tpetra_GO, KokkosNode> Tpetra_MultiVector;
 
 #endif  // ALBANY_TPETRA_TYPES_HPP

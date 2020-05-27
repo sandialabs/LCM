@@ -12,16 +12,13 @@ namespace PHAL {
 
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::
-    DOFGradInterpolationSideBase(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl_side)
+DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::DOFGradInterpolationSideBase(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl_side)
     : sideSetName(p.get<std::string>("Side Set Name")),
       val_node(p.get<std::string>("Variable Name"), dl_side->node_scalar),
       gradBF(p.get<std::string>("Gradient BF Name"), dl_side->node_qp_gradient),
-      grad_qp(
-          p.get<std::string>("Gradient Variable Name"),
-          dl_side->qp_gradient)
+      grad_qp(p.get<std::string>("Gradient Variable Name"), dl_side->qp_gradient)
 {
   ALBANY_PANIC(
       !dl_side->isSideLayouts,
@@ -32,9 +29,7 @@ DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::
   this->addDependentField(gradBF.fieldTag());
   this->addEvaluatedField(grad_qp);
 
-  this->setName(
-      "DOFGradInterpolationSide(" + p.get<std::string>("Variable Name") + ")" +
-      PHX::print<EvalT>());
+  this->setName("DOFGradInterpolationSide(" + p.get<std::string>("Variable Name") + ")" + PHX::print<EvalT>());
 
   numSideNodes = dl_side->node_qp_gradient->extent(2);
   numSideQPs   = dl_side->node_qp_gradient->extent(3);
@@ -58,13 +53,11 @@ DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
 
-  std::vector<Albany::SideStruct> const& sideSet =
-      workset.sideSets->at(sideSetName);
+  std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell
     int const cell = it_side.elem_LID;
@@ -74,8 +67,7 @@ DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(
       for (int dim = 0; dim < numDims; ++dim) {
         grad_qp(cell, side, qp, dim) = 0.;
         for (int node = 0; node < numSideNodes; ++node) {
-          grad_qp(cell, side, qp, dim) +=
-              val_node(cell, side, node) * gradBF(cell, side, node, qp, dim);
+          grad_qp(cell, side, qp, dim) += val_node(cell, side, node) * gradBF(cell, side, node, qp, dim);
         }
       }
     }

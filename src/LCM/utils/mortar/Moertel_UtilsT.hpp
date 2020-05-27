@@ -85,10 +85,7 @@ MatMatMult(
 */
 template <class ST, class LO, class GO, class N>
 Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
-PaddedMatrix(
-    const Tpetra::Map<LO, GO, N>& rowmap,
-    double                        val,
-    int const                     numentriesperrow);
+PaddedMatrix(const Tpetra::Map<LO, GO, N>& rowmap, double val, int const numentriesperrow);
 
 /*!
 \brief Strip out values from a matrix below a certain tolerance
@@ -148,9 +145,7 @@ to be given on input
 */
 template <class LO, class GO, class N>
 Teuchos::RCP<Tpetra::Map<LO, GO, N>>
-SplitMap(
-    const Tpetra::Map<LO, GO, N>& Amap,
-    const Tpetra::Map<LO, GO, N>& Agiven);
+SplitMap(const Tpetra::Map<LO, GO, N>& Amap, const Tpetra::Map<LO, GO, N>& Agiven);
 
 /*!
 \brief split a vector into 2 non-overlapping pieces
@@ -191,10 +186,7 @@ the sond row gives the local size of the row- and column map.
 */
 template <class ST, class LO, class GO, class N>
 bool
-Print_Matrix(
-    std::string                             name,
-    const Tpetra::CrsMatrix<ST, LO, GO, N>& A,
-    int                                     ibase);
+Print_Matrix(std::string name, const Tpetra::CrsMatrix<ST, LO, GO, N>& A, int ibase);
 
 /*!
 \brief Print graph to file
@@ -226,10 +218,7 @@ Index base can either be 0 or 1.
 */
 template <class ST, class LO, class GO, class N>
 bool
-Print_Vector(
-    std::string                          name,
-    const Tpetra::Vector<ST, LO, GO, N>& v,
-    int                                  ibase);
+Print_Vector(std::string name, const Tpetra::Vector<ST, LO, GO, N>& v, int ibase);
 
 //! Error reporting method
 int

@@ -25,15 +25,12 @@ class Manager;
  */
 
 template <typename EvalT, typename Traits>
-class ReaderBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                   public PHX::EvaluatorDerived<EvalT, Traits>
+class ReaderBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ReaderBase(const Teuchos::RCP<Manager>& rc_mgr);
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
   void
   evaluateFields(typename Traits::EvalData d);
   const Teuchos::RCP<const PHX::FieldTag>&
@@ -54,17 +51,12 @@ class Reader : public ReaderBase<EvalT, Traits>
 };
 
 template <typename Traits>
-class Reader<PHAL::AlbanyTraits::Residual, Traits>
-    : public ReaderBase<PHAL::AlbanyTraits::Residual, Traits>
+class Reader<PHAL::AlbanyTraits::Residual, Traits> : public ReaderBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  Reader(
-      const Teuchos::RCP<Manager>&         rc_mgr,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  Reader(const Teuchos::RCP<Manager>& rc_mgr, const Teuchos::RCP<Albany::Layouts>& dl);
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
   void
   evaluateFields(typename Traits::EvalData d);
 

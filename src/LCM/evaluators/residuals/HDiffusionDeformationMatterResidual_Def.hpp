@@ -12,14 +12,11 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-HDiffusionDeformationMatterResidual<EvalT, Traits>::
-    HDiffusionDeformationMatterResidual(
-        Teuchos::ParameterList&              p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+HDiffusionDeformationMatterResidual<EvalT, Traits>::HDiffusionDeformationMatterResidual(
+    Teuchos::ParameterList&              p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
     : wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          dl->node_qp_vector),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       GradBF(p.get<std::string>("Gradient BF Name"), dl->node_qp_vector),
       Dstar(p.get<std::string>("Effective Diffusivity Name"), dl->qp_scalar),
       DL(p.get<std::string>("Diffusion Coefficient Name"), dl->qp_scalar),
@@ -30,9 +27,7 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::
       Ctrapped(p.get<std::string>("Trapped Concentration Name"), dl->qp_scalar),
       Ntrapped(p.get<std::string>("Trapped Solvent Name"), dl->qp_scalar),
       CLGrad(p.get<std::string>("Gradient QP Variable Name"), dl->qp_vector),
-      stressGrad(
-          p.get<std::string>("Gradient Hydrostatic Stress Name"),
-          dl->qp_vector),
+      stressGrad(p.get<std::string>("Gradient Hydrostatic Stress Name"), dl->qp_vector),
       DefGrad(p.get<std::string>("Deformation Gradient Name"), dl->qp_tensor),
       Pstress(p.get<std::string>("Stress Name"), dl->qp_tensor),
       weights(p.get<std::string>("Weights Name"), dl->qp_scalar),
@@ -74,11 +69,9 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::
   have_eqps_ = false;
   if (p.isType<std::string>("Equivalent Plastic Strain Name")) {
     have_eqps_ = true;
-    eqps       = decltype(eqps)(
-        p.get<std::string>("Equivalent Plastic Strain Name"), dl->qp_scalar);
+    eqps       = decltype(eqps)(p.get<std::string>("Equivalent Plastic Strain Name"), dl->qp_scalar);
     this->addDependentField(eqps);
-    eqpsFactor = decltype(eqpsFactor)(
-        p.get<std::string>("Strain Rate Factor Name"), dl->qp_scalar);
+    eqpsFactor = decltype(eqpsFactor)(p.get<std::string>("Strain Rate Factor Name"), dl->qp_scalar);
     this->addDependentField(eqpsFactor);
   }
 
@@ -106,8 +99,7 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::
   // Get data from previous converged time step
   ClatticeName = p.get<std::string>("QP Variable Name") + "_old";
   CLGradName   = p.get<std::string>("Gradient QP Variable Name") + "_old";
-  if (have_eqps_)
-    eqpsName = p.get<std::string>("Equivalent Plastic Strain Name") + "_old";
+  if (have_eqps_) eqpsName = p.get<std::string>("Equivalent Plastic Strain Name") + "_old";
 
   this->setName("HDiffusionDeformationMatterResidual" + PHX::print<EvalT>());
   // std::cout << "End of Hdiff ctor" << std::endl;
@@ -148,32 +140,24 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(TResidual, fm);
 
   // Allocate workspace for temporary variables
-  Hflux = Kokkos::createDynRankView(
-      DL.get_view(), "XXX", worksetSize, numQPs, numDims);
-  pterm  = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
-  tpterm = Kokkos::createDynRankView(
-      DL.get_view(), "XXX", worksetSize, numNodes, numQPs);
-  artificalDL =
-      Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
-  stabilizedDL =
-      Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
-  C = Kokkos::createDynRankView(
-      DL.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  Cinv = Kokkos::createDynRankView(
-      DL.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  Hflux        = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims);
+  pterm        = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
+  tpterm       = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numNodes, numQPs);
+  artificalDL  = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
+  stabilizedDL = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
+  C            = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  Cinv         = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
   // CinDLTgrad = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize,
   // numQPs, numDims);
   // CinDLTgrad_old = Kokkos::createDynRankView(DL.get_view(), "XXX",
   // worksetSize, numQPs, numDims);
-  CinvTaugrad = Kokkos::createDynRankView(
-      DL.get_view(), "XXX", worksetSize, numQPs, numDims);
+  CinvTaugrad = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims);
 }
 
 //*****
 template <typename EvalT, typename Traits>
 void
-HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // std::cout << "In evaluator: " << this->getName() << "\n";
 
@@ -197,58 +181,46 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(
       if (dt == 0) {
         artificalDL(cell, qp) = 0;
       } else {
-        temp = elementLength(cell, qp) * elementLength(cell, qp) / 6.0 *
-               Dstar(cell, qp) / DL(cell, qp) / dt;
+        temp          = elementLength(cell, qp) * elementLength(cell, qp) / 6.0 * Dstar(cell, qp) / DL(cell, qp) / dt;
         ScalarT temp2 = ((temp - 1) / DL(cell, qp));
         if (temp2 < 10.0 && temp2 > -10.0)
-          artificalDL(cell, qp) =
-              stab_param_ *
-              //  (temp) // temp - DL is closer to the limit ...if lumped mass
-              //  is preferred..
-              std::abs(temp)  // should be 1 but use 0.5 for safety
-              * (0.5 + 0.5 * std::tanh(temp2)) * DL(cell, qp);
+          artificalDL(cell, qp) = stab_param_ *
+                                  //  (temp) // temp - DL is closer to the limit ...if lumped mass
+                                  //  is preferred..
+                                  std::abs(temp)  // should be 1 but use 0.5 for safety
+                                  * (0.5 + 0.5 * std::tanh(temp2)) * DL(cell, qp);
         else if (temp2 >= 10.0)
           artificalDL(cell, qp) = stab_param_ * std::abs(temp) * DL(cell, qp);
         else
           artificalDL(cell, qp) = 0.0;
       }
-      stabilizedDL(cell, qp) =
-          artificalDL(cell, qp) / (DL(cell, qp) + artificalDL(cell, qp));
+      stabilizedDL(cell, qp) = artificalDL(cell, qp) / (DL(cell, qp) + artificalDL(cell, qp));
     }
   }
 
   // compute the 'material' flux
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
-      minitensor::Tensor<ScalarT> F(
-          minitensor::Source::ARRAY, numDims, DefGrad, cell, qp, 0, 0);
+      minitensor::Tensor<ScalarT> F(minitensor::Source::ARRAY, numDims, DefGrad, cell, qp, 0, 0);
 
       minitensor::Tensor<ScalarT> C_tensor_ = minitensor::t_dot(F, F);
 
-      minitensor::Tensor<ScalarT> C_inv_tensor_ =
-          minitensor::inverse(C_tensor_);
+      minitensor::Tensor<ScalarT> C_inv_tensor_ = minitensor::inverse(C_tensor_);
 
-      minitensor::Vector<ScalarT> C_grad_(
-          minitensor::Source::ARRAY, numDims, CLGrad, cell, qp, 0);
+      minitensor::Vector<ScalarT> C_grad_(minitensor::Source::ARRAY, numDims, CLGrad, cell, qp, 0);
 
-      minitensor::Vector<ScalarT> C_grad_in_ref_ =
-          minitensor::dot(C_inv_tensor_, C_grad_);
+      minitensor::Vector<ScalarT> C_grad_in_ref_ = minitensor::dot(C_inv_tensor_, C_grad_);
 
       temp = (DL(cell, qp) + artificalDL(cell, qp));  //**GB changed 08/14/2015
       // Note: Now temp is the diffusivity
 
       for (int j = 0; j < numDims; j++) {
-        Hflux(cell, qp, j) = (1.0 - stabilizedDL(cell, qp)) *
-                             C_grad_in_ref_(j) * dt *
-                             temp;  // **GB changed 08/14/2015
+        Hflux(cell, qp, j) = (1.0 - stabilizedDL(cell, qp)) * C_grad_in_ref_(j) * dt * temp;  // **GB changed 08/14/2015
       }
     }
   }
-  FST::integrate(
-      TResidual.get_view(),
-      Hflux,
-      wGradBF.get_view(),
-      false);  // this also works
+  FST::integrate(TResidual.get_view(), Hflux, wGradBF.get_view(),
+                 false);  // this also works
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < numNodes; ++node) {
@@ -258,41 +230,32 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(
         // 08/14/2015
 
         // Transient Term
-        TResidual(cell, node) +=
-            Dstar(cell, qp) * (Clattice(cell, qp) - Clattice_old(cell, qp)) *
-            wBF(cell, node, qp);  //*temp; GB changed 08/14/2015
+        TResidual(cell, node) += Dstar(cell, qp) * (Clattice(cell, qp) - Clattice_old(cell, qp)) *
+                                 wBF(cell, node, qp);  //*temp; GB changed 08/14/2015
 
         // Strain Rate Term
         if (have_eqps_) {
-          TResidual(cell, node) +=
-              eqpsFactor(cell, qp) * (eqps(cell, qp) - eqps_old(cell, qp)) *
-              wBF(cell, node, qp);  //*temp; GB changed 08/14/2015
+          TResidual(cell, node) += eqpsFactor(cell, qp) * (eqps(cell, qp) - eqps_old(cell, qp)) *
+                                   wBF(cell, node, qp);  //*temp; GB changed 08/14/2015
         }
 
         // Isotope decay term
-        TResidual(cell, node) +=
-            t_decay_constant_ * (Clattice(cell, qp) + Ctrapped(cell, qp)) *
-            wBF(cell, node, qp) * dt;  //*temp; GB changed 08/14/2015
+        TResidual(cell, node) += t_decay_constant_ * (Clattice(cell, qp) + Ctrapped(cell, qp)) * wBF(cell, node, qp) *
+                                 dt;  //*temp; GB changed 08/14/2015
 
         // hydrostatic stress term
         // Need to be done: Add C_inverse term into hydrostatic residual
         // This is horribly inefficient - will refactor to a single loop
 
-        minitensor::Tensor<ScalarT> F(
-            minitensor::Source::ARRAY, numDims, DefGrad, cell, qp, 0, 0);
-        minitensor::Tensor<ScalarT> C_tensor = minitensor::t_dot(F, F);
-        minitensor::Tensor<ScalarT> C_inv_tensor =
-            minitensor::inverse(C_tensor);
-        minitensor::Vector<ScalarT> stress_grad(
-            minitensor::Source::ARRAY, numDims, stressGrad, cell, qp, 0);
-        minitensor::Vector<ScalarT> C_inv_stress_grad =
-            minitensor::dot(C_inv_tensor, stress_grad);
+        minitensor::Tensor<ScalarT> F(minitensor::Source::ARRAY, numDims, DefGrad, cell, qp, 0, 0);
+        minitensor::Tensor<ScalarT> C_tensor     = minitensor::t_dot(F, F);
+        minitensor::Tensor<ScalarT> C_inv_tensor = minitensor::inverse(C_tensor);
+        minitensor::Vector<ScalarT> stress_grad(minitensor::Source::ARRAY, numDims, stressGrad, cell, qp, 0);
+        minitensor::Vector<ScalarT> C_inv_stress_grad = minitensor::dot(C_inv_tensor, stress_grad);
 
         for (int dim = 0; dim < numDims; ++dim) {
-          TResidual(cell, node) -= tauFactor(cell, qp) * Clattice(cell, qp) *
-                                   wGradBF(cell, node, qp, dim) *
-                                   C_inv_stress_grad(dim) *
-                                   dt;  //*temp; GB changed 08/14/2015
+          TResidual(cell, node) -= tauFactor(cell, qp) * Clattice(cell, qp) * wGradBF(cell, node, qp, dim) *
+                                   C_inv_stress_grad(dim) * dt;  //*temp; GB changed 08/14/2015
         }
       }
     }
@@ -307,8 +270,7 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(
     CLPbar = 0.0;
     vol    = 0.0;
     for (int qp = 0; qp < numQPs; ++qp) {
-      CLPbar +=
-          weights(cell, qp) * (Clattice(cell, qp) - Clattice_old(cell, qp));
+      CLPbar += weights(cell, qp) * (Clattice(cell, qp) - Clattice_old(cell, qp));
       vol += weights(cell, qp);
     }
     CLPbar /= vol;
@@ -319,9 +281,7 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(
       trialPbar = 0.0;
       for (int qp = 0; qp < numQPs; ++qp) { trialPbar += wBF(cell, node, qp); }
       trialPbar /= vol;
-      for (int qp = 0; qp < numQPs; ++qp) {
-        tpterm(cell, node, qp) = trialPbar;
-      }
+      for (int qp = 0; qp < numQPs; ++qp) { tpterm(cell, node, qp) = trialPbar; }
     }
   }
 
@@ -330,10 +290,8 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(
       for (int qp = 0; qp < numQPs; ++qp) {
         // temp =  1.0/ ( DL(cell,qp)  + artificalDL(cell,qp)  ); GB changed
         // 08/14/2015
-        TResidual(cell, node) -=
-            stab_param_ * Dstar(cell, qp) *  // temp* GB changed 08/14/2015
-            (-Clattice(cell, qp) + Clattice_old(cell, qp) + pterm(cell, qp)) *
-            wBF(cell, node, qp);
+        TResidual(cell, node) -= stab_param_ * Dstar(cell, qp) *  // temp* GB changed 08/14/2015
+                                 (-Clattice(cell, qp) + Clattice_old(cell, qp) + pterm(cell, qp)) * wBF(cell, node, qp);
       }
     }
   }

@@ -20,16 +20,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class ThermalResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-                     public PHX::EvaluatorDerived<EvalT, Traits>
+class ThermalResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ThermalResid(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -43,9 +40,9 @@ class ThermalResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT const, Cell, QuadPoint>                Tdot;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           TGrad;
-  Teuchos::Array<double> kappa;  // Thermal Conductivity array
-  double                 C;      // Heat Capacity
-  double                 rho;    // Density
+  Teuchos::Array<double>                                      kappa;  // Thermal Conductivity array
+  double                                                      C;      // Heat Capacity
+  double                                                      rho;    // Density
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> TResidual;

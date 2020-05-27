@@ -19,8 +19,7 @@ namespace LCM {
 
 // Body force evaluator
 template <typename EvalT, typename Traits>
-class BodyForce : public PHX::EvaluatorWithBaseImpl<Traits>,
-                  public PHX::EvaluatorDerived<EvalT, Traits>
+class BodyForce : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
@@ -29,9 +28,7 @@ class BodyForce : public PHX::EvaluatorWithBaseImpl<Traits>,
   BodyForce(Teuchos::ParameterList& p, Teuchos::RCP<Albany::Layouts> dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

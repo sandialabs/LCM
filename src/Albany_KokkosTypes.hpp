@@ -30,23 +30,16 @@ namespace Albany {
 
 // kokkos 1d and 2d views to be used for on-device kernels
 template <typename Scalar, typename MemoryTraits = Kokkos::MemoryUnmanaged>
-using DeviceView1d =
-    Kokkos::View<Scalar*, Kokkos::LayoutLeft, PHX::Device, MemoryTraits>;
+using DeviceView1d = Kokkos::View<Scalar*, Kokkos::LayoutLeft, PHX::Device, MemoryTraits>;
 template <typename Scalar, typename MemoryTraits = Kokkos::MemoryUnmanaged>
-using DeviceView2d =
-    Kokkos::View<Scalar**, Kokkos::LayoutLeft, PHX::Device, MemoryTraits>;
+using DeviceView2d = Kokkos::View<Scalar**, Kokkos::LayoutLeft, PHX::Device, MemoryTraits>;
 
 // Kokkos types for local graphs/matrices, to be used for on-device kernels
-using DeviceLocalGraph =
-    Kokkos::StaticCrsGraph<LO, Kokkos::LayoutLeft, PHX::Device>;
+using DeviceLocalGraph = Kokkos::StaticCrsGraph<LO, Kokkos::LayoutLeft, PHX::Device>;
 
 template <typename Scalar>
-using DeviceLocalMatrix = KokkosSparse::CrsMatrix<
-    Scalar,
-    LO,
-    PHX::Device,
-    Kokkos::MemoryUnmanaged,
-    DeviceLocalGraph::size_type>;
+using DeviceLocalMatrix =
+    KokkosSparse::CrsMatrix<Scalar, LO, PHX::Device, Kokkos::MemoryUnmanaged, DeviceLocalGraph::size_type>;
 
 }  // namespace Albany
 

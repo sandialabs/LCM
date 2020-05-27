@@ -192,9 +192,7 @@ class Topology
   /// \attention Assumes that all elements have the same topology
   ////
   stk::mesh::EntityVector
-  createSurfaceElementConnectivity(
-      stk::mesh::Entity face_top,
-      stk::mesh::Entity face_bottom);
+  createSurfaceElementConnectivity(stk::mesh::Entity face_top, stk::mesh::Entity face_bottom);
 
   ///
   /// \brief Create vectors describing the vertices and edges of the
@@ -296,36 +294,26 @@ class Topology
   /// \brief Adds a relation between two entities
   ///
   void
-  add_relation(
-      stk::mesh::Entity source_entity,
-      stk::mesh::Entity target_entity,
-      EdgeId            local_relation_id);
+  add_relation(stk::mesh::Entity source_entity, stk::mesh::Entity target_entity, EdgeId local_relation_id);
 
   ///
   /// \brief Removes the relation between two entities
   ///
   void
-  remove_relation(
-      stk::mesh::Entity source_entity,
-      stk::mesh::Entity target_entity,
-      EdgeId            local_relation_id);
+  remove_relation(stk::mesh::Entity source_entity, stk::mesh::Entity target_entity, EdgeId local_relation_id);
 
   ///
   /// \brief Returns a vector with all the mesh entities of a
   ///        specific rank
   ///
   stk::mesh::EntityVector
-  get_rank_entities(
-      stk::mesh::BulkData const& bulk_data,
-      stk::mesh::EntityRank      entity_rank);
+  get_rank_entities(stk::mesh::BulkData const& bulk_data, stk::mesh::EntityRank entity_rank);
 
   ///
   /// \brief Gets the local relation id (0,1,2,...) between two entities
   ///
   EdgeId
-  getLocalRelationId(
-      stk::mesh::Entity source_entity,
-      stk::mesh::Entity target_entity);
+  getLocalRelationId(stk::mesh::Entity source_entity, stk::mesh::Entity target_entity);
 
   ///
   /// \brief Returns the total number of lower rank entities
@@ -340,17 +328,13 @@ class Topology
   ///        returned entities.
   ///
   stk::mesh::EntityVector
-  getDirectlyConnectedEntities(
-      stk::mesh::Entity     entity,
-      stk::mesh::EntityRank entity_rank);
+  getDirectlyConnectedEntities(stk::mesh::Entity entity, stk::mesh::EntityRank entity_rank);
 
   ///
   /// \brief Checks if an entity exists inside a specific vector
   ///
   bool
-  findEntityInVector(
-      stk::mesh::EntityVector& entities,
-      stk::mesh::Entity        entity);
+  findEntityInVector(stk::mesh::EntityVector& entities, stk::mesh::Entity entity);
 
   ///
   /// \brief Returns a group of entities connected indirectly to a
@@ -363,9 +347,7 @@ class Topology
   ///
   ///
   stk::mesh::EntityVector
-  getBoundaryEntities(
-      stk::mesh::Entity     entity,
-      stk::mesh::EntityRank entity_rank);
+  getBoundaryEntities(stk::mesh::Entity entity, stk::mesh::EntityRank entity_rank);
 
   ///
   /// \brief Checks if a segment is connected to an input node.
@@ -423,9 +405,7 @@ class Topology
   ///        nodes of an input entity
   ///
   stk::mesh::EntityVector
-  getFormerElementNodes(
-      stk::mesh::Entity                           element,
-      std::vector<stk::mesh::EntityVector> const& entities);
+  getFormerElementNodes(stk::mesh::Entity element, std::vector<stk::mesh::EntityVector> const& entities);
 
   ///
   /// \brief Generates the coordinate of a given barycenter
@@ -433,9 +413,7 @@ class Topology
   ///        entity of the barycenter(e.g segment, face, or element)
   ///
   void
-  computeBarycentricCoordinates(
-      stk::mesh::EntityVector const& entities,
-      stk::mesh::Entity              barycenter);
+  computeBarycentricCoordinates(stk::mesh::EntityVector const& entities, stk::mesh::Entity barycenter);
 
   ///
   /// \brief Barycentric subdivision
@@ -585,9 +563,7 @@ class Topology
   /// \brief Returns the number of times an entity is repeated in a vector
   ///
   int
-  numberOfRepetitions(
-      std::vector<stk::mesh::Entity>& entities,
-      stk::mesh::Entity               entity);
+  numberOfRepetitions(std::vector<stk::mesh::Entity>& entities, stk::mesh::Entity entity);
 
   ///
   /// \brief Returns the coordinates of an input node.
@@ -658,9 +634,7 @@ class Topology
   /// associated with the given rank.
   ///
   void
-  AssignTopology(
-      stk::mesh::EntityRank const rank,
-      stk::mesh::Entity const     entity);
+  AssignTopology(stk::mesh::EntityRank const rank, stk::mesh::Entity const entity);
 
   ///
   /// Accessors and mutators
@@ -701,8 +675,7 @@ class Topology
   Albany::STKDiscretization&
   get_stk_discretization()
   {
-    return static_cast<Albany::STKDiscretization&>(
-        *(get_discretization().get()));
+    return static_cast<Albany::STKDiscretization&>(*(get_discretization().get()));
   }
 
   stk::mesh::BulkData&
@@ -830,9 +803,8 @@ class Topology
   shards::CellTopology
   get_cell_topology()
   {
-    stk::topology stk_topo_data = get_meta_data().get_topology(get_bulk_part());
-    shards::CellTopology shards_ctd =
-        stk::mesh::get_cell_topology(stk_topo_data);
+    stk::topology        stk_topo_data = get_meta_data().get_topology(get_bulk_part());
+    shards::CellTopology shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
     return shards_ctd;
   }
 
@@ -881,8 +853,7 @@ class Topology
   bool
   is_bulk_cell(stk::mesh::Entity e)
   {
-    return (get_bulk_data().entity_rank(e) == stk::topology::ELEMENT_RANK) &&
-           is_in_bulk(e);
+    return (get_bulk_data().entity_rank(e) == stk::topology::ELEMENT_RANK) && is_in_bulk(e);
   }
 
   bool
@@ -894,8 +865,7 @@ class Topology
   bool
   is_interface_cell(stk::mesh::Entity e)
   {
-    return (get_bulk_data().entity_rank(e) == stk::topology::ELEMENT_RANK) &&
-           is_in_interface(e);
+    return (get_bulk_data().entity_rank(e) == stk::topology::ELEMENT_RANK) && is_in_interface(e);
   }
 
   // Set failure state.
@@ -1064,21 +1034,21 @@ class Topology
 
   Teuchos::RCP<Albany::AbstractDiscretization> discretization_{Teuchos::null};
   Teuchos::RCP<Albany::AbstractSTKMeshStruct>  stk_mesh_struct_{Teuchos::null};
-  Teuchos::RCP<AbstractFailureCriterion> failure_criterion_{Teuchos::null};
-  std::vector<stk::mesh::EntityVector>   connectivity_;
-  std::set<EntityPair>                   fractured_faces_;
-  std::vector<stk::topology>             topologies_;
-  std::vector<stk::mesh::EntityId>       highest_ids_;
-  std::set<stk::mesh::Entity>            boundary_;
-  std::string                            bulk_block_name_{""};
-  std::string                            interface_block_name_{""};
-  OutputType                             output_type_;
-  double                                 xm_{0.0};
-  double                                 ym_{0.0};
-  double                                 zm_{0.0};
-  double                                 xp_{0.0};
-  double                                 yp_{0.0};
-  double                                 zp_{0.0};
+  Teuchos::RCP<AbstractFailureCriterion>       failure_criterion_{Teuchos::null};
+  std::vector<stk::mesh::EntityVector>         connectivity_;
+  std::set<EntityPair>                         fractured_faces_;
+  std::vector<stk::topology>                   topologies_;
+  std::vector<stk::mesh::EntityId>             highest_ids_;
+  std::set<stk::mesh::Entity>                  boundary_;
+  std::string                                  bulk_block_name_{""};
+  std::string                                  interface_block_name_{""};
+  OutputType                                   output_type_;
+  double                                       xm_{0.0};
+  double                                       ym_{0.0};
+  double                                       zm_{0.0};
+  double                                       xp_{0.0};
+  double                                       yp_{0.0};
+  double                                       zp_{0.0};
 
   ///
   /// \brief Hide default constructor for Topology

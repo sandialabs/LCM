@@ -31,17 +31,13 @@ class StabilizedPressureResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Constructor
   ///
-  StabilizedPressureResidual(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  StabilizedPressureResidual(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics

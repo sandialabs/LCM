@@ -17,16 +17,13 @@ namespace PHAL {
 /// ReadStateField
 ///
 template <typename EvalT, typename Traits>
-class ReadStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
-                       public PHX::EvaluatorDerived<EvalT, Traits>
+class ReadStateField : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ReadStateField(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -34,16 +31,13 @@ class ReadStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 template <typename Traits>
 class ReadStateField<PHAL::AlbanyTraits::Residual, Traits>
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
+    : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ReadStateField(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);

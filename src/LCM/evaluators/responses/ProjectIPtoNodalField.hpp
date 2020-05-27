@@ -37,14 +37,12 @@ namespace LCM {
  */
 
 template <typename EvalT, typename Traits>
-class ProjectIPtoNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                  public PHX::EvaluatorDerived<EvalT, Traits>
+class ProjectIPtoNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ProjectIPtoNodalFieldBase(const Teuchos::RCP<Albany::Layouts>& dl)
   {
-    field_tag_ = Teuchos::rcp(new PHX::Tag<typename EvalT::ScalarT>(
-        "Project IP to Nodal Field", dl->dummy));
+    field_tag_ = Teuchos::rcp(new PHX::Tag<typename EvalT::ScalarT>("Project IP to Nodal Field", dl->dummy));
     this->addEvaluatedField(*field_tag_);
   }
   Teuchos::RCP<const PHX::FieldTag>
@@ -74,16 +72,11 @@ class ProjectIPtoNodalField : public ProjectIPtoNodalFieldBase<EvalT, Traits>
   {
   }
   void
-  postRegistrationSetup(
-      typename Traits::SetupData /* d */,
-      PHX::FieldManager<Traits>& /* vm */)
+  postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& /* vm */)
   {
   }
   void preEvaluate(typename Traits::PreEvalData /* d */) {}
-  void postEvaluate(typename Traits::PostEvalData /* d */)
-  {
-    ALBANY_ABORT("Should never be called.");
-  }
+  void postEvaluate(typename Traits::PostEvalData /* d */) { ALBANY_ABORT("Should never be called."); }
   void evaluateFields(typename Traits::EvalData /* d */) {}
 };
 
@@ -100,9 +93,7 @@ class ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
       const Teuchos::RCP<Albany::Layouts>& dl,
       Albany::MeshSpecsStruct const*       mesh_specs);
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
   void
   preEvaluate(typename Traits::PreEvalData d);
   void

@@ -17,14 +17,11 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
           p.get<std::string>("QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  Teuchos::ParameterList* pr_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* pr_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numQPs  = dims[1];
@@ -45,10 +42,8 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
   // Switched ON by sending Temperature field in p
 
   if (p.isType<std::string>("QP Temperature Name")) {
-    Teuchos::RCP<PHX::DataLayout> scalar_dl =
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-    Temperature = decltype(Temperature)(
-        p.get<std::string>("QP Temperature Name"), scalar_dl);
+    Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+    Temperature = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), scalar_dl);
     this->addDependentField(Temperature);
     isThermoElastic = true;
     dnudT_value     = pr_list->get("dnudT Value", 0.0);
@@ -66,9 +61,7 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PoissonsRatio<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+PoissonsRatio<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(poissonsRatio, fm);
   if (!is_constant) this->utils.setFieldData(coordVec, fm);
@@ -84,16 +77,13 @@ PoissonsRatio<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   if (is_constant) {
     for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) {
-        poissonsRatio(cell, qp) = constant_value;
-      }
+      for (int qp = 0; qp < numQPs; ++qp) { poissonsRatio(cell, qp) = constant_value; }
     }
   }
   if (isThermoElastic) {
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {
-        poissonsRatio(cell, qp) +=
-            dnudT_value * (Temperature(cell, qp) - refTemp);
+        poissonsRatio(cell, qp) += dnudT_value * (Temperature(cell, qp) - refTemp);
       }
     }
   }
@@ -110,8 +100,7 @@ PoissonsRatio<EvalT, Traits>::getValue(std::string const& n)
     return dnudT_value;
   ALBANY_ABORT(
       std::endl
-      << "Error! Logic error in getting paramter " << n
-      << " in PoissonsRatio::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n << " in PoissonsRatio::getValue()" << std::endl);
   return constant_value;
 }
 

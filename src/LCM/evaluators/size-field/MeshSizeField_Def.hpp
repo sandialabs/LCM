@@ -20,18 +20,10 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::IsoMeshSizeField(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>(dl),
-      currentCoords(
-          p.get<std::string>("Current Coordinates Name"),
-          dl->node_vector),
-      isoMeshSizeField(
-          p.get<std::string>("IsoTropic MeshSizeField Name"),
-          dl->qp_scalar),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepidBasis(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis"))
+      currentCoords(p.get<std::string>("Current Coordinates Name"), dl->node_vector),
+      isoMeshSizeField(p.get<std::string>("IsoTropic MeshSizeField Name"), dl->qp_scalar),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis"))
 
 {
   // Save the adaptation PL to pass back
@@ -68,26 +60,20 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
   this->utils.setFieldData(currentCoords, fm);
 
   // Allocate Temporary Views
-  grad_at_cub_points = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", numNodes, numQPs, numDims);
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numDims);
-  refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
-  dxdxi      = Kokkos::createDynRankView(
-      isoMeshSizeField.get_view(), "XXX", numDims, numDims);
-  dEDdxi =
-      Kokkos::createDynRankView(isoMeshSizeField.get_view(), "XXX", numDims);
+  grad_at_cub_points = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numNodes, numQPs, numDims);
+  refPoints          = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numDims);
+  refWeights         = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
+  dxdxi              = Kokkos::createDynRankView(isoMeshSizeField.get_view(), "XXX", numDims, numDims);
+  dEDdxi             = Kokkos::createDynRankView(isoMeshSizeField.get_view(), "XXX", numDims);
 
   // Pre-Calculate reference element quantitites
   cubature->getCubature(refPoints, refWeights);
-  intrepidBasis->getValues(
-      grad_at_cub_points, refPoints, Intrepid2::OPERATOR_GRAD);
+  intrepidBasis->getValues(grad_at_cub_points, refPoints, Intrepid2::OPERATOR_GRAD);
 }
 
 template <typename Traits>
 void
-IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Compute IsoMeshSizeField - element width is dx/dxi (sum_nodes_i x[i] *
   // dphi[i]/dxi[j])
@@ -108,8 +94,7 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
             //                                   - qp is the integration point
             //                                   - ref_dim is xi, etc, zeta
             //                                   dimension
-            dxdxi(dim, ref_dim) += currentCoords(cell, node, dim) *
-                                   grad_at_cub_points(node, qp, ref_dim);
+            dxdxi(dim, ref_dim) += currentCoords(cell, node, dim) * grad_at_cub_points(node, qp, ref_dim);
           }
         }
       }
@@ -121,9 +106,7 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
       // Calculate Euclidean distance of the element in each of the master
       // directions
       for (int ref_dim = 0; ref_dim < numDims; ++ref_dim) {  // xi, eta, zeta
-        for (int dim = 0; dim < numDims; ++dim) {
-          dEDdxi(ref_dim) += Sqr(dxdxi(dim, ref_dim));
-        }
+        for (int dim = 0; dim < numDims; ++dim) { dEDdxi(ref_dim) += Sqr(dxdxi(dim, ref_dim)); }
         dEDdxi(ref_dim) = std::sqrt(dEDdxi(ref_dim));
       }
 
@@ -143,18 +126,10 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::AnisoMeshSizeField(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>(dl),
-      currentCoords(
-          p.get<std::string>("Current Coordinates Name"),
-          dl->node_vector),
-      anisoMeshSizeField(
-          p.get<std::string>("AnisoTropic MeshSizeField Name"),
-          dl->qp_scalar),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepidBasis(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis"))
+      currentCoords(p.get<std::string>("Current Coordinates Name"), dl->node_vector),
+      anisoMeshSizeField(p.get<std::string>("AnisoTropic MeshSizeField Name"), dl->qp_scalar),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis"))
 
 {
   // Save the adaptation PL to pass back
@@ -191,24 +166,19 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
   this->utils.setFieldData(currentCoords, fm);
 
   // Allocate Temporary Views
-  grad_at_cub_points = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", numNodes, numQPs, numDims);
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numDims);
-  refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
-  dxdxi      = Kokkos::createDynRankView(
-      anisoMeshSizeField.get_view(), "XXX", numDims, numDims);
+  grad_at_cub_points = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numNodes, numQPs, numDims);
+  refPoints          = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numDims);
+  refWeights         = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
+  dxdxi              = Kokkos::createDynRankView(anisoMeshSizeField.get_view(), "XXX", numDims, numDims);
 
   // Pre-Calculate reference element quantitites
   cubature->getCubature(refPoints, refWeights);
-  intrepidBasis->getValues(
-      grad_at_cub_points, refPoints, Intrepid2::OPERATOR_GRAD);
+  intrepidBasis->getValues(grad_at_cub_points, refPoints, Intrepid2::OPERATOR_GRAD);
 }
 
 template <typename Traits>
 void
-AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Compute IsoMeshSizeField tensor from displacement gradient
   for (int cell = 0; cell < workset.numCells; ++cell) {
@@ -228,8 +198,7 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
             //                                   - qp is the integration point
             //                                   - ref_dim is xi, etc, zeta
             //                                   dimension
-            dxdxi(dim, ref_dim) += currentCoords(cell, node, dim) *
-                                   grad_at_cub_points(node, qp, ref_dim);
+            dxdxi(dim, ref_dim) += currentCoords(cell, node, dim) * grad_at_cub_points(node, qp, ref_dim);
           }
         }
       }
@@ -241,11 +210,8 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
       // Calculate Euclidean distance of the element in each of the master
       // directions
       for (int ref_dim = 0; ref_dim < numDims; ++ref_dim) {  // xi, eta, zeta
-        for (int dim = 0; dim < numDims; ++dim) {
-          anisoMeshSizeField(cell, qp, ref_dim) += Sqr(dxdxi(dim, ref_dim));
-        }
-        anisoMeshSizeField(cell, qp, ref_dim) =
-            std::sqrt(anisoMeshSizeField(cell, qp, ref_dim));
+        for (int dim = 0; dim < numDims; ++dim) { anisoMeshSizeField(cell, qp, ref_dim) += Sqr(dxdxi(dim, ref_dim)); }
+        anisoMeshSizeField(cell, qp, ref_dim) = std::sqrt(anisoMeshSizeField(cell, qp, ref_dim));
       }
     }
   }

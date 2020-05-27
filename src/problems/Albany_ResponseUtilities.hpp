@@ -63,10 +63,9 @@ class ResponseUtilities
 
  private:
   //! Struct of PHX::DataLayout objects defined all together.
-  Teuchos::RCP<Albany::Layouts> dl;
-  std::map<std::string, Teuchos::RCP<Albany::Layouts>>
-      dls;  // Different sides may have different layouts (b/c different
-            // cubatures)
+  Teuchos::RCP<Albany::Layouts>                        dl;
+  std::map<std::string, Teuchos::RCP<Albany::Layouts>> dls;  // Different sides may have different layouts (b/c
+                                                             // different cubatures)
 };
 
 }  // namespace Albany

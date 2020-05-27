@@ -16,25 +16,20 @@ namespace Albany {
 class AsciiSTKMeshStruct : public GenericSTKMeshStruct
 {
  public:
-  AsciiSTKMeshStruct(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<Teuchos_Comm const>&     comm);
+  AsciiSTKMeshStruct(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<Teuchos_Comm const>& comm);
 
   ~AsciiSTKMeshStruct();
 
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<Teuchos_Comm const>&                   comm,
-      const Teuchos::RCP<Teuchos::ParameterList>&               params,
-      const unsigned int                                        neq_,
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-      const unsigned int                                        worksetSize,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-          side_set_sis = {},
-      const std::
-          map<std::string, AbstractFieldContainer::FieldContainerRequirements>&
-              side_set_req = {});
+      const Teuchos::RCP<Teuchos_Comm const>&                                          comm,
+      const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+      const unsigned int                                                               neq_,
+      const AbstractFieldContainer::FieldContainerRequirements&                        req,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+      const unsigned int                                                               worksetSize,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis = {},
+      const std::map<std::string, AbstractFieldContainer::FieldContainerRequirements>& side_set_req = {});
 
   //! Flag if solution has a restart values -- used in Init Cond
   bool
@@ -56,27 +51,27 @@ class AsciiSTKMeshStruct : public GenericSTKMeshStruct
 
   Teuchos::RCP<Teuchos::FancyOStream> out;
   bool                                periodic;
-  bool contigIDs;      // boolean specifying if node / element / face IDs are
-                       // contiguous; only relevant for 1 processor run
-  Tpetra_GO NumNodes;  // number of nodes
-  Tpetra_GO NumEles;   // number of elements
-  Tpetra_GO NumBasalFaces;  // number of faces on basal boundary
-  double (*xyz)[3];         // hard-coded for 3D for now
+  bool                                contigIDs;  // boolean specifying if node / element / face IDs are
+                                                  // contiguous; only relevant for 1 processor run
+  Tpetra_GO NumNodes;                             // number of nodes
+  Tpetra_GO NumEles;                              // number of elements
+  Tpetra_GO NumBasalFaces;                        // number of faces on basal boundary
+  double (*xyz)[3];                               // hard-coded for 3D for now
   double*                   sh;
   double*                   beta;
-  Teuchos::Array<Tpetra_GO> globalElesID;   // int array to define element map
-  Teuchos::Array<Tpetra_GO> globalNodesID;  // int array to define node map
-  Teuchos::Array<Tpetra_GO> basalFacesID;  // int array to define basal face map
-  int (*eles)[8];                          // hard-coded for 3D hexes for now
-  double* flwa;       // double array that gives value of flow factor
-  double* temper;     // double array that gives value of flow factor
-  bool    have_sh;    // Does surface height data exist?
-  bool    have_bf;    // Does basal face connectivity file exist?
-  bool    have_flwa;  // Does flwa (flow factor) file exist?
-  bool    have_temp;  // Does temperature file exist?
-  bool    have_beta;  // Does beta (basal fraction) file exist?
-  int (*bf)[5];  // hard-coded for 3D hexes for now (meaning boundary faces are
-                 // quads)
+  Teuchos::Array<Tpetra_GO> globalElesID;    // int array to define element map
+  Teuchos::Array<Tpetra_GO> globalNodesID;   // int array to define node map
+  Teuchos::Array<Tpetra_GO> basalFacesID;    // int array to define basal face map
+  int (*eles)[8];                            // hard-coded for 3D hexes for now
+  double* flwa;                              // double array that gives value of flow factor
+  double* temper;                            // double array that gives value of flow factor
+  bool    have_sh;                           // Does surface height data exist?
+  bool    have_bf;                           // Does basal face connectivity file exist?
+  bool    have_flwa;                         // Does flwa (flow factor) file exist?
+  bool    have_temp;                         // Does temperature file exist?
+  bool    have_beta;                         // Does beta (basal fraction) file exist?
+  int (*bf)[5];                              // hard-coded for 3D hexes for now (meaning boundary faces are
+                                             // quads)
   Teuchos::RCP<Tpetra_Map> elem_mapT;        // element map
   Teuchos::RCP<Tpetra_Map> node_mapT;        // node map
   Teuchos::RCP<Tpetra_Map> basal_face_mapT;  // basalface map

@@ -24,14 +24,10 @@ class DOFTensorInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                    public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFTensorInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  DOFTensorInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -62,25 +58,19 @@ class DOFTensorInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
    does not work when the mesh coordinates are of type ScalarT
 */
 template <typename EvalT, typename Traits, typename ScalarT>
-class FastSolutionTensorInterpolationBase
-    : public DOFTensorInterpolationBase<EvalT, Traits, ScalarT>
+class FastSolutionTensorInterpolationBase : public DOFTensorInterpolationBase<EvalT, Traits, ScalarT>
 {
  public:
-  FastSolutionTensorInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  FastSolutionTensorInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFTensorInterpolationBase<EvalT, Traits, ScalarT>(p, dl)
   {
     this->setName("FastSolutionTensorInterpolationBase" + PHX::print<EvalT>());
   };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-        d, vm);
+    DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(d, vm);
   }
 
   void
@@ -103,29 +93,20 @@ class FastSolutionTensorInterpolationBase<
           typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
  public:
-  FastSolutionTensorInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  FastSolutionTensorInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFTensorInterpolationBase<
             PHAL::AlbanyTraits::Jacobian,
             Traits,
             typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
   {
-    this->setName(
-        "FastSolutionTensorInterpolationBase" +
-        PHX::print<PHAL::AlbanyTraits::Jacobian>());
+    this->setName("FastSolutionTensorInterpolationBase" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
   };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFTensorInterpolationBase<
-        PHAL::AlbanyTraits::Jacobian,
-        Traits,
-        typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
+    DOFTensorInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
         postRegistrationSetup(d, vm);
   }
 
@@ -142,20 +123,16 @@ class FastSolutionTensorInterpolationBase<
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFTensorInterpolation =
-    DOFTensorInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFTensorInterpolation = DOFTensorInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFTensorInterpolationMesh =
-    DOFTensorInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFTensorInterpolationMesh = DOFTensorInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFTensorInterpolationParam =
-    DOFTensorInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using DOFTensorInterpolationParam = DOFTensorInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
-using FastSolutionTensorInterpolation =
-    FastSolutionTensorInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using FastSolutionTensorInterpolation = FastSolutionTensorInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 }  // Namespace PHAL
 

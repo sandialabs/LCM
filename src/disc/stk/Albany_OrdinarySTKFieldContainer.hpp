@@ -93,10 +93,7 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
 #endif
 
   void
-  fillSolnVector(
-      Thyra_Vector&                                soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
+  fillSolnVector(Thyra_Vector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
   fillVector(
       Thyra_Vector&                                field_vector,
@@ -175,9 +172,8 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   bool build_node_boundary_indicator{false};
 
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field;
-  Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>
-                                              solution_field_dtk;
-  AbstractSTKFieldContainer::VectorFieldType* residual_field;
+  Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field_dtk;
+  AbstractSTKFieldContainer::VectorFieldType*                 residual_field;
 };
 
 }  // namespace Albany

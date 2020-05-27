@@ -43,9 +43,7 @@ class MonitorBase
   pointer_type operator[](const key_type& item);
 
   void
-  summarize(
-      Teuchos::Ptr<Teuchos::Comm<int> const> comm,
-      std::ostream&                          out = std::cout);
+  summarize(Teuchos::Ptr<Teuchos::Comm<int> const> comm, std::ostream& out = std::cout);
 
   void
   summarize(std::ostream& out = std::cout);
@@ -62,30 +60,22 @@ class MonitorBase
 };
 
 template <class MonitoredType>
-inline MonitorBase<MonitoredType>::MonitorBase()
-    : title_("Monitor"), itemTypeLabel_("Item"), itemValueLabel_("Value")
+inline MonitorBase<MonitoredType>::MonitorBase() : title_("Monitor"), itemTypeLabel_("Item"), itemValueLabel_("Value")
 {
 }
 
 template <class MonitoredType>
-inline typename MonitorBase<MonitoredType>::pointer_type
-    MonitorBase<MonitoredType>::operator[](const key_type& item)
+inline typename MonitorBase<MonitoredType>::pointer_type MonitorBase<MonitoredType>::operator[](const key_type& item)
 {
   auto pos = itemMap_.find(item);
-  if (pos == itemMap_.end())
-    pos = itemMap_
-              .insert(
-                  std::make_pair(item, pointer_type(new monitored_type(item))))
-              .first;
+  if (pos == itemMap_.end()) pos = itemMap_.insert(std::make_pair(item, pointer_type(new monitored_type(item)))).first;
 
   return pos->second;
 }
 
 template <class MonitoredType>
 inline void
-MonitorBase<MonitoredType>::summarize(
-    Teuchos::Ptr<Teuchos::Comm<int> const> comm,
-    std::ostream&                          out)
+MonitorBase<MonitoredType>::summarize(Teuchos::Ptr<Teuchos::Comm<int> const> comm, std::ostream& out)
 {
   using std::vector;
 
@@ -98,8 +88,7 @@ MonitorBase<MonitoredType>::summarize(
     table.addRow(itemTypeLabel_, itemValueLabel_);
 
     // Add each item from the map. Map will keep them sorted lexicographically
-    for (auto iter : itemMap_)
-      table.addRow(iter.first, getStringValue(*iter.second));
+    for (auto iter : itemMap_) table.addRow(iter.first, getStringValue(*iter.second));
 
     // out << "Summary for " << title_ << std::endl;
 
@@ -117,8 +106,7 @@ inline void
 MonitorBase<MonitoredType>::summarize(std::ostream& out)
 {
   // MPI should be initialized before this call
-  Teuchos::RCP<Teuchos::Comm<int> const> comm =
-      Teuchos::DefaultComm<int>::getComm();
+  Teuchos::RCP<Teuchos::Comm<int> const> comm = Teuchos::DefaultComm<int>::getComm();
 
   summarize(comm.ptr(), out);
 }

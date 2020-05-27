@@ -20,9 +20,8 @@
 #include "Albany_ThyraUtils.hpp"
 #include "Phalanx_DataLayout_MDALayout.hpp"
 
-#define loop(a, i, dim)                                                      \
-  for (PHX::MDField<RealType>::size_type i = 0;                              \
-       i < static_cast<PHX::MDField<RealType>::size_type>(a.dimension(dim)); \
+#define loop(a, i, dim)                                                                                               \
+  for (PHX::MDField<RealType>::size_type i = 0; i < static_cast<PHX::MDField<RealType>::size_type>(a.dimension(dim)); \
        ++i)
 
 namespace AAdapt {
@@ -51,16 +50,10 @@ void
 read(const Albany::MDArray& mda, PHX::MDField<RealType>& f)
 {
   switch (f.rank()) {
-    case 2:
-      loop(mda, cell, 0) loop(f, qp, 1) f(cell, qp) = mda(cell, qp);
-      break;
-    case 3:
-      loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) f(cell, qp, i0) =
-          mda(cell, qp, i0);
-      break;
+    case 2: loop(mda, cell, 0) loop(f, qp, 1) f(cell, qp) = mda(cell, qp); break;
+    case 3: loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) f(cell, qp, i0) = mda(cell, qp, i0); break;
     case 4:
-      loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3)
-          f(cell, qp, i0, i1) = mda(cell, qp, i0, i1);
+      loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3) f(cell, qp, i0, i1) = mda(cell, qp, i0, i1);
       break;
     default: ALBANY_ABORT("dims.size() \notin {2,3,4}.");
   }
@@ -71,16 +64,10 @@ void
 write(Albany::MDArray& mda, const MDArray& f)
 {
   switch (f.rank()) {
-    case 2:
-      loop(mda, cell, 0) loop(f, qp, 1) mda(cell, qp) = f(cell, qp);
-      break;
-    case 3:
-      loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) mda(cell, qp, i0) =
-          f(cell, qp, i0);
-      break;
+    case 2: loop(mda, cell, 0) loop(f, qp, 1) mda(cell, qp) = f(cell, qp); break;
+    case 3: loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) mda(cell, qp, i0) = f(cell, qp, i0); break;
     case 4:
-      loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3)
-          mda(cell, qp, i0, i1) = f(cell, qp, i0, i1);
+      loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3) mda(cell, qp, i0, i1) = f(cell, qp, i0, i1);
       break;
     default: ALBANY_ABORT("dims.size() \notin {2,3,4}.");
   }
@@ -110,15 +97,12 @@ struct Direction
 };
 
 void
-calc_right_polar_LieR_LieS_G2g(
-    const minitensor::Tensor<RealType>& F,
-    minitensor::Tensor<RealType>        RS[2])
+calc_right_polar_LieR_LieS_G2g(const minitensor::Tensor<RealType>& F, minitensor::Tensor<RealType> RS[2])
 {
   {
-    std::pair<minitensor::Tensor<RealType>, minitensor::Tensor<RealType>>
-        RSpair = minitensor::polar_right(F);
-    RS[0]      = RSpair.first;
-    RS[1]      = RSpair.second;
+    std::pair<minitensor::Tensor<RealType>, minitensor::Tensor<RealType>> RSpair = minitensor::polar_right(F);
+    RS[0]                                                                        = RSpair.first;
+    RS[1]                                                                        = RSpair.second;
   }
   RS[0] = minitensor::log_rotation(RS[0]);
   RS[1] = minitensor::log_sym(RS[1]);
@@ -126,9 +110,7 @@ calc_right_polar_LieR_LieS_G2g(
 }
 
 void
-calc_right_polar_LieR_LieS_g2G(
-    minitensor::Tensor<RealType>& R,
-    minitensor::Tensor<RealType>& S)
+calc_right_polar_LieR_LieS_g2G(minitensor::Tensor<RealType>& R, minitensor::Tensor<RealType>& S)
 {
   R = minitensor::exp_skew_symmetric(R);
   S = minitensor::exp(S);
@@ -170,8 +152,7 @@ transformStateArray(
           }
         } else {
           // Copy mda1,2 -> local.
-          minitensor::Tensor<RealType> R(mda1.dimension(2)),
-              S(mda2.dimension(2));
+          minitensor::Tensor<RealType> R(mda1.dimension(2)), S(mda2.dimension(2));
           loop(mda1, i, 2) loop(mda1, j, 3)
           {
             R(i, j) = mda1(cell, qp, i, j);
@@ -204,14 +185,9 @@ class Projector
  public:
   Projector() {}
   void
-  init(
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
+  init(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
   void
-  fillMassMatrix(
-      const PHAL::Workset& workset,
-      const BasisField&    bf,
-      const BasisField&    wbf);
+  fillMassMatrix(const PHAL::Workset& workset, const BasisField& bf, const BasisField& wbf);
   void
   fillRhs(
       const PHX::MDField<const RealType>& f_G_qp,
@@ -252,19 +228,15 @@ Projector::init(
   node_vs_                  = node_vs;
   ol_node_vs_               = ol_node_vs;
   int const max_num_entries = 27;  // Enough for first-order hex.
-  M_factory_                = Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(
-      ol_node_vs_, ol_node_vs_, max_num_entries));
-  M_                        = Teuchos::null;
+  M_factory_   = Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(ol_node_vs_, ol_node_vs_, max_num_entries));
+  M_           = Teuchos::null;
   cas_manager_ = Albany::createCombineAndScatterManager(node_vs_, ol_node_vs_);
   P_           = Teuchos::null;
   filled_.clear();
 }
 
 void
-Projector::fillMassMatrix(
-    const PHAL::Workset& workset,
-    const BasisField&    bf,
-    const BasisField&    wbf)
+Projector::fillMassMatrix(const PHAL::Workset& workset, const BasisField& bf, const BasisField& wbf)
 {
   if (is_filled(workset.wsIndex)) return;
   filled_[workset.wsIndex] = true;
@@ -274,9 +246,7 @@ Projector::fillMassMatrix(
     for (size_type rnode = 0; rnode < num_node; ++rnode) {
       const GO           row = workset.wsElNodeID[cell][rnode];
       Teuchos::Array<GO> cols;
-      for (size_type cnode = 0; cnode < num_node; ++cnode) {
-        cols.push_back(workset.wsElNodeID[cell][cnode]);
-      }
+      for (size_type cnode = 0; cnode < num_node; ++cnode) { cols.push_back(workset.wsElNodeID[cell][cnode]); }
       M_factory_->insertGlobalIndices(row, cols);
     }
   }
@@ -287,8 +257,7 @@ Projector::fillMassMatrix(
       Teuchos::Array<ST> vals;
       for (size_type cnode = 0; cnode < num_node; ++cnode) {
         ST v = 0;
-        for (size_type qp = 0; qp < num_qp; ++qp)
-          v += wbf(cell, rnode, qp) * bf(cell, cnode, qp);
+        for (size_type qp = 0; qp < num_qp; ++qp) v += wbf(cell, rnode, qp) * bf(cell, cnode, qp);
         vals.push_back(v);
       }
       const GO grow = workset.wsElNodeID[cell][rnode];
@@ -305,18 +274,15 @@ Projector::fillRhs(
     const PHAL::Workset&                workset,
     const BasisField&                   wbf)
 {
-  int const rank = f.layout->rank() - 2, num_node = wbf.dimension(1),
-            num_qp = wbf.dimension(2),
-            ndim   = rank >= 1 ? f_G_qp.dimension(2) : 1;
+  int const rank = f.layout->rank() - 2, num_node = wbf.dimension(1), num_qp = wbf.dimension(2),
+            ndim = rank >= 1 ? f_G_qp.dimension(2) : 1;
 
   if (f.data_->mv[0].is_null()) {
     int const ncol = rank == 0 ? 1 : rank == 1 ? ndim : ndim * ndim;
-    for (int fi = 0; fi < f.num_g_fields; ++fi) {
-      f.data_->mv[fi] = Thyra::createMembers(ol_node_vs_, ncol);
-    }
+    for (int fi = 0; fi < f.num_g_fields; ++fi) { f.data_->mv[fi] = Thyra::createMembers(ol_node_vs_, ncol); }
   }
 
-  auto indexer = Albany::createGlobalLocalIndexer(f.data_->mv[0]->range());
+  auto                       indexer        = Albany::createGlobalLocalIndexer(f.data_->mv[0]->range());
   const Transformation::Enum transformation = f.data_->transformation;
   for (int cell = 0; cell < (int)workset.numCells; ++cell) {
     for (int node = 0; node < num_node; ++node) {
@@ -331,21 +297,17 @@ Projector::fillRhs(
               case Transformation::none: {
                 auto data = Albany::getNonconstLocalData(f.data_->mv[0]);
                 for (int i = 0, col = 0; i < ndim; ++i)
-                  for (int j = 0; j < ndim; ++j, ++col)
-                    data[col][lrow] +=
-                        f_G_qp(cell, qp, i, j) * wbf(cell, node, qp);
+                  for (int j = 0; j < ndim; ++j, ++col) data[col][lrow] += f_G_qp(cell, qp, i, j) * wbf(cell, node, qp);
               } break;
               case Transformation::right_polar_LieR_LieS: {
                 minitensor::Tensor<RealType> F(ndim);
-                loop(f_G_qp, i, 2) loop(f_G_qp, j, 3) F(i, j) =
-                    f_G_qp(cell, qp, i, j);
+                loop(f_G_qp, i, 2) loop(f_G_qp, j, 3) F(i, j) = f_G_qp(cell, qp, i, j);
                 minitensor::Tensor<RealType> RS[2];
                 calc_right_polar_LieR_LieS_G2g(F, RS);
                 for (int fi = 0; fi < f.num_g_fields; ++fi) {
                   auto data = Albany::getNonconstLocalData(f.data_->mv[fi]);
                   for (int i = 0, col = 0; i < ndim; ++i)
-                    for (int j = 0; j < ndim; ++j, ++col)
-                      data[col][lrow] += RS[fi](i, j) * wbf(cell, node, qp);
+                    for (int j = 0; j < ndim; ++j, ++col) data[col][lrow] += RS[fi](i, j) * wbf(cell, node, qp);
                 }
                 break;
               }
@@ -368,9 +330,8 @@ Projector::project(Manager::Field& f)
   if (Albany::isFillActive(M_)) {
     // Export M_ so it has nonoverlapping rows and cols.
     Albany::fillComplete(M_);
-    Albany::ThyraCrsMatrixFactory M_owned_factory(
-        node_vs_, node_vs_, M_factory_);
-    auto M = M_owned_factory.createOp();
+    Albany::ThyraCrsMatrixFactory M_owned_factory(node_vs_, node_vs_, M_factory_);
+    auto                          M = M_owned_factory.createOp();
     cas_manager_->combine(M_, M, Albany::CombineMode::ADD);
     M_ = M;
     Albany::fillComplete(M_);
@@ -405,8 +366,8 @@ Projector::interp(
     Albany::MDArray&      mda1,
     Albany::MDArray&      mda2)
 {
-  int const rank = f.layout->rank() - 2, num_node = bf.dimension(1),
-            num_qp = bf.dimension(2), ndim = rank >= 1 ? mda1.dimension(2) : 1;
+  int const rank = f.layout->rank() - 2, num_node = bf.dimension(1), num_qp = bf.dimension(2),
+            ndim = rank >= 1 ? mda1.dimension(2) : 1;
 
   Albany::MDArray* mdas[2];
   mdas[0]       = &mda1;
@@ -429,8 +390,7 @@ Projector::interp(
               for (int fi = 0; fi < nmv; ++fi) {
                 auto data = Albany::getLocalData(f.data_->mv[fi].getConst());
                 for (int j = 0; j < ndim; ++j, ++col) {
-                  (*mdas[fi])(cell, qp, i, j) +=
-                      data[col][row] * bf(cell, node, qp);
+                  (*mdas[fi])(cell, qp, i, j) += data[col][row] * bf(cell, node, qp);
                 }
               }
             }
@@ -447,9 +407,7 @@ Projector::interp(
 bool
 Projector::is_filled(int wi)
 {
-  if (static_cast<int>(filled_.size()) <= wi) {
-    filled_.insert(filled_.end(), wi - filled_.size() + 1, false);
-  }
+  if (static_cast<int>(filled_.size()) <= wi) { filled_.insert(filled_.end(), wi - filled_.size() + 1, false); }
   return filled_[wi];
 }
 
@@ -462,9 +420,7 @@ class ProjectorTester
  public:
   ProjectorTester();
   void
-  init(
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
+  init(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
   void
   eval(
       const PHAL::Workset&                                workset,
@@ -516,10 +472,7 @@ struct Manager::Impl
   std::vector<short>               is_g_;
 
  public:
-  Impl(
-      const Teuchos::RCP<Albany::StateManager>& state_mgr,
-      bool const                                use_projection,
-      bool const                                do_transform)
+  Impl(const Teuchos::RCP<Albany::StateManager>& state_mgr, bool const use_projection, bool const do_transform)
       : state_mgr_(state_mgr)
   {
     init(use_projection, do_transform);
@@ -571,13 +524,10 @@ struct Manager::Impl
     // Transform G -> g and write to the primary or, depending on state, primary
     // and provisional fields.
     if (proj_.is_null())
-      for (Map::const_iterator it = field_map_.begin(); it != field_map_.end();
-           ++it)
-        for (WsIdx wi = 0; wi < is_g_.size(); ++wi)
-          transformStateArray(it->first, wi, Direction::G2g);
+      for (Map::const_iterator it = field_map_.begin(); it != field_map_.end(); ++it)
+        for (WsIdx wi = 0; wi < is_g_.size(); ++wi) transformStateArray(it->first, wi, Direction::G2g);
     else {
-      for (Map::iterator it = field_map_.begin(); it != field_map_.end(); ++it)
-        proj_->project(*it->second);
+      for (Map::iterator it = field_map_.begin(); it != field_map_.end(); ++it) proj_->project(*it->second);
     }
   }
 
@@ -589,12 +539,10 @@ struct Manager::Impl
     init_g(state_mgr_->getStateArrays().elemStateArrays.size(), true);
     if (Teuchos::nonnull(proj_)) {
       proj_->init(node_vs, ol_node_vs);
-      for (Map::iterator it = field_map_.begin(); it != field_map_.end();
-           ++it) {
+      for (Map::iterator it = field_map_.begin(); it != field_map_.end(); ++it) {
         Field& f = *it->second;
         for (int i = 0; i < f.num_g_fields; ++i)
-          f.data_->mv[i] =
-              Thyra::createMembers(ol_node_vs, f.data_->mv[i]->domain()->dim());
+          f.data_->mv[i] = Thyra::createMembers(ol_node_vs, f.data_->mv[i]->domain()->dim());
       }
     }
   }
@@ -608,10 +556,7 @@ struct Manager::Impl
   }
 
   void
-  interpQpField(
-      PHX::MDField<RealType>& f_G_qp,
-      const PHAL::Workset&    workset,
-      const BasisField&       bf)
+  interpQpField(PHX::MDField<RealType>& f_G_qp, const PHAL::Workset& workset, const BasisField& bf)
   {
     if (proj_.is_null()) return;
     if (is_g_.empty()) {
@@ -623,12 +568,7 @@ struct Manager::Impl
     // Interpolate g at NP to g at QP.
     std::string const          name_rc = f_G_qp.fieldTag().name();
     const Teuchos::RCP<Field>& f       = field_map_[name_rc];
-    proj_->interp(
-        *f,
-        workset,
-        bf,
-        getMDArray(name_rc, workset.wsIndex),
-        getMDArray(name_rc + "_1", workset.wsIndex));
+    proj_->interp(*f, workset, bf, getMDArray(name_rc, workset.wsIndex), getMDArray(name_rc + "_1", workset.wsIndex));
     // Transform g -> G at QP.
     transformStateArray(name_rc, workset.wsIndex, Direction::g2G);
     set_G(workset.wsIndex);
@@ -643,31 +583,24 @@ struct Manager::Impl
   {
     // At startup, is_g_.size() is 0. We also initialized fields to their G, not
     // g, values.
-    if (is_g_.empty())
-      init_g(state_mgr_->getStateArrays().elemStateArrays.size(), false);
+    if (is_g_.empty()) init_g(state_mgr_->getStateArrays().elemStateArrays.size(), false);
     if (proj_.is_null()) {
       if (is_g(workset.wsIndex)) {
         // If this is the first read after an RCU, transform g -> G.
-        transformStateArray(
-            f.fieldTag().name(), workset.wsIndex, Direction::g2G);
+        transformStateArray(f.fieldTag().name(), workset.wsIndex, Direction::g2G);
         set_G(workset.wsIndex);
       }
     } else {
       // The most obvious reason this exception could be thrown is because
       // EvalT=Jacobian is run before Residual, which I think should not happen.
-      ALBANY_PANIC(
-          is_g(workset.wsIndex),
-          "If usingProjection(), then readQpField should always see G, not g.");
+      ALBANY_PANIC(is_g(workset.wsIndex), "If usingProjection(), then readQpField should always see G, not g.");
     }
     // Read from the primary field.
     read(getMDArray(f.fieldTag().name(), workset.wsIndex), f);
   }
 
   void
-  writeQpField(
-      const PHX::MDField<const RealType>& f,
-      const PHAL::Workset&                workset,
-      const BasisField&                   wbf)
+  writeQpField(const PHX::MDField<const RealType>& f, const PHAL::Workset& workset, const BasisField& wbf)
   {
     std::string const name_rc = decorate(f.fieldTag().name());
     if (proj_.is_null()) {
@@ -706,8 +639,7 @@ struct Manager::Impl
       // Zero the nodal values in prep for fillRhs.
       for (Field::iterator it = fields_.begin(); it != fields_.end(); ++it)
         for (int i = 0; i < (*it)->num_g_fields; ++i)
-          if (Teuchos::nonnull((*it)->data_->mv[i]))
-            (*it)->data_->mv[i]->assign(0);
+          if (Teuchos::nonnull((*it)->data_->mv[i])) (*it)->data_->mv[i]->assign(0);
     }
   }
 
@@ -733,26 +665,16 @@ struct Manager::Impl
   }
 
   void
-  registerStateVariable(
-      std::string const&                   name,
-      const Teuchos::RCP<PHX::DataLayout>& dl,
-      const Init::Enum                     init)
+  registerStateVariable(std::string const& name, const Teuchos::RCP<PHX::DataLayout>& dl, const Init::Enum init)
   {
-    state_mgr_->registerStateVariable(
-        name,
-        dl,
-        "",
-        init == Init::zero ? "scalar" : "identity",
-        0,
-        false,
-        false);
+    state_mgr_->registerStateVariable(name, dl, "", init == Init::zero ? "scalar" : "identity", 0, false, false);
   }
 
   Albany::MDArray&
   getMDArray(std::string const& name, const WsIdx wi)
   {
-    Albany::StateArray& esa = state_mgr_->getStateArrays().elemStateArrays[wi];
-    Albany::StateArray::iterator it = esa.find(name);
+    Albany::StateArray&          esa = state_mgr_->getStateArrays().elemStateArrays[wi];
+    Albany::StateArray::iterator it  = esa.find(name);
     ALBANY_PANIC(it == esa.end(), "elemStateArrays is missing " + name);
     return it->second;
   }
@@ -775,38 +697,26 @@ struct Manager::Impl
   }
 
   void
-  transformStateArray(
-      std::string const&    name_rc,
-      const WsIdx           wi,
-      const Direction::Enum dir)
+  transformStateArray(std::string const& name_rc, const WsIdx wi, const Direction::Enum dir)
   {
     // Name decoration coordinates with registerField's calls to
     // registerStateVariable.
     const Transformation::Enum transformation = get_transformation(name_rc);
-    rc::transformStateArray(
-        dir,
-        transformation,
-        getMDArray(name_rc, wi),
-        getMDArray(name_rc + "_1", wi));
+    rc::transformStateArray(dir, transformation, getMDArray(name_rc, wi), getMDArray(name_rc + "_1", wi));
   }
 };
 
 Teuchos::RCP<Manager>
-Manager::create(
-    const Teuchos::RCP<Albany::StateManager>& state_mgr,
-    Teuchos::ParameterList&                   problem_params)
+Manager::create(const Teuchos::RCP<Albany::StateManager>& state_mgr, Teuchos::ParameterList& problem_params)
 {
   if (!problem_params.isSublist("Adaptation")) return Teuchos::null;
 
-  Teuchos::ParameterList& adapt_params =
-      problem_params.sublist("Adaptation", true);
+  Teuchos::ParameterList& adapt_params = problem_params.sublist("Adaptation", true);
 
   if (adapt_params.isType<bool>("Reference Configuration: Update")) {
     if (adapt_params.get<bool>("Reference Configuration: Update")) {
-      bool const use_projection =
-          adapt_params.get<bool>("Reference Configuration: Project", false);
-      bool const do_transform =
-          adapt_params.get<bool>("Reference Configuration: Transform", false);
+      bool const use_projection = adapt_params.get<bool>("Reference Configuration: Project", false);
+      bool const do_transform   = adapt_params.get<bool>("Reference Configuration: Transform", false);
       return Teuchos::rcp(new Manager(state_mgr, use_projection, do_transform));
     }
   }
@@ -815,8 +725,7 @@ Manager::create(
 }
 
 void
-Manager::setSolutionManager(
-    const Teuchos::RCP<AdaptiveSolutionManager>& sol_mgr)
+Manager::setSolutionManager(const Teuchos::RCP<AdaptiveSolutionManager>& sol_mgr)
 {
   impl_->sol_mgr_ = sol_mgr;
 }
@@ -824,10 +733,7 @@ Manager::setSolutionManager(
 void
 Manager::getValidParameters(Teuchos::RCP<Teuchos::ParameterList>& valid_pl)
 {
-  valid_pl->set<bool>(
-      "Reference Configuration: Update",
-      false,
-      "Send coordinates + solution to SCOREC.");
+  valid_pl->set<bool>("Reference Configuration: Update", false, "Send coordinates + solution to SCOREC.");
 }
 
 void
@@ -856,8 +762,7 @@ Manager::update_x(Thyra_Vector const& soln_nol)
   // any other DOFs.
   auto x_data   = Albany::getNonconstLocalData(impl_->x_);
   auto sol_data = Albany::getLocalData(soln_nol);
-  AAdapt::rc::update_x(
-      x_data, sol_data, impl_->state_mgr_->getDiscretization());
+  AAdapt::rc::update_x(x_data, sol_data, impl_->state_mgr_->getDiscretization());
 }
 
 Teuchos::RCP<Thyra_Vector const>
@@ -881,12 +786,9 @@ Manager::get_x()
 
 template <typename EvalT>
 void
-Manager::createEvaluators(
-    PHX::FieldManager<PHAL::AlbanyTraits>& fm,
-    const Teuchos::RCP<Albany::Layouts>&)
+Manager::createEvaluators(PHX::FieldManager<PHAL::AlbanyTraits>& fm, const Teuchos::RCP<Albany::Layouts>&)
 {
-  fm.registerEvaluator<EvalT>(Teuchos::rcp(
-      new Reader<EvalT, PHAL::AlbanyTraits>(Teuchos::rcp(this, false))));
+  fm.registerEvaluator<EvalT>(Teuchos::rcp(new Reader<EvalT, PHAL::AlbanyTraits>(Teuchos::rcp(this, false))));
 }
 
 template <>
@@ -896,12 +798,10 @@ Manager::createEvaluators<PHAL::AlbanyTraits::Residual>(
     const Teuchos::RCP<Albany::Layouts>&   dl)
 {
   typedef PHAL::AlbanyTraits::Residual Residual;
-  fm.registerEvaluator<Residual>(Teuchos::rcp(
-      new Reader<Residual, PHAL::AlbanyTraits>(Teuchos::rcp(this, false), dl)));
+  fm.registerEvaluator<Residual>(Teuchos::rcp(new Reader<Residual, PHAL::AlbanyTraits>(Teuchos::rcp(this, false), dl)));
   if (impl_->building_sfm()) {
     Teuchos::RCP<Writer<Residual, PHAL::AlbanyTraits>> writer =
-        Teuchos::rcp(new Writer<Residual, PHAL::AlbanyTraits>(
-            Teuchos::rcp(this, false), dl));
+        Teuchos::rcp(new Writer<Residual, PHAL::AlbanyTraits>(Teuchos::rcp(this, false), dl));
     fm.registerEvaluator<Residual>(writer);
     fm.requireField<Residual>(*writer->getNoOutputTag());
   }
@@ -928,10 +828,7 @@ Manager::beginQpInterp()
 { /* Do nothing. */
 }
 void
-Manager::interpQpField(
-    PHX::MDField<RealType>& f,
-    const PHAL::Workset&    workset,
-    const BasisField&       bf)
+Manager::interpQpField(PHX::MDField<RealType>& f, const PHAL::Workset& workset, const BasisField& bf)
 {
   impl_->interpQpField(f, workset, bf);
 }
@@ -947,19 +844,13 @@ Manager::readQpField(PHX::MDField<RealType>& f, const PHAL::Workset& workset)
 }
 
 void
-Manager::beginQpWrite(
-    const PHAL::Workset& workset,
-    const BasisField&    bf,
-    const BasisField&    wbf)
+Manager::beginQpWrite(const PHAL::Workset& workset, const BasisField& bf, const BasisField& wbf)
 {
   if (impl_->proj_.is_null()) return;
   impl_->proj_->fillMassMatrix(workset, bf, wbf);
 }
 void
-Manager::writeQpField(
-    const PHX::MDField<const RealType>& f,
-    const PHAL::Workset&                workset,
-    const BasisField&                   wbf)
+Manager::writeQpField(const PHX::MDField<const RealType>& f, const PHAL::Workset& workset, const BasisField& wbf)
 {
   impl_->writeQpField(f, workset, wbf);
 }
@@ -984,8 +875,7 @@ Manager::testProjector(
 }
 
 Teuchos::RCP<Thyra_MultiVector> const&
-Manager::getNodalField(const Field& f, int const g_idx, bool const overlapped)
-    const
+Manager::getNodalField(const Field& f, int const g_idx, bool const overlapped) const
 {
   ALBANY_PANIC(!overlapped, "must be overlapped");
   return f.data_->mv[g_idx];
@@ -1061,8 +951,7 @@ Manager::Manager(
 
 #define eti_fn(EvalT)                             \
   template void Manager::createEvaluators<EvalT>( \
-      PHX::FieldManager<PHAL::AlbanyTraits> & fm, \
-      const Teuchos::RCP<Albany::Layouts>& dl);
+      PHX::FieldManager<PHAL::AlbanyTraits> & fm, const Teuchos::RCP<Albany::Layouts>& dl);
 aadapt_rc_apply_to_all_eval_types(eti_fn)
 #undef eti_fn
 
@@ -1072,18 +961,15 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
   typedef minitensor::Tensor<RealType> Tensor;
 
   // Some deformation gradient tensors with det(F) > 0 for use in testing.
-  static double const Fs[3][3][3] = {
-      {{-7.382752820294219e-01, -1.759182226321058e+00, 1.417301043170359e+00},
-       {7.999093048231801e-01, 5.295155264305610e-01, -3.075207765325406e-02},
-       {6.283454283198379e-02, 4.117063384659416e-01, -1.243061703605918e-01}},
-      {{4.929646496030746e-01, -1.672547330507927e+00, 1.374629761307942e-01},
-       {9.785301515971359e-01, 8.608882413324722e-01, 6.315167262108045e-01},
-       {-5.339914726510328e-01, -1.559378791976819e+00, 1.242404824706601e-01}},
-      {{1.968477583454205e+00, 1.805729439108956e+00, -2.759426722073080e-01},
-       {7.787416415696722e-01, -5.361220317998502e-03, 1.838993634875665e-01},
-       {-1.072168271881842e-02,
-        3.771872253769205e-01,
-        -9.553540517889956e-01}}};
+  static double const Fs[3][3][3] = {{{-7.382752820294219e-01, -1.759182226321058e+00, 1.417301043170359e+00},
+                                      {7.999093048231801e-01, 5.295155264305610e-01, -3.075207765325406e-02},
+                                      {6.283454283198379e-02, 4.117063384659416e-01, -1.243061703605918e-01}},
+                                     {{4.929646496030746e-01, -1.672547330507927e+00, 1.374629761307942e-01},
+                                      {9.785301515971359e-01, 8.608882413324722e-01, 6.315167262108045e-01},
+                                      {-5.339914726510328e-01, -1.559378791976819e+00, 1.242404824706601e-01}},
+                                     {{1.968477583454205e+00, 1.805729439108956e+00, -2.759426722073080e-01},
+                                      {7.787416415696722e-01, -5.361220317998502e-03, 1.838993634875665e-01},
+                                      {-1.072168271881842e-02, 3.771872253769205e-01, -9.553540517889956e-01}}};
 
   // Some sample functions. Only the constant and linear ones should be
   // interpolated exactly.
@@ -1102,17 +988,12 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       case 8: return x * x;
       case 9: return x * x * x;
     }
-    ALBANY_ABORT(
-        "Error: unhandled argument in evalf() in AAdapt_RC_Manager.cpp"
-        << std::endl);
+    ALBANY_ABORT("Error: unhandled argument in evalf() in AAdapt_RC_Manager.cpp" << std::endl);
   }
 
   // Axis-aligned bounding box on the vertices.
   void
-  getBoundingBox(
-      const PHX::MDField<RealType, Cell, Vertex, Dim>& vs,
-      RealType                                         lo[3],
-      RealType                                         hi[3])
+  getBoundingBox(const PHX::MDField<RealType, Cell, Vertex, Dim>& vs, RealType lo[3], RealType hi[3])
   {
     bool first = true;
     for (unsigned cell = 0; cell < vs.dimension(0); ++cell)
@@ -1187,27 +1068,19 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
 
     // Set up the data containers.
     typedef PHX::MDALayout<Cell, QuadPoint, Dim, Dim> Layout;
-    Teuchos::RCP<Layout>   layout     = Teuchos::rcp(new Layout(
-        workset.numCells,
-        coord_qp.dimension(1),
-        coord_qp.dimension(2),
-        coord_qp.dimension(2)));
-    PHX::MDField<RealType> f_mdf      = PHX::MDField<RealType>("f_mdf", layout);
-    auto                   f_mdf_data = PHX::KokkosViewFactory<
-        RealType,
-        typename PHX::DevLayout<RealType>::type,
-        PHX::Device>::buildView(f_mdf.fieldTag());
+    Teuchos::RCP<Layout>                              layout =
+        Teuchos::rcp(new Layout(workset.numCells, coord_qp.dimension(1), coord_qp.dimension(2), coord_qp.dimension(2)));
+    PHX::MDField<RealType> f_mdf = PHX::MDField<RealType>("f_mdf", layout);
+    auto f_mdf_data = PHX::KokkosViewFactory<RealType, typename PHX::DevLayout<RealType>::type, PHX::Device>::buildView(
+        f_mdf.fieldTag());
     f_mdf.setFieldData(f_mdf_data);
 
     std::vector<Albany::MDArray> mda;
     std::vector<double>          mda_data[2];
     for (int i = 0; i < 2; ++i) {
       typedef Albany::MDArray::size_type size_t;
-      mda_data[i].resize(
-          f_mdf.dimension(0) * f_mdf.dimension(1) * f_mdf.dimension(2) *
-          f_mdf.dimension(3));
-      shards::Array<RealType, shards::NaturalOrder, Cell, QuadPoint, Dim, Dim>
-          a;
+      mda_data[i].resize(f_mdf.dimension(0) * f_mdf.dimension(1) * f_mdf.dimension(2) * f_mdf.dimension(3));
+      shards::Array<RealType, shards::NaturalOrder, Cell, QuadPoint, Dim, Dim> a;
       a.assign(
           &mda_data[i][0],
           (size_t)f_mdf.dimension(0),
@@ -1233,15 +1106,9 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       if (test == 0) {
         f.data_->transformation = Transformation::none;
         f.num_g_fields          = 1;
-        loop(f_mdf, cell, 0) loop(
-            f_mdf, qp, 1) for (unsigned i = 0, k = 0; i < f_mdf.dimension(2);
-                               ++i) for (unsigned j = 0; j < f_mdf.dimension(3);
-                                         ++j, ++k) f_mdf(cell, qp, i, j) =
-            eval_f(
-                coord_qp(cell, qp, 0),
-                coord_qp(cell, qp, 1),
-                coord_qp(cell, qp, 2),
-                k);
+        loop(f_mdf, cell, 0) loop(f_mdf, qp, 1) for (unsigned i = 0, k = 0; i < f_mdf.dimension(2);
+                                                     ++i) for (unsigned j = 0; j < f_mdf.dimension(3); ++j, ++k)
+            f_mdf(cell, qp, i, j) = eval_f(coord_qp(cell, qp, 0), coord_qp(cell, qp, 1), coord_qp(cell, qp, 2), k);
       } else {
         f.data_->transformation = Transformation::right_polar_LieR_LieS;
         f.num_g_fields          = 2;
@@ -1250,9 +1117,8 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         loop(f_mdf, cell, 0) loop(f_mdf, qp, 1)
         {
           RealType pt[3];
-          for (int k = 0; k < 3; ++k)
-            pt[k] = (coord_qp(cell, qp, k) - lo[k]) / (hi[k] - lo[k]);
-          const minitensor::Tensor<RealType> F = eval_F(pt);
+          for (int k = 0; k < 3; ++k) pt[k] = (coord_qp(cell, qp, k) - lo[k]) / (hi[k] - lo[k]);
+          const minitensor::Tensor<RealType> F                      = eval_F(pt);
           loop(f_mdf, i, 2) loop(f_mdf, j, 3) f_mdf(cell, qp, i, j) = F(i, j);
         }
       }
@@ -1268,8 +1134,8 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       p.project(f);
 
       if (test == 0) {  // Compare with true values at NP.
-        auto      indexer = Albany::createGlobalLocalIndexer(pc.get_node_vs());
-        int const ncol = 9, nverts = pc.get_node_vs()->dim();
+        auto                  indexer = Albany::createGlobalLocalIndexer(pc.get_node_vs());
+        int const             ncol = 9, nverts = pc.get_node_vs()->dim();
         std::vector<RealType> f_true(ncol * nverts);
         {
           std::vector<bool> evaled(nverts, false);
@@ -1279,11 +1145,8 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
             const LO lid = indexer->getLocalElement(gid);
             if (!evaled[lid]) {
               for (int k = 0; k < ncol; ++k)
-                f_true[ncol * lid + k] = eval_f(
-                    coord_vert(cell, node, 0),
-                    coord_vert(cell, node, 1),
-                    coord_vert(cell, node, 2),
-                    k);
+                f_true[ncol * lid + k] =
+                    eval_f(coord_vert(cell, node, 0), coord_vert(cell, node, 1), coord_vert(cell, node, 2), k);
               evaled[lid] = true;
             }
           }
@@ -1301,32 +1164,22 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         printf("err np (test %d):", test);
         int const n = f_mdf.dimension(0) * f_mdf.dimension(1);
         for (int k = 0; k < 9; ++k)
-          printf(
-              " %1.2e %1.2e (%1.2e)",
-              err1[k] / (n * scale[k]),
-              errmax[k] / scale[k],
-              scale[k]);
+          printf(" %1.2e %1.2e (%1.2e)", err1[k] / (n * scale[k]), errmax[k] / scale[k], scale[k]);
         std::cout << "\n";
       }
 
       // Interpolate to IP.
       p.interp(f, workset, bf, mda[0], mda[1]);
-      transformStateArray(
-          Direction::g2G, f.data_->transformation, mda[0], mda[1]);
+      transformStateArray(Direction::g2G, f.data_->transformation, mda[0], mda[1]);
 
       {  // Compare with true values at IP.
         double err1[9], errmax[9], scale[9];
         for (int k = 0; k < 9; ++k) { err1[k] = errmax[k] = scale[k] = 0; }
-        loop(f_mdf, cell, 0) loop(
-            f_mdf,
-            qp,
-            1) for (int i = 0, k = 0; i < static_cast<int>(f_mdf.dimension(2));
-                    ++i) for (int j = 0;
-                              j < static_cast<int>(f_mdf.dimension(3));
-                              ++j, ++k)
+        loop(f_mdf, cell, 0)
+            loop(f_mdf, qp, 1) for (int i = 0, k = 0; i < static_cast<int>(f_mdf.dimension(2));
+                                    ++i) for (int j = 0; j < static_cast<int>(f_mdf.dimension(3)); ++j, ++k)
         {
-          double const d = std::abs(
-              mda[0]((int)cell, (int)qp, i, j) - f_mdf(cell, qp, i, j));
+          double const d = std::abs(mda[0]((int)cell, (int)qp, i, j) - f_mdf(cell, qp, i, j));
           err1[k] += d;
           errmax[k] = std::max(errmax[k], d);
           scale[k]  = std::max(scale[k], std::abs(f_mdf(cell, qp, i, j)));
@@ -1334,11 +1187,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         printf("err ip (test %d):", test);
         int const n = f_mdf.dimension(0) * f_mdf.dimension(1);
         for (int k = 0; k < 9; ++k)
-          printf(
-              " %1.2e %1.2e (%1.2e)",
-              err1[k] / (n * scale[k]),
-              errmax[k] / scale[k],
-              scale[k]);
+          printf(" %1.2e %1.2e (%1.2e)", err1[k] / (n * scale[k]), errmax[k] / scale[k], scale[k]);
         std::cout << "\n";
       }
     }
@@ -1447,13 +1296,10 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
     int const num_qp = coord_qp.dimension(1), num_dim = coord_qp.dimension(2);
 
     typedef PHX::MDALayout<Cell, QuadPoint, Dim, Dim> Layout;
-    Teuchos::RCP<Layout>                              layout =
-        Teuchos::rcp(new Layout(workset.numCells, num_qp, num_dim, num_dim));
-    PHX::MDField<RealType> f_mdf      = PHX::MDField<RealType>("f_mdf", layout);
-    auto                   f_mdf_data = PHX::KokkosViewFactory<
-        RealType,
-        typename PHX::DevLayout<RealType>::type,
-        PHX::Device>::buildView(f_mdf.fieldTag());
+    Teuchos::RCP<Layout>   layout = Teuchos::rcp(new Layout(workset.numCells, num_qp, num_dim, num_dim));
+    PHX::MDField<RealType> f_mdf  = PHX::MDField<RealType>("f_mdf", layout);
+    auto f_mdf_data = PHX::KokkosViewFactory<RealType, typename PHX::DevLayout<RealType>::type, PHX::Device>::buildView(
+        f_mdf.fieldTag());
     f_mdf.setFieldData(f_mdf_data);
 
     for (int test = 0; test < Impl::ntests; ++test) {
@@ -1468,18 +1314,16 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         for (int i = 0; i < 3; ++i) p.x[i] = coord_qp(cell, qp, i);
         Impl::FValues fv;
         if (test == 0)
-          for (int k = 0; k < 9; ++k)
-            fv.f[k] = eval_f(p.x[0], p.x[1], p.x[2], k);
+          for (int k = 0; k < 9; ++k) fv.f[k] = eval_f(p.x[0], p.x[1], p.x[2], k);
         else {
           // I don't have a bounding box, so come up with something reasonable.
-          RealType alpha[3]                    = {0, 0, 0};
-          alpha[0]                             = (100 + p.x[0]) / 200;
-          const minitensor::Tensor<RealType> F = eval_F(alpha);
+          RealType alpha[3]                                         = {0, 0, 0};
+          alpha[0]                                                  = (100 + p.x[0]) / 200;
+          const minitensor::Tensor<RealType> F                      = eval_F(alpha);
           loop(f_mdf, i, 2) loop(f_mdf, j, 3) fv.f[num_dim * i + j] = F(i, j);
         }
-        td.f_true_qp[p] = fv;
-        loop(f_mdf, i, 2) loop(f_mdf, j, 3) f_mdf(cell, qp, i, j) =
-            fv.f[num_dim * i + j];
+        td.f_true_qp[p]                                           = fv;
+        loop(f_mdf, i, 2) loop(f_mdf, j, 3) f_mdf(cell, qp, i, j) = fv.f[num_dim * i + j];
       }
 
       PHX::MDField<const RealType> f_mdf_const("f_mdf_const", layout);
@@ -1516,8 +1360,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
     for (int i = 0; i < 2; ++i) {
       typedef Albany::MDArray::size_type size_t;
       mda_data[i].resize(workset.numCells * num_qp * num_dim * num_dim);
-      shards::Array<RealType, shards::NaturalOrder, Cell, QuadPoint, Dim, Dim>
-          a;
+      shards::Array<RealType, shards::NaturalOrder, Cell, QuadPoint, Dim, Dim> a;
       a.assign(&mda_data[i][0], workset.numCells, num_qp, num_dim, num_dim);
       mda.push_back(a);
     }
@@ -1527,17 +1370,15 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       Manager::Field& f  = td.f;
       // Interpolate to IP.
       d->p.interp(f, workset, bf, mda[0], mda[1]);
-      transformStateArray(
-          Direction::g2G, f.data_->transformation, mda[0], mda[1]);
+      transformStateArray(Direction::g2G, f.data_->transformation, mda[0], mda[1]);
       // Record for later comparison.
       loop(mda[0], cell, 0) loop(mda[0], qp, 1)
       {
         Impl::Point p;
         for (int i = 0; i < 3; ++i) p.x[i] = coord_qp(cell, qp, i);
         Impl::FValues fv;
-        loop(mda[0], i, 2) loop(mda[0], j, 3) fv.f[num_dim * i + j] =
-            mda[0](cell, qp, i, j);
-        td.f_interp_qp[p] = fv;
+        loop(mda[0], i, 2) loop(mda[0], j, 3) fv.f[num_dim * i + j] = mda[0](cell, qp, i, j);
+        td.f_interp_qp[p]                                           = fv;
       }
     }
   }
@@ -1550,9 +1391,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       // Compare with true values at IP.
       double err1[9], errmax[9], scale[9];
       for (int k = 0; k < 9; ++k) { err1[k] = errmax[k] = scale[k] = 0; }
-      for (Impl::Map::const_iterator it = td.f_true_qp.begin();
-           it != td.f_true_qp.end();
-           ++it) {
+      for (Impl::Map::const_iterator it = td.f_true_qp.begin(); it != td.f_true_qp.end(); ++it) {
         const Impl::Point&              p         = it->first;
         const Impl::FValues&            fv_true   = it->second;
         const Impl::Map::const_iterator it_interp = td.f_interp_qp.find(p);
@@ -1566,10 +1405,9 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         }
       }
 
-      double gerr1[9], gerrmax[9], gscale[9];
-      int    gn;
-      Teuchos::RCP<Teuchos::Comm<int> const> const comm =
-          Teuchos::DefaultComm<int>::getComm();
+      double                                       gerr1[9], gerrmax[9], gscale[9];
+      int                                          gn;
+      Teuchos::RCP<Teuchos::Comm<int> const> const comm = Teuchos::DefaultComm<int>::getComm();
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 9, err1, gerr1);
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 9, errmax, gerrmax);
       Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 9, scale, gscale);
@@ -1579,11 +1417,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       if (comm->getRank() == 0) {
         printf("err ip (test %d):", test);
         for (int k = 0; k < 9; ++k)
-          printf(
-              " %1.2e %1.2e (%1.2e)",
-              gerr1[k] / (gn * gscale[k]),
-              gerrmax[k] / gscale[k],
-              gscale[k]);
+          printf(" %1.2e %1.2e (%1.2e)", gerr1[k] / (gn * gscale[k]), gerrmax[k] / gscale[k], gscale[k]);
         std::cout << "\n";
       }
 

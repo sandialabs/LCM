@@ -86,12 +86,12 @@ class Erosion : public AbstractAdapter
   Teuchos::RCP<Albany::AbstractDiscretization> discretization_{Teuchos::null};
   Albany::STKDiscretization*                   stk_discretization_{nullptr};
   Teuchos::RCP<stk::mesh::MetaData>            meta_data_{Teuchos::null};
-  Teuchos::RCP<LCM::AbstractFailureCriterion> failure_criterion_{Teuchos::null};
-  Teuchos::RCP<LCM::Topology>                 topology_{Teuchos::null};
-  StoreT                                      cell_state_store_;
-  StoreT                                      node_state_store_;
-  Albany::StateArrays                         state_arrays_;
-  Albany::WsLIDList                           gidwslid_map_;
+  Teuchos::RCP<LCM::AbstractFailureCriterion>  failure_criterion_{Teuchos::null};
+  Teuchos::RCP<LCM::Topology>                  topology_{Teuchos::null};
+  StoreT                                       cell_state_store_;
+  StoreT                                       node_state_store_;
+  Albany::StateArrays                          state_arrays_;
+  Albany::WsLIDList                            gidwslid_map_;
 
   int         num_dim_{0};
   int         remesh_file_index_{0};

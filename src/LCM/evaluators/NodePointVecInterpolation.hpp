@@ -18,18 +18,13 @@ namespace LCM {
 /// This evaluator interpolates nodal DOFVec values an arbitrary
 /// point within the cell.
 template <typename EvalT, typename Traits>
-class NodePointVecInterpolation : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                  public PHX::EvaluatorDerived<EvalT, Traits>
+class NodePointVecInterpolation : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  NodePointVecInterpolation(
-      Teuchos::ParameterList const&        p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  NodePointVecInterpolation(Teuchos::ParameterList const& p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -58,18 +53,13 @@ class NodePointVecInterpolation : public PHX::EvaluatorWithBaseImpl<Traits>,
 //! Specialization for Jacobian evaluation taking advantage of known sparsity
 template <typename Traits>
 class NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Jacobian, Traits>
+    : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
-  NodePointVecInterpolation(
-      Teuchos::ParameterList const&        p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  NodePointVecInterpolation(Teuchos::ParameterList const& p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

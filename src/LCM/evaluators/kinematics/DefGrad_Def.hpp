@@ -18,24 +18,17 @@ DefGrad<EvalT, Traits>::DefGrad(Teuchos::ParameterList const& p)
     : GradU(
           p.get<std::string>("Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      weights(
-          p.get<std::string>("Weights Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      defgrad(
-          p.get<std::string>("DefGrad Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      J(p.get<std::string>("DetDefGrad Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      weights(p.get<std::string>("Weights Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      defgrad(p.get<std::string>("DefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       weightedAverage(false),
       alpha(0.05)
 {
-  if (p.isType<bool>("Weighted Volume Average J"))
-    weightedAverage = p.get<bool>("Weighted Volume Average J");
+  if (p.isType<bool>("Weighted Volume Average J")) weightedAverage = p.get<bool>("Weighted Volume Average J");
   if (p.isType<RealType>("Average J Stabilization Parameter"))
     alpha = p.get<RealType>("Average J Stabilization Parameter");
 
-  Teuchos::RCP<PHX::DataLayout> tensor_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
+  Teuchos::RCP<PHX::DataLayout> tensor_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
 
   std::vector<PHX::DataLayout::size_type> dims;
   tensor_dl->dimensions(dims);
@@ -55,9 +48,7 @@ DefGrad<EvalT, Traits>::DefGrad(Teuchos::ParameterList const& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-DefGrad<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DefGrad<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(weights, fm);
   this->utils.setFieldData(defgrad, fm);
@@ -76,9 +67,7 @@ DefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
       for (int i = 0; i < numDims; ++i) {
-        for (int j = 0; j < numDims; ++j) {
-          defgrad(cell, qp, i, j) = GradU(cell, qp, i, j);
-        }
+        for (int j = 0; j < numDims; ++j) { defgrad(cell, qp, i, j) = GradU(cell, qp, i, j); }
         defgrad(cell, qp, i, i) += 1.0;
       }
     }
@@ -108,8 +97,7 @@ DefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       for (int qp = 0; qp < numQPs; ++qp) {
         for (int i = 0; i < numDims; ++i) {
           for (int j = 0; j < numDims; ++j) {
-            wJbar = std::exp(
-                (1 - alpha) * std::log(Jbar) + alpha * std::log(J(cell, qp)));
+            wJbar = std::exp((1 - alpha) * std::log(Jbar) + alpha * std::log(J(cell, qp)));
             defgrad(cell, qp, i, j) *= std::cbrt(wJbar / J(cell, qp));
           }
         }

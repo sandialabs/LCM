@@ -35,49 +35,31 @@ createConstThyraLinearOp(const Teuchos::RCP<const Tpetra_Operator>& op);
 
 // ============ Thyra->Tpetra conversion routines ============ //
 Teuchos::RCP<const Tpetra_Map>
-getTpetraMap(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    bool const                                   throw_if_not_tpetra = true);
+getTpetraMap(Teuchos::RCP<Thyra_VectorSpace const> const& vs, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<Tpetra_Vector>
-getTpetraVector(
-    Teuchos::RCP<Thyra_Vector> const& v,
-    bool const                        throw_if_not_tpetra = true);
+getTpetraVector(Teuchos::RCP<Thyra_Vector> const& v, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_Vector>
-getConstTpetraVector(
-    Teuchos::RCP<Thyra_Vector const> const& v,
-    bool const                              throw_if_not_tpetra = true);
+getConstTpetraVector(Teuchos::RCP<Thyra_Vector const> const& v, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<Tpetra_MultiVector>
-getTpetraMultiVector(
-    Teuchos::RCP<Thyra_MultiVector> const& mv,
-    bool const                             throw_if_not_tpetra = true);
+getTpetraMultiVector(Teuchos::RCP<Thyra_MultiVector> const& mv, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_MultiVector>
-getConstTpetraMultiVector(
-    const Teuchos::RCP<const Thyra_MultiVector>& mv,
-    bool const                                   throw_if_not_tpetra = true);
+getConstTpetraMultiVector(const Teuchos::RCP<const Thyra_MultiVector>& mv, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<Tpetra_Operator>
-getTpetraOperator(
-    const Teuchos::RCP<Thyra_LinearOp>& lop,
-    bool const                          throw_if_not_tpetra = true);
+getTpetraOperator(const Teuchos::RCP<Thyra_LinearOp>& lop, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_Operator>
-getConstTpetraOperator(
-    const Teuchos::RCP<const Thyra_LinearOp>& lop,
-    bool const                                throw_if_not_tpetra = true);
+getConstTpetraOperator(const Teuchos::RCP<const Thyra_LinearOp>& lop, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<Tpetra_CrsMatrix>
-getTpetraMatrix(
-    const Teuchos::RCP<Thyra_LinearOp>& lop,
-    bool const                          throw_if_not_tpetra = true);
+getTpetraMatrix(const Teuchos::RCP<Thyra_LinearOp>& lop, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_CrsMatrix>
-getConstTpetraMatrix(
-    const Teuchos::RCP<const Thyra_LinearOp>& lop,
-    bool const                                throw_if_not_tpetra = true);
+getConstTpetraMatrix(const Teuchos::RCP<const Thyra_LinearOp>& lop, bool const throw_if_not_tpetra = true);
 
 // --- Conversion from references rather than RCPs --- //
 
@@ -85,35 +67,25 @@ Teuchos::RCP<Tpetra_Vector>
 getTpetraVector(Thyra_Vector& v, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_Vector>
-getConstTpetraVector(
-    Thyra_Vector const& v,
-    bool const          throw_if_not_tpetra = true);
+getConstTpetraVector(Thyra_Vector const& v, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<Tpetra_MultiVector>
-getTpetraMultiVector(
-    Thyra_MultiVector& mv,
-    bool const         throw_if_not_tpetra = true);
+getTpetraMultiVector(Thyra_MultiVector& mv, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_MultiVector>
-getConstTpetraMultiVector(
-    const Thyra_MultiVector& mv,
-    bool const               throw_if_not_tpetra = true);
+getConstTpetraMultiVector(const Thyra_MultiVector& mv, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<Tpetra_Operator>
 getTpetraOperator(Thyra_LinearOp& lop, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_Operator>
-getConstTpetraOperator(
-    const Thyra_LinearOp& lop,
-    bool const            throw_if_not_tpetra = true);
+getConstTpetraOperator(const Thyra_LinearOp& lop, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<Tpetra_CrsMatrix>
 getTpetraMatrix(Thyra_LinearOp& lop, bool const throw_if_not_tpetra = true);
 
 Teuchos::RCP<const Tpetra_CrsMatrix>
-getConstTpetraMatrix(
-    const Thyra_LinearOp& lop,
-    bool const            throw_if_not_tpetra = true);
+getConstTpetraMatrix(const Thyra_LinearOp& lop, bool const throw_if_not_tpetra = true);
 
 }  // namespace Albany
 

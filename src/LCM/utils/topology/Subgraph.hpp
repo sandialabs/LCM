@@ -77,9 +77,7 @@ class Subgraph : public Graph
   ///  to the maps localGlobalVertexMap and globalLocalVertexMap.
   ///
   Vertex
-  addVertex(
-      stk::mesh::EntityRank vertex_rank,
-      stk::mesh::Entity     entity = INVALID_ENTITY);
+  addVertex(stk::mesh::EntityRank vertex_rank, stk::mesh::Entity entity = INVALID_ENTITY);
 
   ///
   /// \brief Remove vertex in subgraph
@@ -110,10 +108,7 @@ class Subgraph : public Graph
   /// subgraph.
   ///
   std::pair<Edge, bool>
-  addEdge(
-      EdgeId const edge_id,
-      Vertex const source_vertex,
-      Vertex const target_vertex);
+  addEdge(EdgeId const edge_id, Vertex const source_vertex, Vertex const target_vertex);
 
   ///
   /// \brief Remove edge from graph
@@ -192,9 +187,7 @@ class Subgraph : public Graph
   /// was replaced by a new point.
   ///
   void
-  updateEntityPointConnectivity(
-      stk::mesh::Entity old_point,
-      EntityEntityMap&  entity_new_point_map);
+  updateEntityPointConnectivity(stk::mesh::Entity old_point, EntityEntityMap& entity_new_point_map);
 
   ///
   /// \brief Splits an articulation point.
@@ -299,8 +292,7 @@ class Subgraph : public Graph
 
     Vertex vertex = vertexFromEntity(e);
 
-    boost::graph_traits<Graph>::degree_size_type number_in_edges =
-        boost::in_degree(vertex, *this);
+    boost::graph_traits<Graph>::degree_size_type number_in_edges = boost::in_degree(vertex, *this);
 
     assert(number_in_edges == 1 || number_in_edges == 2);
 

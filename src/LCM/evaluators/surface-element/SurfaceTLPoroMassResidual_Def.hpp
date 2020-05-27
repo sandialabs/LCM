@@ -17,33 +17,18 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepidBasis(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis")),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
       scalarGrad(p.get<std::string>("Scalar Gradient Name"), dl->qp_vector),
-      surface_Grad_BF(
-          p.get<std::string>(
-              "Surface Scalar Gradient Operator Pore Pressure Name"),
-          dl->node_qp_gradient),
-      refDualBasis(
-          p.get<std::string>("Reference Dual Basis Name"),
-          dl->qp_tensor),
+      surface_Grad_BF(p.get<std::string>("Surface Scalar Gradient Operator Pore Pressure Name"), dl->node_qp_gradient),
+      refDualBasis(p.get<std::string>("Reference Dual Basis Name"), dl->qp_tensor),
       refNormal(p.get<std::string>("Reference Normal Name"), dl->qp_vector),
       refArea(p.get<std::string>("Reference Area Name"), dl->qp_scalar),
       porePressure(p.get<std::string>("Pore Pressure Name"), dl->qp_scalar),
-      nodalPorePressure(
-          p.get<std::string>("Nodal Pore Pressure Name"),
-          dl->node_scalar),
-      biotCoefficient(
-          p.get<std::string>("Biot Coefficient Name"),
-          dl->qp_scalar),
+      nodalPorePressure(p.get<std::string>("Nodal Pore Pressure Name"), dl->node_scalar),
+      biotCoefficient(p.get<std::string>("Biot Coefficient Name"), dl->qp_scalar),
       biotModulus(p.get<std::string>("Biot Modulus Name"), dl->qp_scalar),
-      kcPermeability(
-          p.get<std::string>("Kozeny-Carman Permeability Name"),
-          dl->qp_scalar),
+      kcPermeability(p.get<std::string>("Kozeny-Carman Permeability Name"), dl->qp_scalar),
       deltaTime(p.get<std::string>("Delta Time Name"), dl->workset_scalar),
       poroMassResidual(p.get<std::string>("Residual Name"), dl->node_scalar),
       haveMech(false)
@@ -67,8 +52,7 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
   if (p.isType<std::string>("DefGrad Name")) {
     haveMech = true;
 
-    defGrad =
-        decltype(defGrad)(p.get<std::string>("DefGrad Name"), dl->qp_tensor);
+    defGrad = decltype(defGrad)(p.get<std::string>("DefGrad Name"), dl->qp_tensor);
     this->addDependentField(defGrad);
 
     J = decltype(J)(p.get<std::string>("DetDefGrad Name"), dl->qp_scalar);
@@ -91,10 +75,8 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
   std::cout << " numPlaneNodes: " << numPlaneNodes << std::endl;
   std::cout << " numPlaneDims: " << numPlaneDims << std::endl;
   std::cout << " numQPs: " << numQPs << std::endl;
-  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints()
-            << std::endl;
-  std::cout << " cubature->getDimension(): " << cubature->getDimension()
-            << std::endl;
+  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints() << std::endl;
+  std::cout << " cubature->getDimension(): " << cubature->getDimension() << std::endl;
 #endif
 
   porePressureName = p.get<std::string>("Pore Pressure Name") + "_old";
@@ -128,35 +110,24 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::postRegistrationSetup(
   }
 
   // Allocate Temporary Views
-  refValues =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
-  refGrads = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", numPlaneNodes, numQPs, numPlaneDims);
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
+  refValues  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
+  refGrads   = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs, numPlaneDims);
+  refPoints  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
   refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
 
   if (haveMech) {
     // Works space FCs
-    C = Kokkos::createDynRankView(
-        J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    Cinv = Kokkos::createDynRankView(
-        J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    F_inv = Kokkos::createDynRankView(
-        J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    F_invT = Kokkos::createDynRankView(
-        J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    JF_invT = Kokkos::createDynRankView(
-        J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    KJF_invT = Kokkos::createDynRankView(
-        J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    Kref = Kokkos::createDynRankView(
-        J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    C        = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    Cinv     = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    F_inv    = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    F_invT   = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    JF_invT  = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    KJF_invT = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    Kref     = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
   }
 
   // Allocate workspace
-  flux = Kokkos::createDynRankView(
-      scalarGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
+  flux = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
 
   // Pre-Calculate reference element quantitites
   cubature->getCubature(refPoints, refWeights);
@@ -167,8 +138,7 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
   typedef Intrepid2::RealSpaceTools<PHX::Device>     RST;
@@ -190,13 +160,10 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(
     FST::scalarMultiplyDataData(JF_invT, J.get_view(), F_invT);
     FST::scalarMultiplyDataData(KJF_invT, kcPermeability.get_view(), JF_invT);
     FST::tensorMultiplyDataData(Kref, F_inv, KJF_invT);
-    FST::tensorMultiplyDataData(
-        flux, Kref, scalarGrad.get_view());  // flux_i = k I_ij p_j
+    FST::tensorMultiplyDataData(flux, Kref, scalarGrad.get_view());  // flux_i = k I_ij p_j
   } else {
-    FST::scalarMultiplyDataData(
-        flux,
-        kcPermeability.get_view(),
-        scalarGrad.get_view());  // flux_i = kc p_i
+    FST::scalarMultiplyDataData(flux, kcPermeability.get_view(),
+                                scalarGrad.get_view());  // flux_i = kc p_i
   }
 
   for (int cell(0); cell < workset.numCells; ++cell) {
@@ -217,20 +184,15 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(
         // mid-plane value
 
         // Local Rate of Change volumetric constraint term
-        poroMassResidual(cell, node) -=
-            refValues(node, pt) *
-            (std::log(J(cell, pt) / Jold(cell, pt)) *
-                 biotCoefficient(cell, pt) +
-             (porePressure(cell, pt) - porePressureold(cell, pt)) /
-                 biotModulus(cell, pt)) *
-            refArea(cell, pt);
+        poroMassResidual(cell, node) -= refValues(node, pt) *
+                                        (std::log(J(cell, pt) / Jold(cell, pt)) * biotCoefficient(cell, pt) +
+                                         (porePressure(cell, pt) - porePressureold(cell, pt)) / biotModulus(cell, pt)) *
+                                        refArea(cell, pt);
 
         poroMassResidual(cell, topNode) -=
             refValues(node, pt) *
-            (std::log(J(cell, pt) / Jold(cell, pt)) *
-                 biotCoefficient(cell, pt) +
-             (porePressure(cell, pt) - porePressureold(cell, pt)) /
-                 biotModulus(cell, pt)) *
+            (std::log(J(cell, pt) / Jold(cell, pt)) * biotCoefficient(cell, pt) +
+             (porePressure(cell, pt) - porePressureold(cell, pt)) / biotModulus(cell, pt)) *
             refArea(cell, pt);
 
       }  // end integrartion point loop
@@ -243,13 +205,11 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(
 
       for (int pt = 0; pt < numQPs; ++pt) {
         for (int dim = 0; dim < numDims; ++dim) {
-          poroMassResidual(cell, node) -= flux(cell, pt, dim) * dt *
-                                          surface_Grad_BF(cell, node, pt, dim) *
-                                          refArea(cell, pt);
+          poroMassResidual(cell, node) -=
+              flux(cell, pt, dim) * dt * surface_Grad_BF(cell, node, pt, dim) * refArea(cell, pt);
 
           poroMassResidual(cell, topNode) -=
-              flux(cell, pt, dim) * dt *
-              surface_Grad_BF(cell, topNode, pt, dim) * refArea(cell, pt);
+              flux(cell, pt, dim) * dt * surface_Grad_BF(cell, topNode, pt, dim) * refArea(cell, pt);
         }
       }
     }

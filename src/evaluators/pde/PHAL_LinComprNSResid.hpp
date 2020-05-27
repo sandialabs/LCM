@@ -19,16 +19,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class LinComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-                        public PHX::EvaluatorDerived<EvalT, Traits>
+class LinComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   LinComprNSResid(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -49,10 +46,10 @@ class LinComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   Teuchos::Array<double> baseFlowData;
   double                 gamma_gas;  // 1.4 typically
-  double Rgas;  // Non-dimensional gas constant Rgas = R*Tref/(cref*cref), where
-                // R = nondimensional gas constant = 287.0 typically
-  double Re;    // Reynolds number
-  double Pr;    // Prandtl number, 0.72 typically
+  double                 Rgas;       // Non-dimensional gas constant Rgas = R*Tref/(cref*cref), where
+                                     // R = nondimensional gas constant = 287.0 typically
+  double Re;                         // Reynolds number
+  double Pr;                         // Prandtl number, 0.72 typically
   double mu;
   double lambda;             // viscosity coefficients
   double kappa;              // thermal diffusivity

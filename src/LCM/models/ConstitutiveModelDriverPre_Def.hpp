@@ -15,20 +15,15 @@ ConstitutiveModelDriverPre<EvalT, Traits>::ConstitutiveModelDriverPre(
     : solution_(p.get<std::string>("Solution Name"), dl->node_tensor),
       def_grad_(p.get<std::string>("F Name"), dl->qp_tensor),
       j_(p.get<std::string>("J Name"), dl->qp_scalar),
-      prescribed_def_grad_(
-          p.get<std::string>("Prescribed F Name"),
-          dl->qp_tensor),
+      prescribed_def_grad_(p.get<std::string>("Prescribed F Name"), dl->qp_tensor),
       time_(p.get<std::string>("Time Name"), dl->workset_scalar)
 {
-  std::cout << "ConstitutiveModelDriverPre<EvalT, Traits>::constructor"
-            << std::endl;
-  Teuchos::ParameterList driver_params =
-      p.get<Teuchos::ParameterList>("Driver Params");
-  std::string loading_case =
-      driver_params.get<std::string>("loading case", "uniaxial-strain");
-  double increment      = driver_params.get<double>("increment", 0.1);
-  final_time_           = driver_params.get<double>("final time", 1.0);
-  std::string component = driver_params.get<std::string>("component", "00");
+  std::cout << "ConstitutiveModelDriverPre<EvalT, Traits>::constructor" << std::endl;
+  Teuchos::ParameterList driver_params = p.get<Teuchos::ParameterList>("Driver Params");
+  std::string            loading_case  = driver_params.get<std::string>("loading case", "uniaxial-strain");
+  double                 increment     = driver_params.get<double>("increment", 0.1);
+  final_time_                          = driver_params.get<double>("final time", 1.0);
+  std::string component                = driver_params.get<std::string>("component", "00");
 
   this->addDependentField(solution_);
   this->addDependentField(time_);
@@ -62,17 +57,15 @@ ConstitutiveModelDriverPre<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelDriverPre<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ConstitutiveModelDriverPre<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  std::cout << "ConstitutiveModelDriverPre<EvalT, Traits>::evaluateFields"
-            << std::endl;
+  std::cout << "ConstitutiveModelDriverPre<EvalT, Traits>::evaluateFields" << std::endl;
   minitensor::Tensor<ScalarT> F(num_dims_);
 
-  RealType alpha = Sacado::ScalarValue<ScalarT>::eval(time_(0)) / final_time_;
+  RealType                    alpha               = Sacado::ScalarValue<ScalarT>::eval(time_(0)) / final_time_;
   minitensor::Tensor<ScalarT> log_F_tensor        = minitensor::log(F0_);
   minitensor::Tensor<ScalarT> scaled_log_F_tensor = alpha * log_F_tensor;
-  minitensor::Tensor<ScalarT> current_F = minitensor::exp(scaled_log_F_tensor);
+  minitensor::Tensor<ScalarT> current_F           = minitensor::exp(scaled_log_F_tensor);
 
   // FIXME, I really need to figure out which components are prescribed, and
   // which will be traction free, and assign the def_grad_ only for the
@@ -82,7 +75,7 @@ ConstitutiveModelDriverPre<EvalT, Traits>::evaluateFields(
       for (int node = 0; node < num_nodes_; ++node) {
         for (int dim1 = 0; dim1 < num_dims_; ++dim1) {
           for (int dim2 = 0; dim2 < num_dims_; ++dim2) {
-            def_grad_(cell, pt, dim1, dim2) = solution_(cell, node, dim1, dim2);
+            def_grad_(cell, pt, dim1, dim2)            = solution_(cell, node, dim1, dim2);
             prescribed_def_grad_(cell, pt, dim1, dim2) = current_F(dim1, dim2);
             F.fill(def_grad_, cell, pt, 0, 0);
             j_(cell, pt) = minitensor::det(F);
@@ -95,9 +88,7 @@ ConstitutiveModelDriverPre<EvalT, Traits>::evaluateFields(
 
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename EvalT::ScalarT>
-ConstitutiveModelDriverPre<EvalT, Traits>::computeLoading(
-    std::string load_case,
-    double      inc)
+ConstitutiveModelDriverPre<EvalT, Traits>::computeLoading(std::string load_case, double inc)
 {
   minitensor::Tensor<ScalarT> F0(num_dims_);
   minitensor::Tensor<ScalarT> I(minitensor::eye<ScalarT>(num_dims_));

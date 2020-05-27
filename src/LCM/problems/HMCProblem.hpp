@@ -62,9 +62,7 @@ class HMCProblem : public virtual Albany::AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -81,11 +79,8 @@ class HMCProblem : public virtual Albany::AbstractProblem
 
   void
   getAllocatedStates(
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-          Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState_,
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-          Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState_)
-      const;
+      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState_,
+      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState_) const;
 
  private:
   //! Private to prohibit copying
@@ -96,9 +91,7 @@ class HMCProblem : public virtual Albany::AbstractProblem
   operator=(const HMCProblem&);
 
   void
-  parseMaterialModel(
-      Teuchos::RCP<Teuchos::ParameterList>&       p,
-      const Teuchos::RCP<Teuchos::ParameterList>& params) const;
+  parseMaterialModel(Teuchos::RCP<Teuchos::ParameterList>& p, const Teuchos::RCP<Teuchos::ParameterList>& params) const;
 
   Teuchos::RCP<Albany::MaterialDatabase> material_db_;
 
@@ -117,8 +110,7 @@ class HMCProblem : public virtual Albany::AbstractProblem
   void
   constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs);
   void
-  constructNeumannEvaluators(
-      const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
+  constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
 
  protected:
   ///
@@ -136,22 +128,17 @@ class HMCProblem : public virtual Albany::AbstractProblem
   std::string                   matModel;
   Teuchos::RCP<Albany::Layouts> dl;
 
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-      Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>>
-      oldState;
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-      Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>>
-      newState;
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState;
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState;
 
   template <typename EvalT>
   void
   registerStateVariables(
-      Teuchos::RCP<LCM::ConstitutiveModelInterface<EvalT, PHAL::AlbanyTraits>>
-                                             cmiEv,
-      PHX::FieldManager<PHAL::AlbanyTraits>& fm0,
-      Albany::StateManager&                  stateMgr,
-      std::string                            eb_name,
-      int                                    numDim);
+      Teuchos::RCP<LCM::ConstitutiveModelInterface<EvalT, PHAL::AlbanyTraits>> cmiEv,
+      PHX::FieldManager<PHAL::AlbanyTraits>&                                   fm0,
+      Albany::StateManager&                                                    stateMgr,
+      std::string                                                              eb_name,
+      int                                                                      numDim);
 };
 
 }  // namespace Albany
@@ -200,11 +187,8 @@ Albany::HMCProblem::constructEvaluators(
 
   // get the name of the material model to be used (and make sure there is one)
   std::string material_model_name =
-      material_db_->getElementBlockSublist(eb_name, "Material Model")
-          .get<std::string>("Model Name");
-  ALBANY_PANIC(
-      material_model_name.length() == 0,
-      "A material model must be defined for block: " + eb_name);
+      material_db_->getElementBlockSublist(eb_name, "Material Model").get<std::string>("Model Name");
+  ALBANY_PANIC(material_model_name.length() == 0, "A material model must be defined for block: " + eb_name);
 
 #if defined(ALBANY_VERBOSE)
   *out << "In MechanicsProblem::constructEvaluators" << std::endl;
@@ -212,36 +196,30 @@ Albany::HMCProblem::constructEvaluators(
   *out << "material model name: " << material_model_name << std::endl;
 #endif
 
-  RCP<shards::CellTopology> cellType =
-      rcp(new shards::CellTopology(&meshSpecs.ctd));
-  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
-      Albany::getIntrepid2Basis(meshSpecs.ctd);
+  RCP<shards::CellTopology>                              cellType      = rcp(new shards::CellTopology(&meshSpecs.ctd));
+  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis = Albany::getIntrepid2Basis(meshSpecs.ctd);
 
   int const numNodes    = intrepidBasis->getCardinality();
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(
-          *cellType, meshSpecs.cubatureDegree);
+      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numDim      = cubature->getDimension();
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize
-       << ", Vertices= " << numVertices << ", Nodes= " << numNodes
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
        << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
 
   // volume average pressure
   bool volume_average_pressure(false);
   if (material_db_->isElementBlockParam(eb_name, "Volume Average Pressure"))
-    volume_average_pressure = material_db_->getElementBlockParam<bool>(
-        eb_name, "Volume Average Pressure");
+    volume_average_pressure = material_db_->getElementBlockParam<bool>(eb_name, "Volume Average Pressure");
 
   // Construct standard FEM evaluators with standard field names
-  dl = rcp(
-      new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
   ALBANY_PANIC(
       dl->vectorAndGradientLayoutsAreEquivalent == false,
       "Data Layout Usage in Mechanics problems assume vecDim = numDim");
@@ -265,32 +243,25 @@ Albany::HMCProblem::constructEvaluators(
   macro_resid_names[0] = macro_dof_names[0] + " Residual";
 
   //   micro
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_dof_names(
-      numMicroScales);
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_resid_names(
-      numMicroScales);
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_scatter_names(
-      numMicroScales);
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_dof_names(numMicroScales);
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_resid_names(numMicroScales);
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_scatter_names(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
     micro_dof_names[i].resize(1);
     micro_resid_names[i].resize(1);
     micro_scatter_names[i].resize(1);
-    micro_dof_names[i][0] =
-        std::string("Delta") + Albany::strint(strMicrostrain, i);
+    micro_dof_names[i][0]     = std::string("Delta") + Albany::strint(strMicrostrain, i);
     micro_resid_names[i][0]   = micro_dof_names[i][0] + " Residual";
     micro_scatter_names[i][0] = micro_dof_names[i][0] + " Scatter";
   }
 
   // acceleration
   //   macro
-  Teuchos::ArrayRCP<std::string> macro_dof_names_dotdot(numMacroScales);
-  Teuchos::ArrayRCP<std::string> macro_resid_names_dotdot(numMacroScales);
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_dof_names_dotdot(
-      numMicroScales);
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_resid_names_dotdot(
-      numMicroScales);
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_scatter_names_dotdot(
-      numMicroScales);
+  Teuchos::ArrayRCP<std::string>                    macro_dof_names_dotdot(numMacroScales);
+  Teuchos::ArrayRCP<std::string>                    macro_resid_names_dotdot(numMacroScales);
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_dof_names_dotdot(numMicroScales);
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_resid_names_dotdot(numMicroScales);
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<std::string>> micro_scatter_names_dotdot(numMicroScales);
   macro_dof_names_dotdot[0]   = macro_dof_names[0] + "_dotdot";
   macro_resid_names_dotdot[0] = macro_resid_names[0] + " Residual";
   //   micro
@@ -298,11 +269,9 @@ Albany::HMCProblem::constructEvaluators(
     micro_dof_names_dotdot[i].resize(1);
     micro_resid_names_dotdot[i].resize(1);
     micro_scatter_names_dotdot[i].resize(1);
-    micro_dof_names_dotdot[i][0] = micro_dof_names[i][0] + "_dotdot";
-    micro_resid_names_dotdot[i][0] =
-        micro_resid_names_dotdot[i][0] + " Residual";
-    micro_scatter_names_dotdot[i][0] =
-        micro_scatter_names_dotdot[i][0] + " Scatter";
+    micro_dof_names_dotdot[i][0]     = micro_dof_names[i][0] + "_dotdot";
+    micro_resid_names_dotdot[i][0]   = micro_resid_names_dotdot[i][0] + " Residual";
+    micro_scatter_names_dotdot[i][0] = micro_scatter_names_dotdot[i][0] + " Scatter";
   }
 
   // Temporary variable used numerous times below
@@ -321,10 +290,8 @@ Albany::HMCProblem::constructEvaluators(
   dims(cell,I=nNodes,i=vecDim) \\ $u_{Ii}^{N+1}$ & Displacement at state N+1 &
   "Displacement_updated"  & dims(cell,I=nNodes,i=vecDim) \end{tabular}
   \end{text}*/
-  std::string strDisplacement_Updated =
-      strDisplacement;  // updated state, i.e., state at N+1
-  std::string strDisplacement_Current =
-      strDisplacement + "_old";  // current state, i.e., state at N
+  std::string strDisplacement_Updated = strDisplacement;           // updated state, i.e., state at N+1
+  std::string strDisplacement_Current = strDisplacement + "_old";  // current state, i.e., state at N
   {
     RCP<ParameterList> p = rcp(new ParameterList);
     p                    = stateMgr.registerStateVariable(
@@ -411,16 +378,13 @@ Albany::HMCProblem::constructEvaluators(
         p->set("Weights Name", "Weights");
         p->set("component i", j);
         p->set("component j", k);
-        ev = Teuchos::rcp(
-            new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
+        ev = Teuchos::rcp(new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
         fm0.template registerEvaluator<EvalT>(ev);
       }
 
-    strMicrostrains_Updated[i] =
-        strMicrostrains[i];  // updated state, i.e., state at N+1
-    strMicrostrains_Current[i] =
-        strMicrostrains[i] + "_old";  // current state, i.e., state at N
-    p = stateMgr.registerStateVariable(
+    strMicrostrains_Updated[i] = strMicrostrains[i];           // updated state, i.e., state at N+1
+    strMicrostrains_Current[i] = strMicrostrains[i] + "_old";  // current state, i.e., state at N
+    p                          = stateMgr.registerStateVariable(
         strMicrostrains[i],
         dl->qp_tensor,
         dl->dummy,
@@ -471,9 +435,8 @@ Albany::HMCProblem::constructEvaluators(
   \end{text}*/
 
   int vectorRank = 1;
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator_withAcceleration(
-          vectorRank, macro_dof_names, Teuchos::null, macro_dof_names_dotdot));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_withAcceleration(
+      vectorRank, macro_dof_names, Teuchos::null, macro_dof_names_dotdot));
 
   // Gather Solution (microstrains and micro accelerations)
   /*\begin{text}
@@ -493,13 +456,8 @@ Albany::HMCProblem::constructEvaluators(
   int dof_stride = numDim * numDim;
   int tensorRank = 2;
   for (int i = 0; i < numMicroScales; i++) {
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator_withAcceleration(
-            tensorRank,
-            micro_dof_names[i],
-            Teuchos::null,
-            micro_dof_names_dotdot[i],
-            dof_offset + i * dof_stride));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_withAcceleration(
+        tensorRank, micro_dof_names[i], Teuchos::null, micro_dof_names_dotdot[i], dof_offset + i * dof_stride));
   }
 
   // Gather Coordinates
@@ -517,9 +475,7 @@ Albany::HMCProblem::constructEvaluators(
   \\
      \end{tabular} \\
   \end{text}*/
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherCoordinateVectorEvaluator(
-          strDisplacement_Current));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator(strDisplacement_Current));
 
   // Compute gradient matrix and weighted basis function values in current
   // coordinates
@@ -556,8 +512,7 @@ Albany::HMCProblem::constructEvaluators(
       \end{tabular} \\
    \end{text}*/
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(
-          cellType, intrepidBasis, cubature));
+      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   // Project displacements to Gauss points
   /*\begin{text}
@@ -579,8 +534,7 @@ Albany::HMCProblem::constructEvaluators(
   dims(cell,p=nQPs,i=vecDim)
     \end{tabular} \\
   \end{text}*/
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecInterpolationEvaluator(macro_dof_names[0]));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(macro_dof_names[0]));
 
   // Project microstrains to Gauss points
   /*\begin{text}
@@ -604,8 +558,7 @@ Albany::HMCProblem::constructEvaluators(
   \end{text}*/
   for (int i = 0; i < numMicroScales; i++)
     fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFTensorInterpolationEvaluator(
-            micro_dof_names[i][0], dof_offset + i * dof_stride));
+        evalUtils.constructDOFTensorInterpolationEvaluator(micro_dof_names[i][0], dof_offset + i * dof_stride));
 
   // Project accelerations to Gauss points
   /*\begin{text}
@@ -627,9 +580,7 @@ Albany::HMCProblem::constructEvaluators(
   "Displacement\_dotdot"  & dims(cell,p=nQPs,i=vecDim)
     \end{tabular} \\
   \end{text}*/
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecInterpolationEvaluator(
-          macro_dof_names_dotdot[0]));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(macro_dof_names_dotdot[0]));
 
   // Project micro accelerations to Gauss points
   /*\begin{text}
@@ -654,8 +605,7 @@ Albany::HMCProblem::constructEvaluators(
   \end{text}*/
   for (int i = 0; i < numMicroScales; i++)
     fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFTensorInterpolationEvaluator(
-            micro_dof_names_dotdot[i][0], dof_offset + i * dof_stride));
+        evalUtils.constructDOFTensorInterpolationEvaluator(micro_dof_names_dotdot[i][0], dof_offset + i * dof_stride));
 
   // Project nodal coordinates to Gauss points
   /*\begin{text}
@@ -675,8 +625,7 @@ Albany::HMCProblem::constructEvaluators(
   dims(cell,p=nQPs,i=vecDim) \\
      \end{tabular} \\
   \end{text}*/
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
   // Compute displacement gradient
   /*\begin{text}
@@ -698,8 +647,7 @@ Albany::HMCProblem::constructEvaluators(
   dims(cell,p=nQPs,i=vecDim,j=spcDim)
     \end{tabular} \\
   \end{text}*/
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecGradInterpolationEvaluator(macro_dof_names[0]));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecGradInterpolationEvaluator(macro_dof_names[0]));
 
   // Compute increment of the microstrain gradient
   /*\begin{text}
@@ -724,8 +672,7 @@ Albany::HMCProblem::constructEvaluators(
   \end{text}*/
   for (int i = 0; i < numMicroScales; i++) {
     fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFTensorGradInterpolationEvaluator(
-            micro_dof_names[i][0], dof_offset + i * dof_stride));
+        evalUtils.constructDOFTensorGradInterpolationEvaluator(micro_dof_names[i][0], dof_offset + i * dof_stride));
 
     std::string strMSGrad_Inc = micro_dof_names[i][0] + " Gradient";
     std::string msGrad        = Albany::strint(strMicrostrain, i) + " Gradient";
@@ -743,10 +690,8 @@ Albany::HMCProblem::constructEvaluators(
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
     }
-    std::string strMSGrad_Updated =
-        msGrad;  // updated state, i.e., state at N+1
-    std::string strMSGrad_Current =
-        msGrad + "_old";  // current state, i.e., state at N
+    std::string strMSGrad_Updated = msGrad;           // updated state, i.e., state at N+1
+    std::string strMSGrad_Current = msGrad + "_old";  // current state, i.e., state at N
     {
       RCP<ParameterList> p = rcp(new ParameterList("Microstrain Gradient"));
       p->set<RCP<DataLayout>>("Field Layout", dl->qp_tensor3);
@@ -786,8 +731,7 @@ Albany::HMCProblem::constructEvaluators(
     RCP<ParameterList> p = rcp(new ParameterList("Strain Increment"));
 
     // Input
-    p->set<std::string>(
-        "Gradient QP Variable Name", macro_dof_names[0] + " Gradient");
+    p->set<std::string>("Gradient QP Variable Name", macro_dof_names[0] + " Gradient");
 
     // Output
     p->set<std::string>("Strain Name", "Strain Increment");
@@ -823,8 +767,7 @@ Albany::HMCProblem::constructEvaluators(
         p->set("Weights Name", "Weights");
         p->set("component i", j);
         p->set("component j", k);
-        ev = Teuchos::rcp(
-            new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
+        ev = Teuchos::rcp(new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
         fm0.template registerEvaluator<EvalT>(ev);
       }
 
@@ -840,10 +783,8 @@ Albany::HMCProblem::constructEvaluators(
     ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
-  std::string strStrain_Updated =
-      strStrain;  // updated state, i.e., state at N+1
-  std::string strStrain_Current =
-      strStrain + "_old";  // current state, i.e., state at N
+  std::string strStrain_Updated = strStrain;           // updated state, i.e., state at N+1
+  std::string strStrain_Current = strStrain + "_old";  // current state, i.e., state at N
   {
     RCP<ParameterList> p = rcp(new ParameterList("Strain"));
     p->set<RCP<DataLayout>>("Field Layout", dl->qp_tensor);
@@ -883,36 +824,29 @@ Albany::HMCProblem::constructEvaluators(
     p->set<std::string>("Macro Strain Name", "Strain");
 
     // Output
-    p->set<std::string>(
-        "Strain Difference Name", Albany::strint("Strain Difference", i));
+    p->set<std::string>("Strain Difference Name", Albany::strint("Strain Difference", i));
 
     ev = rcp(new HMC::StrainDifference<EvalT, AlbanyTraits>(*p, dl));
     fm0.template registerEvaluator<EvalT>(ev);
   }
   for (int i = 0; i < numMicroScales; i++) {
-    RCP<ParameterList> p =
-        rcp(new ParameterList("Increment of Strain Difference"));
+    RCP<ParameterList> p = rcp(new ParameterList("Increment of Strain Difference"));
 
     // Input
     p->set<std::string>("Micro Strain Name", micro_dof_names[i][0]);
     p->set<std::string>("Macro Strain Name", "Strain Increment");
 
     // Output
-    p->set<std::string>(
-        "Strain Difference Name",
-        Albany::strint("Strain Difference", i) + " Increment");
+    p->set<std::string>("Strain Difference Name", Albany::strint("Strain Difference", i) + " Increment");
 
     ev = rcp(new HMC::StrainDifference<EvalT, AlbanyTraits>(*p, dl));
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
   {  // Constitutive Model Parameters
-    RCP<ParameterList> p =
-        rcp(new ParameterList("Constitutive Model Parameters"));
-    std::string matName =
-        material_db_->getElementBlockParam<std::string>(eb_name, "material");
-    Teuchos::ParameterList& param_list =
-        material_db_->getElementBlockSublist(eb_name, matName);
+    RCP<ParameterList>      p          = rcp(new ParameterList("Constitutive Model Parameters"));
+    std::string             matName    = material_db_->getElementBlockParam<std::string>(eb_name, "material");
+    Teuchos::ParameterList& param_list = material_db_->getElementBlockSublist(eb_name, matName);
 
     // pass through material properties
     p->set<Teuchos::ParameterList*>("Material Parameters", &param_list);
@@ -949,12 +883,9 @@ Albany::HMCProblem::constructEvaluators(
     \end{tabular} \\
   \end{text}*/
   {
-    RCP<ParameterList> p =
-        rcp(new ParameterList("Constitutive Model Interface"));
-    std::string matName =
-        material_db_->getElementBlockParam<std::string>(eb_name, "material");
-    Teuchos::ParameterList& param_list =
-        material_db_->getElementBlockSublist(eb_name, matName);
+    RCP<ParameterList>      p          = rcp(new ParameterList("Constitutive Model Interface"));
+    std::string             matName    = material_db_->getElementBlockParam<std::string>(eb_name, "material");
+    Teuchos::ParameterList& param_list = material_db_->getElementBlockSublist(eb_name, matName);
 
     // construct field name map
     // required
@@ -965,9 +896,7 @@ Albany::HMCProblem::constructEvaluators(
     // end required
 
     p->set<bool>("Volume Average Pressure", volume_average_pressure);
-    if (volume_average_pressure) {
-      p->set<std::string>("Weights Name", "Weights");
-    }
+    if (volume_average_pressure) { p->set<std::string>("Weights Name", "Weights"); }
 
     RCP<LCM::ConstitutiveModelInterface<EvalT, AlbanyTraits>> cmiEv =
         rcp(new LCM::ConstitutiveModelInterface<EvalT, AlbanyTraits>(*p, dl));
@@ -1031,8 +960,7 @@ Albany::HMCProblem::constructEvaluators(
     // extra input for time dependent term
     p->set<std::string>("Weighted BF Name", "wBF");
     p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl->node_qp_scalar);
-    p->set<std::string>(
-        "Time Dependent Variable Name", macro_dof_names_dotdot[0]);
+    p->set<std::string>("Time Dependent Variable Name", macro_dof_names_dotdot[0]);
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl->qp_vector);
 
     // Output
@@ -1062,8 +990,7 @@ Albany::HMCProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl->node_qp_scalar);
 
     // extra input for time dependent term
-    p->set<std::string>(
-        "Time Dependent Variable Name", micro_dof_names[i][0] + "_dotdot");
+    p->set<std::string>("Time Dependent Variable Name", micro_dof_names[i][0] + "_dotdot");
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl->qp_vector);
 
     // Output
@@ -1074,19 +1001,13 @@ Albany::HMCProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(
-          vectorRank, macro_resid_names));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(vectorRank, macro_resid_names));
 
   int numTensorFields = numDim * numDim;
   int dofOffset       = numDim;
   for (int i = 0; i < numMicroScales; i++) {  // Micro forces
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(
-            tensorRank,
-            micro_resid_names[i],
-            dofOffset,
-            micro_scatter_names[i][0]));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(
+        tensorRank, micro_resid_names[i], dofOffset, micro_scatter_names[i][0]));
     dofOffset += numTensorFields;
   }
 
@@ -1101,8 +1022,7 @@ Albany::HMCProblem::constructEvaluators(
 
     ev = rcp(new LCM::Time<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
-    p = stateMgr.registerStateVariable(
-        "Time", dl->workset_scalar, dl->dummy, eb_name, "scalar", 0.0, true);
+    p  = stateMgr.registerStateVariable("Time", dl->workset_scalar, dl->dummy, eb_name, "scalar", 0.0, true);
     ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
@@ -1111,8 +1031,7 @@ Albany::HMCProblem::constructEvaluators(
     PHX::Tag<typename EvalT::ScalarT> res_tag("Scatter", dl->dummy);
     fm0.requireField<EvalT>(res_tag);
     for (int i = 0; i < numMicroScales; i++) {  // Micro forces
-      PHX::Tag<typename EvalT::ScalarT> res_tag(
-          micro_scatter_names[i][0], dl->dummy);
+      PHX::Tag<typename EvalT::ScalarT> res_tag(micro_scatter_names[i][0], dl->dummy);
       fm0.requireField<EvalT>(res_tag);
     }
     return res_tag.clone();
@@ -1128,12 +1047,11 @@ Albany::HMCProblem::constructEvaluators(
 template <typename EvalT>
 void
 Albany::HMCProblem::registerStateVariables(
-    Teuchos::RCP<LCM::ConstitutiveModelInterface<EvalT, PHAL::AlbanyTraits>>
-                                           cmiEv,
-    PHX::FieldManager<PHAL::AlbanyTraits>& fm0,
-    Albany::StateManager&                  stateMgr,
-    std::string                            eb_name,
-    int                                    numDim)
+    Teuchos::RCP<LCM::ConstitutiveModelInterface<EvalT, PHAL::AlbanyTraits>> cmiEv,
+    PHX::FieldManager<PHAL::AlbanyTraits>&                                   fm0,
+    Albany::StateManager&                                                    stateMgr,
+    std::string                                                              eb_name,
+    int                                                                      numDim)
 /******************************************************************************/
 {
   Teuchos::RCP<Teuchos::ParameterList>             p;
@@ -1144,8 +1062,7 @@ Albany::HMCProblem::registerStateVariables(
     cmiEv->fillStateVariableStruct(sv);
 
     // QUAD POINT SCALARS
-    if ((cmiEv->getLayout() == dl->qp_scalar) &&
-        (cmiEv->getOutputFlag() == true)) {
+    if ((cmiEv->getLayout() == dl->qp_scalar) && (cmiEv->getOutputFlag() == true)) {
       // save cell average for output
       p = stateMgr.registerStateVariable(
           cmiEv->getName() + "_ave",
@@ -1160,8 +1077,7 @@ Albany::HMCProblem::registerStateVariables(
       p->set("Field Name", cmiEv->getName());
       p->set("Weights Layout", dl->qp_scalar);
       p->set("Weights Name", "Weights");
-      ev = Teuchos::rcp(
-          new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
+      ev = Teuchos::rcp(new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
       // save state w/o output
@@ -1174,15 +1090,13 @@ Albany::HMCProblem::registerStateVariables(
           cmiEv->getInitValue(),
           cmiEv->getStateFlag(),
           /* write output = */ false);
-      ev =
-          Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+      ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
     } else
 
         // QUAD POINT TENSORS
-        if ((cmiEv->getLayout() == dl->qp_tensor) &&
-            (cmiEv->getOutputFlag() == true)) {
+        if ((cmiEv->getLayout() == dl->qp_tensor) && (cmiEv->getOutputFlag() == true)) {
       std::string cn[3] = {"x", "y", "z"};
 
       // save cell average for output
@@ -1208,8 +1122,7 @@ Albany::HMCProblem::registerStateVariables(
           p->set("Weights Name", "Weights");
           p->set("component i", i);
           p->set("component j", j);
-          ev = Teuchos::rcp(
-              new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
+          ev = Teuchos::rcp(new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
           fm0.template registerEvaluator<EvalT>(ev);
         }
 
@@ -1223,15 +1136,13 @@ Albany::HMCProblem::registerStateVariables(
           cmiEv->getInitValue(),
           cmiEv->getStateFlag(),
           /* write output = */ false);
-      ev =
-          Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+      ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
     } else
 
         // QUAD POINT THIRD RANK TENSORS
-        if ((cmiEv->getLayout() == dl->qp_tensor3) &&
-            (cmiEv->getOutputFlag() == true)) {
+        if ((cmiEv->getLayout() == dl->qp_tensor3) && (cmiEv->getOutputFlag() == true)) {
       std::string cn[3] = {"x", "y", "z"};
 
       // save cell average for output
@@ -1260,8 +1171,7 @@ Albany::HMCProblem::registerStateVariables(
             p->set("component i", i);
             p->set("component j", j);
             p->set("component k", k);
-            ev = Teuchos::rcp(
-                new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
+            ev = Teuchos::rcp(new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
             fm0.template registerEvaluator<EvalT>(ev);
           }
 
@@ -1275,8 +1185,7 @@ Albany::HMCProblem::registerStateVariables(
           cmiEv->getInitValue(),
           cmiEv->getStateFlag(),
           /* write output = */ false);
-      ev =
-          Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+      ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
     } else {
@@ -1289,8 +1198,7 @@ Albany::HMCProblem::registerStateVariables(
           cmiEv->getInitValue(),
           cmiEv->getStateFlag(),
           cmiEv->getOutputFlag());
-      ev =
-          Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+      ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
     }
   }

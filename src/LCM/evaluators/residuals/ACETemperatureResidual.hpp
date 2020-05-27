@@ -19,8 +19,7 @@ namespace LCM {
 /// Heat equation residual evaluator for ACE-LCM
 ///
 template <typename EvalT, typename Traits>
-class ACETemperatureResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                               public PHX::EvaluatorDerived<EvalT, Traits>
+class ACETemperatureResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
@@ -29,17 +28,13 @@ class ACETemperatureResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Constructor
   ///
-  ACETemperatureResidual(
-      Teuchos::ParameterList const&        p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  ACETemperatureResidual(Teuchos::ParameterList const& p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Calculates the heat equation residual
@@ -53,8 +48,8 @@ class ACETemperatureResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<MeshScalarT const, Cell, Node, QuadPoint, Dim> wgradbf_;
   PHX::MDField<ScalarT const, Cell, QuadPoint>                tdot_;
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           tgrad_;
-  PHX::MDField<ScalarT const, Cell, QuadPoint> thermal_conductivity_;
-  PHX::MDField<ScalarT const, Cell, QuadPoint> thermal_inertia_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                thermal_conductivity_;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>                thermal_inertia_;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> residual_;

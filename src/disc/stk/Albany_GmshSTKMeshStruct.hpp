@@ -18,25 +18,20 @@ enum class GmshVersion
 class GmshSTKMeshStruct : public GenericSTKMeshStruct
 {
  public:
-  GmshSTKMeshStruct(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<Teuchos_Comm const>&     commT);
+  GmshSTKMeshStruct(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   ~GmshSTKMeshStruct();
 
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
-      const Teuchos::RCP<Teuchos::ParameterList>&               params,
-      const unsigned int                                        neq_,
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-      const unsigned int                                        worksetSize,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-          side_set_sis = {},
-      const std::
-          map<std::string, AbstractFieldContainer::FieldContainerRequirements>&
-              side_set_req = {});
+      const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+      const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+      const unsigned int                                                               neq_,
+      const AbstractFieldContainer::FieldContainerRequirements&                        req,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+      const unsigned int                                                               worksetSize,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis = {},
+      const std::map<std::string, AbstractFieldContainer::FieldContainerRequirements>& side_set_req = {});
 
   //! Flag if solution has a restart values -- used in Init Cond
   bool
@@ -78,25 +73,18 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
   // Looks through ifile for the line containing the
   // line_of_interest.
   void
-  swallow_lines_until(
-      std::ifstream& ifile,
-      std::string&   line,
-      std::string    line_of_interest);
+  swallow_lines_until(std::ifstream& ifile, std::string& line, std::string line_of_interest);
 
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidDiscretizationParameters() const;
 
   // Gets the physical name-tag pairs for version 4.1 meshes
   void
-  get_physical_names(
-      std::map<std::string, int>&             physical_names,
-      const Teuchos::RCP<Teuchos_Comm const>& commT);
+  get_physical_names(std::map<std::string, int>& physical_names, const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   // Share physical_names map with all other proccesses
   void
-  broadcast_physical_names(
-      std::map<std::string, int>&             physical_names,
-      const Teuchos::RCP<Teuchos_Comm const>& commT);
+  broadcast_physical_names(std::map<std::string, int>& physical_names, const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   // Read the physical names for Gmsh V 4.1
   // to populate the physical_names map
@@ -203,17 +191,11 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
 
   // Adds a sideset with name sideset_name and side tag number tag.
   void
-  add_sideset(
-      std::string               sideset_name,
-      int                       tag,
-      std::vector<std::string>& ssNames);
+  add_sideset(std::string sideset_name, int tag, std::vector<std::string>& ssNames);
 
   // Adds a nodeset with name nodeset_name and node tag number tag.
   void
-  add_nodeset(
-      std::string               nodeset_name,
-      int                       tag,
-      std::vector<std::string>& nsNames);
+  add_nodeset(std::string nodeset_name, int tag, std::vector<std::string>& nsNames);
 
   // The version of the gmsh msh file
   GmshVersion version;

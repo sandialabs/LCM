@@ -7,5 +7,4 @@
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_DOFGradInterpolationSide_Def.hpp"
 
-PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(
-    PHAL::DOFGradInterpolationSideBase)
+PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(PHAL::DOFGradInterpolationSideBase)

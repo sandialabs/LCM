@@ -19,16 +19,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class ComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-                     public PHX::EvaluatorDerived<EvalT, Traits>
+class ComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ComprNSResid(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -58,10 +55,10 @@ class ComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT const, Cell, QuadPoint> tau33;
 
   double gamma_gas;  // 1.4 typically
-  double Rgas;  // Non-dimensional gas constant Rgas = R*Tref/(cref*cref), where
-                // R = nondimensional gas constant = 287.0 typically
-  double Re;    // Reynolds number
-  double Pr;    // Prandtl number, 0.72 typically
+  double Rgas;       // Non-dimensional gas constant Rgas = R*Tref/(cref*cref), where
+                     // R = nondimensional gas constant = 287.0 typically
+  double Re;         // Reynolds number
+  double Pr;         // Prandtl number, 0.72 typically
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node, VecDim> Residual;

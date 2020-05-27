@@ -25,8 +25,7 @@ AbstractAdapter::AbstractAdapter(
 Teuchos::RCP<Teuchos::ParameterList>
 AbstractAdapter::getGenericAdapterParams(std::string listname) const
 {
-  Teuchos::RCP<Teuchos::ParameterList> valid_pl =
-      Teuchos::rcp(new Teuchos::ParameterList(listname));
+  Teuchos::RCP<Teuchos::ParameterList> valid_pl = Teuchos::rcp(new Teuchos::ParameterList(listname));
 
   valid_pl->set<std::string>("Method", "", "String to designate adapter class");
 

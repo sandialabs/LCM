@@ -25,14 +25,10 @@ class DOFVecInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                     public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFVecInterpolationSideBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  DOFVecInterpolationSideBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -59,16 +55,13 @@ class DOFVecInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFVecInterpolationSide =
-    DOFVecInterpolationSideBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFVecInterpolationSide = DOFVecInterpolationSideBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFVecInterpolationSideMesh =
-    DOFVecInterpolationSideBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFVecInterpolationSideMesh = DOFVecInterpolationSideBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFVecInterpolationSideParam =
-    DOFVecInterpolationSideBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using DOFVecInterpolationSideParam = DOFVecInterpolationSideBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

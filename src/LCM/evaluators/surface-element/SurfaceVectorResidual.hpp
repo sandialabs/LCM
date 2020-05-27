@@ -20,18 +20,13 @@ namespace LCM {
 // Compute the residual forces on a surface
 
 template <typename EvalT, typename Traits>
-class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                              public PHX::EvaluatorDerived<EvalT, Traits>
+class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  SurfaceVectorResidual(
-      Teuchos::ParameterList&              p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  SurfaceVectorResidual(Teuchos::ParameterList& p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -48,8 +43,7 @@ class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature_;
 
   /// Finite element basis for the midplane
-  Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
-      intrepid_basis_;
+  Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepid_basis_;
 
   /// First PK Stress
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> stress_;

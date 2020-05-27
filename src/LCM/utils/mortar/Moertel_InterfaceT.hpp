@@ -196,11 +196,7 @@ class InterfaceT
   1D-interface of a 2D problem \param comm : An Teuchos_Comm object handle
   \param outlevel : Level of output information written to stdout ( 0 - 10 )
   */
-  explicit InterfaceT(
-      int                                          Id,
-      bool                                         oneD,
-      const Teuchos::RCP<const Teuchos::Comm<LO>>& comm,
-      int                                          outlevel);
+  explicit InterfaceT(int Id, bool oneD, const Teuchos::RCP<const Teuchos::Comm<LO>>& comm, int outlevel);
 
   /*!
   \brief Copy-constructor
@@ -798,9 +794,7 @@ class InterfaceT
   \return True if successful, false otherwise
   */
   bool
-  Mortar_Assemble(
-      Tpetra::CrsMatrix<ST, LO, GO, N>& D,
-      Tpetra::CrsMatrix<ST, LO, GO, N>& M);
+  Mortar_Assemble(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M);
 
   bool
   AssembleResidualVector();
@@ -817,8 +811,7 @@ class InterfaceT
   - \ref MoertelT::Interface::proj_orthogonal (1D interfaces only)
   */
   void
-  SetProjectionType(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectionType typ)
+  SetProjectionType(MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectionType typ)
   {
     ptype_ = typ;
   }
@@ -989,9 +982,7 @@ class InterfaceT
 
   // Assemble values from integration this interface (3D problem)
   bool
-  Assemble_3D(
-      Tpetra::CrsMatrix<ST, LO, GO, N>& D,
-      Tpetra::CrsMatrix<ST, LO, GO, N>& M);
+  Assemble_3D(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M);
 
   // Check and see if the master seg and slave seg are even close to each other
   bool QuickOverlapTest_2D(
@@ -999,54 +990,48 @@ class InterfaceT
       MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg);
 
  private:
-  int  Id_;            // the interface Id
-  int  outlevel_;      // output level (0-10)
-  bool oneD_;          // flag indicating 1D interface (opposed to 2D)
-  bool isComplete_;    // flag indicating whether InterfaceComplete() has been
-                       // called
-  bool isIntegrated_;  // flag indicating status of integration
-  Teuchos::RCP<const Teuchos::Comm<LO>> gcomm_;  // the global communicator
-  Teuchos::RCP<const Teuchos::Comm<LO>> lcomm_;  // the local communicator
-  int mortarside_;  // indicate which side (0 or 1) is mortar (master) side
-  ProjectionType ptype_;  // type of projection used
-  Teuchos::RCP<Teuchos::ParameterList>
-      intparams_;  // parameter list holding integration parameters
+  int  Id_;                                             // the interface Id
+  int  outlevel_;                                       // output level (0-10)
+  bool oneD_;                                           // flag indicating 1D interface (opposed to 2D)
+  bool isComplete_;                                     // flag indicating whether InterfaceComplete() has been
+                                                        // called
+  bool                                  isIntegrated_;  // flag indicating status of integration
+  Teuchos::RCP<const Teuchos::Comm<LO>> gcomm_;         // the global communicator
+  Teuchos::RCP<const Teuchos::Comm<LO>> lcomm_;         // the local communicator
+  int                                   mortarside_;    // indicate which side (0 or 1) is mortar (master) side
+  ProjectionType                        ptype_;         // type of projection used
+  Teuchos::RCP<Teuchos::ParameterList>  intparams_;     // parameter list holding integration parameters
 
   std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>
       seg_[2];  // local segments of interface (both sides)
   std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>
-      rseg_[2];  // global segments of interface (both sides)
-  std::map<int, int>
-      segPID_;  // maps all global seg ids to process holding segment
+                     rseg_[2];  // global segments of interface (both sides)
+  std::map<int, int> segPID_;   // maps all global seg ids to process holding segment
 
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>
       node_[2];  // local nodes of interface (both sides)
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>
-      rnode_[2];  // global nodes of interface (both sides)
-  std::map<int, int>
-      nodePID_;  // maps all global node ids to process holding the node
+                     rnode_[2];  // global nodes of interface (both sides)
+  std::map<int, int> nodePID_;   // maps all global node ids to process holding the node
 
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType
-      primal_;  // the type of functions to be set as trace space function
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType
-      dual_;  // the type of functions to be set as LM space function
+  MoertelT::MOERTEL_TEMPLATE_CLASS(
+      FunctionT)::FunctionType primal_;  // the type of functions to be set as trace space function
+  MoertelT::MOERTEL_TEMPLATE_CLASS(
+      FunctionT)::FunctionType dual_;  // the type of functions to be set as LM space function
 };
 
 // Now, the explicit template function declarations (templated on dimension)
 
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::InterfaceT<2, ST, LO, GO, N>::Mortar_Integrate_2D(
-    Teuchos::RCP<Teuchos::ParameterList> intparams);
+MoertelT::InterfaceT<2, ST, LO, GO, N>::Mortar_Integrate_2D(Teuchos::RCP<Teuchos::ParameterList> intparams);
 
 }  // namespace MoertelT
 
 // operator <<
 MOERTEL_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter);
+operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter);
 
 #ifndef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
 #include "Moertel_InterfaceT_Complete_Def.hpp"

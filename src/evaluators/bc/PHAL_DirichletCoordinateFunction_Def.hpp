@@ -14,8 +14,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits /*, typename cfunc_traits*/>
-DirichletCoordFunction_Base<EvalT, Traits /*, cfunc_traits*/>::
-    DirichletCoordFunction_Base(Teuchos::ParameterList& p)
+DirichletCoordFunction_Base<EvalT, Traits /*, cfunc_traits*/>::DirichletCoordFunction_Base(Teuchos::ParameterList& p)
     : PHAL::DirichletBase<EvalT, Traits>(p), func(p)
 {
 }
@@ -24,23 +23,17 @@ DirichletCoordFunction_Base<EvalT, Traits /*, cfunc_traits*/>::
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits /*, typename cfunc_traits*/>
-DirichletCoordFunction<
-    PHAL::AlbanyTraits::Residual,
-    Traits /*, cfunc_traits*/>::DirichletCoordFunction(Teuchos::ParameterList&
-                                                           p)
-    : DirichletCoordFunction_Base<
-          PHAL::AlbanyTraits::Residual,
-          Traits /*, cfunc_traits*/>(p)
+DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>::DirichletCoordFunction(
+    Teuchos::ParameterList& p)
+    : DirichletCoordFunction_Base<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>(p)
 {
 }
 
 // **********************************************************************
 template <typename Traits /*, typename cfunc_traits*/>
 void
-DirichletCoordFunction<
-    PHAL::AlbanyTraits::Residual,
-    Traits /*, cfunc_traits*/>::evaluateFields(typename Traits::EvalData
-                                                   dirichletWorkset)
+DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>::evaluateFields(
+    typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
@@ -49,10 +42,8 @@ DirichletCoordFunction<
   Teuchos::ArrayRCP<ST>       f_nonconstView = Albany::getNonconstLocalData(f);
 
   // Grab the vector off node GIDs for this Node Set ID from the std::map
-  std::vector<std::vector<int>> const& nsNodes =
-      dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-  std::vector<double*> const& nsNodeCoords =
-      dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
+  std::vector<std::vector<int>> const& nsNodes      = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
+  std::vector<double*> const&          nsNodeCoords = dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   RealType time                 = dirichletWorkset.current_time;
   int      number_of_components = this->func.getNumComponents();
@@ -76,22 +67,16 @@ DirichletCoordFunction<
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits /*, typename cfunc_traits*/>
-DirichletCoordFunction<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits /*, cfunc_traits*/>::DirichletCoordFunction(Teuchos::ParameterList&
-                                                           p)
-    : DirichletCoordFunction_Base<
-          PHAL::AlbanyTraits::Jacobian,
-          Traits /*, cfunc_traits*/>(p)
+DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>::DirichletCoordFunction(
+    Teuchos::ParameterList& p)
+    : DirichletCoordFunction_Base<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>(p)
 {
 }
 // **********************************************************************
 template <typename Traits /*, typename cfunc_traits*/>
 void
-DirichletCoordFunction<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits /*, cfunc_traits*/>::evaluateFields(typename Traits::EvalData
-                                                   dirichletWorkset)
+DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>::evaluateFields(
+    typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;
@@ -102,10 +87,8 @@ DirichletCoordFunction<
 
   const RealType j_coeff = dirichletWorkset.j_coeff;
 
-  std::vector<std::vector<int>> const& nsNodes =
-      dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-  std::vector<double*> const& nsNodeCoords =
-      dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
+  std::vector<std::vector<int>> const& nsNodes      = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
+  std::vector<double*> const&          nsNodeCoords = dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   Teuchos::Array<LO> index(1);
   Teuchos::Array<ST> value(1);
@@ -140,9 +123,7 @@ DirichletCoordFunction<
       Albany::setLocalRowValues(jac, offset, matrixIndices(), matrixEntries());
       Albany::setLocalRowValues(jac, offset, index(), value());
 
-      if (fillResid) {
-        f_nonconstView[offset] = (x_constView[offset] - BCVals[j].val());
-      }
+      if (fillResid) { f_nonconstView[offset] = (x_constView[offset] - BCVals[j].val()); }
     }
   }
 }

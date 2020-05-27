@@ -37,11 +37,7 @@ class AnalyticFunction
 
 // Factory method to build functions based on a string name
 Teuchos::RCP<AnalyticFunction>
-createAnalyticFunction(
-    std::string            name,
-    int                    neq,
-    int                    numDim,
-    Teuchos::Array<double> data);
+createAnalyticFunction(std::string name, int neq, int numDim, Teuchos::Array<double> data);
 
 // Below is a library of intial condition functions
 
@@ -113,10 +109,7 @@ class TemperatureLinear : public AnalyticFunction
 class DispConstTemperatureLinear : public AnalyticFunction
 {
  public:
-  DispConstTemperatureLinear(
-      int                    neq_,
-      int                    numDim_,
-      Teuchos::Array<double> data_);
+  DispConstTemperatureLinear(int neq_, int numDim_, Teuchos::Array<double> data_);
   void
   compute(double* x, const double* X);
 
@@ -167,12 +160,9 @@ class ConstantFunctionGaussianPerturbed : public AnalyticFunction
   Teuchos::Array<double> data;
   Teuchos::Array<double> pert_mag;
 
-  boost::mt19937                                                   rng;
-  Teuchos::Array<Teuchos::RCP<boost::normal_distribution<double>>> nd;
-  Teuchos::Array<Teuchos::RCP<boost::variate_generator<
-      boost::mt19937&,
-      boost::normal_distribution<double>>>>
-      var_nor;
+  boost::mt19937                                                                                              rng;
+  Teuchos::Array<Teuchos::RCP<boost::normal_distribution<double>>>                                            nd;
+  Teuchos::Array<Teuchos::RCP<boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>>> var_nor;
 };
 
 class GaussSin : public AnalyticFunction

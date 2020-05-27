@@ -25,8 +25,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
-                          public PHX::EvaluatorDerived<EvalT, Traits>
+class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT ScalarT;
@@ -34,9 +33,7 @@ class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
   LangevinNoiseTerm(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -58,12 +55,9 @@ class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
   ScalarT             sd;
   Teuchos::Array<int> duration;
 
-  boost::mt19937                                   rng;
-  Teuchos::RCP<boost::normal_distribution<double>> nd;
-  Teuchos::RCP<boost::variate_generator<
-      boost::mt19937&,
-      boost::normal_distribution<double>>>
-      var_nor;
+  boost::mt19937                                                                              rng;
+  Teuchos::RCP<boost::normal_distribution<double>>                                            nd;
+  Teuchos::RCP<boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>> var_nor;
   //  Teuchos::RCP<boost::normal_distribution<ScalarT> > nd;
   //  Teuchos::RCP<boost::variate_generator<boost::mt19937&,
   //  boost::normal_distribution<ScalarT> > > var_nor;

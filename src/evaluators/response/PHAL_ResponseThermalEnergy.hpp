@@ -15,21 +15,16 @@ namespace PHAL {
  * temperature.
  */
 template <typename EvalT, typename Traits>
-class ResponseThermalEnergy
-    : public PHAL::SeparableScatterScalarResponse<EvalT, Traits>
+class ResponseThermalEnergy : public PHAL::SeparableScatterScalarResponse<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  ResponseThermalEnergy(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ResponseThermalEnergy(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   preEvaluate(typename Traits::PreEvalData d);

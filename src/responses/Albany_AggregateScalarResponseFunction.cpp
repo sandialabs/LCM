@@ -23,17 +23,11 @@ void
 AggregateScalarResponseFunction::setup()
 {
   typedef Teuchos::Array<Teuchos::RCP<ScalarResponseFunction>> ResponseArray;
-  for (ResponseArray::iterator it = responses.begin(), it_end = responses.end();
-       it != it_end;
-       ++it) {
-    (*it)->setup();
-  }
+  for (ResponseArray::iterator it = responses.begin(), it_end = responses.end(); it != it_end; ++it) { (*it)->setup(); }
 
   // Now that all responses are setup, build the product vector space
   Teuchos::Array<Teuchos::RCP<Thyra_VectorSpace const>> vss(responses.size());
-  for (int i = 0; i < responses.size(); ++i) {
-    vss[i] = responses[i]->responseVectorSpace();
-  }
+  for (int i = 0; i < responses.size(); ++i) { vss[i] = responses[i]->responseVectorSpace(); }
 
   productVectorSpace = Thyra::productVectorSpace(vss());
 }
@@ -42,9 +36,7 @@ void
 AggregateScalarResponseFunction::postRegSetup()
 {
   typedef Teuchos::Array<Teuchos::RCP<ScalarResponseFunction>> ResponseArray;
-  for (ResponseArray::iterator it = responses.begin(), it_end = responses.end();
-       it != it_end;
-       ++it) {
+  for (ResponseArray::iterator it = responses.begin(), it_end = responses.end(); it != it_end; ++it) {
     (*it)->postRegSetup();
   }
 }
@@ -85,15 +77,13 @@ AggregateScalarResponseFunction::evaluateResponse(
    * }
    */
 
-  Teuchos::ArrayRCP<ST> g_data =
-      getNonconstLocalData(g);  // We already checked g is not null
+  Teuchos::ArrayRCP<ST>       g_data = getNonconstLocalData(g);  // We already checked g is not null
   Teuchos::ArrayRCP<const ST> gi_data;
 
   unsigned int offset = 0;
   for (unsigned int i = 0; i < responses.size(); i++) {
     // Create Thyra_Vector for response function
-    Teuchos::RCP<Thyra_Vector> g_i =
-        Thyra::createMember(productVectorSpace->getBlock(i));
+    Teuchos::RCP<Thyra_Vector> g_i = Thyra::createMember(productVectorSpace->getBlock(i));
     g_i->assign(0.0);
 
     gi_data = getLocalData(g_i.getConst());
@@ -102,9 +92,7 @@ AggregateScalarResponseFunction::evaluateResponse(
     responses[i]->evaluateResponse(current_time, x, xdot, xdotdot, p, g_i);
 
     // Copy into the monolithic vector
-    for (unsigned int j = 0; j < responses[i]->numResponses(); ++j) {
-      g_data[offset + j] = gi_data[j];
-    }
+    for (unsigned int j = 0; j < responses[i]->numResponses(); ++j) { g_data[offset + j] = gi_data[j]; }
 
     // Update offset
     offset += responses[i]->numResponses();
@@ -163,9 +151,7 @@ AggregateScalarResponseFunction::evaluateGradient(
     }
     if (!dg_dx.is_null()) { dgdx_i = dg_dx->subView(colRange); }
     if (!dg_dxdot.is_null()) { dgdxdot_i = dg_dxdot->subView(colRange); }
-    if (!dg_dxdotdot.is_null()) {
-      dgdxdotdot_i = dg_dxdotdot->subView(colRange);
-    }
+    if (!dg_dxdotdot.is_null()) { dgdxdotdot_i = dg_dxdotdot->subView(colRange); }
     if (!dg_dp.is_null()) {
       dgdp_i      = Thyra::createMembers(vs_i, dg_dp->domain()->dim());
       dgdp_i_data = getLocalData(dgdp_i.getConst());
@@ -173,25 +159,13 @@ AggregateScalarResponseFunction::evaluateGradient(
 
     // Evaluate response function
     responses[i]->evaluateGradient(
-        current_time,
-        x,
-        xdot,
-        xdotdot,
-        p,
-        deriv_p,
-        g_i,
-        dgdx_i,
-        dgdxdot_i,
-        dgdxdotdot_i,
-        dgdp_i);
+        current_time, x, xdot, xdotdot, p, deriv_p, g_i, dgdx_i, dgdxdot_i, dgdxdotdot_i, dgdp_i);
 
     // Copy into the monolithic (multi)vectors
     for (unsigned int j = 0; j < responses[i]->numResponses(); ++j) {
       if (!g.is_null()) { g_data[offset + j] = g_i_data[j]; }
       if (!dg_dp.is_null()) {
-        for (int col = 0; col < dg_dp->domain()->dim(); ++col) {
-          dgdp_data[col][offset + j] = dgdp_i_data[col][j];
-        }
+        for (int col = 0; col < dg_dp->domain()->dim(); ++col) { dgdp_data[col][offset + j] = dgdp_i_data[col][j]; }
       }
     }
 

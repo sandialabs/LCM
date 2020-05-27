@@ -59,10 +59,7 @@ struct NeohookeanKernel : public ParallelKernel<EvalT, Traits>
   ScalarField tangent;
 
   void
-  init(
-      Workset&                 workset,
-      FieldMap<ScalarT const>& dep_fields,
-      FieldMap<ScalarT>&       eval_fields);
+  init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields);
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -70,15 +67,10 @@ struct NeohookeanKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class ParallelNeohookeanModel : public LCM::ParallelConstitutiveModel<
-                                    EvalT,
-                                    Traits,
-                                    NeohookeanKernel<EvalT, Traits>>
+class ParallelNeohookeanModel : public LCM::ParallelConstitutiveModel<EvalT, Traits, NeohookeanKernel<EvalT, Traits>>
 {
  public:
-  ParallelNeohookeanModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ParallelNeohookeanModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 };
 
 #if 0

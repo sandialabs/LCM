@@ -9,13 +9,8 @@
 #include "ParallelConstitutiveModel_Def.hpp"
 
 template <typename EvalT, typename Traits>
-LCM::ACEpermafrost<EvalT, Traits>::ACEpermafrost(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
-    : LCM::ParallelConstitutiveModel<
-          EvalT,
-          Traits,
-          ACEpermafrostMiniKernel<EvalT, Traits>>(p, dl)
+LCM::ACEpermafrost<EvalT, Traits>::ACEpermafrost(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
+    : LCM::ParallelConstitutiveModel<EvalT, Traits, ACEpermafrostMiniKernel<EvalT, Traits>>(p, dl)
 {
 }
 

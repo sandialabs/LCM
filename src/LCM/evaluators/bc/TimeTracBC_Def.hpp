@@ -11,8 +11,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-TimeTracBC_Base<EvalT, Traits>::TimeTracBC_Base(Teuchos::ParameterList& p)
-    : PHAL::Neumann<EvalT, Traits>(p)
+TimeTracBC_Base<EvalT, Traits>::TimeTracBC_Base(Teuchos::ParameterList& p) : PHAL::Neumann<EvalT, Traits>(p)
 {
   timeValues = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
   BCValues   = p.get<Teuchos::TwoDArray<RealType>>("BC Values");
@@ -20,12 +19,10 @@ TimeTracBC_Base<EvalT, Traits>::TimeTracBC_Base(Teuchos::ParameterList& p)
   if (this->bc_type == PHAL::NeumannBase<EvalT, Traits>::COORD)
 
     ALBANY_PANIC(
-        !(this->cellDims == BCValues.getNumCols()),
-        "Dimension of the current problem and \"BC Values\" do not match");
+        !(this->cellDims == BCValues.getNumCols()), "Dimension of the current problem and \"BC Values\" do not match");
 
   ALBANY_PANIC(
-      !(timeValues.size() == BCValues.getNumRows()),
-      "Dimension of \"Time Values\" and \"BC Values\" do not match");
+      !(timeValues.size() == BCValues.getNumRows()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
 
 //*****
@@ -43,10 +40,8 @@ TimeTracBC_Base<EvalT, Traits>::computeVal(RealType time)
   if (Index == 0)
     this->const_val = BCValues(0, Index);
   else {
-    slope = (BCValues(0, Index) - BCValues(0, Index - 1)) /
-            (timeValues[Index] - timeValues[Index - 1]);
-    this->const_val =
-        BCValues(0, Index - 1) + slope * (time - timeValues[Index - 1]);
+    slope           = (BCValues(0, Index) - BCValues(0, Index - 1)) / (timeValues[Index] - timeValues[Index - 1]);
+    this->const_val = BCValues(0, Index - 1) + slope * (time - timeValues[Index - 1]);
   }
 
   return;
@@ -64,14 +59,11 @@ TimeTracBC_Base<EvalT, Traits>::computeCoordVal(RealType time)
   while (timeValues[Index] < time) Index++;
 
   if (Index == 0)
-    for (int dim = 0; dim < this->cellDims; dim++)
-      this->dudx[dim] = BCValues(dim, Index);
+    for (int dim = 0; dim < this->cellDims; dim++) this->dudx[dim] = BCValues(dim, Index);
   else {
     for (size_t dim = 0; dim < this->cellDims; dim++) {
-      slope = (BCValues(dim, Index) - BCValues(dim, Index - 1)) /
-              (timeValues[Index] - timeValues[Index - 1]);
-      this->dudx[dim] =
-          BCValues(dim, Index - 1) + slope * (time - timeValues[Index - 1]);
+      slope           = (BCValues(dim, Index) - BCValues(dim, Index - 1)) / (timeValues[Index] - timeValues[Index - 1]);
+      this->dudx[dim] = BCValues(dim, Index - 1) + slope * (time - timeValues[Index - 1]);
     }
   }
 
@@ -79,8 +71,7 @@ TimeTracBC_Base<EvalT, Traits>::computeCoordVal(RealType time)
 }
 
 template <typename EvalT, typename Traits>
-TimeTracBC<EvalT, Traits>::TimeTracBC(Teuchos::ParameterList& p)
-    : TimeTracBC_Base<EvalT, Traits>(p)
+TimeTracBC<EvalT, Traits>::TimeTracBC(Teuchos::ParameterList& p) : TimeTracBC_Base<EvalT, Traits>(p)
 {
 }
 
@@ -107,9 +98,7 @@ TimeTracBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
     default:
 
-      ALBANY_ABORT(
-          "Time dependent Neumann boundary condition of type - "
-          << this->bc_type << " is not supported");
+      ALBANY_ABORT("Time dependent Neumann boundary condition of type - " << this->bc_type << " is not supported");
       break;
   }
 

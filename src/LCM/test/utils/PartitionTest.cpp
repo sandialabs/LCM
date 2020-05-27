@@ -35,31 +35,23 @@ main(int ac, char* av[])
 
   int const number_schemes = 6;
 
-  LCM::PARTITION::Scheme const scheme_values[] = {
-      LCM::PARTITION::Scheme::RANDOM,
-      LCM::PARTITION::Scheme::HYPERGRAPH,
-      LCM::PARTITION::Scheme::GEOMETRIC,
-      LCM::PARTITION::Scheme::KMEANS,
-      LCM::PARTITION::Scheme::SEQUENTIAL,
-      LCM::PARTITION::Scheme::KDTREE};
+  LCM::PARTITION::Scheme const scheme_values[] = {LCM::PARTITION::Scheme::RANDOM,
+                                                  LCM::PARTITION::Scheme::HYPERGRAPH,
+                                                  LCM::PARTITION::Scheme::GEOMETRIC,
+                                                  LCM::PARTITION::Scheme::KMEANS,
+                                                  LCM::PARTITION::Scheme::SEQUENTIAL,
+                                                  LCM::PARTITION::Scheme::KDTREE};
 
-  char const* scheme_names[] = {
-      "random", "hypergraph", "geometric", "kmeans", "sequential", "kdtree"};
+  char const* scheme_names[] = {"random", "hypergraph", "geometric", "kmeans", "sequential", "kdtree"};
 
   LCM::PARTITION::Scheme partition_scheme = LCM::PARTITION::Scheme::KDTREE;
 
   command_line_processor.setOption(
-      "scheme",
-      &partition_scheme,
-      number_schemes,
-      scheme_values,
-      scheme_names,
-      "Partition Scheme");
+      "scheme", &partition_scheme, number_schemes, scheme_values, scheme_names, "Partition Scheme");
 
   double length_scale = 0.00165;
 
-  command_line_processor.setOption(
-      "length-scale", &length_scale, "Length Scale");
+  command_line_processor.setOption("length-scale", &length_scale, "Length Scale");
 
   double tolerance = 1.0e-4;
 
@@ -67,20 +59,16 @@ main(int ac, char* av[])
 
   double requested_cell_size = 0.0001;
 
-  command_line_processor.setOption(
-      "requested-cell-size", &requested_cell_size, "Requested cell size");
+  command_line_processor.setOption("requested-cell-size", &requested_cell_size, "Requested cell size");
 
   int maximum_iterations = 64;
 
-  command_line_processor.setOption(
-      "maximum-iterations", &maximum_iterations, "Maximum Iterations");
+  command_line_processor.setOption("maximum-iterations", &maximum_iterations, "Maximum Iterations");
 
   int const number_initializers = 3;
 
   LCM::PARTITION::Scheme const initializer_values[] = {
-      LCM::PARTITION::Scheme::RANDOM,
-      LCM::PARTITION::Scheme::GEOMETRIC,
-      LCM::PARTITION::Scheme::HYPERGRAPH};
+      LCM::PARTITION::Scheme::RANDOM, LCM::PARTITION::Scheme::GEOMETRIC, LCM::PARTITION::Scheme::HYPERGRAPH};
 
   char const* initializer_names[] = {"random", "geometric", "hypergraph"};
 
@@ -101,16 +89,11 @@ main(int ac, char* av[])
   command_line_processor.throwExceptions(false);
 
   // Parse command line
-  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return =
-      command_line_processor.parse(ac, av);
+  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return = command_line_processor.parse(ac, av);
 
-  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) {
-    return 0;
-  }
+  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) { return 0; }
 
-  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) {
-    return 1;
-  }
+  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) { return 1; }
 
   // Read mesh
   LCM::ConnectivityArray connectivity_array(input_file, output_file);
@@ -124,18 +107,15 @@ main(int ac, char* av[])
   // Partition mesh
   auto start = std::chrono::system_clock::now();
 
-  std::map<int, int> const partitions =
-      connectivity_array.partition(partition_scheme, length_scale);
+  std::map<int, int> const partitions = connectivity_array.partition(partition_scheme, length_scale);
 
   auto end = std::chrono::system_clock::now();
 
   // Get abstract discretization from connectivity array and convert
   // to stk discretization to use stk-specific methods.
-  Albany::AbstractDiscretization& discretization =
-      connectivity_array.getDiscretization();
+  Albany::AbstractDiscretization& discretization = connectivity_array.getDiscretization();
 
-  Albany::STKDiscretization& stk_discretization =
-      static_cast<Albany::STKDiscretization&>(discretization);
+  Albany::STKDiscretization& stk_discretization = static_cast<Albany::STKDiscretization&>(discretization);
 
   // Output partitions
 
@@ -144,8 +124,7 @@ main(int ac, char* av[])
 
   int element = 0;
 
-  Albany::StateArrayVec state_arrays =
-      stk_discretization.getStateArrays().elemStateArrays;
+  Albany::StateArrayVec state_arrays = stk_discretization.getStateArrays().elemStateArrays;
 
   for (Albany::StateArrayVec::size_type i = 0; i < state_arrays.size(); ++i) {
     Albany::StateArray state_array = state_arrays[i];
@@ -154,8 +133,7 @@ main(int ac, char* av[])
     Albany::MDArray stk_partition = state_array["Partition"];
 
     for (Albany::MDArray::size_type j = 0; j < stk_partition.size(); ++j) {
-      std::map<int, int>::const_iterator const partitions_iterator =
-          partitions.find(element);
+      std::map<int, int>::const_iterator const partitions_iterator = partitions.find(element);
 
       if (partitions_iterator == partitions.end()) {
         std::cerr << '\n';
@@ -172,8 +150,7 @@ main(int ac, char* av[])
   }
 
   // Need solution for output call
-  Teuchos::RCP<Thyra_Vector> solution_field =
-      stk_discretization.getSolutionField();
+  Teuchos::RCP<Thyra_Vector> solution_field = stk_discretization.getSolutionField();
 
   // second arg to output is (pseudo)time
   stk_discretization.writeSolution(*solution_field, 1.0);
@@ -183,8 +160,7 @@ main(int ac, char* av[])
 
   double const length_scale_cubed = length_scale * length_scale * length_scale;
 
-  LCM::ScalarMap const partition_volumes =
-      connectivity_array.getPartitionVolumes();
+  LCM::ScalarMap const partition_volumes = connectivity_array.getPartitionVolumes();
 
   unsigned int const number_partitions = partition_volumes.size();
 

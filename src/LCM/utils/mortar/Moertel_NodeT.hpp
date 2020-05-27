@@ -64,12 +64,7 @@ class NodeT
   (2D problem). Note that the number of lmdofs for nodes on the boundary are set
   to zero. \param out : Level of output information written to stdout ( 0 - 10 )
   */
-  explicit NodeT(
-      GO                     Id,
-      std::array<ST, DIM>&   x,
-      std::vector<LO> const& dof,
-      bool                   isonboundary,
-      int                    out);
+  explicit NodeT(GO Id, std::array<ST, DIM>& x, std::vector<LO> const& dof, bool isonboundary, int out);
 
   /*!
   \brief Constructor
@@ -279,10 +274,7 @@ class NodeT
   and does not exist before
 
   */
-  inline MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) * *Segments()
-  {
-    return &(segptr_[0]);
-  }
+  inline MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) * *Segments() { return &(segptr_[0]); }
 
   /*!
   \brief Adds a segment id to the list of segments adjacent to this node
@@ -336,8 +328,7 @@ class NodeT
   \brief Construct vector of pointers to segments from adjacent segments id list
 
   */
-  bool GetPtrstoSegments(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & interface);
+  bool GetPtrstoSegments(MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & interface);
 
   /*!
   \brief Store a pointer to a projected node
@@ -346,8 +337,7 @@ class NodeT
   this Node projected onto an opposing interface surface
 
   */
-  bool SetProjectedNode(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) * pnode);
+  bool SetProjectedNode(MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) * pnode);
 
   /*!
   \brief Returns a view of all projected nodes this node owns
@@ -576,13 +566,12 @@ class NodeT
   std::vector<int> dof_;    // dof ids on this node
   std::vector<int> LMdof_;  // dofs ids of LM if this is slave side
 
-  std::vector<int> seg_;  // std::vector of segment ids adjacent to me
-  std::vector<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)*>
-      segptr_;  // ptrs to segments length nseg_ (not in charge of destorying
-                // the ptrs))
+  std::vector<int>                                         seg_;     // std::vector of segment ids adjacent to me
+  std::vector<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)*> segptr_;  // ptrs to segments length nseg_ (not in charge of
+                                                                     // destorying the ptrs))
 
-  Teuchos::RCP<std::map<int, ST>>              Drow_;  // a nodal block row of D
-  Teuchos::RCP<std::map<int, ST>>              Mrow_;  // a nodal block row of D
+  Teuchos::RCP<std::map<int, ST>>              Drow_;     // a nodal block row of D
+  Teuchos::RCP<std::map<int, ST>>              Mrow_;     // a nodal block row of D
   Teuchos::RCP<std::vector<std::map<int, ST>>> Mmodrow_;  // scalar rows of Mmod
 
   std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>>
@@ -596,9 +585,7 @@ class NodeT
 // << operator
 MOERTEL_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node);
+operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node);
 
 #ifndef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
 #include "Moertel_NodeT_Def.hpp"

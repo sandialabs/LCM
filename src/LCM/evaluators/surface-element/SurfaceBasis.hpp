@@ -23,8 +23,7 @@ namespace LCM {
 /// \tparam Traits
 ///
 template <typename EvalT, typename Traits>
-class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>,
-                     public PHX::EvaluatorDerived<EvalT, Traits>
+class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
@@ -35,17 +34,13 @@ class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// \param[in] p Teuchos::ParameterList
   /// \param[in] dl RCP to Albany::Layout
   ///
-  SurfaceBasis(
-      Teuchos::ParameterList const&        p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  SurfaceBasis(Teuchos::ParameterList const& p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics
@@ -84,7 +79,7 @@ class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   void
   computeDualBasisVectors(
-      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& midplane_coords,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const&       midplane_coords,
       PHX::MDField<MeshScalarT, Cell, QuadPoint, Dim, Dim> const basis,
       PHX::MDField<MeshScalarT, Cell, QuadPoint, Dim>            normal,
       PHX::MDField<MeshScalarT, Cell, QuadPoint, Dim, Dim>       dual_basis);
@@ -102,8 +97,7 @@ class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>,
       PHX::MDField<MeshScalarT, Cell, QuadPoint>                 area);
 
  private:
-  unsigned int container_size, num_dims_, num_nodes_, num_qps_, num_surf_nodes_,
-      num_surf_dims_;
+  unsigned int container_size, num_dims_, num_nodes_, num_qps_, num_surf_nodes_, num_surf_dims_;
 
   bool need_current_basis_;
 
@@ -120,8 +114,7 @@ class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Input: Finite element basis for the midplane
   ///
-  Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
-      intrepid_basis_;
+  Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepid_basis_;
 
   ///
   /// Local View to store the reference midplane_coords

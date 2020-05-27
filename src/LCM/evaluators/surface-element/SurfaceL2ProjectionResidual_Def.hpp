@@ -19,19 +19,10 @@ SurfaceL2ProjectionResidual<EvalT, Traits>::SurfaceL2ProjectionResidual(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepidBasis(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis")),
-      surface_Grad_BF(
-          p.get<std::string>(
-              "Surface Scalar Gradient Operator HydroStress Name"),
-          dl->node_qp_gradient),
-      refDualBasis(
-          p.get<std::string>("Reference Dual Basis Name"),
-          dl->qp_tensor),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
+      surface_Grad_BF(p.get<std::string>("Surface Scalar Gradient Operator HydroStress Name"), dl->node_qp_gradient),
+      refDualBasis(p.get<std::string>("Reference Dual Basis Name"), dl->qp_tensor),
       refNormal(p.get<std::string>("Reference Normal Name"), dl->qp_vector),
       refArea(p.get<std::string>("Reference Area Name"), dl->qp_scalar),
       Cauchy_stress_(p.get<std::string>("Cauchy Stress Name"), dl->qp_tensor),
@@ -67,10 +58,8 @@ SurfaceL2ProjectionResidual<EvalT, Traits>::SurfaceL2ProjectionResidual(
   std::cout << " numPlaneNodes: " << numPlaneNodes << std::endl;
   std::cout << " numPlaneDims: " << numPlaneDims << std::endl;
   std::cout << " numQPs: " << numQPs << std::endl;
-  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints()
-            << std::endl;
-  std::cout << " cubature->getDimension(): " << cubature->getDimension()
-            << std::endl;
+  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints() << std::endl;
+  std::cout << " cubature->getDimension(): " << cubature->getDimension() << std::endl;
 #endif
 }
 
@@ -92,12 +81,9 @@ SurfaceL2ProjectionResidual<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(detF_, fm);
 
   // Allocate Temporary Views
-  refValues =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
-  refGrads = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", numPlaneNodes, numQPs, numPlaneDims);
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
+  refValues  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
+  refGrads   = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs, numPlaneDims);
+  refPoints  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
   refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
 
   // Pre-Calculate reference element quantitites
@@ -109,8 +95,7 @@ SurfaceL2ProjectionResidual<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceL2ProjectionResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceL2ProjectionResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // THESE NEED TO BE REMOVED!!!
   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
@@ -137,9 +122,8 @@ SurfaceL2ProjectionResidual<EvalT, Traits>::evaluateFields(
           tau += detF_(cell, pt) * Cauchy_stress_(cell, pt, dim, dim) / numDims;
         }
 
-        projection_residual_(cell, node) += refValues(node, pt) *
-                                            (projected_tau_(cell, pt) - tau) *
-                                            refArea(cell, pt) * thickness;
+        projection_residual_(cell, node) +=
+            refValues(node, pt) * (projected_tau_(cell, pt) - tau) * refArea(cell, pt) * thickness;
       }
       projection_residual_(cell, topNode) = projection_residual_(cell, node);
     }

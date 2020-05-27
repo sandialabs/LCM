@@ -18,15 +18,10 @@ StabilizedPressureResidual<EvalT, Traits>::StabilizedPressureResidual(
       def_grad_(p.get<std::string>("Deformation Gradient Name"), dl->qp_tensor),
       stress_(p.get<std::string>("Stress Name"), dl->qp_tensor),
       pressure_(p.get<std::string>("Pressure Name"), dl->qp_scalar),
-      pressure_grad_(
-          p.get<std::string>("Pressure Gradient Name"),
-          dl->qp_vector),
-      w_grad_bf_(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          dl->node_qp_vector),
+      pressure_grad_(p.get<std::string>("Pressure Gradient Name"), dl->qp_vector),
+      w_grad_bf_(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       w_bf_(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
-      h_(p.get<std::string>("Element Characteristic Length Name"),
-         dl->qp_scalar),
+      h_(p.get<std::string>("Element Characteristic Length Name"), dl->qp_scalar),
       residual_(p.get<std::string>("Residual Name"), dl->node_scalar),
       small_strain_(p.get<bool>("Small Strain", false)),
       alpha_(p.get<RealType>("Stabilization Parameter"))
@@ -72,24 +67,19 @@ StabilizedPressureResidual<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-StabilizedPressureResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+StabilizedPressureResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   minitensor::Tensor<ScalarT> sigma(num_dims_);
 
   if (small_strain_) {
     // small strain version needs no pull back
     for (int cell = 0; cell < workset.numCells; ++cell) {
-      for (int node = 0; node < num_nodes_; ++node) {
-        residual_(cell, node) = 0.0;
-      }
+      for (int node = 0; node < num_nodes_; ++node) { residual_(cell, node) = 0.0; }
       for (int pt = 0; pt < num_pts_; ++pt) {
         sigma.fill(stress_, cell, pt, 0, 0);
         ScalarT dUdJ = (1.0 / num_dims_) * minitensor::trace(sigma);
         for (int node = 0; node < num_nodes_; ++node) {
-          residual_(cell, node) += w_bf_(cell, node, pt) *
-                                   (dUdJ - pressure_(cell, pt)) /
-                                   bulk_modulus_(cell, pt);
+          residual_(cell, node) += w_bf_(cell, node, pt) * (dUdJ - pressure_(cell, pt)) / bulk_modulus_(cell, pt);
         }
       }
 
@@ -99,9 +89,7 @@ StabilizedPressureResidual<EvalT, Traits>::evaluateFields(
         ScalarT stab_param = stab_term / shear_modulus_(cell, pt);
         for (int node = 0; node < num_nodes_; ++node) {
           for (int i = 0; i < num_dims_; ++i) {
-            residual_(cell, node) -= stab_param *
-                                     w_grad_bf_(cell, node, pt, i) *
-                                     pressure_grad_(cell, pt, i);
+            residual_(cell, node) -= stab_param * w_grad_bf_(cell, node, pt, i) * pressure_grad_(cell, pt, i);
           }
         }
       }
@@ -111,16 +99,12 @@ StabilizedPressureResidual<EvalT, Traits>::evaluateFields(
     minitensor::Tensor<ScalarT> Cinv(num_dims_);
 
     for (int cell = 0; cell < workset.numCells; ++cell) {
-      for (int node = 0; node < num_nodes_; ++node) {
-        residual_(cell, node) = 0.0;
-      }
+      for (int node = 0; node < num_nodes_; ++node) { residual_(cell, node) = 0.0; }
       for (int pt = 0; pt < num_pts_; ++pt) {
         sigma.fill(stress_, cell, pt, 0, 0);
         ScalarT dUdJ = (1.0 / num_dims_) * minitensor::trace(sigma);
         for (int node = 0; node < num_nodes_; ++node) {
-          residual_(cell, node) += w_bf_(cell, node, pt) *
-                                   (dUdJ - pressure_(cell, pt)) /
-                                   bulk_modulus_(cell, pt);
+          residual_(cell, node) += w_bf_(cell, node, pt) * (dUdJ - pressure_(cell, pt)) / bulk_modulus_(cell, pt);
         }
       }
 
@@ -128,16 +112,14 @@ StabilizedPressureResidual<EvalT, Traits>::evaluateFields(
       ScalarT stab_term = 0.5 * alpha_;
       for (int pt = 0; pt < num_pts_; ++pt) {
         F.fill(def_grad_, cell, pt, 0, 0);
-        ScalarT J = minitensor::det(F);
-        Cinv      = minitensor::inverse(minitensor::transpose(F) * F);
-        ScalarT stab_param =
-            stab_term * h_(cell, pt) * h_(cell, pt) / shear_modulus_(cell, pt);
+        ScalarT J          = minitensor::det(F);
+        Cinv               = minitensor::inverse(minitensor::transpose(F) * F);
+        ScalarT stab_param = stab_term * h_(cell, pt) * h_(cell, pt) / shear_modulus_(cell, pt);
         for (int node = 0; node < num_nodes_; ++node) {
           for (int i = 0; i < num_dims_; ++i) {
             for (int j = 0; j < num_dims_; ++j) {
-              residual_(cell, node) -= stab_param * J * Cinv(i, j) *
-                                       pressure_grad_(cell, pt, i) *
-                                       w_grad_bf_(cell, node, pt, j);
+              residual_(cell, node) -=
+                  stab_param * J * Cinv(i, j) * pressure_grad_(cell, pt, i) * w_grad_bf_(cell, node, pt, j);
             }
           }
         }

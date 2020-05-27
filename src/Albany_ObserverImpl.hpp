@@ -20,12 +20,10 @@ class ObserverImpl : public StatelessObserverImpl
       double                                  stamp,
       Thyra_Vector const&                     nonOverlappedSolution,
       const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot,
-      const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDotDot)
-      override;
+      const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDotDot) override;
 
   void
-  observeSolution(double stamp, const Thyra_MultiVector& nonOverlappedSolution)
-      override;
+  observeSolution(double stamp, const Thyra_MultiVector& nonOverlappedSolution) override;
 
   void
   parameterChanged(std::string const& param);

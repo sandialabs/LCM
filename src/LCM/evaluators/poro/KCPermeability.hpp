@@ -35,9 +35,7 @@ class KCPermeability : public PHX::EvaluatorWithBaseImpl<Traits>,
   KCPermeability(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

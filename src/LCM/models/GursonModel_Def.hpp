@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-GursonModel<EvalT, Traits>::GursonModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+GursonModel<EvalT, Traits>::GursonModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       sat_mod_(p->get<RealType>("Saturation Modulus", 0.0)),
       sat_exp_(p->get<RealType>("Saturation Exponent", 0.0)),
@@ -34,8 +32,7 @@ GursonModel<EvalT, Traits>::GursonModel(
   this->dep_field_map_.insert(std::make_pair("Poissons Ratio", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Elastic Modulus", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Yield Strength", dl->qp_scalar));
-  this->dep_field_map_.insert(
-      std::make_pair("Hardening Modulus", dl->qp_scalar));
+  this->dep_field_map_.insert(std::make_pair("Hardening Modulus", dl->qp_scalar));
 
   // retrieve appropriate field name strings
   std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
@@ -111,16 +108,14 @@ GursonModel<EvalT, Traits>::computeState(
   auto void_volume = *eval_fields[void_string];
 
   // get State Variables
-  Albany::MDArray Fp_old   = (*workset.stateArrayPtr)[Fp_string + "_old"];
-  Albany::MDArray eqps_old = (*workset.stateArrayPtr)[eqps_string + "_old"];
-  Albany::MDArray void_volume_old =
-      (*workset.stateArrayPtr)[void_string + "_old"];
+  Albany::MDArray Fp_old          = (*workset.stateArrayPtr)[Fp_string + "_old"];
+  Albany::MDArray eqps_old        = (*workset.stateArrayPtr)[eqps_string + "_old"];
+  Albany::MDArray void_volume_old = (*workset.stateArrayPtr)[void_string + "_old"];
 
   minitensor::Tensor<ScalarT> F(num_dims_), be(num_dims_), logbe(num_dims_);
   minitensor::Tensor<ScalarT> s(num_dims_), sigma(num_dims_), N(num_dims_);
   minitensor::Tensor<ScalarT> A(num_dims_), expA(num_dims_), Fpnew(num_dims_);
-  minitensor::Tensor<ScalarT> Fpn(num_dims_), Fpinv(num_dims_),
-      Cpinv(num_dims_);
+  minitensor::Tensor<ScalarT> Fpn(num_dims_), Fpinv(num_dims_), Cpinv(num_dims_);
   minitensor::Tensor<ScalarT> dPhi(num_dims_);
   minitensor::Tensor<ScalarT> I(minitensor::eye<ScalarT>(num_dims_));
 
@@ -135,19 +130,16 @@ GursonModel<EvalT, Traits>::computeState(
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      kappa = elastic_modulus(cell, pt) /
-              (3.0 * (1.0 - 2.0 * poissons_ratio(cell, pt)));
-      mu = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
-      K  = hardening_modulus(cell, pt);
-      Y  = yield_strength(cell, pt);
+      kappa = elastic_modulus(cell, pt) / (3.0 * (1.0 - 2.0 * poissons_ratio(cell, pt)));
+      mu    = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
+      K     = hardening_modulus(cell, pt);
+      Y     = yield_strength(cell, pt);
 
       // fill local tensors
       F.fill(def_grad, cell, pt, 0, 0);
       // Fpn.fill( &Fpold(cell,pt,int(0),int(0)) );
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) {
-          Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j));
-        }
+        for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j)); }
       }
 
       // compute trial state
@@ -163,8 +155,7 @@ GursonModel<EvalT, Traits>::computeState(
       eq         = eqps_old(cell, pt);
 
       // check yield condition
-      Phi = YieldFunction(
-          s, p, fvoid, eq, K, Y, J(cell, pt), elastic_modulus(cell, pt));
+      Phi = YieldFunction(s, p, fvoid, eq, K, Y, J(cell, pt), elastic_modulus(cell, pt));
 
       dgam = 0.0;
       if (Phi > 0.0) {  // plastic yielding
@@ -182,8 +173,7 @@ GursonModel<EvalT, Traits>::computeState(
 
         // local N-R loop
         while (true) {
-          ResidualJacobian(
-              X, R, dRdX, p, fvoid, eq, s, mu, kappa, K, Y, J(cell, pt));
+          ResidualJacobian(X, R, dRdX, p, fvoid, eq, s, mu, kappa, K, Y, J(cell, pt));
 
           norm_residual = 0.0;
           for (int i = 0; i < 4; i++) norm_residual += R[i] * R[i];
@@ -223,9 +213,7 @@ GursonModel<EvalT, Traits>::computeState(
         // accounts for void coalescence
         fvoid_star = fvoid;
         if ((fvoid > fc_) && (fvoid < ff_)) {
-          if ((ff_ - fc_) != 0.0) {
-            fvoid_star = fc_ + (fvoid - fc_) * (1.0 / q1_ - fc_) / (ff_ - fc_);
-          }
+          if ((ff_ - fc_) != 0.0) { fvoid_star = fc_ + (fvoid - fc_) * (1.0 / q1_ - fc_) / (ff_ - fc_); }
         } else if (fvoid >= ff_) {
           fvoid_star = 1.0 / q1_;
           if (fvoid_star > 1.0) fvoid_star = 1.0;
@@ -242,17 +230,14 @@ GursonModel<EvalT, Traits>::computeState(
 
         // dPhi w.r.t. dKirchhoff_stress
         ScalarT tmp = 1.5 * q2_ * p / Ybar;
-        dPhi =
-            s + 1.0 / 3.0 * q1_ * q2_ * Ybar * fvoid_star * std::sinh(tmp) * I;
+        dPhi        = s + 1.0 / 3.0 * q1_ * q2_ * Ybar * fvoid_star * std::sinh(tmp) * I;
 
         expA = minitensor::exp(dgam * dPhi);
 
         for (int i(0); i < num_dims_; ++i) {
           for (int j(0); j < num_dims_; ++j) {
             Fp(cell, pt, i, j) = 0.0;
-            for (int k(0); k < num_dims_; ++k) {
-              Fp(cell, pt, i, j) += expA(i, k) * Fpn(k, j);
-            }
+            for (int k(0); k < num_dims_; ++k) { Fp(cell, pt, i, j) += expA(i, k) * Fpn(k, j); }
           }
         }
 
@@ -266,9 +251,7 @@ GursonModel<EvalT, Traits>::computeState(
         void_volume(cell, pt) = void_volume_old(cell, pt);
 
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) {
-            Fp(cell, pt, i, j) = Fp_old(cell, pt, i, j);
-          }
+          for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fp_old(cell, pt, i, j); }
         }
 
       }  // end of elasticity
@@ -277,9 +260,7 @@ GursonModel<EvalT, Traits>::computeState(
       // note that p also has to be divided by J
       // because the one computed from return mapping is the Kirchhoff pressure
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = s(i, j) / J(cell, pt);
-        }
+        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = s(i, j) / J(cell, pt); }
         stress(cell, pt, i, i) += p / J(cell, pt);
       }
 
@@ -312,16 +293,13 @@ GursonModel<EvalT, Traits>::YieldFunction(
   // acounts for void coalescence
   ScalarT fvoid_star = fvoid;
   if ((fvoid > fc_) && (fvoid < ff_)) {
-    if ((ff_ - fc_) != 0.0) {
-      fvoid_star = fc_ + (fvoid - fc_) * (1. / q1_ - fc_) / (ff_ - fc_);
-    }
+    if ((ff_ - fc_) != 0.0) { fvoid_star = fc_ + (fvoid - fc_) * (1. / q1_ - fc_) / (ff_ - fc_); }
   } else if (fvoid >= ff_) {
     fvoid_star = 1.0 / q1_;
     if (fvoid_star > 1.0) fvoid_star = 1.0;
   }
 
-  ScalarT psi = 1.0 + q3_ * fvoid_star * fvoid_star -
-                2.0 * q1_ * fvoid_star * std::cosh(tmp);
+  ScalarT psi = 1.0 + q3_ * fvoid_star * fvoid_star - 2.0 * q1_ * fvoid_star * std::cosh(tmp);
 
   // a quadratic representation will look like:
   ScalarT Phi = 0.5 * minitensor::dotdot(s, s) - psi * Ybar * Ybar / 3.0;
@@ -375,25 +353,21 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
   DFadType fvoidFad_star = fvoidFad;
 
   if ((fvoidFad > fc_) && (fvoidFad < ff_)) {
-    if ((ff_ - fc_) != 0.0) {
-      fvoidFad_star = fc_ + (fvoidFad - fc_) * (1. / q1_ - fc_) / (ff_ - fc_);
-    }
+    if ((ff_ - fc_) != 0.0) { fvoidFad_star = fc_ + (fvoidFad - fc_) * (1. / q1_ - fc_) / (ff_ - fc_); }
   } else if (fvoidFad >= ff_) {
     fvoidFad_star = 1.0 / q1_;
     if (fvoidFad_star > 1.0) fvoidFad_star = 1.0;
   }
 
   // yield strength
-  DFadType Ybar =
-      Y + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqFad)) + K * eqFad;
+  DFadType Ybar = Y + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqFad)) + K * eqFad;
 
   // Kirchhoff yield stress
   Ybar = Ybar * jacobian;
 
   DFadType tmp = 1.5 * q2_ * pFad / Ybar;
 
-  DFadType psi = 1.0 + q3_ * fvoidFad_star * fvoidFad_star -
-                 2.0 * q1_ * fvoidFad_star * std::cosh(tmp);
+  DFadType psi = 1.0 + q3_ * fvoidFad_star * fvoidFad_star - 2.0 * q1_ * fvoidFad_star * std::cosh(tmp);
 
   DFadType factor = 1.0 / (1.0 + (2.0 * (mu * dgam)));
 
@@ -415,18 +389,13 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
     taue = sq32 * smag;
   }
 
-  if (taue > 0.0)
-    omega = 1.0 - (27.0 * J3 / 2.0 / taue / taue / taue) *
-                      (27.0 * J3 / 2.0 / taue / taue / taue);
+  if (taue > 0.0) omega = 1.0 - (27.0 * J3 / 2.0 / taue / taue / taue) * (27.0 * J3 / 2.0 / taue / taue / taue);
 
   DFadType deq(0.0);
   if (smag != 0.0) {
-    deq = dgam *
-          (smag2 + q1_ * q2_ * pFad * Ybar * fvoidFad_star * std::sinh(tmp)) /
-          (1.0 - fvoidFad) / Ybar;
+    deq = dgam * (smag2 + q1_ * q2_ * pFad * Ybar * fvoidFad_star * std::sinh(tmp)) / (1.0 - fvoidFad) / Ybar;
   } else {
-    deq = dgam * (q1_ * q2_ * pFad * Ybar * fvoidFad_star * std::sinh(tmp)) /
-          (1.0 - fvoidFad) / Ybar;
+    deq = dgam * (q1_ * q2_ * pFad * Ybar * fvoidFad_star * std::sinh(tmp)) / (1.0 - fvoidFad) / Ybar;
   }
 
   // void nucleation
@@ -435,9 +404,7 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
   eratio = -0.5 * (eqFad - eN_) * (eqFad - eN_) / sN_ / sN_;
 
   double const pi = acos(-1.0);
-  if (pFad >= 0.0) {
-    An = fN_ / sN_ / (std::sqrt(2.0 * pi)) * std::exp(eratio);
-  }
+  if (pFad >= 0.0) { An = fN_ / sN_ / (std::sqrt(2.0 * pi)) * std::exp(eratio); }
 
   dfn = An * deq;
 
@@ -445,12 +412,10 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
   // fvoidFad or fvoidFad_star
   DFadType dfg(0.0);
   if (taue > 0.0) {
-    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad_star * Ybar *
-              std::sinh(tmp) +
+    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad_star * Ybar * std::sinh(tmp) +
           sq23 * dgam * kw_ * fvoidFad * omega * smag;
   } else {
-    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad_star * Ybar *
-          std::sinh(tmp);
+    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad_star * Ybar * std::sinh(tmp);
   }
 
   DFadType Phi;
@@ -458,8 +423,7 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
 
   // local system of equations
   Rfad[0] = Phi;
-  Rfad[1] = pFad - p +
-            dgam * q1_ * q2_ * kappa * Ybar * fvoidFad_star * std::sinh(tmp);
+  Rfad[1] = pFad - p + dgam * q1_ * q2_ * kappa * Ybar * fvoidFad_star * std::sinh(tmp);
   Rfad[2] = fvoidFad - fvoid - dfg - dfn;
   Rfad[3] = eqFad - eq - deq;
 

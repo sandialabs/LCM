@@ -48,23 +48,18 @@ DOFInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 // Kokkos functor
 template <typename EvalT, typename Traits, typename ScalarT>
 KOKKOS_INLINE_FUNCTION void
-DOFInterpolationBase<EvalT, Traits, ScalarT>::operator()(
-    const DOFInterpolationBase_Tag& tag,
-    const int&                      cell) const
+DOFInterpolationBase<EvalT, Traits, ScalarT>::operator()(const DOFInterpolationBase_Tag& tag, const int& cell) const
 {
   for (int qp = 0; qp < numQPs; ++qp) {
     val_qp(cell, qp) = val_node(cell, 0) * BF(cell, 0, qp);
-    for (int node = 1; node < numNodes; ++node) {
-      val_qp(cell, qp) += val_node(cell, node) * BF(cell, node, qp);
-    }
+    for (int node = 1; node < numNodes; ++node) { val_qp(cell, qp) += val_node(cell, node) * BF(cell, node, qp); }
   }
 }
 
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   Kokkos::parallel_for(DOFInterpolationBase_Policy(0, workset.numCells), *this);
 }

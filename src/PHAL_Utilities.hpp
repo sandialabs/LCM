@@ -27,16 +27,12 @@ namespace PHAL {
 //! Get derivative dimensions for Phalanx fields.
 template <typename EvalT>
 int
-getDerivativeDimensions(
-    Albany::Application const*     app,
-    Albany::MeshSpecsStruct const* ms);
+getDerivativeDimensions(Albany::Application const* app, Albany::MeshSpecsStruct const* ms);
 //! Get derivative dimensions for Phalanx fields. Convenience wrapper. Can call
 //! this once app has the discretization.
 template <typename EvalT>
 int
-getDerivativeDimensions(
-    Albany::Application const* app,
-    int const                  element_block_idx);
+getDerivativeDimensions(Albany::Application const* app, int const element_block_idx);
 
 template <class ViewType>
 int
@@ -103,17 +99,11 @@ class MDFieldIterator
 //! Reduce on an MDField.
 template <typename T>
 void
-reduceAll(
-    Teuchos_Comm const&           comm,
-    Teuchos::EReductionType const reduct_type,
-    PHX::MDField<T>&              a);
+reduceAll(Teuchos_Comm const& comm, Teuchos::EReductionType const reduct_type, PHX::MDField<T>& a);
 //! Reduce on a ScalarT.
 template <typename T>
 void
-reduceAll(
-    Teuchos_Comm const&           comm,
-    Teuchos::EReductionType const reduct_type,
-    T&                            a);
+reduceAll(Teuchos_Comm const& comm, Teuchos::EReductionType const reduct_type, T& a);
 //! Broadcast an MDField.
 template <typename T>
 void
@@ -160,102 +150,58 @@ template <
 Teuchos::RCP<PHX::DataLayout>
 createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
-  ALBANY_PANIC(
-      dims.size() != 8,
-      "Error! Dimensions vector size does not match the number of tags.\n");
+  ALBANY_PANIC(dims.size() != 8, "Error! Dimensions vector size does not match the number of tags.\n");
+  return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>(
+      dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], dims[6], dims[7]));
+}
+
+template <typename Tag0, typename Tag1, typename Tag2, typename Tag3, typename Tag4, typename Tag5, typename Tag6>
+Teuchos::RCP<PHX::DataLayout>
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
+{
+  ALBANY_PANIC(dims.size() != 7, "Error! Dimensions vector size does not match the number of tags.\n");
+  return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6>(
+      dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], dims[6]));
+}
+
+template <typename Tag0, typename Tag1, typename Tag2, typename Tag3, typename Tag4, typename Tag5>
+Teuchos::RCP<PHX::DataLayout>
+createMDALayout(std::vector<PHX::Device::size_type> const& dims)
+{
+  ALBANY_PANIC(dims.size() != 6, "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(
-      new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>(
-          dims[0],
-          dims[1],
-          dims[2],
-          dims[3],
-          dims[4],
-          dims[5],
-          dims[6],
-          dims[7]));
+      new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5>(dims[0], dims[1], dims[2], dims[3], dims[4], dims[5]));
 }
 
-template <
-    typename Tag0,
-    typename Tag1,
-    typename Tag2,
-    typename Tag3,
-    typename Tag4,
-    typename Tag5,
-    typename Tag6>
+template <typename Tag0, typename Tag1, typename Tag2, typename Tag3, typename Tag4>
 Teuchos::RCP<PHX::DataLayout>
 createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
-  ALBANY_PANIC(
-      dims.size() != 7,
-      "Error! Dimensions vector size does not match the number of tags.\n");
-  return Teuchos::rcp(
-      new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6>(
-          dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], dims[6]));
-}
-
-template <
-    typename Tag0,
-    typename Tag1,
-    typename Tag2,
-    typename Tag3,
-    typename Tag4,
-    typename Tag5>
-Teuchos::RCP<PHX::DataLayout>
-createMDALayout(std::vector<PHX::Device::size_type> const& dims)
-{
-  ALBANY_PANIC(
-      dims.size() != 6,
-      "Error! Dimensions vector size does not match the number of tags.\n");
-  return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4, Tag5>(
-      dims[0], dims[1], dims[2], dims[3], dims[4], dims[5]));
-}
-
-template <
-    typename Tag0,
-    typename Tag1,
-    typename Tag2,
-    typename Tag3,
-    typename Tag4>
-Teuchos::RCP<PHX::DataLayout>
-createMDALayout(std::vector<PHX::Device::size_type> const& dims)
-{
-  ALBANY_PANIC(
-      dims.size() != 5,
-      "Error! Dimensions vector size does not match the number of tags.\n");
-  return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4>(
-      dims[0], dims[1], dims[2], dims[3], dims[4]));
+  ALBANY_PANIC(dims.size() != 5, "Error! Dimensions vector size does not match the number of tags.\n");
+  return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3, Tag4>(dims[0], dims[1], dims[2], dims[3], dims[4]));
 }
 
 template <typename Tag0, typename Tag1, typename Tag2, typename Tag3>
 Teuchos::RCP<PHX::DataLayout>
 createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
-  ALBANY_PANIC(
-      dims.size() != 4,
-      "Error! Dimensions vector size does not match the number of tags.\n");
-  return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3>(
-      dims[0], dims[1], dims[2], dims[3]));
+  ALBANY_PANIC(dims.size() != 4, "Error! Dimensions vector size does not match the number of tags.\n");
+  return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2, Tag3>(dims[0], dims[1], dims[2], dims[3]));
 }
 
 template <typename Tag0, typename Tag1, typename Tag2>
 Teuchos::RCP<PHX::DataLayout>
 createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
-  ALBANY_PANIC(
-      dims.size() != 3,
-      "Error! Dimensions vector size does not match the number of tags.\n");
-  return Teuchos::rcp(
-      new PHX::MDALayout<Tag0, Tag1, Tag2>(dims[0], dims[1], dims[2]));
+  ALBANY_PANIC(dims.size() != 3, "Error! Dimensions vector size does not match the number of tags.\n");
+  return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1, Tag2>(dims[0], dims[1], dims[2]));
 }
 
 template <typename Tag0, typename Tag1>
 Teuchos::RCP<PHX::DataLayout>
 createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
-  ALBANY_PANIC(
-      dims.size() != 2,
-      "Error! Dimensions vector size does not match the number of tags.\n");
+  ALBANY_PANIC(dims.size() != 2, "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(new PHX::MDALayout<Tag0, Tag1>(dims[0], dims[1]));
 }
 
@@ -263,9 +209,7 @@ template <typename Tag0>
 Teuchos::RCP<PHX::DataLayout>
 createMDALayout(std::vector<PHX::Device::size_type> const& dims)
 {
-  ALBANY_PANIC(
-      dims.size() != 1,
-      "Error! Dimensions vector size does not match the number of tags.\n");
+  ALBANY_PANIC(dims.size() != 1, "Error! Dimensions vector size does not match the number of tags.\n");
   return Teuchos::rcp(new PHX::MDALayout<Tag0>(dims[0]));
 }
 
@@ -309,9 +253,7 @@ class MDFieldMemoizer
 
   //! Check if evaluated MDFields are saved (only works on single workset)
   bool
-  have_saved_data(
-      const typename Traits::EvalData                 workset,
-      std::vector<Teuchos::RCP<PHX::FieldTag>> const& evalFields)
+  have_saved_data(const typename Traits::EvalData workset, std::vector<Teuchos::RCP<PHX::FieldTag>> const& evalFields)
   {
     if (!_memoizerEnabled) return false;
 

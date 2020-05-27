@@ -24,15 +24,9 @@ class LocalNonlinearSolver_Base
   ~LocalNonlinearSolver_Base(){};
   Teuchos::LAPACK<int, RealType> lapack;
   void
-  solve(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
+  solve(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B);
   void
-  computeFadInfo(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
+  computeFadInfo(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B);
 };
 
 // -----------------------------------------------------------------------------
@@ -53,15 +47,9 @@ class LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
   LocalNonlinearSolver();
   void
-  solve(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
+  solve(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B);
   void
-  computeFadInfo(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
+  computeFadInfo(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B);
 };
 
 // -----------------------------------------------------------------------------
@@ -75,15 +63,9 @@ class LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;
   LocalNonlinearSolver();
   void
-  solve(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
+  solve(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B);
   void
-  computeFadInfo(
-      std::vector<ScalarT>& A,
-      std::vector<ScalarT>& X,
-      std::vector<ScalarT>& B);
+  computeFadInfo(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B);
 };
 
 }  // namespace LCM

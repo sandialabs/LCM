@@ -19,14 +19,11 @@ class CombineAndScatterManager;
 /*!
  * \brief Reponse function representing the average of the solution values
  */
-class SolutionValuesResponseFunction
-    : public SamplingBasedScalarResponseFunction
+class SolutionValuesResponseFunction : public SamplingBasedScalarResponseFunction
 {
  public:
   //! Constructor
-  SolutionValuesResponseFunction(
-      const Teuchos::RCP<const Application>& app,
-      Teuchos::ParameterList&                responseParams);
+  SolutionValuesResponseFunction(const Teuchos::RCP<const Application>& app, Teuchos::ParameterList& responseParams);
 
   //! Get the number of responses
   unsigned int

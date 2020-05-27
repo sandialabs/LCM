@@ -19,21 +19,14 @@ namespace PHAL {
 
 */
 
-template <
-    typename EvalT,
-    typename Traits,
-    typename InputType,
-    typename OutputType>
-class ConvertFieldType : public PHX::EvaluatorWithBaseImpl<Traits>,
-                         public PHX::EvaluatorDerived<EvalT, Traits>
+template <typename EvalT, typename Traits, typename InputType, typename OutputType>
+class ConvertFieldType : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ConvertFieldType(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -46,37 +39,23 @@ class ConvertFieldType : public PHX::EvaluatorWithBaseImpl<Traits>,
 };
 
 template <typename EvalT, typename Traits>
-using ConvertFieldTypeRTtoMST =
-    ConvertFieldType<EvalT, Traits, RealType, typename EvalT::MeshScalarT>;
+using ConvertFieldTypeRTtoMST = ConvertFieldType<EvalT, Traits, RealType, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using ConvertFieldTypeRTtoPST =
-    ConvertFieldType<EvalT, Traits, RealType, typename EvalT::ParamScalarT>;
+using ConvertFieldTypeRTtoPST = ConvertFieldType<EvalT, Traits, RealType, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
-using ConvertFieldTypeRTtoST =
-    ConvertFieldType<EvalT, Traits, RealType, typename EvalT::ScalarT>;
+using ConvertFieldTypeRTtoST = ConvertFieldType<EvalT, Traits, RealType, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using ConvertFieldTypeMSTtoPST = ConvertFieldType<
-    EvalT,
-    Traits,
-    typename EvalT::MeshScalarT,
-    typename EvalT::ParamScalarT>;
+using ConvertFieldTypeMSTtoPST =
+    ConvertFieldType<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
-using ConvertFieldTypeMSTtoST = ConvertFieldType<
-    EvalT,
-    Traits,
-    typename EvalT::MeshScalarT,
-    typename EvalT::ScalarT>;
+using ConvertFieldTypeMSTtoST = ConvertFieldType<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using ConvertFieldTypePSTtoST = ConvertFieldType<
-    EvalT,
-    Traits,
-    typename EvalT::ParamScalarT,
-    typename EvalT::ScalarT>;
+using ConvertFieldTypePSTtoST = ConvertFieldType<EvalT, Traits, typename EvalT::ParamScalarT, typename EvalT::ScalarT>;
 
 }  // Namespace PHAL
 

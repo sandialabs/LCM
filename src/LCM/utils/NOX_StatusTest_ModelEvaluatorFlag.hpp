@@ -22,9 +22,7 @@ class ModelEvaluatorFlag : public Generic
   virtual ~ModelEvaluatorFlag();
 
   virtual NOX::StatusTest::StatusType
-  checkStatus(
-      const NOX::Solver::Generic& problem,
-      NOX::StatusTest::CheckType  checkType);
+  checkStatus(const NOX::Solver::Generic& problem, NOX::StatusTest::CheckType checkType);
 
   virtual NOX::StatusTest::StatusType
   getStatus() const;

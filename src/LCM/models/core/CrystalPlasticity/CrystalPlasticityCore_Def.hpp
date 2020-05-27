@@ -17,9 +17,7 @@ CP::SlipFamily<NumDimT, NumSlipT>::setHardeningLawType(CP::HardeningLawType law)
 {
   type_hardening_law_ = law;
 
-  phardening_parameters_ =
-      CP::hardeningParameterFactory<CP::MAX_DIM, CP::MAX_SLIP>(
-          type_hardening_law_);
+  phardening_parameters_ = CP::hardeningParameterFactory<CP::MAX_DIM, CP::MAX_SLIP>(type_hardening_law_);
 }
 
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
@@ -34,17 +32,14 @@ CP::SlipFamily<NumDimT, NumSlipT>::setFlowRuleType(CP::FlowRuleType rule)
 // Verify that constitutive update has preserved finite values
 template <typename T, minitensor::Index N>
 void
-CP::expectFiniteTensor(
-    minitensor::Tensor<T, N> const& A,
-    std::string const&              msg)
+CP::expectFiniteTensor(minitensor::Tensor<T, N> const& A, std::string const& msg)
 {
   minitensor::Index const dim = A.get_dimension();
 
   minitensor::Index const num_components = dim * dim;
 
   for (minitensor::Index i = 0; i < num_components; ++i) {
-    ALBANY_EXPECT(
-        boost::math::isfinite(Sacado::ScalarValue<T>::eval(A[i])) == true);
+    ALBANY_EXPECT(boost::math::isfinite(Sacado::ScalarValue<T>::eval(A[i])) == true);
   }
 }
 
@@ -74,8 +69,7 @@ CP::applySlipIncrement(
     for (minitensor::Index s(0); s < num_slip; ++s) {
       for (int i = 0; i < num_dim; ++i) {
         for (int j = 0; j < num_dim; ++j) {
-          Lp_np1(i, j) += (slip_np1[s] - slip_n[s]) / dt *
-                          slip_systems.at(s).projector_(i, j);
+          Lp_np1(i, j) += (slip_np1[s] - slip_n[s]) / dt * slip_systems.at(s).projector_(i, j);
         }
       }
     }
@@ -85,8 +79,7 @@ CP::applySlipIncrement(
 
   // update plastic deformation gradient
   // F^{p}_{n+1} = exp(L_{n+1} * delta t) F^{p}_{n}
-  minitensor::Tensor<ArgT, NumDimT> const exp_L_dt =
-      minitensor::exp(Lp_np1 * dt);
+  minitensor::Tensor<ArgT, NumDimT> const exp_L_dt = minitensor::exp(Lp_np1 * dt);
 
   Fp_np1 = exp_L_dt * Fp_n;
 
@@ -122,18 +115,10 @@ CP::updateHardness(
 
     HardeningLawFactory<NumDimT, NumSlipT> hardening_law_factory;
 
-    auto phardening = hardening_law_factory.template createHardeningLaw<ArgT>(
-        type_hardening_law);
+    auto phardening = hardening_law_factory.template createHardeningLaw<ArgT>(type_hardening_law);
 
     phardening->harden(
-        slip_family,
-        slip_systems,
-        dt,
-        rate_slip,
-        state_hardening_n,
-        state_hardening_np1,
-        slip_resistance,
-        failed);
+        slip_family, slip_systems, dt, rate_slip, state_hardening_n, state_hardening_np1, slip_resistance, failed);
   }
 
   return;
@@ -155,21 +140,16 @@ CP::updateSlip(
     bool&                                                 failed)
 {
   for (unsigned int ss_index(0); ss_index < slip_systems.size(); ++ss_index) {
-    auto const& slip_family =
-        slip_families[slip_systems.at(ss_index).slip_family_index_];
+    auto const& slip_family = slip_families[slip_systems.at(ss_index).slip_family_index_];
 
     auto type_flow_rule = slip_family.getFlowRuleType();
 
     FlowRuleFactory flow_rule_factory;
 
-    auto pflow =
-        flow_rule_factory.template createFlowRule<ArgT>(type_flow_rule);
+    auto pflow = flow_rule_factory.template createFlowRule<ArgT>(type_flow_rule);
 
-    ArgT rate_slip = pflow->computeRateSlip(
-        slip_family.pflow_parameters_,
-        shear[ss_index],
-        slip_resistance[ss_index],
-        failed);
+    ArgT rate_slip =
+        pflow->computeRateSlip(slip_family.pflow_parameters_, shear[ss_index], slip_resistance[ss_index], failed);
 
     // return with failed immediately if slip increment is too large
     if (std::abs(rate_slip) > slip_family.pflow_parameters_->max_incr_) {
@@ -245,11 +225,9 @@ CP::computeStress(
     return;
   }
 
-  deformation_elastic =
-      minitensor::transpose(defgrad_elastic) * defgrad_elastic;
+  deformation_elastic = minitensor::transpose(defgrad_elastic) * defgrad_elastic;
 
-  strain_elastic = 0.5 * (deformation_elastic -
-                          minitensor::identity<ArgT, NumDimT>(num_dim));
+  strain_elastic = 0.5 * (deformation_elastic - minitensor::identity<ArgT, NumDimT>(num_dim));
 
   // Not using minitensor::dotdot since C is 3x3x3x3 while strain_elastic could
   // be 2x2 S = minitensor::dotdot(C, strain_elastic);
@@ -257,27 +235,21 @@ CP::computeStress(
   for (int i = 0; i < num_dim; ++i) {
     for (int j = 0; j < num_dim; ++j) {
       for (int k = 0; k < num_dim; ++k) {
-        for (int l = 0; l < num_dim; ++l) {
-          S(i, j) += C(i, j, k, l) * strain_elastic(k, l);
-        }
+        for (int l = 0; l < num_dim; ++l) { S(i, j) += C(i, j, k, l) * strain_elastic(k, l); }
       }
     }
   }
 
-  sigma = 1.0 / det_fe * defgrad_elastic * S *
-          minitensor::transpose(defgrad_elastic);
+  sigma = 1.0 / det_fe * defgrad_elastic * S * minitensor::transpose(defgrad_elastic);
 
-  CP::expectFiniteTensor(
-      sigma, "Cauchy stress in ResidualSlipNLS::computeStress()");
+  CP::expectFiniteTensor(sigma, "Cauchy stress in ResidualSlipNLS::computeStress()");
 
   // Compute resolved shear stresses
   minitensor::Tensor<ArgT, NumDimT> const s_trans = deformation_elastic * S;
   shear.fill(minitensor::Filler::ZEROS);
   for (minitensor::Index s(0); s < num_slip; ++s) {
     for (int i = 0; i < num_dim; ++i) {
-      for (int j = 0; j < num_dim; ++j) {
-        shear[s] += slip_systems.at(s).projector_(i, j) * s_trans(i, j);
-      }
+      for (int j = 0; j < num_dim; ++j) { shear[s] += slip_systems.at(s).projector_(i, j) * s_trans(i, j); }
     }
   }
 }

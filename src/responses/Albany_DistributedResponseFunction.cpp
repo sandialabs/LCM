@@ -27,15 +27,5 @@ Albany::DistributedResponseFunction::evaluateDerivative(
   Teuchos::RCP<Thyra_MultiVector> const& dg_dp_mv = dg_dp.getMultiVector();
 
   this->evaluateGradient(
-      current_time,
-      x,
-      xdot,
-      xdotdot,
-      p,
-      deriv_p,
-      g,
-      dg_dx_op,
-      dg_dxdot_op,
-      dg_dxdotdot_op,
-      dg_dp_mv);
+      current_time, x, xdot, xdotdot, p, deriv_p, g, dg_dx_op, dg_dxdot_op, dg_dxdotdot_op, dg_dp_mv);
 }

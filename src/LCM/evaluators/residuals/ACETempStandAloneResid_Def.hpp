@@ -12,8 +12,7 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::ParameterList const& p)
-    : wbf_(p.get<std::string>("Weighted BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
+    : wbf_(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       tdot_(
           p.get<std::string>("QP Time Derivative Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
@@ -23,13 +22,13 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
       tgrad_(
           p.get<std::string>("Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      residual_(
-          p.get<std::string>("Residual Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
-      thermal_conductivity_(p.get<std::string>   ("ACE Thermal Conductivity QP Variable Name"),
-               p.get<Teuchos::RCP<PHX::DataLayout> >("QP Scalar Data Layout") ),
-      thermal_inertia_(p.get<std::string>   ("ACE Thermal Inertia QP Variable Name"),
-               p.get<Teuchos::RCP<PHX::DataLayout> >("QP Scalar Data Layout") )
+      residual_(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
+      thermal_conductivity_(
+          p.get<std::string>("ACE Thermal Conductivity QP Variable Name"),
+          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      thermal_inertia_(
+          p.get<std::string>("ACE Thermal Inertia QP Variable Name"),
+          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   this->addDependentField(wbf_);
   this->addDependentField(tdot_);
@@ -39,14 +38,13 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
   this->addDependentField(thermal_inertia_);
   this->addEvaluatedField(residual_);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   workset_size_ = dims[0];
   num_nodes_    = dims[1];
   num_qps_      = dims[2];
-  num_dims_      = dims[3];
+  num_dims_     = dims[3];
   this->setName("ACETempStandAloneResid");
 }
 
@@ -81,8 +79,8 @@ ACETempStandAloneResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData 
         residual_(cell, node) += thermal_inertia_(cell, qp) * tdot_(cell, qp) * wbf_(cell, node, qp);
         // Diffusion part of residual
         for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
-          residual_(cell, node) += thermal_conductivity_(cell, qp) * tgrad_(cell, qp, ndim) *
-                                   wgradbf_(cell, node, qp, ndim);
+          residual_(cell, node) +=
+              thermal_conductivity_(cell, qp) * tgrad_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim);
         }
       }
     }

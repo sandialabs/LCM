@@ -16,16 +16,13 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-class ODEResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-                 public PHX::EvaluatorDerived<EvalT, Traits>
+class ODEResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ODEResid(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData ud);

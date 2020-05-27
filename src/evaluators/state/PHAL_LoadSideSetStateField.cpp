@@ -7,5 +7,4 @@
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_LoadSideSetStateField_Def.hpp"
 
-PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(
-    PHAL::LoadSideSetStateFieldBase)
+PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(PHAL::LoadSideSetStateFieldBase)

@@ -12,12 +12,8 @@ template <typename EvalT, typename Traits>
 SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
-    : cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepidBasis(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis"))
+    : cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis"))
 {
   this->setName("Surface Scalar Jump" + PHX::print<EvalT>());
 
@@ -28,61 +24,50 @@ SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
 
   if (p.isType<std::string>("Nodal Pore Pressure Name")) {
     havePorePressure  = true;
-    nodalPorePressure = decltype(nodalPorePressure)(
-        p.get<std::string>("Nodal Pore Pressure Name"), dl->node_scalar);
+    nodalPorePressure = decltype(nodalPorePressure)(p.get<std::string>("Nodal Pore Pressure Name"), dl->node_scalar);
     this->addDependentField(nodalPorePressure);
 
-    jumpPorePressure = decltype(jumpPorePressure)(
-        p.get<std::string>("Jump of Pore Pressure Name"), dl->qp_scalar);
+    jumpPorePressure = decltype(jumpPorePressure)(p.get<std::string>("Jump of Pore Pressure Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpPorePressure);
 
-    midPlanePorePressure = decltype(midPlanePorePressure)(
-        p.get<std::string>("MidPlane Pore Pressure Name"), dl->qp_scalar);
+    midPlanePorePressure =
+        decltype(midPlanePorePressure)(p.get<std::string>("MidPlane Pore Pressure Name"), dl->qp_scalar);
     this->addEvaluatedField(midPlanePorePressure);
   }
 
   if (p.isType<std::string>("Nodal Temperature Name")) {
     haveTemperature  = true;
-    nodalTemperature = decltype(nodalTemperature)(
-        p.get<std::string>("Nodal Temperature Name"), dl->node_scalar);
+    nodalTemperature = decltype(nodalTemperature)(p.get<std::string>("Nodal Temperature Name"), dl->node_scalar);
     this->addDependentField(nodalTemperature);
 
-    jumpTemperature = decltype(jumpTemperature)(
-        p.get<std::string>("Jump of Temperature Name"), dl->qp_scalar);
+    jumpTemperature = decltype(jumpTemperature)(p.get<std::string>("Jump of Temperature Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpTemperature);
 
-    midPlaneTemperature = decltype(midPlaneTemperature)(
-        p.get<std::string>("MidPlane Temperature Name"), dl->qp_scalar);
+    midPlaneTemperature = decltype(midPlaneTemperature)(p.get<std::string>("MidPlane Temperature Name"), dl->qp_scalar);
     this->addEvaluatedField(midPlaneTemperature);
   }
 
   if (p.isType<std::string>("Nodal Transport Name")) {
     haveTransport  = true;
-    nodalTransport = decltype(nodalTransport)(
-        p.get<std::string>("Nodal Transport Name"), dl->node_scalar);
+    nodalTransport = decltype(nodalTransport)(p.get<std::string>("Nodal Transport Name"), dl->node_scalar);
     this->addDependentField(nodalTransport);
 
-    jumpTransport = decltype(jumpTransport)(
-        p.get<std::string>("Jump of Transport Name"), dl->qp_scalar);
+    jumpTransport = decltype(jumpTransport)(p.get<std::string>("Jump of Transport Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpTransport);
 
-    midPlaneTransport = decltype(midPlaneTransport)(
-        p.get<std::string>("MidPlane Transport Name"), dl->qp_scalar);
+    midPlaneTransport = decltype(midPlaneTransport)(p.get<std::string>("MidPlane Transport Name"), dl->qp_scalar);
     this->addEvaluatedField(midPlaneTransport);
   }
 
   if (p.isType<std::string>("Nodal HydroStress Name")) {
     haveHydroStress  = true;
-    nodalHydroStress = decltype(nodalHydroStress)(
-        p.get<std::string>("Nodal HydroStress Name"), dl->node_scalar);
+    nodalHydroStress = decltype(nodalHydroStress)(p.get<std::string>("Nodal HydroStress Name"), dl->node_scalar);
     this->addDependentField(nodalHydroStress);
 
-    jumpHydroStress = decltype(jumpHydroStress)(
-        p.get<std::string>("Jump of HydroStress Name"), dl->qp_scalar);
+    jumpHydroStress = decltype(jumpHydroStress)(p.get<std::string>("Jump of HydroStress Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpHydroStress);
 
-    midPlaneHydroStress = decltype(midPlaneHydroStress)(
-        p.get<std::string>("MidPlane HydroStress Name"), dl->qp_scalar);
+    midPlaneHydroStress = decltype(midPlaneHydroStress)(p.get<std::string>("MidPlane HydroStress Name"), dl->qp_scalar);
     this->addEvaluatedField(midPlaneHydroStress);
   }
 
@@ -102,19 +87,15 @@ SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
   std::cout << " numPlaneNodes: " << numPlaneNodes << std::endl;
   std::cout << " numPlaneDims: " << numPlaneDims << std::endl;
   std::cout << " numQPs: " << numQPs << std::endl;
-  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints()
-            << std::endl;
-  std::cout << " cubature->getDimension(): " << cubature->getDimension()
-            << std::endl;
+  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints() << std::endl;
+  std::cout << " cubature->getDimension(): " << cubature->getDimension() << std::endl;
 #endif
 }
 
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceScalarJump<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceScalarJump<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   //  this->utils.setFieldData(scalar,fm);
   //   this->utils.setFieldData(scalarJump,fm);
@@ -142,12 +123,9 @@ SurfaceScalarJump<EvalT, Traits>::postRegistrationSetup(
   };
 
   // Allocate Temporary Views
-  refValues =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
-  refGrads = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", numPlaneNodes, numQPs, numPlaneDims);
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
+  refValues  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
+  refGrads   = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs, numPlaneDims);
+  refPoints  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
   refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
 
   // Pre-Calculate reference element quantitites
@@ -159,8 +137,7 @@ SurfaceScalarJump<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceScalarJump<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceScalarJump<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   ScalarT scalarA(0.0), scalarB(0.0);
   /*

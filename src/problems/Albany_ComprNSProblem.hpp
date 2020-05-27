@@ -45,9 +45,7 @@ class ComprNSProblem : public AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -85,8 +83,7 @@ class ComprNSProblem : public AbstractProblem
   void
   constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs);
   void
-  constructNeumannEvaluators(
-      const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
+  constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
 
  protected:
   int                           numDim;
@@ -133,35 +130,28 @@ Albany::ComprNSProblem::constructEvaluators(
   using Teuchos::RCP;
   using Teuchos::rcp;
 
-  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
-      Albany::getIntrepid2Basis(meshSpecs.ctd);
-  RCP<shards::CellTopology> cellType =
-      rcp(new shards::CellTopology(&meshSpecs.ctd));
+  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis = Albany::getIntrepid2Basis(meshSpecs.ctd);
+  RCP<shards::CellTopology>                              cellType      = rcp(new shards::CellTopology(&meshSpecs.ctd));
 
   // Problem is transient
-  ALBANY_PANIC(
-      number_of_time_deriv != 1,
-      "Albany_ComprNSProblem must be defined as a transient calculation.");
+  ALBANY_PANIC(number_of_time_deriv != 1, "Albany_ComprNSProblem must be defined as a transient calculation.");
 
   int const numNodes    = intrepidBasis->getCardinality();
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(
-          *cellType, meshSpecs.cubatureDegree);
+      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize
-       << ", Vertices= " << numVertices << ", Nodes= " << numNodes
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
        << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
 
   int vecDim = neq;
 
-  dl = rcp(new Albany::Layouts(
-      worksetSize, numVertices, numNodes, numQPts, numDim, vecDim));
+  dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim, vecDim));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
   bool                                              supportsTransient = true;
   int                                               offset            = 0;
@@ -178,38 +168,29 @@ Albany::ComprNSProblem::constructEvaluators(
   dof_names_dot[0] = dof_names[0] + "_dot";
   resid_names[0]   = "ComprNS Residual";
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator(
-          true, dof_names, dof_names_dot, offset));
+      evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0], offset));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0], offset));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecInterpolationEvaluator(
-          dof_names_dot[0], offset));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dot[0], offset));
 
   //     fm0.template registerEvaluator<EvalT>
   //  (evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0],
   //  offset));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(
-          true, resid_names, offset, "Scatter ComprNS"));
+      evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter ComprNS"));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherCoordinateVectorEvaluator());
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(
-          cellType, intrepidBasis, cubature));
+      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   {  // Specialized DofVecGrad Interpolation for this problem
 
-    RCP<ParameterList> p =
-        rcp(new ParameterList("DOFVecGrad Interpolation " + dof_names[0]));
+    RCP<ParameterList> p = rcp(new ParameterList("DOFVecGrad Interpolation " + dof_names[0]));
     // Input
     p->set<string>("Variable Name", dof_names[0]);
 
@@ -237,8 +218,7 @@ Albany::ComprNSProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl->qp_vector);
     p->set<RCP<DataLayout>>("QP Tensor Data Layout", dl->qp_vecgradient);
     p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl->node_qp_scalar);
-    p->set<RCP<DataLayout>>(
-        "Node QP Gradient Data Layout", dl->node_qp_gradient);
+    p->set<RCP<DataLayout>>("Node QP Gradient Data Layout", dl->node_qp_gradient);
 
     p->set<string>("Viscosity Mu QP Variable Name", "Viscosity Mu");
     p->set<string>("Viscosity Lambda QP Variable Name", "Viscosity Lambda");
@@ -318,8 +298,7 @@ Albany::ComprNSProblem::constructEvaluators(
     fm0.requireField<EvalT>(res_tag);
   } else if (fieldManagerChoice == Albany::BUILD_RESPONSE_FM) {
     Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> respUtils(dl);
-    return respUtils.constructResponses(
-        fm0, *responseList, Teuchos::null, stateMgr);
+    return respUtils.constructResponses(fm0, *responseList, Teuchos::null, stateMgr);
   }
 
   return Teuchos::null;

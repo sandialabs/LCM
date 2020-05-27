@@ -11,8 +11,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-SaveCellStateField<EvalT, Traits>::SaveCellStateField(
-    Teuchos::ParameterList const& p)
+SaveCellStateField<EvalT, Traits>::SaveCellStateField(Teuchos::ParameterList const& p)
 {
   // States Not Saved for Generic Type, only Specializations
   this->setName("Save Cell State Field");
@@ -21,9 +20,7 @@ SaveCellStateField<EvalT, Traits>::SaveCellStateField(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SaveCellStateField<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SaveCellStateField<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   // States Not Saved for Generic Type, only Specializations
 }
@@ -31,19 +28,15 @@ SaveCellStateField<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SaveCellStateField<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SaveCellStateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // States Not Saved for Generic Type, only Specializations
 }
 // **********************************************************************
 // **********************************************************************
 template <typename Traits>
-SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveCellStateField(
-    Teuchos::ParameterList const& p)
-    : weights(
-          p.get<std::string>("Weights Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Weights Layout"))
+SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveCellStateField(Teuchos::ParameterList const& p)
+    : weights(p.get<std::string>("Weights Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Weights Layout"))
 {
   i_index = 0;
   j_index = 0;
@@ -54,18 +47,16 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveCellStateField(
 
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");
-  field     = decltype(field)(
-      fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout"));
+  field     = decltype(field)(fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout"));
 
-  savestate_operation = Teuchos::rcp(new PHX::Tag<ScalarT>(
-      stateName, p.get<Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout")));
+  savestate_operation =
+      Teuchos::rcp(new PHX::Tag<ScalarT>(stateName, p.get<Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout")));
 
   this->addDependentField(weights.fieldTag());
   this->addDependentField(field.fieldTag());
   this->addEvaluatedField(*savestate_operation);
 
-  this->setName(
-      "Save Field " + fieldName + " to Cell State " + stateName + "Residual");
+  this->setName("Save Field " + fieldName + " to Cell State " + stateName + "Residual");
 }
 
 // **********************************************************************
@@ -81,8 +72,7 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename Traits>
 void
-SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Get shards Array (from STK) for this state
   // Need to check if we can just copy full size -- can assume same ordering?
@@ -92,8 +82,7 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   ALBANY_PANIC(
       (it == workset.stateArrayPtr->end()),
       std::endl
-          << "Error: cannot locate " << stateName
-          << " in PHAL_SaveCellStateField_Def" << std::endl);
+          << "Error: cannot locate " << stateName << " in PHAL_SaveCellStateField_Def" << std::endl);
 
   Albany::MDArray sta = it->second;
 
@@ -156,8 +145,7 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
         sta(cell, 0) = 0.0;
         el_weight    = 0.0;
         for (int qp = 0; qp < numQPs; ++qp) {
-          sta(cell, 0) +=
-              weights(cell, qp) * field(cell, qp, i_index, j_index, k_index);
+          sta(cell, 0) += weights(cell, qp) * field(cell, qp, i_index, j_index, k_index);
           el_weight += weights(cell, qp);
         }
         if (el_weight == 0.0)
@@ -166,10 +154,7 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
           sta(cell, 0) /= el_weight;
       }
       break;
-    default:
-      ALBANY_PANIC(
-          size < 1 || size > 5,
-          "Unexpected Array dimensions in SaveCellStateField: " << size);
+    default: ALBANY_PANIC(size < 1 || size > 5, "Unexpected Array dimensions in SaveCellStateField: " << size);
   }
 }
 

@@ -17,9 +17,7 @@ Albany::ReactDiffSystem::ReactDiffSystem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_)
-    : Albany::AbstractProblem(params_, paramLib_),
-      numDim(numDim_),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_), use_sdbcs_(false)
 {
   neq = 3;
 }
@@ -37,8 +35,7 @@ Albany::ReactDiffSystem::buildProblem(
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
   fm.resize(1);
   fm[0] = rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-  buildEvaluators(
-      *fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
+  buildEvaluators(*fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
   constructDirichletEvaluators(*meshSpecs[0]);
 }
 
@@ -52,15 +49,13 @@ Albany::ReactDiffSystem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<ReactDiffSystem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<ReactDiffSystem>                op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 void
-Albany::ReactDiffSystem::constructDirichletEvaluators(
-    Albany::MeshSpecsStruct const& meshSpecs)
+Albany::ReactDiffSystem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -70,8 +65,7 @@ Albany::ReactDiffSystem::constructDirichletEvaluators(
     dirichletNames[i] = s.str();
   }
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
@@ -80,8 +74,7 @@ Albany::ReactDiffSystem::constructDirichletEvaluators(
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ReactDiffSystem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidReactDiffSystemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidReactDiffSystemParams");
 
   validPL->sublist("Options", false, "");
 

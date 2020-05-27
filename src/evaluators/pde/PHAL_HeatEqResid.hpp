@@ -20,16 +20,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class HeatEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-                    public PHX::EvaluatorDerived<EvalT, Traits>
+class HeatEqResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   HeatEqResid(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -53,12 +50,12 @@ class HeatEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   // Output:
   PHX::MDField<ScalarT, Cell, Node> TResidual;
 
-  bool         haveSource;
-  bool         haveConvection;
-  bool         haveAbsorption;
-  bool         enableTransient;
-  bool         haverhoCp;
-  unsigned int numQPs, numDims, numNodes, worksetSize;
+  bool                                      haveSource;
+  bool                                      haveConvection;
+  bool                                      haveAbsorption;
+  bool                                      enableTransient;
+  bool                                      haverhoCp;
+  unsigned int                              numQPs, numDims, numNodes, worksetSize;
   Kokkos::DynRankView<ScalarT, PHX::Device> flux;
   Kokkos::DynRankView<ScalarT, PHX::Device> aterm;
   Kokkos::DynRankView<ScalarT, PHX::Device> convection;

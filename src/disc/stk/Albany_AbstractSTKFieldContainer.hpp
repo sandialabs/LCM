@@ -31,8 +31,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
 {
  public:
   // Tensor per Node/Cell  - (Node, Dim, Dim) or (Cell,Dim,Dim)
-  typedef stk::mesh::Field<double, stk::mesh::Cartesian, stk::mesh::Cartesian>
-      TensorFieldType;
+  typedef stk::mesh::Field<double, stk::mesh::Cartesian, stk::mesh::Cartesian> TensorFieldType;
   // Vector per Node/Cell  - (Node, Dim) or (Cell,Dim)
   typedef stk::mesh::Field<double, stk::mesh::Cartesian> VectorFieldType;
   // Scalar per Node/Cell  - (Node) or (Cell)
@@ -44,16 +43,12 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
 
   typedef stk::mesh::Cartesian QPTag;  // need to invent shards::ArrayDimTag
   // Tensor per QP   - (Cell, QP, Dim, Dim)
-  typedef stk::mesh::
-      Field<double, QPTag, stk::mesh::Cartesian, stk::mesh::Cartesian>
-          QPTensorFieldType;
+  typedef stk::mesh::Field<double, QPTag, stk::mesh::Cartesian, stk::mesh::Cartesian> QPTensorFieldType;
   // Vector per QP   - (Cell, QP, Dim)
-  typedef stk::mesh::Field<double, QPTag, stk::mesh::Cartesian>
-      QPVectorFieldType;
+  typedef stk::mesh::Field<double, QPTag, stk::mesh::Cartesian> QPVectorFieldType;
   // One scalar per QP   - (Cell, QP)
-  typedef stk::mesh::Field<double, QPTag> QPScalarFieldType;
-  typedef stk::mesh::Field<double, stk::mesh::Cartesian3d>
-      SphereVolumeFieldType;
+  typedef stk::mesh::Field<double, QPTag>                  QPScalarFieldType;
+  typedef stk::mesh::Field<double, stk::mesh::Cartesian3d> SphereVolumeFieldType;
 
   typedef std::vector<std::string const*> ScalarValueState;
   typedef std::vector<QPScalarFieldType*> QPScalarState;

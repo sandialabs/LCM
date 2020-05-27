@@ -22,9 +22,7 @@ class KLResponseFunction : public AbstractResponseFunction
 {
  public:
   //! Default constructor
-  KLResponseFunction(
-      const Teuchos::RCP<AbstractResponseFunction>& response,
-      Teuchos::ParameterList&                       responseParams);
+  KLResponseFunction(const Teuchos::RCP<AbstractResponseFunction>& response, Teuchos::ParameterList& responseParams);
 
   //! Destructor
   ~KLResponseFunction() = default;

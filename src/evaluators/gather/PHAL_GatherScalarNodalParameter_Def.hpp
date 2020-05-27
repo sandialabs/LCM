@@ -16,13 +16,10 @@ template <typename EvalT, typename Traits>
 GatherScalarNodalParameterBase<EvalT, Traits>::GatherScalarNodalParameterBase(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
-    : numNodes(dl->node_scalar->extent(1)),
-      param_name(p.get<std::string>("Parameter Name"))
+    : numNodes(dl->node_scalar->extent(1)), param_name(p.get<std::string>("Parameter Name"))
 {
-  std::string field_name = p.isParameter("Field Name") ?
-                               p.get<std::string>("Field Name") :
-                               param_name;
-  val = PHX::MDField<ParamScalarT, Cell, Node>(field_name, dl->node_scalar);
+  std::string field_name = p.isParameter("Field Name") ? p.get<std::string>("Field Name") : param_name;
+  val                    = PHX::MDField<ParamScalarT, Cell, Node>(field_name, dl->node_scalar);
 
   this->addEvaluatedField(val);
 }
@@ -35,10 +32,7 @@ GatherScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(
     PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val, fm);
-  d.fill_field_dependencies(
-      this->dependentFields(),
-      this->evaluatedFields(),
-      d.memoizer_for_params_active());
+  d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields(), d.memoizer_for_params_active());
 }
 
 // **********************************************************************
@@ -48,34 +42,26 @@ GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(
     const Teuchos::RCP<Albany::Layouts>& dl)
     : GatherScalarNodalParameterBase<EvalT, Traits>(p, dl)
 {
-  this->setName(
-      "GatherNodalParameter(" + this->param_name + ")" + PHX::print<EvalT>());
+  this->setName("GatherNodalParameter(" + this->param_name + ")" + PHX::print<EvalT>());
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(
-    Teuchos::ParameterList const& p)
-    : GatherScalarNodalParameterBase<EvalT, Traits>(
-          p,
-          p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct"))
+GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(Teuchos::ParameterList const& p)
+    : GatherScalarNodalParameterBase<EvalT, Traits>(p, p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct"))
 {
-  this->setName(
-      "GatherNodalParameter(" + this->param_name + ")" + PHX::print<EvalT>());
+  this->setName("GatherNodalParameter(" + this->param_name + ")" + PHX::print<EvalT>());
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-GatherScalarNodalParameter<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+GatherScalarNodalParameter<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  Teuchos::RCP<Thyra_Vector const> pvec =
-      workset.distParamLib->get(this->param_name)->overlapped_vector();
-  Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
+  Teuchos::RCP<Thyra_Vector const> pvec           = workset.distParamLib->get(this->param_name)->overlapped_vector();
+  Teuchos::ArrayRCP<const ST>      pvec_constView = Albany::getLocalData(pvec);
 
-  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)
-                                        ->workset_elem_dofs()[workset.wsIndex];
+  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)->workset_elem_dofs()[workset.wsIndex];
 
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t node = 0; node < this->numNodes; ++node) {
@@ -87,35 +73,27 @@ GatherScalarNodalParameter<EvalT, Traits>::evaluateFields(
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-GatherScalarExtruded2DNodalParameter<EvalT, Traits>::
-    GatherScalarExtruded2DNodalParameter(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
-    : GatherScalarNodalParameterBase<EvalT, Traits>(p, dl),
-      fieldLevel(p.get<int>("Field Level"))
+GatherScalarExtruded2DNodalParameter<EvalT, Traits>::GatherScalarExtruded2DNodalParameter(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
+    : GatherScalarNodalParameterBase<EvalT, Traits>(p, dl), fieldLevel(p.get<int>("Field Level"))
 {
-  this->setName(
-      "GatherScalarExtruded2DNodalParameter(" + this->param_name + ")" +
-      PHX::print<EvalT>());
+  this->setName("GatherScalarExtruded2DNodalParameter(" + this->param_name + ")" + PHX::print<EvalT>());
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-GatherScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+GatherScalarExtruded2DNodalParameter<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?
-  Teuchos::RCP<Thyra_Vector const> pvec =
-      workset.distParamLib->get(this->param_name)->overlapped_vector();
-  Teuchos::ArrayRCP<const ST> pvec_constView = Albany::getLocalData(pvec);
+  Teuchos::RCP<Thyra_Vector const> pvec           = workset.distParamLib->get(this->param_name)->overlapped_vector();
+  Teuchos::ArrayRCP<const ST>      pvec_constView = Albany::getLocalData(pvec);
 
-  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering =
-      *workset.disc->getLayeredMeshNumbering();
+  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering = *workset.disc->getLayeredMeshNumbering();
 
-  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID =
-      workset.disc->getWsElNodeID()[workset.wsIndex];
+  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID = workset.disc->getWsElNodeID()[workset.wsIndex];
 
   auto overlapNodeVS   = workset.disc->getOverlapNodeVectorSpace();
   auto ov_node_indexer = Albany::createGlobalLocalIndexer(overlapNodeVS);

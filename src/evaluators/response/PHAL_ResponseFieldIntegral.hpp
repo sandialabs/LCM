@@ -12,21 +12,16 @@ namespace PHAL {
  * \brief Response Description
  */
 template <typename EvalT, typename Traits>
-class ResponseFieldIntegral
-    : public PHAL::SeparableScatterScalarResponse<EvalT, Traits>
+class ResponseFieldIntegral : public PHAL::SeparableScatterScalarResponse<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  ResponseFieldIntegral(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ResponseFieldIntegral(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   preEvaluate(typename Traits::PreEvalData d);

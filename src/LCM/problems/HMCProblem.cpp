@@ -13,10 +13,7 @@ Albany::HMCProblem::HMCProblem(
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_,
     Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
-    : Albany::AbstractProblem(
-          params_,
-          paramLib_,
-          numDim_ + params_->get("Additional Scales", 1) * numDim_ * numDim_),
+    : Albany::AbstractProblem(params_, paramLib_, numDim_ + params_->get("Additional Scales", 1) * numDim_ * numDim_),
       params(params_),
       haveSource(false),
       use_sdbcs_(false),
@@ -30,10 +27,9 @@ Albany::HMCProblem::HMCProblem(
   if (params->isType<std::string>("MaterialDB Filename")) {
     validMaterialDB      = true;
     std::string filename = params->get<std::string>("MaterialDB Filename");
-    material_db_ = Teuchos::rcp(new Albany::MaterialDatabase(filename, commT));
+    material_db_         = Teuchos::rcp(new Albany::MaterialDatabase(filename, commT));
   }
-  ALBANY_PANIC(
-      !validMaterialDB, "Mechanics Problem Requires a Material Database");
+  ALBANY_PANIC(!validMaterialDB, "Mechanics Problem Requires a Material Database");
 
   // the following function returns the problem information required for setting
   // the rigid body modes (RBMs) for elasticity problems
@@ -66,11 +62,9 @@ Albany::HMCProblem::buildProblem(
   fm.resize(1);
 
   fm[0] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-  buildEvaluators(
-      *fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
+  buildEvaluators(*fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
 
-  if (meshSpecs[0]->nsNames.size() >
-      0) {  // Build a nodeset evaluator if nodesets are present
+  if (meshSpecs[0]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
     constructDirichletEvaluators(*meshSpecs[0]);
   }
 
@@ -78,12 +72,10 @@ Albany::HMCProblem::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() >
-      0) {  // Build a sideset evaluator if sidesets are present
+  if (meshSpecs[0]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
     constructNeumannEvaluators(meshSpecs[0]);
   }
 }
@@ -98,16 +90,14 @@ Albany::HMCProblem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<HMCProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<HMCProblem>                     op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 // Dirichlet BCs
 void
-Albany::HMCProblem::constructDirichletEvaluators(
-    Albany::MeshSpecsStruct const& meshSpecs)
+Albany::HMCProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -115,8 +105,7 @@ Albany::HMCProblem::constructDirichletEvaluators(
   if (neq > 1) dirichletNames[1] = "Y";
   if (neq > 2) dirichletNames[2] = "Z";
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
@@ -124,8 +113,7 @@ Albany::HMCProblem::constructDirichletEvaluators(
 
 // Neumann BCs
 void
-Albany::HMCProblem::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
+Albany::HMCProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
   // i.e. meshSpecs.ssNames.size() > 0
@@ -178,9 +166,7 @@ Albany::HMCProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(t_x, t_y, t_z)";
   else
-    ALBANY_ABORT(
-        std::endl
-        << "Error: Sidesets only supported in 2 and 3D." << std::endl);
+    ALBANY_ABORT(std::endl << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 
   condNames[1] = "dudn";
   condNames[2] = "P";
@@ -188,29 +174,16 @@ Albany::HMCProblem::constructNeumannEvaluators(
   nfm.resize(1);  // HMC problem only has one element block
 
   nfm[0] = neuUtils.constructBCEvaluators(
-      meshSpecs,
-      neumannNames,
-      dof_names,
-      true,
-      0,
-      condNames,
-      offsets,
-      dl,
-      this->params,
-      this->paramLib);
+      meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::HMCProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidHMCProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidHMCProblemParams");
 
   validPL->set<int>("Additional Scales", false, "1");
-  validPL->set<std::string>(
-      "MaterialDB Filename",
-      "materials.xml",
-      "Filename of material database xml file");
+  validPL->set<std::string>("MaterialDB Filename", "materials.xml", "Filename of material database xml file");
   validPL->sublist("Hierarchical Elasticity Model", false, "");
   validPL->sublist("Topology Parameters", false, "");
   validPL->sublist("Objective Aggregator", false, "");
@@ -224,8 +197,7 @@ Albany::HMCProblem::parseMaterialModel(
     Teuchos::RCP<Teuchos::ParameterList>&       p,
     const Teuchos::RCP<Teuchos::ParameterList>& params) const
 {
-  Teuchos::ParameterList& modelList =
-      params->sublist("Hierarchical Elasticity Model");
+  Teuchos::ParameterList& modelList = params->sublist("Hierarchical Elasticity Model");
   p->set("C11", modelList.get("C11", 0.0));
   p->set("C33", modelList.get("C33", 0.0));
   p->set("C12", modelList.get("C12", 0.0));
@@ -234,7 +206,7 @@ Albany::HMCProblem::parseMaterialModel(
   p->set("C66", modelList.get("C66", 0.0));
 
   for (int i = 0; i < numMicroScales; i++) {
-    std::string scaleName = Albany::strint("Microscale", i + 1);
+    std::string                   scaleName = Albany::strint("Microscale", i + 1);
     Teuchos::ParameterList const& scaleList = modelList.sublist(scaleName);
     p->sublist(scaleName);
     p->set(scaleName, scaleList);
@@ -243,11 +215,8 @@ Albany::HMCProblem::parseMaterialModel(
 
 void
 Albany::HMCProblem::getAllocatedStates(
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-        Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState_,
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-        Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState_)
-    const
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState_,
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState_) const
 {
   oldState_ = oldState;
   newState_ = newState;

@@ -67,8 +67,7 @@ struct AlbanyTraits : public PHX::TraitsBase
   struct Residual : EvaluationType<RealType, RealType, RealType>
   {
   };
-#if defined(ALBANY_MESH_DEPENDS_ON_SOLUTION) && \
-    defined(ALBANY_PARAMETERS_DEPEND_ON_SOLUTION)
+#if defined(ALBANY_MESH_DEPENDS_ON_SOLUTION) && defined(ALBANY_PARAMETERS_DEPEND_ON_SOLUTION)
   struct Jacobian : EvaluationType<FadType, FadType, FadType>
   {
   };
@@ -154,149 +153,53 @@ DECLARE_EVAL_SCALAR_TYPES(Jacobian, FadType, RealType)
 
 // 2. Versatile cases: after EvalT and Traits, accept any number of args
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_RESIDUAL(name, ...) \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Residual,                                         \
-      PHAL::AlbanyTraits,                                                   \
-      __VA_ARGS__>;
+  template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, __VA_ARGS__>;
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_JACOBIAN(name, ...) \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Jacobian,                                         \
-      PHAL::AlbanyTraits,                                                   \
-      __VA_ARGS__>;
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, __VA_ARGS__>;
 
 // 3. Scalar dependent cases: after EvalT and Traits, accept one or two scalar
 // types
 //    NOTE: *always* allow RealType for the scalar type(s)
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_RESIDUAL(name) \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Residual,                                         \
-      PHAL::AlbanyTraits,                                                   \
-      RealType>;
+  template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, RealType>;
 
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_JACOBIAN(name) \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Jacobian,                                         \
-      PHAL::AlbanyTraits,                                                   \
-      FadType>;                                                             \
-  template class name<                                                      \
-      PHAL::AlbanyTraits::Jacobian,                                         \
-      PHAL::AlbanyTraits,                                                   \
-      RealType>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_JACOBIAN(name)       \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType>; \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType>;
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_RESIDUAL(name) \
-  template class name<                                                       \
-      PHAL::AlbanyTraits::Residual,                                          \
-      PHAL::AlbanyTraits,                                                    \
-      RealType,                                                              \
-      RealType>;
+  template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, RealType, RealType>;
 
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_JACOBIAN(name) \
-  template class name<                                                       \
-      PHAL::AlbanyTraits::Jacobian,                                          \
-      PHAL::AlbanyTraits,                                                    \
-      FadType,                                                               \
-      RealType>;                                                             \
-  template class name<                                                       \
-      PHAL::AlbanyTraits::Jacobian,                                          \
-      PHAL::AlbanyTraits,                                                    \
-      RealType,                                                              \
-      RealType>;                                                             \
-  template class name<                                                       \
-      PHAL::AlbanyTraits::Jacobian,                                          \
-      PHAL::AlbanyTraits,                                                    \
-      FadType,                                                               \
-      FadType>;                                                              \
-  template class name<                                                       \
-      PHAL::AlbanyTraits::Jacobian,                                          \
-      PHAL::AlbanyTraits,                                                    \
-      RealType,                                                              \
-      FadType>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_TWO_SCALAR_TYPES_JACOBIAN(name)                 \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType, RealType>;  \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType, RealType>; \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType, FadType>;   \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType, FadType>;
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_RESIDUAL(name) \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Residual,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      RealType,                                                                \
-      RealType,                                                                \
-      RealType>;
+  template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, RealType, RealType, RealType>;
 
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_JACOBIAN(name) \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      FadType,                                                                 \
-      RealType,                                                                \
-      RealType>;                                                               \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      RealType,                                                                \
-      RealType,                                                                \
-      RealType>;                                                               \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      FadType,                                                                 \
-      FadType,                                                                 \
-      RealType>;                                                               \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      RealType,                                                                \
-      FadType,                                                                 \
-      RealType>;                                                               \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      FadType,                                                                 \
-      RealType,                                                                \
-      FadType>;                                                                \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      RealType,                                                                \
-      RealType,                                                                \
-      FadType>;                                                                \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      FadType,                                                                 \
-      FadType,                                                                 \
-      FadType>;                                                                \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      RealType,                                                                \
-      FadType,                                                                 \
-      FadType>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_THREE_SCALAR_TYPES_JACOBIAN(name)                         \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType, RealType, RealType>;  \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType, RealType, RealType>; \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType, FadType, RealType>;   \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType, FadType, RealType>;  \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType, RealType, FadType>;   \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType, RealType, FadType>;  \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType, FadType, FadType>;    \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType, FadType, FadType>;
 
 // 4. Input-output scalar type case: similar to the above one with two scalar
 // types.
 //    However, the output scalar type MUST be constructible from the input one,
 //    so certain combinations are not allowed.
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_RESIDUAL(name) \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Residual,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      RealType,                                                                \
-      RealType>;
+  template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, RealType, RealType>;
 
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_JACOBIAN(name) \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      RealType,                                                                \
-      RealType>;                                                               \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      RealType,                                                                \
-      FadType>;                                                                \
-  template class name<                                                         \
-      PHAL::AlbanyTraits::Jacobian,                                            \
-      PHAL::AlbanyTraits,                                                      \
-      FadType,                                                                 \
-      FadType>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_INPUT_OUTPUT_TYPES_JACOBIAN(name)               \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType, RealType>; \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, RealType, FadType>;  \
+  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType, FadType>;
 
 // 5. General macros: you should call these in your cpp files,
 //    which in turn will call the ones above.

@@ -23,16 +23,13 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class LatticeDefGrad : public PHX::EvaluatorWithBaseImpl<Traits>,
-                       public PHX::EvaluatorDerived<EvalT, Traits>
+class LatticeDefGrad : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   LatticeDefGrad(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -44,13 +41,11 @@ class LatticeDefGrad : public PHX::EvaluatorWithBaseImpl<Traits>,
   // Input:
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> defgrad;
   PHX::MDField<ScalarT const, Cell, QuadPoint>           J;
-  PHX::MDField<ScalarT const, Cell, QuadPoint> VH;  // partial molar volume
-  PHX::MDField<ScalarT const, Cell, QuadPoint> VM;  // molar volume of Fe
-  PHX::MDField<ScalarT const, Cell, QuadPoint>
-      CtotalRef;  // stress free concentration
-  PHX::MDField<ScalarT const, Cell, QuadPoint>
-                                                   Ctotal;  // current total concentration
-  PHX::MDField<const MeshScalarT, Cell, QuadPoint> weights;
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           VH;         // partial molar volume
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           VM;         // molar volume of Fe
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           CtotalRef;  // stress free concentration
+  PHX::MDField<ScalarT const, Cell, QuadPoint>           Ctotal;     // current total concentration
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint>       weights;
 
   // Output:
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim> latticeDefGrad;

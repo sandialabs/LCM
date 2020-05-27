@@ -19,18 +19,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class SaveSideSetStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
-                              public PHX::EvaluatorDerived<EvalT, Traits>
+class SaveSideSetStateField : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  SaveSideSetStateField(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  SaveSideSetStateField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData workset);
@@ -40,18 +35,13 @@ class SaveSideSetStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 template <typename Traits>
 class SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
+    : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  SaveSideSetStateField(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  SaveSideSetStateField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);

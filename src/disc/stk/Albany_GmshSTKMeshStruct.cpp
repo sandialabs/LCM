@@ -76,37 +76,25 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     case 2:
       if (NumElemNodes == 3) {
         stk::mesh::set_topology(*partVec[0], stk::topology::TRI_3_2D);
-        for (auto ss : ssPartVec) {
-          stk::mesh::set_topology(*ss.second, stk::topology::LINE_2);
-        }
+        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::LINE_2); }
       } else if (NumElemNodes == 6) {
         stk::mesh::set_topology(*partVec[0], stk::topology::TRI_6_2D);
-        for (auto ss : ssPartVec) {
-          stk::mesh::set_topology(*ss.second, stk::topology::LINE_3);
-        }
+        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::LINE_3); }
       } else {
         stk::mesh::set_topology(*partVec[0], stk::topology::QUAD_4_2D);
-        for (auto ss : ssPartVec) {
-          stk::mesh::set_topology(*ss.second, stk::topology::LINE_2);
-        }
+        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::LINE_2); }
       }
       break;
     case 3:
       if (NumElemNodes == 4) {
         stk::mesh::set_topology(*partVec[0], stk::topology::TET_4);
-        for (auto ss : ssPartVec) {
-          stk::mesh::set_topology(*ss.second, stk::topology::TRI_3);
-        }
+        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::TRI_3); }
       } else if (NumElemNodes == 10) {
         stk::mesh::set_topology(*partVec[0], stk::topology::TET_10);
-        for (auto ss : ssPartVec) {
-          stk::mesh::set_topology(*ss.second, stk::topology::TRI_6);
-        }
+        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::TRI_6); }
       } else {
         stk::mesh::set_topology(*partVec[0], stk::topology::HEX_8);
-        for (auto ss : ssPartVec) {
-          stk::mesh::set_topology(*ss.second, stk::topology::QUAD_4);
-        }
+        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::QUAD_4); }
       }
       break;
     default:
@@ -115,23 +103,15 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
           "error before though).\n");
   }
 
-  int cub            = params->get("Cubature Degree", 3);
-  int worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
-  int worksetSize    = this->computeWorksetSize(worksetSizeMax, NumElems);
-  stk::topology        stk_topo_data = metaData->get_topology(*partVec[0]);
-  shards::CellTopology shards_ctd = stk::mesh::get_cell_topology(stk_topo_data);
-  const CellTopologyData& ctd     = *shards_ctd.getCellTopologyData();
+  int                     cub            = params->get("Cubature Degree", 3);
+  int                     worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
+  int                     worksetSize    = this->computeWorksetSize(worksetSizeMax, NumElems);
+  stk::topology           stk_topo_data  = metaData->get_topology(*partVec[0]);
+  shards::CellTopology    shards_ctd     = stk::mesh::get_cell_topology(stk_topo_data);
+  const CellTopologyData& ctd            = *shards_ctd.getCellTopologyData();
   cullSubsetParts(ssNames, ssPartVec);
   this->meshSpecs[0] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-      ctd,
-      numDim,
-      cub,
-      nsNames,
-      ssNames,
-      worksetSize,
-      partVec[0]->name(),
-      ebNameToIndex,
-      this->interleavedOrdering));
+      ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
 
   this->initializeSideSetMeshStructs(commT);
 }
@@ -178,10 +158,7 @@ Albany::GmshSTKMeshStruct::~GmshSTKMeshStruct()
 }
 
 void
-Albany::GmshSTKMeshStruct::determine_file_type(
-    bool& legacy,
-    bool& binary,
-    bool& ascii)
+Albany::GmshSTKMeshStruct::determine_file_type(bool& legacy, bool& binary, bool& ascii)
 {
   std::ifstream ifile;
   open_fname(ifile);
@@ -241,8 +218,7 @@ Albany::GmshSTKMeshStruct::init_pointers_to_null()
 }
 
 void
-Albany::GmshSTKMeshStruct::broadcast_topology(
-    const Teuchos::RCP<Teuchos_Comm const>& commT)
+Albany::GmshSTKMeshStruct::broadcast_topology(const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   Teuchos::broadcast(*commT, 0, 1, &this->numDim);
   Teuchos::broadcast(*commT, 0, 1, &NumElemNodes);
@@ -255,17 +231,14 @@ Albany::GmshSTKMeshStruct::broadcast_topology(
 
 void
 Albany::GmshSTKMeshStruct::setFieldAndBulkData(
-    const Teuchos::RCP<Teuchos_Comm const>&                   commT,
-    const Teuchos::RCP<Teuchos::ParameterList>&               params,
-    const unsigned int                                        neq_,
-    const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-    const unsigned int                                        worksetSize,
-    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-        side_set_sis,
-    std::map<
-        std::string,
-        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
+    const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+    const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+    const unsigned int                                                               neq_,
+    const AbstractFieldContainer::FieldContainerRequirements&                        req,
+    const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+    const unsigned int                                                               worksetSize,
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
+    std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   this->SetupFieldData(commT, neq_, req, sis, worksetSize);
 
@@ -279,16 +252,13 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
     unsigned int          ebNo   = 0;  // element block #???
     int                   sideID = 0;
 
-    AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field =
-        fieldContainer->getProcRankField();
-    AbstractSTKFieldContainer::VectorFieldType* coordinates_field =
-        fieldContainer->getCoordinatesField();
+    AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field   = fieldContainer->getProcRankField();
+    AbstractSTKFieldContainer::VectorFieldType*    coordinates_field = fieldContainer->getCoordinatesField();
 
     singlePartVec[0] = nsPartVec["Node"];
 
     for (int i = 0; i < NumNodes; i++) {
-      stk::mesh::Entity node = bulkData->declare_entity(
-          stk::topology::NODE_RANK, i + 1, singlePartVec);
+      stk::mesh::Entity node = bulkData->declare_entity(stk::topology::NODE_RANK, i + 1, singlePartVec);
 
       double* coord;
       coord    = stk::mesh::field_data(*coordinates_field, node);
@@ -299,12 +269,10 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
 
     for (int i = 0; i < NumElems; i++) {
       singlePartVec[0]       = partVec[ebNo];
-      stk::mesh::Entity elem = bulkData->declare_entity(
-          stk::topology::ELEMENT_RANK, i + 1, singlePartVec);
+      stk::mesh::Entity elem = bulkData->declare_entity(stk::topology::ELEMENT_RANK, i + 1, singlePartVec);
 
       for (int j = 0; j < NumElemNodes; j++) {
-        stk::mesh::Entity node =
-            bulkData->get_entity(stk::topology::NODE_RANK, elems[j][i]);
+        stk::mesh::Entity node = bulkData->get_entity(stk::topology::NODE_RANK, elems[j][i]);
         bulkData->declare_relation(elem, node, j);
       }
 
@@ -323,20 +291,15 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
       partName       = bdTagToSideSetName[sides[NumSideNodes][i]];
       ssPartVec_i[1] = ssPartVec[partName];
 
-      stk::mesh::Entity side =
-          bulkData->declare_entity(metaData->side_rank(), i + 1, ssPartVec_i);
+      stk::mesh::Entity side = bulkData->declare_entity(metaData->side_rank(), i + 1, ssPartVec_i);
       for (int j = 0; j < NumSideNodes; ++j) {
-        stk::mesh::Entity node_j =
-            bulkData->get_entity(stk::topology::NODE_RANK, sides[j][i]);
-        bulkData->change_entity_parts(
-            node_j, nsPartVec_i);  // Add node to the boundary nodeset
+        stk::mesh::Entity node_j = bulkData->get_entity(stk::topology::NODE_RANK, sides[j][i]);
+        bulkData->change_entity_parts(node_j, nsPartVec_i);  // Add node to the boundary nodeset
         bulkData->declare_relation(side, node_j, j);
 
         int                      num_e = bulkData->num_elements(node_j);
         const stk::mesh::Entity* e     = bulkData->begin_elements(node_j);
-        for (int k(0); k < num_e; ++k) {
-          ++elm_count[bulkData->identifier(e[k])];
-        }
+        for (int k(0); k < num_e; ++k) { ++elm_count[bulkData->identifier(e[k])]; }
       }
 
       // We have to find out what element has this side as a side. We check the
@@ -346,17 +309,14 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
 
       for (auto e : elm_count)
         if (e.second == NumSideNodes) {
-          stk::mesh::Entity elem =
-              bulkData->get_entity(stk::topology::ELEM_RANK, e.first);
-          found         = true;
-          int num_sides = bulkData->num_sides(elem);
+          stk::mesh::Entity elem = bulkData->get_entity(stk::topology::ELEM_RANK, e.first);
+          found                  = true;
+          int num_sides          = bulkData->num_sides(elem);
           bulkData->declare_relation(elem, side, num_sides);
           break;
         }
 
-      ALBANY_PANIC(
-          found == false,
-          "Error! Cannot find element connected to side " << i + 1 << ".\n");
+      ALBANY_PANIC(found == false, "Error! Cannot find element connected to side " << i + 1 << ".\n");
     }
   }
   bulkData->modification_end();
@@ -381,8 +341,7 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
 
   // Finally, perform the setup of the (possible) side set meshes (including
   // extraction if of type SideSetSTKMeshStruct)
-  this->finalizeSideSetMeshStructs(
-      commT, side_set_req, side_set_sis, worksetSize);
+  this->finalizeSideSetMeshStructs(commT, side_set_req, side_set_sis, worksetSize);
 
   fieldAndBulkDataSet = true;
 }
@@ -390,8 +349,7 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::GmshSTKMeshStruct::getValidDiscretizationParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getValidGenericSTKParameters("Valid ASCII_DiscParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getValidGenericSTKParameters("Valid ASCII_DiscParams");
   validPL->set<std::string>(
       "Gmsh Input Mesh File Name",
       "mesh.msh",
@@ -422,9 +380,7 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
 
   // Read the nodes
   int id;
-  for (int i = 0; i < NumNodes; ++i) {
-    ifile >> id >> pts[i][0] >> pts[i][1] >> pts[i][2];
-  }
+  for (int i = 0; i < NumNodes; ++i) { ifile >> id >> pts[i][0] >> pts[i][1] >> pts[i][2]; }
 
   // Start reading elements (cells and sides)
   ifile.seekg(0, std::ios::beg);
@@ -450,15 +406,9 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
     increment_element_type(e_type);
   }
 
-  ALBANY_PANIC(
-      nb_tetra * nb_hexas != 0,
-      "Error! Cannot mix tetrahedra and hexahedra.\n");
-  ALBANY_PANIC(
-      nb_trias * nb_quads != 0,
-      "Error! Cannot mix triangles and quadrilaterals.\n");
-  ALBANY_PANIC(
-      nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
-      "Error! Can only handle 2D and 3D geometries.\n");
+  ALBANY_PANIC(nb_tetra * nb_hexas != 0, "Error! Cannot mix tetrahedra and hexahedra.\n");
+  ALBANY_PANIC(nb_trias * nb_quads != 0, "Error! Cannot mix triangles and quadrilaterals.\n");
+  ALBANY_PANIC(nb_tetra + nb_hexas + nb_trias + nb_quads == 0, "Error! Can only handle 2D and 3D geometries.\n");
 
   lines = new int*[3];
   tetra = new int*[5];
@@ -539,21 +489,18 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
         ++itria;
         break;
       case 3:  // 4-pt Quad
-        ss >> quads[0][iquad] >> quads[1][iquad] >> quads[2][iquad] >>
-            quads[3][iquad];
+        ss >> quads[0][iquad] >> quads[1][iquad] >> quads[2][iquad] >> quads[3][iquad];
         quads[4][iquad] = reg_phys;
         ++iquad;
         break;
       case 4:  // 4-pt Tetra
-        ss >> tetra[0][itetra] >> tetra[1][itetra] >> tetra[2][itetra] >>
-            tetra[3][itetra];
+        ss >> tetra[0][itetra] >> tetra[1][itetra] >> tetra[2][itetra] >> tetra[3][itetra];
         trias[4][itetra] = reg_phys;
         ++itria;
         break;
       case 5:  // 8-pt Hexa
-        ss >> hexas[0][ihexa] >> hexas[1][ihexa] >> hexas[2][ihexa] >>
-            hexas[3][ihexa] >> hexas[4][ihexa] >> hexas[5][ihexa] >>
-            hexas[6][ihexa] >> hexas[7][ihexa];
+        ss >> hexas[0][ihexa] >> hexas[1][ihexa] >> hexas[2][ihexa] >> hexas[3][ihexa] >> hexas[4][ihexa] >>
+            hexas[5][ihexa] >> hexas[6][ihexa] >> hexas[7][ihexa];
         hexas[8][ihexa] = reg_phys;
         ++ihexa;
         break;
@@ -571,10 +518,7 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
 }
 
 void
-Albany::GmshSTKMeshStruct::swallow_lines_until(
-    std::ifstream& ifile,
-    std::string&   line,
-    std::string    line_of_interest)
+Albany::GmshSTKMeshStruct::swallow_lines_until(std::ifstream& ifile, std::string& line, std::string line_of_interest)
 {
   while (std::getline(ifile, line) && line != line_of_interest) {
     // Keep swallowing lines...
@@ -612,9 +556,7 @@ Albany::GmshSTKMeshStruct::load_node_data(std::ifstream& ifile)
 {
   if (version == GmshVersion::V2_2) {
     int id = 0;
-    for (int i = 0; i < NumNodes; ++i) {
-      ifile >> id >> pts[i][0] >> pts[i][1] >> pts[i][2];
-    }
+    for (int i = 0; i < NumNodes; ++i) { ifile >> id >> pts[i][0] >> pts[i][1] >> pts[i][2]; }
   } else if (version == GmshVersion::V4_1) {
     int accounted_nodes = 0;
     while (accounted_nodes < NumNodes) {
@@ -685,16 +627,14 @@ Albany::GmshSTKMeshStruct::increment_element_type(int e_type)
     case 9: ++nb_tri6; break;
     case 11: ++nb_tet10; break;
     case 15: /*point*/ break;
-    default:
-      ALBANY_ABORT("Error! Element type (" << e_type << ") not supported.\n");
+    default: ALBANY_ABORT("Error! Element type (" << e_type << ") not supported.\n");
   }
 
   return;
 }
 
 void
-Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
-    std::ifstream& ifile)
+Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(std::ifstream& ifile)
 {
   // Gmsh lists elements and sides (and some points) all toghether,
   // and does not specify beforehand what kind of elements
@@ -747,35 +687,23 @@ Albany::GmshSTKMeshStruct::set_specific_num_of_each_elements(
     mixed_order_mesh      = (nb_tri6 != 0) || mixed_order_mesh;
     mixed_order_mesh      = (nb_tet10 != 0) || mixed_order_mesh;
 
-    ALBANY_PANIC(
-        mixed_order_mesh,
-        "Error! Found second order elements in first order mesh.\n");
+    ALBANY_PANIC(mixed_order_mesh, "Error! Found second order elements in first order mesh.\n");
 
-    ALBANY_PANIC(
-        nb_tetra * nb_hexas != 0,
-        "Error! Cannot mix tetrahedra and hexahedra.\n");
-    ALBANY_PANIC(
-        nb_trias * nb_quads != 0,
-        "Error! Cannot mix triangles and quadrilaterals.\n");
-    ALBANY_PANIC(
-        nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
-        "Error! Can only handle 2D and 3D geometries.\n");
+    ALBANY_PANIC(nb_tetra * nb_hexas != 0, "Error! Cannot mix tetrahedra and hexahedra.\n");
+    ALBANY_PANIC(nb_trias * nb_quads != 0, "Error! Cannot mix triangles and quadrilaterals.\n");
+    ALBANY_PANIC(nb_tetra + nb_hexas + nb_trias + nb_quads == 0, "Error! Can only handle 2D and 3D geometries.\n");
   } else if (is_second_order) {
     bool mixed_order_mesh = (nb_lines != 0);
     mixed_order_mesh      = (nb_trias != 0) || mixed_order_mesh;
     mixed_order_mesh      = (nb_tetra != 0) || mixed_order_mesh;
 
-    ALBANY_PANIC(
-        mixed_order_mesh,
-        "Error! Found first order elements in second order mesh.\n");
+    ALBANY_PANIC(mixed_order_mesh, "Error! Found first order elements in second order mesh.\n");
 
     bool missing_parts = (nb_line3 == 0);
     missing_parts      = (nb_tri6 == 0) || missing_parts;
     missing_parts      = (nb_tet10 == 0) || missing_parts;
 
-    ALBANY_PANIC(
-        missing_parts,
-        "Error! This second order mesh is missing secord order parts.\n");
+    ALBANY_PANIC(missing_parts, "Error! This second order mesh is missing secord order parts.\n");
 
   } else {
     ALBANY_ABORT(
@@ -900,21 +828,18 @@ Albany::GmshSTKMeshStruct::store_element_info(
       ++itria;
       break;
     case 3:  // 4-pt Quad
-      ss >> quads[0][iquad] >> quads[1][iquad] >> quads[2][iquad] >>
-          quads[3][iquad];
+      ss >> quads[0][iquad] >> quads[1][iquad] >> quads[2][iquad] >> quads[3][iquad];
       quads[4][iquad] = tags[0];
       ++iquad;
       break;
     case 4:  // 4-pt Tetra
-      ss >> tetra[0][itetra] >> tetra[1][itetra] >> tetra[2][itetra] >>
-          tetra[3][itetra];
+      ss >> tetra[0][itetra] >> tetra[1][itetra] >> tetra[2][itetra] >> tetra[3][itetra];
       tetra[4][itetra] = tags[0];
       ++itetra;
       break;
     case 5:  // 8-pt Hexa
-      ss >> hexas[0][ihexa] >> hexas[1][ihexa] >> hexas[2][ihexa] >>
-          hexas[3][ihexa] >> hexas[4][ihexa] >> hexas[5][ihexa] >>
-          hexas[6][ihexa] >> hexas[7][ihexa];
+      ss >> hexas[0][ihexa] >> hexas[1][ihexa] >> hexas[2][ihexa] >> hexas[3][ihexa] >> hexas[4][ihexa] >>
+          hexas[5][ihexa] >> hexas[6][ihexa] >> hexas[7][ihexa];
       hexas[8][ihexa] = tags[0];
       ++ihexa;
       break;
@@ -924,8 +849,7 @@ Albany::GmshSTKMeshStruct::store_element_info(
       iline3++;
       break;
     case 9:  // 6-pt Triangle
-      ss >> tri6[0][itri6] >> tri6[1][itri6] >> tri6[2][itri6] >>
-          tri6[3][itri6] >> tri6[4][itri6] >> tri6[5][itri6];
+      ss >> tri6[0][itri6] >> tri6[1][itri6] >> tri6[2][itri6] >> tri6[3][itri6] >> tri6[4][itri6] >> tri6[5][itri6];
       tri6[6][itri6] = tags[0];
       itri6++;
       break;
@@ -933,10 +857,8 @@ Albany::GmshSTKMeshStruct::store_element_info(
       // NOTE!
       // The node ordering between gmsh and STK for tet10 is the same
       // EXCEPT for the last two. I.e., nodes 8 and 9 are switched!
-      ss >> tet10[0][itet10] >> tet10[1][itet10] >> tet10[2][itet10] >>
-          tet10[3][itet10] >> tet10[4][itet10] >> tet10[5][itet10] >>
-          tet10[6][itet10] >> tet10[7][itet10] >> tet10[9][itet10] >>
-          tet10[8][itet10];
+      ss >> tet10[0][itet10] >> tet10[1][itet10] >> tet10[2][itet10] >> tet10[3][itet10] >> tet10[4][itet10] >>
+          tet10[5][itet10] >> tet10[6][itet10] >> tet10[7][itet10] >> tet10[9][itet10] >> tet10[8][itet10];
       tet10[10][itet10] = tags[0];
       itet10++;
       break;
@@ -967,8 +889,7 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
   std::getline(ifile, line);
 
   // Read the elements
-  int iline(0), iline3(0), itria(0), itri6(0), iquad(0), itetra(0), itet10(0),
-      ihexa(0), n_tags(0), id(0), e_type(0);
+  int iline(0), iline3(0), itria(0), itri6(0), iquad(0), itetra(0), itet10(0), ihexa(0), n_tags(0), id(0), e_type(0);
 
   if (version == GmshVersion::V2_2) {
     std::vector<int> tags;
@@ -981,18 +902,7 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
       for (int j(0); j < n_tags; ++j) { ss >> tags[j]; }
       tags[n_tags] = 0;
 
-      store_element_info(
-          e_type,
-          iline,
-          iline3,
-          itria,
-          itri6,
-          iquad,
-          itetra,
-          itet10,
-          ihexa,
-          tags,
-          ss);
+      store_element_info(e_type, iline, iline3, itria, itri6, iquad, itetra, itet10, ihexa, tags, ss);
     }
   } else if (version == GmshVersion::V4_1) {
     int              accounted_elems = 0;
@@ -1015,18 +925,7 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
         ss >> elem_id;
 
         int e_type = entity_type;
-        store_element_info(
-            e_type,
-            iline,
-            iline3,
-            itria,
-            itri6,
-            iquad,
-            itetra,
-            itet10,
-            ihexa,
-            tags,
-            ss);
+        store_element_info(e_type, iline, iline3, itria, itri6, iquad, itetra, itet10, ihexa, tags, ss);
         accounted_elems++;
       }
       tags.clear();
@@ -1065,8 +964,8 @@ Albany::GmshSTKMeshStruct::loadAsciiMesh()
 void
 Albany::GmshSTKMeshStruct::create_element_block()
 {
-  std::string ebn = "Element Block 0";
-  partVec[0]      = &metaData->declare_part(ebn, stk::topology::ELEMENT_RANK);
+  std::string ebn    = "Element Block 0";
+  partVec[0]         = &metaData->declare_part(ebn, stk::topology::ELEMENT_RANK);
   ebNameToIndex[ebn] = 0;
 
   return;
@@ -1130,8 +1029,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     int header[3];
     ifile.read(reinterpret_cast<char*>(header), 3 * sizeof(int));
 
-    ALBANY_PANIC(
-        header[1] <= 0, "Error! Invalid number of elements of this type.\n");
+    ALBANY_PANIC(header[1] <= 0, "Error! Invalid number of elements of this type.\n");
     ALBANY_PANIC(header[2] <= 0, "Error! Invalid number of tags.\n");
 
     e_type = header[0];
@@ -1143,36 +1041,31 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       case 1:                     // 2-pt Line
         length = 1 + n_tags + 2;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         nb_lines += header[1];
         break;
       case 2:                     // 3-pt Triangle
         length = 1 + n_tags + 3;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         nb_trias += header[1];
         break;
       case 3:                     // 4-pt Quad
         length = 1 + n_tags + 4;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         nb_quads += header[1];
         break;
       case 4:                     // 4-pt Tetra
         length = 1 + n_tags + 4;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         nb_quads += header[1];
         break;
       case 5:                     // 8-pt Hexa
         length = 1 + n_tags + 8;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         nb_quads += header[1];
         break;
       case 15:  // Point
@@ -1180,15 +1073,9 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       default: ALBANY_ABORT("Error! Element type not supported.\n");
     }
   }
-  ALBANY_PANIC(
-      nb_tetra * nb_hexas != 0,
-      "Error! Cannot mix tetrahedra and hexahedra.\n");
-  ALBANY_PANIC(
-      nb_trias * nb_quads != 0,
-      "Error! Cannot mix triangles and quadrilaterals.\n");
-  ALBANY_PANIC(
-      nb_tetra + nb_hexas + nb_trias + nb_quads == 0,
-      "Error! Can only handle 2D and 3D geometries.\n");
+  ALBANY_PANIC(nb_tetra * nb_hexas != 0, "Error! Cannot mix tetrahedra and hexahedra.\n");
+  ALBANY_PANIC(nb_trias * nb_quads != 0, "Error! Cannot mix triangles and quadrilaterals.\n");
+  ALBANY_PANIC(nb_tetra + nb_hexas + nb_trias + nb_quads == 0, "Error! Can only handle 2D and 3D geometries.\n");
 
   lines = new int*[3];
   tetra = new int*[5];
@@ -1252,8 +1139,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
     int header[3];
     ifile.read(reinterpret_cast<char*>(header), 3 * sizeof(int));
 
-    ALBANY_PANIC(
-        header[1] <= 0, "Error! Invalid number of elements of this type.\n");
+    ALBANY_PANIC(header[1] <= 0, "Error! Invalid number of elements of this type.\n");
     ALBANY_PANIC(header[2] <= 0, "Error! Invalid number of tags.\n");
 
     e_type = header[0];
@@ -1265,11 +1151,9 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       case 1:                     // 2-pt Line
         length = 1 + n_tags + 2;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         for (int j(0); j < header[1]; ++j, ++iline) {
-          lines[0][j] =
-              tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
+          lines[0][j] = tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
           lines[1][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 1)];
           lines[2][j] = tmp[sizeof(int) * (j * length + 1)];  // Use first tag
         }
@@ -1277,11 +1161,9 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       case 2:                     // 3-pt Triangle
         length = 1 + n_tags + 3;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         for (int j(0); j < header[1]; ++j, ++itria) {
-          trias[0][j] =
-              tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
+          trias[0][j] = tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
           trias[1][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 1)];
           trias[2][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 2)];
           trias[3][j] = tmp[sizeof(int) * (j * length + 1)];  // Use first tag
@@ -1290,11 +1172,9 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       case 3:                     // 4-pt Quad
         length = 1 + n_tags + 4;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         for (int j(0); j < header[1]; ++j, ++iquad) {
-          quads[0][j] =
-              tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
+          quads[0][j] = tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
           quads[1][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 1)];
           quads[2][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 2)];
           quads[3][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 3)];
@@ -1304,11 +1184,9 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       case 4:                     // 4-pt Tetra
         length = 1 + n_tags + 4;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         for (int j(0); j < header[1]; ++j, ++itetra) {
-          tetra[0][j] =
-              tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
+          tetra[0][j] = tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
           tetra[1][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 1)];
           tetra[2][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 2)];
           tetra[3][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 3)];
@@ -1318,11 +1196,9 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
       case 5:                     // 8-pt Hexa
         length = 1 + n_tags + 8;  // id, tags, points
         tmp.resize(header[1] * length);
-        ifile.read(
-            reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
+        ifile.read(reinterpret_cast<char*>(&tmp[0]), header[1] * length * sizeof(int));
         for (int j(0); j < header[1]; ++j, ++ihexa) {
-          hexas[0][j] =
-              tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
+          hexas[0][j] = tmp[sizeof(int) * (j * length + 1 + n_tags)];  // First pt
           hexas[1][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 1)];
           hexas[2][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 2)];
           hexas[3][j] = tmp[sizeof(int) * (j * length + 1 + n_tags + 3)];
@@ -1344,8 +1220,7 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
 }
 
 void
-Albany::GmshSTKMeshStruct::set_all_nodes_boundary(
-    std::vector<std::string>& nsNames)
+Albany::GmshSTKMeshStruct::set_all_nodes_boundary(std::vector<std::string>& nsNames)
 {
   std::string nsn = "Node";
   nsNames.push_back(nsn);
@@ -1356,8 +1231,7 @@ Albany::GmshSTKMeshStruct::set_all_nodes_boundary(
 }
 
 void
-Albany::GmshSTKMeshStruct::set_all_sides_boundary(
-    std::vector<std::string>& ssNames)
+Albany::GmshSTKMeshStruct::set_all_sides_boundary(std::vector<std::string>& ssNames)
 {
   std::string ssn = "BoundarySide";
   ssNames.push_back(ssn);
@@ -1423,10 +1297,7 @@ Albany::GmshSTKMeshStruct::set_boundaries(
 }
 
 void
-Albany::GmshSTKMeshStruct::add_sideset(
-    std::string               sideset_name,
-    int                       tag,
-    std::vector<std::string>& ssNames)
+Albany::GmshSTKMeshStruct::add_sideset(std::string sideset_name, int tag, std::vector<std::string>& ssNames)
 {
   std::stringstream ssn_i;
   ssn_i << "BoundarySideSet" << sideset_name;
@@ -1434,18 +1305,14 @@ Albany::GmshSTKMeshStruct::add_sideset(
   bdTagToSideSetName[tag] = ssn_i.str();
   ssNames.push_back(ssn_i.str());
 
-  ssPartVec[ssn_i.str()] =
-      &metaData->declare_part(ssn_i.str(), metaData->side_rank());
+  ssPartVec[ssn_i.str()] = &metaData->declare_part(ssn_i.str(), metaData->side_rank());
   stk::io::put_io_part_attribute(*ssPartVec[ssn_i.str()]);
 
   return;
 }
 
 void
-Albany::GmshSTKMeshStruct::add_nodeset(
-    std::string               nodeset_name,
-    int                       tag,
-    std::vector<std::string>& nsNames)
+Albany::GmshSTKMeshStruct::add_nodeset(std::string nodeset_name, int tag, std::vector<std::string>& nsNames)
 {
   std::stringstream nsn_i;
   nsn_i << "BoundaryNodeSet" << nodeset_name;
@@ -1453,8 +1320,7 @@ Albany::GmshSTKMeshStruct::add_nodeset(
   bdTagToNodeSetName[tag] = nsn_i.str();
   nsNames.push_back(nsn_i.str());
 
-  nsPartVec[nsn_i.str()] =
-      &metaData->declare_part(nsn_i.str(), stk::topology::NODE_RANK);
+  nsPartVec[nsn_i.str()] = &metaData->declare_part(nsn_i.str(), stk::topology::NODE_RANK);
   stk::io::put_io_part_attribute(*nsPartVec[nsn_i.str()]);
 
   return;
@@ -1488,8 +1354,7 @@ void
 Albany::GmshSTKMeshStruct::check_version(std::ifstream& ifile)
 {
   // Tell user what gmsh version we're reading
-  Teuchos::RCP<Teuchos::FancyOStream> out =
-      Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
+  Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
   *out << "The gmsh version is: " << version_in << std::endl;
 
   // Check if we know how to read this gmsh version.
@@ -1497,9 +1362,7 @@ Albany::GmshSTKMeshStruct::check_version(std::ifstream& ifile)
   if (!set_version_enum_from_float()) {
     *out << "Allowable gmsh *.msh file versions are: " << std::endl;
     set_allowable_gmsh_versions();
-    for (std::set<float>::iterator it = allowable_gmsh_versions.begin();
-         it != allowable_gmsh_versions.end();
-         it++) {
+    for (std::set<float>::iterator it = allowable_gmsh_versions.begin(); it != allowable_gmsh_versions.end(); it++) {
       *out << *it << std::endl;
     }
 
@@ -1513,17 +1376,13 @@ void
 Albany::GmshSTKMeshStruct::open_fname(std::ifstream& ifile)
 {
   ifile.open(fname.c_str());
-  if (!ifile.is_open()) {
-    ALBANY_ABORT("Error! Cannot open mesh file '" << fname << "'.\n");
-  }
+  if (!ifile.is_open()) { ALBANY_ABORT("Error! Cannot open mesh file '" << fname << "'.\n"); }
 
   return;
 }
 
 void
-Albany::GmshSTKMeshStruct::get_name_for_physical_names(
-    std::string&   name,
-    std::ifstream& ifile)
+Albany::GmshSTKMeshStruct::get_name_for_physical_names(std::string& name, std::ifstream& ifile)
 {
   std::string line;
   int         id;
@@ -1571,28 +1430,21 @@ Albany::GmshSTKMeshStruct::get_physical_tag_to_surface_tag_map(
   for (int i = 0; i < num_surfaces; i++) {
     std::getline(ifile, line);
     std::stringstream ss(line);
-    ss >> surface_tag >> min_x >> min_y >> min_z >> max_x >> max_y >> max_z >>
-        num_physical_tags >> physical_tag >> num_bounding_curves >> curve_tag;
+    ss >> surface_tag >> min_x >> min_y >> min_z >> max_x >> max_y >> max_z >> num_physical_tags >> physical_tag >>
+        num_bounding_curves >> curve_tag;
 
-    ALBANY_PANIC(
-        num_physical_tags > 1,
-        "Cannot support more than one physical tag per surface.\n");
+    ALBANY_PANIC(num_physical_tags > 1, "Cannot support more than one physical tag per surface.\n");
 
-    ALBANY_PANIC(
-        num_physical_tags < 0,
-        "Cannot have a negative number of physical tags per surface.\n");
+    ALBANY_PANIC(num_physical_tags < 0, "Cannot have a negative number of physical tags per surface.\n");
 
-    if (num_physical_tags == 1) {
-      physical_surface_tags.insert(std::make_pair(physical_tag, surface_tag));
-    }
+    if (num_physical_tags == 1) { physical_surface_tags.insert(std::make_pair(physical_tag, surface_tag)); }
   }
 
   return;
 }
 
 void
-Albany::GmshSTKMeshStruct::read_physical_names_from_file(
-    std::map<std::string, int>& physical_names)
+Albany::GmshSTKMeshStruct::read_physical_names_from_file(std::map<std::string, int>& physical_names)
 {
   std::ifstream ifile;
   open_fname(ifile);
@@ -1632,14 +1484,12 @@ Albany::GmshSTKMeshStruct::read_physical_names_from_file(
     int num_lines_to_skip = num_points + num_curves;
     for (int i = 0; i < num_lines_to_skip; i++) { std::getline(ifile, line); }
     std::map<int, int> physical_surface_tags;
-    get_physical_tag_to_surface_tag_map(
-        ifile, physical_surface_tags, num_surfaces);
+    get_physical_tag_to_surface_tag_map(ifile, physical_surface_tags, num_surfaces);
 
     std::stringstream error_msg;
     error_msg << "Cannot support more than one physical tag per surface \n"
               << "(but you should have gotten an error before this!)    \n"
-              << "physical_surface_tags.size() = "
-              << physical_surface_tags.size() << ". \n"
+              << "physical_surface_tags.size() = " << physical_surface_tags.size() << ". \n"
               << "names.size() = " << names.size() << ". \n";
     ALBANY_PANIC(physical_surface_tags.size() != names.size(), error_msg.str());
 
@@ -1717,9 +1567,7 @@ Albany::GmshSTKMeshStruct::broadcast_physical_names(
 
   // Broadcast names and tags
   Teuchos::broadcast<LO, LO>(*commT, 0, num_pairs, tags_array);
-  for (int i = 0; i < num_pairs; i++) {
-    broadcast_name_tag_pair(names, tags_array, i, commT, physical_names);
-  }
+  for (int i = 0; i < num_pairs; i++) { broadcast_name_tag_pair(names, tags_array, i, commT, physical_names); }
 
   delete[] tags_array;
   return;

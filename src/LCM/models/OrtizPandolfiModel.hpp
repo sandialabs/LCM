@@ -35,9 +35,7 @@ class OrtizPandolfiModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  OrtizPandolfiModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  OrtizPandolfiModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Destructor
@@ -48,16 +46,10 @@ class OrtizPandolfiModel : public LCM::ConstitutiveModel<EvalT, Traits>
   /// Method to compute the state (e.g. energy, stress, tangent)
   ///
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields)
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
   {
     ALBANY_ABORT("Not implemented.");
   }

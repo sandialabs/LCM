@@ -12,9 +12,7 @@ namespace Albany {
 KLResponseFunction::KLResponseFunction(
     const Teuchos::RCP<Albany::AbstractResponseFunction>& response_,
     Teuchos::ParameterList&                               responseParams)
-    : response(response_),
-      responseParams(responseParams),
-      out(Teuchos::VerboseObjectBase::getDefaultOStream())
+    : response(response_), responseParams(responseParams), out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   num_kl = responseParams.get("Number of KL Terms", 5);
 }
@@ -45,18 +43,7 @@ KLResponseFunction::evaluateDerivative(
     const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dxdotdot,
     const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dp)
 {
-  response->evaluateDerivative(
-      current_time,
-      x,
-      xdot,
-      xdotdot,
-      p,
-      deriv_p,
-      g,
-      dg_dx,
-      dg_dxdot,
-      dg_dxdotdot,
-      dg_dp);
+  response->evaluateDerivative(current_time, x, xdot, xdotdot, p, deriv_p, g, dg_dx, dg_dxdot, dg_dxdotdot, dg_dp);
 }
 
 }  // namespace Albany

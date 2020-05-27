@@ -11,16 +11,10 @@ combineModeT(const Albany::CombineMode modeA)
   Tpetra::CombineMode modeT;
   switch (modeA) {
     case Albany::CombineMode::ADD: modeT = Tpetra::CombineMode::ADD; break;
-    case Albany::CombineMode::INSERT:
-      modeT = Tpetra::CombineMode::INSERT;
-      break;
+    case Albany::CombineMode::INSERT: modeT = Tpetra::CombineMode::INSERT; break;
     case Albany::CombineMode::ZERO: modeT = Tpetra::CombineMode::ZERO; break;
-    case Albany::CombineMode::ABSMAX:
-      modeT = Tpetra::CombineMode::ABSMAX;
-      break;
-    default:
-      ALBANY_ABORT(
-          "Error! Unknown Albany combine mode. Please, contact developers.\n");
+    case Albany::CombineMode::ABSMAX: modeT = Tpetra::CombineMode::ABSMAX; break;
+    default: ALBANY_ABORT("Error! Unknown Albany combine mode. Please, contact developers.\n");
   }
   return modeT;
 }
@@ -41,10 +35,7 @@ CombineAndScatterManagerTpetra::CombineAndScatterManagerTpetra(
 }
 
 void
-CombineAndScatterManagerTpetra::combine(
-    Thyra_Vector const& src,
-    Thyra_Vector&       dst,
-    const CombineMode   CM) const
+CombineAndScatterManagerTpetra::combine(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM) const
 {
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraVector(src);
@@ -54,10 +45,8 @@ CombineAndScatterManagerTpetra::combine(
 }
 
 void
-CombineAndScatterManagerTpetra::combine(
-    const Thyra_MultiVector& src,
-    Thyra_MultiVector&       dst,
-    const CombineMode        CM) const
+CombineAndScatterManagerTpetra::combine(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM)
+    const
 {
   // There's a catch here!
   // Legend: V = Vector, MV = MultiVector, TV = Tpetra_Vector, TMV =
@@ -70,10 +59,8 @@ CombineAndScatterManagerTpetra::combine(
   // objects, which I _think_ do not support polymorphism. So, given what we
   // have, we _try_ to extract a TMV from the T_MV, and, if we fail, we try
   // again, this time extracting a TV. If we still fail, then we can error out.
-  Teuchos::RCP<const Tpetra_MultiVector> srcT =
-      Albany::getConstTpetraMultiVector(src, false);
-  Teuchos::RCP<Tpetra_MultiVector> dstT =
-      Albany::getTpetraMultiVector(dst, false);
+  Teuchos::RCP<const Tpetra_MultiVector> srcT = Albany::getConstTpetraMultiVector(src, false);
+  Teuchos::RCP<Tpetra_MultiVector>       dstT = Albany::getTpetraMultiVector(dst, false);
 
   if (srcT.is_null()) {
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
@@ -106,10 +93,7 @@ CombineAndScatterManagerTpetra::combine(
 }
 
 void
-CombineAndScatterManagerTpetra::combine(
-    const Thyra_LinearOp& src,
-    Thyra_LinearOp&       dst,
-    const CombineMode     CM) const
+CombineAndScatterManagerTpetra::combine(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM) const
 {
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraMatrix(src);
@@ -148,15 +132,12 @@ CombineAndScatterManagerTpetra::combine(
   // objects, which I _think_ do not support polymorphism. So, given what we
   // have, we _try_ to extract a TMV from the T_MV, and, if we fail, we try
   // again, this time extracting a TV. If we still fail, then we can error out.
-  Teuchos::RCP<const Tpetra_MultiVector> srcT =
-      Albany::getConstTpetraMultiVector(src, false);
-  Teuchos::RCP<Tpetra_MultiVector> dstT =
-      Albany::getTpetraMultiVector(dst, false);
+  Teuchos::RCP<const Tpetra_MultiVector> srcT = Albany::getConstTpetraMultiVector(src, false);
+  Teuchos::RCP<Tpetra_MultiVector>       dstT = Albany::getTpetraMultiVector(dst, false);
 
   if (srcT.is_null()) {
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
-    Teuchos::RCP<Thyra_Vector const> srcV =
-        Teuchos::rcp_dynamic_cast<Thyra_Vector const>(src);
+    Teuchos::RCP<Thyra_Vector const> srcV = Teuchos::rcp_dynamic_cast<Thyra_Vector const>(src);
 
     ALBANY_PANIC(
         srcV.is_null(),
@@ -169,8 +150,7 @@ CombineAndScatterManagerTpetra::combine(
 
   if (dstT.is_null()) {
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
-    Teuchos::RCP<Thyra_Vector> dstV =
-        Teuchos::rcp_dynamic_cast<Thyra_Vector>(dst);
+    Teuchos::RCP<Thyra_Vector> dstV = Teuchos::rcp_dynamic_cast<Thyra_Vector>(dst);
 
     ALBANY_PANIC(
         dstV.is_null(),
@@ -200,10 +180,7 @@ CombineAndScatterManagerTpetra::combine(
 
 // Scatter methods
 void
-CombineAndScatterManagerTpetra::scatter(
-    Thyra_Vector const& src,
-    Thyra_Vector&       dst,
-    const CombineMode   CM) const
+CombineAndScatterManagerTpetra::scatter(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM) const
 {
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraVector(src);
@@ -213,10 +190,8 @@ CombineAndScatterManagerTpetra::scatter(
 }
 
 void
-CombineAndScatterManagerTpetra::scatter(
-    const Thyra_MultiVector& src,
-    Thyra_MultiVector&       dst,
-    const CombineMode        CM) const
+CombineAndScatterManagerTpetra::scatter(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM)
+    const
 {
   // There's a catch here!
   // Legend: V = Vector, MV = MultiVector, TV = Tpetra_Vector, TMV =
@@ -229,10 +204,8 @@ CombineAndScatterManagerTpetra::scatter(
   // objects, which I _think_ do not support polymorphism. So, given what we
   // have, we _try_ to extract a TMV from the T_MV, and, if we fail, we try
   // again, this time extracting a TV. If we still fail, then we can error out.
-  Teuchos::RCP<const Tpetra_MultiVector> srcT =
-      Albany::getConstTpetraMultiVector(src, false);
-  Teuchos::RCP<Tpetra_MultiVector> dstT =
-      Albany::getTpetraMultiVector(dst, false);
+  Teuchos::RCP<const Tpetra_MultiVector> srcT = Albany::getConstTpetraMultiVector(src, false);
+  Teuchos::RCP<Tpetra_MultiVector>       dstT = Albany::getTpetraMultiVector(dst, false);
 
   if (srcT.is_null()) {
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
@@ -265,10 +238,7 @@ CombineAndScatterManagerTpetra::scatter(
 }
 
 void
-CombineAndScatterManagerTpetra::scatter(
-    const Thyra_LinearOp& src,
-    Thyra_LinearOp&       dst,
-    const CombineMode     CM) const
+CombineAndScatterManagerTpetra::scatter(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM) const
 {
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraMatrix(src);
@@ -307,15 +277,12 @@ CombineAndScatterManagerTpetra::scatter(
   // objects, which I _think_ do not support polymorphism. So, given what we
   // have, we _try_ to extract a TMV from the T_MV, and, if we fail, we try
   // again, this time extracting a TV. If we still fail, then we can error out.
-  Teuchos::RCP<const Tpetra_MultiVector> srcT =
-      Albany::getConstTpetraMultiVector(src, false);
-  Teuchos::RCP<Tpetra_MultiVector> dstT =
-      Albany::getTpetraMultiVector(dst, false);
+  Teuchos::RCP<const Tpetra_MultiVector> srcT = Albany::getConstTpetraMultiVector(src, false);
+  Teuchos::RCP<Tpetra_MultiVector>       dstT = Albany::getTpetraMultiVector(dst, false);
 
   if (srcT.is_null()) {
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
-    Teuchos::RCP<Thyra_Vector const> srcV =
-        Teuchos::rcp_dynamic_cast<Thyra_Vector const>(src);
+    Teuchos::RCP<Thyra_Vector const> srcV = Teuchos::rcp_dynamic_cast<Thyra_Vector const>(src);
 
     ALBANY_PANIC(
         srcV.is_null(),
@@ -328,8 +295,7 @@ CombineAndScatterManagerTpetra::scatter(
 
   if (dstT.is_null()) {
     // Try to cast to Thyra_Vector, then extract the Tpetra_Vector
-    Teuchos::RCP<Thyra_Vector> dstV =
-        Teuchos::rcp_dynamic_cast<Thyra_Vector>(dst);
+    Teuchos::RCP<Thyra_Vector> dstV = Teuchos::rcp_dynamic_cast<Thyra_Vector>(dst);
 
     ALBANY_PANIC(
         dstV.is_null(),
@@ -364,9 +330,8 @@ CombineAndScatterManagerTpetra::create_ghosted_aura_owners() const
   auto ga_vs = getGhostedAuraVectorSpace();
 
   // Get the gids in the ghosted vs
-  auto gids  = getGlobalElements(ga_vs);
-  auto tgids = Teuchos::arrayView(
-      reinterpret_cast<Tpetra_GO*>(gids.getRawPtr()), gids.size());
+  auto               gids  = getGlobalElements(ga_vs);
+  auto               tgids = Teuchos::arrayView(reinterpret_cast<Tpetra_GO*>(gids.getRawPtr()), gids.size());
   Teuchos::Array<LO> lids(gids.size());
   ghosted_aura_owners.resize(lids.size());
 

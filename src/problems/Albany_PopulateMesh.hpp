@@ -50,9 +50,7 @@ class PopulateMesh : public Albany::AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      Albany::StateManager&                                    stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -96,8 +94,7 @@ class PopulateMesh : public Albany::AbstractProblem
   void
   constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs);
   void
-  constructNeumannEvaluators(
-      const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
+  constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
 
  protected:
   Teuchos::RCP<Albany::Layouts> dl;
@@ -158,8 +155,7 @@ PopulateMesh::constructEvaluators(
   fm0.template registerEvaluator<EvalT>(ev);
 
   // --- Scatter residual --- //
-  ev = evalUtils.constructScatterResidualEvaluator(
-      false, resid_names, offset, "Scatter Dummy Residual");
+  ev = evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Dummy Residual");
   fm0.template registerEvaluator<EvalT>(ev);
 
   // --- Dummy Residual --- //
@@ -171,8 +167,7 @@ PopulateMesh::constructEvaluators(
 
   if (fieldManagerChoice == BUILD_RESID_FM) {
     // Require scattering of residual
-    PHX::Tag<typename EvalT::ScalarT> res_tag(
-        "Scatter Dummy Residual", dl->dummy);
+    PHX::Tag<typename EvalT::ScalarT> res_tag("Scatter Dummy Residual", dl->dummy);
     fm0.requireField<EvalT>(res_tag);
   }
 

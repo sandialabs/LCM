@@ -30,18 +30,13 @@ namespace LCM {
 // **************************************************************
 
 template <typename EvalT, typename Traits>
-class AnalyticMassResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                 public PHX::EvaluatorDerived<EvalT, Traits>
+class AnalyticMassResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  AnalyticMassResidualBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  AnalyticMassResidualBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   virtual void
   evaluateFields(typename Traits::EvalData d) = 0;
@@ -157,9 +152,7 @@ class AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>
     : public AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  AnalyticMassResidual(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  AnalyticMassResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);
 
@@ -176,9 +169,7 @@ class AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>
     : public AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
-  AnalyticMassResidual(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  AnalyticMassResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);
 

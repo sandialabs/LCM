@@ -141,8 +141,7 @@ struct Layouts
    * the action is performed.
    */
   Teuchos::RCP<PHX::DataLayout> shared_param;
-  Teuchos::RCP<PHX::DataLayout>
-                                shared_param_vec;  // same length as other vectors
+  Teuchos::RCP<PHX::DataLayout> shared_param_vec;  // same length as other vectors
   Teuchos::RCP<PHX::DataLayout> dummy;
 
   // For backward compatibility, and simplicitiy, we want to check if

@@ -11,14 +11,11 @@ namespace LCM {
 
 /******************************************************************************/
 template <typename EvalT, typename Traits>
-FerroicDriver<EvalT, Traits>::FerroicDriver(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+FerroicDriver<EvalT, Traits>::FerroicDriver(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 /******************************************************************************/
 {
-  ALBANY_PANIC(
-      num_dims_ != FM::THREE_D, ">>> ERROR (FerroicModel): Only valid for 3D.");
+  ALBANY_PANIC(num_dims_ != FM::THREE_D, ">>> ERROR (FerroicModel): Only valid for 3D.");
 
   ferroicModel = Teuchos::rcp(new FM::FerroicModel<EvalT>());
 
@@ -27,8 +24,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   R.set_dimension(FM::THREE_D);
   R.clear();
   if (p->isType<Teuchos::ParameterList>("Material Basis")) {
-    Teuchos::ParameterList const& pBasis =
-        p->get<Teuchos::ParameterList>("Material Basis");
+    Teuchos::ParameterList const& pBasis = p->get<Teuchos::ParameterList>("Material Basis");
     LCM::parseBasis(pBasis, R);
   } else {
     R(0, 0) = 1.0;
@@ -37,20 +33,17 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   }
 
   // PARSE INITIAL BIN FRACTIONS
-  Teuchos::Array<RealType>& initialBinFractions =
-      ferroicModel->getInitialBinFractions();
+  Teuchos::Array<RealType>& initialBinFractions = ferroicModel->getInitialBinFractions();
   if (p->isType<Teuchos::Array<RealType>>("Bin Fractions"))
     initialBinFractions = p->get<Teuchos::Array<RealType>>("Bin Fractions");
   else
     initialBinFractions.resize(0);
 
   // PARSE PHASES
-  Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& crystalPhases =
-      ferroicModel->getCrystalPhases();
-  int nphases = p->get<int>("Number of Phases");
+  Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& crystalPhases = ferroicModel->getCrystalPhases();
+  int                                             nphases       = p->get<int>("Number of Phases");
   for (int i = 0; i < nphases; i++) {
-    Teuchos::ParameterList& pParam =
-        p->get<Teuchos::ParameterList>(Albany::strint("Phase", i + 1));
+    Teuchos::ParameterList&                    pParam = p->get<Teuchos::ParameterList>(Albany::strint("Phase", i + 1));
     minitensor::Tensor4<RealType, FM::THREE_D> C;
     LCM::parseTensor4(pParam, C);
     minitensor::Tensor3<RealType, FM::THREE_D> h;
@@ -61,21 +54,18 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   }
 
   // PARSE VARIANTS
-  Teuchos::Array<FM::CrystalVariant>& crystalVariants =
-      ferroicModel->getCrystalVariants();
+  Teuchos::Array<FM::CrystalVariant>& crystalVariants = ferroicModel->getCrystalVariants();
   if (initialBinFractions.size() > 0) {
-    Teuchos::ParameterList& vParams =
-        p->get<Teuchos::ParameterList>("Variants");
-    int nvars = vParams.get<int>("Number of Variants");
+    Teuchos::ParameterList& vParams = p->get<Teuchos::ParameterList>("Variants");
+    int                     nvars   = vParams.get<int>("Number of Variants");
     crystalVariants.resize(nvars);
     ALBANY_PANIC(
         initialBinFractions.size() != nvars,
         ">>> ERROR (FerroicModel): 'Number of Variants' must equal length of "
         "'Bin Fractions' array");
     for (int i = 0; i < nvars; i++) {
-      Teuchos::ParameterList& vParam =
-          vParams.get<Teuchos::ParameterList>(Albany::strint("Variant", i + 1));
-      crystalVariants[i] = parseCrystalVariant(crystalPhases, vParam);
+      Teuchos::ParameterList& vParam = vParams.get<Teuchos::ParameterList>(Albany::strint("Variant", i + 1));
+      crystalVariants[i]             = parseCrystalVariant(crystalPhases, vParam);
     }
   } else {
     // no variants specified.  Create single dummy variant.
@@ -88,16 +78,13 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(
   Teuchos::Array<RealType>& tBarrier  = ferroicModel->getTransitionBarrier();
   tBarrier.resize(nVariants * nVariants);
   if (p->isType<Teuchos::ParameterList>("Critical Values")) {
-    Teuchos::ParameterList const& cParams =
-        p->get<Teuchos::ParameterList>("Critical Values");
-    int transitionIndex = 0;
+    Teuchos::ParameterList const& cParams         = p->get<Teuchos::ParameterList>("Critical Values");
+    int                           transitionIndex = 0;
     for (int i = 0; i < nVariants; i++) {
-      Teuchos::Array<RealType> array = cParams.get<Teuchos::Array<RealType>>(
-          Albany::strint("Variant", i + 1));
+      Teuchos::Array<RealType> array = cParams.get<Teuchos::Array<RealType>>(Albany::strint("Variant", i + 1));
       ALBANY_PANIC(
           array.size() != nVariants,
-          ">>> ERROR (FerroicModel): List of critical values for variant "
-              << i + 1 << " is wrong length");
+          ">>> ERROR (FerroicModel): List of critical values for variant " << i + 1 << " is wrong length");
       for (int j = 0; j < nVariants; j++) {
         tBarrier[transitionIndex] = array[j];
         transitionIndex++;
@@ -228,8 +215,7 @@ FerroicDriver<EvalT, Traits>::computeState(
 
       for (int i = 0; i < 3; i++) edisp(cell, qp, i) = D(i);
 
-      for (int vnt = 0; vnt < nVariants; vnt++)
-        newBinFractions[vnt](cell, qp) = newfractions[vnt];
+      for (int vnt = 0; vnt < nVariants; vnt++) newBinFractions[vnt](cell, qp) = newfractions[vnt];
     }
   }
 }
@@ -243,45 +229,37 @@ FerroicDriver<EvalT, Traits>::computeStateParallel(
     FieldMap                  eval_fields)
 /******************************************************************************/
 {
-  ALBANY_PANIC(
-      false, ">>> ERROR (FerroicDriver): computeStateParallel not implemented");
+  ALBANY_PANIC(false, ">>> ERROR (FerroicDriver): computeStateParallel not implemented");
 }
 
 /******************************************************************************/
 void
-parseBasis(
-    Teuchos::ParameterList const&              pBasis,
-    minitensor::Tensor<RealType, FM::THREE_D>& R)
+parseBasis(Teuchos::ParameterList const& pBasis, minitensor::Tensor<RealType, FM::THREE_D>& R)
 /******************************************************************************/
 {
   if (pBasis.isType<Teuchos::Array<RealType>>("X axis")) {
-    Teuchos::Array<RealType> Xhat =
-        pBasis.get<Teuchos::Array<RealType>>("X axis");
-    R(0, 0) = Xhat[0];
-    R(0, 1) = Xhat[1];
-    R(0, 2) = Xhat[2];
+    Teuchos::Array<RealType> Xhat = pBasis.get<Teuchos::Array<RealType>>("X axis");
+    R(0, 0)                       = Xhat[0];
+    R(0, 1)                       = Xhat[1];
+    R(0, 2)                       = Xhat[2];
   }
   if (pBasis.isType<Teuchos::Array<RealType>>("Y axis")) {
-    Teuchos::Array<RealType> Yhat =
-        pBasis.get<Teuchos::Array<RealType>>("Y axis");
-    R(1, 0) = Yhat[0];
-    R(1, 1) = Yhat[1];
-    R(1, 2) = Yhat[2];
+    Teuchos::Array<RealType> Yhat = pBasis.get<Teuchos::Array<RealType>>("Y axis");
+    R(1, 0)                       = Yhat[0];
+    R(1, 1)                       = Yhat[1];
+    R(1, 2)                       = Yhat[2];
   }
   if (pBasis.isType<Teuchos::Array<RealType>>("Z axis")) {
-    Teuchos::Array<RealType> Zhat =
-        pBasis.get<Teuchos::Array<RealType>>("Z axis");
-    R(2, 0) = Zhat[0];
-    R(2, 1) = Zhat[1];
-    R(2, 2) = Zhat[2];
+    Teuchos::Array<RealType> Zhat = pBasis.get<Teuchos::Array<RealType>>("Z axis");
+    R(2, 0)                       = Zhat[0];
+    R(2, 1)                       = Zhat[1];
+    R(2, 2)                       = Zhat[2];
   }
 }
 
 /******************************************************************************/
 void
-parseTensor4(
-    Teuchos::ParameterList const&               cParam,
-    minitensor::Tensor4<RealType, FM::THREE_D>& C)
+parseTensor4(Teuchos::ParameterList const& cParam, minitensor::Tensor4<RealType, FM::THREE_D>& C)
 /******************************************************************************/
 {
   // JR:  This should be generalized to read stiffness tensors of various
@@ -315,9 +293,7 @@ parseTensor4(
 }
 /******************************************************************************/
 void
-parseTensor3(
-    Teuchos::ParameterList const&               cParam,
-    minitensor::Tensor3<RealType, FM::THREE_D>& h)
+parseTensor3(Teuchos::ParameterList const& cParam, minitensor::Tensor3<RealType, FM::THREE_D>& h)
 /******************************************************************************/
 {
   // JR:  This should be generalized to read piezoelectric tensors of various
@@ -339,9 +315,7 @@ parseTensor3(
 }
 /******************************************************************************/
 void
-parseTensor(
-    Teuchos::ParameterList const&              cParam,
-    minitensor::Tensor<RealType, FM::THREE_D>& e)
+parseTensor(Teuchos::ParameterList const& cParam, minitensor::Tensor<RealType, FM::THREE_D>& e)
 /******************************************************************************/
 {
   // JR:  This should be generalized to read permittivity tensors of various
@@ -359,9 +333,7 @@ parseTensor(
 
 /******************************************************************************/
 FM::CrystalVariant
-parseCrystalVariant(
-    const Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& phases,
-    Teuchos::ParameterList const&                         vParam)
+parseCrystalVariant(const Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& phases, Teuchos::ParameterList const& vParam)
 /******************************************************************************/
 {
   ALBANY_PANIC(
@@ -379,13 +351,11 @@ parseCrystalVariant(
     ALBANY_ABORT(">>> ERROR (FerroicModel): Crystal variants require a phase.");
 
   ALBANY_PANIC(
-      phaseIndex < 0 || phaseIndex >= phases.size(),
-      ">>> ERROR (FerroicModel): Requested phase has not been defined.");
+      phaseIndex < 0 || phaseIndex >= phases.size(), ">>> ERROR (FerroicModel): Requested phase has not been defined.");
 
   if (vParam.isType<Teuchos::ParameterList>("Crystallographic Basis")) {
     cv.R.set_dimension(phases[phaseIndex]->C.get_dimension());
-    Teuchos::ParameterList const& pBasis =
-        vParam.get<Teuchos::ParameterList>("Crystallographic Basis");
+    Teuchos::ParameterList const& pBasis = vParam.get<Teuchos::ParameterList>("Crystallographic Basis");
     LCM::parseBasis(pBasis, cv.R);
   } else
     ALBANY_ABORT(
@@ -393,8 +363,7 @@ parseCrystalVariant(
         "basis.");
 
   if (vParam.isType<Teuchos::Array<RealType>>("Spontaneous Polarization")) {
-    Teuchos::Array<RealType> inVals =
-        vParam.get<Teuchos::Array<RealType>>("Spontaneous Polarization");
+    Teuchos::Array<RealType> inVals = vParam.get<Teuchos::Array<RealType>>("Spontaneous Polarization");
     ALBANY_PANIC(
         inVals.size() != FM::THREE_D,
         ">>> ERROR (FerroicModel): Expected 3 terms 'Spontaneous Polarization' "
@@ -407,8 +376,7 @@ parseCrystalVariant(
         "Polarization'.");
 
   if (vParam.isType<Teuchos::Array<RealType>>("Spontaneous Strain")) {
-    Teuchos::Array<RealType> inVals =
-        vParam.get<Teuchos::Array<RealType>>("Spontaneous Strain");
+    Teuchos::Array<RealType> inVals = vParam.get<Teuchos::Array<RealType>>("Spontaneous Strain");
     ALBANY_PANIC(
         inVals.size() != 6,
         ">>> ERROR (FerroicModel): Expected 6 voigt terms 'Spontaneous Strain' "

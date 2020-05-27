@@ -10,18 +10,12 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-TransportResidual<EvalT, Traits>::TransportResidual(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+TransportResidual<EvalT, Traits>::TransportResidual(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : scalar_(p.get<std::string>("Scalar Variable Name"), dl->qp_scalar),
-      scalar_grad_(
-          p.get<std::string>("Scalar Gradient Variable Name"),
-          dl->qp_vector),
+      scalar_grad_(p.get<std::string>("Scalar Gradient Variable Name"), dl->qp_vector),
       weights_(p.get<std::string>("Weights Name"), dl->qp_scalar),
       w_bf_(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
-      w_grad_bf_(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          dl->node_qp_vector),
+      w_grad_bf_(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       residual_(p.get<std::string>("Residual Name"), dl->node_scalar),
       have_source_(p.get<bool>("Have Source", false)),
       have_second_source_(p.get<bool>("Have Second Source", false)),
@@ -44,67 +38,55 @@ TransportResidual<EvalT, Traits>::TransportResidual(
   this->addDependentField(w_grad_bf_);
 
   if (have_source_) {
-    source_ =
-        decltype(source_)(p.get<std::string>("Source Name"), dl->qp_scalar);
+    source_ = decltype(source_)(p.get<std::string>("Source Name"), dl->qp_scalar);
     this->addDependentField(source_);
   }
 
   if (have_second_source_) {
-    second_source_ = decltype(second_source_)(
-        p.get<std::string>("Second Source Name"), dl->qp_scalar);
+    second_source_ = decltype(second_source_)(p.get<std::string>("Second Source Name"), dl->qp_scalar);
     this->addDependentField(second_source_);
   }
 
   if (have_transient_) {
-    scalar_dot_ = decltype(scalar_dot_)(
-        p.get<std::string>("Scalar Dot Name"), dl->qp_scalar);
+    scalar_dot_ = decltype(scalar_dot_)(p.get<std::string>("Scalar Dot Name"), dl->qp_scalar);
     this->addDependentField(scalar_dot_);
 
-    transient_coeff_ = decltype(transient_coeff_)(
-        p.get<std::string>("Transient Coefficient Name"), dl->qp_scalar);
+    transient_coeff_ = decltype(transient_coeff_)(p.get<std::string>("Transient Coefficient Name"), dl->qp_scalar);
     this->addDependentField(transient_coeff_);
 
-    delta_time_ = decltype(delta_time_)(
-        p.get<std::string>("Delta Time Name"), dl->workset_scalar);
+    delta_time_ = decltype(delta_time_)(p.get<std::string>("Delta Time Name"), dl->workset_scalar);
     this->addDependentField(delta_time_);
   }
 
   if (have_diffusion_) {
-    diffusivity_ = decltype(diffusivity_)(
-        p.get<std::string>("Diffusivity Name"), dl->qp_tensor);
+    diffusivity_ = decltype(diffusivity_)(p.get<std::string>("Diffusivity Name"), dl->qp_tensor);
     this->addDependentField(diffusivity_);
   }
 
   if (have_convection_) {
-    convection_vector_ = decltype(convection_vector_)(
-        p.get<std::string>("Convection Vector Name"), dl->qp_vector);
+    convection_vector_ = decltype(convection_vector_)(p.get<std::string>("Convection Vector Name"), dl->qp_vector);
     this->addDependentField(convection_vector_);
   }
 
   if (have_species_coupling_) {
-    species_coupling_ = decltype(species_coupling_)(
-        p.get<std::string>("Species Coupling Name"), dl->qp_scalar);
+    species_coupling_ = decltype(species_coupling_)(p.get<std::string>("Species Coupling Name"), dl->qp_scalar);
     this->addDependentField(species_coupling_);
   }
 
   if (have_stabilization_) {
-    stabilization_ = decltype(stabilization_)(
-        p.get<std::string>("Stabilization Name"), dl->qp_scalar);
+    stabilization_ = decltype(stabilization_)(p.get<std::string>("Stabilization Name"), dl->qp_scalar);
     this->addDependentField(stabilization_);
   }
 
   if (have_contact_) {
-    M_operator_ =
-        decltype(M_operator_)(p.get<std::string>("M Name"), dl->qp_scalar);
+    M_operator_ = decltype(M_operator_)(p.get<std::string>("M Name"), dl->qp_scalar);
     this->addDependentField(M_operator_);
   }
 
   if (have_transient_ && have_mechanics_ && (SolutionType_ != "Continuation")) {
-    stress_ =
-        decltype(stress_)(p.get<std::string>("Stress Name"), dl->qp_tensor);
+    stress_ = decltype(stress_)(p.get<std::string>("Stress Name"), dl->qp_tensor);
 
-    vel_grad_ = decltype(vel_grad_)(
-        p.get<std::string>("Velocity Gradient Variable Name"), dl->qp_tensor);
+    vel_grad_ = decltype(vel_grad_)(p.get<std::string>("Velocity Gradient Variable Name"), dl->qp_tensor);
 
     this->addDependentField(stress_);
     this->addDependentField(vel_grad_);
@@ -126,9 +108,7 @@ TransportResidual<EvalT, Traits>::TransportResidual(
 
 template <typename EvalT, typename Traits>
 void
-TransportResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+TransportResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(scalar_, fm);
   this->utils.setFieldData(scalar_grad_, fm);
@@ -150,9 +130,7 @@ TransportResidual<EvalT, Traits>::postRegistrationSetup(
 
   if (have_convection_) { this->utils.setFieldData(convection_vector_, fm); }
 
-  if (have_species_coupling_) {
-    this->utils.setFieldData(species_coupling_, fm);
-  }
+  if (have_species_coupling_) { this->utils.setFieldData(species_coupling_, fm); }
 
   if (have_stabilization_) { this->utils.setFieldData(stabilization_, fm); }
 
@@ -166,20 +144,16 @@ TransportResidual<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(residual_, fm);
 
   // initialize term1_
-  term1_ = Kokkos::createDynRankView(
-      scalar_.get_view(), "XXX", num_cells_, num_pts_);
+  term1_ = Kokkos::createDynRankView(scalar_.get_view(), "XXX", num_cells_, num_pts_);
 }
 
 template <typename EvalT, typename Traits>
 void
-TransportResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+TransportResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // zero out residual
   for (int cell = 0; cell < workset.numCells; ++cell) {
-    for (int node = 0; node < num_nodes_; ++node) {
-      residual_(cell, node) = 0.0;
-    }
+    for (int node = 0; node < num_nodes_; ++node) { residual_(cell, node) = 0.0; }
   }
 
   // transient term
@@ -187,9 +161,7 @@ TransportResidual<EvalT, Traits>::evaluateFields(
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int pt = 0; pt < num_pts_; ++pt) {
         for (int node = 0; node < num_nodes_; ++node) {
-          residual_(cell, node) += transient_coeff_(cell, pt) *
-                                   w_bf_(cell, node, pt) *
-                                   scalar_dot_(cell, pt);
+          residual_(cell, node) += transient_coeff_(cell, pt) * w_bf_(cell, node, pt) * scalar_dot_(cell, pt);
         }
       }
     }
@@ -204,9 +176,7 @@ TransportResidual<EvalT, Traits>::evaluateFields(
         // zeros.
         term1_(cell, pt) = ScalarT(0.0);
         for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) {
-            sum += stress_(cell, pt, i, j) * vel_grad_(cell, pt, i, j);
-          }
+          for (int j = 0; j < num_dims_; ++j) { sum += stress_(cell, pt, i, j) * vel_grad_(cell, pt, i, j); }
         }
         term1_(cell, pt) = sum;
       }
@@ -229,9 +199,8 @@ TransportResidual<EvalT, Traits>::evaluateFields(
         for (int node = 0; node < num_nodes_; ++node) {
           for (int i = 0; i < num_dims_; ++i) {
             for (int j = 0; j < num_dims_; ++j) {
-              residual_(cell, node) += w_grad_bf_(cell, node, pt, i) *
-                                       diffusivity_(cell, pt, i, j) *
-                                       scalar_grad_(cell, pt, j);
+              residual_(cell, node) +=
+                  w_grad_bf_(cell, node, pt, i) * diffusivity_(cell, pt, i, j) * scalar_grad_(cell, pt, j);
             }
           }
         }
@@ -255,8 +224,7 @@ TransportResidual<EvalT, Traits>::evaluateFields(
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t pt = 0; pt < num_pts_; ++pt) {
         for (std::size_t node = 0; node < num_nodes_; ++node) {
-          residual_(cell, node) -=
-              w_bf_(cell, node, pt) * second_source_(cell, pt);
+          residual_(cell, node) -= w_bf_(cell, node, pt) * second_source_(cell, pt);
         }
       }
     }
@@ -268,9 +236,8 @@ TransportResidual<EvalT, Traits>::evaluateFields(
       for (int pt = 0; pt < num_pts_; ++pt) {
         for (int node = 0; node < num_nodes_; ++node) {
           for (int dim = 0; dim < num_dims_; ++dim) {
-            residual_(cell, node) += w_bf_(cell, node, pt) *
-                                     convection_vector_(cell, pt, dim) *
-                                     scalar_grad_(cell, pt, dim);
+            residual_(cell, node) +=
+                w_bf_(cell, node, pt) * convection_vector_(cell, pt, dim) * scalar_grad_(cell, pt, dim);
           }
         }
       }

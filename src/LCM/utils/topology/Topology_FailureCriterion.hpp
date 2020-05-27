@@ -139,8 +139,7 @@ class FractureCriterionRandom : public AbstractFailureCriterion
   {
     stk::mesh::EntityRank const rank = bulk_data.entity_rank(interface);
 
-    stk::mesh::EntityRank const rank_up =
-        static_cast<stk::mesh::EntityRank>(rank + 1);
+    stk::mesh::EntityRank const rank_up = static_cast<stk::mesh::EntityRank>(rank + 1);
 
     size_t const num_connected = bulk_data.num_connectivity(interface, rank_up);
 
@@ -167,9 +166,7 @@ class FractureCriterionOnce : public AbstractFailureCriterion
 {
  public:
   FractureCriterionOnce(Topology& topology, double const probability)
-      : AbstractFailureCriterion(topology),
-        probability_(probability),
-        open_(true)
+      : AbstractFailureCriterion(topology), probability_(probability), open_(true)
   {
   }
 
@@ -178,8 +175,7 @@ class FractureCriterionOnce : public AbstractFailureCriterion
   {
     stk::mesh::EntityRank const rank = bulk_data.entity_rank(interface);
 
-    stk::mesh::EntityRank const rank_up =
-        static_cast<stk::mesh::EntityRank>(rank + 1);
+    stk::mesh::EntityRank const rank_up = static_cast<stk::mesh::EntityRank>(rank + 1);
 
     size_t const num_connected = bulk_data.num_connectivity(interface, rank_up);
 
@@ -248,9 +244,7 @@ class FractureCriterionTraction : public AbstractFailureCriterion
 class BulkFailureCriterion : public AbstractFailureCriterion
 {
  public:
-  BulkFailureCriterion(
-      Topology&          topology,
-      std::string const& failure_indicator_name);
+  BulkFailureCriterion(Topology& topology, std::string const& failure_indicator_name);
 
   bool
   check(stk::mesh::BulkData& bulk_data, stk::mesh::Entity element);

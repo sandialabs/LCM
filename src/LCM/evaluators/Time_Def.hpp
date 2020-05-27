@@ -13,9 +13,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 Time<EvalT, Traits>::Time(Teuchos::ParameterList& p)
-    : time(
-          p.get<std::string>("Time Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Workset Scalar Data Layout")),
+    : time(p.get<std::string>("Time Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Workset Scalar Data Layout")),
       deltaTime(
           p.get<std::string>("Delta Time Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Workset Scalar Data Layout")),
@@ -27,8 +25,7 @@ Time<EvalT, Traits>::Time(Teuchos::ParameterList& p)
     enableTransient = true;
 
   // Add Time as a Sacado-ized parameter
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
   this->registerSacadoParameter("Time", paramLib);
 
   this->addEvaluatedField(time);
@@ -41,9 +38,7 @@ Time<EvalT, Traits>::Time(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-Time<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+Time<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(time, fm);
   this->utils.setFieldData(deltaTime, fm);

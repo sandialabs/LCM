@@ -7,5 +7,4 @@
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_SideQuadPointsToSideInterpolation_Def.hpp"
 
-PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(
-    PHAL::SideQuadPointsToSideInterpolationBase)
+PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE(PHAL::SideQuadPointsToSideInterpolationBase)

@@ -64,9 +64,7 @@ class ThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   ThermalConductivity(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -106,10 +104,7 @@ class ThermalConductivity : public PHX::EvaluatorWithBaseImpl<Traits>,
   //! Convenience function to initialize thermal conductivity based on
   //  Truncated KL Expansion || Log Normal RF
   void
-  init_KL_RF(
-      std::string&            type,
-      Teuchos::ParameterList& subList,
-      Teuchos::ParameterList& p);
+  init_KL_RF(std::string& type, Teuchos::ParameterList& subList, Teuchos::ParameterList& p);
 
   SG_RF randField;
 };

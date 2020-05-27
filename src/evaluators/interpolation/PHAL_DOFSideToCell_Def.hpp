@@ -25,52 +25,38 @@ DOFSideToCellBase<EvalT, Traits, ScalarT>::DOFSideToCellBase(
   std::string                   layout_str = p.get<std::string>("Data Layout");
 
   if (layout_str == "Cell Scalar") {
-    val_cell = decltype(val_cell)(
-        p.get<std::string>("Cell Variable Name"), dl->cell_scalar2);
-    val_side = decltype(val_side)(
-        p.get<std::string>("Side Variable Name"), dl_side->cell_scalar2);
+    val_cell = decltype(val_cell)(p.get<std::string>("Cell Variable Name"), dl->cell_scalar2);
+    val_side = decltype(val_side)(p.get<std::string>("Side Variable Name"), dl_side->cell_scalar2);
 
     layout = CELL_SCALAR;
   } else if (layout_str == "Cell Vector") {
-    val_cell = decltype(val_cell)(
-        p.get<std::string>("Cell Variable Name"), dl->cell_vector);
-    val_side = decltype(val_side)(
-        p.get<std::string>("Side Variable Name"), dl_side->cell_vector);
+    val_cell = decltype(val_cell)(p.get<std::string>("Cell Variable Name"), dl->cell_vector);
+    val_side = decltype(val_side)(p.get<std::string>("Side Variable Name"), dl_side->cell_vector);
 
     layout = CELL_VECTOR;
   } else if (layout_str == "Cell Tensor") {
-    val_cell = decltype(val_cell)(
-        p.get<std::string>("Cell Variable Name"), dl->cell_tensor);
-    val_side = decltype(val_side)(
-        p.get<std::string>("Side Variable Name"), dl_side->cell_tensor);
+    val_cell = decltype(val_cell)(p.get<std::string>("Cell Variable Name"), dl->cell_tensor);
+    val_side = decltype(val_side)(p.get<std::string>("Side Variable Name"), dl_side->cell_tensor);
 
     layout = CELL_TENSOR;
   } else if (layout_str == "Node Scalar") {
-    val_cell = decltype(val_cell)(
-        p.get<std::string>("Cell Variable Name"), dl->node_scalar);
-    val_side = decltype(val_side)(
-        p.get<std::string>("Side Variable Name"), dl_side->node_scalar);
+    val_cell = decltype(val_cell)(p.get<std::string>("Cell Variable Name"), dl->node_scalar);
+    val_side = decltype(val_side)(p.get<std::string>("Side Variable Name"), dl_side->node_scalar);
 
     layout = NODE_SCALAR;
   } else if (layout_str == "Node Vector") {
-    val_cell = decltype(val_cell)(
-        p.get<std::string>("Cell Variable Name"), dl->node_vector);
-    val_side = decltype(val_side)(
-        p.get<std::string>("Side Variable Name"), dl_side->node_vector);
+    val_cell = decltype(val_cell)(p.get<std::string>("Cell Variable Name"), dl->node_vector);
+    val_side = decltype(val_side)(p.get<std::string>("Side Variable Name"), dl_side->node_vector);
 
     layout = NODE_VECTOR;
   } else if (layout_str == "Node Tensor") {
-    val_cell = decltype(val_cell)(
-        p.get<std::string>("Cell Variable Name"), dl->node_tensor);
-    val_side = decltype(val_side)(
-        p.get<std::string>("Side Variable Name"), dl_side->node_tensor);
+    val_cell = decltype(val_cell)(p.get<std::string>("Cell Variable Name"), dl->node_tensor);
+    val_side = decltype(val_side)(p.get<std::string>("Side Variable Name"), dl_side->node_tensor);
 
     layout = NODE_TENSOR;
   } else if (layout_str == "Vertex Vector") {
-    val_cell = decltype(val_cell)(
-        p.get<std::string>("Cell Variable Name"), dl->vertices_vector);
-    val_side = decltype(val_side)(
-        p.get<std::string>("Side Variable Name"), dl_side->vertices_vector);
+    val_cell = decltype(val_cell)(p.get<std::string>("Cell Variable Name"), dl->vertices_vector);
+    val_side = decltype(val_side)(p.get<std::string>("Side Variable Name"), dl_side->vertices_vector);
 
     layout = VERTEX_VECTOR;
   } else {
@@ -83,8 +69,7 @@ DOFSideToCellBase<EvalT, Traits, ScalarT>::DOFSideToCellBase(
   int sideDim  = cellType->getDimension() - 1;
   int numSides = cellType->getSideCount();
 
-  if (layout == NODE_SCALAR || layout == NODE_VECTOR || layout == NODE_TENSOR ||
-      layout == VERTEX_VECTOR) {
+  if (layout == NODE_SCALAR || layout == NODE_VECTOR || layout == NODE_TENSOR || layout == VERTEX_VECTOR) {
     sideNodes.resize(numSides);
     for (int side = 0; side < numSides; ++side) {
       // Need to get the subcell exact count, since different sides may have
@@ -118,13 +103,11 @@ DOFSideToCellBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFSideToCellBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFSideToCellBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
 
-  std::vector<Albany::SideStruct> const& sideSet =
-      workset.sideSets->at(sideSetName);
+  std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell
     int const cell = it_side.elem_LID;
@@ -134,34 +117,28 @@ DOFSideToCellBase<EvalT, Traits, ScalarT>::evaluateFields(
       case CELL_SCALAR: val_cell(cell) = val_side(cell, side); break;
 
       case CELL_VECTOR:
-        for (int i = 0; i < dims[2]; ++i)
-          val_cell(cell, i) = val_side(cell, side, i);
+        for (int i = 0; i < dims[2]; ++i) val_cell(cell, i) = val_side(cell, side, i);
         break;
 
       case CELL_TENSOR:
         for (int i = 0; i < dims[2]; ++i)
-          for (int j = 0; j < dims[3]; ++j)
-            val_cell(cell, i, j) = val_side(cell, side, i, j);
+          for (int j = 0; j < dims[3]; ++j) val_cell(cell, i, j) = val_side(cell, side, i, j);
         break;
 
       case NODE_SCALAR:
-        for (int node = 0; node < dims[2]; ++node)
-          val_cell(cell, sideNodes[side][node]) = val_side(cell, side, node);
+        for (int node = 0; node < dims[2]; ++node) val_cell(cell, sideNodes[side][node]) = val_side(cell, side, node);
         break;
 
       case NODE_VECTOR:
       case VERTEX_VECTOR:
         for (int node = 0; node < dims[2]; ++node)
-          for (int i = 0; i < dims[3]; ++i)
-            val_cell(cell, sideNodes[side][node], i) =
-                val_side(cell, side, node, i);
+          for (int i = 0; i < dims[3]; ++i) val_cell(cell, sideNodes[side][node], i) = val_side(cell, side, node, i);
         break;
       case NODE_TENSOR:
         for (int node = 0; node < dims[2]; ++node)
           for (int i = 0; i < dims[3]; ++i)
             for (int j = 0; j < dims[4]; ++j)
-              val_cell(cell, sideNodes[side][node], i, j) =
-                  val_side(cell, side, node, i, j);
+              val_cell(cell, sideNodes[side][node], i, j) = val_side(cell, side, node, i, j);
         break;
       default:
         ALBANY_ABORT(

@@ -24,10 +24,8 @@ struct EigendataStruct
     eigenvalueRe = Teuchos::rcp(new std::vector<double>(*(src.eigenvalueRe)));
     eigenvalueIm = Teuchos::rcp(new std::vector<double>(*(src.eigenvalueIm)));
 
-    eigenvectorRe = Thyra::createMembers(
-        src.eigenvectorRe->range(), src.eigenvectorRe->domain()->dim());
-    eigenvectorIm = Thyra::createMembers(
-        src.eigenvectorIm->range(), src.eigenvectorIm->domain()->dim());
+    eigenvectorRe = Thyra::createMembers(src.eigenvectorRe->range(), src.eigenvectorRe->domain()->dim());
+    eigenvectorIm = Thyra::createMembers(src.eigenvectorIm->range(), src.eigenvectorIm->domain()->dim());
   };
 
   Teuchos::RCP<std::vector<double>> eigenvalueRe;

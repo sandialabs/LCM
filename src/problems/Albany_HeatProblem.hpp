@@ -50,9 +50,7 @@ class HeatProblem : public AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -90,8 +88,7 @@ class HeatProblem : public AbstractProblem
   void
   constructDirichletEvaluators(std::vector<std::string> const& nodeSetIDs);
   void
-  constructNeumannEvaluators(
-      const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
+  constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs);
 
  protected:
   //! Boundary conditions on source term
@@ -147,17 +144,15 @@ Albany::HeatProblem::constructEvaluators(
 
   const CellTopologyData* const elem_top = &meshSpecs.ctd;
 
-  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
-      Albany::getIntrepid2Basis(*elem_top);
-  RCP<shards::CellTopology> cellType = rcp(new shards::CellTopology(elem_top));
+  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis = Albany::getIntrepid2Basis(*elem_top);
+  RCP<shards::CellTopology>                              cellType      = rcp(new shards::CellTopology(elem_top));
 
   int const numNodes    = intrepidBasis->getCardinality();
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cellCubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(
-          *cellType, meshSpecs.cubatureDegree);
+      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPtsCell = cellCubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
@@ -168,12 +163,10 @@ Albany::HeatProblem::constructEvaluators(
       "Albany_HeatProblem must be defined as a steady or transient "
       "calculation.");
 
-  *out << "Field Dimensions: Workset=" << worksetSize
-       << ", Vertices= " << numVertices << ", Nodes= " << numNodes
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
        << ", QuadPts= " << numQPtsCell << ", Dim= " << numDim << std::endl;
 
-  dl = rcp(new Albany::Layouts(
-      worksetSize, numVertices, numNodes, numQPtsCell, numDim));
+  dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPtsCell, numDim));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
 
   // Temporary variable used numerous times below
@@ -187,37 +180,26 @@ Albany::HeatProblem::constructEvaluators(
   resid_names[0] = "Temperature Residual";
 
   if (number_of_time_deriv == 1)
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator(
-            false, dof_names, dof_names_dot));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot));
   else
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator_noTransient(
-            false, dof_names));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(false, resid_names));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherCoordinateVectorEvaluator());
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(
-          cellType, intrepidBasis, cellCubature));
+      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cellCubature));
 
   for (unsigned int i = 0; i < neq; i++) {
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFInterpolationEvaluator(dof_names[i]));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[i]));
 
     if (number_of_time_deriv == 1)
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i]));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i]));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
 
   if (!conductivityIsDistParam) {  // Thermal conductivity
@@ -239,8 +221,7 @@ Albany::HeatProblem::constructEvaluators(
     // element block
     p->set<string>("Element Block Name", meshSpecs.ebName);
 
-    if (materialDB != Teuchos::null)
-      p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", materialDB);
+    if (materialDB != Teuchos::null) p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", materialDB);
 
     ev = rcp(new PHAL::ThermalConductivity<EvalT, AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
@@ -264,27 +245,18 @@ Albany::HeatProblem::constructEvaluators(
 
   if (dirichletIsDistParam) {
     // Here is how to register the field for dirichlet condition.
-    RCP<ParameterList>                   p = rcp(new ParameterList);
-    Albany::StateStruct::MeshFieldEntity entity =
-        Albany::StateStruct::NodalDistParameter;
-    std::string stateName = "dirichlet_field";
-    p                     = stateMgr.registerStateVariable(
-        stateName,
-        dl->node_scalar,
-        meshSpecs.ebName,
-        true,
-        &entity,
-        meshPartDirichlet);
+    RCP<ParameterList>                   p         = rcp(new ParameterList);
+    Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::NodalDistParameter;
+    std::string                          stateName = "dirichlet_field";
+    p = stateMgr.registerStateVariable(stateName, dl->node_scalar, meshSpecs.ebName, true, &entity, meshPartDirichlet);
   }
 
   if (conductivityIsDistParam) {
-    RCP<ParameterList>                   p = rcp(new ParameterList);
-    Albany::StateStruct::MeshFieldEntity entity =
-        Albany::StateStruct::NodalDistParameter;
-    std::string stateName = "thermal_conductivity";
-    std::string fieldName = "ThermalConductivity";
-    p                     = stateMgr.registerStateVariable(
-        stateName, dl->node_scalar, meshSpecs.ebName, true, &entity, "");
+    RCP<ParameterList>                   p         = rcp(new ParameterList);
+    Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::NodalDistParameter;
+    std::string                          stateName = "thermal_conductivity";
+    std::string                          fieldName = "ThermalConductivity";
+    p = stateMgr.registerStateVariable(stateName, dl->node_scalar, meshSpecs.ebName, true, &entity, "");
 
     // Gather parameter (similarly to what done with the solution)
     ev = evalUtils.constructGatherScalarNodalParameter(stateName, fieldName);
@@ -293,21 +265,17 @@ Albany::HeatProblem::constructEvaluators(
     // Scalar Nodal parameter is stored as a ParamScalarT, while the residual
     // evaluator expect a ScalarT. Hence, if ScalarT!=ParamScalarT, we need to
     // convert the field into a ScalarT
-    if (!std::is_same<typename EvalT::ScalarT, typename EvalT::ParamScalarT>::
-            value) {
+    if (!std::is_same<typename EvalT::ScalarT, typename EvalT::ParamScalarT>::value) {
       p->set<Teuchos::RCP<PHX::DataLayout>>("Data Layout", dl->node_scalar);
       p->set<std::string>("Field Name", fieldName);
-      ev = Teuchos::rcp(
-          new PHAL::ConvertFieldTypePSTtoST<EvalT, PHAL::AlbanyTraits>(*p));
+      ev = Teuchos::rcp(new PHAL::ConvertFieldTypePSTtoST<EvalT, PHAL::AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
     }
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFInterpolationEvaluator(fieldName));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(fieldName));
 
     stateName = "thermal_conductivity_sensitivity";
-    p         = stateMgr.registerStateVariable(
-        stateName, dl->node_scalar, meshSpecs.ebName, true, &entity, "");
+    p         = stateMgr.registerStateVariable(stateName, dl->node_scalar, meshSpecs.ebName, true, &entity, "");
   }
 
   // Check and see if a source term is specified for this problem in the main
@@ -337,8 +305,7 @@ Albany::HeatProblem::constructEvaluators(
 
     // Is the source function active for "this" element block?
 
-    haveSource =
-        materialDB->isElementBlockSublist(meshSpecs.ebName, "Source Functions");
+    haveSource = materialDB->isElementBlockSublist(meshSpecs.ebName, "Source Functions");
 
     if (haveSource) {
       RCP<ParameterList> p = rcp(new ParameterList);
@@ -348,8 +315,7 @@ Albany::HeatProblem::constructEvaluators(
       p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl->qp_scalar);
 
       p->set<RCP<ParamLib>>("Parameter Library", paramLib);
-      Teuchos::ParameterList& paramList = materialDB->getElementBlockSublist(
-          meshSpecs.ebName, "Source Functions");
+      Teuchos::ParameterList& paramList = materialDB->getElementBlockSublist(meshSpecs.ebName, "Source Functions");
       p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
       ev = rcp(new PHAL::Source<EvalT, AlbanyTraits>(*p));
@@ -384,10 +350,8 @@ Albany::HeatProblem::constructEvaluators(
     p->set<string>("Weighted Gradient BF Name", "wGrad BF");
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl->node_qp_vector);
     if (params->isType<string>("Convection Velocity"))
-      p->set<string>(
-          "Convection Velocity", params->get<string>("Convection Velocity"));
-    if (params->isType<bool>("Have Rho Cp"))
-      p->set<bool>("Have Rho Cp", params->get<bool>("Have Rho Cp"));
+      p->set<string>("Convection Velocity", params->get<string>("Convection Velocity"));
+    if (params->isType<bool>("Have Rho Cp")) p->set<bool>("Have Rho Cp", params->get<bool>("Have Rho Cp"));
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");
@@ -405,8 +369,7 @@ Albany::HeatProblem::constructEvaluators(
 
   else if (fieldManagerChoice == Albany::BUILD_RESPONSE_FM) {
     Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> respUtils(dl);
-    return respUtils.constructResponses(
-        fm0, *responseList, Teuchos::null, stateMgr);
+    return respUtils.constructResponses(fm0, *responseList, Teuchos::null, stateMgr);
   }
 
   return Teuchos::null;

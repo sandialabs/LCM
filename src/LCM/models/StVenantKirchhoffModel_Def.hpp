@@ -58,8 +58,7 @@ StVenantKirchhoffModel<EvalT, Traits>::computeState(
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) /
-               (1. + poissons_ratio(cell, pt)) /
+      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) / (1. + poissons_ratio(cell, pt)) /
                (1 - 2 * poissons_ratio(cell, pt));
       mu = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
       F.fill(def_grad, cell, pt, 0, 0);
@@ -68,9 +67,7 @@ StVenantKirchhoffModel<EvalT, Traits>::computeState(
       S     = lambda * minitensor::trace(E) * I + 2.0 * mu * E;
       sigma = (1.0 / minitensor::det(F)) * F * S * minitensor::transpose(F);
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = sigma(i, j);
-        }
+        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
       }
     }
   }

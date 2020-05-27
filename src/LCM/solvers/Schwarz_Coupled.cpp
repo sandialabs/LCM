@@ -18,9 +18,9 @@
 namespace LCM {
 
 SchwarzCoupled::SchwarzCoupled(
-    Teuchos::RCP<Teuchos::ParameterList> const&   app_params,
-    Teuchos::RCP<Teuchos::Comm<int> const> const& comm,
-    Teuchos::RCP<Thyra_Vector const> const&       initial_guess,
+    Teuchos::RCP<Teuchos::ParameterList> const&                        app_params,
+    Teuchos::RCP<Teuchos::Comm<int> const> const&                      comm,
+    Teuchos::RCP<Thyra_Vector const> const&                            initial_guess,
     Teuchos::RCP<Thyra::LinearOpWithSolveFactoryBase<ST> const> const& lowsfb)
     : supports_xdot_(false)
 {
@@ -31,26 +31,22 @@ SchwarzCoupled::SchwarzCoupled(
   num_dist_params_total_ = 0;
 
   // Get "Coupled Schwarz" parameter sublist
-  Teuchos::ParameterList& coupled_system_params =
-      app_params->sublist("Coupled System");
+  Teuchos::ParameterList& coupled_system_params = app_params->sublist("Coupled System");
 
   // Get names of individual model input files from problem parameterlist
   Teuchos::Array<std::string> model_filenames =
-      coupled_system_params.get<Teuchos::Array<std::string>>(
-          "Model Input Files");
+      coupled_system_params.get<Teuchos::Array<std::string>>("Model Input Files");
 
   // number of models
   num_models_ = model_filenames.size();
 
   // Create application name-index map used for Schwarz BC.
-  Teuchos::RCP<std::map<std::string, int>> app_name_index_map =
-      Teuchos::rcp(new std::map<std::string, int>);
+  Teuchos::RCP<std::map<std::string, int>> app_name_index_map = Teuchos::rcp(new std::map<std::string, int>);
 
   for (auto app_index = 0; app_index < num_models_; ++app_index) {
     std::string const& app_name = model_filenames[app_index];
 
-    std::pair<std::string, int> app_name_index =
-        std::make_pair(app_name, app_index);
+    std::pair<std::string, int> app_name_index = std::make_pair(app_name, app_index);
 
     app_name_index_map->insert(app_name_index);
   }
@@ -64,15 +60,12 @@ SchwarzCoupled::SchwarzCoupled(
 
   // Check if problem is matrix-free
   std::string const jacob_op =
-      piroPL.isParameter("Jacobian Operator") == true ?
-          piroPL.get<std::string>("Jacobian Operator") :
-          "";
+      piroPL.isParameter("Jacobian Operator") == true ? piroPL.get<std::string>("Jacobian Operator") : "";
 
   // Get matrix-free preconditioner from input file
-  std::string const mf_prec =
-      coupled_system_params.isParameter("Matrix-Free Preconditioner") == true ?
-          coupled_system_params.get<std::string>("Matrix-Free Preconditioner") :
-          "None";
+  std::string const mf_prec = coupled_system_params.isParameter("Matrix-Free Preconditioner") == true ?
+                                  coupled_system_params.get<std::string>("Matrix-Free Preconditioner") :
+                                  "None";
 
   if (mf_prec == "None") {
     mf_prec_type_ = NONE;
@@ -103,11 +96,9 @@ SchwarzCoupled::SchwarzCoupled(
         if (dirPL.isSublist("Newton")) {
           Teuchos::ParameterList& newPL = dirPL.sublist("Newton", true);
           if (newPL.isSublist("Stratimikos Linear Solver")) {
-            Teuchos::ParameterList& stratLSPL =
-                newPL.sublist("Stratimikos Linear Solver", true);
+            Teuchos::ParameterList& stratLSPL = newPL.sublist("Stratimikos Linear Solver", true);
             if (stratLSPL.isSublist("Stratimikos")) {
-              Teuchos::ParameterList& stratPL =
-                  stratLSPL.sublist("Stratimikos", true);
+              Teuchos::ParameterList& stratPL = stratLSPL.sublist("Stratimikos", true);
               stratPL.set<std::string>("Preconditioner Type", "None");
             }
           }
@@ -119,18 +110,15 @@ SchwarzCoupled::SchwarzCoupled(
   // Create a NOX status test and associated machinery for cutting the
   // global time step when the constitutive model's state
   // update routine fails
-  Teuchos::RCP<NOX::StatusTest::Generic> nox_status_test =
-      Teuchos::rcp(new NOX::StatusTest::ModelEvaluatorFlag);
+  Teuchos::RCP<NOX::StatusTest::Generic> nox_status_test = Teuchos::rcp(new NOX::StatusTest::ModelEvaluatorFlag);
 
-  Teuchos::RCP<NOX::Abstract::PrePostOperator> pre_post_operator =
-      Teuchos::rcp(new LCM::SolutionSniffer);
+  Teuchos::RCP<NOX::Abstract::PrePostOperator> pre_post_operator = Teuchos::rcp(new LCM::SolutionSniffer);
 
   Teuchos::RCP<LCM::SolutionSniffer> nox_solver_pre_post_operator =
       Teuchos::rcp_dynamic_cast<LCM::SolutionSniffer>(pre_post_operator);
 
   Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> status_test =
-      Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(
-          nox_status_test);
+      Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(nox_status_test);
 
   // Acquire the NOX "Solver Options" and "Status Tests" parameter lists
   Teuchos::RCP<Teuchos::ParameterList> solver_options_pl;
@@ -149,21 +137,15 @@ SchwarzCoupled::SchwarzCoupled(
 
       auto const have_opts = nox_list.isSublist("Solver Options");
 
-      if (have_opts == true) {
-        solver_options_pl =
-            Teuchos::rcpFromRef(nox_list.sublist("Solver Options"));
-      }
+      if (have_opts == true) { solver_options_pl = Teuchos::rcpFromRef(nox_list.sublist("Solver Options")); }
 
       auto const have_tests = nox_list.isSublist("Status Tests");
 
-      if (have_tests == true) {
-        status_tests_pl = Teuchos::rcpFromRef(nox_list.sublist("Status Tests"));
-      }
+      if (have_tests == true) { status_tests_pl = Teuchos::rcpFromRef(nox_list.sublist("Status Tests")); }
     }
   }
 
-  bool const have_opts_or_tests = solver_options_pl.is_null() == false &&
-                                  status_tests_pl.is_null() == false;
+  bool const have_opts_or_tests = solver_options_pl.is_null() == false && status_tests_pl.is_null() == false;
 
   if (have_opts_or_tests == true) {
     // Add the model evaulator flag as a status test.
@@ -199,20 +181,14 @@ SchwarzCoupled::SchwarzCoupled(
 
   // Get "Parameters" parameter sublist, if it exists
   if (problem_params.isSublist("Parameters")) {
-    parameter_params =
-        Teuchos::rcp(&(problem_params.sublist("Parameters")), false);
+    parameter_params = Teuchos::rcp(&(problem_params.sublist("Parameters")), false);
 
     auto const num_parameters =
-        parameter_params->isType<int>("Number") == true ?
-            parameter_params->get<int>("Number") :
-            0;
+        parameter_params->isType<int>("Number") == true ? parameter_params->get<int>("Number") : 0;
 
     bool const using_old_parameter_list = num_parameters > 0 ? true : false;
 
-    num_params_total_ =
-        num_parameters > 0 ?
-            1 :
-            parameter_params->get("Number of Parameter Vectors", 0);
+    num_params_total_ = num_parameters > 0 ? 1 : parameter_params->get("Number of Parameter Vectors", 0);
 
     // Get parameter names
     param_names_.resize(num_params_total_);
@@ -220,21 +196,16 @@ SchwarzCoupled::SchwarzCoupled(
       Teuchos::RCP<Teuchos::ParameterList const> p_list =
           using_old_parameter_list == true ?
               Teuchos::rcp(new Teuchos::ParameterList(*parameter_params)) :
-              Teuchos::rcp(
-                  &(parameter_params->sublist(
-                      Albany::strint("Parameter Vector", l))),
-                  false);
+              Teuchos::rcp(&(parameter_params->sublist(Albany::strint("Parameter Vector", l))), false);
 
       auto const num_parameters = p_list->get<int>("Number");
 
       ALBANY_EXPECT(num_parameters > 0);
 
-      param_names_[l] =
-          Teuchos::rcp(new Teuchos::Array<std::string>(num_parameters));
+      param_names_[l] = Teuchos::rcp(new Teuchos::Array<std::string>(num_parameters));
 
       for (auto k = 0; k < num_parameters; ++k) {
-        (*param_names_[l])[k] =
-            p_list->get<std::string>(Albany::strint("Parameter", k));
+        (*param_names_[l])[k] = p_list->get<std::string>(Albany::strint("Parameter", k));
       }
       std::cout << "Number of parameters in parameter vector ";
       std::cout << l << " = " << num_parameters << '\n';
@@ -250,19 +221,14 @@ SchwarzCoupled::SchwarzCoupled(
   num_responses_total_ = 0;
 
   if (problem_params.isSublist("Response Functions")) {
-    response_params =
-        Teuchos::rcp(&(problem_params.sublist("Response Functions")), false);
+    response_params = Teuchos::rcp(&(problem_params.sublist("Response Functions")), false);
 
-    auto const num_parameters = response_params->isType<int>("Number") == true ?
-                                    response_params->get<int>("Number") :
-                                    0;
+    auto const num_parameters =
+        response_params->isType<int>("Number") == true ? response_params->get<int>("Number") : 0;
 
     bool const using_old_response_list = num_parameters > 0 ? true : false;
 
-    num_responses_total_ =
-        num_parameters > 0 ?
-            1 :
-            response_params->get("Number of Response Vectors", 0);
+    num_responses_total_ = num_parameters > 0 ? 1 : response_params->get("Number of Response Vectors", 0);
 
     Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>> response_names;
 
@@ -272,21 +238,15 @@ SchwarzCoupled::SchwarzCoupled(
       Teuchos::RCP<Teuchos::ParameterList const> p_list =
           using_old_response_list == true ?
               Teuchos::rcp(new Teuchos::ParameterList(*response_params)) :
-              Teuchos::rcp(
-                  &(response_params->sublist(
-                      Albany::strint("Response Vector", l))),
-                  false);
+              Teuchos::rcp(&(response_params->sublist(Albany::strint("Response Vector", l))), false);
 
-      auto const num_params =
-          p_list->get<int>("Number") == true ? p_list->get<int>("Number") : 0;
+      auto const num_params = p_list->get<int>("Number") == true ? p_list->get<int>("Number") : 0;
 
       if (num_params > 0) {
-        response_names[l] =
-            Teuchos::rcp(new Teuchos::Array<std::string>(num_params));
+        response_names[l] = Teuchos::rcp(new Teuchos::Array<std::string>(num_params));
 
         for (auto k = 0; k < num_params; ++k) {
-          (*response_names[l])[k] =
-              p_list->get<std::string>(Albany::strint("Response", k));
+          (*response_names[l])[k] = p_list->get<std::string>(Albany::strint("Response", k));
         }
       }
     }
@@ -300,8 +260,7 @@ SchwarzCoupled::SchwarzCoupled(
   models_.resize(num_models_);
   model_app_params_.resize(num_models_);
 
-  Teuchos::Array<Teuchos::RCP<Teuchos::ParameterList>> model_problem_params(
-      num_models_);
+  Teuchos::Array<Teuchos::RCP<Teuchos::ParameterList>> model_problem_params(num_models_);
 
   disc_vss_.resize(num_models_);
 
@@ -309,8 +268,7 @@ SchwarzCoupled::SchwarzCoupled(
 
   precs_.resize(num_models_);
 
-  Teuchos::Array<Teuchos::RCP<Thyra_VectorSpace const>> disc_overlap_vss(
-      num_models_);
+  Teuchos::Array<Teuchos::RCP<Thyra_VectorSpace const>> disc_overlap_vss(num_models_);
 
   material_dbs_.resize(num_models_);
 
@@ -322,11 +280,9 @@ SchwarzCoupled::SchwarzCoupled(
 
     // solver_factory will go out of scope, so get a copy of the PL. We take
     // ownership and give weak pointers to everyone else.
-    model_app_params_[m] = Teuchos::rcp(
-        new Teuchos::ParameterList(solver_factory.getParameters()));
+    model_app_params_[m] = Teuchos::rcp(new Teuchos::ParameterList(solver_factory.getParameters()));
 
-    Teuchos::RCP<Teuchos::ParameterList> problem_params_m =
-        Teuchos::sublist(model_app_params_[m], "Problem");
+    Teuchos::RCP<Teuchos::ParameterList> problem_params_m = Teuchos::sublist(model_app_params_[m], "Problem");
 
     // Set Parameter sublists for individual models
     // to the parameters specified in the "master" coupled input file.
@@ -334,13 +290,12 @@ SchwarzCoupled::SchwarzCoupled(
       if (problem_params_m->isSublist("Parameters")) {
         std::cout << "parameters!" << '\n';
         ALBANY_ABORT(
-            "Error in CoupledSchwarz! Model input file "
-            << model_filenames[m] << " cannot have a 'Parameters' section!  "
-            << "Parameters must be specified in the 'master' input file "
-            << "driving the coupled problem.\n");
+            "Error in CoupledSchwarz! Model input file " << model_filenames[m]
+                                                         << " cannot have a 'Parameters' section!  "
+                                                         << "Parameters must be specified in the 'master' input file "
+                                                         << "driving the coupled problem.\n");
       }
-      Teuchos::ParameterList& param_params_m =
-          problem_params_m->sublist("Parameters", false);
+      Teuchos::ParameterList& param_params_m = problem_params_m->sublist("Parameters", false);
 
       param_params_m.setParametersNotAlreadySet(*parameter_params);
     }
@@ -351,14 +306,12 @@ SchwarzCoupled::SchwarzCoupled(
     if (response_params != Teuchos::null) {
       if (problem_params_m->isSublist("Response Functions")) {
         ALBANY_ABORT(
-            "Error in CoupledSchwarz! Model input file "
-            << model_filenames[m]
-            << " cannot have a 'Response Functions' section!  "
-            << "Responses must be specified in the 'master' input file "
-            << "driving the coupled problem.\n");
+            "Error in CoupledSchwarz! Model input file " << model_filenames[m]
+                                                         << " cannot have a 'Response Functions' section!  "
+                                                         << "Responses must be specified in the 'master' input file "
+                                                         << "driving the coupled problem.\n");
       }
-      Teuchos::ParameterList& response_params_m =
-          problem_params_m->sublist("Response Functions", false);
+      Teuchos::ParameterList& response_params_m = problem_params_m->sublist("Response Functions", false);
       response_params_m.setParametersNotAlreadySet(*response_params);
     }
 
@@ -368,8 +321,7 @@ SchwarzCoupled::SchwarzCoupled(
 
     std::cout << "Name of problem #" << m << ": " << problem_name << '\n';
 
-    bool const matdb_exists =
-        problem_params_m->isType<std::string>("MaterialDB Filename");
+    bool const matdb_exists = problem_params_m->isType<std::string>("MaterialDB Filename");
 
     if (matdb_exists == false) {
       ALBANY_ABORT(
@@ -377,11 +329,9 @@ SchwarzCoupled::SchwarzCoupled(
           << "Input file needs to have 'MaterialDB Filename' specified.\n");
     }
 
-    std::string const& matdb_file =
-        problem_params_m->get<std::string>("MaterialDB Filename");
+    std::string const& matdb_file = problem_params_m->get<std::string>("MaterialDB Filename");
 
-    material_dbs_[m] =
-        Teuchos::rcp(new Albany::MaterialDatabase(matdb_file, comm_));
+    material_dbs_[m] = Teuchos::rcp(new Albany::MaterialDatabase(matdb_file, comm_));
 
     std::cout << "Materials #" << m << ": " << matdb_file << '\n';
 
@@ -399,38 +349,28 @@ SchwarzCoupled::SchwarzCoupled(
 
     // Machinery for cutting the global time step from within the
     // constitutive model
-    model_app_params_[m]->sublist("Problem").set(
-        "Constitutive Model NOX Status Test", nox_status_test);
+    model_app_params_[m]->sublist("Problem").set("Constitutive Model NOX Status Test", nox_status_test);
 
     // create application for mth model
-    apps_[m] = Teuchos::rcp(new Albany::Application(
-        comm, model_app_params_[m].create_weak(), initial_guess, true));
+    apps_[m] = Teuchos::rcp(new Albany::Application(comm, model_app_params_[m].create_weak(), initial_guess, true));
 
-    int num_sol_vectors =
-        apps_[m]->getAdaptSolMgr()->getInitialSolution()->domain()->dim();
+    int num_sol_vectors = apps_[m]->getAdaptSolMgr()->getInitialSolution()->domain()->dim();
 
     if (num_sol_vectors > 1)  // have x dot
       supports_xdot_ = true;
 
     // Create model evaluator
-    models_[m] = Teuchos::rcp(new Albany::ModelEvaluator(
-        apps_[m], model_app_params_[m].create_weak()));
+    models_[m] = Teuchos::rcp(new Albany::ModelEvaluator(apps_[m], model_app_params_[m].create_weak()));
 
     // create array of individual model jacobians
     Teuchos::RCP<Thyra_LinearOp> const jac_temp =
-        Teuchos::nonnull(models_[m]->create_W_op()) ?
-            models_[m]->create_W_op() :
-            Teuchos::null;
+        Teuchos::nonnull(models_[m]->create_W_op()) ? models_[m]->create_W_op() : Teuchos::null;
 
-    jacs_[m] = Teuchos::nonnull(jac_temp) ?
-                   Teuchos::rcp_dynamic_cast<Thyra_LinearOp>(jac_temp, true) :
-                   Teuchos::null;
+    jacs_[m] = Teuchos::nonnull(jac_temp) ? Teuchos::rcp_dynamic_cast<Thyra_LinearOp>(jac_temp, true) : Teuchos::null;
 
     // create array of individual model preconditioners
     // these will have same graph as Jacobians for now
-    precs_[m] = Teuchos::nonnull(jac_temp) ?
-                    Teuchos::rcp_dynamic_cast<Thyra_LinearOp>(jac_temp, true) :
-                    Teuchos::null;
+    precs_[m] = Teuchos::nonnull(jac_temp) ? Teuchos::rcp_dynamic_cast<Thyra_LinearOp>(jac_temp, true) : Teuchos::null;
 
     if (Albany::isFillActive(precs_[m])) { Albany::fillComplete(precs_[m]); }
   }
@@ -443,8 +383,7 @@ SchwarzCoupled::SchwarzCoupled(
   for (auto m = 0; m < num_models_; ++m) {
     disc_vss_[m] = apps_[m]->getVectorSpace();
 
-    disc_overlap_vss[m] =
-        apps_[m]->getStateMgr().getDiscretization()->getOverlapVectorSpace();
+    disc_overlap_vss[m] = apps_[m]->getStateMgr().getDiscretization()->getOverlapVectorSpace();
 
     solver_inargs_[m]  = models_[m]->createInArgs();
     solver_outargs_[m] = models_[m]->createOutArgs();
@@ -455,9 +394,7 @@ SchwarzCoupled::SchwarzCoupled(
   // for use in evalModelImpl
   sacado_param_vecs_.resize(num_models_);
 
-  for (auto m = 0; m < num_models_; ++m) {
-    sacado_param_vecs_[m].resize(num_params_total_);
-  }
+  for (auto m = 0; m < num_models_; ++m) { sacado_param_vecs_[m].resize(num_params_total_); }
 
   for (auto m = 0; m < num_models_; ++m) {
     for (auto l = 0; l < num_params_total_; ++l) {
@@ -468,17 +405,14 @@ SchwarzCoupled::SchwarzCoupled(
         // "Parameters" PL
         // in the input file.
         // Give the user a hint about what might be happening
-        apps_[m]->getParamLib()->fillVector<PHAL::AlbanyTraits::Residual>(
-            *(param_names_[l]), sacado_param_vecs_[m][l]);
+        apps_[m]->getParamLib()->fillVector<PHAL::AlbanyTraits::Residual>(*(param_names_[l]), sacado_param_vecs_[m][l]);
       } catch (const std::logic_error& le) {
         std::cout << "Error: exception thrown from ParamLib fillVector in ";
         std::cout << __FILE__ << " line " << __LINE__ << '\n';
         std::cout << "This is probably due to something incorrect in the";
         std::cout << " \"Parameters\" list in the input file, ";
         std::cout << "one of the lines:" << '\n';
-        for (auto k = 0; k < param_names_[l]->size(); ++k) {
-          std::cout << "      " << (*param_names_[l])[k] << '\n';
-        }
+        for (auto k = 0; k < param_names_[l]->size(); ++k) { std::cout << "      " << (*param_names_[l])[k] << '\n'; }
         throw le;  // rethrow to shut things down
       }
     }
@@ -498,25 +432,17 @@ SchwarzCoupled::SchwarzCoupled(
   // TODO: Check if these are correct nominal values for parameters
 
   for (auto l = 0; l < num_params_total_; ++l) {
-    Teuchos::Array<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> p_spaces(
-        num_models_);
+    Teuchos::Array<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> p_spaces(num_models_);
 
-    for (auto m = 0; m < num_models_; ++m) {
-      p_spaces[m] = models_[m]->get_p_space(l);
-    }
+    for (auto m = 0; m < num_models_; ++m) { p_spaces[m] = models_[m]->get_p_space(l); }
 
-    Teuchos::RCP<Thyra::DefaultProductVectorSpace<ST> const> p_space =
-        Thyra::productVectorSpace<ST>(p_spaces);
+    Teuchos::RCP<Thyra::DefaultProductVectorSpace<ST> const> p_space = Thyra::productVectorSpace<ST>(p_spaces);
 
-    Teuchos::ArrayRCP<Teuchos::RCP<Thyra::VectorBase<ST> const>> p_vecs(
-        num_models_);
+    Teuchos::ArrayRCP<Teuchos::RCP<Thyra::VectorBase<ST> const>> p_vecs(num_models_);
 
-    for (auto m = 0; m < num_models_; ++m) {
-      p_vecs[m] = models_[m]->getNominalValues().get_p(l);
-    }
+    for (auto m = 0; m < num_models_; ++m) { p_vecs[m] = models_[m]->getNominalValues().get_p(l); }
 
-    Teuchos::RCP<Thyra::DefaultProductVector<ST>> p_prod_vec =
-        Thyra::defaultProductVector<ST>(p_space, p_vecs());
+    Teuchos::RCP<Thyra::DefaultProductVector<ST>> p_prod_vec = Thyra::defaultProductVector<ST>(p_space, p_vecs());
 
     if (Teuchos::is_null(p_prod_vec) == true) continue;
 
@@ -576,9 +502,7 @@ SchwarzCoupled::getThyraResponseSpace(int l) const
     // loop over all vectors and build the vector space
     std::vector<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> vs_array;
 
-    for (auto m = 0; m < num_models_; ++m) {
-      vs_array.push_back(apps_[m]->getResponse(l)->responseVectorSpace());
-    }
+    for (auto m = 0; m < num_models_; ++m) { vs_array.push_back(apps_[m]->getResponse(l)->responseVectorSpace()); }
 
     response_space_ = Thyra::productVectorSpace<ST>(vs_array);
   }
@@ -593,9 +517,7 @@ SchwarzCoupled::getThyraParamSpace(int l) const
     // loop over all vectors and build the vector space
     std::vector<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> vs_array;
 
-    for (auto m = 0; m < num_models_; ++m) {
-      vs_array.push_back(models_[m]->get_p_space(l));
-    }
+    for (auto m = 0; m < num_models_; ++m) { vs_array.push_back(models_[m]->get_p_space(l)); }
 
     param_space_ = Thyra::productVectorSpace<ST>(vs_array);
   }
@@ -687,8 +609,7 @@ SchwarzCoupled::create_W_op() const
 Teuchos::RCP<Thyra_Preconditioner>
 SchwarzCoupled::create_W_prec() const
 {
-  Teuchos::RCP<Thyra::DefaultPreconditioner<ST>> W_prec =
-      Teuchos::rcp(new Thyra::DefaultPreconditioner<ST>);
+  Teuchos::RCP<Thyra::DefaultPreconditioner<ST>> W_prec = Teuchos::rcp(new Thyra::DefaultPreconditioner<ST>);
 
   ALBANY_ASSERT(w_prec_supports_ == true, "Error! W_prec is not supported.");
 
@@ -696,8 +617,7 @@ SchwarzCoupled::create_W_prec() const
   for (auto m = 0; m < num_models_; m++) {
     if (Albany::isFillActive(precs_[m])) Albany::fillComplete(precs_[m]);
   }
-  Teuchos::RCP<Thyra::LinearOpBase<ST>> W_op =
-      jac.getThyraCoupledJacobian(precs_, apps_);
+  Teuchos::RCP<Thyra::LinearOpBase<ST>> W_op = jac.getThyraCoupledJacobian(precs_, apps_);
   W_prec->initializeRight(W_op);
 
   return W_prec;
@@ -728,13 +648,11 @@ SchwarzCoupled::allocateVectors()
 {
   // In this function, we create and set x_init and x_dot_init in
   // nominal_values_ for the coupled model.
-  Teuchos::Array<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> spaces(
-      num_models_);
+  Teuchos::Array<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> spaces(num_models_);
 
   for (auto m = 0; m < num_models_; ++m) { spaces[m] = disc_vss_[m]; }
 
-  Teuchos::RCP<Thyra::DefaultProductVectorSpace<ST> const> space =
-      Thyra::productVectorSpace<ST>(spaces);
+  Teuchos::RCP<Thyra::DefaultProductVectorSpace<ST> const> space = Thyra::productVectorSpace<ST>(spaces);
 
   Teuchos::ArrayRCP<Teuchos::RCP<Thyra::VectorBase<ST>>> xT_vecs;
 
@@ -744,8 +662,7 @@ SchwarzCoupled::allocateVectors()
   x_dotT_vecs.resize(num_models_);
 
   for (auto m = 0; m < num_models_; ++m) {
-    Teuchos::RCP<Thyra_MultiVector const> const xMV =
-        apps_[m]->getAdaptSolMgr()->getInitialSolution();
+    Teuchos::RCP<Thyra_MultiVector const> const xMV = apps_[m]->getAdaptSolMgr()->getInitialSolution();
 
     Teuchos::RCP<Thyra_Vector> xT_vec = Thyra::createMember(spaces[m]);
     Thyra::copy(*xMV->col(0), xT_vec.ptr());
@@ -762,8 +679,7 @@ SchwarzCoupled::allocateVectors()
     }
   }
 
-  Teuchos::RCP<Thyra::DefaultProductVector<ST>> xT_prod_vec =
-      Thyra::defaultProductVector<ST>(space, xT_vecs());
+  Teuchos::RCP<Thyra::DefaultProductVector<ST>> xT_prod_vec = Thyra::defaultProductVector<ST>(space, xT_vecs());
   nominal_values_.set_x(xT_prod_vec);
 
   if (supports_xdot_) {
@@ -806,13 +722,10 @@ SchwarzCoupled::createOutArgsImpl() const
 
   result.setSupports(Thyra::ModelEvaluatorBase::OUT_ARG_f, true);
   result.setSupports(Thyra::ModelEvaluatorBase::OUT_ARG_W_op, true);
-  result.setSupports(
-      Thyra::ModelEvaluatorBase::OUT_ARG_W_prec, w_prec_supports_);
+  result.setSupports(Thyra::ModelEvaluatorBase::OUT_ARG_W_prec, w_prec_supports_);
 
   result.set_W_properties(Thyra::ModelEvaluatorBase::DerivativeProperties(
-      Thyra::ModelEvaluatorBase::DERIV_LINEARITY_UNKNOWN,
-      Thyra::ModelEvaluatorBase::DERIV_RANK_FULL,
-      true));
+      Thyra::ModelEvaluatorBase::DERIV_LINEARITY_UNKNOWN, Thyra::ModelEvaluatorBase::DERIV_RANK_FULL, true));
 
   return result;
 }
@@ -825,16 +738,13 @@ SchwarzCoupled::evalModelImpl(
 {
   // Get x and x_dot from in_args
   Teuchos::RCP<const Thyra_ProductVector> x, x_dot, x_dotdot;
-  x = Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(
-      in_args.get_x(), true);
+  x = Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(in_args.get_x(), true);
   if (supports_xdot_ && !in_args.get_x_dot().is_null()) {
-    x_dot = Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(
-        in_args.get_x_dot(), true);
+    x_dot = Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(in_args.get_x_dot(), true);
   }
 
   // Create a Teuchos array of the x for each model
-  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> xs(num_models_),
-      x_dots(num_models_);
+  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> xs(num_models_), x_dots(num_models_);
 
   // x_dotdot not used, so just create a global Thyra Vector RCP
   Teuchos::RCP<Thyra_Vector const> x_dotdotT;
@@ -846,16 +756,13 @@ SchwarzCoupled::evalModelImpl(
     if (!x_dot.is_null()) { x_dots[m] = x_dot->getVectorBlock(m); }
   }
 
-  double const alpha =
-      (!x_dot.is_null() || !x_dotdot.is_null()) ? in_args.get_alpha() : 0.0;
+  double const alpha = (!x_dot.is_null() || !x_dotdot.is_null()) ? in_args.get_alpha() : 0.0;
 
   double const omega = 0.0;
 
-  double const beta =
-      (!x_dot.is_null() || !x_dotdot.is_null()) ? in_args.get_beta() : 1.0;
+  double const beta = (!x_dot.is_null() || !x_dotdot.is_null()) ? in_args.get_beta() : 1.0;
 
-  double const curr_time =
-      (!x_dot.is_null() || !x_dotdot.is_null()) ? in_args.get_t() : 0.0;
+  double const curr_time = (!x_dot.is_null() || !x_dotdot.is_null()) ? in_args.get_t() : 0.0;
 
   // Get parameters
   for (auto l = 0; l < num_params_total_; ++l) {
@@ -882,9 +789,7 @@ SchwarzCoupled::evalModelImpl(
   }
   // Get the output arguments
   Teuchos::RCP<Thyra_ProductVector> f_out;
-  if (!out_args.get_f().is_null()) {
-    f_out = Albany::getProductVector(out_args.get_f());
-  }
+  if (!out_args.get_f().is_null()) { f_out = Albany::getProductVector(out_args.get_f()); }
 
   // Create a Teuchos array of the f_out for each model.
   Teuchos::Array<Teuchos::RCP<Thyra_Vector>> fs_out(num_models_);
@@ -907,8 +812,7 @@ SchwarzCoupled::evalModelImpl(
   for (auto m = 0; m < num_models_; ++m) {
     double const time = 0.0;
 
-    Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc =
-        apps_[m]->getDiscretization();
+    Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = apps_[m]->getDiscretization();
 
     app_disc->writeSolutionToMeshDatabase(*xs[m], time);
   }
@@ -918,16 +822,7 @@ SchwarzCoupled::evalModelImpl(
     for (auto m = 0; m < num_models_; ++m) {
       // computeGlobalJacobianT sets fTs_out[m] and jacs_[m]
       apps_[m]->computeGlobalJacobian(
-          alpha,
-          beta,
-          omega,
-          curr_time,
-          xs[m],
-          x_dots[m],
-          x_dotdot,
-          sacado_param_vecs_[m],
-          fs_out[m],
-          jacs_[m]);
+          alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
       fs_already_computed[m] = true;
     }
     // FIXME: create coupled W matrix from array of model W matrices
@@ -940,13 +835,7 @@ SchwarzCoupled::evalModelImpl(
       ALBANY_ABORT("This functionality no longer exists.");
     } else {
       if (Teuchos::nonnull(fs_out[m]) && fs_already_computed[m] == false) {
-        apps_[m]->computeGlobalResidual(
-            curr_time,
-            xs[m],
-            x_dots[m],
-            x_dotdot,
-            sacado_param_vecs_[m],
-            fs_out[m]);
+        apps_[m]->computeGlobalResidual(curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m]);
       }
     }
   }
@@ -961,116 +850,83 @@ SchwarzCoupled::evalModelImpl(
       for (auto m = 0; m < num_models_; ++m) {
         if (!Albany::isFillActive(precs_[m])) Albany::resumeFill(precs_[m]);
 
-        auto jac_range_indexer =
-            Albany::createGlobalLocalIndexer(jacs_[m]->range());
+        auto jac_range_indexer = Albany::createGlobalLocalIndexer(jacs_[m]->range());
         if (mf_prec_type_ == JACOBI) {
           // With matrix-free, W_op_out is null, so computeJacobian does not
           // get called earlier.  We need to call it here to get the Jacobians.
           apps_[m]->computeGlobalJacobian(
-              alpha,
-              beta,
-              omega,
-              curr_time,
-              xs[m],
-              x_dots[m],
-              x_dotdot,
-              sacado_param_vecs_[m],
-              fs_out[m],
-              jacs_[m]);
+              alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
           // Get diagonal of jacs_[m]
-          Teuchos::RCP<Thyra_Vector> diag =
-              Thyra::createMember(jacs_[m]->range());
+          Teuchos::RCP<Thyra_Vector> diag = Thyra::createMember(jacs_[m]->range());
           Albany::getDiagonalCopy(jacs_[m], diag);
           // Take reciprocal of diagonal
-          Teuchos::RCP<Thyra_Vector> invdiag =
-              Thyra::createMember(jacs_[m]->range());
+          Teuchos::RCP<Thyra_Vector> invdiag = Thyra::createMember(jacs_[m]->range());
           invdiag->reciprocal(*diag);
-          auto invdiag_constView = Albany::getLocalData(
-              Teuchos::rcp_dynamic_cast<Thyra_Vector const>(invdiag));
+          auto invdiag_constView = Albany::getLocalData(Teuchos::rcp_dynamic_cast<Thyra_Vector const>(invdiag));
           // Zero out precs_[m]
           Albany::resumeFill(precs_[m]);
           Albany::scale(precs_[m], 0.0);
           // Create Jacobi preconditioner
           for (LO i = 0; i < jac_range_indexer->getNumLocalElements(); ++i) {
-            const GO global_row = jac_range_indexer->getGlobalElement(i);
+            const GO           global_row = jac_range_indexer->getGlobalElement(i);
             Teuchos::Array<ST> matrixEntriesT(1);
             Teuchos::Array<GO> matrixIndicesT(1);
             matrixEntriesT[0] = invdiag_constView[i];
             matrixIndicesT[0] = global_row;
-            Albany::replaceGlobalValues(
-                precs_[m], global_row, matrixIndicesT(), matrixEntriesT());
+            Albany::replaceGlobalValues(precs_[m], global_row, matrixIndicesT(), matrixEntriesT());
           }
         } else if (mf_prec_type_ == ABS_ROW_SUM) {
           // With matrix-free, W_op_outT is null, so computeJacobianT does not
           // get called earlier.  We need to call it here to get the Jacobians.
           apps_[m]->computeGlobalJacobian(
-              alpha,
-              beta,
-              omega,
-              curr_time,
-              xs[m],
-              x_dots[m],
-              x_dotdot,
-              sacado_param_vecs_[m],
-              fs_out[m],
-              jacs_[m]);
+              alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
           // Create vector to store absrowsum
-          Teuchos::RCP<Thyra_Vector> absrowsum =
-              Thyra::createMember(jacs_[m]->range());
+          Teuchos::RCP<Thyra_Vector> absrowsum = Thyra::createMember(jacs_[m]->range());
           absrowsum->assign(0.0);
           auto absrowsum_nonconstView = Albany::getNonconstLocalData(absrowsum);
           // Compute abs sum of each row and store in absrowsum vector
           for (LO i = 0; i < jac_range_indexer->getNumLocalElements(); ++i) {
-            std::size_t const NumEntries =
-                Albany::getNumEntriesInLocalRow(jacs_[m], i);
+            std::size_t const  NumEntries = Albany::getNumEntriesInLocalRow(jacs_[m], i);
             Teuchos::Array<LO> Indices(NumEntries);
             Teuchos::Array<ST> Values(NumEntries);
             // Get local row
             Albany::getLocalRowValues(jacs_[m], i, Indices, Values);
             // Compute abs row rum
-            for (std::size_t j = 0; j < NumEntries; j++)
-              absrowsum_nonconstView[i] += std::abs(Values[j]);
+            for (std::size_t j = 0; j < NumEntries; j++) absrowsum_nonconstView[i] += std::abs(Values[j]);
           }
           // Invert absrowsum
-          Teuchos::RCP<Thyra_Vector> invabsrowsum =
-              Thyra::createMember(jacs_[m]->range());
+          Teuchos::RCP<Thyra_Vector> invabsrowsum = Thyra::createMember(jacs_[m]->range());
           invabsrowsum->reciprocal(*absrowsum);
-          auto invabsrowsum_constView = Albany::getLocalData(
-              Teuchos::rcp_dynamic_cast<Thyra_Vector const>(invabsrowsum));
+          auto invabsrowsum_constView =
+              Albany::getLocalData(Teuchos::rcp_dynamic_cast<Thyra_Vector const>(invabsrowsum));
           // Zero out precs_[m]
           Albany::resumeFill(precs_[m]);
           Albany::scale(precs_[m], 0.0);
           // Create diagonal abs row sum preconditioner
           for (LO i = 0; i < jac_range_indexer->getNumLocalElements(); ++i) {
-            const GO global_row = jac_range_indexer->getGlobalElement(i);
+            const GO           global_row = jac_range_indexer->getGlobalElement(i);
             Teuchos::Array<ST> matrixEntriesT(1);
             Teuchos::Array<GO> matrixIndicesT(1);
             matrixEntriesT[0] = invabsrowsum_constView[i];
             matrixIndicesT[0] = global_row;
-            Albany::replaceGlobalValues(
-                precs_[m], global_row, matrixIndicesT(), matrixEntriesT());
+            Albany::replaceGlobalValues(precs_[m], global_row, matrixIndicesT(), matrixEntriesT());
           }
         } else if (mf_prec_type_ == ID) {
           // Create Identity
           for (LO i = 0; i < jac_range_indexer->getNumLocalElements(); ++i) {
-            const GO global_row = jac_range_indexer->getGlobalElement(i);
+            const GO           global_row = jac_range_indexer->getGlobalElement(i);
             Teuchos::Array<ST> matrixEntriesT(1);
             Teuchos::Array<GO> matrixIndicesT(1);
             matrixEntriesT[0] = 1.0;
             matrixIndicesT[0] = global_row;
-            Albany::replaceGlobalValues(
-                precs_[m], global_row, matrixIndicesT(), matrixEntriesT());
+            Albany::replaceGlobalValues(precs_[m], global_row, matrixIndicesT(), matrixEntriesT());
           }
         }
-        if (Albany::isFillActive(precs_[m])) {
-          Albany::fillComplete(precs_[m]);
-        }
+        if (Albany::isFillActive(precs_[m])) { Albany::fillComplete(precs_[m]); }
       }
-      Schwarz_CoupledJacobian      jac(comm_);
-      Teuchos::RCP<Thyra_LinearOp> W_op =
-          jac.getThyraCoupledJacobian(precs_, apps_);
-      Teuchos::RCP<Thyra::DefaultPreconditioner<ST>> W_prec =
-          Teuchos::rcp(new Thyra::DefaultPreconditioner<ST>);
+      Schwarz_CoupledJacobian                        jac(comm_);
+      Teuchos::RCP<Thyra_LinearOp>                   W_op   = jac.getThyraCoupledJacobian(precs_, apps_);
+      Teuchos::RCP<Thyra::DefaultPreconditioner<ST>> W_prec = Teuchos::rcp(new Thyra::DefaultPreconditioner<ST>);
       W_prec->initializeRight(W_op);
       W_prec_out = W_prec;
     }
@@ -1087,13 +943,7 @@ SchwarzCoupled::evalModelImpl(
         for (auto l = 0; l < out_args.Np(); ++l) {
           // sets g_out
           apps_[m]->evaluateResponse(
-              l,
-              curr_time,
-              xs[m],
-              x_dots[m],
-              x_dotdot,
-              sacado_param_vecs_[m],
-              g_out->getNonconstVectorBlock(m));
+              l, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], g_out->getNonconstVectorBlock(m));
         }
       }
     }
@@ -1131,8 +981,7 @@ SchwarzCoupled::createInArgsImpl() const
 Teuchos::RCP<Teuchos::ParameterList const>
 SchwarzCoupled::getValidAppParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> list =
-      Teuchos::rcp(new Teuchos::ParameterList("ValidAppParams"));
+  Teuchos::RCP<Teuchos::ParameterList> list = Teuchos::rcp(new Teuchos::ParameterList("ValidAppParams"));
 
   list->sublist("Problem", false, "Problem sublist");
   list->sublist("Debug Output", false, "Debug Output sublist");
@@ -1142,8 +991,7 @@ SchwarzCoupled::getValidAppParameters() const
   list->sublist("VTK", false, "DEPRECATED  VTK sublist");
   list->sublist("Piro", false, "Piro sublist");
   list->sublist("Coupled System", false, "Coupled system sublist");
-  list->set<std::string>(
-      "Matrix-Free Preconditioner", "", "Matrix-Free Preconditioner Type");
+  list->set<std::string>("Matrix-Free Preconditioner", "", "Matrix-Free Preconditioner Type");
 
   return list;
 }
@@ -1153,21 +1001,14 @@ SchwarzCoupled::getValidAppParameters() const
 Teuchos::RCP<Teuchos::ParameterList const>
 SchwarzCoupled::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> list =
-      Teuchos::createParameterList("ValidCoupledSchwarzProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> list = Teuchos::createParameterList("ValidCoupledSchwarzProblemParams");
 
   list->set<std::string>("Name", "", "String to designate Problem Class");
 
-  list->set<int>(
-      "Phalanx Graph Visualization Detail",
-      0,
-      "Flag to select output of Phalanx Graph and level of detail");
+  list->set<int>("Phalanx Graph Visualization Detail", 0, "Flag to select output of Phalanx Graph and level of detail");
 
   // FIXME: anything else to validate?
-  list->set<std::string>(
-      "Solution Method",
-      "Steady",
-      "Flag for Steady, Transient, or Continuation");
+  list->set<std::string>("Solution Method", "Steady", "Flag for Steady, Transient, or Continuation");
 
   return list;
 }

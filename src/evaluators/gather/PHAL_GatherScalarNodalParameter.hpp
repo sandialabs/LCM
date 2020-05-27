@@ -30,18 +30,13 @@ namespace PHAL {
 // **************************************************************
 
 template <typename EvalT, typename Traits>
-class GatherScalarNodalParameterBase
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<EvalT, Traits>
+class GatherScalarNodalParameterBase : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                       public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  GatherScalarNodalParameterBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GatherScalarNodalParameterBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   // This function requires template specialization, in derived class below
   virtual void
@@ -60,13 +55,10 @@ class GatherScalarNodalParameterBase
 
 // General version for most evaluation types
 template <typename EvalT, typename Traits>
-class GatherScalarNodalParameter
-    : public GatherScalarNodalParameterBase<EvalT, Traits>
+class GatherScalarNodalParameter : public GatherScalarNodalParameterBase<EvalT, Traits>
 {
  public:
-  GatherScalarNodalParameter(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GatherScalarNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   // Old constructor, still needed by BCs that use PHX Factory
   GatherScalarNodalParameter(Teuchos::ParameterList const& p);
   //  void postRegistrationSetup(typename Traits::SetupData d,
@@ -80,13 +72,10 @@ class GatherScalarNodalParameter
 
 // General version for most evaluation types
 template <typename EvalT, typename Traits>
-class GatherScalarExtruded2DNodalParameter
-    : public GatherScalarNodalParameterBase<EvalT, Traits>
+class GatherScalarExtruded2DNodalParameter : public GatherScalarNodalParameterBase<EvalT, Traits>
 {
  public:
-  GatherScalarExtruded2DNodalParameter(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GatherScalarExtruded2DNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);
 

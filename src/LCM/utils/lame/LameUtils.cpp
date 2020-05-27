@@ -33,10 +33,7 @@ constructLameMaterialModel(
   // Strings should be all upper case with spaces replaced with underscores
   std::string materialModelName = lameMaterialModelName;
   std::transform(
-      materialModelName.begin(),
-      materialModelName.end(),
-      materialModelName.begin(),
-      (int (*)(int))std::toupper);
+      materialModelName.begin(), materialModelName.end(), materialModelName.begin(), (int (*)(int))std::toupper);
   std::replace(materialModelName.begin(), materialModelName.end(), ' ', '_');
 
   LameMatProps props;
@@ -68,9 +65,7 @@ constructLameMaterialModel(
   else if (materialModelName == "CRYSTAL_PLASTICITY")
     materialModel = Teuchos::rcp(new lame::CrystalPlasticity(props));
   else
-    ALBANY_ABORT(
-        " unsupported LAME material model: " + lameMaterialModelName + " (" +
-        materialModelName + ")\n");
+    ALBANY_ABORT(" unsupported LAME material model: " + lameMaterialModelName + " (" + materialModelName + ")\n");
 #endif
 
 #if defined(ALBANY_LAMENT)
@@ -80,9 +75,7 @@ constructLameMaterialModel(
     materialModel = Teuchos::rcp(new lament::Neohookean<double>(props));
   else {
     if (materialModel.is_null())
-      ALBANY_ABORT(
-          " unsupported LAMENT material model: " + lameMaterialModelName +
-          " (" + materialModelName + ")\n");
+      ALBANY_ABORT(" unsupported LAMENT material model: " + lameMaterialModelName + " (" + materialModelName + ")\n");
   }
 #endif
 
@@ -90,25 +83,21 @@ constructLameMaterialModel(
 }
 
 std::vector<std::string>
-getStateVariableNames(
-    std::string const&            lameMaterialModelName,
-    Teuchos::ParameterList const& lameMaterialParameters)
+getStateVariableNames(std::string const& lameMaterialModelName, Teuchos::ParameterList const& lameMaterialParameters)
 {
-  Teuchos::RCP<LameMaterial> materialModel =
-      constructLameMaterialModel(lameMaterialModelName, lameMaterialParameters);
+  Teuchos::RCP<LameMaterial> materialModel = constructLameMaterialModel(lameMaterialModelName, lameMaterialParameters);
 
   // Get a list of the state variables, in alphabetical order
   std::vector<std::string> lameMaterialModelStateVariables;
   std::string              tempLameMaterialModelName;
-  materialModel->getStateVarListAndName(
-      lameMaterialModelStateVariables, tempLameMaterialModelName);
+  materialModel->getStateVarListAndName(lameMaterialModelStateVariables, tempLameMaterialModelName);
 
   // Reorder the list to match the order of the variables in the actual state
   // array passed to/from LAME
   std::map<int, std::string> variableNamesByIndex;
   for (unsigned int i = 0; i < lameMaterialModelStateVariables.size(); ++i) {
-    std::string variableName = lameMaterialModelStateVariables[i];
-    int         index = materialModel->getStateVariableIndex(variableName);
+    std::string variableName    = lameMaterialModelStateVariables[i];
+    int         index           = materialModel->getStateVariableIndex(variableName);
     variableNamesByIndex[index] = variableName;
   }
 
@@ -125,22 +114,19 @@ getStateVariableInitialValues(
     std::string const&            lameMaterialModelName,
     Teuchos::ParameterList const& lameMaterialParameters)
 {
-  Teuchos::RCP<LameMaterial> materialModel =
-      constructLameMaterialModel(lameMaterialModelName, lameMaterialParameters);
+  Teuchos::RCP<LameMaterial> materialModel = constructLameMaterialModel(lameMaterialModelName, lameMaterialParameters);
 
   int numStateVariables = materialModel->getNumStateVars();
 
   // Allocate workset space
-  std::vector<double> strainRate(6);   // symmetric tensor5
-  std::vector<double> spin(3);         // skew-symmetric tensor
-  std::vector<double> leftStretch(6);  // symmetric tensor
-  std::vector<double> rotation(9);     // full tensor
-  std::vector<double> stressOld(6);    // symmetric tensor
-  std::vector<double> stressNew(6);    // symmetric tensor
-  std::vector<double> stateOld(
-      numStateVariables);  // a single double for each state variable
-  std::vector<double> stateNew(
-      numStateVariables);  // a single double for each state variable
+  std::vector<double> strainRate(6);                // symmetric tensor5
+  std::vector<double> spin(3);                      // skew-symmetric tensor
+  std::vector<double> leftStretch(6);               // symmetric tensor
+  std::vector<double> rotation(9);                  // full tensor
+  std::vector<double> stressOld(6);                 // symmetric tensor
+  std::vector<double> stressNew(6);                 // symmetric tensor
+  std::vector<double> stateOld(numStateVariables);  // a single double for each state variable
+  std::vector<double> stateNew(numStateVariables);  // a single double for each state variable
 
   // \todo Set up scratch space for material models using getNumScratchVars()
   // and setScratchPtr().

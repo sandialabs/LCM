@@ -19,8 +19,7 @@ namespace PHAL {
 
 // Specialization: Residual
 template <typename Traits>
-ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(
-    Teuchos::ParameterList& p)
+ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(Teuchos::ParameterList& p)
     : PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
   expression = p.get<std::string>("Dirichlet Expression");
@@ -28,17 +27,16 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(
 
 template <typename Traits>
 void
-ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
-    typename Traits::EvalData workset)
+ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits::EvalData workset)
 {
   auto const          dim = workset.spatial_dimension_;
   stk::expreval::Eval expr_eval(expression);
   expr_eval.parse();
   expr_eval.bindVariable("t", workset.current_time);
-  auto rcp_disc = workset.disc;
-  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto x        = workset.x;
-  auto x_view   = Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x));
+  auto        rcp_disc    = workset.disc;
+  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto        x           = workset.x;
+  auto        x_view      = Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x));
   auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const  ns_id       = this->nodeSetID;
   auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
@@ -66,13 +64,12 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(
 
 template <typename Traits>
 void
-ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto rcp_disc = workset.disc;
-  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto f        = workset.f;
-  auto f_view   = Albany::getNonconstLocalData(f);
+  auto        rcp_disc    = workset.disc;
+  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto        f           = workset.f;
+  auto        f_view      = Albany::getNonconstLocalData(f);
   auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const  ns_id       = this->nodeSetID;
   auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
@@ -97,22 +94,20 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 
 // Specialization: Jacobian
 template <typename Traits>
-ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::ExprEvalSDBC(
-    Teuchos::ParameterList& p)
+ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::ExprEvalSDBC(Teuchos::ParameterList& p)
     : PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 
 template <typename Traits>
 void
-ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
-    typename Traits::EvalData workset)
+ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(typename Traits::EvalData workset)
 {
-  auto rcp_disc = workset.disc;
-  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto J        = workset.Jac;
-  auto range_vs = J->range();
-  auto col_vs   = Albany::getColumnSpace(J);
+  auto        rcp_disc    = workset.disc;
+  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto        J           = workset.Jac;
+  auto        range_vs    = J->range();
+  auto        col_vs      = Albany::getColumnSpace(J);
   auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const  ns_id       = this->nodeSetID;
   auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
@@ -159,16 +154,14 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(
 
 template <typename Traits>
 void
-ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   auto       x      = workset.x;
   auto       f      = workset.f;
   auto       J      = workset.Jac;
   auto const fill   = f != Teuchos::null;
   auto       f_view = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
-  auto x_view = fill ? Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x)) :
-                       Teuchos::null;
+  auto       x_view = fill ? Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x)) : Teuchos::null;
 
   Teuchos::Array<GO> global_index(1);
   Teuchos::Array<LO> index(1);

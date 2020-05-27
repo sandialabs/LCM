@@ -17,18 +17,15 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
           p.get<std::string>("Biot Modulus Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  Teuchos::ParameterList* elmd_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* elmd_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numQPs  = dims[1];
   numDims = dims[2];
 
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
   std::string type = elmd_list->get("Biot Modulus Type", "Constant");
   if (type == "Constant") {
@@ -42,17 +39,13 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
   }
 
   if (p.isType<std::string>("Porosity Name")) {
-    Teuchos::RCP<PHX::DataLayout> scalar_dl =
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-    porosity =
-        decltype(porosity)(p.get<std::string>("Porosity Name"), scalar_dl);
+    Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+    porosity                                = decltype(porosity)(p.get<std::string>("Porosity Name"), scalar_dl);
     this->addDependentField(porosity);
     isPoroElastic    = true;
     FluidBulkModulus = elmd_list->get("Fluid Bulk Modulus Value", 10.0e9);
-    this->registerSacadoParameter(
-        "Skeleton Bulk Modulus Parameter Value", paramLib);
-    GrainBulkModulus = elmd_list->get(
-        "Grain Bulk Modulus Value", 10.0e12);  // typically Kgrain >> Kskeleton
+    this->registerSacadoParameter("Skeleton Bulk Modulus Parameter Value", paramLib);
+    GrainBulkModulus = elmd_list->get("Grain Bulk Modulus Value", 10.0e12);  // typically Kgrain >> Kskeleton
     this->registerSacadoParameter("Grain Bulk Modulus Value", paramLib);
   } else {
     isPoroElastic    = false;
@@ -61,10 +54,8 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
   }
 
   if (p.isType<std::string>("Biot Coefficient Name")) {
-    Teuchos::RCP<PHX::DataLayout> scalar_dl =
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-    biotCoefficient = decltype(biotCoefficient)(
-        p.get<std::string>("Biot Coefficient Name"), scalar_dl);
+    Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+    biotCoefficient = decltype(biotCoefficient)(p.get<std::string>("Biot Coefficient Name"), scalar_dl);
     this->addDependentField(biotCoefficient);
   }
 
@@ -75,9 +66,7 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-BiotModulus<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+BiotModulus<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(biotModulus, fm);
   if (!is_constant) this->utils.setFieldData(coordVec, fm);
@@ -95,19 +84,15 @@ BiotModulus<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   if (is_constant) {
     for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) {
-        biotModulus(cell, qp) = constant_value;
-      }
+      for (int qp = 0; qp < numQPs; ++qp) { biotModulus(cell, qp) = constant_value; }
     }
   }
   if (isPoroElastic) {
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {
         // 1/M = (B-phi)/Ks + phi/Kf
-        biotModulus(cell, qp) =
-            1 / ((biotCoefficient(cell, qp) - porosity(cell, qp)) /
-                     GrainBulkModulus +
-                 porosity(cell, qp) / FluidBulkModulus);
+        biotModulus(cell, qp) = 1 / ((biotCoefficient(cell, qp) - porosity(cell, qp)) / GrainBulkModulus +
+                                     porosity(cell, qp) / FluidBulkModulus);
       }
     }
   }
@@ -126,8 +111,7 @@ BiotModulus<EvalT, Traits>::getValue(std::string const& n)
     return GrainBulkModulus;
   ALBANY_ABORT(
       std::endl
-      << "Error! Logic error in getting paramter " << n
-      << " in BiotModulus::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n << " in BiotModulus::getValue()" << std::endl);
   return constant_value;
 }
 

@@ -21,8 +21,7 @@ class IPtoNodalFieldManager;
 /// \brief Evaltuator to compute a nodal stress field
 ///
 template <typename EvalT, typename Traits>
-class IPtoNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                           public PHX::EvaluatorDerived<EvalT, Traits>
+class IPtoNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
@@ -34,9 +33,7 @@ class IPtoNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       Albany::MeshSpecsStruct const*       mesh_specs);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// These functions are defined in the specializations

@@ -17,14 +17,11 @@ Albany::AdvDiffProblem::AdvDiffProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_)
-    : Albany::AbstractProblem(params_, paramLib_),
-      numDim(numDim_),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_), use_sdbcs_(false)
 {
   // Get number of species equations from Problem specifications
-  neq = params_->get("Number of PDE Equations", numDim);
-  bool useAugForm =
-      params_->sublist("Options").get<bool>("Use Augmented Form", false);
+  neq             = params_->get("Number of PDE Equations", numDim);
+  bool useAugForm = params_->sublist("Options").get<bool>("Use Augmented Form", false);
   if (useAugForm)  // if we're using the augmented form of the equations, there
                    // are 2 extra auxiliary dofs / node (in 2D).
     neq = neq + 2;
@@ -44,8 +41,7 @@ Albany::AdvDiffProblem::buildProblem(
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
   fm.resize(1);
   fm[0] = rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-  buildEvaluators(
-      *fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
+  buildEvaluators(*fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
   constructDirichletEvaluators(*meshSpecs[0]);
 }
 
@@ -59,15 +55,13 @@ Albany::AdvDiffProblem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<AdvDiffProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<AdvDiffProblem>                 op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 void
-Albany::AdvDiffProblem::constructDirichletEvaluators(
-    Albany::MeshSpecsStruct const& meshSpecs)
+Albany::AdvDiffProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -77,8 +71,7 @@ Albany::AdvDiffProblem::constructDirichletEvaluators(
     dirichletNames[i] = s.str();
   }
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
@@ -87,13 +80,9 @@ Albany::AdvDiffProblem::constructDirichletEvaluators(
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::AdvDiffProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidAdvDiffProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidAdvDiffProblemParams");
 
-  validPL->set(
-      "Number of PDE Equations",
-      1,
-      "Number of PDE Equations in AdvDiff equation set");
+  validPL->set("Number of PDE Equations", 1, "Number of PDE Equations in AdvDiff equation set");
   validPL->sublist("Options", false, "");
 
   return validPL;

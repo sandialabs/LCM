@@ -81,10 +81,7 @@ struct J2MiniKernel : public ParallelKernel<EvalT, Traits>
   RealType sat_exp_;
 
   void
-  init(
-      Workset&                 workset,
-      FieldMap<ScalarT const>& dep_fields,
-      FieldMap<ScalarT>&       eval_fields);
+  init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields);
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -92,14 +89,10 @@ struct J2MiniKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class J2MiniSolver
-    : public LCM::
-          ParallelConstitutiveModel<EvalT, Traits, J2MiniKernel<EvalT, Traits>>
+class J2MiniSolver : public LCM::ParallelConstitutiveModel<EvalT, Traits, J2MiniKernel<EvalT, Traits>>
 {
  public:
-  J2MiniSolver(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  J2MiniSolver(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 };
 }  // namespace LCM
 #endif  // LCM_J2MiniSolver_hpp

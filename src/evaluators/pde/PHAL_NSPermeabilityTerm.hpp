@@ -19,8 +19,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-class NSPermeabilityTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
-                           public PHX::EvaluatorDerived<EvalT, Traits>
+class NSPermeabilityTerm : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT ScalarT;
@@ -28,9 +27,7 @@ class NSPermeabilityTerm : public PHX::EvaluatorWithBaseImpl<Traits>,
   NSPermeabilityTerm(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

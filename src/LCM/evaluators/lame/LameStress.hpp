@@ -23,16 +23,13 @@ namespace LCM {
 // just throw's a Not Implemented
 // (2) Implements private functions with calls to Lame with doubles.
 template <typename EvalT, typename Traits>
-class LameStressBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                       public PHX::EvaluatorDerived<EvalT, Traits>
+class LameStressBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   LameStressBase(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   virtual void
   evaluateFields(typename Traits::EvalData d);
@@ -79,12 +76,10 @@ class LameStressBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Vector of the fields corresponding to the LAME material model state
   // variables
-  std::vector<PHX::MDField<ScalarT, Cell, QuadPoint>>
-      lameMaterialModelStateVariableFields;
+  std::vector<PHX::MDField<ScalarT, Cell, QuadPoint>> lameMaterialModelStateVariableFields;
 
   // Work space
-  PHX::MDField<RealType, Cell, QuadPoint, Dim, Dim> stressFieldRealType,
-      defGradFieldRealType;
+  PHX::MDField<RealType, Cell, QuadPoint, Dim, Dim> stressFieldRealType, defGradFieldRealType;
 };
 
 // Inherted classes
@@ -102,12 +97,10 @@ class LameStress : public LameStressBase<EvalT, Traits>
 
 // Template Specialization: Residual Eval calls Lame with doubles.
 template <typename Traits>
-class LameStress<PHAL::AlbanyTraits::Residual, Traits>
-    : public LameStressBase<PHAL::AlbanyTraits::Residual, Traits>
+class LameStress<PHAL::AlbanyTraits::Residual, Traits> : public LameStressBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  LameStress(Teuchos::ParameterList& p)
-      : LameStressBase<PHAL::AlbanyTraits::Residual, Traits>(p){};
+  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Residual, Traits>(p){};
   void
   evaluateFields(typename Traits::EvalData d);
 };
@@ -115,12 +108,10 @@ class LameStress<PHAL::AlbanyTraits::Residual, Traits>
 // Template Specialization: Jacobian Eval does finite difference of Lame with
 // doubles.
 template <typename Traits>
-class LameStress<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public LameStressBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class LameStress<PHAL::AlbanyTraits::Jacobian, Traits> : public LameStressBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
-  LameStress(Teuchos::ParameterList& p)
-      : LameStressBase<PHAL::AlbanyTraits::Jacobian, Traits>(p){};
+  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Jacobian, Traits>(p){};
   void
   evaluateFields(typename Traits::EvalData d);
 };
@@ -128,12 +119,10 @@ class LameStress<PHAL::AlbanyTraits::Jacobian, Traits>
 // Template Specialization: Tangent Eval does finite difference of Lame with
 // doubles.
 template <typename Traits>
-class LameStress<PHAL::AlbanyTraits::Tangent, Traits>
-    : public LameStressBase<PHAL::AlbanyTraits::Tangent, Traits>
+class LameStress<PHAL::AlbanyTraits::Tangent, Traits> : public LameStressBase<PHAL::AlbanyTraits::Tangent, Traits>
 {
  public:
-  LameStress(Teuchos::ParameterList& p)
-      : LameStressBase<PHAL::AlbanyTraits::Tangent, Traits>(p){};
+  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Tangent, Traits>(p){};
   void
   evaluateFields(typename Traits::EvalData d);
 };

@@ -22,8 +22,7 @@ namespace LCM {
 ///
 ///
 template <typename EvalT, typename Traits>
-class MeshSizeFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                          public PHX::EvaluatorDerived<EvalT, Traits>
+class MeshSizeFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ///
@@ -31,8 +30,7 @@ class MeshSizeFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   MeshSizeFieldBase(const Teuchos::RCP<Albany::Layouts>& dl)
   {
-    field_tag_ = Teuchos::rcp(new PHX::Tag<typename EvalT::ScalarT>(
-        "Mesh Nodal Size Field", dl->dummy));
+    field_tag_ = Teuchos::rcp(new PHX::Tag<typename EvalT::ScalarT>("Mesh Nodal Size Field", dl->dummy));
     this->addEvaluatedField(*field_tag_);
   }
 
@@ -66,9 +64,7 @@ class IsoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
   ///
   /// Constructor
   ///
-  IsoMeshSizeField(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  IsoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : MeshSizeFieldBase<EvalT, Traits>(dl)
   {
   }
@@ -77,9 +73,7 @@ class IsoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
   }
 
@@ -109,17 +103,13 @@ class IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   ///
   /// Constructor
   ///
-  IsoMeshSizeField(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  IsoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics
@@ -133,8 +123,7 @@ class IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   void
   postEvaluate(typename Traits::PostEvalData d)
   {
-    if (adapt_PL->get<int>("LastIter", 0) == 3)
-      adapt_PL->set<bool>("AdaptNow", true);
+    if (adapt_PL->get<int>("LastIter", 0) == 3) adapt_PL->set<bool>("AdaptNow", true);
   }
 
  private:
@@ -192,9 +181,7 @@ class AnisoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
   ///
   /// Constructor
   ///
-  AnisoMeshSizeField(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  AnisoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : MeshSizeFieldBase<EvalT, Traits>(dl)
   {
   }
@@ -203,9 +190,7 @@ class AnisoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
   }
 
@@ -235,17 +220,13 @@ class AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
   ///
   /// Constructor
   ///
-  AnisoMeshSizeField(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  AnisoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics

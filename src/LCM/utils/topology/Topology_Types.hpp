@@ -50,16 +50,15 @@ using CoordinatesIndex    = Coordinates::size_type;
 using Connectivity        = std::vector<std::vector<stk::mesh::EntityId>>;
 using ConnectivityIndex   = Connectivity::size_type;
 
-using VertexName     = boost::vertex_name_t;
-using EdgeName       = boost::edge_name_t;
-using VertexProperty = boost::property<VertexName, stk::mesh::EntityRank>;
-using EdgeProperty   = boost::property<EdgeName, EdgeId>;
-using ListS          = boost::listS;
-using VectorS        = boost::vecS;
-using Directed       = boost::bidirectionalS;
-using Undirected     = boost::undirectedS;
-using Graph =
-    boost::adjacency_list<ListS, ListS, Directed, VertexProperty, EdgeProperty>;
+using VertexName            = boost::vertex_name_t;
+using EdgeName              = boost::edge_name_t;
+using VertexProperty        = boost::property<VertexName, stk::mesh::EntityRank>;
+using EdgeProperty          = boost::property<EdgeName, EdgeId>;
+using ListS                 = boost::listS;
+using VectorS               = boost::vecS;
+using Directed              = boost::bidirectionalS;
+using Undirected            = boost::undirectedS;
+using Graph                 = boost::adjacency_list<ListS, ListS, Directed, VertexProperty, EdgeProperty>;
 using VertexNamePropertyMap = boost::property_map<Graph, VertexName>::type;
 using EdgeNamePropertyMap   = boost::property_map<Graph, EdgeName>::type;
 using Vertex                = boost::graph_traits<Graph>::vertex_descriptor;
@@ -69,11 +68,10 @@ using EdgeIterator          = boost::graph_traits<Graph>::edge_iterator;
 using OutEdgeIterator       = boost::graph_traits<Graph>::out_edge_iterator;
 using InEdgeIterator        = boost::graph_traits<Graph>::in_edge_iterator;
 
-using IntScalarFieldType =
-    Albany::AbstractSTKFieldContainer::IntScalarFieldType;
-using ScalarFieldType = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-using VectorFieldType = Albany::AbstractSTKFieldContainer::VectorFieldType;
-using TensorFieldType = Albany::AbstractSTKFieldContainer::TensorFieldType;
+using IntScalarFieldType = Albany::AbstractSTKFieldContainer::IntScalarFieldType;
+using ScalarFieldType    = Albany::AbstractSTKFieldContainer::ScalarFieldType;
+using VectorFieldType    = Albany::AbstractSTKFieldContainer::VectorFieldType;
+using TensorFieldType    = Albany::AbstractSTKFieldContainer::TensorFieldType;
 
 using EntityPair         = std::pair<stk::mesh::Entity, stk::mesh::Entity>;
 using VertexComponentMap = std::map<Vertex, size_t>;
@@ -140,8 +138,7 @@ struct EdgeLessThan
   }
 };
 
-stk::mesh::Entity const INVALID_ENTITY(
-    stk::mesh::Entity::Entity_t::InvalidEntity);
+stk::mesh::Entity const INVALID_ENTITY(stk::mesh::Entity::Entity_t::InvalidEntity);
 
 // Forward declarations
 class Topology;

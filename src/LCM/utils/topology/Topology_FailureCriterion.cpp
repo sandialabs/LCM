@@ -15,9 +15,7 @@ FractureCriterionTraction::FractureCriterionTraction(
     double const       critical_traction,
     double const       beta)
     : AbstractFailureCriterion(topology),
-      stress_field_(get_meta_data().get_field<TensorFieldType>(
-          stk::topology::NODE_RANK,
-          stress_name)),
+      stress_field_(get_meta_data().get_field<TensorFieldType>(stk::topology::NODE_RANK, stress_name)),
       critical_traction_(critical_traction),
       beta_(beta)
 {
@@ -33,16 +31,13 @@ FractureCriterionTraction::FractureCriterionTraction(
 }
 
 bool
-FractureCriterionTraction::check(
-    stk::mesh::BulkData& bulk_data,
-    stk::mesh::Entity    interface)
+FractureCriterionTraction::check(stk::mesh::BulkData& bulk_data, stk::mesh::Entity interface)
 {
   // Check the adjacent bulk elements. Proceed only
   // if both elements belong to the bulk part.
   stk::mesh::EntityRank const rank = bulk_data.entity_rank(interface);
 
-  stk::mesh::EntityRank const rank_up =
-      static_cast<stk::mesh::EntityRank>(rank + 1);
+  stk::mesh::EntityRank const rank_up = static_cast<stk::mesh::EntityRank>(rank + 1);
 
   stk::mesh::Entity const* relations_up = bulk_data.begin(interface, rank_up);
 
@@ -56,22 +51,18 @@ FractureCriterionTraction::check(
 
   stk::mesh::Bucket const& bucket_1 = bulk_data.bucket(element_1);
 
-  bool const is_embedded =
-      bucket_0.member(get_bulk_part()) && bucket_1.member(get_bulk_part());
+  bool const is_embedded = bucket_0.member(get_bulk_part()) && bucket_1.member(get_bulk_part());
 
   if (is_embedded == false) return false;
 
   // Now traction check
-  stk::mesh::EntityVector nodes =
-      get_topology().getBoundaryEntityNodes(interface);
+  stk::mesh::EntityVector nodes = get_topology().getBoundaryEntityNodes(interface);
 
   EntityVectorIndex const number_nodes = nodes.size();
 
-  minitensor::Tensor<double> stress(
-      get_space_dimension(), minitensor::Filler::ZEROS);
+  minitensor::Tensor<double> stress(get_space_dimension(), minitensor::Filler::ZEROS);
 
-  minitensor::Tensor<double> nodal_stress(
-      get_space_dimension(), minitensor::Filler::ZEROS);
+  minitensor::Tensor<double> nodal_stress(get_space_dimension(), minitensor::Filler::ZEROS);
 
   // The traction is evaluated at centroid of face, so a simple
   // average yields the value.
@@ -107,8 +98,7 @@ FractureCriterionTraction::check(
   // Ignore compression
   t_n = std::max(t_n, 0.0);
 
-  double const effective_traction =
-      std::sqrt(t_s * t_s / beta_ / beta_ + t_n * t_n);
+  double const effective_traction = std::sqrt(t_s * t_s / beta_ / beta_ + t_n * t_n);
 
   return effective_traction >= critical_traction_;
 }
@@ -116,8 +106,7 @@ FractureCriterionTraction::check(
 minitensor::Vector<double> const&
 FractureCriterionTraction::getNormal(stk::mesh::EntityId const entity_id)
 {
-  std::map<stk::mesh::EntityId, minitensor::Vector<double>>::const_iterator it =
-      normals_.find(entity_id);
+  std::map<stk::mesh::EntityId, minitensor::Vector<double>>::const_iterator it = normals_.find(entity_id);
 
   assert(it != normals_.end());
 
@@ -129,8 +118,7 @@ FractureCriterionTraction::computeNormals()
 {
   stk::mesh::Selector local_selector = get_meta_data().locally_owned_part();
 
-  std::vector<stk::mesh::Bucket*> const& node_buckets =
-      get_bulk_data().buckets(stk::topology::NODE_RANK);
+  std::vector<stk::mesh::Bucket*> const& node_buckets = get_bulk_data().buckets(stk::topology::NODE_RANK);
 
   stk::mesh::EntityVector nodes;
 
@@ -140,19 +128,16 @@ FractureCriterionTraction::computeNormals()
 
   std::vector<minitensor::Vector<double>> coordinates(number_nodes);
 
-  const Teuchos::ArrayRCP<double>& node_coordinates =
-      get_stk_discretization().getCoordinates();
+  const Teuchos::ArrayRCP<double>& node_coordinates = get_stk_discretization().getCoordinates();
 
   for (EntityVectorIndex i = 0; i < number_nodes; ++i) {
-    double const* const pointer_coordinates =
-        &(node_coordinates[get_space_dimension() * i]);
+    double const* const pointer_coordinates = &(node_coordinates[get_space_dimension() * i]);
 
     coordinates[i].set_dimension(get_space_dimension());
     coordinates[i].fill(pointer_coordinates);
   }
 
-  std::vector<stk::mesh::Bucket*> const& face_buckets =
-      get_bulk_data().buckets(get_meta_data().side_rank());
+  std::vector<stk::mesh::Bucket*> const& face_buckets = get_bulk_data().buckets(get_meta_data().side_rank());
 
   stk::mesh::EntityVector faces;
 
@@ -164,8 +149,7 @@ FractureCriterionTraction::computeNormals()
   // functions for entity ids from the Topology class as the local
   // element mapping functions expect the former.
 
-  auto node_vs_indexer = Albany::createGlobalLocalIndexer(
-      get_stk_discretization().getNodeVectorSpace());
+  auto node_vs_indexer = Albany::createGlobalLocalIndexer(get_stk_discretization().getNodeVectorSpace());
   for (EntityVectorIndex i = 0; i < number_normals; ++i) {
     stk::mesh::Entity face = faces[i];
 
@@ -185,8 +169,7 @@ FractureCriterionTraction::computeNormals()
         break;
 
       case 2: {
-        stk::mesh::EntityId const gid0 =
-            get_bulk_data().identifier(nodes[0]) - 1;
+        stk::mesh::EntityId const gid0 = get_bulk_data().identifier(nodes[0]) - 1;
 
         stk::mesh::EntityId const lid0 = node_vs_indexer->getLocalElement(gid0);
 
@@ -207,8 +190,7 @@ FractureCriterionTraction::computeNormals()
       } break;
 
       case 3: {
-        stk::mesh::EntityId const gid0 =
-            get_bulk_data().identifier(nodes[0]) - 1;
+        stk::mesh::EntityId const gid0 = get_bulk_data().identifier(nodes[0]) - 1;
 
         stk::mesh::EntityId const lid0 = node_vs_indexer->getLocalElement(gid0);
 
@@ -240,13 +222,9 @@ FractureCriterionTraction::computeNormals()
   }
 }
 
-BulkFailureCriterion::BulkFailureCriterion(
-    Topology&          topology,
-    std::string const& failure_indicator_name)
+BulkFailureCriterion::BulkFailureCriterion(Topology& topology, std::string const& failure_indicator_name)
     : AbstractFailureCriterion(topology),
-      failure_state_(get_meta_data().get_field<ScalarFieldType>(
-          stk::topology::ELEMENT_RANK,
-          failure_indicator_name))
+      failure_state_(get_meta_data().get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, failure_indicator_name))
 {
   if (failure_state_ == nullptr) {
     std::cerr << "ERROR: " << __PRETTY_FUNCTION__;
@@ -259,9 +237,7 @@ BulkFailureCriterion::BulkFailureCriterion(
 }
 
 bool
-BulkFailureCriterion::check(
-    stk::mesh::BulkData& /* bulk_data */,
-    stk::mesh::Entity element)
+BulkFailureCriterion::check(stk::mesh::BulkData& /* bulk_data */, stk::mesh::Entity element)
 {
   double const failure_state = *stk::mesh::field_data(*failure_state_, element);
   return failure_state > 0.0;

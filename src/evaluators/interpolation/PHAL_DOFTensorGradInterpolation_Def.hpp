@@ -10,15 +10,12 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::
-    DOFTensorGradInterpolationBase(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::DOFTensorGradInterpolationBase(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
     : val_node(p.get<std::string>("Variable Name"), dl->node_tensor),
       GradBF(p.get<std::string>("Gradient BF Name"), dl->node_qp_gradient),
-      grad_val_qp(
-          p.get<std::string>("Gradient Variable Name"),
-          dl->qp_tensorgradient)
+      grad_val_qp(p.get<std::string>("Gradient Variable Name"), dl->qp_tensorgradient)
 {
   this->addDependentField(val_node.fieldTag());
   this->addDependentField(GradBF.fieldTag());
@@ -51,8 +48,7 @@ DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
@@ -61,11 +57,9 @@ DOFTensorGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
           for (std::size_t dim = 0; dim < numDims; dim++) {
             // For node==0, overwrite. Then += for 1 to numNodes.
             // ScalarT& gvqp = grad_val_qp(cell,qp,i,j,dim);
-            grad_val_qp(cell, qp, i, j, dim) =
-                val_node(cell, 0, i, j) * GradBF(cell, 0, qp, dim);
+            grad_val_qp(cell, qp, i, j, dim) = val_node(cell, 0, i, j) * GradBF(cell, 0, qp, dim);
             for (std::size_t node = 1; node < numNodes; ++node) {
-              grad_val_qp(cell, qp, i, j, dim) +=
-                  val_node(cell, node, i, j) * GradBF(cell, node, qp, dim);
+              grad_val_qp(cell, qp, i, j, dim) += val_node(cell, node, i, j) * GradBF(cell, node, qp, dim);
             }
           }
         }
@@ -84,8 +78,7 @@ void
 FastSolutionTensorGradInterpolationBase<
     PHAL::AlbanyTraits::Jacobian,
     Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-    evaluateFields(typename Traits::EvalData workset)
+    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   int const  num_dof = this->val_node(0, 0, 0, 0).size();
   int const  neq     = workset.wsElNodeEqID.extent(2);
@@ -96,22 +89,14 @@ FastSolutionTensorGradInterpolationBase<
         for (std::size_t j = 0; j < vecDim; j++) {
           for (std::size_t dim = 0; dim < this->numDims; dim++) {
             // For node==0, overwrite. Then += for 1 to numNodes.
-            typename PHAL::Ref<ScalarT>::type gvqp =
-                this->grad_val_qp(cell, qp, i, j, dim);
-            gvqp = ScalarT(
-                num_dof,
-                this->val_node(cell, 0, i, j).val() *
-                    this->GradBF(cell, 0, qp, dim));
+            typename PHAL::Ref<ScalarT>::type gvqp = this->grad_val_qp(cell, qp, i, j, dim);
+            gvqp = ScalarT(num_dof, this->val_node(cell, 0, i, j).val() * this->GradBF(cell, 0, qp, dim));
             gvqp.fastAccessDx(offset + i * vecDim + j) =
-                this->val_node(cell, 0, i, j)
-                    .fastAccessDx(offset + i * vecDim + j) *
-                this->GradBF(cell, 0, qp, dim);
+                this->val_node(cell, 0, i, j).fastAccessDx(offset + i * vecDim + j) * this->GradBF(cell, 0, qp, dim);
             for (std::size_t node = 1; node < this->numNodes; ++node) {
-              gvqp.val() += this->val_node(cell, node, i, j).val() *
-                            this->GradBF(cell, node, qp, dim);
+              gvqp.val() += this->val_node(cell, node, i, j).val() * this->GradBF(cell, node, qp, dim);
               gvqp.fastAccessDx(neq * node + offset + i * vecDim + j) +=
-                  this->val_node(cell, node, i, j)
-                      .fastAccessDx(neq * node + offset + i * vecDim + j) *
+                  this->val_node(cell, node, i, j).fastAccessDx(neq * node + offset + i * vecDim + j) *
                   this->GradBF(cell, node, qp, dim);
             }
           }

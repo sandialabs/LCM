@@ -10,8 +10,7 @@
 namespace Albany {
 
 template <class Norm>
-SolutionFileResponseFunction<Norm>::SolutionFileResponseFunction(
-    const Teuchos::RCP<Teuchos_Comm const>& comm)
+SolutionFileResponseFunction<Norm>::SolutionFileResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm)
     : SamplingBasedScalarResponseFunction(comm), solutionLoaded(false)
 {
   // Nothing to be done here
@@ -40,8 +39,7 @@ SolutionFileResponseFunction<Norm>::evaluateResponse(
     ALBANY_PANIC(
         MMFileStatus != 0,
         std::endl
-            << "MatrixMarketFile, file " __FILE__ " line " << __LINE__
-            << " returned " << MMFileStatus << std::endl);
+            << "MatrixMarketFile, file " __FILE__ " line " << __LINE__ << " returned " << MMFileStatus << std::endl);
 
     solutionLoaded = true;
   }
@@ -90,8 +88,7 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
     ALBANY_PANIC(
         MMFileStatus != 0,
         std::endl
-            << "MatrixMarketFile, file " __FILE__ " line " << __LINE__
-            << " returned " << MMFileStatus << std::endl);
+            << "MatrixMarketFile, file " __FILE__ " line " << __LINE__ << " returned " << MMFileStatus << std::endl);
 
     solutionLoaded = true;
   }
@@ -120,9 +117,7 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
 
   // Evaluate dg/dx
   if (!dg_dx.is_null()) {
-    ALBANY_PANIC(
-        dg_dx->domain()->dim() != 1,
-        "Error! dg_dx has more than one column.\n");
+    ALBANY_PANIC(dg_dx->domain()->dim() != 1, "Error! dg_dx has more than one column.\n");
     Norm::NormDerivative(*x, *RefSoln, *dg_dx->col(0));
   }
 
@@ -138,9 +133,7 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
 
 template <class Norm>
 int
-SolutionFileResponseFunction<Norm>::MatrixMarketFile(
-    char const*                            filename,
-    Teuchos::RCP<Thyra_MultiVector> const& mv)
+SolutionFileResponseFunction<Norm>::MatrixMarketFile(char const* filename, Teuchos::RCP<Thyra_MultiVector> const& mv)
 {
   int const lineLength  = 1025;
   int const tokenLength = 35;
@@ -157,10 +150,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   handle = fopen(filename, "r");  // Open file
   if (handle == 0)
     // file not found
-    ALBANY_ABORT(
-        std::endl
-        << "Reference solution file \" " << filename << " \" not found"
-        << std::endl);
+    ALBANY_ABORT(std::endl << "Reference solution file \" " << filename << " \" not found" << std::endl);
 
   // Check first line, which should be "%%MatrixMarket matrix coordinate real
   // general" (without quotes)
@@ -172,8 +162,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
            "format."
         << std::endl);
 
-  if (sscanf(line, "%s %s %s %s %s", token1, token2, token3, token4, token5) ==
-      0)
+  if (sscanf(line, "%s %s %s %s %s", token1, token2, token3, token4, token5) == 0)
 
     ALBANY_ABORT(
         std::endl
@@ -181,9 +170,8 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
            "solution file."
         << std::endl);
 
-  if (strcmp(token1, "%%MatrixMarket") || strcmp(token2, "matrix") ||
-      strcmp(token3, "array") || strcmp(token4, "real") ||
-      strcmp(token5, "general"))
+  if (strcmp(token1, "%%MatrixMarket") || strcmp(token2, "matrix") || strcmp(token3, "array") ||
+      strcmp(token4, "real") || strcmp(token5, "general"))
 
     ALBANY_ABORT(
         std::endl
@@ -194,18 +182,13 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   // Next, strip off header lines (which start with "%")
   do {
     if (fgets(line, lineLength, handle) == 0)
-      ALBANY_ABORT(
-          std::endl
-          << "Reference solution file: invalid comment line." << std::endl);
+      ALBANY_ABORT(std::endl << "Reference solution file: invalid comment line." << std::endl);
   } while (line[0] == '%');
 
   // Next get problem dimensions: M, N
   if (sscanf(line, "%d %d", &M, &N) == 0)
 
-    ALBANY_ABORT(
-        std::endl
-        << "Reference solution file: cannot compute problem dimensions"
-        << std::endl);
+    ALBANY_ABORT(std::endl << "Reference solution file: cannot compute problem dimensions" << std::endl);
 
   // Compute the offset for each processor for when it should start storing
   // values
@@ -218,10 +201,8 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
   //  offset = map.MinMyGID();
 
   if (spmd_vs->getComm()->getRank() == 0) {
-    std::cout << "Reading reference solution from file \"" << filename << "\""
-              << std::endl;
-    std::cout << "Reference solution contains " << N << " vectors, each with "
-              << M << " rows." << std::endl;
+    std::cout << "Reading reference solution from file \"" << filename << "\"" << std::endl;
+    std::cout << "Reference solution contains " << N << " vectors, each with " << M << " rows." << std::endl;
     std::cout << std::endl;
   }
 
@@ -240,29 +221,24 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(
     // Now read in each value and store to the local portion of the array if the
     // row is owned.
     ST V;
-    for (int i = 0; i < M; i++) {  // i is rownumber in file, or the GID
+    for (int i = 0; i < M; i++) {                // i is rownumber in file, or the GID
       if (fgets(line, lineLength, handle) == 0)  // Can't read the line
 
         ALBANY_ABORT(
             std::endl
-            << "Reference solution file: cannot read line number " << i + offset
-            << " in file." << std::endl);
+            << "Reference solution file: cannot read line number " << i + offset << " in file." << std::endl);
 
       const LO lid = indexer->getLocalElement(i);
       if (lid >= 0) {  // we own this data value
         if (sscanf(line, "%lg\n", &V) == 0) {
-          ALBANY_ABORT(
-              "Reference solution file: cannot parse line number "
-              << i << " in file.\n");
+          ALBANY_ABORT("Reference solution file: cannot parse line number " << i << " in file.\n");
         }
         v[lid] = V;
       }
     }
   }
 
-  if (fclose(handle)) {
-    ALBANY_ABORT("Cannot close reference solution file.\n");
-  }
+  if (fclose(handle)) { ALBANY_ABORT("Cannot close reference solution file.\n"); }
 
   return 0;
 }

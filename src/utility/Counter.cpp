@@ -8,9 +8,6 @@
 
 namespace util {
 
-Counter::Counter(std::string const& name, counter_type start)
-    : name_(name), value_(start)
-{
-}
+Counter::Counter(std::string const& name, counter_type start) : name_(name), value_(start) {}
 
 }  // namespace util

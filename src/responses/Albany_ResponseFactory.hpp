@@ -24,14 +24,11 @@ class ResponseFactory
  public:
   //! Default constructor
   ResponseFactory(
-      const Teuchos::RCP<Albany::Application>&     application,
-      const Teuchos::RCP<Albany::AbstractProblem>& problem,
+      const Teuchos::RCP<Albany::Application>&                        application,
+      const Teuchos::RCP<Albany::AbstractProblem>&                    problem,
       const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>& ms,
-      const Teuchos::RCP<Albany::StateManager>& state_manager)
-      : app(application),
-        prob(problem),
-        meshSpecs(ms),
-        stateMgr(state_manager){};
+      const Teuchos::RCP<Albany::StateManager>&                       state_manager)
+      : app(application), prob(problem), meshSpecs(ms), stateMgr(state_manager){};
 
   //! Destructor
   virtual ~ResponseFactory(){};

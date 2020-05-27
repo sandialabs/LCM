@@ -10,10 +10,10 @@
 #include "Albany_ProblemUtils.hpp"
 #include "PHAL_ConvertFieldType.hpp"
 #include "PHAL_Dimension.hpp"
+#include "PHAL_SaveStateField.hpp"
 #include "PHAL_Workset.hpp"
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
-#include "PHAL_SaveStateField.hpp"
 
 namespace Albany {
 
@@ -28,8 +28,8 @@ class ACEThermalProblem : public AbstractProblem
   ACEThermalProblem(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       const Teuchos::RCP<ParamLib>&               paramLib,
-      int const                               num_dim,
-      Teuchos::RCP<Teuchos::Comm<int> const>& comm);
+      int const                                   num_dim,
+      Teuchos::RCP<Teuchos::Comm<int> const>&     comm);
 
   //! Destructor
   ~ACEThermalProblem();
@@ -50,9 +50,7 @@ class ACEThermalProblem : public AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> mesh_specs,
-      StateManager&                                            state_mgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> mesh_specs, StateManager& state_mgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -90,12 +88,11 @@ class ACEThermalProblem : public AbstractProblem
   void
   constructDirichletEvaluators(std::vector<std::string> const& node_set_ids);
   void
-  constructNeumannEvaluators(
-      const Teuchos::RCP<Albany::MeshSpecsStruct>& mesh_specs);
+  constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& mesh_specs);
 
  protected:
   int num_dim_;  // number spatial dimensions
- 
+
   Teuchos::RCP<Albany::MaterialDatabase> material_db_;
 
   Teuchos::ArrayRCP<std::string> eb_names_;
@@ -112,13 +109,13 @@ class ACEThermalProblem : public AbstractProblem
 
 }  // namespace Albany
 
+#include "ACETempStandAloneResid.hpp"
+#include "ACEThermalParameters.hpp"
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
-#include "ACEThermalParameters.hpp"
-#include "ACETempStandAloneResid.hpp"
 #include "Shards_CellTopology.hpp"
 
 template <typename EvalT>
@@ -139,25 +136,23 @@ Albany::ACEThermalProblem::constructEvaluators(
   using Teuchos::RCP;
   using Teuchos::rcp;
 
-  Albany::StateStruct::MeshFieldEntity entity; 
-  
+  Albany::StateStruct::MeshFieldEntity entity;
+
   // Collect problem-specific response parameters
-  Teuchos::RCP<Teuchos::ParameterList> params_from_prob = Teuchos::rcp(
-      new Teuchos::ParameterList("Response Parameters from Problem"));
+  Teuchos::RCP<Teuchos::ParameterList> params_from_prob =
+      Teuchos::rcp(new Teuchos::ParameterList("Response Parameters from Problem"));
 
   const CellTopologyData* const elem_top = &mesh_specs.ctd;
 
-  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepid_basis =
-      Albany::getIntrepid2Basis(*elem_top);
-  RCP<shards::CellTopology> cell_type = rcp(new shards::CellTopology(elem_top));
+  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepid_basis = Albany::getIntrepid2Basis(*elem_top);
+  RCP<shards::CellTopology>                              cell_type      = rcp(new shards::CellTopology(elem_top));
 
   int const num_nodes    = intrepid_basis->getCardinality();
   int const workset_size = mesh_specs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cub_factory;
   RCP<Intrepid2::Cubature<PHX::Device>> cell_cubature =
-      cub_factory.create<PHX::Device, RealType, RealType>(
-          *cell_type, mesh_specs.cubatureDegree);
+      cub_factory.create<PHX::Device, RealType, RealType>(*cell_type, mesh_specs.cubatureDegree);
 
   int const num_qps_cell = cell_cubature->getNumPoints();
   int const num_vertices = cell_type->getNodeCount();
@@ -168,12 +163,10 @@ Albany::ACEThermalProblem::constructEvaluators(
       "ACETempStandAloneProblem must be defined as transient "
       "calculation.");
 
-  *out << "Field Dimensions: Workset=" << workset_size
-       << ", Vertices= " << num_vertices << ", Nodes= " << num_nodes
-       << ", QuadPts= " << num_qps_cell << ", Dim= " << num_dim_ << "\n"; 
+  *out << "Field Dimensions: Workset=" << workset_size << ", Vertices= " << num_vertices << ", Nodes= " << num_nodes
+       << ", QuadPts= " << num_qps_cell << ", Dim= " << num_dim_ << "\n";
 
-  dl_ = rcp(new Albany::Layouts(
-      workset_size, num_vertices, num_nodes, num_qps_cell, num_dim_));
+  dl_ = rcp(new Albany::Layouts(workset_size, num_vertices, num_nodes, num_qps_cell, num_dim_));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
 
   // Temporary variable used numerous times below
@@ -186,34 +179,25 @@ Albany::ACEThermalProblem::constructEvaluators(
   Teuchos::ArrayRCP<string> resid_names(neq);
   resid_names[0] = "Temperature Residual";
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator(
-          false, dof_names, dof_names_dot));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cell_type, cell_cubature));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(false, resid_names));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherCoordinateVectorEvaluator());
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructMapToPhysicalFrameEvaluator(cell_type, cell_cubature));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(
-          cell_type, intrepid_basis, cell_cubature));
+      evalUtils.constructComputeBasisFunctionsEvaluator(cell_type, intrepid_basis, cell_cubature));
 
   for (unsigned int i = 0; i < neq; i++) {
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFInterpolationEvaluator(dof_names[i]));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[i]));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i]));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i]));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
-   
+
   // ACE thermal parameters
   {
     RCP<ParameterList> p = rcp(new ParameterList);
@@ -228,151 +212,150 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE Porosity QP Variable Name", "ACE Porosity");
     p->set<string>("ACE Temperature QP Variable Name", "Temperature");
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
-    p->set< RCP<DataLayout> >("Node Data Layout", dl_->node_scalar);
-    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
-    p->set< RCP<DataLayout> >("QP Vector Data Layout", dl_->qp_vector);
+    p->set<RCP<DataLayout>>("Node Data Layout", dl_->node_scalar);
+    p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
 
-    p->set<RCP<ParamLib> >("Parameter Library", paramLib);
+    p->set<RCP<ParamLib>>("Parameter Library", paramLib);
     Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Parameters");
     p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
-    p->set<Teuchos::ArrayRCP<string>>("Element Block Names", eb_names_ );
+    p->set<Teuchos::ArrayRCP<string>>("Element Block Names", eb_names_);
 
-    if(material_db_ != Teuchos::null)
-      p->set< RCP<Albany::MaterialDatabase> >("MaterialDB", material_db_);
+    if (material_db_ != Teuchos::null) p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", material_db_);
 
-    ev = rcp(new LCM::ACEThermalParameters<EvalT,AlbanyTraits>(*p, dl_));
+    ev = rcp(new LCM::ACEThermalParameters<EvalT, AlbanyTraits>(*p, dl_));
     fm0.template registerEvaluator<EvalT>(ev);
-    // Save ACE Bluff Salinity to the output Exodus file 
+    // Save ACE Bluff Salinity to the output Exodus file
     {
       std::string stateName = "ACE Bluff Salinity";
-      entity = Albany::StateStruct::QuadPoint;
+      entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Bluff Salinity");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
       Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
-      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
-      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE Ice Saturation to the output Exodus file 
+    // Save ACE Ice Saturation to the output Exodus file
     {
       std::string stateName = "ACE Ice Saturation";
-      entity = Albany::StateStruct::QuadPoint;
+      entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Ice Saturation");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
       Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
-      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
-      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE Density to the output Exodus file 
+    // Save ACE Density to the output Exodus file
     {
       std::string stateName = "ACE Density";
-      entity = Albany::StateStruct::QuadPoint;
+      entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Density");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
       Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
-      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
-      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE Heat Capacity to the output Exodus file 
+    // Save ACE Heat Capacity to the output Exodus file
     {
       std::string stateName = "ACE Heat Capacity";
-      entity = Albany::StateStruct::QuadPoint;
+      entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Heat Capacity");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
       Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
-      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
-      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE Thermal Conductivity to the output Exodus file 
+    // Save ACE Thermal Conductivity to the output Exodus file
     {
       std::string stateName = "ACE Thermal Conductivity";
-      entity = Albany::StateStruct::QuadPoint;
+      entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Thermal Conductivity");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
       Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
-      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
-      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE Thermal Inertia to the output Exodus file 
+    // Save ACE Thermal Inertia to the output Exodus file
     {
       std::string stateName = "ACE Thermal Inertia";
-      entity = Albany::StateStruct::QuadPoint;
+      entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Thermal Inertia");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
       Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
-      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
-      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE Water Saturation to the output Exodus file 
+    // Save ACE Water Saturation to the output Exodus file
     {
       std::string stateName = "ACE Water Saturation";
-      entity = Albany::StateStruct::QuadPoint;
+      entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Water Saturation");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
       Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
-      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
-      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE Porosity to the output Exodus file 
+    // Save ACE Porosity to the output Exodus file
     {
       std::string stateName = "ACE Porosity";
-      entity = Albany::StateStruct::QuadPoint;
+      entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Porosity");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
       Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
-      ev = rcp(new PHAL::SaveStateField<EvalT,AlbanyTraits>(*p));
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
-      if ((field_manager_choice == Albany::BUILD_RESID_FM)&&(ev->evaluatedFields().size()>0))
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
   }
-              
+
   {  // Temperature Resid
     RCP<ParameterList> p = rcp(new ParameterList("Temperature Resid"));
 
@@ -389,7 +372,7 @@ Albany::ACEThermalProblem::constructEvaluators(
 
     p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
-    p->set< RCP<DataLayout> >("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");
@@ -407,8 +390,7 @@ Albany::ACEThermalProblem::constructEvaluators(
 
   else if (field_manager_choice == Albany::BUILD_RESPONSE_FM) {
     Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> resp_utils(dl_);
-    return resp_utils.constructResponses(
-        fm0, *response_list, params_from_prob, state_mgr, &mesh_specs);
+    return resp_utils.constructResponses(fm0, *response_list, params_from_prob, state_mgr, &mesh_specs);
   }
 
   return Teuchos::null;

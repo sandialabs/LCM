@@ -6,10 +6,7 @@
 
 using namespace utility;
 
-StaticAllocator::StaticAllocator(std::size_t size)
-    : size_(size), buffer_(new unsigned char[size]), ptr_(buffer_)
-{
-}
+StaticAllocator::StaticAllocator(std::size_t size) : size_(size), buffer_(new unsigned char[size]), ptr_(buffer_) {}
 
 StaticAllocator::~StaticAllocator() { delete[] buffer_; }
 

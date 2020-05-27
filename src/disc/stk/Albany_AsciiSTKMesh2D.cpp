@@ -30,8 +30,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
 {
   NumElemNodes = NumNodes = NumElems = NumBdEdges = 0;
 
-  std::string fname =
-      params->get("Ascii Input Mesh File Name", "greenland.msh");
+  std::string fname = params->get("Ascii Input Mesh File Name", "greenland.msh");
 
   std::string shape, word;
   int         number;
@@ -58,8 +57,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
             std::endl
                 << "Error in AsciiSTKMesh2D: Triangles must be linear. Number "
                    "of nodes per element in file "
-                << fname << " is: " << NumElemNodes << ". Should be 3!"
-                << std::endl);
+                << fname << " is: " << NumElemNodes << ". Should be 3!" << std::endl);
       } else if (shape == "Quadrilateral") {
         ALBANY_PANIC(
             NumElemNodes != 4,
@@ -73,8 +71,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
             std::endl
             << "Error in AsciiSTKMesh2D: Only Triangle or Quadrilateral "
                "grids can be imported. Shape in in file "
-            << fname << " is: " << shape
-            << ". Should be Triangle or Quadrialteral" << std::endl);
+            << fname << " is: " << shape << ". Should be Triangle or Quadrialteral" << std::endl);
 
       ifile >> NumNodes >> NumElems >> NumBdEdges;
       // read in nodes coordinates
@@ -99,8 +96,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
 
       for (int i = 0; i < NumNodes; i++) {
         if (globalIds)
-          ifile >> coord_Ids[i] >> coords[i][0] >> coords[i][1] >>
-              coord_flags[i];
+          ifile >> coord_Ids[i] >> coords[i][0] >> coords[i][1] >> coord_flags[i];
         else
           ifile >> coords[i][0] >> coords[i][1] >> coord_flags[i];
       }
@@ -109,19 +105,16 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
       if (shape == "Triangle") {
         for (int i = 0; i < NumElems; i++) {
           if (globalIds)
-            ifile >> ele_Ids[i] >> elems[i][0] >> elems[i][1] >> elems[i][2] >>
-                temp;
+            ifile >> ele_Ids[i] >> elems[i][0] >> elems[i][1] >> elems[i][2] >> temp;
           else
             ifile >> elems[i][0] >> elems[i][1] >> elems[i][2] >> temp;
         }
       } else {  // Quadrilateral
         for (int i = 0; i < NumElems; i++) {
           if (globalIds)
-            ifile >> ele_Ids[i] >> elems[i][0] >> elems[i][1] >> elems[i][2] >>
-                elems[i][3] >> temp;
+            ifile >> ele_Ids[i] >> elems[i][0] >> elems[i][1] >> elems[i][2] >> elems[i][3] >> temp;
           else
-            ifile >> elems[i][0] >> elems[i][1] >> elems[i][2] >> elems[i][3] >>
-                temp;
+            ifile >> elems[i][0] >> elems[i][1] >> elems[i][2] >> elems[i][3] >> temp;
         }
       }
 
@@ -133,10 +126,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
       }
       ifile.close();
     } else {
-      ALBANY_ABORT(
-          std::endl
-          << "Error in AsciiSTKMesh2D: Input Mesh File " << fname
-          << " not found!" << std::endl);
+      ALBANY_ABORT(std::endl << "Error in AsciiSTKMesh2D: Input Mesh File " << fname << " not found!" << std::endl);
     }
   }
 
@@ -189,8 +179,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
 
     nsNames.push_back(nsn_ss.str());
 
-    nsPartVec[nsn_ss.str()] =
-        &metaData->declare_part(nsn_ss.str(), stk::topology::NODE_RANK);
+    nsPartVec[nsn_ss.str()] = &metaData->declare_part(nsn_ss.str(), stk::topology::NODE_RANK);
 
     stk::io::put_io_part_attribute(*nsPartVec[nsn_ss.str()]);
   }
@@ -214,8 +203,7 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
 
     ssNames.push_back(ssn_ss.str());
 
-    ssPartVec[ssn_ss.str()] =
-        &metaData->declare_part(ssn_ss.str(), metaData->side_rank());
+    ssPartVec[ssn_ss.str()] = &metaData->declare_part(ssn_ss.str(), metaData->side_rank());
 
     stk::io::put_io_part_attribute(*ssPartVec[ssn_ss.str()]);
   }
@@ -236,21 +224,13 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
   Teuchos::broadcast<LO, LO>(*commT, 0, &NumElems);
   int worksetSize = this->computeWorksetSize(worksetSizeMax, NumElems);
 
-  stk::topology        stk_topo_data = metaData->get_topology(*partVec[0]);
-  shards::CellTopology shards_ctd = stk::mesh::get_cell_topology(stk_topo_data);
-  const CellTopologyData& ctd     = *shards_ctd.getCellTopologyData();
+  stk::topology           stk_topo_data = metaData->get_topology(*partVec[0]);
+  shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
+  const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
 
   cullSubsetParts(ssNames, ssPartVec);
   this->meshSpecs[0] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-      ctd,
-      numDim,
-      cub,
-      nsNames,
-      ssNames,
-      worksetSize,
-      partVec[0]->name(),
-      ebNameToIndex,
-      this->interleavedOrdering));
+      ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
 
   // Create a mesh specs object for EACH side set
   this->initializeSideSetMeshSpecs(commT);
@@ -265,15 +245,12 @@ void
 Albany::AsciiSTKMesh2D::setFieldAndBulkData(
     const Teuchos::RCP<Teuchos_Comm const>& commT,
     const Teuchos::RCP<Teuchos::ParameterList>& /*params_*/,
-    const unsigned int                                        neq_,
-    const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-    const unsigned int                                        worksetSize,
-    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-        side_set_sis,
-    std::map<
-        std::string,
-        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
+    const unsigned int                                                               neq_,
+    const AbstractFieldContainer::FieldContainerRequirements&                        req,
+    const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+    const unsigned int                                                               worksetSize,
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
+    std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   this->SetupFieldData(commT, neq_, req, sis, worksetSize);
 
@@ -281,8 +258,7 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
 
   bulkData->modification_begin();  // Begin modifying the mesh
 
-  Teuchos::RCP<Teuchos::FancyOStream> out =
-      Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
+  Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
   out->setProcRankAndSize(commT->getRank(), commT->getSize());
   out->setOutputToRootOnly(0);
 
@@ -291,18 +267,15 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
     stk::mesh::PartVector singlePartVec(1);
     unsigned int          ebNo = 0;  // element block #???
 
-    AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field =
-        fieldContainer->getProcRankField();
-    AbstractSTKFieldContainer::VectorFieldType* coordinates_field =
-        fieldContainer->getCoordinatesField();
+    AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field   = fieldContainer->getProcRankField();
+    AbstractSTKFieldContainer::VectorFieldType*    coordinates_field = fieldContainer->getCoordinatesField();
 
     singlePartVec[0] = nsPartVec["node_set"];
 
     *out << "[AsciiSTKMesh2D] Adding nodes... ";
     out->getOStream()->flush();
     for (int i = 0; i < NumNodes; i++) {
-      stk::mesh::Entity node = bulkData->declare_entity(
-          stk::topology::NODE_RANK, coord_Ids[i], singlePartVec);
+      stk::mesh::Entity node = bulkData->declare_entity(stk::topology::NODE_RANK, coord_Ids[i], singlePartVec);
 
       double* coord;
       coord    = stk::mesh::field_data(*coordinates_field, node);
@@ -317,12 +290,10 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
     out->getOStream()->flush();
     for (int i = 0; i < NumElems; i++) {
       singlePartVec[0]       = partVec[ebNo];
-      stk::mesh::Entity elem = bulkData->declare_entity(
-          stk::topology::ELEMENT_RANK, ele_Ids[i], singlePartVec);
+      stk::mesh::Entity elem = bulkData->declare_entity(stk::topology::ELEMENT_RANK, ele_Ids[i], singlePartVec);
 
       for (int j = 0; j < NumElemNodes; j++) {
-        stk::mesh::Entity node = bulkData->get_entity(
-            stk::topology::NODE_RANK, coord_Ids[elems[i][j] - 1]);
+        stk::mesh::Entity node = bulkData->get_entity(stk::topology::NODE_RANK, coord_Ids[elems[i][j] - 1]);
         bulkData->declare_relation(elem, node, j);
       }
 
@@ -339,18 +310,15 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
     for (int i = 0; i < NumBdEdges; i++) {
       auto node1_lid = bdEdges[i][0] - 1, node2_lid = bdEdges[i][1] - 1;
       auto node1_id = coord_Ids[node1_lid], node2_id = coord_Ids[node2_lid];
-      edgeMap.insert(std::pair<std::pair<int, int>, int>(
-          std::make_pair(node1_id, node2_id), i));
+      edgeMap.insert(std::pair<std::pair<int, int>, int>(std::make_pair(node1_id, node2_id), i));
 
       // create parts for boundary nodes
       partName         = bdTagToNodeSetName[coord_flags[node1_lid]];
       singlePartVec[0] = nsPartVec[partName];
-      /* stk::mesh::Entity node1 = */ bulkData->declare_entity(
-          stk::topology::NODE_RANK, node1_id, singlePartVec);
+      /* stk::mesh::Entity node1 = */ bulkData->declare_entity(stk::topology::NODE_RANK, node1_id, singlePartVec);
       partName         = bdTagToNodeSetName[coord_flags[node2_lid]];
       singlePartVec[0] = nsPartVec[partName];
-      /* stk::mesh::Entity node2 = */ bulkData->declare_entity(
-          stk::topology::NODE_RANK, node2_id, singlePartVec);
+      /* stk::mesh::Entity node2 = */ bulkData->declare_entity(stk::topology::NODE_RANK, node2_id, singlePartVec);
     }
 
     *out << "done!\n";
@@ -363,26 +331,20 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
     multiPartVec[0] = ssPartVec["boundary_side_set"];
     for (int i = 0; i < NumElems; i++) {
       for (int j = 0; j < NumElemNodes; j++) {
-        auto node1 = coord_Ids[elems[i][j] - 1],
-             node2 = coord_Ids[elems[i][(j + 1) % NumElemNodes] - 1];
-        std::map<std::pair<int, int>, int>::iterator it =
-            edgeMap.find(std::make_pair(node1, node2));
+        auto node1 = coord_Ids[elems[i][j] - 1], node2 = coord_Ids[elems[i][(j + 1) % NumElemNodes] - 1];
+        std::map<std::pair<int, int>, int>::iterator it = edgeMap.find(std::make_pair(node1, node2));
 
-        if (it == edgeMap.end())
-          it = edgeMap.find(std::make_pair(node2, node1));
+        if (it == edgeMap.end()) it = edgeMap.find(std::make_pair(node2, node1));
 
         if (it != edgeMap.end()) {
-          partName        = bdTagToSideSetName.at(bdEdges[it->second][2]);
-          multiPartVec[1] = ssPartVec.at(partName);
-          stk::mesh::Entity side = bulkData->declare_entity(
-              metaData->side_rank(), be_Ids[it->second], multiPartVec);
-          stk::mesh::Entity elem =
-              bulkData->get_entity(stk::topology::ELEMENT_RANK, ele_Ids[i]);
+          partName               = bdTagToSideSetName.at(bdEdges[it->second][2]);
+          multiPartVec[1]        = ssPartVec.at(partName);
+          stk::mesh::Entity side = bulkData->declare_entity(metaData->side_rank(), be_Ids[it->second], multiPartVec);
+          stk::mesh::Entity elem = bulkData->get_entity(stk::topology::ELEMENT_RANK, ele_Ids[i]);
           bulkData->declare_relation(elem, side, j /*local side id*/);
           stk::mesh::Entity const* rel_elemNodes = bulkData->begin_nodes(elem);
           for (int k = 0; k < 2; k++) {
-            stk::mesh::Entity node =
-                rel_elemNodes[this->meshSpecs[0]->ctd.side[j].node[k]];
+            stk::mesh::Entity node = rel_elemNodes[this->meshSpecs[0]->ctd.side[j].node[k]];
             bulkData->declare_relation(side, node, k);
           }
           edgeMap.erase(it);
@@ -413,8 +375,7 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
 
   // Finally, perform the setup of the (possible) side set meshes (including
   // extraction if of type SideSetSTKMeshStruct)
-  this->finalizeSideSetMeshStructs(
-      commT, side_set_req, side_set_sis, worksetSize);
+  this->finalizeSideSetMeshStructs(commT, side_set_req, side_set_sis, worksetSize);
 
   fieldAndBulkDataSet = true;
 }
@@ -422,8 +383,7 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::AsciiSTKMesh2D::getValidDiscretizationParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getValidGenericSTKParameters("Valid ASCII_DiscParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getValidGenericSTKParameters("Valid ASCII_DiscParams");
   validPL->set<std::string>(
       "Ascii Input Mesh File Name",
       "greenland.msh",

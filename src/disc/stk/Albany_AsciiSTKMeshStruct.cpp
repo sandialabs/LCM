@@ -62,11 +62,10 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   char geIDsfilename[100];
   char gnIDsfilename[100];
   char bfIDsfilename[100];
-  char flwafilename[100];  // flow factor file
-  char tempfilename[100];  // temperature file
-  char betafilename[100];  // basal friction coefficient file
-  if ((numProc == 1) &
-      (contigIDs == true)) {  // serial run with contiguous global IDs
+  char flwafilename[100];                      // flow factor file
+  char tempfilename[100];                      // temperature file
+  char betafilename[100];                      // basal friction coefficient file
+  if ((numProc == 1) & (contigIDs == true)) {  // serial run with contiguous global IDs
     sprintf(meshfilename, "%s", "xyz");
     sprintf(shfilename, "%s", "sh");
     sprintf(confilename, "%s", "eles");
@@ -74,9 +73,9 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     sprintf(flwafilename, "%s", "flwa");
     sprintf(tempfilename, "%s", "temp");
     sprintf(betafilename, "%s", "beta");
-  } else {  // parallel run or serial run with non-contiguous global IDs - proc
-            // # is appended to file name to indicate what processor the mesh
-            // piece is on
+  } else {                         // parallel run or serial run with non-contiguous global IDs - proc
+                                   // # is appended to file name to indicate what processor the mesh
+                                   // piece is on
     int suffix = comm->getRank();  // current processor number
     sprintf(meshfilename, "%s%i", "xyz", suffix);
     sprintf(shfilename, "%s%i", "sh", suffix);
@@ -94,12 +93,10 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   // assumes mesh file is called "xyz" and its first row is the number of nodes
   FILE* meshfile = fopen(meshfilename, "r");
   if (meshfile == NULL) {  // check if coordinates file exists
-    *out << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename
-         << " not found!" << std::endl;
+    *out << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename << " not found!" << std::endl;
     ALBANY_ABORT(
         std::endl
-        << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename
-        << " not found!" << std::endl);
+        << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename << " not found!" << std::endl);
   }
   double temp;
   fseek(meshfile, 0, SEEK_SET);
@@ -147,12 +144,10 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   // elements
   FILE* confile = fopen(confilename, "r");
   if (confile == NULL) {  // check if element connectivity file exists
-    *out << "Error in AsciiSTKMeshStruct: element connectivity file "
-         << confilename << " not found!" << std::endl;
+    *out << "Error in AsciiSTKMeshStruct: element connectivity file " << confilename << " not found!" << std::endl;
     ALBANY_ABORT(
         std::endl
-        << "Error in AsciiSTKMeshStruct: element connectivity file "
-        << confilename << " not found!" << std::endl);
+        << "Error in AsciiSTKMeshStruct: element connectivity file " << confilename << " not found!" << std::endl);
   }
   fseek(confile, 0, SEEK_SET);
   safe_fscanf(1, confile, "%lf", &temp);
@@ -188,30 +183,21 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     fseek(bffile, 0, SEEK_SET);
     safe_fscanf(1, bffile, "%lf", &temp);
     NumBasalFaces = int(temp);
-    bf = new int[NumBasalFaces][5];  // 1st column of bf: element # that face
-                                     // belongs to, 2rd-5th columns of bf:
-                                     // connectivity (hard-coded for quad faces)
+    bf            = new int[NumBasalFaces][5];  // 1st column of bf: element # that face
+                                                // belongs to, 2rd-5th columns of bf:
+                                                // connectivity (hard-coded for quad faces)
     safe_fgets(buffer, 100, bffile);
     for (int i = 0; i < NumBasalFaces; i++) {
       safe_fgets(buffer, 100, bffile);
-      safe_sscanf(
-          5,
-          buffer,
-          "%i %i %i %i %i",
-          &bf[i][0],
-          &bf[i][1],
-          &bf[i][2],
-          &bf[i][3],
-          &bf[i][4]);
+      safe_sscanf(5, buffer, "%i %i %i %i %i", &bf[i][0], &bf[i][1], &bf[i][2], &bf[i][3], &bf[i][4]);
       //*out << "face #:" << bf[i][0] << ", face conn:" << bf[i][1] << " " <<
       // bf[i][2] << " " << bf[i][3] << " " << bf[i][4] << std::endl;
     }
   }
   // Create array w/ global element IDs
   globalElesID.resize(NumEles);
-  if ((numProc == 1) &
-      (contigIDs == true)) {  // serial run with contiguous global IDs: element
-                              // IDs are just 0->NumEles-1
+  if ((numProc == 1) & (contigIDs == true)) {  // serial run with contiguous global IDs: element
+                                               // IDs are just 0->NumEles-1
     for (int i = 0; i < NumEles; i++) {
       globalElesID[i] = i;
       //*out << "local element ID #:" << i << ", global element ID #:" <<
@@ -222,30 +208,26 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
             // NumEles.
     FILE* geIDsfile = fopen(geIDsfilename, "r");
     if (geIDsfile == NULL) {  // check if global element IDs file exists
-      *out << "Error in AsciiSTKMeshStruct: global element IDs file "
-           << geIDsfilename << " not found!" << std::endl;
+      *out << "Error in AsciiSTKMeshStruct: global element IDs file " << geIDsfilename << " not found!" << std::endl;
       ALBANY_ABORT(
           std::endl
-          << "Error in AsciiSTKMeshStruct: global element IDs file "
-          << geIDsfilename << " not found!" << std::endl);
+          << "Error in AsciiSTKMeshStruct: global element IDs file " << geIDsfilename << " not found!" << std::endl);
     }
     fseek(geIDsfile, 0, SEEK_SET);
     safe_fgets(buffer, 100, geIDsfile);
     for (int i = 0; i < NumEles; i++) {
       safe_fgets(buffer, 100, geIDsfile);
       safe_sscanf(1, buffer, "" ST_LLI " ", &globalElesID[i]);
-      globalElesID[i] =
-          globalElesID[i] - 1;  // subtract 1 b/c global element IDs file
-                                // assumed to be 1-based not 0-based
+      globalElesID[i] = globalElesID[i] - 1;  // subtract 1 b/c global element IDs file
+                                              // assumed to be 1-based not 0-based
       //*out << "local element ID #:" << i << ", global element ID #:" <<
       // globalElesID[i] << std::endl;
     }
   }
   // Create array w/ global node IDs
   globalNodesID.resize(NumNodes);
-  if ((numProc == 1) &
-      (contigIDs == true)) {  // serial run with contiguous global IDs: element
-                              // IDs are just 0->NumEles-1
+  if ((numProc == 1) & (contigIDs == true)) {  // serial run with contiguous global IDs: element
+                                               // IDs are just 0->NumEles-1
     for (int i = 0; i < NumNodes; i++) {
       globalNodesID[i] = i;
       //*out << "local node ID #:" << i << ", global node ID #:" <<
@@ -256,29 +238,25 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
             // NumNodes
     FILE* gnIDsfile = fopen(gnIDsfilename, "r");
     if (gnIDsfile == NULL) {  // check if global node IDs file exists
-      *out << "Error in AsciiSTKMeshStruct: global node IDs file "
-           << gnIDsfilename << " not found!" << std::endl;
+      *out << "Error in AsciiSTKMeshStruct: global node IDs file " << gnIDsfilename << " not found!" << std::endl;
       ALBANY_ABORT(
           std::endl
-          << "Error in AsciiSTKMeshStruct: global node IDs file "
-          << gnIDsfilename << " not found!" << std::endl);
+          << "Error in AsciiSTKMeshStruct: global node IDs file " << gnIDsfilename << " not found!" << std::endl);
     }
     fseek(gnIDsfile, 0, SEEK_SET);
     safe_fgets(buffer, 100, gnIDsfile);
     for (int i = 0; i < NumNodes; i++) {
       safe_fgets(buffer, 100, gnIDsfile);
       safe_sscanf(1, buffer, "" ST_LLI " ", &globalNodesID[i]);
-      globalNodesID[i] =
-          globalNodesID[i] - 1;  // subtract 1 b/c global node IDs file assumed
-                                 // to be 1-based not 0-based
+      globalNodesID[i] = globalNodesID[i] - 1;  // subtract 1 b/c global node IDs file assumed
+                                                // to be 1-based not 0-based
       //*out << "local node ID #:" << i << ", global node ID #:" <<
       // globalNodesID[i] << std::endl;
     }
   }
   basalFacesID.resize(NumBasalFaces);
-  if ((numProc == 1) &
-      (contigIDs == true)) {  // serial run with contiguous global IDs: element
-                              // IDs are just 0->NumEles-1
+  if ((numProc == 1) & (contigIDs == true)) {  // serial run with contiguous global IDs: element
+                                               // IDs are just 0->NumEles-1
     for (int i = 0; i < NumBasalFaces; i++) {
       basalFacesID[i] = i;
       //*out << "local face ID #:" << i << ", global face ID #:" <<
@@ -293,9 +271,8 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     for (int i = 0; i < NumBasalFaces; i++) {
       safe_fgets(buffer, 100, bfIDsfile);
       safe_sscanf(1, buffer, "" ST_LLI " ", &basalFacesID[i]);
-      basalFacesID[i] =
-          basalFacesID[i] - 1;  // subtract 1 b/c basal face IDs file assumed to
-                                // be 1-based not 0-based
+      basalFacesID[i] = basalFacesID[i] - 1;  // subtract 1 b/c basal face IDs file assumed to
+                                              // be 1-based not 0-based
       //*out << "local face ID #:" << i << ", global face ID #:" <<
       // basalFacesID[i] << std::endl;
     }
@@ -419,23 +396,14 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   numDim             = 3;
   int cub            = params->get("Cubature Degree", 3);
   int worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
-  int worksetSize =
-      this->computeWorksetSize(worksetSizeMax, elem_mapT->getNodeNumElements());
+  int worksetSize    = this->computeWorksetSize(worksetSizeMax, elem_mapT->getNodeNumElements());
 
-  stk::topology        stk_topo_data = metaData->get_topology(*partVec[0]);
-  shards::CellTopology shards_ctd = stk::mesh::get_cell_topology(stk_topo_data);
-  const CellTopologyData& ctd     = *shards_ctd.getCellTopologyData();
+  stk::topology           stk_topo_data = metaData->get_topology(*partVec[0]);
+  shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
+  const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
 
   this->meshSpecs[0] = Teuchos::rcp(new MeshSpecsStruct(
-      ctd,
-      numDim,
-      cub,
-      nsNames,
-      ssNames,
-      worksetSize,
-      partVec[0]->name(),
-      ebNameToIndex,
-      this->interleavedOrdering));
+      ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
 
   // Create a mesh specs object for EACH side set
   this->initializeSideSetMeshSpecs(comm);
@@ -456,14 +424,12 @@ void
 AsciiSTKMeshStruct::setFieldAndBulkData(
     const Teuchos::RCP<Teuchos_Comm const>& comm,
     const Teuchos::RCP<Teuchos::ParameterList>& /* params */,
-    const unsigned int                                          neq_,
-    const AbstractFieldContainer::FieldContainerRequirements&   req,
-    const Teuchos::RCP<StateInfoStruct>&                        sis,
-    const unsigned int                                          worksetSize,
-    std::map<std::string, Teuchos::RCP<StateInfoStruct>> const& side_set_sis,
-    std::map<
-        std::string,
-        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
+    const unsigned int                                                               neq_,
+    const AbstractFieldContainer::FieldContainerRequirements&                        req,
+    const Teuchos::RCP<StateInfoStruct>&                                             sis,
+    const unsigned int                                                               worksetSize,
+    std::map<std::string, Teuchos::RCP<StateInfoStruct>> const&                      side_set_sis,
+    std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   this->SetupFieldData(comm, neq_, req, sis, worksetSize);
 
@@ -479,16 +445,13 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
 
   typedef AbstractSTKFieldContainer::ScalarFieldType ScalarFieldType;
 
-  AbstractSTKFieldContainer::VectorFieldType* coordinates_field =
-      fieldContainer->getCoordinatesField();
-  ScalarFieldType* surfaceHeight_field = metaData->get_field<ScalarFieldType>(
-      stk::topology::NODE_RANK, "surface_height");
-  ScalarFieldType* flowFactor_field = metaData->get_field<ScalarFieldType>(
-      stk::topology::ELEMENT_RANK, "flow_factor");
-  ScalarFieldType* temperature_field = metaData->get_field<ScalarFieldType>(
-      stk::topology::ELEMENT_RANK, "temperature");
-  ScalarFieldType* basal_friction_field = metaData->get_field<ScalarFieldType>(
-      stk::topology::NODE_RANK, "basal_friction");
+  AbstractSTKFieldContainer::VectorFieldType* coordinates_field = fieldContainer->getCoordinatesField();
+  ScalarFieldType*                            surfaceHeight_field =
+      metaData->get_field<ScalarFieldType>(stk::topology::NODE_RANK, "surface_height");
+  ScalarFieldType* flowFactor_field  = metaData->get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, "flow_factor");
+  ScalarFieldType* temperature_field = metaData->get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, "temperature");
+  ScalarFieldType* basal_friction_field =
+      metaData->get_field<ScalarFieldType>(stk::topology::NODE_RANK, "basal_friction");
 
   if (!surfaceHeight_field) have_sh = false;
   if (!flowFactor_field) have_flwa = false;
@@ -500,26 +463,17 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
     // std::cout << "elem_GID: " << elem_GID << std::endl;
     stk::mesh::EntityId elem_id = (stk::mesh::EntityId)elem_GID;
     singlePartVec[0]            = partVec[ebNo];
-    stk::mesh::Entity elem      = bulkData->declare_entity(
-        stk::topology::ELEMENT_RANK, 1 + elem_id, singlePartVec);
+    stk::mesh::Entity elem      = bulkData->declare_entity(stk::topology::ELEMENT_RANK, 1 + elem_id, singlePartVec);
     // I am assuming the ASCII mesh is 1-based not 0-based, so no need to add 1
     // for STK mesh
-    stk::mesh::Entity llnode = bulkData->declare_entity(
-        stk::topology::NODE_RANK, eles[i][0], nodePartVec);
-    stk::mesh::Entity lrnode = bulkData->declare_entity(
-        stk::topology::NODE_RANK, eles[i][1], nodePartVec);
-    stk::mesh::Entity urnode = bulkData->declare_entity(
-        stk::topology::NODE_RANK, eles[i][2], nodePartVec);
-    stk::mesh::Entity ulnode = bulkData->declare_entity(
-        stk::topology::NODE_RANK, eles[i][3], nodePartVec);
-    stk::mesh::Entity llnodeb = bulkData->declare_entity(
-        stk::topology::NODE_RANK, eles[i][4], nodePartVec);
-    stk::mesh::Entity lrnodeb = bulkData->declare_entity(
-        stk::topology::NODE_RANK, eles[i][5], nodePartVec);
-    stk::mesh::Entity urnodeb = bulkData->declare_entity(
-        stk::topology::NODE_RANK, eles[i][6], nodePartVec);
-    stk::mesh::Entity ulnodeb = bulkData->declare_entity(
-        stk::topology::NODE_RANK, eles[i][7], nodePartVec);
+    stk::mesh::Entity llnode  = bulkData->declare_entity(stk::topology::NODE_RANK, eles[i][0], nodePartVec);
+    stk::mesh::Entity lrnode  = bulkData->declare_entity(stk::topology::NODE_RANK, eles[i][1], nodePartVec);
+    stk::mesh::Entity urnode  = bulkData->declare_entity(stk::topology::NODE_RANK, eles[i][2], nodePartVec);
+    stk::mesh::Entity ulnode  = bulkData->declare_entity(stk::topology::NODE_RANK, eles[i][3], nodePartVec);
+    stk::mesh::Entity llnodeb = bulkData->declare_entity(stk::topology::NODE_RANK, eles[i][4], nodePartVec);
+    stk::mesh::Entity lrnodeb = bulkData->declare_entity(stk::topology::NODE_RANK, eles[i][5], nodePartVec);
+    stk::mesh::Entity urnodeb = bulkData->declare_entity(stk::topology::NODE_RANK, eles[i][6], nodePartVec);
+    stk::mesh::Entity ulnodeb = bulkData->declare_entity(stk::topology::NODE_RANK, eles[i][7], nodePartVec);
     bulkData->declare_relation(elem, llnode, 0);
     bulkData->declare_relation(elem, lrnode, 1);
     bulkData->declare_relation(elem, urnode, 2);
@@ -689,16 +643,14 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
     // If first node has z=0 and there is no basal face file provided, identify
     // it as a Basal SS
     if (have_bf == false) {
-      *out << "No bf file specified...  setting basal boundary to z=0 plane..."
-           << std::endl;
+      *out << "No bf file specified...  setting basal boundary to z=0 plane..." << std::endl;
       if (xyz[eles[i][0]][2] == 0.0) {
         // std::cout << "sideID: " << sideID << std::endl;
         singlePartVec[0]            = ssPartVec["Basal"];
         stk::mesh::EntityId side_id = (stk::mesh::EntityId)(sideID);
         sideID++;
 
-        stk::mesh::Entity side = bulkData->declare_entity(
-            metaData->side_rank(), 1 + side_id, singlePartVec);
+        stk::mesh::Entity side = bulkData->declare_entity(metaData->side_rank(), 1 + side_id, singlePartVec);
         bulkData->declare_relation(elem, side, 4 /*local side id*/);
 
         bulkData->declare_relation(side, llnode, 0);
@@ -761,29 +713,22 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
     }
   }
   if (have_bf == true) {
-    *out << "Setting basal surface connectivity from bf file provided..."
-         << std::endl;
+    *out << "Setting basal surface connectivity from bf file provided..." << std::endl;
     for (unsigned int i = 0; i < basal_face_mapT->getNodeNumElements(); i++) {
       singlePartVec[0]            = ssPartVec["Basal"];
       sideID                      = basal_face_mapT->getGlobalElement(i);
       stk::mesh::EntityId side_id = (stk::mesh::EntityId)(sideID);
-      stk::mesh::Entity   side    = bulkData->declare_entity(
-          metaData->side_rank(), 1 + side_id, singlePartVec);
+      stk::mesh::Entity   side    = bulkData->declare_entity(metaData->side_rank(), 1 + side_id, singlePartVec);
 
       const unsigned int elem_GID = bf[i][0];
       // std::cout << "elem_GID: " << elem_GID << std::endl;
       stk::mesh::EntityId elem_id = (stk::mesh::EntityId)elem_GID;
-      stk::mesh::Entity   elem    = bulkData->declare_entity(
-          stk::topology::ELEMENT_RANK, elem_id, emptyPartVec);
+      stk::mesh::Entity   elem    = bulkData->declare_entity(stk::topology::ELEMENT_RANK, elem_id, emptyPartVec);
       bulkData->declare_relation(elem, side, 4 /*local side id*/);
-      stk::mesh::Entity llnode = bulkData->declare_entity(
-          stk::topology::NODE_RANK, bf[i][1], nodePartVec);
-      stk::mesh::Entity lrnode = bulkData->declare_entity(
-          stk::topology::NODE_RANK, bf[i][2], nodePartVec);
-      stk::mesh::Entity urnode = bulkData->declare_entity(
-          stk::topology::NODE_RANK, bf[i][3], nodePartVec);
-      stk::mesh::Entity ulnode = bulkData->declare_entity(
-          stk::topology::NODE_RANK, bf[i][4], nodePartVec);
+      stk::mesh::Entity llnode = bulkData->declare_entity(stk::topology::NODE_RANK, bf[i][1], nodePartVec);
+      stk::mesh::Entity lrnode = bulkData->declare_entity(stk::topology::NODE_RANK, bf[i][2], nodePartVec);
+      stk::mesh::Entity urnode = bulkData->declare_entity(stk::topology::NODE_RANK, bf[i][3], nodePartVec);
+      stk::mesh::Entity ulnode = bulkData->declare_entity(stk::topology::NODE_RANK, bf[i][4], nodePartVec);
 
       bulkData->declare_relation(side, llnode, 0);
       bulkData->declare_relation(side, ulnode, 3);
@@ -796,15 +741,13 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
   bulkData->modification_end();
 
   fieldAndBulkDataSet = true;
-  this->finalizeSideSetMeshStructs(
-      comm, side_set_req, side_set_sis, worksetSize);
+  this->finalizeSideSetMeshStructs(comm, side_set_req, side_set_sis, worksetSize);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 AsciiSTKMeshStruct::getValidDiscretizationParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getValidGenericSTKParameters("Valid ASCII_DiscParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getValidGenericSTKParameters("Valid ASCII_DiscParams");
 
   return validPL;
 }

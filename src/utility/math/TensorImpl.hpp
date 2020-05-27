@@ -158,9 +158,7 @@ KOKKOS_INLINE_FUNCTION void
 BasicTensor<T, Order>::fill(Array arr, Indices... fixed_indices)
 {
   // For now just support rank-1 copies
-  for (index_t i = 0; i < arraySize(); ++i) {
-    data_[i] = arr(fixed_indices..., i);
-  }
+  for (index_t i = 0; i < arraySize(); ++i) { data_[i] = arr(fixed_indices..., i); }
 }
 
 template <typename T, index_t Order>
@@ -226,9 +224,7 @@ KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
 }
 
 template <typename S, typename T, int O>
-KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(
-    S                        s,
-    const BasicTensor<T, O>& rhs)
+KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(S s, const BasicTensor<T, O>& rhs)
 {
   BasicTensor<Promotion<S, T>, O> ret(rhs.dim());
 
@@ -243,9 +239,7 @@ KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(
 }
 
 template <typename S, typename T, int O>
-KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(
-    const BasicTensor<S, O>& lhs,
-    T                        s)
+KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(const BasicTensor<S, O>& lhs, T s)
 {
   BasicTensor<Promotion<S, T>, O> ret(lhs.dim());
 
@@ -292,9 +286,7 @@ KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
 }
 
 template <typename S, typename T>
-KOKKOS_INLINE_FUNCTION Tensor2<Promotion<S, T>> operator*(
-    const Tensor2<S>& lhs,
-    const Tensor2<T>& rhs)
+KOKKOS_INLINE_FUNCTION Tensor2<Promotion<S, T>> operator*(const Tensor2<S>& lhs, const Tensor2<T>& rhs)
 {
   using ValueType = typename Tensor2<T>::value_type;
   assert(lhs.dim() == rhs.dim());
@@ -317,9 +309,7 @@ KOKKOS_INLINE_FUNCTION Tensor2<T>
 {
   using ValueType = typename Tensor2<T>::value_type;
   Tensor2<T> ret(dim);
-  for (index_t i = 0; i < dim; ++i) {
-    ret(i, i) = typename Tensor2<T>::value_type(1);
-  }
+  for (index_t i = 0; i < dim; ++i) { ret(i, i) = typename Tensor2<T>::value_type(1); }
 
   return ret;
 }
@@ -451,9 +441,7 @@ KOKKOS_INLINE_FUNCTION Tensor4<T>
   for (index_t i = 0; i < dim; ++i) {
     for (index_t j = 0; j < dim; ++j) {
       for (index_t k = 0; k < dim; ++k) {
-        for (index_t l = 0; l < dim; ++l) {
-          ret(i, j, k, l) = lhs(i, j) * rhs(k, l);
-        }
+        for (index_t l = 0; l < dim; ++l) { ret(i, j, k, l) = lhs(i, j) * rhs(k, l); }
       }
     }
   }

@@ -10,8 +10,7 @@ namespace LCM {
 
 FieldNameMap::FieldNameMap(bool surface_flag)
 {
-  Teuchos::RCP<std::map<std::string, std::string>> name_map =
-      Teuchos::rcp(new std::map<std::string, std::string>);
+  Teuchos::RCP<std::map<std::string, std::string>> name_map = Teuchos::rcp(new std::map<std::string, std::string>);
 
   name_map->insert(std::make_pair("Cauchy_Stress", "Cauchy_Stress"));
   name_map->insert(std::make_pair("FirstPK", "FirstPK"));
@@ -25,10 +24,8 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(std::make_pair("Matrix_Damage", "Matrix_Damage"));
   name_map->insert(std::make_pair("F1_Damage", "F1_Damage"));
   name_map->insert(std::make_pair("F2_Damage", "F2_Damage"));
-  name_map->insert(
-      std::make_pair("void_volume_fraction", "void_volume_fraction"));
-  name_map->insert(
-      std::make_pair("isotropic_hardening", "isotropic_hardening"));
+  name_map->insert(std::make_pair("void_volume_fraction", "void_volume_fraction"));
+  name_map->insert(std::make_pair("isotropic_hardening", "isotropic_hardening"));
   name_map->insert(std::make_pair("eps_ss", "eps_ss"));
   name_map->insert(std::make_pair("Energy", "Energy"));
   name_map->insert(std::make_pair("Material Tangent", "Material Tangent"));
@@ -39,8 +36,7 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(std::make_pair("F", "F"));
   name_map->insert(std::make_pair("J", "J"));
   name_map->insert(std::make_pair("Velocity_Gradient", "Velocity_Gradient"));
-  name_map->insert(
-      std::make_pair("Velocity_Gradient_Plastic", "Velocity_Gradient_Plastic"));
+  name_map->insert(std::make_pair("Velocity_Gradient_Plastic", "Velocity_Gradient_Plastic"));
 
   // Crystal plasticity model
   int const max_slip_systems = 48;
@@ -82,8 +78,7 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(std::make_pair("H_1", "H_1"));
   name_map->insert(std::make_pair("H_2", "H_2"));
   name_map->insert(std::make_pair("H_3", "H_3"));
-  name_map->insert(
-      std::make_pair("Instantaneous Stress", "Instantaneous Stress"));
+  name_map->insert(std::make_pair("Instantaneous Stress", "Instantaneous Stress"));
 
   // Poroplasticity model
   name_map->insert(std::make_pair("Total_Stress", "Total_Stress"));
@@ -96,29 +91,20 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   // Hydrogen transport model
   name_map->insert(std::make_pair("Transport", "Transport"));
   name_map->insert(std::make_pair("HydroStress", "HydroStress"));
-  name_map->insert(
-      std::make_pair("Diffusion_Coefficient", "Diffusion_Coefficient"));
+  name_map->insert(std::make_pair("Diffusion_Coefficient", "Diffusion_Coefficient"));
   name_map->insert(std::make_pair("Tau_Contribution", "Tau_Contribution"));
-  name_map->insert(
-      std::make_pair("Trapped_Concentration", "Trapped_Concentration"));
-  name_map->insert(
-      std::make_pair("Total_Concentration", "Total_Concentration"));
-  name_map->insert(
-      std::make_pair("Effective_Diffusivity", "Effective_Diffusivity"));
+  name_map->insert(std::make_pair("Trapped_Concentration", "Trapped_Concentration"));
+  name_map->insert(std::make_pair("Total_Concentration", "Total_Concentration"));
+  name_map->insert(std::make_pair("Effective_Diffusivity", "Effective_Diffusivity"));
   name_map->insert(std::make_pair("Trapped_Solvent", "Trapped_Solvent"));
   name_map->insert(std::make_pair("Strain_Rate_Factor", "Strain_Rate_Factor"));
-  name_map->insert(std::make_pair(
-      "Concentration_Equilibrium_Parameter",
-      "Concentration_Equilibrium_Parameter"));
-  name_map->insert(
-      std::make_pair("Gradient_Element_Length", "Gradient_Element_Length"));
+  name_map->insert(std::make_pair("Concentration_Equilibrium_Parameter", "Concentration_Equilibrium_Parameter"));
+  name_map->insert(std::make_pair("Gradient_Element_Length", "Gradient_Element_Length"));
 
   // Helium ODEs
   name_map->insert(std::make_pair("He_Concentration", "He_Concentration"));
-  name_map->insert(
-      std::make_pair("Total_Bubble_Density", "Total_Bubble_Density"));
-  name_map->insert(
-      std::make_pair("Bubble_Volume_Fraction", "Bubble_Volume_Fraction"));
+  name_map->insert(std::make_pair("Total_Bubble_Density", "Total_Bubble_Density"));
+  name_map->insert(std::make_pair("Bubble_Volume_Fraction", "Bubble_Volume_Fraction"));
 
   // Geo-models
   name_map->insert(std::make_pair("Back_Stress", "Back_Stress"));
@@ -130,9 +116,7 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   if (surface_flag) {
     std::map<std::string, std::string>::iterator it;
 
-    for (it = name_map->begin(); it != name_map->end(); ++it) {
-      it->second = "surf_" + it->second;
-    }
+    for (it = name_map->begin(); it != name_map->end(); ++it) { it->second = "surf_" + it->second; }
   }
 
   field_name_map_ = name_map;

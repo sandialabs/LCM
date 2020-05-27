@@ -30,9 +30,7 @@ class Absorption : public PHX::EvaluatorWithBaseImpl<Traits>,
   Absorption(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

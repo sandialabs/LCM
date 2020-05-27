@@ -22,25 +22,20 @@ namespace PHAL {
 
 */
 template <typename EvalT, typename Traits>
-class ComputeBasisFunctionsSide : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                  public PHX::EvaluatorDerived<EvalT, Traits>
+class ComputeBasisFunctionsSide : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ComputeBasisFunctionsSide(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ComputeBasisFunctionsSide(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
-  int numSides, numSideNodes, numSideQPs, numCellDims, numSideDims, numNodes;
+  int                                 numSides, numSideNodes, numSideQPs, numCellDims, numSideDims, numNodes;
 
   //! The side set where to compute the Basis Functions
   std::string sideSetName;

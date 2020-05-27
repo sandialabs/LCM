@@ -20,16 +20,13 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-                     public PHX::EvaluatorDerived<EvalT, Traits>
+class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ACETempStandAloneResid(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -43,8 +40,8 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT const, Cell, QuadPoint>                tdot_;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wgradbf_;
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           tgrad_;
-  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_conductivity_; //thermal conductivity
-  PHX::MDField<const ScalarT,Cell,QuadPoint> thermal_inertia_; //thermal inertia = rho * C
+  PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_conductivity_;  // thermal conductivity
+  PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_inertia_;       // thermal inertia = rho * C
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> residual_;

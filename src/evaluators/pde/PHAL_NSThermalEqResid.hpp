@@ -19,16 +19,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class NSThermalEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
-                         public PHX::EvaluatorDerived<EvalT, Traits>
+class NSThermalEqResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   NSThermalEqResid(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -56,9 +53,9 @@ class NSThermalEqResid : public PHX::EvaluatorWithBaseImpl<Traits>,
   // Output:
   PHX::MDField<ScalarT, Cell, Node> TResidual;
 
-  bool         haveSource, haveFlow, haveSUPG, haveNeut;
-  bool         enableTransient;
-  unsigned int numQPs, numDims, numNodes, numCells;
+  bool                                      haveSource, haveFlow, haveSUPG, haveNeut;
+  bool                                      enableTransient;
+  unsigned int                              numQPs, numDims, numNodes, numCells;
   Kokkos::DynRankView<ScalarT, PHX::Device> flux;
   Kokkos::DynRankView<ScalarT, PHX::Device> convection;
 };

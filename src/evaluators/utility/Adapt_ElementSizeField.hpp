@@ -20,20 +20,15 @@ class StateManager;
 namespace Adapt {
 
 template <typename EvalT, typename Traits>
-class ElementSizeFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                             public PHX::EvaluatorDerived<EvalT, Traits>
+class ElementSizeFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
-  ElementSizeFieldBase(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ElementSizeFieldBase(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   // These functions are defined in the specializations
   void
@@ -95,9 +90,7 @@ template <typename EvalT, typename Traits>
 class ElementSizeField : public ElementSizeFieldBase<EvalT, Traits>
 {
  public:
-  ElementSizeField(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  ElementSizeField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : ElementSizeFieldBase<EvalT, Traits>(p, dl)
   {
   }
@@ -121,9 +114,7 @@ class ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>
     : public ElementSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  ElementSizeField(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ElementSizeField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
   preEvaluate(typename Traits::PreEvalData d);
   void

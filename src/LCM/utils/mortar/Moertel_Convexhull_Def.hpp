@@ -46,11 +46,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> newp;
   for (int i = 0; i < np; ++i) {
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> tmp =
-        Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)(
-            i, points[list2[i]]->Xi(), OutLevel()));
-    newp.insert(
-        std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>(
-            i, tmp));
+        Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)(i, points[list2[i]]->Xi(), OutLevel()));
+    newp.insert(std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>(i, tmp));
   }
 
   // delete the old one
@@ -62,8 +59,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
 
   points.clear();
 
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::
-      iterator pcurr;
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::iterator pcurr;
 
 #if 0
   // printout the polygon
@@ -85,8 +81,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
     AddPointtoPolygon(upper, i, points[i]->Xi());  // std::cout << *points[i];
 
     // find whether we still have a convex hull
-    while (upper.size() > 2 && !MakeRightTurnUpper(i, upper))
-      RemovePointBefore(i, upper);
+    while (upper.size() > 2 && !MakeRightTurnUpper(i, upper)) RemovePointBefore(i, upper);
 #if 0
   // printout the current upper hull
   std::map<int,MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)*>::iterator pcurr;
@@ -100,17 +95,14 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
   // build the lower hull
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> lower;
   // put in the first 2 points
-  AddPointtoPolygon(
-      lower, np - 1, points[np - 1]->Xi());  // std::cout << *points[np-1];
-  AddPointtoPolygon(
-      lower, np - 2, points[np - 2]->Xi());  // std::cout << *points[np-2];
+  AddPointtoPolygon(lower, np - 1, points[np - 1]->Xi());  // std::cout << *points[np-1];
+  AddPointtoPolygon(lower, np - 2, points[np - 2]->Xi());  // std::cout << *points[np-2];
   for (int i = np - 3; i >= 0; --i) {
     // add point[i] to lower
     AddPointtoPolygon(lower, i, points[i]->Xi());  // std::cout << *points[i];
 
     // find whether we still have a convex hull
-    while (lower.size() > 2 && !MakeRightTurnLower(i, lower))
-      RemovePointAfter(i, lower);
+    while (lower.size() > 2 && !MakeRightTurnLower(i, lower)) RemovePointAfter(i, lower);
 #if 0
   // printout the current lower hull
   std::map<int,Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) > >::iterator pcurr;
@@ -160,10 +152,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
   if (finalp.size() != p.size()) {
     if (OutLevel() > 8)
       std::cout << "MOERTEL: ***WRN*** MOERTEL::Overlap::ConvexHull:\n"
-                << "MOERTEL: ***WRN*** size of convex hull " << finalp.size()
-                << " not # nodes " << p.size() << std::endl
-                << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/"
-                << __LINE__ << "\n";
+                << "MOERTEL: ***WRN*** size of convex hull " << finalp.size() << " not # nodes " << p.size()
+                << std::endl
+                << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
   }
 
   // copy the polygon over to the input map p
@@ -188,27 +179,22 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnUpper(
   // point i for sure exists as it was added as last point
   // the points i-1 and i-2 do not necessary have ids i-1 and i-2, they
   // are just the 2 point BEFORE i (could have any id < i)
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::
-      iterator curr = hull.find(i);
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::iterator curr = hull.find(i);
 
   if (curr == hull.end()) {
     std::stringstream oss;
     oss << "MOERTEL: ***ERR*** MOERTEL::Overlap::MakeRightTurn:\n"
         << "MOERTEL: ***ERR*** cannot find point " << i << " in convex hull\n"
-        << "MOERTEL: ***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-        << "\n";
+        << "MOERTEL: ***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     throw ReportError(oss);
   }
 
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> point =
-      curr->second;  // std::cout << *point;
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> point = curr->second;  // std::cout << *point;
   curr--;
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> pointm1 =
-      curr->second;  // std::cout << *pointm1;
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> pointm1 = curr->second;  // std::cout << *pointm1;
   curr--;
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> pointm2 =
-      curr->second;  // std::cout << *pointm2;
-  double N[2];
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> pointm2 = curr->second;  // std::cout << *pointm2;
+  double                                                 N[2];
   N[0] = pointm1->Xi()[1] - pointm2->Xi()[1];
   N[1] = -(pointm1->Xi()[0] - pointm2->Xi()[0]);
   double P[2];
@@ -237,27 +223,22 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnLower(
   // point i for sure exists as it was added as last point
   // the points i-1 and i-2 do not necessary have ids i-1 and i-2, they
   // are just the 2 point BEFORE i (could have any id < i)
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::
-      iterator curr = hull.find(i);
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::iterator curr = hull.find(i);
 
   if (curr == hull.end()) {
     std::stringstream oss;
     oss << "MOERTEL: ***ERR*** MOERTEL::Overlap::MakeRightTurn:\n"
         << "MOERTEL: ***ERR*** cannot find point " << i << " in convex hull\n"
-        << "MOERTEL: ***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-        << "\n";
+        << "MOERTEL: ***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     throw ReportError(oss);
   }
 
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> point =
-      curr->second;  // std::cout << *point;
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> point = curr->second;  // std::cout << *point;
   curr++;
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> pointm1 =
-      curr->second;  // std::cout << *pointm1;
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> pointm1 = curr->second;  // std::cout << *pointm1;
   curr++;
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> pointm2 =
-      curr->second;  // std::cout << *pointm2;
-  double N[2];
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)> pointm2 = curr->second;  // std::cout << *pointm2;
+  double                                                 N[2];
   N[0] = pointm1->Xi()[1] - pointm2->Xi()[1];
   N[1] = -(pointm1->Xi()[0] - pointm2->Xi()[0]);
   double P[2];
@@ -285,15 +266,13 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointBefore(
   // note:
   // point i for sure exists as it was added as last point
   // the points i-1 does not necessary have id i-1
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::
-      iterator curr = hull.find(i);
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::iterator curr = hull.find(i);
 
   if (curr == hull.end()) {
     std::stringstream oss;
     oss << "MOERTEL: ***ERR*** MOERTEL::Overlap::RemovePointBefore:\n"
         << "MOERTEL: ***ERR*** cannot find point " << i << " in convex hull\n"
-        << "MOERTEL: ***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-        << "\n";
+        << "MOERTEL: ***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     throw ReportError(oss);
   }
 
@@ -314,15 +293,13 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointAfter(
   // note:
   // point i for sure exists as it was added as last point
   // the points i-1 does not necessary have id i-1
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::
-      iterator curr = hull.find(i);
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>::iterator curr = hull.find(i);
 
   if (curr == hull.end()) {
     std::stringstream oss;
     oss << "MOERTEL: ***ERR*** MOERTEL::Overlap::RemovePointBefore:\n"
         << "MOERTEL: ***ERR*** cannot find point " << i << " in convex hull\n"
-        << "MOERTEL: ***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-        << "\n";
+        << "MOERTEL: ***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     throw ReportError(oss);
   }
 
@@ -354,8 +331,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::CollapsePoints(
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> pnew;
 
   // create  vector holding points to collapse
-  std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> collapse(
-      points.size());
+  std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> collapse(points.size());
 
   // loop points and compare coords
   for (int i = 0; i < np; ++i) {

@@ -23,8 +23,7 @@ Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc);
 
 Teuchos::RCP<Teuchos_Comm const>
-createTeuchosCommFromThyraComm(
-    const Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>& tc_in);
+createTeuchosCommFromThyraComm(const Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>& tc_in);
 
 Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>
 createThyraCommFromTeuchosComm(const Teuchos::RCP<Teuchos_Comm const>& tc_in);

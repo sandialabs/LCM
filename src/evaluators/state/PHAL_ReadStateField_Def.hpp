@@ -23,23 +23,19 @@ ReadStateField<EvalT, Traits>::ReadStateField(Teuchos::ParameterList const&)
 
 template <typename EvalT, typename Traits>
 void
-ReadStateField<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData,
-    PHX::FieldManager<Traits>&)
+ReadStateField<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData, PHX::FieldManager<Traits>&)
 {
   // States not read for generic type, only specializations
 }
 
 template <typename EvalT, typename Traits>
-void ReadStateField<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData /* workset */)
+void ReadStateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData /* workset */)
 {
   // States not read for generic type, only specializations
 }
 
 template <typename Traits>
-ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::ReadStateField(
-    Teuchos::ParameterList const& p)
+ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::ReadStateField(Teuchos::ParameterList const& p)
 {
   field_name  = p.get<std::string>("Field Name");
   state_name  = p.get<std::string>("State Name");
@@ -53,8 +49,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::ReadStateField(
   this->addEvaluatedField(*read_state_op);
   this->addEvaluatedField(field.fieldTag());
 
-  this->setName(
-      "Read Field " + field_name + " to State " + state_name + "Residual");
+  this->setName("Read Field " + field_name + " to State " + state_name + "Residual");
 }
 
 template <typename Traits>
@@ -68,24 +63,20 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
 
 template <typename Traits>
 void
-ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   if (field_type == "Cell") {
     readElemState(workset);
   } else if (field_type == "Node") {
     readNodalState(workset);
   } else {
-    ALBANY_PANIC(
-        field_type == "Cell" || field_type == "Node",
-        "Error! Only read cell or node states for now.\n");
+    ALBANY_PANIC(field_type == "Cell" || field_type == "Node", "Error! Only read cell or node states for now.\n");
   }
 }
 
 template <typename Traits>
 void
-ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(
-    typename Traits::EvalData workset)
+ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(typename Traits::EvalData workset)
 {
   // Note: to read cell fields, we need to open up the mesh, and work directly
   // on it.
@@ -97,8 +88,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(
 
   auto disc = workset.disc;
   ALBANY_ASSERT(disc != Teuchos::null, "Null discretization");
-  auto mesh = Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(
-      disc->getMeshStruct());
+  auto mesh = Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(disc->getMeshStruct());
   ALBANY_ASSERT(mesh != Teuchos::null, "Null STK mesh structure");
 
   stk::mesh::MetaData& metaData = *mesh->metaData;
@@ -109,9 +99,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(
   using GIDT                 = decltype(elem_gid_wslid.begin()->first);
   std::map<LIDT, GIDT> elem_lid_2_gid;
   for (auto&& gid_wslid : elem_gid_wslid) {
-    if (gid_wslid.second.ws == workset.wsIndex) {
-      elem_lid_2_gid.emplace(gid_wslid.second.LID, gid_wslid.first);
-    }
+    if (gid_wslid.second.ws == workset.wsIndex) { elem_lid_2_gid.emplace(gid_wslid.second.LID, gid_wslid.first); }
   }
 
   std::vector<PHX::DataLayout::size_type> dims;
@@ -119,9 +107,8 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(
 
   switch (dims.size()) {
     case 2: {
-      using SFT = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-      auto scalar_field =
-          metaData.get_field<SFT>(stk::topology::ELEM_RANK, state_name);
+      using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
+      auto scalar_field = metaData.get_field<SFT>(stk::topology::ELEM_RANK, state_name);
       ALBANY_ASSERT(scalar_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell) {
         auto gid    = elem_lid_2_gid[cell];
@@ -131,9 +118,8 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(
       }
     } break;
     case 3: {
-      using VFT = Albany::AbstractSTKFieldContainer::VectorFieldType;
-      auto vector_field =
-          metaData.get_field<VFT>(stk::topology::NODE_RANK, state_name);
+      using VFT         = Albany::AbstractSTKFieldContainer::VectorFieldType;
+      auto vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(vector_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell) {
         auto gid    = elem_lid_2_gid[cell];
@@ -148,8 +134,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(
 
 template <typename Traits>
 void
-ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(
-    typename Traits::EvalData workset)
+ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(typename Traits::EvalData workset)
 {
   // Note: to read nodal fields, we need to open up the mesh, and work directly
   // on it.
@@ -161,8 +146,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(
 
   auto disc = workset.disc;
   ALBANY_ASSERT(disc != Teuchos::null, "Null discretization");
-  auto mesh = Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(
-      disc->getMeshStruct());
+  auto mesh = Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(disc->getMeshStruct());
   ALBANY_ASSERT(mesh != Teuchos::null, "Null STK mesh structure");
 
   stk::mesh::MetaData& metaData = *mesh->metaData;
@@ -175,22 +159,20 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(
 
   switch (dims.size()) {
     case 2: {
-      using SFT = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-      auto scalar_field =
-          metaData.get_field<SFT>(stk::topology::NODE_RANK, state_name);
+      using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
+      auto scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(scalar_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
-          auto gid    = wsElgid[workset.wsIndex][cell][node];
-          auto e      = bulkData.get_entity(stk::topology::NODE_RANK, gid + 1);
-          auto values = stk::mesh::field_data(*scalar_field, e);
+          auto gid          = wsElgid[workset.wsIndex][cell][node];
+          auto e            = bulkData.get_entity(stk::topology::NODE_RANK, gid + 1);
+          auto values       = stk::mesh::field_data(*scalar_field, e);
           field(cell, node) = values[0];
         }
     } break;
     case 3: {
-      using VFT = Albany::AbstractSTKFieldContainer::VectorFieldType;
-      auto vector_field =
-          metaData.get_field<VFT>(stk::topology::NODE_RANK, state_name);
+      using VFT         = Albany::AbstractSTKFieldContainer::VectorFieldType;
+      auto vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(vector_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {

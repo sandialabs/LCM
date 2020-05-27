@@ -35,12 +35,10 @@ PrintHeader(std::ostream& os)
   os << "##     ## ##       ##     ## ##     ## ##   ###    ##   " << '\n';
   os << "##     ## ######## ########  ##     ## ##    ##    ##   " << '\n';
   os << std::endl;
-  os << R"(** Trilinos git commit id - )" << ALBANY_TRILINOS_GIT_COMMIT_ID
-     << std::endl;
+  os << R"(** Trilinos git commit id - )" << ALBANY_TRILINOS_GIT_COMMIT_ID << std::endl;
   os << R"(** Albany git branch ------ )" << ALBANY_GIT_BRANCH << std::endl;
   os << R"(** Albany git commit id --- )" << ALBANY_GIT_COMMIT_ID << std::endl;
-  os << R"(** Albany cxx compiler ---- )" << ALBANY_CXX_COMPILER_ID << " "
-     << ALBANY_CXX_COMPILER_VERSION << std::endl;
+  os << R"(** Albany cxx compiler ---- )" << ALBANY_CXX_COMPILER_ID << " " << ALBANY_CXX_COMPILER_VERSION << std::endl;
 
   // Print start time
   time_t rawtime;
@@ -49,14 +47,11 @@ PrintHeader(std::ostream& os)
   char       buffer[80];
   strftime(buffer, 80, "%F at %T", timeinfo);
   os << R"(** Simulation start time -- )" << buffer << std::endl;
-  os << R"(***************************************************************)"
-     << std::endl;
+  os << R"(***************************************************************)" << std::endl;
 }
 
 void
-ReplaceDiagonalEntries(
-    const Teuchos::RCP<Tpetra_CrsMatrix>& matrix,
-    const Teuchos::RCP<Tpetra_Vector>&    diag)
+ReplaceDiagonalEntries(const Teuchos::RCP<Tpetra_CrsMatrix>& matrix, const Teuchos::RCP<Tpetra_Vector>& diag)
 {
   Teuchos::ArrayRCP<const ST> diag_constView = diag->get1dView();
   for (size_t i = 0; i < matrix->getNodeNumRows(); i++) {
@@ -79,9 +74,7 @@ ReplaceDiagonalEntries(
 }
 
 void
-InvAbsRowSum(
-    Teuchos::RCP<Tpetra_Vector>&         invAbsRowSumsTpetra,
-    const Teuchos::RCP<Tpetra_CrsMatrix> matrix)
+InvAbsRowSum(Teuchos::RCP<Tpetra_Vector>& invAbsRowSumsTpetra, const Teuchos::RCP<Tpetra_CrsMatrix> matrix)
 {
   // Check that invAbsRowSumsTpetra and matrix have same map
   ALBANY_ASSERT(
@@ -90,8 +83,7 @@ InvAbsRowSum(
       "Input vector must have same map as row map of input matrix!");
 
   invAbsRowSumsTpetra->putScalar(0.0);
-  Teuchos::ArrayRCP<double> invAbsRowSumsTpetra_nonconstView =
-      invAbsRowSumsTpetra->get1dViewNonConst();
+  Teuchos::ArrayRCP<double> invAbsRowSumsTpetra_nonconstView = invAbsRowSumsTpetra->get1dViewNonConst();
   for (size_t row = 0; row < invAbsRowSumsTpetra->getLocalLength(); row++) {
     auto               numEntriesRow = matrix->getNumEntriesInLocalRow(row);
     Teuchos::Array<LO> indices(numEntriesRow);
@@ -109,9 +101,7 @@ InvAbsRowSum(
 }
 
 void
-AbsRowSum(
-    Teuchos::RCP<Tpetra_Vector>&         absRowSumsTpetra,
-    const Teuchos::RCP<Tpetra_CrsMatrix> matrix)
+AbsRowSum(Teuchos::RCP<Tpetra_Vector>& absRowSumsTpetra, const Teuchos::RCP<Tpetra_CrsMatrix> matrix)
 {
   // Check that absRowSumsTpetra and matrix have same map
   ALBANY_ASSERT(
@@ -119,8 +109,7 @@ AbsRowSum(
       "Error in Albany::AbsRowSum!  "
       "Input vector must have same map as row map of input matrix!");
   absRowSumsTpetra->putScalar(0.0);
-  Teuchos::ArrayRCP<double> absRowSumsTpetra_nonconstView =
-      absRowSumsTpetra->get1dViewNonConst();
+  Teuchos::ArrayRCP<double> absRowSumsTpetra_nonconstView = absRowSumsTpetra->get1dViewNonConst();
   for (size_t row = 0; row < absRowSumsTpetra->getLocalLength(); row++) {
     auto               numEntriesRow = matrix->getNumEntriesInLocalRow(row);
     Teuchos::Array<LO> indices(numEntriesRow);
@@ -149,10 +138,8 @@ isValidInitString(std::string const& initString)
   if (pos != 0) return false;
 
   // Make sure the rest of the string has only allowable characters
-  std::string valueString =
-      initString.substr(verbiage.size(), initString.size() - verbiage.size());
-  for (std::string::iterator it = valueString.begin(); it != valueString.end();
-       it++) {
+  std::string valueString = initString.substr(verbiage.size(), initString.size() - verbiage.size());
+  for (std::string::iterator it = valueString.begin(); it != valueString.end(); it++) {
     std::string charAsString(1, *it);
     pos = charAsString.find_first_of("0123456789.-+eE");
     if (pos == std::string::npos) return false;
@@ -174,20 +161,14 @@ double
 initStringToDouble(std::string const& initString)
 {
   ALBANY_ASSERT(
-      isValidInitString(initString),
-      " initStringToDouble() called with invalid initialization string: "
-          << initString);
+      isValidInitString(initString), " initStringToDouble() called with invalid initialization string: " << initString);
   std::string verbiage("initial value ");
-  std::string valueString =
-      initString.substr(verbiage.size(), initString.size() - verbiage.size());
+  std::string valueString = initString.substr(verbiage.size(), initString.size() - verbiage.size());
   return std::atof(valueString.c_str());
 }
 
 void
-splitStringOnDelim(
-    std::string const&        s,
-    char                      delim,
-    std::vector<std::string>& elems)
+splitStringOnDelim(std::string const& s, char delim, std::vector<std::string>& elems)
 {
   std::stringstream ss(s);
   std::string       item;
@@ -223,9 +204,7 @@ printThyraVector(
   Teuchos::ArrayRCP<const ST> vv          = Albany::getLocalData(vec);
   int const                   localLength = vv.size();
 
-  ALBANY_PANIC(
-      names.size() != localLength,
-      "Error! names and mvec length do not match.\n");
+  ALBANY_PANIC(names.size() != localLength, "Error! names and mvec length do not match.\n");
 
   os << std::setw(10) << std::endl;
   for (int i = 0; i < localLength; ++i) {
@@ -240,32 +219,25 @@ printThyraMultiVector(
     const Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>>& names,
     const Teuchos::RCP<const Thyra_MultiVector>&                     mvec)
 {
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> mvv =
-      Albany::getLocalData(mvec);
-  int const numVecs     = mvec->domain()->dim();
-  int const localLength = mvv.size() > 0 ? mvv[0].size() : 0;
-  ALBANY_PANIC(
-      names.size() != localLength,
-      "Error! names and mvec length do not match.\n");
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> mvv         = Albany::getLocalData(mvec);
+  int const                                      numVecs     = mvec->domain()->dim();
+  int const                                      localLength = mvv.size() > 0 ? mvv[0].size() : 0;
+  ALBANY_PANIC(names.size() != localLength, "Error! names and mvec length do not match.\n");
 
   os << std::setw(10) << std::endl;
   for (int row = 0; row < localLength; ++row) {
     for (int col = 0; col < numVecs; ++col) {
       os.width(20);
-      os << "   " << std::left << (*names[col])[row] << "\t" << mvv[col][row]
-         << std::endl;
+      os << "   " << std::left << (*names[col])[row] << "\t" << mvv[col][row] << std::endl;
     }
     os << std::endl;
   }
 }
 
 void
-printThyraMultiVector(
-    std::ostream&                                os,
-    const Teuchos::RCP<const Thyra_MultiVector>& mvec)
+printThyraMultiVector(std::ostream& os, const Teuchos::RCP<const Thyra_MultiVector>& mvec)
 {
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> mvv =
-      Albany::getLocalData(mvec);
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> mvv = Albany::getLocalData(mvec);
 
   int const numVecs     = mvec->domain()->dim();
   int const localLength = mvv.size() > 0 ? mvv[0].size() : 0;
@@ -290,9 +262,7 @@ writeMatrixMarket<const Tpetra_Map>(
 
   std::ostringstream oss;
   oss << prefix;
-  if (counter >= 0) {
-    oss << '-' << std::setfill('0') << std::setw(3) << counter;
-  }
+  if (counter >= 0) { oss << '-' << std::setfill('0') << std::setw(3) << counter; }
   oss << ".mm";
 
   std::string const& filename = oss.str();
@@ -312,9 +282,7 @@ writeMatrixMarket<const Tpetra_Vector>(
   std::ostringstream oss;
 
   oss << prefix;
-  if (counter >= 0) {
-    oss << '-' << std::setfill('0') << std::setw(3) << counter;
-  }
+  if (counter >= 0) { oss << '-' << std::setfill('0') << std::setw(3) << counter; }
   oss << ".mm";
 
   std::string const& filename = oss.str();
@@ -334,9 +302,7 @@ writeMatrixMarket<const Tpetra_MultiVector>(
   std::ostringstream oss;
 
   oss << prefix;
-  if (counter >= 0) {
-    oss << '-' << std::setfill('0') << std::setw(3) << counter;
-  }
+  if (counter >= 0) { oss << '-' << std::setfill('0') << std::setw(3) << counter; }
   oss << ".mm";
 
   std::string const& filename = oss.str();
@@ -356,9 +322,7 @@ writeMatrixMarket<const Tpetra_CrsMatrix>(
   std::ostringstream oss;
 
   oss << prefix;
-  if (counter >= 0) {
-    oss << '-' << std::setfill('0') << std::setw(3) << counter;
-  }
+  if (counter >= 0) { oss << '-' << std::setfill('0') << std::setw(3) << counter; }
   oss << ".mm";
 
   std::string const& filename = oss.str();
@@ -417,8 +381,7 @@ connect_vtune(int const p_rank)
   pid_t             my_os_pid  = getpid();
   std::string const vtune_loc  = "amplxe-cl";
   std::string const output_dir = "./vtune/vtune.";
-  cmd << vtune_loc << " -collect hotspots -result-dir " << output_dir << p_rank
-      << " -target-pid " << my_os_pid << " &";
+  cmd << vtune_loc << " -collect hotspots -result-dir " << output_dir << p_rank << " -target-pid " << my_os_pid << " &";
   if (p_rank == 0) std::cout << cmd.str() << std::endl;
   safe_system(cmd.str().c_str());
   safe_system("sleep 10");
@@ -441,10 +404,7 @@ safe_fscanf(int nitems, FILE* file, char const* format, ...)
   va_start(ap, format);
   int ret = vfscanf(file, format, ap);
   va_end(ap);
-  ALBANY_ASSERT(
-      ret == nitems,
-      ret << "=safe_fscanf(" << nitems << ", " << file << ", \"" << format
-          << "\")");
+  ALBANY_ASSERT(ret == nitems, ret << "=safe_fscanf(" << nitems << ", " << file << ", \"" << format << "\")");
 }
 
 void
@@ -454,20 +414,14 @@ safe_sscanf(int nitems, char const* str, char const* format, ...)
   va_start(ap, format);
   int ret = vsscanf(str, format, ap);
   va_end(ap);
-  ALBANY_ASSERT(
-      ret == nitems,
-      ret << "=safe_sscanf(" << nitems << ", \"" << str << "\", \"" << format
-          << "\")");
+  ALBANY_ASSERT(ret == nitems, ret << "=safe_sscanf(" << nitems << ", \"" << str << "\", \"" << format << "\")");
 }
 
 void
 safe_fgets(char* str, int size, FILE* stream)
 {
   char* ret = fgets(str, size, stream);
-  ALBANY_ASSERT(
-      ret == str,
-      ret << "=safe_fgets(" << static_cast<void*>(str) << ", " << size << ", "
-          << stream << ")");
+  ALBANY_ASSERT(ret == str, ret << "=safe_fgets(" << static_cast<void*>(str) << ", " << size << ", " << stream << ")");
 }
 
 void

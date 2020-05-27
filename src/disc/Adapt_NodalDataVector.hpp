@@ -36,16 +36,12 @@ class NodalDataVector
   void
   replaceOwnedVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
   void
-  replaceOwnedVectorSpace(
-      const Teuchos::Array<GO>&               owned_nodeGIDs,
-      const Teuchos::RCP<Teuchos_Comm const>& comm_);
+  replaceOwnedVectorSpace(const Teuchos::Array<GO>& owned_nodeGIDs, const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   void
   replaceOverlapVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
   void
-  replaceOverlapVectorSpace(
-      const Teuchos::Array<GO>&               overlap_nodeGIDs,
-      const Teuchos::RCP<Teuchos_Comm const>& comm_);
+  replaceOverlapVectorSpace(const Teuchos::Array<GO>& overlap_nodeGIDs, const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   // Methods to get multivectors (or their data)
   Teuchos::RCP<Thyra_MultiVector> const&
@@ -106,9 +102,7 @@ class NodalDataVector
   // In this version, mv may have fewer columns than there are vectors in the
   // database. start_col indicates the offset into the database.
   void
-  saveNodalDataState(
-      const Teuchos::RCP<const Thyra_MultiVector>& mv,
-      int const                                    start_col) const;
+  saveNodalDataState(const Teuchos::RCP<const Thyra_MultiVector>& mv, int const start_col) const;
 
   void
   saveNodalDataVector(
@@ -117,8 +111,7 @@ class NodalDataVector
       int const                                    offset) const;
 
   void
-  getNDofsAndOffset(std::string const& stateName, int& offset, int& ndofs)
-      const;
+  getNDofsAndOffset(std::string const& stateName, int& offset, int& ndofs) const;
 
   LO
   getVecSize()

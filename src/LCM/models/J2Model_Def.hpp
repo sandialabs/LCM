@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-J2Model<EvalT, Traits>::J2Model(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+J2Model<EvalT, Traits>::J2Model(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       sat_mod_(p->get<RealType>("Saturation Modulus", 0.0)),
       sat_exp_(p->get<RealType>("Saturation Exponent", 0.0))
@@ -33,19 +31,15 @@ J2Model<EvalT, Traits>::J2Model(
   this->dep_field_map_.insert(std::make_pair("Poissons Ratio", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Elastic Modulus", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Yield Strength", dl->qp_scalar));
-  this->dep_field_map_.insert(
-      std::make_pair("Hardening Modulus", dl->qp_scalar));
+  this->dep_field_map_.insert(std::make_pair("Hardening Modulus", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Delta Time", dl->workset_scalar));
 
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(Fp_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair(yieldSurface_string, dl->qp_scalar));
-  if (have_temperature_) {
-    this->eval_field_map_.insert(std::make_pair(source_string, dl->qp_scalar));
-  }
+  this->eval_field_map_.insert(std::make_pair(yieldSurface_string, dl->qp_scalar));
+  if (have_temperature_) { this->eval_field_map_.insert(std::make_pair(source_string, dl->qp_scalar)); }
 
   // define the state variables
   // stress
@@ -55,8 +49,7 @@ J2Model<EvalT, Traits>::J2Model(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Cauchy Stress", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Cauchy Stress", false));
   // Fp
   this->num_state_variables_++;
   this->state_var_names_.push_back(Fp_string);
@@ -80,8 +73,7 @@ J2Model<EvalT, Traits>::J2Model(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Yield Surface", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Yield Surface", false));
   // mechanical source
   if (have_temperature_) {
     this->num_state_variables_++;
@@ -90,16 +82,12 @@ J2Model<EvalT, Traits>::J2Model(
     this->state_var_init_types_.push_back("scalar");
     this->state_var_init_values_.push_back(0.0);
     this->state_var_old_state_flags_.push_back(false);
-    this->state_var_output_flags_.push_back(
-        p->get<bool>("Output Mechanical Source", false));
+    this->state_var_output_flags_.push_back(p->get<bool>("Output Mechanical Source", false));
   }
 }
 template <typename EvalT, typename Traits>
 void
-J2Model<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+J2Model<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   std::string cauchy_string       = (*field_name_map_)["Cauchy_Stress"];
   std::string Fp_string           = (*field_name_map_)["Fp"];
@@ -134,22 +122,18 @@ J2Model<EvalT, Traits>::computeState(
   ScalarT Jm23, trace, smag2, smag, f, p, dgam;
   ScalarT sq23(std::sqrt(2. / 3.));
 
-  minitensor::Tensor<ScalarT> F(num_dims_), be(num_dims_), s(num_dims_),
-      sigma(num_dims_);
-  minitensor::Tensor<ScalarT> N(num_dims_), A(num_dims_), expA(num_dims_),
-      Fpnew(num_dims_);
+  minitensor::Tensor<ScalarT> F(num_dims_), be(num_dims_), s(num_dims_), sigma(num_dims_);
+  minitensor::Tensor<ScalarT> N(num_dims_), A(num_dims_), expA(num_dims_), Fpnew(num_dims_);
   minitensor::Tensor<ScalarT> I(minitensor::eye<ScalarT>(num_dims_));
-  minitensor::Tensor<ScalarT> Fpn(num_dims_), Fpinv(num_dims_),
-      Cpinv(num_dims_);
+  minitensor::Tensor<ScalarT> Fpn(num_dims_), Fpinv(num_dims_), Cpinv(num_dims_);
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      kappa = elastic_modulus(cell, pt) /
-              (3. * (1. - 2. * poissons_ratio(cell, pt)));
-      mu   = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
-      K    = hardening_modulus(cell, pt);
-      Y    = yield_strength(cell, pt);
-      Jm23 = std::pow(J(cell, pt), -2. / 3.);
+      kappa = elastic_modulus(cell, pt) / (3. * (1. - 2. * poissons_ratio(cell, pt)));
+      mu    = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
+      K     = hardening_modulus(cell, pt);
+      Y     = yield_strength(cell, pt);
+      Jm23  = std::pow(J(cell, pt), -2. / 3.);
       // fill local tensors
       F.fill(def_grad, cell, pt, 0, 0);
 
@@ -170,9 +154,7 @@ J2Model<EvalT, Traits>::computeState(
 
       // Fpn.fill( &Fpold(cell,pt,int(0),int(0)) );
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) {
-          Fpn(i, j) = ScalarT(Fpold(cell, pt, i, j));
-        }
+        for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fpold(cell, pt, i, j)); }
       }
 
       // compute trial state
@@ -186,9 +168,7 @@ J2Model<EvalT, Traits>::computeState(
 
       // check yield condition
       smag = minitensor::norm(s);
-      f    = smag -
-          sq23 * (Y + K * eqpsold(cell, pt) +
-                  sat_mod_ * (1. - std::exp(-sat_exp_ * eqpsold(cell, pt))));
+      f    = smag - sq23 * (Y + K * eqpsold(cell, pt) + sat_mod_ * (1. - std::exp(-sat_exp_ * eqpsold(cell, pt))));
 
       if (f > 1E-12) {
         // return mapping algorithm
@@ -224,16 +204,14 @@ J2Model<EvalT, Traits>::computeState(
           dFdX[0] = -2. * mubar * (1. + dH / (3. * mubar));
 
           res = std::abs(F[0]);
-          if (res < 1.e-11 || res / Y < 1.E-11 || res / f < 1.E-11)
-            converged = true;
+          if (res < 1.e-11 || res / Y < 1.E-11 || res / f < 1.E-11) converged = true;
 
           ALBANY_PANIC(
               count == num_max_iter,
               std::endl
-                  << "Error in return mapping, count = " << count
-                  << "\nres = " << res << "\nrelres  = " << res / f
-                  << "\nrelres2 = " << res / Y << "\ng = " << F[0] << "\ndg = "
-                  << dFdX[0] << "\nalpha = " << alpha << std::endl);
+                  << "Error in return mapping, count = " << count << "\nres = " << res << "\nrelres  = " << res / f
+                  << "\nrelres2 = " << res / Y << "\ng = " << F[0] << "\ndg = " << dFdX[0] << "\nalpha = " << alpha
+                  << std::endl);
         }
 
         solver.computeFadInfo(dFdX, X, F);
@@ -251,8 +229,7 @@ J2Model<EvalT, Traits>::computeState(
         // mechanical source
         if (have_temperature_ && delta_time(0) > 0) {
           source(cell, pt) =
-              (sq23 * dgam / delta_time(0) * (Y + H + temperature_(cell, pt))) /
-              (density_ * heat_capacity_);
+              (sq23 * dgam / delta_time(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
         }
 
         // exponential map to get Fpnew
@@ -260,9 +237,7 @@ J2Model<EvalT, Traits>::computeState(
         expA  = minitensor::exp(A);
         Fpnew = expA * Fpn;
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) {
-            Fp(cell, pt, i, j) = Fpnew(i, j);
-          }
+          for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fpnew(i, j); }
         }
       } else {
         eqps(cell, pt) = eqpsold(cell, pt);
@@ -273,9 +248,7 @@ J2Model<EvalT, Traits>::computeState(
       }
 
       // update yield surface
-      yieldSurf(cell, pt) =
-          Y + K * eqps(cell, pt) +
-          sat_mod_ * (1. - std::exp(-sat_exp_ * eqps(cell, pt)));
+      yieldSurf(cell, pt) = Y + K * eqps(cell, pt) + sat_mod_ * (1. - std::exp(-sat_exp_ * eqps(cell, pt)));
 
       // compute pressure
       p = 0.5 * kappa * (J(cell, pt) - 1. / (J(cell, pt)));
@@ -283,9 +256,7 @@ J2Model<EvalT, Traits>::computeState(
       // compute stress
       sigma = p * I + s / J(cell, pt);
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = sigma(i, j);
-        }
+        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
       }
     }
   }

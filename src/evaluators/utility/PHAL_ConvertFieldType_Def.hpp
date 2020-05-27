@@ -10,13 +10,8 @@
 namespace PHAL {
 
 //*****
-template <
-    typename EvalT,
-    typename Traits,
-    typename InputType,
-    typename OutputType>
-ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(
-    Teuchos::ParameterList const& p)
+template <typename EvalT, typename Traits, typename InputType, typename OutputType>
+ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(Teuchos::ParameterList const& p)
 {
   std::string input_field_name, output_field_name;
   if (p.isParameter("Input Field Name") && p.isParameter("Output Field Name")) {
@@ -26,10 +21,8 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(
     input_field_name = output_field_name = p.get<std::string>("Field Name");
   } else
     ALBANY_ABORT("Field Name not set.\n");
-  in_field = decltype(in_field)(
-      input_field_name, p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"));
-  out_field = decltype(out_field)(
-      output_field_name, p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"));
+  in_field  = decltype(in_field)(input_field_name, p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"));
+  out_field = decltype(out_field)(output_field_name, p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"));
 
   this->addDependentField(in_field);
   this->addEvaluatedField(out_field);
@@ -38,11 +31,7 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(
 }
 
 //*****
-template <
-    typename EvalT,
-    typename Traits,
-    typename InputType,
-    typename OutputType>
+template <typename EvalT, typename Traits, typename InputType, typename OutputType>
 void
 ConvertFieldType<EvalT, Traits, InputType, OutputType>::postRegistrationSetup(
     typename Traits::SetupData d,
@@ -53,14 +42,9 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::postRegistrationSetup(
 }
 
 //*****
-template <
-    typename EvalT,
-    typename Traits,
-    typename InputType,
-    typename OutputType>
+template <typename EvalT, typename Traits, typename InputType, typename OutputType>
 void
-ConvertFieldType<EvalT, Traits, InputType, OutputType>::evaluateFields(
-    typename Traits::EvalData workset)
+ConvertFieldType<EvalT, Traits, InputType, OutputType>::evaluateFields(typename Traits::EvalData workset)
 {
   std::vector<int> dims;
   in_field.dimensions(dims);
@@ -76,23 +60,20 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::evaluateFields(
     case 3:
       for (int i = 0; i < dims[0]; ++i)
         for (int j = 0; j < dims[1]; ++j)
-          for (int k = 0; k < dims[2]; ++k)
-            out_field(i, j, k) = in_field(i, j, k);
+          for (int k = 0; k < dims[2]; ++k) out_field(i, j, k) = in_field(i, j, k);
       break;
     case 4:
       for (int i = 0; i < dims[0]; ++i)
         for (int j = 0; j < dims[1]; ++j)
           for (int k = 0; k < dims[2]; ++k)
-            for (int l = 0; l < dims[3]; ++l)
-              out_field(i, j, k, l) = in_field(i, j, k, l);
+            for (int l = 0; l < dims[3]; ++l) out_field(i, j, k, l) = in_field(i, j, k, l);
       break;
     case 5:
       for (int i = 0; i < dims[0]; ++i)
         for (int j = 0; j < dims[1]; ++j)
           for (int k = 0; k < dims[2]; ++k)
             for (int l = 0; l < dims[3]; ++l)
-              for (int m = 0; m < dims[4]; ++m)
-                out_field(i, j, k, l, m) = in_field(i, j, k, l, m);
+              for (int m = 0; m < dims[4]; ++m) out_field(i, j, k, l, m) = in_field(i, j, k, l, m);
       break;
     case 6:
       for (int i = 0; i < dims[0]; ++i)
@@ -100,11 +81,9 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::evaluateFields(
           for (int k = 0; k < dims[2]; ++k)
             for (int l = 0; l < dims[3]; ++l)
               for (int m = 0; m < dims[4]; ++m)
-                for (int n = 0; n < dims[5]; ++n)
-                  out_field(i, j, k, l, m, n) = in_field(i, j, k, l, m, n);
+                for (int n = 0; n < dims[5]; ++n) out_field(i, j, k, l, m, n) = in_field(i, j, k, l, m, n);
       break;
-    default:
-      ALBANY_ABORT("Implemented only up to 6 dimensions in data layout.\n");
+    default: ALBANY_ABORT("Implemented only up to 6 dimensions in data layout.\n");
   }
 
   //  all the switch above might be substituted in the future with the simple

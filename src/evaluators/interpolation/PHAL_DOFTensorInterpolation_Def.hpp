@@ -46,8 +46,7 @@ DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
@@ -55,7 +54,7 @@ DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
         for (std::size_t j = 0; j < vecDim; j++) {
           // Zero out for node==0; then += for node = 1 to numNodes
           typename PHAL::Ref<ScalarT>::type vqp = val_qp(cell, qp, i, j);
-          vqp = val_node(cell, 0, i, j) * BF(cell, 0, qp);
+          vqp                                   = val_node(cell, 0, i, j) * BF(cell, 0, qp);
           for (std::size_t node = 1; node < numNodes; ++node) {
             vqp += val_node(cell, node, i, j) * BF(cell, node, qp);
           }
@@ -74,8 +73,7 @@ void
 FastSolutionTensorInterpolationBase<
     PHAL::AlbanyTraits::Jacobian,
     Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-    evaluateFields(typename Traits::EvalData workset)
+    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   int const  num_dof = this->val_node(0, 0, 0, 0).size();
   int const  neq     = workset.wsElNodeEqID.extent(2);
@@ -88,19 +86,13 @@ FastSolutionTensorInterpolationBase<
           typename PHAL::Ref<ScalarT>::type vqp = this->val_qp(cell, qp, i, j);
 
           vqp = this->val_node(cell, 0, i, j) * this->BF(cell, 0, qp);
-          vqp = ScalarT(
-              num_dof,
-              this->val_node(cell, 0, i, j).val() * this->BF(cell, 0, qp));
+          vqp = ScalarT(num_dof, this->val_node(cell, 0, i, j).val() * this->BF(cell, 0, qp));
           vqp.fastAccessDx(offset + i * vecDim + j) =
-              this->val_node(cell, 0, i, j)
-                  .fastAccessDx(offset + i * vecDim + j) *
-              this->BF(cell, 0, qp);
+              this->val_node(cell, 0, i, j).fastAccessDx(offset + i * vecDim + j) * this->BF(cell, 0, qp);
           for (std::size_t node = 1; node < this->numNodes; ++node) {
-            vqp.val() += this->val_node(cell, node, i, j).val() *
-                         this->BF(cell, node, qp);
+            vqp.val() += this->val_node(cell, node, i, j).val() * this->BF(cell, node, qp);
             vqp.fastAccessDx(neq * node + offset + i * this->vecDim + j) +=
-                this->val_node(cell, node, i, j)
-                    .fastAccessDx(neq * node + offset + i * vecDim + j) *
+                this->val_node(cell, node, i, j).fastAccessDx(neq * node + offset + i * vecDim + j) *
                 this->BF(cell, node, qp);
           }
         }

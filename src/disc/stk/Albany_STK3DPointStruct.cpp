@@ -15,11 +15,10 @@ Albany::STK3DPointStruct::STK3DPointStruct(
   stk::io::put_io_part_attribute(*partVec[0]);
   std::cout << "---3DPoint constructor---" << std::endl;
   stk::mesh::set_topology(*partVec[0], stk::topology::PARTICLE);
-  std::cout << "finished setting cell topology to shards::Particle"
-            << std::endl;
-  auto                 stk_topo_data = metaData->get_topology(*partVec[0]);
-  shards::CellTopology shards_ctd = stk::mesh::get_cell_topology(stk_topo_data);
-  const CellTopologyData& ctd     = *shards_ctd.getCellTopologyData();
+  std::cout << "finished setting cell topology to shards::Particle" << std::endl;
+  auto                    stk_topo_data = metaData->get_topology(*partVec[0]);
+  shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
+  const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
   std::cout << "finished extracting cell topology data" << std::endl;
   int                      cubDegree = 1;
   std::vector<std::string> nsNames;
@@ -52,17 +51,14 @@ Albany::STK3DPointStruct::~STK3DPointStruct(){};
 
 void
 Albany::STK3DPointStruct::setFieldAndBulkData(
-    const Teuchos::RCP<Teuchos_Comm const>&                   commT,
-    const Teuchos::RCP<Teuchos::ParameterList>&               params,
-    const unsigned int                                        neq_,
-    const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-    const unsigned int                                        worksetSize,
-    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-        side_set_sis,
-    std::map<
-        std::string,
-        AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
+    const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+    const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+    const unsigned int                                                               neq_,
+    const AbstractFieldContainer::FieldContainerRequirements&                        req,
+    const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+    const unsigned int                                                               worksetSize,
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
+    std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
   std::cout << "---3DPoint::setFieldAndBulkData---" << std::endl;
   SetupFieldData(commT, neq_, req, sis, worksetSize);
@@ -71,14 +67,11 @@ Albany::STK3DPointStruct::setFieldAndBulkData(
   // TmplSTKMeshStruct<0, albany_stk_mesh_traits<0> >::buildMesh(commT);
   stk::mesh::PartVector nodePartVec;
   stk::mesh::PartVector singlePartVec(1);
-  singlePartVec[0] =
-      partVec[0];  // Get the element block part to put the element in.
+  singlePartVec[0] = partVec[0];  // Get the element block part to put the element in.
   // Declare element 1 is in that block
-  stk::mesh::Entity pt =
-      bulkData->declare_entity(stk::topology::ELEMENT_RANK, 1, singlePartVec);
+  stk::mesh::Entity pt = bulkData->declare_entity(stk::topology::ELEMENT_RANK, 1, singlePartVec);
   // Declare node 1 is in the node part vector
-  stk::mesh::Entity node =
-      bulkData->declare_entity(stk::topology::NODE_RANK, 1, nodePartVec);
+  stk::mesh::Entity node = bulkData->declare_entity(stk::topology::NODE_RANK, 1, nodePartVec);
   // Declare that the node belongs to the element "pt"
   // "node" is the zeroth node of this element
   bulkData->declare_relation(pt, node, 0);
@@ -86,13 +79,11 @@ Albany::STK3DPointStruct::setFieldAndBulkData(
   bulkData->modification_end();
 
   fieldAndBulkDataSet = true;
-  this->finalizeSideSetMeshStructs(
-      commT, side_set_req, side_set_sis, worksetSize);
+  this->finalizeSideSetMeshStructs(commT, side_set_req, side_set_sis, worksetSize);
 }
 
 void
-Albany::STK3DPointStruct::buildMesh(
-    const Teuchos::RCP<Teuchos_Comm const>& commT)
+Albany::STK3DPointStruct::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   std::cout << "---3DPoint::buildMesh---" << std::endl;
 }
@@ -101,8 +92,7 @@ Teuchos::RCP<Teuchos::ParameterList const>
 Albany::STK3DPointStruct::getValidDiscretizationParameters() const
 {
   std::cout << "---3DPoint::getValidDiscretizationParameters---" << std::endl;
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getValidGenericSTKParameters("ValidSTK3DPoint_DiscParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getValidGenericSTKParameters("ValidSTK3DPoint_DiscParams");
 
   return validPL;
 }

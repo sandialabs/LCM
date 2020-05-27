@@ -9,16 +9,13 @@ namespace PHAL {
 
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::
-    DOFVecGradInterpolationSideBase(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl_side)
+DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::DOFVecGradInterpolationSideBase(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl_side)
     : sideSetName(p.get<std::string>("Side Set Name")),
       val_node(p.get<std::string>("Variable Name"), dl_side->node_vector),
       gradBF(p.get<std::string>("Gradient BF Name"), dl_side->node_qp_gradient),
-      grad_qp(
-          p.get<std::string>("Gradient Variable Name"),
-          dl_side->qp_vecgradient)
+      grad_qp(p.get<std::string>("Gradient Variable Name"), dl_side->qp_vecgradient)
 {
   ALBANY_PANIC(
       !dl_side->isSideLayouts,
@@ -52,13 +49,11 @@ DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 // *********************************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
 
-  std::vector<Albany::SideStruct> const& sideSet =
-      workset.sideSets->at(sideSetName);
+  std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell
     int const cell = it_side.elem_LID;
@@ -69,9 +64,7 @@ DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(
         for (int dim = 0; dim < numDims; ++dim) {
           grad_qp(cell, side, qp, comp, dim) = 0.;
           for (int node = 0; node < numSideNodes; ++node) {
-            grad_qp(cell, side, qp, comp, dim) +=
-                val_node(cell, side, node, comp) *
-                gradBF(cell, side, node, qp, dim);
+            grad_qp(cell, side, qp, comp, dim) += val_node(cell, side, node, comp) * gradBF(cell, side, node, qp, dim);
           }
         }
       }

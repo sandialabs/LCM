@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-RIHMRModel<EvalT, Traits>::RIHMRModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+RIHMRModel<EvalT, Traits>::RIHMRModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       sat_mod_(p->get<RealType>("Saturation Modulus", 0.0)),
       sat_exp_(p->get<RealType>("Saturation Exponent", 0.0))
@@ -24,10 +22,8 @@ RIHMRModel<EvalT, Traits>::RIHMRModel(
   this->dep_field_map_.insert(std::make_pair("Poissons Ratio", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Elastic Modulus", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Yield Strength", dl->qp_scalar));
-  this->dep_field_map_.insert(
-      std::make_pair("Hardening Modulus", dl->qp_scalar));
-  this->dep_field_map_.insert(
-      std::make_pair("Recovery Modulus", dl->qp_scalar));
+  this->dep_field_map_.insert(std::make_pair("Hardening Modulus", dl->qp_scalar));
+  this->dep_field_map_.insert(std::make_pair("Recovery Modulus", dl->qp_scalar));
 
   // retrieve appropriate field name strings
   std::string cauchy_string       = (*field_name_map_)["Cauchy_Stress"];
@@ -39,8 +35,7 @@ RIHMRModel<EvalT, Traits>::RIHMRModel(
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(logFp_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair(isoHardening_string, dl->qp_scalar));
+  this->eval_field_map_.insert(std::make_pair(isoHardening_string, dl->qp_scalar));
 
   // define the state variables
   // stress
@@ -78,10 +73,7 @@ RIHMRModel<EvalT, Traits>::RIHMRModel(
 }
 template <typename EvalT, typename Traits>
 void
-RIHMRModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+RIHMRModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto def_grad          = *dep_fields["F"];
@@ -104,10 +96,9 @@ RIHMRModel<EvalT, Traits>::computeState(
   auto isoHardening = *eval_fields[isoHardening_string];
 
   // get State Variables
-  Albany::MDArray logFp_old = (*workset.stateArrayPtr)[logFp_string + "_old"];
-  Albany::MDArray eqps_old  = (*workset.stateArrayPtr)[eqps_string + "_old"];
-  Albany::MDArray isoHardening_old =
-      (*workset.stateArrayPtr)[isoHardening_string + "_old"];
+  Albany::MDArray logFp_old        = (*workset.stateArrayPtr)[logFp_string + "_old"];
+  Albany::MDArray eqps_old         = (*workset.stateArrayPtr)[eqps_string + "_old"];
+  Albany::MDArray isoHardening_old = (*workset.stateArrayPtr)[isoHardening_string + "_old"];
 
   // scratch space FCs
   minitensor::Tensor<ScalarT> be(num_dims_);
@@ -150,17 +141,14 @@ RIHMRModel<EvalT, Traits>::computeState(
 
       Fp    = minitensor::exp(logFp_n);
       Fpold = Fp;
-      Cpinv = minitensor::dot(
-          minitensor::inverse(Fp),
-          minitensor::transpose(minitensor::inverse(Fp)));
+      Cpinv = minitensor::dot(minitensor::inverse(Fp), minitensor::transpose(minitensor::inverse(Fp)));
 
-      kappa = elastic_modulus(cell, pt) /
-              (3.0 * (1.0 - 2.0 * poissons_ratio(cell, pt)));
-      mu = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
-      K  = hardening_modulus(cell, pt);
-      Y  = yield_strength(cell, pt);
-      Rd = recovery_modulus(cell, pt);
-      Jm23 = std::pow(J(cell, pt), -2.0 / 3.0);
+      kappa = elastic_modulus(cell, pt) / (3.0 * (1.0 - 2.0 * poissons_ratio(cell, pt)));
+      mu    = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
+      K     = hardening_modulus(cell, pt);
+      Y     = yield_strength(cell, pt);
+      Rd    = recovery_modulus(cell, pt);
+      Jm23  = std::pow(J(cell, pt), -2.0 / 3.0);
 
       // Compute Trial State
       be.clear();
@@ -168,8 +156,7 @@ RIHMRModel<EvalT, Traits>::computeState(
         for (int j = 0; j < num_dims_; ++j)
           for (int p = 0; p < num_dims_; ++p)
             for (int q = 0; q < num_dims_; ++q)
-              be(i, j) += Jm23 * def_grad(cell, pt, i, p) * Cpinv(p, q) *
-                          def_grad(cell, pt, j, q);
+              be(i, j) += Jm23 * def_grad(cell, pt, i, p) * Cpinv(p, q) * def_grad(cell, pt, j, q);
 
       trd3  = minitensor::trace(be) / 3.;
       mubar = trd3 * mu;
@@ -245,9 +232,7 @@ RIHMRModel<EvalT, Traits>::computeState(
         for (int i = 0; i < num_dims_; ++i) {
           for (int j = 0; j < num_dims_; ++j) {
             Fp(i, j) = 0.0;
-            for (int p = 0; p < num_dims_; ++p) {
-              Fp(i, j) += expA(i, p) * Fpold(p, j);
-            }
+            for (int p = 0; p < num_dims_; ++p) { Fp(i, j) += expA(i, p) * Fpold(p, j); }
           }
         }
 
@@ -262,17 +247,14 @@ RIHMRModel<EvalT, Traits>::computeState(
       // store logFp as the state variable
       logFp_n = minitensor::log(Fp);
       for (int i = 0; i < num_dims_; ++i)
-        for (int j = 0; j < num_dims_; ++j)
-          logFp(cell, pt, i, j) = logFp_n(i, j);
+        for (int j = 0; j < num_dims_; ++j) logFp(cell, pt, i, j) = logFp_n(i, j);
 
       // compute pressure
       p = 0.5 * kappa * (J(cell, pt) - 1 / (J(cell, pt)));
 
       // compute stress
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = s(i, j) / J(cell, pt);
-        }
+        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = s(i, j) / J(cell, pt); }
         stress(cell, pt, i, i) += p;
       }
     }
@@ -333,8 +315,7 @@ RIHMRModel<EvalT, Traits>::ResidualJacobian(
   d_isoH = d_isoH * sq23;
 
   // local nonlinear sys of equations
-  Rfad[0] =
-      smagfad - Yfad;  // Phi = smag - 2.* mubar * dgam - sq23 * (Y + isoHfad);
+  Rfad[0] = smagfad - Yfad;  // Phi = smag - 2.* mubar * dgam - sq23 * (Y + isoHfad);
   Rfad[1] = isoHfad - isoH - d_isoH;
 
   // get ScalarT residual

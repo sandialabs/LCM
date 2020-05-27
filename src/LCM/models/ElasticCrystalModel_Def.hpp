@@ -128,9 +128,7 @@ ElasticCrystalModel<EvalT, Traits>::ElasticCrystalModel(
             for (int j1 = 0; j1 < num_dims_; ++j1) {
               for (int k1 = 0; k1 < num_dims_; ++k1) {
                 for (int l1 = 0; l1 < num_dims_; ++l1) {
-                  C_(i, j, k, l) = C_(i, j, k, l) + rl(i, i1) * rl(j, j1) *
-                                                        rl(k, k1) * rl(l, l1) *
-                                                        C(i1, j1, k1, l1);
+                  C_(i, j, k, l) = C_(i, j, k, l) + rl(i, i1) * rl(j, j1) * rl(k, k1) * rl(l, l1) * C(i1, j1, k1, l1);
                 }
               }
             }
@@ -158,8 +156,7 @@ ElasticCrystalModel<EvalT, Traits>::ElasticCrystalModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Cauchy Stress", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Cauchy Stress", false));
 }
 
 template <typename EvalT, typename Traits>
@@ -257,12 +254,10 @@ ElasticCrystalModel<EvalT, Traits>::computeState(
         for (int j = 0; j < num_dims_; ++j) {
           S(i, j) = 0.0;
           for (int k = 0; k < num_dims_; ++k) {
-            for (int l = 0; l < num_dims_; ++l) {
-              S(i, j) = S(i, j) + C_(i, j, k, l) * E(k, l);
-            }  // end l
-          }    // end k
-        }      // end j
-      }        // end i
+            for (int l = 0; l < num_dims_; ++l) { S(i, j) = S(i, j) + C_(i, j, k, l) * E(k, l); }  // end l
+          }                                                                                        // end k
+        }                                                                                          // end j
+      }                                                                                            // end i
 
       // temporal variable
       tmp1        = S * C;
@@ -285,9 +280,7 @@ ElasticCrystalModel<EvalT, Traits>::computeState(
 
       // fill Cauchy stress
       for (int i = 0; i < num_dims_; i++) {
-        for (int j = 0; j < num_dims_; j++) {
-          stress(cell, pt, i, j) = sigma(i, j);
-        }
+        for (int j = 0; j < num_dims_; j++) { stress(cell, pt, i, j) = sigma(i, j); }
       }
 
     }  // end pt

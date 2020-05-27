@@ -19,41 +19,35 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
 {
   if (IsComplete()) {
     if (OutLevel() > 0)
-      std::cout
-          << "MoertelT: ***WRN*** MoertelT::InterfaceT::InterfaceComplete:\n"
-          << "MoertelT: ***WRN*** InterfaceComplete() was called before, do "
-             "nothing\n"
-          << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__
-          << "\n";
+      std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::InterfaceComplete:\n"
+                << "MoertelT: ***WRN*** InterfaceComplete() was called before, do "
+                   "nothing\n"
+                << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return true;
   }
 
   // check for NULL entries in maps
   bool ok = true;
   for (int i = 0; i < 2; ++i) {
-    std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::
-        const_iterator curr;
+    std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::const_iterator curr;
     for (curr = node_[i].begin(); curr != node_[i].end(); ++curr) {
       if (curr->second == Teuchos::null) {
         std::cout << "***ERR*** MoertelT::InterfaceT::Complete:\n"
                   << "***ERR*** Interface # " << Id_ << ":\n"
                   << "***ERR*** found NULL entry in map of nodes\n"
-                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                  << "\n";
+                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         ok = false;
       }
     }
   }
   for (int i = 0; i < 2; ++i) {
-    std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-        const_iterator curr;
+    std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::const_iterator curr;
     for (curr = seg_[i].begin(); curr != seg_[i].end(); ++curr) {
       if (curr->second == Teuchos::null) {
         std::cout << "***ERR*** MoertelT::Interface::Complete:\n"
                   << "***ERR*** Interface # " << Id_ << ":\n"
                   << "***ERR*** found NULL entry in map of segments\n"
-                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                  << "\n";
+                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         ok = false;
       }
     }
@@ -74,27 +68,19 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
         // create length of list of all nodes adjacent to segments on proc
         int sendsize = 0;
         if (proc == gcomm_->getRank()) {
-          std::map<
-              int,
-              Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-              const_iterator curr;
-          for (curr = seg_[side].begin(); curr != seg_[side].end(); ++curr)
-            sendsize += curr->second->Nnode();
+          std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::const_iterator curr;
+          for (curr = seg_[side].begin(); curr != seg_[side].end(); ++curr) sendsize += curr->second->Nnode();
         }
         Teuchos::broadcast<LO, int>(*gcomm_, proc, 1, &sendsize);
 
         // create list of all nodes adjacent to segments on proc
         std::vector<int> ids(sendsize);
         if (proc == gcomm_->getRank()) {
-          std::map<
-              int,
-              Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-              const_iterator curr;
-          int                counter = 0;
+          std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::const_iterator curr;
+          int                                                                                     counter = 0;
           for (curr = seg_[side].begin(); curr != seg_[side].end(); ++curr) {
             const int* segids = curr->second->NodeIds();
-            for (int i = 0; i < curr->second->Nnode(); ++i)
-              ids[counter++] = segids[i];
+            for (int i = 0; i < curr->second->Nnode(); ++i) ids[counter++] = segids[i];
           }
         }
         Teuchos::broadcast<LO, int>(*gcomm_, proc, sendsize, &ids[0]);
@@ -106,17 +92,14 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
           foundit[i] = 0;
           if (node_[side].find(ids[i]) != node_[side].end()) foundit[i] = 1;
         }
-        Teuchos::reduceAll<LO, int>(
-            *gcomm_, Teuchos::REDUCE_MAX, sendsize, &foundit[0], &gfoundit[0]);
+        Teuchos::reduceAll<LO, int>(*gcomm_, Teuchos::REDUCE_MAX, sendsize, &foundit[0], &gfoundit[0]);
         for (int i = 0; i < sendsize; ++i) {
           if (gfoundit[i] != 1) {
             if (gcomm_->getRank() == proc)
               std::cout << "***ERR*** MoertelT::Interface::Complete:\n"
-                        << "***ERR*** cannot find segment's node # " << ids[i]
-                        << "\n"
+                        << "***ERR*** cannot find segment's node # " << ids[i] << "\n"
                         << "***ERR*** in map of all nodes on all procs\n"
-                        << "***ERR*** file/line: " << __FILE__ << "/"
-                        << __LINE__ << "\n";
+                        << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
             ids.clear();
             foundit.clear();
             gfoundit.clear();
@@ -155,18 +138,15 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
         lin[gcomm_->getRank()] = 1;
         break;
       }
-    Teuchos::reduceAll<LO, int>(
-        *gcomm_, Teuchos::REDUCE_MAX, gcomm_->getSize(), &lin[0], &gin[0]);
+    Teuchos::reduceAll<LO, int>(*gcomm_, Teuchos::REDUCE_MAX, gcomm_->getSize(), &lin[0], &gin[0]);
     lin.clear();
 
     // typecast the Teuchos_Comm to Teuchos_MpiComm
-    const Teuchos::MpiComm<LO>* teuchosmpicomm =
-        dynamic_cast<const Teuchos::MpiComm<LO>*>(gcomm_.get());
+    const Teuchos::MpiComm<LO>* teuchosmpicomm = dynamic_cast<const Teuchos::MpiComm<LO>*>(gcomm_.get());
     if (!teuchosmpicomm) {
       std::stringstream oss;
       oss << "***ERR*** MoertelT::Interface::Complete:\n"
-          << "***ERR*** Interface " << Id()
-          << ": Teuchos_Comm is not a Teuchos_MpiComm\n"
+          << "***ERR*** Interface " << Id() << ": Teuchos_Comm is not a Teuchos_MpiComm\n"
           << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       throw MoertelT::ReportError(oss);
     }
@@ -186,13 +166,11 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
     // create the local communicator
     lcomm_ = gcomm_->split(color, key);
 #else  // the easy serial case
-    const Teuchos::SerialComm<LO>* serialcomm =
-        dynamic_cast<const Teuchos::SerialComm<LO>*>(gcomm_.get());
+    const Teuchos::SerialComm<LO>* serialcomm = dynamic_cast<const Teuchos::SerialComm<LO>*>(gcomm_.get());
     if (!serialcomm) {
       std::stringstream oss;
       oss << "***ERR*** MoertelT::Interface::Complete:\n"
-          << "***ERR*** Interface " << Id()
-          << ": Teuchos::Comm is not a Teuchos::SerialComm\n"
+          << "***ERR*** Interface " << Id() << ": Teuchos::Comm is not a Teuchos::SerialComm\n"
           << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       throw MoertelT::ReportError(oss);
     }
@@ -204,21 +182,17 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
   if (lcomm_ != Teuchos::null)
     for (int proc = 0; proc < lcomm_->getSize(); ++proc) {
       int lnnodes = 0;
-      if (proc == lcomm_->getRank())
-        lnnodes = node_[0].size() + node_[1].size();
+      if (proc == lcomm_->getRank()) lnnodes = node_[0].size() + node_[1].size();
       Teuchos::broadcast<LO, int>(*lcomm_, proc, 1, &lnnodes);
       std::vector<int> ids(lnnodes);
       if (proc == lcomm_->getRank()) {
-        std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::
-            const_iterator curr;
-        int                counter = 0;
+        std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::const_iterator curr;
+        int                                                                                  counter = 0;
         for (int side = 0; side < 2; ++side)
-          for (curr = node_[side].begin(); curr != node_[side].end(); ++curr)
-            ids[counter++] = curr->first;
+          for (curr = node_[side].begin(); curr != node_[side].end(); ++curr) ids[counter++] = curr->first;
       }
       Teuchos::broadcast<LO, int>(*lcomm_, proc, lnnodes, &ids[0]);
-      for (int i = 0; i < lnnodes; ++i)
-        nodePID_.insert(std::pair<int, int>(ids[i], proc));
+      for (int i = 0; i < lnnodes; ++i) nodePID_.insert(std::pair<int, int>(ids[i], proc));
       ids.clear();
     }
 
@@ -230,17 +204,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
       Teuchos::broadcast<LO, int>(*lcomm_, proc, 1, &lnsegs);
       std::vector<int> ids(lnsegs);
       if (proc == lcomm_->getRank()) {
-        std::
-            map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-                const_iterator curr;
-        int                    counter = 0;
+        std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::const_iterator curr;
+        int                                                                                     counter = 0;
         for (int side = 0; side < 2; ++side)
-          for (curr = seg_[side].begin(); curr != seg_[side].end(); ++curr)
-            ids[counter++] = curr->first;
+          for (curr = seg_[side].begin(); curr != seg_[side].end(); ++curr) ids[counter++] = curr->first;
       }
       Teuchos::broadcast<LO, int>(*lcomm_, proc, lnsegs, &ids[0]);
-      for (int i = 0; i < lnsegs; ++i)
-        segPID_.insert(std::pair<int, int>(ids[i], proc));
+      for (int i = 0; i < lnsegs; ++i) segPID_.insert(std::pair<int, int>(ids[i], proc));
       ids.clear();
     }
 
@@ -255,14 +225,11 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
     int lmaxnnode = 0;
     int gmaxnnode = 0;
     for (int side = 0; side < 2; ++side) {
-      std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-          const_iterator scurr;
+      std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::const_iterator scurr;
       for (scurr = seg_[side].begin(); scurr != seg_[side].end(); ++scurr)
-        if (lmaxnnode < scurr->second->Nnode())
-          lmaxnnode = scurr->second->Nnode();
+        if (lmaxnnode < scurr->second->Nnode()) lmaxnnode = scurr->second->Nnode();
     }
-    Teuchos::reduceAll<LO, int>(
-        *lcomm_, Teuchos::REDUCE_MAX, 1, &lmaxnnode, &gmaxnnode);
+    Teuchos::reduceAll<LO, int>(*lcomm_, Teuchos::REDUCE_MAX, 1, &lmaxnnode, &gmaxnnode);
 
     // loop all procs and broadcast their adjacency
     for (int proc = 0; proc < lcomm_->getSize(); ++proc) {
@@ -280,16 +247,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
       if (proc == lcomm_->getRank()) {
         int count = 0;
         for (int side = 0; side < 2; ++side) {
-          std::map<
-              int,
-              Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-              const_iterator scurr;
+          std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::const_iterator scurr;
           for (scurr = seg_[side].begin(); scurr != seg_[side].end(); ++scurr) {
-            Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> seg =
-                scurr->second;
-            adj[count]     = seg->Id();
-            adj[count + 1] = seg->Nnode();
-            const int* ids = seg->NodeIds();
+            Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> seg = scurr->second;
+            adj[count]                                                   = seg->Id();
+            adj[count + 1]                                               = seg->Nnode();
+            const int* ids                                               = seg->NodeIds();
             for (int i = 0; i < seg->Nnode(); ++i) adj[count + 2 + i] = ids[i];
             count += offset;
           }
@@ -306,15 +269,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
           int nid = adj[count + 2 + j];
           if (lcomm_->getRank() == NodePID(nid)) {
             // I own this node, so set the segment segid in it
-            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> node =
-                GetNodeViewLocal(nid);
+            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> node = GetNodeViewLocal(nid);
             if (node == Teuchos::null) {
               std::stringstream oss;
               oss << "***ERR*** MoertelT::Interface::Complete:\n"
                   << "***ERR*** cannot find node " << nid << "\n"
                   << "***ERR*** in map of all nodes on this proc\n"
-                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                  << "\n";
+                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
               throw MoertelT::ReportError(oss);
             }
             node->AddSegment(segid);

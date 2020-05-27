@@ -14,12 +14,8 @@ namespace HMC {
 //*****
 template <typename EvalT, typename Traits>
 Stresses<EvalT, Traits>::Stresses(Teuchos::ParameterList const& p)
-    : strain(
-          p.get<std::string>("Strain Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")),
-      stress(
-          p.get<std::string>("Stress Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")),
+    : strain(p.get<std::string>("Strain Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")),
+      stress(p.get<std::string>("Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")),
       numMicroScales(p.get<int>("Additional Scales")),
       C11(p.get<RealType>("C11")),
       C33(p.get<RealType>("C33")),
@@ -38,37 +34,32 @@ Stresses<EvalT, Traits>::Stresses(Teuchos::ParameterList const& p)
     std::stringstream sdname;
     sdname << "Strain Difference " << i << " Name";
     strainDifference[i] = Teuchos::rcp(new cHMC2Tensor(
-        p.get<std::string>(sdname.str()),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
+        p.get<std::string>(sdname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
     std::stringstream sdgradname;
     sdgradname << "Micro Strain Gradient " << i << " Name";
     microStrainGradient[i] = Teuchos::rcp(new cHMC3Tensor(
-        p.get<std::string>(sdgradname.str()),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")));
+        p.get<std::string>(sdgradname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")));
     std::stringstream msname;
     msname << "Micro Stress " << i << " Name";
     microStress[i] = Teuchos::rcp(new HMC2Tensor(
-        p.get<std::string>(msname.str()),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
+        p.get<std::string>(msname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
     std::stringstream dsname;
     dsname << "Double Stress " << i << " Name";
     doubleStress[i] = Teuchos::rcp(new HMC3Tensor(
-        p.get<std::string>(dsname.str()),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")));
+        p.get<std::string>(dsname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")));
   }
 
   lengthScale.resize(numMicroScales);
   betaParameter.resize(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
-    std::string mySublist                 = Albany::strint("Microscale", i + 1);
-    Teuchos::ParameterList const& msModel = p.sublist(mySublist);
-    lengthScale[i]   = msModel.get<RealType>("Length Scale");
-    betaParameter[i] = msModel.get<RealType>("Beta Constant");
+    std::string                   mySublist = Albany::strint("Microscale", i + 1);
+    Teuchos::ParameterList const& msModel   = p.sublist(mySublist);
+    lengthScale[i]                          = msModel.get<RealType>("Length Scale");
+    betaParameter[i]                        = msModel.get<RealType>("Beta Constant");
   }
 
   // Pull out numQPs and numDims from a Layout
-  Teuchos::RCP<PHX::DataLayout> tensor_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           tensor_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   tensor_dl->dimensions(dims);
   numQPs  = dims[1];
@@ -91,9 +82,7 @@ Stresses<EvalT, Traits>::Stresses(Teuchos::ParameterList const& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-Stresses<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+Stresses<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(stress, fm);
   this->utils.setFieldData(strain, fm);
@@ -138,8 +127,7 @@ Stresses<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   //  ScalarT C11,C33,C12,C23,C44,C66;
 
   // Irina TOFIX pointers
-  ALBANY_PANIC(
-      0 == 0, "Stress:: evaluator has to be fixed for Kokkos data types");
+  ALBANY_PANIC(0 == 0, "Stress:: evaluator has to be fixed for Kokkos data types");
   /*
     switch (numDims) {
     case 1:

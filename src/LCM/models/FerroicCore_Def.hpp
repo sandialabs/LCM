@@ -25,8 +25,7 @@ FM::DomainSwitching<EvalT, M>::DomainSwitching(
   // compute trial state
   minitensor::Tensor<ArgT, FM::THREE_D> X, linear_x;
   minitensor::Vector<ArgT, FM::THREE_D> linear_D;
-  FM::computeInitialState(
-      m_binFractions, m_crystalVariants, m_x, X, linear_x, E, m_D, linear_D);
+  FM::computeInitialState(m_binFractions, m_crystalVariants, m_x, X, linear_x, E, m_D, linear_D);
 
   // set all transitions active for first residual eval
   int nTransitions = m_transitions.size();
@@ -61,17 +60,13 @@ template <typename EvalT, minitensor::Index M>
 template <typename T, minitensor::Index N>
 T
 FM::DomainSwitching<EvalT, M>::value(minitensor::Vector<T, N> const& x)
-/******************************************************************************/
-{
-  return Base::value(*this, x);
-}
+/******************************************************************************/ { return Base::value(*this, x); }
 
 /******************************************************************************/
 template <typename EvalT, minitensor::Index M>
 template <typename T, minitensor::Index N>
 minitensor::Vector<T, N>
-FM::DomainSwitching<EvalT, M>::gradient(
-    minitensor::Vector<T, N> const& xi) const
+FM::DomainSwitching<EvalT, M>::gradient(minitensor::Vector<T, N> const& xi) const
 /******************************************************************************/
 {
   minitensor::Tensor<T, FM::THREE_D> X;
@@ -86,25 +81,14 @@ FM::DomainSwitching<EvalT, M>::gradient(
 
   // apply transition increment
   Teuchos::Array<T> fractionsNew(m_binFractions.size());
-  computeBinFractions(
-      xi, fractionsNew, m_binFractions, m_transitionMap, m_aMatrix);
+  computeBinFractions(xi, fractionsNew, m_binFractions, m_transitionMap, m_aMatrix);
 
-  minitensor::Tensor<T, FM::THREE_D> const x_peeled =
-      LCM::peel_tensor<EvalT, T, N, FM::THREE_D>()(m_x);
+  minitensor::Tensor<T, FM::THREE_D> const x_peeled = LCM::peel_tensor<EvalT, T, N, FM::THREE_D>()(m_x);
 
-  minitensor::Vector<T, FM::THREE_D> const D_peeled =
-      LCM::peel_vector<EvalT, T, N, FM::THREE_D>()(m_D);
+  minitensor::Vector<T, FM::THREE_D> const D_peeled = LCM::peel_vector<EvalT, T, N, FM::THREE_D>()(m_D);
 
   // compute new state
-  computeRelaxedState(
-      fractionsNew,
-      m_crystalVariants,
-      x_peeled,
-      X,
-      linear_x,
-      E,
-      D_peeled,
-      linear_D);
+  computeRelaxedState(fractionsNew, m_crystalVariants, x_peeled, X, linear_x, E, D_peeled, linear_D);
 
   // compute new residual
   auto const               num_unknowns = xi.get_dimension();
@@ -130,10 +114,7 @@ template <typename EvalT, minitensor::Index M>
 template <typename T, minitensor::Index N>
 minitensor::Tensor<T, N>
 FM::DomainSwitching<EvalT, M>::hessian(minitensor::Vector<T, N> const& xi)
-/******************************************************************************/
-{
-  return Base::hessian(*this, xi);
-}
+/******************************************************************************/ { return Base::hessian(*this, xi); }
 
 /******************************************************************************/
 template <typename DataT>
@@ -154,9 +135,7 @@ FM::changeBasis(
             for (int r = 0; r < num_dims; r++)
               for (int s = 0; s < num_dims; s++)
                 for (int t = 0; t < num_dims; t++)
-                  inMatlBasis(i, j, k, l) += inGlobalBasis(q, r, s, t) *
-                                             R(i, q) * R(j, r) * R(k, s) *
-                                             R(l, t);
+                  inMatlBasis(i, j, k, l) += inGlobalBasis(q, r, s, t) * R(i, q) * R(j, r) * R(k, s) * R(l, t);
 }
 /******************************************************************************/
 template <typename DataT>
@@ -175,8 +154,7 @@ FM::changeBasis(
         for (int q = 0; q < num_dims; q++)
           for (int r = 0; r < num_dims; r++)
             for (int s = 0; s < num_dims; s++)
-              inMatlBasis(i, j, k) +=
-                  inGlobalBasis(q, r, s) * R(i, q) * R(j, r) * R(k, s);
+              inMatlBasis(i, j, k) += inGlobalBasis(q, r, s) * R(i, q) * R(j, r) * R(k, s);
 }
 /******************************************************************************/
 template <typename DataT>
@@ -192,8 +170,7 @@ FM::changeBasis(
   for (int i = 0; i < num_dims; i++)
     for (int j = 0; j < num_dims; j++)
       for (int q = 0; q < num_dims; q++)
-        for (int r = 0; r < num_dims; r++)
-          inMatlBasis(i, j) += inGlobalBasis(q, r) * R(i, q) * R(j, r);
+        for (int r = 0; r < num_dims; r++) inMatlBasis(i, j) += inGlobalBasis(q, r) * R(i, q) * R(j, r);
 }
 /******************************************************************************/
 template <typename DataT>
@@ -207,8 +184,7 @@ FM::changeBasis(
   int num_dims = R.get_dimension();
   inMatlBasis.clear();
   for (int i = 0; i < num_dims; i++)
-    for (int q = 0; q < num_dims; q++)
-      inMatlBasis(i) += inGlobalBasis(q) * R(i, q);
+    for (int q = 0; q < num_dims; q++) inMatlBasis(i) += inGlobalBasis(q) * R(i, q);
 }
 
 /******************************************************************************/
@@ -245,9 +221,7 @@ FM::computeBinFractions(
   for (int I = 0; I < nVariants; I++) {
     newFractions[I] = oldFractions[I];
     for (int i = 0; i < nTransitions; i++) {
-      if (transitionMap[i] >= 0) {
-        newFractions[I] += xi(transitionMap[i]) * aMatrix(I, i);
-      }
+      if (transitionMap[i] >= 0) { newFractions[I] += xi(transitionMap[i]) * aMatrix(I, i); }
     }
   }
 }
@@ -367,8 +341,7 @@ FM::computeResidual(
       if (transitionMap[i] >= 0) {
         const Transition& transition = transitions[i];
         int               lindex     = transitionMap[i];
-        residual[lindex] = -tBarrier[i] - dotdot(transition.transStrain, X) -
-                           dot(transition.transEDisp, E);
+        residual[lindex]             = -tBarrier[i] - dotdot(transition.transStrain, X) - dot(transition.transEDisp, E);
       }
     }
   }
@@ -376,13 +349,8 @@ FM::computeResidual(
   for (int I = 0; I < nVariants; I++) {
     ArgT                  myRate(0.0);
     const CrystalVariant& variant = crystalVariants[I];
-    myRate +=
-        dotdot(
-            linear_x, dotdot(variant.C, linear_x) - dot(linear_D, variant.h)) *
-        half;
-    myRate +=
-        dot(linear_D, dot(variant.b, linear_D) - dotdot(variant.h, linear_x)) *
-        half;
+    myRate += dotdot(linear_x, dotdot(variant.C, linear_x) - dot(linear_D, variant.h)) * half;
+    myRate += dot(linear_D, dot(variant.b, linear_D) - dotdot(variant.h, linear_x)) * half;
     for (int i = 0; i < nTransitions; i++) {
       if (transitionMap[i] >= 0) {
         DataT aVal = aMatrix(I, i);

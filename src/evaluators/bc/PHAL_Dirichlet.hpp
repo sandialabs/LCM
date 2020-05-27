@@ -39,9 +39,7 @@ class DirichletBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   DirichletBase(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   // This function will be overloaded with template specialized code
   void
@@ -72,8 +70,7 @@ class Dirichlet;
 // Residual
 // **************************************************************
 template <typename Traits>
-class Dirichlet<PHAL::AlbanyTraits::Residual, Traits>
-    : public DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
+class Dirichlet<PHAL::AlbanyTraits::Residual, Traits> : public DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   Dirichlet(Teuchos::ParameterList& p);
@@ -85,8 +82,7 @@ class Dirichlet<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits> : public DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   Dirichlet(Teuchos::ParameterList& p);
@@ -98,8 +94,7 @@ class Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>
 // Evaluator to aggregate all Dirichlet BCs into one "field"
 // **************************************************************
 template <typename EvalT, typename Traits>
-class DirichletAggregator : public PHX::EvaluatorWithBaseImpl<Traits>,
-                            public PHX::EvaluatorDerived<EvalT, Traits>
+class DirichletAggregator : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  private:
   typedef typename EvalT::ScalarT ScalarT;
@@ -108,9 +103,7 @@ class DirichletAggregator : public PHX::EvaluatorWithBaseImpl<Traits>,
   DirichletAggregator(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   // This function will be overloaded with template specialized code
   void evaluateFields(typename Traits::EvalData /* d */){};

@@ -52,8 +52,7 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
     // requested. If the user does not specify anything, for backward
     // compatibility, we select the top/bottom topology. Otherwise, we honor the
     // request (if valid)
-    std::string side_topo_name =
-        params->get<std::string>("Side Topology Name", "Triangle");
+    std::string side_topo_name = params->get<std::string>("Side Topology Name", "Triangle");
     if (side_topo_name == "Triangle") {
       // Top/bottom
       stk::mesh::set_topology(*partVec[0], stk::topology::TRI_3_2D);
@@ -67,8 +66,7 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
     }
   } else if (input_elem_name == "Hexahedron_8") {
     stk::mesh::set_topology(*partVec[0], stk::topology::QUAD_4_2D);
-  } else if (
-      input_elem_name == "Triangle_3" || input_elem_name == "Quadrilateral_4") {
+  } else if (input_elem_name == "Triangle_3" || input_elem_name == "Quadrilateral_4") {
     stk::mesh::set_topology(*partVec[0], stk::topology::LINE_2_1D);
   } else {
     ALBANY_ABORT(
@@ -77,34 +75,19 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
   }
 
   std::vector<std::string> ssNames;  // Empty
-  int                      cub = params->get("Cubature Degree", 3);
-  int worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
-  int worksetSize =
-      this->computeWorksetSize(worksetSizeMax, inputMeshSpecs.worksetSize);
-  auto                 stk_topo_data = metaData->get_topology(*partVec[0]);
-  shards::CellTopology shards_ctd = stk::mesh::get_cell_topology(stk_topo_data);
-  const CellTopologyData& ctd     = *shards_ctd.getCellTopologyData();
+  int                      cub            = params->get("Cubature Degree", 3);
+  int                      worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
+  int                      worksetSize    = this->computeWorksetSize(worksetSizeMax, inputMeshSpecs.worksetSize);
+  auto                     stk_topo_data  = metaData->get_topology(*partVec[0]);
+  shards::CellTopology     shards_ctd     = stk::mesh::get_cell_topology(stk_topo_data);
+  const CellTopologyData&  ctd            = *shards_ctd.getCellTopologyData();
 
   this->meshSpecs[0] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-      ctd,
-      this->numDim,
-      cub,
-      nsNames,
-      ssNames,
-      worksetSize,
-      ebn,
-      ebNameToIndex,
-      this->interleavedOrdering));
+      ctd, this->numDim, cub, nsNames, ssNames, worksetSize, ebn, ebNameToIndex, this->interleavedOrdering));
 
-  const Teuchos::MpiComm<int>* mpiComm =
-      dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
-  bulkData = Teuchos::rcp(new stk::mesh::BulkData(
-      *metaData,
-      *mpiComm->getRawMpiComm(),
-      stk::mesh::BulkData::NO_AUTO_AURA,
-      false,
-      NULL,
-      worksetSize));
+  const Teuchos::MpiComm<int>* mpiComm = dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
+  bulkData                             = Teuchos::rcp(new stk::mesh::BulkData(
+      *metaData, *mpiComm->getRawMpiComm(), stk::mesh::BulkData::NO_AUTO_AURA, false, NULL, worksetSize));
 }
 
 SideSetSTKMeshStruct::~SideSetSTKMeshStruct()
@@ -113,9 +96,7 @@ SideSetSTKMeshStruct::~SideSetSTKMeshStruct()
 }
 
 void
-SideSetSTKMeshStruct::setParentMeshInfo(
-    AbstractSTKMeshStruct const& parentMeshStruct_,
-    std::string const&           sideSetName)
+SideSetSTKMeshStruct::setParentMeshInfo(AbstractSTKMeshStruct const& parentMeshStruct_, std::string const& sideSetName)
 {
   parentMeshStruct      = Teuchos::rcpFromRef(parentMeshStruct_);
   parentMeshSideSetName = sideSetName;
@@ -129,48 +110,32 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
     AbstractFieldContainer::FieldContainerRequirements const& req,
     Teuchos::RCP<StateInfoStruct> const&                      sis,
     unsigned int const                                        worksetSize,
-    std::
-        map<std::string, Teuchos::RCP<StateInfoStruct>> const& /*side_set_sis*/,
-    std::map<
-        std::string,
-        AbstractFieldContainer::
-            FieldContainerRequirements> const& /*side_set_req*/)
+    std::map<std::string, Teuchos::RCP<StateInfoStruct>> const& /*side_set_sis*/,
+    std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& /*side_set_req*/)
 {
   this->SetupFieldData(commT, neq_, req, sis, worksetSize);
 
   ALBANY_PANIC(
-      parentMeshStruct->ssPartVec.find(parentMeshSideSetName) ==
-          parentMeshStruct->ssPartVec.end(),
-      "Error! The side set " << parentMeshSideSetName
-                             << " is not present in the input mesh.\n");
+      parentMeshStruct->ssPartVec.find(parentMeshSideSetName) == parentMeshStruct->ssPartVec.end(),
+      "Error! The side set " << parentMeshSideSetName << " is not present in the input mesh.\n");
 
   // Extracting the side part and updating the selector
-  const stk::mesh::Part& ss_part =
-      *parentMeshStruct->ssPartVec.find(parentMeshSideSetName)->second;
-  stk::mesh::Selector select_required_ss(ss_part);
+  const stk::mesh::Part& ss_part = *parentMeshStruct->ssPartVec.find(parentMeshSideSetName)->second;
+  stk::mesh::Selector    select_required_ss(ss_part);
 
   const stk::mesh::MetaData& inputMetaData = *parentMeshStruct->metaData;
   const stk::mesh::BulkData& inputBulkData = *parentMeshStruct->bulkData;
 
   typedef AbstractSTKFieldContainer::VectorFieldType VectorFieldType;
-  const VectorFieldType&                             parent_coordinates_field =
-      *parentMeshStruct->getCoordinatesField();
-  const VectorFieldType& parent_coordinates_field3d =
-      *parentMeshStruct->getCoordinatesField3d();
-  VectorFieldType& coordinates_field = *fieldContainer->getCoordinatesField();
-  VectorFieldType& coordinates_field3d =
-      *fieldContainer->getCoordinatesField3d();
+  const VectorFieldType& parent_coordinates_field   = *parentMeshStruct->getCoordinatesField();
+  const VectorFieldType& parent_coordinates_field3d = *parentMeshStruct->getCoordinatesField3d();
+  VectorFieldType&       coordinates_field          = *fieldContainer->getCoordinatesField();
+  VectorFieldType&       coordinates_field3d        = *fieldContainer->getCoordinatesField3d();
 
   // Now we can extract the entities
   std::vector<stk::mesh::Entity> sides, nodes;
-  stk::mesh::get_selected_entities(
-      select_required_ss,
-      inputBulkData.buckets(inputMetaData.side_rank()),
-      sides);
-  stk::mesh::get_selected_entities(
-      select_required_ss,
-      inputBulkData.buckets(stk::topology::NODE_RANK),
-      nodes);
+  stk::mesh::get_selected_entities(select_required_ss, inputBulkData.buckets(inputMetaData.side_rank()), sides);
+  stk::mesh::get_selected_entities(select_required_ss, inputBulkData.buckets(stk::topology::NODE_RANK), nodes);
 
   // Insertion of the entities begins
   bulkData->modification_begin();
@@ -183,15 +148,12 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
   for (size_t inode(0); inode < nodes.size(); ++inode) {
     // Adding the node (same Id)
     nodeId = inputBulkData.identifier(nodes[inode]);
-    node   = bulkData->declare_entity(
-        stk::topology::NODE_RANK, nodeId, singlePartVec);
+    node   = bulkData->declare_entity(stk::topology::NODE_RANK, nodeId, singlePartVec);
 
     // Setting the coordinates_field
-    double*       coord = stk::mesh::field_data(coordinates_field, node);
-    double const* p_coord =
-        stk::mesh::field_data(parent_coordinates_field, nodes[inode]);
-    for (size_t idim = 0; idim < metaData->spatial_dimension(); ++idim)
-      coord[idim] = p_coord[idim];
+    double*       coord   = stk::mesh::field_data(coordinates_field, node);
+    double const* p_coord = stk::mesh::field_data(parent_coordinates_field, nodes[inode]);
+    for (size_t idim = 0; idim < metaData->spatial_dimension(); ++idim) coord[idim] = p_coord[idim];
 
     // Setting the coordinates_field3d (since this is a side mesh, for sure
     // numDim<3)
@@ -201,10 +163,8 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
 
     // Checking for shared node
     std::vector<int> sharing_procs;
-    inputBulkData.comm_shared_procs(
-        inputBulkData.entity_key(nodes[inode]), sharing_procs);
-    for (size_t iproc(0); iproc < sharing_procs.size(); ++iproc)
-      bulkData->add_node_sharing(node, sharing_procs[iproc]);
+    inputBulkData.comm_shared_procs(inputBulkData.entity_key(nodes[inode]), sharing_procs);
+    for (size_t iproc(0); iproc < sharing_procs.size(); ++iproc) bulkData->add_node_sharing(node, sharing_procs[iproc]);
   }
 
   // Adding sides (aka elements in the boundary mesh)
@@ -214,16 +174,13 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
   for (size_t iside(0); iside < sides.size(); ++iside) {
     // Adding the element (same Id as the side)
     elemId = inputBulkData.identifier(sides[iside]);
-    elem   = bulkData->declare_entity(
-        stk::topology::ELEM_RANK, elemId, singlePartVec);
+    elem   = bulkData->declare_entity(stk::topology::ELEM_RANK, elemId, singlePartVec);
 
     // Adding the relation elem->node
-    stk::mesh::Entity const* node_rels =
-        inputBulkData.begin_nodes(sides[iside]);
-    int const num_local_nodes = inputBulkData.num_nodes(sides[iside]);
+    stk::mesh::Entity const* node_rels       = inputBulkData.begin_nodes(sides[iside]);
+    int const                num_local_nodes = inputBulkData.num_nodes(sides[iside]);
     for (int j(0); j < num_local_nodes; ++j) {
-      node = bulkData->get_entity(
-          stk::topology::NODE_RANK, inputBulkData.identifier(node_rels[j]));
+      node = bulkData->get_entity(stk::topology::NODE_RANK, inputBulkData.identifier(node_rels[j]));
       bulkData->declare_relation(elem, node, j);
     }
   }
@@ -238,12 +195,8 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
 Teuchos::RCP<Teuchos::ParameterList const>
 SideSetSTKMeshStruct::getValidDiscretizationParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getValidGenericSTKParameters("Valid SideSetSTK DiscParams");
-  validPL->set(
-      "Build Mesh",
-      true,
-      "If false, does not build the internal mesh, just the mesh specs.\n");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getValidGenericSTKParameters("Valid SideSetSTK DiscParams");
+  validPL->set("Build Mesh", true, "If false, does not build the internal mesh, just the mesh specs.\n");
 
   return validPL;
 }

@@ -15,9 +15,7 @@ namespace LCM {
 
 /******************************************************************************/
 template <typename EvalT, typename Traits>
-LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       C11(p->get<RealType>("C11")),
       C33(p->get<RealType>("C33")),
@@ -36,28 +34,24 @@ LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(
   R.set_dimension(num_dims_);
   R.clear();
   if (p->isType<Teuchos::ParameterList>("Material Basis")) {
-    Teuchos::ParameterList const& pBasis =
-        p->get<Teuchos::ParameterList>("Material Basis");
+    Teuchos::ParameterList const& pBasis = p->get<Teuchos::ParameterList>("Material Basis");
     if (pBasis.isType<Teuchos::Array<double>>("X axis")) {
-      Teuchos::Array<double> Xhat =
-          pBasis.get<Teuchos::Array<double>>("X axis");
-      R(0, 0) = Xhat[0];
-      R(1, 0) = Xhat[1];
-      R(2, 0) = Xhat[2];
+      Teuchos::Array<double> Xhat = pBasis.get<Teuchos::Array<double>>("X axis");
+      R(0, 0)                     = Xhat[0];
+      R(1, 0)                     = Xhat[1];
+      R(2, 0)                     = Xhat[2];
     }
     if (pBasis.isType<Teuchos::Array<double>>("Y axis")) {
-      Teuchos::Array<double> Yhat =
-          pBasis.get<Teuchos::Array<double>>("Y axis");
-      R(0, 1) = Yhat[0];
-      R(1, 1) = Yhat[1];
-      R(2, 1) = Yhat[2];
+      Teuchos::Array<double> Yhat = pBasis.get<Teuchos::Array<double>>("Y axis");
+      R(0, 1)                     = Yhat[0];
+      R(1, 1)                     = Yhat[1];
+      R(2, 1)                     = Yhat[2];
     }
     if (pBasis.isType<Teuchos::Array<double>>("Z axis")) {
-      Teuchos::Array<double> Zhat =
-          pBasis.get<Teuchos::Array<double>>("Z axis");
-      R(0, 2) = Zhat[0];
-      R(1, 2) = Zhat[1];
-      R(2, 2) = Zhat[2];
+      Teuchos::Array<double> Zhat = pBasis.get<Teuchos::Array<double>>("Z axis");
+      R(0, 2)                     = Zhat[0];
+      R(1, 2)                     = Zhat[1];
+      R(2, 2)                     = Zhat[2];
     }
   } else {
     R(0, 0) = 1.0;
@@ -149,14 +143,9 @@ LinearPiezoModel<EvalT, Traits>::computeState(
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < num_pts_; ++qp) {
         if (test) {
-          ScalarT const &x1 = strain(cell, qp, 0, 0),
-                        &x2 = strain(cell, qp, 1, 1),
-                        &x3 = strain(cell, qp, 2, 2),
-                        &x4 = strain(cell, qp, 1, 2),
-                        &x5 = strain(cell, qp, 0, 2),
-                        &x6 = strain(cell, qp, 0, 1);
-          ScalarT const &E1 = -Gradp(cell, qp, 0), &E2 = -Gradp(cell, qp, 1),
-                        &E3 = -Gradp(cell, qp, 2);
+          ScalarT const &x1 = strain(cell, qp, 0, 0), &x2 = strain(cell, qp, 1, 1), &x3 = strain(cell, qp, 2, 2),
+                        &x4 = strain(cell, qp, 1, 2), &x5 = strain(cell, qp, 0, 2), &x6 = strain(cell, qp, 0, 1);
+          ScalarT const &E1 = -Gradp(cell, qp, 0), &E2 = -Gradp(cell, qp, 1), &E3 = -Gradp(cell, qp, 2);
 
           stress(cell, qp, 0, 0) = C11 * x1 + C12 * x2 + C23 * x3 - e31 * E3;
           stress(cell, qp, 1, 1) = C12 * x1 + C11 * x2 + C23 * x3 - e31 * E3;
@@ -259,16 +248,13 @@ LinearPiezoModel<EvalT, Traits>::initializeConstants()
             for (int r = 0; r < num_dims_; r++)
               for (int s = 0; s < num_dims_; s++)
                 for (int t = 0; t < num_dims_; t++)
-                  C(i, j, k, l) +=
-                      Ctmp(q, r, s, t) * R(i, q) * R(j, r) * R(k, s) * R(l, t);
+                  C(i, j, k, l) += Ctmp(q, r, s, t) * R(i, q) * R(j, r) * R(k, s) * R(l, t);
         for (int q = 0; q < num_dims_; q++)
           for (int r = 0; r < num_dims_; r++)
-            for (int s = 0; s < num_dims_; s++)
-              e(i, j, k) += etmp(q, r, s) * R(i, q) * R(j, r) * R(k, s);
+            for (int s = 0; s < num_dims_; s++) e(i, j, k) += etmp(q, r, s) * R(i, q) * R(j, r) * R(k, s);
       }
       for (int q = 0; q < num_dims_; q++)
-        for (int r = 0; r < num_dims_; r++)
-          eps(i, j) += epstmp(q, r) * R(i, q) * R(j, r);
+        for (int r = 0; r < num_dims_; r++) eps(i, j) += epstmp(q, r) * R(i, q) * R(j, r);
     }
 }
 

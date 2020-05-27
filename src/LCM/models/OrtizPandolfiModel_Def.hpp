@@ -27,10 +27,8 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->dep_field_map_.insert(std::make_pair("Current Basis", dl->qp_tensor));
 
   // define the evaluated fields
-  this->eval_field_map_.insert(
-      std::make_pair("Cohesive_Traction", dl->qp_vector));
-  this->eval_field_map_.insert(
-      std::make_pair("Normal_Traction", dl->qp_scalar));
+  this->eval_field_map_.insert(std::make_pair("Cohesive_Traction", dl->qp_vector));
+  this->eval_field_map_.insert(std::make_pair("Normal_Traction", dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair("Shear_Traction", dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair("Normal_Jump", dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair("Shear_Jump", dl->qp_scalar));
@@ -44,8 +42,7 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Cohesive Traction", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Cohesive Traction", false));
   // normal traction
   this->num_state_variables_++;
   this->state_var_names_.push_back("Normal_Traction");
@@ -53,8 +50,7 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Normal Traction", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Normal Traction", false));
   // shear traction
   this->num_state_variables_++;
   this->state_var_names_.push_back("Shear_Traction");
@@ -62,8 +58,7 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Shear Traction", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Shear Traction", false));
   // normal jump
   this->num_state_variables_++;
   this->state_var_names_.push_back("Normal_Jump");
@@ -71,8 +66,7 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Normal Jump", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Normal Jump", false));
   // shear jump
   this->num_state_variables_++;
   this->state_var_names_.push_back("Shear_Jump");
@@ -80,8 +74,7 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Shear Jump", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Shear Jump", false));
   // max jump
   this->num_state_variables_++;
   this->state_var_names_.push_back("Max_Jump");
@@ -89,8 +82,7 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Max Jump", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Max Jump", false));
 }
 template <typename EvalT, typename Traits>
 void
@@ -119,18 +111,14 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
       // current basis vector
-      minitensor::Vector<ScalarT> g_0(
-          minitensor::Source::ARRAY, 3, mdf_basis, cell, pt, 0, 0);
+      minitensor::Vector<ScalarT> g_0(minitensor::Source::ARRAY, 3, mdf_basis, cell, pt, 0, 0);
 
-      minitensor::Vector<ScalarT> g_1(
-          minitensor::Source::ARRAY, 3, mdf_basis, cell, pt, 1, 0);
+      minitensor::Vector<ScalarT> g_1(minitensor::Source::ARRAY, 3, mdf_basis, cell, pt, 1, 0);
 
-      minitensor::Vector<ScalarT> n(
-          minitensor::Source::ARRAY, 3, mdf_basis, cell, pt, 2, 0);
+      minitensor::Vector<ScalarT> n(minitensor::Source::ARRAY, 3, mdf_basis, cell, pt, 2, 0);
 
       // current jump vector - move PHX::MDField into minitensor::Vector
-      minitensor::Vector<ScalarT> jump_pt(
-          minitensor::Source::ARRAY, 3, mdf_jump, cell, pt, 0);
+      minitensor::Vector<ScalarT> jump_pt(minitensor::Source::ARRAY, 3, mdf_jump, cell, pt, 0);
 
       // construct Identity tensor (2nd order) and tensor product of normal
       minitensor::Tensor<ScalarT> I(minitensor::eye<ScalarT>(3));
@@ -158,8 +146,7 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
 
       if (jump_n >= 0.0) {
         // Be careful regarding Sacado and sqrt()
-        ScalarT const jump_eff2 =
-            beta * beta * jump_s * jump_s + jump_n * jump_n;
+        ScalarT const jump_eff2 = beta * beta * jump_s * jump_s + jump_n * jump_n;
 
         if (jump_eff2 > 0.0) { jump_eff = std::sqrt(jump_eff2); }
       } else {
@@ -220,12 +207,9 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
       // Shear traction, default to zero.
       minitensor::Vector<ScalarT> traction_shear(3, minitensor::Filler::ZEROS);
 
-      if (jump_eff > 0.0) {
-        traction_shear = t_eff / jump_eff * beta * beta * vec_jump_s;
-      }
+      if (jump_eff > 0.0) { traction_shear = t_eff / jump_eff * beta * beta * vec_jump_s; }
 
-      minitensor::Vector<ScalarT> traction_vector =
-          traction_normal + traction_shear;
+      minitensor::Vector<ScalarT> traction_vector = traction_normal + traction_shear;
 
       // Debugging - debug_print tractions
       if (print_debug) {
@@ -242,9 +226,8 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
       // update state variables
 
       // Calculate normal and shear components of global traction
-      ScalarT traction_n = minitensor::dot(traction_vector, n);
-      minitensor::Vector<ScalarT> vec_traction_s =
-          minitensor::dot(I - Fn, jump_pt);
+      ScalarT                     traction_n     = minitensor::dot(traction_vector, n);
+      minitensor::Vector<ScalarT> vec_traction_s = minitensor::dot(I - Fn, jump_pt);
       // Be careful regarding Sacado and sqrt()
       ScalarT traction_s2 = minitensor::dot(vec_traction_s, vec_traction_s);
       ScalarT traction_s  = 0.0;

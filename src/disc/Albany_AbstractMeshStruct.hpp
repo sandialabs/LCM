@@ -50,9 +50,8 @@ struct LayeredMeshNumbering
   T
   getId(const T column_id, const T level_index) const
   {
-    return (ordering == LayeredMeshOrdering::LAYER) ?
-               column_id + level_index * stride :
-               column_id * stride + level_index;
+    return (ordering == LayeredMeshOrdering::LAYER) ? column_id + level_index * stride :
+                                                      column_id * stride + level_index;
   }
 
   void
@@ -86,17 +85,14 @@ struct AbstractMeshStruct
 
   virtual void
   setFieldAndBulkData(
-      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
-      const Teuchos::RCP<Teuchos::ParameterList>&               params,
-      const unsigned int                                        neq_,
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-      const unsigned int                                        worksetSize,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-          side_set_sis = {},
-      const std::
-          map<std::string, AbstractFieldContainer::FieldContainerRequirements>&
-              side_set_req = {}) = 0;
+      const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+      const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+      const unsigned int                                                               neq_,
+      const AbstractFieldContainer::FieldContainerRequirements&                        req,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+      const unsigned int                                                               worksetSize,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis = {},
+      const std::map<std::string, AbstractFieldContainer::FieldContainerRequirements>& side_set_req = {}) = 0;
 
   virtual Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>&
   getMeshSpecs() = 0;

@@ -26,22 +26,17 @@ class NodesToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  NodesToCellInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  NodesToCellInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  private:
-  typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
-      OutputScalarT;
+  typedef typename EvalT::MeshScalarT                                      MeshScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type OutputScalarT;
 
   int numNodes;
   int numQPs;
@@ -60,16 +55,13 @@ class NodesToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using NodesToCellInterpolation =
-    NodesToCellInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using NodesToCellInterpolation = NodesToCellInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using NodesToCellInterpolationMesh =
-    NodesToCellInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using NodesToCellInterpolationMesh = NodesToCellInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using NodesToCellInterpolationParam =
-    NodesToCellInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using NodesToCellInterpolationParam = NodesToCellInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

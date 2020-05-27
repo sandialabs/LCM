@@ -20,21 +20,16 @@ class StateManager;
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-class SaveNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                           public PHX::EvaluatorDerived<EvalT, Traits>
+class SaveNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
-  SaveNodalFieldBase(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  SaveNodalFieldBase(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   // These functions are defined in the specializations
   void
@@ -70,9 +65,7 @@ template <typename EvalT, typename Traits>
 class SaveNodalField : public SaveNodalFieldBase<EvalT, Traits>
 {
  public:
-  SaveNodalField(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  SaveNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : SaveNodalFieldBase<EvalT, Traits>(p, dl)
   {
   }
@@ -96,9 +89,7 @@ class SaveNodalField<PHAL::AlbanyTraits::Residual, Traits>
     : public SaveNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  SaveNodalField(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  SaveNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
   preEvaluate(typename Traits::PreEvalData d);
   void

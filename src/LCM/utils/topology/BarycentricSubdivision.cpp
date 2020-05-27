@@ -48,34 +48,24 @@ Topology::remove_entity(stk::mesh::Entity entity)
 
 // \brief Adds a relation between two entities
 void
-Topology::add_relation(
-    stk::mesh::Entity source_entity,
-    stk::mesh::Entity target_entity,
-    EdgeId            local_relation_id)
+Topology::add_relation(stk::mesh::Entity source_entity, stk::mesh::Entity target_entity, EdgeId local_relation_id)
 {
-  get_bulk_data().declare_relation(
-      source_entity, target_entity, local_relation_id);
+  get_bulk_data().declare_relation(source_entity, target_entity, local_relation_id);
   return;
 }
 
 // \brief Removes the relation between two entities
 void
-Topology::remove_relation(
-    stk::mesh::Entity source_entity,
-    stk::mesh::Entity target_entity,
-    EdgeId            local_relation_id)
+Topology::remove_relation(stk::mesh::Entity source_entity, stk::mesh::Entity target_entity, EdgeId local_relation_id)
 {
-  get_bulk_data().destroy_relation(
-      source_entity, target_entity, local_relation_id);
+  get_bulk_data().destroy_relation(source_entity, target_entity, local_relation_id);
   return;
 }
 
 // \brief Returns a vector with all the actual mesh entities of a
 // specific rank
 std::vector<stk::mesh::Entity>
-Topology::get_rank_entities(
-    const stk::mesh::BulkData& mesh,
-    stk::mesh::EntityRank      entity_rank)
+Topology::get_rank_entities(const stk::mesh::BulkData& mesh, stk::mesh::EntityRank entity_rank)
 {
   stk::mesh::EntityVector entities;
   stk::mesh::get_entities(mesh, entity_rank, entities);
@@ -84,28 +74,21 @@ Topology::get_rank_entities(
 
 // \brief Gets the local relation id (0,1,2,...) between two entities
 EdgeId
-Topology::getLocalRelationId(
-    const stk::mesh::Entity source_entity,
-    const stk::mesh::Entity target_entity)
+Topology::getLocalRelationId(const stk::mesh::Entity source_entity, const stk::mesh::Entity target_entity)
 {
   EdgeId local_id = 0;
 
   bool found = false;
 
-  stk::mesh::EntityId const target_entity_identifier =
-      get_entity_id(target_entity);
+  stk::mesh::EntityId const target_entity_identifier = get_entity_id(target_entity);
 
-  stk::mesh::EntityRank const target_entity_entity_rank =
-      get_bulk_data().entity_rank(target_entity);
+  stk::mesh::EntityRank const target_entity_entity_rank = get_bulk_data().entity_rank(target_entity);
 
-  stk::mesh::Entity const* source_relations =
-      get_bulk_data().begin(source_entity, target_entity_entity_rank);
+  stk::mesh::Entity const* source_relations = get_bulk_data().begin(source_entity, target_entity_entity_rank);
 
-  stk::mesh::ConnectivityOrdinal const* ords =
-      get_bulk_data().begin_ordinals(source_entity, target_entity_entity_rank);
+  stk::mesh::ConnectivityOrdinal const* ords = get_bulk_data().begin_ordinals(source_entity, target_entity_entity_rank);
 
-  size_t const num_relations = get_bulk_data().num_connectivity(
-      source_entity, target_entity_entity_rank);
+  size_t const num_relations = get_bulk_data().num_connectivity(source_entity, target_entity_entity_rank);
 
   for (size_t i = 0; i < num_relations; ++i) {
     if (source_relations[i] == target_entity) {
@@ -126,9 +109,7 @@ Topology::getNumberLowerRankEntities(const stk::mesh::Entity entity)
   unsigned int count       = 0;
   unsigned int entity_rank = get_bulk_data().entity_rank(entity);
 
-  for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK;
-       rank < entity_rank;
-       ++rank) {
+  for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK; rank < entity_rank; ++rank) {
     count += get_bulk_data().num_connectivity(entity, rank);
   }
 
@@ -138,15 +119,11 @@ Topology::getNumberLowerRankEntities(const stk::mesh::Entity entity)
 // \brief Returns a group of entities connected directly to a given
 //  entity. The input rank is the rank of the returned entities.
 std::vector<stk::mesh::Entity>
-Topology::getDirectlyConnectedEntities(
-    const stk::mesh::Entity entity,
-    stk::mesh::EntityRank   entity_rank)
+Topology::getDirectlyConnectedEntities(const stk::mesh::Entity entity, stk::mesh::EntityRank entity_rank)
 {
-  stk::mesh::Entity const* relations =
-      get_bulk_data().begin(entity, entity_rank);
+  stk::mesh::Entity const* relations = get_bulk_data().begin(entity, entity_rank);
 
-  size_t const num_relations =
-      get_bulk_data().num_connectivity(entity, entity_rank);
+  size_t const num_relations = get_bulk_data().num_connectivity(entity, entity_rank);
 
   return std::vector<stk::mesh::Entity>(relations, relations + num_relations);
 }
@@ -154,15 +131,11 @@ Topology::getDirectlyConnectedEntities(
 // \brief Checks if an entity exists inside a specific
 // vector. returns "true" if the entity exists in the vector of entities
 bool
-Topology::findEntityInVector(
-    std::vector<stk::mesh::Entity>& entities,
-    stk::mesh::Entity               entity)
+Topology::findEntityInVector(std::vector<stk::mesh::Entity>& entities, stk::mesh::Entity entity)
 {
   std::vector<stk::mesh::Entity>::iterator iterator_entities;
   bool                                     is_in_vector(false);
-  for (iterator_entities = entities.begin();
-       iterator_entities != entities.end();
-       ++iterator_entities) {
+  for (iterator_entities = entities.begin(); iterator_entities != entities.end(); ++iterator_entities) {
     if (*iterator_entities == entity) {
       is_in_vector = true;
       break;
@@ -177,32 +150,24 @@ Topology::findEntityInVector(
 //  the rank of the returned entities.  The input rank must be lower
 //  than that of the input entity
 std::vector<stk::mesh::Entity>
-Topology::getBoundaryEntities(
-    const stk::mesh::Entity entity,
-    stk::mesh::EntityRank   entity_rank)
+Topology::getBoundaryEntities(const stk::mesh::Entity entity, stk::mesh::EntityRank entity_rank)
 {
   stk::mesh::EntityRank given_entity_rank = get_bulk_data().entity_rank(entity);
   // Get entities of  "given_entity_rank -1"
-  std::vector<std::vector<stk::mesh::Entity>> boundary_entities(
-      given_entity_rank + 1);
-  boundary_entities[given_entity_rank - 1] = getDirectlyConnectedEntities(
-      entity, (stk::mesh::EntityRank)(given_entity_rank - 1));
+  std::vector<std::vector<stk::mesh::Entity>> boundary_entities(given_entity_rank + 1);
+  boundary_entities[given_entity_rank - 1] =
+      getDirectlyConnectedEntities(entity, (stk::mesh::EntityRank)(given_entity_rank - 1));
   std::vector<stk::mesh::Entity>::iterator iterator_entities1;
   std::vector<stk::mesh::Entity>::iterator iterator_entities2;
   std::vector<stk::mesh::Entity>           temp_vector1;
   for (unsigned int ii = given_entity_rank - 1; ii > entity_rank; ii--) {
-    for (iterator_entities1 = boundary_entities[ii].begin();
-         iterator_entities1 != boundary_entities[ii].end();
+    for (iterator_entities1 = boundary_entities[ii].begin(); iterator_entities1 != boundary_entities[ii].end();
          ++iterator_entities1) {
-      temp_vector1 = getDirectlyConnectedEntities(
-          *iterator_entities1, (stk::mesh::EntityRank)(ii - 1));
-      for (iterator_entities2 = temp_vector1.begin();
-           iterator_entities2 != temp_vector1.end();
-           ++iterator_entities2) {
+      temp_vector1 = getDirectlyConnectedEntities(*iterator_entities1, (stk::mesh::EntityRank)(ii - 1));
+      for (iterator_entities2 = temp_vector1.begin(); iterator_entities2 != temp_vector1.end(); ++iterator_entities2) {
         // If the entity pointed to by iterator_entities2 is not in
         // boundary_entities[ii - 1], add it to the vector
-        if (!findEntityInVector(
-                boundary_entities[ii - 1], *iterator_entities2)) {
+        if (!findEntityInVector(boundary_entities[ii - 1], *iterator_entities2)) {
           boundary_entities[ii - 1].push_back(*iterator_entities2);
         }
       }
@@ -215,18 +180,13 @@ Topology::getBoundaryEntities(
 // \brief Checks if a segment is connected to an input node. Returns
 // "true" if segment is connected to the node.
 bool
-Topology::segmentIsConnected(
-    const stk::mesh::Entity segment,
-    stk::mesh::Entity       node)
+Topology::segmentIsConnected(const stk::mesh::Entity segment, stk::mesh::Entity node)
 {
   // NOT connected is the default
-  bool                           is_connected(false);
-  std::vector<stk::mesh::Entity> segment_nodes =
-      getBoundaryEntities(segment, stk::topology::NODE_RANK);
+  bool                                     is_connected(false);
+  std::vector<stk::mesh::Entity>           segment_nodes = getBoundaryEntities(segment, stk::topology::NODE_RANK);
   std::vector<stk::mesh::Entity>::iterator Iterator_nodes;
-  for (Iterator_nodes = segment_nodes.begin();
-       Iterator_nodes != segment_nodes.end();
-       ++Iterator_nodes) {
+  for (Iterator_nodes = segment_nodes.begin(); Iterator_nodes != segment_nodes.end(); ++Iterator_nodes) {
     if (*Iterator_nodes == node) {
       // segment IS connected
       is_connected = true;
@@ -239,9 +199,7 @@ Topology::segmentIsConnected(
 // adjacent segments are connected to a given common point.  it
 // returns adjacent segments
 std::vector<stk::mesh::Entity>
-Topology::findAdjacentSegments(
-    const stk::mesh::Entity segment,
-    stk::mesh::Entity       node)
+Topology::findAdjacentSegments(const stk::mesh::Entity segment, stk::mesh::Entity node)
 {
   std::vector<stk::mesh::Entity>::iterator Iterator_seg_nodes;
   std::vector<stk::mesh::Entity>::iterator Iterator_adj_nodes;
@@ -250,21 +208,15 @@ Topology::findAdjacentSegments(
   std::vector<stk::mesh::Entity>           adjacent_segments_final;
 
   // Obtain the nodes corresponding to the input segment
-  std::vector<stk::mesh::Entity> input_segment_nodes =
-      getDirectlyConnectedEntities(segment, stk::topology::NODE_RANK);
+  std::vector<stk::mesh::Entity> input_segment_nodes = getDirectlyConnectedEntities(segment, stk::topology::NODE_RANK);
   // Find the segments connected to "input_segment_nodes"
-  for (Iterator_adj_nodes = input_segment_nodes.begin();
-       Iterator_adj_nodes != input_segment_nodes.end();
+  for (Iterator_adj_nodes = input_segment_nodes.begin(); Iterator_adj_nodes != input_segment_nodes.end();
        ++Iterator_adj_nodes) {
-    adjacent_segments = getDirectlyConnectedEntities(
-        *Iterator_adj_nodes, stk::topology::EDGE_RANK);
+    adjacent_segments = getDirectlyConnectedEntities(*Iterator_adj_nodes, stk::topology::EDGE_RANK);
     // Which segment is connected to the input node?
-    for (Iterator_adj_seg = adjacent_segments.begin();
-         Iterator_adj_seg != adjacent_segments.end();
+    for (Iterator_adj_seg = adjacent_segments.begin(); Iterator_adj_seg != adjacent_segments.end();
          ++Iterator_adj_seg) {
-      if (segmentIsConnected(*Iterator_adj_seg, node)) {
-        adjacent_segments_final.push_back(*Iterator_adj_seg);
-      }
+      if (segmentIsConnected(*Iterator_adj_seg, node)) { adjacent_segments_final.push_back(*Iterator_adj_seg); }
     }
   }
   return adjacent_segments_final;
@@ -296,22 +248,17 @@ Topology::findSegmentsFromElement(const stk::mesh::Entity element)
   std::vector<stk::mesh::Entity>::const_iterator iterator_outer_segments;
 
   element_faces = getBoundaryEntities(element, stk::topology::FACE_RANK);
-  for (iterator_element_faces = element_faces.begin();
-       iterator_element_faces != element_faces.end();
+  for (iterator_element_faces = element_faces.begin(); iterator_element_faces != element_faces.end();
        ++iterator_element_faces) {
-    element_node = getDirectlyConnectedEntities(
-        *iterator_element_faces, stk::topology::NODE_RANK);
-    node_segments =
-        getDirectlyConnectedEntities(element_node[0], stk::topology::EDGE_RANK);
-    for (iterator_node_segments = node_segments.begin();
-         iterator_node_segments != node_segments.end();
+    element_node  = getDirectlyConnectedEntities(*iterator_element_faces, stk::topology::NODE_RANK);
+    node_segments = getDirectlyConnectedEntities(element_node[0], stk::topology::EDGE_RANK);
+    for (iterator_node_segments = node_segments.begin(); iterator_node_segments != node_segments.end();
          ++iterator_node_segments) {
       _segments.push_back(*iterator_node_segments);
     }
   }
   outer_segments = getBoundaryEntities(element, stk::topology::EDGE_RANK);
-  for (iterator_outer_segments = outer_segments.begin();
-       iterator_outer_segments != outer_segments.end();
+  for (iterator_outer_segments = outer_segments.begin(); iterator_outer_segments != outer_segments.end();
        ++iterator_outer_segments) {
     _segments.push_back(*iterator_outer_segments);
   }
@@ -321,9 +268,7 @@ Topology::findSegmentsFromElement(const stk::mesh::Entity element)
 // FIXME - I don't know what to do with this.
 // \brief Returns true if the input faces have two points in common
 bool
-Topology::facesShareTwoPoints(
-    const stk::mesh::Entity face1,
-    const stk::mesh::Entity face2)
+Topology::facesShareTwoPoints(const stk::mesh::Entity face1, const stk::mesh::Entity face2)
 {
   std::vector<stk::mesh::Entity>           face1_nodes;
   std::vector<stk::mesh::Entity>           face2_nodes;
@@ -333,14 +278,11 @@ Topology::facesShareTwoPoints(
   face1_nodes = getBoundaryEntities(face1, stk::topology::NODE_RANK);
   face2_nodes = getBoundaryEntities(face2, stk::topology::NODE_RANK);
   bool num    = false;
-  for (iterator_entity_faces = face2_nodes.begin();
-       iterator_entity_faces != face2_nodes.end();
+  for (iterator_entity_faces = face2_nodes.begin(); iterator_entity_faces != face2_nodes.end();
        ++iterator_entity_faces) {
     // If the entity pointed to by iterator_entity_faces is in the
     // vector face1_nodes, save the entity in common_nodes
-    if (findEntityInVector(face1_nodes, *iterator_entity_faces)) {
-      common_nodes.push_back(*iterator_entity_faces);
-    }
+    if (findEntityInVector(face1_nodes, *iterator_entity_faces)) { common_nodes.push_back(*iterator_entity_faces); }
   }
   if (common_nodes.size() == 2) { num = true; }
   return num;
@@ -355,11 +297,9 @@ Topology::findAdjacentSegmentsFromFace(
 {
   std::vector<stk::mesh::Entity> adjacent_faces;
 
-  std::vector<stk::mesh::Entity>::const_iterator
-      iterator_element_internal_faces;
+  std::vector<stk::mesh::Entity>::const_iterator iterator_element_internal_faces;
 
-  std::vector<stk::mesh::Entity> _element_internal_faces =
-      faces_inside_element[element_number];
+  std::vector<stk::mesh::Entity> _element_internal_faces = faces_inside_element[element_number];
 
   for (iterator_element_internal_faces = _element_internal_faces.begin();
        iterator_element_internal_faces != _element_internal_faces.end();
@@ -376,16 +316,12 @@ Topology::findAdjacentSegmentsFromFace(
 double*
 Topology::getEntityCoordinates(stk::mesh::Entity entity)
 {
-  Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr =
-      get_discretization();
-  Albany::STKDiscretization& stk_discretization =
-      static_cast<Albany::STKDiscretization&>(*discretization_ptr);
+  Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr = get_discretization();
+  Albany::STKDiscretization& stk_discretization = static_cast<Albany::STKDiscretization&>(*discretization_ptr);
   // Obtain the stkMeshStruct
-  Teuchos::RCP<Albany::AbstractSTKMeshStruct> stkMeshStruct =
-      stk_discretization.getSTKMeshStruct();
+  Teuchos::RCP<Albany::AbstractSTKMeshStruct> stkMeshStruct = stk_discretization.getSTKMeshStruct();
   // Create the pointer of coordinates
-  double* pointer_coordinates =
-      stk::mesh::field_data(*stkMeshStruct->getCoordinatesField(), entity);
+  double* pointer_coordinates = stk::mesh::field_data(*stkMeshStruct->getCoordinatesField(), entity);
 
   return pointer_coordinates;
 }
@@ -403,9 +339,7 @@ Topology::getFormerElementNodes(
   std::vector<stk::mesh::Entity>::iterator iterator_nodes;
   vector_nodes_ = entities[get_entity_id(element)];
 
-  for (iterator_nodes = vector_nodes_.begin();
-       iterator_nodes != vector_nodes_.end();
-       ++iterator_nodes) {
+  for (iterator_nodes = vector_nodes_.begin(); iterator_nodes != vector_nodes_.end(); ++iterator_nodes) {
     boundary_nodes.push_back(*iterator_nodes);
   }
   return boundary_nodes;
@@ -416,9 +350,7 @@ Topology::getFormerElementNodes(
 // higher rank entity connected to the barycenter(e.g segment, face,
 // or element)
 void
-Topology::computeBarycentricCoordinates(
-    std::vector<stk::mesh::Entity> const& entities,
-    stk::mesh::Entity                     barycenter)
+Topology::computeBarycentricCoordinates(std::vector<stk::mesh::Entity> const& entities, stk::mesh::Entity barycenter)
 {
   // vector of pointers
   std::vector<double*>                           vector_pointers;
@@ -429,9 +361,7 @@ Topology::computeBarycentricCoordinates(
 
   // With the barycenter coordinate initialized, take the average
   // between the entities that belong to the vector called: "entities"
-  for (iterator_entities = entities.begin();
-       iterator_entities != entities.end();
-       ++iterator_entities) {
+  for (iterator_entities = entities.begin(); iterator_entities != entities.end(); ++iterator_entities) {
     vector_pointers.push_back(getEntityCoordinates(*iterator_entities));
   }
 
@@ -479,8 +409,7 @@ Topology::barycentricSubdivision()
   start1 = clock();
 
   // Get the segments from the original mesh
-  std::vector<stk::mesh::Entity> initial_entities_1D =
-      get_rank_entities(get_bulk_data(), stk::topology::EDGE_RANK);
+  std::vector<stk::mesh::Entity> initial_entities_1D = get_rank_entities(get_bulk_data(), stk::topology::EDGE_RANK);
   std::vector<stk::mesh::Entity> vector_nodes;
 
   // Adding nodes to divide segments by half
@@ -490,31 +419,24 @@ Topology::barycentricSubdivision()
   requests_step1_1[0] = initial_entities_1D.size();
   add_entities(requests_step1_1);
 
-  std::vector<stk::mesh::Entity> initial_entities_0D =
-      get_rank_entities(get_bulk_data(), stk::topology::NODE_RANK);
+  std::vector<stk::mesh::Entity> initial_entities_0D = get_rank_entities(get_bulk_data(), stk::topology::NODE_RANK);
 
   // vector with all elements from former mesh. This is used in step VI
-  std::vector<stk::mesh::Entity> initial_entities_3d =
-      get_rank_entities(get_bulk_data(), stk::topology::ELEMENT_RANK);
+  std::vector<stk::mesh::Entity> initial_entities_3d = get_rank_entities(get_bulk_data(), stk::topology::ELEMENT_RANK);
   // Create a vector of vectors that contains all the former boundary
   // nodes of all the elements of the mesh
-  std::vector<std::vector<stk::mesh::Entity>> all_elements_boundary_nodes1(
-      initial_entities_3d.size() + 1);
+  std::vector<std::vector<stk::mesh::Entity>> all_elements_boundary_nodes1(initial_entities_3d.size() + 1);
   // temporary vector //check the values inside this vector
   for (unsigned int ii = 0; ii < initial_entities_3d.size(); ++ii) {
-    all_elements_boundary_nodes1[ii + 1] =
-        getBoundaryEntities(initial_entities_3d[ii], stk::topology::NODE_RANK);
+    all_elements_boundary_nodes1[ii + 1] = getBoundaryEntities(initial_entities_3d[ii], stk::topology::NODE_RANK);
   }
 
   for (unsigned int ii = 0; ii < initial_entities_1D.size(); ++ii) {
     // Create a vector with all the initial nodes connected to a segment
-    vector_nodes = getDirectlyConnectedEntities(
-        initial_entities_1D[ii], stk::topology::NODE_RANK);
+    vector_nodes = getDirectlyConnectedEntities(initial_entities_1D[ii], stk::topology::NODE_RANK);
     // Look for all the relations of each segment
-    stk::mesh::Entity const* _relations =
-        get_bulk_data().begin_nodes(initial_entities_1D[ii]);
-    unsigned const num_relations =
-        get_bulk_data().num_nodes(initial_entities_1D[ii]);
+    stk::mesh::Entity const* _relations    = get_bulk_data().begin_nodes(initial_entities_1D[ii]);
+    unsigned const           num_relations = get_bulk_data().num_nodes(initial_entities_1D[ii]);
     for (unsigned i = 0; i < num_relations; ++i) {
       if (getLocalRelationId(initial_entities_1D[ii], _relations[i]) == 1) {
         // Add a blue(local relation) connection. This is only for reference
@@ -533,15 +455,12 @@ Topology::barycentricSubdivision()
   std::vector<size_t> requests_step1_2(get_space_dimension() + 1, 0);
   requests_step1_2[1] = initial_entities_1D.size();
   add_entities(requests_step1_2);
-  std::vector<stk::mesh::Entity> modified1_entities_1D =
-      get_rank_entities(get_bulk_data(), stk::topology::EDGE_RANK);
+  std::vector<stk::mesh::Entity> modified1_entities_1D = get_rank_entities(get_bulk_data(), stk::topology::EDGE_RANK);
 
   for (unsigned int ii = 0; ii < initial_entities_1D.size(); ++ii) {
     // Look for all the relations of each segment
-    stk::mesh::Entity const* _relations =
-        get_bulk_data().begin_nodes(initial_entities_1D[ii]);
-    unsigned const num_relations =
-        get_bulk_data().num_nodes(initial_entities_1D[ii]);
+    stk::mesh::Entity const* _relations    = get_bulk_data().begin_nodes(initial_entities_1D[ii]);
+    unsigned const           num_relations = get_bulk_data().num_nodes(initial_entities_1D[ii]);
 
     for (unsigned i = 0; i < num_relations; ++i) {
       if (getLocalRelationId(initial_entities_1D[ii], _relations[i]) == 2) {
@@ -558,30 +477,21 @@ Topology::barycentricSubdivision()
   // Adding the new segments to its corresponding faces
   // The segments can be connected to 1 one or more faces
   for (unsigned int ii = 0; ii < initial_entities_1D.size(); ++ii) {
-    stk::mesh::Entity const* _relations =
-        get_bulk_data().begin_faces(initial_entities_1D[ii]);
-    unsigned const num_relations =
-        get_bulk_data().num_faces(initial_entities_1D[ii]);
+    stk::mesh::Entity const* _relations    = get_bulk_data().begin_faces(initial_entities_1D[ii]);
+    unsigned const           num_relations = get_bulk_data().num_faces(initial_entities_1D[ii]);
 
     for (unsigned i = 0; i < num_relations; ++i) {
-      add_relation(
-          _relations[i],
-          modified1_entities_1D[ii],
-          getNumberLowerRankEntities(_relations[i]));
+      add_relation(_relations[i], modified1_entities_1D[ii], getNumberLowerRankEntities(_relations[i]));
     }
   }
 
   // Get the former faces from the mesh
-  std::vector<stk::mesh::Entity> initial_entities_2D =
-      get_rank_entities(get_bulk_data(), stk::topology::FACE_RANK);
+  std::vector<stk::mesh::Entity> initial_entities_2D = get_rank_entities(get_bulk_data(), stk::topology::FACE_RANK);
   // Calculate the final number of segments per face after the division
   // of the segments
-  stk::mesh::Entity const* _relations =
-      get_bulk_data().begin_edges(initial_entities_2D[0]);
-  unsigned const num_relations =
-      get_bulk_data().num_edges(initial_entities_2D[0]);
-  std::vector<stk::mesh::Entity> segments(
-      _relations, _relations + num_relations);
+  stk::mesh::Entity const*       _relations    = get_bulk_data().begin_edges(initial_entities_2D[0]);
+  unsigned const                 num_relations = get_bulk_data().num_edges(initial_entities_2D[0]);
+  std::vector<stk::mesh::Entity> segments(_relations, _relations + num_relations);
 
   // Number of segments per face after division by half
   unsigned int Num_segments_face = segments.size();
@@ -606,30 +516,25 @@ Topology::barycentricSubdivision()
   requests_step2[0] = initial_entities_2D.size();
   add_entities(requests_step2);
 
-  std::vector<stk::mesh::Entity> modified1_entities_0D =
-      get_rank_entities(get_bulk_data(), stk::topology::NODE_RANK);
+  std::vector<stk::mesh::Entity> modified1_entities_0D = get_rank_entities(get_bulk_data(), stk::topology::NODE_RANK);
 
   for (unsigned int ii = 0; ii < initial_entities_2D.size(); ++ii) {
     // Connect the node to its corresponding face
     add_relation(
-        initial_entities_2D[ii],
-        modified1_entities_0D[ii],
-        getNumberLowerRankEntities(initial_entities_2D[ii]));
+        initial_entities_2D[ii], modified1_entities_0D[ii], getNumberLowerRankEntities(initial_entities_2D[ii]));
   }
 
   // Add the corresponding coordinates to the barycenters of all faces
   std::vector<stk::mesh::Entity> boundary_nodes;
   for (unsigned int ii = 0; ii < initial_entities_2D.size(); ++ii) {
-    boundary_nodes =
-        getBoundaryEntities(initial_entities_2D[ii], stk::topology::NODE_RANK);
+    boundary_nodes = getBoundaryEntities(initial_entities_2D[ii], stk::topology::NODE_RANK);
     computeBarycentricCoordinates(boundary_nodes, modified1_entities_0D[ii]);
   }
   // MEASURING TIME
   end2           = clock();
   cpu_time_used2 = ((double)(end2 - start2)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The second part takes " << cpu_time_used2 << " seconds"
-            << std::endl;
+  std::cout << "The second part takes " << cpu_time_used2 << " seconds" << std::endl;
   // III. For each face start creating new segments that will connect
   // the center point of the face with with all the points at its
   // boundary modified2_entities_1D: Vector with all the segments up
@@ -646,32 +551,26 @@ Topology::barycentricSubdivision()
   // Add the new segments that will connect the center point with the
   // points at the boundary
   int const New_Boundary_segments =
-      (getDirectlyConnectedEntities(
-           initial_entities_2D[0], stk::topology::EDGE_RANK)
-           .size()) *
+      (getDirectlyConnectedEntities(initial_entities_2D[0], stk::topology::EDGE_RANK).size()) *
       (initial_entities_2D.size());
   std::vector<size_t> requests_step3(get_space_dimension() + 1, 0);
   requests_step3[1] = New_Boundary_segments;
   add_entities(requests_step3);
 
   // Vector that contains the latest addition of segments
-  std::vector<stk::mesh::Entity> modified2_entities_1D =
-      get_rank_entities(get_bulk_data(), stk::topology::EDGE_RANK);
+  std::vector<stk::mesh::Entity> modified2_entities_1D = get_rank_entities(get_bulk_data(), stk::topology::EDGE_RANK);
 
   // Vector with all the boundary nodes of all faces of the element
   std::vector<stk::mesh::Entity>::iterator iterator_entities1;
   std::vector<stk::mesh::Entity>::iterator iterator_entities2;
   std::vector<stk::mesh::Entity>           vector_boundary_points1;
   std::vector<stk::mesh::Entity>           vector_boundary_points;
-  for (iterator_entities1 = initial_entities_2D.begin();
-       iterator_entities1 != initial_entities_2D.end();
+  for (iterator_entities1 = initial_entities_2D.begin(); iterator_entities1 != initial_entities_2D.end();
        ++iterator_entities1) {
     // Create a vector with all the "0 rank" boundaries (nodes)
-    vector_boundary_points1 =
-        getBoundaryEntities(*iterator_entities1, stk::topology::NODE_RANK);
+    vector_boundary_points1 = getBoundaryEntities(*iterator_entities1, stk::topology::NODE_RANK);
     // Push all the vector of boundary points into a single one
-    for (iterator_entities2 = vector_boundary_points1.begin();
-         iterator_entities2 != vector_boundary_points1.end();
+    for (iterator_entities2 = vector_boundary_points1.begin(); iterator_entities2 != vector_boundary_points1.end();
          ++iterator_entities2) {
       vector_boundary_points.push_back(*iterator_entities2);
     }
@@ -679,13 +578,9 @@ Topology::barycentricSubdivision()
   }
 
   // Connect the new segments to the corresponding nodes
-  for (unsigned int ii = 0; ii < Num_segments_face * initial_entities_2D.size();
-       ++ii) {
+  for (unsigned int ii = 0; ii < Num_segments_face * initial_entities_2D.size(); ++ii) {
     // Add a relation between the segments and the center nodes
-    add_relation(
-        modified2_entities_1D[ii],
-        modified1_entities_0D[ii / Num_segments_face],
-        0);
+    add_relation(modified2_entities_1D[ii], modified1_entities_0D[ii / Num_segments_face], 0);
     // Add a relation between the segments and the boundary nodes
     add_relation(modified2_entities_1D[ii], vector_boundary_points[ii], 1);
   }
@@ -693,18 +588,16 @@ Topology::barycentricSubdivision()
   // Create a vector with all the boundary segments of the elements
   // "All_boundary_segments" and "Number_new_triangles_inside_element"
   // used in step VIII.
-  int                            Number_new_triangles_inside_element = 0;
-  std::vector<stk::mesh::Entity> All_boundary_segments;
-  std::vector<stk::mesh::Entity> element_segments;
+  int                                      Number_new_triangles_inside_element = 0;
+  std::vector<stk::mesh::Entity>           All_boundary_segments;
+  std::vector<stk::mesh::Entity>           element_segments;
   std::vector<stk::mesh::Entity>::iterator iterator_elements_;
   std::vector<stk::mesh::Entity>::iterator iterator_element_segments;
-  for (iterator_elements_ = initial_entities_3d.begin();
-       iterator_elements_ != initial_entities_3d.end();
+  for (iterator_elements_ = initial_entities_3d.begin(); iterator_elements_ != initial_entities_3d.end();
        ++iterator_elements_) {
-    element_segments = findSegmentsFromElement(*iterator_elements_);
+    element_segments                    = findSegmentsFromElement(*iterator_elements_);
     Number_new_triangles_inside_element = element_segments.size();
-    for (iterator_element_segments = element_segments.begin();
-         iterator_element_segments != element_segments.end();
+    for (iterator_element_segments = element_segments.begin(); iterator_element_segments != element_segments.end();
          ++iterator_element_segments) {
       All_boundary_segments.push_back(*iterator_element_segments);
     }
@@ -713,8 +606,7 @@ Topology::barycentricSubdivision()
   end3           = clock();
   cpu_time_used3 = ((double)(end3 - start3)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The Third part takes " << cpu_time_used3 << " seconds"
-            << std::endl;
+  std::cout << "The Third part takes " << cpu_time_used3 << " seconds" << std::endl;
   // IV. Define the new faces at the boundary of the elements
   // modified1_entities_2D: Vector that contains all the faces up to
   // the new ones at the boundary of the elements
@@ -729,8 +621,7 @@ Topology::barycentricSubdivision()
   requests_step4[2] = Num_segments_face * initial_entities_2D.size();
   add_entities(requests_step4);
 
-  std::vector<stk::mesh::Entity> modified1_entities_2D =
-      get_rank_entities(get_bulk_data(), stk::topology::FACE_RANK);
+  std::vector<stk::mesh::Entity> modified1_entities_2D = get_rank_entities(get_bulk_data(), stk::topology::FACE_RANK);
 
   // iterators
   std::vector<stk::mesh::Entity>::iterator iterator_faces;
@@ -744,23 +635,15 @@ Topology::barycentricSubdivision()
 
   // Put all the boundary segments in a single vector. Likewise, the
   // nodes.
-  for (iterator_faces = initial_entities_2D.begin();
-       iterator_faces != initial_entities_2D.end();
-       ++iterator_faces) {
+  for (iterator_faces = initial_entities_2D.begin(); iterator_faces != initial_entities_2D.end(); ++iterator_faces) {
     // vector_segments, This vector contains the boundary segments
     // that conform a specific face
-    vector_segments =
-        getDirectlyConnectedEntities(*iterator_faces, stk::topology::EDGE_RANK);
-    face_centroid =
-        getDirectlyConnectedEntities(*iterator_faces, stk::topology::NODE_RANK);
-    for (iterator_segments = vector_segments.begin();
-         iterator_segments != vector_segments.end();
-         ++iterator_segments) {
+    vector_segments = getDirectlyConnectedEntities(*iterator_faces, stk::topology::EDGE_RANK);
+    face_centroid   = getDirectlyConnectedEntities(*iterator_faces, stk::topology::NODE_RANK);
+    for (iterator_segments = vector_segments.begin(); iterator_segments != vector_segments.end(); ++iterator_segments) {
       all_boundary_segments.push_back(*iterator_segments);
     }
-    for (iterator_nodes = face_centroid.begin();
-         iterator_nodes != face_centroid.end();
-         ++iterator_nodes) {
+    for (iterator_nodes = face_centroid.begin(); iterator_nodes != face_centroid.end(); ++iterator_nodes) {
       all_faces_centroids.push_back(*iterator_nodes);
     }
   }
@@ -771,25 +654,19 @@ Topology::barycentricSubdivision()
   std::vector<stk::mesh::Entity>           original_face;
   std::vector<stk::mesh::Entity>::iterator iterator_entities;
   for (unsigned int ii = 0; ii < all_boundary_segments.size(); ++ii) {
-    adjacent_segments = findAdjacentSegments(
-        all_boundary_segments[ii], all_faces_centroids[ii / Num_segments_face]);
+    adjacent_segments = findAdjacentSegments(all_boundary_segments[ii], all_faces_centroids[ii / Num_segments_face]);
     add_relation(modified1_entities_2D[ii], all_boundary_segments[ii], 0);
     add_relation(modified1_entities_2D[ii], adjacent_segments[0], 1);
     add_relation(modified1_entities_2D[ii], adjacent_segments[1], 2);
 
     // Add the new face to its corresponding element
-    original_face = getDirectlyConnectedEntities(
-        all_faces_centroids[ii / Num_segments_face], stk::topology::FACE_RANK);
+    original_face = getDirectlyConnectedEntities(all_faces_centroids[ii / Num_segments_face], stk::topology::FACE_RANK);
 
     // find original_face 3D relations (entities)
     original_face_relations_3D = findCellRelations(original_face[0]);
-    for (iterator_entities = original_face_relations_3D.begin();
-         iterator_entities != original_face_relations_3D.end();
+    for (iterator_entities = original_face_relations_3D.begin(); iterator_entities != original_face_relations_3D.end();
          iterator_entities++) {
-      add_relation(
-          *iterator_entities,
-          modified1_entities_2D[ii],
-          getNumberLowerRankEntities(*iterator_entities));
+      add_relation(*iterator_entities, modified1_entities_2D[ii], getNumberLowerRankEntities(*iterator_entities));
     }
   }
 
@@ -797,8 +674,7 @@ Topology::barycentricSubdivision()
   end4           = clock();
   cpu_time_used4 = ((double)(end4 - start4)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The Fourth part takes " << cpu_time_used4 << " seconds"
-            << std::endl;
+  std::cout << "The Fourth part takes " << cpu_time_used4 << " seconds" << std::endl;
 
   // V. Delete former mesh faces initial_entities_3d: Vector that
   // contains all the former elements of the mesh
@@ -815,20 +691,13 @@ Topology::barycentricSubdivision()
   // elements and faces
   std::vector<stk::mesh::Entity>::iterator iterator_entities_3d;
   std::vector<stk::mesh::Entity>::iterator iterator_faces_centroids;
-  for (iterator_faces_centroids = all_faces_centroids.begin();
-       iterator_faces_centroids != all_faces_centroids.end();
+  for (iterator_faces_centroids = all_faces_centroids.begin(); iterator_faces_centroids != all_faces_centroids.end();
        ++iterator_faces_centroids) {
-    std::vector<stk::mesh::Entity> former_face = getDirectlyConnectedEntities(
-        *iterator_faces_centroids, stk::topology::FACE_RANK);
-    std::vector<stk::mesh::Entity> elements = getDirectlyConnectedEntities(
-        former_face[0], stk::topology::ELEMENT_RANK);
-    for (iterator_entities_3d = elements.begin();
-         iterator_entities_3d != elements.end();
-         ++iterator_entities_3d) {
-      remove_relation(
-          *iterator_entities_3d,
-          former_face[0],
-          getLocalRelationId(*iterator_entities_3d, former_face[0]));
+    std::vector<stk::mesh::Entity> former_face =
+        getDirectlyConnectedEntities(*iterator_faces_centroids, stk::topology::FACE_RANK);
+    std::vector<stk::mesh::Entity> elements = getDirectlyConnectedEntities(former_face[0], stk::topology::ELEMENT_RANK);
+    for (iterator_entities_3d = elements.begin(); iterator_entities_3d != elements.end(); ++iterator_entities_3d) {
+      remove_relation(*iterator_entities_3d, former_face[0], getLocalRelationId(*iterator_entities_3d, former_face[0]));
     }
   }
 
@@ -837,8 +706,8 @@ Topology::barycentricSubdivision()
   for (iterator_all_faces_centroids = all_faces_centroids.begin();
        iterator_all_faces_centroids != all_faces_centroids.end();
        ++iterator_all_faces_centroids) {
-    std::vector<stk::mesh::Entity> former_face = getDirectlyConnectedEntities(
-        *iterator_all_faces_centroids, stk::topology::FACE_RANK);
+    std::vector<stk::mesh::Entity> former_face =
+        getDirectlyConnectedEntities(*iterator_all_faces_centroids, stk::topology::FACE_RANK);
     remove_entity(former_face[0]);
   }
 
@@ -852,10 +721,8 @@ Topology::barycentricSubdivision()
   for (iterator_initial_entities_3d = initial_entities_3d.begin();
        iterator_initial_entities_3d != initial_entities_3d.end();
        ++iterator_initial_entities_3d) {
-    _faces_element = getDirectlyConnectedEntities(
-        *iterator_initial_entities_3d, stk::topology::FACE_RANK);
-    for (iterator_faces_element = _faces_element.begin();
-         iterator_faces_element != _faces_element.end();
+    _faces_element = getDirectlyConnectedEntities(*iterator_initial_entities_3d, stk::topology::FACE_RANK);
+    for (iterator_faces_element = _faces_element.begin(); iterator_faces_element != _faces_element.end();
          ++iterator_faces_element) {
       All_boundary_faces.push_back(*iterator_faces_element);
     }
@@ -864,8 +731,7 @@ Topology::barycentricSubdivision()
   end5           = clock();
   cpu_time_used5 = ((double)(end5 - start5)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The Fifth part takes " << cpu_time_used5 << " seconds"
-            << std::endl;
+  std::cout << "The Fifth part takes " << cpu_time_used5 << " seconds" << std::endl;
   // VI. Add a point to each element. Each point represents the
   // centroid of each element modified2_entities_0D: Vector that
   // contains all the nodes up to the centroids of all the elements
@@ -880,42 +746,33 @@ Topology::barycentricSubdivision()
   requests_step6[0] = initial_entities_3d.size();
   add_entities(requests_step6);
 
-  std::vector<stk::mesh::Entity> modified2_entities_0D =
-      get_rank_entities(get_bulk_data(), stk::topology::NODE_RANK);
+  std::vector<stk::mesh::Entity> modified2_entities_0D = get_rank_entities(get_bulk_data(), stk::topology::NODE_RANK);
 
   // At this point the way the numbers are stored in the vector of
   // nodes has changed Thus, create a new vector with the nodes that
   // has all the centroids of the elements
   std::vector<stk::mesh::Entity> elements_centroids;
   int                            _start = initial_entities_2D.size();
-  int _end = initial_entities_2D.size() + initial_entities_3d.size();
-  for (int ii = _start; ii < _end; ++ii) {
-    elements_centroids.push_back(modified2_entities_0D[ii]);
-  }
+  int                            _end   = initial_entities_2D.size() + initial_entities_3d.size();
+  for (int ii = _start; ii < _end; ++ii) { elements_centroids.push_back(modified2_entities_0D[ii]); }
 
   // Add the coordinates of all the elements centroids
   std::vector<stk::mesh::Entity> boundary_nodes_elements;
   for (unsigned int ii = 0; ii < initial_entities_3d.size(); ++ii) {
-    boundary_nodes_elements = getFormerElementNodes(
-        initial_entities_3d[ii], all_elements_boundary_nodes1);
-    computeBarycentricCoordinates(
-        boundary_nodes_elements, elements_centroids[ii]);
+    boundary_nodes_elements = getFormerElementNodes(initial_entities_3d[ii], all_elements_boundary_nodes1);
+    computeBarycentricCoordinates(boundary_nodes_elements, elements_centroids[ii]);
   }
 
   // Connect each element to the new added nodes
   for (unsigned int ii = 0; ii < initial_entities_3d.size(); ++ii) {
     // Connect the node to its corresponding element
-    add_relation(
-        initial_entities_3d[ii],
-        elements_centroids[ii],
-        getNumberLowerRankEntities(initial_entities_3d[ii]));
+    add_relation(initial_entities_3d[ii], elements_centroids[ii], getNumberLowerRankEntities(initial_entities_3d[ii]));
   }
   // MEASURING TIME
   end6           = clock();
   cpu_time_used6 = ((double)(end6 - start6)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The Sixth part takes " << cpu_time_used6 << " seconds"
-            << std::endl;
+  std::cout << "The Sixth part takes " << cpu_time_used6 << " seconds" << std::endl;
 
   // VII. For each element create new segments to connect its center
   // point to all the points that compose its boundary
@@ -938,8 +795,7 @@ Topology::barycentricSubdivision()
   for (iterator_Initial_entities_3d = initial_entities_3d.begin();
        iterator_Initial_entities_3d != initial_entities_3d.end();
        ++iterator_Initial_entities_3d) {
-    element_boundary_nodes = getBoundaryEntities(
-        *iterator_Initial_entities_3d, stk::topology::NODE_RANK);
+    element_boundary_nodes = getBoundaryEntities(*iterator_Initial_entities_3d, stk::topology::NODE_RANK);
     for (iterator_element_boundary_nodes = element_boundary_nodes.begin();
          iterator_element_boundary_nodes != element_boundary_nodes.end();
          ++iterator_element_boundary_nodes) {
@@ -953,38 +809,29 @@ Topology::barycentricSubdivision()
   add_entities(requests_step7);
 
   // Vector that contains the latest addition of segments
-  std::vector<stk::mesh::Entity> modified3_entities_1D =
-      get_rank_entities(get_bulk_data(), stk::topology::EDGE_RANK);
+  std::vector<stk::mesh::Entity> modified3_entities_1D = get_rank_entities(get_bulk_data(), stk::topology::EDGE_RANK);
 
   // At this point the way the numbers are stored in the vector of
   // segments has changed. Thus, create a new vector that contains
   // the segments that connect the element centroid with the element
   // boundary points
-  int const Start_ = Num_segments_face * initial_entities_2D.size() +
-                     initial_entities_1D.size();
-  int const End_ = modified3_entities_1D.size() - initial_entities_1D.size();
+  int const                      Start_ = Num_segments_face * initial_entities_2D.size() + initial_entities_1D.size();
+  int const                      End_   = modified3_entities_1D.size() - initial_entities_1D.size();
   std::vector<stk::mesh::Entity> segments_connected_centroid;
-  for (int ii = Start_; ii < End_; ++ii) {
-    segments_connected_centroid.push_back(modified3_entities_1D[ii]);
-  }
+  for (int ii = Start_; ii < End_; ++ii) { segments_connected_centroid.push_back(modified3_entities_1D[ii]); }
 
   // Connect the new segments to the corresponding nodes
   for (unsigned int ii = 0; ii < segments_connected_centroid.size(); ++ii) {
     // Add a relation between the segments and the center nodes
-    add_relation(
-        segments_connected_centroid[ii],
-        elements_centroids[ii / element_boundary_nodes.size()],
-        0);
+    add_relation(segments_connected_centroid[ii], elements_centroids[ii / element_boundary_nodes.size()], 0);
     // Add a relation between the segments and the boundary nodes
-    add_relation(
-        segments_connected_centroid[ii], all_elements_boundary_nodes[ii], 1);
+    add_relation(segments_connected_centroid[ii], all_elements_boundary_nodes[ii], 1);
   }
   // MEASURING TIME
   end7           = clock();
   cpu_time_used7 = ((double)(end7 - start7)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The Seventh part takes " << cpu_time_used7 << " seconds"
-            << std::endl;
+  std::cout << "The Seventh part takes " << cpu_time_used7 << " seconds" << std::endl;
 
   // -------------------------------------------------------------------------
   // VIII. Create the new faces inside each element
@@ -1000,20 +847,17 @@ Topology::barycentricSubdivision()
   requests_step8[2] = All_boundary_segments.size();
   add_entities(requests_step8);
 
-  std::vector<stk::mesh::Entity> modified2_entities_2D =
-      get_rank_entities(get_bulk_data(), stk::topology::FACE_RANK);
+  std::vector<stk::mesh::Entity> modified2_entities_2D = get_rank_entities(get_bulk_data(), stk::topology::FACE_RANK);
 
   // Create a vector of vectors with all the faces inside the element. Each
   // row represents an element
-  std::vector<std::vector<stk::mesh::Entity>> faces_inside_elements(
-      initial_entities_3d.size());
+  std::vector<std::vector<stk::mesh::Entity>> faces_inside_elements(initial_entities_3d.size());
 
   // Connect the face to the corresponding segments
   std::vector<stk::mesh::Entity> adjacent_segments_inside(2);
   for (unsigned int ii = 0; ii < All_boundary_segments.size(); ++ii) {
-    adjacent_segments_inside = findAdjacentSegments(
-        All_boundary_segments[ii],
-        elements_centroids[ii / Number_new_triangles_inside_element]);
+    adjacent_segments_inside =
+        findAdjacentSegments(All_boundary_segments[ii], elements_centroids[ii / Number_new_triangles_inside_element]);
     add_relation(modified2_entities_2D[ii], All_boundary_segments[ii], 0);
     add_relation(modified2_entities_2D[ii], adjacent_segments_inside[0], 1);
     add_relation(modified2_entities_2D[ii], adjacent_segments_inside[1], 2);
@@ -1021,16 +865,14 @@ Topology::barycentricSubdivision()
     // faces inside each element. Each row contains the faces of one
     // specific element. The first row corresponds to the first
     // element, the second one to the second element, and so forth.
-    faces_inside_elements[ii / Number_new_triangles_inside_element].push_back(
-        modified2_entities_2D[ii]);
+    faces_inside_elements[ii / Number_new_triangles_inside_element].push_back(modified2_entities_2D[ii]);
   }
 
   // MEASURING TIME
   end8           = clock();
   cpu_time_used8 = ((double)(end8 - start8)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The Eight part takes " << cpu_time_used8 << " seconds"
-            << std::endl;
+  std::cout << "The Eight part takes " << cpu_time_used8 << " seconds" << std::endl;
 
   // IX. Delete the former elements
   // MEASURING TIME
@@ -1043,8 +885,7 @@ Topology::barycentricSubdivision()
        iterator_elements_centroids != elements_centroids.end();
        ++iterator_elements_centroids) {
     std::vector<stk::mesh::Entity> former_element =
-        getDirectlyConnectedEntities(
-            *iterator_elements_centroids, stk::topology::ELEMENT_RANK);
+        getDirectlyConnectedEntities(*iterator_elements_centroids, stk::topology::ELEMENT_RANK);
     remove_entity(former_element[0]);
   }
 
@@ -1052,21 +893,17 @@ Topology::barycentricSubdivision()
   end9           = clock();
   cpu_time_used9 = ((double)(end9 - start9)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The Ninth part takes " << cpu_time_used9 << " seconds"
-            << std::endl;
+  std::cout << "The Ninth part takes " << cpu_time_used9 << " seconds" << std::endl;
 
   // X. Create the new elements modified1_entities_3d: Vector with
   // all the elements required to carry out the barycentric
   // subdivision
   // -------------------------------------------------------------------------
 
-  int const number_new_elements =
-      _faces_element.size() * initial_entities_3d.size();
+  int const number_new_elements = _faces_element.size() * initial_entities_3d.size();
 
   // Add the new elements
-  for (int ii = 0; ii < number_new_elements; ++ii) {
-    add_element(stk::topology::ELEMENT_RANK);
-  }
+  for (int ii = 0; ii < number_new_elements; ++ii) { add_element(stk::topology::ELEMENT_RANK); }
   std::vector<stk::mesh::Entity> modified1_entities_3d =
       get_rank_entities(get_bulk_data(), stk::topology::ELEMENT_RANK);
 
@@ -1077,10 +914,8 @@ Topology::barycentricSubdivision()
   // Connect the the element with its corresponding faces
   std::vector<stk::mesh::Entity> adjacent_faces_inside(3);
   for (unsigned int ii = 0; ii < All_boundary_faces.size(); ++ii) {
-    adjacent_faces_inside = findAdjacentSegmentsFromFace(
-        faces_inside_elements,
-        All_boundary_faces[ii],
-        (ii / _faces_element.size()));
+    adjacent_faces_inside =
+        findAdjacentSegmentsFromFace(faces_inside_elements, All_boundary_faces[ii], (ii / _faces_element.size()));
     add_relation(modified1_entities_3d[ii], All_boundary_faces[ii], 0);
     add_relation(modified1_entities_3d[ii], adjacent_faces_inside[0], 1);
     add_relation(modified1_entities_3d[ii], adjacent_faces_inside[1], 2);
@@ -1091,8 +926,7 @@ Topology::barycentricSubdivision()
   end10           = clock();
   cpu_time_used10 = ((double)(end10 - start10)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The tenth part takes " << cpu_time_used10 << "seconds"
-            << std::endl;
+  std::cout << "The tenth part takes " << cpu_time_used10 << "seconds" << std::endl;
 
   // XI. Update the vector: connectivity_temp
   // MEASURING TIME
@@ -1100,17 +934,13 @@ Topology::barycentricSubdivision()
   double  cpu_time_used11;
   start11 = clock();
   // Connectivity matrix
-  std::vector<std::vector<stk::mesh::Entity>> connectivity_temp(
-      modified1_entities_3d.size());
+  std::vector<std::vector<stk::mesh::Entity>> connectivity_temp(modified1_entities_3d.size());
   // Add the new entities to "connectivity_temp"
   for (unsigned int ii = 0; ii < modified1_entities_3d.size(); ++ii) {
     std::vector<double*>                     vector_pointers;
     std::vector<stk::mesh::Entity>::iterator iterator_entities;
-    std::vector<stk::mesh::Entity>           entities = getBoundaryEntities(
-        modified1_entities_3d[ii], stk::topology::NODE_RANK);
-    for (iterator_entities = entities.begin();
-         iterator_entities != entities.end();
-         ++iterator_entities) {
+    std::vector<stk::mesh::Entity> entities = getBoundaryEntities(modified1_entities_3d[ii], stk::topology::NODE_RANK);
+    for (iterator_entities = entities.begin(); iterator_entities != entities.end(); ++iterator_entities) {
       vector_pointers.push_back(getEntityCoordinates(*iterator_entities));
     }
     std::vector<std::vector<double>> coordinates;
@@ -1133,9 +963,8 @@ Topology::barycentricSubdivision()
       double v14x = coordinates[3][0] - coordinates[0][0];
       double v14y = coordinates[3][1] - coordinates[0][1];
       double v14z = coordinates[3][2] - coordinates[0][2];
-      volume      = v12x * (v13y * v14z - v14y * v13z) -
-               v12y * (v13x * v14z - v14x * v13z) +
-               v12z * (v13x * v14y - v14x * v13y);
+      volume =
+          v12x * (v13y * v14z - v14y * v13z) - v12y * (v13x * v14z - v14x * v13z) + v12z * (v13x * v14y - v14x * v13y);
     }
     if (volume < 0) { std::reverse(++entities.begin(), --entities.end()); }
     connectivity_temp[ii] = entities;
@@ -1150,8 +979,7 @@ Topology::barycentricSubdivision()
   end11           = clock();
   cpu_time_used11 = ((double)(end11 - start11)) / CLOCKS_PER_SEC;
   std::cout << std::endl;
-  std::cout << "The Eleventh part takes " << cpu_time_used11 << " seconds"
-            << std::endl;
+  std::cout << "The Eleventh part takes " << cpu_time_used11 << " seconds" << std::endl;
 
   return;
 }

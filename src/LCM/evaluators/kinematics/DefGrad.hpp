@@ -21,16 +21,13 @@ namespace LCM {
  */
 
 template <typename EvalT, typename Traits>
-class DefGrad : public PHX::EvaluatorWithBaseImpl<Traits>,
-                public PHX::EvaluatorDerived<EvalT, Traits>
+class DefGrad : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   DefGrad(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);

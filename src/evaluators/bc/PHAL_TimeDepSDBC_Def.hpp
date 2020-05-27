@@ -10,16 +10,13 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-TimeDepSDBC_Base<EvalT, Traits>::TimeDepSDBC_Base(Teuchos::ParameterList& p)
-    : PHAL::SDirichlet<EvalT, Traits>(p)
+TimeDepSDBC_Base<EvalT, Traits>::TimeDepSDBC_Base(Teuchos::ParameterList& p) : PHAL::SDirichlet<EvalT, Traits>(p)
 {
   offset_ = p.get<int>("Equation Offset");
   times_  = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
   values_ = p.get<Teuchos::Array<RealType>>("BC Values").toVector();
 
-  ALBANY_ASSERT(
-      times_.size() == values_.size(),
-      "Number of times and number of values must match");
+  ALBANY_ASSERT(times_.size() == values_.size(), "Number of times and number of values must match");
 }
 
 template <typename EvalT, typename Traits>
@@ -43,8 +40,7 @@ TimeDepSDBC_Base<EvalT, Traits>::computeVal(RealType time)
 }
 
 template <typename EvalT, typename Traits>
-TimeDepSDBC<EvalT, Traits>::TimeDepSDBC(Teuchos::ParameterList& p)
-    : TimeDepSDBC_Base<EvalT, Traits>(p)
+TimeDepSDBC<EvalT, Traits>::TimeDepSDBC(Teuchos::ParameterList& p) : TimeDepSDBC_Base<EvalT, Traits>(p)
 {
 }
 

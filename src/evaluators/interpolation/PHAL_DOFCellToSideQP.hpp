@@ -22,18 +22,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class DOFCellToSideQPBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                            public PHX::EvaluatorDerived<EvalT, Traits>
+class DOFCellToSideQPBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFCellToSideQPBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  DOFCellToSideQPBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -66,16 +61,13 @@ class DOFCellToSideQPBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFCellToSideQP =
-    DOFCellToSideQPBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFCellToSideQP = DOFCellToSideQPBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFCellToSideQPMesh =
-    DOFCellToSideQPBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFCellToSideQPMesh = DOFCellToSideQPBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFCellToSideQPParam =
-    DOFCellToSideQPBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using DOFCellToSideQPParam = DOFCellToSideQPBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

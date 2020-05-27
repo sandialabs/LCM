@@ -89,9 +89,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   printParts(stk::mesh::MetaData* metaData);
 
   void
-  cullSubsetParts(
-      std::vector<std::string>&                ssNames,
-      std::map<std::string, stk::mesh::Part*>& partVec);
+  cullSubsetParts(std::vector<std::string>& ssNames, std::map<std::string, stk::mesh::Part*>& partVec);
 
   //! Utility function that uses some integer arithmetic to choose a good
   //! worksetSize
@@ -135,14 +133,10 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   //! SideSetSTKMeshStruct)
   void
   finalizeSideSetMeshStructs(
-      const Teuchos::RCP<Teuchos_Comm const>& commT,
-      std::map<
-          std::string,
-          AbstractFieldContainer::FieldContainerRequirements> const&
-          side_set_req,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-          side_set_sis,
-      int worksetSize);
+      const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+      std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
+      int                                                                              worksetSize);
 
   //! Loads from file input required fields not found in the mesh
   void
@@ -231,8 +225,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   setDefaultCoordinates3d();
 
   Teuchos::RCP<Teuchos::ParameterList>
-  getValidGenericSTKParameters(
-      std::string listname = "Discretization Param Names") const;
+  getValidGenericSTKParameters(std::string listname = "Discretization Param Names") const;
 
   Teuchos::RCP<Teuchos::ParameterList> params;
 

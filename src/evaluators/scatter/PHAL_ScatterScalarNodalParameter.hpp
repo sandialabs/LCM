@@ -30,20 +30,15 @@ namespace PHAL {
 // **************************************************************
 
 template <typename EvalT, typename Traits>
-class ScatterScalarNodalParameterBase
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<EvalT, Traits>
+class ScatterScalarNodalParameterBase : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                        public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ScatterScalarNodalParameterBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ScatterScalarNodalParameterBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   virtual ~ScatterScalarNodalParameterBase(){};
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   // This function requires template specialization, in derived class below
   virtual void
@@ -58,13 +53,10 @@ class ScatterScalarNodalParameterBase
 
 // General version for most evaluation types
 template <typename EvalT, typename Traits>
-class ScatterScalarNodalParameter
-    : public ScatterScalarNodalParameterBase<EvalT, Traits>
+class ScatterScalarNodalParameter : public ScatterScalarNodalParameterBase<EvalT, Traits>
 {
  public:
-  ScatterScalarNodalParameter(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  ScatterScalarNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : ScatterScalarNodalParameterBase<EvalT, Traits>(p, dl)
   {
   }
@@ -78,13 +70,10 @@ class ScatterScalarNodalParameter
 
 // General version for most evaluation types
 template <typename EvalT, typename Traits>
-class ScatterScalarExtruded2DNodalParameter
-    : public ScatterScalarNodalParameterBase<EvalT, Traits>
+class ScatterScalarExtruded2DNodalParameter : public ScatterScalarNodalParameterBase<EvalT, Traits>
 {
  public:
-  ScatterScalarExtruded2DNodalParameter(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  ScatterScalarExtruded2DNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : ScatterScalarNodalParameterBase<EvalT, Traits>(p, dl)
   {
   }
@@ -107,14 +96,10 @@ class ScatterScalarExtruded2DNodalParameter
 // **************************************************************
 template <typename Traits>
 class ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>
-    : public ScatterScalarNodalParameterBase<
-          PHAL::AlbanyTraits::Residual,
-          Traits>
+    : public ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  ScatterScalarNodalParameter(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ScatterScalarNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   // Old constructor, still needed by BCs that use PHX Factory
   ScatterScalarNodalParameter(Teuchos::ParameterList const& p);
   void
@@ -127,17 +112,11 @@ class ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>
 };
 
 template <typename Traits>
-class ScatterScalarExtruded2DNodalParameter<
-    PHAL::AlbanyTraits::Residual,
-    Traits>
-    : public ScatterScalarNodalParameterBase<
-          PHAL::AlbanyTraits::Residual,
-          Traits>
+class ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>
+    : public ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  ScatterScalarExtruded2DNodalParameter(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ScatterScalarExtruded2DNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
   evaluateFields(typename Traits::EvalData d);

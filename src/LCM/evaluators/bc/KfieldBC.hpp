@@ -56,8 +56,7 @@ class KfieldBC_Base : public PHAL::DirichletBase<EvalT, Traits>
 // Residual
 // **************************************************************
 template <typename Traits>
-class KfieldBC<PHAL::AlbanyTraits::Residual, Traits>
-    : public KfieldBC_Base<PHAL::AlbanyTraits::Residual, Traits>
+class KfieldBC<PHAL::AlbanyTraits::Residual, Traits> : public KfieldBC_Base<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   KfieldBC(Teuchos::ParameterList& p);
@@ -70,8 +69,7 @@ class KfieldBC<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public KfieldBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>
+class KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits> : public KfieldBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   KfieldBC(Teuchos::ParameterList& p);

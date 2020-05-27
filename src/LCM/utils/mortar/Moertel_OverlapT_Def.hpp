@@ -34,14 +34,10 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::OverlapT(
       havelinem_(false),
       exactvalues_(exactvalues)
 {
-  if ((sseg.Type() !=
-           MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
-       sseg.Type() !=
-           MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad) ||
-      (mseg.Type() !=
-           MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
-       mseg.Type() !=
-           MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad)) {
+  if ((sseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
+       sseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad) ||
+      (mseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
+       mseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad)) {
     std::stringstream oss;
     oss << "***ERR*** Moertel::Overlap::Overlap:\n"
         << "***ERR*** Overlap of other then bilinear triangles/quads not yet "
@@ -186,10 +182,9 @@ MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_lines_m()
 {
   if (!havesxim_) {
-    std::cout
-        << "***ERR*** Moertel::Overlap::build_lines:\n"
-        << "***ERR*** projection of slave element nodes has to be done before\n"
-        << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
+    std::cout << "***ERR*** Moertel::Overlap::build_lines:\n"
+              << "***ERR*** projection of slave element nodes has to be done before\n"
+              << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return false;
   }
 
@@ -280,14 +275,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_mxi()
 {
   // project the master segment's nodes onto the slave segment
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** mnode = mseg_.Nodes();
-  MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)
-      projector(inter_.IsOneDimensional(), OutLevel());
+  MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT) projector(inter_.IsOneDimensional(), OutLevel());
   double gap;
   for (int i = 0; i < mseg_.Nnode(); ++i) {
     // project node i onto sseg
 
-    projector.ProjectNodetoSegment_SegmentNormal(
-        *mnode[i], sseg_, mxi_[i], gap);
+    projector.ProjectNodetoSegment_SegmentNormal(*mnode[i], sseg_, mxi_[i], gap);
 
     /*
        mxi_[i] output. mxi_[i][0] is the \xi coordinate of the projection in
@@ -315,8 +308,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_sxim()
   // project the slave segment's nodes onto the master segment
   int nsnode                                      = sseg_.Nnode();
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** snode = sseg_.Nodes();
-  MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)
-      projector(inter_.IsOneDimensional(), OutLevel());
+  MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT) projector(inter_.IsOneDimensional(), OutLevel());
   double gap;
   for (int i = 0; i < nsnode; ++i) {
     // project node i onto sseg
@@ -740,8 +732,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Clipelements()
                   << "Moertel: ***WRN*** " << np
                   << " slave nodes seem to be in master segment but no overlap "
                      "detected\n"
-                  << "Moertel: ***WRN*** file/line: " << __FILE__ << "/"
-                  << __LINE__ << "\n";
+                  << "Moertel: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       return false;
     } else  // with none or less then 3 points in we assume no overlap
       return false;
@@ -774,10 +765,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Clipelements()
   if (np && np < 3) {
     if (OutLevel() > 8)
       std::cout << "Moertel: ***WRN*** Moertel::Overlap::Clipelements:\n"
-                << "Moertel: ***WRN*** " << np
-                << " nodes in polygon but could not detect overlap\n"
-                << "Moertel: ***WRN*** file/line: " << __FILE__ << "/"
-                << __LINE__ << "\n";
+                << "Moertel: ***WRN*** " << np << " nodes in polygon but could not detect overlap\n"
+                << "Moertel: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return false;
   } else if (!np)
     return false;
@@ -837,11 +826,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::buildPoly(
     point_s[0] = source_xi[i];
     point_s[1] = source_eta[i];
 
-    s_in = Clip_TestPoint(
-        N,
-        PE,
-        point_s,
-        Nodes_Identical_Epsilon);  // true if point is inside edge
+    s_in = Clip_TestPoint(N, PE, point_s,
+                          Nodes_Identical_Epsilon);  // true if point is inside edge
 
     if (s_in) {  // if point s is inside the clipedge
 
@@ -860,17 +846,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::buildPoly(
   // Go to the end of the input poly data
 
   const unsigned int source_xi_size = source_xi.size();
-  for (unsigned int i = static_cast<unsigned int>(index); i < source_xi_size;
-       ++i) {
+  for (unsigned int i = static_cast<unsigned int>(index); i < source_xi_size; ++i) {
     int const slot = (i + 1) % source_xi_size;
     point_p[0]     = source_xi[slot];
     point_p[1]     = source_eta[slot];
 
-    p_in = Clip_TestPoint(
-        N,
-        PE,
-        point_p,
-        Nodes_Identical_Epsilon);  // true if point is inside edge
+    p_in = Clip_TestPoint(N, PE, point_p,
+                          Nodes_Identical_Epsilon);  // true if point is inside edge
 
     if (s_in && p_in) {  // both s and p are in polygon
 
@@ -940,11 +922,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::buildPoly(
     point_p[0] = source_xi[i + 1];
     point_p[1] = source_eta[i + 1];
 
-    p_in = Clip_TestPoint(
-        N,
-        PE,
-        point_p,
-        Nodes_Identical_Epsilon);  // true if point is inside edge
+    p_in = Clip_TestPoint(N, PE, point_p,
+                          Nodes_Identical_Epsilon);  // true if point is inside edge
 
     if (s_in && p_in) {  // both s and p are in polygon
 
@@ -1189,9 +1168,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ClipelementsSH()
     }
   }  // for (int i=0; i<3; ++i)
 
-  if (s_node_id.size() <
-      static_cast<unsigned int>(
-          nsnode)) {  // Slave poly does not lie within master either.
+  if (s_node_id.size() < static_cast<unsigned int>(nsnode)) {  // Slave poly does not lie within master either.
     // There is no overlap. Move on.
 
     /* The reasoning here is that zero of the master polygon was found in the
@@ -1314,8 +1291,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
     for (int j = 0; j < 3; ++j) n[j] /= length;
     // create a node with this coords and normal;
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)* node =
-        new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(
-            points[i]->Id(), x, 3, dof, false, OutLevel());
+        new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(points[i]->Id(), x, 3, dof, false, OutLevel());
     node->SetN(n);
     // set node in point
     points[i]->SetNode(node);
@@ -1328,12 +1304,10 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
   {
     double mxi[2];
     double gap;
-    MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)
-        projector(inter_.IsOneDimensional(), OutLevel());
+    MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT) projector(inter_.IsOneDimensional(), OutLevel());
 
     for (int i = 0; i < np; ++i) {
-      Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> node =
-          points[i]->Node();
+      Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> node = points[i]->Node();
 
       // GAH - found by kimliegeois
       // Moertel occasionally trys to project a slave segment on a master
@@ -1358,8 +1332,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
       projector.ProjectNodetoSegment_NodalNormal(*node, mseg_, mxi, gap);
       // create a projected node and set it in node
       MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-          new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(
-              *node, mxi, &mseg_);
+          new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*node, mxi, &mseg_);
       node->SetProjectedNode(pnode);
       node->SetGap(gap);
 #if 0
@@ -1409,8 +1382,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
       sseg_.EvaluateFunction(1, points[i]->Xi(), val, nsval, NULL);
       points[i]->StoreFunctionValues(1, val, nsval);
       // evaluate function 0 from mseg
-      mseg_.EvaluateFunction(
-          0, points[i]->Node()->GetProjectedNode()->Xi(), val, nmval, NULL);
+      mseg_.EvaluateFunction(0, points[i]->Node()->GetProjectedNode()->Xi(), val, nmval, NULL);
       points[i]->StoreFunctionValues(2, val, nmval);
     }
   }
@@ -1438,7 +1410,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
       nodeid[0] = points[0]->Id();
       nodeid[1] = points[i]->Id();
       nodeid[2] = points[i - 1]->Id();
-      tmp = new MoertelT::Segment_BiLinearTri(i - 2, 3, nodeid, OutLevel());
+      tmp       = new MoertelT::Segment_BiLinearTri(i - 2, 3, nodeid, OutLevel());
       // set a linear shape function to this triangle
       tmp->SetFunction(0, func);
       // add triangle to the *this class
@@ -1449,7 +1421,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
     nodeid[0] = points[0]->Id();
     nodeid[1] = points[1]->Id();
     nodeid[2] = points[np - 1]->Id();
-    tmp = new MoertelT::Segment_BiLinearTri(np - 2, 3, nodeid, OutLevel());
+    tmp       = new MoertelT::Segment_BiLinearTri(np - 2, 3, nodeid, OutLevel());
     // set a linear shape function to this triangle
     tmp->SetFunction(0, func);
     // add triangle to the *this class
@@ -1485,10 +1457,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
   for (int i = 0; i < np; ++i) nodes[i] = points[i]->Node().get();
 
   // loop segments and set ptr to nodes in them
-  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-      iterator curr;
-  for (curr = s_.begin(); curr != s_.end(); ++curr)
-    curr->second->GetPtrstoNodes(nodes);
+  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::iterator curr;
+  for (curr = s_.begin(); curr != s_.end(); ++curr) curr->second->GetPtrstoNodes(nodes);
 
   nodes.clear();
 

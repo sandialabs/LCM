@@ -130,8 +130,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData d);
 
 // Residual
 template <typename Traits>
-class SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>
-    : public SchwarzBC_Base<PHAL::AlbanyTraits::Residual, Traits>
+class SchwarzBC<PHAL::AlbanyTraits::Residual, Traits> : public SchwarzBC_Base<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   SchwarzBC(Teuchos::ParameterList& p);
@@ -142,8 +141,7 @@ class SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>
 
 // Jacobian
 template <typename Traits>
-class SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public SchwarzBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>
+class SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits> : public SchwarzBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   SchwarzBC(Teuchos::ParameterList& p);

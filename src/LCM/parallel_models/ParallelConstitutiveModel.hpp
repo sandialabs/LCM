@@ -62,17 +62,13 @@ struct ParallelKernel
   }
 
   void
-  setDependentField(
-      std::string const&                   field_name,
-      Teuchos::RCP<PHX::DataLayout> const& field)
+  setDependentField(std::string const& field_name, Teuchos::RCP<PHX::DataLayout> const& field)
   {
     model_.setDependentField(field_name, field);
   }
 
   void
-  setEvaluatedField(
-      std::string const&                   field_name,
-      Teuchos::RCP<PHX::DataLayout> const& field)
+  setEvaluatedField(std::string const& field_name, Teuchos::RCP<PHX::DataLayout> const& field)
   {
     model_.setEvaluatedField(field_name, field);
   }
@@ -86,8 +82,7 @@ struct ParallelKernel
       bool                          old_state_flag,
       bool                          output_flag)
   {
-    model_.addStateVar(
-        name, layout, init_type, init_value, old_state_flag, output_flag);
+    model_.addStateVar(name, layout, init_type, init_value, old_state_flag, output_flag);
   }
 
   void
@@ -194,8 +189,7 @@ struct ParallelKernel
   RealType latent_heat_;
 
   /// Flag indicating failure in model calculation
-  Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> nox_status_test_{
-      Teuchos::null};
+  Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> nox_status_test_{Teuchos::null};
 };
 
 template <typename EvalT, typename Traits, typename Kernel>
@@ -208,17 +202,13 @@ class ParallelConstitutiveModel : public LCM::ConstitutiveModel<EvalT, Traits>
 
   using ConstitutiveModel<EvalT, Traits>::num_pts_;
 
-  ParallelConstitutiveModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ParallelConstitutiveModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   virtual ~ParallelConstitutiveModel() = default;
 
   void
-  computeState(
-      typename Traits::EvalData workset,
-      FieldMap<ScalarT const>   dep_fields,
-      FieldMap<ScalarT>         eval_fields) final;
+  computeState(typename Traits::EvalData workset, FieldMap<ScalarT const> dep_fields, FieldMap<ScalarT> eval_fields)
+      final;
 
   virtual void
   computeStateParallel(

@@ -25,10 +25,8 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
     : coordVec("Coord Vec", dl->qp_gradient), weights("Weights", dl->qp_scalar)
 {
   // get and validate Response parameter list
-  Teuchos::ParameterList* plist =
-      p.get<Teuchos::ParameterList*>("Parameter List");
-  Teuchos::RCP<Teuchos::ParameterList const> reflist =
-      this->getValidResponseParameters();
+  Teuchos::ParameterList*                    plist   = p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::RCP<Teuchos::ParameterList const> reflist = this->getValidResponseParameters();
   plist->validateParameters(*reflist, 0);
 
   // Get field type and corresponding layouts
@@ -49,11 +47,9 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
       local_response_layout  = dl->cell_vector;
       global_response_layout = dl->workset_vector;
     } else {
-      int worksetSize       = dl->cell_scalar->extent(0);
-      local_response_layout = Teuchos::rcp(
-          new PHX::MDALayout<Cell, Dim>(worksetSize, field_components.size()));
-      global_response_layout =
-          Teuchos::rcp(new PHX::MDALayout<Dim>(field_components.size()));
+      int worksetSize        = dl->cell_scalar->extent(0);
+      local_response_layout  = Teuchos::rcp(new PHX::MDALayout<Cell, Dim>(worksetSize, field_components.size()));
+      global_response_layout = Teuchos::rcp(new PHX::MDALayout<Dim>(field_components.size()));
     }
   } else if (fieldType == "Tensor") {
     ALBANY_ABORT(
@@ -115,9 +111,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   else if (numDims == 3)
     scaling = X0 * X0 * X0;
   else
-    ALBANY_ABORT(
-        std::endl
-        << "Error! Invalid number of dimensions: " << numDims << std::endl);
+    ALBANY_ABORT(std::endl << "Error! Invalid number of dimensions: " << numDims << std::endl);
 
   // add dependent fields
   this->addDependentField(field.fieldTag());
@@ -127,14 +121,10 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
 
   // Setup scatter evaluator
   p.set("Stand-alone Evaluator", false);
-  std::string local_response_name =
-      field_name + " Local Response Field Integral";
-  std::string global_response_name =
-      field_name + " Global Response Field Integral";
-  PHX::Tag<ScalarT> local_response_tag(
-      local_response_name, local_response_layout);
-  PHX::Tag<ScalarT> global_response_tag(
-      global_response_name, global_response_layout);
+  std::string       local_response_name  = field_name + " Local Response Field Integral";
+  std::string       global_response_name = field_name + " Global Response Field Integral";
+  PHX::Tag<ScalarT> local_response_tag(local_response_name, local_response_layout);
+  PHX::Tag<ScalarT> global_response_tag(global_response_name, global_response_layout);
   p.set("Local Response Field Tag", local_response_tag);
   p.set("Global Response Field Tag", global_response_tag);
   PHAL::SeparableScatterScalarResponse<EvalT, Traits>::setup(p, dl);
@@ -150,15 +140,13 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(field, fm);
   this->utils.setFieldData(coordVec, fm);
   this->utils.setFieldData(weights, fm);
-  PHAL::SeparableScatterScalarResponse<EvalT, Traits>::postRegistrationSetup(
-      d, fm);
+  PHAL::SeparableScatterScalarResponse<EvalT, Traits>::postRegistrationSetup(d, fm);
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::ResponseFieldIntegral<EvalT, Traits>::preEvaluate(
-    typename Traits::PreEvalData workset)
+PHAL::ResponseFieldIntegral<EvalT, Traits>::preEvaluate(typename Traits::PreEvalData workset)
 {
   PHAL::set(this->global_response_eval, 0.0);
   // Do global initialization
@@ -168,25 +156,19 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::preEvaluate(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::ResponseFieldIntegral<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+PHAL::ResponseFieldIntegral<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Zero out local response
   PHAL::set(this->local_response_eval, 0.0);
 
-  if (ebNames.size() == 0 ||
-      std::find(ebNames.begin(), ebNames.end(), workset.EBName) !=
-          ebNames.end()) {
+  if (ebNames.size() == 0 || std::find(ebNames.begin(), ebNames.end(), workset.EBName) != ebNames.end()) {
     ScalarT s;
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       bool cellInBox = false;
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
-        if ((!limitX || (coordVec(cell, qp, 0) >= xmin &&
-                         coordVec(cell, qp, 0) <= xmax)) &&
-            (!limitY || (coordVec(cell, qp, 1) >= ymin &&
-                         coordVec(cell, qp, 1) <= ymax)) &&
-            (!limitZ || (coordVec(cell, qp, 2) >= zmin &&
-                         coordVec(cell, qp, 2) <= zmax))) {
+        if ((!limitX || (coordVec(cell, qp, 0) >= xmin && coordVec(cell, qp, 0) <= xmax)) &&
+            (!limitY || (coordVec(cell, qp, 1) >= ymin && coordVec(cell, qp, 1) <= ymax)) &&
+            (!limitZ || (coordVec(cell, qp, 2) >= zmin && coordVec(cell, qp, 2) <= zmax))) {
           cellInBox = true;
           break;
         }
@@ -200,8 +182,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::evaluateFields(
           this->global_response_eval(0) += s;
         } else if (field_rank == 3) {
           for (std::size_t dim = 0; dim < field_components.size(); ++dim) {
-            s = field(cell, qp, field_components[dim]) * weights(cell, qp) *
-                scaling;
+            s = field(cell, qp, field_components[dim]) * weights(cell, qp) * scaling;
             this->local_response_eval(cell, dim) += s;
             this->global_response_eval(dim) += s;
           }
@@ -225,11 +206,9 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::ResponseFieldIntegral<EvalT, Traits>::postEvaluate(
-    typename Traits::PostEvalData workset)
+PHAL::ResponseFieldIntegral<EvalT, Traits>::postEvaluate(typename Traits::PostEvalData workset)
 {
-  PHAL::reduceAll<ScalarT>(
-      *workset.comm, Teuchos::REDUCE_SUM, this->global_response_eval);
+  PHAL::reduceAll<ScalarT>(*workset.comm, Teuchos::REDUCE_SUM, this->global_response_eval);
   // Do global scattering
   PHAL::SeparableScatterScalarResponse<EvalT, Traits>::postEvaluate(workset);
 }
@@ -239,24 +218,15 @@ template <typename EvalT, typename Traits>
 Teuchos::RCP<Teuchos::ParameterList const>
 PHAL::ResponseFieldIntegral<EvalT, Traits>::getValidResponseParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      rcp(new Teuchos::ParameterList("Valid ResponseFieldIntegral Params"));
+  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("Valid ResponseFieldIntegral Params"));
   Teuchos::RCP<Teuchos::ParameterList const> baseValidPL =
-      PHAL::SeparableScatterScalarResponse<EvalT, Traits>::
-          getValidResponseParameters();
+      PHAL::SeparableScatterScalarResponse<EvalT, Traits>::getValidResponseParameters();
   validPL->setParameters(*baseValidPL);
 
   validPL->set<std::string>("Name", "", "Name of response function");
-  validPL->set<int>(
-      "Phalanx Graph Visualization Detail",
-      0,
-      "Make dot file to visualize phalanx graph");
-  validPL->set<std::string>(
-      "Field Type", "", "Type of field (scalar, vector, ...)");
-  validPL->set<std::string>(
-      "Element Block Name",
-      "",
-      "Name of the element block to use as the integration domain");
+  validPL->set<int>("Phalanx Graph Visualization Detail", 0, "Make dot file to visualize phalanx graph");
+  validPL->set<std::string>("Field Type", "", "Type of field (scalar, vector, ...)");
+  validPL->set<std::string>("Element Block Name", "", "Name of the element block to use as the integration domain");
   validPL->set<std::string>("Field Name", "", "Field to integrate");
   validPL->set<bool>("Positive Return Only", false);
 
@@ -268,8 +238,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::getValidResponseParameters() const
   validPL->set<double>("z min", 0.0, "Integration domain minimum z coordinate");
   validPL->set<double>("z max", 0.0, "Integration domain maximum z coordinate");
 
-  validPL->set<Teuchos::Array<int>>(
-      "Field Components", Teuchos::Array<int>(), "Field components to scatter");
+  validPL->set<Teuchos::Array<int>>("Field Components", Teuchos::Array<int>(), "Field components to scatter");
 
   return validPL;
 }

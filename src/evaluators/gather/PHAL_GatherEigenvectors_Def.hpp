@@ -20,9 +20,8 @@ GatherEigenvectors<EvalT, Traits>::GatherEigenvectors(
 {
   char buf[200];
 
-  std::string eigenvector_name_root =
-      p.get<std::string>("Eigenvector field name root");
-  nEigenvectors = p.get<int>("Number of eigenvectors");
+  std::string eigenvector_name_root = p.get<std::string>("Eigenvector field name root");
+  nEigenvectors                     = p.get<int>("Number of eigenvectors");
 
   eigenvector_Re.resize(nEigenvectors);
   eigenvector_Im.resize(nEigenvectors);
@@ -57,24 +56,20 @@ GatherEigenvectors<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-GatherEigenvectors<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+GatherEigenvectors<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   if (nEigenvectors == 0) return;
 
   auto nodeID = workset.wsElNodeEqID;
   if (workset.eigenDataPtr->eigenvectorRe != Teuchos::null) {
-    Teuchos::RCP<const Thyra_MultiVector> e_r =
-        workset.eigenDataPtr->eigenvectorRe;
-    auto e_r_data = Albany::getLocalData(e_r);
+    Teuchos::RCP<const Thyra_MultiVector> e_r      = workset.eigenDataPtr->eigenvectorRe;
+    auto                                  e_r_data = Albany::getLocalData(e_r);
     if (workset.eigenDataPtr->eigenvectorIm != Teuchos::null) {
       // Gather real and imaginary parts from workset Eigendata info structure
-      Teuchos::RCP<const Thyra_MultiVector> e_i =
-          workset.eigenDataPtr->eigenvectorIm;
-      int numVecsInWorkset =
-          std::min(e_r->domain()->dim(), e_i->domain()->dim());
-      int  numVecsToGather = std::min(numVecsInWorkset, (int)nEigenvectors);
-      auto e_i_data        = Albany::getLocalData(e_i);
+      Teuchos::RCP<const Thyra_MultiVector> e_i              = workset.eigenDataPtr->eigenvectorIm;
+      int                                   numVecsInWorkset = std::min(e_r->domain()->dim(), e_i->domain()->dim());
+      int                                   numVecsToGather  = std::min(numVecsInWorkset, (int)nEigenvectors);
+      auto                                  e_i_data         = Albany::getLocalData(e_i);
 
       for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
         for (std::size_t node = 0; node < this->numNodes; ++node) {

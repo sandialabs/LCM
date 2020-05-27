@@ -22,11 +22,7 @@ GenericSTKFieldContainer<Interleaved>::GenericSTKFieldContainer(
     const Teuchos::RCP<stk::mesh::BulkData>&    bulkData_,
     int const                                   neq_,
     int const                                   numDim_)
-    : metaData(metaData_),
-      bulkData(bulkData_),
-      params(params_),
-      neq(neq_),
-      numDim(numDim_)
+    : metaData(metaData_), bulkData(bulkData_), params(params_), neq(neq_), numDim(numDim_)
 {
 }
 
@@ -52,8 +48,7 @@ role_type(bool const output)
 
 template <bool Interleaved>
 void
-GenericSTKFieldContainer<Interleaved>::addStateStructs(
-    const Teuchos::RCP<Albany::StateInfoStruct>& sis)
+GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany::StateInfoStruct>& sis)
 {
   if (sis == Teuchos::null) return;
 
@@ -76,35 +71,19 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
     if (st.entity == StateStruct::ElemData) {
       if (dim.size() == 1) {
         // Scalar on cell
-        cell_scalar_states.push_back(&metaData->declare_field<SFT>(
-            stk::topology::ELEMENT_RANK, st.name));
-        stk::mesh::put_field_on_mesh(
-            *cell_scalar_states.back(), metaData->universal_part(), 1, nullptr);
-        stk::io::set_field_role(
-            *cell_scalar_states.back(), role_type(st.output));
+        cell_scalar_states.push_back(&metaData->declare_field<SFT>(stk::topology::ELEMENT_RANK, st.name));
+        stk::mesh::put_field_on_mesh(*cell_scalar_states.back(), metaData->universal_part(), 1, nullptr);
+        stk::io::set_field_role(*cell_scalar_states.back(), role_type(st.output));
       } else if (dim.size() == 2) {
         // Vector on cell
-        cell_vector_states.push_back(&metaData->declare_field<VFT>(
-            stk::topology::ELEMENT_RANK, st.name));
-        stk::mesh::put_field_on_mesh(
-            *cell_vector_states.back(),
-            metaData->universal_part(),
-            dim[1],
-            nullptr);
-        stk::io::set_field_role(
-            *cell_vector_states.back(), role_type(st.output));
+        cell_vector_states.push_back(&metaData->declare_field<VFT>(stk::topology::ELEMENT_RANK, st.name));
+        stk::mesh::put_field_on_mesh(*cell_vector_states.back(), metaData->universal_part(), dim[1], nullptr);
+        stk::io::set_field_role(*cell_vector_states.back(), role_type(st.output));
       } else if (dim.size() == 3) {
         // 2nd order tensor on cell
-        cell_tensor_states.push_back(&metaData->declare_field<TFT>(
-            stk::topology::ELEMENT_RANK, st.name));
-        stk::mesh::put_field_on_mesh(
-            *cell_tensor_states.back(),
-            metaData->universal_part(),
-            dim[2],
-            dim[1],
-            nullptr);
-        stk::io::set_field_role(
-            *cell_tensor_states.back(), role_type(st.output));
+        cell_tensor_states.push_back(&metaData->declare_field<TFT>(stk::topology::ELEMENT_RANK, st.name));
+        stk::mesh::put_field_on_mesh(*cell_tensor_states.back(), metaData->universal_part(), dim[2], dim[1], nullptr);
+        stk::io::set_field_role(*cell_tensor_states.back(), role_type(st.output));
       } else {
         ALBANY_ABORT("Error! Unexpected state rank.\n");
       }
@@ -113,32 +92,19 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
       //      qpscalar_states.back()->name() <<
       //            " size: (" << dim[0] << ", " << dim[1] << ")" <<endl;
 
-    } else if (
-        st.entity == StateStruct::QuadPoint ||
-        st.entity == StateStruct::ElemNode) {
+    } else if (st.entity == StateStruct::QuadPoint || st.entity == StateStruct::ElemNode) {
       if (dim.size() == 2) {  // Scalar at QPs
-        qpscalar_states.push_back(&metaData->declare_field<QPSFT>(
-            stk::topology::ELEMENT_RANK, st.name));
-        stk::mesh::put_field_on_mesh(
-            *qpscalar_states.back(),
-            metaData->universal_part(),
-            dim[1],
-            nullptr);
+        qpscalar_states.push_back(&metaData->declare_field<QPSFT>(stk::topology::ELEMENT_RANK, st.name));
+        stk::mesh::put_field_on_mesh(*qpscalar_states.back(), metaData->universal_part(), dim[1], nullptr);
         // Debug
         //      cout << "Allocating qps field name " <<
         //      qpscalar_states.back()->name() <<
         //            " size: (" << dim[0] << ", " << dim[1] << ")" <<endl;
         stk::io::set_field_role(*qpscalar_states.back(), role_type(st.output));
       } else if (dim.size() == 3) {  // Vector at QPs
-        qpvector_states.push_back(&metaData->declare_field<QPVFT>(
-            stk::topology::ELEMENT_RANK, st.name));
+        qpvector_states.push_back(&metaData->declare_field<QPVFT>(stk::topology::ELEMENT_RANK, st.name));
         // Multi-dim order is Fortran Ordering, so reversed here
-        stk::mesh::put_field_on_mesh(
-            *qpvector_states.back(),
-            metaData->universal_part(),
-            dim[2],
-            dim[1],
-            nullptr);
+        stk::mesh::put_field_on_mesh(*qpvector_states.back(), metaData->universal_part(), dim[2], dim[1], nullptr);
         // Debug
         //      cout << "Allocating qpv field name " <<
         //      qpvector_states.back()->name() <<
@@ -146,17 +112,11 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         //            << ")" <<endl;
         stk::io::set_field_role(*qpvector_states.back(), role_type(st.output));
       } else if (dim.size() == 4) {  // Tensor at QPs
-        qptensor_states.push_back(&metaData->declare_field<QPTFT>(
-            stk::topology::ELEMENT_RANK, st.name));
+        qptensor_states.push_back(&metaData->declare_field<QPTFT>(stk::topology::ELEMENT_RANK, st.name));
         // Multi-dim order is Fortran Ordering, so reversed here
         if (dim[1] == 4) {
           stk::mesh::put_field_on_mesh(
-              *qptensor_states.back(),
-              metaData->universal_part(),
-              dim[3],
-              dim[2],
-              dim[1],
-              nullptr);
+              *qptensor_states.back(), metaData->universal_part(), dim[3], dim[2], dim[1], nullptr);
         } else {
           // IKT, 12/20/18: this changes the way the qp_tensor field
           // for 1D and 3D problems appears in the output exodus field.
@@ -166,11 +126,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
           // I believe for 2D problems the original layout is correct, hence
           // the if statement above here.
           stk::mesh::put_field_on_mesh(
-              *qptensor_states.back(),
-              metaData->universal_part(),
-              dim[2] * dim[3],
-              dim[1],
-              nullptr);
+              *qptensor_states.back(), metaData->universal_part(), dim[2] * dim[3], dim[1], nullptr);
         }
         stk::io::set_field_role(*qptensor_states.back(), role_type(st.output));
       }
@@ -179,45 +135,33 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(
         ALBANY_ABORT("Error: GenericSTKFieldContainer - cannot match QPData");
     }  // end QuadPoint
     // Single scalar at center of the workset
+    else if (dim.size() == 1 && st.entity == StateStruct::WorksetValue) {  // A single value that applies over
+                                                                           // the entire workset (time)
+      scalarValue_states.push_back(&st.name);  // Just save a pointer to the name allocated in st
+    }                                          // End scalar at center of element
     else if (
-        dim.size() == 1 &&
-        st.entity ==
-            StateStruct::WorksetValue) {  // A single value that applies over
-                                          // the entire workset (time)
-      scalarValue_states.push_back(
-          &st.name);  // Just save a pointer to the name allocated in st
-    }                 // End scalar at center of element
-    else if (
-        (st.entity == StateStruct::NodalData) ||
-        (st.entity == StateStruct::NodalDataToElemNode) ||
-        (st.entity ==
-         StateStruct::NodalDistParameter)) {  // Data at the node points
-      Teuchos::RCP<Albany::NodeFieldContainer> const& nodeContainer =
-          sis->getNodalDataBase()->getNodeContainer();
+        (st.entity == StateStruct::NodalData) || (st.entity == StateStruct::NodalDataToElemNode) ||
+        (st.entity == StateStruct::NodalDistParameter)) {  // Data at the node points
+      Teuchos::RCP<Albany::NodeFieldContainer> const& nodeContainer = sis->getNodalDataBase()->getNodeContainer();
 
       if (st.entity == StateStruct::NodalDataToElemNode) {
         nodal_sis.push_back((*sis)[i]);
         StateStruct::FieldDims nodalFieldDim;
         // convert ElemNode dims to NodalData dims.
         nodalFieldDim.insert(nodalFieldDim.begin(), dim.begin() + 1, dim.end());
-        (*nodeContainer)[st.name] = Albany::buildSTKNodeField(
-            st.name, nodalFieldDim, metaData, st.output);
+        (*nodeContainer)[st.name] = Albany::buildSTKNodeField(st.name, nodalFieldDim, metaData, st.output);
       } else if (st.entity == StateStruct::NodalDistParameter) {
         nodal_parameter_sis.push_back((*sis)[i]);
         StateStruct::FieldDims nodalFieldDim;
         // convert ElemNode dims to NodalData dims.
         nodalFieldDim.insert(nodalFieldDim.begin(), dim.begin() + 1, dim.end());
-        (*nodeContainer)[st.name] = Albany::buildSTKNodeField(
-            st.name, nodalFieldDim, metaData, st.output);
+        (*nodeContainer)[st.name] = Albany::buildSTKNodeField(st.name, nodalFieldDim, metaData, st.output);
       } else
-        (*nodeContainer)[st.name] =
-            Albany::buildSTKNodeField(st.name, dim, metaData, st.output);
+        (*nodeContainer)[st.name] = Albany::buildSTKNodeField(st.name, dim, metaData, st.output);
 
     }  // end Node class - anything else is an error
     else
-      ALBANY_ABORT(
-          "Error: GenericSTKFieldContainer - cannot match unknown entity : "
-          << st.entity << std::endl);
+      ALBANY_ABORT("Error: GenericSTKFieldContainer - cannot match unknown entity : " << st.entity << std::endl);
 
     // Checking if the field is layered, in which case the normalized layer
     // coordinates need to be stored in the meta data

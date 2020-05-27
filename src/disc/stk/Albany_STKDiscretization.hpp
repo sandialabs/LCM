@@ -66,12 +66,9 @@ struct NodalDOFsStructContainer
   void
   printFieldToMap() const
   {
-    typedef std::map<std::string, MapOfDOFsStructs::const_iterator>::
-        const_iterator                  MapIterator;
-    Teuchos::RCP<Teuchos::FancyOStream> out =
-        Teuchos::VerboseObjectBase::getDefaultOStream();
-    for (MapIterator iter = fieldToMap.begin(); iter != fieldToMap.end();
-         iter++) {
+    typedef std::map<std::string, MapOfDOFsStructs::const_iterator>::const_iterator MapIterator;
+    Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
+    for (MapIterator iter = fieldToMap.begin(); iter != fieldToMap.end(); iter++) {
       std::string key = iter->first;
       *out << "IKT Key: " << key << "\n";
       auto vs = getDOFsStruct(key).vs;
@@ -81,18 +78,11 @@ struct NodalDOFsStructContainer
   }
 
   void
-  addEmptyDOFsStruct(
-      std::string const& field_name,
-      std::string const& meshPart,
-      int                numComps)
+  addEmptyDOFsStruct(std::string const& field_name, std::string const& meshPart, int numComps)
   {
-    if (numComps != 1)
-      mapOfDOFsStructs.insert(make_pair(make_pair(meshPart, 1), DOFsStruct()));
+    if (numComps != 1) mapOfDOFsStructs.insert(make_pair(make_pair(meshPart, 1), DOFsStruct()));
 
-    fieldToMap[field_name] =
-        mapOfDOFsStructs
-            .insert(make_pair(make_pair(meshPart, numComps), DOFsStruct()))
-            .first;
+    fieldToMap[field_name] = mapOfDOFsStructs.insert(make_pair(make_pair(meshPart, numComps), DOFsStruct())).first;
   }
 };
 
@@ -101,12 +91,11 @@ class STKDiscretization : public AbstractDiscretization
  public:
   //! Constructor
   STKDiscretization(
-      const Teuchos::RCP<Teuchos::ParameterList>& discParams,
-      Teuchos::RCP<AbstractSTKMeshStruct>&        stkMeshStruct,
-      const Teuchos::RCP<Teuchos_Comm const>&     comm,
-      const Teuchos::RCP<RigidBodyModes>& rigidBodyModes = Teuchos::null,
-      std::map<int, std::vector<std::string>> const& sideSetEquations =
-          std::map<int, std::vector<std::string>>());
+      const Teuchos::RCP<Teuchos::ParameterList>&    discParams,
+      Teuchos::RCP<AbstractSTKMeshStruct>&           stkMeshStruct,
+      const Teuchos::RCP<Teuchos_Comm const>&        comm,
+      const Teuchos::RCP<RigidBodyModes>&            rigidBodyModes   = Teuchos::null,
+      std::map<int, std::vector<std::string>> const& sideSetEquations = std::map<int, std::vector<std::string>>());
 
   //! Destructor
   virtual ~STKDiscretization();
@@ -233,8 +222,7 @@ class STKDiscretization : public AbstractDiscretization
   const NodalDOFManager&
   getOverlapDOFManager(std::string const& field_name) const
   {
-    return nodalDOFsStructContainer.getDOFsStruct(field_name)
-        .overlap_dofManager;
+    return nodalDOFsStructContainer.getDOFsStruct(field_name).overlap_dofManager;
   }
 
   //! Retrieve coodinate vector (num_used_nodes * 3)
@@ -243,8 +231,7 @@ class STKDiscretization : public AbstractDiscretization
   void
   setCoordinates(const Teuchos::ArrayRCP<double const>& c);
   void
-  setReferenceConfigurationManager(
-      const Teuchos::RCP<AAdapt::rc::Manager>& rcm);
+  setReferenceConfigurationManager(const Teuchos::RCP<AAdapt::rc::Manager>& rcm);
 
 #if defined(ALBANY_CONTACT)
   //! Get the contact manager
@@ -484,18 +471,12 @@ class STKDiscretization : public AbstractDiscretization
   void
   getField(Thyra_Vector& field_vector, std::string const& field_name) const;
   void
-  setField(
-      Thyra_Vector const& field_vector,
-      std::string const&  field_name,
-      bool const          overlapped = false);
+  setField(Thyra_Vector const& field_vector, std::string const& field_name, bool const overlapped = false);
 
   // --- Methods to write solution in the output file --- //
 
   void
-  writeSolution(
-      Thyra_Vector const& solution,
-      double const        time,
-      bool const          overlapped = false);
+  writeSolution(Thyra_Vector const& solution, double const time, bool const overlapped = false);
   void
   writeSolution(
       Thyra_Vector const& solution,
@@ -510,17 +491,11 @@ class STKDiscretization : public AbstractDiscretization
       double const        time,
       bool const          overlapped = false);
   void
-  writeSolutionMV(
-      const Thyra_MultiVector& solution,
-      double const             time,
-      bool const               overlapped = false);
+  writeSolutionMV(const Thyra_MultiVector& solution, double const time, bool const overlapped = false);
 
   //! Write the solution to the mesh database.
   void
-  writeSolutionToMeshDatabase(
-      Thyra_Vector const& solution,
-      double const /* time */,
-      bool const overlapped = false);
+  writeSolutionToMeshDatabase(Thyra_Vector const& solution, double const /* time */, bool const overlapped = false);
   void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
@@ -542,15 +517,9 @@ class STKDiscretization : public AbstractDiscretization
 
   //! Write the solution to file. Must call writeSolution first.
   void
-  writeSolutionToFile(
-      Thyra_Vector const& solution,
-      double const        time,
-      bool const          overlapped = false);
+  writeSolutionToFile(Thyra_Vector const& solution, double const time, bool const overlapped = false);
   void
-  writeSolutionMVToFile(
-      const Thyra_MultiVector& solution,
-      double const             time,
-      bool const               overlapped = false);
+  writeSolutionMVToFile(const Thyra_MultiVector& solution, double const time, bool const overlapped = false);
 
   //! used when NetCDF output on a latitude-longitude grid is requested.
   // Each struct contains a latitude/longitude index and it's parametric
@@ -570,10 +539,7 @@ class STKDiscretization : public AbstractDiscretization
   void
   setSolutionField(Thyra_Vector const& soln, bool const overlapped);
   void
-  setSolutionField(
-      Thyra_Vector const& soln,
-      Thyra_Vector const& soln_dot,
-      bool const          overlapped);
+  setSolutionField(Thyra_Vector const& soln, Thyra_Vector const& soln_dot, bool const overlapped);
   void
   setSolutionField(
       Thyra_Vector const& soln,
@@ -699,8 +665,8 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<std::string>::type                                   wsEBNames;
   WorksetArray<int>::type                                           wsPhysIndex;
   WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type coords;
-  WorksetArray<Teuchos::ArrayRCP<double>>::type  sphereVolume;
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type latticeOrientation;
+  WorksetArray<Teuchos::ArrayRCP<double>>::type                     sphereVolume;
+  WorksetArray<Teuchos::ArrayRCP<double*>>::type                    latticeOrientation;
 
   WorksetArray<Teuchos::ArrayRCP<double*>>::type cell_boundary_indicator;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type face_boundary_indicator;
@@ -749,14 +715,12 @@ class STKDiscretization : public AbstractDiscretization
   Teuchos::RCP<Teuchos::ParameterList> discParams;
 
   // Sideset discretizations
-  std::map<std::string, Teuchos::RCP<AbstractDiscretization>>
-      sideSetDiscretizations;
-  std::map<std::string, Teuchos::RCP<STKDiscretization>>
-                                                        sideSetDiscretizationsSTK;
-  std::map<std::string, std::map<GO, GO>>               sideToSideSetCellMap;
-  std::map<std::string, std::map<GO, std::vector<int>>> sideNodeNumerationMap;
-  std::map<std::string, Teuchos::RCP<Thyra_LinearOp>>   projectors;
-  std::map<std::string, Teuchos::RCP<Thyra_LinearOp>>   ov_projectors;
+  std::map<std::string, Teuchos::RCP<AbstractDiscretization>> sideSetDiscretizations;
+  std::map<std::string, Teuchos::RCP<STKDiscretization>>      sideSetDiscretizationsSTK;
+  std::map<std::string, std::map<GO, GO>>                     sideToSideSetCellMap;
+  std::map<std::string, std::map<GO, std::vector<int>>>       sideNodeNumerationMap;
+  std::map<std::string, Teuchos::RCP<Thyra_LinearOp>>         projectors;
+  std::map<std::string, Teuchos::RCP<Thyra_LinearOp>>         ov_projectors;
 
   // Used in Exodus writing capability
   Teuchos::RCP<stk::io::StkMeshIoBroker> mesh_data;

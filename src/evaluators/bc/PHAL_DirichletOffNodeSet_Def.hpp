@@ -19,8 +19,7 @@ namespace PHAL {
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::DirichletOffNodeSet(
-    Teuchos::ParameterList& p)
+DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::DirichletOffNodeSet(Teuchos::ParameterList& p)
     : DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p),
       nodeSets(*p.get<Teuchos::RCP<std::vector<std::string>>>("Node Sets"))
 {
@@ -29,17 +28,13 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::DirichletOffNodeSet(
 // **********************************************************************
 template <typename Traits>
 void
-DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   // Gather all node IDs from all the stored nodesets
   std::set<int> nodeSetsRows;
   for (int ins(0); ins < nodeSets.size(); ++ins) {
-    std::vector<std::vector<int>> const& nsNodes =
-        dirichletWorkset.nodeSets->find(nodeSets[ins])->second;
-    for (int inode = 0; inode < nsNodes.size(); ++inode) {
-      nodeSetsRows.insert(nsNodes[inode][this->offset]);
-    }
+    std::vector<std::vector<int>> const& nsNodes = dirichletWorkset.nodeSets->find(nodeSets[ins])->second;
+    for (int inode = 0; inode < nsNodes.size(); ++inode) { nodeSetsRows.insert(nsNodes[inode][this->offset]); }
   }
 
   Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
@@ -51,9 +46,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   // Loop on all local dofs and set the BC on those not in nodeSetsRows
   LO num_local_dofs = Albany::getSpmdVectorSpace(f->space())->localSubDim();
   for (LO row = 0; row < num_local_dofs; ++row) {
-    if (nodeSetsRows.find(row) == nodeSetsRows.end()) {
-      f_nonconstView[row] = x_constView[row] - this->value;
-    }
+    if (nodeSetsRows.find(row) == nodeSetsRows.end()) { f_nonconstView[row] = x_constView[row] - this->value; }
   }
 }
 
@@ -61,8 +54,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits>
-DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::DirichletOffNodeSet(
-    Teuchos::ParameterList& p)
+DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::DirichletOffNodeSet(Teuchos::ParameterList& p)
     : DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p),
       nodeSets(*p.get<Teuchos::RCP<std::vector<std::string>>>("Node Sets"))
 {
@@ -71,17 +63,13 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::DirichletOffNodeSet(
 // **********************************************************************
 template <typename Traits>
 void
-DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   // Gather all node IDs from all the stored nodesets
   std::set<int> nodeSetsRows;
   for (int ins(0); ins < nodeSets.size(); ++ins) {
-    std::vector<std::vector<int>> const& nsNodes =
-        dirichletWorkset.nodeSets->find(nodeSets[ins])->second;
-    for (int inode = 0; inode < nsNodes.size(); ++inode) {
-      nodeSetsRows.insert(nsNodes[inode][this->offset]);
-    }
+    std::vector<std::vector<int>> const& nsNodes = dirichletWorkset.nodeSets->find(nodeSets[ins])->second;
+    for (int inode = 0; inode < nsNodes.size(); ++inode) { nodeSetsRows.insert(nsNodes[inode][this->offset]); }
   }
 
   Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
@@ -118,9 +106,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
       Albany::setLocalRowValues(jac, row, matrixIndices(), matrixEntries());
       Albany::setLocalRowValues(jac, row, index(), value());
 
-      if (fillResid) {
-        f_nonconstView[row] = x_constView[row] - this->value.val();
-      }
+      if (fillResid) { f_nonconstView[row] = x_constView[row] - this->value.val(); }
     }
   }
 }

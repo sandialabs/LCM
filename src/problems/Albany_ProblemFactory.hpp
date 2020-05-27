@@ -38,8 +38,7 @@ class ProblemFactory
 
   //! Set the ref config manager for use in certain problems.
   void
-  setReferenceConfigurationManager(
-      const Teuchos::RCP<AAdapt::rc::Manager>& rc_mgr);
+  setReferenceConfigurationManager(const Teuchos::RCP<AAdapt::rc::Manager>& rc_mgr);
 
  private:
   //! Private to prohibit copying

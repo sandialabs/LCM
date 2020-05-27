@@ -21,22 +21,17 @@ class SideSetSTKMeshStruct : public GenericSTKMeshStruct
 
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<Teuchos_Comm const>&                   comm,
-      const Teuchos::RCP<Teuchos::ParameterList>&               params,
-      const unsigned int                                        neq_,
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-      const unsigned int                                        worksetSize,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-          side_set_sis = {},
-      const std::
-          map<std::string, AbstractFieldContainer::FieldContainerRequirements>&
-              side_set_req = {});
+      const Teuchos::RCP<Teuchos_Comm const>&                                          comm,
+      const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+      const unsigned int                                                               neq_,
+      const AbstractFieldContainer::FieldContainerRequirements&                        req,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+      const unsigned int                                                               worksetSize,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis = {},
+      const std::map<std::string, AbstractFieldContainer::FieldContainerRequirements>& side_set_req = {});
 
   void
-  setParentMeshInfo(
-      const AbstractSTKMeshStruct& parentMeshStruct_,
-      std::string const&           sideSetName);
+  setParentMeshInfo(const AbstractSTKMeshStruct& parentMeshStruct_, std::string const& sideSetName);
 
   bool
   hasRestartSolution() const

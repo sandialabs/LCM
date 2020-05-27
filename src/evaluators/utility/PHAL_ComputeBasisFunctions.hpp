@@ -22,25 +22,20 @@ namespace PHAL {
 
 */
 template <typename EvalT, typename Traits>
-class ComputeBasisFunctions : public PHX::EvaluatorWithBaseImpl<Traits>,
-                              public PHX::EvaluatorDerived<EvalT, Traits>
+class ComputeBasisFunctions : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ComputeBasisFunctions(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ComputeBasisFunctions(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  private:
   typedef typename EvalT::MeshScalarT MeshScalarT;
-  int numVertices, numDims, numNodes, numQPs, numCells;
+  int                                 numVertices, numDims, numNodes, numQPs, numCells;
 
   // Input:
   //! Coordinate vector at vertices

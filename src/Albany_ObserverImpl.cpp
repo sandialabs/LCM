@@ -8,10 +8,7 @@
 
 namespace Albany {
 
-ObserverImpl::ObserverImpl(const Teuchos::RCP<Application>& app)
-    : StatelessObserverImpl(app)
-{
-}
+ObserverImpl::ObserverImpl(const Teuchos::RCP<Application>& app) : StatelessObserverImpl(app) {}
 
 void
 ObserverImpl::observeSolution(
@@ -20,11 +17,7 @@ ObserverImpl::observeSolution(
     const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot,
     const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDotDot)
 {
-  app_->evaluateStateFieldManager(
-      stamp,
-      nonOverlappedSolution,
-      nonOverlappedSolutionDot,
-      nonOverlappedSolutionDotDot);
+  app_->evaluateStateFieldManager(stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
 
   app_->getStateMgr().updateStates();
 
@@ -40,16 +33,11 @@ ObserverImpl::observeSolution(
   }
 
   StatelessObserverImpl::observeSolution(
-      stamp,
-      nonOverlappedSolution,
-      nonOverlappedSolutionDot,
-      nonOverlappedSolutionDotDot);
+      stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
 }
 
 void
-ObserverImpl::observeSolution(
-    double                   stamp,
-    const Thyra_MultiVector& nonOverlappedSolution)
+ObserverImpl::observeSolution(double stamp, const Thyra_MultiVector& nonOverlappedSolution)
 {
   app_->evaluateStateFieldManager(stamp, nonOverlappedSolution);
   app_->getStateMgr().updateStates();

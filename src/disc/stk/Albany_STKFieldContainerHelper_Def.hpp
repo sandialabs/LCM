@@ -14,10 +14,7 @@
 namespace Albany {
 
 template <typename BucketArrayType>
-typename std::conditional<
-    std::is_const<BucketArrayType>::value,
-    const double&,
-    double&>::type
+typename std::conditional<std::is_const<BucketArrayType>::value, const double&, double&>::type
 access(BucketArrayType& array, int const i, int const j);
 
 template <>
@@ -27,8 +24,7 @@ access<const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
     int const                                                      j,
     int const                                                      i)
 {
-  ALBANY_EXPECT(
-      j == 0, "Error! Attempting to access 1d array with two indices.\n");
+  ALBANY_EXPECT(j == 0, "Error! Attempting to access 1d array with two indices.\n");
   (void)j;
   return array(i);
 }
@@ -40,8 +36,7 @@ access<BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
     int const                                                j,
     int const                                                i)
 {
-  ALBANY_EXPECT(
-      j == 0, "Error! Attempting to access 1d array with two indices.\n");
+  ALBANY_EXPECT(j == 0, "Error! Attempting to access 1d array with two indices.\n");
   (void)j;
   return array(i);
 }
@@ -71,18 +66,11 @@ template <typename FieldType>
 constexpr int
 getRank()
 {
-  return std::is_same<FieldType, AbstractSTKFieldContainer::ScalarFieldType>::
-                 value ?
+  return std::is_same<FieldType, AbstractSTKFieldContainer::ScalarFieldType>::value ?
              0 :
-             (std::is_same<
-                  FieldType,
-                  AbstractSTKFieldContainer::VectorFieldType>::value ?
+             (std::is_same<FieldType, AbstractSTKFieldContainer::VectorFieldType>::value ?
                   1 :
-                  (std::is_same<
-                       FieldType,
-                       AbstractSTKFieldContainer::TensorFieldType>::value ?
-                       2 :
-                       -1));
+                  (std::is_same<FieldType, AbstractSTKFieldContainer::TensorFieldType>::value ? 2 : -1));
 }
 
 // Fill the result vector
@@ -102,9 +90,7 @@ STKFieldContainerHelper<FieldType>::fillVector(
     int const                                     offset)
 {
   constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(
-      rank != 0 && rank != 1,
-      "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
 
   BucketArray<FieldType> field_array(field_stk, bucket);
 
@@ -130,8 +116,7 @@ STKFieldContainerHelper<FieldType>::fillVector(
     const LO node_lid = indexer->getLocalElement(node_gid);
 
     for (int j = 0; j < num_vec_components; ++j) {
-      data[nodalDofManager.getLocalDOF(node_lid, offset + j)] =
-          access(field_array, j, i);
+      data[nodalDofManager.getLocalDOF(node_lid, offset + j)] = access(field_array, j, i);
     }
   }
 }
@@ -147,9 +132,7 @@ STKFieldContainerHelper<FieldType>::saveVector(
     int const                                     offset)
 {
   constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(
-      rank != 0 && rank != 1,
-      "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
 
   BucketArray<FieldType> field_array(field_stk, bucket);
 
@@ -175,22 +158,17 @@ STKFieldContainerHelper<FieldType>::saveVector(
     const LO node_lid = indexer->getLocalElement(node_gid);
 
     for (int j = 0; j < num_vec_components; ++j) {
-      access(field_array, j, i) =
-          data[nodalDofManager.getLocalDOF(node_lid, offset + j)];
+      access(field_array, j, i) = data[nodalDofManager.getLocalDOF(node_lid, offset + j)];
     }
   }
 }
 
 template <class FieldType>
 void
-STKFieldContainerHelper<FieldType>::copySTKField(
-    const FieldType& source,
-    FieldType&       target)
+STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldType& target)
 {
   constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(
-      rank != 0 && rank != 1,
-      "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
 
   const stk::mesh::BulkData&     mesh = source.get_mesh();
   const stk::mesh::BucketVector& bv   = mesh.buckets(stk::topology::NODE_RANK);
@@ -199,8 +177,7 @@ STKFieldContainerHelper<FieldType>::copySTKField(
   constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
   constexpr int  nodes_dim = is_SFT ? 0 : 1;
 
-  for (stk::mesh::BucketVector::const_iterator it = bv.begin(); it != bv.end();
-       ++it) {
+  for (stk::mesh::BucketVector::const_iterator it = bv.begin(); it != bv.end(); ++it) {
     const stk::mesh::Bucket& bucket = **it;
 
     BucketArray<FieldType> source_array(source, bucket);
@@ -210,12 +187,10 @@ STKFieldContainerHelper<FieldType>::copySTKField(
     int const num_target_components = is_SFT ? 1 : target_array.dimension(0);
     int const num_nodes_in_bucket   = source_array.dimension(nodes_dim);
 
-    int const uneven_downsampling =
-        num_source_components % num_target_components;
+    int const uneven_downsampling = num_source_components % num_target_components;
 
     ALBANY_PANIC(
-        (uneven_downsampling) ||
-            (num_nodes_in_bucket != target_array.dimension(nodes_dim)),
+        (uneven_downsampling) || (num_nodes_in_bucket != target_array.dimension(nodes_dim)),
         "Error in stk fields: specification of coordinate vector vs. solution "
         "layout is incorrect."
             << std::endl);
@@ -224,9 +199,7 @@ STKFieldContainerHelper<FieldType>::copySTKField(
       // In source, j varies over neq (num phys vectors * numDim)
       // We want target to only vary over the first numDim components
       // Not sure how to do this generally...
-      for (int j = 0; j < num_target_components; ++j) {
-        access(target_array, j, i) = access(source_array, j, i);
-      }
+      for (int j = 0; j < num_target_components; ++j) { access(target_array, j, i) = access(source_array, j, i); }
     }
   }
 }

@@ -49,18 +49,8 @@ struct BucketArray
  *          for a given scalar field and bucket
  */
 template <typename ScalarType>
-struct BucketArray<
-    stk::mesh::Field<ScalarType, void, void, void, void, void, void, void>>
-    : public shards::Array<
-          ScalarType,
-          shards::FortranOrder,
-          EntityDimension,
-          void,
-          void,
-          void,
-          void,
-          void,
-          void>
+struct BucketArray<stk::mesh::Field<ScalarType, void, void, void, void, void, void, void>>
+    : public shards::Array<ScalarType, shards::FortranOrder, EntityDimension, void, void, void, void, void, void>
 {
  private:
   typedef unsigned char* byte_p;
@@ -70,25 +60,13 @@ struct BucketArray<
   operator=(const BucketArray&);
 
  public:
-  typedef stk::mesh::Field<ScalarType, void, void, void, void, void, void, void>
-      field_type;
-  typedef shards::Array<
-      ScalarType,
-      shards::FortranOrder,
-      EntityDimension,
-      void,
-      void,
-      void,
-      void,
-      void,
-      void>
+  typedef stk::mesh::Field<ScalarType, void, void, void, void, void, void, void> field_type;
+  typedef shards::Array<ScalarType, shards::FortranOrder, EntityDimension, void, void, void, void, void, void>
       array_type;
 
   BucketArray(const field_type& f, const stk::mesh::Bucket& k)
   {
-    if (k.field_data_is_allocated(f)) {
-      array_type::assign((ScalarType*)(k.field_data_location(f)), k.size());
-    }
+    if (k.field_data_is_allocated(f)) { array_type::assign((ScalarType*)(k.field_data_location(f)), k.size()); }
   }
 };
 
@@ -116,28 +94,10 @@ get_size<stk::mesh::Cartesian>(stk::mesh::Bucket const& b)
 /** \brief  \ref stk::mesh::Field "Field" data \ref shards::Array "Array"
  *          for a given array field and bucket
  */
-template <
-    typename ScalarType,
-    class Tag1,
-    class Tag2,
-    class Tag3,
-    class Tag4,
-    class Tag5,
-    class Tag6,
-    class Tag7>
-struct BucketArray<
-    stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>>
+template <typename ScalarType, class Tag1, class Tag2, class Tag3, class Tag4, class Tag5, class Tag6, class Tag7>
+struct BucketArray<stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>>
     : public shards::ArrayAppend<
-          shards::Array<
-              ScalarType,
-              shards::FortranOrder,
-              Tag1,
-              Tag2,
-              Tag3,
-              Tag4,
-              Tag5,
-              Tag6,
-              Tag7>,
+          shards::Array<ScalarType, shards::FortranOrder, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>,
           EntityDimension>::type
 {
  private:
@@ -148,20 +108,10 @@ struct BucketArray<
   operator=(const BucketArray&);
 
  public:
-  typedef stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>
-      field_type;
+  typedef stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7> field_type;
 
   typedef typename shards::ArrayAppend<
-      shards::Array<
-          ScalarType,
-          shards::FortranOrder,
-          Tag1,
-          Tag2,
-          Tag3,
-          Tag4,
-          Tag5,
-          Tag6,
-          Tag7>,
+      shards::Array<ScalarType, shards::FortranOrder, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>,
       EntityDimension>::type array_type;
 
   BucketArray(const field_type& f, const stk::mesh::Bucket& b)
@@ -171,15 +121,11 @@ struct BucketArray<
       if (f.field_array_rank() == 1) {
         stride[0] = stk::mesh::field_scalars_per_entity(f, b);
       } else if (f.field_array_rank() == 2) {
-        int dim0 =
-            stk::mesh::find_restriction(f, b.entity_rank(), b.supersets())
-                .dimension();
+        int dim0  = stk::mesh::find_restriction(f, b.entity_rank(), b.supersets()).dimension();
         stride[0] = dim0;
         stride[1] = stk::mesh::field_scalars_per_entity(f, b);
       } else if (f.field_array_rank() == 3) {
-        int dim0 =
-            stk::mesh::find_restriction(f, b.entity_rank(), b.supersets())
-                .dimension();
+        int dim0 = stk::mesh::find_restriction(f, b.entity_rank(), b.supersets()).dimension();
         if (dim0 == 4) {
           stride[0] = dim0;
           stride[1] = get_size<Tag2>(b) * dim0;
@@ -197,9 +143,7 @@ struct BucketArray<
           stride[2] = stk::mesh::field_scalars_per_entity(f, b);
         }
       } else if (f.field_array_rank() == 4) {
-        int dim0 =
-            stk::mesh::find_restriction(f, b.entity_rank(), b.supersets())
-                .dimension();
+        int dim0  = stk::mesh::find_restriction(f, b.entity_rank(), b.supersets()).dimension();
         stride[0] = dim0;
         stride[1] = get_size<Tag2>(b) * dim0;
         stride[2] = get_size<Tag3>(b) * stride[1];
@@ -209,9 +153,7 @@ struct BucketArray<
       }
 
       array_type::assign_stride(
-          (ScalarType*)(b.field_data_location(f)),
-          stride,
-          (typename array_type::size_type)b.size());
+          (ScalarType*)(b.field_data_location(f)), stride, (typename array_type::size_type)b.size());
     }
   }
 };

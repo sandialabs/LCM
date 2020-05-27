@@ -22,32 +22,29 @@ solve(
     Teuchos::ParameterList&                      pl)
 {
   int const                       nrhs = b->domain()->dim();
-  Teuchos::RCP<Thyra_MultiVector> x = Thyra::createMembers(A->domain(), nrhs);
+  Teuchos::RCP<Thyra_MultiVector> x    = Thyra::createMembers(A->domain(), nrhs);
 
   if (P.is_null()) {
     Teuchos::ParameterList pl_;
     pl_.set<int>("fact: iluk level-of-fill", 0);
     Teuchos::RCP<Ifpack2::RILUK<Tpetra_RowMatrix>> prec;
-    Teuchos::RCP<const Tpetra_CrsMatrix> tA = Albany::getConstTpetraMatrix(A);
-    prec = Teuchos::rcp(new Ifpack2::RILUK<Tpetra_RowMatrix>(tA));
+    Teuchos::RCP<const Tpetra_CrsMatrix>           tA = Albany::getConstTpetraMatrix(A);
+    prec                                              = Teuchos::rcp(new Ifpack2::RILUK<Tpetra_RowMatrix>(tA));
     prec->setParameters(pl_);
     prec->initialize();
     prec->compute();
-    P = Albany::createThyraLinearOp(
-        Teuchos::rcp_implicit_cast<Tpetra_Operator>(prec));
+    P = Albany::createThyraLinearOp(Teuchos::rcp_implicit_cast<Tpetra_Operator>(prec));
   }
 
   typedef Thyra_MultiVector MV;
   typedef Thyra_LinearOp    Op;
 
   typedef Belos::LinearProblem<RealType, MV, Op> LinearProblem;
-  Teuchos::RCP<LinearProblem>                    problem =
-      Teuchos::rcp(new LinearProblem(A, x, b));
+  Teuchos::RCP<LinearProblem>                    problem = Teuchos::rcp(new LinearProblem(A, x, b));
   problem->setRightPrec(P);
   problem->setProblem();
 
-  Belos::BlockCGSolMgr<RealType, MV, Op> solver(
-      problem, Teuchos::rcp(&pl, false));
+  Belos::BlockCGSolMgr<RealType, MV, Op> solver(problem, Teuchos::rcp(&pl, false));
   solver.solve();
 
   return x;

@@ -29,18 +29,13 @@ namespace PHAL {
 // **************************************************************
 
 template <typename EvalT, typename Traits>
-class GatherEigenDataBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                            public PHX::EvaluatorDerived<EvalT, Traits>
+class GatherEigenDataBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  GatherEigenDataBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GatherEigenDataBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   // This function requires template specialization, in derived class below
   void
@@ -60,9 +55,7 @@ template <typename EvalT, typename Traits>
 class GatherEigenData : public GatherEigenDataBase<EvalT, Traits>
 {
  public:
-  GatherEigenData(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GatherEigenData(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   // void evaluateFields(typename Traits::EvalData d);
  private:
@@ -79,13 +72,10 @@ class GatherEigenData : public GatherEigenDataBase<EvalT, Traits>
 // Residual
 // **************************************************************
 template <typename Traits>
-class GatherEigenData<AlbanyTraits::Residual, Traits>
-    : public GatherEigenDataBase<AlbanyTraits::Residual, Traits>
+class GatherEigenData<AlbanyTraits::Residual, Traits> : public GatherEigenDataBase<AlbanyTraits::Residual, Traits>
 {
  public:
-  GatherEigenData(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GatherEigenData(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   // void evaluateFields(typename Traits::EvalData d);
  private:
@@ -96,13 +86,10 @@ class GatherEigenData<AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class GatherEigenData<AlbanyTraits::Jacobian, Traits>
-    : public GatherEigenDataBase<AlbanyTraits::Jacobian, Traits>
+class GatherEigenData<AlbanyTraits::Jacobian, Traits> : public GatherEigenDataBase<AlbanyTraits::Jacobian, Traits>
 {
  public:
-  GatherEigenData(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  GatherEigenData(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
   evaluateFields(typename Traits::EvalData d);

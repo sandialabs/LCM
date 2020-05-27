@@ -28,18 +28,13 @@ namespace PHAL {
 // **************************************************************
 
 template <typename EvalT, typename Traits>
-class ScatterResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                            public PHX::EvaluatorDerived<EvalT, Traits>
+class ScatterResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ScatterResidualBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ScatterResidualBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   virtual void
   evaluateFields(typename Traits::EvalData d) = 0;
@@ -51,16 +46,15 @@ class ScatterResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<ScalarT const, Cell, Node, Dim>         valVec;
   PHX::MDField<ScalarT const, Cell, Node, Dim, Dim>    valTensor;
   std::size_t                                          numNodes;
-  std::size_t numFieldsBase;  // Number of fields gathered in this call
-  std::size_t offset;  // Offset of first DOF being gathered when numFields<neq
+  std::size_t                                          numFieldsBase;  // Number of fields gathered in this call
+  std::size_t                                          offset;  // Offset of first DOF being gathered when numFields<neq
 
   unsigned short int tensorRank;
 
  protected:
-  Albany::WorksetConn      nodeID;
-  Albany::DeviceView1d<ST> f_kokkos;
-  Kokkos::vector<Kokkos::DynRankView<ScalarT const, PHX::Device>, PHX::Device>
-      val_kokkos;
+  Albany::WorksetConn                                                          nodeID;
+  Albany::DeviceView1d<ST>                                                     f_kokkos;
+  Kokkos::vector<Kokkos::DynRankView<ScalarT const, PHX::Device>, PHX::Device> val_kokkos;
 };
 
 template <typename EvalT, typename Traits>
@@ -70,19 +64,14 @@ template <typename EvalT, typename Traits>
 class ScatterResidualWithExtrudedParams : public ScatterResidual<EvalT, Traits>
 {
  public:
-  ScatterResidualWithExtrudedParams(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  ScatterResidualWithExtrudedParams(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : ScatterResidual<EvalT, Traits>(p, dl)
   {
-    extruded_params_levels = p.get<Teuchos::RCP<std::map<std::string, int>>>(
-        "Extruded Params Levels");
+    extruded_params_levels = p.get<Teuchos::RCP<std::map<std::string, int>>>("Extruded Params Levels");
   };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
     ScatterResidual<EvalT, Traits>::postRegistrationSetup(d, vm);
   }
@@ -112,9 +101,7 @@ class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>
     : public ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  ScatterResidual(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ScatterResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);
 
@@ -153,13 +140,10 @@ class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>
   using Base::nodeID;
   using Base::val_kokkos;
 
-  typedef typename PHX::Device::execution_space ExecutionSpace;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank0_Tag>
-      PHAL_ScatterResRank0_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank1_Tag>
-      PHAL_ScatterResRank1_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank2_Tag>
-      PHAL_ScatterResRank2_Policy;
+  typedef typename PHX::Device::execution_space                         ExecutionSpace;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank0_Tag> PHAL_ScatterResRank0_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank1_Tag> PHAL_ScatterResRank1_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank2_Tag> PHAL_ScatterResRank2_Policy;
 };
 
 // **************************************************************
@@ -170,9 +154,7 @@ class ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>
     : public ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
-  ScatterResidual(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ScatterResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
   void
   evaluateFields(typename Traits::EvalData d);
 
@@ -250,25 +232,16 @@ class ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>
   using Base::nodeID;
   using Base::val_kokkos;
 
-  typedef typename PHX::Device::execution_space ExecutionSpace;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank0_Tag>
-      PHAL_ScatterResRank0_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank0_Adjoint_Tag>
-      PHAL_ScatterJacRank0_Adjoint_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank0_Tag>
-      PHAL_ScatterJacRank0_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank1_Tag>
-      PHAL_ScatterResRank1_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank1_Adjoint_Tag>
-      PHAL_ScatterJacRank1_Adjoint_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank1_Tag>
-      PHAL_ScatterJacRank1_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank2_Tag>
-      PHAL_ScatterResRank2_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank2_Adjoint_Tag>
-      PHAL_ScatterJacRank2_Adjoint_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank2_Tag>
-      PHAL_ScatterJacRank2_Policy;
+  typedef typename PHX::Device::execution_space                                 ExecutionSpace;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank0_Tag>         PHAL_ScatterResRank0_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank0_Adjoint_Tag> PHAL_ScatterJacRank0_Adjoint_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank0_Tag>         PHAL_ScatterJacRank0_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank1_Tag>         PHAL_ScatterResRank1_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank1_Adjoint_Tag> PHAL_ScatterJacRank1_Adjoint_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank1_Tag>         PHAL_ScatterJacRank1_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank2_Tag>         PHAL_ScatterResRank2_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank2_Adjoint_Tag> PHAL_ScatterJacRank2_Adjoint_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterJacRank2_Tag>         PHAL_ScatterJacRank2_Policy;
 };
 
 }  // namespace PHAL

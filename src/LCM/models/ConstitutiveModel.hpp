@@ -29,17 +29,14 @@ class ConstitutiveModel
   using MeshScalarT = typename EvalT::MeshScalarT;
   using Workset     = typename Traits::EvalData;
 
-  using FieldMap = std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT>>>;
-  using DepFieldMap =
-      std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT const>>>;
+  using FieldMap      = std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT>>>;
+  using DepFieldMap   = std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT const>>>;
   using DataLayoutMap = std::map<std::string, Teuchos::RCP<PHX::DataLayout>>;
 
   ///
   /// Constructor
   ///
-  ConstitutiveModel(
-      Teuchos::ParameterList*              p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  ConstitutiveModel(Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// Virtual Destructor
@@ -61,25 +58,16 @@ class ConstitutiveModel
   /// Method to compute the state (e.g. energy, stress, tangent)
   ///
   virtual void
-  computeState(
-      Workset     workset,
-      DepFieldMap dep_fields,
-      FieldMap    eval_fields) = 0;
+  computeState(Workset workset, DepFieldMap dep_fields, FieldMap eval_fields) = 0;
 
   virtual void
-  computeStateParallel(
-      Workset     workset,
-      DepFieldMap dep_fields,
-      FieldMap    eval_fields) = 0;
+  computeStateParallel(Workset workset, DepFieldMap dep_fields, FieldMap eval_fields) = 0;
 
   ///
   /// Optional Method to volume average the pressure
   ///
   void
-  computeVolumeAverage(
-      Workset     workset,
-      DepFieldMap dep_fields,
-      FieldMap    eval_fields);
+  computeVolumeAverage(Workset workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   ///
   /// Accessors and mutators
@@ -186,34 +174,26 @@ class ConstitutiveModel
   }
 
   void
-  setDependentField(
-      std::string const&                   field_name,
-      Teuchos::RCP<PHX::DataLayout> const& field)
+  setDependentField(std::string const& field_name, Teuchos::RCP<PHX::DataLayout> const& field)
   {
     dep_field_map_.insert(std::make_pair(field_name, field));
   }
 
   void
-  setDependentFieldFromNameMap(
-      std::string const&                   name_key,
-      Teuchos::RCP<PHX::DataLayout> const& field)
+  setDependentFieldFromNameMap(std::string const& name_key, Teuchos::RCP<PHX::DataLayout> const& field)
   {
     std::string const name = (*field_name_map_)[name_key];
     setDependentField(name, field);
   }
 
   void
-  setEvaluatedField(
-      std::string const&                   field_name,
-      Teuchos::RCP<PHX::DataLayout> const& field)
+  setEvaluatedField(std::string const& field_name, Teuchos::RCP<PHX::DataLayout> const& field)
   {
     eval_field_map_.insert(std::make_pair(field_name, field));
   }
 
   void
-  setEvaluatedFieldFromNameMap(
-      std::string const&                   name_key,
-      Teuchos::RCP<PHX::DataLayout> const& field)
+  setEvaluatedFieldFromNameMap(std::string const& name_key, Teuchos::RCP<PHX::DataLayout> const& field)
   {
     std::string const name = (*field_name_map_)[name_key];
     setEvaluatedField(name, field);
@@ -241,8 +221,7 @@ class ConstitutiveModel
   /// Integration point location set method
   ///
   void
-  setCoordVecField(
-      PHX::MDField<MeshScalarT const, Cell, QuadPoint, Dim> coord_vec)
+  setCoordVecField(PHX::MDField<MeshScalarT const, Cell, QuadPoint, Dim> coord_vec)
   {
     coord_vec_ = coord_vec;
   }
@@ -278,8 +257,7 @@ class ConstitutiveModel
   /// set the total concentration
   ///
   void
-  setTotalConcentrationField(
-      PHX::MDField<ScalarT const, Cell, QuadPoint> total_concentration)
+  setTotalConcentrationField(PHX::MDField<ScalarT const, Cell, QuadPoint> total_concentration)
   {
     total_concentration_ = total_concentration;
   }
@@ -288,8 +266,7 @@ class ConstitutiveModel
   /// set the total bubble density
   ///
   void
-  setTotalBubbleDensityField(
-      PHX::MDField<ScalarT const, Cell, QuadPoint> total_bubble_density)
+  setTotalBubbleDensityField(PHX::MDField<ScalarT const, Cell, QuadPoint> total_bubble_density)
   {
     total_bubble_density_ = total_bubble_density;
   }
@@ -298,8 +275,7 @@ class ConstitutiveModel
   /// set the bubble volume fraction
   ///
   void
-  setBubbleVolumeFractionField(
-      PHX::MDField<ScalarT const, Cell, QuadPoint> bubble_volume_fraction)
+  setBubbleVolumeFractionField(PHX::MDField<ScalarT const, Cell, QuadPoint> bubble_volume_fraction)
   {
     bubble_volume_fraction_ = bubble_volume_fraction;
   }

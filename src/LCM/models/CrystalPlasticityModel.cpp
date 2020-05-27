@@ -12,10 +12,7 @@ template <typename EvalT, typename Traits>
 LCM::CrystalPlasticityModel<EvalT, Traits>::CrystalPlasticityModel(
     Teuchos::ParameterList*              p,
     Teuchos::RCP<Albany::Layouts> const& dl)
-    : LCM::ParallelConstitutiveModel<
-          EvalT,
-          Traits,
-          CrystalPlasticityKernel<EvalT, Traits>>(p, dl)
+    : LCM::ParallelConstitutiveModel<EvalT, Traits, CrystalPlasticityKernel<EvalT, Traits>>(p, dl)
 {
 }
 

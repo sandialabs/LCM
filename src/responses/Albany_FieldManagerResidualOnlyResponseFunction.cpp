@@ -4,19 +4,13 @@
 
 #include "Albany_FieldManagerResidualOnlyResponseFunction.hpp"
 
-Albany::FieldManagerResidualOnlyResponseFunction::
-    FieldManagerResidualOnlyResponseFunction(
-        const Teuchos::RCP<Albany::Application>&     application_,
-        const Teuchos::RCP<Albany::AbstractProblem>& problem_,
-        const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs_,
-        const Teuchos::RCP<Albany::StateManager>&    stateMgr_,
-        Teuchos::ParameterList&                      responseParams)
-    : FieldManagerScalarResponseFunction(
-          application_,
-          problem_,
-          meshSpecs_,
-          stateMgr_,
-          responseParams)
+Albany::FieldManagerResidualOnlyResponseFunction::FieldManagerResidualOnlyResponseFunction(
+    const Teuchos::RCP<Albany::Application>&     application_,
+    const Teuchos::RCP<Albany::AbstractProblem>& problem_,
+    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs_,
+    const Teuchos::RCP<Albany::StateManager>&    stateMgr_,
+    Teuchos::ParameterList&                      responseParams)
+    : FieldManagerScalarResponseFunction(application_, problem_, meshSpecs_, stateMgr_, responseParams)
 {
 }
 
@@ -34,7 +28,5 @@ Albany::FieldManagerResidualOnlyResponseFunction::evaluateGradient(
     Teuchos::RCP<Thyra_MultiVector> const& /*dg_dxdotdot*/,
     Teuchos::RCP<Thyra_MultiVector> const& /*dg_dp*/)
 {
-  if (!g.is_null()) {
-    this->evaluateResponse(current_time, x, xdot, xdotdot, p, g);
-  }
+  if (!g.is_null()) { this->evaluateResponse(current_time, x, xdot, xdotdot, p, g); }
 }

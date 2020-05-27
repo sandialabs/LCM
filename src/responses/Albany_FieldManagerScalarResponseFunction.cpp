@@ -49,8 +49,7 @@ FieldManagerScalarResponseFunction::FieldManagerScalarResponseFunction(
 }
 
 void
-FieldManagerScalarResponseFunction::setup(
-    Teuchos::ParameterList& responseParams)
+FieldManagerScalarResponseFunction::setup(Teuchos::ParameterList& responseParams)
 {
   Teuchos::RCP<Teuchos_Comm const> commT = application->getComm();
 
@@ -64,9 +63,8 @@ FieldManagerScalarResponseFunction::setup(
   // then an exception will be thrown. Quick and dirty fix:
   // Remove the option if it already exists before building
   // the evaluators, it will be added again below anyhow.
-  char const* phx_graph_parm = "Phalanx Graph Visualization Detail";
-  bool const  phx_graph_parm_present =
-      responseParams.isType<int>(phx_graph_parm);
+  char const* phx_graph_parm         = "Phalanx Graph Visualization Detail";
+  bool const  phx_graph_parm_present = responseParams.isType<int>(phx_graph_parm);
   if (phx_graph_parm_present) {
     vis_response_graph = responseParams.get(phx_graph_parm, 0);
     responseParams.remove("Phalanx Graph Visualization Detail", false);
@@ -76,30 +74,20 @@ FieldManagerScalarResponseFunction::setup(
   // (with spaces replaced by _ and lower case)
   vis_response_name = responseParams.get<std::string>("Name");
   std::replace(vis_response_name.begin(), vis_response_name.end(), ' ', '_');
-  std::transform(
-      vis_response_name.begin(),
-      vis_response_name.end(),
-      vis_response_name.begin(),
-      ::tolower);
+  std::transform(vis_response_name.begin(), vis_response_name.end(), vis_response_name.begin(), ::tolower);
 
   // Restrict to the element block?
   char const* reb_parm         = "Restrict to Element Block";
   bool const  reb_parm_present = responseParams.isType<bool>(reb_parm),
-             reb =
-                 reb_parm_present && responseParams.get<bool>(reb_parm, false);
-  element_block_index = reb ? meshSpecs->ebNameToIndex[meshSpecs->ebName] : -1;
+             reb               = reb_parm_present && responseParams.get<bool>(reb_parm, false);
+  element_block_index          = reb ? meshSpecs->ebNameToIndex[meshSpecs->ebName] : -1;
   if (reb_parm_present) { responseParams.remove(reb_parm, false); }
   // Create field manager
   rfm = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
 
   // Create evaluators for field manager
   Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>> tags =
-      problem->buildEvaluators(
-          *rfm,
-          *meshSpecs,
-          *stateMgr,
-          BUILD_RESPONSE_FM,
-          Teuchos::rcp(&responseParams, false));
+      problem->buildEvaluators(*rfm, *meshSpecs, *stateMgr, BUILD_RESPONSE_FM, Teuchos::rcp(&responseParams, false));
   int rank      = tags[0]->dataLayout().rank();
   num_responses = tags[0]->dataLayout().extent(rank - 1);
   if (num_responses == 0) { num_responses = 1; }
@@ -108,8 +96,7 @@ FieldManagerScalarResponseFunction::setup(
   // derivative dimensions cannot be computed correctly because the
   // discretization has not been created yet).
 
-  if (phx_graph_parm_present)
-    responseParams.set<int>(phx_graph_parm, vis_response_graph);
+  if (phx_graph_parm_present) responseParams.set<int>(phx_graph_parm, vis_response_graph);
   if (reb_parm_present) responseParams.set<bool>(reb_parm, reb);
 }
 
@@ -119,8 +106,7 @@ FieldManagerScalarResponseFunction::postRegDerivImpl()
 {
   const auto                        phxSetup = application->getPhxSetup();
   std::vector<PHX::index_size_type> derivative_dimensions;
-  derivative_dimensions.push_back(
-      PHAL::getDerivativeDimensions<EvalT>(application.get(), meshSpecs.get()));
+  derivative_dimensions.push_back(PHAL::getDerivativeDimensions<EvalT>(application.get(), meshSpecs.get()));
   rfm->setKokkosExtendedDataTypeDimensions<EvalT>(derivative_dimensions);
   rfm->postRegistrationSetupForType<EvalT>(*phxSetup);
 }
@@ -147,8 +133,7 @@ FieldManagerScalarResponseFunction::postReg()
 {
   const auto phxSetup = application->getPhxSetup();
 
-  std::string const evalName =
-      PHAL::evalName<EvalT>("RFM", 0) + "_" + vis_response_name;
+  std::string const evalName = PHAL::evalName<EvalT>("RFM", 0) + "_" + vis_response_name;
   phxSetup->insert_eval(evalName);
 
   postRegImpl<EvalT>();
@@ -162,15 +147,13 @@ FieldManagerScalarResponseFunction::postReg()
 
 template <typename EvalT>
 void
-FieldManagerScalarResponseFunction::writePhalanxGraph(
-    std::string const& evalName)
+FieldManagerScalarResponseFunction::writePhalanxGraph(std::string const& evalName)
 {
   if (vis_response_graph > 0) {
-    bool const detail = (vis_response_graph > 1) ? true : false;
-    Teuchos::RCP<Teuchos::FancyOStream> out =
-        Teuchos::VerboseObjectBase::getDefaultOStream();
-    *out << "Phalanx writing graphviz file for graph of " << evalName
-         << " (detail = " << vis_response_graph << ")" << std::endl;
+    bool const                          detail = (vis_response_graph > 1) ? true : false;
+    Teuchos::RCP<Teuchos::FancyOStream> out    = Teuchos::VerboseObjectBase::getDefaultOStream();
+    *out << "Phalanx writing graphviz file for graph of " << evalName << " (detail = " << vis_response_graph << ")"
+         << std::endl;
     std::string const graphName = "phalanxGraph" + evalName;
     *out << "Process using 'dot -Tpng -O " << graphName << std::endl;
     rfm->writeGraphvizFile<EvalT>(graphName, detail, detail);
@@ -196,16 +179,11 @@ template <typename EvalT>
 void
 FieldManagerScalarResponseFunction::evaluate(PHAL::Workset& workset)
 {
-  const WorksetArray<int>::type& wsPhysIndex =
-      application->getDiscretization()->getWsPhysIndex();
+  const WorksetArray<int>::type& wsPhysIndex = application->getDiscretization()->getWsPhysIndex();
   rfm->preEvaluate<EvalT>(workset);
-  for (int ws = 0, numWorksets = application->getNumWorksets();
-       ws < numWorksets;
-       ws++) {
-    if (element_block_index >= 0 && element_block_index != wsPhysIndex[ws])
-      continue;
-    std::string const evalName =
-        PHAL::evalName<EvalT>("RFM", wsPhysIndex[ws]) + "_" + vis_response_name;
+  for (int ws = 0, numWorksets = application->getNumWorksets(); ws < numWorksets; ws++) {
+    if (element_block_index >= 0 && element_block_index != wsPhysIndex[ws]) continue;
+    std::string const evalName = PHAL::evalName<EvalT>("RFM", wsPhysIndex[ws]) + "_" + vis_response_name;
     application->loadWorksetBucketInfo<EvalT>(workset, ws, evalName);
     rfm->evaluateFields<EvalT>(workset);
   }
@@ -224,14 +202,12 @@ FieldManagerScalarResponseFunction::evaluateResponse(
   ALBANY_PANIC(
       !performedPostRegSetup,
       std::endl
-          << "Post registration setup not performed in field manager "
-          << std::endl
+          << "Post registration setup not performed in field manager " << std::endl
           << "Forgot to call \"postRegSetup\"? ");
 
   // Set data in Workset struct
   PHAL::Workset workset;
-  application->setupBasicWorksetInfo(
-      workset, current_time, x, xdot, xdotdot, p);
+  application->setupBasicWorksetInfo(workset, current_time, x, xdot, xdotdot, p);
   workset.g = g;
 
   // Perform fill via field manager
@@ -255,26 +231,23 @@ FieldManagerScalarResponseFunction::evaluateGradient(
   ALBANY_PANIC(
       !performedPostRegSetup,
       std::endl
-          << "Post registration setup not performed in field manager "
-          << std::endl
+          << "Post registration setup not performed in field manager " << std::endl
           << "Forgot to call \"postRegSetup\"? ");
 
   // Set data in Workset struct
   PHAL::Workset workset;
-  application->setupBasicWorksetInfo(
-      workset, current_time, x, xdot, xdotdot, p);
+  application->setupBasicWorksetInfo(workset, current_time, x, xdot, xdotdot, p);
 
   workset.g = g;
 
   // Perform fill via field manager (dg/dx)
   if (!dg_dx.is_null()) {
-    workset.m_coeff         = 0.0;
-    workset.j_coeff         = 1.0;
-    workset.n_coeff         = 0.0;
-    workset.dgdx            = dg_dx;
-    workset.overlapped_dgdx = Thyra::createMembers(
-        workset.x_cas_manager->getOverlappedVectorSpace(),
-        dg_dx->domain()->dim());
+    workset.m_coeff = 0.0;
+    workset.j_coeff = 1.0;
+    workset.n_coeff = 0.0;
+    workset.dgdx    = dg_dx;
+    workset.overlapped_dgdx =
+        Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dx->domain()->dim());
     evaluate<PHAL::AlbanyTraits::Jacobian>(workset);
   }
 
@@ -284,11 +257,10 @@ FieldManagerScalarResponseFunction::evaluateGradient(
     workset.j_coeff = 0.0;
     workset.n_coeff = 0.0;
     // LB: WHY?!?!
-    workset.dgdx               = Teuchos::null;
-    workset.dgdxdot            = dg_dxdot;
-    workset.overlapped_dgdxdot = Thyra::createMembers(
-        workset.x_cas_manager->getOverlappedVectorSpace(),
-        dg_dxdot->domain()->dim());
+    workset.dgdx    = Teuchos::null;
+    workset.dgdxdot = dg_dxdot;
+    workset.overlapped_dgdxdot =
+        Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dxdot->domain()->dim());
     evaluate<PHAL::AlbanyTraits::Jacobian>(workset);
   }
   // Perform fill via field manager (dg/dxdotdot)
@@ -297,12 +269,11 @@ FieldManagerScalarResponseFunction::evaluateGradient(
     workset.j_coeff = 0.0;
     workset.n_coeff = 1.0;
     // LB: WHY?!?!
-    workset.dgdx                  = Teuchos::null;
-    workset.dgdxdot               = Teuchos::null;
-    workset.dgdxdotdot            = dg_dxdotdot;
-    workset.overlapped_dgdxdotdot = Thyra::createMembers(
-        workset.x_cas_manager->getOverlappedVectorSpace(),
-        dg_dxdotdot->domain()->dim());
+    workset.dgdx       = Teuchos::null;
+    workset.dgdxdot    = Teuchos::null;
+    workset.dgdxdotdot = dg_dxdotdot;
+    workset.overlapped_dgdxdotdot =
+        Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dxdotdot->domain()->dim());
     evaluate<PHAL::AlbanyTraits::Jacobian>(workset);
   }
 }

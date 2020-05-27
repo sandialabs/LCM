@@ -19,24 +19,19 @@ namespace LCM {
 /// \f$ \epsilon_{ij} = \frac{1}{2}(u_{i,j}+u{j,i})
 ///
 template <typename EvalT, typename Traits>
-class Strain : public PHX::EvaluatorWithBaseImpl<Traits>,
-               public PHX::EvaluatorDerived<EvalT, Traits>
+class Strain : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ///
   /// Constructor
   ///
-  Strain(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  Strain(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics

@@ -9,9 +9,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-Strain<EvalT, Traits>::Strain(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+Strain<EvalT, Traits>::Strain(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : GradU(p.get<std::string>("Gradient QP Variable Name"), dl->qp_tensor),
       strain(p.get<std::string>("Strain Name"), dl->qp_tensor)
 {
@@ -29,9 +27,7 @@ Strain<EvalT, Traits>::Strain(
 
 template <typename EvalT, typename Traits>
 void
-Strain<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+Strain<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(strain, fm);
   this->utils.setFieldData(GradU, fm);
@@ -46,8 +42,7 @@ Strain<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     for (int qp = 0; qp < numQPs; ++qp) {
       for (int i = 0; i < numDims; ++i) {
         for (int j = 0; j < numDims; ++j) {
-          strain(cell, qp, i, j) =
-              0.5 * (GradU(cell, qp, i, j) + GradU(cell, qp, j, i));
+          strain(cell, qp, i, j) = 0.5 * (GradU(cell, qp, i, j) + GradU(cell, qp, j, i));
         }
       }
     }

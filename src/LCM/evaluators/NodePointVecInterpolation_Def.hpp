@@ -44,8 +44,7 @@ NodePointVecInterpolation<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-NodePointVecInterpolation<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+NodePointVecInterpolation<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int i = 0; i < dimension_; i++) {
@@ -53,11 +52,9 @@ NodePointVecInterpolation<EvalT, Traits>::evaluateFields(
       // ScalarT &
       // vpt = point_value_(cell, i);
       for (int j = 0; j < point_value_.extent(2); j++) {
-        point_value_(cell, i, j) =
-            nodal_value_(cell, 0, i) * basis_fn_(cell, 0, i);
+        point_value_(cell, i, j) = nodal_value_(cell, 0, i) * basis_fn_(cell, 0, i);
         for (int node = 1; node < number_nodes_; ++node) {
-          point_value_(cell, i, j) +=
-              nodal_value_(cell, node, i) * basis_fn_(cell, node, i);
+          point_value_(cell, i, j) += nodal_value_(cell, node, i) * basis_fn_(cell, node, i);
         }
       }
     }
@@ -65,10 +62,9 @@ NodePointVecInterpolation<EvalT, Traits>::evaluateFields(
 }
 
 template <typename Traits>
-NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
-    NodePointVecInterpolation(
-        Teuchos::ParameterList const&        p,
-        Teuchos::RCP<Albany::Layouts> const& dl)
+NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::NodePointVecInterpolation(
+    Teuchos::ParameterList const&        p,
+    Teuchos::RCP<Albany::Layouts> const& dl)
     : nodal_value_(p.get<std::string>("Variable Name"), dl->node_vector),
       basis_fn_(p.get<std::string>("BF Name"), dl->cell_scalar),
       point_value_(p.get<std::string>("Variable Name"), dl->cell_vector)
@@ -77,8 +73,7 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
   this->addDependentField(basis_fn_);
   this->addEvaluatedField(point_value_);
 
-  this->setName(
-      "NodePointVecInterpolation" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
+  this->setName("NodePointVecInterpolation" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
 
   std::vector<PHX::DataLayout::size_type> dimensions;
 
@@ -93,10 +88,9 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
 
 template <typename Traits>
 void
-NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
-    postRegistrationSetup(
-        typename Traits::SetupData d,
-        PHX::FieldManager<Traits>& fm)
+NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::postRegistrationSetup(
+    typename Traits::SetupData d,
+    PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(nodal_value_, fm);
   this->utils.setFieldData(basis_fn_, fm);
@@ -105,8 +99,7 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::
 
 template <typename Traits>
 void
-NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   int const num_dof = nodal_value_(0, 0, 0).size();
 
@@ -118,20 +111,16 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
       // ScalarT &
       // vpt = point_value_(cell, i);
 
-      point_value_(cell, i) =
-          FadType(num_dof, nodal_value_(cell, 0, i).val() * basis_fn_(cell, 0));
+      point_value_(cell, i) = FadType(num_dof, nodal_value_(cell, 0, i).val() * basis_fn_(cell, 0));
 
       (point_value_(cell, i)).fastAccessDx(offset_ + i) =
-          nodal_value_(cell, 0, i).fastAccessDx(offset_ + i) *
-          basis_fn_(cell, 0);
+          nodal_value_(cell, 0, i).fastAccessDx(offset_ + i) * basis_fn_(cell, 0);
 
       for (int node = 1; node < number_nodes_; ++node) {
-        (point_value_(cell, i)).val() +=
-            nodal_value_(cell, node, i).val() * basis_fn_(cell, node);
+        (point_value_(cell, i)).val() += nodal_value_(cell, node, i).val() * basis_fn_(cell, node);
 
         (point_value_(cell, i)).fastAccessDx(neq * node + offset_ + i) +=
-            nodal_value_(cell, node, i).fastAccessDx(neq * node + offset_ + i) *
-            basis_fn_(cell, node);
+            nodal_value_(cell, node, i).fastAccessDx(neq * node + offset_ + i) * basis_fn_(cell, node);
       }
     }
   }

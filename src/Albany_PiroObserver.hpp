@@ -29,10 +29,7 @@ class PiroObserver : public Piro::ObserverBase<ST>
   observeSolution(Thyra_Vector const& solution, const ST stamp);
 
   virtual void
-  observeSolution(
-      Thyra_Vector const& solution,
-      Thyra_Vector const& solution_dot,
-      const ST            stamp);
+  observeSolution(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, const ST stamp);
 
   virtual void
   observeSolution(
@@ -52,10 +49,7 @@ class PiroObserver : public Piro::ObserverBase<ST>
   observeSolutionImpl(Thyra_Vector const& solution, const ST defaultStamp);
 
   void
-  observeSolutionImpl(
-      Thyra_Vector const& solution,
-      Thyra_Vector const& solution_dot,
-      const ST            defaultStamp);
+  observeSolutionImpl(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, const ST defaultStamp);
 
   void
   observeSolutionImpl(

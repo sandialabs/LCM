@@ -61,8 +61,7 @@ class SlipFamily
 
   minitensor::Vector<minitensor::Index, NumSlipT> slip_system_indices_;
 
-  std::shared_ptr<HardeningParameterBase<NumDimT, NumSlipT>>
-      phardening_parameters_{nullptr};
+  std::shared_ptr<HardeningParameterBase<NumDimT, NumSlipT>> phardening_parameters_{nullptr};
 
   std::shared_ptr<FlowParameterBase> pflow_parameters_{nullptr};
 
@@ -82,11 +81,7 @@ struct StateMechanical
   using TensorType      = minitensor::Tensor<ScalarT, NumDimT>;
   using InputTensorType = minitensor::Tensor<RealType, NumDimT>;
 
-  StateMechanical(
-      int                    num_dim,
-      InputTensorType const& F_n,
-      InputTensorType const& Fp_n,
-      TensorType const&      F_np1)
+  StateMechanical(int num_dim, InputTensorType const& F_n, InputTensorType const& Fp_n, TensorType const& F_np1)
       : num_dim_(num_dim),
         F_n_(F_n),
         Fp_n_(Fp_n),
@@ -121,12 +116,7 @@ struct StateInternal
   using VectorType      = minitensor::Vector<ScalarT, NumSlipT>;
   using InputVectorType = minitensor::Vector<RealType, NumSlipT>;
 
-  StateInternal(
-      int                    cell,
-      int                    pt,
-      int                    num_slip,
-      InputVectorType const& hardening_n,
-      InputVectorType const& slip_n)
+  StateInternal(int cell, int pt, int num_slip, InputVectorType const& hardening_n, InputVectorType const& slip_n)
       : cell_(cell),
         pt_(pt),
         num_slip_(num_slip),

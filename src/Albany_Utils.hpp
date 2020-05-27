@@ -24,29 +24,21 @@ PrintHeader(std::ostream& os);
 
 // Helper function which replaces the diagonal of a matrix
 void
-ReplaceDiagonalEntries(
-    const Teuchos::RCP<Tpetra_CrsMatrix>& matrix,
-    const Teuchos::RCP<Tpetra_Vector>&    diag);
+ReplaceDiagonalEntries(const Teuchos::RCP<Tpetra_CrsMatrix>& matrix, const Teuchos::RCP<Tpetra_Vector>& diag);
 
 // Helper function which computes absolute values of the rowsum
 // of a matrix, takes its inverse, and puts it in a vector.
 void
-InvAbsRowSum(
-    Teuchos::RCP<Tpetra_Vector>&         invAbsRowSumsTpetra,
-    const Teuchos::RCP<Tpetra_CrsMatrix> matrix);
+InvAbsRowSum(Teuchos::RCP<Tpetra_Vector>& invAbsRowSumsTpetra, const Teuchos::RCP<Tpetra_CrsMatrix> matrix);
 
 // Helper function which computes absolute values of the rowsum
 // of a matrix, and puts it in a vector.
 void
-AbsRowSum(
-    Teuchos::RCP<Tpetra_Vector>&         absRowSumsTpetra,
-    const Teuchos::RCP<Tpetra_CrsMatrix> matrix);
+AbsRowSum(Teuchos::RCP<Tpetra_Vector>& absRowSumsTpetra, const Teuchos::RCP<Tpetra_CrsMatrix> matrix);
 
 // Helper function which replaces the diagonal of a matrix
 void
-ReplaceDiagonalEntries(
-    const Teuchos::RCP<Tpetra_CrsMatrix>& matrix,
-    const Teuchos::RCP<Tpetra_Vector>&    diag);
+ReplaceDiagonalEntries(const Teuchos::RCP<Tpetra_CrsMatrix>& matrix, const Teuchos::RCP<Tpetra_Vector>& diag);
 
 //! Utility to make a string out of a string + int with a delimiter:
 //! strint("dog",2,' ') = "dog 2"
@@ -71,10 +63,7 @@ initStringToDouble(std::string const& initString);
 
 //! Splits a std::string on a delimiter
 void
-splitStringOnDelim(
-    std::string const&        s,
-    char                      delim,
-    std::vector<std::string>& elems);
+splitStringOnDelim(std::string const& s, char delim, std::vector<std::string>& elems);
 
 /// Get file name extension
 std::string
@@ -91,20 +80,14 @@ printThyraVector(
 
 //! Inlined product version
 inline void
-printThyraVector(
-    std::ostream&                                  os,
-    const Teuchos::RCP<const Thyra_ProductVector>& vec)
+printThyraVector(std::ostream& os, const Teuchos::RCP<const Thyra_ProductVector>& vec)
 {
-  for (int i = 0; i < vec->productSpace()->numBlocks(); ++i) {
-    printThyraVector(os, vec->getVectorBlock(i));
-  }
+  for (int i = 0; i < vec->productSpace()->numBlocks(); ++i) { printThyraVector(os, vec->getVectorBlock(i)); }
 }
 
 //! Nicely prints out a Thyra MultiVector
 void
-printThyraMultiVector(
-    std::ostream&                                os,
-    const Teuchos::RCP<const Thyra_MultiVector>& vec);
+printThyraMultiVector(std::ostream& os, const Teuchos::RCP<const Thyra_MultiVector>& vec);
 void
 printThyraMultiVector(
     std::ostream&                                                    os,
@@ -113,22 +96,15 @@ printThyraMultiVector(
 
 //! Inlined product version
 inline void
-printThyraVector(
-    std::ostream&                                       os,
-    const Teuchos::RCP<const Thyra_ProductMultiVector>& vec)
+printThyraVector(std::ostream& os, const Teuchos::RCP<const Thyra_ProductMultiVector>& vec)
 {
-  for (int i = 0; i < vec->productSpace()->numBlocks(); ++i) {
-    printThyraMultiVector(os, vec->getMultiVectorBlock(i));
-  }
+  for (int i = 0; i < vec->productSpace()->numBlocks(); ++i) { printThyraMultiVector(os, vec->getMultiVectorBlock(i)); }
 }
 
 /// Write to matrix market format a vector, matrix or map.
 template <typename LinearAlgebraObjectType>
 void
-writeMatrixMarket(
-    const Teuchos::RCP<LinearAlgebraObjectType>& A,
-    std::string const&                           prefix,
-    int const                                    counter = -1);
+writeMatrixMarket(const Teuchos::RCP<LinearAlgebraObjectType>& A, std::string const& prefix, int const counter = -1);
 
 template <typename LinearAlgebraObjectType>
 void

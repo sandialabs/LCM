@@ -8,8 +8,7 @@
 #include "PHAL_SaveNodalField_Def.hpp"
 
 template <typename EvalT, typename Traits>
-std::string const PHAL::SaveNodalFieldBase<EvalT, Traits>::className =
-    "Save_Nodal_Field";
+std::string const PHAL::SaveNodalFieldBase<EvalT, Traits>::className = "Save_Nodal_Field";
 
 PHAL_INSTANTIATE_TEMPLATE_CLASS(PHAL::SaveNodalField)
 PHAL_INSTANTIATE_TEMPLATE_CLASS(PHAL::SaveNodalFieldBase)

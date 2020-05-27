@@ -64,15 +64,14 @@ struct EBSpecsStruct
   {
     //        for(std::size_t i = 0; i < h.size(); i++)
     for (unsigned i = 0; i < Dim; i++) {
-      for (GO j = min[i]; j < max[i]; j++)
-        h[i][j] = blLength[i] / double(max[i] - min[i]);
+      for (GO j = min[i]; j < max[i]; j++) h[i][j] = blLength[i] / double(max[i] - min[i]);
     }
   }
 
-  std::string name;               // Name of element block
-  GO     min[traits_type::size];  // Minimum logical coordinate of the block
-  GO     max[traits_type::size];  // Maximum logical coordinate of the block
-  double blLength[traits_type::size];
+  std::string name;                    // Name of element block
+  GO          min[traits_type::size];  // Minimum logical coordinate of the block
+  GO          max[traits_type::size];  // Maximum logical coordinate of the block
+  double      blLength[traits_type::size];
 };
 
 //! Template for STK internal mesh generation classes
@@ -102,18 +101,15 @@ class TmplSTKMeshStruct : public GenericSTKMeshStruct
   //! Sets mesh generation parameters
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
-      const Teuchos::RCP<Teuchos::ParameterList>&               params,
-      const unsigned int                                        neq_,
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-      const unsigned int                                        worksetSize,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-          side_set_sis = {},
-      std::map<
-          std::string,
-          AbstractFieldContainer::FieldContainerRequirements> const&
-          side_set_req = {});  // empty map as default
+      const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+      const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+      const unsigned int                                                               neq_,
+      const AbstractFieldContainer::FieldContainerRequirements&                        req,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+      const unsigned int                                                               worksetSize,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis = {},
+      std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req =
+          {});  // empty map as default
 
   //! Flag if solution has a restart values -- used in Init Cond
   bool
@@ -210,24 +206,16 @@ void
 EBSpecsStruct<0>::Initialize(GO nelems[], double blLen[]);
 template <>
 void
-EBSpecsStruct<0>::Initialize(
-    int                                         i,
-    const Teuchos::RCP<Teuchos::ParameterList>& params);
+EBSpecsStruct<0>::Initialize(int i, const Teuchos::RCP<Teuchos::ParameterList>& params);
 template <>
 void
-EBSpecsStruct<1>::Initialize(
-    int                                         i,
-    const Teuchos::RCP<Teuchos::ParameterList>& params);
+EBSpecsStruct<1>::Initialize(int i, const Teuchos::RCP<Teuchos::ParameterList>& params);
 template <>
 void
-EBSpecsStruct<2>::Initialize(
-    int                                         i,
-    const Teuchos::RCP<Teuchos::ParameterList>& params);
+EBSpecsStruct<2>::Initialize(int i, const Teuchos::RCP<Teuchos::ParameterList>& params);
 template <>
 void
-EBSpecsStruct<3>::Initialize(
-    int                                         i,
-    const Teuchos::RCP<Teuchos::ParameterList>& params);
+EBSpecsStruct<3>::Initialize(int i, const Teuchos::RCP<Teuchos::ParameterList>& params);
 
 template <>
 void
@@ -245,18 +233,14 @@ TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& commT);
 template <>
 void
 TmplSTKMeshStruct<0, albany_stk_mesh_traits<0>>::setFieldAndBulkData(
-    const Teuchos::RCP<Teuchos_Comm const>&                   commT,
-    const Teuchos::RCP<Teuchos::ParameterList>&               params,
-    const unsigned int                                        neq_,
-    const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-    const unsigned int                                        worksetSize,
-    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-        side_set_sis,
-    std::map<
-        std::string,
-        AbstractFieldContainer::FieldContainerRequirements> const&
-        side_set_req);
+    const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+    const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+    const unsigned int                                                               neq_,
+    const AbstractFieldContainer::FieldContainerRequirements&                        req,
+    const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+    const unsigned int                                                               worksetSize,
+    std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
+    std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req);
 
 template <>
 Teuchos::RCP<Teuchos::ParameterList const>

@@ -38,9 +38,7 @@ CombineAndScatterManager::create_aura_vss() const
   auto               indexer = createGlobalLocalIndexer(overlapped_vs);
   Teuchos::Array<GO> aura_gids;
   for (int lid = 0; lid < data.size(); ++lid) {
-    if (data[lid] != 1.0) {
-      aura_gids.push_back(indexer->getGlobalElement(lid));
-    }
+    if (data[lid] != 1.0) { aura_gids.push_back(indexer->getGlobalElement(lid)); }
   }
 
   // Recall the three aura types:
@@ -49,11 +47,9 @@ CombineAndScatterManager::create_aura_vss() const
   //  - ghosted: anything in the shared_aura_vs that is not in the owned_vs
   //  - owned: anything in the shared_aura_vs that is also in the owned_vs
   // Obviously, shared=owned+ghosted
-  shared_aura_vs = createVectorSpace(comm, aura_gids);
-  ghosted_aura_vs =
-      createVectorSpacesDifference(shared_aura_vs, owned_vs, comm);
-  owned_aura_vs =
-      createVectorSpacesIntersection(shared_aura_vs, owned_vs, comm);
+  shared_aura_vs  = createVectorSpace(comm, aura_gids);
+  ghosted_aura_vs = createVectorSpacesDifference(shared_aura_vs, owned_vs, comm);
+  owned_aura_vs   = createVectorSpacesIntersection(shared_aura_vs, owned_vs, comm);
 }
 
 // Utility function that returns a concrete manager.
@@ -71,8 +67,7 @@ createCombineAndScatterManager(
     // fails.
     tvs = getTpetraMap(overlapped, true);
 
-    manager =
-        Teuchos::rcp(new CombineAndScatterManagerTpetra(owned, overlapped));
+    manager = Teuchos::rcp(new CombineAndScatterManagerTpetra(owned, overlapped));
   }
 
   ALBANY_PANIC(

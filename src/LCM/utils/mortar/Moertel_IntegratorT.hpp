@@ -174,10 +174,7 @@ class IntegratorT
   \param sxib : upper bound of overlap in slave segment coordinates
   */
   Teuchos::SerialDenseMatrix<LO, ST>*
-  Integrate(
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-      double sxia,
-      double sxib);
+  Integrate(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, double sxia, double sxib);
 
   /*!
   \brief Assemble integration result 'D' into global matrix 'D'
@@ -267,7 +264,7 @@ class IntegratorT
       Teuchos::SerialDenseMatrix<LO, ST>**                              Mdense,
       MoertelT::OverlapT<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>& overlap,
       double                                                            eps,
-      bool exactvalues);
+      bool                                                              exactvalues);
 
   /*!
   \brief Assemble integration result 'D' into Node (2D interfaces only)
@@ -307,11 +304,11 @@ class IntegratorT
   IntegratorT(MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT) & old);
 
  private:
-  bool oneD_;         // dimension of the integration, true if 1-dimensional
-  int  ngp_;          // order of the integration
-  int  outputlevel_;  // output level (0-10)
-  std::vector<double> coords_;   // vector holding gaussian point coordinates
-  std::vector<double> weights_;  // vector holding gaussian point weights
+  bool                oneD_;         // dimension of the integration, true if 1-dimensional
+  int                 ngp_;          // order of the integration
+  int                 outputlevel_;  // output level (0-10)
+  std::vector<double> coords_;       // vector holding gaussian point coordinates
+  std::vector<double> weights_;      // vector holding gaussian point weights
 };
 
 }  // namespace MoertelT

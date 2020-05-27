@@ -15,10 +15,7 @@ Albany::PNPProblem::PNPProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_)
-    : Albany::AbstractProblem(params_, paramLib_),
-      params(params_),
-      numDim(numDim_),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_), params(params_), numDim(numDim_), use_sdbcs_(false)
 {
   // Compute number of equations
   numSpecies = params->get<int>("Number of Species", 1);
@@ -44,12 +41,10 @@ Albany::PNPProblem::buildProblem(
 
   for (int ps = 0; ps < physSets; ps++) {
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-    buildEvaluators(
-        *fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
+    buildEvaluators(*fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
   }
 
-  if (meshSpecs[0]->nsNames.size() >
-      0) {  // Build a nodeset evaluator if nodesets are present
+  if (meshSpecs[0]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
     constructDirichletEvaluators(*meshSpecs[0]);
   }
 
@@ -57,12 +52,10 @@ Albany::PNPProblem::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() >
-      0) {  // Build a sideset evaluator if sidesets are present
+  if (meshSpecs[0]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
     constructNeumannEvaluators(meshSpecs[0]);
   }
 }
@@ -77,15 +70,13 @@ Albany::PNPProblem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  Albany::ConstructEvaluatorsOp<PNPProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  Albany::ConstructEvaluatorsOp<PNPProblem>             op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 void
-Albany::PNPProblem::constructDirichletEvaluators(
-    Albany::MeshSpecsStruct const& meshSpecs)
+Albany::PNPProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -97,8 +88,7 @@ Albany::PNPProblem::constructDirichletEvaluators(
   }
   dirichletNames[idx++] = "Phi";
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
@@ -106,8 +96,7 @@ Albany::PNPProblem::constructDirichletEvaluators(
 
 // Neumann BCs
 void
-Albany::PNPProblem::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
+Albany::PNPProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
   // i.e. meshSpecs.ssNames.size() > 0
@@ -129,10 +118,9 @@ Albany::PNPProblem::constructNeumannEvaluators(
   // robin conditions, this should work.
 
   std::vector<std::string>                  nbcNames;
-  Teuchos::RCP<Teuchos::Array<std::string>> dof_names =
-      Teuchos::rcp(new Teuchos::Array<std::string>);
-  Teuchos::Array<Teuchos::Array<int>> offsets;
-  int                                 idx = 0;
+  Teuchos::RCP<Teuchos::Array<std::string>> dof_names = Teuchos::rcp(new Teuchos::Array<std::string>);
+  Teuchos::Array<Teuchos::Array<int>>       offsets;
+  int                                       idx = 0;
   for (idx = 0; idx < numSpecies; idx++) {
     std::stringstream s;
     s << "C" << (idx + 1);
@@ -150,23 +138,13 @@ Albany::PNPProblem::constructNeumannEvaluators(
   std::vector<std::string> condNames;  // dudx, dudy, dudz, dudn, basal
 
   nfm[0] = nbcUtils.constructBCEvaluators(
-      meshSpecs,
-      nbcNames,
-      Teuchos::arcp(dof_names),
-      true,
-      0,
-      condNames,
-      offsets,
-      dl,
-      this->params,
-      this->paramLib);
+      meshSpecs, nbcNames, Teuchos::arcp(dof_names), true, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::PNPProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidPNPParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidPNPParams");
 
   validPL->sublist("Body Force", false, "");
   validPL->sublist("Permittivity", false, "");

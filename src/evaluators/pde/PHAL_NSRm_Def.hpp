@@ -17,8 +17,7 @@ NSRm<EvalT, Traits>::NSRm(Teuchos::ParameterList const& p)
       VGrad(
           p.get<std::string>("Velocity Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      V(p.get<std::string>("Velocity QP Variable Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      V(p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       V_Dot(
           p.get<std::string>("Velocity Dot QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
@@ -29,14 +28,9 @@ NSRm<EvalT, Traits>::NSRm(Teuchos::ParameterList const& p)
       force(
           p.get<std::string>("Body Force QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      permTerm(
-          p.get<std::string>("Permeability Term"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      ForchTerm(
-          p.get<std::string>("Forchheimer Term"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      Rm(p.get<std::string>("Rm Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      permTerm(p.get<std::string>("Permeability Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      ForchTerm(p.get<std::string>("Forchheimer Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      Rm(p.get<std::string>("Rm Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       porousMedia(p.get<bool>("Porous Media"))
 
 {
@@ -58,8 +52,7 @@ NSRm<EvalT, Traits>::NSRm(Teuchos::ParameterList const& p)
   }
   this->addEvaluatedField(Rm);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numNodes = dims[1];
@@ -72,9 +65,7 @@ NSRm<EvalT, Traits>::NSRm(Teuchos::ParameterList const& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-NSRm<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+NSRm<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(pGrad, fm);
   this->utils.setFieldData(VGrad, fm);
@@ -106,18 +97,15 @@ NSRm<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         if (!porousMedia)  // Navier-Stokes
           Rm(cell, qp, i) += pGrad(cell, qp, i) + force(cell, qp, i);
         else  // Porous Media
-          Rm(cell, qp, i) += phi(cell, qp) * pGrad(cell, qp, i) +
-                             phi(cell, qp) * force(cell, qp, i);
+          Rm(cell, qp, i) += phi(cell, qp) * pGrad(cell, qp, i) + phi(cell, qp) * force(cell, qp, i);
         if (porousMedia) {  // permeability and Forchheimer terms
           Rm(cell, qp, i) += -permTerm(cell, qp, i) + ForchTerm(cell, qp, i);
         }
         for (std::size_t j = 0; j < numDims; ++j) {
           if (!porousMedia)  // Navier-Stokes
-            Rm(cell, qp, i) +=
-                rho(cell, qp) * V(cell, qp, j) * VGrad(cell, qp, i, j);
+            Rm(cell, qp, i) += rho(cell, qp) * V(cell, qp, j) * VGrad(cell, qp, i, j);
           else  // Porous Media
-            Rm(cell, qp, i) += rho(cell, qp) * V(cell, qp, j) *
-                               VGrad(cell, qp, i, j) / phi(cell, qp);
+            Rm(cell, qp, i) += rho(cell, qp) * V(cell, qp, j) * VGrad(cell, qp, i, j) / phi(cell, qp);
         }
       }
     }

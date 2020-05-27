@@ -11,9 +11,7 @@ GradientElementLength<EvalT, Traits>::GradientElementLength(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : grad_bf_(p.get<std::string>("Gradient BF Name"), dl->node_qp_vector),
-      unit_grad_(
-          p.get<std::string>("Unit Gradient QP Variable Name"),
-          dl->qp_vector),
+      unit_grad_(p.get<std::string>("Unit Gradient QP Variable Name"), dl->qp_vector),
       element_length_(p.get<std::string>("Element Length Name"), dl->qp_scalar)
 {
   this->addDependentField(unit_grad_);
@@ -31,9 +29,7 @@ GradientElementLength<EvalT, Traits>::GradientElementLength(
 
 template <typename EvalT, typename Traits>
 void
-GradientElementLength<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+GradientElementLength<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(grad_bf_, fm);
   this->utils.setFieldData(unit_grad_, fm);
@@ -42,8 +38,7 @@ GradientElementLength<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-GradientElementLength<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+GradientElementLength<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   ScalarT scalar_h(0.0);
 
@@ -52,8 +47,7 @@ GradientElementLength<EvalT, Traits>::evaluateFields(
       scalar_h = 0.0;
       for (int j(0); j < num_dims_; ++j) {
         for (int node(0); node < num_nodes_; ++node) {
-          scalar_h +=
-              std::abs(grad_bf_(cell, node, pt, j) / std::sqrt(num_dims_));
+          scalar_h += std::abs(grad_bf_(cell, node, pt, j) / std::sqrt(num_dims_));
         }
       }
       element_length_(cell, pt) = 2.0 / scalar_h;

@@ -17,9 +17,7 @@ class SamplingBasedScalarResponseFunction : public ScalarResponseFunction
 {
  public:
   //! Default constructor
-  SamplingBasedScalarResponseFunction(
-      const Teuchos::RCP<Teuchos_Comm const>& commT)
-      : ScalarResponseFunction(commT)
+  SamplingBasedScalarResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& commT) : ScalarResponseFunction(commT)
   {
     // Nothing to be done here
   }

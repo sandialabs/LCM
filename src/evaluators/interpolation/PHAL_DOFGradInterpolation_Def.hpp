@@ -56,42 +56,37 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 #if defined(KOKKOS_OPTIMIZED)
 template <typename EvalT, typename Traits, typename ScalarT>
 KOKKOS_INLINE_FUNCTION void
-DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
-    const team_member& thread) const
+DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(const team_member& thread) const
 {
   int const thread_idx = thread.league_rank() * threads_per_team;
-  int const end_loop   = thread_idx + threads_per_team > (numCells * numQPs) ?
-                           (numCells * numQPs) :
-                           (thread_idx + threads_per_team);
+  int const end_loop =
+      thread_idx + threads_per_team > (numCells * numQPs) ? (numCells * numQPs) : (thread_idx + threads_per_team);
   ScalarT gradVal_tmp;
 
-  Kokkos::parallel_for(
-      Kokkos::TeamThreadRange(thread, thread_idx, end_loop), [=](int& indx) {
-        int const cell = indx / numCells;
-        int const qp = indx    = indx / numCells;
-        int const vector_range = numNodes - 1;
-        for (int dim = 0; dim < numDims; dim++) {
-          grad_val_qp(cell, qp, dim) =
-              val_node(cell, 0) * GradBF(cell, 0, qp, dim);
+  Kokkos::parallel_for(Kokkos::TeamThreadRange(thread, thread_idx, end_loop), [=](int& indx) {
+    int const cell = indx / numCells;
+    int const qp = indx    = indx / numCells;
+    int const vector_range = numNodes - 1;
+    for (int dim = 0; dim < numDims; dim++) {
+      grad_val_qp(cell, qp, dim) = val_node(cell, 0) * GradBF(cell, 0, qp, dim);
 
-          /* Kokkos::parallel_reduce(Kokkos::ThreadVectorRange(thread,
-          vector_range),
-                              [&](int const& lk, ScalarT& gradVal){
-                          int const node=1+lk;
-                          gradVal += val_node(cell, node) * GradBF(cell, node,
-          qp, dim);
-               }, gradVal_tmp);
-           Kokkos::single(Kokkos::PerThread(thread),[&](){
-              grad_val_qp(cell,qp,dim)=val_node(cell, 0) * GradBF(cell, 0, qp,
-          dim)+gradVal_tmp;
-          });
-          */
-          for (int node = 1; node < numNodes; ++node) {
-            grad_val_qp(cell, qp, dim) +=
-                val_node(cell, node) * GradBF(cell, node, qp, dim);
-          }
-        }
+      /* Kokkos::parallel_reduce(Kokkos::ThreadVectorRange(thread,
+      vector_range),
+                          [&](int const& lk, ScalarT& gradVal){
+                      int const node=1+lk;
+                      gradVal += val_node(cell, node) * GradBF(cell, node,
+      qp, dim);
+           }, gradVal_tmp);
+       Kokkos::single(Kokkos::PerThread(thread),[&](){
+          grad_val_qp(cell,qp,dim)=val_node(cell, 0) * GradBF(cell, 0, qp,
+      dim)+gradVal_tmp;
       });
+      */
+      for (int node = 1; node < numNodes; ++node) {
+        grad_val_qp(cell, qp, dim) += val_node(cell, node) * GradBF(cell, node, qp, dim);
+      }
+    }
+  });
 }
 
 #else
@@ -105,8 +100,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
     for (int dim = 0; dim < numDims; dim++) {
       grad_val_qp(cell, qp, dim) = val_node(cell, 0) * GradBF(cell, 0, qp, dim);
       for (int node = 1; node < numNodes; ++node) {
-        grad_val_qp(cell, qp, dim) +=
-            val_node(cell, node) * GradBF(cell, node, qp, dim);
+        grad_val_qp(cell, qp, dim) += val_node(cell, node) * GradBF(cell, node, qp, dim);
       }
     }
   }
@@ -115,8 +109,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
 // ***************************************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   // Intrepid2 Version:
   // for (int i=0; i < grad_val_qp.size() ; i++) grad_val_qp[i] = 0.0;
@@ -132,28 +125,23 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
 #if defined(KOKKOS_OPTIMIZED)
 
   threads_per_team = work_size;
-  numTeams =
-      (workset.numCells * numQPs + threads_per_team - 1) / threads_per_team;
-  numCells = workset.numCells;
+  numTeams         = (workset.numCells * numQPs + threads_per_team - 1) / threads_per_team;
+  numCells         = workset.numCells;
 
   const team_policy policy(numTeams, 1, 16);
 
   Kokkos::parallel_for(policy, *this);
 
 #else
-  Kokkos::parallel_for(
-      DOFGradInterpolationBase_Residual_Policy(0, workset.numCells), *this);
+  Kokkos::parallel_for(DOFGradInterpolationBase_Residual_Policy(0, workset.numCells), *this);
 #endif
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "DOFGradInterpolationBase Residual time = " << millisec << "  "
-            << microseconds << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "DOFGradInterpolationBase Residual time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 // Specialization for Jacobian evaluation taking advantage of the sparsity of
@@ -168,25 +156,19 @@ FastSolutionGradInterpolationBase<
     PHAL::AlbanyTraits::Jacobian,
     Traits,
     typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-operator()(
-    const FastSolutionGradInterpolationBase_Jacobian_Tag& tag,
-    int const&                                            cell) const
+operator()(const FastSolutionGradInterpolationBase_Jacobian_Tag& tag, int const& cell) const
 {
   for (int qp = 0; qp < this->numQPs; ++qp) {
     for (int dim = 0; dim < this->numDims; dim++) {
-      this->grad_val_qp(cell, qp, dim) = ScalarT(
-          num_dof,
-          this->val_node(cell, 0).val() * this->GradBF(cell, 0, qp, dim));
+      this->grad_val_qp(cell, qp, dim) =
+          ScalarT(num_dof, this->val_node(cell, 0).val() * this->GradBF(cell, 0, qp, dim));
       (this->grad_val_qp(cell, qp, dim)).fastAccessDx(offset) =
-          this->val_node(cell, 0).fastAccessDx(offset) *
-          this->GradBF(cell, 0, qp, dim);
+          this->val_node(cell, 0).fastAccessDx(offset) * this->GradBF(cell, 0, qp, dim);
       for (int node = 1; node < this->numNodes; ++node) {
         (this->grad_val_qp(cell, qp, dim)).val() +=
-            this->val_node(cell, node).val() *
-            this->GradBF(cell, node, qp, dim);
+            this->val_node(cell, node).val() * this->GradBF(cell, node, qp, dim);
         (this->grad_val_qp(cell, qp, dim)).fastAccessDx(neq * node + offset) +=
-            this->val_node(cell, node).fastAccessDx(neq * node + offset) *
-            this->GradBF(cell, node, qp, dim);
+            this->val_node(cell, node).fastAccessDx(neq * node + offset) * this->GradBF(cell, node, qp, dim);
       }
     }
   }
@@ -198,8 +180,7 @@ void
 FastSolutionGradInterpolationBase<
     PHAL::AlbanyTraits::Jacobian,
     Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-    evaluateFields(typename Traits::EvalData workset)
+    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   // Intrepid2 Version:
   // for (int i=0; i < grad_val_qp.size() ; i++) grad_val_qp[i] = 0.0;
@@ -214,19 +195,14 @@ FastSolutionGradInterpolationBase<
   num_dof = this->val_node(0, 0).size();
   neq     = workset.wsElNodeEqID.extent(2);
 
-  Kokkos::parallel_for(
-      FastSolutionGradInterpolationBase_Jacobian_Policy(0, workset.numCells),
-      *this);
+  Kokkos::parallel_for(FastSolutionGradInterpolationBase_Jacobian_Policy(0, workset.numCells), *this);
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "DOFGradInterpolationBase Jacobian time = " << millisec << "  "
-            << microseconds << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "DOFGradInterpolationBase Jacobian time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION

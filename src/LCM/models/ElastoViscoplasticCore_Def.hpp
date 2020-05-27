@@ -76,8 +76,7 @@ EV::ElastoViscoplasticNLS<EvalT, M>::value(minitensor::Vector<T, N> const& x)
 template <typename EvalT, minitensor::Index M>
 template <typename T, minitensor::Index N>
 minitensor::Vector<T, N>
-EV::ElastoViscoplasticNLS<EvalT, M>::gradient(
-    minitensor::Vector<T, N> const& x) const
+EV::ElastoViscoplasticNLS<EvalT, M>::gradient(minitensor::Vector<T, N> const& x) const
 {
   auto const num_unknowns = x.get_dimension();
 

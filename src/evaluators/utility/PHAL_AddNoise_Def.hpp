@@ -16,15 +16,13 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
-AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
-    Teuchos::ParameterList const& p)
+AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(Teuchos::ParameterList const& p)
 {
   std::string fieldName      = p.get<std::string>("Field Name");
   std::string noisyFieldName = p.get<std::string>("Noisy Field Name");
 
-  Teuchos::RCP<PHX::DataLayout> layout =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout");
-  noisy_field = decltype(noisy_field)(noisyFieldName, layout);
+  Teuchos::RCP<PHX::DataLayout> layout = p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout");
+  noisy_field                          = decltype(noisy_field)(noisyFieldName, layout);
 
   is_zero = (fieldName == "ZERO");
   field   = decltype(field)(fieldName, layout);
@@ -37,9 +35,8 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
 
   this->addEvaluatedField(noisy_field);
 
-  Teuchos::ParameterList& pdf_params =
-      *p.get<Teuchos::ParameterList*>("PDF Parameters");
-  std::string pdf_type_str = pdf_params.get<std::string>("Noise PDF");
+  Teuchos::ParameterList& pdf_params   = *p.get<Teuchos::ParameterList*>("PDF Parameters");
+  std::string             pdf_type_str = pdf_params.get<std::string>("Noise PDF");
   if (pdf_type_str == "Uniform") {
     pdf_type = UNIFORM;
 
@@ -58,17 +55,14 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
     ALBANY_ABORT("Error! Invalid noise p.d.f.\n");
   }
 
-  seed = pdf_params.get<int>("Random Seed", std::time(nullptr));
-  reset_seed_pre_eval =
-      pdf_params.get<bool>("Reset Seed With PreEvaluate", true);
+  seed                = pdf_params.get<int>("Random Seed", std::time(nullptr));
+  reset_seed_pre_eval = pdf_params.get<bool>("Reset Seed With PreEvaluate", true);
 
   rel_noise = pdf_params.get<double>("Relative Noise", 0.);
   abs_noise = pdf_params.get<double>("Absolute Noise", 0.);
 
-  ALBANY_PANIC(
-      rel_noise < 0, "Error! Relative noise should be non-negative.\n");
-  ALBANY_PANIC(
-      abs_noise < 0, "Error! Absolute noise should be non-negative.\n");
+  ALBANY_PANIC(rel_noise < 0, "Error! Relative noise should be non-negative.\n");
+  ALBANY_PANIC(abs_noise < 0, "Error! Absolute noise should be non-negative.\n");
 
   noise_free = (rel_noise == 0) && (abs_noise == 0);
 
@@ -78,9 +72,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-AddNoiseBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+AddNoiseBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   if (is_zero) this->utils.setFieldData(field_eval, fm);
   this->utils.setFieldData(field, fm);
@@ -89,8 +81,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-AddNoiseBase<EvalT, Traits, ScalarT>::preEvaluate(
-    typename Traits::PreEvalData workset)
+AddNoiseBase<EvalT, Traits, ScalarT>::preEvaluate(typename Traits::PreEvalData workset)
 {
   // Reset the seed. E.g., each iteration of Newton should solve the system with
   // the same realization of noise.
@@ -100,8 +91,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::preEvaluate(
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   PHAL::MDFieldIterator<ScalarT const> in(field);
   PHAL::MDFieldIterator<ScalarT>       out(noisy_field);
@@ -114,17 +104,13 @@ AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(
   switch (pdf_type) {
     case UNIFORM:
       for (; !in.done(); ++in, ++out)
-        *out = abs_noise * (*pdf_uniform)(generator) +
-               (*in) * (1 + rel_noise * (*pdf_uniform)(generator));
+        *out = abs_noise * (*pdf_uniform)(generator) + (*in) * (1 + rel_noise * (*pdf_uniform)(generator));
 
     case NORMAL:
       for (; !in.done(); ++in, ++out)
-        *out = abs_noise * (*pdf_normal)(generator) +
-               (*in) * (1 + rel_noise * (*pdf_normal)(generator));
+        *out = abs_noise * (*pdf_normal)(generator) + (*in) * (1 + rel_noise * (*pdf_normal)(generator));
 
-    default:
-      ALBANY_ABORT(
-          "Error! [PHAL::AddNoiseBase] This exception should never throw.\n");
+    default: ALBANY_ABORT("Error! [PHAL::AddNoiseBase] This exception should never throw.\n");
   }
 }
 

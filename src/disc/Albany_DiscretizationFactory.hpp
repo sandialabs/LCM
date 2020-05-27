@@ -53,23 +53,17 @@ class DiscretizationFactory
       unsigned int                                              num_equations,
       const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
       const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<Albany::RigidBodyModes>&               rigidBodyModes =
-          Teuchos::null);
+      const Teuchos::RCP<Albany::RigidBodyModes>&               rigidBodyModes = Teuchos::null);
 
   Teuchos::RCP<Albany::AbstractDiscretization>
   createDiscretization(
-      unsigned int                                   num_equations,
-      std::map<int, std::vector<std::string>> const& sideSetEquations,
-      const Teuchos::RCP<Albany::StateInfoStruct>&   sis,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-                                                                side_set_sis,
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      std::map<
-          std::string,
-          AbstractFieldContainer::FieldContainerRequirements> const&
-                                                  side_set_req,
-      const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes =
-          Teuchos::null);
+      unsigned int                                                                     num_equations,
+      std::map<int, std::vector<std::string>> const&                                   sideSetEquations,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
+      const AbstractFieldContainer::FieldContainerRequirements&                        req,
+      std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req,
+      const Teuchos::RCP<Albany::RigidBodyModes>&                                      rigidBodyModes = Teuchos::null);
 
   void
   setupInternalMeshStruct(
@@ -79,19 +73,14 @@ class DiscretizationFactory
 
   void
   setupInternalMeshStruct(
-      unsigned int                                 neq,
-      const Teuchos::RCP<Albany::StateInfoStruct>& sis,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-                                                                side_set_sis,
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      std::map<
-          std::string,
-          AbstractFieldContainer::FieldContainerRequirements> const&
-          side_set_req);
+      unsigned int                                                                     neq,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
+      const AbstractFieldContainer::FieldContainerRequirements&                        req,
+      std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req);
 
   Teuchos::RCP<Albany::AbstractDiscretization>
-  createDiscretizationFromInternalMeshStruct(
-      const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes);
+  createDiscretizationFromInternalMeshStruct(const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes);
 
   Teuchos::RCP<Albany::AbstractDiscretization>
   createDiscretizationFromInternalMeshStruct(
@@ -110,12 +99,9 @@ class DiscretizationFactory
   DiscretizationFactory&
   operator=(const DiscretizationFactory&);
 
-  std::map<int, std::vector<std::string>> const empty_side_set_equations;
-  std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const
-      empty_side_set_sis;
-  const std::
-      map<std::string, AbstractFieldContainer::FieldContainerRequirements>
-          empty_side_set_req;
+  std::map<int, std::vector<std::string>> const                                   empty_side_set_equations;
+  std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const              empty_side_set_sis;
+  const std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> empty_side_set_req;
 
  protected:
   //! Parameter list specifying what element to create

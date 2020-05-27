@@ -15,12 +15,8 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 LamentStress<EvalT, Traits>::LamentStress(Teuchos::ParameterList& p)
-    : defGradField(
-          p.get<std::string>("DefGrad Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      stressField(
-          p.get<std::string>("Stress Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+    : defGradField(p.get<std::string>("DefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      stressField(p.get<std::string>("Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       lamentMaterialModel(Teuchos::RCP<lament::Material<ScalarT>>())
 {
   // Pull out numQPs and numDims from a Layout
@@ -30,9 +26,7 @@ LamentStress<EvalT, Traits>::LamentStress(Teuchos::ParameterList& p)
   numQPs  = dims[1];
   numDims = dims[2];
 
-  ALBANY_PANIC(
-      this->numDims != 3,
-      " LAMENT materials enabled only for three-dimensional analyses.");
+  ALBANY_PANIC(this->numDims != 3, " LAMENT materials enabled only for three-dimensional analyses.");
 
   defGradName = p.get<std::string>("DefGrad Name") + "_old";
   this->addDependentField(defGradField);
@@ -46,8 +40,7 @@ LamentStress<EvalT, Traits>::LamentStress(Teuchos::ParameterList& p)
   // overwritten later)
   lamentMaterialModelName = p.get<string>("Lame Material Model", "Elastic");
   std::cout << "Material Model Name : " << lamentMaterialModelName << std::endl;
-  Teuchos::ParameterList& lamentMaterialParameters =
-      p.sublist("Lame Material Parameters");
+  Teuchos::ParameterList& lamentMaterialParameters = p.sublist("Lame Material Parameters");
 
   // Code to allow material data to come from materials.xml data file
   int haveMatDB = p.get<bool>("Have MatDB", false);
@@ -57,18 +50,14 @@ LamentStress<EvalT, Traits>::LamentStress(Teuchos::ParameterList& p)
   // Check for material database file
   if (haveMatDB) {
     // Check if material database will be supplying the data
-    bool dataFromDatabase = lamentMaterialParameters.get<bool>(
-        "Material Dependent Data Source", false);
+    bool dataFromDatabase = lamentMaterialParameters.get<bool>("Material Dependent Data Source", false);
 
     // If so, overwrite material model and data from database file
     if (dataFromDatabase) {
-      Teuchos::RCP<Albany::MaterialDatabase> materialDB =
-          p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
+      Teuchos::RCP<Albany::MaterialDatabase> materialDB = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
 
-      lamentMaterialModelName = materialDB->getElementBlockParam<std::string>(
-          ebName, "Lame Material Model");
-      lamentMaterialParameters = materialDB->getElementBlockSublist(
-          ebName, "Lame Material Parameters");
+      lamentMaterialModelName  = materialDB->getElementBlockParam<std::string>(ebName, "Lame Material Model");
+      lamentMaterialParameters = materialDB->getElementBlockSublist(ebName, "Lame Material Parameters");
     }
   }
 
@@ -76,37 +65,30 @@ LamentStress<EvalT, Traits>::LamentStress(Teuchos::ParameterList& p)
   // This assumes that there is a single material model associated with this
   // evaluator and that the material properties are constant (read directly
   // from input deck parameter list)
-  lamentMaterialModel = LameUtils::constructLamentMaterialModel<ScalarT>(
-      lamentMaterialModelName, lamentMaterialParameters);
+  lamentMaterialModel =
+      LameUtils::constructLamentMaterialModel<ScalarT>(lamentMaterialModelName, lamentMaterialParameters);
 
   // Get a list of the LAMENT material model state variable names
-  lamentMaterialModelStateVariableNames = LameUtils::getStateVariableNames(
-      lamentMaterialModelName, lamentMaterialParameters);
+  lamentMaterialModelStateVariableNames =
+      LameUtils::getStateVariableNames(lamentMaterialModelName, lamentMaterialParameters);
 
   // Declare the state variables as evaluated fields (type is always double)
-  Teuchos::RCP<PHX::DataLayout> dataLayout =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-  for (unsigned int i = 0; i < lamentMaterialModelStateVariableNames.size();
-       ++i) {
-    PHX::MDField<ScalarT, Cell, QuadPoint>
-        lamentMaterialModelStateVariableField(
-            lamentMaterialModelStateVariableNames[i], dataLayout);
+  Teuchos::RCP<PHX::DataLayout> dataLayout = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+  for (unsigned int i = 0; i < lamentMaterialModelStateVariableNames.size(); ++i) {
+    PHX::MDField<ScalarT, Cell, QuadPoint> lamentMaterialModelStateVariableField(
+        lamentMaterialModelStateVariableNames[i], dataLayout);
     this->addEvaluatedField(lamentMaterialModelStateVariableField);
-    lamentMaterialModelStateVariableFields.push_back(
-        lamentMaterialModelStateVariableField);
+    lamentMaterialModelStateVariableFields.push_back(lamentMaterialModelStateVariableField);
   }
 }
 
 template <typename EvalT, typename Traits>
 void
-LamentStress<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+LamentStress<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(defGradField, fm);
   this->utils.setFieldData(stressField, fm);
-  for (unsigned int i = 0; i < lamentMaterialModelStateVariableFields.size();
-       ++i)
+  for (unsigned int i = 0; i < lamentMaterialModelStateVariableFields.size(); ++i)
     this->utils.setFieldData(lamentMaterialModelStateVariableFields[i], fm);
 }
 
@@ -114,30 +96,26 @@ template <typename EvalT, typename Traits>
 void
 LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  Teuchos::RCP<lament::matParams<ScalarT>> matp =
-      Teuchos::rcp(new lament::matParams<ScalarT>());
+  Teuchos::RCP<lament::matParams<ScalarT>> matp = Teuchos::rcp(new lament::matParams<ScalarT>());
 
   // Get the old state data
   Albany::MDArray oldDefGrad = (*workset.stateArrayPtr)[defGradName];
   Albany::MDArray oldStress  = (*workset.stateArrayPtr)[stressName];
 
-  int numStateVariables =
-      (int)(this->lamentMaterialModelStateVariableNames.size());
+  int numStateVariables = (int)(this->lamentMaterialModelStateVariableNames.size());
 
   // \todo Get actual time step for calls to LAMENT materials.
   double deltaT = 1.0;
 
-  vector<ScalarT> strainRate(6);   // symmetric tensor
-  vector<ScalarT> spin(3);         // skew-symmetric tensor
-  vector<ScalarT> defGrad(9);      // symmetric tensor
-  vector<ScalarT> leftStretch(6);  // symmetric tensor
-  vector<ScalarT> rotation(9);     // full tensor
-  vector<double>  stressOld(6);    // symmetric tensor
-  vector<ScalarT> stressNew(6);    // symmetric tensor
-  vector<double>  stateOld(
-      numStateVariables);  // a single scalar for each state variable
-  vector<double> stateNew(
-      numStateVariables);  // a single scalar for each state variable
+  vector<ScalarT> strainRate(6);                // symmetric tensor
+  vector<ScalarT> spin(3);                      // skew-symmetric tensor
+  vector<ScalarT> defGrad(9);                   // symmetric tensor
+  vector<ScalarT> leftStretch(6);               // symmetric tensor
+  vector<ScalarT> rotation(9);                  // full tensor
+  vector<double>  stressOld(6);                 // symmetric tensor
+  vector<ScalarT> stressNew(6);                 // symmetric tensor
+  vector<double>  stateOld(numStateVariables);  // a single scalar for each state variable
+  vector<double>  stateNew(numStateVariables);  // a single scalar for each state variable
 
   // \todo Set up scratch space for material models using getNumScratchVars()
   // and setScratchPtr().
@@ -306,10 +284,9 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
       // copy data from the state manager to the LAMENT data structure
       for (int iVar = 0; iVar < numStateVariables; iVar++) {
-        std::string const& variableName =
-            this->lamentMaterialModelStateVariableNames[iVar] + "_old";
-        Albany::MDArray stateVar = (*workset.stateArrayPtr)[variableName];
-        stateOld[iVar]           = stateVar(cell, qp);
+        std::string const& variableName = this->lamentMaterialModelStateVariableNames[iVar] + "_old";
+        Albany::MDArray    stateVar     = (*workset.stateArrayPtr)[variableName];
+        stateOld[iVar]                  = stateVar(cell, qp);
       }
 
       // Make a call to the LAMENT material model to initialize the load step
@@ -353,8 +330,7 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       // copy state_new data from the LAMENT data structure to the corresponding
       // state variable field
       for (int iVar = 0; iVar < numStateVariables; iVar++)
-        this->lamentMaterialModelStateVariableFields[iVar](cell, qp) =
-            stateNew[iVar];
+        this->lamentMaterialModelStateVariableFields[iVar](cell, qp) = stateNew[iVar];
     }
   }
 }

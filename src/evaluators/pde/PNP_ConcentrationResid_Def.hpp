@@ -12,9 +12,7 @@ PNP::ConcentrationResid<EvalT, Traits>::ConcentrationResid(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          dl->node_qp_gradient),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_gradient),
       Concentration("Concentration", dl->qp_vector),
       Concentration_dot("Concentration_dot", dl->qp_vector),
       ConcentrationGrad("Concentration Gradient", dl->qp_vecgradient),
@@ -74,16 +72,13 @@ PNP::ConcentrationResid<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-PNP::ConcentrationResid<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+PNP::ConcentrationResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
 
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t node = 0; node < numNodes; ++node) {
-      for (std::size_t j = 0; j < numSpecies; ++j) {
-        ConcentrationResidual(cell, node, j) = 0.0;
-      }
+      for (std::size_t j = 0; j < numSpecies; ++j) { ConcentrationResidual(cell, node, j) = 0.0; }
     }
   }
 
@@ -95,8 +90,7 @@ PNP::ConcentrationResid<EvalT, Traits>::evaluateFields(
             ConcentrationResidual(cell, node, j) +=
                 D[j] *
                 (ConcentrationGrad(cell, qp, j, dim) +
-                 beta[j] * Concentration(cell, qp, j) *
-                     PotentialGrad(cell, qp, dim)) *
+                 beta[j] * Concentration(cell, qp, j) * PotentialGrad(cell, qp, dim)) *
                 wGradBF(cell, node, qp, dim);
           }
         }

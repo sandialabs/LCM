@@ -13,9 +13,7 @@
 #include "ProjectIPtoNodalField.hpp"
 
 template <typename EvalT, typename Traits>
-Albany::ResponseUtilities<EvalT, Traits>::ResponseUtilities(
-    Teuchos::RCP<Albany::Layouts> dl_)
-    : dl(dl_)
+Albany::ResponseUtilities<EvalT, Traits>::ResponseUtilities(Teuchos::RCP<Albany::Layouts> dl_) : dl(dl_)
 {
 }
 
@@ -40,76 +38,41 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
   RCP<PHX::Evaluator<Traits>> res_ev;
 
   if (responseName == "Squared L2 Difference Source ST Target ST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSST_TST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSST_TST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source ST Target MST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSST_TMST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSST_TMST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source ST Target PST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSST_TPST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSST_TPST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source PST Target ST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSPST_TST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSPST_TST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source PST Target MST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSPST_TMST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSPST_TMST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source PST Target PST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSPST_TPST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSPST_TPST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source MST Target ST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSMST_TST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSMST_TST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source MST Target MST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSMST_TMST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSMST_TMST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Source MST Target PST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSMST_TPST<EvalT, Traits>(
-            *p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSMST_TPST<EvalT, Traits>(*p, dl));
   } else if (responseName == "Squared L2 Difference Side Source ST Target ST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSST_TST<EvalT, Traits>(
-            *p, dl));
-  } else if (
-      responseName == "Squared L2 Difference Side Source ST Target MST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSST_TMST<EvalT, Traits>(
-            *p, dl));
-  } else if (
-      responseName == "Squared L2 Difference Side Source ST Target PST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSST_TPST<EvalT, Traits>(
-            *p, dl));
-  } else if (
-      responseName == "Squared L2 Difference Side Source PST Target ST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSPST_TST<EvalT, Traits>(
-            *p, dl));
-  } else if (
-      responseName == "Squared L2 Difference Side Source PST Target MST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSPST_TMST<EvalT, Traits>(
-            *p, dl));
-  } else if (
-      responseName == "Squared L2 Difference Side Source PST Target PST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSPST_TPST<EvalT, Traits>(
-            *p, dl));
-  } else if (
-      responseName == "Squared L2 Difference Side Source MST Target ST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSMST_TST<EvalT, Traits>(
-            *p, dl));
-  } else if (
-      responseName == "Squared L2 Difference Side Source MST Target MST") {
-    res_ev =
-        rcp(new PHAL::ResponseSquaredL2DifferenceSideSMST_TMST<EvalT, Traits>(
-            *p, dl));
-  } else if (
-      responseName == "Squared L2 Difference Side Source MST Target PST") {
-    res_ev = rcp(
-        new PHAL::ResponseSquaredL2DifferenceSMST_TPST<EvalT, Traits>(*p, dl));
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSST_TST<EvalT, Traits>(*p, dl));
+  } else if (responseName == "Squared L2 Difference Side Source ST Target MST") {
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSST_TMST<EvalT, Traits>(*p, dl));
+  } else if (responseName == "Squared L2 Difference Side Source ST Target PST") {
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSST_TPST<EvalT, Traits>(*p, dl));
+  } else if (responseName == "Squared L2 Difference Side Source PST Target ST") {
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSPST_TST<EvalT, Traits>(*p, dl));
+  } else if (responseName == "Squared L2 Difference Side Source PST Target MST") {
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSPST_TMST<EvalT, Traits>(*p, dl));
+  } else if (responseName == "Squared L2 Difference Side Source PST Target PST") {
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSPST_TPST<EvalT, Traits>(*p, dl));
+  } else if (responseName == "Squared L2 Difference Side Source MST Target ST") {
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSMST_TST<EvalT, Traits>(*p, dl));
+  } else if (responseName == "Squared L2 Difference Side Source MST Target MST") {
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSideSMST_TMST<EvalT, Traits>(*p, dl));
+  } else if (responseName == "Squared L2 Difference Side Source MST Target PST") {
+    res_ev = rcp(new PHAL::ResponseSquaredL2DifferenceSMST_TPST<EvalT, Traits>(*p, dl));
   } else if (responseName == "PHAL Field Integral") {
     res_ev = rcp(new PHAL::ResponseFieldIntegral<EvalT, Traits>(*p, dl));
   } else if (responseName == "PHAL Thermal Energy") {
@@ -136,15 +99,13 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
     p->set<std::string>("Weighted BF Name", "wBF");
     p->set<std::string>("Coordinate Vector Name", "Coord Vec");
 
-    res_ev =
-        rcp(new LCM::ProjectIPtoNodalField<EvalT, Traits>(*p, dl, meshSpecs));
+    res_ev = rcp(new LCM::ProjectIPtoNodalField<EvalT, Traits>(*p, dl, meshSpecs));
   }
 
   else
     ALBANY_ABORT(
         std::endl
-        << "Error!  Unknown response function " << responseName << "!"
-        << std::endl
+        << "Error!  Unknown response function " << responseName << "!" << std::endl
         << "Supplied parameter list is " << std::endl
         << responseParams);
 
@@ -157,9 +118,7 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
   // The response tag is not the same of the evaluated field tag for
   // PHAL::ScatterScalarResponse
   Teuchos::RCP<PHAL::ScatterScalarResponseBase<EvalT, Traits>> sc_resp;
-  sc_resp =
-      Teuchos::rcp_dynamic_cast<PHAL::ScatterScalarResponseBase<EvalT, Traits>>(
-          res_ev);
+  sc_resp = Teuchos::rcp_dynamic_cast<PHAL::ScatterScalarResponseBase<EvalT, Traits>>(res_ev);
   if (sc_resp != Teuchos::null) { ev_tag = sc_resp->getResponseFieldTag(); }
 
   // Require the response tag;

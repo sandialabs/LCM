@@ -22,26 +22,20 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                 public PHX::EvaluatorDerived<EvalT, Traits>
+class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFGradInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  DOFGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  protected:
-  typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
-      OutputScalarT;
+  typedef typename EvalT::MeshScalarT                                      MeshScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type OutputScalarT;
 
   // Input:
   //! Values at nodes
@@ -68,21 +62,19 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   typedef team_policy::member_type           team_member;
   int const                                  work_size = 256;
   int                                        numCells;
-  int threads_per_team;  //=worksize/numQP
-  int numTeams;          //#of elements/threads_per_team
+  int                                        threads_per_team;  //=worksize/numQP
+  int                                        numTeams;          //#of elements/threads_per_team
 
   void
   operator()(const team_member& thread) const;
 
 #else
-  typedef Kokkos::
-      RangePolicy<ExecutionSpace, DOFGradInterpolationBase_Residual_Tag>
-          DOFGradInterpolationBase_Residual_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, DOFGradInterpolationBase_Residual_Tag>
+      DOFGradInterpolationBase_Residual_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const DOFGradInterpolationBase_Residual_Tag& tag, int const& cell)
-      const;
+  operator()(const DOFGradInterpolationBase_Residual_Tag& tag, int const& cell) const;
 #endif
 };
 
@@ -96,25 +88,19 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
    solution It does not work when the mesh coordinates are of type ScalarT
 */
 template <typename EvalT, typename Traits, typename ScalarT>
-class FastSolutionGradInterpolationBase
-    : public DOFGradInterpolationBase<EvalT, Traits, ScalarT>
+class FastSolutionGradInterpolationBase : public DOFGradInterpolationBase<EvalT, Traits, ScalarT>
 {
  public:
-  FastSolutionGradInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  FastSolutionGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFGradInterpolationBase<EvalT, Traits, ScalarT>(p, dl)
   {
     this->setName("FastSolutionGradInterpolationBase" + PHX::print<EvalT>());
   };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-        d, vm);
+    DOFGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(d, vm);
   }
 
   void
@@ -137,29 +123,19 @@ class FastSolutionGradInterpolationBase<
           typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
  public:
-  FastSolutionGradInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
-      : DOFGradInterpolationBase<
-            PHAL::AlbanyTraits::Jacobian,
-            Traits,
-            typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
+  FastSolutionGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
+      : DOFGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>(
+            p,
+            dl)
   {
-    this->setName(
-        "FastSolutionGradInterpolationBase" +
-        PHX::print<PHAL::AlbanyTraits::Jacobian>());
+    this->setName("FastSolutionGradInterpolationBase" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
   }
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFGradInterpolationBase<
-        PHAL::AlbanyTraits::Jacobian,
-        Traits,
-        typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
+    DOFGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
         postRegistrationSetup(d, vm);
   }
 
@@ -176,9 +152,7 @@ class FastSolutionGradInterpolationBase<
   struct FastSolutionGradInterpolationBase_Jacobian_Tag
   {
   };
-  typedef Kokkos::RangePolicy<
-      ExecutionSpace,
-      FastSolutionGradInterpolationBase_Jacobian_Tag>
+  typedef Kokkos::RangePolicy<ExecutionSpace, FastSolutionGradInterpolationBase_Jacobian_Tag>
       FastSolutionGradInterpolationBase_Jacobian_Policy;
 
   int num_dof;
@@ -186,28 +160,22 @@ class FastSolutionGradInterpolationBase<
 
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(
-      const FastSolutionGradInterpolationBase_Jacobian_Tag& tag,
-      int const&                                            cell) const;
+  operator()(const FastSolutionGradInterpolationBase_Jacobian_Tag& tag, int const& cell) const;
 };
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFGradInterpolation =
-    DOFGradInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFGradInterpolation = DOFGradInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFGradInterpolationMesh =
-    DOFGradInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFGradInterpolationMesh = DOFGradInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFGradInterpolationParam =
-    DOFGradInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using DOFGradInterpolationParam = DOFGradInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
-using FastSolutionGradInterpolation =
-    FastSolutionGradInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using FastSolutionGradInterpolation = FastSolutionGradInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 }  // Namespace PHAL
 

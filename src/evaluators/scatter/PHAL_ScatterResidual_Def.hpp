@@ -36,8 +36,7 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
   if (p.isType<Teuchos::ArrayRCP<std::string>>("Residual Names")) {
     names = p.get<Teuchos::ArrayRCP<std::string>>("Residual Names");
   } else if (p.isType<std::string>("Residual Name")) {
-    names =
-        Teuchos::ArrayRCP<std::string>(1, p.get<std::string>("Residual Name"));
+    names = Teuchos::ArrayRCP<std::string>(1, p.get<std::string>("Residual Name"));
   } else {
     ALBANY_ABORT(
         "Error! You must specify either the std::string 'Residual Name', "
@@ -64,8 +63,7 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
     numFieldsBase = dl->node_vector->extent(2);
   } else if (tensorRank == 2) {
     // tensor
-    PHX::MDField<ScalarT const, Cell, Node, Dim, Dim> mdf(
-        names[0], dl->node_tensor);
+    PHX::MDField<ScalarT const, Cell, Node, Dim, Dim> mdf(names[0], dl->node_tensor);
     valTensor = mdf;
     this->addDependentField(valTensor);
     numFieldsBase = (dl->node_tensor->extent(2)) * (dl->node_tensor->extent(3));
@@ -87,14 +85,10 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-ScatterResidualBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ScatterResidualBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   if (tensorRank == 0) {
-    for (std::size_t eq = 0; eq < numFieldsBase; ++eq) {
-      this->utils.setFieldData(val[eq], fm);
-    }
+    for (std::size_t eq = 0; eq < numFieldsBase; ++eq) { this->utils.setFieldData(val[eq], fm); }
     numNodes = val[0].extent(1);
   } else if (tensorRank == 1) {
     this->utils.setFieldData(valVec, fm);
@@ -114,8 +108,7 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::ScatterResidual(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl),
-      numFields(ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>::
-                    numFieldsBase)
+      numFields(ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>::numFieldsBase)
 {
 }
 
@@ -123,9 +116,8 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::ScatterResidual(
 // Kokkos kernels
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
-    const PHAL_ScatterResRank0_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank0_Tag&, int const& cell)
+    const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -136,9 +128,8 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
-    const PHAL_ScatterResRank1_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank1_Tag&, int const& cell)
+    const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -149,24 +140,21 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
-    const PHAL_ScatterResRank2_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank2_Tag&, int const& cell)
+    const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
       for (std::size_t j = 0; j < numDims; j++) {
         const LO id = nodeID(cell, node, this->offset + i * numDims + j);
-        Kokkos::atomic_fetch_add(
-            &f_kokkos(id), this->valTensor(cell, node, i, j));
+        Kokkos::atomic_fetch_add(&f_kokkos(id), this->valTensor(cell, node, i, j));
       }
 }
 
 // **********************************************************************
 template <typename Traits>
 void
-ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   Teuchos::RCP<Thyra_Vector> f = workset.f;
 
@@ -183,29 +171,23 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
     // Get MDField views from std::vector
     for (int i = 0; i < numFields; i++) val_kokkos[i] = this->val[i].get_view();
 
-    Kokkos::parallel_for(
-        PHAL_ScatterResRank0_Policy(0, workset.numCells), *this);
+    Kokkos::parallel_for(PHAL_ScatterResRank0_Policy(0, workset.numCells), *this);
     cudaCheckError();
   } else if (this->tensorRank == 1) {
-    Kokkos::parallel_for(
-        PHAL_ScatterResRank1_Policy(0, workset.numCells), *this);
+    Kokkos::parallel_for(PHAL_ScatterResRank1_Policy(0, workset.numCells), *this);
     cudaCheckError();
   } else if (this->tensorRank == 2) {
     numDims = this->valTensor.extent(2);
-    Kokkos::parallel_for(
-        PHAL_ScatterResRank2_Policy(0, workset.numCells), *this);
+    Kokkos::parallel_for(PHAL_ScatterResRank2_Policy(0, workset.numCells), *this);
     cudaCheckError();
   }
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "Scatter Residual time = " << millisec << "  " << microseconds
-            << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "Scatter Residual time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 
@@ -218,8 +200,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::ScatterResidual(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl),
-      numFields(ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-                    numFieldsBase)
+      numFields(ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::numFieldsBase)
 {
 }
 
@@ -227,15 +208,13 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::ScatterResidual(
 // Kokkos kernels
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterResRank0_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank0_Tag&, int const& cell)
+    const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
-      Kokkos::atomic_fetch_add(
-          &f_kokkos(id), (val_kokkos[eq](cell, node)).val());
+      Kokkos::atomic_fetch_add(&f_kokkos(id), (val_kokkos[eq](cell, node)).val());
     }
 }
 
@@ -254,9 +233,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -273,9 +250,8 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterJacRank0_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank0_Tag&, int const& cell)
+    const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -287,9 +263,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -304,15 +278,13 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterResRank1_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank1_Tag&, int const& cell)
+    const
 {
   for (std::size_t node = 0; node < this->numNodes; node++) {
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
-      Kokkos::atomic_fetch_add(
-          &f_kokkos(id), (this->valVec(cell, node, eq)).val());
+      Kokkos::atomic_fetch_add(&f_kokkos(id), (this->valVec(cell, node, eq)).val());
     }
   }
 }
@@ -332,9 +304,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -352,9 +322,8 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterJacRank1_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank1_Tag&, int const& cell)
+    const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -366,17 +335,14 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       row = nodeID(cell, node, this->offset + eq);
       if (((this->valVec)(cell, node, eq)).hasFastAccess()) {
-        for (int i = 0; i < nunk; ++i)
-          vals[i] = (this->valVec)(cell, node, eq).fastAccessDx(i);
+        for (int i = 0; i < nunk; ++i) vals[i] = (this->valVec)(cell, node, eq).fastAccessDx(i);
         Jac_kokkos.sumIntoValues(row, col, nunk, vals, false, true);
       }
     }
@@ -385,16 +351,14 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterResRank2_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank2_Tag&, int const& cell)
+    const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
       for (std::size_t j = 0; j < numDims; j++) {
         const LO id = nodeID(cell, node, this->offset + i * numDims + j);
-        Kokkos::atomic_fetch_add(
-            &f_kokkos(id), (this->valTensor(cell, node, i, j)).val());
+        Kokkos::atomic_fetch_add(&f_kokkos(id), (this->valTensor(cell, node, i, j)).val());
       }
 }
 
@@ -413,19 +377,15 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       row = nodeID(cell, node, this->offset + eq);
-      if (((this->valTensor)(cell, node, eq / numDims, eq % numDims))
-              .hasFastAccess()) {
+      if (((this->valTensor)(cell, node, eq / numDims, eq % numDims)).hasFastAccess()) {
         for (int lunk = 0; lunk < nunk; lunk++) {
-          ST val = ((this->valTensor)(cell, node, eq / numDims, eq % numDims))
-                       .fastAccessDx(lunk);
+          ST val = ((this->valTensor)(cell, node, eq / numDims, eq % numDims)).fastAccessDx(lunk);
           Jac_kokkos.sumIntoValues(col[lunk], &row, 1, &val, false, true);
         }
       }  // has fast access
@@ -435,9 +395,8 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterJacRank2_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank2_Tag&, int const& cell)
+    const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -449,19 +408,15 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       row = nodeID(cell, node, this->offset + eq);
-      if (((this->valTensor)(cell, node, eq / numDims, eq % numDims))
-              .hasFastAccess()) {
+      if (((this->valTensor)(cell, node, eq / numDims, eq % numDims)).hasFastAccess()) {
         for (int i = 0; i < nunk; ++i)
-          vals[i] = (this->valTensor)(cell, node, eq / numDims, eq % numDims)
-                        .fastAccessDx(i);
+          vals[i] = (this->valTensor)(cell, node, eq / numDims, eq % numDims).fastAccessDx(i);
         Jac_kokkos.sumIntoValues(row, col, nunk, vals, false, true);
       }
     }
@@ -471,8 +426,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 // **********************************************************************
 template <typename Traits>
 void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
 #if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
@@ -494,64 +448,52 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     for (int i = 0; i < numFields; i++) val_kokkos[i] = this->val[i].get_view();
 
     if (loadResid) {
-      Kokkos::parallel_for(
-          PHAL_ScatterResRank0_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterResRank0_Policy(0, workset.numCells), *this);
       cudaCheckError();
     }
 
     if (workset.is_adjoint) {
-      Kokkos::parallel_for(
-          PHAL_ScatterJacRank0_Adjoint_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterJacRank0_Adjoint_Policy(0, workset.numCells), *this);
       cudaCheckError();
     } else {
-      Kokkos::parallel_for(
-          PHAL_ScatterJacRank0_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterJacRank0_Policy(0, workset.numCells), *this);
       cudaCheckError();
     }
   } else if (this->tensorRank == 1) {
     if (loadResid) {
-      Kokkos::parallel_for(
-          PHAL_ScatterResRank1_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterResRank1_Policy(0, workset.numCells), *this);
       cudaCheckError();
     }
 
     if (workset.is_adjoint) {
-      Kokkos::parallel_for(
-          PHAL_ScatterJacRank1_Adjoint_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterJacRank1_Adjoint_Policy(0, workset.numCells), *this);
       cudaCheckError();
     } else {
-      Kokkos::parallel_for(
-          PHAL_ScatterJacRank1_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterJacRank1_Policy(0, workset.numCells), *this);
       cudaCheckError();
     }
   } else if (this->tensorRank == 2) {
     numDims = this->valTensor.extent(2);
 
     if (loadResid) {
-      Kokkos::parallel_for(
-          PHAL_ScatterResRank2_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterResRank2_Policy(0, workset.numCells), *this);
       cudaCheckError();
     }
 
     if (workset.is_adjoint) {
-      Kokkos::parallel_for(
-          PHAL_ScatterJacRank2_Adjoint_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterJacRank2_Adjoint_Policy(0, workset.numCells), *this);
     } else {
-      Kokkos::parallel_for(
-          PHAL_ScatterJacRank2_Policy(0, workset.numCells), *this);
+      Kokkos::parallel_for(PHAL_ScatterJacRank2_Policy(0, workset.numCells), *this);
       cudaCheckError();
     }
   }
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "Scatter Jacobian time = " << millisec << "  " << microseconds
-            << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "Scatter Jacobian time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 

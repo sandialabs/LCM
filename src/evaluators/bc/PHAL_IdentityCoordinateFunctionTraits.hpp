@@ -63,10 +63,8 @@ class IdentityCoordFunctionTraits
 }  // namespace PHAL
 
 // Define macro for explicit template instantiation
-#define COORD_FUNC_INSTANTIATE_TEMPLATE_CLASS_RESIDUAL(name) \
-  template class name<PHAL::AlbanyTraits::Residual>;
-#define COORD_FUNC_INSTANTIATE_TEMPLATE_CLASS_JACOBIAN(name) \
-  template class name<PHAL::AlbanyTraits::Jacobian>;
+#define COORD_FUNC_INSTANTIATE_TEMPLATE_CLASS_RESIDUAL(name) template class name<PHAL::AlbanyTraits::Residual>;
+#define COORD_FUNC_INSTANTIATE_TEMPLATE_CLASS_JACOBIAN(name) template class name<PHAL::AlbanyTraits::Jacobian>;
 
 #define COORD_FUNC_INSTANTIATE_TEMPLATE_CLASS(name)    \
   COORD_FUNC_INSTANTIATE_TEMPLATE_CLASS_RESIDUAL(name) \

@@ -43,9 +43,7 @@ class CapImplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  CapImplicitModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  CapImplicitModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Destructor
@@ -56,16 +54,10 @@ class CapImplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
   /// Implementation of physics
   ///
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields)
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
   {
     ALBANY_ABORT("Not implemented.");
   }
@@ -87,10 +79,7 @@ class CapImplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
   // yield function
   template <typename T>
   T
-  compute_f(
-      minitensor::Tensor<T>& sigma,
-      minitensor::Tensor<T>& alpha,
-      T&                     kappa);
+  compute_f(minitensor::Tensor<T>& sigma, minitensor::Tensor<T>& alpha, T& kappa);
 
   // unknow variable value list
   std::vector<ScalarT>
@@ -115,10 +104,7 @@ class CapImplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
   // plastic potential
   template <typename T>
   T
-  compute_g(
-      minitensor::Tensor<T>& sigma,
-      minitensor::Tensor<T>& alpha,
-      T&                     kappa);
+  compute_g(minitensor::Tensor<T>& sigma, minitensor::Tensor<T>& alpha, T& kappa);
 
   // derivative
   minitensor::Tensor<ScalarT>

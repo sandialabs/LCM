@@ -38,10 +38,7 @@ namespace rebalance {
  */
 
 void
-check_ownership(
-    mesh::BulkData&          bulk_data,
-    stk::mesh::EntityVector& entities,
-    std::string const&       msg);
+check_ownership(mesh::BulkData& bulk_data, stk::mesh::EntityVector& entities, std::string const& msg);
 
 double
 check_balance(

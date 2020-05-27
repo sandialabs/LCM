@@ -25,12 +25,12 @@
 #include "Albany_ThermoElectrostaticsProblem.hpp"
 #endif
 
+#include "LCM/problems/ACEThermalProblem.hpp"
 #include "LCM/problems/ConstitutiveDriverProblem.hpp"
 #include "LCM/problems/ElasticityProblem.hpp"
 #include "LCM/problems/ElectroMechanicsProblem.hpp"
 #include "LCM/problems/HMCProblem.hpp"
 #include "LCM/problems/MechanicsProblem.hpp"
-#include "LCM/problems/ACEThermalProblem.hpp"
 #include "LCM/problems/ThermoElasticityProblem.hpp"
 
 Albany::ProblemFactory::ProblemFactory(
@@ -76,24 +76,19 @@ Albany::ProblemFactory::create()
   } else if (method == "Heat 3D") {
     strategy = rcp(new Albany::HeatProblem(problemParams, paramLib, 3, commT));
   } else if (method == "Thermal 1D") {
-    strategy =
-        rcp(new Albany::ThermalProblem(problemParams, paramLib, 1, commT));
+    strategy = rcp(new Albany::ThermalProblem(problemParams, paramLib, 1, commT));
   } else if (method == "Thermal 2D") {
-    strategy =
-        rcp(new Albany::ThermalProblem(problemParams, paramLib, 2, commT));
+    strategy = rcp(new Albany::ThermalProblem(problemParams, paramLib, 2, commT));
   } else if (method == "Thermal 3D") {
-    strategy =
-        rcp(new Albany::ThermalProblem(problemParams, paramLib, 3, commT));
+    strategy = rcp(new Albany::ThermalProblem(problemParams, paramLib, 3, commT));
   } else if (method == "Populate Mesh") {
-    strategy = rcp(new Albany::PopulateMesh(
-        problemParams, discretizationParams, paramLib));
+    strategy = rcp(new Albany::PopulateMesh(problemParams, discretizationParams, paramLib));
   } else if (method == "Side Laplacian 3D") {
     strategy = rcp(new Albany::SideLaplacian(problemParams, paramLib, 1));
   }
 #if defined(ALBANY_DEMO_PDES)
   else if (method == "CahnHill 2D") {
-    strategy =
-        rcp(new Albany::CahnHillProblem(problemParams, paramLib, 2, commT));
+    strategy = rcp(new Albany::CahnHillProblem(problemParams, paramLib, 2, commT));
   } else if (method == "ODE") {
     strategy = rcp(new Albany::ODEProblem(problemParams, paramLib, 0));
   } else if (method == "Helmholtz 2D") {
@@ -110,9 +105,7 @@ Albany::ProblemFactory::create()
     strategy = rcp(new Albany::AdvDiffProblem(problemParams, paramLib, 1));
   } else if (method == "AdvDiff 2D") {
     strategy = rcp(new Albany::AdvDiffProblem(problemParams, paramLib, 2));
-  } else if (
-      (method == "Reaction-Diffusion System 3D") ||
-      (method == "Reaction-Diffusion System")) {
+  } else if ((method == "Reaction-Diffusion System 3D") || (method == "Reaction-Diffusion System")) {
     strategy = rcp(new Albany::ReactDiffSystem(problemParams, paramLib, 3));
   } else if (method == "LinComprNS 2D") {
     strategy = rcp(new Albany::LinComprNSProblem(problemParams, paramLib, 2));
@@ -129,37 +122,27 @@ Albany::ProblemFactory::create()
   } else if (method == "PNP 3D") {
     strategy = rcp(new Albany::PNPProblem(problemParams, paramLib, 3));
   } else if (method == "ThermoElectrostatics 1D") {
-    strategy = rcp(
-        new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 1));
+    strategy = rcp(new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 1));
   } else if (method == "ThermoElectrostatics 2D") {
-    strategy = rcp(
-        new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 2));
+    strategy = rcp(new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 2));
   } else if (method == "ThermoElectrostatics 3D") {
-    strategy = rcp(
-        new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 3));
+    strategy = rcp(new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 3));
   }
 #endif
   else if (getName(method) == "Mechanics") {
-    strategy = rcp(new Albany::MechanicsProblem(
-        problemParams, paramLib, getNumDim(method), rc_mgr, commT));
+    strategy = rcp(new Albany::MechanicsProblem(problemParams, paramLib, getNumDim(method), rc_mgr, commT));
   } else if (getName(method) == "ACE Thermal") {
-    strategy =
-        rcp(new ACEThermalProblem(problemParams, paramLib, getNumDim(method), commT));
+    strategy = rcp(new ACEThermalProblem(problemParams, paramLib, getNumDim(method), commT));
   } else if (getName(method) == "Elasticity") {
-    strategy = rcp(new Albany::ElasticityProblem(
-        problemParams, paramLib, getNumDim(method), rc_mgr));
+    strategy = rcp(new Albany::ElasticityProblem(problemParams, paramLib, getNumDim(method), rc_mgr));
   } else if (method == "Constitutive Model Driver") {
-    strategy = rcp(new Albany::ConstitutiveDriverProblem(
-        problemParams, paramLib, 3, commT));
+    strategy = rcp(new Albany::ConstitutiveDriverProblem(problemParams, paramLib, 3, commT));
   } else if (method == "ThermoElasticity 1D") {
-    strategy =
-        rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 1));
+    strategy = rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 1));
   } else if (method == "ThermoElasticity 2D") {
-    strategy =
-        rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 2));
+    strategy = rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 2));
   } else if (method == "ThermoElasticity 3D") {
-    strategy =
-        rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 3));
+    strategy = rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 3));
   } else if (method == "HMC 1D") {
     strategy = rcp(new Albany::HMCProblem(problemParams, paramLib, 1, commT));
   } else if (method == "HMC 2D") {
@@ -167,14 +150,11 @@ Albany::ProblemFactory::create()
   } else if (method == "HMC 3D") {
     strategy = rcp(new Albany::HMCProblem(problemParams, paramLib, 3, commT));
   } else if (method == "Electromechanics 1D") {
-    strategy = rcp(
-        new Albany::ElectroMechanicsProblem(problemParams, paramLib, 1, commT));
+    strategy = rcp(new Albany::ElectroMechanicsProblem(problemParams, paramLib, 1, commT));
   } else if (method == "Electromechanics 2D") {
-    strategy = rcp(
-        new Albany::ElectroMechanicsProblem(problemParams, paramLib, 2, commT));
+    strategy = rcp(new Albany::ElectroMechanicsProblem(problemParams, paramLib, 2, commT));
   } else if (method == "Electromechanics 3D") {
-    strategy = rcp(
-        new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
+    strategy = rcp(new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
   } else {
     ALBANY_ABORT(
         std::endl
@@ -187,8 +167,7 @@ Albany::ProblemFactory::create()
 }
 
 void
-Albany::ProblemFactory::setReferenceConfigurationManager(
-    const Teuchos::RCP<AAdapt::rc::Manager>& rc_mgr_)
+Albany::ProblemFactory::setReferenceConfigurationManager(const Teuchos::RCP<AAdapt::rc::Manager>& rc_mgr_)
 {
   rc_mgr = rc_mgr_;
 }

@@ -18,16 +18,10 @@
 #include "Thyra_TpetraThyraWrappers.hpp"
 #include "Thyra_TpetraVector.hpp"
 
-typedef Thyra::
-    TpetraOperatorVectorExtraction<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
-        ConverterT;
-typedef Thyra::TpetraLinearOp<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
-    Thyra_TpetraLinearOp;
-typedef Thyra::TpetraMultiVector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
-    Thyra_TpetraMultiVector;
-typedef Thyra::TpetraVector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
-    Thyra_TpetraVector;
-typedef Thyra::TpetraVectorSpace<ST, Tpetra_LO, Tpetra_GO, KokkosNode>
-    Thyra_TpetraVectorSpace;
+typedef Thyra::TpetraOperatorVectorExtraction<ST, Tpetra_LO, Tpetra_GO, KokkosNode> ConverterT;
+typedef Thyra::TpetraLinearOp<ST, Tpetra_LO, Tpetra_GO, KokkosNode>                 Thyra_TpetraLinearOp;
+typedef Thyra::TpetraMultiVector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>              Thyra_TpetraMultiVector;
+typedef Thyra::TpetraVector<ST, Tpetra_LO, Tpetra_GO, KokkosNode>                   Thyra_TpetraVector;
+typedef Thyra::TpetraVectorSpace<ST, Tpetra_LO, Tpetra_GO, KokkosNode>              Thyra_TpetraVectorSpace;
 
 #endif  // ALBANY_TPETRA_THYRA_TYPES_HPP

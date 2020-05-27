@@ -17,24 +17,20 @@ BiotCoefficient<EvalT, Traits>::BiotCoefficient(Teuchos::ParameterList& p)
           p.get<std::string>("Biot Coefficient Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  Teuchos::ParameterList* elmd_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* elmd_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numQPs  = dims[1];
   numDims = dims[2];
 
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
   std::string type = elmd_list->get("Biot Coefficient Type", "Constant");
   if (type == "Constant") {
     is_constant    = true;
-    constant_value = elmd_list->get(
-        "Value", 1.0);  // default value=1, identical to Terzaghi stress
+    constant_value = elmd_list->get("Value", 1.0);  // default value=1, identical to Terzaghi stress
 
     // Add Biot Coefficient as a Sacado-ized parameter
     this->registerSacadoParameter("Biot Coefficient", paramLib);
@@ -45,13 +41,10 @@ BiotCoefficient<EvalT, Traits>::BiotCoefficient(Teuchos::ParameterList& p)
   // Optional dependence on Temperature (E = E_ + dEdT * T)
   // Switched ON by sending Temperature field in p
 
-  isPoroElastic = true;
-  Kskeleton_value =
-      elmd_list->get("Skeleton Bulk Modulus Parameter Value", 10.0e5);
-  this->registerSacadoParameter(
-      "Skeleton Bulk Modulus Parameter Value", paramLib);
-  Kgrain_value = elmd_list->get(
-      "Grain Bulk Modulus Value", 10.0e12);  // typically Kgrain >> Kskeleton
+  isPoroElastic   = true;
+  Kskeleton_value = elmd_list->get("Skeleton Bulk Modulus Parameter Value", 10.0e5);
+  this->registerSacadoParameter("Skeleton Bulk Modulus Parameter Value", paramLib);
+  Kgrain_value = elmd_list->get("Grain Bulk Modulus Value", 10.0e12);  // typically Kgrain >> Kskeleton
   this->registerSacadoParameter("Grain Bulk Modulus Value", paramLib);
 
   this->addEvaluatedField(biotCoefficient);
@@ -61,9 +54,7 @@ BiotCoefficient<EvalT, Traits>::BiotCoefficient(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-BiotCoefficient<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+BiotCoefficient<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(biotCoefficient, fm);
   if (!is_constant) this->utils.setFieldData(coordVec, fm);
@@ -73,16 +64,13 @@ BiotCoefficient<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-BiotCoefficient<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+BiotCoefficient<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   int numCells = workset.numCells;
 
   if (is_constant) {
     for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) {
-        biotCoefficient(cell, qp) = constant_value;
-      }
+      for (int qp = 0; qp < numQPs; ++qp) { biotCoefficient(cell, qp) = constant_value; }
     }
   }
   if (isPoroElastic) {
@@ -108,8 +96,7 @@ BiotCoefficient<EvalT, Traits>::getValue(std::string const& n)
     return Kgrain_value;
   ALBANY_ABORT(
       std::endl
-      << "Error! Logic error in getting paramter " << n
-      << " in BiotCoefficient::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n << " in BiotCoefficient::getValue()" << std::endl);
   return constant_value;
 }
 

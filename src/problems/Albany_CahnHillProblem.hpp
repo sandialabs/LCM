@@ -47,9 +47,7 @@ class CahnHillProblem : public AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -132,42 +130,35 @@ Albany::CahnHillProblem::constructEvaluators(
   using Teuchos::rcp;
 
   // Problem is transient
-  ALBANY_PANIC(
-      number_of_time_deriv != 1,
-      "Albany_CahnHillProblem must be defined as a transient calculation.");
+  ALBANY_PANIC(number_of_time_deriv != 1, "Albany_CahnHillProblem must be defined as a transient calculation.");
 
   const CellTopologyData* const elem_top = &meshSpecs.ctd;
 
-  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
-      Albany::getIntrepid2Basis(*elem_top);
-  RCP<shards::CellTopology> cellType = rcp(new shards::CellTopology(elem_top));
+  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis = Albany::getIntrepid2Basis(*elem_top);
+  RCP<shards::CellTopology>                              cellType      = rcp(new shards::CellTopology(elem_top));
 
   int const numNodes    = intrepidBasis->getCardinality();
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cellCubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(
-          *cellType, meshSpecs.cubatureDegree);
+      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPtsCell = cellCubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize
-       << ", Vertices= " << numVertices << ", Nodes= " << numNodes
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
        << ", QuadPts= " << numQPtsCell << ", Dim= " << numDim << std::endl;
 
-  dl = rcp(new Albany::Layouts(
-      worksetSize, numVertices, numNodes, numQPtsCell, numDim));
+  dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPtsCell, numDim));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
 
   // Temporary variable used numerous times below
   Teuchos::RCP<PHX::Evaluator<AlbanyTraits>> ev;
 
   Teuchos::ArrayRCP<string> dof_names(neq);
-  dof_names[0] =
-      "Rho";  // The concentration difference variable 0 \leq \rho \leq 1
-  dof_names[1] = "W";  // The chemical potential difference variable
+  dof_names[0] = "Rho";  // The concentration difference variable 0 \leq \rho \leq 1
+  dof_names[1] = "W";    // The chemical potential difference variable
   Teuchos::ArrayRCP<string> dof_names_dot(neq);
   dof_names_dot[0] = "rhoDot";
   dof_names_dot[1] = "wDot";  // not currently used
@@ -175,32 +166,23 @@ Albany::CahnHillProblem::constructEvaluators(
   resid_names[0] = "Rho Residual";
   resid_names[1] = "W Residual";
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator(
-          false, dof_names, dof_names_dot));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(false, resid_names));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherCoordinateVectorEvaluator());
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(
-          cellType, intrepidBasis, cellCubature));
+      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cellCubature));
 
   for (unsigned int i = 0; i < neq; i++) {
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFInterpolationEvaluator(dof_names[i], i));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[i], i));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i], i));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i], i));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i], i));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i], i));
   }
 
   {  // Form the Chemical Energy term in Eq. 2.2
@@ -240,8 +222,7 @@ Albany::CahnHillProblem::constructEvaluators(
     // Time period over which to apply the noise (-1 means over the whole time)
     p->set<Teuchos::Array<int>>(
         "Langevin Noise Time Period",
-        params->get<Teuchos::Array<int>>(
-            "Langevin Noise Time Period", Teuchos::tuple<int>(-1, -1)));
+        params->get<Teuchos::Array<int>>("Langevin Noise Time Period", Teuchos::tuple<int>(-1, -1)));
 
     // Input
     p->set<string>("Rho QP Variable Name", "Rho");
@@ -319,8 +300,7 @@ Albany::CahnHillProblem::constructEvaluators(
 
   else if (fieldManagerChoice == Albany::BUILD_RESPONSE_FM) {
     Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> respUtils(dl);
-    return respUtils.constructResponses(
-        fm0, *responseList, Teuchos::null, stateMgr);
+    return respUtils.constructResponses(fm0, *responseList, Teuchos::null, stateMgr);
   }
 
   return Teuchos::null;

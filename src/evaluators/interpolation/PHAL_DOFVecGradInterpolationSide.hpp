@@ -22,28 +22,22 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class DOFVecGradInterpolationSideBase
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<EvalT, Traits>
+class DOFVecGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                        public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFVecGradInterpolationSideBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl_side);
+  DOFVecGradInterpolationSideBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl_side);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  private:
-  typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
-              OutputScalarT;
-  std::string sideSetName;
+  typedef typename EvalT::MeshScalarT                                      MeshScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type OutputScalarT;
+  std::string                                                              sideSetName;
 
   // Input:
   //! Values at nodes
@@ -63,18 +57,13 @@ class DOFVecGradInterpolationSideBase
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFVecGradInterpolationSide =
-    DOFVecGradInterpolationSideBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFVecGradInterpolationSide = DOFVecGradInterpolationSideBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFVecGradInterpolationSideMesh =
-    DOFVecGradInterpolationSideBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFVecGradInterpolationSideMesh = DOFVecGradInterpolationSideBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFVecGradInterpolationSideParam = DOFVecGradInterpolationSideBase<
-    EvalT,
-    Traits,
-    typename EvalT::ParamScalarT>;
+using DOFVecGradInterpolationSideParam = DOFVecGradInterpolationSideBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

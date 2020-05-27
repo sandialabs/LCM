@@ -24,18 +24,15 @@ buildSTKNodeField(
   Teuchos::RCP<AbstractNodeFieldContainer> nfc;
   switch (dim.size()) {
     case 1:  // scalar
-      nfc = Teuchos::rcp(
-          new STKNodeField<double, 1>(name, dim, metaData, output));
+      nfc = Teuchos::rcp(new STKNodeField<double, 1>(name, dim, metaData, output));
       break;
 
     case 2:  // vector
-      nfc = Teuchos::rcp(
-          new STKNodeField<double, 2>(name, dim, metaData, output));
+      nfc = Teuchos::rcp(new STKNodeField<double, 2>(name, dim, metaData, output));
       break;
 
     case 3:  // tensor
-      nfc = Teuchos::rcp(
-          new STKNodeField<double, 3>(name, dim, metaData, output));
+      nfc = Teuchos::rcp(new STKNodeField<double, 3>(name, dim, metaData, output));
       break;
 
     default: ALBANY_PANIC(true, "Error: unexpected argument for dimension");
@@ -59,19 +56,15 @@ STKNodeField<DataType, ArrayDim, traits>::STKNodeField(
 
 template <typename DataType, unsigned ArrayDim, class traits>
 void
-STKNodeField<DataType, ArrayDim, traits>::saveFieldVector(
-    const Teuchos::RCP<const Thyra_MultiVector>& mv,
-    int                                          offset)
+STKNodeField<DataType, ArrayDim, traits>::saveFieldVector(const Teuchos::RCP<const Thyra_MultiVector>& mv, int offset)
 {
   // Iterate over the processor-visible nodes
-  const stk::mesh::Selector select_owned_or_shared =
-      metaData->locally_owned_part() | metaData->globally_shared_part();
+  const stk::mesh::Selector select_owned_or_shared = metaData->locally_owned_part() | metaData->globally_shared_part();
 
   // Iterate over the overlap nodes by getting node buckets and iterating over
   // each bucket.
-  stk::mesh::BulkData&           mesh = node_field->get_mesh();
-  const stk::mesh::BucketVector& all_elements =
-      mesh.get_buckets(stk::topology::NODE_RANK, select_owned_or_shared);
+  stk::mesh::BulkData&           mesh         = node_field->get_mesh();
+  const stk::mesh::BucketVector& all_elements = mesh.get_buckets(stk::topology::NODE_RANK, select_owned_or_shared);
 
   traits_type::saveFieldData(mv, all_elements, node_field, offset);
 }

@@ -41,8 +41,7 @@ DruckerPragerModel<EvalT, Traits>::DruckerPragerModel(
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(friction_string, dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair("Material Tangent", dl->qp_tensor4));
+  this->eval_field_map_.insert(std::make_pair("Material Tangent", dl->qp_tensor4));
 
   // define the state variables
   // strain
@@ -103,11 +102,10 @@ DruckerPragerModel<EvalT, Traits>::computeState(
   auto tangent  = *eval_fields["Material Tangent"];
 
   // get State Variables
-  Albany::MDArray strainold = (*workset.stateArrayPtr)[strain_string + "_old"];
-  Albany::MDArray stressold = (*workset.stateArrayPtr)[cauchy_string + "_old"];
-  Albany::MDArray eqpsold   = (*workset.stateArrayPtr)[eqps_string + "_old"];
-  Albany::MDArray frictionold =
-      (*workset.stateArrayPtr)[friction_string + "_old"];
+  Albany::MDArray strainold   = (*workset.stateArrayPtr)[strain_string + "_old"];
+  Albany::MDArray stressold   = (*workset.stateArrayPtr)[cauchy_string + "_old"];
+  Albany::MDArray eqpsold     = (*workset.stateArrayPtr)[eqps_string + "_old"];
+  Albany::MDArray frictionold = (*workset.stateArrayPtr)[friction_string + "_old"];
 
   minitensor::Tensor<ScalarT>  id(minitensor::eye<ScalarT>(num_dims_));
   minitensor::Tensor4<ScalarT> id1(minitensor::identity_1<ScalarT>(num_dims_));
@@ -115,10 +113,10 @@ DruckerPragerModel<EvalT, Traits>::computeState(
   minitensor::Tensor4<ScalarT> id3(minitensor::identity_3<ScalarT>(num_dims_));
 
   minitensor::Tensor4<ScalarT> Celastic(num_dims_);
-  minitensor::Tensor<ScalarT> sigma(num_dims_), sigmaN(num_dims_), s(num_dims_);
-  minitensor::Tensor<ScalarT> epsilon(num_dims_), epsilonN(num_dims_);
-  minitensor::Tensor<ScalarT> depsilon(num_dims_);
-  minitensor::Tensor<ScalarT> nhat(num_dims_);
+  minitensor::Tensor<ScalarT>  sigma(num_dims_), sigmaN(num_dims_), s(num_dims_);
+  minitensor::Tensor<ScalarT>  epsilon(num_dims_), epsilonN(num_dims_);
+  minitensor::Tensor<ScalarT>  depsilon(num_dims_);
+  minitensor::Tensor<ScalarT>  nhat(num_dims_);
 
   ScalarT lambda, mu, kappa;
   ScalarT alpha, alphaN;
@@ -134,9 +132,8 @@ DruckerPragerModel<EvalT, Traits>::computeState(
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      lambda =
-          (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) /
-          ((1 + poissons_ratio(cell, pt)) * (1 - 2 * poissons_ratio(cell, pt)));
+      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) /
+               ((1 + poissons_ratio(cell, pt)) * (1 - 2 * poissons_ratio(cell, pt)));
       mu    = elastic_modulus(cell, pt) / (2 * (1 + poissons_ratio(cell, pt)));
       kappa = lambda + 2.0 * mu / 3.0;
 
@@ -193,7 +190,7 @@ DruckerPragerModel<EvalT, Traits>::computeState(
 
         LocalNonlinearSolver<EvalT, Traits> solver;
         int                                 iter = 0;
-        ScalarT norm_residual0(0.0), norm_residual(0.0), relative_residual(0.0);
+        ScalarT                             norm_residual0(0.0), norm_residual(0.0), relative_residual(0.0);
 
         // local N-R loop
         while (true) {
@@ -247,9 +244,7 @@ DruckerPragerModel<EvalT, Traits>::computeState(
       friction(cell, pt) = alpha;
 
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = sigma(i, j);
-        }
+        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
       }
 
     }  // end loop over pt

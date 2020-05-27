@@ -22,13 +22,10 @@ template <int rank>
 bool
 Field<rank>::init(Teuchos::ParameterList const& p, std::string const& name)
 {
-  std::string const name_rc      = Manager::decorate(name),
-                    name_rc_name = name_rc + " Name";
-  valid_                         = p.isType<std::string>(name_rc_name);
+  std::string const name_rc = Manager::decorate(name), name_rc_name = name_rc + " Name";
+  valid_ = p.isType<std::string>(name_rc_name);
   if (!valid_) return false;
-  f_ = decltype(f_)(
-      p.get<std::string>(name_rc_name),
-      p.get<Teuchos::RCP<PHX::DataLayout>>(name_rc + " Data Layout"));
+  f_ = decltype(f_)(p.get<std::string>(name_rc_name), p.get<Teuchos::RCP<PHX::DataLayout>>(name_rc + " Data Layout"));
   return true;
 }
 
@@ -46,8 +43,7 @@ struct SizeType
   using type         = typename T_noref_nocv::size_type;
 };
 
-#define loop(f, i, dim) \
-  for (typename SizeType<decltype(f)>::type i = 0; i < f.extent(dim); ++i)
+#define loop(f, i, dim) for (typename SizeType<decltype(f)>::type i = 0; i < f.extent(dim); ++i)
 #define loopf(i, dim) loop(f_, i, dim)
 
 template <>
@@ -62,44 +58,33 @@ template <typename ad_type>
 void
 Field<1>::addTo(typename Tensor<ad_type, 1>::type& f_incr) const
 {
-  loopf(cell, 0) loopf(qp, 1) loopf(i0, 2) f_incr(cell, qp, i0) +=
-      f_(cell, qp, i0);
+  loopf(cell, 0) loopf(qp, 1) loopf(i0, 2) f_incr(cell, qp, i0) += f_(cell, qp, i0);
 }
 template <>
 template <typename ad_type>
 void
 Field<2>::addTo(typename Tensor<ad_type, 2>::type& f_incr) const
 {
-  loopf(cell, 0) loopf(qp, 1) loopf(i0, 2) loopf(i1, 3)
-      f_incr(cell, qp, i0, i1) += f_(cell, qp, i0, i1);
+  loopf(cell, 0) loopf(qp, 1) loopf(i0, 2) loopf(i1, 3) f_incr(cell, qp, i0, i1) += f_(cell, qp, i0, i1);
 }
 template <>
 template <typename ad_type>
 void
-Field<0>::addTo(
-    typename Tensor<ad_type, 0>::type& f_incr,
-    std::size_t const                  cell,
-    std::size_t const                  qp) const
+Field<0>::addTo(typename Tensor<ad_type, 0>::type& f_incr, std::size_t const cell, std::size_t const qp) const
 {
   f_incr(cell, qp) += f_(cell, qp);
 }
 template <>
 template <typename ad_type>
 void
-Field<1>::addTo(
-    typename Tensor<ad_type, 1>::type& f_incr,
-    std::size_t const                  cell,
-    std::size_t const                  qp) const
+Field<1>::addTo(typename Tensor<ad_type, 1>::type& f_incr, std::size_t const cell, std::size_t const qp) const
 {
   loopf(i0, 2) f_incr(cell, qp, i0) += f_(cell, qp, i0);
 }
 template <>
 template <typename ad_type>
 void
-Field<2>::addTo(
-    typename Tensor<ad_type, 2>::type& f_incr,
-    std::size_t const                  cell,
-    std::size_t const                  qp) const
+Field<2>::addTo(typename Tensor<ad_type, 2>::type& f_incr, std::size_t const cell, std::size_t const qp) const
 {
   loopf(i0, 2) loopf(i1, 3) f_incr(cell, qp, i0, i1) += f_(cell, qp, i0, i1);
 }
@@ -122,9 +107,9 @@ multiplyIntoImpl(
     std::size_t const                      qp,
     MultiplyWork<ad_type>&                 w)
 {
-  loopf(i0, 2) loopf(i1, 3) w.f_incr_mt(i0, i1)  = f_incr(cell, qp, i0, i1);
-  loopf(i0, 2) loopf(i1, 3) w.f_accum_mt(i0, i1) = f_(cell, qp, i0, i1);
-  minitensor::Tensor<ad_type> C = minitensor::dot(w.f_incr_mt, w.f_accum_mt);
+  loopf(i0, 2) loopf(i1, 3) w.f_incr_mt(i0, i1)      = f_incr(cell, qp, i0, i1);
+  loopf(i0, 2) loopf(i1, 3) w.f_accum_mt(i0, i1)     = f_(cell, qp, i0, i1);
+  minitensor::Tensor<ad_type> C                      = minitensor::dot(w.f_incr_mt, w.f_accum_mt);
   loopf(i0, 2) loopf(i1, 3) f_incr(cell, qp, i0, i1) = C(i0, i1);
 }
 }  // namespace
@@ -132,10 +117,7 @@ multiplyIntoImpl(
 template <>
 template <typename ad_type>
 void
-Field<2>::multiplyInto(
-    typename Tensor<ad_type, 2>::type& f_incr,
-    std::size_t const                  cell,
-    std::size_t const                  qp) const
+Field<2>::multiplyInto(typename Tensor<ad_type, 2>::type& f_incr, std::size_t const cell, std::size_t const qp) const
 {
   MultiplyWork<ad_type> w(f_.extent(2));
   multiplyIntoImpl(f_, f_incr, cell, qp, w);
@@ -153,24 +135,18 @@ Field<2>::multiplyInto(typename Tensor<ad_type, 2>::type& f_incr) const
 #undef loop
 
 aadapt_rc_eti_class(Field)
-#define eti(ad_type, rank) \
-  template void Field<rank>::addTo<ad_type>(Tensor<ad_type, rank>::type&) const;
+#define eti(ad_type, rank) template void Field<rank>::addTo<ad_type>(Tensor<ad_type, rank>::type&) const;
     aadapt_rc_apply_to_all_ad_types_all_ranks(eti)
 #undef eti
-#define eti(ad_type, rank)                                                \
-  template void Field<rank>::addTo<ad_type>(                              \
-      Tensor<ad_type, rank>::type&, std::size_t const, std::size_t const) \
-      const;
+#define eti(ad_type, rank) \
+  template void Field<rank>::addTo<ad_type>(Tensor<ad_type, rank>::type&, std::size_t const, std::size_t const) const;
         aadapt_rc_apply_to_all_ad_types_all_ranks(eti)
 #undef eti
-#define eti(ad_type, arg2)                                                 \
-  template void Field<2>::multiplyInto<ad_type>(Tensor<ad_type, 2>::type&) \
-      const;
+#define eti(ad_type, arg2) template void Field<2>::multiplyInto<ad_type>(Tensor<ad_type, 2>::type&) const;
             aadapt_rc_apply_to_all_ad_types(eti, )
 #undef eti
-#define eti(ad_type, arg2)                       \
-  template void Field<2>::multiplyInto<ad_type>( \
-      Tensor<ad_type, 2>::type&, std::size_t const, std::size_t const) const;
+#define eti(ad_type, arg2) \
+  template void Field<2>::multiplyInto<ad_type>(Tensor<ad_type, 2>::type&, std::size_t const, std::size_t const) const;
                 aadapt_rc_apply_to_all_ad_types(eti, )
 #undef eti
 

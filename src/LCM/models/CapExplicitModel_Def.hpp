@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-CapExplicitModel<EvalT, Traits>::CapExplicitModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+CapExplicitModel<EvalT, Traits>::CapExplicitModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       A(p->get<RealType>("A")),
       B(p->get<RealType>("B")),
@@ -45,15 +43,11 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(
 
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
-  this->eval_field_map_.insert(
-      std::make_pair(backStress_string, dl->qp_tensor));
-  this->eval_field_map_.insert(
-      std::make_pair(capParameter_string, dl->qp_scalar));
+  this->eval_field_map_.insert(std::make_pair(backStress_string, dl->qp_tensor));
+  this->eval_field_map_.insert(std::make_pair(capParameter_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair(volPlasticStrain_string, dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair("Material Tangent", dl->qp_tensor4));
+  this->eval_field_map_.insert(std::make_pair(volPlasticStrain_string, dl->qp_scalar));
+  this->eval_field_map_.insert(std::make_pair("Material Tangent", dl->qp_tensor4));
 
   // define the state variables
   // strain
@@ -165,32 +159,27 @@ CapExplicitModel<EvalT, Traits>::computeState(
   auto tangent          = *eval_fields["Material Tangent"];
 
   // get State Variables
-  Albany::MDArray strainold = (*workset.stateArrayPtr)[strain_string + "_old"];
-  Albany::MDArray stressold = (*workset.stateArrayPtr)[cauchy_string + "_old"];
-  Albany::MDArray backStressold =
-      (*workset.stateArrayPtr)[backStress_string + "_old"];
-  Albany::MDArray capParameterold =
-      (*workset.stateArrayPtr)[capParameter_string + "_old"];
-  Albany::MDArray eqpsold = (*workset.stateArrayPtr)[eqps_string + "_old"];
-  Albany::MDArray volPlasticStrainold =
-      (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
+  Albany::MDArray strainold           = (*workset.stateArrayPtr)[strain_string + "_old"];
+  Albany::MDArray stressold           = (*workset.stateArrayPtr)[cauchy_string + "_old"];
+  Albany::MDArray backStressold       = (*workset.stateArrayPtr)[backStress_string + "_old"];
+  Albany::MDArray capParameterold     = (*workset.stateArrayPtr)[capParameter_string + "_old"];
+  Albany::MDArray eqpsold             = (*workset.stateArrayPtr)[eqps_string + "_old"];
+  Albany::MDArray volPlasticStrainold = (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
 
   ScalarT lame, mu, bulkModulus;
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < num_pts_; ++qp) {
       // local parameters
-      lame = elastic_modulus(cell, qp) * poissons_ratio(cell, qp) /
-             (1.0 + poissons_ratio(cell, qp)) /
+      lame = elastic_modulus(cell, qp) * poissons_ratio(cell, qp) / (1.0 + poissons_ratio(cell, qp)) /
              (1.0 - 2.0 * poissons_ratio(cell, qp));
-      mu = elastic_modulus(cell, qp) / 2.0 / (1.0 + poissons_ratio(cell, qp));
+      mu          = elastic_modulus(cell, qp) / 2.0 / (1.0 + poissons_ratio(cell, qp));
       bulkModulus = lame + (2. / 3.) * mu;
 
       // elastic matrix
       Celastic = lame * id3 + mu * (id1 + id2);
 
       // elastic compliance tangent matrix
-      compliance = (1. / bulkModulus / 9.) * id3 +
-                   (1. / mu / 2.) * (0.5 * (id1 + id2) - (1. / 3.) * id3);
+      compliance = (1. / bulkModulus / 9.) * id3 + (1. / mu / 2.) * (0.5 * (id1 + id2) - (1. / 3.) * id3);
 
       // trial state
       minitensor::Tensor<ScalarT> depsilon(3);
@@ -252,8 +241,7 @@ CapExplicitModel<EvalT, Traits>::computeState(
           hkappa = 0.0;
 
         ScalarT kai(0.0);
-        kai = minitensor::dotdot(
-                  dfdsigma, minitensor::dotdot(Celastic, dgdsigma)) -
+        kai = minitensor::dotdot(dfdsigma, minitensor::dotdot(Celastic, dgdsigma)) -
               minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
 
         // H = -minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
@@ -312,8 +300,7 @@ CapExplicitModel<EvalT, Traits>::computeState(
           // generalized plastic hardening modulus
           // H = -minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
 
-          kai = minitensor::dotdot(
-              dfdsigma, minitensor::dotdot(Celastic, dgdsigma));
+          kai = minitensor::dotdot(dfdsigma, minitensor::dotdot(Celastic, dgdsigma));
           kai = kai - minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
 
           if (std::abs(f) < tolerance) break;
@@ -339,8 +326,7 @@ CapExplicitModel<EvalT, Traits>::computeState(
           }
 
           // update
-          sigmaK =
-              sigmaVal - delta_gamma * minitensor::dotdot(Celastic, dgdsigma);
+          sigmaK         = sigmaVal - delta_gamma * minitensor::dotdot(Celastic, dgdsigma);
           alphaK         = alphaVal + delta_gamma * halpha;
           ScalarT kappaK = kappaVal + dkappa;
 
@@ -478,9 +464,8 @@ CapExplicitModel<EvalT, Traits>::compute_f(
 
   ScalarT Gamma = 1.0;
   if (psi != 0 && J2 != 0)
-    Gamma =
-        0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
-               (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
+                   (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
 
   ScalarT Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
 
@@ -490,8 +475,7 @@ CapExplicitModel<EvalT, Traits>::compute_f(
 
   ScalarT Fc = 1.0;
 
-  if ((kappa - I1) > 0 && ((X - kappa) != 0))
-    Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
+  if ((kappa - I1) > 0 && ((X - kappa) != 0)) Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
 
   return Gamma * Gamma * J2 - Fc * (Ff_I1 - N) * (Ff_I1 - N);
 }
@@ -515,8 +499,7 @@ CapExplicitModel<EvalT, Traits>::compute_dfdsigma(
   // dI1dsigma = I;
   // dJ2dsigma = s;
   for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
-      dJ3dsigma(i, j) = s(i, j) * s(i, j) - 2 * J2 * I(i, j) / 3;
+    for (int j = 0; j < 3; j++) dJ3dsigma(i, j) = s(i, j) * s(i, j) - 2 * J2 * I(i, j) / 3;
 
   ScalarT Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
 
@@ -526,35 +509,28 @@ CapExplicitModel<EvalT, Traits>::compute_dfdsigma(
 
   ScalarT Fc = 1.0;
 
-  if ((kappa - I1) > 0)
-    Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
+  if ((kappa - I1) > 0) Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
 
   ScalarT Gamma = 1.0;
   if (psi != 0 && J2 != 0)
-    Gamma =
-        0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
-               (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
+                   (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
 
   // derivatives
   ScalarT dFfdI1 = -(B * C * std::exp(B * I1) + theta);
 
   ScalarT dFcdI1 = 0.0;
-  if ((kappa - I1) > 0 && ((X - kappa) != 0))
-    dFcdI1 = -2.0 * (I1 - kappa) / (X - kappa) / (X - kappa);
+  if ((kappa - I1) > 0 && ((X - kappa) != 0)) dFcdI1 = -2.0 * (I1 - kappa) / (X - kappa) / (X - kappa);
 
   ScalarT dfdI1 = -(Ff_I1 - N) * (2 * Fc * dFfdI1 + (Ff_I1 - N) * dFcdI1);
 
   ScalarT dGammadJ2 = 0.0;
-  if (J2 != 0)
-    dGammadJ2 =
-        9.0 * std::sqrt(3.0) * J3 / std::pow(J2, 2.5) / 8.0 * (1.0 - 1.0 / psi);
+  if (J2 != 0) dGammadJ2 = 9.0 * std::sqrt(3.0) * J3 / std::pow(J2, 2.5) / 8.0 * (1.0 - 1.0 / psi);
 
   ScalarT dfdJ2 = 2.0 * Gamma * dGammadJ2 * J2 + Gamma * Gamma;
 
   ScalarT dGammadJ3 = 0.0;
-  if (J2 != 0)
-    dGammadJ3 =
-        -3.0 * std::sqrt(3.0) / std::pow(J2, 1.5) / 4.0 * (1.0 - 1.0 / psi);
+  if (J2 != 0) dGammadJ3 = -3.0 * std::sqrt(3.0) / std::pow(J2, 1.5) / 4.0 * (1.0 - 1.0 / psi);
 
   ScalarT dfdJ3 = 2.0 * Gamma * dGammadJ3 * J2;
 
@@ -582,8 +558,7 @@ CapExplicitModel<EvalT, Traits>::compute_dgdsigma(
   // dJ2dsigma = s;
   // dJ3dsigma(3);
   for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
-      dJ3dsigma(i, j) = s(i, j) * s(i, j) - 2 * J2 * I(i, j) / 3;
+    for (int j = 0; j < 3; j++) dJ3dsigma(i, j) = s(i, j) * s(i, j) - 2 * J2 * I(i, j) / 3;
 
   ScalarT Ff_I1 = A - C * std::exp(L * I1) - phi * I1;
 
@@ -593,35 +568,28 @@ CapExplicitModel<EvalT, Traits>::compute_dgdsigma(
 
   ScalarT Fc = 1.0;
 
-  if ((kappa - I1) > 0)
-    Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
+  if ((kappa - I1) > 0) Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
 
   ScalarT Gamma = 1.0;
   if (psi != 0 && J2 != 0)
-    Gamma =
-        0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
-               (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
+                   (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
 
   // derivatives
   ScalarT dFfdI1 = -(L * C * std::exp(L * I1) + phi);
 
   ScalarT dFcdI1 = 0.0;
-  if ((kappa - I1) > 0 && ((X - kappa) != 0))
-    dFcdI1 = -2.0 * (I1 - kappa) / (X - kappa) / (X - kappa);
+  if ((kappa - I1) > 0 && ((X - kappa) != 0)) dFcdI1 = -2.0 * (I1 - kappa) / (X - kappa) / (X - kappa);
 
   ScalarT dfdI1 = -(Ff_I1 - N) * (2 * Fc * dFfdI1 + (Ff_I1 - N) * dFcdI1);
 
   ScalarT dGammadJ2 = 0.0;
-  if (J2 != 0)
-    dGammadJ2 =
-        9.0 * std::sqrt(3.0) * J3 / std::pow(J2, 2.5) / 8.0 * (1.0 - 1.0 / psi);
+  if (J2 != 0) dGammadJ2 = 9.0 * std::sqrt(3.0) * J3 / std::pow(J2, 2.5) / 8.0 * (1.0 - 1.0 / psi);
 
   ScalarT dfdJ2 = 2.0 * Gamma * dGammadJ2 * J2 + Gamma * Gamma;
 
   ScalarT dGammadJ3 = 0.0;
-  if (J2 != 0)
-    dGammadJ3 =
-        -3.0 * std::sqrt(3.0) / std::pow(J2, 1.5) / 4.0 * (1.0 - 1.0 / psi);
+  if (J2 != 0) dGammadJ3 = -3.0 * std::sqrt(3.0) / std::pow(J2, 1.5) / 4.0 * (1.0 - 1.0 / psi);
 
   ScalarT dfdJ3 = 2.0 * Gamma * dGammadJ3 * J2;
 
@@ -657,9 +625,7 @@ CapExplicitModel<EvalT, Traits>::compute_dfdkappa(
   ScalarT dFcdkappa = 0.0;
 
   if ((kappa - I1) > 0 && ((X - kappa) != 0)) {
-    dFcdkappa = 2 * (I1 - kappa) *
-                ((X - kappa) +
-                 R * (I1 - kappa) * (theta + B * C * std::exp(B * kappa))) /
+    dFcdkappa = 2 * (I1 - kappa) * ((X - kappa) + R * (I1 - kappa) * (theta + B * C * std::exp(B * kappa))) /
                 (X - kappa) / (X - kappa) / (X - kappa);
   }
 
@@ -678,9 +644,7 @@ CapExplicitModel<EvalT, Traits>::compute_Galpha(ScalarT& J2_alpha)
 }
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapExplicitModel<EvalT, Traits>::ScalarT>
-CapExplicitModel<EvalT, Traits>::compute_halpha(
-    minitensor::Tensor<ScalarT>& dgdsigma,
-    ScalarT&                     J2_alpha)
+CapExplicitModel<EvalT, Traits>::compute_halpha(minitensor::Tensor<ScalarT>& dgdsigma, ScalarT& J2_alpha)
 {
   ScalarT Galpha = compute_Galpha(J2_alpha);
 
@@ -706,8 +670,7 @@ CapExplicitModel<EvalT, Traits>::compute_dedkappa(ScalarT& kappa)
 
   ScalarT X = kappa - Q * Ff_kappa;
 
-  ScalarT dedX =
-      (D1 - 2 * D2 * (X - X0)) * std::exp((D1 - D2 * (X - X0)) * (X - X0)) * W;
+  ScalarT dedX = (D1 - 2 * D2 * (X - X0)) * std::exp((D1 - D2 * (X - X0)) * (X - X0)) * W;
 
   ScalarT dXdkappa = 1 + Q * C * L * std::exp(L * kappa) + Q * phi;
 

@@ -27,8 +27,7 @@ NodalDataVector::NodalDataVector(
 }
 
 void
-NodalDataVector::replaceOverlapVectorSpace(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs)
+NodalDataVector::replaceOverlapVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   overlap_node_vs = vs;
 
@@ -48,8 +47,7 @@ NodalDataVector::replaceOverlapVectorSpace(
 }
 
 void
-NodalDataVector::replaceOwnedVectorSpace(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs)
+NodalDataVector::replaceOwnedVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   owned_node_vs = vs;
 
@@ -72,8 +70,7 @@ Teuchos::RCP<const Albany::CombineAndScatterManager>
 NodalDataVector::initializeCASManager()
 {
   if (mapsHaveChanged) {
-    cas_manager =
-        Albany::createCombineAndScatterManager(owned_node_vs, overlap_node_vs);
+    cas_manager     = Albany::createCombineAndScatterManager(owned_node_vs, overlap_node_vs);
     mapsHaveChanged = false;
   }
   return cas_manager;
@@ -82,15 +79,11 @@ NodalDataVector::initializeCASManager()
 void
 NodalDataVector::exportAddNodalDataVector()
 {
-  cas_manager->scatter(
-      *owned_node_vec, *overlap_node_vec, Albany::CombineMode::ADD);
+  cas_manager->scatter(*owned_node_vec, *overlap_node_vec, Albany::CombineMode::ADD);
 }
 
 void
-NodalDataVector::getNDofsAndOffset(
-    std::string const& stateName,
-    int&               offset,
-    int&               ndofs) const
+NodalDataVector::getNDofsAndOffset(std::string const& stateName, int& offset, int& ndofs) const
 {
   NodeFieldSizeMap::const_iterator it;
   it = nodeVectorMap.find(stateName);
@@ -98,8 +91,7 @@ NodalDataVector::getNDofsAndOffset(
   ALBANY_PANIC(
       (it == nodeVectorMap.end()),
       std::endl
-          << "Error: cannot find state " << stateName << " in NodalDataVector"
-          << std::endl);
+          << "Error: cannot find state " << stateName << " in NodalDataVector" << std::endl);
 
   std::size_t value = it->second;
 
@@ -117,17 +109,12 @@ NodalDataVector::saveNodalDataState() const
 }
 
 void
-NodalDataVector::saveNodalDataState(
-    const Teuchos::RCP<const Thyra_MultiVector>& mv,
-    int const                                    start_col) const
+NodalDataVector::saveNodalDataState(const Teuchos::RCP<const Thyra_MultiVector>& mv, int const start_col) const
 {
   // Save the nodal data arrays back to stk.
   const size_t nv = mv->domain()->dim();
   for (auto it = nodeVectorLayout.begin(); it != nodeVectorLayout.end(); ++it) {
-    if (it->offset < start_col ||
-        static_cast<unsigned long>(it->offset) >= start_col + nv) {
-      continue;
-    }
+    if (it->offset < start_col || static_cast<unsigned long>(it->offset) >= start_col + nv) { continue; }
     (*nodeContainer)[it->name]->saveFieldVector(mv, it->offset - start_col);
   }
 }
@@ -139,9 +126,7 @@ NodalDataVector::saveNodalDataVector(
     int const                                    offset) const
 {
   Albany::NodeFieldContainer::const_iterator it = nodeContainer->find(name);
-  ALBANY_PANIC(
-      it == nodeContainer->end(),
-      "Error: Cannot locate nodal field " << name << " in NodalDataVector");
+  ALBANY_PANIC(it == nodeContainer->end(), "Error: Cannot locate nodal field " << name << " in NodalDataVector");
   (*nodeContainer)[name]->saveFieldVector(overlap_node_vector, offset);
 }
 

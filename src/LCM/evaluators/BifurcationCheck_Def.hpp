@@ -19,12 +19,8 @@ BifurcationCheck<EvalT, Traits>::BifurcationCheck(
     : parametrization_type_(p.get<std::string>("Parametrization Type Name")),
       parametrization_interval_(p.get<double>("Parametrization Interval Name")),
       tangent_(p.get<std::string>("Material Tangent Name"), dl->qp_tensor4),
-      ellipticity_flag_(
-          p.get<std::string>("Ellipticity Flag Name"),
-          dl->qp_scalar),
-      direction_(
-          p.get<std::string>("Bifurcation Direction Name"),
-          dl->qp_vector),
+      ellipticity_flag_(p.get<std::string>("Ellipticity Flag Name"), dl->qp_scalar),
+      direction_(p.get<std::string>("Bifurcation Direction Name"), dl->qp_vector),
       min_detA_(p.get<std::string>("Min detA Name"), dl->qp_scalar)
 {
   std::vector<PHX::DataLayout::size_type> dims;
@@ -42,9 +38,7 @@ BifurcationCheck<EvalT, Traits>::BifurcationCheck(
 
 template <typename EvalT, typename Traits>
 void
-BifurcationCheck<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+BifurcationCheck<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(tangent_, fm);
   this->utils.setFieldData(ellipticity_flag_, fm);
@@ -54,8 +48,7 @@ BifurcationCheck<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-BifurcationCheck<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+BifurcationCheck<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   minitensor::Vector<ScalarT, 3>  direction(1.0, 0.0, 0.0);
   minitensor::Tensor4<ScalarT, 3> tangent;
@@ -70,10 +63,8 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(
       double interval = parametrization_interval_;
 
       if (parametrization_type_ == "Oliver") {
-        boost::tie(ellipticity_flag, direction) =
-            minitensor::check_strong_ellipticity(tangent);
-        min_detA = minitensor::det(
-            minitensor::dot2(direction, minitensor::dot(tangent, direction)));
+        boost::tie(ellipticity_flag, direction) = minitensor::check_strong_ellipticity(tangent);
+        min_detA = minitensor::det(minitensor::dot2(direction, minitensor::dot(tangent, direction)));
       } else if (parametrization_type_ == "PSO") {
         minitensor::Vector<ScalarT, 2> arg_minimum;
 
@@ -88,8 +79,7 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(
       } else if (parametrization_type_ == "Stereographic") {
         minitensor::Vector<ScalarT, 2> arg_minimum;
 
-        min_detA =
-            stereographic_sweep(tangent, arg_minimum, direction, interval);
+        min_detA = stereographic_sweep(tangent, arg_minimum, direction, interval);
         stereographic_newton_raphson(tangent, arg_minimum, direction, min_detA);
 
       } else if (parametrization_type_ == "Projective") {
@@ -112,32 +102,26 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(
         minitensor::Vector<ScalarT, 3> direction2(0.0, 1.0, 0.0);
         minitensor::Vector<ScalarT, 3> direction3(0.0, 0.0, 1.0);
 
-        ScalarT min_detA1 =
-            cartesian_sweep(tangent, arg_minimum1, 1, direction1, interval);
+        ScalarT min_detA1 = cartesian_sweep(tangent, arg_minimum1, 1, direction1, interval);
 
-        ScalarT min_detA2 =
-            cartesian_sweep(tangent, arg_minimum2, 2, direction2, interval);
+        ScalarT min_detA2 = cartesian_sweep(tangent, arg_minimum2, 2, direction2, interval);
 
-        ScalarT min_detA3 =
-            cartesian_sweep(tangent, arg_minimum3, 3, direction3, interval);
+        ScalarT min_detA3 = cartesian_sweep(tangent, arg_minimum3, 3, direction3, interval);
 
         if (min_detA1 <= min_detA2 && min_detA1 <= min_detA3) {
-          cartesian_newton_raphson(
-              tangent, arg_minimum1, 1, direction1, min_detA1);
+          cartesian_newton_raphson(tangent, arg_minimum1, 1, direction1, min_detA1);
 
           min_detA  = min_detA1;
           direction = direction1;
 
         } else if (min_detA2 <= min_detA1 && min_detA2 <= min_detA3) {
-          cartesian_newton_raphson(
-              tangent, arg_minimum2, 2, direction2, min_detA2);
+          cartesian_newton_raphson(tangent, arg_minimum2, 2, direction2, min_detA2);
 
           min_detA  = min_detA2;
           direction = direction2;
 
         } else if (min_detA3 <= min_detA1 && min_detA3 <= min_detA2) {
-          cartesian_newton_raphson(
-              tangent, arg_minimum3, 3, direction3, min_detA3);
+          cartesian_newton_raphson(tangent, arg_minimum3, 3, direction3, min_detA3);
 
           min_detA  = min_detA3;
           direction = direction3;
@@ -158,9 +142,7 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(
 
       // std::cout << "\n" << min_detA << " @ " << direction << std::endl;
 
-      for (int i(0); i < num_dims_; ++i) {
-        direction_(cell, pt, i) = direction(i);
-      }
+      for (int i(0); i < num_dims_; ++i) { direction_(cell, pt, i) = direction(i); }
     }
   }
 }
@@ -208,12 +190,10 @@ BifurcationCheck<EvalT, Traits>::spherical_sweep(
 
   minitensor::Vector<ScalarT, 2> const sphere_max(phi_max, theta_max);
 
-  minitensor::Vector<minitensor::Index, 2> const sphere_num_points(
-      phi_num_points, theta_num_points);
+  minitensor::Vector<minitensor::Index, 2> const sphere_num_points(phi_num_points, theta_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<ScalarT, 2> sphere_grid(
-      sphere_min, sphere_max, sphere_num_points);
+  minitensor::ParametricGrid<ScalarT, 2> sphere_grid(sphere_min, sphere_max, sphere_num_points);
 
   // Build a spherical parametrization for this elasticity.
   minitensor::SphericalParametrization<ScalarT, 3> sphere_param(tangent);
@@ -228,13 +208,9 @@ BifurcationCheck<EvalT, Traits>::spherical_sweep(
   //<< "  " << sphere_param.get_normal_minimum() << std::endl;
 
   ScalarT min_detA = sphere_param.get_minimum();
-  for (int i(0); i < 3; ++i) {
-    direction(i) = (sphere_param.get_normal_minimum())(i);
-  }
+  for (int i(0); i < 3; ++i) { direction(i) = (sphere_param.get_normal_minimum())(i); }
 
-  for (int i(0); i < 2; ++i) {
-    arg_minimum(i) = (sphere_param.get_arg_minimum())(i);
-  }
+  for (int i(0); i < 2; ++i) { arg_minimum(i) = (sphere_param.get_arg_minimum())(i); }
 
   return min_detA;
 }
@@ -282,16 +258,14 @@ BifurcationCheck<EvalT, Traits>::stereographic_sweep(
 
   minitensor::Vector<ScalarT, 2> const stereographic_max(x_max, y_max);
 
-  minitensor::Vector<minitensor::Index, 2> const stereographic_num_points(
-      x_num_points, y_num_points);
+  minitensor::Vector<minitensor::Index, 2> const stereographic_num_points(x_num_points, y_num_points);
 
   // Build the parametric grid with the specified parameters.
   minitensor::ParametricGrid<ScalarT, 2> stereographic_grid(
       stereographic_min, stereographic_max, stereographic_num_points);
 
   // Build a stereographic parametrization for this elasticity.
-  minitensor::StereographicParametrization<ScalarT, 3> stereographic_param(
-      tangent);
+  minitensor::StereographicParametrization<ScalarT, 3> stereographic_param(tangent);
 
   // Traverse the grid with the parametrization.
   stereographic_grid.traverse(stereographic_param);
@@ -304,13 +278,9 @@ BifurcationCheck<EvalT, Traits>::stereographic_sweep(
   //<< "  " << stereographic_param.get_normal_minimum() << std::endl;
 
   ScalarT min_detA = stereographic_param.get_minimum();
-  for (int i(0); i < 3; ++i) {
-    direction(i) = (stereographic_param.get_normal_minimum())(i);
-  }
+  for (int i(0); i < 3; ++i) { direction(i) = (stereographic_param.get_normal_minimum())(i); }
 
-  for (int i(0); i < 2; ++i) {
-    arg_minimum(i) = (stereographic_param.get_arg_minimum())(i);
-  }
+  for (int i(0); i < 2; ++i) { arg_minimum(i) = (stereographic_param.get_arg_minimum())(i); }
 
   return min_detA;
 }
@@ -365,12 +335,10 @@ BifurcationCheck<EvalT, Traits>::projective_sweep(
 
   minitensor::Vector<ScalarT, 3> const projective_max(x_max, y_max, z_max);
 
-  minitensor::Vector<minitensor::Index, 3> const projective_num_points(
-      x_num_points, y_num_points, z_num_points);
+  minitensor::Vector<minitensor::Index, 3> const projective_num_points(x_num_points, y_num_points, z_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<ScalarT, 3> projective_grid(
-      projective_min, projective_max, projective_num_points);
+  minitensor::ParametricGrid<ScalarT, 3> projective_grid(projective_min, projective_max, projective_num_points);
 
   // Build a projective parametrization for this elasticity.
   minitensor::ProjectiveParametrization<ScalarT, 3> projective_param(tangent);
@@ -385,13 +353,9 @@ BifurcationCheck<EvalT, Traits>::projective_sweep(
   //<< "  " << projective_param.get_normal_minimum() << std::endl;
 
   ScalarT min_detA = projective_param.get_minimum();
-  for (int i(0); i < 3; ++i) {
-    direction(i) = (projective_param.get_normal_minimum())(i);
-  }
+  for (int i(0); i < 3; ++i) { direction(i) = (projective_param.get_normal_minimum())(i); }
 
-  for (int i(0); i < 3; ++i) {
-    arg_minimum(i) = (projective_param.get_arg_minimum())(i);
-  }
+  for (int i(0); i < 3; ++i) { arg_minimum(i) = (projective_param.get_arg_minimum())(i); }
 
   return min_detA;
 }
@@ -438,12 +402,10 @@ BifurcationCheck<EvalT, Traits>::tangent_sweep(
 
   minitensor::Vector<ScalarT, 2> const tangent_max(x_max, y_max);
 
-  minitensor::Vector<minitensor::Index, 2> const tangent_num_points(
-      x_num_points, y_num_points);
+  minitensor::Vector<minitensor::Index, 2> const tangent_num_points(x_num_points, y_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<ScalarT, 2> tangent_grid(
-      tangent_min, tangent_max, tangent_num_points);
+  minitensor::ParametricGrid<ScalarT, 2> tangent_grid(tangent_min, tangent_max, tangent_num_points);
 
   // Build a tangent parametrization for this elasticity.
   minitensor::TangentParametrization<ScalarT, 3> tangent_param(tangent);
@@ -458,13 +420,9 @@ BifurcationCheck<EvalT, Traits>::tangent_sweep(
   //<< "  " << tangent_param.get_normal_minimum() << std::endl;
 
   ScalarT min_detA = tangent_param.get_minimum();
-  for (int i(0); i < 3; ++i) {
-    direction(i) = (tangent_param.get_normal_minimum())(i);
-  }
+  for (int i(0); i < 3; ++i) { direction(i) = (tangent_param.get_normal_minimum())(i); }
 
-  for (int i(0); i < 2; ++i) {
-    arg_minimum(i) = (tangent_param.get_arg_minimum())(i);
-  }
+  for (int i(0); i < 2; ++i) { arg_minimum(i) = (tangent_param.get_arg_minimum())(i); }
 
   return min_detA;
 }
@@ -505,18 +463,15 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
 
   if (surface_index == 1) {
     // x surface
-    minitensor::Vector<ScalarT, 3> const cartesian1_min(
-        p_surface, p_min, p_min);
+    minitensor::Vector<ScalarT, 3> const cartesian1_min(p_surface, p_min, p_min);
 
-    minitensor::Vector<ScalarT, 3> const cartesian1_max(
-        p_surface, p_max, p_max);
+    minitensor::Vector<ScalarT, 3> const cartesian1_max(p_surface, p_max, p_max);
 
     minitensor::Vector<minitensor::Index, 3> const cartesian1_num_points(
         p_surface_num_points, p_num_points, p_num_points);
 
     // Build the parametric grid with the specified parameters.
-    minitensor::ParametricGrid<ScalarT, 3> cartesian1_grid(
-        cartesian1_min, cartesian1_max, cartesian1_num_points);
+    minitensor::ParametricGrid<ScalarT, 3> cartesian1_grid(cartesian1_min, cartesian1_max, cartesian1_num_points);
 
     // Build a cartesian parametrization for this elasticity.
     minitensor::CartesianParametrization<ScalarT, 3> cartesian1_param(tangent);
@@ -533,25 +488,20 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
     min_detA       = cartesian1_param.get_minimum();
     arg_minimum(0) = (cartesian1_param.get_arg_minimum())(1);
     arg_minimum(1) = (cartesian1_param.get_arg_minimum())(2);
-    for (int i(0); i < 3; ++i) {
-      direction(i) = (cartesian1_param.get_normal_minimum())(i);
-    }
+    for (int i(0); i < 3; ++i) { direction(i) = (cartesian1_param.get_normal_minimum())(i); }
   }
 
   if (surface_index == 2) {
     // y surface
-    minitensor::Vector<ScalarT, 3> const cartesian2_min(
-        p_min, p_surface, p_min);
+    minitensor::Vector<ScalarT, 3> const cartesian2_min(p_min, p_surface, p_min);
 
-    minitensor::Vector<ScalarT, 3> const cartesian2_max(
-        p_max, p_surface, p_max);
+    minitensor::Vector<ScalarT, 3> const cartesian2_max(p_max, p_surface, p_max);
 
     minitensor::Vector<minitensor::Index, 3> const cartesian2_num_points(
         p_num_points, p_surface_num_points, p_num_points);
 
     // Build the parametric grid with the specified parameters.
-    minitensor::ParametricGrid<ScalarT, 3> cartesian2_grid(
-        cartesian2_min, cartesian2_max, cartesian2_num_points);
+    minitensor::ParametricGrid<ScalarT, 3> cartesian2_grid(cartesian2_min, cartesian2_max, cartesian2_num_points);
 
     // Build a cartesian parametrization for this elasticity.
     minitensor::CartesianParametrization<ScalarT, 3> cartesian2_param(tangent);
@@ -568,25 +518,20 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
     min_detA       = cartesian2_param.get_minimum();
     arg_minimum(0) = (cartesian2_param.get_arg_minimum())(0);
     arg_minimum(1) = (cartesian2_param.get_arg_minimum())(2);
-    for (int i(0); i < 3; ++i) {
-      direction(i) = (cartesian2_param.get_normal_minimum())(i);
-    }
+    for (int i(0); i < 3; ++i) { direction(i) = (cartesian2_param.get_normal_minimum())(i); }
   }
 
   if (surface_index == 3) {
     // z surface
-    minitensor::Vector<ScalarT, 3> const cartesian3_min(
-        p_min, p_min, p_surface);
+    minitensor::Vector<ScalarT, 3> const cartesian3_min(p_min, p_min, p_surface);
 
-    minitensor::Vector<ScalarT, 3> const cartesian3_max(
-        p_max, p_max, p_surface);
+    minitensor::Vector<ScalarT, 3> const cartesian3_max(p_max, p_max, p_surface);
 
     minitensor::Vector<minitensor::Index, 3> const cartesian3_num_points(
         p_num_points, p_num_points, p_surface_num_points);
 
     // Build the parametric grid with the specified parameters.
-    minitensor::ParametricGrid<ScalarT, 3> cartesian3_grid(
-        cartesian3_min, cartesian3_max, cartesian3_num_points);
+    minitensor::ParametricGrid<ScalarT, 3> cartesian3_grid(cartesian3_min, cartesian3_max, cartesian3_num_points);
 
     // Build a cartesian parametrization for this elasticity.
     minitensor::CartesianParametrization<ScalarT, 3> cartesian3_param(tangent);
@@ -603,9 +548,7 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
     min_detA       = cartesian3_param.get_minimum();
     arg_minimum(0) = (cartesian3_param.get_arg_minimum())(0);
     arg_minimum(1) = (cartesian3_param.get_arg_minimum())(1);
-    for (int i(0); i < 3; ++i) {
-      direction(i) = (cartesian3_param.get_normal_minimum())(i);
-    }
+    for (int i(0); i < 3; ++i) { direction(i) = (cartesian3_param.get_normal_minimum())(i); }
   }
 
   return min_detA;
@@ -679,8 +622,7 @@ BifurcationCheck<EvalT, Traits>::spherical_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -783,8 +725,7 @@ BifurcationCheck<EvalT, Traits>::stereographic_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -872,8 +813,7 @@ BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
     n = projective_get_normal(Xfad2_sub);
 
     detA = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n))) +
-           Xfad2[3] * (Xfad2[0] * Xfad2[0] + Xfad2[1] * Xfad2[1] +
-                       Xfad2[2] * Xfad2[2] - 1);
+           Xfad2[3] * (Xfad2[0] * Xfad2[0] + Xfad2[1] * Xfad2[1] + Xfad2[2] * Xfad2[2] - 1);
 
     // std::cout << "parameters: " << parameters << std::endl;
     // std::cout << "determinant: " << (detA.val()).val() << std::endl;
@@ -899,8 +839,7 @@ BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -1003,8 +942,7 @@ BifurcationCheck<EvalT, Traits>::tangent_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -1113,8 +1051,7 @@ BifurcationCheck<EvalT, Traits>::cartesian_newton_raphson(
     if (relativeR < 1.0e-8 || normR < 1.0e-8) break;
 
     if (iter > 50) {
-      std::cout << "Newton's loop for bifurcation check not converging after "
-                << 50 << " iterations" << std::endl;
+      std::cout << "Newton's loop for bifurcation check not converging after " << 50 << " iterations" << std::endl;
       break;
     }
 
@@ -1173,7 +1110,7 @@ BifurcationCheck<EvalT, Traits>::stereographic_pso(
   std::vector<ScalarT>                        detA_ibest(group_size);
 
   minitensor::Vector<ScalarT, 2> arg_gbest;
-  ScalarT detA_gbest = std::numeric_limits<ScalarT>::max();
+  ScalarT                        detA_gbest = std::numeric_limits<ScalarT>::max();
 
   std::random_device                     rd;
   std::mt19937                           mt_eng(rd());
@@ -1193,13 +1130,11 @@ BifurcationCheck<EvalT, Traits>::stereographic_pso(
 
     ScalarT r2 = arg_tmp[0] * arg_tmp[0] + arg_tmp[1] * arg_tmp[1];
 
-    minitensor::Vector<ScalarT, 3> n(
-        2.0 * arg_tmp[0], 2.0 * arg_tmp[1], r2 - 1.0);
+    minitensor::Vector<ScalarT, 3> n(2.0 * arg_tmp[0], 2.0 * arg_tmp[1], r2 - 1.0);
     n /= (r2 + 1.0);
 
-    arg_ibest[i] = arg_tmp;
-    detA_ibest[i] =
-        minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n)));
+    arg_ibest[i]  = arg_tmp;
+    detA_ibest[i] = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n)));
 
     if (detA_gbest > detA_ibest[i]) {
       detA_gbest = detA_ibest[i];
@@ -1215,22 +1150,18 @@ BifurcationCheck<EvalT, Traits>::stereographic_pso(
     ScalarT error = 0.0;
 
     for (int i = 0; i < group_size; i++) {
-      arg_velocity_group[i] =
-          w * arg_velocity_group[i] +
-          c1 * real_dist(mt_eng) * (arg_ibest[i] - arg_group[i]) +
-          c2 * real_dist(mt_eng) * (arg_gbest - arg_group[i]);
+      arg_velocity_group[i] = w * arg_velocity_group[i] + c1 * real_dist(mt_eng) * (arg_ibest[i] - arg_group[i]) +
+                              c2 * real_dist(mt_eng) * (arg_gbest - arg_group[i]);
       arg_group[i] += r * arg_velocity_group[i];
 
       minitensor::Vector<ScalarT, 2> arg_tmp = arg_group[i];
 
       ScalarT r2 = arg_tmp[0] * arg_tmp[0] + arg_tmp[1] * arg_tmp[1];
 
-      minitensor::Vector<ScalarT, 3> n(
-          2.0 * arg_tmp[0], 2.0 * arg_tmp[1], r2 - 1.0);
+      minitensor::Vector<ScalarT, 3> n(2.0 * arg_tmp[0], 2.0 * arg_tmp[1], r2 - 1.0);
       n /= (r2 + 1.0);
 
-      ScalarT detA_tmp =
-          minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n)));
+      ScalarT detA_tmp = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n)));
 
       if (detA_ibest[i] > detA_tmp) {
         detA_ibest[i] = detA_tmp;
@@ -1258,8 +1189,7 @@ BifurcationCheck<EvalT, Traits>::stereographic_pso(
 
   ScalarT r2 = arg_gbest[0] * arg_gbest[0] + arg_gbest[1] * arg_gbest[1];
 
-  minitensor::Vector<ScalarT, 3> n(
-      2.0 * arg_gbest[0], 2.0 * arg_gbest[1], r2 - 1.0);
+  minitensor::Vector<ScalarT, 3> n(2.0 * arg_gbest[0], 2.0 * arg_gbest[1], r2 - 1.0);
   n /= (r2 + 1.0);
 
   for (int i(0); i < 3; ++i) { direction(i) = n(i); }
@@ -1271,26 +1201,21 @@ BifurcationCheck<EvalT, Traits>::stereographic_pso(
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-BifurcationCheck<EvalT, Traits>::spherical_get_normal(
-    minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::spherical_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
   minitensor::Vector<D2FadType, 3> normal(
-      sin(parameters[0]) * cos(parameters[1]),
-      sin(parameters[0]) * sin(parameters[1]),
-      cos(parameters[0]));
+      sin(parameters[0]) * cos(parameters[1]), sin(parameters[0]) * sin(parameters[1]), cos(parameters[0]));
 
   return normal;
 }
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-BifurcationCheck<EvalT, Traits>::stereographic_get_normal(
-    minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::stereographic_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
   D2FadType r2 = parameters[0] * parameters[0] + parameters[1] * parameters[1];
 
-  minitensor::Vector<D2FadType, 3> normal(
-      2.0 * parameters[0], 2.0 * parameters[1], r2 - 1.0);
+  minitensor::Vector<D2FadType, 3> normal(2.0 * parameters[0], 2.0 * parameters[1], r2 - 1.0);
   normal /= (r2 + 1.0);
 
   return normal;
@@ -1298,8 +1223,7 @@ BifurcationCheck<EvalT, Traits>::stereographic_get_normal(
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-BifurcationCheck<EvalT, Traits>::projective_get_normal(
-    minitensor::Vector<D2FadType, 3>& parameters)
+BifurcationCheck<EvalT, Traits>::projective_get_normal(minitensor::Vector<D2FadType, 3>& parameters)
 {
   minitensor::Vector<D2FadType, 3>& normal = parameters;
 
@@ -1325,11 +1249,9 @@ BifurcationCheck<EvalT, Traits>::projective_get_normal(
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-BifurcationCheck<EvalT, Traits>::tangent_get_normal(
-    minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::tangent_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
-  D2FadType const r =
-      sqrt(parameters[0] * parameters[0] + parameters[1] * parameters[1]);
+  D2FadType const r = sqrt(parameters[0] * parameters[0] + parameters[1] * parameters[1]);
 
   minitensor::Vector<D2FadType, 3> normal(3, minitensor::Filler::ZEROS);
 
@@ -1348,33 +1270,27 @@ BifurcationCheck<EvalT, Traits>::tangent_get_normal(
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-BifurcationCheck<EvalT, Traits>::cartesian_get_normal1(
-    minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::cartesian_get_normal1(minitensor::Vector<D2FadType, 2>& parameters)
 {
-  minitensor::Vector<D2FadType, 3> normal(
-      D2FadType(1), parameters[0], parameters[1]);
+  minitensor::Vector<D2FadType, 3> normal(D2FadType(1), parameters[0], parameters[1]);
 
   return normal;
 }
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-BifurcationCheck<EvalT, Traits>::cartesian_get_normal2(
-    minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::cartesian_get_normal2(minitensor::Vector<D2FadType, 2>& parameters)
 {
-  minitensor::Vector<D2FadType, 3> normal(
-      parameters[0], D2FadType(1), parameters[1]);
+  minitensor::Vector<D2FadType, 3> normal(parameters[0], D2FadType(1), parameters[1]);
 
   return normal;
 }
 
 template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
-BifurcationCheck<EvalT, Traits>::cartesian_get_normal3(
-    minitensor::Vector<D2FadType, 2>& parameters)
+BifurcationCheck<EvalT, Traits>::cartesian_get_normal3(minitensor::Vector<D2FadType, 2>& parameters)
 {
-  minitensor::Vector<D2FadType, 3> normal(
-      parameters[0], parameters[1], D2FadType(1));
+  minitensor::Vector<D2FadType, 3> normal(parameters[0], parameters[1], D2FadType(1));
 
   return normal;
 }

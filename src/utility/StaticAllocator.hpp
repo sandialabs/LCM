@@ -123,15 +123,13 @@ StaticPointer<T>::StaticPointer(T* ptr) : ptr_(ptr)
 }
 
 template <typename T>
-StaticPointer<T>::StaticPointer(StaticPointer<T>&& other)
-    : ptr_(other.release())
+StaticPointer<T>::StaticPointer(StaticPointer<T>&& other) : ptr_(other.release())
 {
 }
 
 template <typename T>
 template <typename U>
-StaticPointer<T>::StaticPointer(StaticPointer<U>&& other)
-    : ptr_(other.release())
+StaticPointer<T>::StaticPointer(StaticPointer<U>&& other) : ptr_(other.release())
 {
 }
 

@@ -33,10 +33,7 @@ ElasticDamageModel<EvalT, Traits>::ElasticDamageModel(
   this->eval_field_map_.insert(std::make_pair(energy_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(damage_string, dl->qp_scalar));
 
-  if (compute_tangent_) {
-    this->eval_field_map_.insert(
-        std::make_pair(tangent_string, dl->qp_tensor4));
-  }
+  if (compute_tangent_) { this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4)); }
 
   // define the state variables
   // stress
@@ -108,15 +105,13 @@ ElasticDamageModel<EvalT, Traits>::computeState(
   minitensor::Tensor4<ScalarT> id4(num_dims_);
   minitensor::Tensor4<ScalarT> id3(minitensor::identity_3<ScalarT>(num_dims_));
 
-  id4 = 0.5 * (minitensor::identity_1<ScalarT>(num_dims_) +
-               minitensor::identity_2<ScalarT>(num_dims_));
+  id4 = 0.5 * (minitensor::identity_1<ScalarT>(num_dims_) + minitensor::identity_2<ScalarT>(num_dims_));
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int pt = 0; pt < num_pts_; ++pt) {
       // local parameters
-      mu = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
-      lame = elastic_modulus(cell, pt) * poissons_ratio(cell, pt) /
-             (1.0 + poissons_ratio(cell, pt)) /
+      mu   = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
+      lame = elastic_modulus(cell, pt) * poissons_ratio(cell, pt) / (1.0 + poissons_ratio(cell, pt)) /
              (1.0 - 2.0 * poissons_ratio(cell, pt));
 
       // small strain tensor
@@ -126,8 +121,7 @@ ElasticDamageModel<EvalT, Traits>::computeState(
       Ce = lame * id3 + 2.0 * mu * id4;
 
       // undamaged energy
-      energy(cell, pt) =
-          0.5 * minitensor::dotdot(minitensor::dotdot(epsilon, Ce), epsilon);
+      energy(cell, pt) = 0.5 * minitensor::dotdot(minitensor::dotdot(epsilon, Ce), epsilon);
 
       // undamaged Cauchy stress
       sigma = minitensor::dotdot(Ce, epsilon);
@@ -143,16 +137,11 @@ ElasticDamageModel<EvalT, Traits>::computeState(
       damage_deriv = max_damage_ / saturation_ * std::exp(-alpha / saturation_);
 
       // tangent for matrix considering damage
-      if (compute_tangent_) {
-        Ce = (1.0 - damage(cell, pt)) * Ce -
-             damage_deriv * minitensor::tensor(sigma, sigma);
-      }
+      if (compute_tangent_) { Ce = (1.0 - damage(cell, pt)) * Ce - damage_deriv * minitensor::tensor(sigma, sigma); }
 
       // total Cauchy stress
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = (1.0 - damage(cell, pt)) * sigma(i, j);
-        }
+        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = (1.0 - damage(cell, pt)) * sigma(i, j); }
       }
 
       // total tangent
@@ -160,9 +149,7 @@ ElasticDamageModel<EvalT, Traits>::computeState(
         for (int i(0); i < num_dims_; ++i) {
           for (int j(0); j < num_dims_; ++j) {
             for (int k(0); k < num_dims_; ++k) {
-              for (int l(0); l < num_dims_; ++l) {
-                tangent(cell, pt, i, j, k, l) = Ce(i, j, k, l);
-              }
+              for (int l(0); l < num_dims_; ++l) { tangent(cell, pt, i, j, k, l) = Ce(i, j, k, l); }
             }
           }
         }

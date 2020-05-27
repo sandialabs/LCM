@@ -21,9 +21,7 @@ class ModelEvaluator : public Piro::TransientDecorator<ST>
 {
  public:
   // Constructor
-  ModelEvaluator(
-      const Teuchos::RCP<Application>&            app,
-      const Teuchos::RCP<Teuchos::ParameterList>& appParams);
+  ModelEvaluator(const Teuchos::RCP<Application>& app, const Teuchos::RCP<Teuchos::ParameterList>& appParams);
 
   /** \name Overridden from Thyra::ModelEvaluator<ST> . */
   //@{
@@ -138,9 +136,7 @@ class ModelEvaluator : public Piro::TransientDecorator<ST>
 
   //! Evaluate model on InArgs
   void
-  evalModelImpl(
-      const Thyra_InArgs&                           inArgs,
-      const Thyra::ModelEvaluatorBase::OutArgs<ST>& outArgs) const;
+  evalModelImpl(const Thyra_InArgs& inArgs, const Thyra::ModelEvaluatorBase::OutArgs<ST>& outArgs) const;
 
   //! Application object
   Teuchos::RCP<Albany::Application>    app;

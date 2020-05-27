@@ -17,16 +17,13 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class UpdateField : public PHX::EvaluatorWithBaseImpl<Traits>,
-                    public PHX::EvaluatorDerived<EvalT, Traits>
+class UpdateField : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   UpdateField(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

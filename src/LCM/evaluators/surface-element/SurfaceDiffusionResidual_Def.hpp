@@ -13,23 +13,15 @@ SurfaceDiffusionResidual<EvalT, Traits>::SurfaceDiffusionResidual(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepidBasis(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis")),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
       scalarGrad(p.get<std::string>("Scalar Gradient Name"), dl->qp_vector),
       scalarJump(p.get<std::string>("Scalar Jump Name"), dl->qp_scalar),
       currentBasis(p.get<std::string>("Current Basis Name"), dl->qp_tensor),
-      refDualBasis(
-          p.get<std::string>("Reference Dual Basis Name"),
-          dl->qp_tensor),
+      refDualBasis(p.get<std::string>("Reference Dual Basis Name"), dl->qp_tensor),
       refNormal(p.get<std::string>("Reference Normal Name"), dl->qp_vector),
       refArea(p.get<std::string>("Reference Area Name"), dl->qp_scalar),
-      scalarResidual(
-          p.get<std::string>("Surface Scalar Residual Name"),
-          dl->node_scalar)
+      scalarResidual(p.get<std::string>("Surface Scalar Residual Name"), dl->node_scalar)
 {
   this->addDependentField(scalarGrad);
   this->addDependentField(scalarJump);
@@ -70,12 +62,9 @@ SurfaceDiffusionResidual<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(scalarResidual, fm);
 
   // Allocate Temporary Views
-  refValues =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
-  refGrads = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", numPlaneNodes, numQPs, numPlaneDims);
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
+  refValues  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
+  refGrads   = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs, numPlaneDims);
+  refPoints  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
   refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
 
   // Pre-Calculate reference element quantitites
@@ -87,16 +76,13 @@ SurfaceDiffusionResidual<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceDiffusionResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceDiffusionResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int node(0); node < numPlaneNodes; ++node) {
       scalarResidual(cell, node) = 0;
       for (int pt = 0; pt < numQPs; ++pt) {
-        scalarResidual(cell, node) += refValues(node, pt) *
-                                      scalarJump(cell, pt) * thickness *
-                                      refArea(cell, pt);
+        scalarResidual(cell, node) += refValues(node, pt) * scalarJump(cell, pt) * thickness * refArea(cell, pt);
       }
     }
   }

@@ -15,10 +15,9 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits, typename Kernel>
-inline ParallelConstitutiveModel<EvalT, Traits, Kernel>::
-    ParallelConstitutiveModel(
-        Teuchos::ParameterList*              p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+inline ParallelConstitutiveModel<EvalT, Traits, Kernel>::ParallelConstitutiveModel(
+    Teuchos::ParameterList*              p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
     : ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   kernel_ = util::make_unique<EvalKernel>(*this, p, dl);
@@ -31,14 +30,11 @@ ParallelConstitutiveModel<EvalT, Traits, Kernel>::computeState(
     FieldMap<ScalarT const>   dep_fields,
     FieldMap<ScalarT>         eval_fields)
 {
-  util::TimeMonitor& tmonitor =
-      util::PerformanceContext::instance().timeMonitor();
+  util::TimeMonitor& tmonitor = util::PerformanceContext::instance().timeMonitor();
 
-  Teuchos::RCP<Teuchos::Time> kernel_time =
-      tmonitor["Constitutive Model: Kernel Time"];
+  Teuchos::RCP<Teuchos::Time> kernel_time = tmonitor["Constitutive Model: Kernel Time"];
 
-  Teuchos::RCP<Teuchos::Time> transfer_time =
-      tmonitor["Constitutive Model: Transfer Time"];
+  Teuchos::RCP<Teuchos::Time> transfer_time = tmonitor["Constitutive Model: Transfer Time"];
 
   kernel_->init(workset, dep_fields, eval_fields);
 
@@ -57,12 +53,9 @@ ParallelConstitutiveModel<EvalT, Traits, Kernel>::computeState(
   // supercomputers
   auto kernel_ptr = kernel_.get();
 
-  Kokkos::parallel_for(
-      Kokkos::RangePolicy<Kokkos::Schedule<Kokkos::Dynamic>>(
-          0, workset.numCells),
-      [=](int cell) {
-        for (int pt = 0; pt < num_pts_; ++pt) { (*kernel_ptr)(cell, pt); }
-      });
+  Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::Schedule<Kokkos::Dynamic>>(0, workset.numCells), [=](int cell) {
+    for (int pt = 0; pt < num_pts_; ++pt) { (*kernel_ptr)(cell, pt); }
+  });
 
   Kokkos::fence();
 }

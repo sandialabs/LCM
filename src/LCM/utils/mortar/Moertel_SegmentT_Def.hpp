@@ -25,11 +25,8 @@
  |                                  of the outward normal of the segment|
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-MoertelT::SEGMENT_TEMPLATE_CLASS(
-    SegmentT)::Segment(int id, int nnode, int* nodeId, int outlevel)
-    : Id_(id),
-      outputlevel_(outlevel),
-      stype_(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none)
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Segment(int id, int nnode, int* nodeId, int outlevel)
+    : Id_(id), outputlevel_(outlevel), stype_(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none)
 {
   nodeId_.resize(nnode);
   for (int i = 0; i < nnode; ++i) nodeId_[i] = nodeId[i];
@@ -37,12 +34,8 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(
 }
 
 SEGMENT_TEMPLATE_STATEMENT
-MoertelT::SEGMENT_TEMPLATE_CLASS(
-    SegmentT)::Segment(int id, std::vector<int> const& nodev, int outlevel)
-    : Id_(id),
-      outputlevel_(outlevel),
-      stype_(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none),
-      nodeId_(nodev)
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Segment(int id, std::vector<int> const& nodev, int outlevel)
+    : Id_(id), outputlevel_(outlevel), stype_(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none), nodeId_(nodev)
 {
   nodeptr_.resize(0);
 }
@@ -52,9 +45,7 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
 MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Segment(int outlevel)
-    : Id_(-1),
-      outputlevel_(outlevel),
-      stype_(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none)
+    : Id_(-1), outputlevel_(outlevel), stype_(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none)
 {
   nodeId_.resize(0);
   nodeptr_.resize(0);
@@ -64,8 +55,7 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Segment(int outlevel)
  | base class copy ctor                                      mwgee 07/05|
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Segment(
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & old)
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Segment(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & old)
 {
   Id_          = old.Id_;
   outputlevel_ = old.outputlevel_;
@@ -75,8 +65,7 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Segment(
 
   // copy the functions
   // this is not a deep copy but we simply copy the refcountptr
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>::
-      iterator curr;
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>::iterator curr;
   for (curr = old.functions_.begin(); curr != old.functions_.end(); ++curr) {
     if (curr->second == Teuchos::null) {
       std::stringstream oss;
@@ -85,13 +74,8 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Segment(
           << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       throw ReportError(oss);
     }
-    Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)> newfunc =
-        curr->second;
-    functions_.insert(
-        std::pair<
-            int,
-            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>(
-            curr->first, newfunc));
+    Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)> newfunc = curr->second;
+    functions_.insert(std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>(curr->first, newfunc));
   }
 }
 
@@ -113,22 +97,15 @@ SEGMENT_TEMPLATE_STATEMENT
 bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Print() const
 {
   std::cout << "Segment " << std::setw(6) << Id_;
-  if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_Linear1D)
-    std::cout << " Typ Linear1D   ";
-  if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad)
-    std::cout << " Typ BiLinearQuad ";
-  if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri)
-    std::cout << " Typ BiLinearTri";
-  if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none)
-    std::cout << " Typ NONE       ";
+  if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_Linear1D) std::cout << " Typ Linear1D   ";
+  if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad) std::cout << " Typ BiLinearQuad ";
+  if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri) std::cout << " Typ BiLinearTri";
+  if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_none) std::cout << " Typ NONE       ";
   std::cout << " #Nodes " << nodeId_.size() << " Nodes: ";
-  for (int i = 0; i < (int)nodeId_.size(); ++i)
-    std::cout << std::setw(6) << nodeId_[i] << "  ";
+  for (int i = 0; i < (int)nodeId_.size(); ++i) std::cout << std::setw(6) << nodeId_[i] << "  ";
   std::cout << "  #Functions " << functions_.size() << "  Types: ";
-  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)>>::
-      const_iterator curr;
-  for (curr = functions_.begin(); curr != functions_.end(); ++curr)
-    std::cout << curr->second->Type() << "  ";
+  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)>>::const_iterator curr;
+  for (curr = functions_.begin(); curr != functions_.end(); ++curr) std::cout << curr->second->Type() << "  ";
   std::cout << std::endl;
   return true;
 }
@@ -139,9 +116,7 @@ bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Print() const
  | the user can set func to several segments!                           |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::SetFunction(
-    int id,
-    MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT) * func)
+bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::SetFunction(int id, MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT) * func)
 {
   if (id < 0) {
     std::cout << "***ERR*** MOERTEL::Segment::SetFunction:\n"
@@ -157,18 +132,14 @@ bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::SetFunction(
   }
 
   // check for existing function with this id and evtentually overwrite
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>::
-      iterator curr = functions_.find(id);
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>::iterator curr = functions_.find(id);
   if (curr != functions_.end()) {
     curr->second = Teuchos::null;
     curr->second = Teuchos::rcp(func->Clone());
     return true;
   }
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)> newfunc =
-      Teuchos::rcp(func->Clone());
-  functions_.insert(
-      std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>(
-          id, newfunc));
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)> newfunc = Teuchos::rcp(func->Clone());
+  functions_.insert(std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>(id, newfunc));
   return true;
 }
 
@@ -218,15 +189,10 @@ bool MOERTEL::Segment::SetFunction(int id, Teuchos::RCP<MOERTEL::Function> func)
  |               no evaluation                                          |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::EvaluateFunction(
-    int           id,
-    const double* xi,
-    double*       val,
-    int           valdim,
-    double*       deriv)
+bool MoertelT::SEGMENT_TEMPLATE_CLASS(
+    SegmentT)::EvaluateFunction(int id, const double* xi, double* val, int valdim, double* deriv)
 {
-  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)>>::
-      iterator curr = functions_.find(id);
+  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)>>::iterator curr = functions_.find(id);
   if (curr == functions_.end()) {
     std::stringstream oss;
     oss << "***ERR*** "
@@ -245,9 +211,7 @@ bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::EvaluateFunction(
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg)
+operator<<(std::ostream& os, const MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg)
 {
   seg.Print();
   return os;
@@ -269,8 +233,7 @@ int MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetLocalNodeId(int nid)
   if (lid < 0) {
     std::stringstream oss;
     oss << "***ERR*** MOERTEL::Segment::GetLocalNodeId:\n"
-        << "***ERR*** cannot find node " << nid << " in segment " << this->Id()
-        << " list of nodes\n"
+        << "***ERR*** cannot find node " << nid << " in segment " << this->Id() << " list of nodes\n"
         << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     throw ReportError(oss);
   }
@@ -324,8 +287,7 @@ bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
 }
 
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
-    MoertelT::InterfaceT<ST, LO, GO, N>& interface)
+bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(MoertelT::InterfaceT<ST, LO, GO, N>& interface)
 {
   if (!interface.IsComplete()) return false;
   if (interface.lComm() == Teuchos::null) return true;
@@ -386,12 +348,11 @@ bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
  | return type of function with certain id                              |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)::FunctionType
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::FunctionType(int id)
+MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)::FunctionType MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::FunctionType(
+    int id)
 {
   // find the function with id id
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>::
-      iterator curr = functions_.find(id);
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>::iterator curr = functions_.find(id);
   if (curr == functions_.end())
     return MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_none;
   else
@@ -517,13 +478,11 @@ MoertelT::Linear1DSeg::UnPack(int* pack)
   int nfunc = pack[count++];
 
   for (int i = 0; i < nfunc; ++i) {
-    int                id   = pack[count++];
-    int                type = pack[count++];
-    MOERTEL::Function* func = MOERTEL::AllocateFunction(
-        (MOERTEL::Function::FunctionType)type, OutLevel());
+    int                             id   = pack[count++];
+    int                             type = pack[count++];
+    MOERTEL::Function*              func = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
     Teuchos::RCP<MOERTEL::Function> rcptrfunc = Teuchos::rcp(func);
-    functions_.insert(
-        std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
+    functions_.insert(std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
   }
 
   if (count != size) {
@@ -551,13 +510,11 @@ MoertelT::BiLinearTriSeg::UnPack(int* pack)
   int nfunc = pack[count++];
 
   for (int i = 0; i < nfunc; ++i) {
-    int                id   = pack[count++];
-    int                type = pack[count++];
-    MOERTEL::Function* func = MOERTEL::AllocateFunction(
-        (MOERTEL::Function::FunctionType)type, OutLevel());
+    int                             id   = pack[count++];
+    int                             type = pack[count++];
+    MOERTEL::Function*              func = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
     Teuchos::RCP<MOERTEL::Function> rcptrfunc = Teuchos::rcp(func);
-    functions_.insert(
-        std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
+    functions_.insert(std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
   }
 
   if (count != size) {
@@ -583,13 +540,11 @@ MoertelT::BiLinearQuadSeg::UnPack(int* pack)
   for (int i = 0; i < (int)nodeId_.size(); ++i) nodeId_[i] = pack[count++];
   int nfunc = pack[count++];
   for (int i = 0; i < nfunc; ++i) {
-    int                id   = pack[count++];
-    int                type = pack[count++];
-    MOERTEL::Function* func = MOERTEL::AllocateFunction(
-        (MOERTEL::Function::FunctionType)type, OutLevel());
+    int                             id   = pack[count++];
+    int                             type = pack[count++];
+    MOERTEL::Function*              func = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
     Teuchos::RCP<MOERTEL::Function> rcptrfunc = Teuchos::rcp(func);
-    functions_.insert(
-        std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
+    functions_.insert(std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
   }
 
   if (count != size) {
@@ -613,8 +568,7 @@ MoertelT::Linear1DSeg::LocalCoordinatesOfNode(int lid, double* xi)
   else {
     std::stringstream oss;
     oss << "***ERR*** MOERTEL::Segment_Linear1D::LocalCoordinatesOfNode:\n"
-        << "***ERR*** Segment " << Id() << ": node number " << lid
-        << " out of range\n"
+        << "***ERR*** Segment " << Id() << ": node number " << lid << " out of range\n"
         << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     throw ReportError(oss);
   }
@@ -794,8 +748,7 @@ MoertelT::BiLinearQuadSeg::Metric(double* xi, double g[], double G[][3])
   for (int i = 0; i < 2; ++i)
     for (int dim = 0; dim < 3; ++dim) {
       G[i][dim] = 0.0;
-      for (int node = 0; node < 4; ++node)
-        G[i][dim] += deriv[node * 2 + i] * x[node][dim];
+      for (int node = 0; node < 4; ++node) G[i][dim] += deriv[node * 2 + i] * x[node][dim];
     }
 
   // build G3 as cross product of G1 x G2
@@ -880,12 +833,10 @@ MOERTEL::Function* MOERTEL::Segment::GetFunction(int id)
 
 // ETI
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
-template bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::
-    GetPtrstoNodes<double, int, int, KokkosNode>(
-        MoertelT::InterfaceT<double, int, int, KokkosNode>& interface);
+template bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes<double, int, int, KokkosNode>(
+    MoertelT::InterfaceT<double, int, int, KokkosNode>& interface);
 #endif
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
-template bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::
-    GetPtrstoNodes<double, int, long long, KokkosNode>(
-        MoertelT::InterfaceT<double, int, long long, KokkosNode>& interface);
+template bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes<double, int, long long, KokkosNode>(
+    MoertelT::InterfaceT<double, int, long long, KokkosNode>& interface);
 #endif

@@ -17,10 +17,7 @@ Albany::ComprNSProblem::ComprNSProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_)
-    : Albany::AbstractProblem(params_, paramLib_),
-      params(params_),
-      numDim(numDim_),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_), params(params_), numDim(numDim_), use_sdbcs_(false)
 {
   // Get number of species equations from Problem specifications
   neq = params_->get("Number of PDE Equations", numDim);
@@ -39,20 +36,17 @@ Albany::ComprNSProblem::buildProblem(
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
   fm.resize(1);
   fm[0] = rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-  buildEvaluators(
-      *fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
+  buildEvaluators(*fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
   constructDirichletEvaluators(*meshSpecs[0]);
 
   // Check if have Neumann sublist; throw error if attempting to specify
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() >
-      0) {  // Build a sideset evaluator if sidesets are present
+  if (meshSpecs[0]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
     constructNeumannEvaluators(meshSpecs[0]);
   }
 }
@@ -67,15 +61,13 @@ Albany::ComprNSProblem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<ComprNSProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<ComprNSProblem>                 op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 void
-Albany::ComprNSProblem::constructDirichletEvaluators(
-    Albany::MeshSpecsStruct const& meshSpecs)
+Albany::ComprNSProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -85,8 +77,7 @@ Albany::ComprNSProblem::constructDirichletEvaluators(
     dirichletNames[i] = s.str();
   }
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
@@ -94,8 +85,7 @@ Albany::ComprNSProblem::constructDirichletEvaluators(
 
 // Neumann BCs
 void
-Albany::ComprNSProblem::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
+Albany::ComprNSProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
 {
   std::cout << "setting Neumann evaluators" << std::endl;
   // Note: we only enter this function if sidesets are defined in the mesh file
@@ -164,37 +154,22 @@ Albany::ComprNSProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(dFluxdx, dFluxdy, dFluxdz)";
   else
-    ALBANY_ABORT(
-        std::endl
-        << "Error: Sidesets only supported in 2 and 3D." << std::endl);
+    ALBANY_ABORT(std::endl << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 
   condNames[1] = "dFluxdn";
 
   nfm.resize(1);  // ComprNS problem only has one element block
 
   nfm[0] = nbcUtils.constructBCEvaluators(
-      meshSpecs,
-      neumannNames,
-      dof_names,
-      true,
-      0,
-      condNames,
-      offsets,
-      dl,
-      this->params,
-      this->paramLib);
+      meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ComprNSProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidComprNSProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidComprNSProblemParams");
 
-  validPL->set(
-      "Number of PDE Equations",
-      1,
-      "Number of PDE Equations in ComprNS equation set");
+  validPL->set("Number of PDE Equations", 1, "Number of PDE Equations in ComprNS equation set");
   validPL->sublist("Viscosity", false, "");
   validPL->sublist("Body Force", false, "");
   validPL->sublist("Equation Set", false, "");

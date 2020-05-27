@@ -139,10 +139,7 @@ struct ACEpermafrostMiniKernel : public ParallelKernel<EvalT, Traits>
   std::string block_name_{""};
 
   void
-  init(
-      Workset&                 workset,
-      FieldMap<ScalarT const>& input_fields,
-      FieldMap<ScalarT>&       output_fields);
+  init(Workset& workset, FieldMap<ScalarT const>& input_fields, FieldMap<ScalarT>& output_fields);
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -150,15 +147,10 @@ struct ACEpermafrostMiniKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class ACEpermafrost : public LCM::ParallelConstitutiveModel<
-                          EvalT,
-                          Traits,
-                          ACEpermafrostMiniKernel<EvalT, Traits>>
+class ACEpermafrost : public LCM::ParallelConstitutiveModel<EvalT, Traits, ACEpermafrostMiniKernel<EvalT, Traits>>
 {
  public:
-  ACEpermafrost(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ACEpermafrost(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 };
 }  // namespace LCM
 #endif  // LCM_ACEpermafrost_hpp

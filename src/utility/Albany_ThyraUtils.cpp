@@ -17,12 +17,9 @@ namespace Albany {
 // ========= Vector Spaces utilities ========= //
 
 Teuchos::RCP<Thyra_VectorSpace const>
-createLocallyReplicatedVectorSpace(
-    int const                              size,
-    const Teuchos::RCP<Teuchos_Comm const> comm)
+createLocallyReplicatedVectorSpace(int const size, const Teuchos::RCP<Teuchos_Comm const> comm)
 {
-  Teuchos::RCP<const Tpetra_Map> tmap(
-      new Tpetra_Map(size, 0, comm, Tpetra::LocalGlobal::LocallyReplicated));
+  Teuchos::RCP<const Tpetra_Map> tmap(new Tpetra_Map(size, 0, comm, Tpetra::LocalGlobal::LocallyReplicated));
   return createThyraVectorSpace(tmap);
 }
 
@@ -51,41 +48,29 @@ getMaxAllGlobalIndex(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 }
 
 Teuchos::Array<GO>
-getGlobalElements(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<const LO>&          lids)
+getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<const LO>& lids)
 {
   auto               indexer = createGlobalLocalIndexer(vs);
   Teuchos::Array<GO> gids(lids.size());
-  for (LO i = 0; i < lids.size(); ++i) {
-    gids[i] = indexer->getGlobalElement(lids[i]);
-  }
+  for (LO i = 0; i < lids.size(); ++i) { gids[i] = indexer->getGlobalElement(lids[i]); }
   return gids;
 }
 
 Teuchos::Array<LO>
-getLocalElements(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<const GO>&          gids)
+getLocalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<const GO>& gids)
 {
   auto               indexer = createGlobalLocalIndexer(vs);
   Teuchos::Array<LO> lids(gids.size());
-  for (LO i = 0; i < gids.size(); ++i) {
-    lids[i] = indexer->getLocalElement(gids[i]);
-  }
+  for (LO i = 0; i < gids.size(); ++i) { lids[i] = indexer->getLocalElement(gids[i]); }
   return lids;
 }
 
 void
-getGlobalElements(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<GO>&                gids)
+getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<GO>& gids)
 {
   auto     indexer  = createGlobalLocalIndexer(vs);
   const LO localDim = indexer->getNumLocalElements();
-  ALBANY_PANIC(
-      gids.size() != localDim,
-      "Error! ArrayView for gids not properly dimensioned.\n");
+  ALBANY_PANIC(gids.size() != localDim, "Error! ArrayView for gids not properly dimensioned.\n");
 
   for (LO i = 0; i < localDim; ++i) { gids[i] = indexer->getGlobalElement(i); }
 }
@@ -106,9 +91,7 @@ getLocalSubdim(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 }
 
 bool
-sameAs(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs2)
+sameAs(Teuchos::RCP<Thyra_VectorSpace const> const& vs1, Teuchos::RCP<Thyra_VectorSpace const> const& vs2)
 {
   auto tmap1 = getTpetraMap(vs1, false);
   if (!tmap1.is_null()) {
@@ -127,9 +110,7 @@ sameAs(
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-removeComponents(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<const LO>&          local_components)
+removeComponents(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<const LO>& local_components)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
@@ -142,20 +123,15 @@ removeComponents(
         "actually present.\n");
     Teuchos::Array<Tpetra_GO> reduced_gids(num_reduced_node_lids);
     for (LO lid = 0, k = 0; lid < num_node_lids; ++lid) {
-      if (std::find(local_components.begin(), local_components.end(), lid) ==
-          local_components.end()) {
+      if (std::find(local_components.begin(), local_components.end(), lid) == local_components.end()) {
         reduced_gids[k] = tmap->getGlobalElement(lid);
         ++k;
       }
     }
 
-    Tpetra::global_size_t inv_gs =
-        Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid();
-    Teuchos::RCP<const Tpetra_Map> reduced_map(new Tpetra_Map(
-        inv_gs,
-        reduced_gids().getConst(),
-        tmap->getIndexBase(),
-        tmap->getComm()));
+    Tpetra::global_size_t          inv_gs = Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid();
+    Teuchos::RCP<const Tpetra_Map> reduced_map(
+        new Tpetra_Map(inv_gs, reduced_gids().getConst(), tmap->getIndexBase(), tmap->getComm()));
 
     return createThyraVectorSpace(reduced_map);
   }
@@ -170,9 +146,7 @@ removeComponents(
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-createSubspace(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<const LO>&          subspace_components)
+createSubspace(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<const LO>& subspace_components)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
@@ -184,13 +158,9 @@ createSubspace(
       ++k;
     }
 
-    Tpetra::global_size_t inv_gs =
-        Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid();
-    Teuchos::RCP<const Tpetra_Map> reduced_map(new Tpetra_Map(
-        inv_gs,
-        subspace_gids().getConst(),
-        tmap->getIndexBase(),
-        tmap->getComm()));
+    Tpetra::global_size_t          inv_gs = Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid();
+    Teuchos::RCP<const Tpetra_Map> reduced_map(
+        new Tpetra_Map(inv_gs, subspace_gids().getConst(), tmap->getIndexBase(), tmap->getComm()));
 
     return createThyraVectorSpace(reduced_map);
   }
@@ -211,14 +181,11 @@ createVectorSpace(
     const Teuchos::ArrayView<const GO>&     gids,
     const GO                                globalDim)
 {
-  const GO invalid = Teuchos::OrdinalTraits<GO>::invalid();
-  auto     gsi     = Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid();
-  const decltype(gsi) numGlobalElements =
-      (globalDim == invalid) ? gsi : static_cast<Tpetra_GO>(globalDim);
-  Teuchos::ArrayView<const Tpetra_GO> tgids(
-      reinterpret_cast<const Tpetra_GO*>(gids.getRawPtr()), gids.size());
-  Teuchos::RCP<const Tpetra_Map> tmap =
-      Teuchos::rcp(new Tpetra_Map(numGlobalElements, tgids, 0, comm));
+  const GO            invalid           = Teuchos::OrdinalTraits<GO>::invalid();
+  auto                gsi               = Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid();
+  const decltype(gsi) numGlobalElements = (globalDim == invalid) ? gsi : static_cast<Tpetra_GO>(globalDim);
+  Teuchos::ArrayView<const Tpetra_GO> tgids(reinterpret_cast<const Tpetra_GO*>(gids.getRawPtr()), gids.size());
+  Teuchos::RCP<const Tpetra_Map>      tmap = Teuchos::rcp(new Tpetra_Map(numGlobalElements, tgids, 0, comm));
   return createThyraVectorSpace(tmap);
 }
 
@@ -236,8 +203,7 @@ createVectorSpacesIntersection(
   const auto min_size = std::min(gids1.size(), gids2.size());
 
   Teuchos::Array<GO> gids(min_size);
-  const auto         it = std::set_intersection(
-      gids1.begin(), gids1.end(), gids2.begin(), gids2.end(), gids.begin());
+  const auto         it = std::set_intersection(gids1.begin(), gids1.end(), gids2.begin(), gids2.end(), gids.begin());
   gids.resize(std::distance(gids.begin(), it));
 
   return createVectorSpace(comm, gids);
@@ -255,12 +221,7 @@ createVectorSpacesDifference(
   std::sort(gids2.begin(), gids2.end());
 
   Teuchos::Array<GO> gids;
-  std::set_difference(
-      gids1.begin(),
-      gids1.end(),
-      gids2.begin(),
-      gids2.end(),
-      std::back_inserter(gids));
+  std::set_difference(gids1.begin(), gids1.end(), gids2.begin(), gids2.end(), std::back_inserter(gids));
 
   return createVectorSpace(comm, gids);
 }
@@ -300,9 +261,7 @@ getRowSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 }
 
 std::size_t
-getNumEntriesInLocalRow(
-    const Teuchos::RCP<const Thyra_LinearOp>& lop,
-    const LO                                  lrow)
+getNumEntriesInLocalRow(const Teuchos::RCP<const Thyra_LinearOp>& lop, const LO lrow)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
@@ -408,9 +367,7 @@ assign(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST value)
 }
 
 void
-getDiagonalCopy(
-    const Teuchos::RCP<const Thyra_LinearOp>& lop,
-    Teuchos::RCP<Thyra_Vector>&               diag)
+getDiagonalCopy(const Teuchos::RCP<const Thyra_LinearOp>& lop, Teuchos::RCP<Thyra_Vector>& diag)
 {
   // Diagonal makes sense only for (globally) square operators.
   // From Thyra, we can't check the global ids of the range/domain vector
@@ -520,8 +477,7 @@ insertGlobalValues(
   auto tmat = getTpetraMatrix(lop, false);
   if (!tmat.is_null()) {
     const Tpetra_GO                     tgrow = grow;
-    Teuchos::ArrayView<const Tpetra_GO> tcols(
-        reinterpret_cast<const Tpetra_GO*>(cols.getRawPtr()), cols.size());
+    Teuchos::ArrayView<const Tpetra_GO> tcols(reinterpret_cast<const Tpetra_GO*>(cols.getRawPtr()), cols.size());
     tmat->insertGlobalValues(tgrow, tcols, values);
     return;
   }
@@ -539,8 +495,7 @@ replaceGlobalValues(
   if (!tmat.is_null()) {
     const Tpetra_GO                     tgid = gid;
     Teuchos::ArrayView<const Tpetra_GO> tindices(
-        reinterpret_cast<const Tpetra_GO*>(indices.getRawPtr()),
-        indices.size());
+        reinterpret_cast<const Tpetra_GO*>(indices.getRawPtr()), indices.size());
     tmat->replaceGlobalValues(tgid, tindices, values);
     return;
   }
@@ -565,8 +520,7 @@ addToGlobalRowValues(
   if (!tmat.is_null()) {
     const Tpetra_GO                     tgrow = grow;
     Teuchos::ArrayView<const Tpetra_GO> tindices(
-        reinterpret_cast<const Tpetra_GO*>(indices.getRawPtr()),
-        indices.size());
+        reinterpret_cast<const Tpetra_GO*>(indices.getRawPtr()), indices.size());
     auto returned_val = tmat->sumIntoGlobalValues(tgrow, tindices, values);
     // std::cout << "IKT returned_val, indices size = " << returned_val << ", "
     // << indices.size() << std::endl;
@@ -610,10 +564,7 @@ setLocalRowValues(
 }
 
 void
-setLocalRowValues(
-    const Teuchos::RCP<Thyra_LinearOp>& lop,
-    const LO                            lrow,
-    const Teuchos::ArrayView<const ST>  values)
+setLocalRowValues(const Teuchos::RCP<Thyra_LinearOp>& lop, const LO lrow, const Teuchos::ArrayView<const ST> values)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getTpetraMatrix(lop, false);
@@ -878,9 +829,7 @@ getNonconstLocalData(Teuchos::RCP<Thyra_MultiVector> const& mv)
   if (mv.is_null()) { return Teuchos::null; }
 
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> data(mv->domain()->dim());
-  for (int i = 0; i < mv->domain()->dim(); ++i) {
-    data[i] = getNonconstLocalData(mv->col(i));
-  }
+  for (int i = 0; i < mv->domain()->dim(); ++i) { data[i] = getNonconstLocalData(mv->col(i)); }
   return data;
 }
 
@@ -890,9 +839,7 @@ getLocalData(const Teuchos::RCP<const Thyra_MultiVector>& mv)
   if (mv.is_null()) { return Teuchos::null; }
 
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> data(mv->domain()->dim());
-  for (int i = 0; i < mv->domain()->dim(); ++i) {
-    data[i] = getLocalData(mv->col(i));
-  }
+  for (int i = 0; i < mv->domain()->dim(); ++i) { data[i] = getLocalData(mv->col(i)); }
   return data;
 }
 
@@ -956,9 +903,7 @@ Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>
 getNonconstLocalData(Thyra_MultiVector& mv)
 {
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> data(mv.domain()->dim());
-  for (int i = 0; i < mv.domain()->dim(); ++i) {
-    data[i] = getNonconstLocalData(mv.col(i));
-  }
+  for (int i = 0; i < mv.domain()->dim(); ++i) { data[i] = getNonconstLocalData(mv.col(i)); }
   return data;
 }
 
@@ -966,9 +911,7 @@ Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>>
 getLocalData(const Thyra_MultiVector& mv)
 {
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> data(mv.domain()->dim());
-  for (int i = 0; i < mv.domain()->dim(); ++i) {
-    data[i] = getLocalData(mv.col(i));
-  }
+  for (int i = 0; i < mv.domain()->dim(); ++i) { data[i] = getLocalData(mv.col(i)); }
   return data;
 }
 
@@ -978,8 +921,8 @@ getDeviceData(Teuchos::RCP<Thyra_Vector const> const& v)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tv = getConstTpetraVector(v, false);
   if (!tv.is_null()) {
-    auto data2d = tv->getLocalView<KokkosNode::execution_space>();
-    DeviceView1d<const ST> data = Kokkos::subview(data2d, Kokkos::ALL(), 0);
+    auto                   data2d = tv->getLocalView<KokkosNode::execution_space>();
+    DeviceView1d<const ST> data   = Kokkos::subview(data2d, Kokkos::ALL(), 0);
     return data;
   }
 
@@ -1129,10 +1072,7 @@ writeMatrixMarket<Thyra_Vector const>(
 
 template <>
 void
-writeMatrixMarket<Thyra_Vector>(
-    Teuchos::RCP<Thyra_Vector> const& v,
-    std::string const&                prefix,
-    int const                         counter)
+writeMatrixMarket<Thyra_Vector>(Teuchos::RCP<Thyra_Vector> const& v, std::string const& prefix, int const counter)
 {
   writeMatrixMarket(v.getConst(), prefix, counter);
 }
@@ -1189,10 +1129,7 @@ writeMatrixMarket<const Thyra_LinearOp>(
 
 template <>
 void
-writeMatrixMarket<Thyra_LinearOp>(
-    const Teuchos::RCP<Thyra_LinearOp>& A,
-    std::string const&                  prefix,
-    int const                           counter)
+writeMatrixMarket<Thyra_LinearOp>(const Teuchos::RCP<Thyra_LinearOp>& A, std::string const& prefix, int const counter)
 {
   writeMatrixMarket(A.getConst(), prefix, counter);
 }
@@ -1232,33 +1169,25 @@ writeMatrixMarket<Thyra_VectorSpace>(
 // ========= Thyra_SpmdXYZ utilities ========== //
 
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
-getSpmdVectorSpace(
-    Teuchos::RCP<Thyra_VectorSpace const> const vs,
-    bool const                                  throw_on_failure)
+getSpmdVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const vs, bool const throw_on_failure)
 {
   Teuchos::RCP<const Thyra_SpmdVectorSpace> spmd_vs;
-  spmd_vs = Teuchos::rcp_dynamic_cast<const Thyra_SpmdVectorSpace>(
-      vs, throw_on_failure);
+  spmd_vs = Teuchos::rcp_dynamic_cast<const Thyra_SpmdVectorSpace>(vs, throw_on_failure);
   return spmd_vs;
 }
 
 // ========= Thyra_ProductXYZ utilities ========== //
 
 Teuchos::RCP<const Thyra_ProductVectorSpace>
-getProductVectorSpace(
-    Teuchos::RCP<Thyra_VectorSpace const> const vs,
-    bool const                                  throw_on_failure)
+getProductVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const vs, bool const throw_on_failure)
 {
   Teuchos::RCP<const Thyra_ProductVectorSpace> pvs;
-  pvs = Teuchos::rcp_dynamic_cast<const Thyra_ProductVectorSpace>(
-      vs, throw_on_failure);
+  pvs = Teuchos::rcp_dynamic_cast<const Thyra_ProductVectorSpace>(vs, throw_on_failure);
   return pvs;
 }
 
 Teuchos::RCP<Thyra_ProductVector>
-getProductVector(
-    Teuchos::RCP<Thyra_Vector> const v,
-    bool const                       throw_on_failure)
+getProductVector(Teuchos::RCP<Thyra_Vector> const v, bool const throw_on_failure)
 {
   Teuchos::RCP<Thyra_ProductVector> pv;
   pv = Teuchos::rcp_dynamic_cast<Thyra_ProductVector>(v, throw_on_failure);
@@ -1266,35 +1195,26 @@ getProductVector(
 }
 
 Teuchos::RCP<const Thyra_ProductVector>
-getConstProductVector(
-    Teuchos::RCP<Thyra_Vector const> const v,
-    bool const                             throw_on_failure)
+getConstProductVector(Teuchos::RCP<Thyra_Vector const> const v, bool const throw_on_failure)
 {
   Teuchos::RCP<const Thyra_ProductVector> pv;
-  pv =
-      Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(v, throw_on_failure);
+  pv = Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(v, throw_on_failure);
   return pv;
 }
 
 Teuchos::RCP<Thyra_ProductMultiVector>
-getProductMultiVector(
-    Teuchos::RCP<Thyra_MultiVector> const mv,
-    bool const                            throw_on_failure)
+getProductMultiVector(Teuchos::RCP<Thyra_MultiVector> const mv, bool const throw_on_failure)
 {
   Teuchos::RCP<Thyra_ProductMultiVector> pmv;
-  pmv =
-      Teuchos::rcp_dynamic_cast<Thyra_ProductMultiVector>(mv, throw_on_failure);
+  pmv = Teuchos::rcp_dynamic_cast<Thyra_ProductMultiVector>(mv, throw_on_failure);
   return pmv;
 }
 
 Teuchos::RCP<const Thyra_ProductMultiVector>
-getConstProductMultiVector(
-    const Teuchos::RCP<const Thyra_MultiVector> mv,
-    bool const                                  throw_on_failure)
+getConstProductMultiVector(const Teuchos::RCP<const Thyra_MultiVector> mv, bool const throw_on_failure)
 {
   Teuchos::RCP<const Thyra_ProductMultiVector> pmv;
-  pmv = Teuchos::rcp_dynamic_cast<const Thyra_ProductMultiVector>(
-      mv, throw_on_failure);
+  pmv = Teuchos::rcp_dynamic_cast<const Thyra_ProductMultiVector>(mv, throw_on_failure);
   return pmv;
 }
 

@@ -132,11 +132,10 @@ class ProjectedNodeT : public MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)
   operator=(const MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) & old);
 
  protected:
-  double xi_[2];  // local coordinates of this projected node on pseg_;
-  MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) *
-      pseg_;     // segment this projected node is on
-  int orthseg_;  // id of segment this projection is orthogonal to
-                 // (used only in orth. projection, otherwise -1)
+  double xi_[2];                                       // local coordinates of this projected node on pseg_;
+  MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) * pseg_;  // segment this projected node is on
+  int orthseg_;                                        // id of segment this projection is orthogonal to
+                                                       // (used only in orth. projection, otherwise -1)
 };
 
 }  // namespace MoertelT
@@ -144,9 +143,7 @@ class ProjectedNodeT : public MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)
 // << operator
 MOERTEL_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const Moertel::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) & pnode);
+operator<<(std::ostream& os, const Moertel::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) & pnode);
 
 #ifndef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
 #include "Moertel_PnodeT_Def.hpp"

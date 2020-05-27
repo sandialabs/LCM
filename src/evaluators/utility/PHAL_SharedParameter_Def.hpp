@@ -17,17 +17,16 @@ SharedParameter<EvalT, Traits>::SharedParameter(Teuchos::ParameterList const& p)
   paramName  = p.get<std::string>("Parameter Name");
   paramValue = p.get<double>("Parameter Value");
 
-  Teuchos::RCP<PHX::DataLayout> layout =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
+  Teuchos::RCP<PHX::DataLayout> layout = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
 
   //! Initialize field with same name as parameter
   PHX::MDField<ScalarT, Dim> f(paramName, layout);
   paramAsField = f;
 
   // Sacado-ized parameter
-  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>(
-      "Parameter Library");  //, Teuchos::null ANDY - why a compiler error with
-                             // this?
+  Teuchos::RCP<ParamLib> paramLib =
+      p.get<Teuchos::RCP<ParamLib>>("Parameter Library");  //, Teuchos::null ANDY - why a compiler error with
+                                                           // this?
   this->registerSacadoParameter(paramName, paramLib);
 
   this->addEvaluatedField(paramAsField);
@@ -37,9 +36,7 @@ SharedParameter<EvalT, Traits>::SharedParameter(Teuchos::ParameterList const& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SharedParameter<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SharedParameter<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(paramAsField, fm);
 }
@@ -47,8 +44,7 @@ SharedParameter<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SharedParameter<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SharedParameter<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   paramAsField(0) = paramValue;
 }
@@ -65,14 +61,12 @@ SharedParameter<EvalT, Traits>::getValue(std::string const& n)
 // **********************************************************************
 
 template <typename EvalT, typename Traits>
-SharedParameterVec<EvalT, Traits>::SharedParameterVec(
-    Teuchos::ParameterList const& p)
+SharedParameterVec<EvalT, Traits>::SharedParameterVec(Teuchos::ParameterList const& p)
 {
-  Teuchos::RCP<PHX::DataLayout> layout =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
-  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>(
-      "Parameter Library");  //, Teuchos::null ANDY - why a compiler error with
-                             // this?
+  Teuchos::RCP<PHX::DataLayout> layout = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
+  Teuchos::RCP<ParamLib>        paramLib =
+      p.get<Teuchos::RCP<ParamLib>>("Parameter Library");  //, Teuchos::null ANDY - why a compiler error with
+                                                           // this?
 
   numParams = layout->extent(1);
 
@@ -102,9 +96,7 @@ SharedParameterVec<EvalT, Traits>::SharedParameterVec(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SharedParameterVec<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SharedParameterVec<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(paramAsField, fm);
 }
@@ -112,8 +104,7 @@ SharedParameterVec<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SharedParameterVec<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SharedParameterVec<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   for (int i = 0; i < numParams; ++i) paramAsField(i) = paramValues[i];
 }

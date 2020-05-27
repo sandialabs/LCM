@@ -34,8 +34,7 @@ Albany::NavierStokes::getVariableType(
 }
 
 std::string
-Albany::NavierStokes::variableTypeToString(
-    Albany::NavierStokes::NS_VAR_TYPE variableType)
+Albany::NavierStokes::variableTypeToString(Albany::NavierStokes::NS_VAR_TYPE variableType)
 {
   if (variableType == NS_VAR_TYPE_NONE)
     return "None";
@@ -68,23 +67,18 @@ Albany::NavierStokes::NavierStokes(
     periodic = params->get("Periodic BC", false);
   else
     periodic = false;
-  if (periodic)
-    *out << " Periodic Boundary Conditions being used." << std::endl;
+  if (periodic) *out << " Periodic Boundary Conditions being used." << std::endl;
 
-  getVariableType(
-      params->sublist("Flow"), "DOF", flowType, haveFlow, haveFlowEq);
-  getVariableType(
-      params->sublist("Heat"), "None", heatType, haveHeat, haveHeatEq);
-  getVariableType(
-      params->sublist("Neutronics"), "None", neutType, haveNeut, haveNeutEq);
+  getVariableType(params->sublist("Flow"), "DOF", flowType, haveFlow, haveFlowEq);
+  getVariableType(params->sublist("Heat"), "None", heatType, haveHeat, haveHeatEq);
+  getVariableType(params->sublist("Neutronics"), "None", neutType, haveNeut, haveNeutEq);
 
   if (haveFlowEq) {
     havePSPG    = params->get("Have Pressure Stabilization", true);
     porousMedia = params->get("Porous Media", false);
   }
 
-  if (haveFlow && (haveFlowEq || haveHeatEq))
-    haveSUPG = params->get("Have SUPG Stabilization", true);
+  if (haveFlow && (haveFlowEq || haveHeatEq)) haveSUPG = params->get("Have SUPG Stabilization", true);
 
   if (haveHeatEq) haveSource = params->isSublist("Source Functions");
 
@@ -100,12 +94,9 @@ Albany::NavierStokes::NavierStokes(
   // Print out a summary of the problem
   *out << "Navier-Stokes problem:" << std::endl
        << "\tSpatial dimension:      " << numDim << std::endl
-       << "\tFlow variables:         " << variableTypeToString(flowType)
-       << std::endl
-       << "\tHeat variables:         " << variableTypeToString(heatType)
-       << std::endl
-       << "\tNeutronics variables:   " << variableTypeToString(neutType)
-       << std::endl
+       << "\tFlow variables:         " << variableTypeToString(flowType) << std::endl
+       << "\tHeat variables:         " << variableTypeToString(heatType) << std::endl
+       << "\tNeutronics variables:   " << variableTypeToString(neutType) << std::endl
        << "\tPressure stabilization: " << havePSPG << std::endl
        << "\tUpwind stabilization:   " << haveSUPG << std::endl
        << "\tPorous media:           " << porousMedia << std::endl;
@@ -125,11 +116,9 @@ Albany::NavierStokes::buildProblem(
 
   fm.resize(1);
   fm[0] = rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-  buildEvaluators(
-      *fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
+  buildEvaluators(*fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
 
-  if (meshSpecs[0]->nsNames.size() >
-      0) {  // Build a nodeset evaluator if nodesets are present
+  if (meshSpecs[0]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
     constructDirichletEvaluators(meshSpecs[0]->nsNames);
   }
 
@@ -137,12 +126,10 @@ Albany::NavierStokes::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() >
-      0) {  // Build a sideset evaluator if sidesets are present
+  if (meshSpecs[0]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
     constructNeumannEvaluators(meshSpecs[0]);
   }
 }
@@ -157,15 +144,13 @@ Albany::NavierStokes::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<NavierStokes> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<NavierStokes>                   op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 void
-Albany::NavierStokes::constructDirichletEvaluators(
-    std::vector<std::string> const& nodeSetIDs)
+Albany::NavierStokes::constructDirichletEvaluators(std::vector<std::string> const& nodeSetIDs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -179,8 +164,7 @@ Albany::NavierStokes::constructDirichletEvaluators(
   if (haveHeatEq) dirichletNames[index++] = "T";
   if (haveNeutEq) dirichletNames[index++] = "phi";
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      nodeSetIDs, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(nodeSetIDs, dirichletNames, this->params, this->paramLib);
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
@@ -188,8 +172,7 @@ Albany::NavierStokes::constructDirichletEvaluators(
 
 // Neumann BCs
 void
-Albany::NavierStokes::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
+Albany::NavierStokes::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
   // i.e. meshSpecs.ssNames.size() > 0
@@ -212,10 +195,9 @@ Albany::NavierStokes::constructNeumannEvaluators(
   // robin conditions, this should work.
 
   std::vector<std::string>                  nbcNames;
-  Teuchos::RCP<Teuchos::Array<std::string>> dof_names =
-      Teuchos::rcp(new Teuchos::Array<std::string>);
-  Teuchos::Array<Teuchos::Array<int>> offsets;
-  int                                 idx = 0;
+  Teuchos::RCP<Teuchos::Array<std::string>> dof_names = Teuchos::rcp(new Teuchos::Array<std::string>);
+  Teuchos::Array<Teuchos::Array<int>>       offsets;
+  int                                       idx = 0;
   if (haveFlowEq) {
     nbcNames.push_back("ux");
     offsets.push_back(Teuchos::Array<int>(1, idx++));
@@ -254,40 +236,25 @@ Albany::NavierStokes::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(dudx, dudy, dudz)";
   else
-    ALBANY_ABORT(
-        std::endl
-        << "Error: Sidesets only supported in 2 and 3D." << std::endl);
+    ALBANY_ABORT(std::endl << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 
   condNames[1] = "dudn";
 
   nfm.resize(1);
 
   nfm[0] = nbcUtils.constructBCEvaluators(
-      meshSpecs,
-      nbcNames,
-      Teuchos::arcp(dof_names),
-      false,
-      0,
-      condNames,
-      offsets,
-      dl,
-      this->params,
-      this->paramLib);
+      meshSpecs, nbcNames, Teuchos::arcp(dof_names), false, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::NavierStokes::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidNavierStokesParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidNavierStokesParams");
 
-  if (numDim == 1)
-    validPL->set<bool>(
-        "Periodic BC", false, "Flag to indicate periodic BC for 1D problems");
+  if (numDim == 1) validPL->set<bool>("Periodic BC", false, "Flag to indicate periodic BC for 1D problems");
   validPL->set<bool>("Have Pressure Stabilization", true);
   validPL->set<bool>("Have SUPG Stabilization", true);
-  validPL->set<bool>(
-      "Porous Media", false, "Flag to use porous media equations");
+  validPL->set<bool>("Porous Media", false, "Flag to use porous media equations");
   validPL->sublist("Flow", false, "");
   validPL->sublist("Heat", false, "");
   validPL->sublist("Neutronics", false, "");

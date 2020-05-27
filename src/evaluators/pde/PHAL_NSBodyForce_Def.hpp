@@ -11,13 +11,10 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
-    : force(
-          p.get<std::string>("Body Force Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+    : force(p.get<std::string>("Body Force Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       haveHeat(p.get<bool>("Have Heat"))
 {
-  Teuchos::ParameterList* bf_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* bf_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
   std::string type = bf_list->get("Type", "None");
   if (type == "None") {
@@ -25,8 +22,7 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
   } else if (type == "Constant") {
     bf_type = CONSTANT;
     rho     = decltype(rho)(
-        p.get<std::string>("Density QP Variable Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+        p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(rho.fieldTag());
   } else if (type == "Boussinesq") {
     ALBANY_PANIC(
@@ -39,8 +35,7 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
         p.get<std::string>("Temperature QP Variable Name"),
         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     rho = decltype(rho)(
-        p.get<std::string>("Density QP Variable Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+        p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     beta = decltype(beta)(
         p.get<std::string>("Volumetric Expansion Coefficient QP Variable Name"),
         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
@@ -51,8 +46,7 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
 
   this->addEvaluatedField(force);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numQPs  = dims[1];
@@ -72,9 +66,7 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-NSBodyForce<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+NSBodyForce<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   if (bf_type == CONSTANT) {
     this->utils.setFieldData(rho, fm);
@@ -100,8 +92,7 @@ NSBodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         else if (bf_type == CONSTANT)
           force(cell, qp, i) = rho(cell, qp) * gravity[i];
         else if (bf_type == BOUSSINESQ)
-          force(cell, qp, i) =
-              rho(cell, qp) * T(cell, qp) * beta(cell, qp) * gravity[i];
+          force(cell, qp, i) = rho(cell, qp) * T(cell, qp) * beta(cell, qp) * gravity[i];
       }
     }
   }

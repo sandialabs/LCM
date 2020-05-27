@@ -95,10 +95,7 @@ class Zoltan : public GeomDecomp
     std::vector<unsigned>     dest_proc_ids;
 
     /** \brief Default Constructor. */
-    MeshInfo(stk::mesh::BulkData* bulk)
-        : m_bulk(bulk), nodal_coord_ref(NULL), elem_weight_ref(NULL)
-    {
-    }
+    MeshInfo(stk::mesh::BulkData* bulk) : m_bulk(bulk), nodal_coord_ref(NULL), elem_weight_ref(NULL) {}
 
     /** \brief Destructor. */
     ~MeshInfo() {}
@@ -193,8 +190,7 @@ class Zoltan : public GeomDecomp
   int
   globalID(const unsigned moid) const
   {
-    return m_mesh_information_.m_bulk->identifier(
-        m_mesh_information_.mesh_entities[moid]);
+    return m_mesh_information_.m_bulk->identifier(m_mesh_information_.mesh_entities[moid]);
   }
 
   /** \brief Return the number of local ids per global ids (entities per
@@ -230,9 +226,7 @@ class Zoltan : public GeomDecomp
    * first because it merges with the long names.
    */
   static void
-  merge_default_values(
-      Teuchos::ParameterList const& from,
-      Teuchos::ParameterList&       to);
+  merge_default_values(Teuchos::ParameterList const& from, Teuchos::ParameterList& to);
 
   /** \brief Name Conversion Functions.
    * \a Convert_Names_and_Values
@@ -240,9 +234,7 @@ class Zoltan : public GeomDecomp
    *  to convert long names to short names.
    */
   static void
-  convert_names_and_values(
-      Teuchos::ParameterList const& from,
-      Teuchos::ParameterList&       to);
+  convert_names_and_values(Teuchos::ParameterList const& from, Teuchos::ParameterList& to);
 
   /** \brief determine New Partition.
    *
@@ -310,14 +302,7 @@ class Zoltan : public GeomDecomp
    *
    */
   int
-  evaluate(
-      int     print_stats,
-      int*    nentity,
-      double* entity_wgt,
-      int*    ncuts,
-      double* cut_wgt,
-      int*    nboundary,
-      int*    nadj);
+  evaluate(int print_stats, int* nentity, double* entity_wgt, int* ncuts, double* cut_wgt, int* nboundary, int* nadj);
 
   /** \brief Return version of Zoltan linked into executable */
   double
@@ -369,8 +354,7 @@ class Zoltan : public GeomDecomp
   void
   init_default_parameters();
   void
-  init(std::vector<std::pair<std::string, std::string>> const&
-           dynamicLoadRebalancingParameters);
+  init(std::vector<std::pair<std::string, std::string>> const& dynamicLoadRebalancingParameters);
   static double
   init_zoltan_library();
 

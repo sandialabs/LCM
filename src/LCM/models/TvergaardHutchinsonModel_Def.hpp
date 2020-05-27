@@ -30,10 +30,8 @@ TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
   this->dep_field_map_.insert(std::make_pair("Current Basis", dl->qp_tensor));
 
   // define the evaluated fields
-  this->eval_field_map_.insert(
-      std::make_pair("Cohesive_Traction", dl->qp_vector));
-  this->eval_field_map_.insert(
-      std::make_pair("Normal_Traction", dl->qp_scalar));
+  this->eval_field_map_.insert(std::make_pair("Cohesive_Traction", dl->qp_vector));
+  this->eval_field_map_.insert(std::make_pair("Normal_Traction", dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair("Shear_Traction", dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair("Normal_Jump", dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair("Shear_Jump", dl->qp_scalar));
@@ -46,8 +44,7 @@ TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Cohesive Traction", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Cohesive Traction", false));
   // normal traction
   this->num_state_variables_++;
   this->state_var_names_.push_back("Normal_Traction");
@@ -55,8 +52,7 @@ TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Normal Traction", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Normal Traction", false));
   // shear traction
   this->num_state_variables_++;
   this->state_var_names_.push_back("Shear_Traction");
@@ -64,8 +60,7 @@ TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Shear Traction", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Shear Traction", false));
   // normal jump
   this->num_state_variables_++;
   this->state_var_names_.push_back("Normal_Jump");
@@ -73,8 +68,7 @@ TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Normal Jump", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Normal Jump", false));
   // shear jump
   this->num_state_variables_++;
   this->state_var_names_.push_back("Shear_Jump");
@@ -82,8 +76,7 @@ TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Shear Jump", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Shear Jump", false));
 }
 template <typename EvalT, typename Traits>
 void
@@ -106,14 +99,11 @@ TvergaardHutchinsonModel<EvalT, Traits>::computeState(
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
       // current basis vector
-      minitensor::Vector<ScalarT> g_0(
-          minitensor::Source::ARRAY, 3, basis, cell, pt, 0, 0);
+      minitensor::Vector<ScalarT> g_0(minitensor::Source::ARRAY, 3, basis, cell, pt, 0, 0);
 
-      minitensor::Vector<ScalarT> g_1(
-          minitensor::Source::ARRAY, 3, basis, cell, pt, 1, 0);
+      minitensor::Vector<ScalarT> g_1(minitensor::Source::ARRAY, 3, basis, cell, pt, 1, 0);
 
-      minitensor::Vector<ScalarT> n(
-          minitensor::Source::ARRAY, 3, basis, cell, pt, 2, 0);
+      minitensor::Vector<ScalarT> n(minitensor::Source::ARRAY, 3, basis, cell, pt, 2, 0);
 
       // construct orthogonal unit basis
       minitensor::Vector<ScalarT> t_0(0.0, 0.0, 0.0), t_1(0.0, 0.0, 0.0);
@@ -134,8 +124,7 @@ TvergaardHutchinsonModel<EvalT, Traits>::computeState(
       Q(2, 2) = n(2);
 
       // global and local jump
-      minitensor::Vector<ScalarT> jump_global(
-          minitensor::Source::ARRAY, 3, jump, cell, pt, 0);
+      minitensor::Vector<ScalarT> jump_global(minitensor::Source::ARRAY, 3, jump, cell, pt, 0);
       minitensor::Vector<ScalarT> jump_local(3);
       jump_local = minitensor::dot(minitensor::transpose(Q), jump_global);
 
@@ -143,9 +132,8 @@ TvergaardHutchinsonModel<EvalT, Traits>::computeState(
       // needed for interpenetration
       // Note: need to protect sqrt around zero when using Sacado
       ScalarT JumpNormal, JumpShear, IntermediateValue;
-      JumpNormal = jump_local(2);
-      IntermediateValue =
-          jump_local(0) * jump_local(0) + jump_local(1) * jump_local(1);
+      JumpNormal        = jump_local(2);
+      IntermediateValue = jump_local(0) * jump_local(0) + jump_local(1) * jump_local(1);
       if (IntermediateValue > 0.0)
         JumpShear = sqrt(IntermediateValue);
       else
@@ -159,8 +147,7 @@ TvergaardHutchinsonModel<EvalT, Traits>::computeState(
 
       // compute scalar effective jump
       ScalarT jump_eff;
-      IntermediateValue =
-          minitensor::dot(jump_local, minitensor::dot(beta, jump_local));
+      IntermediateValue = minitensor::dot(jump_local, minitensor::dot(beta, jump_local));
       if (IntermediateValue > 0.0)
         jump_eff = sqrt(IntermediateValue);
       else
@@ -181,14 +168,11 @@ TvergaardHutchinsonModel<EvalT, Traits>::computeState(
       // construct traction vector
       minitensor::Vector<ScalarT> traction_local(3);
       traction_local.clear();
-      if (jump_eff != 0)
-        traction_local =
-            minitensor::dot(beta, jump_local) * sigma_eff / jump_eff;
+      if (jump_eff != 0) traction_local = minitensor::dot(beta, jump_local) * sigma_eff / jump_eff;
 
       // norm of the local shear components of the traction
       ScalarT TractionShear;
-      IntermediateValue = traction_local(0) * traction_local(0) +
-                          traction_local(1) * traction_local(1);
+      IntermediateValue = traction_local(0) * traction_local(0) + traction_local(1) * traction_local(1);
       if (IntermediateValue > 0.0)
         TractionShear = sqrt(IntermediateValue);
       else

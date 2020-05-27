@@ -37,8 +37,7 @@ class MiniLinearSolver;
 
 // Residual
 template <minitensor::Index N>
-class MiniLinearSolver<PHAL::AlbanyTraits::Residual, N>
-    : public MiniLinearSolver_Base<PHAL::AlbanyTraits::Residual, N>
+class MiniLinearSolver<PHAL::AlbanyTraits::Residual, N> : public MiniLinearSolver_Base<PHAL::AlbanyTraits::Residual, N>
 {
  public:
   using ScalarT = PHAL::AlbanyTraits::Residual::ScalarT;
@@ -53,8 +52,7 @@ class MiniLinearSolver<PHAL::AlbanyTraits::Residual, N>
 
 // Jacobian
 template <minitensor::Index N>
-class MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N>
-    : public MiniLinearSolver_Base<PHAL::AlbanyTraits::Jacobian, N>
+class MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N> : public MiniLinearSolver_Base<PHAL::AlbanyTraits::Jacobian, N>
 {
  public:
   using ScalarT = PHAL::AlbanyTraits::Jacobian::ScalarT;

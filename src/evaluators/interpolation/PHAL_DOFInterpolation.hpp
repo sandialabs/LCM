@@ -20,18 +20,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class DOFInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                             public PHX::EvaluatorDerived<EvalT, Traits>
+class DOFInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  DOFInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -56,8 +51,7 @@ class DOFInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   {
   };
 
-  typedef Kokkos::RangePolicy<ExecutionSpace, DOFInterpolationBase_Tag>
-      DOFInterpolationBase_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, DOFInterpolationBase_Tag> DOFInterpolationBase_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -66,16 +60,13 @@ class DOFInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFInterpolation =
-    DOFInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFInterpolation = DOFInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFInterpolationMesh =
-    DOFInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFInterpolationMesh = DOFInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFInterpolationParam =
-    DOFInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using DOFInterpolationParam = DOFInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

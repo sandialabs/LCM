@@ -50,13 +50,11 @@ DOFInterpolationSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
 
-  std::vector<Albany::SideStruct> const& sideSet =
-      workset.sideSets->at(sideSetName);
+  std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell
     int const cell = it_side.elem_LID;
@@ -65,8 +63,7 @@ DOFInterpolationSideBase<EvalT, Traits, ScalarT>::evaluateFields(
     for (int qp = 0; qp < numSideQPs; ++qp) {
       val_qp(cell, side, qp) = 0;
       for (int node = 0; node < numSideNodes; ++node) {
-        val_qp(cell, side, qp) +=
-            val_node(cell, side, node) * BF(cell, side, node, qp);
+        val_qp(cell, side, qp) += val_node(cell, side, node) * BF(cell, side, node, qp);
       }
     }
   }

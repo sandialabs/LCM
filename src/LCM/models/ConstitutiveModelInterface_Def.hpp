@@ -55,24 +55,20 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
       have_bubble_volume_fraction_(false),
       volume_average_pressure_(p.get<bool>("Volume Average Pressure", false))
 {
-  Teuchos::ParameterList* plist =
-      p.get<Teuchos::ParameterList*>("Material Parameters");
+  Teuchos::ParameterList* plist = p.get<Teuchos::ParameterList*>("Material Parameters");
   plist->set<bool>("Volume Average Pressure", volume_average_pressure_);
   this->initializeModel(plist, dl);
 
   // construct the dependent fields
   auto dependent_map = model_->getDependentFieldMap();
   for (auto& pair : dependent_map) {
-    auto temp_field =
-        Teuchos::rcp(new PHX::MDField<ScalarT const>(pair.first, pair.second));
+    auto temp_field = Teuchos::rcp(new PHX::MDField<ScalarT const>(pair.first, pair.second));
     dep_fields_map_.insert(std::make_pair(pair.first, temp_field));
   }
 
   // register dependent fields
   typename decltype(dep_fields_map_)::iterator it;
-  for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) {
-    this->addDependentField(*(it->second));
-  }
+  for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) { this->addDependentField(*(it->second)); }
 
   // optionally deal with integration point locations
   if (model_->getIntegrationPointLocationFlag()) {
@@ -83,47 +79,44 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
   // optionally deal with temperature
   if (p.isType<std::string>("Temperature Name")) {
     have_temperature_ = true;
-    temperature_      = decltype(temperature_)(
-        p.get<std::string>("Temperature Name"), dl->qp_scalar);
+    temperature_      = decltype(temperature_)(p.get<std::string>("Temperature Name"), dl->qp_scalar);
     this->addDependentField(temperature_);
   }
 
   // optionally deal with damage
   if (p.isType<std::string>("Damage Name")) {
     have_damage_ = true;
-    damage_ =
-        decltype(damage_)(p.get<std::string>("Damage Name"), dl->qp_scalar);
+    damage_      = decltype(damage_)(p.get<std::string>("Damage Name"), dl->qp_scalar);
     this->addDependentField(damage_);
   }
 
   // optionally deal with total concentration
   if (p.isType<std::string>("Total Concentration Name")) {
     have_total_concentration_ = true;
-    total_concentration_      = decltype(total_concentration_)(
-        p.get<std::string>("Total Concentration Name"), dl->qp_scalar);
+    total_concentration_ =
+        decltype(total_concentration_)(p.get<std::string>("Total Concentration Name"), dl->qp_scalar);
     this->addDependentField(total_concentration_);
   }
 
   // optionally deal with total bubble density
   if (p.isType<std::string>("Total Bubble Density Name")) {
     have_total_bubble_density_ = true;
-    total_bubble_density_      = decltype(total_bubble_density_)(
-        p.get<std::string>("Total Bubble Density Name"), dl->qp_scalar);
+    total_bubble_density_ =
+        decltype(total_bubble_density_)(p.get<std::string>("Total Bubble Density Name"), dl->qp_scalar);
     this->addDependentField(total_bubble_density_);
   }
 
   // optionally deal with bubble volume fraction
   if (p.isType<std::string>("Bubble Volume Fraction Name")) {
     have_bubble_volume_fraction_ = true;
-    bubble_volume_fraction_      = decltype(bubble_volume_fraction_)(
-        p.get<std::string>("Bubble Volume Fraction Name"), dl->qp_scalar);
+    bubble_volume_fraction_ =
+        decltype(bubble_volume_fraction_)(p.get<std::string>("Bubble Volume Fraction Name"), dl->qp_scalar);
     this->addDependentField(bubble_volume_fraction_);
   }
 
   // optional volume averaging needs integration weights and J
   if (volume_average_pressure_) {
-    weights_ =
-        decltype(weights_)(p.get<std::string>("Weights Name"), dl->qp_scalar);
+    weights_ = decltype(weights_)(p.get<std::string>("Weights Name"), dl->qp_scalar);
     this->addDependentField(weights_);
 
     j_ = decltype(j_)(p.get<std::string>("J Name"), dl->qp_scalar);
@@ -133,15 +126,12 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
   // construct the evaluated fields
   auto eval_map = model_->getEvaluatedFieldMap();
   for (auto& pair : eval_map) {
-    auto temp_field =
-        Teuchos::rcp(new PHX::MDField<ScalarT>(pair.first, pair.second));
+    auto temp_field = Teuchos::rcp(new PHX::MDField<ScalarT>(pair.first, pair.second));
     eval_fields_map_.insert(std::make_pair(pair.first, temp_field));
   }
 
   // register evaluated fields
-  for (auto& pair : eval_fields_map_) {
-    this->addEvaluatedField(*(pair.second));
-  }
+  for (auto& pair : eval_fields_map_) { this->addEvaluatedField(*(pair.second)); }
 
   this->setName("ConstitutiveModelInterface" + PHX::print<EvalT>());
 }
@@ -152,15 +142,11 @@ ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
     typename Traits::SetupData d,
     PHX::FieldManager<Traits>& fm)
 {
-  ALBANY_PANIC(
-      dep_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
-  ALBANY_PANIC(
-      eval_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
+  ALBANY_PANIC(dep_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
+  ALBANY_PANIC(eval_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
   // dependent fields
   typename decltype(dep_fields_map_)::iterator it;
-  for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) {
-    this->utils.setFieldData(*(it->second), fm);
-  }
+  for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) { this->utils.setFieldData(*(it->second), fm); }
 
   // optionally deal with integration point locations
   if (model_->getIntegrationPointLocationFlag()) {
@@ -219,26 +205,20 @@ ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
   }
 
   // evaluated fields
-  for (auto& pair : eval_fields_map_) {
-    this->utils.setFieldData(*(pair.second), fm);
-  }
+  for (auto& pair : eval_fields_map_) { this->utils.setFieldData(*(pair.second), fm); }
 }
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelInterface<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ConstitutiveModelInterface<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   model_->computeState(workset, dep_fields_map_, eval_fields_map_);
-  if (volume_average_pressure_) {
-    model_->computeVolumeAverage(workset, dep_fields_map_, eval_fields_map_);
-  }
+  if (volume_average_pressure_) { model_->computeVolumeAverage(workset, dep_fields_map_, eval_fields_map_); }
 }
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelInterface<EvalT, Traits>::fillStateVariableStruct(
-    int state_var)
+ConstitutiveModelInterface<EvalT, Traits>::fillStateVariableStruct(int state_var)
 {
   sv_struct_.name               = model_->getStateVarName(state_var);
   sv_struct_.data_layout        = model_->getStateVarLayout(state_var);
@@ -254,8 +234,7 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
     Teuchos::ParameterList*              p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
-  std::string model_name =
-      p->sublist("Material Model").get<std::string>("Model Name");
+  std::string model_name = p->sublist("Material Model").get<std::string>("Model Name");
 
   std::string const error_msg = "Undefined material model name";
 

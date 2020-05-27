@@ -11,11 +11,8 @@ namespace PHAL {
 //*****
 
 template <typename EvalT, typename Traits>
-ComprNSViscosity<EvalT, Traits>::ComprNSViscosity(
-    Teuchos::ParameterList const& p)
-    : qFluct(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+ComprNSViscosity<EvalT, Traits>::ComprNSViscosity(Teuchos::ParameterList const& p)
+    : qFluct(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       qFluctGrad(
           p.get<std::string>("Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
@@ -46,8 +43,7 @@ ComprNSViscosity<EvalT, Traits>::ComprNSViscosity(
           p.get<std::string>("Stress Tau33 QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  Teuchos::ParameterList* visc_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* visc_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
   std::string viscType = visc_list->get("Type", "Constant");
 
@@ -66,8 +62,7 @@ ComprNSViscosity<EvalT, Traits>::ComprNSViscosity(
   Cp       = visc_list->get("Specific heat Cp", 1.0);
 
   coordVec = decltype(coordVec)(
-      p.get<std::string>("Coordinate Vector Name"),
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Gradient Data Layout"));
+      p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Gradient Data Layout"));
 
   this->addDependentField(qFluct.fieldTag());
   this->addDependentField(qFluctGrad.fieldTag());
@@ -102,9 +97,7 @@ ComprNSViscosity<EvalT, Traits>::ComprNSViscosity(
 //*****
 template <typename EvalT, typename Traits>
 void
-ComprNSViscosity<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ComprNSViscosity<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(qFluct, fm);
   this->utils.setFieldData(qFluctGrad, fm);
@@ -123,8 +116,7 @@ ComprNSViscosity<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-ComprNSViscosity<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ComprNSViscosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Visocisity coefficients
   if (visc_type == CONSTANT) {
@@ -139,10 +131,8 @@ ComprNSViscosity<EvalT, Traits>::evaluateFields(
   } else if (visc_type == SUTHERLAND) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
-        ScalarT T =
-            qFluct(cell, qp, vecDim - 1) * Tref;  // temperature (dimensional)
-        mu(cell, qp) = (1.458e-6) * sqrt(T * T * T) /
-                       (T + 110.4);  // mu = (1.458e-6)*T^(1/5)/(T + 110.4)
+        ScalarT T        = qFluct(cell, qp, vecDim - 1) * Tref;         // temperature (dimensional)
+        mu(cell, qp)     = (1.458e-6) * sqrt(T * T * T) / (T + 110.4);  // mu = (1.458e-6)*T^(1/5)/(T + 110.4)
         kappa(cell, qp)  = mu(cell, qp) * Cp / Pr / kapparef;
         mu(cell, qp)     = mu(cell, qp) / muref;       // non-dimensionalize mu
         lambda(cell, qp) = -2.0 / 3.0 * mu(cell, qp);  // Stokes' hypothesis
@@ -154,18 +144,12 @@ ComprNSViscosity<EvalT, Traits>::evaluateFields(
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
       tau11(cell, qp) =
           mu(cell, qp) * 2.0 * qFluctGrad(cell, qp, 1, 0) +
-          lambda(cell, qp) *
-              (qFluctGrad(cell, qp, 1, 0) +
-               qFluctGrad(cell, qp, 2, 1));  // mu*2*du/dx + lambda*div(u)
-      tau12(cell, qp) =
-          mu(cell, qp) * (qFluctGrad(cell, qp, 1, 1) +
-                          qFluctGrad(cell, qp, 2, 0));  // mu*(du/dy + dv/dx)
+          lambda(cell, qp) * (qFluctGrad(cell, qp, 1, 0) + qFluctGrad(cell, qp, 2, 1));  // mu*2*du/dx + lambda*div(u)
+      tau12(cell, qp) = mu(cell, qp) * (qFluctGrad(cell, qp, 1, 1) + qFluctGrad(cell, qp, 2, 0));  // mu*(du/dy + dv/dx)
       tau13(cell, qp) = 0.0;
       tau22(cell, qp) =
           mu(cell, qp) * 2.0 * qFluctGrad(cell, qp, 2, 1) +
-          lambda(cell, qp) *
-              (qFluctGrad(cell, qp, 1, 0) +
-               qFluctGrad(cell, qp, 2, 1));  // mu*2*dv/dy + lambda*div(u)
+          lambda(cell, qp) * (qFluctGrad(cell, qp, 1, 0) + qFluctGrad(cell, qp, 2, 1));  // mu*2*dv/dy + lambda*div(u)
       tau23(cell, qp) = 0.0;
       tau33(cell, qp) = 0.0;
     }
@@ -173,16 +157,12 @@ ComprNSViscosity<EvalT, Traits>::evaluateFields(
   if (numDims == 3) {  // 3D case
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
-        tau11(cell, qp) +=
-            lambda(cell, qp) * qFluctGrad(cell, qp, 3, 2);  //+lambda*dw/dz
+        tau11(cell, qp) += lambda(cell, qp) * qFluctGrad(cell, qp, 3, 2);  //+lambda*dw/dz
         tau13(cell, qp) +=
-            mu(cell, qp) * (qFluctGrad(cell, qp, 1, 2) +
-                            qFluctGrad(cell, qp, 3, 0));  // mu*(du/dz + dw/dx)
-        tau22(cell, qp) +=
-            lambda(cell, qp) * qFluctGrad(cell, qp, 3, 2);  //+lambda*dw/dz
+            mu(cell, qp) * (qFluctGrad(cell, qp, 1, 2) + qFluctGrad(cell, qp, 3, 0));  // mu*(du/dz + dw/dx)
+        tau22(cell, qp) += lambda(cell, qp) * qFluctGrad(cell, qp, 3, 2);              //+lambda*dw/dz
         tau23(cell, qp) +=
-            mu(cell, qp) * (qFluctGrad(cell, qp, 2, 3) +
-                            qFluctGrad(cell, qp, 3, 1));  // mu*(dv/dz + dw/dy)
+            mu(cell, qp) * (qFluctGrad(cell, qp, 2, 3) + qFluctGrad(cell, qp, 3, 1));  // mu*(dv/dz + dw/dy)
         ALBANY_ABORT(
             "This next line has qFluct in it with the wrong indexing: there"
             " should be 3, not 4. Inspection does not reveal what should be"

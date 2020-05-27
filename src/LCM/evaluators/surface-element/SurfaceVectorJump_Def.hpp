@@ -13,12 +13,8 @@ template <typename EvalT, typename Traits>
 SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
-    : cubature_(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepid_basis_(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis")),
+    : cubature_(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepid_basis_(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
       vector_(p.get<std::string>("Vector Name"), dl->node_vector),
       jump_(p.get<std::string>("Vector Jump Name"), dl->qp_vector)
 {
@@ -54,34 +50,27 @@ SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceVectorJump<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceVectorJump<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(vector_, fm);
   this->utils.setFieldData(jump_, fm);
 
   // Allocate Temporary Views
-  ref_values_ = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", num_plane_nodes_, num_qps_);
-  ref_grads_ = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", num_plane_nodes_, num_qps_, num_plane_dims_);
-  ref_points_ = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", num_qps_, num_plane_dims_);
+  ref_values_  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_plane_nodes_, num_qps_);
+  ref_grads_   = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_plane_nodes_, num_qps_, num_plane_dims_);
+  ref_points_  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_qps_, num_plane_dims_);
   ref_weights_ = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_qps_);
 
   // Pre-Calculate reference element quantitites
   cubature_->getCubature(ref_points_, ref_weights_);
-  intrepid_basis_->getValues(
-      ref_values_, ref_points_, Intrepid2::OPERATOR_VALUE);
+  intrepid_basis_->getValues(ref_values_, ref_points_, Intrepid2::OPERATOR_VALUE);
   intrepid_basis_->getValues(ref_grads_, ref_points_, Intrepid2::OPERATOR_GRAD);
 }
 
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceVectorJump<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceVectorJump<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   minitensor::Vector<ScalarT> vecA(0, 0, 0), vecB(0, 0, 0), vecJump(0, 0, 0);
 

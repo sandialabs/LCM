@@ -51,9 +51,7 @@ class SideLaplacian : public Albany::AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      Albany::StateManager&                                    stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -137,12 +135,8 @@ SideLaplacian::constructEvaluators(
     Albany::FieldManagerChoice                  fieldManagerChoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
 {
-  if (numDim == 2) {
-    return constructEvaluators2D<EvalT>(
-        fm0, meshSpecs, stateMgr, fieldManagerChoice, responseList);
-  }
-  return constructEvaluators3D<EvalT>(
-      fm0, meshSpecs, stateMgr, fieldManagerChoice, responseList);
+  if (numDim == 2) { return constructEvaluators2D<EvalT>(fm0, meshSpecs, stateMgr, fieldManagerChoice, responseList); }
+  return constructEvaluators3D<EvalT>(fm0, meshSpecs, stateMgr, fieldManagerChoice, responseList);
 }
 
 template <typename EvalT>
@@ -170,15 +164,13 @@ SideLaplacian::constructEvaluators2D(
   ev = evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names);
   fm0.template registerEvaluator<EvalT>(ev);
 
-  ev = evalUtils.constructComputeBasisFunctionsEvaluator(
-      cellType, cellBasis, cellCubature);
+  ev = evalUtils.constructComputeBasisFunctionsEvaluator(cellType, cellBasis, cellCubature);
   fm0.template registerEvaluator<EvalT>(ev);
 
   ev = evalUtils.constructGatherCoordinateVectorEvaluator();
   fm0.template registerEvaluator<EvalT>(ev);
 
-  ev = evalUtils.constructScatterResidualEvaluator(
-      false, resid_names, offset, "Scatter SideLaplacian");
+  ev = evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter SideLaplacian");
   fm0.template registerEvaluator<EvalT>(ev);
 
   ev = evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature);
@@ -203,39 +195,32 @@ SideLaplacian::constructEvaluators2D(
   p->set<std::string>("Weighted Measure Variable Name", "Weights");
   p->set<std::string>("Gradient BF Variable Name", "Grad BF");
   p->set<std::string>("Solution QP Variable Name", dof_names[0]);
-  p->set<std::string>(
-      "Solution Gradient QP Variable Name", dof_names[0] + " Gradient");
+  p->set<std::string>("Solution Gradient QP Variable Name", dof_names[0] + " Gradient");
   p->set<bool>("Side Equation", false);
 
   // Output
   p->set<std::string>("Residual Variable Name", resid_names[0]);
 
-  ev = Teuchos::rcp(
-      new PHAL::SideLaplacianResidual<EvalT, PHAL::AlbanyTraits>(*p, dl));
+  ev = Teuchos::rcp(new PHAL::SideLaplacianResidual<EvalT, PHAL::AlbanyTraits>(*p, dl));
   fm0.template registerEvaluator<EvalT>(ev);
 
   // ----------------------------------------------------- //
 
-  Teuchos::RCP<Teuchos::ParameterList> paramList =
-      Teuchos::rcp(new Teuchos::ParameterList("Param List"));
+  Teuchos::RCP<Teuchos::ParameterList> paramList = Teuchos::rcp(new Teuchos::ParameterList("Param List"));
   {
     // response
-    Teuchos::RCP<Albany::MeshSpecsStruct const> meshSpecsPtr =
-        Teuchos::rcpFromRef(meshSpecs);
-    paramList->set<Teuchos::RCP<Albany::MeshSpecsStruct const>>(
-        "Mesh Specs Struct", meshSpecsPtr);
+    Teuchos::RCP<Albany::MeshSpecsStruct const> meshSpecsPtr = Teuchos::rcpFromRef(meshSpecs);
+    paramList->set<Teuchos::RCP<Albany::MeshSpecsStruct const>>("Mesh Specs Struct", meshSpecsPtr);
     paramList->set<Teuchos::RCP<ParamLib>>("Parameter Library", paramLib);
   }
 
   if (fieldManagerChoice == Albany::BUILD_RESID_FM) {
-    PHX::Tag<typename EvalT::ScalarT> res_tag(
-        "Scatter SideLaplacian", dl->dummy);
+    PHX::Tag<typename EvalT::ScalarT> res_tag("Scatter SideLaplacian", dl->dummy);
     fm0.requireField<EvalT>(res_tag);
   } else if (fieldManagerChoice == Albany::BUILD_RESPONSE_FM) {
     Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> respUtils(dl);
 
-    return respUtils.constructResponses(
-        fm0, *responseList, paramList, stateMgr);
+    return respUtils.constructResponses(fm0, *responseList, paramList, stateMgr);
   }
 
   return Teuchos::null;
@@ -266,20 +251,17 @@ SideLaplacian::constructEvaluators3D(
   ev = evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names);
   fm0.template registerEvaluator<EvalT>(ev);
 
-  ev = evalUtils.constructComputeBasisFunctionsEvaluator(
-      cellType, cellBasis, cellCubature);
+  ev = evalUtils.constructComputeBasisFunctionsEvaluator(cellType, cellBasis, cellCubature);
   fm0.template registerEvaluator<EvalT>(ev);
 
   // 2D basis function
-  ev = evalUtils.constructComputeBasisFunctionsSideEvaluator(
-      cellType, sideBasis, sideCubature, sideSetName);
+  ev = evalUtils.constructComputeBasisFunctionsSideEvaluator(cellType, sideBasis, sideCubature, sideSetName);
   fm0.template registerEvaluator<EvalT>(ev);
 
   ev = evalUtils.constructGatherCoordinateVectorEvaluator();
   fm0.template registerEvaluator<EvalT>(ev);
 
-  ev = evalUtils.constructScatterResidualEvaluator(
-      false, resid_names, offset, "Scatter SideLaplacian");
+  ev = evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter SideLaplacian");
   fm0.template registerEvaluator<EvalT>(ev);
 
   ev = evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature);
@@ -292,44 +274,34 @@ SideLaplacian::constructEvaluators3D(
   fm0.template registerEvaluator<EvalT>(ev);
 
   // Solution Side
-  ev = evalUtils.constructDOFInterpolationSideEvaluator(
-      dof_names[0], sideSetName);
+  ev = evalUtils.constructDOFInterpolationSideEvaluator(dof_names[0], sideSetName);
   fm0.template registerEvaluator<EvalT>(ev);
 
   // Solution Gradient Side
-  ev = evalUtils.constructDOFGradInterpolationSideEvaluator(
-      dof_names[0], sideSetName);
+  ev = evalUtils.constructDOFGradInterpolationSideEvaluator(dof_names[0], sideSetName);
   fm0.template registerEvaluator<EvalT>(ev);
 
   // -------- Restriction of Solution to Side Field -------- /
-  ev = evalUtils.constructDOFCellToSideEvaluator(
-      dof_names[0], sideSetName, "Node Scalar", cellType);
+  ev = evalUtils.constructDOFCellToSideEvaluator(dof_names[0], sideSetName, "Node Scalar", cellType);
   fm0.template registerEvaluator<EvalT>(ev);
 
   //---- Restrict vertex coordinates from cell-based to cell-side-based
   ev = evalUtils.getMSTUtils().constructDOFCellToSideEvaluator(
-      "Coord Vec",
-      sideSetName,
-      "Vertex Vector",
-      cellType,
-      "Coord Vec " + sideSetName);
+      "Coord Vec", sideSetName, "Vertex Vector", cellType, "Coord Vec " + sideSetName);
   fm0.template registerEvaluator<EvalT>(ev);
 
   // ------- Side Laplacian Residual -------- //
   p = Teuchos::rcp(new Teuchos::ParameterList("Side Laplacian Residual"));
 
   // Input
-  p->set<std::string>(
-      "Coordinate Vector Variable Name", "Coord Vec " + sideSetName);
+  p->set<std::string>("Coordinate Vector Variable Name", "Coord Vec " + sideSetName);
   p->set<std::string>("BF Variable Name", "BF " + sideSetName);
-  p->set<std::string>(
-      "Weighted Measure Variable Name", "Weighted Measure " + sideSetName);
+  p->set<std::string>("Weighted Measure Variable Name", "Weighted Measure " + sideSetName);
   p->set<std::string>("Metric Name", "Metric " + sideSetName);
   p->set<std::string>("Gradient BF Variable Name", "Grad BF " + sideSetName);
   p->set<std::string>("Solution Variable Name", dof_names[0]);
   p->set<std::string>("Solution QP Variable Name", dof_names[0]);
-  p->set<std::string>(
-      "Solution Gradient QP Variable Name", dof_names[0] + " Gradient");
+  p->set<std::string>("Solution Gradient QP Variable Name", dof_names[0] + " Gradient");
   p->set<std::string>("Side Set Name", sideSetName);
   p->set<bool>("Side Equation", true);
   p->set<Teuchos::RCP<shards::CellTopology>>("Cell Type", cellType);
@@ -337,32 +309,26 @@ SideLaplacian::constructEvaluators3D(
   // Output
   p->set<std::string>("Residual Variable Name", resid_names[0]);
 
-  ev = Teuchos::rcp(
-      new PHAL::SideLaplacianResidual<EvalT, PHAL::AlbanyTraits>(*p, dl));
+  ev = Teuchos::rcp(new PHAL::SideLaplacianResidual<EvalT, PHAL::AlbanyTraits>(*p, dl));
   fm0.template registerEvaluator<EvalT>(ev);
 
   // ----------------------------------------------------- //
 
-  Teuchos::RCP<Teuchos::ParameterList> paramList =
-      Teuchos::rcp(new Teuchos::ParameterList("Param List"));
+  Teuchos::RCP<Teuchos::ParameterList> paramList = Teuchos::rcp(new Teuchos::ParameterList("Param List"));
   {
     // response
-    Teuchos::RCP<Albany::MeshSpecsStruct const> meshSpecsPtr =
-        Teuchos::rcpFromRef(meshSpecs);
-    paramList->set<Teuchos::RCP<Albany::MeshSpecsStruct const>>(
-        "Mesh Specs Struct", meshSpecsPtr);
+    Teuchos::RCP<Albany::MeshSpecsStruct const> meshSpecsPtr = Teuchos::rcpFromRef(meshSpecs);
+    paramList->set<Teuchos::RCP<Albany::MeshSpecsStruct const>>("Mesh Specs Struct", meshSpecsPtr);
     paramList->set<Teuchos::RCP<ParamLib>>("Parameter Library", paramLib);
   }
 
   if (fieldManagerChoice == Albany::BUILD_RESID_FM) {
-    PHX::Tag<typename EvalT::ScalarT> res_tag(
-        "Scatter SideLaplacian", dl->dummy);
+    PHX::Tag<typename EvalT::ScalarT> res_tag("Scatter SideLaplacian", dl->dummy);
     fm0.requireField<EvalT>(res_tag);
   } else if (fieldManagerChoice == Albany::BUILD_RESPONSE_FM) {
     Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> respUtils(dl);
 
-    return respUtils.constructResponses(
-        fm0, *responseList, paramList, stateMgr);
+    return respUtils.constructResponses(fm0, *responseList, paramList, stateMgr);
   }
 
   return Teuchos::null;

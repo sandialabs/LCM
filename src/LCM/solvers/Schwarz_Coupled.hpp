@@ -123,8 +123,7 @@ class SchwarzCoupled : public Thyra::ModelEvaluatorDefaultBase<ST>
 
   /// Evaluate model on InArgs
   void
-  evalModelImpl(Thyra_InArgs const& in_args, Thyra_OutArgs const& out_args)
-      const;
+  evalModelImpl(Thyra_InArgs const& in_args, Thyra_OutArgs const& out_args) const;
 
  private:
   Teuchos::RCP<Teuchos::ParameterList const>

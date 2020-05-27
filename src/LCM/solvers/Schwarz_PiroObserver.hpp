@@ -25,16 +25,11 @@ class Schwarz_PiroObserver : public Piro::ObserverBase<ST>
   observeSolution(Thyra::VectorBase<ST> const& solution, ST const stamp);
 
   virtual void
-  observeSolution(
-      Thyra::VectorBase<ST> const& solution,
-      Thyra::VectorBase<ST> const& solution_dot,
-      ST const                     stamp);
+  observeSolution(Thyra::VectorBase<ST> const& solution, Thyra::VectorBase<ST> const& solution_dot, ST const stamp);
 
  private:
   void
-  observeSolutionImpl(
-      Thyra::VectorBase<ST> const& solution,
-      ST const                     default_stamp);
+  observeSolutionImpl(Thyra::VectorBase<ST> const& solution, ST const default_stamp);
 
   void
   observeSolutionImpl(

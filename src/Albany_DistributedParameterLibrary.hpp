@@ -47,8 +47,7 @@ class DistributedParameterLibrary
   get(std::string const& name) const
   {
     const_iterator i = param_map.find(name);
-    ALBANY_PANIC(
-        i == param_map.end(), "Parameter " << name << " is not in the library");
+    ALBANY_PANIC(i == param_map.end(), "Parameter " << name << " is not in the library");
     return i->second;
   }
 

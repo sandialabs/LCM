@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-NeohookeanModel<EvalT, Traits>::NeohookeanModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+NeohookeanModel<EvalT, Traits>::NeohookeanModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   std::string F_string = (*field_name_map_)["F"];
@@ -28,8 +26,7 @@ NeohookeanModel<EvalT, Traits>::NeohookeanModel(
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair("Energy", dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair("Material Tangent", dl->qp_tensor4));
+  this->eval_field_map_.insert(std::make_pair("Material Tangent", dl->qp_tensor4));
 
   // define the state variables
   this->num_state_variables_++;
@@ -38,8 +35,7 @@ NeohookeanModel<EvalT, Traits>::NeohookeanModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Cauchy Stress", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Cauchy Stress", false));
 }
 
 template <typename EvalT, typename Traits>
@@ -109,14 +105,12 @@ NeohookeanModel<EvalT, Traits>::computeState(
       sigma = 0.5 * kappa * (J - 1.0 / J) * I + mu * Jm53 * minitensor::dev(b);
 
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = sigma(i, j);
-        }
+        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
       }
 
       if (compute_energy_ == true) {
-        energy(cell, pt) = 0.5 * kappa * (0.5 * (J * J - 1.0) - std::log(J)) +
-                           0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
+        energy(cell, pt) =
+            0.5 * kappa * (0.5 * (J * J - 1.0) - std::log(J)) + 0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
       }
 
       if (compute_tangent_ == true) {
@@ -124,17 +118,13 @@ NeohookeanModel<EvalT, Traits>::computeState(
         smag = minitensor::norm(s);
         n    = s / smag;
 
-        dsigmadb = kappa * J * J * I3 - kappa * (J * J - 1.0) * I1 +
-                   2.0 * mubar * (I1 - (1.0 / 3.0) * I3) -
-                   2.0 / 3.0 * smag *
-                       (minitensor::tensor(n, I) + minitensor::tensor(I, n));
+        dsigmadb = kappa * J * J * I3 - kappa * (J * J - 1.0) * I1 + 2.0 * mubar * (I1 - (1.0 / 3.0) * I3) -
+                   2.0 / 3.0 * smag * (minitensor::tensor(n, I) + minitensor::tensor(I, n));
 
         for (int i = 0; i < num_dims_; ++i) {
           for (int j = 0; j < num_dims_; ++j) {
             for (int k = 0; k < num_dims_; ++k) {
-              for (int l = 0; l < num_dims_; ++l) {
-                tangent(cell, pt, i, j, k, l) = dsigmadb(i, j, k, l);
-              }
+              for (int l = 0; l < num_dims_; ++l) { tangent(cell, pt, i, j, k, l) = dsigmadb(i, j, k, l); }
             }
           }
         }

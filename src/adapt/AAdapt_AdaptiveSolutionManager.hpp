@@ -69,17 +69,13 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
   }
 
   Teuchos::RCP<Thyra_Vector const>
-  updateAndReturnOverlapSolution(
-      Thyra_Vector const& solution /*not overlapped*/);
+  updateAndReturnOverlapSolution(Thyra_Vector const& solution /*not overlapped*/);
   Teuchos::RCP<Thyra_Vector const>
-  updateAndReturnOverlapSolutionDot(
-      Thyra_Vector const& solution_dot /*not overlapped*/);
+  updateAndReturnOverlapSolutionDot(Thyra_Vector const& solution_dot /*not overlapped*/);
   Teuchos::RCP<Thyra_Vector const>
-  updateAndReturnOverlapSolutionDotDot(
-      Thyra_Vector const& solution_dotdot /*not overlapped*/);
+  updateAndReturnOverlapSolutionDotDot(Thyra_Vector const& solution_dotdot /*not overlapped*/);
   Teuchos::RCP<const Thyra_MultiVector>
-  updateAndReturnOverlapSolutionMV(
-      const Thyra_MultiVector& solution /*not overlapped*/);
+  updateAndReturnOverlapSolutionMV(const Thyra_MultiVector& solution /*not overlapped*/);
 
   Teuchos::RCP<Thyra_Vector>
   get_overlapped_f() const
@@ -141,8 +137,7 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
   buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr);
 
   void
-  resizeMeshDataArrays(
-      const Teuchos::RCP<const Albany::AbstractDiscretization>& disc);
+  resizeMeshDataArrays(const Teuchos::RCP<const Albany::AbstractDiscretization>& disc);
 };
 
 }  // namespace AAdapt

@@ -66,12 +66,9 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(
   this->addDependentField(val_cell);
   this->addEvaluatedField(val_side);
 
-  this->setName(
-      "DOFCellToSide(" + cell_field_name + " -> " + side_field_name + ")" +
-      PHX::print<EvalT>());
+  this->setName("DOFCellToSide(" + cell_field_name + " -> " + side_field_name + ")" + PHX::print<EvalT>());
 
-  if (layout == NODE_SCALAR || layout == NODE_VECTOR || layout == NODE_TENSOR ||
-      layout == VERTEX_VECTOR) {
+  if (layout == NODE_SCALAR || layout == NODE_VECTOR || layout == NODE_TENSOR || layout == VERTEX_VECTOR) {
     Teuchos::RCP<shards::CellTopology> cellType;
     cellType = p.get<Teuchos::RCP<shards::CellTopology>>("Cell Type");
 
@@ -108,13 +105,11 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFCellToSideBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFCellToSideBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
 
-  std::vector<Albany::SideStruct> const& sideSet =
-      workset.sideSets->at(sideSetName);
+  std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell
     int const cell = it_side.elem_LID;
@@ -124,34 +119,28 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::evaluateFields(
       case CELL_SCALAR: val_side(cell, side) = val_cell(cell); break;
 
       case CELL_VECTOR:
-        for (int i = 0; i < dims[2]; ++i)
-          val_side(cell, side, i) = val_cell(cell, i);
+        for (int i = 0; i < dims[2]; ++i) val_side(cell, side, i) = val_cell(cell, i);
         break;
 
       case CELL_TENSOR:
         for (int i = 0; i < dims[2]; ++i)
-          for (int j = 0; j < dims[3]; ++j)
-            val_side(cell, side, i, j) = val_cell(cell, i, j);
+          for (int j = 0; j < dims[3]; ++j) val_side(cell, side, i, j) = val_cell(cell, i, j);
         break;
 
       case NODE_SCALAR:
-        for (int node = 0; node < dims[2]; ++node)
-          val_side(cell, side, node) = val_cell(cell, sideNodes[side][node]);
+        for (int node = 0; node < dims[2]; ++node) val_side(cell, side, node) = val_cell(cell, sideNodes[side][node]);
         break;
 
       case NODE_VECTOR:
       case VERTEX_VECTOR:
         for (int node = 0; node < dims[2]; ++node)
-          for (int i = 0; i < dims[3]; ++i)
-            val_side(cell, side, node, i) =
-                val_cell(cell, sideNodes[side][node], i);
+          for (int i = 0; i < dims[3]; ++i) val_side(cell, side, node, i) = val_cell(cell, sideNodes[side][node], i);
         break;
       case NODE_TENSOR:
         for (int node = 0; node < dims[2]; ++node)
           for (int i = 0; i < dims[3]; ++i)
             for (int j = 0; j < dims[4]; ++j)
-              val_side(cell, side, node, i, j) =
-                  val_cell(cell, sideNodes[side][node], i, j);
+              val_side(cell, side, node, i, j) = val_cell(cell, sideNodes[side][node], i, j);
         break;
       default:
         ALBANY_ABORT(

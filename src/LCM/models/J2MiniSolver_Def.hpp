@@ -47,66 +47,29 @@ J2MiniKernel<EvalT, Traits>::J2MiniKernel(
   // define the state variables
 
   // stress
-  addStateVariable(
-      cauchy_string,
-      dl->qp_tensor,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Cauchy Stress", false));
+  addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
 
   // Fp
-  addStateVariable(
-      Fp_string,
-      dl->qp_tensor,
-      "identity",
-      0.0,
-      true,
-      p->get<bool>("Output Fp", false));
+  addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
 
   // eqps
-  addStateVariable(
-      eqps_string,
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      true,
-      p->get<bool>("Output eqps", false));
+  addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
 
   // yield surface
   addStateVariable(
-      yieldSurface_string,
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Yield Surface", false));
+      yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   // mechanical source
   if (have_temperature_ == true) {
-    addStateVariable(
-        "Temperature",
-        dl->qp_scalar,
-        "scalar",
-        0.0,
-        true,
-        p->get<bool>("Output Temperature", false));
+    addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
 
     addStateVariable(
-        source_string,
-        dl->qp_scalar,
-        "scalar",
-        0.0,
-        false,
-        p->get<bool>("Output Mechanical Source", false));
+        source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 }
 
 template <typename EvalT, typename Traits>
 void
-J2MiniKernel<EvalT, Traits>::init(
-    Workset&                 workset,
-    FieldMap<ScalarT const>& dep_fields,
-    FieldMap<ScalarT>&       eval_fields)
+J2MiniKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields)
 {
   std::string cauchy_string       = field_name_map_["Cauchy_Stress"];
   std::string Fp_string           = field_name_map_["Fp"];
@@ -149,34 +112,19 @@ static RealType const SQ23{std::sqrt(2.0 / 3.0)};
 
 // J2 nonlinear system
 template <typename EvalT, minitensor::Index M = 1>
-class J2NLS : public minitensor::
-                  Function_Base<J2NLS<EvalT, M>, typename EvalT::ScalarT, M>
+class J2NLS : public minitensor::Function_Base<J2NLS<EvalT, M>, typename EvalT::ScalarT, M>
 {
   using S = typename EvalT::ScalarT;
 
  public:
-  J2NLS(
-      RealType sat_mod,
-      RealType sat_exp,
-      RealType eqps_old,
-      S const& K,
-      S const& smag,
-      S const& mubar,
-      S const& Y)
-      : sat_mod_(sat_mod),
-        sat_exp_(sat_exp),
-        eqps_old_(eqps_old),
-        K_(K),
-        smag_(smag),
-        mubar_(mubar),
-        Y_(Y)
+  J2NLS(RealType sat_mod, RealType sat_exp, RealType eqps_old, S const& K, S const& smag, S const& mubar, S const& Y)
+      : sat_mod_(sat_mod), sat_exp_(sat_exp), eqps_old_(eqps_old), K_(K), smag_(smag), mubar_(mubar), Y_(Y)
   {
   }
 
   constexpr static char const* const NAME{"J2 NLS"};
 
-  using Base =
-      minitensor::Function_Base<J2NLS<EvalT, M>, typename EvalT::ScalarT, M>;
+  using Base = minitensor::Function_Base<J2NLS<EvalT, M>, typename EvalT::ScalarT, M>;
 
   // Default value.
   template <typename T, minitensor::Index N>
@@ -278,9 +226,7 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Tensor Fpn(num_dims_);
 
   for (int i{0}; i < num_dims_; ++i) {
-    for (int j{0}; j < num_dims_; ++j) {
-      Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j));
-    }
+    for (int j{0}; j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j)); }
   }
 
   // compute trial state
@@ -293,9 +239,7 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // check yield condition
   ScalarT const smag = minitensor::norm(s);
   ScalarT const f =
-      smag -
-      SQ23 * (Y + K * eqps_old_(cell, pt) +
-              sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+      smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
 
   RealType constexpr yield_tolerance = 1.0e-12;
 
@@ -317,8 +261,7 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
     x(0) = 0.0;
 
-    LCM::MiniSolver<MIN, STEP, NLS, EvalT, nls_dim> mini_solver(
-        minimizer, step, j2nls, x);
+    LCM::MiniSolver<MIN, STEP, NLS, EvalT, nls_dim> mini_solver(minimizer, step, j2nls, x);
 
     ScalarT const alpha = eqps_old_(cell, pt) + SQ23 * x(0);
     ScalarT const H     = K * alpha + sat_mod_ * (1.0 - exp(-sat_exp_ * alpha));
@@ -336,8 +279,7 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // mechanical source
     if (have_temperature_ == true && delta_time_(0) > 0) {
       source_(cell, pt) =
-          (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) /
-          (density_ * heat_capacity_);
+          (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
     }
 
     // exponential map to get Fpnew
@@ -359,9 +301,7 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // update yield surface
-  yield_surf_(cell, pt) =
-      Y + K * eqps_(cell, pt) +
-      sat_mod_ * (1. - std::exp(-sat_exp_ * eqps_(cell, pt)));
+  yield_surf_(cell, pt) = Y + K * eqps_(cell, pt) + sat_mod_ * (1. - std::exp(-sat_exp_ * eqps_(cell, pt)));
 
   // compute pressure
   ScalarT const p = 0.5 * kappa * (J_(cell, pt) - 1. / (J_(cell, pt)));
@@ -370,9 +310,7 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   sigma = p * I + s / J_(cell, pt);
 
   for (int i(0); i < num_dims_; ++i) {
-    for (int j(0); j < num_dims_; ++j) {
-      stress_(cell, pt, i, j) = sigma(i, j);
-    }
+    for (int j(0); j < num_dims_; ++j) { stress_(cell, pt, i, j) = sigma(i, j); }
   }
 }
 }  // namespace LCM

@@ -15,8 +15,7 @@
   |  ctor (public)                                            mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(
-    IntegratorT)::IntegratorT(int ngp, bool oneD, int outlevel)
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::IntegratorT(int ngp, bool oneD, int outlevel)
     : oneD_(oneD), ngp_(ngp), outputlevel_(outlevel)
 {
   if (oneD) {
@@ -137,8 +136,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
 
         std::stringstream oss;
         oss << "***ERR*** MoertelT::IntegratorT::IntegratorT:\n"
-            << "***ERR*** given number of gaussian points " << ngp_
-            << "does not exist\n"
+            << "***ERR*** given number of gaussian points " << ngp_ << "does not exist\n"
             << "***ERR*** use 1, 2, 3, 4, 5, 6, 7, 8, 10 instead\n"
             << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         throw MoertelT::ReportError(oss);
@@ -469,8 +467,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
 
         std::stringstream oss;
         oss << "***ERR*** MoertelT::IntegratorT::IntegratorT:\n"
-            << "***ERR*** given number of gaussian points " << ngp_
-            << "does not exist\n"
+            << "***ERR*** given number of gaussian points " << ngp_ << "does not exist\n"
             << "***ERR*** use 3 6 12 13 16 19 27 instead\n"
             << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         throw MoertelT::ReportError(oss);
@@ -508,19 +505,17 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::~IntegratorT()
  *----------------------------------------------------------------------*/
 
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::SerialDenseMatrix<LO, ST>*
-    MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-        double sxia,
-        double sxib,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg,
-        double mxia,
-        double mxib)
+Teuchos::SerialDenseMatrix<LO, ST>* MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
+    double sxia,
+    double sxib,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg,
+    double mxia,
+    double mxib)
 {
-  int                                 nrow = sseg.Nnode();
-  int                                 ncol = mseg.Nnode();
-  Teuchos::SerialDenseMatrix<LO, ST>* Mdense =
-      new Teuchos::SerialDenseMatrix<LO, ST>(nrow, ncol, false);
+  int                                 nrow   = sseg.Nnode();
+  int                                 ncol   = mseg.Nnode();
+  Teuchos::SerialDenseMatrix<LO, ST>* Mdense = new Teuchos::SerialDenseMatrix<LO, ST>(nrow, ncol, false);
 
   for (int gp = 0; gp < Ngp(); ++gp) {
     double eta = Coordinate(gp);
@@ -583,8 +578,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
 
   for (int slave = 0; slave < sseg.Nnode(); ++slave) {
     // only do slave node rows that belong to this proc
-    if (inter.NodePID(snodes[slave]->Id()) != inter.lComm()->getRank())
-      continue;
+    if (inter.NodePID(snodes[slave]->Id()) != inter.lComm()->getRank()) continue;
 
     // we want to add the row Mdense(slave,...) to the rows lmdof[sdof]
     // get the dofs of slave node snodes[slave];
@@ -610,10 +604,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
         oss << "***ERR*** MoertelT::IntegratorT::Assemble:\n"
             << "***ERR*** mismatch in number of Lagrange multipliers and "
                "primal degrees of freedom:\n"
-            << "***ERR*** slave node " << snodes[slave]->Id() << " master node "
-            << mnodes[master]->Id() << "\n"
-            << "***ERR*** # Lagrange multipliers " << snlmdof << " # dofs "
-            << mndof << "\n"
+            << "***ERR*** slave node " << snodes[slave]->Id() << " master node " << mnodes[master]->Id() << "\n"
+            << "***ERR*** # Lagrange multipliers " << snlmdof << " # dofs " << mndof << "\n"
             << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         throw MoertelT::ReportError(oss);
       }
@@ -654,8 +646,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
 
   for (int rownode = 0; rownode < sseg.Nnode(); ++rownode) {
     // only insert in rows that I own
-    if (inter.NodePID(snodes[rownode]->Id()) != inter.lComm()->getRank())
-      continue;
+    if (inter.NodePID(snodes[rownode]->Id()) != inter.lComm()->getRank()) continue;
 
     // get row dofs
     int        nlmdof = snodes[rownode]->Nlmdof();
@@ -679,9 +670,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
         oss << "***ERR*** MoertelT::InterfaceT::Integrate_2D_Section:\n"
             << "***ERR*** mismatch in number of Lagrange multipliers and "
                "primal degrees of freedom:\n"
-            << "***ERR*** slave node " << snodes[rownode]->Id()
-            << "***ERR*** # Lagrange multipliers " << nlmdof << " # dofs "
-            << ndof << "\n"
+            << "***ERR*** slave node " << snodes[rownode]->Id() << "***ERR*** # Lagrange multipliers " << nlmdof
+            << " # dofs " << ndof << "\n"
             << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         throw MoertelT::ReportError(oss);
       }
@@ -718,16 +708,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
   | Teuchos::SerialDenseMatrix object                                    |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::SerialDenseMatrix<LO, ST>*
-    MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-        double sxia,
-        double sxib)
+Teuchos::SerialDenseMatrix<LO, ST>* MoertelT::MOERTEL_TEMPLATE_CLASS(
+    IntegratorT)::Integrate(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, double sxia, double sxib)
 {
-  int                                 nrow = sseg.Nnode();
-  int                                 ncol = nrow;
-  Teuchos::SerialDenseMatrix<LO, ST>* Ddense =
-      new Teuchos::SerialDenseMatrix<LO, ST>(nrow, ncol);
+  int                                 nrow   = sseg.Nnode();
+  int                                 ncol   = nrow;
+  Teuchos::SerialDenseMatrix<LO, ST>* Ddense = new Teuchos::SerialDenseMatrix<LO, ST>(nrow, ncol);
 
   for (int gp = 0; gp < Ngp(); ++gp) {
     double eta = Coordinate(gp);
@@ -774,17 +760,15 @@ Teuchos::SerialDenseMatrix<LO, ST>*
   | integrate the modification of the master side                        |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::SerialDenseMatrix<LO, ST>*
-    MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate_2D_Mmod(
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-        double sxia,
-        double sxib,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg,
-        double mxia,
-        double mxib)
+Teuchos::SerialDenseMatrix<LO, ST>* MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate_2D_Mmod(
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
+    double sxia,
+    double sxib,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg,
+    double mxia,
+    double mxib)
 {
-  Teuchos::SerialDenseMatrix<LO, ST>* Mmod =
-      new Teuchos::SerialDenseMatrix<LO, ST>(mseg.Nnode(), 1);
+  Teuchos::SerialDenseMatrix<LO, ST>* Mmod = new Teuchos::SerialDenseMatrix<LO, ST>(mseg.Nnode(), 1);
 
   for (int gp = 0; gp < Ngp(); ++gp) {
     double eta = Coordinate(gp);
@@ -920,8 +904,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
 
   for (int slave = 0; slave < sseg.Nnode(); ++slave) {
     // only do slave node rows that belong to this proc
-    if (inter.NodePID(snodes[slave]->Id()) != inter.lComm()->getRank())
-      continue;
+    if (inter.NodePID(snodes[slave]->Id()) != inter.lComm()->getRank()) continue;
 
     // we want to add the row Mdense(slave,...) to the rows lmdof[sdof]
     // and                row Ddense(slave,...) to the rows lmdof[sdof]
@@ -958,15 +941,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
           if (abs(val) < 1.e-9) continue;
 
           // standard assembly for internal nodes
-          if (!snodes[slave]->IsOnBoundary())
-            snodes[slave]->AddMmodValue(sdof, val, col);
+          if (!snodes[slave]->IsOnBoundary()) snodes[slave]->AddMmodValue(sdof, val, col);
           // if slave node is on boundary
           else {
-            std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>& suppnodes =
-                snodes[slave]->GetSupportedByNode();
-            double w = 1. / (double)(snodes[slave]->NSupportSet());
-            std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>::iterator
-                curr;
+            std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>& suppnodes = snodes[slave]->GetSupportedByNode();
+            double                                                   w = 1. / (double)(snodes[slave]->NSupportSet());
+            std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>::iterator curr;
             for (curr = suppnodes.begin(); curr != suppnodes.end(); ++curr)
               curr->second->AddMmodValue(sdof, w * val, col);
           }
@@ -991,7 +971,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
     Teuchos::SerialDenseMatrix<LO, ST>**                              Mdense,
     MoertelT::OverlapT<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>& overlap,
     double                                                            eps,
-    bool exactvalues)
+    bool                                                              exactvalues)
 {
   //  static int cnt = 0;
 
@@ -1007,8 +987,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
   int nrow = sseg.Nnode();
   int ncol = mseg.Nnode();
   // get the points
-  int const np =
-      actseg->Nnode();  // this is an overlap segment - always a triangle
+  int const                      np     = actseg->Nnode();  // this is an overlap segment - always a triangle
   int const*                     nodeid = actseg->NodeIds();
   std::vector<MoertelT::PointT*> points;
   overlap.PointView(points, nodeid, np);
@@ -1018,11 +997,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
   if (area < 0.0) {
     if (OutLevel() > 3)
       std::cout << "MoertelT: ***ERR***  MoertelT::IntegratorT::Integrate:\n"
-                << "MoertelT: ***ERR***  overlap segment area is negative: "
-                << area << std::endl
+                << "MoertelT: ***ERR***  overlap segment area is negative: " << area << std::endl
                 << "MoertelT: ***ERR***  skipping....\n"
-                << "MoertelT: ***ERR***  file/line: " << __FILE__ << "/"
-                << __LINE__ << "\n";
+                << "MoertelT: ***ERR***  file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return false;
   }
 
@@ -1031,9 +1008,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
 
   if (abs(area / sarea) < eps) {
     if (OutLevel() > 10)
-      std::cout
-          << "MoertelT: ***WRN*** Skipping overlap segment with tiny area "
-          << area << std::endl;
+      std::cout << "MoertelT: ***WRN*** Skipping overlap segment with tiny area " << area << std::endl;
     points.clear();
     return false;
   }
@@ -1140,8 +1115,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
     int    dof[3];
     dof[0] = dof[1] = dof[2] = -1;
     Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> gpnode =
-        Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(
-            -2, x, 3, dof, false, OutLevel()));
+        Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(-2, x, 3, dof, false, OutLevel()));
 
     // create a projector to project gaussian points
     MoertelT::ProjectorT projector(false, OutLevel());
@@ -1187,8 +1161,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
       gpnode->SetN(n);
       double mxi[2];
       double gap;
-      bool   ok =
-          projector.ProjectNodetoSegment_NodalNormal(*gpnode, mseg, mxi, gap);
+      bool   ok = projector.ProjectNodetoSegment_NodalNormal(*gpnode, mseg, mxi, gap);
       // if we have problems projecting here, we better skip this gauss point
       if (!ok) {
         std::cout << "MoertelT: ***WRN***------------------projection failed "
@@ -1205,13 +1178,10 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
       // loop over all slave nodes (lm loop)
       for (int lm = 0; lm < sseg.Nnode(); ++lm) {
         // loop over all nodes (dof loop master)
-        for (int dof = 0; dof < mseg.Nnode(); ++dof)
-          (**Mdense)(lm, dof) += (weight * val_sfunc1[lm] * val_mfunc0[dof]);
+        for (int dof = 0; dof < mseg.Nnode(); ++dof) (**Mdense)(lm, dof) += (weight * val_sfunc1[lm] * val_mfunc0[dof]);
 
         // loop over all nodes (dof loop slave)
-        for (int dof = 0; dof < sseg.Nnode(); ++dof)
-
-          (**Ddense)(lm, dof) += (weight * val_sfunc1[lm] * val_sfunc0[dof]);
+        for (int dof = 0; dof < sseg.Nnode(); ++dof) (**Ddense)(lm, dof) += (weight * val_sfunc1[lm] * val_sfunc0[dof]);
       }
 
     }  // for (int gp=0; gp<Ngp(); ++gp)
@@ -1263,8 +1233,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     if (!snode[row]->IsOnBoundary()) {
       for (int col = 0; col < nnode; ++col) {
         // row/col are both internal
-        if (!snode[col]->IsOnBoundary())
-          snode[row]->AddDValue(Ddense(row, col), snode[col]->Id());
+        if (!snode[col]->IsOnBoundary()) snode[row]->AddDValue(Ddense(row, col), snode[col]->Id());
         // row is internal node, col is boundary node
         // As those entries would ruin the diagonal structure of D they are
         // simply assembled into M (which is not diagonal anyway)
@@ -1274,15 +1243,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     }
     // row node is a boundary node
     else {
-      std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>& suppnodes =
-          snode[row]->GetSupportedByNode();
-      double w = 1. / (double)(snode[row]->NSupportSet());
+      std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>&          suppnodes = snode[row]->GetSupportedByNode();
+      double                                                            w = 1. / (double)(snode[row]->NSupportSet());
       std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>::iterator curr;
       for (curr = suppnodes.begin(); curr != suppnodes.end(); ++curr)
         for (int col = 0; col < nnode; ++col) {
           // col node is internal, assemble into D
-          if (!snode[col]->IsOnBoundary())
-            curr->second->AddDValue((w * Ddense(row, col)), snode[col]->Id());
+          if (!snode[col]->IsOnBoundary()) curr->second->AddDValue((w * Ddense(row, col)), snode[col]->Id());
           // col node is boundary, assemble into M
           else
             curr->second->AddMValue((w * Ddense(row, col)), snode[col]->Id());
@@ -1338,14 +1305,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
         // note the sign change here!!!!
         snode[row]->AddMValue((-Mdense(row, col)), mnode[col]->Id());
     } else {
-      std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>& suppnodes =
-          snode[row]->GetSupportedByNode();
+      std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>& suppnodes = snode[row]->GetSupportedByNode();
       // note the sign change here!!!!
-      double w = -1. / (double)(snode[row]->NSupportSet());
+      double                                                            w = -1. / (double)(snode[row]->NSupportSet());
       std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>::iterator curr;
       for (curr = suppnodes.begin(); curr != suppnodes.end(); ++curr)
-        for (int col = 0; col < nmnode; ++col)
-          curr->second->AddMValue((w * Mdense(row, col)), mnode[col]->Id());
+        for (int col = 0; col < nmnode; ++col) curr->second->AddMValue((w * Mdense(row, col)), mnode[col]->Id());
     }
   }
 #endif

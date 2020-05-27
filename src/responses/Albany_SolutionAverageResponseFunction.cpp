@@ -8,8 +8,7 @@
 
 namespace Albany {
 
-SolutionAverageResponseFunction::SolutionAverageResponseFunction(
-    const Teuchos::RCP<Teuchos_Comm const>& comm)
+SolutionAverageResponseFunction::SolutionAverageResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm)
     : ScalarResponseFunction(comm)
 {
   // Nothing to be done here
@@ -58,9 +57,7 @@ SolutionAverageResponseFunction::evaluateGradient(
 }
 
 void
-SolutionAverageResponseFunction::evaluateResponseImpl(
-    Thyra_Vector const& x,
-    Thyra_Vector&       g)
+SolutionAverageResponseFunction::evaluateResponseImpl(Thyra_Vector const& x, Thyra_Vector& g)
 {
   if (one.is_null() || !sameAs(one->range(), x.range())) {
     one = Thyra::createMember(x.space());

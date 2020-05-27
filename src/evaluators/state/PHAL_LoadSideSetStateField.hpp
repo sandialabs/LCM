@@ -18,16 +18,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarType>
-class LoadSideSetStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                  public PHX::EvaluatorDerived<EvalT, Traits>
+class LoadSideSetStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   LoadSideSetStateFieldBase(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -41,25 +38,20 @@ class LoadSideSetStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 };
 
 template <typename EvalT, typename Traits>
-using LoadSideSetStateFieldST =
-    LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ScalarT>;
+using LoadSideSetStateFieldST = LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using LoadSideSetStateFieldPST =
-    LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using LoadSideSetStateFieldPST = LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
-using LoadSideSetStateFieldMST =
-    LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using LoadSideSetStateFieldMST = LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using LoadSideSetStateFieldRT =
-    LoadSideSetStateFieldBase<EvalT, Traits, RealType>;
+using LoadSideSetStateFieldRT = LoadSideSetStateFieldBase<EvalT, Traits, RealType>;
 
 // The default is the ParamScalarT
 template <typename EvalT, typename Traits>
-using LoadSideSetStateField =
-    LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using LoadSideSetStateField = LoadSideSetStateFieldBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

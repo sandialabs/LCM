@@ -26,22 +26,17 @@ class DOFGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFGradInterpolationSideBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl_side);
+  DOFGradInterpolationSideBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl_side);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  private:
-  typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
-      OutputScalarT;
+  typedef typename EvalT::MeshScalarT                                      MeshScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type OutputScalarT;
 
   std::string sideSetName;
 
@@ -62,16 +57,13 @@ class DOFGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFGradInterpolationSide =
-    DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFGradInterpolationSide = DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFGradInterpolationSideMesh =
-    DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFGradInterpolationSideMesh = DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFGradInterpolationSideParam =
-    DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using DOFGradInterpolationSideParam = DOFGradInterpolationSideBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

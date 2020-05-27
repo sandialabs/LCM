@@ -21,8 +21,7 @@ namespace LCM {
 /// and Cauchy stress, and optionally volume averages the pressure
 ///
 template <typename EvalT, typename Traits>
-class FirstPK : public PHX::EvaluatorWithBaseImpl<Traits>,
-                public PHX::EvaluatorDerived<EvalT, Traits>
+class FirstPK : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
@@ -37,9 +36,7 @@ class FirstPK : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics
@@ -122,14 +119,10 @@ class FirstPK : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
 
-  typedef Kokkos::RangePolicy<ExecutionSpace, have_stab_pressure_Tag>
-      have_stab_pressure_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, have_pore_pressure_Tag>
-      have_pore_pressure_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, small_strain_Tag>
-      small_strain_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, no_small_strain_Tag>
-      no_small_strain_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, have_stab_pressure_Tag> have_stab_pressure_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, have_pore_pressure_Tag> have_pore_pressure_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, small_strain_Tag>       small_strain_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, no_small_strain_Tag>    no_small_strain_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void

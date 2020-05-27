@@ -99,10 +99,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   int                               ws_index_{0};
 
   void
-  init(
-      Workset&                 workset,
-      FieldMap<ScalarT const>& dep_fields,
-      FieldMap<ScalarT>&       eval_fields);
+  init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields);
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -110,10 +107,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class J2Erosion : public LCM::ParallelConstitutiveModel<
-                      EvalT,
-                      Traits,
-                      J2ErosionKernel<EvalT, Traits>>
+class J2Erosion : public LCM::ParallelConstitutiveModel<EvalT, Traits, J2ErosionKernel<EvalT, Traits>>
 {
  public:
   J2Erosion(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);

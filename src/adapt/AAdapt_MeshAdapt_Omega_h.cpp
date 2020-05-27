@@ -14,12 +14,8 @@
 
 namespace AAdapt {
 
-Omega_h_Method::Omega_h_Method(
-    const Teuchos::RCP<Albany::APFDiscretization>& disc)
-    : MeshAdaptMethod(disc),
-      library_osh(nullptr, nullptr),
-      mesh_osh(&library_osh),
-      adapt_opts(disc->getNumDim())
+Omega_h_Method::Omega_h_Method(const Teuchos::RCP<Albany::APFDiscretization>& disc)
+    : MeshAdaptMethod(disc), library_osh(nullptr, nullptr), mesh_osh(&library_osh), adapt_opts(disc->getNumDim())
 {
   mesh_apf = mesh_struct->getMesh();
 }
@@ -46,17 +42,14 @@ Omega_h_Method::preProcessShrunkenMesh()
 }
 
 void
-Omega_h_Method::adaptMesh(
-    const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_)
+Omega_h_Method::adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_params_)
 {
   apf::to_omega_h(&mesh_osh, mesh_apf);
   apf::clear(mesh_apf);
   mesh_osh.set_parting(OMEGA_H_GHOSTED);
   Omega_h::add_implied_metric_tag(&mesh_osh);
   Omega_h::generate_target_metric_tag(&mesh_osh, metric_opts);
-  while (Omega_h::approach_metric(&mesh_osh, adapt_opts)) {
-    Omega_h::adapt(&mesh_osh, adapt_opts);
-  }
+  while (Omega_h::approach_metric(&mesh_osh, adapt_opts)) { Omega_h::adapt(&mesh_osh, adapt_opts); }
   apf::from_omega_h(mesh_apf, &mesh_osh);
   mesh_osh = Omega_h::Mesh(&library_osh);
 }

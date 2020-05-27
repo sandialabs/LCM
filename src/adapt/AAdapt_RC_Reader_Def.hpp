@@ -8,41 +8,31 @@ namespace AAdapt {
 namespace rc {
 
 template <typename EvalT, typename Traits>
-ReaderBase<EvalT, Traits>::ReaderBase(const Teuchos::RCP<Manager>& rc_mgr)
-    : rc_mgr_(rc_mgr)
+ReaderBase<EvalT, Traits>::ReaderBase(const Teuchos::RCP<Manager>& rc_mgr) : rc_mgr_(rc_mgr)
 {
   this->setName("AAdapt::rc::Reader" + PHX::print<EvalT>());
-  for (Manager::Field::iterator it  = rc_mgr_->fieldsBegin(),
-                                end = rc_mgr_->fieldsEnd();
-       it != end;
-       ++it) {
-    fields_.push_back(
-        PHX::MDField<RealType>(Manager::decorate((*it)->name), (*it)->layout));
+  for (Manager::Field::iterator it = rc_mgr_->fieldsBegin(), end = rc_mgr_->fieldsEnd(); it != end; ++it) {
+    fields_.push_back(PHX::MDField<RealType>(Manager::decorate((*it)->name), (*it)->layout));
     this->addEvaluatedField(fields_.back());
   }
 }
 
 template <typename EvalT, typename Traits>
 void
-ReaderBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ReaderBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
-  for (FieldsIterator it = fields_.begin(); it != fields_.end(); ++it)
-    this->utils.setFieldData(*it, fm);
+  for (FieldsIterator it = fields_.begin(); it != fields_.end(); ++it) this->utils.setFieldData(*it, fm);
 }
 
 template <typename EvalT, typename Traits>
 void
 ReaderBase<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  for (FieldsIterator it = fields_.begin(); it != fields_.end(); ++it)
-    rc_mgr_->readQpField(*it, workset);
+  for (FieldsIterator it = fields_.begin(); it != fields_.end(); ++it) rc_mgr_->readQpField(*it, workset);
 }
 
 template <typename EvalT, typename Traits>
-Reader<EvalT, Traits>::Reader(const Teuchos::RCP<Manager>& rc_mgr)
-    : ReaderBase<EvalT, Traits>(rc_mgr)
+Reader<EvalT, Traits>::Reader(const Teuchos::RCP<Manager>& rc_mgr) : ReaderBase<EvalT, Traits>(rc_mgr)
 {
 }
 
@@ -53,10 +43,8 @@ Reader<PHAL::AlbanyTraits::Residual, Traits>::Reader(
     : ReaderBase<PHAL::AlbanyTraits::Residual, Traits>(rc_mgr)
 {
   if (this->rc_mgr_->usingProjection()) {
-    bf_ = PHX::MDField<const RealType, Cell, Node, QuadPoint>(
-        "BF", dl->node_qp_scalar);
-    wbf_ = PHX::MDField<const RealType, Cell, Node, QuadPoint>(
-        "wBF", dl->node_qp_scalar);
+    bf_  = PHX::MDField<const RealType, Cell, Node, QuadPoint>("BF", dl->node_qp_scalar);
+    wbf_ = PHX::MDField<const RealType, Cell, Node, QuadPoint>("wBF", dl->node_qp_scalar);
     this->addDependentField(bf_.fieldTag());
     this->addDependentField(wbf_.fieldTag());
   }
@@ -72,22 +60,19 @@ Reader<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
     this->utils.setFieldData(bf_, fm);
     this->utils.setFieldData(wbf_, fm);
   }
-  ReaderBase<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-      d, fm);
+  ReaderBase<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(d, fm);
 }
 
 template <typename Traits>
 void
-Reader<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+Reader<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // It is necessary that Reader<Residual> is evaluated before Reader<EvalT> for
   // EvalT other than Residual, for otherwise the interpolated values won't be
   // available.
   if (this->rc_mgr_->usingProjection()) {
     this->rc_mgr_->beginQpInterp();
-    for (typename ReaderBase<PHAL::AlbanyTraits::Residual, Traits>::
-             FieldsIterator it = this->fields_.begin();
+    for (typename ReaderBase<PHAL::AlbanyTraits::Residual, Traits>::FieldsIterator it = this->fields_.begin();
          it != this->fields_.end();
          ++it)
       this->rc_mgr_->interpQpField(*it, workset, bf_);

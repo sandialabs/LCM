@@ -44,8 +44,7 @@ TEST(AlbanyResidual, NewtonBanana)
 
   MIN minimizer;
 
-  std::unique_ptr<STEP> pstep =
-      minitensor::stepFactory<FN, ValueT, DIM>(minitensor::StepType::NEWTON);
+  std::unique_ptr<STEP> pstep = minitensor::stepFactory<FN, ValueT, DIM>(minitensor::StepType::NEWTON);
 
   assert(pstep->name() != nullptr);
 
@@ -58,8 +57,7 @@ TEST(AlbanyResidual, NewtonBanana)
   x(0) = 0.0;
   x(1) = 3.0;
 
-  LCM::MiniSolver<MIN, STEP, FN, EvalT, DIM> mini_solver(
-      minimizer, step, banana, x);
+  LCM::MiniSolver<MIN, STEP, FN, EvalT, DIM> mini_solver(minimizer, step, banana, x);
 
   minimizer.printReport(os);
 
@@ -97,8 +95,7 @@ TEST(AlbanyJacobian, NewtonBanana)
   x(0) = 0.0;
   x(1) = 3.0;
 
-  LCM::MiniSolver<MIN, STEP, FN, EvalT, DIM> mini_solver(
-      minimizer, step, banana, x);
+  LCM::MiniSolver<MIN, STEP, FN, EvalT, DIM> mini_solver(minimizer, step, banana, x);
 
   minimizer.printReport(os);
 

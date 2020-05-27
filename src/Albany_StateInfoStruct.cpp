@@ -47,8 +47,7 @@ printElementStates(StateArrays const& sa)
           for (auto cell = 0; cell < dims[0]; ++cell) {
             for (auto qp = 0; qp < dims[1]; ++qp) {
               double& value = mda(cell, qp);
-              fos << "**** # INDEX 2, " << state_name << "(" << cell << ","
-                  << qp << ")"
+              fos << "**** # INDEX 2, " << state_name << "(" << cell << "," << qp << ")"
                   << " = " << value << '\n';
             }
           }
@@ -58,8 +57,7 @@ printElementStates(StateArrays const& sa)
             for (auto qp = 0; qp < dims[1]; ++qp) {
               for (auto i = 0; i < dims[2]; ++i) {
                 double& value = mda(cell, qp, i);
-                fos << "**** # INDEX 3, " << state_name << "(" << cell << ","
-                    << qp << "," << i << ")"
+                fos << "**** # INDEX 3, " << state_name << "(" << cell << "," << qp << "," << i << ")"
                     << " = " << value << '\n';
               }
             }
@@ -71,8 +69,7 @@ printElementStates(StateArrays const& sa)
               for (int i = 0; i < dims[2]; ++i) {
                 for (int j = 0; j < dims[3]; ++j) {
                   double& value = mda(cell, qp, i, j);
-                  fos << "**** # INDEX 4, " << state_name << "(" << cell << ","
-                      << qp << "," << i << "," << j << ")"
+                  fos << "**** # INDEX 4, " << state_name << "(" << cell << "," << qp << "," << i << "," << j << ")"
                       << " = " << value << '\n';
                 }
               }
@@ -86,8 +83,8 @@ printElementStates(StateArrays const& sa)
                 for (int j = 0; j < dims[3]; ++j) {
                   for (int k = 0; k < dims[4]; ++k) {
                     double& value = mda(cell, qp, i, j, k);
-                    fos << "**** # INDEX 5, " << state_name << "(" << cell
-                        << "," << qp << "," << i << "," << j << "," << k << ")"
+                    fos << "**** # INDEX 5, " << state_name << "(" << cell << "," << qp << "," << i << "," << j << ","
+                        << k << ")"
                         << " = " << value << '\n';
                   }
                 }
@@ -130,8 +127,7 @@ printNodeStates(StateArrays const& sa)
           for (auto node = 0; node < dims[0]; ++node) {
             for (auto i = 0; i < dims[1]; ++i) {
               double& value = mda(node, i);
-              fos << "**** # VECTOR, " << state_name << "(" << node << "," << i
-                  << ")"
+              fos << "**** # VECTOR, " << state_name << "(" << node << "," << i << ")"
                   << " = " << value << '\n';
             }
           }
@@ -141,8 +137,7 @@ printNodeStates(StateArrays const& sa)
             for (int i = 0; i < dims[1]; ++i) {
               for (int j = 0; j < dims[2]; ++j) {
                 double& value = mda(node, i, j);
-                fos << "**** # TENSOR, " << state_name << "(" << node << ","
-                    << i << "," << j << ")"
+                fos << "**** # TENSOR, " << state_name << "(" << node << "," << i << "," << j << ")"
                     << " = " << value << '\n';
               }
             }

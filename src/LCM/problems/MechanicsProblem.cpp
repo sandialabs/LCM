@@ -57,26 +57,12 @@ MechanicsProblem::MechanicsProblem(
   // Are any source functions specified?
   have_source_ = params->isSublist("Source Functions");
 
-  getVariableType(
-      params->sublist("Displacement"),
-      "DOF",
-      mech_type_,
-      have_mech_,
-      have_mech_eq_);
+  getVariableType(params->sublist("Displacement"), "DOF", mech_type_, have_mech_, have_mech_eq_);
+
+  getVariableType(params->sublist("Temperature"), "None", temperature_type_, have_temperature_, have_temperature_eq_);
 
   getVariableType(
-      params->sublist("Temperature"),
-      "None",
-      temperature_type_,
-      have_temperature_,
-      have_temperature_eq_);
-
-  getVariableType(
-      params->sublist("ACE Temperature"),
-      "None",
-      temperature_type_,
-      have_ace_temperature_,
-      have_ace_temperature_eq_);
+      params->sublist("ACE Temperature"), "None", temperature_type_, have_ace_temperature_, have_ace_temperature_eq_);
 
   getVariableType(
       params->sublist("DislocationDensity"),
@@ -86,61 +72,31 @@ MechanicsProblem::MechanicsProblem(
       have_dislocation_density_eq_);
 
   getVariableType(
-      params->sublist("Pore Pressure"),
-      "None",
-      pore_pressure_type_,
-      have_pore_pressure_,
-      have_pore_pressure_eq_);
+      params->sublist("Pore Pressure"), "None", pore_pressure_type_, have_pore_pressure_, have_pore_pressure_eq_);
+
+  getVariableType(params->sublist("Transport"), "None", transport_type_, have_transport_, have_transport_eq_);
+
+  getVariableType(params->sublist("HydroStress"), "None", hydrostress_type_, have_hydrostress_, have_hydrostress_eq_);
+
+  getVariableType(params->sublist("Damage"), "None", damage_type_, have_damage_, have_damage_eq_);
 
   getVariableType(
-      params->sublist("Transport"),
-      "None",
-      transport_type_,
-      have_transport_,
-      have_transport_eq_);
+      params->sublist("Stabilized Pressure"), "None", stab_pressure_type_, have_stab_pressure_, have_stab_pressure_eq_);
 
-  getVariableType(
-      params->sublist("HydroStress"),
-      "None",
-      hydrostress_type_,
-      have_hydrostress_,
-      have_hydrostress_eq_);
-
-  getVariableType(
-      params->sublist("Damage"),
-      "None",
-      damage_type_,
-      have_damage_,
-      have_damage_eq_);
-
-  getVariableType(
-      params->sublist("Stabilized Pressure"),
-      "None",
-      stab_pressure_type_,
-      have_stab_pressure_,
-      have_stab_pressure_eq_);
-
-  bool const have_both_temps =
-      (have_temperature_ == true) && (have_ace_temperature_ == true);
+  bool const have_both_temps = (have_temperature_ == true) && (have_ace_temperature_ == true);
 
   ALBANY_ASSERT(have_both_temps == false, "Cannot have two temperatures");
 
-  bool const have_both_temp_eqs =
-      (have_temperature_eq_ == true) && (have_ace_temperature_eq_ == true);
+  bool const have_both_temp_eqs = (have_temperature_eq_ == true) && (have_ace_temperature_eq_ == true);
 
-  ALBANY_ASSERT(
-      have_both_temp_eqs == false, "Cannot have two temperature equations");
+  ALBANY_ASSERT(have_both_temp_eqs == false, "Cannot have two temperature equations");
 
-  bool const have_both_ace =
-      (have_ace_temperature_ == true) && (have_ace_temperature_eq_ == true);
+  bool const have_both_ace = (have_ace_temperature_ == true) && (have_ace_temperature_eq_ == true);
 
-  bool const is_ace_problem =
-      (have_ace_temperature_ == true) || (have_ace_temperature_eq_ == true);
+  bool const is_ace_problem = (have_ace_temperature_ == true) || (have_ace_temperature_eq_ == true);
 
   if (is_ace_problem == true) {
-    ALBANY_ASSERT(
-        have_both_ace == true,
-        "Cannot have ACE temperature without its equation");
+    ALBANY_ASSERT(have_both_ace == true, "Cannot have ACE temperature without its equation");
   }
 
   // Compute number of equations
@@ -149,9 +105,7 @@ MechanicsProblem::MechanicsProblem(
   if (have_mech_eq_) num_eq += num_dims_;
   if (have_temperature_eq_) num_eq++;
   if (have_ace_temperature_eq_) num_eq++;
-  if (have_dislocation_density_eq_) {
-    num_eq += LCM::DislocationDensity::get_num_slip(num_dims_);
-  }
+  if (have_dislocation_density_eq_) { num_eq += LCM::DislocationDensity::get_num_slip(num_dims_); }
   if (have_pore_pressure_eq_) num_eq++;
   if (have_transport_eq_) num_eq++;
   if (have_hydrostress_eq_) num_eq++;
@@ -163,22 +117,14 @@ MechanicsProblem::MechanicsProblem(
   // Print out a summary of the problem
   *out << "Mechanics problem:" << '\n'
        << "\tSpatial dimension             : " << num_dims_ << '\n'
-       << "\tMechanics variables           : "
-       << variableTypeToString(mech_type_) << '\n'
-       << "\tTemperature variables         : "
-       << variableTypeToString(temperature_type_) << '\n'
-       << "\tDislocation Density variables : "
-       << variableTypeToString(dislocation_density_type_) << '\n'
-       << "\tPore Pressure variables       : "
-       << variableTypeToString(pore_pressure_type_) << '\n'
-       << "\tTransport variables           : "
-       << variableTypeToString(transport_type_) << '\n'
-       << "\tHydroStress variables         : "
-       << variableTypeToString(hydrostress_type_) << '\n'
-       << "\tDamage variables              : "
-       << variableTypeToString(damage_type_) << '\n'
-       << "\tStabilized Pressure variables : "
-       << variableTypeToString(stab_pressure_type_) << '\n';
+       << "\tMechanics variables           : " << variableTypeToString(mech_type_) << '\n'
+       << "\tTemperature variables         : " << variableTypeToString(temperature_type_) << '\n'
+       << "\tDislocation Density variables : " << variableTypeToString(dislocation_density_type_) << '\n'
+       << "\tPore Pressure variables       : " << variableTypeToString(pore_pressure_type_) << '\n'
+       << "\tTransport variables           : " << variableTypeToString(transport_type_) << '\n'
+       << "\tHydroStress variables         : " << variableTypeToString(hydrostress_type_) << '\n'
+       << "\tDamage variables              : " << variableTypeToString(damage_type_) << '\n'
+       << "\tStabilized Pressure variables : " << variableTypeToString(stab_pressure_type_) << '\n';
 
   material_db_ = createMaterialDatabase(params, commT);
 
@@ -188,14 +134,10 @@ MechanicsProblem::MechanicsProblem(
   if (have_source_ && have_temperature_eq_) {
     // If a thermal source is specified
     if (params->sublist("Source Functions").isSublist("Thermal Source")) {
-      Teuchos::ParameterList& thSrcPL =
-          params->sublist("Source Functions").sublist("Thermal Source");
+      Teuchos::ParameterList& thSrcPL = params->sublist("Source Functions").sublist("Thermal Source");
 
-      if (thSrcPL.get<std::string>("Thermal Source Type", "None") ==
-          "Block Dependent") {
-        if (Teuchos::nonnull(material_db_)) {
-          thermal_source_ = SOURCE_TYPE_MATERIAL;
-        }
+      if (thSrcPL.get<std::string>("Thermal Source Type", "None") == "Block Dependent") {
+        if (Teuchos::nonnull(material_db_)) { thermal_source_ = SOURCE_TYPE_MATERIAL; }
       } else {
         thermal_source_ = SOURCE_TYPE_INPUT;
       }
@@ -234,17 +176,13 @@ MechanicsProblem::MechanicsProblem(
         break;
       }
       default: {
-        ALBANY_ABORT(
-            '\n'
-            << "Error: " << __FILE__ << " line " << __LINE__
-            << ": num_dims_ set incorrectly." << '\n');
+        ALBANY_ABORT('\n' << "Error: " << __FILE__ << " line " << __LINE__ << ": num_dims_ set incorrectly." << '\n');
         break;
       }
     }
   }
 
-  rigidBodyModes->setParameters(
-      num_PDEs, num_eq_mech, num_eq_aux, null_space_dim);
+  rigidBodyModes->setParameters(num_PDEs, num_eq_mech, num_eq_aux, null_space_dim);
 
   // Check whether we are doing adaptive insertion with topology modification.
   bool const have_adaptation = params->isSublist("Adaptation");
@@ -253,8 +191,7 @@ MechanicsProblem::MechanicsProblem(
   if (have_adaptation == true) {
     Teuchos::ParameterList const& adapt_params = params->sublist("Adaptation");
 
-    std::string const& adaptation_method_name =
-        adapt_params.get<std::string>("Method");
+    std::string const& adaptation_method_name = adapt_params.get<std::string>("Method");
 
     have_sizefield_adaptation_ = adaptation_method_name == "RPI Albany Size";
     have_topmod_adaptation_    = adaptation_method_name == "Topmod";
@@ -265,8 +202,7 @@ MechanicsProblem::MechanicsProblem(
   // This allows a ModelEvaluator to indicate to NOX that something has failed,
   // which is useful for adaptive step size reduction
   if (params->isParameter("Constitutive Model NOX Status Test")) {
-    nox_status_test_ = params->get<Teuchos::RCP<NOX::StatusTest::Generic>>(
-        "Constitutive Model NOX Status Test");
+    nox_status_test_ = params->get<Teuchos::RCP<NOX::StatusTest::Generic>>("Constitutive Model NOX Status Test");
   } else {
     nox_status_test_ = Teuchos::rcp(new NOX::StatusTest::ModelEvaluatorFlag);
   }
@@ -275,18 +211,13 @@ MechanicsProblem::MechanicsProblem(
 
   if (Teuchos::nonnull(material_db_)) {
     std::vector<bool> readOrientationFromMesh =
-        material_db_->getAllMatchingParams<bool>(
-            "Read Lattice Orientation From Mesh");
+        material_db_->getAllMatchingParams<bool>("Read Lattice Orientation From Mesh");
 
     for (unsigned int i = 0; i < readOrientationFromMesh.size(); i++) {
-      if (readOrientationFromMesh[i]) {
-        requireLatticeOrientationOnMesh = true;
-      }
+      if (readOrientationFromMesh[i]) { requireLatticeOrientationOnMesh = true; }
     }
   }
-  if (requireLatticeOrientationOnMesh == true) {
-    requirements.push_back("Lattice_Orientation");
-  }
+  if (requireLatticeOrientationOnMesh == true) { requirements.push_back("Lattice_Orientation"); }
   if (have_erosion == true) {
     requirements.push_back("cell_boundary_indicator");
     // requirements.push_back("face_boundary_indicator");
@@ -296,9 +227,7 @@ MechanicsProblem::MechanicsProblem(
 }  // MechanicsProblem
 
 void
-MechanicsProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> meshSpecs,
-    StateManager&                                    stateMgr)
+MechanicsProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> meshSpecs, StateManager& stateMgr)
 {
   // Construct All Phalanx Evaluators
 
@@ -312,8 +241,7 @@ MechanicsProblem::buildProblem(
   *out << "Calling MechanicsProblem::buildEvaluators" << '\n';
   for (int ps = 0; ps < physSets; ++ps) {
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-    buildEvaluators(
-        *fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
+    buildEvaluators(*fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
 
     if (meshSpecs[ps]->ssNames.size() > 0) { haveSidesets = true; }
   }
@@ -324,8 +252,7 @@ MechanicsProblem::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params_->isSublist("Neumann BCs");
   if (isNeumannPL && !haveSidesets) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
   if (haveSidesets) {
@@ -336,19 +263,15 @@ MechanicsProblem::buildProblem(
 
 void
 MechanicsProblem::getAllocatedStates(
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-        Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> old_state,
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-        Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> new_state)
-    const
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> old_state,
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> new_state) const
 {
   old_state = old_state_;
   new_state = new_state_;
 }
 
 void
-MechanicsProblem::applyProblemSpecificSolverSettings(
-    Teuchos::RCP<Teuchos::ParameterList> params)
+MechanicsProblem::applyProblemSpecificSolverSettings(Teuchos::RCP<Teuchos::ParameterList> params)
 {
   // Acquire the NOX "Solver Options" and "Status Tests" parameter lists
   Teuchos::RCP<Teuchos::ParameterList> solver_opts_params;
@@ -361,22 +284,16 @@ MechanicsProblem::applyProblemSpecificSolverSettings(
 
   if (params->isSublist("Piro")) {
     if (params->sublist("Piro").isSublist("NOX")) {
-      if (params->sublist("Piro").sublist("NOX").isSublist("Solver Options")) {
-        have_solver_opts = true;
-      }
-      if (params->sublist("Piro").sublist("NOX").isSublist("Status Tests")) {
-        have_status_test = true;
-      }
+      if (params->sublist("Piro").sublist("NOX").isSublist("Solver Options")) { have_solver_opts = true; }
+      if (params->sublist("Piro").sublist("NOX").isSublist("Status Tests")) { have_status_test = true; }
     }
   }
 
   if (have_solver_opts && have_status_test) {
     // Add the model evaulator flag as a status test.
-    Teuchos::ParameterList& solver_opts_params =
-        params->sublist("Piro").sublist("NOX").sublist("Solver Options");
+    Teuchos::ParameterList& solver_opts_params = params->sublist("Piro").sublist("NOX").sublist("Solver Options");
 
-    Teuchos::ParameterList& status_tests_params =
-        params->sublist("Piro").sublist("NOX").sublist("Status Tests");
+    Teuchos::ParameterList& status_tests_params = params->sublist("Piro").sublist("NOX").sublist("Status Tests");
 
     Teuchos::ParameterList old_params = status_tests_params;
 
@@ -414,8 +331,7 @@ MechanicsProblem::applyProblemSpecificSolverSettings(
         Teuchos::rcp_dynamic_cast<LCM::SolutionSniffer>(ppo, throw_on_fail);
 
     Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> status_test =
-        Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(
-            nox_status_test_);
+        Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(nox_status_test_);
 
     status_test_op->setStatusTest(status_test);
   }
@@ -459,8 +375,7 @@ MechanicsProblem::constructDirichletEvaluators(MeshSpecsStruct const& meshSpecs)
 
   BCUtils<DirichletTraits> dirUtils;
 
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
 
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
@@ -469,8 +384,7 @@ MechanicsProblem::constructDirichletEvaluators(MeshSpecsStruct const& meshSpecs)
 
 // Neumann (Traction) BCs
 void
-MechanicsProblem::constructNeumannEvaluators(
-    Teuchos::RCP<MeshSpecsStruct> const& meshSpecs)
+MechanicsProblem::constructNeumannEvaluators(Teuchos::RCP<MeshSpecsStruct> const& meshSpecs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
   // i.e. meshSpecs.ssNames.size() > 0
@@ -539,8 +453,7 @@ MechanicsProblem::constructNeumannEvaluators(
 
   Teuchos::ArrayRCP<std::string> dof_names(1, "Displacement");
 
-  std::vector<std::string> condNames(
-      4);  // dudx, dudy, dudz, dudn, P, closed_form
+  std::vector<std::string> condNames(4);  // dudx, dudy, dudz, dudn, P, closed_form
 
   // Note that sidesets are only supported for two and 3D currently
   if (num_dims_ == 2) {
@@ -602,8 +515,7 @@ MechanicsProblem::getVariableType(
 }
 
 std::string
-MechanicsProblem::variableTypeToString(
-    MechanicsProblem::MECH_VAR_TYPE variable_type)
+MechanicsProblem::variableTypeToString(MechanicsProblem::MECH_VAR_TYPE variable_type)
 {
   if (variable_type == MECH_VAR_TYPE_NONE) {
     return "None";

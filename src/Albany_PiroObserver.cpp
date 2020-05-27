@@ -12,16 +12,11 @@
 
 namespace Albany {
 
-PiroObserver::PiroObserver(
-    const Teuchos::RCP<Application>&         app,
-    Teuchos::RCP<const Thyra_ModelEvaluator> model)
-    : impl_(app),
-      model_(model),
-      out(Teuchos::VerboseObjectBase::getDefaultOStream())
+PiroObserver::PiroObserver(const Teuchos::RCP<Application>& app, Teuchos::RCP<const Thyra_ModelEvaluator> model)
+    : impl_(app), model_(model), out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   observe_responses_ = false;
-  if ((app->observeResponses() == true) && (model_ != Teuchos::null))
-    observe_responses_ = true;
+  if ((app->observeResponses() == true) && (model_ != Teuchos::null)) observe_responses_ = true;
   stepper_counter_                 = 0;
   observe_responses_every_n_steps_ = app->observeResponsesFreq();
 
@@ -49,10 +44,7 @@ PiroObserver::observeSolution(Thyra_Vector const& solution, const ST stamp)
 }
 
 void
-PiroObserver::observeSolution(
-    Thyra_Vector const& solution,
-    Thyra_Vector const& solution_dot,
-    const ST            stamp)
+PiroObserver::observeSolution(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, const ST stamp)
 {
   this->observeSolutionImpl(solution, solution_dot, stamp);
   stepper_counter_++;
@@ -83,9 +75,7 @@ PiroObserver::parameterChanged(std::string const& param)
 }
 
 void
-PiroObserver::observeSolutionImpl(
-    Thyra_Vector const& solution,
-    const ST            defaultStamp)
+PiroObserver::observeSolutionImpl(Thyra_Vector const& solution, const ST defaultStamp)
 {
   // Determine the stamp associated with the snapshot
   const ST stamp = impl_.getTimeParamValueOrDefault(defaultStamp);
@@ -99,23 +89,16 @@ PiroObserver::observeSolutionImpl(
 }
 
 void
-PiroObserver::observeSolutionImpl(
-    Thyra_Vector const& solution,
-    Thyra_Vector const& solution_dot,
-    const ST            defaultStamp)
+PiroObserver::observeSolutionImpl(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, const ST defaultStamp)
 {
   // Determine the stamp associated with the snapshot
   const ST stamp = impl_.getTimeParamValueOrDefault(defaultStamp);
-  impl_.observeSolution(
-      stamp, solution, Teuchos::constPtr(solution_dot), Teuchos::null);
+  impl_.observeSolution(stamp, solution, Teuchos::constPtr(solution_dot), Teuchos::null);
 
   // observe responses
   if (observe_responses_ == true) {
     if (stepper_counter_ % observe_responses_every_n_steps_ == 0)
-      this->observeResponse(
-          defaultStamp,
-          Teuchos::rcpFromRef(solution),
-          Teuchos::rcpFromRef(solution_dot));
+      this->observeResponse(defaultStamp, Teuchos::rcpFromRef(solution), Teuchos::rcpFromRef(solution_dot));
   }
 }
 
@@ -128,11 +111,7 @@ PiroObserver::observeSolutionImpl(
 {
   // Determine the stamp associated with the snapshot
   const ST stamp = impl_.getTimeParamValueOrDefault(defaultStamp);
-  impl_.observeSolution(
-      stamp,
-      solution,
-      Teuchos::constPtr(solution_dot),
-      Teuchos::constPtr(solution_dotdot));
+  impl_.observeSolution(stamp, solution, Teuchos::constPtr(solution_dot), Teuchos::constPtr(solution_dotdot));
 
   // observe responses
   if (observe_responses_ == true) {
@@ -146,9 +125,7 @@ PiroObserver::observeSolutionImpl(
 }
 
 void
-PiroObserver::observeSolutionImpl(
-    const Thyra_MultiVector& solution,
-    const ST                 defaultStamp)
+PiroObserver::observeSolutionImpl(const Thyra_MultiVector& solution, const ST defaultStamp)
 {
   impl_.observeSolution(defaultStamp, solution);
 }
@@ -170,13 +147,11 @@ PiroObserver::observeResponse(
   Thyra::ModelEvaluatorBase::OutArgs<double> outArgs = model_->createOutArgs();
   if (outArgs.Ng() > 0) {
     // build the in arguments
-    Thyra::ModelEvaluatorBase::InArgs<double> nominal_values =
-        model_->getNominalValues();
-    Thyra::ModelEvaluatorBase::InArgs<double> inArgs = model_->createInArgs();
+    Thyra::ModelEvaluatorBase::InArgs<double> nominal_values = model_->getNominalValues();
+    Thyra::ModelEvaluatorBase::InArgs<double> inArgs         = model_->createInArgs();
     inArgs.setArgs(nominal_values);
     inArgs.set_x(solution);
-    if (inArgs.supports(Thyra::ModelEvaluatorBase::IN_ARG_x_dot))
-      inArgs.set_x_dot(solution_dot);
+    if (inArgs.supports(Thyra::ModelEvaluatorBase::IN_ARG_x_dot)) inArgs.set_x_dot(solution_dot);
     if (inArgs.supports(Thyra::ModelEvaluatorBase::IN_ARG_t)) {
       const ST time = impl_.getTimeParamValueOrDefault(defaultStamp);
       inArgs.set_t(time);
@@ -184,16 +159,14 @@ PiroObserver::observeResponse(
     }
 
     // set up the output arguments, in this case only the responses
-    for (int i = 0; i < outArgs.Ng(); i++)
-      outArgs.set_g(i, Thyra::createMember(*model_->get_g_space(i)));
+    for (int i = 0; i < outArgs.Ng(); i++) outArgs.set_g(i, Thyra::createMember(*model_->get_g_space(i)));
 
     // Solve the model
     model_->evalModel(inArgs, outArgs);
 
     std::size_t precision   = 8;
     std::size_t value_width = precision + 7;
-    *out << std::scientific << std::showpoint << std::setprecision(precision)
-         << std::left;
+    *out << std::scientific << std::showpoint << std::setprecision(precision) << std::left;
 
     // Note that we don't have g_names support in thyra yet.  Once
     // this is added, we can print response names as well.
@@ -214,8 +187,7 @@ PiroObserver::observeResponse(
 
     for (int i = 0; i < outArgs.Ng(); i++) {
       std::stringstream                          ss;
-      std::map<int, std::string>::const_iterator itr =
-          m_response_index_to_name.find(i);
+      std::map<int, std::string>::const_iterator itr = m_response_index_to_name.find(i);
       if (itr != m_response_index_to_name.end())
         ss << "         Response \"" << itr->second << "\" = ";
       else
@@ -237,8 +209,7 @@ PiroObserver::observeResponse(
           for (size_t j = 0; j < storedResponses[i].size(); j++) {
             double prevresp = storedResponses[i][j];
             if (std::abs(prevresp) > tol) {
-              *out << std::setw(value_width)
-                   << (Thyra::get_ele(*g, j) - prevresp) / prevresp << " ";
+              *out << std::setw(value_width) << (Thyra::get_ele(*g, j) - prevresp) / prevresp << " ";
             } else {
               *out << " N/A(int. value 0) ";
             }
@@ -256,8 +227,7 @@ PiroObserver::observeResponse(
       if ((!firstResponseObtained) && calculateRelativeResponses) {
         int gsize = g->space()->dim();
         storedResponses[i].resize(gsize);
-        for (int j = 0; j < gsize; j++)
-          storedResponses[i][j] = Thyra::get_ele(*g, j);
+        for (int j = 0; j < gsize; j++) storedResponses[i][j] = Thyra::get_ele(*g, j);
       }  // end if !firstRessponseObtained
     }    // end of loop over outArgs.Ng()
     firstResponseObtained = true;

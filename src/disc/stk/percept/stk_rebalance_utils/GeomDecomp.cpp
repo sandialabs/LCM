@@ -51,13 +51,11 @@ GeomDecomp::entity_coordinates(
       const percept::MyPairIterRelation::MyRelation& rel = nr[inr];
       // if (rel.entity_rank() ==  NODE_RANK) { // %fixme: need to check for
       // USES relation
-      if (bulk_data.entity_rank(rel.entity()) ==
-          NODE_RANK) {  // %fixme: need to check for USES relation
+      if (bulk_data.entity_rank(rel.entity()) == NODE_RANK) {  // %fixme: need to check for USES relation
         const mesh::Entity nent = rel.entity();
         // const unsigned ndim(nodal_coor.max_size(NODE_RANK)/sizeof(double));
         // // TODO - is there a better way to get this info?
-        const unsigned ndim(nodal_coor.max_size(
-            NODE_RANK));  // TODO - is there a better way to get this info?
+        const unsigned ndim(nodal_coor.max_size(NODE_RANK));  // TODO - is there a better way to get this info?
         double*        coor = mesh::field_data(nodal_coor, nent);
         if (!coor) {
           throw std::runtime_error(
@@ -84,16 +82,13 @@ GeomDecomp::compute_entity_centroid(
   std::vector<std::vector<double>> coordinates;
   stk::mesh::EntityRank            entity_rank = bulk_data.entity_rank(entity);
   if (entity_rank == stk::topology::ELEMENT_RANK + 1) {
-    for (stk::mesh::EntityRank irank = stk::topology::NODE_RANK;
-         irank <= stk::topology::ELEMENT_RANK;
-         ++irank) {
+    for (stk::mesh::EntityRank irank = stk::topology::NODE_RANK; irank <= stk::topology::ELEMENT_RANK; ++irank) {
       const percept::MyPairIterRelation nr(bulk_data, entity, irank);
       for (unsigned ii = 0; ii < nr.size(); ++ii) {
         stk::mesh::Entity                elem = nr[ii].entity();
         std::vector<std::vector<double>> coordinates_1;
         entity_coordinates(bulk_data, elem, nodal_coor_ref, coordinates_1);
-        coordinates.insert(
-            coordinates.end(), coordinates_1.begin(), coordinates_1.end());
+        coordinates.insert(coordinates.end(), coordinates_1.begin(), coordinates_1.end());
       }
     }
   } else {

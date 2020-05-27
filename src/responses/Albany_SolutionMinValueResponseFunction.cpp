@@ -62,9 +62,8 @@ SolutionMinValueResponseFunction::evaluateGradient(
 
   // Evaluate dg/dx
   if (!dg_dx.is_null()) {
-    Teuchos::ArrayRCP<const ST> x_constView = getLocalData(x);
-    Teuchos::ArrayRCP<ST>       dg_dx_nonconstView =
-        getNonconstLocalData(dg_dx->col(0));
+    Teuchos::ArrayRCP<const ST> x_constView        = getLocalData(x);
+    Teuchos::ArrayRCP<ST>       dg_dx_nonconstView = getNonconstLocalData(dg_dx->col(0));
     for (int i = 0; i < x_constView.size(); ++i) {
       if (x_constView[i] == min_val) {
         dg_dx_nonconstView[i] = 1.0;
@@ -85,9 +84,7 @@ SolutionMinValueResponseFunction::evaluateGradient(
 }
 
 void
-SolutionMinValueResponseFunction::computeMinValue(
-    Teuchos::RCP<Thyra_Vector const> const& x,
-    ST&                                     global_min)
+SolutionMinValueResponseFunction::computeMinValue(Teuchos::RCP<Thyra_Vector const> const& x, ST& global_min)
 {
   auto x_local = getLocalData(x);
 

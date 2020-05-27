@@ -58,9 +58,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   NeumannBase(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d) = 0;
@@ -76,7 +74,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   const Teuchos::RCP<Albany::Layouts>&         dl;
   const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs;
 
-  int cellDims, numQPs, numNodes, numCells, maxSideDim, maxNumQpSide;
+  int                 cellDims, numQPs, numNodes, numCells, maxSideDim, maxNumQpSide;
   Teuchos::Array<int> offset;
   int                 numDOFsSet;
 
@@ -85,9 +83,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // dudn scaled
   void
-  calc_dudn_const(
-      Kokkos::DynRankView<ScalarT, PHX::Device>& qp_data_returned,
-      ScalarT                                    scale = 1.0) const;
+  calc_dudn_const(Kokkos::DynRankView<ScalarT, PHX::Device>& qp_data_returned, ScalarT scale = 1.0) const;
 
   // robin (also uses flux scaling)
   void
@@ -104,36 +100,32 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   // (dudx, dudy, dudz)
   void
   calc_gradu_dotn_const(
-      Kokkos::DynRankView<ScalarT, PHX::Device>& qp_data_returned,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>&
-                                  jacobian_side_refcell,
-      const shards::CellTopology& celltopo,
-      int                         local_side_id) const;
+      Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
+      const shards::CellTopology&                          celltopo,
+      int                                                  local_side_id) const;
 
   // (t_x, t_y, t_z)
   void
-  calc_traction_components(
-      Kokkos::DynRankView<ScalarT, PHX::Device>& qp_data_returned) const;
+  calc_traction_components(Kokkos::DynRankView<ScalarT, PHX::Device>& qp_data_returned) const;
 
   // Pressure P
   void
   calc_press(
-      Kokkos::DynRankView<ScalarT, PHX::Device>& qp_data_returned,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>&
-                                  jacobian_side_refcell,
-      const shards::CellTopology& celltopo,
-      int                         local_side_id) const;
+      Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
+      const shards::CellTopology&                          celltopo,
+      int                                                  local_side_id) const;
 
   // closed_from bc assignment
   void
   calc_closed_form(
       Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
       const Kokkos::DynRankView<MeshScalarT, PHX::Device>& physPointsSide,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>&
-                                  jacobian_side_refcell,
-      const shards::CellTopology& celltopo,
-      int                         local_side_id,
-      typename Traits::EvalData   workset) const;
+      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
+      const shards::CellTopology&                          celltopo,
+      int                                                  local_side_id,
+      typename Traits::EvalData                            workset) const;
 
   // Do the side integration
   void
@@ -144,11 +136,10 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   PHX::MDField<const MeshScalarT, Cell, Vertex, Dim> coordVec;
   PHX::MDField<ScalarT const>                        dof;
 
-  Teuchos::RCP<shards::CellTopology>                    cellType;
-  Teuchos::ArrayRCP<Teuchos::RCP<shards::CellTopology>> sideType;
-  Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>        cubatureCell;
-  Teuchos::ArrayRCP<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>
-      cubatureSide;
+  Teuchos::RCP<shards::CellTopology>                                cellType;
+  Teuchos::ArrayRCP<Teuchos::RCP<shards::CellTopology>>             sideType;
+  Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>                    cubatureCell;
+  Teuchos::ArrayRCP<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>> cubatureSide;
 
   // The basis
   Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
@@ -168,10 +159,8 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   Kokkos::DynRankView<MeshScalarT, PHX::Device> jacobianSide_buffer;
   Kokkos::DynRankView<MeshScalarT, PHX::Device> jacobianSide_det_buffer;
   Kokkos::DynRankView<MeshScalarT, PHX::Device> weighted_measure_buffer;
-  Kokkos::DynRankView<MeshScalarT, PHX::Device>
-      trans_basis_refPointsSide_buffer;
-  Kokkos::DynRankView<MeshScalarT, PHX::Device>
-                                                weighted_trans_basis_refPointsSide_buffer;
+  Kokkos::DynRankView<MeshScalarT, PHX::Device> trans_basis_refPointsSide_buffer;
+  Kokkos::DynRankView<MeshScalarT, PHX::Device> weighted_trans_basis_refPointsSide_buffer;
   Kokkos::DynRankView<MeshScalarT, PHX::Device> side_normals_buffer;
   Kokkos::DynRankView<MeshScalarT, PHX::Device> normal_lengths_buffer;
 
@@ -195,8 +184,8 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   NEU_TYPE                  bc_type;
   Teuchos::Array<SIDE_TYPE> side_type;
   ScalarT                   const_val;
-  ScalarT robin_vals[5];  // (dof_value, coeff multiplying difference (dof -
-                          // dof_value), jump)
+  ScalarT                   robin_vals[5];  // (dof_value, coeff multiplying difference (dof -
+                                            // dof_value), jump)
   std::vector<ScalarT> dudx;
 
   std::vector<ScalarT> matScaling;
@@ -215,8 +204,7 @@ class Neumann;
 // Residual
 // **************************************************************
 template <typename Traits>
-class Neumann<PHAL::AlbanyTraits::Residual, Traits>
-    : public NeumannBase<PHAL::AlbanyTraits::Residual, Traits>
+class Neumann<PHAL::AlbanyTraits::Residual, Traits> : public NeumannBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   Neumann(Teuchos::ParameterList& p);
@@ -231,8 +219,7 @@ class Neumann<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class Neumann<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public NeumannBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class Neumann<PHAL::AlbanyTraits::Jacobian, Traits> : public NeumannBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   Neumann(Teuchos::ParameterList& p);
@@ -247,8 +234,7 @@ class Neumann<PHAL::AlbanyTraits::Jacobian, Traits>
 // Evaluator to aggregate all Neumann BCs into one "field"
 // **************************************************************
 template <typename EvalT, typename Traits>
-class NeumannAggregator : public PHX::EvaluatorWithBaseImpl<Traits>,
-                          public PHX::EvaluatorDerived<EvalT, Traits>
+class NeumannAggregator : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  private:
   typedef typename EvalT::ScalarT ScalarT;
@@ -257,9 +243,7 @@ class NeumannAggregator : public PHX::EvaluatorWithBaseImpl<Traits>,
   NeumannAggregator(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void evaluateFields(typename Traits::EvalData /* d */){};
 };

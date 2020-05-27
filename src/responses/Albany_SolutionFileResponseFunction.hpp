@@ -60,9 +60,7 @@ class SolutionFileResponseFunction : public SamplingBasedScalarResponseFunction
 
  private:
   int
-  MatrixMarketFile(
-      char const*                            filename,
-      Teuchos::RCP<Thyra_MultiVector> const& mv);
+  MatrixMarketFile(char const* filename, Teuchos::RCP<Thyra_MultiVector> const& mv);
 
   //! Reference Vector - Thyra
   Teuchos::RCP<Thyra_Vector> RefSoln;
@@ -84,10 +82,7 @@ struct NormTwo
   }
 
   static void
-  NormDerivative(
-      Thyra_Vector const& x,
-      Thyra_Vector const& soln,
-      Thyra_Vector&       grad)
+  NormDerivative(Thyra_Vector const& x, Thyra_Vector const& soln, Thyra_Vector& grad)
   {
     Teuchos::Array<ST> coeffs(2);
     coeffs[0] = 2.0;
@@ -108,10 +103,7 @@ struct NormInf
   }
 
   static void
-  NormDerivative(
-      Thyra_Vector const& /* x */,
-      Thyra_Vector const& /* soln */,
-      Thyra_Vector& /* grad */)
+  NormDerivative(Thyra_Vector const& /* x */, Thyra_Vector const& /* soln */, Thyra_Vector& /* grad */)
   {
     ALBANY_ABORT(
         "SolutionFileResponseFunction::NormInf::NormDerivative is not "

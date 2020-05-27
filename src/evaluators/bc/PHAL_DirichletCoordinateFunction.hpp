@@ -34,10 +34,10 @@ namespace PHAL {
 // factory (and all of FactoryTraits.hpp), we can go back to using it if it's of
 // use.
 
-template<typename EvalT, typename Traits/*, typename cfunc_traits = PHAL::IdentityCoordFunctionTraits<EvalT>*/ >
+template <typename EvalT, typename Traits /*, typename cfunc_traits = PHAL::IdentityCoordFunctionTraits<EvalT>*/>
 class DirichletCoordFunction;
 
-template <typename EvalT, typename Traits/*, typename cfunc_traits = PHAL::IdentityCoordFunctionTraits<EvalT>*/ >
+template <typename EvalT, typename Traits /*, typename cfunc_traits = PHAL::IdentityCoordFunctionTraits<EvalT>*/>
 class DirichletCoordFunction_Base : public PHAL::DirichletBase<EvalT, Traits>
 {
  public:
@@ -56,12 +56,8 @@ class DirichletCoordFunction_Base : public PHAL::DirichletBase<EvalT, Traits>
 // **************************************************************
 
 template <typename Traits /*, typename cfunc_traits*/>
-class DirichletCoordFunction<
-    PHAL::AlbanyTraits::Residual,
-    Traits /*, cfunc_traits*/>
-    : public DirichletCoordFunction_Base<
-          PHAL::AlbanyTraits::Residual,
-          Traits /*, cfunc_traits*/>
+class DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>
+    : public DirichletCoordFunction_Base<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>
 {
  public:
   DirichletCoordFunction(Teuchos::ParameterList& p);
@@ -75,12 +71,8 @@ class DirichletCoordFunction<
 // **************************************************************
 
 template <typename Traits /*, typename cfunc_traits*/>
-class DirichletCoordFunction<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits /*, cfunc_traits*/>
-    : public DirichletCoordFunction_Base<
-          PHAL::AlbanyTraits::Jacobian,
-          Traits /*, cfunc_traits*/>
+class DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>
+    : public DirichletCoordFunction_Base<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>
 {
  public:
   DirichletCoordFunction(Teuchos::ParameterList& p);

@@ -12,9 +12,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-BodyForce<EvalT, Traits>::BodyForce(
-    Teuchos::ParameterList&       p,
-    Teuchos::RCP<Albany::Layouts> dl)
+BodyForce<EvalT, Traits>::BodyForce(Teuchos::ParameterList& p, Teuchos::RCP<Albany::Layouts> dl)
     : body_force_("Body Force", dl->qp_vector),
       density_(p.get<RealType>("Density")),
       weights_("Weights", dl->qp_scalar),
@@ -35,18 +33,14 @@ BodyForce<EvalT, Traits>::BodyForce(
     is_constant_    = true;
     constant_value_ = p.get<Teuchos::Array<RealType>>("Value");
   } else if (type == "Centripetal") {
-    is_constant_     = false;
-    rotation_center_ = p.get<Teuchos::Array<RealType>>(
-        "Rotation Center", Teuchos::tuple<double>(0.0, 0.0, 0.0));
-    rotation_axis_ = p.get<Teuchos::Array<RealType>>(
-        "Rotation Axis", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+    is_constant_       = false;
+    rotation_center_   = p.get<Teuchos::Array<RealType>>("Rotation Center", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+    rotation_axis_     = p.get<Teuchos::Array<RealType>>("Rotation Axis", Teuchos::tuple<double>(0.0, 0.0, 0.0));
     angular_frequency_ = p.get<RealType>("Angular Frequency", 0.0);
 
     // Ensure that axisDirection is normalized
     double len = 0.0;
-    for (int i = 0; i < 3; i++) {
-      len += this->rotation_axis_[i] * this->rotation_axis_[i];
-    }
+    for (int i = 0; i < 3; i++) { len += this->rotation_axis_[i] * this->rotation_axis_[i]; }
 
     len = sqrt(len);
     for (int i = 0; i < 3; i++) { this->rotation_axis_[i] /= len; }
@@ -62,9 +56,7 @@ BodyForce<EvalT, Traits>::BodyForce(
 
 template <typename EvalT, typename Traits>
 void
-BodyForce<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+BodyForce<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(body_force_, fm);
   if (is_constant_ == false) this->utils.setFieldData(coordinates_, fm);
@@ -80,9 +72,7 @@ BodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   if (is_constant_ == true) {
     for (int cell = 0; cell < num_cells; ++cell) {
       for (int qp = 0; qp < num_qp_; ++qp) {
-        for (int dim = 0; dim < num_dim_; ++dim) {
-          body_force_(cell, qp, dim) = constant_value_[dim];
-        }
+        for (int dim = 0; dim < num_dim_; ++dim) { body_force_(cell, qp, dim) = constant_value_[dim]; }
       }
     }
   } else {
@@ -95,8 +85,7 @@ BodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         // Determine the qp's distance from the axis of rotation
         len2 = dot = 0.;
         for (std::size_t dim = 0; dim < num_dim_; dim++) {
-          xyz[dim] = f_dir[dim] =
-              this->coordinates_(cell, qp, dim) - this->rotation_center_[dim];
+          xyz[dim] = f_dir[dim] = this->coordinates_(cell, qp, dim) - this->rotation_center_[dim];
           dot += xyz[dim] * this->rotation_axis_[dim];
           len2 += xyz[dim] * xyz[dim];
         }
@@ -109,18 +98,14 @@ BodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
           len2 += f_dir[dim] * f_dir[dim];
         }
         MeshScalarT len_reciprocal = 1. / sqrt(len2);
-        for (std::size_t dim = 0; dim < num_dim_; dim++) {
-          f_dir[dim] *= len_reciprocal;
-        }
+        for (std::size_t dim = 0; dim < num_dim_; dim++) { f_dir[dim] *= len_reciprocal; }
 
         // Determine the qp's mass
         // qpmass = weights_(cell,qp) * density_(cell, qp);
         // qp volume * density - Is this right?
         qpmass = weights_(cell, qp) * density_;
         f_mag  = qpmass * omega2 * r;
-        for (std::size_t dim = 0; dim < num_dim_; dim++)
-
-          this->body_force_(cell, qp, dim) = f_dir[dim] * f_mag;
+        for (std::size_t dim = 0; dim < num_dim_; dim++) this->body_force_(cell, qp, dim) = f_dir[dim] * f_mag;
       }
     }
   }

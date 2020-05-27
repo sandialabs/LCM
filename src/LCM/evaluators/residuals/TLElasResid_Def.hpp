@@ -13,22 +13,14 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 TLElasResid<EvalT, Traits>::TLElasResid(Teuchos::ParameterList const& p)
-    : stress(
-          p.get<std::string>("Stress Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      J(p.get<std::string>("DetDefGrad Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      defgrad(
-          p.get<std::string>("DefGrad Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+    : stress(p.get<std::string>("Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      defgrad(p.get<std::string>("DefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       wGradBF(
           p.get<std::string>("Weighted Gradient BF Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      wBF(p.get<std::string>("Weighted BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      Residual(
-          p.get<std::string>("Residual Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
+      wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
+      Residual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
   this->addDependentField(stress);
   this->addDependentField(J);
@@ -47,8 +39,7 @@ TLElasResid<EvalT, Traits>::TLElasResid(Teuchos::ParameterList const& p)
   numDims     = dims[3];
   worksetSize = dims[0];
 
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library");
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library");
 
   matModel = p.get<std::string>("Stress Name");
 
@@ -59,9 +50,7 @@ TLElasResid<EvalT, Traits>::TLElasResid(Teuchos::ParameterList const& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-TLElasResid<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+TLElasResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(stress, fm);
   this->utils.setFieldData(J, fm);
@@ -72,14 +61,10 @@ TLElasResid<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(Residual, fm);
 
   // Works space FCs
-  F_inv = Kokkos::createDynRankView(
-      J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  F_invT = Kokkos::createDynRankView(
-      J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  JF_invT = Kokkos::createDynRankView(
-      J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  P = Kokkos::createDynRankView(
-      J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  F_inv   = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  F_invT  = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  JF_invT = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  P       = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
 }
 
 //*****
@@ -99,8 +84,7 @@ TLElasResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         for (int qp = 0; qp < numQPs; ++qp) {
           for (int i = 0; i < numDims; i++) {
             for (int j = 0; j < numDims; j++) {
-              Residual(cell, node, i) +=
-                  stress(cell, qp, i, j) * wGradBF(cell, node, qp, j);
+              Residual(cell, node, i) += stress(cell, qp, i, j) * wGradBF(cell, node, qp, j);
             }
           }
         }
@@ -117,8 +101,7 @@ TLElasResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         for (int qp = 0; qp < numQPs; ++qp) {
           for (int i = 0; i < numDims; i++) {
             for (int j = 0; j < numDims; j++) {
-              Residual(cell, node, i) +=
-                  P(cell, qp, i, j) * wGradBF(cell, node, qp, j);
+              Residual(cell, node, i) += P(cell, qp, i, j) * wGradBF(cell, node, qp, j);
             }
           }
         }

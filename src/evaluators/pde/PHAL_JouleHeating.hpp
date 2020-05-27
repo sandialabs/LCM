@@ -20,8 +20,7 @@ namespace PHAL {
  * \brief Joule heating source term for ThermoElectrostatics
  */
 template <typename EvalT, typename Traits>
-class JouleHeating : public PHX::EvaluatorWithBaseImpl<Traits>,
-                     public PHX::EvaluatorDerived<EvalT, Traits>
+class JouleHeating : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   typedef typename EvalT::ScalarT     ScalarT;
@@ -30,9 +29,7 @@ class JouleHeating : public PHX::EvaluatorWithBaseImpl<Traits>,
   JouleHeating(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

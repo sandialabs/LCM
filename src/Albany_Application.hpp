@@ -37,8 +37,7 @@ class Manager;
 
 namespace Albany {
 
-class Application
-    : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residual, SPL_Traits>
+class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residual, SPL_Traits>
 {
  public:
   enum SolutionMethod
@@ -83,7 +82,7 @@ class Application
   void
   finalSetUp(
       const Teuchos::RCP<Teuchos::ParameterList>& params,
-      Teuchos::RCP<Thyra_Vector const> const& initial_guess = Teuchos::null);
+      Teuchos::RCP<Thyra_Vector const> const&     initial_guess = Teuchos::null);
 
   //! Get underlying abstract discretization
   Teuchos::RCP<Albany::AbstractDiscretization>
@@ -281,9 +280,7 @@ class Application
       Teuchos::Ptr<Thyra_Vector const> xdotdot);
 
   void
-  evaluateStateFieldManager(
-      double const             current_time,
-      const Thyra_MultiVector& x);
+  evaluateStateFieldManager(double const current_time, const Thyra_MultiVector& x);
 
   //! Access to number of worksets - needed for working with StateManager
   int
@@ -334,10 +331,7 @@ class Application
   //! Routine to get workset (bucket) size info needed by all Evaluation types
   template <typename EvalT>
   void
-  loadWorksetBucketInfo(
-      PHAL::Workset&     workset,
-      int const&         ws,
-      std::string const& evalName);
+  loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::string const& evalName);
 
   void
   loadBasicWorksetInfo(PHAL::Workset& workset, double current_time);
@@ -349,11 +343,7 @@ class Application
       double const                            current_time);
 
   void
-  loadWorksetJacobianInfo(
-      PHAL::Workset& workset,
-      double const   alpha,
-      double const   beta,
-      double const   omega);
+  loadWorksetJacobianInfo(PHAL::Workset& workset, double const alpha, double const beta, double const omega);
 
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>
   getEnrichedMeshSpecs() const
@@ -373,9 +363,7 @@ class Application
   void
   setScale(Teuchos::RCP<const Thyra_LinearOp> jac = Teuchos::null);
   void
-  setScaleBCDofs(
-      PHAL::Workset&                     workset,
-      Teuchos::RCP<const Thyra_LinearOp> jac = Teuchos::null);
+  setScaleBCDofs(PHAL::Workset& workset, Teuchos::RCP<const Thyra_LinearOp> jac = Teuchos::null);
 
   void
   setupBasicWorksetInfo(
@@ -406,14 +394,11 @@ class Application
   double
   fixTime(double const current_time) const
   {
-    bool const use_time_param = (paramLib->isParameter("Time") == true) &&
-                                (getSchwarzAlternating() == false) &&
-                                (solMethod != TransientTempus);
+    bool const use_time_param =
+        (paramLib->isParameter("Time") == true) && (getSchwarzAlternating() == false) && (solMethod != TransientTempus);
 
     double const this_time =
-        use_time_param == true ?
-            paramLib->getRealValue<PHAL::AlbanyTraits::Residual>("Time") :
-            current_time;
+        use_time_param == true ? paramLib->getRealValue<PHAL::AlbanyTraits::Residual>("Time") : current_time;
 
     return this_time;
   }
@@ -565,8 +550,7 @@ class Application
 
   Teuchos::RCP<std::map<std::string, int>> app_name_index_map_{Teuchos::null};
 
-  std::map<int, std::pair<std::string, std::string>>
-      coupled_app_index_block_nodeset_names_map_;
+  std::map<int, std::pair<std::string, std::string>> coupled_app_index_block_nodeset_names_map_;
 
   Teuchos::RCP<Thyra_Vector const> x_{Teuchos::null};
   Teuchos::RCP<Thyra_Vector const> xdot_{Teuchos::null};
@@ -588,18 +572,17 @@ class Application
   bool requires_sdbcs_{false};
   bool requires_orig_dbcs_{false};
 
-  Teuchos::RCP<Teuchos_Comm const>             comm{Teuchos::null};
-  Teuchos::RCP<Teuchos::FancyOStream>          out{Teuchos::null};
-  Teuchos::RCP<Albany::AbstractDiscretization> disc{Teuchos::null};
-  Teuchos::RCP<Albany::DiscretizationFactory>  discFactory{Teuchos::null};
-  Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs{
-      Teuchos::null};
-  Teuchos::RCP<Albany::AbstractProblem>         problem{Teuchos::null};
-  Teuchos::RCP<Teuchos::ParameterList>          problemParams{Teuchos::null};
-  Teuchos::RCP<Teuchos::ParameterList>          params_{Teuchos::null};
-  Teuchos::RCP<ParamLib>                        paramLib{Teuchos::null};
-  Teuchos::RCP<DistributedParameterLibrary>     distParamLib{Teuchos::null};
-  Teuchos::RCP<AAdapt::AdaptiveSolutionManager> solMgr{Teuchos::null};
+  Teuchos::RCP<Teuchos_Comm const>                         comm{Teuchos::null};
+  Teuchos::RCP<Teuchos::FancyOStream>                      out{Teuchos::null};
+  Teuchos::RCP<Albany::AbstractDiscretization>             disc{Teuchos::null};
+  Teuchos::RCP<Albany::DiscretizationFactory>              discFactory{Teuchos::null};
+  Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs{Teuchos::null};
+  Teuchos::RCP<Albany::AbstractProblem>                    problem{Teuchos::null};
+  Teuchos::RCP<Teuchos::ParameterList>                     problemParams{Teuchos::null};
+  Teuchos::RCP<Teuchos::ParameterList>                     params_{Teuchos::null};
+  Teuchos::RCP<ParamLib>                                   paramLib{Teuchos::null};
+  Teuchos::RCP<DistributedParameterLibrary>                distParamLib{Teuchos::null};
+  Teuchos::RCP<AAdapt::AdaptiveSolutionManager>            solMgr{Teuchos::null};
 
   // Reference configuration (update) manager
   Teuchos::RCP<AAdapt::rc::Manager> rc_mgr{Teuchos::null};
@@ -678,8 +661,7 @@ class Application
   double perturbBetaForDirichlets{0.0};
 
   void
-  determinePiroSolver(
-      const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams);
+  determinePiroSolver(const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams);
 
   int derivatives_check_{0};
   int num_time_deriv{0};
@@ -702,10 +684,7 @@ class Application
 
 template <typename EvalT>
 void
-Application::loadWorksetBucketInfo(
-    PHAL::Workset&     workset,
-    int const&         ws,
-    std::string const& evalName)
+Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::string const& evalName)
 {
   auto const& wsElNodeEqID            = disc->getWsElNodeEqID();
   auto const& wsElNodeID              = disc->getWsElNodeID();
@@ -718,26 +697,15 @@ Application::loadWorksetBucketInfo(
   auto const& edge_boundary_indicator = disc->getEdgeBoundaryIndicator();
   auto const& node_boundary_indicator = disc->getNodeBoundaryIndicator();
 
-  auto const has_cell = cell_boundary_indicator != Teuchos::null &&
-                        ws < cell_boundary_indicator.size();
-  auto const has_face = face_boundary_indicator != Teuchos::null &&
-                        ws < face_boundary_indicator.size();
-  auto const has_edge = edge_boundary_indicator != Teuchos::null &&
-                        ws < edge_boundary_indicator.size();
+  auto const has_cell = cell_boundary_indicator != Teuchos::null && ws < cell_boundary_indicator.size();
+  auto const has_face = face_boundary_indicator != Teuchos::null && ws < face_boundary_indicator.size();
+  auto const has_edge = edge_boundary_indicator != Teuchos::null && ws < edge_boundary_indicator.size();
   auto const has_node = node_boundary_indicator.size() > 0;
 
-  if (has_cell == true) {
-    workset.cell_boundary_indicator = cell_boundary_indicator[ws];
-  }
-  if (has_face == true) {
-    workset.face_boundary_indicator = face_boundary_indicator[ws];
-  }
-  if (has_edge == true) {
-    workset.edge_boundary_indicator = edge_boundary_indicator[ws];
-  }
-  if (has_node == true) {
-    workset.node_boundary_indicator = node_boundary_indicator;
-  }
+  if (has_cell == true) { workset.cell_boundary_indicator = cell_boundary_indicator[ws]; }
+  if (has_face == true) { workset.face_boundary_indicator = face_boundary_indicator[ws]; }
+  if (has_edge == true) { workset.edge_boundary_indicator = edge_boundary_indicator[ws]; }
+  if (has_node == true) { workset.node_boundary_indicator = node_boundary_indicator; }
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);
   workset.wsElNodeEqID         = wsElNodeEqID[ws];
@@ -755,8 +723,7 @@ Application::loadWorksetBucketInfo(
   // Sidesets are integrated within the Cells
   loadWorksetSidesetInfo(workset, ws);
 
-  workset.stateArrayPtr =
-      &stateMgr.getStateArray(Albany::StateManager::ELEM, ws);
+  workset.stateArrayPtr = &stateMgr.getStateArray(Albany::StateManager::ELEM, ws);
 }
 
 }  // namespace Albany

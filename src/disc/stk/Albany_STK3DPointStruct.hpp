@@ -17,26 +17,21 @@ class STK3DPointStruct : public GenericSTKMeshStruct
 {
  public:
   //! Default constructor
-  STK3DPointStruct(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<Teuchos_Comm const>&     commT);
+  STK3DPointStruct(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   ~STK3DPointStruct();
 
   //! Sets mesh generation parameters
   void
   setFieldAndBulkData(
-      const Teuchos::RCP<Teuchos_Comm const>&                   commT,
-      const Teuchos::RCP<Teuchos::ParameterList>&               params,
-      const unsigned int                                        neq_,
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-      const unsigned int                                        worksetSize,
-      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&
-          side_set_sis = {},
-      const std::
-          map<std::string, AbstractFieldContainer::FieldContainerRequirements>&
-              side_set_req = {});
+      const Teuchos::RCP<Teuchos_Comm const>&                                          commT,
+      const Teuchos::RCP<Teuchos::ParameterList>&                                      params,
+      const unsigned int                                                               neq_,
+      const AbstractFieldContainer::FieldContainerRequirements&                        req,
+      const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
+      const unsigned int                                                               worksetSize,
+      std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis = {},
+      const std::map<std::string, AbstractFieldContainer::FieldContainerRequirements>& side_set_req = {});
 
   //! Flag if solution has a restart values -- used in Init Cond
   bool

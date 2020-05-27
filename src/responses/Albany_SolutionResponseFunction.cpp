@@ -19,8 +19,7 @@ SolutionResponseFunction::SolutionResponseFunction(
   // This should be replaced by DOF names eventually
   int numDOF = application->getProblem()->numEquations();
   if (responseParams.isType<Teuchos::Array<int>>("Keep DOF Indices")) {
-    Teuchos::Array<int> dofs =
-        responseParams.get<Teuchos::Array<int>>("Keep DOF Indices");
+    Teuchos::Array<int> dofs = responseParams.get<Teuchos::Array<int>>("Keep DOF Indices");
     keepDOF.resize(numDOF, false);
     numKeepDOF = 0;
     for (int i = 0; i < dofs.size(); i++) {
@@ -51,17 +50,13 @@ Albany::SolutionResponseFunction::setup()
   Teuchos::Array<LO> subspace_components(N_new);
   for (int ieqn = 0, idx = 0; ieqn < Neqns; ++ieqn) {
     if (keepDOF[ieqn]) {
-      for (int inode = 0; inode < nnodes; ++inode, ++idx) {
-        subspace_components[idx] = inode * Neqns + ieqn;
-      }
+      for (int inode = 0; inode < nnodes; ++inode, ++idx) { subspace_components[idx] = inode * Neqns + ieqn; }
     }
   }
-  culled_vs =
-      getSpmdVectorSpace(createSubspace(solution_vs, subspace_components));
+  culled_vs = getSpmdVectorSpace(createSubspace(solution_vs, subspace_components));
 
   // Create graph for gradient operator -- diagonal matrix
-  cull_op_factory =
-      Teuchos::rcp(new ThyraCrsMatrixFactory(solution_vs, culled_vs, 1));
+  cull_op_factory        = Teuchos::rcp(new ThyraCrsMatrixFactory(solution_vs, culled_vs, 1));
   auto culled_vs_indexer = createGlobalLocalIndexer(culled_vs);
   for (int i = 0; i < culled_vs->localSubDim(); i++) {
     const GO row = culled_vs_indexer->getGlobalElement(i);

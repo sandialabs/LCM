@@ -15,19 +15,10 @@ namespace LCM {
 ///
 /// Class for dealing with Albany traits. Native implementation.
 ///
-template <
-    typename MIN,
-    typename STEP,
-    typename FN,
-    typename EvalT,
-    minitensor::Index N>
+template <typename MIN, typename STEP, typename FN, typename EvalT, minitensor::Index N>
 struct MiniSolver
 {
-  MiniSolver(
-      MIN&                                            minimizer,
-      STEP&                                           step_method,
-      FN&                                             function,
-      minitensor::Vector<typename EvalT::ScalarT, N>& soln);
+  MiniSolver(MIN& minimizer, STEP& step_method, FN& function, minitensor::Vector<typename EvalT::ScalarT, N>& soln);
 };
 
 ///
@@ -96,12 +87,7 @@ struct MiniSolverROL<MIN, FN, PHAL::AlbanyTraits::Jacobian, N>
 /// Class for dealing with Albany traits. ROL implementation with bound
 /// constraints.
 ///
-template <
-    typename MIN,
-    typename FN,
-    typename BC,
-    typename EvalT,
-    minitensor::Index N>
+template <typename MIN, typename FN, typename BC, typename EvalT, minitensor::Index N>
 struct MiniSolverBoundsROL
 {
   MiniSolverBoundsROL(
@@ -145,13 +131,7 @@ struct MiniSolverBoundsROL<MIN, FN, BC, PHAL::AlbanyTraits::Jacobian, N>
 /// Class for dealing with Albany traits. ROL implementation with equality
 /// and inequality constraints.
 ///
-template <
-    typename MIN,
-    typename FN,
-    typename EIC,
-    typename EvalT,
-    minitensor::Index N,
-    minitensor::Index NC>
+template <typename MIN, typename FN, typename EIC, typename EvalT, minitensor::Index N, minitensor::Index NC>
 struct MiniSolverEqIneqROL
 {
   MiniSolverEqIneqROL(
@@ -168,44 +148,30 @@ struct MiniSolverEqIneqROL
 /// MiniSolver class specializations for Albany traits.
 /// Equality and inequality constraint ROL implementation.
 ///
-template <
-    typename MIN,
-    typename FN,
-    typename EIC,
-    minitensor::Index N,
-    minitensor::Index NC>
+template <typename MIN, typename FN, typename EIC, minitensor::Index N, minitensor::Index NC>
 struct MiniSolverEqIneqROL<MIN, FN, EIC, PHAL::AlbanyTraits::Residual, N, NC>
 {
   MiniSolverEqIneqROL(
-      MIN&                    minimizer,
-      std::string const&      algoname,
-      Teuchos::ParameterList& params,
-      FN&                     function,
-      EIC&                    eqineq,
-      minitensor::Vector<typename PHAL::AlbanyTraits::Residual::ScalarT, N>&
-          soln,
-      minitensor::Vector<typename PHAL::AlbanyTraits::Residual::ScalarT, NC>&
-          cv);
+      MIN&                                                                    minimizer,
+      std::string const&                                                      algoname,
+      Teuchos::ParameterList&                                                 params,
+      FN&                                                                     function,
+      EIC&                                                                    eqineq,
+      minitensor::Vector<typename PHAL::AlbanyTraits::Residual::ScalarT, N>&  soln,
+      minitensor::Vector<typename PHAL::AlbanyTraits::Residual::ScalarT, NC>& cv);
 };
 
-template <
-    typename MIN,
-    typename FN,
-    typename EIC,
-    minitensor::Index N,
-    minitensor::Index NC>
+template <typename MIN, typename FN, typename EIC, minitensor::Index N, minitensor::Index NC>
 struct MiniSolverEqIneqROL<MIN, FN, EIC, PHAL::AlbanyTraits::Jacobian, N, NC>
 {
   MiniSolverEqIneqROL(
-      MIN&                    minimizer,
-      std::string const&      algoname,
-      Teuchos::ParameterList& params,
-      FN&                     function,
-      EIC&                    eqineq,
-      minitensor::Vector<typename PHAL::AlbanyTraits::Jacobian::ScalarT, N>&
-          soln,
-      minitensor::Vector<typename PHAL::AlbanyTraits::Jacobian::ScalarT, NC>&
-          cv);
+      MIN&                                                                    minimizer,
+      std::string const&                                                      algoname,
+      Teuchos::ParameterList&                                                 params,
+      FN&                                                                     function,
+      EIC&                                                                    eqineq,
+      minitensor::Vector<typename PHAL::AlbanyTraits::Jacobian::ScalarT, N>&  soln,
+      minitensor::Vector<typename PHAL::AlbanyTraits::Jacobian::ScalarT, NC>& cv);
 };
 
 ///
@@ -216,10 +182,7 @@ struct MiniSolverEqIneqROL<MIN, FN, EIC, PHAL::AlbanyTraits::Jacobian, N, NC>
 ///
 template <typename T, typename S, minitensor::Index N>
 void
-computeFADInfo(
-    minitensor::Vector<T, N> const& r,
-    minitensor::Tensor<S, N> const& DrDx,
-    minitensor::Vector<T, N>&       x);
+computeFADInfo(minitensor::Vector<T, N> const& r, minitensor::Tensor<S, N> const& DrDx, minitensor::Vector<T, N>& x);
 
 ///
 /// Auxiliary functors that peel off derivative information from Albany::Traits
@@ -234,8 +197,7 @@ struct peel
 
   // This ugly return type is to avoid matching Tensor types.
   // If it does not match then it just becomes T.
-  using TS = typename minitensor::
-      disable_if_c<minitensor::order_1234<T>::value, T>::type;
+  using TS = typename minitensor::disable_if_c<minitensor::order_1234<T>::value, T>::type;
 
   TS
   operator()(S const& s)
@@ -364,9 +326,7 @@ struct peel_vector
     minitensor::Index const  dimension = s.get_dimension();
     minitensor::Vector<T, N> t(dimension);
     minitensor::Index const  num_components = s.get_number_components();
-    for (minitensor::Index i = 0; i < num_components; ++i) {
-      t[i] = peel<EvalT, T, M>()(s[i]);
-    }
+    for (minitensor::Index i = 0; i < num_components; ++i) { t[i] = peel<EvalT, T, M>()(s[i]); }
     return t;
   }
 };
@@ -383,9 +343,7 @@ struct peel_tensor
     minitensor::Tensor<T, N> t(dimension);
     minitensor::Index const  num_components = s.get_number_components();
 
-    for (minitensor::Index i = 0; i < num_components; ++i) {
-      t[i] = peel<EvalT, T, M>()(s[i]);
-    }
+    for (minitensor::Index i = 0; i < num_components; ++i) { t[i] = peel<EvalT, T, M>()(s[i]); }
     return t;
   }
 };
@@ -402,9 +360,7 @@ struct peel_tensor3
     minitensor::Tensor3<T, N> t(dimension);
     minitensor::Index const   num_components = s.get_number_components();
 
-    for (minitensor::Index i = 0; i < num_components; ++i) {
-      t[i] = peel<EvalT, T, M>()(s[i]);
-    }
+    for (minitensor::Index i = 0; i < num_components; ++i) { t[i] = peel<EvalT, T, M>()(s[i]); }
     return t;
   }
 };
@@ -421,9 +377,7 @@ struct peel_tensor4
     minitensor::Tensor4<T, N> t(dimension);
     minitensor::Index const   num_components = s.get_number_components();
 
-    for (minitensor::Index i = 0; i < num_components; ++i) {
-      t[i] = peel<EvalT, T, M>()(s[i]);
-    }
+    for (minitensor::Index i = 0; i < num_components; ++i) { t[i] = peel<EvalT, T, M>()(s[i]); }
     return t;
   }
 };

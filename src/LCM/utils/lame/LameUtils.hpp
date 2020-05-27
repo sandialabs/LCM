@@ -31,20 +31,15 @@ namespace LameUtils {
 
 //! Convert a Teuchos::ParameterList into a lame(nt)::MatProps structure.
 inline void
-parameterListToMatProps(
-    Teuchos::ParameterList const& lameMaterialParameters,
-    LameMatProps&                 matProps)
+parameterListToMatProps(Teuchos::ParameterList const& lameMaterialParameters, LameMatProps& matProps)
 {
   // load the material properties into the lame(nt)::MatProps container.
   // LAME material properties must be of type int, double, or string.
 
-  for (Teuchos::ParameterList::ConstIterator it =
-           lameMaterialParameters.begin();
-       it != lameMaterialParameters.end();
+  for (Teuchos::ParameterList::ConstIterator it = lameMaterialParameters.begin(); it != lameMaterialParameters.end();
        ++it) {
     std::string name = lameMaterialParameters.name(it);
-    std::transform(
-        name.begin(), name.end(), name.begin(), (int (*)(int))std::toupper);
+    std::transform(name.begin(), name.end(), name.begin(), (int (*)(int))std::toupper);
     std::replace(name.begin(), name.end(), ' ', '_');
 
     const Teuchos::ParameterEntry entry = lameMaterialParameters.entry(it);
@@ -92,10 +87,7 @@ constructLamentMaterialModel(
   // Strings should be all upper case with spaces replaced with underscores
   std::string materialModelName = lameMaterialModelName;
   std::transform(
-      materialModelName.begin(),
-      materialModelName.end(),
-      materialModelName.begin(),
-      (int (*)(int))std::toupper);
+      materialModelName.begin(), materialModelName.end(), materialModelName.begin(), (int (*)(int))std::toupper);
   std::replace(materialModelName.begin(), materialModelName.end(), ' ', '_');
 
   LameMatProps props;
@@ -109,9 +101,7 @@ constructLamentMaterialModel(
     materialModel = Teuchos::rcp(new lament::Neohookean<ScalarT>(props));
   else {
     if (materialModel.is_null())
-      ALBANY_ABORT(
-          " unsupported LAMENT material model: " + lameMaterialModelName +
-          " (" + materialModelName + ")\n");
+      ALBANY_ABORT(" unsupported LAMENT material model: " + lameMaterialModelName + " (" + materialModelName + ")\n");
   }
 
   return materialModel;
@@ -121,9 +111,7 @@ constructLamentMaterialModel(
 //! Return a vector containing the names of the state variables associated with
 //! the given LAME material model and material parameters.
 std::vector<std::string>
-getStateVariableNames(
-    std::string const&            lameMaterialModelName,
-    Teuchos::ParameterList const& lameMaterialParameters);
+getStateVariableNames(std::string const& lameMaterialModelName, Teuchos::ParameterList const& lameMaterialParameters);
 
 //! Return a vector containing the initial values for the state variables
 //! associated with the given LAME material model and material parameters.

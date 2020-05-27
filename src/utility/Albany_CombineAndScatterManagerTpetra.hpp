@@ -19,61 +19,43 @@ class CombineAndScatterManagerTpetra : public CombineAndScatterManager
 
   // Combine methods
   void
-  combine(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM)
-      const override;
+  combine(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM) const override;
   void
-  combine(
-      const Thyra_MultiVector& src,
-      Thyra_MultiVector&       dst,
-      const CombineMode        CM) const override;
+  combine(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM) const override;
   void
-  combine(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM)
-      const override;
+  combine(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM) const override;
 
   void
-  combine(
-      Teuchos::RCP<Thyra_Vector const> const& src,
-      Teuchos::RCP<Thyra_Vector> const&       dst,
-      const CombineMode                       CM) const override;
+  combine(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM)
+      const override;
   void
   combine(
       const Teuchos::RCP<const Thyra_MultiVector>& src,
       Teuchos::RCP<Thyra_MultiVector> const&       dst,
       const CombineMode                            CM) const override;
   void
-  combine(
-      const Teuchos::RCP<const Thyra_LinearOp>& src,
-      const Teuchos::RCP<Thyra_LinearOp>&       dst,
-      const CombineMode                         CM) const override;
+  combine(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM)
+      const override;
 
   // Scatter methods
   void
-  scatter(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM)
-      const override;
+  scatter(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM) const override;
   void
-  scatter(
-      const Thyra_MultiVector& src,
-      Thyra_MultiVector&       dst,
-      const CombineMode        CM) const override;
+  scatter(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM) const override;
   void
-  scatter(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM)
-      const override;
+  scatter(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM) const override;
 
   void
-  scatter(
-      Teuchos::RCP<Thyra_Vector const> const& src,
-      Teuchos::RCP<Thyra_Vector> const&       dst,
-      const CombineMode                       CM) const override;
+  scatter(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM)
+      const override;
   void
   scatter(
       const Teuchos::RCP<const Thyra_MultiVector>& src,
       Teuchos::RCP<Thyra_MultiVector> const&       dst,
       const CombineMode                            CM) const override;
   void
-  scatter(
-      const Teuchos::RCP<const Thyra_LinearOp>& src,
-      const Teuchos::RCP<Thyra_LinearOp>&       dst,
-      const CombineMode                         CM) const override;
+  scatter(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM)
+      const override;
 
  protected:
   void

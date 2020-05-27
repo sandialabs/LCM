@@ -15,24 +15,16 @@ namespace Albany {
 // ========= Vector Spaces utilities ========= //
 
 Teuchos::RCP<Thyra_VectorSpace const>
-createLocallyReplicatedVectorSpace(
-    int const                              size,
-    const Teuchos::RCP<Teuchos_Comm const> comm);
+createLocallyReplicatedVectorSpace(int const size, const Teuchos::RCP<Teuchos_Comm const> comm);
 
 Teuchos::RCP<Teuchos_Comm const>
 getComm(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 Teuchos::Array<GO>
-getGlobalElements(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<const LO>&          lids);
+getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<const LO>& lids);
 Teuchos::Array<LO>
-getLocalElements(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<const GO>&          gids);
+getLocalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<const GO>& gids);
 void
-getGlobalElements(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<GO>&                gids);
+getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<GO>& gids);
 LO
 getLocalSubdim(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 
@@ -41,15 +33,11 @@ getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 
 // Check if two vector spaces are indeed the same vector space
 bool
-sameAs(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs1,
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs2);
+sameAs(Teuchos::RCP<Thyra_VectorSpace const> const& vs1, Teuchos::RCP<Thyra_VectorSpace const> const& vs2);
 
 // Remove a set of local components from a vector space
 Teuchos::RCP<Thyra_VectorSpace const>
-removeComponents(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<const LO>&          local_components);
+removeComponents(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<const LO>& local_components);
 
 // The complement of the above: the specified components are the ones to keep
 Teuchos::RCP<Thyra_VectorSpace const>
@@ -62,7 +50,7 @@ Teuchos::RCP<const Thyra_SpmdVectorSpace>
 createVectorSpace(
     const Teuchos::RCP<Teuchos_Comm const>& comm,
     const Teuchos::ArrayView<const GO>&     gids,
-    const GO globalDim = Teuchos::OrdinalTraits<GO>::invalid());
+    const GO                                globalDim = Teuchos::OrdinalTraits<GO>::invalid());
 
 // Intersects vectors spaces
 Teuchos::RCP<Thyra_VectorSpace const>
@@ -92,9 +80,7 @@ Teuchos::RCP<Thyra_VectorSpace const>
 getRowSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop);
 
 std::size_t
-getNumEntriesInLocalRow(
-    const Teuchos::RCP<const Thyra_LinearOp>& lop,
-    const LO                                  lrow);
+getNumEntriesInLocalRow(const Teuchos::RCP<const Thyra_LinearOp>& lop, const LO lrow);
 
 // Fill related helpers
 bool
@@ -110,9 +96,7 @@ fillComplete(const Teuchos::RCP<Thyra_LinearOp>& lop);
 void
 assign(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST value);
 void
-getDiagonalCopy(
-    const Teuchos::RCP<const Thyra_LinearOp>& lop,
-    Teuchos::RCP<Thyra_Vector>&               diag);
+getDiagonalCopy(const Teuchos::RCP<const Thyra_LinearOp>& lop, Teuchos::RCP<Thyra_Vector>& diag);
 void
 getLocalRowValues(
     const Teuchos::RCP<Thyra_LinearOp>& lop,
@@ -127,10 +111,7 @@ setLocalRowValues(
     const Teuchos::ArrayView<const LO>  indices,
     const Teuchos::ArrayView<const ST>  values);
 void
-setLocalRowValues(
-    const Teuchos::RCP<Thyra_LinearOp>& lop,
-    const LO                            lrow,
-    const Teuchos::ArrayView<const ST>  values);
+setLocalRowValues(const Teuchos::RCP<Thyra_LinearOp>& lop, const LO lrow, const Teuchos::ArrayView<const ST> values);
 
 int
 addToLocalRowValues(
@@ -263,9 +244,7 @@ describe(
 // proper derived classes, and checking that the result is nonnull.
 
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
-getSpmdVectorSpace(
-    Teuchos::RCP<Thyra_VectorSpace const> const vs,
-    bool const                                  throw_on_failure = true);
+getSpmdVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const vs, bool const throw_on_failure = true);
 
 // ========= Thyra_ProductXYZ utilities ========== //
 
@@ -273,29 +252,19 @@ getSpmdVectorSpace(
 // proper derived classes, and checking that the result is nonnull.
 
 Teuchos::RCP<const Thyra_ProductVectorSpace>
-getProductVectorSpace(
-    Teuchos::RCP<Thyra_VectorSpace const> const vs,
-    bool const                                  throw_on_failure = true);
+getProductVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const vs, bool const throw_on_failure = true);
 
 Teuchos::RCP<Thyra_ProductVector>
-getProductVector(
-    Teuchos::RCP<Thyra_Vector> const v,
-    bool const                       throw_on_failure = true);
+getProductVector(Teuchos::RCP<Thyra_Vector> const v, bool const throw_on_failure = true);
 
 Teuchos::RCP<const Thyra_ProductVector>
-getConstProductVector(
-    Teuchos::RCP<Thyra_Vector const> const v,
-    bool const                             throw_on_failure = true);
+getConstProductVector(Teuchos::RCP<Thyra_Vector const> const v, bool const throw_on_failure = true);
 
 Teuchos::RCP<Thyra_ProductMultiVector>
-getProductMultiVector(
-    Teuchos::RCP<Thyra_MultiVector> const mv,
-    bool const                            throw_on_failure = true);
+getProductMultiVector(Teuchos::RCP<Thyra_MultiVector> const mv, bool const throw_on_failure = true);
 
 Teuchos::RCP<const Thyra_ProductMultiVector>
-getConstProductMultiVector(
-    const Teuchos::RCP<const Thyra_MultiVector> mv,
-    bool const                                  throw_on_failure = true);
+getConstProductMultiVector(const Teuchos::RCP<const Thyra_MultiVector> mv, bool const throw_on_failure = true);
 
 }  // namespace Albany
 

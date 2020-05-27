@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-LinearHMCModel<EvalT, Traits>::LinearHMCModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+LinearHMCModel<EvalT, Traits>::LinearHMCModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       numMicroScales(p->get<int>("Additional Scales")),
       C11(p->get<RealType>("C11")),
@@ -26,10 +24,10 @@ LinearHMCModel<EvalT, Traits>::LinearHMCModel(
   lengthScale.resize(numMicroScales);
   betaParameter.resize(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
-    std::string mySublist                 = Albany::strint("Microscale", i + 1);
-    Teuchos::ParameterList const& msModel = p->sublist(mySublist);
-    lengthScale[i]   = msModel.get<RealType>("Length Scale");
-    betaParameter[i] = msModel.get<RealType>("Beta Constant");
+    std::string                   mySublist = Albany::strint("Microscale", i + 1);
+    Teuchos::ParameterList const& msModel   = p->sublist(mySublist);
+    lengthScale[i]                          = msModel.get<RealType>("Length Scale");
+    betaParameter[i]                        = msModel.get<RealType>("Beta Constant");
   }
 
   // define the dependent fields
@@ -45,8 +43,7 @@ LinearHMCModel<EvalT, Traits>::LinearHMCModel(
     std::stringstream sgradname;
     sgradname << "Microstrain " << i << " Gradient";
     microStrainGradientName[i] = sgradname.str();
-    this->dep_field_map_.insert(
-        std::make_pair(sgradname.str(), dl->qp_tensor3));
+    this->dep_field_map_.insert(std::make_pair(sgradname.str(), dl->qp_tensor3));
   }
 
   // define the evaluated fields
@@ -82,7 +79,7 @@ LinearHMCModel<EvalT, Traits>::computeState(
     FieldMap                  eval_fields)
 {
   // extract independent MDFields
-  auto macroStrain = *dep_fields[macroStrainName];
+  auto                                     macroStrain = *dep_fields[macroStrainName];
   std::vector<PHX::MDField<ScalarT const>> strainDifference(numMicroScales);
   std::vector<PHX::MDField<ScalarT const>> microStrainGradient(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
@@ -91,7 +88,7 @@ LinearHMCModel<EvalT, Traits>::computeState(
   }
 
   // extract evaluated MDFields
-  auto macroStress = *eval_fields[macroStressName];
+  auto                               macroStress = *eval_fields[macroStressName];
   std::vector<PHX::MDField<ScalarT>> microStress(numMicroScales);
   std::vector<PHX::MDField<ScalarT>> doubleStress(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
@@ -103,8 +100,7 @@ LinearHMCModel<EvalT, Traits>::computeState(
     case 1:
       // Compute Stress (uniaxial strain)
       for (std::size_t cell = 0; cell < workset.numCells; ++cell)
-        for (std::size_t qp = 0; qp < num_pts_; ++qp)
-          macroStress(cell, qp, 0, 0) = C11 * macroStrain(cell, qp, 0, 0);
+        for (std::size_t qp = 0; qp < num_pts_; ++qp) macroStress(cell, qp, 0, 0) = C11 * macroStrain(cell, qp, 0, 0);
       break;
     case 2:
       // Compute Stress (plane strain)
@@ -126,8 +122,8 @@ LinearHMCModel<EvalT, Traits>::computeState(
         ScalarT beta = betaParameter[i];
         for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
           for (std::size_t qp = 0; qp < num_pts_; ++qp) {
-            ScalarT const e1 = sd(cell, qp, 0, 0), e2 = sd(cell, qp, 1, 1),
-                          e3 = sd(cell, qp, 0, 1), e4 = sd(cell, qp, 1, 0);
+            ScalarT const e1 = sd(cell, qp, 0, 0), e2 = sd(cell, qp, 1, 1), e3 = sd(cell, qp, 0, 1),
+                          e4   = sd(cell, qp, 1, 0);
             ms(cell, qp, 0, 0) = beta * (C11 * e1 + C12 * e2);
             ms(cell, qp, 1, 1) = beta * (C12 * e1 + C11 * e2);
             ms(cell, qp, 0, 1) = beta * (C44 * e3);

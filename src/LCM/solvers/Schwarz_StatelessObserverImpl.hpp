@@ -12,8 +12,7 @@ namespace LCM {
 class StatelessObserverImpl
 {
  public:
-  explicit StatelessObserverImpl(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps);
+  explicit StatelessObserverImpl(Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps);
 
   virtual ~StatelessObserverImpl();
 
@@ -24,8 +23,7 @@ class StatelessObserverImpl
   observeSolution(
       double                                           stamp,
       Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> non_overlapped_solution,
-      Teuchos::Array<Teuchos::RCP<Thyra_Vector const>>
-          non_overlapped_solution_dot);
+      Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> non_overlapped_solution_dot);
 
   StatelessObserverImpl(StatelessObserverImpl const&) = delete;
   StatelessObserverImpl&

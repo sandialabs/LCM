@@ -63,13 +63,10 @@ display_relation(Topology& topology, stk::mesh::Entity entity)
   std::cout << bulk_data.entity_rank(entity);
   std::cout << '\n';
 
-  for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK;
-       rank <= stk::topology::ELEMENT_RANK;
-       ++rank) {
+  for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK; rank <= stk::topology::ELEMENT_RANK; ++rank) {
     stk::mesh::Entity const* relations = bulk_data.begin(entity, rank);
 
-    stk::mesh::ConnectivityOrdinal const* ords =
-        bulk_data.begin_ordinals(entity, rank);
+    stk::mesh::ConnectivityOrdinal const* ords = bulk_data.begin_ordinals(entity, rank);
 
     size_t num_rels = bulk_data.num_connectivity(entity, rank);
     for (size_t i = 0; i < num_rels; ++i) {
@@ -88,10 +85,7 @@ display_relation(Topology& topology, stk::mesh::Entity entity)
 // \param[in] entity
 // \param[in] the rank of the entity
 void
-display_relation(
-    Topology&                   topology,
-    stk::mesh::Entity           entity,
-    stk::mesh::EntityRank const rank)
+display_relation(Topology& topology, stk::mesh::Entity entity, stk::mesh::EntityRank const rank)
 {
   stk::mesh::BulkData& bulk_data = topology.get_bulk_data();
 
@@ -106,8 +100,7 @@ display_relation(
 
   size_t num_rels = bulk_data.num_connectivity(entity, rank);
 
-  stk::mesh::ConnectivityOrdinal const* ords =
-      bulk_data.begin_ordinals(entity, rank);
+  stk::mesh::ConnectivityOrdinal const* ords = bulk_data.begin_ordinals(entity, rank);
 
   for (size_t i = 0; i < num_rels; ++i) {
     std::cout << "entity:\t";
@@ -130,11 +123,9 @@ is_needed_for_stk(
     stk::mesh::EntityRank       target_rank,
     stk::mesh::EntityRank const cell_rank)
 {
-  stk::mesh::EntityRank const source_rank =
-      bulk_data.entity_rank(source_entity);
+  stk::mesh::EntityRank const source_rank = bulk_data.entity_rank(source_entity);
 
-  return (source_rank == stk::topology::ELEMENT_RANK) &&
-         (target_rank == stk::topology::NODE_RANK);
+  return (source_rank == stk::topology::ELEMENT_RANK) && (target_rank == stk::topology::NODE_RANK);
 }
 
 // Add a dash and processor rank to a string. Useful for output
@@ -362,11 +353,9 @@ new_id_from_old_id(
     bool const                  is_low_from_high)
 {
   stk::mesh::EntityId const start_id =
-      256 * parallel_rank +
-      (static_cast<stk::mesh::EntityId>(parallel_rank + 1) << 32) - 1;
+      256 * parallel_rank + (static_cast<stk::mesh::EntityId>(parallel_rank + 1) << 32) - 1;
 
-  bool const needs_mapping =
-      is_low_from_high == true ? old_id >= start_id : old_id < start_id;
+  bool const needs_mapping = is_low_from_high == true ? old_id >= start_id : old_id < start_id;
 
   bool is_face_or_edge = false;
 
@@ -385,10 +374,7 @@ new_id_from_old_id(
       break;
 
     case 3:
-      if (rank == stk::topology::EDGE_RANK ||
-          rank == stk::topology::FACE_RANK) {
-        is_face_or_edge = true;
-      }
+      if (rank == stk::topology::EDGE_RANK || rank == stk::topology::FACE_RANK) { is_face_or_edge = true; }
       break;
   }
 
@@ -410,8 +396,7 @@ low_id_from_high_id(
 {
   bool const is_lo_from_hi = true;
 
-  return new_id_from_old_id(
-      dimension, parallel_rank, rank, high_id, is_lo_from_hi);
+  return new_id_from_old_id(dimension, parallel_rank, rank, high_id, is_lo_from_hi);
 }
 
 stk::mesh::EntityId
@@ -423,8 +408,7 @@ high_id_from_low_id(
 {
   bool const is_lo_from_hi = false;
 
-  return new_id_from_old_id(
-      dimension, parallel_rank, rank, low_id, is_lo_from_hi);
+  return new_id_from_old_id(dimension, parallel_rank, rank, low_id, is_lo_from_hi);
 }
 
 }  // namespace LCM

@@ -101,9 +101,7 @@ class ManagerT
   \param comm : An Teuchos_Comm object
   \param outlevel : The level of output to stdout to be generated ( 0 - 10 )
   */
-  explicit ManagerT(
-      const Teuchos::RCP<const Teuchos::Comm<LO>>& comm,
-      int                                          outlevel);
+  explicit ManagerT(const Teuchos::RCP<const Teuchos::Comm<LO>>& comm, int outlevel);
 
   /*!
   \brief Creates and empty instance of this class
@@ -116,9 +114,7 @@ class ManagerT
   \param comm : An Teuchos_Comm object
   \param outlevel : The level of output to stdout to be generated ( 0 - 10 )
   */
-  explicit ManagerT(
-      const Teuchos::RCP<const Teuchos::Comm<LO>>& comm,
-      int                                          outlevel);
+  explicit ManagerT(const Teuchos::RCP<const Teuchos::Comm<LO>>& comm, int outlevel);
 
   /*!
   \brief Destroys an instance of this class
@@ -191,9 +187,7 @@ class ManagerT
   \return true when adding the interface was successful and false otherwise
   */
   bool
-  AddInterface(
-      const Teuchos::RCP<const MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>&
-          interface);
+  AddInterface(const Teuchos::RCP<const MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>& interface);
 
   /*!
   \brief Obtain a parameter list with default values
@@ -357,9 +351,7 @@ class ManagerT
 
   */
   bool
-  SetInputMatrix(
-      Tpetra::CrsMatrix<ST, LO, GO, N>* inputmatrix,
-      bool                              DeepCopy = false);
+  SetInputMatrix(Tpetra::CrsMatrix<ST, LO, GO, N>* inputmatrix, bool DeepCopy = false);
 
   /*!
   \brief Construct a saddle point system of equations
@@ -509,10 +501,7 @@ class ManagerT
   \param rhs (in) : The right hand side vector
   */
   bool
-  Solve(
-      Teuchos::ParameterList&              params,
-      Tpetra::Vector<ST, LO, GO, N>&       sol,
-      const Tpetra::Vector<ST, LO, GO, N>& rhs);
+  Solve(Teuchos::ParameterList& params, Tpetra::Vector<ST, LO, GO, N>& sol, const Tpetra::Vector<ST, LO, GO, N>& rhs);
 
   /*!
   \brief Solve the problem
@@ -528,9 +517,7 @@ class ManagerT
   \param rhs (in) : The right hand side vector
   */
   bool
-  Solve(
-      Tpetra::Vector<ST, LO, GO, N>&       sol,
-      const Tpetra::Vector<ST, LO, GO, N>& rhs);
+  Solve(Tpetra::Vector<ST, LO, GO, N>& sol, const Tpetra::Vector<ST, LO, GO, N>& rhs);
 
   /*!
   \brief Reset the internal solver
@@ -611,30 +598,21 @@ class ManagerT
   ChooseMortarSide();
 
  protected:
-  int outlevel_;  // output level (0-10)
-  const Teuchos::RCP<const Teuchos::Comm<LO>>&
-      comm_;  // communicator (global, contains ALL procs)
+  int                                          outlevel_;  // output level (0-10)
+  const Teuchos::RCP<const Teuchos::Comm<LO>>& comm_;      // communicator (global, contains ALL procs)
 
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>
-      interface_;  // the interfaces
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>> interface_;  // the interfaces
 
-  Teuchos::RCP<const Tpetra::Map<LO, GO, N>>
-      problemmap_;  // the rowmap of the input matrix
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
-      inputmatrix_;  // the uncoupled matrix on input
-  Teuchos::RCP<Tpetra::Map<LO, GO, N>>
-                                                 constraintsmap_;  // the rowmap of M and D (both of them use comm_)
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> D_;  // the coupling matrix D
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> M_;  // the coupling matrix M
-  Teuchos::RCP<Tpetra::Map<LO, GO, N>>
-      saddlemap_;  // the rowmap of the saddlepointproblem
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
-      saddlematrix_;  // the matrix of the saddle problem;
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
-      spdmatrix_;  // the spd matrix of the problem;
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
-      spdrhs_;  // the matrix to left-multiply the rhs vector with for the spd
-                // problem
+  Teuchos::RCP<const Tpetra::Map<LO, GO, N>>     problemmap_;      // the rowmap of the input matrix
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> inputmatrix_;     // the uncoupled matrix on input
+  Teuchos::RCP<Tpetra::Map<LO, GO, N>>           constraintsmap_;  // the rowmap of M and D (both of them use comm_)
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> D_;               // the coupling matrix D
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> M_;               // the coupling matrix M
+  Teuchos::RCP<Tpetra::Map<LO, GO, N>>           saddlemap_;       // the rowmap of the saddlepointproblem
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> saddlematrix_;    // the matrix of the saddle problem;
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> spdmatrix_;       // the spd matrix of the problem;
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> spdrhs_;  // the matrix to left-multiply the rhs vector with for the
+                                                           // spd problem
 
   Teuchos::RCP<std::map<int, int>> lm_to_dof_;  // maps lagrange multiplier dofs
                                                 // to primary dofs (slave side))
@@ -644,13 +622,10 @@ class ManagerT
   Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> B_;
   Teuchos::RCP<Tpetra::Map<LO, GO, N>>           annmap_;
 
-  Teuchos::RCP<Teuchos::ParameterList>
-      integrationparams_;  // parameter list with integration parameters
+  Teuchos::RCP<Teuchos::ParameterList> integrationparams_;  // parameter list with integration parameters
 
   bool
-  ChooseMortarSideInterface(
-      std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>&
-          inter);
+  ChooseMortarSideInterface(std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter);
 };
 
 // Now, the explicit template function declarations (templated on dimension)
@@ -677,14 +652,12 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Build_MD();
 template <class ST, class LO, class GO, class N>
 bool
 MoertelT::ManagerT<2, ST, LO, GO, N>::ChooseMortarSideInterface(
-    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>&
-        inter);
+    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter);
 
 template <class ST, class LO, class GO, class N>
 bool
 MoertelT::ManagerT<3, ST, LO, GO, N>::ChooseMortarSideInterface(
-    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>&
-        inter);
+    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter);
 
 }  // namespace MoertelT
 
@@ -697,9 +670,7 @@ std::ostream
 */
 MOERTEL_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT) & node);
+operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT) & node);
 
 #ifndef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
 #include "Moertel_ManagerT_Def.hpp"

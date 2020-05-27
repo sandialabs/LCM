@@ -19,16 +19,13 @@ namespace HMC {
 */
 
 template <typename EvalT, typename Traits>
-class Stresses : public PHX::EvaluatorWithBaseImpl<Traits>,
-                 public PHX::EvaluatorDerived<EvalT, Traits>
+class Stresses : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   Stresses(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -37,12 +34,11 @@ class Stresses : public PHX::EvaluatorWithBaseImpl<Traits>,
   using ScalarT     = typename EvalT::ScalarT;
   using MeshScalarT = typename EvalT::MeshScalarT;
 
-  typedef PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim> cHMC2Tensor;
-  typedef PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim>       HMC2Tensor;
-  typedef PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim, Dim>
-                                                                cHMC3Tensor;
-  typedef PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim, Dim> HMC3Tensor;
-  typedef PHX::MDField<ScalarT, Cell, QuadPoint>                HMCScalar;
+  typedef PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim>      cHMC2Tensor;
+  typedef PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim>            HMC2Tensor;
+  typedef PHX::MDField<ScalarT const, Cell, QuadPoint, Dim, Dim, Dim> cHMC3Tensor;
+  typedef PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim, Dim>       HMC3Tensor;
+  typedef PHX::MDField<ScalarT, Cell, QuadPoint>                      HMCScalar;
 
   // Input:
   cHMC2Tensor strain;

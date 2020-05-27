@@ -38,9 +38,7 @@ class J2HMCModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  J2HMCModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  J2HMCModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Destructor
@@ -51,23 +49,14 @@ class J2HMCModel : public LCM::ConstitutiveModel<EvalT, Traits>
   /// Method to compute the state (e.g. energy, stress, tangent)
   ///
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   // Kokkos
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   void
-  computeVolumeAverage(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeVolumeAverage(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
  private:
   ///
@@ -152,9 +141,7 @@ class J2HMCModel : public LCM::ConstitutiveModel<EvalT, Traits>
   converged(std::vector<ScalarT>& R, int iteration, ScalarT& initNorm);
 
   minitensor::Tensor3<typename EvalT::ScalarT>
-  dotdotdot(
-      minitensor::Tensor4<ScalarT>& doubleCelastic,
-      minitensor::Tensor3<ScalarT>& elTrialDoubleStress);
+  dotdotdot(minitensor::Tensor4<ScalarT>& doubleCelastic, minitensor::Tensor3<ScalarT>& elTrialDoubleStress);
 
   ///
   /// Private to prohibit copying

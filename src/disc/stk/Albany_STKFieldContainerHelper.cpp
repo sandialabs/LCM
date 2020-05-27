@@ -9,9 +9,7 @@
 
 namespace Albany {
 
-template struct STKFieldContainerHelper<
-    Albany::AbstractSTKFieldContainer::ScalarFieldType>;
-template struct STKFieldContainerHelper<
-    Albany::AbstractSTKFieldContainer::VectorFieldType>;
+template struct STKFieldContainerHelper<Albany::AbstractSTKFieldContainer::ScalarFieldType>;
+template struct STKFieldContainerHelper<Albany::AbstractSTKFieldContainer::VectorFieldType>;
 
 }  // namespace Albany

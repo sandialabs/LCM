@@ -14,9 +14,7 @@ StrainDifference<EvalT, Traits>::StrainDifference(
     const Teuchos::RCP<Albany::Layouts>& dl)
     : macroStrain(p.get<std::string>("Macro Strain Name"), dl->qp_tensor),
       microStrain(p.get<std::string>("Micro Strain Name"), dl->qp_tensor),
-      strainDifference(
-          p.get<std::string>("Strain Difference Name"),
-          dl->qp_tensor)
+      strainDifference(p.get<std::string>("Strain Difference Name"), dl->qp_tensor)
 {
   this->addDependentField(microStrain);
   this->addDependentField(macroStrain);
@@ -33,9 +31,7 @@ StrainDifference<EvalT, Traits>::StrainDifference(
 
 template <typename EvalT, typename Traits>
 void
-StrainDifference<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+StrainDifference<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(microStrain, fm);
   this->utils.setFieldData(macroStrain, fm);
@@ -44,16 +40,14 @@ StrainDifference<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-StrainDifference<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+StrainDifference<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Compute strain difference tensor
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
       for (std::size_t i = 0; i < numDims; ++i) {
         for (std::size_t j = 0; j < numDims; ++j) {
-          strainDifference(cell, qp, i, j) =
-              macroStrain(cell, qp, i, j) - microStrain(cell, qp, i, j);
+          strainDifference(cell, qp, i, j) = macroStrain(cell, qp, i, j) - microStrain(cell, qp, i, j);
         }
       }
     }

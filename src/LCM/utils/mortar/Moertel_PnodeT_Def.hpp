@@ -50,8 +50,7 @@ Moertel::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::ProjectedNodeT(
  |  copy-ctor (public)                                       mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::ProjectedNodeT(
-    MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) & old)
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::ProjectedNodeT(MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) & old)
     : MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(old)
 {
   pseg_    = old.pseg_;
@@ -66,8 +65,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::ProjectedNodeT(
 MOERTEL_TEMPLATE_STATEMENT
 MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::~ProjectedNodeT()
 {
-  pseg_ =
-      NULL;  // this is just a 'referencing' ptr, not in charge of destroying
+  pseg_ = NULL;  // this is just a 'referencing' ptr, not in charge of destroying
 }
 
 /*----------------------------------------------------------------------*
@@ -85,8 +83,7 @@ bool NoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::Print() const
     std::cout << *pseg_;
     std::cout << "at xi[0]/[1] = " << xi_[0] << "/" << xi_[1];
   } else {
-    std::cout << "on Segment !!!!!NULL!!!!! at xi[0]/[1] = " << xi_[0] << "/"
-              << xi_[1];
+    std::cout << "on Segment !!!!!NULL!!!!! at xi[0]/[1] = " << xi_[0] << "/" << xi_[1];
   }
   std::cout << "orth to seg " << orthseg_ << std::endl;
   return true;
@@ -97,9 +94,7 @@ bool NoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::Print() const
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) & pnode)
+operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) & pnode)
 {
   pnode.Print();
   return (os);

@@ -41,44 +41,33 @@ template <size_t DIM,\
 #define MOERTEL_TEMPLATE_CLASS(x) x < DIM,ST,LO,GO,N >
 */
 
-#define MOERTEL_TEMPLATE_STATEMENT \
-  template <size_t DIM, class SEGT, class FUNCT>
+#define MOERTEL_TEMPLATE_STATEMENT template <size_t DIM, class SEGT, class FUNCT>
 
 #define MOERTEL_TEMPLATE_CLASS(x) x<DIM, SEGT, FUNCT>
 
-#define MOERTEL_TEMPLATE_STATEMENT_1A(x) \
-  template <size_t DIM, class SEGT, class FUNCT, x>
+#define MOERTEL_TEMPLATE_STATEMENT_1A(x) template <size_t DIM, class SEGT, class FUNCT, x>
 
 #define MOERTEL_TEMPLATE_CLASS_1A(x, y) x<DIM, SEGT, FUNCT, y>
 
-#define SEGMENT_TEMPLATE_STATEMENT \
-  template <size_t DIM, class SEGT, class FUNCT>
+#define SEGMENT_TEMPLATE_STATEMENT template <size_t DIM, class SEGT, class FUNCT>
 
 #define SEGMENT_TEMPLATE_CLASS(x) x<DIM, SEGT, FUNCT>
 
 // typedef DefaultNodeType KokkosNode;
-typedef Kokkos::Compat::
-    KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace>
-        KokkosNode;
-typedef Kokkos::Compat::
-    KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace>
-        N;
+typedef Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace> KokkosNode;
+typedef Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace> N;
 // typedef KokkosClassic::DefaultNode::DefaultNodeType KokkosNode;
 
 // ETI templates
-#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ORD(name, ordinal) \
-  template class name<ordinal>;
+#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ORD(name, ordinal) template class name<ordinal>;
 
-#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_LO_ST( \
-    name, LocalOrdinal, ScalarType)                       \
+#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_LO_ST(name, LocalOrdinal, ScalarType) \
   template class name<LocalOrdinal, ScalarType>;
 
-#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_LO_GO_ST( \
-    name, LocalOrdinal, GlobalOrdinal, ScalarType)           \
+#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_LO_GO_ST(name, LocalOrdinal, GlobalOrdinal, ScalarType) \
   template class name<LocalOrdinal, GlobalOrdinal, ScalarType>;
 
-#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ST_LO_GO_N( \
-    name, ScalarType, LocalOrdinal, GlobalOrdinal, NodeType)   \
+#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ST_LO_GO_N(name, ScalarType, LocalOrdinal, GlobalOrdinal, NodeType) \
   template class name<ScalarType, LocalOrdinal, GlobalOrdinal, NodeType>;
 
 #define MOERTEL_INSTANTIATE_NESTED_TEMPLATE_CLASS_ST_LO_GO_N(       \
@@ -86,17 +75,15 @@ typedef Kokkos::Compat::
   template class name<name2<ScalarType, LocalOrdinal, GlobalOrdinal, NodeType>>;
 
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
-#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DII(name)     \
-  MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ST_LO_GO_N( \
-      name, double, int, int, KokkosNode)
+#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DII(name) \
+  MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ST_LO_GO_N(name, double, int, int, KokkosNode)
 #else
 #define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DII(name)
 #endif
 
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
-#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DILLI(name)   \
-  MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ST_LO_GO_N( \
-      name, double, int, long long, KokkosNode)
+#define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DILLI(name) \
+  MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ST_LO_GO_N(name, double, int, long long, KokkosNode)
 #else
 #define MOERTEL_INSTANTIATE_TEMPLATE_CLASS_DILLI(name)
 #endif

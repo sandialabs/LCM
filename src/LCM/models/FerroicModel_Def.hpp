@@ -35,14 +35,14 @@ FerroicModel<EvalT>::PostParseInitialize()
       //      t.toVariant = crystalVariants[J];
       CrystalVariant& fromVariant = crystalVariants[I];
       CrystalVariant& toVariant   = crystalVariants[J];
-      t.transStrain = toVariant.spontStrain - fromVariant.spontStrain;
-      t.transEDisp  = toVariant.spontEDisp - fromVariant.spontEDisp;
+      t.transStrain               = toVariant.spontStrain - fromVariant.spontStrain;
+      t.transEDisp                = toVariant.spontEDisp - fromVariant.spontEDisp;
       transIndex++;
     }
 
   // create/initialize transition matrix
   int nTransitions = transitions.size();
-  aMatrix = Kokkos::DynRankView<RealType>("aMatrix", nVariants, nTransitions);
+  aMatrix          = Kokkos::DynRankView<RealType>("aMatrix", nVariants, nTransitions);
   for (int I = 0; I < nVariants; I++) {
     for (int J = 0; J < nVariants; J++) {
       aMatrix(I, nVariants * I + J) = -1.0;
@@ -103,20 +103,17 @@ FerroicModel<EvalT>::computeState(
       MIN minimizer;
 
       // create stepper
-      using STEP = minitensor::StepBase<NLS, ValueT, MAX_TRNS>;
-      std::unique_ptr<STEP> pstep =
-          minitensor::stepFactory<NLS, ValueT, MAX_TRNS>(m_step_type);
-      STEP& step = *pstep;
+      using STEP                  = minitensor::StepBase<NLS, ValueT, MAX_TRNS>;
+      std::unique_ptr<STEP> pstep = minitensor::stepFactory<NLS, ValueT, MAX_TRNS>(m_step_type);
+      STEP&                 step  = *pstep;
 
       // create solution vector with initial guess
       int ntrans = domainSwitching.getNumStates();
       xi.set_dimension(ntrans);
-      for (int itrans = 0; itrans < ntrans; itrans++)
-        xi(itrans) = Sacado::ScalarValue<ScalarT>::eval(0.0);
+      for (int itrans = 0; itrans < ntrans; itrans++) xi(itrans) = Sacado::ScalarValue<ScalarT>::eval(0.0);
 
       // solve
-      LCM::MiniSolver<MIN, STEP, NLS, EvalT, MAX_TRNS> mini_solver(
-          minimizer, step, domainSwitching, xi);
+      LCM::MiniSolver<MIN, STEP, NLS, EvalT, MAX_TRNS> mini_solver(minimizer, step, domainSwitching, xi);
     }
   }
 

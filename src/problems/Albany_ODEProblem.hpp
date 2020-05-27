@@ -45,9 +45,7 @@ class ODEProblem : public AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -124,19 +122,15 @@ Albany::ODEProblem::constructEvaluators(
   int const numVertices = 1;
   int const worksetSize = meshSpecs.worksetSize;
 
-  *out << "Field Dimensions: Workset=" << worksetSize
-       << ", Vertices= " << numVertices << ", Nodes= " << numNodes
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
        << ", Dim= " << numDim << std::endl;
 
-  RCP<Albany::Layouts> dl =
-      rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, 1, numDim));
+  RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, 1, numDim));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
   bool                                              supportsTransient = true;
 
   // Problem is transient
-  ALBANY_PANIC(
-      number_of_time_deriv != 1,
-      "Albany_ODEProblem must be defined as a transient calculation.");
+  ALBANY_PANIC(number_of_time_deriv != 1, "Albany_ODEProblem must be defined as a transient calculation.");
 
   // Temporary variable used numerous times below
   Teuchos::RCP<PHX::Evaluator<AlbanyTraits>> ev;
@@ -156,16 +150,11 @@ Albany::ODEProblem::constructEvaluators(
   for (int i = 0; i < neq; i++) resid_names[i] = dof_names[i] + " Residual";
 
   if (supportsTransient)
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator(
-            false, dof_names, dof_names_dot));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot));
   else
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator_noTransient(
-            false, dof_names));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(false, resid_names));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names));
 
   {  // X Resid
     RCP<ParameterList> p = rcp(new ParameterList("ODE Resid"));
@@ -193,8 +182,7 @@ Albany::ODEProblem::constructEvaluators(
 
   else if (fieldManagerChoice == Albany::BUILD_RESPONSE_FM) {
     Albany::ResponseUtilities<EvalT, PHAL::AlbanyTraits> respUtils(dl);
-    return respUtils.constructResponses(
-        fm0, *responseList, Teuchos::null, stateMgr);
+    return respUtils.constructResponses(fm0, *responseList, Teuchos::null, stateMgr);
   }
 
   return Teuchos::null;

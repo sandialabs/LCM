@@ -17,18 +17,15 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
           p.get<std::string>("QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  Teuchos::ParameterList* elmd_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* elmd_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numQPs  = dims[1];
   numDims = dims[2];
 
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
   std::string type = elmd_list->get("Elastic Modulus Type", "Constant");
   if (type == "Constant") {
@@ -54,10 +51,8 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
   // Switched ON by sending Temperature field in p
 
   if (p.isType<std::string>("QP Temperature Name")) {
-    Teuchos::RCP<PHX::DataLayout> scalar_dl =
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-    Temperature = decltype(Temperature)(
-        p.get<std::string>("QP Temperature Name"), scalar_dl);
+    Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+    Temperature = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), scalar_dl);
     this->addDependentField(Temperature);
     isThermoElastic = true;
     dEdT_value      = elmd_list->get("dEdT Value", 0.0);
@@ -72,10 +67,8 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
   // Switched ON by sending Temperature field in p
 
   if (p.isType<std::string>("Porosity Name")) {
-    Teuchos::RCP<PHX::DataLayout> scalar_dl =
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-    porosity =
-        decltype(porosity)(p.get<std::string>("Porosity Name"), scalar_dl);
+    Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+    porosity                                = decltype(porosity)(p.get<std::string>("Porosity Name"), scalar_dl);
     this->addDependentField(porosity);
     isPoroElastic = true;
 
@@ -90,9 +83,7 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-ElasticModulus<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ElasticModulus<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(elasticModulus, fm);
   if (!is_constant) this->utils.setFieldData(coordVec, fm);
@@ -109,16 +100,13 @@ ElasticModulus<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   if (is_constant) {
     for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) {
-        elasticModulus(cell, qp) = constant_value;
-      }
+      for (int qp = 0; qp < numQPs; ++qp) { elasticModulus(cell, qp) = constant_value; }
     }
   }
   if (isThermoElastic) {
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {
-        elasticModulus(cell, qp) +=
-            dEdT_value * (Temperature(cell, qp) - refTemp);
+        elasticModulus(cell, qp) += dEdT_value * (Temperature(cell, qp) - refTemp);
       }
     }
   }
@@ -146,8 +134,7 @@ ElasticModulus<EvalT, Traits>::getValue(std::string const& n)
     return dEdT_value;
   ALBANY_ABORT(
       std::endl
-      << "Error! Logic error in getting paramter " << n
-      << " in ElasticModulus::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n << " in ElasticModulus::getValue()" << std::endl);
   return constant_value;
 }
 

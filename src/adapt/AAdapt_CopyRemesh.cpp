@@ -22,8 +22,7 @@ CopyRemesh::CopyRemesh(
 {
   discretization_ = state_mgr_.getDiscretization();
 
-  stk_discretization_ =
-      static_cast<Albany::STKDiscretization*>(discretization_.get());
+  stk_discretization_ = static_cast<Albany::STKDiscretization*>(discretization_.get());
 
   stk_mesh_struct_ = stk_discretization_->getSTKMeshStruct();
 
@@ -39,8 +38,7 @@ CopyRemesh::CopyRemesh(
 bool
 CopyRemesh::queryAdaptationCriteria(int iter)
 {
-  if (adapt_params_->get<std::string>("Remesh Strategy", "None")
-          .compare("Continuous") == 0) {
+  if (adapt_params_->get<std::string>("Remesh Strategy", "None").compare("Continuous") == 0) {
     if (iter > 1) {
       return true;
     } else {
@@ -48,8 +46,7 @@ CopyRemesh::queryAdaptationCriteria(int iter)
     }
   }
 
-  Teuchos::Array<int> remesh_iter =
-      adapt_params_->get<Teuchos::Array<int>>("Remesh Step Number");
+  Teuchos::Array<int> remesh_iter = adapt_params_->get<Teuchos::Array<int>>("Remesh Step Number");
 
   for (int i = 0; i < remesh_iter.size(); i++) {
     if (iter == remesh_iter[i]) { return true; }
@@ -95,19 +92,12 @@ CopyRemesh::adaptMesh()
 Teuchos::RCP<Teuchos::ParameterList const>
 CopyRemesh::getValidAdapterParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericAdapterParams("ValidCopyRemeshParameters");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericAdapterParams("ValidCopyRemeshParameters");
 
   Teuchos::Array<int> defaultArgs;
 
-  validPL->set<Teuchos::Array<int>>(
-      "Remesh Step Number",
-      defaultArgs,
-      "Iteration step at which to remesh the problem");
-  validPL->set<std::string>(
-      "Remesh Strategy",
-      "",
-      "Strategy to use when remeshing: Continuous - remesh every step.");
+  validPL->set<Teuchos::Array<int>>("Remesh Step Number", defaultArgs, "Iteration step at which to remesh the problem");
+  validPL->set<std::string>("Remesh Strategy", "", "Strategy to use when remeshing: Continuous - remesh every step.");
 
   return validPL;
 }

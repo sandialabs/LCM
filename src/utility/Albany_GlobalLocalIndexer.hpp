@@ -12,8 +12,7 @@ class GlobalLocalIndexer
  public:
   GlobalLocalIndexer(Teuchos::RCP<Thyra_VectorSpace const> const& vs) : m_vs(vs)
   {
-    ALBANY_PANIC(
-        m_vs.is_null(), "Error! Input vector space pointer is null.\n");
+    ALBANY_PANIC(m_vs.is_null(), "Error! Input vector space pointer is null.\n");
   }
 
   virtual ~GlobalLocalIndexer() = default;

@@ -30,8 +30,7 @@ KfieldBC_Base<EvalT, Traits>::KfieldBC_Base(Teuchos::ParameterList& p)
   KII_name = p.get<std::string>("Kfield KII Name");
 
   // Set up values as parameters for parameter library
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
   this->registerSacadoParameter(KI_name, paramLib);
   this->registerSacadoParameter(KII_name, paramLib);
@@ -40,13 +39,10 @@ KfieldBC_Base<EvalT, Traits>::KfieldBC_Base(Teuchos::ParameterList& p)
   KIValues   = p.get<Teuchos::Array<RealType>>("KI Values").toVector();
   KIIValues  = p.get<Teuchos::Array<RealType>>("KII Values").toVector();
 
-  ALBANY_PANIC(
-      !(timeValues.size() == KIValues.size()),
-      "Dimension of \"Time Values\" and \"KI Values\" do not match");
+  ALBANY_PANIC(!(timeValues.size() == KIValues.size()), "Dimension of \"Time Values\" and \"KI Values\" do not match");
 
   ALBANY_PANIC(
-      !(timeValues.size() == KIIValues.size()),
-      "Dimension of \"Time Values\" and \"KII Values\" do not match");
+      !(timeValues.size() == KIIValues.size()), "Dimension of \"Time Values\" and \"KII Values\" do not match");
 }
 
 // **********************************************************************
@@ -64,11 +60,7 @@ KfieldBC_Base<EvalT, Traits>::getValue(std::string const& n)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-KfieldBC_Base<EvalT, Traits>::computeBCs(
-    double*  coord,
-    ScalarT& Xval,
-    ScalarT& Yval,
-    RealType time)
+KfieldBC_Base<EvalT, Traits>::computeBCs(double* coord, ScalarT& Xval, ScalarT& Yval, RealType time)
 {
   ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
 
@@ -92,33 +84,21 @@ KfieldBC_Base<EvalT, Traits>::computeBCs(
     KIFunctionVal  = KIValues[Index];
     KIIFunctionVal = KIIValues[Index];
   } else {
-    KIslope = (KIValues[Index] - KIValues[Index - 1]) /
-              (timeValues[Index] - timeValues[Index - 1]);
-    KIFunctionVal =
-        KIValues[Index - 1] + KIslope * (time - timeValues[Index - 1]);
+    KIslope       = (KIValues[Index] - KIValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    KIFunctionVal = KIValues[Index - 1] + KIslope * (time - timeValues[Index - 1]);
 
-    KIIslope = (KIIValues[Index] - KIIValues[Index - 1]) /
-               (timeValues[Index] - timeValues[Index - 1]);
-    KIIFunctionVal =
-        KIIValues[Index - 1] + KIIslope * (time - timeValues[Index - 1]);
+    KIIslope       = (KIIValues[Index] - KIIValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    KIIFunctionVal = KIIValues[Index - 1] + KIIslope * (time - timeValues[Index - 1]);
   }
 
   coeff_1 = (KI * KIFunctionVal / mu) * std::sqrt(R / tau);
   coeff_2 = (KII * KIIFunctionVal / mu) * std::sqrt(R / tau);
 
-  KI_X = coeff_1 *
-         (1.0 - 2.0 * nu + std::sin(theta / 2.0) * std::sin(theta / 2.0)) *
-         std::cos(theta / 2.0);
-  KI_Y = coeff_1 *
-         (2.0 - 2.0 * nu - std::cos(theta / 2.0) * std::cos(theta / 2.0)) *
-         std::sin(theta / 2.0);
+  KI_X = coeff_1 * (1.0 - 2.0 * nu + std::sin(theta / 2.0) * std::sin(theta / 2.0)) * std::cos(theta / 2.0);
+  KI_Y = coeff_1 * (2.0 - 2.0 * nu - std::cos(theta / 2.0) * std::cos(theta / 2.0)) * std::sin(theta / 2.0);
 
-  KII_X = coeff_2 *
-          (2.0 - 2.0 * nu + std::cos(theta / 2.0) * std::cos(theta / 2.0)) *
-          std::sin(theta / 2.0);
-  KII_Y = coeff_2 *
-          (-1.0 + 2.0 * nu + std::sin(theta / 2.0) * std::sin(theta / 2.0)) *
-          std::cos(theta / 2.0);
+  KII_X = coeff_2 * (2.0 - 2.0 * nu + std::cos(theta / 2.0) * std::cos(theta / 2.0)) * std::sin(theta / 2.0);
+  KII_Y = coeff_2 * (-1.0 + 2.0 * nu + std::sin(theta / 2.0) * std::sin(theta / 2.0)) * std::cos(theta / 2.0);
 
   Xval = KI_X + KII_X;
   Yval = KI_Y + KII_Y;
@@ -128,8 +108,7 @@ KfieldBC_Base<EvalT, Traits>::computeBCs(
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::KfieldBC(
-    Teuchos::ParameterList& p)
+KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::KfieldBC(Teuchos::ParameterList& p)
     : KfieldBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
@@ -137,8 +116,7 @@ KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::KfieldBC(
 // **********************************************************************
 template <typename Traits>
 void
-KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
@@ -147,10 +125,8 @@ KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   Teuchos::ArrayRCP<ST>       f_nonconstView = Albany::getNonconstLocalData(f);
 
   // Grab the vector off node GIDs for this Node Set ID from the std::map
-  std::vector<std::vector<int>> const& nsNodes =
-      dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-  std::vector<double*> const& nsNodeCoords =
-      dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
+  std::vector<std::vector<int>> const& nsNodes      = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
+  std::vector<double*> const&          nsNodeCoords = dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   RealType time = dirichletWorkset.current_time;
 
@@ -178,16 +154,14 @@ KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits>
-KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::KfieldBC(
-    Teuchos::ParameterList& p)
+KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::KfieldBC(Teuchos::ParameterList& p)
     : KfieldBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 // **********************************************************************
 template <typename Traits>
 void
-KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;
@@ -198,11 +172,9 @@ KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 
   RealType time = dirichletWorkset.current_time;
 
-  const RealType                       j_coeff = dirichletWorkset.j_coeff;
-  std::vector<std::vector<int>> const& nsNodes =
-      dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-  std::vector<double*> const& nsNodeCoords =
-      dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
+  const RealType                       j_coeff      = dirichletWorkset.j_coeff;
+  std::vector<std::vector<int>> const& nsNodes      = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
+  std::vector<double*> const&          nsNodeCoords = dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   bool fillResid = (f != Teuchos::null);
   if (fillResid) { f_nonconstView = Albany::getNonconstLocalData(f); }

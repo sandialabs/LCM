@@ -163,12 +163,7 @@ loop(Functor& f, const PHX::MDField<ScalarT, T1, T2>& a)
 {
   loop(f, const_cast<PHX::MDField<ScalarT, T1, T2>&>(a));
 }
-template <
-    class Functor,
-    typename ScalarT,
-    typename T1,
-    typename T2,
-    typename T3>
+template <class Functor, typename ScalarT, typename T1, typename T2, typename T3>
 void
 loop(Functor& f, PHX::MDField<ScalarT, T1, T2, T3>& a)
 {
@@ -179,24 +174,13 @@ loop(Functor& f, PHX::MDField<ScalarT, T1, T2, T3>& a)
     ++ctr;
   }
 }
-template <
-    class Functor,
-    typename ScalarT,
-    typename T1,
-    typename T2,
-    typename T3>
+template <class Functor, typename ScalarT, typename T1, typename T2, typename T3>
 void
 loop(Functor& f, const PHX::MDField<ScalarT, T1, T2, T3>& a)
 {
   loop(f, const_cast<PHX::MDField<ScalarT, T1, T2, T3>&>(a));
 }
-template <
-    class Functor,
-    typename ScalarT,
-    typename T1,
-    typename T2,
-    typename T3,
-    typename T4>
+template <class Functor, typename ScalarT, typename T1, typename T2, typename T3, typename T4>
 void
 loop(Functor& f, PHX::MDField<ScalarT, T1, T2, T3, T4>& a)
 {
@@ -207,26 +191,13 @@ loop(Functor& f, PHX::MDField<ScalarT, T1, T2, T3, T4>& a)
     ++ctr;
   }
 }
-template <
-    class Functor,
-    typename ScalarT,
-    typename T1,
-    typename T2,
-    typename T3,
-    typename T4>
+template <class Functor, typename ScalarT, typename T1, typename T2, typename T3, typename T4>
 void
 loop(Functor& f, const PHX::MDField<ScalarT, T1, T2, T3, T4>& a)
 {
   loop(f, const_cast<PHX::MDField<ScalarT, T1, T2, T3, T4>&>(a));
 }
-template <
-    class Functor,
-    typename ScalarT,
-    typename T1,
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5>
+template <class Functor, typename ScalarT, typename T1, typename T2, typename T3, typename T4, typename T5>
 void
 loop(Functor& f, PHX::MDField<ScalarT, T1, T2, T3, T4, T5>& a)
 {
@@ -237,14 +208,7 @@ loop(Functor& f, PHX::MDField<ScalarT, T1, T2, T3, T4, T5>& a)
     ++ctr;
   }
 }
-template <
-    class Functor,
-    typename ScalarT,
-    typename T1,
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5>
+template <class Functor, typename ScalarT, typename T1, typename T2, typename T3, typename T4, typename T5>
 void
 loop(Functor& f, const PHX::MDField<ScalarT, T1, T2, T3, T4, T5>& a)
 {
@@ -310,15 +274,13 @@ template <class T, class... P>
 inline typename std::enable_if<
     Kokkos::is_dynrankview_fad<Kokkos::DynRankView<T, P...>>::value,
     typename Kokkos::DynRankView<T, P...>::non_const_type>::type
-create_copy(
-    std::string const& /* name */,
-    const Kokkos::DynRankView<T, P...>& src)
+create_copy(std::string const& /* name */, const Kokkos::DynRankView<T, P...>& src)
 {
-  using Src     = Kokkos::DynRankView<T, P...>;
-  using Dst     = typename Kokkos::DynRankView<T, P...>::non_const_type;
-  auto sl       = src.layout();
-  auto sm       = src.impl_map();
-  auto fad_rank = src.rank();
+  using Src              = Kokkos::DynRankView<T, P...>;
+  using Dst              = typename Kokkos::DynRankView<T, P...>::non_const_type;
+  auto sl                = src.layout();
+  auto sm                = src.impl_map();
+  auto fad_rank          = src.rank();
   sl.dimension[fad_rank] = sm.dimension_scalar();
   auto real_rank         = fad_rank + 1;
   auto ml                = Kokkos::Impl::reconstructLayout(sl, real_rank);

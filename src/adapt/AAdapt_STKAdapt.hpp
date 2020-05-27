@@ -35,9 +35,7 @@ class STKAdapt : public AbstractAdapter
   //! Apply adaptation method to mesh and problem. Returns true if adaptation is
   //! performed successfully.
   virtual bool
-  adaptMesh(
-      const Teuchos::RCP<const Tpetra_Vector>& solution,
-      const Teuchos::RCP<const Tpetra_Vector>& ovlp_solution);
+  adaptMesh(const Teuchos::RCP<const Tpetra_Vector>& solution, const Teuchos::RCP<const Tpetra_Vector>& ovlp_solution);
 
   //! Each adapter must generate it's list of valid parameters
   Teuchos::RCP<Teuchos::ParameterList const>
@@ -74,10 +72,8 @@ class STKAdapt : public AbstractAdapter
 }  // namespace AAdapt
 
 // Define macros for explicit template instantiation
-#define STKADAPTT_INSTANTIATE_TEMPLATE_CLASS_UNIFREFINE(name) \
-  template class name<AAdapt::STKUnifRefineField>;
+#define STKADAPTT_INSTANTIATE_TEMPLATE_CLASS_UNIFREFINE(name) template class name<AAdapt::STKUnifRefineField>;
 
-#define STKADAPTT_INSTANTIATE_TEMPLATE_CLASS(name) \
-  STKADAPTT_INSTANTIATE_TEMPLATE_CLASS_UNIFREFINE(name)
+#define STKADAPTT_INSTANTIATE_TEMPLATE_CLASS(name) STKADAPTT_INSTANTIATE_TEMPLATE_CLASS_UNIFREFINE(name)
 
 #endif  // ALBANY_STK_ADAPT_HPP

@@ -38,13 +38,11 @@ int countScale;
 
 namespace {
 int
-calcTangentDerivDimension(
-    const Teuchos::RCP<Teuchos::ParameterList>& problemParams)
+calcTangentDerivDimension(const Teuchos::RCP<Teuchos::ParameterList>& problemParams)
 {
-  Teuchos::ParameterList& parameterParams =
-      problemParams->sublist("Parameters");
-  int  num_param_vecs = parameterParams.get("Number of Parameter Vectors", 0);
-  bool using_old_parameter_list = false;
+  Teuchos::ParameterList& parameterParams          = problemParams->sublist("Parameters");
+  int                     num_param_vecs           = parameterParams.get("Number of Parameter Vectors", 0);
+  bool                    using_old_parameter_list = false;
   if (parameterParams.isType<int>("Number")) {
     int numParameters = parameterParams.get<int>("Number");
     if (numParameters > 0) {
@@ -55,9 +53,7 @@ calcTangentDerivDimension(
   int np = 0;
   for (int i = 0; i < num_param_vecs; ++i) {
     Teuchos::ParameterList& pList =
-        using_old_parameter_list ?
-            parameterParams :
-            parameterParams.sublist(Albany::strint("Parameter Vector", i));
+        using_old_parameter_list ? parameterParams : parameterParams.sublist(Albany::strint("Parameter Vector", i));
     np += pList.get<int>("Number");
   }
   return std::max(1, np);
@@ -119,11 +115,8 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   problemParams = Teuchos::sublist(params, "Problem", true);
 
   ProblemFactory problemFactory(params, paramLib, comm);
-  rc_mgr = AAdapt::rc::Manager::create(
-      Teuchos::rcp(&stateMgr, false), *problemParams);
-  if (Teuchos::nonnull(rc_mgr)) {
-    problemFactory.setReferenceConfigurationManager(rc_mgr);
-  }
+  rc_mgr = AAdapt::rc::Manager::create(Teuchos::rcp(&stateMgr, false), *problemParams);
+  if (Teuchos::nonnull(rc_mgr)) { problemFactory.setReferenceConfigurationManager(rc_mgr); }
   problem = problemFactory.create();
 
   // Validate Problem parameters against list for this specific problem
@@ -148,10 +141,8 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
 
   // Possibly set in the Discretization list in the input file - this overrides
   // the above if set
-  int num_time_deriv_from_input =
-      discParams.get<int>("Number Of Time Derivatives", -1);
-  if (num_time_deriv_from_input <
-      0)  // Use the value from the problem by default
+  int num_time_deriv_from_input = discParams.get<int>("Number Of Time Derivatives", -1);
+  if (num_time_deriv_from_input < 0)  // Use the value from the problem by default
     discParams.set<int>("Number Of Time Derivatives", num_time_deriv);
   else
     num_time_deriv = num_time_deriv_from_input;
@@ -179,61 +170,48 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
     Teuchos::ParameterList& piro_params = params->sublist("Piro");
     bool const              have_nox    = piro_params.isSublist("NOX");
     if (have_nox) {
-      Teuchos::ParameterList nox_params = piro_params.sublist("NOX");
-      std::string            nonlinear_solver =
-          nox_params.get<std::string>("Nonlinear Solver");
+      Teuchos::ParameterList nox_params       = piro_params.sublist("NOX");
+      std::string            nonlinear_solver = nox_params.get<std::string>("Nonlinear Solver");
     }
   } else if (solutionMethod == "Transient") {
     solMethod = Transient;
   } else if (solutionMethod == "Eigensolve") {
     solMethod = Eigensolve;
-  } else if (
-      solutionMethod == "Transient Tempus" || "Transient Tempus No Piro") {
+  } else if (solutionMethod == "Transient Tempus" || "Transient Tempus No Piro") {
     solMethod = TransientTempus;
 
     // Add NOX pre-post-operator for debugging.
     bool const have_piro = params->isSublist("Piro");
     ALBANY_ASSERT(have_piro == true, "Error! Piro sublist not found.\n");
     Teuchos::ParameterList& piro_params = params->sublist("Piro");
-    bool const have_dbcs = problemParams->isSublist("Dirichlet BCs");
+    bool const              have_dbcs   = problemParams->isSublist("Dirichlet BCs");
     if (have_dbcs == false) no_dir_bcs_ = true;
     bool const have_tempus = piro_params.isSublist("Tempus");
     ALBANY_ASSERT(have_tempus == true, "Error! Tempus sublist not found.\n");
-    Teuchos::ParameterList& tempus_params = piro_params.sublist("Tempus");
-    bool const have_tempus_stepper = tempus_params.isSublist("Tempus Stepper");
+    Teuchos::ParameterList& tempus_params       = piro_params.sublist("Tempus");
+    bool const              have_tempus_stepper = tempus_params.isSublist("Tempus Stepper");
 
-    ALBANY_ASSERT(
-        have_tempus_stepper == true,
-        "Error! Tempus stepper sublist not found.\n");
+    ALBANY_ASSERT(have_tempus_stepper == true, "Error! Tempus stepper sublist not found.\n");
 
-    Teuchos::ParameterList& tempus_stepper_params =
-        tempus_params.sublist("Tempus Stepper");
+    Teuchos::ParameterList& tempus_stepper_params = tempus_params.sublist("Tempus Stepper");
 
-    std::string stepper_type =
-        tempus_stepper_params.get<std::string>("Stepper Type");
+    std::string stepper_type = tempus_stepper_params.get<std::string>("Stepper Type");
 
     Teuchos::ParameterList nox_params;
 
-    if ((stepper_type == "Newmark Implicit d-Form") ||
-        (stepper_type == "Newmark Implicit a-Form")) {
-      bool const have_solver_name =
-          tempus_stepper_params.isType<std::string>("Solver Name");
+    if ((stepper_type == "Newmark Implicit d-Form") || (stepper_type == "Newmark Implicit a-Form")) {
+      bool const have_solver_name = tempus_stepper_params.isType<std::string>("Solver Name");
 
-      ALBANY_ASSERT(
-          have_solver_name == true,
-          "Error! Implicit solver sublist not found.\n");
+      ALBANY_ASSERT(have_solver_name == true, "Error! Implicit solver sublist not found.\n");
 
-      std::string const solver_name =
-          tempus_stepper_params.get<std::string>("Solver Name");
+      std::string const solver_name = tempus_stepper_params.get<std::string>("Solver Name");
 
-      Teuchos::ParameterList& solver_name_params =
-          tempus_stepper_params.sublist(solver_name);
+      Teuchos::ParameterList& solver_name_params = tempus_stepper_params.sublist(solver_name);
 
       bool const have_nox = solver_name_params.isSublist("NOX");
       ALBANY_ASSERT(have_nox == true, "Error! Nox sublist not found.\n");
-      nox_params = solver_name_params.sublist("NOX");
-      std::string nonlinear_solver =
-          nox_params.get<std::string>("Nonlinear Solver");
+      nox_params                   = solver_name_params.sublist("NOX");
+      std::string nonlinear_solver = nox_params.get<std::string>("Nonlinear Solver");
 
       // Set flag marking that we are running with Tempus + d-Form Newmark +
       // SDBCs.
@@ -247,9 +225,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
                  "Search Based'.");
         }
       }
-      if (stepper_type == "Newmark Implicit a-Form") {
-        requires_orig_dbcs_ = true;
-      }
+      if (stepper_type == "Newmark Implicit a-Form") { requires_orig_dbcs_ = true; }
     } else if (stepper_type == "Newmark Explicit a-Form") {
       requires_sdbcs_ = true;
     }
@@ -264,65 +240,51 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   std::string stepperType;
   if (solMethod == Transient) {
     // Get Piro PL
-    Teuchos::RCP<Teuchos::ParameterList> piroParams =
-        Teuchos::sublist(params, "Piro", true);
+    Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(params, "Piro", true);
     // Check if there is Rythmos Solver sublist, and get the stepper type
     if (piroParams->isSublist("Rythmos Solver")) {
-      Teuchos::RCP<Teuchos::ParameterList> rythmosSolverParams =
-          Teuchos::sublist(piroParams, "Rythmos Solver", true);
+      Teuchos::RCP<Teuchos::ParameterList> rythmosSolverParams = Teuchos::sublist(piroParams, "Rythmos Solver", true);
       if (rythmosSolverParams->isSublist("Rythmos")) {
-        Teuchos::RCP<Teuchos::ParameterList> rythmosParams =
-            Teuchos::sublist(rythmosSolverParams, "Rythmos", true);
+        Teuchos::RCP<Teuchos::ParameterList> rythmosParams = Teuchos::sublist(rythmosSolverParams, "Rythmos", true);
         if (rythmosParams->isSublist("Stepper Settings")) {
           Teuchos::RCP<Teuchos::ParameterList> stepperSettingsParams =
               Teuchos::sublist(rythmosParams, "Stepper Settings", true);
           if (stepperSettingsParams->isSublist("Stepper Selection")) {
             Teuchos::RCP<Teuchos::ParameterList> stepperSelectionParams =
-                Teuchos::sublist(
-                    stepperSettingsParams, "Stepper Selection", true);
-            stepperType =
-                stepperSelectionParams->get("Stepper Type", "Backward Euler");
+                Teuchos::sublist(stepperSettingsParams, "Stepper Selection", true);
+            stepperType = stepperSelectionParams->get("Stepper Type", "Backward Euler");
           }
         }
       }
     }
     // Check if there is Rythmos sublist, and get the stepper type
     else if (piroParams->isSublist("Rythmos")) {
-      Teuchos::RCP<Teuchos::ParameterList> rythmosParams =
-          Teuchos::sublist(piroParams, "Rythmos", true);
-      stepperType = rythmosParams->get("Stepper Type", "Backward Euler");
+      Teuchos::RCP<Teuchos::ParameterList> rythmosParams = Teuchos::sublist(piroParams, "Rythmos", true);
+      stepperType                                        = rythmosParams->get("Stepper Type", "Backward Euler");
     }
   } else if (solMethod == TransientTempus) {
     // Get Piro PL
-    Teuchos::RCP<Teuchos::ParameterList> piroParams =
-        Teuchos::sublist(params, "Piro", true);
+    Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(params, "Piro", true);
     // Check if there is Rythmos Solver sublist, and get the stepper type
     if (piroParams->isSublist("Tempus")) {
-      Teuchos::RCP<Teuchos::ParameterList> rythmosSolverParams =
-          Teuchos::sublist(piroParams, "Tempus", true);
+      Teuchos::RCP<Teuchos::ParameterList> rythmosSolverParams = Teuchos::sublist(piroParams, "Tempus", true);
     }
   }
 
   determinePiroSolver(params);
 
-  physicsBasedPreconditioner =
-      problemParams->get("Use Physics-Based Preconditioner", false);
-  if (physicsBasedPreconditioner) {
-    precType = problemParams->get("Physics-Based Preconditioner", "Teko");
-  }
+  physicsBasedPreconditioner = problemParams->get("Use Physics-Based Preconditioner", false);
+  if (physicsBasedPreconditioner) { precType = problemParams->get("Physics-Based Preconditioner", "Teko"); }
 
   // Create debug output object
-  auto debugParams = Teuchos::sublist(params, "Debug Output", true);
-  writeToMatrixMarketSol =
-      debugParams->get("Write Solution to MatrixMarket", 0);
-  writeToMatrixMarketRes =
-      debugParams->get("Write Residual to MatrixMarket", 0);
-  writeToMatrixMarketJac =
-      debugParams->get("Write Jacobian to MatrixMarket", 0);
-  writeToCoutSol     = debugParams->get("Write Solution to Standard Output", 0);
-  writeToCoutRes     = debugParams->get("Write Residual to Standard Output", 0);
-  writeToCoutJac     = debugParams->get("Write Jacobian to Standard Output", 0);
-  derivatives_check_ = debugParams->get<int>("Derivative Check", 0);
+  auto debugParams       = Teuchos::sublist(params, "Debug Output", true);
+  writeToMatrixMarketSol = debugParams->get("Write Solution to MatrixMarket", 0);
+  writeToMatrixMarketRes = debugParams->get("Write Residual to MatrixMarket", 0);
+  writeToMatrixMarketJac = debugParams->get("Write Jacobian to MatrixMarket", 0);
+  writeToCoutSol         = debugParams->get("Write Solution to Standard Output", 0);
+  writeToCoutRes         = debugParams->get("Write Residual to Standard Output", 0);
+  writeToCoutJac         = debugParams->get("Write Jacobian to Standard Output", 0);
+  derivatives_check_     = debugParams->get<int>("Derivative Check", 0);
   // the above parameters cannot have values < -1
   if (writeToMatrixMarketSol < -1) {
     ALBANY_ABORT(
@@ -376,24 +338,21 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   discFactory = rcp(new Albany::DiscretizationFactory(params, comm));
 
   // Check for Schwarz parameters
-  bool const has_app_array = params->isParameter("Application Array");
-  bool const has_app_index = params->isParameter("Application Index");
-  bool const has_app_name_index_map =
-      params->isParameter("Application Name Index Map");
+  bool const has_app_array          = params->isParameter("Application Array");
+  bool const has_app_index          = params->isParameter("Application Index");
+  bool const has_app_name_index_map = params->isParameter("Application Name Index Map");
 
   // Only if all these are present set them in the app.
   bool const has_all = has_app_array && has_app_index && has_app_name_index_map;
 
   if (has_all == true) {
     Teuchos::ArrayRCP<Teuchos::RCP<Application>> aa =
-        params->get<Teuchos::ArrayRCP<Teuchos::RCP<Application>>>(
-            "Application Array");
+        params->get<Teuchos::ArrayRCP<Teuchos::RCP<Application>>>("Application Array");
 
     int const ai = params->get<int>("Application Index");
 
     Teuchos::RCP<std::map<std::string, int>> anim =
-        params->get<Teuchos::RCP<std::map<std::string, int>>>(
-            "Application Name Index Map");
+        params->get<Teuchos::RCP<std::map<std::string, int>>>("Application Name Index Map");
 
     this->setApplications(aa.create_weak());
     this->setAppIndex(ai);
@@ -424,8 +383,7 @@ Application::buildProblem()
 
   problem->buildProblem(meshSpecs, stateMgr);
 
-  if ((requires_sdbcs_ == true) && (problem->useSDBCs() == false) &&
-      (no_dir_bcs_ == false)) {
+  if ((requires_sdbcs_ == true) && (problem->useSDBCs() == false) && (no_dir_bcs_ == false)) {
     ALBANY_ABORT(
         "Error in Albany::Application: you are using a "
         "solver that requires SDBCs yet you are not "
@@ -456,40 +414,28 @@ Application::buildProblem()
   // are responses that setup states, which has to happen before the
   // discretization is created.  We will delay setup of the distributed
   // responses to deal with this temporarily.
-  Teuchos::ParameterList& responseList =
-      problemParams->sublist("Response Functions");
-  ResponseFactory responseFactory(
-      Teuchos::rcp(this, false),
-      problem,
-      meshSpecs,
-      Teuchos::rcp(&stateMgr, false));
+  Teuchos::ParameterList& responseList = problemParams->sublist("Response Functions");
+  ResponseFactory responseFactory(Teuchos::rcp(this, false), problem, meshSpecs, Teuchos::rcp(&stateMgr, false));
   responses            = responseFactory.createResponseFunctions(responseList);
   observe_responses    = responseList.get("Observe Responses", true);
   response_observ_freq = responseList.get("Responses Observation Frequency", 1);
   const Teuchos::Array<unsigned int> defaultDataUnsignedInt;
-  relative_responses =
-      responseList.get("Relative Responses Markers", defaultDataUnsignedInt);
+  relative_responses = responseList.get("Relative Responses Markers", defaultDataUnsignedInt);
 
   // Build state field manager
   if (Teuchos::nonnull(rc_mgr)) rc_mgr->beginBuildingSfm();
   sfm.resize(meshSpecs.size());
-  Teuchos::RCP<PHX::DataLayout> dummy =
-      Teuchos::rcp(new PHX::MDALayout<Dummy>(0));
+  Teuchos::RCP<PHX::DataLayout> dummy = Teuchos::rcp(new PHX::MDALayout<Dummy>(0));
   for (int ps = 0; ps < meshSpecs.size(); ps++) {
-    std::string              elementBlockName = meshSpecs[ps]->ebName;
-    std::vector<std::string> responseIDs_to_require =
-        stateMgr.getResidResponseIDsToRequire(elementBlockName);
-    sfm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
+    std::string              elementBlockName       = meshSpecs[ps]->ebName;
+    std::vector<std::string> responseIDs_to_require = stateMgr.getResidResponseIDsToRequire(elementBlockName);
+    sfm[ps]                                         = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
     Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>> tags =
-        problem->buildEvaluators(
-            *sfm[ps], *meshSpecs[ps], stateMgr, BUILD_STATE_FM, Teuchos::null);
+        problem->buildEvaluators(*sfm[ps], *meshSpecs[ps], stateMgr, BUILD_STATE_FM, Teuchos::null);
     std::vector<std::string>::const_iterator it;
-    for (it = responseIDs_to_require.begin();
-         it != responseIDs_to_require.end();
-         it++) {
+    for (it = responseIDs_to_require.begin(); it != responseIDs_to_require.end(); it++) {
       std::string const&                              responseID = *it;
-      PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT> res_response_tag(
-          responseID, dummy);
+      PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT> res_response_tag(responseID, dummy);
       sfm[ps]->requireField<PHAL::AlbanyTraits::Residual>(res_response_tag);
     }
   }
@@ -514,11 +460,10 @@ void
 Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
 {
   // get info from Scaling parameter list (for scaling Jacobian/residual)
-  RCP<Teuchos::ParameterList> scalingParams =
-      Teuchos::sublist(params, "Scaling", true);
-  scale                 = scalingParams->get<double>("Scale", 0.0);
-  scaleBCdofs           = scalingParams->get<bool>("Scale BC Dofs", false);
-  std::string scaleType = scalingParams->get<std::string>("Type", "Constant");
+  RCP<Teuchos::ParameterList> scalingParams = Teuchos::sublist(params, "Scaling", true);
+  scale                                     = scalingParams->get<double>("Scale", 0.0);
+  scaleBCdofs                               = scalingParams->get<bool>("Scale BC Dofs", false);
+  std::string scaleType                     = scalingParams->get<std::string>("Type", "Constant");
 
   if (scale == 0.0) { scale = 1.0; }
 
@@ -532,9 +477,8 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
     scale      = 1.0e1;
   } else {
     ALBANY_ABORT(
-        "The scaling Type you selected "
-        << scaleType << " is not supported!"
-        << "Supported scaling Types are currently: Constant" << std::endl);
+        "The scaling Type you selected " << scaleType << " is not supported!"
+                                         << "Supported scaling Types are currently: Constant" << std::endl);
   }
 
   if (scale == 1.0) scaleBCdofs = false;
@@ -575,19 +519,14 @@ Application::finalSetUp(
     // Get parameter vector spaces and build parameter vector
     // Create distributed parameter and set workset_elem_dofs
     Teuchos::RCP<DistributedParameter> parameter(new DistributedParameter(
-        param_name,
-        disc->getVectorSpace(param_name),
-        disc->getOverlapVectorSpace(param_name)));
-    parameter->set_workset_elem_dofs(
-        Teuchos::rcpFromRef(disc->getElNodeEqID(param_name)));
+        param_name, disc->getVectorSpace(param_name), disc->getOverlapVectorSpace(param_name)));
+    parameter->set_workset_elem_dofs(Teuchos::rcpFromRef(disc->getElNodeEqID(param_name)));
 
     // Get the vector and lower/upper bounds, and fill them with available
     // data
-    Teuchos::RCP<Thyra_Vector> dist_param = parameter->vector();
-    Teuchos::RCP<Thyra_Vector> dist_param_lowerbound =
-        parameter->lower_bounds_vector();
-    Teuchos::RCP<Thyra_Vector> dist_param_upperbound =
-        parameter->upper_bounds_vector();
+    Teuchos::RCP<Thyra_Vector> dist_param            = parameter->vector();
+    Teuchos::RCP<Thyra_Vector> dist_param_lowerbound = parameter->lower_bounds_vector();
+    Teuchos::RCP<Thyra_Vector> dist_param_upperbound = parameter->upper_bounds_vector();
 
     std::stringstream lowerbound_name, upperbound_name;
     lowerbound_name << param_name << "_lowerbound";
@@ -597,12 +536,9 @@ Application::finalSetUp(
     disc->getField(*dist_param, param_name);
     const auto& nodal_param_states = disc->getNodalParameterSIS();
     bool        has_lowerbound(false), has_upperbound(false);
-    for (int ist = 0; ist < static_cast<int>(nodal_param_states.size());
-         ist++) {
-      has_lowerbound = has_lowerbound ||
-                       (nodal_param_states[ist]->name == lowerbound_name.str());
-      has_upperbound = has_upperbound ||
-                       (nodal_param_states[ist]->name == upperbound_name.str());
+    for (int ist = 0; ist < static_cast<int>(nodal_param_states.size()); ist++) {
+      has_lowerbound = has_lowerbound || (nodal_param_states[ist]->name == lowerbound_name.str());
+      has_upperbound = has_upperbound || (nodal_param_states[ist]->name == upperbound_name.str());
     }
     if (has_lowerbound) {
       disc->getField(*dist_param_lowerbound, lowerbound_name.str());
@@ -616,14 +552,10 @@ Application::finalSetUp(
     }
     // JR: for now, initialize to constant value from user input if requested.
     // This needs to be generalized.
-    if (params->sublist("Problem").isType<Teuchos::ParameterList>(
-            "Topology Parameters")) {
-      Teuchos::ParameterList& topoParams =
-          params->sublist("Problem").sublist("Topology Parameters");
-      if (topoParams.isType<std::string>("Entity Type") &&
-          topoParams.isType<double>("Initial Value")) {
-        if (topoParams.get<std::string>("Entity Type") ==
-                "Distributed Parameter" &&
+    if (params->sublist("Problem").isType<Teuchos::ParameterList>("Topology Parameters")) {
+      Teuchos::ParameterList& topoParams = params->sublist("Problem").sublist("Topology Parameters");
+      if (topoParams.isType<std::string>("Entity Type") && topoParams.isType<double>("Initial Value")) {
+        if (topoParams.get<std::string>("Entity Type") == "Distributed Parameter" &&
             topoParams.get<std::string>("Topology Name") == param_name) {
           double initVal = topoParams.get<double>("Initial Value");
           dist_param->assign(initVal);
@@ -649,8 +581,7 @@ Application::finalSetUp(
   nfm = problem->getNeumannFieldManager();
 
   if (comm->getRank() == 0) {
-    phxGraphVisDetail =
-        problemParams->get("Phalanx Graph Visualization Detail", 0);
+    phxGraphVisDetail   = problemParams->get("Phalanx Graph Visualization Detail", 0);
     stateGraphVisDetail = phxGraphVisDetail;
   }
 
@@ -662,8 +593,7 @@ Application::finalSetUp(
   // Allow Problem to add custom NOX status test
   problem->applyProblemSpecificSolverSettings(params);
 
-  ignore_residual_in_jacobian =
-      problemParams->get("Ignore Residual In Jacobian", false);
+  ignore_residual_in_jacobian = problemParams->get("Ignore Residual In Jacobian", false);
 
   perturbBetaForDirichlets = problemParams->get("Perturb Dirichlet", 0.0);
 
@@ -673,11 +603,9 @@ Application::finalSetUp(
   // "Compute Sensitivity" flag as a default value for the new flag location
   // when the latter has been left undefined
   std::string const              sensitivityToken = "Compute Sensitivities";
-  const Teuchos::Ptr<bool const> oldSensitivityFlag(
-      problemParams->getPtr<bool>(sensitivityToken));
+  const Teuchos::Ptr<bool const> oldSensitivityFlag(problemParams->getPtr<bool>(sensitivityToken));
   if (Teuchos::nonnull(oldSensitivityFlag)) {
-    Teuchos::ParameterList& solveParams =
-        params->sublist("Piro").sublist("Analysis").sublist("Solve");
+    Teuchos::ParameterList& solveParams = params->sublist("Piro").sublist("Analysis").sublist("Solve");
     solveParams.get(sensitivityToken, *oldSensitivityFlag);
   }
 
@@ -767,11 +695,11 @@ namespace {
 inline Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>&
 deref_nfm(
     Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>>& nfm,
-    const WorksetArray<int>::type& wsPhysIndex,
-    int                            ws)
+    const WorksetArray<int>::type&                                          wsPhysIndex,
+    int                                                                     ws)
 {
-  return nfm.size() == 1 ?  // Currently, all problems seem to have one nfm ...
-             nfm[0] :       // ... hence this is the intended behavior ...
+  return nfm.size() == 1 ?          // Currently, all problems seem to have one nfm ...
+             nfm[0] :               // ... hence this is the intended behavior ...
              nfm[wsPhysIndex[ws]];  // ... and this is not, but may one day be
                                     // again.
 }
@@ -785,10 +713,10 @@ dfm_set(
     Teuchos::RCP<Thyra_Vector const> const& xdd,
     Teuchos::RCP<AAdapt::rc::Manager>&      rc_mgr)
 {
-  workset.x              = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(x) : x;
-  workset.xdot           = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(xd) : xd;
-  workset.xdotdot        = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(xdd) : xdd;
-  workset.transientTerms = Teuchos::nonnull(xd);
+  workset.x                 = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(x) : x;
+  workset.xdot              = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(xd) : xd;
+  workset.xdotdot           = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(xdd) : xdd;
+  workset.transientTerms    = Teuchos::nonnull(xd);
   workset.accelerationTerms = Teuchos::nonnull(xdd);
 }
 
@@ -844,8 +772,7 @@ checkDerivatives(
   // Construct a perturbation.
   double const               delta = 1e-7;
   Teuchos::RCP<Thyra_Vector> xd    = w1;
-  xd->randomize(
-      -Teuchos::ScalarTraits<ST>::rmax(), Teuchos::ScalarTraits<ST>::rmax());
+  xd->randomize(-Teuchos::ScalarTraits<ST>::rmax(), Teuchos::ScalarTraits<ST>::rmax());
   Teuchos::RCP<Thyra_Vector> xpd = w2;
   {
     const Teuchos::ArrayRCP<const RealType> x_d   = getLocalData(x);
@@ -918,8 +845,7 @@ checkDerivatives(
   double const den = std::max(fdn, Jxdn), e = dn / den;
   *Teuchos::VerboseObjectBase::getDefaultOStream()
       << "Albany::Application Check Derivatives level " << check_lvl << ":\n"
-      << "   reldif(f(x + dx) - f(x), J(x) dx) = " << e
-      << ",\n which should be on the order of " << xdn << "\n";
+      << "   reldif(f(x + dx) - f(x), J(x) dx) = " << e << ",\n which should be on the order of " << xdn << "\n";
 
   if (Teuchos::nonnull(mv)) {
     static int        ctr = 0;
@@ -1037,8 +963,7 @@ Application::postRegSetupDImpl()
     phxSetup->insert_eval(evalName);
 
     std::vector<PHX::index_size_type> derivative_dimensions;
-    derivative_dimensions.push_back(
-        PHAL::getDerivativeDimensions<EvalT>(this, ps));
+    derivative_dimensions.push_back(PHAL::getDerivativeDimensions<EvalT>(this, ps));
     fm[ps]->setKokkosExtendedDataTypeDimensions<EvalT>(derivative_dimensions);
     fm[ps]->postRegistrationSetupForType<EvalT>(*phxSetup);
 
@@ -1052,8 +977,7 @@ Application::postRegSetupDImpl()
       evalName = PHAL::evalName<EvalT>("NFM", ps);
       phxSetup->insert_eval(evalName);
 
-      nfm[ps]->setKokkosExtendedDataTypeDimensions<EvalT>(
-          derivative_dimensions);
+      nfm[ps]->setKokkosExtendedDataTypeDimensions<EvalT>(derivative_dimensions);
       nfm[ps]->postRegistrationSetupForType<EvalT>(*phxSetup);
 
       // Update phalanx saved/unsaved fields based on field dependencies
@@ -1070,8 +994,7 @@ Application::postRegSetupDImpl()
     // amb Need to look into this. What happens with DBCs in meshes having
     // different element types?
     std::vector<PHX::index_size_type> derivative_dimensions;
-    derivative_dimensions.push_back(
-        PHAL::getDerivativeDimensions<EvalT>(this, 0));
+    derivative_dimensions.push_back(PHAL::getDerivativeDimensions<EvalT>(this, 0));
     dfm->setKokkosExtendedDataTypeDimensions<EvalT>(derivative_dimensions);
     dfm->postRegistrationSetupForType<EvalT>(*phxSetup);
 
@@ -1092,8 +1015,8 @@ Application::writePhalanxGraph(
 {
   if (phxGraphVisDetail > 0) {
     bool const detail = (phxGraphVisDetail > 1) ? true : false;
-    *out << "Phalanx writing graphviz file for graph of " << evalName
-         << " (detail = " << phxGraphVisDetail << ")" << std::endl;
+    *out << "Phalanx writing graphviz file for graph of " << evalName << " (detail = " << phxGraphVisDetail << ")"
+         << std::endl;
     std::string const graphName = "phalanxGraph" + evalName;
     *out << "Process using 'dot -Tpng -O " << graphName << std::endl;
     fm->writeGraphvizFile<EvalT>(graphName, detail, detail);
@@ -1125,8 +1048,7 @@ Application::computeGlobalResidualImpl(
 
   Teuchos::RCP<Thyra_Vector> const overlapped_f = solMgr->get_overlapped_f();
 
-  Teuchos::RCP<const CombineAndScatterManager> cas_manager =
-      solMgr->get_cas_manager();
+  Teuchos::RCP<const CombineAndScatterManager> cas_manager = solMgr->get_cas_manager();
 
   // Scatter x and xdot to the overlapped distrbution
   solMgr->scatterX(*x, x_dot.ptr(), x_dotdot.ptr());
@@ -1136,9 +1058,7 @@ Application::computeGlobalResidualImpl(
 
   // Set parameters
   for (int i = 0; i < p.size(); i++) {
-    for (unsigned int j = 0; j < p[i].size(); j++) {
-      p[i][j].family->setRealValueForAllTypes(p[i][j].baseValue);
-    }
+    for (unsigned int j = 0; j < p[i].size(); j++) { p[i][j].family->setRealValueForAllTypes(p[i][j].baseValue); }
   }
 
   // Store pointers to solution and time derivatives.
@@ -1192,9 +1112,7 @@ Application::computeGlobalResidualImpl(
       // FillType template argument used to specialize Sacado
       fm[wsPhysIndex[ws]]->evaluateFields<EvalT>(workset);
 
-      if (nfm != Teuchos::null) {
-        deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
-      }
+      if (nfm != Teuchos::null) { deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset); }
     }
   }
 
@@ -1223,9 +1141,7 @@ Application::computeGlobalResidualImpl(
   ALBANY_ASSERT(scale == 1.0, "non-unity scale implementation requires MPI!");
 #endif
 
-  if (scaleBCdofs == false && scale != 1.0) {
-    Thyra::ele_wise_scale<ST>(*scaleVec_, f.ptr());
-  }
+  if (scaleBCdofs == false && scale != 1.0) { Thyra::ele_wise_scale<ST>(*scaleVec_, f.ptr()); }
 
   // Push the assembled residual values back into the overlap vector
   cas_manager->scatter(f, overlapped_f, CombineMode::INSERT);
@@ -1236,8 +1152,7 @@ Application::computeGlobalResidualImpl(
   // Apply Dirichlet conditions using dfm (Dirchelt Field Manager)
 
   if (dfm != Teuchos::null) {
-    PHAL::Workset workset =
-        set_dfm_workset(current_time, x, x_dot, x_dotdot, f);
+    PHAL::Workset workset = set_dfm_workset(current_time, x, x_dot, x_dotdot, f);
 
     // FillType template argument used to specialize Sacado
     dfm->evaluateFields<EvalT>(workset);
@@ -1262,11 +1177,9 @@ Application::computeGlobalResidual(
   // Debut output write residual or solution to MatrixMarket
   // every time it arises or at requested count#
   auto const write_sol_mm =
-      writeToMatrixMarketSol != 0 &&
-      (writeToMatrixMarketSol == -1 || countSol == writeToMatrixMarketSol);
+      writeToMatrixMarketSol != 0 && (writeToMatrixMarketSol == -1 || countSol == writeToMatrixMarketSol);
   if (write_sol_mm == true) { writeMatrixMarket(x, "sol", countSol); }
-  auto const write_sol_co = writeToCoutSol != 0 && (writeToCoutSol == -1 ||
-                                                    countSol == writeToCoutSol);
+  auto const write_sol_co = writeToCoutSol != 0 && (writeToCoutSol == -1 || countSol == writeToCoutSol);
   if (write_sol_co == true) {
     std::cout << "Global Solution #" << countSol << ": " << std::endl;
     describe(x.getConst(), *out, Teuchos::VERB_EXTREME);
@@ -1274,11 +1187,9 @@ Application::computeGlobalResidual(
   if (writeToMatrixMarketSol != 0 || writeToCoutSol != 0) { countSol++; }
 
   auto const write_red_mm =
-      writeToMatrixMarketRes != 0 &&
-      (writeToMatrixMarketRes == -1 || countRes == writeToMatrixMarketRes);
+      writeToMatrixMarketRes != 0 && (writeToMatrixMarketRes == -1 || countRes == writeToMatrixMarketRes);
   if (write_red_mm == true) { writeMatrixMarket(f, "rhs", countRes); }
-  auto const write_red_co = writeToCoutRes != 0 && (writeToCoutRes == -1 ||
-                                                    countRes == writeToCoutRes);
+  auto const write_red_co = writeToCoutRes != 0 && (writeToCoutRes == -1 || countRes == writeToCoutRes);
   if (write_red_co == true) {
     std::cout << "Global Residual #" << countRes << ": " << std::endl;
     describe(f.getConst(), *out, Teuchos::VERB_EXTREME);
@@ -1324,9 +1235,7 @@ Application::computeGlobalJacobianImpl(
 
   // Set parameters
   for (int i = 0; i < p.size(); i++) {
-    for (unsigned int j = 0; j < p[i].size(); j++) {
-      p[i][j].family->setRealValueForAllTypes(p[i][j].baseValue);
-    }
+    for (unsigned int j = 0; j < p[i].size(); j++) { p[i][j].family->setRealValueForAllTypes(p[i][j].baseValue); }
   }
 
   // Zero out overlapped residual
@@ -1361,31 +1270,24 @@ Application::computeGlobalJacobianImpl(
 
     // fill Jacobian derivative dimensions:
     for (int ps = 0; ps < fm.size(); ps++) {
-      (workset.Jacobian_deriv_dims)
-          .push_back(PHAL::getDerivativeDimensions<EvalT>(this, ps));
+      (workset.Jacobian_deriv_dims).push_back(PHAL::getDerivativeDimensions<EvalT>(this, ps));
     }
 
-    if (!workset.f.is_null()) {
-      workset.f_kokkos = getNonconstDeviceData(workset.f);
-    }
-    if (!workset.Jac.is_null()) {
-      workset.Jac_kokkos = getNonconstDeviceData(workset.Jac);
-    }
+    if (!workset.f.is_null()) { workset.f_kokkos = getNonconstDeviceData(workset.f); }
+    if (!workset.Jac.is_null()) { workset.Jac_kokkos = getNonconstDeviceData(workset.Jac); }
     for (int ws = 0; ws < numWorksets; ws++) {
       std::string const evalName = PHAL::evalName<EvalT>("FM", wsPhysIndex[ws]);
       loadWorksetBucketInfo<EvalT>(workset, ws, evalName);
 
       // FillType template argument used to specialize Sacado
       fm[wsPhysIndex[ws]]->evaluateFields<EvalT>(workset);
-      if (Teuchos::nonnull(nfm))
-        deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
+      if (Teuchos::nonnull(nfm)) deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
     }
   }
 
   // Allocate and populate scaleVec_
   if (scale != 1.0) {
-    if (scaleVec_ == Teuchos::null ||
-        scaleVec_->space()->dim() != jac->domain()->dim()) {
+    if (scaleVec_ == Teuchos::null || scaleVec_->space()->dim() != jac->domain()->dim()) {
       scaleVec_ = Thyra::createMember(jac->range());
       scaleVec_->assign(0.0);
       setScale();
@@ -1395,9 +1297,7 @@ Application::computeGlobalJacobianImpl(
   {
     TEUCHOS_FUNC_TIME_MONITOR("Albany Jacobian Fill: Export");
     // Assemble global residual
-    if (Teuchos::nonnull(f)) {
-      cas_manager->combine(overlapped_f, f, CombineMode::ADD);
-    }
+    if (Teuchos::nonnull(f)) { cas_manager->combine(overlapped_f, f, CombineMode::ADD); }
     // Assemble global Jacobian
     cas_manager->combine(overlapped_jac, jac, CombineMode::ADD);
   }
@@ -1411,8 +1311,7 @@ Application::computeGlobalJacobianImpl(
     // scale Jacobian
     // We MUST be able to cast jac to ScaledLinearOpBase in order to left
     // scale it.
-    auto jac_scaled_lop =
-        Teuchos::rcp_dynamic_cast<Thyra::ScaledLinearOpBase<ST>>(jac, true);
+    auto jac_scaled_lop = Teuchos::rcp_dynamic_cast<Thyra::ScaledLinearOpBase<ST>>(jac, true);
     jac_scaled_lop->scaleLeft(*scaleVec_);
     resumeFill(jac);
     countScale++;
@@ -1432,8 +1331,7 @@ Application::computeGlobalJacobianImpl(
 
     workset.current_time = this_time;
 
-    if (beta == 0.0 && perturbBetaForDirichlets > 0.0)
-      workset.j_coeff = perturbBetaForDirichlets;
+    if (beta == 0.0 && perturbBetaForDirichlets > 0.0) workset.j_coeff = perturbBetaForDirichlets;
 
     dfm_set(workset, x, xdot, xdotdot, rc_mgr);
 
@@ -1461,8 +1359,7 @@ Application::computeGlobalJacobianImpl(
     if (Teuchos::nonnull(f)) { Thyra::ele_wise_scale<ST>(*scaleVec_, f.ptr()); }
     // We MUST be able to cast jac to ScaledLinearOpBase in order to left scale
     // it.
-    auto jac_scaled_lop =
-        Teuchos::rcp_dynamic_cast<Thyra::ScaledLinearOpBase<ST>>(jac, true);
+    auto jac_scaled_lop = Teuchos::rcp_dynamic_cast<Thyra::ScaledLinearOpBase<ST>>(jac, true);
     jac_scaled_lop->scaleLeft(*scaleVec_);
   }
 
@@ -1471,8 +1368,7 @@ Application::computeGlobalJacobianImpl(
     fillComplete(overlapped_jac);
   }
   if (derivatives_check_ > 0) {
-    checkDerivatives(
-        *this, current_time, x, xdot, xdotdot, p, f, jac, derivatives_check_);
+    checkDerivatives(*this, current_time, x, xdot, xdotdot, p, f, jac, derivatives_check_);
   }
 }  // namespace Albany
 
@@ -1490,8 +1386,7 @@ Application::computeGlobalJacobian(
     const Teuchos::RCP<Thyra_LinearOp>&     jac,
     double const                            dt)
 {
-  this->computeGlobalJacobianImpl(
-      alpha, beta, omega, current_time, x, xdot, xdotdot, p, f, jac, dt);
+  this->computeGlobalJacobianImpl(alpha, beta, omega, current_time, x, xdot, xdotdot, p, f, jac, dt);
   // Debut output
   if (writeToMatrixMarketJac != 0) {
     // If requesting writing to MatrixMarket of Jacobian...
@@ -1531,26 +1426,20 @@ Application::evaluateResponse(
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response");
   double const this_time = fixTime(current_time);
-  responses[response_index]->evaluateResponse(
-      this_time, x, xdot, xdotdot, p, g);
+  responses[response_index]->evaluateResponse(this_time, x, xdot, xdotdot, p, g);
 }
 
 void
-Application::evaluateStateFieldManager(
-    double const             current_time,
-    const Thyra_MultiVector& x)
+Application::evaluateStateFieldManager(double const current_time, const Thyra_MultiVector& x)
 {
   int num_vecs = x.domain()->dim();
 
   if (num_vecs == 1) {
-    this->evaluateStateFieldManager(
-        current_time, *x.col(0), Teuchos::null, Teuchos::null);
+    this->evaluateStateFieldManager(current_time, *x.col(0), Teuchos::null, Teuchos::null);
   } else if (num_vecs == 2) {
-    this->evaluateStateFieldManager(
-        current_time, *x.col(0), x.col(1).ptr(), Teuchos::null);
+    this->evaluateStateFieldManager(current_time, *x.col(0), x.col(1).ptr(), Teuchos::null);
   } else {
-    this->evaluateStateFieldManager(
-        current_time, *x.col(0), x.col(1).ptr(), x.col(2).ptr());
+    this->evaluateStateFieldManager(current_time, *x.col(0), x.col(1).ptr(), x.col(2).ptr());
   }
 }
 
@@ -1563,29 +1452,22 @@ Application::evaluateStateFieldManager(
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: State Residual");
   {
-    std::string evalName =
-        PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", 0);
+    std::string evalName = PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", 0);
     if (!phxSetup->contain_eval(evalName)) {
       for (int ps = 0; ps < sfm.size(); ++ps) {
         evalName = PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", ps);
         phxSetup->insert_eval(evalName);
 
         std::vector<PHX::index_size_type> derivative_dimensions;
-        derivative_dimensions.push_back(
-            PHAL::getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(
-                this, ps));
-        sfm[ps]
-            ->setKokkosExtendedDataTypeDimensions<PHAL::AlbanyTraits::Jacobian>(
-                derivative_dimensions);
+        derivative_dimensions.push_back(PHAL::getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(this, ps));
+        sfm[ps]->setKokkosExtendedDataTypeDimensions<PHAL::AlbanyTraits::Jacobian>(derivative_dimensions);
         sfm[ps]->postRegistrationSetup(*phxSetup);
 
         // Update phalanx saved/unsaved fields based on field dependencies
-        phxSetup->check_fields(
-            sfm[ps]->getFieldTagsForSizing<PHAL::AlbanyTraits::Residual>());
+        phxSetup->check_fields(sfm[ps]->getFieldTagsForSizing<PHAL::AlbanyTraits::Residual>());
         phxSetup->update_fields();
 
-        writePhalanxGraph<PHAL::AlbanyTraits::Residual>(
-            sfm[ps], evalName, stateGraphVisDetail);
+        writePhalanxGraph<PHAL::AlbanyTraits::Residual>(sfm[ps], evalName, stateGraphVisDetail);
       }
     }
   }
@@ -1612,8 +1494,7 @@ Application::evaluateStateFieldManager(
   // Perform fill via field manager
   if (Teuchos::nonnull(rc_mgr)) rc_mgr->beginEvaluatingSfm();
   for (int ws = 0; ws < numWorksets; ws++) {
-    std::string const evalName =
-        PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", wsPhysIndex[ws]);
+    std::string const evalName = PHAL::evalName<PHAL::AlbanyTraits::Residual>("SFM", wsPhysIndex[ws]);
     loadWorksetBucketInfo<PHAL::AlbanyTraits::Residual>(workset, ws, evalName);
     sfm[wsPhysIndex[ws]]->evaluateFields<PHAL::AlbanyTraits::Residual>(workset);
   }
@@ -1626,8 +1507,7 @@ Application::registerShapeParameters()
   int numShParams = shapeParams.size();
   if (shapeParamNames.size() == 0) {
     shapeParamNames.resize(numShParams);
-    for (int i = 0; i < numShParams; i++)
-      shapeParamNames[i] = strint("ShapeParam", i);
+    for (int i = 0; i < numShParams; i++) shapeParamNames[i] = strint("ShapeParam", i);
   }
   DummyParameterAccessor<PHAL::AlbanyTraits::Jacobian, SPL_Traits>* dJ =
       new DummyParameterAccessor<PHAL::AlbanyTraits::Jacobian, SPL_Traits>();
@@ -1636,10 +1516,8 @@ Application::registerShapeParameters()
   // create dummy ones for other type that will not be used.
   for (int i = 0; i < numShParams; i++) {
     *out << "Registering Shape Param " << shapeParamNames[i] << std::endl;
-    new Sacado::ParameterRegistration<PHAL::AlbanyTraits::Residual, SPL_Traits>(
-        shapeParamNames[i], this, paramLib);
-    new Sacado::ParameterRegistration<PHAL::AlbanyTraits::Jacobian, SPL_Traits>(
-        shapeParamNames[i], dJ, paramLib);
+    new Sacado::ParameterRegistration<PHAL::AlbanyTraits::Residual, SPL_Traits>(shapeParamNames[i], this, paramLib);
+    new Sacado::ParameterRegistration<PHAL::AlbanyTraits::Jacobian, SPL_Traits>(shapeParamNames[i], dJ, paramLib);
   }
 }
 
@@ -1661,24 +1539,20 @@ Application::getValue(std::string const& name)
 }
 
 void
-Application::determinePiroSolver(
-    const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams)
+Application::determinePiroSolver(const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams)
 {
-  const Teuchos::RCP<Teuchos::ParameterList>& localProblemParams =
-      Teuchos::sublist(topLevelParams, "Problem", true);
+  const Teuchos::RCP<Teuchos::ParameterList>& localProblemParams = Teuchos::sublist(topLevelParams, "Problem", true);
 
-  const Teuchos::RCP<Teuchos::ParameterList>& piroParams =
-      Teuchos::sublist(topLevelParams, "Piro");
+  const Teuchos::RCP<Teuchos::ParameterList>& piroParams = Teuchos::sublist(topLevelParams, "Piro");
 
   // If not explicitly specified, determine which Piro solver to use from the
   // problem parameters
   if (!piroParams->getPtr<std::string>("Solver Type")) {
-    std::string const secondOrder =
-        localProblemParams->get("Second Order", "No");
+    std::string const secondOrder = localProblemParams->get("Second Order", "No");
 
     ALBANY_PANIC(
-        secondOrder != "No" && secondOrder != "Velocity Verlet" &&
-            secondOrder != "Newmark" && secondOrder != "Trapezoid Rule",
+        secondOrder != "No" && secondOrder != "Velocity Verlet" && secondOrder != "Newmark" &&
+            secondOrder != "Trapezoid Rule",
         "Invalid value for Second Order: (No, Velocity Verlet, Newmark, "
         "Trapezoid Rule): "
             << secondOrder << "\n");
@@ -1730,8 +1604,7 @@ Application::loadBasicWorksetInfoSDBCs(
   auto overlapped_MV  = solMgr->getOverlappedSolution();
   auto overlapped_sol = Thyra::createMember(overlapped_MV->range());
   overlapped_sol->assign(0.0);
-  solMgr->get_cas_manager()->scatter(
-      owned_sol, overlapped_sol, CombineMode::INSERT);
+  solMgr->get_cas_manager()->scatter(owned_sol, overlapped_sol, CombineMode::INSERT);
 
   auto numVectors = overlapped_MV->domain()->dim();
   workset.x       = overlapped_sol;
@@ -1747,11 +1620,7 @@ Application::loadBasicWorksetInfoSDBCs(
 }
 
 void
-Application::loadWorksetJacobianInfo(
-    PHAL::Workset& workset,
-    double const   alpha,
-    double const   beta,
-    double const   omega)
+Application::loadWorksetJacobianInfo(PHAL::Workset& workset, double const alpha, double const beta, double const omega)
 {
   workset.m_coeff         = alpha;
   workset.n_coeff         = omega;
@@ -1792,22 +1661,16 @@ Application::setScale(Teuchos::RCP<const Thyra_LinearOp> jac)
       scaleVec_->assign(0.0);
       // We MUST be able to cast the linear op to RowStatLinearOpBase, in order
       // to get row informations
-      auto jac_row_stat =
-          Teuchos::rcp_dynamic_cast<const Thyra::RowStatLinearOpBase<ST>>(
-              jac, true);
+      auto jac_row_stat = Teuchos::rcp_dynamic_cast<const Thyra::RowStatLinearOpBase<ST>>(jac, true);
 
       // Compute the inverse of the absolute row sum
-      jac_row_stat->getRowStat(
-          Thyra::RowStatLinearOpBaseUtils::ROW_STAT_INV_ROW_SUM,
-          scaleVec_.ptr());
+      jac_row_stat->getRowStat(Thyra::RowStatLinearOpBaseUtils::ROW_STAT_INV_ROW_SUM, scaleVec_.ptr());
     }
   }
 }
 
 void
-Application::setScaleBCDofs(
-    PHAL::Workset&                     workset,
-    Teuchos::RCP<const Thyra_LinearOp> jac)
+Application::setScaleBCDofs(PHAL::Workset& workset, Teuchos::RCP<const Thyra_LinearOp> jac)
 {
   // First step: set scaleVec_ to all 1.0s if it is all 0s
   if (scaleVec_->norm_2() == 0) { scaleVec_->assign(1.0); }
@@ -1825,13 +1688,10 @@ Application::setScaleBCDofs(
   } else if (scale_type == ABSROWSUM) {
     // We MUST be able to cast the linear op to RowStatLinearOpBase, in order to
     // get row informations
-    auto jac_row_stat =
-        Teuchos::rcp_dynamic_cast<const Thyra::RowStatLinearOpBase<ST>>(
-            jac, true);
+    auto jac_row_stat = Teuchos::rcp_dynamic_cast<const Thyra::RowStatLinearOpBase<ST>>(jac, true);
 
     // Compute the absolute row sum
-    jac_row_stat->getRowStat(
-        Thyra::RowStatLinearOpBaseUtils::ROW_STAT_ROW_SUM, tmp.ptr());
+    jac_row_stat->getRowStat(Thyra::RowStatLinearOpBaseUtils::ROW_STAT_ROW_SUM, tmp.ptr());
     scale = tmp->norm_inf();
   }
 
@@ -1841,8 +1701,7 @@ Application::setScaleBCDofs(
   for (size_t ns = 0; ns < nodeSetIDs_.size(); ns++) {
     std::string key = nodeSetIDs_[ns];
 
-    std::vector<std::vector<int>> const& nsNodes =
-        workset.nodeSets->find(key)->second;
+    std::vector<std::vector<int>> const& nsNodes = workset.nodeSets->find(key)->second;
     for (unsigned int i = 0; i < nsNodes.size(); i++) {
       for (unsigned j = 0; j < offsets_[ns].size(); j++) {
         int lunk                = nsNodes[i][offsets_[ns][j]];
@@ -1873,15 +1732,12 @@ Application::setupBasicWorksetInfo(
     Teuchos::RCP<Thyra_Vector const> const& xdotdot,
     const Teuchos::Array<ParamVec>&         p)
 {
-  Teuchos::RCP<const Thyra_MultiVector> overlapped_MV =
-      solMgr->getOverlappedSolution();
-  auto numVectors = overlapped_MV->domain()->dim();
+  Teuchos::RCP<const Thyra_MultiVector> overlapped_MV = solMgr->getOverlappedSolution();
+  auto                                  numVectors    = overlapped_MV->domain()->dim();
 
-  Teuchos::RCP<Thyra_Vector const> overlapped_x = overlapped_MV->col(0);
-  Teuchos::RCP<Thyra_Vector const> overlapped_xdot =
-      numVectors > 1 ? overlapped_MV->col(1) : Teuchos::null;
-  Teuchos::RCP<Thyra_Vector const> overlapped_xdotdot =
-      numVectors > 2 ? overlapped_MV->col(2) : Teuchos::null;
+  Teuchos::RCP<Thyra_Vector const> overlapped_x       = overlapped_MV->col(0);
+  Teuchos::RCP<Thyra_Vector const> overlapped_xdot    = numVectors > 1 ? overlapped_MV->col(1) : Teuchos::null;
+  Teuchos::RCP<Thyra_Vector const> overlapped_xdotdot = numVectors > 2 ? overlapped_MV->col(2) : Teuchos::null;
 
   // Scatter xT and xdotT to the overlapped distrbution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
@@ -1891,9 +1747,7 @@ Application::setupBasicWorksetInfo(
 
   // Set parameters
   for (int i = 0; i < p.size(); i++) {
-    for (unsigned int j = 0; j < p[i].size(); j++) {
-      p[i][j].family->setRealValueForAllTypes(p[i][j].baseValue);
-    }
+    for (unsigned int j = 0; j < p[i].size(); j++) { p[i][j].family->setRealValueForAllTypes(p[i][j].baseValue); }
   }
 
   double const this_time    = fixTime(current_time);
@@ -1918,13 +1772,11 @@ Application::setCoupledAppBlockNodeset(
   // Check for valid application name
   auto it = app_name_index_map_->find(app_name);
 
-  ALBANY_PANIC(
-      it == app_name_index_map_->end(),
-      "Trying to couple to an unknown Application: " << app_name << '\n');
+  ALBANY_PANIC(it == app_name_index_map_->end(), "Trying to couple to an unknown Application: " << app_name << '\n');
 
-  int const app_index           = it->second;
-  auto      block_nodeset_names = std::make_pair(block_name, nodeset_name);
-  auto app_index_block_names = std::make_pair(app_index, block_nodeset_names);
+  int const app_index             = it->second;
+  auto      block_nodeset_names   = std::make_pair(block_name, nodeset_name);
+  auto      app_index_block_names = std::make_pair(app_index, block_nodeset_names);
   coupled_app_index_block_nodeset_names_map_.insert(app_index_block_names);
 }
 

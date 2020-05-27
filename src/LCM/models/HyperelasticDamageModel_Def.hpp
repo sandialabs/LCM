@@ -88,11 +88,10 @@ HyperelasticDamageModel<EvalT, Traits>::computeState(
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      kappa = elastic_modulus(cell, pt) /
-              (3. * (1. - 2. * poissons_ratio(cell, pt)));
-      mu   = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
-      Jm53 = std::pow(J(cell, pt), -5. / 3.);
-      Jm23 = Jm53 * J(cell, pt);
+      kappa = elastic_modulus(cell, pt) / (3. * (1. - 2. * poissons_ratio(cell, pt)));
+      mu    = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
+      Jm53  = std::pow(J(cell, pt), -5. / 3.);
+      Jm23  = Jm53 * J(cell, pt);
 
       F.fill(def_grad, cell, pt, 0, 0);
 
@@ -113,39 +112,27 @@ HyperelasticDamageModel<EvalT, Traits>::computeState(
 
       b     = Fm * transpose(Fm);
       mubar = (1.0 / 3.0) * mu * Jm23 * minitensor::trace(b);
-      sigma = 0.5 * kappa * (J(cell, pt) - 1. / J(cell, pt)) * I +
-              mu * Jm53 * minitensor::dev(b);
+      sigma = 0.5 * kappa * (J(cell, pt) - 1. / J(cell, pt)) * I + mu * Jm53 * minitensor::dev(b);
 
-      energy = 0.5 * kappa *
-                   (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) -
-                    std::log(J(cell, pt))) +
+      energy = 0.5 * kappa * (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) +
                0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
 
       if (have_temperature_) {
         ScalarT delta_temp = temperature_(cell, pt) - ref_temperature_;
         energy += heat_capacity_ *
-                      ((delta_temp)-temperature_(cell, pt) *
-                       std::log(temperature_(cell, pt) / ref_temperature_)) -
-                  3.0 * kappa * expansion_coeff_ *
-                      (J(cell, pt) - 1.0 / J(cell, pt)) * delta_temp;
+                      ((delta_temp)-temperature_(cell, pt) * std::log(temperature_(cell, pt) / ref_temperature_)) -
+                  3.0 * kappa * expansion_coeff_ * (J(cell, pt) - 1.0 / J(cell, pt)) * delta_temp;
       }
 
       alpha(cell, pt) = std::max((ScalarT)alpha_old(cell, pt), energy);
 
-      source(cell, pt) = (max_damage_ / damage_saturation_) *
-                         std::exp(-alpha(cell, pt) / damage_saturation_) *
+      source(cell, pt) = (max_damage_ / damage_saturation_) * std::exp(-alpha(cell, pt) / damage_saturation_) *
                          (alpha(cell, pt) - alpha_old(cell, pt)) / dt;
 
-      if (!have_damage_) {
-        damage(cell, pt) =
-            max_damage_ *
-            (1.0 - std::exp(-alpha(cell, pt) / damage_saturation_));
-      }
+      if (!have_damage_) { damage(cell, pt) = max_damage_ * (1.0 - std::exp(-alpha(cell, pt) / damage_saturation_)); }
 
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = (1.0 - damage(cell, pt)) * sigma(i, j);
-        }
+        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = (1.0 - damage(cell, pt)) * sigma(i, j); }
       }
     }
   }

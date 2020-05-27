@@ -16,20 +16,18 @@
  | and its gradient                                                     |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    evaluate_FgradF_3D_NodalNormal(
-        double* F,
-        double  dF[][3],
-        const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double* eta,
-        double  alpha,
-        double& gap)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_NodalNormal(
+    double* F,
+    double  dF[][3],
+    const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double* eta,
+    double  alpha,
+    double& gap)
 {
   // check the type of function on the segment
   // Here, we need a blinear triangle shape function
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_LinearTri &&
       type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_BiLinearQuad) {
     std::stringstream oss;
@@ -90,9 +88,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
     dF[i][2] = n[i];
   }
 
-  gap =
-      ((Nx[0] - X[0]) * n[0] + (Nx[1] - X[1]) * n[1] + (Nx[2] - X[2]) * n[2]) /
-      sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);  // ||gap|| cos theta
+  gap = ((Nx[0] - X[0]) * n[0] + (Nx[1] - X[1]) * n[1] + (Nx[2] - X[2]) * n[2]) /
+        sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);  // ||gap|| cos theta
 
   return true;
 }
@@ -106,20 +103,18 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
  | and its gradient                                                     |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    evaluate_FgradF_3D_SegmentNormal(
-        double* F,
-        double  dF[][3],
-        const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double* eta,
-        double  alpha,
-        double& gap)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_SegmentNormal(
+    double* F,
+    double  dF[][3],
+    const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double* eta,
+    double  alpha,
+    double& gap)
 {
   // check the type of function on the segment
   // Here, we need a bilinear triangle shape function
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_LinearTri &&
       type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_BiLinearQuad) {
     std::stringstream oss;
@@ -199,10 +194,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
     dF[i][2] = Nn[i];
   }
 
-  gap =
-      ((Nx[0] - X[0]) * Nn[0] + (Nx[1] - X[1]) * Nn[1] +
-       (Nx[2] - X[2]) * Nn[2]) /
-      sqrt(Nn[0] * Nn[0] + Nn[1] * Nn[1] + Nn[2] * Nn[2]);  // ||gap|| cos theta
+  gap = ((Nx[0] - X[0]) * Nn[0] + (Nx[1] - X[1]) * Nn[1] + (Nx[2] - X[2]) * Nn[2]) /
+        sqrt(Nn[0] * Nn[0] + Nn[1] * Nn[1] + Nn[2] * Nn[2]);  // ||gap|| cos theta
 
   return true;
 }

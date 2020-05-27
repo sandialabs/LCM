@@ -15,20 +15,14 @@ SurfaceVectorGradient<EvalT, Traits>::SurfaceVectorGradient(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       currentBasis(p.get<std::string>("Current Basis Name"), dl->qp_tensor),
-      refDualBasis(
-          p.get<std::string>("Reference Dual Basis Name"),
-          dl->qp_tensor),
+      refDualBasis(p.get<std::string>("Reference Dual Basis Name"), dl->qp_tensor),
       refNormal(p.get<std::string>("Reference Normal Name"), dl->qp_vector),
       jump(p.get<std::string>("Vector Jump Name"), dl->qp_vector),
       weights(p.get<std::string>("Weights Name"), dl->qp_scalar),
-      defGrad(
-          p.get<std::string>("Surface Vector Gradient Name"),
-          dl->qp_tensor),
-      J(p.get<std::string>("Surface Vector Gradient Determinant Name"),
-        dl->qp_scalar),
+      defGrad(p.get<std::string>("Surface Vector Gradient Name"), dl->qp_tensor),
+      J(p.get<std::string>("Surface Vector Gradient Determinant Name"), dl->qp_scalar),
       weightedAverage(p.get<bool>("Weighted Volume Average J", false)),
       alpha(p.get<RealType>("Average J Stabilization Parameter", 0.0))
 {
@@ -63,9 +57,7 @@ SurfaceVectorGradient<EvalT, Traits>::SurfaceVectorGradient(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceVectorGradient<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceVectorGradient<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(currentBasis, fm);
   this->utils.setFieldData(refDualBasis, fm);
@@ -79,41 +71,29 @@ SurfaceVectorGradient<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceVectorGradient<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceVectorGradient<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int pt = 0; pt < numQPs; ++pt) {
-      minitensor::Vector<ScalarT> g_0(
-          minitensor::Source::ARRAY, 3, currentBasis, cell, pt, 0, 0);
+      minitensor::Vector<ScalarT> g_0(minitensor::Source::ARRAY, 3, currentBasis, cell, pt, 0, 0);
 
-      minitensor::Vector<ScalarT> g_1(
-          minitensor::Source::ARRAY, 3, currentBasis, cell, pt, 1, 0);
+      minitensor::Vector<ScalarT> g_1(minitensor::Source::ARRAY, 3, currentBasis, cell, pt, 1, 0);
 
-      minitensor::Vector<ScalarT> g_2(
-          minitensor::Source::ARRAY, 3, currentBasis, cell, pt, 2, 0);
+      minitensor::Vector<ScalarT> g_2(minitensor::Source::ARRAY, 3, currentBasis, cell, pt, 2, 0);
 
-      minitensor::Vector<MeshScalarT> G_2(
-          minitensor::Source::ARRAY, 3, refNormal, cell, pt, 0);
+      minitensor::Vector<MeshScalarT> G_2(minitensor::Source::ARRAY, 3, refNormal, cell, pt, 0);
 
-      minitensor::Vector<ScalarT> d(
-          minitensor::Source::ARRAY, 3, jump, cell, pt, 0);
+      minitensor::Vector<ScalarT> d(minitensor::Source::ARRAY, 3, jump, cell, pt, 0);
 
-      minitensor::Vector<MeshScalarT> G0(
-          minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 0, 0);
+      minitensor::Vector<MeshScalarT> G0(minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 0, 0);
 
-      minitensor::Vector<MeshScalarT> G1(
-          minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 1, 0);
+      minitensor::Vector<MeshScalarT> G1(minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 1, 0);
 
-      minitensor::Vector<MeshScalarT> G2(
-          minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 2, 0);
+      minitensor::Vector<MeshScalarT> G2(minitensor::Source::ARRAY, 3, refDualBasis, cell, pt, 2, 0);
 
-      minitensor::Tensor<ScalarT> Fpar(
-          minitensor::bun(g_0, G0) + minitensor::bun(g_1, G1) +
-          minitensor::bun(g_2, G2));
+      minitensor::Tensor<ScalarT> Fpar(minitensor::bun(g_0, G0) + minitensor::bun(g_1, G1) + minitensor::bun(g_2, G2));
       // for Jay: bun()
-      minitensor::Tensor<ScalarT> Fper(
-          (1 / thickness) * minitensor::bun(d, G_2));
+      minitensor::Tensor<ScalarT> Fper((1 / thickness) * minitensor::bun(d, G_2));
 
       minitensor::Tensor<ScalarT> F = Fpar + Fper;
 
@@ -145,8 +125,7 @@ SurfaceVectorGradient<EvalT, Traits>::evaluateFields(
       for (int qp = 0; qp < numQPs; ++qp) {
         for (int i = 0; i < numDims; ++i) {
           for (int j = 0; j < numDims; ++j) {
-            wJbar =
-                std::exp((1 - alpha) * Jbar + alpha * std::log(J(cell, qp)));
+            wJbar = std::exp((1 - alpha) * Jbar + alpha * std::log(J(cell, qp)));
             defGrad(cell, qp, i, j) *= std::pow(wJbar / J(cell, qp), 1. / 3.);
           }
         }

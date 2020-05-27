@@ -107,11 +107,10 @@ template <typename EvalT, minitensor::Index NumDimT, minitensor::Index NumSlipT>
 class IntegratorFactory
 {
  public:
-  using ScalarT   = typename EvalT::ScalarT;
-  using ValueT    = typename Sacado::ValueType<ScalarT>::type;
-  using Minimizer = minitensor::Minimizer<ValueT, CP::NlsDim<NumSlipT>::value>;
-  using RolMinimizer =
-      ROL::MiniTensor_Minimizer<ValueT, CP::NlsDim<NumSlipT>::value>;
+  using ScalarT        = typename EvalT::ScalarT;
+  using ValueT         = typename Sacado::ValueType<ScalarT>::type;
+  using Minimizer      = minitensor::Minimizer<ValueT, CP::NlsDim<NumSlipT>::value>;
+  using RolMinimizer   = ROL::MiniTensor_Minimizer<ValueT, CP::NlsDim<NumSlipT>::value>;
   using IntegratorBase = Integrator<EvalT, NumDimT, NumSlipT>;
 
   IntegratorFactory(
@@ -129,9 +128,7 @@ class IntegratorFactory
       CP::Verbosity const                                   verbosity);
 
   utility::StaticPointer<IntegratorBase>
-  operator()(
-      CP::IntegrationScheme integration_scheme,
-      CP::ResidualType      residual_type) const;
+  operator()(CP::IntegrationScheme integration_scheme, CP::ResidualType residual_type) const;
 
  private:
   utility::StaticAllocator& allocator_;
@@ -193,12 +190,11 @@ template <typename EvalT, minitensor::Index NumDimT, minitensor::Index NumSlipT>
 class ImplicitIntegrator : public Integrator<EvalT, NumDimT, NumSlipT>
 {
  public:
-  using Base      = Integrator<EvalT, NumDimT, NumSlipT>;
-  using ScalarT   = typename Base::ScalarT;
-  using ValueT    = typename Sacado::ValueType<ScalarT>::type;
-  using Minimizer = minitensor::Minimizer<ValueT, CP::NlsDim<NumSlipT>::value>;
-  using RolMinimizer =
-      ROL::MiniTensor_Minimizer<ValueT, CP::NlsDim<NumSlipT>::value>;
+  using Base         = Integrator<EvalT, NumDimT, NumSlipT>;
+  using ScalarT      = typename Base::ScalarT;
+  using ValueT       = typename Sacado::ValueType<ScalarT>::type;
+  using Minimizer    = minitensor::Minimizer<ValueT, CP::NlsDim<NumSlipT>::value>;
+  using RolMinimizer = ROL::MiniTensor_Minimizer<ValueT, CP::NlsDim<NumSlipT>::value>;
 
   ImplicitIntegrator(
       const Minimizer&                                      minimizer,
@@ -235,8 +231,7 @@ class ImplicitIntegrator : public Integrator<EvalT, NumDimT, NumSlipT>
 };
 
 template <typename EvalT, minitensor::Index NumDimT, minitensor::Index NumSlipT>
-class ImplicitSlipIntegrator
-    : public ImplicitIntegrator<EvalT, NumDimT, NumSlipT>
+class ImplicitSlipIntegrator : public ImplicitIntegrator<EvalT, NumDimT, NumSlipT>
 {
  public:
   using Base         = ImplicitIntegrator<EvalT, NumDimT, NumSlipT>;
@@ -275,8 +270,7 @@ class ImplicitSlipIntegrator
 };
 
 template <typename EvalT, minitensor::Index NumDimT, minitensor::Index NumSlipT>
-class ImplicitSlipHardnessIntegrator
-    : public ImplicitIntegrator<EvalT, NumDimT, NumSlipT>
+class ImplicitSlipHardnessIntegrator : public ImplicitIntegrator<EvalT, NumDimT, NumSlipT>
 {
  public:
   using Base         = ImplicitIntegrator<EvalT, NumDimT, NumSlipT>;
@@ -315,8 +309,7 @@ class ImplicitSlipHardnessIntegrator
 };
 
 template <typename EvalT, minitensor::Index NumDimT, minitensor::Index NumSlipT>
-class ImplicitConstrainedSlipHardnessIntegrator
-    : public ImplicitIntegrator<EvalT, NumDimT, NumSlipT>
+class ImplicitConstrainedSlipHardnessIntegrator : public ImplicitIntegrator<EvalT, NumDimT, NumSlipT>
 {
  public:
   using Base         = ImplicitIntegrator<EvalT, NumDimT, NumSlipT>;

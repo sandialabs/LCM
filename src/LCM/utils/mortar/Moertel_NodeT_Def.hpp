@@ -12,13 +12,8 @@
  |  ctor (public)                                            mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(
-    int           Id,
-    const double* x,
-    int           ndof,
-    const int*    dof,
-    bool          isonboundary,
-    int           out)
+MoertelT::MOERTEL_TEMPLATE_CLASS(
+    NodeT)::NodeT(int Id, const double* x, int ndof, const int* dof, bool isonboundary, int out)
     : Id_(Id),
       outputlevel_(out),
       iscorner_(false),
@@ -78,8 +73,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(int out)
  |  copy-ctor (public)                                       mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(
-    const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & old)
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & old)
     : supportedby_(old.supportedby_)
 {
   Id_           = old.Id();
@@ -117,8 +111,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(
   pnode_.resize(old.pnode_.size());
   for (int i = 0; i < (int)pnode_.size(); ++i)
     if (old.pnode_[i].get() != NULL) {
-      pnode_[i] = Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(
-          ProjectedNodeT)(*(old.pnode_[i])));
+      pnode_[i] = Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*(old.pnode_[i])));
     }
 
   if (old.Drow_ != Teuchos::null) {
@@ -239,9 +232,7 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Reset()
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node)
+operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node)
 {
   node.Print();
   return (os);
@@ -344,8 +335,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(
     if (!segptr_[i]) {
       std::stringstream oss;
       oss << "***ERR*** MoertelT::NodeT::GetPtrstoSegments:\n"
-          << "***ERR*** Interface " << interface.Id()
-          << ": GetSegmentView failed\n"
+          << "***ERR*** Interface " << interface.Id() << ": GetSegmentView failed\n"
           << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       throw ReportError(oss);
     }
@@ -354,8 +344,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(
 }
 
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(
-    MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & iface)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & iface)
 {
   if (!iface.IsComplete()) return false;
   if (iface.lComm() == Teuchos::null) return true;
@@ -405,8 +394,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::BuildAveragedNormal()
     if (!seg) {
       std::stringstream oss;
       oss << "***ERR*** MoertelT::NodeT::BuildAveragedNormal:\n"
-          << "***ERR*** NodeT " << Id() << ": Segment " << sid[i]
-          << " not found -> fatal\n"
+          << "***ERR*** NodeT " << Id() << ": Segment " << sid[i] << " not found -> fatal\n"
           << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       throw ReportError(oss);
     }
@@ -439,8 +427,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::BuildAveragedNormal()
  |  set a projected node                                     mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetProjectedNode(
-    MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) * pnode)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetProjectedNode(MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) * pnode)
 {
   pnode_.resize(pnode_.size() + 1);
   pnode_[pnode_.size() - 1] = Teuchos::rcp(pnode);
@@ -451,8 +438,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetProjectedNode(
  |  get projected nodes                                      mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>*
-    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetProjectedNode(int& length)
+Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>* MoertelT::MOERTEL_TEMPLATE_CLASS(
+    NodeT)::GetProjectedNode(int& length)
 {
   length = pnode_.size();
   if (length)
@@ -465,8 +452,8 @@ Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>*
  |  get projected node                                       mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>
-    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetProjectedNode()
+Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)> MoertelT::MOERTEL_TEMPLATE_CLASS(
+    NodeT)::GetProjectedNode()
 {
   int length = pnode_.size();
   if (length)
@@ -509,11 +496,9 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddMValue(double val, int col)
  |  add a value to the Drow_ map                             mwgee 02/06|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-void MoertelT::MOERTEL_TEMPLATE_CLASS(
-    NodeT)::AddMmodValue(int row, double val, int col)
+void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddMmodValue(int row, double val, int col)
 {
-  if (Mmodrow_ == Teuchos::null)
-    Mmodrow_ = Teuchos::rcp(new std::vector<std::map<int, double>>(Ndof()));
+  if (Mmodrow_ == Teuchos::null) Mmodrow_ = Teuchos::rcp(new std::vector<std::map<int, double>>(Ndof()));
 
   if ((int)Mmodrow_->size() <= row) Mmodrow_->resize(row + 1);
 
@@ -527,21 +512,17 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS(
 // ETI
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
 template bool
-MoertelT::NodeT<3, double, int, int, KokkosNode>::
-    GetPtrstoSegments<double, int, int, KokkosNode>(
-        MoertelT::InterfaceT<double, int, int, KokkosNode>& interface);
+MoertelT::NodeT<3, double, int, int, KokkosNode>::GetPtrstoSegments<double, int, int, KokkosNode>(
+    MoertelT::InterfaceT<double, int, int, KokkosNode>& interface);
 template bool
-MoertelT::NodeT<2, double, int, int, KokkosNode>::
-    GetPtrstoSegments<double, int, int, KokkosNode>(
-        MoertelT::InterfaceT<double, int, int, KokkosNode>& interface);
+MoertelT::NodeT<2, double, int, int, KokkosNode>::GetPtrstoSegments<double, int, int, KokkosNode>(
+    MoertelT::InterfaceT<double, int, int, KokkosNode>& interface);
 #endif
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 template bool
-MoertelT::NodeT<3, double, int, long long, KokkosNode>::
-    GetPtrstoSegments<double, int, long long, KokkosNode>(
-        MoertelT::InterfaceT<double, int, long long, KokkosNode>& interface);
+MoertelT::NodeT<3, double, int, long long, KokkosNode>::GetPtrstoSegments<double, int, long long, KokkosNode>(
+    MoertelT::InterfaceT<double, int, long long, KokkosNode>& interface);
 template bool
-MoertelT::NodeT<2, double, int, long long, KokkosNode>::
-    GetPtrstoSegments<double, int, long long, KokkosNode>(
-        MoertelT::InterfaceT<double, int, long long, KokkosNode>& interface);
+MoertelT::NodeT<2, double, int, long long, KokkosNode>::GetPtrstoSegments<double, int, long long, KokkosNode>(
+    MoertelT::InterfaceT<double, int, long long, KokkosNode>& interface);
 #endif

@@ -13,8 +13,7 @@ template <typename EvalT, typename Traits>
 NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(
     Teuchos::ParameterList*              p,
     const Teuchos::RCP<Albany::Layouts>& dl)
-    : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
-      mu_(p->get<RealType>("Shear Viscosity", 1.0))
+    : LCM::ConstitutiveModel<EvalT, Traits>(p, dl), mu_(p->get<RealType>("Shear Viscosity", 1.0))
 {
   // retrive appropriate field name strings
   std::string F_string      = (*field_name_map_)["F"];
@@ -43,8 +42,7 @@ NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Cauchy Stress", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Cauchy Stress", false));
 }
 template <typename EvalT, typename Traits>
 void
@@ -91,8 +89,7 @@ NewtonianFluidModel<EvalT, Traits>::computeState(
       } else {
         // old deformation gradient
         for (int i = 0; i < num_dims_; ++i)
-          for (int j = 0; j < num_dims_; ++j)
-            Fold(i, j) = ScalarT(def_grad_old(cell, pt, i, j));
+          for (int j = 0; j < num_dims_; ++j) Fold(i, j) = ScalarT(def_grad_old(cell, pt, i, j));
 
         // current deformation gradient
         Fnew.fill(def_grad, cell, pt, 0, 0);
@@ -107,13 +104,11 @@ NewtonianFluidModel<EvalT, Traits>::computeState(
         D = minitensor::sym(L);
 
         // stress tensor
-        sigma =
-            -p * I + 2.0 * mu_ * (D - (2.0 / 3.0) * minitensor::trace(D) * I);
+        sigma = -p * I + 2.0 * mu_ * (D - (2.0 / 3.0) * minitensor::trace(D) * I);
 
         // update stress state
         for (int i = 0; i < num_dims_; ++i)
-          for (int j = 0; j < num_dims_; ++j)
-            stress(cell, pt, i, j) = sigma(i, j);
+          for (int j = 0; j < num_dims_; ++j) stress(cell, pt, i, j) = sigma(i, j);
       }
     }
   }

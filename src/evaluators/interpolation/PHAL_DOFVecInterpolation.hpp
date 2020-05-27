@@ -20,18 +20,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class DOFVecInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                public PHX::EvaluatorDerived<EvalT, Traits>
+class DOFVecInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  DOFVecInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  DOFVecInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -62,25 +57,19 @@ class DOFVecInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
    does not work when the mesh coordinates are of type ScalarT
 */
 template <typename EvalT, typename Traits, typename ScalarT>
-class FastSolutionVecInterpolationBase
-    : public DOFVecInterpolationBase<EvalT, Traits, ScalarT>
+class FastSolutionVecInterpolationBase : public DOFVecInterpolationBase<EvalT, Traits, ScalarT>
 {
  public:
-  FastSolutionVecInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
+  FastSolutionVecInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
       : DOFVecInterpolationBase<EvalT, Traits, ScalarT>(p, dl)
   {
     this->setName("FastSolutionVecInterpolationBase" + PHX::print<EvalT>());
   };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFVecInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-        d, vm);
+    DOFVecInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(d, vm);
   }
 
   void
@@ -103,29 +92,19 @@ class FastSolutionVecInterpolationBase<
           typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
  public:
-  FastSolutionVecInterpolationBase(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl)
-      : DOFVecInterpolationBase<
-            PHAL::AlbanyTraits::Jacobian,
-            Traits,
-            typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
+  FastSolutionVecInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
+      : DOFVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>(
+            p,
+            dl)
   {
-    this->setName(
-        "FastSolutionVecInterpolationBase" +
-        PHX::print<PHAL::AlbanyTraits::Jacobian>());
+    this->setName("FastSolutionVecInterpolationBase" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
   };
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm)
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFVecInterpolationBase<
-        PHAL::AlbanyTraits::Jacobian,
-        Traits,
-        typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
+    DOFVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
         postRegistrationSetup(d, vm);
   }
 
@@ -142,20 +121,16 @@ class FastSolutionVecInterpolationBase<
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using DOFVecInterpolation =
-    DOFVecInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using DOFVecInterpolation = DOFVecInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFVecInterpolationMesh =
-    DOFVecInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using DOFVecInterpolationMesh = DOFVecInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using DOFVecInterpolationParam =
-    DOFVecInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using DOFVecInterpolationParam = DOFVecInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
-using FastSolutionVecInterpolation =
-    FastSolutionVecInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using FastSolutionVecInterpolation = FastSolutionVecInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 }  // Namespace PHAL
 

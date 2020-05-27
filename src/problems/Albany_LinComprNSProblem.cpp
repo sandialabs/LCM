@@ -17,9 +17,7 @@ Albany::LinComprNSProblem::LinComprNSProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_)
-    : Albany::AbstractProblem(params_, paramLib_),
-      numDim(numDim_),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_), use_sdbcs_(false)
 {
   // Get number of species equations from Problem specifications
   neq = params_->get("Number of PDE Equations", numDim);
@@ -38,8 +36,7 @@ Albany::LinComprNSProblem::buildProblem(
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
   fm.resize(1);
   fm[0] = rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-  buildEvaluators(
-      *fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
+  buildEvaluators(*fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
   constructDirichletEvaluators(*meshSpecs[0]);
 }
 
@@ -53,15 +50,13 @@ Albany::LinComprNSProblem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<LinComprNSProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<LinComprNSProblem>              op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 void
-Albany::LinComprNSProblem::constructDirichletEvaluators(
-    Albany::MeshSpecsStruct const& meshSpecs)
+Albany::LinComprNSProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -71,8 +66,7 @@ Albany::LinComprNSProblem::constructDirichletEvaluators(
     dirichletNames[i] = s.str();
   }
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
@@ -81,13 +75,9 @@ Albany::LinComprNSProblem::constructDirichletEvaluators(
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::LinComprNSProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidLinComprNSProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidLinComprNSProblemParams");
 
-  validPL->set(
-      "Number of PDE Equations",
-      1,
-      "Number of PDE Equations in LinComprNS equation set");
+  validPL->set("Number of PDE Equations", 1, "Number of PDE Equations in LinComprNS equation set");
   validPL->sublist("Body Force", false, "");
   validPL->sublist("Equation Set", false, "");
 

@@ -47,9 +47,7 @@ class LameProblem : public Albany::AbstractProblem
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -140,31 +138,26 @@ Albany::LameProblem::constructEvaluators(
   // get the name of the current element block
   string elementBlockName = meshSpecs.ebName;
 
-  RCP<shards::CellTopology> cellType =
-      rcp(new shards::CellTopology(&meshSpecs.ctd));
-  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis =
-      Albany::getIntrepid2Basis(meshSpecs.ctd);
+  RCP<shards::CellTopology>                              cellType      = rcp(new shards::CellTopology(&meshSpecs.ctd));
+  RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis = Albany::getIntrepid2Basis(meshSpecs.ctd);
 
   int const numNodes    = intrepidBasis->getCardinality();
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(
-          *cellType, meshSpecs.cubatureDegree);
+      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   numDim                = cubature->getDimension();
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
   //   int const numVertices = cellType->getVertexCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize
-       << ", Vertices= " << numVertices << ", Nodes= " << numNodes
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
        << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
 
   // Construct standard FEM evaluators with standard field names
-  RCP<Albany::Layouts> dl = rcp(
-      new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
   ALBANY_PANIC(
       dl->vectorAndGradientLayoutsAreEquivalent == false,
       "Data Layout Usage in Mechanics problems assume vecDim = numDim");
@@ -179,37 +172,27 @@ Albany::LameProblem::constructEvaluators(
   Teuchos::ArrayRCP<string> resid_names(1);
   resid_names[0] = dof_names[0] + " Residual";
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0]));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0]));
+
+  if (supportsTransient)
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dotdot[0]));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0]));
 
   if (supportsTransient)
     fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dotdot[0]));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0]));
-
-  if (supportsTransient)
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator(
-            true, dof_names, dof_names_dotdot));
+        evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dotdot));
   else
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator_noTransient(
-            true, dof_names));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, resid_names));
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
+
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
   fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(true, resid_names));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherCoordinateVectorEvaluator());
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
-
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(
-          cellType, intrepidBasis, cubature));
+      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   // Temporary variable used numerous times below
   Teuchos::RCP<PHX::Evaluator<AlbanyTraits>> ev;
@@ -259,8 +242,7 @@ Albany::LameProblem::constructEvaluators(
     // a constant volumetric response.
     bool const volavgJ = params->get("volavgJ", false);
     p->set<bool>("volavgJ Name", volavgJ);
-    bool const weighted_Volume_Averaged_J =
-        params->get("weighted_Volume_Averaged_J", false);
+    bool const weighted_Volume_Averaged_J = params->get("weighted_Volume_Averaged_J", false);
     p->set<bool>("weighted_Volume_Averaged_J Name", weighted_Volume_Averaged_J);
     // Integration weights for each quadrature point
     p->set<string>("Weights Name", "Weights");
@@ -269,8 +251,7 @@ Albany::LameProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Tensor Data Layout", dl->qp_tensor);
 
     // Output
-    p->set<string>(
-        "DefGrad Name", "Deformation Gradient");  // dl->qp_tensor also
+    p->set<string>("DefGrad Name", "Deformation Gradient");  // dl->qp_tensor also
     p->set<string>("DetDefGrad Name", "Determinant of Deformation Gradient");
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl->qp_scalar);
 
@@ -289,20 +270,17 @@ Albany::LameProblem::constructEvaluators(
     p->set<bool>("Have MatDB", haveMatDB);
     p->set<string>("Element Block Name", meshSpecs.ebName);
 
-    if (haveMatDB)
-      p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", materialDB);
+    if (haveMatDB) p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", materialDB);
 
     // Materials specification
-    Teuchos::ParameterList& lameMaterialParametersList =
-        p->sublist("Lame Material Parameters");
-    lameMaterialParametersList = params->sublist("Lame Material Parameters");
+    Teuchos::ParameterList& lameMaterialParametersList = p->sublist("Lame Material Parameters");
+    lameMaterialParametersList                         = params->sublist("Lame Material Parameters");
 
     // Input
     p->set<string>("Strain Name", "Strain");
     p->set<RCP<DataLayout>>("QP Tensor Data Layout", dl->qp_tensor);
 
-    p->set<string>(
-        "DefGrad Name", "Deformation Gradient");  // dl->qp_tensor also
+    p->set<string>("DefGrad Name", "Deformation Gradient");  // dl->qp_tensor also
 
     // Output
     p->set<string>("Stress Name", "Stress");  // dl->qp_tensor also
@@ -324,36 +302,20 @@ Albany::LameProblem::constructEvaluators(
     // Declare state data that need to be saved
     // (register with state manager and create corresponding evaluator)
     RCP<ParameterList> p2;
-    p2 = stateMgr.registerStateVariable(
-        "Stress",
-        dl->qp_tensor,
-        dl->dummy,
-        elementBlockName,
-        "scalar",
-        0.0,
-        true);
+    p2 = stateMgr.registerStateVariable("Stress", dl->qp_tensor, dl->dummy, elementBlockName, "scalar", 0.0, true);
     ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p2));
     fm0.template registerEvaluator<EvalT>(ev);
 
     p2 = stateMgr.registerStateVariable(
-        "Deformation Gradient",
-        dl->qp_tensor,
-        dl->dummy,
-        elementBlockName,
-        "identity",
-        1.0,
-        true);
+        "Deformation Gradient", dl->qp_tensor, dl->dummy, elementBlockName, "identity", 1.0, true);
     ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p2));
     fm0.template registerEvaluator<EvalT>(ev);
 
     std::vector<std::string> lameMaterialModelStateVariableNames =
-        LameUtils::getStateVariableNames(
-            lameMaterialModel, lameMaterialParametersList);
+        LameUtils::getStateVariableNames(lameMaterialModel, lameMaterialParametersList);
     std::vector<double> lameMaterialModelStateVariableInitialValues =
-        LameUtils::getStateVariableInitialValues(
-            lameMaterialModel, lameMaterialParametersList);
-    for (unsigned int i = 0; i < lameMaterialModelStateVariableNames.size();
-         ++i) {
+        LameUtils::getStateVariableInitialValues(lameMaterialModel, lameMaterialParametersList);
+    for (unsigned int i = 0; i < lameMaterialModelStateVariableNames.size(); ++i) {
       p2 = stateMgr.registerStateVariable(
           lameMaterialModelStateVariableNames[i],
           dl->qp_scalar,
@@ -374,8 +336,7 @@ Albany::LameProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Tensor Data Layout", dl->qp_tensor);
 
     // \todo Is the required?
-    p->set<string>(
-        "DefGrad Name", "Deformation Gradient");  // dl->qp_tensor also
+    p->set<string>("DefGrad Name", "Deformation Gradient");  // dl->qp_tensor also
     p->set<string>("DetDefGrad Name", "Determinant of Deformation Gradient");
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl->qp_scalar);
 

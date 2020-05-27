@@ -46,8 +46,7 @@ class StrongSchwarzBC_Base : public PHAL::SDirichlet<EvalT, Traits>
   computeBCs(size_t const ns_node, T& x_val, T& y_val, T& z_val);
 
 #if defined(ALBANY_DTK)
-  Teuchos::Array<Teuchos::RCP<
-      Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>>
+  Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>>
   computeBCsDTK();
 
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>
@@ -131,10 +130,10 @@ class StrongSchwarzBC_Base : public PHAL::SDirichlet<EvalT, Traits>
  protected:
   Teuchos::RCP<Albany::Application>                    app_{Teuchos::null};
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> coupled_apps_;
-  std::string coupled_app_name_{"SELF"};
-  std::string coupled_block_name_{"NONE"};
-  int         this_app_index_{-1};
-  int         coupled_app_index_{-1};
+  std::string                                          coupled_app_name_{"SELF"};
+  std::string                                          coupled_block_name_{"NONE"};
+  int                                                  this_app_index_{-1};
+  int                                                  coupled_app_index_{-1};
 };
 
 // Fill solution with Dirichlet values

@@ -55,9 +55,7 @@ class Banana : public minitensor::Function_Base<Banana<S, M>, S, M>
 };
 
 template <typename EvalT, minitensor::Index M = 2>
-class Banana_Traits
-    : public minitensor::
-          Function_Base<Banana_Traits<EvalT, M>, typename EvalT::ScalarT, M>
+class Banana_Traits : public minitensor::Function_Base<Banana_Traits<EvalT, M>, typename EvalT::ScalarT, M>
 {
   using S = typename EvalT::ScalarT;
 
@@ -66,8 +64,7 @@ class Banana_Traits
 
   static constexpr char const* const NAME{"Banana_Traits Function 2D"};
 
-  using Base = minitensor::
-      Function_Base<Banana_Traits<EvalT, M>, typename EvalT::ScalarT, M>;
+  using Base = minitensor::Function_Base<Banana_Traits<EvalT, M>, typename EvalT::ScalarT, M>;
 
   // Explicit value.
   template <typename T, minitensor::Index N>
@@ -111,9 +108,7 @@ class Banana_Traits
 };
 
 template <typename EvalT, minitensor::Index M = 2>
-class Paraboloid_Traits
-    : public minitensor::
-          Function_Base<Paraboloid_Traits<EvalT, M>, typename EvalT::ScalarT, M>
+class Paraboloid_Traits : public minitensor::Function_Base<Paraboloid_Traits<EvalT, M>, typename EvalT::ScalarT, M>
 {
   using S = typename EvalT::ScalarT;
 
@@ -122,8 +117,7 @@ class Paraboloid_Traits
 
   static constexpr char const* const NAME{"Paraboloid_Traits Function 2D"};
 
-  using Base = minitensor::
-      Function_Base<Paraboloid_Traits<EvalT, M>, typename EvalT::ScalarT, M>;
+  using Base = minitensor::Function_Base<Paraboloid_Traits<EvalT, M>, typename EvalT::ScalarT, M>;
 
   // Explicit value.
   template <typename T, minitensor::Index N>
@@ -139,11 +133,9 @@ class Paraboloid_Traits
     // T const
     // yc = peel<EvalT, T, N>()(yc_);
 
-    typename Sacado::ScalarType<S>::type const xc =
-        Sacado::ScalarValue<S>::eval(xc_);
+    typename Sacado::ScalarType<S>::type const xc = Sacado::ScalarValue<S>::eval(xc_);
 
-    typename Sacado::ScalarType<S>::type const yc =
-        Sacado::ScalarValue<S>::eval(yc_);
+    typename Sacado::ScalarType<S>::type const yc = Sacado::ScalarValue<S>::eval(yc_);
 
     T const a = x(0) - xc;
 

@@ -10,13 +10,9 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(
-    Teuchos::ParameterList const& p)
-    : wBF(p.get<std::string>("Weighted BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      Neutron(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(Teuchos::ParameterList const& p)
+    : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
+      Neutron(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       NeutronDiff(
           p.get<std::string>("Neutron Diffusion Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
@@ -34,9 +30,7 @@ NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       nu(p.get<std::string>("Neutrons per Fission Name"),
          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      NResidual(
-          p.get<std::string>("Residual Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
+      NResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       haveNeutSource(p.get<bool>("Have Neutron Source"))
 {
   this->addDependentField(wBF.fieldTag());
@@ -50,15 +44,13 @@ NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(
 
   if (haveNeutSource) {
     Source = decltype(Source)(
-        p.get<std::string>("Source Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+        p.get<std::string>("Source Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(Source.fieldTag());
   }
 
   this->addEvaluatedField(NResidual);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numCells = dims[0];
@@ -71,9 +63,7 @@ NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(
 //*****
 template <typename EvalT, typename Traits>
 void
-NSNeutronEqResid<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+NSNeutronEqResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(wBF, fm);
   this->utils.setFieldData(wGradBF, fm);
@@ -88,42 +78,31 @@ NSNeutronEqResid<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(NResidual, fm);
 
   // Allocate workspace
-  flux = Kokkos::createDynRankView(
-      Neutron.get_view(), "XXX", numCells, numQPs, numDims);
-  abscoeff =
-      Kokkos::createDynRankView(Neutron.get_view(), "XXX", numCells, numQPs);
+  flux     = Kokkos::createDynRankView(Neutron.get_view(), "XXX", numCells, numQPs, numDims);
+  abscoeff = Kokkos::createDynRankView(Neutron.get_view(), "XXX", numCells, numQPs);
 }
 
 //*****
 template <typename EvalT, typename Traits>
 void
-NSNeutronEqResid<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+NSNeutronEqResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
 
   FST::scalarMultiplyDataData(flux, NeutronDiff.get_view(), NGrad.get_view());
 
-  FST::integrate(
-      NResidual.get_view(),
-      flux,
-      wGradBF.get_view(),
-      false);  // "false" overwrites
+  FST::integrate(NResidual.get_view(), flux, wGradBF.get_view(),
+                 false);  // "false" overwrites
 
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
-      abscoeff(cell, qp) =
-          (Absorp(cell, qp) - nu(cell, qp) * Fission(cell, qp)) *
-          Neutron(cell, qp);
+      abscoeff(cell, qp) = (Absorp(cell, qp) - nu(cell, qp) * Fission(cell, qp)) * Neutron(cell, qp);
       if (haveNeutSource) abscoeff(cell, qp) -= Source(cell, qp);
     }
   }
 
-  FST::integrate(
-      NResidual.get_view(),
-      abscoeff,
-      wBF.get_view(),
-      true);  // "true" sums into
+  FST::integrate(NResidual.get_view(), abscoeff, wBF.get_view(),
+                 true);  // "true" sums into
 }
 
 //*****

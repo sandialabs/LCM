@@ -113,14 +113,10 @@ KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
                        operator-(const BasicTensor<S, O>& lhs, const BasicTensor<T, O>& rhs);
 
 template <typename S, typename T, int O>
-KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(
-    S                        s,
-    const BasicTensor<T, O>& rhs);
+KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(S s, const BasicTensor<T, O>& rhs);
 
 template <typename S, typename T, int O>
-KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(
-    const BasicTensor<S, O>& lhs,
-    T                        s);
+KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(const BasicTensor<S, O>& lhs, T s);
 
 template <typename S, typename T, int O>
 KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
@@ -131,9 +127,7 @@ KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
                        operator/(const BasicTensor<S, O>& lhs, T s);
 
 template <typename S, typename T>
-KOKKOS_INLINE_FUNCTION Tensor2<Promotion<S, T>> operator*(
-    const Tensor2<S>& lhs,
-    const Tensor2<T>& rhs);
+KOKKOS_INLINE_FUNCTION Tensor2<Promotion<S, T>> operator*(const Tensor2<S>& lhs, const Tensor2<T>& rhs);
 
 // Utility
 

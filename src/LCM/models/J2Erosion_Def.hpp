@@ -35,8 +35,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   }
 
   ALBANY_ASSERT(
-      time_.size() == sea_level_.size(),
-      "*** ERROR: Number of times and number of sea level values must match");
+      time_.size() == sea_level_.size(), "*** ERROR: Number of times and number of sea level values must match");
 
   // retrieve appropriate field name strings
   std::string const cauchy_string       = field_name_map_["Cauchy_Stress"];
@@ -71,76 +70,31 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   // define the state variables
 
   // stress
-  addStateVariable(
-      cauchy_string,
-      dl->qp_tensor,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Cauchy Stress", false));
+  addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
 
   // Fp
-  addStateVariable(
-      Fp_string,
-      dl->qp_tensor,
-      "identity",
-      0.0,
-      true,
-      p->get<bool>("Output Fp", false));
+  addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
 
   // eqps
-  addStateVariable(
-      eqps_string,
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      true,
-      p->get<bool>("Output eqps", false));
+  addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
 
   // yield surface
   addStateVariable(
-      yieldSurface_string,
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Yield Surface", false));
+      yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   // mechanical source
   if (have_temperature_ == true) {
-    addStateVariable(
-        "Temperature",
-        dl->qp_scalar,
-        "scalar",
-        0.0,
-        true,
-        p->get<bool>("Output Temperature", false));
+    addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
 
     addStateVariable(
-        source_string,
-        dl->qp_scalar,
-        "scalar",
-        0.0,
-        false,
-        p->get<bool>("Output Mechanical Source", false));
+        source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
   // failed state
   addStateVariable(
-      "Failure Indicator",
-      dl->cell_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Failure Indicator", true));
+      "Failure Indicator", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output Failure Indicator", true));
 
   // exposure time
-  addStateVariable(
-      "Exposure Time",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Exposure Time", true));
+  addStateVariable("Exposure Time", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Exposure Time", true));
 }
 
 template <typename EvalT, typename Traits>
@@ -184,10 +138,10 @@ J2ErosionKernel<EvalT, Traits>::init(
   Fp_old_   = (*workset.stateArrayPtr)[Fp_string + "_old"];
   eqps_old_ = (*workset.stateArrayPtr)[eqps_string + "_old"];
 
-  auto& disc        = *workset.disc;
-  auto& stk_disc    = dynamic_cast<Albany::STKDiscretization&>(disc);
-  auto& mesh_struct = *(stk_disc.getSTKMeshStruct());
-  auto& field_cont  = *(mesh_struct.getFieldContainer());
+  auto& disc                    = *workset.disc;
+  auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
+  auto& mesh_struct             = *(stk_disc.getSTKMeshStruct());
+  auto& field_cont              = *(mesh_struct.getFieldContainer());
   have_cell_boundary_indicator_ = field_cont.hasCellBoundaryIndicatorField();
 
   elemWsLIDGIDMap_ = stk_disc.getElemWsLIDGIDMap();
@@ -206,9 +160,7 @@ J2ErosionKernel<EvalT, Traits>::init(
 
 // J2 nonlinear system
 template <typename EvalT, minitensor::Index M = 1>
-class J2ErosionNLS
-    : public minitensor::
-          Function_Base<J2ErosionNLS<EvalT, M>, typename EvalT::ScalarT, M>
+class J2ErosionNLS : public minitensor::Function_Base<J2ErosionNLS<EvalT, M>, typename EvalT::ScalarT, M>
 {
   using S = typename EvalT::ScalarT;
 
@@ -221,20 +173,13 @@ class J2ErosionNLS
       S const& smag,
       S const& mubar,
       S const& Y)
-      : sat_mod_(sat_mod),
-        sat_exp_(sat_exp),
-        eqps_old_(eqps_old),
-        K_(K),
-        smag_(smag),
-        mubar_(mubar),
-        Y_(Y)
+      : sat_mod_(sat_mod), sat_exp_(sat_exp), eqps_old_(eqps_old), K_(K), smag_(smag), mubar_(mubar), Y_(Y)
   {
   }
 
   constexpr static char const* const NAME{"J2 NLS"};
 
-  using Base = minitensor::
-      Function_Base<J2ErosionNLS<EvalT, M>, typename EvalT::ScalarT, M>;
+  using Base = minitensor::Function_Base<J2ErosionNLS<EvalT, M>, typename EvalT::ScalarT, M>;
 
   // Default value.
   template <typename T, minitensor::Index N>
@@ -323,15 +268,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&& exposure_time = exposure_time_(cell, pt);
 
   // Determine if erosion has occurred.
-  auto const element_size = element_size_;
-  auto const sea_level =
-      sea_level_.size() > 0 ?
-          interpolateVectors(time_, sea_level_, current_time) :
-          0.0;
+  auto const element_size        = element_size_;
+  auto const sea_level           = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : 0.0;
   bool const is_exposed_to_water = (height <= sea_level);
-  bool const is_erodible         = have_cell_boundary_indicator_ == true ?
-                               *(cell_boundary_indicator_[cell]) == 2.0 :
-                               false;
+  bool const is_erodible = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) == 2.0 : false;
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);
@@ -347,9 +287,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Tensor Fpn(num_dims_);
 
   for (int i{0}; i < num_dims_; ++i) {
-    for (int j{0}; j < num_dims_; ++j) {
-      Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j));
-    }
+    for (int j{0}; j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j)); }
   }
 
   // compute trial state
@@ -362,9 +300,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // check yield condition
   ScalarT const smag = minitensor::norm(s);
   ScalarT const f =
-      smag -
-      SQ23 * (Y + K * eqps_old_(cell, pt) +
-              sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+      smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
 
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;
@@ -387,8 +323,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
     x(0) = 0.0;
 
-    LCM::MiniSolver<MIN, STEP, NLS, EvalT, nls_dim> mini_solver(
-        minimizer, step, j2nls, x);
+    LCM::MiniSolver<MIN, STEP, NLS, EvalT, nls_dim> mini_solver(minimizer, step, j2nls, x);
 
     ScalarT const alpha = eqps_old_(cell, pt) + SQ23 * x(0);
     ScalarT const H     = K * alpha + sat_mod_ * (1.0 - exp(-sat_exp_ * alpha));
@@ -406,8 +341,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // mechanical source
     if (have_temperature_ == true && delta_time_(0) > 0) {
       source_(cell, pt) =
-          (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) /
-          (density_ * heat_capacity_);
+          (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
     }
 
     // exponential map to get Fpnew
@@ -429,9 +363,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // update yield surface
-  yield_surf_(cell, pt) =
-      Y + K * eqps_(cell, pt) +
-      sat_mod_ * (1. - std::exp(-sat_exp_ * eqps_(cell, pt)));
+  yield_surf_(cell, pt) = Y + K * eqps_(cell, pt) + sat_mod_ * (1. - std::exp(-sat_exp_ * eqps_(cell, pt)));
 
   // compute pressure
   ScalarT const p = 0.5 * kappa * (J_(cell, pt) - 1. / (J_(cell, pt)));
@@ -440,9 +372,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   sigma = p * I + s / J_(cell, pt);
 
   for (int i(0); i < num_dims_; ++i) {
-    for (int j(0); j < num_dims_; ++j) {
-      stress_(cell, pt, i, j) = sigma(i, j);
-    }
+    for (int j(0); j < num_dims_; ++j) { stress_(cell, pt, i, j) = sigma(i, j); }
   }
 
   // Determine if critical stress is exceeded

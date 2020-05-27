@@ -13,14 +13,12 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits, typename ScalarType>
-LoadStateFieldBase<EvalT, Traits, ScalarType>::LoadStateFieldBase(
-    Teuchos::ParameterList const& p)
+LoadStateFieldBase<EvalT, Traits, ScalarType>::LoadStateFieldBase(Teuchos::ParameterList const& p)
 {
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");
 
-  PHX::MDField<ScalarType> f(
-      fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("State Field Layout"));
+  PHX::MDField<ScalarType> f(fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("State Field Layout"));
   data = f;
 
   this->addEvaluatedField(data);
@@ -42,16 +40,14 @@ LoadStateFieldBase<EvalT, Traits, ScalarType>::postRegistrationSetup(
 // **********************************************************************
 template <typename EvalT, typename Traits, typename ScalarType>
 void
-LoadStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
-    typename Traits::EvalData workset)
+LoadStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(typename Traits::EvalData workset)
 {
   // cout << "LoadStateFieldBase importing state " << stateName << " to field "
   //     << fieldName << " with size " << data.size() << endl;
 
-  const Albany::MDArray& stateToLoad = (*workset.stateArrayPtr)[stateName];
+  const Albany::MDArray&            stateToLoad = (*workset.stateArrayPtr)[stateName];
   PHAL::MDFieldIterator<ScalarType> d(data);
-  for (int i = 0; !d.done() && i < stateToLoad.size(); ++d, ++i)
-    *d = stateToLoad[i];
+  for (int i = 0; !d.done() && i < stateToLoad.size(); ++d, ++i) *d = stateToLoad[i];
   for (; !d.done(); ++d) *d = 0.;
 }
 
@@ -61,8 +57,7 @@ LoadStateField<EvalT, Traits>::LoadStateField(Teuchos::ParameterList const& p)
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");
 
-  PHX::MDField<ParamScalarT> f(
-      fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("State Field Layout"));
+  PHX::MDField<ParamScalarT> f(fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("State Field Layout"));
   data = f;
 
   this->addEvaluatedField(data);
@@ -72,9 +67,7 @@ LoadStateField<EvalT, Traits>::LoadStateField(Teuchos::ParameterList const& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-LoadStateField<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+LoadStateField<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(data, fm);
 
@@ -89,10 +82,9 @@ LoadStateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   // cout << "LoadStateField importing state " << stateName << " to field "
   //     << fieldName << " with size " << data.size() << endl;
 
-  const Albany::MDArray& stateToLoad = (*workset.stateArrayPtr)[stateName];
+  const Albany::MDArray&              stateToLoad = (*workset.stateArrayPtr)[stateName];
   PHAL::MDFieldIterator<ParamScalarT> d(data);
-  for (int i = 0; !d.done() && i < stateToLoad.size(); ++d, ++i)
-    *d = stateToLoad[i];
+  for (int i = 0; !d.done() && i < stateToLoad.size(); ++d, ++i) *d = stateToLoad[i];
   for (; !d.done(); ++d) *d = 0.;
 }
 

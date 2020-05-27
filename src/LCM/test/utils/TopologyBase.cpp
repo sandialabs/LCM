@@ -33,12 +33,7 @@ main(int ac, char* av[])
   LCM::fracture::Criterion failure_criterion = LCM::fracture::RANDOM;
 
   command_line_processor.setOption(
-      "fracture-criterion",
-      &failure_criterion,
-      num_criteria,
-      criteria_values,
-      criteria_names,
-      "Fracture Criterion");
+      "fracture-criterion", &failure_criterion, num_criteria, criteria_values, criteria_names, "Fracture Criterion");
 
   double probability = 1.0;
 
@@ -46,23 +41,16 @@ main(int ac, char* av[])
 
   int const num_styles = 4;
 
-  LCM::Topology::OutputType const style_values[] = {
-      LCM::Topology::UNIDIRECTIONAL_UNILEVEL,
-      LCM::Topology::UNIDIRECTIONAL_MULTILEVEL,
-      LCM::Topology::BIDIRECTIONAL_UNILEVEL,
-      LCM::Topology::BIDIRECTIONAL_MULTILEVEL};
+  LCM::Topology::OutputType const style_values[] = {LCM::Topology::UNIDIRECTIONAL_UNILEVEL,
+                                                    LCM::Topology::UNIDIRECTIONAL_MULTILEVEL,
+                                                    LCM::Topology::BIDIRECTIONAL_UNILEVEL,
+                                                    LCM::Topology::BIDIRECTIONAL_MULTILEVEL};
 
   char const* style_names[] = {"UU", "UM", "BU", "BM"};
 
   LCM::Topology::OutputType plot_style = LCM::Topology::UNIDIRECTIONAL_UNILEVEL;
 
-  command_line_processor.setOption(
-      "plot-style",
-      &plot_style,
-      num_styles,
-      style_values,
-      style_names,
-      "Plot Style");
+  command_line_processor.setOption("plot-style", &plot_style, num_styles, style_values, style_names, "Plot Style");
 
   // Throw a warning and not error for unrecognized options
   command_line_processor.recogniseAllOptions(true);
@@ -71,16 +59,11 @@ main(int ac, char* av[])
   command_line_processor.throwExceptions(false);
 
   // Parse command line
-  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return =
-      command_line_processor.parse(ac, av);
+  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return = command_line_processor.parse(ac, av);
 
-  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) {
-    return 0;
-  }
+  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) { return 0; }
 
-  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) {
-    return 1;
-  }
+  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) { return 1; }
 
   // Read the mesh
   Teuchos::GlobalMPISession mpiSession(&ac, &av);
@@ -100,13 +83,11 @@ main(int ac, char* av[])
       break;
 
     case LCM::fracture::ONE:
-      abstract_failure_criterion =
-          Teuchos::rcp(new LCM::FractureCriterionOnce(topology, probability));
+      abstract_failure_criterion = Teuchos::rcp(new LCM::FractureCriterionOnce(topology, probability));
       break;
 
     case LCM::fracture::RANDOM:
-      abstract_failure_criterion =
-          Teuchos::rcp(new LCM::FractureCriterionRandom(topology, probability));
+      abstract_failure_criterion = Teuchos::rcp(new LCM::FractureCriterionRandom(topology, probability));
       break;
   }
 
@@ -115,15 +96,12 @@ main(int ac, char* av[])
   topology.set_output_type(plot_style);
   topology.splitOpenFaces();
 
-  Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr =
-      topology.get_discretization();
+  Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr = topology.get_discretization();
 
-  Albany::STKDiscretization& stk_discretization =
-      static_cast<Albany::STKDiscretization&>(*discretization_ptr);
+  Albany::STKDiscretization& stk_discretization = static_cast<Albany::STKDiscretization&>(*discretization_ptr);
 
   // Need solution for output call
-  Teuchos::RCP<Thyra_Vector> solution_field =
-      stk_discretization.getSolutionField();
+  Teuchos::RCP<Thyra_Vector> solution_field = stk_discretization.getSolutionField();
 
   // second arg to output is (pseudo)time
   stk_discretization.writeSolution(*solution_field, 1.0);

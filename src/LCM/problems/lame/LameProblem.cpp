@@ -11,13 +11,9 @@ Albany::LameProblem::LameProblem(
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_,
     Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
-    : Albany::AbstractProblem(params_, paramLib_, numDim_),
-      haveSource(false),
-      haveMatDB(false),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_, numDim_), haveSource(false), haveMatDB(false), use_sdbcs_(false)
 {
-  std::string& method = params->get(
-      "Name", "Library of Advanced Materials for Engineering (LAME) ");
+  std::string& method = params->get("Name", "Library of Advanced Materials for Engineering (LAME) ");
   *out << "Problem Name = " << method << std::endl;
 
   haveSource = params->isSublist("Source Functions");
@@ -64,8 +60,7 @@ Albany::LameProblem::buildProblem(
 
   for (int ps = 0; ps < physSets; ps++) {
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-    buildEvaluators(
-        *fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
+    buildEvaluators(*fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
   }
   constructDirichletEvaluators(*meshSpecs[0]);
 }
@@ -80,15 +75,13 @@ Albany::LameProblem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], meshSpecs, stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<LameProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<LameProblem>                    op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 void
-Albany::LameProblem::constructDirichletEvaluators(
-    Albany::MeshSpecsStruct const& meshSpecs)
+Albany::LameProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -96,8 +89,7 @@ Albany::LameProblem::constructDirichletEvaluators(
   if (neq > 1) dirichletNames[1] = "Y";
   if (neq > 2) dirichletNames[2] = "Z";
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
   use_sdbcs_  = dirUtils.useSDBCs();
@@ -106,11 +98,9 @@ Albany::LameProblem::constructDirichletEvaluators(
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::LameProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidLameProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidLameProblemParams");
 
-  validPL->set<std::string>(
-      "Lame Material Model", "", "The name of the LAME material model.");
+  validPL->set<std::string>("Lame Material Model", "", "The name of the LAME material model.");
   validPL->sublist("Lame Material Parameters", false, "");
   validPL->sublist(
       "aveJ",
@@ -126,10 +116,7 @@ Albany::LameProblem::getValidProblemParameters() const
       "integration point is replaced with the volume-averaged value over all "
       "integration points in the element (produces constant volumetric "
       "response).");
-  validPL->set<std::string>(
-      "MaterialDB Filename",
-      "materials.xml",
-      "Filename of material database xml file");
+  validPL->set<std::string>("MaterialDB Filename", "materials.xml", "Filename of material database xml file");
 
   return validPL;
 }

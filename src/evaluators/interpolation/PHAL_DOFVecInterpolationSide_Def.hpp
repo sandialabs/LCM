@@ -50,13 +50,11 @@ DOFVecInterpolationSideBase<EvalT, Traits, Type>::postRegistrationSetup(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename Type>
 void
-DOFVecInterpolationSideBase<EvalT, Traits, Type>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFVecInterpolationSideBase<EvalT, Traits, Type>::evaluateFields(typename Traits::EvalData workset)
 {
   if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;
 
-  std::vector<Albany::SideStruct> const& sideSet =
-      workset.sideSets->at(sideSetName);
+  std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell
     int const cell = it_side.elem_LID;
@@ -64,11 +62,9 @@ DOFVecInterpolationSideBase<EvalT, Traits, Type>::evaluateFields(
 
     for (int dim = 0; dim < vecDim; ++dim) {
       for (int qp = 0; qp < numSideQPs; ++qp) {
-        val_qp(cell, side, qp, dim) =
-            val_node(cell, side, 0, dim) * BF(cell, side, 0, qp);
+        val_qp(cell, side, qp, dim) = val_node(cell, side, 0, dim) * BF(cell, side, 0, qp);
         for (int node = 1; node < numSideNodes; ++node) {
-          val_qp(cell, side, qp, dim) +=
-              val_node(cell, side, node, dim) * BF(cell, side, node, qp);
+          val_qp(cell, side, qp, dim) += val_node(cell, side, node, dim) * BF(cell, side, node, qp);
         }
       }
     }

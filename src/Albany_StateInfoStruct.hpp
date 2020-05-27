@@ -128,9 +128,7 @@ struct StateStruct
   {
     std::cout << "StateInfoStruct diagnostics for : " << name << std::endl;
     std::cout << "Dimensions : " << std::endl;
-    for (unsigned i = 0; i < dim.size(); ++i) {
-      std::cout << "    " << i << " " << dim[i] << std::endl;
-    }
+    for (unsigned i = 0; i < dim.size(); ++i) { std::cout << "    " << i << " " << dim[i] << std::endl; }
     std::cout << "Entity : " << entity << std::endl;
   }
 
@@ -167,10 +165,7 @@ class StateInfoStruct
   typedef std::vector<Teuchos::RCP<StateStruct>>::const_iterator const_iterator;
 
   Teuchos::RCP<StateStruct>&      operator[](int index) { return sis[index]; }
-  const Teuchos::RCP<StateStruct> operator[](int index) const
-  {
-    return sis[index];
-  }
+  const Teuchos::RCP<StateStruct> operator[](int index) const { return sis[index]; }
   void
   push_back(const Teuchos::RCP<StateStruct>& ss)
   {
@@ -201,8 +196,7 @@ class StateInfoStruct
   Teuchos::RCP<Adapt::NodalDataBase>
   createNodalDataBase()
   {
-    if (Teuchos::is_null(nodal_data_base))
-      nodal_data_base = Teuchos::rcp(new Adapt::NodalDataBase);
+    if (Teuchos::is_null(nodal_data_base)) nodal_data_base = Teuchos::rcp(new Adapt::NodalDataBase);
     return nodal_data_base;
   }
   const Teuchos::RCP<Adapt::NodalDataBase>&

@@ -13,15 +13,12 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::
-    DOFVecGradInterpolationBase(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::DOFVecGradInterpolationBase(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
     : val_node(p.get<std::string>("Variable Name"), dl->node_vector),
       GradBF(p.get<std::string>("Gradient BF Name"), dl->node_qp_gradient),
-      grad_val_qp(
-          p.get<std::string>("Gradient Variable Name"),
-          dl->qp_vecgradient)
+      grad_val_qp(p.get<std::string>("Gradient Variable Name"), dl->qp_vecgradient)
 {
   this->addDependentField(val_node.fieldTag());
   this->addDependentField(GradBF.fieldTag());
@@ -63,18 +60,15 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
 {
   for (int qp = 0; qp < numQPs; ++qp)
     for (int i = 0; i < vecDim; i++)
-      for (int dim = 0; dim < numDims; dim++)
-        grad_val_qp(cell, qp, i, dim) = 0.0;
+      for (int dim = 0; dim < numDims; dim++) grad_val_qp(cell, qp, i, dim) = 0.0;
 
   for (int qp = 0; qp < numQPs; ++qp) {
     for (int i = 0; i < vecDim; i++) {
       for (int dim = 0; dim < numDims; dim++) {
         // For node==0, overwrite. Then += for 1 to numNodes.
-        grad_val_qp(cell, qp, i, dim) =
-            val_node(cell, 0, i) * GradBF(cell, 0, qp, dim);
+        grad_val_qp(cell, qp, i, dim) = val_node(cell, 0, i) * GradBF(cell, 0, qp, dim);
         for (int node = 1; node < numNodes; ++node) {
-          grad_val_qp(cell, qp, i, dim) +=
-              val_node(cell, node, i) * GradBF(cell, node, qp, dim);
+          grad_val_qp(cell, qp, i, dim) += val_node(cell, node, i) * GradBF(cell, node, qp, dim);
         }
       }
     }
@@ -84,26 +78,21 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
 // *********************************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
   auto start = std::chrono::high_resolution_clock::now();
 #endif
   // Kokkos::deep_copy(grad_val_qp.get_kokkos_view(), 0.0);
-  Kokkos::parallel_for(
-      DOFVecGradInterpolationBase_Residual_Policy(0, workset.numCells), *this);
+  Kokkos::parallel_for(DOFVecGradInterpolationBase_Residual_Policy(0, workset.numCells), *this);
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "DOFVecGradInterpolationBase Residual time = " << millisec
-            << "  " << microseconds << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "DOFVecGradInterpolationBase Residual time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 
@@ -117,29 +106,21 @@ FastSolutionVecGradInterpolationBase<
     PHAL::AlbanyTraits::Jacobian,
     Traits,
     typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-operator()(
-    const FastSolutionVecGradInterpolationBase_Jacobian_Tag& tag,
-    const int&                                               cell) const
+operator()(const FastSolutionVecGradInterpolationBase_Jacobian_Tag& tag, const int& cell) const
 {
   for (int qp = 0; qp < this->numQPs; ++qp) {
     for (int i = 0; i < this->vecDim; i++) {
       for (int dim = 0; dim < this->numDims; dim++) {
         // For node==0, overwrite. Then += for 1 to numNodes.
-        this->grad_val_qp(cell, qp, i, dim) = ScalarT(
-            num_dof,
-            this->val_node(cell, 0, i).val() * this->GradBF(cell, 0, qp, dim));
+        this->grad_val_qp(cell, qp, i, dim) =
+            ScalarT(num_dof, this->val_node(cell, 0, i).val() * this->GradBF(cell, 0, qp, dim));
         (this->grad_val_qp(cell, qp, i, dim)).fastAccessDx(offset + i) =
-            this->val_node(cell, 0, i).fastAccessDx(offset + i) *
-            this->GradBF(cell, 0, qp, dim);
+            this->val_node(cell, 0, i).fastAccessDx(offset + i) * this->GradBF(cell, 0, qp, dim);
         for (int node = 1; node < this->numNodes; ++node) {
           (this->grad_val_qp(cell, qp, i, dim)).val() +=
-              this->val_node(cell, node, i).val() *
-              this->GradBF(cell, node, qp, dim);
-          (this->grad_val_qp(cell, qp, i, dim))
-              .fastAccessDx(neq * node + offset + i) +=
-              this->val_node(cell, node, i)
-                  .fastAccessDx(neq * node + offset + i) *
-              this->GradBF(cell, node, qp, dim);
+              this->val_node(cell, node, i).val() * this->GradBF(cell, node, qp, dim);
+          (this->grad_val_qp(cell, qp, i, dim)).fastAccessDx(neq * node + offset + i) +=
+              this->val_node(cell, node, i).fastAccessDx(neq * node + offset + i) * this->GradBF(cell, node, qp, dim);
         }
       }
     }
@@ -151,8 +132,7 @@ void
 FastSolutionVecGradInterpolationBase<
     PHAL::AlbanyTraits::Jacobian,
     Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-    evaluateFields(typename Traits::EvalData workset)
+    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
 #if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
@@ -161,19 +141,14 @@ FastSolutionVecGradInterpolationBase<
   num_dof = this->val_node(0, 0, 0).size();
   neq     = workset.wsElNodeEqID.extent(2);
 
-  Kokkos::parallel_for(
-      FastSolutionVecGradInterpolationBase_Jacobian_Policy(0, workset.numCells),
-      *this);
+  Kokkos::parallel_for(FastSolutionVecGradInterpolationBase_Jacobian_Policy(0, workset.numCells), *this);
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "FastSolutionVecGradInterpolationBase Jacobian time = "
-            << millisec << "  " << microseconds << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "FastSolutionVecGradInterpolationBase Jacobian time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION

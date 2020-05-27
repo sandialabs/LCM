@@ -24,9 +24,7 @@ class SolverFactory
 {
  public:
   //! Default constructor
-  SolverFactory(
-      std::string const&                      inputfile,
-      const Teuchos::RCP<Teuchos_Comm const>& comm);
+  SolverFactory(std::string const& inputfile, const Teuchos::RCP<Teuchos_Comm const>& comm);
 
   SolverFactory(
       const Teuchos::RCP<Teuchos::ParameterList>& input_appParams,
@@ -113,15 +111,11 @@ class SolverFactory
 
   /** \brief Function that does regression testing for Dakota runs. */
   int
-  checkDakotaTestResults(
-      int                                            response_index,
-      const Teuchos::SerialDenseVector<int, double>* drdv) const;
+  checkDakotaTestResults(int response_index, const Teuchos::SerialDenseVector<int, double>* drdv) const;
 
   /** \brief Function that does regression testing for Analysis runs. */
   int
-  checkAnalysisTestResults(
-      int                                            response_index,
-      const Teuchos::RCP<Thyra::VectorBase<double>>& tvec) const;
+  checkAnalysisTestResults(int response_index, const Teuchos::RCP<Thyra::VectorBase<double>>& tvec) const;
 
   Teuchos::RCP<Thyra::ModelEvaluator<ST>>
   returnModel() const
@@ -138,21 +132,13 @@ class SolverFactory
  private:
   /** \brief Testing utility that compares two numbers using two tolerances */
   bool
-  scaledCompare(
-      double             x1,
-      double             x2,
-      double             relTol,
-      double             absTol,
-      std::string const& name) const;
+  scaledCompare(double x1, double x2, double relTol, double absTol, std::string const& name) const;
 
   Teuchos::ParameterList*
   getTestParameters(int response_index) const;
 
   void
-  storeTestResults(
-      Teuchos::ParameterList* testParams,
-      int                     failures,
-      int                     comparisons) const;
+  storeTestResults(Teuchos::ParameterList* testParams, int failures, int comparisons) const;
 
   Teuchos::RCP<Thyra::ModelEvaluator<ST>> model_;
 

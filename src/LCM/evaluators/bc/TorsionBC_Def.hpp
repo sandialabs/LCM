@@ -25,11 +25,7 @@ TorsionBC_Base<EvalT, Traits>::TorsionBC_Base(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-TorsionBC_Base<EvalT, Traits>::computeBCs(
-    double*        coord,
-    ScalarT&       Xval,
-    ScalarT&       Yval,
-    const RealType time)
+TorsionBC_Base<EvalT, Traits>::computeBCs(double* coord, ScalarT& Xval, ScalarT& Yval, const RealType time)
 {
   RealType X(coord[0]);
   RealType Y(coord[1]);
@@ -44,8 +40,7 @@ TorsionBC_Base<EvalT, Traits>::computeBCs(
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::TorsionBC(
-    Teuchos::ParameterList& p)
+TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::TorsionBC(Teuchos::ParameterList& p)
     : TorsionBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
@@ -53,8 +48,7 @@ TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::TorsionBC(
 // **********************************************************************
 template <typename Traits>
 void
-TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
@@ -63,10 +57,8 @@ TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   Teuchos::ArrayRCP<ST>       f_nonconstView = Albany::getNonconstLocalData(f);
 
   // Grab the vector off node GIDs for this Node Set ID from the std::map
-  std::vector<std::vector<int>> const& nsNodes =
-      dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-  std::vector<double*> const& nsNodeCoords =
-      dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
+  std::vector<std::vector<int>> const& nsNodes      = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
+  std::vector<double*> const&          nsNodeCoords = dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   RealType time = dirichletWorkset.current_time;
 
@@ -94,16 +86,14 @@ TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits>
-TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>::TorsionBC(
-    Teuchos::ParameterList& p)
+TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>::TorsionBC(Teuchos::ParameterList& p)
     : TorsionBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 // **********************************************************************
 template <typename Traits>
 void
-TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;
@@ -112,11 +102,9 @@ TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   Teuchos::ArrayRCP<const ST> x_constView = Albany::getLocalData(x);
   Teuchos::ArrayRCP<ST>       f_nonconstView;
 
-  const RealType                       j_coeff = dirichletWorkset.j_coeff;
-  std::vector<std::vector<int>> const& nsNodes =
-      dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
-  std::vector<double*> const& nsNodeCoords =
-      dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
+  const RealType                       j_coeff      = dirichletWorkset.j_coeff;
+  std::vector<std::vector<int>> const& nsNodes      = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
+  std::vector<double*> const&          nsNodeCoords = dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   bool fillResid = (f != Teuchos::null);
   if (fillResid) { f_nonconstView = Albany::getNonconstLocalData(f); }

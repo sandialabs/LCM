@@ -7,8 +7,7 @@
 namespace PHAL {
 
 template <typename EvalT>
-IdentityCoordFunctionTraits<EvalT>::IdentityCoordFunctionTraits(
-    Teuchos::ParameterList& p)
+IdentityCoordFunctionTraits<EvalT>::IdentityCoordFunctionTraits(Teuchos::ParameterList& p)
 {
   numEqn    = p.get<int>("Number of Equations");
   eqnOffset = p.get<int>("Equation Offset");
@@ -17,10 +16,7 @@ IdentityCoordFunctionTraits<EvalT>::IdentityCoordFunctionTraits(
 // **********************************************************************
 template <typename EvalT>
 void
-IdentityCoordFunctionTraits<EvalT>::computeBCs(
-    double*               coord,
-    std::vector<ScalarT>& BCVals,
-    const RealType        time)
+IdentityCoordFunctionTraits<EvalT>::computeBCs(double* coord, std::vector<ScalarT>& BCVals, const RealType time)
 {
   // Apply the desired function to the coordinate values here
   for (int i = 0; i < numEqn; i++) BCVals[i] = coord[i];

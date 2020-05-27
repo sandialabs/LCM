@@ -18,10 +18,7 @@ ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
     Teuchos::RCP<Thyra_VectorSpace const> const domain_vs,
     Teuchos::RCP<Thyra_VectorSpace const> const range_vs,
     int const /*nonzeros_per_row*/)
-    : m_graph(new Impl()),
-      m_domain_vs(domain_vs),
-      m_range_vs(range_vs),
-      m_filled(false)
+    : m_graph(new Impl()), m_domain_vs(domain_vs), m_range_vs(range_vs), m_filled(false)
 {
   t_range = getTpetraMap(range_vs);
   t_local_graph.resize(t_range->getNodeNumElements());
@@ -56,9 +53,7 @@ ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
 }
 
 void
-ThyraCrsMatrixFactory::insertGlobalIndices(
-    const GO                            row,
-    const Teuchos::ArrayView<const GO>& indices)
+ThyraCrsMatrixFactory::insertGlobalIndices(const GO row, const Teuchos::ArrayView<const GO>& indices)
 {
   // Indices are inserted in a temporary local graph.
   // The actual graph is created and filled when fillComplete is called
@@ -69,9 +64,7 @@ ThyraCrsMatrixFactory::insertGlobalIndices(
   if (lrow < 0) return;
 
   auto& row_indices = t_local_graph[lrow];
-  for (int i = 0; i < indices.size(); ++i) {
-    row_indices.emplace(static_cast<Tpetra_GO>(indices[i]));
-  }
+  for (int i = 0; i < indices.size(); ++i) { row_indices.emplace(static_cast<Tpetra_GO>(indices[i])); }
 }
 
 void
@@ -80,15 +73,13 @@ ThyraCrsMatrixFactory::fillComplete()
   // We created the CrsGraph,
   // insert indices from the temporary local graph,
   // and call fill complete.
-  Teuchos::ArrayRCP<size_t> nonzeros_per_row_array(
-      t_range->getNodeNumElements());
+  Teuchos::ArrayRCP<size_t> nonzeros_per_row_array(t_range->getNodeNumElements());
 
   for (int lrow = 0; lrow < nonzeros_per_row_array.size(); ++lrow) {
     nonzeros_per_row_array[lrow] = t_local_graph[lrow].size();
   }
 
-  m_graph->t_graph =
-      Teuchos::rcp(new Tpetra_CrsGraph(t_range, nonzeros_per_row_array()));
+  m_graph->t_graph = Teuchos::rcp(new Tpetra_CrsGraph(t_range, nonzeros_per_row_array()));
 
   for (int lrow = 0; lrow < nonzeros_per_row_array.size(); ++lrow) {
     auto& row_indices = t_local_graph[lrow];
@@ -113,14 +104,11 @@ ThyraCrsMatrixFactory::fillComplete()
 Teuchos::RCP<Thyra_LinearOp>
 ThyraCrsMatrixFactory::createOp() const
 {
-  ALBANY_PANIC(
-      !m_filled,
-      "Error! Cannot create a linear operator if the graph is not filled.\n");
+  ALBANY_PANIC(!m_filled, "Error! Cannot create a linear operator if the graph is not filled.\n");
 
   Teuchos::RCP<Thyra_LinearOp>   op;
-  Teuchos::RCP<Tpetra_CrsMatrix> mat =
-      Teuchos::rcp(new Tpetra_CrsMatrix(m_graph->t_graph));
-  auto const zero = Teuchos::ScalarTraits<ST>::zero();
+  Teuchos::RCP<Tpetra_CrsMatrix> mat  = Teuchos::rcp(new Tpetra_CrsMatrix(m_graph->t_graph));
+  auto const                     zero = Teuchos::ScalarTraits<ST>::zero();
   mat->resumeFill();
   mat->setAllToScalar(zero);
   mat->fillComplete();

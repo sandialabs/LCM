@@ -66,9 +66,7 @@ class MechanicsProblem : public AbstractProblem
   /// Build the PDE instantiations, boundary conditions, initial solution
   ///
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> meshSpecs,
-      StateManager&                                    stateMgr);
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
   ///
   /// Build evaluators
@@ -100,8 +98,7 @@ class MechanicsProblem : public AbstractProblem
   /// reduction)
   ///
   void
-  applyProblemSpecificSolverSettings(
-      Teuchos::RCP<Teuchos::ParameterList> params);
+  applyProblemSpecificSolverSettings(Teuchos::RCP<Teuchos::ParameterList> params);
 
   ///
   /// Main problem setup routine.

@@ -14,11 +14,7 @@ using Thyra::PhysicallyBlockedLinearOpBase;
 
 namespace LCM {
 
-Schwarz_CoupledJacobian::Schwarz_CoupledJacobian(
-    Teuchos::RCP<Teuchos_Comm const> const& comm)
-{
-  comm_ = comm;
-}
+Schwarz_CoupledJacobian::Schwarz_CoupledJacobian(Teuchos::RCP<Teuchos_Comm const> const& comm) { comm_ = comm; }
 
 Schwarz_CoupledJacobian::~Schwarz_CoupledJacobian() { return; }
 
@@ -36,8 +32,7 @@ Schwarz_CoupledJacobian::getThyraCoupledJacobian(
 
   // get the block dimension
   // this operator will be square
-  Teuchos::RCP<Thyra::PhysicallyBlockedLinearOpBase<ST>> blocked_op =
-      Thyra::defaultBlockedLinearOp<ST>();
+  Teuchos::RCP<Thyra::PhysicallyBlockedLinearOpBase<ST>> blocked_op = Thyra::defaultBlockedLinearOp<ST>();
 
   blocked_op->beginBlockFill(block_dim, block_dim);
 
@@ -54,15 +49,13 @@ Schwarz_CoupledJacobian::getThyraCoupledJacobian(
         Teuchos::RCP<Schwarz_BoundaryJacobian> jac_boundary =
             Teuchos::rcp(new Schwarz_BoundaryJacobian(comm_, ca, jacs, i, j));
 
-        Teuchos::RCP<Thyra_LinearOp> exp_jac =
-            jac_boundary->getExplicitOperator();
+        Teuchos::RCP<Thyra_LinearOp> exp_jac = jac_boundary->getExplicitOperator();
 
         Teuchos::RCP<Thyra::LinearOpBase<ST>> block = exp_jac;
 
 #else
 
-        Teuchos::RCP<Thyra_LinearOp> jac_boundary =
-            Teuchos::rcp(new Schwarz_BoundaryJacobian(comm_, ca, jacs, i, j));
+        Teuchos::RCP<Thyra_LinearOp> jac_boundary = Teuchos::rcp(new Schwarz_BoundaryJacobian(comm_, ca, jacs, i, j));
 
         Teuchos::RCP<Thyra::LinearOpBase<ST>> block = jac_boundary;
 

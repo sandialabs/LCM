@@ -43,11 +43,9 @@ AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(
     enable_dynamics_ = true;
 
   if (enable_dynamics_) {
-    accel_qps_ = decltype(accel_qps_)(
-        p.get<std::string>("Acceleration Name"), dl->qp_vector);
+    accel_qps_ = decltype(accel_qps_)(p.get<std::string>("Acceleration Name"), dl->qp_vector);
     this->addDependentField(accel_qps_);
-    accel_nodes_ = decltype(accel_nodes_)(
-        p.get<std::string>("Acceleration Name"), dl->node_vector);
+    accel_nodes_ = decltype(accel_nodes_)(p.get<std::string>("Acceleration Name"), dl->node_vector);
     this->addDependentField(accel_nodes_);
   }
 
@@ -91,8 +89,7 @@ AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(
     default: elt_type = ELT_TYPE::UNSUPPORTED;
   }
 
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library");
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library");
 }
 
 // **********************************************************************
@@ -113,9 +110,7 @@ AnalyticMassResidualBase<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRow(
-    int const cell,
-    int const row) const
+AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRow(int const cell, int const row) const
 {
   std::vector<RealType> mass_row(4);
   switch (row) {
@@ -159,9 +154,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRow(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRowLumped(
-    int const cell,
-    int const row) const
+AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRowLumped(int const cell, int const row) const
 {
   std::vector<RealType> mass_row(4);
   switch (row) {
@@ -171,8 +164,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRowLumped(
     case 3: mass_row[3] = 1.0; break;
     default:
       ALBANY_ABORT(
-          "Error! invalid value row = " << row
-                                        << " to tet4LocalMassRowLumped! \n"
+          "Error! invalid value row = " << row << " to tet4LocalMassRowLumped! \n"
                                         << "Row must be between 0 and 3.\n");
   }
   const RealType elt_vol = computeElementVolume(cell);
@@ -186,9 +178,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet4LocalMassRowLumped(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRow(
-    int const cell,
-    int const row) const
+AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRow(int const cell, int const row) const
 {
   std::vector<RealType> mass_row(10);
   switch (row) {
@@ -328,9 +318,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRow(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRowLumped(
-    int const cell,
-    int const row) const
+AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRowLumped(int const cell, int const row) const
 {
   std::vector<RealType> mass_row(10);
   switch (row) {
@@ -346,8 +334,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRowLumped(
     case 9: mass_row[9] = 4.0; break;
     default:
       ALBANY_ABORT(
-          "Error! invalid value row = " << row
-                                        << " to tet10LocalMassRowLumped! \n"
+          "Error! invalid value row = " << row << " to tet10LocalMassRowLumped! \n"
                                         << "Row must be between 0 and 9.\n");
   }
   const RealType elt_vol = computeElementVolume(cell);
@@ -361,9 +348,7 @@ AnalyticMassResidualBase<EvalT, Traits>::tet10LocalMassRowLumped(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRow(
-    int const cell,
-    int const row) const
+AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRow(int const cell, int const row) const
 {
   std::vector<RealType> mass_row(8);
   switch (row) {
@@ -463,9 +448,7 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRow(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(
-    int const cell,
-    int const row) const
+AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(int const cell, int const row) const
 {
   std::vector<RealType> mass_row(8);
   switch (row) {
@@ -479,8 +462,7 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(
     case 7: mass_row[7] = 1.0; break;
     default:
       ALBANY_ABORT(
-          "Error! invalid value row = " << row
-                                        << " to hex8LocalMassRowLumped! \n"
+          "Error! invalid value row = " << row << " to hex8LocalMassRowLumped! \n"
                                         << "Row must be between 0 and 7.\n");
   }
   const RealType elt_vol = computeElementVolume(cell);
@@ -491,9 +473,7 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRow(
-    int const cell,
-    int const row) const
+AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRow(int const cell, int const row) const
 {
   std::vector<RealType> mass_row(10);
   switch (row) {
@@ -619,8 +599,7 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRow(
       break;
     default:
       ALBANY_ABORT(
-          "Error! invalid value row = " << row
-                                        << " to compositeTet10LocalMassRow! \n"
+          "Error! invalid value row = " << row << " to compositeTet10LocalMassRow! \n"
                                         << "Row must be between 0 and 9.\n");
   }
   const RealType elt_vol = computeElementVolume(cell);
@@ -634,9 +613,7 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRow(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRowLumped(
-    int const cell,
-    int const row) const
+AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRowLumped(int const cell, int const row) const
 {
   std::vector<RealType> mass_row(10);
   switch (row) {
@@ -652,9 +629,8 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRowLumped(
     case 9: mass_row[9] = 14.0; break;
     default:
       ALBANY_ABORT(
-          "Error! invalid value row = "
-          << row << " to compositeTet10LocalMassRowLumped! \n"
-          << "Row must be between 0 and 9.\n");
+          "Error! invalid value row = " << row << " to compositeTet10LocalMassRowLumped! \n"
+                                        << "Row must be between 0 and 9.\n");
   }
   const RealType elt_vol = computeElementVolume(cell);
   const RealType scale   = elt_vol * density_;
@@ -667,40 +643,30 @@ AnalyticMassResidualBase<EvalT, Traits>::compositeTet10LocalMassRowLumped(
 
 template <typename EvalT, typename Traits>
 RealType
-AnalyticMassResidualBase<EvalT, Traits>::computeElementVolScaling(
-    int const cell,
-    int const node) const
+AnalyticMassResidualBase<EvalT, Traits>::computeElementVolScaling(int const cell, int const node) const
 {
   RealType elt_vol_scale_at_node = 0.0;
-  for (int pt = 0; pt < num_pts_; ++pt) {
-    elt_vol_scale_at_node += w_bf_(cell, node, pt);
-  }
+  for (int pt = 0; pt < num_pts_; ++pt) { elt_vol_scale_at_node += w_bf_(cell, node, pt); }
   return elt_vol_scale_at_node;
 }
 
 template <typename EvalT, typename Traits>
 RealType
-AnalyticMassResidualBase<EvalT, Traits>::computeElementVolume(
-    int const cell) const
+AnalyticMassResidualBase<EvalT, Traits>::computeElementVolume(int const cell) const
 {
   RealType elt_vol = 0.0;
-  for (int pt = 0; pt < num_pts_; ++pt) {
-    elt_vol += Albany::ADValue(weights_(cell, pt));
-  }
+  for (int pt = 0; pt < num_pts_; ++pt) { elt_vol += Albany::ADValue(weights_(cell, pt)); }
   return elt_vol;
 }
 
 template <typename EvalT, typename Traits>
 void
-AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(
-    typename Traits::EvalData workset) const
+AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(typename Traits::EvalData workset) const
 {
   // Zero out mass_
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < this->num_nodes_; ++node) {
-      for (int dim = 0; dim < this->num_dims_; ++dim) {
-        (this->mass_)(cell, node, dim) = ScalarT(0.0);
-      }
+      for (int dim = 0; dim < this->num_dims_; ++dim) { (this->mass_)(cell, node, dim) = ScalarT(0.0); }
     }
   }
   if (resid_using_cub_ == true) {
@@ -710,8 +676,7 @@ AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(
         for (int pt = 0; pt < this->num_pts_; ++pt) {
           for (int dim = 0; dim < this->num_dims_; ++dim) {
             (this->mass_)(cell, node, dim) +=
-                (this->density_) * (this->accel_qps_)(cell, pt, dim) *
-                (this->w_bf_)(cell, node, pt);
+                (this->density_) * (this->accel_qps_)(cell, pt, dim) * (this->w_bf_)(cell, node, pt);
           }
         }
       }
@@ -723,30 +688,14 @@ AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(
       for (int node = 0; node < this->num_nodes_; ++node) {  // loop over rows
         std::vector<RealType> mass_row;
         switch (this->elt_type) {
-          case ELT_TYPE::TET4:
-            mass_row = this->tet4LocalMassRow(cell, node);
-            break;
-          case ELT_TYPE::LUMPED_TET4:
-            mass_row = this->tet4LocalMassRowLumped(cell, node);
-            break;
-          case ELT_TYPE::HEX8:
-            mass_row = this->hex8LocalMassRow(cell, node);
-            break;
-          case ELT_TYPE::LUMPED_HEX8:
-            mass_row = this->hex8LocalMassRowLumped(cell, node);
-            break;
-          case ELT_TYPE::TET10:
-            mass_row = this->tet10LocalMassRow(cell, node);
-            break;
-          case ELT_TYPE::LUMPED_TET10:
-            mass_row = this->tet10LocalMassRowLumped(cell, node);
-            break;
-          case ELT_TYPE::CT10:
-            mass_row = this->compositeTet10LocalMassRow(cell, node);
-            break;
-          case ELT_TYPE::LUMPED_CT10:
-            mass_row = this->compositeTet10LocalMassRowLumped(cell, node);
-            break;
+          case ELT_TYPE::TET4: mass_row = this->tet4LocalMassRow(cell, node); break;
+          case ELT_TYPE::LUMPED_TET4: mass_row = this->tet4LocalMassRowLumped(cell, node); break;
+          case ELT_TYPE::HEX8: mass_row = this->hex8LocalMassRow(cell, node); break;
+          case ELT_TYPE::LUMPED_HEX8: mass_row = this->hex8LocalMassRowLumped(cell, node); break;
+          case ELT_TYPE::TET10: mass_row = this->tet10LocalMassRow(cell, node); break;
+          case ELT_TYPE::LUMPED_TET10: mass_row = this->tet10LocalMassRowLumped(cell, node); break;
+          case ELT_TYPE::CT10: mass_row = this->compositeTet10LocalMassRow(cell, node); break;
+          case ELT_TYPE::LUMPED_CT10: mass_row = this->compositeTet10LocalMassRowLumped(cell, node); break;
           default: break;
         }
         for (int dim = 0; dim < this->num_dims_; ++dim) {
@@ -765,10 +714,9 @@ AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::
-    AnalyticMassResidual(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::AnalyticMassResidual(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
     : AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl)
 {
 }
@@ -776,20 +724,16 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::
 // **********************************************************************
 template <typename Traits>
 void
-AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   if (this->use_analytic_mass_ == false) return;
 
   // Throw error is trying to call with unsupported element type
-  if (this->elt_type ==
-      AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>::ELT_TYPE::
-          UNSUPPORTED) {
+  if (this->elt_type == AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>::ELT_TYPE::UNSUPPORTED) {
     ALBANY_ABORT(
         "Error! AnalyticMassResidual is being run with unsupported element "
         "having \n"
-        << this->num_nodes_
-        << " nodes.  Please re-run with 'Use Analytic Mass' = 'false'.\n");
+        << this->num_nodes_ << " nodes.  Please re-run with 'Use Analytic Mass' = 'false'.\n");
   }
 
   this->computeResidualValue(workset);
@@ -800,10 +744,9 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 // **********************************************************************
 
 template <typename Traits>
-AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::
-    AnalyticMassResidual(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::AnalyticMassResidual(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
     : AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl)
 {
 }
@@ -811,20 +754,16 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::
 // **********************************************************************
 template <typename Traits>
 void
-AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   if (this->use_analytic_mass_ == false) return;
 
   // Throw error is trying to call with unsupported element type
-  if (this->elt_type ==
-      AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::
-          UNSUPPORTED) {
+  if (this->elt_type == AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::UNSUPPORTED) {
     ALBANY_ABORT(
         "Error! AnalyticMassResidual is being run with unsupported element "
         "having \n"
-        << this->num_nodes_
-        << " nodes.  Please re-run with 'Use Analytic Mass' = 'false'.\n");
+        << this->num_nodes_ << " nodes.  Please re-run with 'Use Analytic Mass' = 'false'.\n");
   }
 
   // Compute residual value
@@ -833,48 +772,38 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   // Set local Jacobian entries
   double n_coeff = workset.n_coeff;
   for (int cell = 0; cell < workset.numCells; ++cell) {
-    for (int node = 0; node < this->num_nodes_;
-         ++node) {  // loop over Jacobian rows
+    for (int node = 0; node < this->num_nodes_; ++node) {  // loop over Jacobian rows
       std::vector<RealType> mass_row;
       switch (this->elt_type) {
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-            ELT_TYPE::TET4:
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::TET4:
           mass_row = this->tet4LocalMassRow(cell, node);
           break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-            ELT_TYPE::LUMPED_TET4:
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_TET4:
           mass_row = this->tet4LocalMassRowLumped(cell, node);
           break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-            ELT_TYPE::HEX8:
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::HEX8:
           mass_row = this->hex8LocalMassRow(cell, node);
           break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-            ELT_TYPE::LUMPED_HEX8:
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_HEX8:
           mass_row = this->hex8LocalMassRowLumped(cell, node);
           break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-            ELT_TYPE::TET10:
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::TET10:
           mass_row = this->tet10LocalMassRow(cell, node);
           break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-            ELT_TYPE::LUMPED_TET10:
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_TET10:
           mass_row = this->tet10LocalMassRowLumped(cell, node);
           break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-            ELT_TYPE::CT10:
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::CT10:
           mass_row = this->compositeTet10LocalMassRow(cell, node);
           break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-            ELT_TYPE::LUMPED_CT10:
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_CT10:
           mass_row = this->compositeTet10LocalMassRowLumped(cell, node);
           break;
         default: break;
       }
       for (int dim = 0; dim < this->num_dims_; ++dim) {
-        typename PHAL::Ref<ScalarT>::type valref =
-            (this->mass_)(cell, node, dim);  // get Jacobian row
-        int k;
+        typename PHAL::Ref<ScalarT>::type valref = (this->mass_)(cell, node, dim);  // get Jacobian row
+        int                               k;
         for (int i = 0; i < this->num_nodes_; ++i) {  // loop over Jacobian cols
           k                      = i * this->num_dims_ + dim;
           valref.fastAccessDx(k) = n_coeff * mass_row[i];

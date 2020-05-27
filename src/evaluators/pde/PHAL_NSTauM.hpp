@@ -19,16 +19,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class NSTauM : public PHX::EvaluatorWithBaseImpl<Traits>,
-               public PHX::EvaluatorDerived<EvalT, Traits>
+class NSTauM : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   NSTauM(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

@@ -21,11 +21,7 @@ namespace util {
 class TimeGuard
 {
  public:
-  TimeGuard(Teuchos::RCP<Teuchos::Time> timer, bool reset = false)
-      : timer_(timer)
-  {
-    timer_->start(reset);
-  }
+  TimeGuard(Teuchos::RCP<Teuchos::Time> timer, bool reset = false) : timer_(timer) { timer_->start(reset); }
 
   ~TimeGuard() { timer_->stop(); }
 

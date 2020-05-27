@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-GursonHMRModel<EvalT, Traits>::GursonHMRModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+GursonHMRModel<EvalT, Traits>::GursonHMRModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       sat_mod_(p->get<RealType>("Saturation Modulus", 0.0)),
       sat_exp_(p->get<RealType>("Saturation Exponent", 0.0)),
@@ -34,10 +32,8 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->dep_field_map_.insert(std::make_pair("Poissons Ratio", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Elastic Modulus", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Yield Strength", dl->qp_scalar));
-  this->dep_field_map_.insert(
-      std::make_pair("Hardening Modulus", dl->qp_scalar));
-  this->dep_field_map_.insert(
-      std::make_pair("Recovery Modulus", dl->qp_scalar));
+  this->dep_field_map_.insert(std::make_pair("Hardening Modulus", dl->qp_scalar));
+  this->dep_field_map_.insert(std::make_pair("Recovery Modulus", dl->qp_scalar));
 
   // retrieve appropriate field name strings
   std::string cauchy_string       = (*field_name_map_)["Cauchy_Stress"];
@@ -52,8 +48,7 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(
   this->eval_field_map_.insert(std::make_pair(Fp_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(ess_string, dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair(isoHardening_string, dl->qp_scalar));
+  this->eval_field_map_.insert(std::make_pair(isoHardening_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(void_string, dl->qp_scalar));
 
   // define the state variables
@@ -139,19 +134,16 @@ GursonHMRModel<EvalT, Traits>::computeState(
   auto void_volume  = *eval_fields[void_string];
 
   // get State Variables
-  Albany::MDArray Fp_old   = (*workset.stateArrayPtr)[Fp_string + "_old"];
-  Albany::MDArray eqps_old = (*workset.stateArrayPtr)[eqps_string + "_old"];
-  Albany::MDArray ess_old  = (*workset.stateArrayPtr)[ess_string + "_old"];
-  Albany::MDArray isoHardening_old =
-      (*workset.stateArrayPtr)[isoHardening_string + "_old"];
-  Albany::MDArray void_volume_old =
-      (*workset.stateArrayPtr)[void_string + "_old"];
+  Albany::MDArray Fp_old           = (*workset.stateArrayPtr)[Fp_string + "_old"];
+  Albany::MDArray eqps_old         = (*workset.stateArrayPtr)[eqps_string + "_old"];
+  Albany::MDArray ess_old          = (*workset.stateArrayPtr)[ess_string + "_old"];
+  Albany::MDArray isoHardening_old = (*workset.stateArrayPtr)[isoHardening_string + "_old"];
+  Albany::MDArray void_volume_old  = (*workset.stateArrayPtr)[void_string + "_old"];
 
   minitensor::Tensor<ScalarT> F(num_dims_), be(num_dims_), logbe(num_dims_);
   minitensor::Tensor<ScalarT> s(num_dims_), sigma(num_dims_), N(num_dims_);
   minitensor::Tensor<ScalarT> A(num_dims_), expA(num_dims_), Fpnew(num_dims_);
-  minitensor::Tensor<ScalarT> Fpn(num_dims_), Fpinv(num_dims_),
-      Cpinv(num_dims_);
+  minitensor::Tensor<ScalarT> Fpn(num_dims_), Fpinv(num_dims_), Cpinv(num_dims_);
   minitensor::Tensor<ScalarT> dPhi(num_dims_);
   minitensor::Tensor<ScalarT> I(minitensor::eye<ScalarT>(num_dims_));
 
@@ -160,28 +152,25 @@ GursonHMRModel<EvalT, Traits>::computeState(
   ScalarT fvoid, eq, es, isoH, Phi, dgam, Ybar;
 
   // local unknowns and residual vectors
-  std::vector<ScalarT> X(4);
-  std::vector<ScalarT> R(4);
-  std::vector<ScalarT> dRdX(16);
-  ScalarT norm_residual0(0.0), norm_residual(0.0), relative_residual(0.0);
+  std::vector<ScalarT>                X(4);
+  std::vector<ScalarT>                R(4);
+  std::vector<ScalarT>                dRdX(16);
+  ScalarT                             norm_residual0(0.0), norm_residual(0.0), relative_residual(0.0);
   LocalNonlinearSolver<EvalT, Traits> solver;
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      kappa = elastic_modulus(cell, pt) /
-              (3.0 * (1.0 - 2.0 * poissons_ratio(cell, pt)));
-      mu = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
-      H  = hardening_modulus(cell, pt);
-      Y  = yield_strength(cell, pt);
-      Rd = recovery_modulus(cell, pt);
+      kappa = elastic_modulus(cell, pt) / (3.0 * (1.0 - 2.0 * poissons_ratio(cell, pt)));
+      mu    = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
+      H     = hardening_modulus(cell, pt);
+      Y     = yield_strength(cell, pt);
+      Rd    = recovery_modulus(cell, pt);
 
       // fill local tensors
       F.fill(def_grad, cell, pt, 0, 0);
       // Fpn.fill( &Fpold(cell,pt,int(0),int(0)) );
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) {
-          Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j));
-        }
+        for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j)); }
       }
 
       // compute trial state
@@ -217,8 +206,7 @@ GursonHMRModel<EvalT, Traits>::computeState(
 
         // local N-R loop
         while (true) {
-          ResidualJacobian(
-              X, R, dRdX, p, fvoid, es, s, mu, kappa, H, Y, Rd, J(cell, pt));
+          ResidualJacobian(X, R, dRdX, p, fvoid, es, s, mu, kappa, H, Y, Rd, J(cell, pt));
 
           norm_residual = 0.0;
           for (int i = 0; i < 4; i++) norm_residual += R[i] * R[i];
@@ -282,9 +270,8 @@ GursonHMRModel<EvalT, Traits>::computeState(
 
         // dPhi w.r.t. dKirchhoff_stress
         ScalarT tmp = 1.5 * q2_ * p / Ybar;
-        ScalarT deq = dgam / Ybar / (1.0 - fvoid) *
-                      (minitensor::dotdot(s, s) +
-                       q1_ * q2_ * p * Ybar * fvoid * std::sinh(tmp));
+        ScalarT deq =
+            dgam / Ybar / (1.0 - fvoid) * (minitensor::dotdot(s, s) + q1_ * q2_ * p * Ybar * fvoid * std::sinh(tmp));
         eq = eq + deq;
 
         dPhi = s + 1.0 / 3.0 * q1_ * q2_ * Ybar * fvoid * std::sinh(tmp) * I;
@@ -294,9 +281,7 @@ GursonHMRModel<EvalT, Traits>::computeState(
         for (int i(0); i < num_dims_; ++i) {
           for (int j(0); j < num_dims_; ++j) {
             Fp(cell, pt, i, j) = 0.0;
-            for (int k(0); k < num_dims_; ++k) {
-              Fp(cell, pt, i, j) += expA(i, k) * Fpn(k, j);
-            }
+            for (int k(0); k < num_dims_; ++k) { Fp(cell, pt, i, j) += expA(i, k) * Fpn(k, j); }
           }
         }
 
@@ -314,9 +299,7 @@ GursonHMRModel<EvalT, Traits>::computeState(
         void_volume(cell, pt)  = void_volume_old(cell, pt);
 
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) {
-            Fp(cell, pt, i, j) = Fp_old(cell, pt, i, j);
-          }
+          for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fp_old(cell, pt, i, j); }
         }
 
       }  // end of elasticity
@@ -325,9 +308,7 @@ GursonHMRModel<EvalT, Traits>::computeState(
       // note that p also has to be divided by J
       // because the one computed from return mapping is the Kirchhoff pressure
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = s(i, j) / J(cell, pt);
-        }
+        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = s(i, j) / J(cell, pt); }
         stress(cell, pt, i, i) += p / J(cell, pt);
       }
 
@@ -446,8 +427,7 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
 
   DFadType tmp = 1.5 * q2_ * pFad / Ybar;
 
-  DFadType psi =
-      1.0 + q3_ * fvoidFad * fvoidFad - 2.0 * q1_ * fvoidFad * std::cosh(tmp);
+  DFadType psi = 1.0 + q3_ * fvoidFad * fvoidFad - 2.0 * q1_ * fvoidFad * std::cosh(tmp);
 
   DFadType factor = 1.0 / (1.0 + (2.0 * (mu * dgam)));
 
@@ -469,17 +449,13 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
     taue = sq32 * smag;
   }
 
-  if (taue > 0.0)
-    omega = 1.0 - (27.0 * J3 / 2.0 / taue / taue / taue) *
-                      (27.0 * J3 / 2.0 / taue / taue / taue);
+  if (taue > 0.0) omega = 1.0 - (27.0 * J3 / 2.0 / taue / taue / taue) * (27.0 * J3 / 2.0 / taue / taue / taue);
 
   DFadType deq(0.0);
   if (smag != 0.0) {
-    deq = dgam * (smag2 + q1_ * q2_ * pFad * Ybar * fvoidFad * std::sinh(tmp)) /
-          (1.0 - fvoidFad) / Ybar;
+    deq = dgam * (smag2 + q1_ * q2_ * pFad * Ybar * fvoidFad * std::sinh(tmp)) / (1.0 - fvoidFad) / Ybar;
   } else {
-    deq = dgam * (q1_ * q2_ * pFad * Ybar * fvoidFad * std::sinh(tmp)) /
-          (1.0 - fvoidFad) / Ybar;
+    deq = dgam * (q1_ * q2_ * pFad * Ybar * fvoidFad * std::sinh(tmp)) / (1.0 - fvoidFad) / Ybar;
   }
 
   DFadType des = (H - Rd * esFad) * deq;
@@ -498,12 +474,10 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
   // fvoidFad or fvoidFad_star
   DFadType dfg(0.0);
   if (taue > 0.0) {
-    dfg =
-        dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad * Ybar * std::sinh(tmp) +
-        sq23 * dgam * kw_ * fvoidFad * omega * smag;
+    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad * Ybar * std::sinh(tmp) +
+          sq23 * dgam * kw_ * fvoidFad * omega * smag;
   } else {
-    dfg =
-        dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad * Ybar * std::sinh(tmp);
+    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad * Ybar * std::sinh(tmp);
   }
 
   DFadType Phi;
@@ -511,8 +485,7 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
 
   // local system of equations
   Rfad[0] = Phi;
-  Rfad[1] =
-      pFad - p + dgam * q1_ * q2_ * kappa * Ybar * fvoidFad * std::sinh(tmp);
+  Rfad[1] = pFad - p + dgam * q1_ * q2_ * kappa * Ybar * fvoidFad * std::sinh(tmp);
   Rfad[2] = fvoidFad - fvoid - dfg - dfn;
   Rfad[3] = esFad - es - des;
 

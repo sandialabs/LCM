@@ -168,8 +168,7 @@ struct Workset
     template <typename EvalT>
     struct apply
     {
-      typedef
-          typename Sacado::mpl::apply<T, typename EvalT::ScalarT>::type type;
+      typedef typename Sacado::mpl::apply<T, typename EvalT::ScalarT>::type type;
     };
   };
 
@@ -195,13 +194,11 @@ struct Workset
     for (unsigned int i = 0; i < wsElNodeEqID.extent(0); i++)
       for (unsigned int j = 0; j < wsElNodeEqID.extent(1); j++)
         for (unsigned int k = 0; k < wsElNodeEqID.extent(2); k++)
-          os << "\t\twsElNodeEqID(" << i << "," << j << "," << k
-             << ") = " << wsElNodeEqID(i, j, k) << '\n';
+          os << "\t\twsElNodeEqID(" << i << "," << j << "," << k << ") = " << wsElNodeEqID(i, j, k) << '\n';
     os << "\twsCoords : " << std::endl;
     for (int i = 0; i < wsCoords.size(); i++)
       for (int j = 0; j < wsCoords[i].size(); j++)
-        os << "\t\tcoord0:" << wsCoords[i][j][0] << "][" << wsCoords[i][j][1]
-           << std::endl;
+        os << "\t\tcoord0:" << wsCoords[i][j][0] << "][" << wsCoords[i][j][1] << std::endl;
   }
 };
 

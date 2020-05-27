@@ -13,10 +13,7 @@ Albany::ConstitutiveDriverProblem::ConstitutiveDriverProblem(
     const Teuchos::RCP<ParamLib>&               param_lib,
     int const                                   num_dims,
     Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
-    : Albany::AbstractProblem(params, param_lib),
-      have_temperature_(false),
-      use_sdbcs_(false),
-      num_dims_(num_dims)
+    : Albany::AbstractProblem(params, param_lib), have_temperature_(false), use_sdbcs_(false), num_dims_(num_dims)
 {
   std::string& method = params->get("Name", "ConstitutiveDriver");
   *out << "Problem Name = " << method << '\n';
@@ -32,8 +29,7 @@ Albany::ConstitutiveDriverProblem::ConstitutiveDriverProblem(
   int num_scalar         = neq - num_elasticity_dim;
   int null_space_dim(0);
 
-  rigidBodyModes->setParameters(
-      num_PDEs, num_elasticity_dim, num_scalar, null_space_dim);
+  rigidBodyModes->setParameters(num_PDEs, num_elasticity_dim, num_scalar, null_space_dim);
 }
 Albany::ConstitutiveDriverProblem::~ConstitutiveDriverProblem() {}
 void
@@ -50,8 +46,7 @@ Albany::ConstitutiveDriverProblem::buildProblem(
   *out << "Calling ConstitutiveDriverProblem::buildEvaluators" << '\n';
   for (int ps = 0; ps < physSets; ++ps) {
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-    buildEvaluators(
-        *fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
+    buildEvaluators(*fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
     if (meshSpecs[ps]->ssNames.size() > 0) haveSidesets = true;
   }
 }
@@ -65,21 +60,16 @@ Albany::ConstitutiveDriverProblem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<ConstitutiveDriverProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<ConstitutiveDriverProblem>      op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ConstitutiveDriverProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidConstitutiveDriverProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidConstitutiveDriverProblemParams");
 
-  validPL->set<std::string>(
-      "MaterialDB Filename",
-      "materials.xml",
-      "Filename of material database xml file");
+  validPL->set<std::string>("MaterialDB Filename", "materials.xml", "Filename of material database xml file");
   validPL->sublist("Temperature", false, "");
   validPL->sublist("Constitutive Model Driver Parameters", false, "");
 
@@ -87,11 +77,8 @@ Albany::ConstitutiveDriverProblem::getValidProblemParameters() const
 }
 void
 Albany::ConstitutiveDriverProblem::getAllocatedStates(
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-        Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> old_state,
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-        Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> new_state)
-    const
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> old_state,
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> new_state) const
 {
   old_state = old_state_;
   new_state = new_state_;

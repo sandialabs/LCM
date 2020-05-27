@@ -46,9 +46,7 @@ namespace Albany {
  *  system does not provide a value for that field, which is common.
  */
 void
-printMemoryAnalysis(
-    std::ostream&                                 os,
-    Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
+printMemoryAnalysis(std::ostream& os, Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
 }  // namespace Albany
 
 #endif  // ALBANY_MEMORY_HPP

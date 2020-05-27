@@ -14,9 +14,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   // Read elastic coefficients
@@ -70,8 +68,7 @@ ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(false);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Cauchy Stress", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Cauchy Stress", false));
 
   // Instantaneous stress
   this->num_state_variables_++;
@@ -80,8 +77,7 @@ ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(
   this->state_var_init_types_.push_back("scalar");
   this->state_var_init_values_.push_back(0.0);
   this->state_var_old_state_flags_.push_back(true);
-  this->state_var_output_flags_.push_back(
-      p->get<bool>("Output Instantaneous Stress", false));
+  this->state_var_output_flags_.push_back(p->get<bool>("Output Instantaneous Stress", false));
 
   // H1
   this->num_state_variables_++;
@@ -279,16 +275,12 @@ ViscoElasticModel<EvalT, Traits>::computeState(
       Finv = minitensor::inverse(F);
 
       // compute instantaneous stress
-      S0 =
-          Jac23_inv * mu_ * (I - (1.0 / 3.0) * minitensor::trace(C23) * C23inv);
+      S0 = Jac23_inv * mu_ * (I - (1.0 / 3.0) * minitensor::trace(C23) * C23inv);
 
       // Compute state variables h_alpha
-      h1 = exp(-dt / tau1_) * h1_old +
-           exp(-0.5 * dt / tau1_) * (Jac23 * S0 - Jac23_old * S0_old);
-      h2 = exp(-dt / tau2_) * h2_old +
-           exp(-0.5 * dt / tau2_) * (Jac23 * S0 - Jac23_old * S0_old);
-      h3 = exp(-dt / tau3_) * h1_old +
-           exp(-0.5 * dt / tau3_) * (Jac23 * S0 - Jac23_old * S0_old);
+      h1 = exp(-dt / tau1_) * h1_old + exp(-0.5 * dt / tau1_) * (Jac23 * S0 - Jac23_old * S0_old);
+      h2 = exp(-dt / tau2_) * h2_old + exp(-0.5 * dt / tau2_) * (Jac23 * S0 - Jac23_old * S0_old);
+      h3 = exp(-dt / tau3_) * h1_old + exp(-0.5 * dt / tau3_) * (Jac23 * S0 - Jac23_old * S0_old);
 
       // compute state variables h_bar
       ScalarT sum1(0.0);
@@ -306,9 +298,7 @@ ViscoElasticModel<EvalT, Traits>::computeState(
       h3_alpha = h3 - (1.0 / 3.0) * (sum3)*Cinv;
 
       // Deviator stress
-      Dev_Stress = gamma_inf_ * S0 +
-                   Jac23_inv * (gamma1_ * h1_alpha + gamma2_ * h2_alpha +
-                                gamma3_ * h3_alpha);
+      Dev_Stress = gamma_inf_ * S0 + Jac23_inv * (gamma1_ * h1_alpha + gamma2_ * h2_alpha + gamma3_ * h3_alpha);
 
       // compute p_0 using gas law
       p_star = density_ * (1.0 / Jac) * R_ * temperature_(cell, pt);

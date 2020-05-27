@@ -13,9 +13,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-CapImplicitModel<EvalT, Traits>::CapImplicitModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+CapImplicitModel<EvalT, Traits>::CapImplicitModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       A(p->get<RealType>("A")),
       B(p->get<RealType>("B")),
@@ -51,20 +49,13 @@ CapImplicitModel<EvalT, Traits>::CapImplicitModel(
 
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
-  this->eval_field_map_.insert(
-      std::make_pair(backStress_string, dl->qp_tensor));
-  this->eval_field_map_.insert(
-      std::make_pair(capParameter_string, dl->qp_scalar));
+  this->eval_field_map_.insert(std::make_pair(backStress_string, dl->qp_tensor));
+  this->eval_field_map_.insert(std::make_pair(capParameter_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair(volPlasticStrain_string, dl->qp_scalar));
-  this->eval_field_map_.insert(
-      std::make_pair("Material Tangent", dl->qp_tensor4));
+  this->eval_field_map_.insert(std::make_pair(volPlasticStrain_string, dl->qp_scalar));
+  this->eval_field_map_.insert(std::make_pair("Material Tangent", dl->qp_tensor4));
 
-  if (compute_tangent_) {
-    this->eval_field_map_.insert(
-        std::make_pair(tangent_string, dl->qp_tensor4));
-  }
+  if (compute_tangent_) { this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4)); }
 
   // define the state variables
   // strain
@@ -140,51 +131,43 @@ CapImplicitModel<EvalT, Traits>::computeState(
   std::string tangent_string          = (*field_name_map_)["Material Tangent"];
 
   // extract evaluated MDFields
-  auto stress           = *eval_fields[cauchy_string];
-  auto backStress       = *eval_fields[backStress_string];
-  auto capParameter     = *eval_fields[capParameter_string];
-  auto eqps             = *eval_fields[eqps_string];
-  auto volPlasticStrain = *eval_fields[volPlasticStrain_string];
+  auto                  stress           = *eval_fields[cauchy_string];
+  auto                  backStress       = *eval_fields[backStress_string];
+  auto                  capParameter     = *eval_fields[capParameter_string];
+  auto                  eqps             = *eval_fields[eqps_string];
+  auto                  volPlasticStrain = *eval_fields[volPlasticStrain_string];
   PHX::MDField<ScalarT> tangent;
   if (compute_tangent_) tangent = *eval_fields[tangent_string];
 
   // get State Variables
-  Albany::MDArray strainold = (*workset.stateArrayPtr)[strain_string + "_old"];
-  Albany::MDArray stressold = (*workset.stateArrayPtr)[cauchy_string + "_old"];
-  Albany::MDArray backStressold =
-      (*workset.stateArrayPtr)[backStress_string + "_old"];
-  Albany::MDArray capParameterold =
-      (*workset.stateArrayPtr)[capParameter_string + "_old"];
-  Albany::MDArray eqpsold = (*workset.stateArrayPtr)[eqps_string + "_old"];
-  Albany::MDArray volPlasticStrainold =
-      (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
+  Albany::MDArray strainold           = (*workset.stateArrayPtr)[strain_string + "_old"];
+  Albany::MDArray stressold           = (*workset.stateArrayPtr)[cauchy_string + "_old"];
+  Albany::MDArray backStressold       = (*workset.stateArrayPtr)[backStress_string + "_old"];
+  Albany::MDArray capParameterold     = (*workset.stateArrayPtr)[capParameter_string + "_old"];
+  Albany::MDArray eqpsold             = (*workset.stateArrayPtr)[eqps_string + "_old"];
+  Albany::MDArray volPlasticStrainold = (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < num_pts_; ++qp) {
       // local parameters
-      ScalarT lame = elastic_modulus(cell, qp) * poissons_ratio(cell, qp) /
-                     (1.0 + poissons_ratio(cell, qp)) /
+      ScalarT lame = elastic_modulus(cell, qp) * poissons_ratio(cell, qp) / (1.0 + poissons_ratio(cell, qp)) /
                      (1.0 - 2.0 * poissons_ratio(cell, qp));
-      ScalarT mu =
-          elastic_modulus(cell, qp) / 2.0 / (1.0 + poissons_ratio(cell, qp));
+      ScalarT mu          = elastic_modulus(cell, qp) / 2.0 / (1.0 + poissons_ratio(cell, qp));
       ScalarT bulkModulus = lame + (2. / 3.) * mu;
 
       // elastic matrix
       minitensor::Tensor4<ScalarT> Celastic =
           lame * minitensor::identity_3<ScalarT>(3) +
-          mu * (minitensor::identity_1<ScalarT>(3) +
-                minitensor::identity_2<ScalarT>(3));
+          mu * (minitensor::identity_1<ScalarT>(3) + minitensor::identity_2<ScalarT>(3));
 
       // elastic compliance tangent matrix
       minitensor::Tensor4<ScalarT> compliance =
           (1. / bulkModulus / 9.) * minitensor::identity_3<ScalarT>(3) +
-          (1. / mu / 2.) * (0.5 * (minitensor::identity_1<ScalarT>(3) +
-                                   minitensor::identity_2<ScalarT>(3)) -
+          (1. / mu / 2.) * (0.5 * (minitensor::identity_1<ScalarT>(3) + minitensor::identity_2<ScalarT>(3)) -
                             (1. / 3.) * minitensor::identity_3<ScalarT>(3));
 
       // previous state
-      minitensor::Tensor<ScalarT> sigmaN(3, minitensor::Filler::ZEROS),
-          alphaN(3, minitensor::Filler::ZEROS),
+      minitensor::Tensor<ScalarT> sigmaN(3, minitensor::Filler::ZEROS), alphaN(3, minitensor::Filler::ZEROS),
           strainN(3, minitensor::Filler::ZEROS);
 
       // incremental strain tensor
@@ -197,8 +180,7 @@ CapImplicitModel<EvalT, Traits>::computeState(
       }
 
       // trial state
-      minitensor::Tensor<ScalarT> sigmaVal =
-          minitensor::dotdot(Celastic, depsilon);
+      minitensor::Tensor<ScalarT> sigmaVal = minitensor::dotdot(Celastic, depsilon);
       minitensor::Tensor<ScalarT> alphaVal(3, minitensor::Filler::ZEROS);
 
       for (int i = 0; i < num_dims_; ++i) {
@@ -243,15 +225,7 @@ CapImplicitModel<EvalT, Traits>::computeState(
 
         while (!converged) {
           // assemble residual vector and local Jacobian
-          compute_ResidJacobian(
-              XXVal,
-              R,
-              dRdX,
-              sigmaVal,
-              alphaVal,
-              kappaVal,
-              Celastic,
-              kappa_flag);
+          compute_ResidJacobian(XXVal, R, dRdX, sigmaVal, alphaVal, kappaVal, Celastic, kappa_flag);
 
           normR = 0.0;
           for (int i = 0; i < 13; i++) normR += R[i] * R[i];
@@ -323,13 +297,11 @@ CapImplicitModel<EvalT, Traits>::computeState(
       // compute plastic strain increment deps_plastic = compliance ( sigma_tr -
       // sigma_(n+1));
       minitensor::Tensor<ScalarT> dsigma = sigmaTr - sigmaVal;
-      deps_plastic = minitensor::dotdot(compliance, dsigma);
+      deps_plastic                       = minitensor::dotdot(compliance, dsigma);
 
       // compute its two invariants: devolps (volumetric) and deqps (deviatoric)
-      devolps = minitensor::trace(deps_plastic);
-      minitensor::Tensor<ScalarT> dev_plastic =
-          deps_plastic -
-          (1.0 / 3.0) * devolps * minitensor::identity<ScalarT>(3);
+      devolps                                 = minitensor::trace(deps_plastic);
+      minitensor::Tensor<ScalarT> dev_plastic = deps_plastic - (1.0 / 3.0) * devolps * minitensor::identity<ScalarT>(3);
       // deqps = std::sqrt(2./3.) * minitensor::norm(dev_plastic);
       // use altenative definition, just differ by constants
       deqps = std::sqrt(2) * minitensor::norm(dev_plastic);
@@ -347,15 +319,12 @@ CapImplicitModel<EvalT, Traits>::computeState(
       volPlasticStrain(cell, qp) = volPlasticStrainold(cell, qp) + devolps;
 
       if (compute_tangent_) {
-        minitensor::Tensor4<ScalarT> Cep =
-            compute_Cep(Celastic, sigmaVal, alphaVal, kappaVal, dgammaVal);
+        minitensor::Tensor4<ScalarT> Cep = compute_Cep(Celastic, sigmaVal, alphaVal, kappaVal, dgammaVal);
 
         for (int i(0); i < num_dims_; ++i) {
           for (int j(0); j < num_dims_; ++j) {
             for (int k(0); k < num_dims_; ++k) {
-              for (int l(0); l < num_dims_; ++l) {
-                tangent(cell, qp, i, j, k, l) = Cep(i, j, k, l);
-              }
+              for (int l(0); l < num_dims_; ++l) { tangent(cell, qp, i, j, k, l) = Cep(i, j, k, l); }
             }
           }
         }
@@ -373,10 +342,7 @@ CapImplicitModel<EvalT, Traits>::computeState(
 template <typename EvalT, typename Traits>
 template <typename T>
 T
-CapImplicitModel<EvalT, Traits>::compute_f(
-    minitensor::Tensor<T>& sigma,
-    minitensor::Tensor<T>& alpha,
-    T&                     kappa)
+CapImplicitModel<EvalT, Traits>::compute_f(minitensor::Tensor<T>& sigma, minitensor::Tensor<T>& alpha, T& kappa)
 {
   minitensor::Tensor<T> xi = sigma - alpha;
 
@@ -391,9 +357,8 @@ CapImplicitModel<EvalT, Traits>::compute_f(
   T Gamma = 1.0;
 
   if (psi != 0 && J2 != 0)
-    Gamma =
-        0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
-               (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
+                   (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
 
   T Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
 
@@ -403,8 +368,7 @@ CapImplicitModel<EvalT, Traits>::compute_f(
 
   T Fc = 1.0;
 
-  if ((kappa - I1) > 0 && ((X - kappa) != 0))
-    Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
+  if ((kappa - I1) > 0 && ((X - kappa) != 0)) Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
 
   return Gamma * Gamma * J2 - Fc * (Ff_I1 - N) * (Ff_I1 - N);
 }
@@ -508,49 +472,37 @@ CapImplicitModel<EvalT, Traits>::compute_ResidJacobian(
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      t = t + Celastic(0, 0, i, j) * dgdsigma(i, j);
-    }
+    for (int j = 0; j < 3; j++) { t = t + Celastic(0, 0, i, j) * dgdsigma(i, j); }
   }
   Rfad[0] = dgamma * t + sigma(0, 0) - sigmaVal(0, 0);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      t = t + Celastic(1, 1, i, j) * dgdsigma(i, j);
-    }
+    for (int j = 0; j < 3; j++) { t = t + Celastic(1, 1, i, j) * dgdsigma(i, j); }
   }
   Rfad[1] = dgamma * t + sigma(1, 1) - sigmaVal(1, 1);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      t = t + Celastic(2, 2, i, j) * dgdsigma(i, j);
-    }
+    for (int j = 0; j < 3; j++) { t = t + Celastic(2, 2, i, j) * dgdsigma(i, j); }
   }
   Rfad[2] = dgamma * t + sigma(2, 2) - sigmaVal(2, 2);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      t = t + Celastic(1, 2, i, j) * dgdsigma(i, j);
-    }
+    for (int j = 0; j < 3; j++) { t = t + Celastic(1, 2, i, j) * dgdsigma(i, j); }
   }
   Rfad[3] = dgamma * t + sigma(1, 2) - sigmaVal(1, 2);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      t = t + Celastic(0, 2, i, j) * dgdsigma(i, j);
-    }
+    for (int j = 0; j < 3; j++) { t = t + Celastic(0, 2, i, j) * dgdsigma(i, j); }
   }
   Rfad[4] = dgamma * t + sigma(0, 2) - sigmaVal(0, 2);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      t = t + Celastic(0, 1, i, j) * dgdsigma(i, j);
-    }
+    for (int j = 0; j < 3; j++) { t = t + Celastic(0, 1, i, j) * dgdsigma(i, j); }
   }
   Rfad[5] = dgamma * t + sigma(0, 1) - sigmaVal(0, 1);
 
@@ -592,10 +544,7 @@ CapImplicitModel<EvalT, Traits>::compute_ResidJacobian(
 template <typename EvalT, typename Traits>
 template <typename T>
 T
-CapImplicitModel<EvalT, Traits>::compute_g(
-    minitensor::Tensor<T>& sigma,
-    minitensor::Tensor<T>& alpha,
-    T&                     kappa)
+CapImplicitModel<EvalT, Traits>::compute_g(minitensor::Tensor<T>& sigma, minitensor::Tensor<T>& alpha, T& kappa)
 {
   minitensor::Tensor<T> xi = sigma - alpha;
 
@@ -612,9 +561,8 @@ CapImplicitModel<EvalT, Traits>::compute_g(
   T Gamma = 1.0;
 
   if (psi != 0 && J2 != 0)
-    Gamma =
-        0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
-               (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
+                   (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
 
   T Ff_I1 = A - C * std::exp(L * I1) - phi * I1;
 
@@ -624,8 +572,7 @@ CapImplicitModel<EvalT, Traits>::compute_g(
 
   T Fc = 1.0;
 
-  if ((kappa - I1) > 0 && ((X - kappa) != 0))
-    Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
+  if ((kappa - I1) > 0 && ((X - kappa) != 0)) Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
 
   return Gamma * Gamma * J2 - Fc * (Ff_I1 - N) * (Ff_I1 - N);
 }
@@ -634,8 +581,7 @@ CapImplicitModel<EvalT, Traits>::compute_g(
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapImplicitModel<EvalT, Traits>::ScalarT>
 // minitensor::Tensor<typename EvalT::DFadType>
-CapImplicitModel<EvalT, Traits>::compute_dfdsigma(
-    std::vector<ScalarT> const& XX)
+CapImplicitModel<EvalT, Traits>::compute_dfdsigma(std::vector<ScalarT> const& XX)
 {
   std::vector<DFadType> XXFad(13);
   std::vector<ScalarT>  XXtmp(13);
@@ -691,8 +637,7 @@ CapImplicitModel<EvalT, Traits>::compute_dfdsigma(
 template <typename EvalT, typename Traits>
 typename CapImplicitModel<EvalT, Traits>::ScalarT
 // minitensor::Tensor<typename EvalT::ScalarT>
-CapImplicitModel<EvalT, Traits>::compute_dfdkappa(
-    std::vector<ScalarT> const& XX)
+CapImplicitModel<EvalT, Traits>::compute_dfdkappa(std::vector<ScalarT> const& XX)
 {
   std::vector<DFadType> XXFad(13);
   std::vector<ScalarT>  XXtmp(13);
@@ -740,8 +685,7 @@ CapImplicitModel<EvalT, Traits>::compute_dfdkappa(
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapImplicitModel<EvalT, Traits>::ScalarT>
 // minitensor::Tensor<typename EvalT::ScalarT>
-CapImplicitModel<EvalT, Traits>::compute_dgdsigma(
-    std::vector<ScalarT> const& XX)
+CapImplicitModel<EvalT, Traits>::compute_dgdsigma(std::vector<ScalarT> const& XX)
 {
   std::vector<DFadType> XXFad(13);
   std::vector<ScalarT>  XXtmp(13);
@@ -797,8 +741,7 @@ CapImplicitModel<EvalT, Traits>::compute_dgdsigma(
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapImplicitModel<EvalT, Traits>::DFadType>
 // minitensor::Tensor<typename EvalT::DFadType>
-CapImplicitModel<EvalT, Traits>::compute_dgdsigma(
-    std::vector<DFadType> const& XX)
+CapImplicitModel<EvalT, Traits>::compute_dgdsigma(std::vector<DFadType> const& XX)
 {
   std::vector<D2FadType> D2XX(13);
   std::vector<DFadType>  XXFadtmp(13);
@@ -868,9 +811,7 @@ CapImplicitModel<EvalT, Traits>::compute_Galpha(T J2_alpha)
 template <typename EvalT, typename Traits>
 template <typename T>
 minitensor::Tensor<T>
-CapImplicitModel<EvalT, Traits>::compute_halpha(
-    minitensor::Tensor<T> const& dgdsigma,
-    T const                      J2_alpha)
+CapImplicitModel<EvalT, Traits>::compute_halpha(minitensor::Tensor<T> const& dgdsigma, T const J2_alpha)
 {
   T Galpha = compute_Galpha(J2_alpha);
 
@@ -902,8 +843,7 @@ CapImplicitModel<EvalT, Traits>::compute_dedkappa(T const kappa)
 
   T X = kappa - Q * Ff_kappa;
 
-  T dedX =
-      (D1 - 2. * D2 * (X - X0)) * std::exp((D1 - D2 * (X - X0)) * (X - X0)) * W;
+  T dedX = (D1 - 2. * D2 * (X - X0)) * std::exp((D1 - D2 * (X - X0)) * (X - X0)) * W;
 
   T dXdkappa = 1. + Q * C * L * exp(L * kappa) + Q * phi;
 
@@ -913,9 +853,7 @@ CapImplicitModel<EvalT, Traits>::compute_dedkappa(T const kappa)
 template <typename EvalT, typename Traits>
 template <typename T>
 T
-CapImplicitModel<EvalT, Traits>::compute_hkappa(
-    T const I1_dgdsigma,
-    T const dedkappa)
+CapImplicitModel<EvalT, Traits>::compute_hkappa(T const I1_dgdsigma, T const dedkappa)
 {
   if (dedkappa != 0)
     return I1_dgdsigma / dedkappa;
@@ -963,22 +901,17 @@ CapImplicitModel<EvalT, Traits>::compute_Cep(
   ScalarT dedkappa    = compute_dedkappa(kappa);
   hkappa              = compute_hkappa(I1_dgdsigma, dedkappa);
 
-  chi = minitensor::dotdot(minitensor::dotdot(dfdsigma, Celastic), dgdsigma) -
-        minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
+  chi = minitensor::dotdot(minitensor::dotdot(dfdsigma, Celastic), dgdsigma) - minitensor::dotdot(dfdalpha, halpha) -
+        dfdkappa * hkappa;
 
   if (chi == 0) {
-    std::cout << "Chi equals to 0 error during computing elasto-plastic tangent"
-              << std::endl;
+    std::cout << "Chi equals to 0 error during computing elasto-plastic tangent" << std::endl;
     chi = 1e-16;
   }
 
   // compute tangent
-  Cep =
-      Celastic - 1.0 / chi *
-                     minitensor::dotdot(
-                         Celastic,
-                         minitensor::tensor(
-                             dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
+  Cep = Celastic -
+        1.0 / chi * minitensor::dotdot(Celastic, minitensor::tensor(dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
 
   return Cep;
 }  // end compute tangent function
@@ -1026,18 +959,13 @@ CapImplicitModel<EvalT, Traits>::compute_Cepp(
   chi = minitensor::dotdot(minitensor::dotdot(dfdsigma, Celastic), dgdsigma);
 
   if (chi == 0) {
-    std::cout << "Chi equals to 0 error during computing elasto-plastic tangent"
-              << std::endl;
+    std::cout << "Chi equals to 0 error during computing elasto-plastic tangent" << std::endl;
     chi = 1e-16;
   }
 
   // compute tangent
-  Cepp =
-      Celastic - 1.0 / chi *
-                     minitensor::dotdot(
-                         Celastic,
-                         minitensor::tensor(
-                             dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
+  Cepp = Celastic -
+         1.0 / chi * minitensor::dotdot(Celastic, minitensor::tensor(dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
 
   return Cepp;
 }  // end compute tangent function

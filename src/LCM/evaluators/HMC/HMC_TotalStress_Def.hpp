@@ -10,9 +10,7 @@
 namespace HMC {
 
 template <typename EvalT, typename Traits>
-TotalStress<EvalT, Traits>::TotalStress(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+TotalStress<EvalT, Traits>::TotalStress(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : macroStress(p.get<std::string>("Macro Stress Name"), dl->qp_tensor),
       totalStress(p.get<std::string>("Total Stress Name"), dl->qp_tensor),
       numMicroScales(p.get<int>("Additional Scales"))
@@ -24,9 +22,8 @@ TotalStress<EvalT, Traits>::TotalStress(
     std::string ms = Albany::strint("Micro Stress", i);
     std::string msname(ms);
     msname += " Name";
-    microStress[i] = Teuchos::rcp(new cHMC2Tensor(
-        p.get<std::string>(msname),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
+    microStress[i] = Teuchos::rcp(
+        new cHMC2Tensor(p.get<std::string>(msname), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
     this->addDependentField(*(microStress[i]));
   }
 
@@ -42,9 +39,7 @@ TotalStress<EvalT, Traits>::TotalStress(
 
 template <typename EvalT, typename Traits>
 void
-TotalStress<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+TotalStress<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(macroStress, fm);
   this->utils.setFieldData(totalStress, fm);

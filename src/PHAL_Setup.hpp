@@ -92,9 +92,7 @@ class Setup
   //! Update list of saved/unsaved MDFields based on unsaved MDFields and field
   //! dependencies
   void
-  update_fields(
-      Teuchos::RCP<StringSet> savedFields,
-      Teuchos::RCP<StringSet> unsavedFields);
+  update_fields(Teuchos::RCP<StringSet> savedFields, Teuchos::RCP<StringSet> unsavedFields);
 
   //! Update list of saved/unsaved MDFields with unsaved parameters
   void
@@ -102,10 +100,7 @@ class Setup
 
   //! Print list of _saved/_unsaved MDFields
   void
-  print_fields(
-      std::ostream&           os,
-      Teuchos::RCP<StringSet> savedFields,
-      Teuchos::RCP<StringSet> unsavedFields) const;
+  print_fields(std::ostream& os, Teuchos::RCP<StringSet> savedFields, Teuchos::RCP<StringSet> unsavedFields) const;
 
   //! Used to ensure postRegistrationSetup only occurs once
   const Teuchos::RCP<StringSet> _setupEvals;

@@ -17,21 +17,19 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 DirichletBase<EvalT, Traits>::DirichletBase(Teuchos::ParameterList& p)
-    : offset(p.get<int>("Equation Offset")),
-      nodeSetID(p.get<std::string>("Node Set ID"))
+    : offset(p.get<int>("Equation Offset")), nodeSetID(p.get<std::string>("Node Set ID"))
 {
   value = p.get<RealType>("Dirichlet Value");
 
-  auto const name  = p.get<std::string>("Dirichlet Name");
-  auto const dummy = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
+  auto const              name  = p.get<std::string>("Dirichlet Name");
+  auto const              dummy = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
   PHX::Tag<ScalarT> const fieldTag(name, dummy);
 
   this->addEvaluatedField(fieldTag);
   this->setName(name + PHX::print<EvalT>());
 
   // Set up values as parameters for parameter library
-  auto paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  auto paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
   this->registerSacadoParameter(name, paramLib);
 
   {
@@ -39,13 +37,11 @@ DirichletBase<EvalT, Traits>::DirichletBase(Teuchos::ParameterList& p)
     // imposeOrder defined elsewhere. It happens that "Data Layout" is Dummy, so
     // we can use it.
     if (p.isType<std::string>("BCOrder Dependency")) {
-      PHX::Tag<ScalarT> order_depends_on(
-          p.get<std::string>("BCOrder Dependency"), dummy);
+      PHX::Tag<ScalarT> order_depends_on(p.get<std::string>("BCOrder Dependency"), dummy);
       this->addDependentField(order_depends_on);
     }
     if (p.isType<std::string>("BCOrder Evaluates")) {
-      PHX::Tag<ScalarT> order_evaluates(
-          p.get<std::string>("BCOrder Evaluates"), dummy);
+      PHX::Tag<ScalarT> order_evaluates(p.get<std::string>("BCOrder Evaluates"), dummy);
       this->addEvaluatedField(order_evaluates);
     }
   }
@@ -53,9 +49,7 @@ DirichletBase<EvalT, Traits>::DirichletBase(Teuchos::ParameterList& p)
 
 template <typename EvalT, typename Traits>
 void
-DirichletBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& /* fm */)
+DirichletBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& /* fm */)
 {
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
 }
@@ -64,8 +58,7 @@ DirichletBase<EvalT, Traits>::postRegistrationSetup(
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::Dirichlet(
-    Teuchos::ParameterList& p)
+Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::Dirichlet(Teuchos::ParameterList& p)
     : DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
@@ -73,15 +66,14 @@ Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::Dirichlet(
 // **********************************************************************
 template <typename Traits>
 void
-Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto rcp_disc      = workset.disc;
-  auto stk_disc      = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto const  x      = workset.x;
-  auto        f      = workset.f;
-  auto const  x_view = Albany::getLocalData(x);
-  auto        f_view = Albany::getNonconstLocalData(f);
+  auto        rcp_disc    = workset.disc;
+  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto const  x           = workset.x;
+  auto        f           = workset.f;
+  auto const  x_view      = Albany::getLocalData(x);
+  auto        f_view      = Albany::getNonconstLocalData(f);
   auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const  ns_id       = this->nodeSetID;
   auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
@@ -108,8 +100,7 @@ Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits>
-Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::Dirichlet(
-    Teuchos::ParameterList& p)
+Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::Dirichlet(Teuchos::ParameterList& p)
     : DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
@@ -117,17 +108,16 @@ Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::Dirichlet(
 // **********************************************************************
 template <typename Traits>
 void
-Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto rcp_disc      = workset.disc;
-  auto stk_disc      = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto x             = workset.x;
-  auto f             = workset.f;
-  auto J             = workset.Jac;
-  auto const  fill   = f != Teuchos::null;
-  auto        f_view = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
-  auto        x_view = fill ? Albany::getLocalData(x) : Teuchos::null;
+  auto        rcp_disc    = workset.disc;
+  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  auto        x           = workset.x;
+  auto        f           = workset.f;
+  auto        J           = workset.Jac;
+  auto const  fill        = f != Teuchos::null;
+  auto        f_view      = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
+  auto        x_view      = fill ? Albany::getLocalData(x) : Teuchos::null;
   auto const  j_coeff     = workset.j_coeff;
   auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const  ns_id       = this->nodeSetID;
@@ -169,12 +159,10 @@ Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 // **********************************************************************
 
 template <typename EvalT, typename Traits>
-DirichletAggregator<EvalT, Traits>::DirichletAggregator(
-    Teuchos::ParameterList& p)
+DirichletAggregator<EvalT, Traits>::DirichletAggregator(Teuchos::ParameterList& p)
 {
-  auto        dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
-  auto const& dbcs =
-      *p.get<Teuchos::RCP<std::vector<std::string>>>("DBC Names");
+  auto        dl   = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
+  auto const& dbcs = *p.get<Teuchos::RCP<std::vector<std::string>>>("DBC Names");
 
   for (auto i = 0; i < dbcs.size(); ++i) {
     PHX::Tag<ScalarT> fieldTag(dbcs[i], dl);
@@ -189,9 +177,7 @@ DirichletAggregator<EvalT, Traits>::DirichletAggregator(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-DirichletAggregator<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& vm)
+DirichletAggregator<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
 {
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields());
 }

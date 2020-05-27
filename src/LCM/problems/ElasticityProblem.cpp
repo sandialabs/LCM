@@ -24,8 +24,7 @@ Albany::ElasticityProblem::ElasticityProblem(
 
   haveSource = params->isSublist("Source Functions");
 
-  matModel =
-      params->sublist("Material Model").get("Model Name", "LinearElasticity");
+  matModel = params->sublist("Material Model").get("Model Name", "LinearElasticity");
 
   computeError = params->get<bool>("Compute Error", false);
 
@@ -63,11 +62,9 @@ Albany::ElasticityProblem::buildProblem(
   fm.resize(1);
 
   fm[0] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-  buildEvaluators(
-      *fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
+  buildEvaluators(*fm[0], *meshSpecs[0], stateMgr, BUILD_RESID_FM, Teuchos::null);
 
-  if (meshSpecs[0]->nsNames.size() >
-      0) {  // Build a nodeset evaluator if nodesets are present
+  if (meshSpecs[0]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
     constructDirichletEvaluators(*meshSpecs[0]);
   }
 
@@ -75,12 +72,10 @@ Albany::ElasticityProblem::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() >
-      0) {  // Build a sideset evaluator if sidesets are present
+  if (meshSpecs[0]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
     constructNeumannEvaluators(meshSpecs[0]);
   }
 }
@@ -95,16 +90,14 @@ Albany::ElasticityProblem::buildEvaluators(
 {
   // Call constructeEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<ElasticityProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<ElasticityProblem>              op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 // Dirichlet BCs
 void
-Albany::ElasticityProblem::constructDirichletEvaluators(
-    Albany::MeshSpecsStruct const& meshSpecs)
+Albany::ElasticityProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshSpecs)
 {
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(neq);
@@ -112,8 +105,7 @@ Albany::ElasticityProblem::constructDirichletEvaluators(
   if (neq > 1) dirichletNames[1] = "Y";
   if (neq > 2) dirichletNames[2] = "Z";
   Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm = dirUtils.constructBCEvaluators(
-      meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
+  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
@@ -121,8 +113,7 @@ Albany::ElasticityProblem::constructDirichletEvaluators(
 
 // Neumann BCs
 void
-Albany::ElasticityProblem::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
+Albany::ElasticityProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
   // i.e. meshSpecs.ssNames.size() > 0
@@ -175,9 +166,7 @@ Albany::ElasticityProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(t_x, t_y, t_z)";
   else
-    ALBANY_ABORT(
-        std::endl
-        << "Error: Sidesets only supported in 2 and 3D." << std::endl);
+    ALBANY_ABORT(std::endl << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 
   condNames[1] = "dudn";
   condNames[2] = "P";
@@ -185,23 +174,13 @@ Albany::ElasticityProblem::constructNeumannEvaluators(
   nfm.resize(1);  // Elasticity problem only has one element block
 
   nfm[0] = neuUtils.constructBCEvaluators(
-      meshSpecs,
-      neumannNames,
-      dof_names,
-      true,
-      0,
-      condNames,
-      offsets,
-      dl,
-      this->params,
-      this->paramLib);
+      meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ElasticityProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidElasticityProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidElasticityProblemParams");
 
   validPL->sublist("Density", false, "");
   validPL->sublist("Elastic Modulus", false, "");
@@ -249,11 +228,8 @@ Albany::ElasticityProblem::getValidProblemParameters() const
 
 void
 Albany::ElasticityProblem::getAllocatedStates(
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-        Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState_,
-    Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-        Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState_)
-    const
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> oldState_,
+    Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>> newState_) const
 {
   oldState_ = oldState;
   newState_ = newState;

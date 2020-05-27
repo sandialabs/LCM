@@ -29,9 +29,7 @@ class ScalarL2ProjectionResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
   ScalarL2ProjectionResidual(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

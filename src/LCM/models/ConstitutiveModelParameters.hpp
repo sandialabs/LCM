@@ -22,10 +22,9 @@ namespace LCM {
 /// Either as a constant or a truncated KL expansion.
 ///
 template <typename EvalT, typename Traits>
-class ConstitutiveModelParameters
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<EvalT, Traits>,
-      public Sacado::ParameterAccessor<EvalT, SPL_Traits>
+class ConstitutiveModelParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                    public PHX::EvaluatorDerived<EvalT, Traits>,
+                                    public Sacado::ParameterAccessor<EvalT, SPL_Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
@@ -34,17 +33,13 @@ class ConstitutiveModelParameters
   ///
   /// Constructor
   ///
-  ConstitutiveModelParameters(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ConstitutiveModelParameters(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics
@@ -62,10 +57,7 @@ class ConstitutiveModelParameters
   /// Helper method to parse a parameter
   ///
   void
-  parseParameters(
-      std::string const&      n,
-      Teuchos::ParameterList& pl,
-      Teuchos::RCP<ParamLib>  paramLib);
+  parseParameters(std::string const& n, Teuchos::ParameterList& pl, Teuchos::RCP<ParamLib> paramLib);
 
  private:
   ///
@@ -176,22 +168,16 @@ class ConstitutiveModelParameters
 
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
 
-  typedef Kokkos::RangePolicy<ExecutionSpace, is_constant_map_Tag>
-      is_const_map_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_Tag>
-      no_const_map_Policy;
-  typedef Kokkos::
-      RangePolicy<ExecutionSpace, is_const_map_have_temperature_Linear_Tag>
-          is_const_map_have_temperature_Linear_Policy;
-  typedef Kokkos::
-      RangePolicy<ExecutionSpace, is_const_map_have_temperature_Arrhenius_Tag>
-          is_const_map_have_temperature_Arrhenius_Policy;
-  typedef Kokkos::
-      RangePolicy<ExecutionSpace, no_const_map_have_temperature_Linear_Tag>
-          no_const_map_have_temperature_Linear_Policy;
-  typedef Kokkos::
-      RangePolicy<ExecutionSpace, no_const_map_have_temperature_Arrhenius_Tag>
-          no_const_map_have_temperature_Arrhenius_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, is_constant_map_Tag> is_const_map_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_Tag>    no_const_map_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, is_const_map_have_temperature_Linear_Tag>
+      is_const_map_have_temperature_Linear_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, is_const_map_have_temperature_Arrhenius_Tag>
+      is_const_map_have_temperature_Arrhenius_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_have_temperature_Linear_Tag>
+      no_const_map_have_temperature_Linear_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_have_temperature_Arrhenius_Tag>
+      no_const_map_have_temperature_Arrhenius_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -201,22 +187,16 @@ class ConstitutiveModelParameters
   operator()(const no_const_map_Tag& tag, int const& i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const is_const_map_have_temperature_Linear_Tag& tag, int const& i)
-      const;
+  operator()(const is_const_map_have_temperature_Linear_Tag& tag, int const& i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(
-      const is_const_map_have_temperature_Arrhenius_Tag& tag,
-      int const&                                         i) const;
+  operator()(const is_const_map_have_temperature_Arrhenius_Tag& tag, int const& i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(const no_const_map_have_temperature_Linear_Tag& tag, int const& i)
-      const;
+  operator()(const no_const_map_have_temperature_Linear_Tag& tag, int const& i) const;
   KOKKOS_INLINE_FUNCTION
   void
-  operator()(
-      const no_const_map_have_temperature_Arrhenius_Tag& tag,
-      int const&                                         i) const;
+  operator()(const no_const_map_have_temperature_Arrhenius_Tag& tag, int const& i) const;
 
   KOKKOS_INLINE_FUNCTION
   void

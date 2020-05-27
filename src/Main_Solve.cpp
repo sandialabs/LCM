@@ -23,8 +23,7 @@
 #include "Thyra_MultiVectorStdOps.hpp"
 #include "Thyra_VectorStdOps.hpp"
 
-#if defined(ALBANY_CHECK_FPE) || defined(ALBANY_STRONG_FPE_CHECK) || \
-    defined(ALBANY_FLUSH_DENORMALS)
+#if defined(ALBANY_CHECK_FPE) || defined(ALBANY_STRONG_FPE_CHECK) || defined(ALBANY_FLUSH_DENORMALS)
 #include <xmmintrin.h>
 #endif
 
@@ -63,18 +62,16 @@ main(int argc, char* argv[])
 #elif defined(ALBANY_STRONG_FPE_CHECK)
 
   _MM_SET_EXCEPTION_MASK(
-      _MM_GET_EXCEPTION_MASK() &
-      ~(_MM_MASK_INVALID | _MM_MASK_DIV_ZERO | _MM_MASK_OVERFLOW
-        //           | _MM_MASK_UNDERFLOW
-        ));
+      _MM_GET_EXCEPTION_MASK() & ~(_MM_MASK_INVALID | _MM_MASK_DIV_ZERO | _MM_MASK_OVERFLOW
+                                   //           | _MM_MASK_UNDERFLOW
+                                   ));
 
 #endif
 
   using Teuchos::RCP;
   using Teuchos::rcp;
 
-  RCP<Teuchos::FancyOStream> out(
-      Teuchos::VerboseObjectBase::getDefaultOStream());
+  RCP<Teuchos::FancyOStream> out(Teuchos::VerboseObjectBase::getDefaultOStream());
 
   // Command-line argument for input file
   Albany::CmdLineArgs cmd("input.yaml");
@@ -82,12 +79,10 @@ main(int argc, char* argv[])
 
   Albany::PrintHeader(*out);
 
-  const auto stackedTimer =
-      Teuchos::rcp(new Teuchos::StackedTimer("Albany Total Time"));
+  const auto stackedTimer = Teuchos::rcp(new Teuchos::StackedTimer("Albany Total Time"));
   Teuchos::TimeMonitor::setStackedTimer(stackedTimer);
   try {
-    auto setupTimer = Teuchos::rcp(new Teuchos::TimeMonitor(
-        *Teuchos::TimeMonitor::getNewTimer("Albany: Setup Time")));
+    auto setupTimer = Teuchos::rcp(new Teuchos::TimeMonitor(*Teuchos::TimeMonitor::getNewTimer("Albany: Setup Time")));
 
     RCP<Teuchos_Comm const> comm = Albany::getDefaultComm();
 
@@ -97,30 +92,23 @@ main(int argc, char* argv[])
     Albany::SolverFactory slvrfctry(cmd.yaml_filename, comm);
 
     RCP<Albany::Application>                             app;
-    const RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
-        slvrfctry.createAndGetAlbanyApp(app, comm, comm);
+    const RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver = slvrfctry.createAndGetAlbanyApp(app, comm, comm);
 
     setupTimer = Teuchos::null;
 
-    std::string solnMethod =
-        slvrfctry.getParameters().sublist("Problem").get<std::string>(
-            "Solution Method");
+    std::string solnMethod = slvrfctry.getParameters().sublist("Problem").get<std::string>("Solution Method");
     Teuchos::ParameterList& solveParams =
-        slvrfctry.getAnalysisParameters().sublist(
-            "Solve", /*mustAlreadyExist =*/false);
+        slvrfctry.getAnalysisParameters().sublist("Solve", /*mustAlreadyExist =*/false);
 
-    Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> thyraResponses;
-    Teuchos::Array<Teuchos::Array<Teuchos::RCP<const Thyra_MultiVector>>>
-        thyraSensitivities;
-    Piro::PerformSolve(
-        *solver, solveParams, thyraResponses, thyraSensitivities);
+    Teuchos::Array<Teuchos::RCP<Thyra_Vector const>>                      thyraResponses;
+    Teuchos::Array<Teuchos::Array<Teuchos::RCP<const Thyra_MultiVector>>> thyraSensitivities;
+    Piro::PerformSolve(*solver, solveParams, thyraResponses, thyraSensitivities);
 
     // Check if thyraResponses are product vectors or regular vectors
     Teuchos::RCP<const Thyra_ProductVector> r_prod;
     if (thyraResponses.size() > 0) {
       r_prod = Teuchos::nonnull(thyraResponses[0]) ?
-                   Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(
-                       thyraResponses[0], false) :
+                   Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(thyraResponses[0], false) :
                    Teuchos::null;
     }
 
@@ -129,21 +117,16 @@ main(int argc, char* argv[])
     if (r_prod != Teuchos::null && num_g > 0) {
       *out << "WARNING: For Thyra::ProductVectorBase, printing of responses "
               "does not work yet!  "
-           << "No responses will be printed even though you requested " << num_g
-           << " responses. \n";
+           << "No responses will be printed even though you requested " << num_g << " responses. \n";
       num_g = 1;
     }
 
-    *out << "Finished eval of first model: Params, Responses "
-         << std::setprecision(12) << std::endl;
+    *out << "Finished eval of first model: Params, Responses " << std::setprecision(12) << std::endl;
 
-    Teuchos::ParameterList& parameterParams =
-        slvrfctry.getParameters().sublist("Problem").sublist("Parameters");
-    Teuchos::ParameterList& responseParams =
-        slvrfctry.getParameters().sublist("Problem").sublist(
-            "Response Functions");
+    Teuchos::ParameterList& parameterParams = slvrfctry.getParameters().sublist("Problem").sublist("Parameters");
+    Teuchos::ParameterList& responseParams = slvrfctry.getParameters().sublist("Problem").sublist("Response Functions");
 
-    int  num_param_vecs = parameterParams.get("Number of Parameter Vectors", 0);
+    int  num_param_vecs           = parameterParams.get("Number of Parameter Vectors", 0);
     bool using_old_parameter_list = false;
     if (parameterParams.isType<int>("Number")) {
       int numParameters = parameterParams.get<int>("Number");
@@ -153,7 +136,7 @@ main(int argc, char* argv[])
       }
     }
 
-    int num_response_vecs = responseParams.get("Number of Response Vectors", 0);
+    int  num_response_vecs       = responseParams.get("Number of Response Vectors", 0);
     bool using_old_response_list = false;
     if (responseParams.isType<int>("Number")) {
       int numParameters = responseParams.get<int>("Number");
@@ -166,24 +149,20 @@ main(int argc, char* argv[])
     Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>> param_names;
     param_names.resize(num_param_vecs);
     for (int l = 0; l < num_param_vecs; ++l) {
-      Teuchos::ParameterList const* pList =
-          using_old_parameter_list ?
-              &parameterParams :
-              &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
+      Teuchos::ParameterList const* pList = using_old_parameter_list ?
+                                                &parameterParams :
+                                                &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
 
       int const numParameters = pList->get<int>("Number");
       ALBANY_PANIC(
           numParameters == 0,
           std::endl
               << "Error!  In Albany::ModelEvaluator constructor:  "
-              << "Parameter vector " << l << " has zero parameters!"
-              << std::endl);
+              << "Parameter vector " << l << " has zero parameters!" << std::endl);
 
-      param_names[l] =
-          Teuchos::rcp(new Teuchos::Array<std::string>(numParameters));
+      param_names[l] = Teuchos::rcp(new Teuchos::Array<std::string>(numParameters));
       for (int k = 0; k < numParameters; ++k) {
-        (*param_names[l])[k] =
-            pList->get<std::string>(Albany::strint("Parameter", k));
+        (*param_names[l])[k] = pList->get<std::string>(Albany::strint("Parameter", k));
       }
     }
 
@@ -191,9 +170,7 @@ main(int argc, char* argv[])
     response_names.resize(num_response_vecs);
     for (int l = 0; l < num_response_vecs; ++l) {
       Teuchos::ParameterList const* pList =
-          using_old_response_list ?
-              &responseParams :
-              &(responseParams.sublist(Albany::strint("Response Vector", l)));
+          using_old_response_list ? &responseParams : &(responseParams.sublist(Albany::strint("Response Vector", l)));
 
       bool number_exists = pList->getEntryPtr("Number");
 
@@ -203,14 +180,11 @@ main(int argc, char* argv[])
             numParameters == 0,
             std::endl
                 << "Error!  In Albany::ModelEvaluator constructor:  "
-                << "Response vector " << l << " has zero parameters!"
-                << std::endl);
+                << "Response vector " << l << " has zero parameters!" << std::endl);
 
-        response_names[l] =
-            Teuchos::rcp(new Teuchos::Array<std::string>(numParameters));
+        response_names[l] = Teuchos::rcp(new Teuchos::Array<std::string>(numParameters));
         for (int k = 0; k < numParameters; ++k) {
-          (*response_names[l])[k] =
-              pList->get<std::string>(Albany::strint("Response", k));
+          (*response_names[l])[k] = pList->get<std::string>(Albany::strint("Response", k));
         }
       } else {
         response_names[l] = Teuchos::null;
@@ -223,30 +197,24 @@ main(int argc, char* argv[])
     Teuchos::RCP<const Thyra_ProductVector> p_prod;
     if (num_p > 0) {
       p_prod = Teuchos::nonnull(nominal.get_p(0)) ?
-                   Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(
-                       nominal.get_p(0), false) :
+                   Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(nominal.get_p(0), false) :
                    Teuchos::null;
       if (p_prod == Teuchos::null) {
         // Thyra vector case (default -- for
         // everything except CoupledSchwarz right now
         for (int i = 0; i < num_p; i++) {
           if (i < num_param_vecs)
-            Albany::printThyraVector(
-                *out << "\nParameter vector " << i << ":\n",
-                *param_names[i],
-                nominal.get_p(i));
+            Albany::printThyraVector(*out << "\nParameter vector " << i << ":\n", *param_names[i], nominal.get_p(i));
           else {  // distributed parameter
             ST norm2 = nominal.get_p(i)->norm_2();
-            *out << "\nDistributed Parameter " << i << ", (two-norm): " << norm2
-                 << std::endl;
+            *out << "\nDistributed Parameter " << i << ", (two-norm): " << norm2 << std::endl;
           }
         }
       } else {
         // Thyra product vector case
         for (int i = 0; i < num_p; i++) {
           Teuchos::RCP<const Thyra_ProductVector> pT =
-              Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(
-                  nominal.get_p(i), true);
+              Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(nominal.get_p(i), true);
           // IKT: note that we are assuming the parameters are all the same for
           // all the models
           // that are being coupled (in CoupledSchwarz) so we print the
@@ -254,10 +222,7 @@ main(int argc, char* argv[])
           // model only.  LOCA does not populate p for more than 1 model at the
           // moment so we cannot
           // allow for different parameters in different models.
-          Albany::printThyraVector(
-              *out << "\nParameter vector " << i << ":\n",
-              *param_names[i],
-              pT->getVectorBlock(0));
+          Albany::printThyraVector(*out << "\nParameter vector " << i << ":\n", *param_names[i], pT->getVectorBlock(0));
         }
       }
     }
@@ -273,22 +238,19 @@ main(int argc, char* argv[])
       }
       Albany::printThyraVector(*out, g);
 
-      if (num_p == 0)
-        status += slvrfctry.checkSolveTestResults(i, 0, g, Teuchos::null);
+      if (num_p == 0) status += slvrfctry.checkSolveTestResults(i, 0, g, Teuchos::null);
       for (int j = 0; j < num_p; j++) {
         Teuchos::RCP<const Thyra_MultiVector> dgdp = thyraSensitivities[i][j];
         if (Teuchos::nonnull(dgdp)) {
           if (j < num_param_vecs) {
-            Albany::printThyraMultiVector(
-                *out << "\nSensitivities (" << i << "," << j << "):\n", dgdp);
+            Albany::printThyraMultiVector(*out << "\nSensitivities (" << i << "," << j << "):\n", dgdp);
             // check response and sensitivities for scalar parameters
             status += slvrfctry.checkSolveTestResults(i, j, g, dgdp);
           } else {
-            auto small_vs = dgdp->domain()->smallVecSpcFcty()->createVecSpc(1);
-            auto norms = Thyra::createMembers(small_vs, dgdp->domain()->dim());
+            auto small_vs   = dgdp->domain()->smallVecSpcFcty()->createVecSpc(1);
+            auto norms      = Thyra::createMembers(small_vs, dgdp->domain()->dim());
             auto norms_vals = Albany::getNonconstLocalData(norms);
-            *out << "\nSensitivities (" << i << "," << j
-                 << ") for Distributed Parameters:  (two-norm)\n";
+            *out << "\nSensitivities (" << i << "," << j << ") for Distributed Parameters:  (two-norm)\n";
             *out << "    ";
             for (int ir = 0; ir < dgdp->domain()->dim(); ++ir) {
               auto norm2        = dgdp->col(ir)->norm_2();
@@ -306,18 +268,16 @@ main(int argc, char* argv[])
 
     // Create debug output object
     if (thyraResponses.size() > 0) {
-      Teuchos::ParameterList& debugParams =
-          slvrfctry.getParameters().sublist("Debug Output", true);
-      bool writeToMatrixMarketDistrSolnMap = debugParams.get(
-          "Write Distributed Solution and Map to MatrixMarket", false);
+      Teuchos::ParameterList& debugParams = slvrfctry.getParameters().sublist("Debug Output", true);
+      bool                    writeToMatrixMarketDistrSolnMap =
+          debugParams.get("Write Distributed Solution and Map to MatrixMarket", false);
 
       RCP<Thyra_Vector const> const xfinal = thyraResponses.back();
       auto                          mnv    = Albany::mean(xfinal);
       *out << "\nMain_Solve: MeanValue of final solution " << mnv << std::endl;
       *out << "\nNumber of Failed Comparisons: " << status << std::endl;
 
-      if (debugParams.get<bool>("Analyze Memory", false))
-        Albany::printMemoryAnalysis(std::cout, comm);
+      if (debugParams.get<bool>("Analyze Memory", false)) Albany::printMemoryAnalysis(std::cout, comm);
 
       if (writeToMatrixMarketDistrSolnMap == true) {
         Albany::writeMatrixMarket(xfinal->space(), "xfinal_distributed_map");
@@ -333,8 +293,7 @@ main(int argc, char* argv[])
     Teuchos::StackedTimer::OutputOptions options;
     options.output_fraction = true;
     options.output_minmax   = true;
-    stackedTimer->report(
-        std::cout, Teuchos::DefaultComm<int>::getComm(), options);
+    stackedTimer->report(std::cout, Teuchos::DefaultComm<int>::getComm(), options);
   }
 
   Kokkos::finalize_all();

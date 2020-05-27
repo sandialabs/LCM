@@ -21,10 +21,10 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(
       dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
       "Error! Layout for side set " << sideSetName << " not found.\n");
 
-  Teuchos::RCP<Albany::Layouts> dl_side    = dl->side_layouts.at(sideSetName);
-  std::string                   layout_str = p.get<std::string>("Data Layout");
-  std::string cell_field_name = p.get<std::string>("Cell Variable Name");
-  std::string side_field_name = p.get<std::string>("Side Variable Name");
+  Teuchos::RCP<Albany::Layouts> dl_side         = dl->side_layouts.at(sideSetName);
+  std::string                   layout_str      = p.get<std::string>("Data Layout");
+  std::string                   cell_field_name = p.get<std::string>("Cell Variable Name");
+  std::string                   side_field_name = p.get<std::string>("Side Variable Name");
 
   if (layout_str == "Cell Scalar") {
     val_cell    = decltype(val_cell)(cell_field_name, dl->cell_scalar2);
@@ -98,9 +98,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 {
   this->utils.setFieldData(val_cell, fm);
   this->utils.setFieldData(val_side_qp, fm);
-  if (layout == NODE_SCALAR || layout == NODE_VECTOR || layout == NODE_TENSOR) {
-    this->utils.setFieldData(BF, fm);
-  }
+  if (layout == NODE_SCALAR || layout == NODE_VECTOR || layout == NODE_TENSOR) { this->utils.setFieldData(BF, fm); }
 
   val_side_qp.dimensions(dims_side);
 
@@ -110,15 +108,11 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
-  if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) {
-    return;
-  }
+  if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) { return; }
 
-  std::vector<Albany::SideStruct> const& sideSet =
-      workset.sideSets->at(sideSetName);
+  std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the local data of side and cell
     int const cell = it_side.elem_LID;
@@ -126,25 +120,19 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
 
     switch (layout) {
       case CELL_SCALAR:
-        for (int qp = 0; qp < dims_side[2]; ++qp) {
-          val_side_qp(cell, side, qp) = val_cell(cell);
-        }
+        for (int qp = 0; qp < dims_side[2]; ++qp) { val_side_qp(cell, side, qp) = val_cell(cell); }
         break;
 
       case CELL_VECTOR:
         for (int qp = 0; qp < dims_side[2]; ++qp) {
-          for (int i = 0; i < dims_side[3]; ++i) {
-            val_side_qp(cell, side, qp, i) = val_cell(cell, i);
-          }
+          for (int i = 0; i < dims_side[3]; ++i) { val_side_qp(cell, side, qp, i) = val_cell(cell, i); }
         }
         break;
 
       case CELL_TENSOR:
         for (int qp = 0; qp < dims_side[2]; ++qp) {
           for (int i = 0; i < dims_side[3]; ++i) {
-            for (int j = 0; j < dims_side[4]; ++j) {
-              val_side_qp(cell, side, qp, i, j) = val_cell(cell, i, j);
-            }
+            for (int j = 0; j < dims_side[4]; ++j) { val_side_qp(cell, side, qp, i, j) = val_cell(cell, i, j); }
           }
         }
         break;
@@ -153,9 +141,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
         for (int qp = 0; qp < dims_side[2]; ++qp) {
           val_side_qp(cell, side, qp) = 0;
           for (int node = 0; node < num_side_nodes; ++node) {
-            val_side_qp(cell, side, qp) +=
-                val_cell(cell, sideNodes[side][node]) *
-                BF(cell, side, node, qp);
+            val_side_qp(cell, side, qp) += val_cell(cell, sideNodes[side][node]) * BF(cell, side, node, qp);
           }
         }
         break;
@@ -165,9 +151,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
           for (int i = 0; i < dims_side[3]; ++i) {
             val_side_qp(cell, side, qp, i) = 0;
             for (int node = 0; node < num_side_nodes; ++node) {
-              val_side_qp(cell, side, qp, i) +=
-                  val_cell(cell, sideNodes[side][node], i) *
-                  BF(cell, side, node, qp);
+              val_side_qp(cell, side, qp, i) += val_cell(cell, sideNodes[side][node], i) * BF(cell, side, node, qp);
             }
           }
         }
@@ -179,8 +163,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(
               val_side_qp(cell, side, qp, i, j) = 0;
               for (int node = 0; node < num_side_nodes; ++node) {
                 val_side_qp(cell, side, qp, i, j) +=
-                    val_cell(cell, sideNodes[side][node], i, j) *
-                    BF(cell, side, node, qp);
+                    val_cell(cell, sideNodes[side][node], i, j) * BF(cell, side, node, qp);
               }
             }
           }

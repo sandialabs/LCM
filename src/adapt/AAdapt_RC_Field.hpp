@@ -78,10 +78,7 @@ class Field
   //! f_incr = f_incr * f_accum.
   template <typename ad_type>
   void
-  multiplyInto(
-      typename Tensor<ad_type, 2>::type& f_incr,
-      std::size_t const                  cell,
-      std::size_t const                  qp) const;
+  multiplyInto(typename Tensor<ad_type, 2>::type& f_incr, std::size_t const cell, std::size_t const qp) const;
 
   //! f_incr += f_accum.
   template <typename ad_type>
@@ -90,10 +87,7 @@ class Field
   //! f_incr += f_accum.
   template <typename ad_type>
   void
-  addTo(
-      typename Tensor<ad_type, rank>::type& f_incr,
-      std::size_t const                     cell,
-      std::size_t const                     qp) const;
+  addTo(typename Tensor<ad_type, rank>::type& f_incr, std::size_t const cell, std::size_t const qp) const;
 
  private:
   typename Tensor<const RealType, rank>::type f_;
@@ -104,20 +98,18 @@ class Field
 template <typename MeshScalarType>
 void
 transformWeightedGradientBF(
-    const Field<2>& F,
-    const RealType& det_F,
-    const PHX::MDField<MeshScalarType const, Cell, Node, QuadPoint, Dim>&
-                   w_grad_bf,
-    int const      cell,
-    int const      pt,
-    int const      node,
-    MeshScalarType w[3])
+    const Field<2>&                                                       F,
+    const RealType&                                                       det_F,
+    const PHX::MDField<MeshScalarType const, Cell, Node, QuadPoint, Dim>& w_grad_bf,
+    int const                                                             cell,
+    int const                                                             pt,
+    int const                                                             node,
+    MeshScalarType                                                        w[3])
 {
   int const nd = w_grad_bf.extent(3);
   for (int k = 0; k < nd; ++k) {
     w[k] = 0;
-    for (int i = 0; i < nd; ++i)
-      w[k] += (w_grad_bf(cell, node, pt, i) * F()(cell, pt, i, k));
+    for (int i = 0; i < nd; ++i) w[k] += (w_grad_bf(cell, node, pt, i) * F()(cell, pt, i, k));
     w[k] /= det_F;
   }
 }

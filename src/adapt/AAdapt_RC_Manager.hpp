@@ -68,9 +68,7 @@ class Manager
   //! Static constructor that may return Teuchos::null depending on the contents
   //  of the parameter list.
   static Teuchos::RCP<Manager>
-  create(
-      const Teuchos::RCP<Albany::StateManager>& state_mgr,
-      Teuchos::ParameterList&                   problem_params);
+  create(const Teuchos::RCP<Albany::StateManager>& state_mgr, Teuchos::ParameterList& problem_params);
 
   void
   setSolutionManager(const Teuchos::RCP<AdaptiveSolutionManager>& sol_mgr);
@@ -109,9 +107,7 @@ class Manager
   //! The problem creates the evaluators associated with RCU.
   template <typename EvalT>
   void
-  createEvaluators(
-      PHX::FieldManager<PHAL::AlbanyTraits>& fm,
-      const Teuchos::RCP<Albany::Layouts>&   dl);
+  createEvaluators(PHX::FieldManager<PHAL::AlbanyTraits>& fm, const Teuchos::RCP<Albany::Layouts>& dl);
 
   /* rc::Reader, rc::Writer, and AAdapt::MeshAdapt use these methods to read and
    * write data. */
@@ -156,25 +152,16 @@ class Manager
   void
   beginQpInterp();
   void
-  interpQpField(
-      PHX::MDField<RealType>& f,
-      const PHAL::Workset&    workset,
-      const BasisField&       bf);
+  interpQpField(PHX::MDField<RealType>& f, const PHAL::Workset& workset, const BasisField& bf);
   void
   endQpInterp();
   void
   readQpField(PHX::MDField<RealType>& f, const PHAL::Workset& workset);
   //! Writer<Residual> uses these methods to record the data.
   void
-  beginQpWrite(
-      const PHAL::Workset& workset,
-      const BasisField&    bf,
-      const BasisField&    wbf);
+  beginQpWrite(const PHAL::Workset& workset, const BasisField& bf, const BasisField& wbf);
   void
-  writeQpField(
-      const PHX::MDField<const RealType>& f,
-      const PHAL::Workset&                workset,
-      const BasisField&                   wbf);
+  writeQpField(const PHX::MDField<const RealType>& f, const PHAL::Workset& workset, const BasisField& wbf);
   void
   endQpWrite();
   void
@@ -227,10 +214,7 @@ class Manager
   struct Impl;
   Teuchos::RCP<Impl> impl_;
 
-  Manager(
-      const Teuchos::RCP<Albany::StateManager>& state_mgr,
-      bool const                                use_projection,
-      bool const                                do_transform);
+  Manager(const Teuchos::RCP<Albany::StateManager>& state_mgr, bool const use_projection, bool const do_transform);
 };
 
 }  // namespace rc

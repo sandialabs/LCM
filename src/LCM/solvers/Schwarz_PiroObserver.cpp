@@ -9,8 +9,7 @@
 
 namespace LCM {
 
-Schwarz_PiroObserver::Schwarz_PiroObserver(
-    Teuchos::RCP<SchwarzCoupled> const& cs_model)
+Schwarz_PiroObserver::Schwarz_PiroObserver(Teuchos::RCP<SchwarzCoupled> const& cs_model)
 {
   apps_     = cs_model->getApps();
   n_models_ = apps_.size();
@@ -24,9 +23,7 @@ Schwarz_PiroObserver::observeSolution(Thyra::VectorBase<ST> const& solution)
 }
 
 void
-Schwarz_PiroObserver::observeSolution(
-    Thyra::VectorBase<ST> const& solution,
-    ST const                     stamp)
+Schwarz_PiroObserver::observeSolution(Thyra::VectorBase<ST> const& solution, ST const stamp)
 {
   this->observeSolutionImpl(solution, stamp);
 }
@@ -46,16 +43,14 @@ Teuchos::Array<Teuchos::RCP<Thyra_Vector const>>
 arrayVecsFromVec(Thyra::VectorBase<double> const& v, int n_models)
 {
   Teuchos::RCP<Thyra::ProductVectorBase<ST> const> const v_nonowning_rcp =
-      Teuchos::rcp_dynamic_cast<const Thyra::ProductVectorBase<ST>>(
-          Teuchos::rcpFromRef(v));
+      Teuchos::rcp_dynamic_cast<const Thyra::ProductVectorBase<ST>>(Teuchos::rcpFromRef(v));
 
   // Create a Teuchos array of the vs for each model.
   Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> vs(n_models);
 
   for (int m = 0; m < n_models; ++m) {
     // Get each Thyra vector
-    vs[m] = Teuchos::rcp_dynamic_cast<Thyra_Vector const>(
-        v_nonowning_rcp->getVectorBlock(m), true);
+    vs[m] = Teuchos::rcp_dynamic_cast<Thyra_Vector const>(v_nonowning_rcp->getVectorBlock(m), true);
   }
   return vs;
 }
@@ -63,12 +58,9 @@ arrayVecsFromVec(Thyra::VectorBase<double> const& v, int n_models)
 }  // anonymous namespace
 
 void
-Schwarz_PiroObserver::observeSolutionImpl(
-    Thyra::VectorBase<ST> const& solution,
-    ST const                     default_stamp)
+Schwarz_PiroObserver::observeSolutionImpl(Thyra::VectorBase<ST> const& solution, ST const default_stamp)
 {
-  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> solutions =
-      arrayVecsFromVec(solution, n_models_);
+  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> solutions = arrayVecsFromVec(solution, n_models_);
 
   Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> null_array;
   null_array.resize(n_models_);
@@ -83,11 +75,9 @@ Schwarz_PiroObserver::observeSolutionImpl(
     Thyra::VectorBase<ST> const& solution_dot,
     ST const                     default_stamp)
 {
-  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> solutions =
-      arrayVecsFromVec(solution, n_models_);
+  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> solutions = arrayVecsFromVec(solution, n_models_);
 
-  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> solutions_dot =
-      arrayVecsFromVec(solution_dot, n_models_);
+  Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> solutions_dot = arrayVecsFromVec(solution_dot, n_models_);
 
   impl_->observeSolution(default_stamp, solutions, solutions_dot);
 }

@@ -24,8 +24,7 @@ class Source_Base;
 }
 
 template <typename EvalT, typename Traits>
-class Source : public PHX::EvaluatorWithBaseImpl<Traits>,
-               public PHX::EvaluatorDerived<EvalT, Traits>
+class Source : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
   typedef typename EvalT::ScalarT     ScalarT;
   typedef typename EvalT::MeshScalarT MeshScalarT;
@@ -36,9 +35,7 @@ class Source : public PHX::EvaluatorWithBaseImpl<Traits>,
   ~Source();
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData ud);

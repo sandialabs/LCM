@@ -19,11 +19,9 @@ MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
 {
-  scatter_operation =
-      Teuchos::rcp(new PHX::Tag<ScalarT>("MortarContact", dl->dummy));
+  scatter_operation = Teuchos::rcp(new PHX::Tag<ScalarT>("MortarContact", dl->dummy));
 
-  const Teuchos::ArrayRCP<std::string>& names =
-      p.get<Teuchos::ArrayRCP<std::string>>("Residual Names");
+  const Teuchos::ArrayRCP<std::string>& names = p.get<Teuchos::ArrayRCP<std::string>>("Residual Names");
 
   numFieldsBase             = names.size();
   std::size_t const num_val = numFieldsBase;
@@ -53,8 +51,7 @@ MortarContactResidualBase<EvalT, Traits>::postRegistrationSetup(
     typename Traits::SetupData d,
     PHX::FieldManager<Traits>& fm)
 {
-  for (std::size_t eq = 0; eq < numFieldsBase; ++eq)
-    this->utils.setFieldData(val[eq], fm);
+  for (std::size_t eq = 0; eq < numFieldsBase; ++eq) this->utils.setFieldData(val[eq], fm);
   numNodes = val[0].extent(1);
 }
 
@@ -62,14 +59,11 @@ MortarContactResidualBase<EvalT, Traits>::postRegistrationSetup(
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::
-    MortarContactResidual(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::MortarContactResidual(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
     : MortarContactResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl),
-      numFields(
-          MortarContactResidualBase<PHAL::AlbanyTraits::Residual, Traits>::
-              numFieldsBase)
+      numFields(MortarContactResidualBase<PHAL::AlbanyTraits::Residual, Traits>::numFieldsBase)
 {
 }
 
@@ -111,16 +105,14 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
     for (std::size_t i = 0; i < numDims; i++)
       for (std::size_t j = 0; j < numDims; j++) {
         const LO id = nodeID(cell, node, this->offset + i * numDims + j);
-        Kokkos::atomic_fetch_add(
-            &f_kokkos(id), this->valTensor(cell, node, i, j));
+        Kokkos::atomic_fetch_add(&f_kokkos(id), this->valTensor(cell, node, i, j));
       }
 }
 
 // **********************************************************************
 template <typename Traits>
 void
-MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
 #if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
@@ -132,23 +124,17 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
   f_kokkos = Albany::getNonconstDeviceData(workset.f);
 
   // Get MDField views from std::vector
-  for (int i = 0; i < numFields; i++) {
-    val_kokkos[i] = this->val[i].get_view();
-  }
+  for (int i = 0; i < numFields; i++) { val_kokkos[i] = this->val[i].get_view(); }
 
-  Kokkos::parallel_for(
-      PHAL_MortarContactResRank0_Policy(0, workset.numCells), *this);
+  Kokkos::parallel_for(PHAL_MortarContactResRank0_Policy(0, workset.numCells), *this);
   cudaCheckError();
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "Mortar Contact Residual time = " << millisec << "  "
-            << microseconds << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "Mortar Contact Residual time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 
@@ -157,14 +143,11 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
 // **********************************************************************
 
 template <typename Traits>
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::
-    MortarContactResidual(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::MortarContactResidual(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
     : MortarContactResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl),
-      numFields(
-          MortarContactResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::
-              numFieldsBase)
+      numFields(MortarContactResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::numFieldsBase)
 {
 }
 
@@ -179,8 +162,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
-      Kokkos::atomic_fetch_add(
-          &f_kokkos(id), (val_kokkos[eq](cell, node)).val());
+      Kokkos::atomic_fetch_add(&f_kokkos(id), (val_kokkos[eq](cell, node)).val());
     }
 }
 
@@ -201,9 +183,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -237,9 +217,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -261,8 +239,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
-      Kokkos::atomic_fetch_add(
-          &f_kokkos(id), (this->valVec(cell, node, eq)).val());
+      Kokkos::atomic_fetch_add(&f_kokkos(id), (this->valVec(cell, node, eq)).val());
     }
 }
 
@@ -285,9 +262,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -322,17 +297,14 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       rowT = nodeID(cell, node, this->offset + eq);
       if (((this->valVec)(cell, node, eq)).hasFastAccess()) {
-        for (int i = 0; i < nunk; ++i)
-          vals[i] = (this->valVec)(cell, node, eq).fastAccessDx(i);
+        for (int i = 0; i < nunk; ++i) vals[i] = (this->valVec)(cell, node, eq).fastAccessDx(i);
         Jac_kokkos.sumIntoValues(rowT, colT, nunk, vals, false, true);
       }
     }
@@ -349,8 +321,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     for (std::size_t i = 0; i < numDims; i++)
       for (std::size_t j = 0; j < numDims; j++) {
         const LO id = nodeID(cell, node, this->offset + i * numDims + j);
-        Kokkos::atomic_fetch_add(
-            &f_kokkos(id), (this->valTensor(cell, node, i, j)).val());
+        Kokkos::atomic_fetch_add(&f_kokkos(id), (this->valTensor(cell, node, i, j)).val());
       }
 }
 
@@ -371,19 +342,15 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       rowT = nodeID(cell, node, this->offset + eq);
-      if (((this->valTensor)(cell, node, eq / numDims, eq % numDims))
-              .hasFastAccess()) {
+      if (((this->valTensor)(cell, node, eq / numDims, eq % numDims)).hasFastAccess()) {
         for (int lunk = 0; lunk < nunk; lunk++) {
-          ST val = ((this->valTensor)(cell, node, eq / numDims, eq % numDims))
-                       .fastAccessDx(lunk);
+          ST val = ((this->valTensor)(cell, node, eq / numDims, eq % numDims)).fastAccessDx(lunk);
           Jac_kokkos.sumIntoValues(colT[lunk], &rowT, 1, &val, false, true);
         }
       }  // has fast access
@@ -410,19 +377,15 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) {
-      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
-    }
+    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       rowT = nodeID(cell, node, this->offset + eq);
-      if (((this->valTensor)(cell, node, eq / numDims, eq % numDims))
-              .hasFastAccess()) {
+      if (((this->valTensor)(cell, node, eq / numDims, eq % numDims)).hasFastAccess()) {
         for (int i = 0; i < nunk; ++i)
-          vals[i] = (this->valTensor)(cell, node, eq / numDims, eq % numDims)
-                        .fastAccessDx(i);
+          vals[i] = (this->valTensor)(cell, node, eq / numDims, eq % numDims).fastAccessDx(i);
         Jac_kokkos.sumIntoValues(rowT, colT, nunk, vals, false, true);
       }
     }
@@ -432,8 +395,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 // **********************************************************************
 template <typename Traits>
 void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
 #if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
@@ -454,30 +416,24 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
   for (int i = 0; i < numFields; i++) val_kokkos[i] = this->val[i].get_view();
 
   if (loadResid) {
-    Kokkos::parallel_for(
-        PHAL_MortarContactResRank0_Policy(0, workset.numCells), *this);
+    Kokkos::parallel_for(PHAL_MortarContactResRank0_Policy(0, workset.numCells), *this);
     cudaCheckError();
   }
 
   if (workset.is_adjoint) {
-    Kokkos::parallel_for(
-        PHAL_MortarContactJacRank0_Adjoint_Policy(0, workset.numCells), *this);
+    Kokkos::parallel_for(PHAL_MortarContactJacRank0_Adjoint_Policy(0, workset.numCells), *this);
     cudaCheckError();
   } else {
-    Kokkos::parallel_for(
-        PHAL_MortarContactJacRank0_Policy(0, workset.numCells), *this);
+    Kokkos::parallel_for(PHAL_MortarContactJacRank0_Policy(0, workset.numCells), *this);
     cudaCheckError();
   }
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "Mortar Contact Jacobian time = " << millisec << "  "
-            << microseconds << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "Mortar Contact Jacobian time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 

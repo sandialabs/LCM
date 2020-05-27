@@ -18,16 +18,13 @@ namespace LCM {
  */
 
 template <typename EvalT, typename Traits>
-class LamentStress : public PHX::EvaluatorWithBaseImpl<Traits>,
-                     public PHX::EvaluatorDerived<EvalT, Traits>
+class LamentStress : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   LamentStress(Teuchos::ParameterList& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   virtual void
   evaluateFields(typename Traits::EvalData d);
@@ -58,8 +55,7 @@ class LamentStress : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // Vector of the fields corresponding to the LAMENT material model state
   // variables
-  std::vector<PHX::MDField<ScalarT, Cell, QuadPoint>>
-      lamentMaterialModelStateVariableFields;
+  std::vector<PHX::MDField<ScalarT, Cell, QuadPoint>> lamentMaterialModelStateVariableFields;
 };
 
 }  // namespace LCM

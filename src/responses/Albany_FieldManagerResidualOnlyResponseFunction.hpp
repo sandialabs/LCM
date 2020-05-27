@@ -22,8 +22,7 @@ namespace Albany {
  * forms of overridden methods. It returns 0 for all derivatives. Hence a
  * sensitivity will turn out to be 0.
  */
-class FieldManagerResidualOnlyResponseFunction
-    : public FieldManagerScalarResponseFunction
+class FieldManagerResidualOnlyResponseFunction : public FieldManagerScalarResponseFunction
 {
  public:
   //! Constructor
@@ -50,8 +49,7 @@ class FieldManagerResidualOnlyResponseFunction
 
  private:
   //! Private to prohibit copying
-  FieldManagerResidualOnlyResponseFunction(
-      const FieldManagerResidualOnlyResponseFunction&);
+  FieldManagerResidualOnlyResponseFunction(const FieldManagerResidualOnlyResponseFunction&);
   FieldManagerResidualOnlyResponseFunction&
   operator=(const FieldManagerResidualOnlyResponseFunction&);
 };

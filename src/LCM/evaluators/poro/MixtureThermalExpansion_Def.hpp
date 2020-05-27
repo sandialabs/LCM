@@ -10,22 +10,18 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(
-    Teuchos::ParameterList const& p)
+MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(Teuchos::ParameterList const& p)
     : biotCoefficient(
           p.get<std::string>("Biot Coefficient Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      porosity(
-          p.get<std::string>("Porosity Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      porosity(p.get<std::string>("Porosity Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       alphaSkeleton(
           p.get<std::string>("Skeleton Thermal Expansion Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       alphaPoreFluid(
           p.get<std::string>("Pore-Fluid Thermal Expansion Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      J(p.get<std::string>("DetDefGrad Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       mixtureThermalExpansion(
           p.get<std::string>("Mixture Thermal Expansion Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
@@ -40,8 +36,7 @@ MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(
 
   this->setName("Mixture Thermal Expansion" + PHX::print<EvalT>());
 
-  Teuchos::RCP<PHX::DataLayout> scalar_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   scalar_dl->dimensions(dims);
   numQPs = dims[1];
@@ -65,15 +60,13 @@ MixtureThermalExpansion<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-MixtureThermalExpansion<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+MixtureThermalExpansion<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Compute Strain tensor from displacement gradient
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
       mixtureThermalExpansion(cell, qp) =
-          (biotCoefficient(cell, qp) * J(cell, qp) - porosity(cell, qp)) *
-              alphaSkeleton(cell, qp) +
+          (biotCoefficient(cell, qp) * J(cell, qp) - porosity(cell, qp)) * alphaSkeleton(cell, qp) +
           porosity(cell, qp) * alphaPoreFluid(cell, qp);
     }
   }

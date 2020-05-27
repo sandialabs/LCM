@@ -41,9 +41,7 @@ class CreepModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  CreepModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  CreepModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Denstructor
@@ -54,16 +52,10 @@ class CreepModel : public LCM::ConstitutiveModel<EvalT, Traits>
   /// Method to compute the state (e.g. energy, stress, tangent)
   ///
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields)
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
   {
     ALBANY_ABORT("Not implemented.");
   }
@@ -83,8 +75,8 @@ class CreepModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Saturation hardening constants
   ///
-  RealType sat_mod_, sat_exp_, creep_initial_guess_, strain_rate_expo_,
-      relaxation_para_, activation_para_, return_map_tolerance;
+  RealType sat_mod_, sat_exp_, creep_initial_guess_, strain_rate_expo_, relaxation_para_, activation_para_,
+      return_map_tolerance;
 
   int max_return_map_count;
 };

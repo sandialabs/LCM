@@ -12,12 +12,9 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 Density<EvalT, Traits>::Density(Teuchos::ParameterList& p)
-    : density(
-          p.get<std::string>("Cell Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Cell Scalar Data Layout"))
+    : density(p.get<std::string>("Cell Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Cell Scalar Data Layout"))
 {
-  Teuchos::ParameterList* density_param_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* density_param_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
   constant_value = density_param_list->get<double>("Value");
 
@@ -28,9 +25,7 @@ Density<EvalT, Traits>::Density(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-Density<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+Density<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(density, fm);
 }
@@ -42,9 +37,7 @@ Density<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   int numCells = workset.numCells;
 
-  for (int cell = 0; cell < numCells; ++cell) {
-    density(cell) = constant_value;
-  }
+  for (int cell = 0; cell < numCells; ++cell) { density(cell) = constant_value; }
 }
 
 // **********************************************************************
@@ -54,10 +47,7 @@ Density<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Density") { return constant_value; }
 
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n
-      << " in Density::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in Density::getValue()" << std::endl);
   return constant_value;
 }
 

@@ -10,16 +10,10 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-CurrentCoords<EvalT, Traits>::CurrentCoords(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
-    : refCoords(
-          p.get<std::string>("Reference Coordinates Name"),
-          dl->vertices_vector),
+CurrentCoords<EvalT, Traits>::CurrentCoords(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
+    : refCoords(p.get<std::string>("Reference Coordinates Name"), dl->vertices_vector),
       displacement(p.get<std::string>("Displacement Name"), dl->node_vector),
-      currentCoords(
-          p.get<std::string>("Current Coordinates Name"),
-          dl->node_vector)
+      currentCoords(p.get<std::string>("Current Coordinates Name"), dl->node_vector)
 {
   this->addDependentField(refCoords);
   this->addDependentField(displacement);
@@ -38,9 +32,7 @@ CurrentCoords<EvalT, Traits>::CurrentCoords(
 //*****
 template <typename EvalT, typename Traits>
 void
-CurrentCoords<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+CurrentCoords<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(refCoords, fm);
   this->utils.setFieldData(displacement, fm);
@@ -55,8 +47,7 @@ CurrentCoords<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   for (int cell = 0; cell < workset.numCells; ++cell)
     for (int node = 0; node < numNodes; ++node)
       for (int dim = 0; dim < numDims; ++dim)
-        currentCoords(cell, node, dim) =
-            refCoords(cell, node, dim) + displacement(cell, node, dim);
+        currentCoords(cell, node, dim) = refCoords(cell, node, dim) + displacement(cell, node, dim);
 }
 
 //*****

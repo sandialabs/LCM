@@ -47,11 +47,7 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 }
 //*****
 // Kokkos kernel for Residual
-template <
-    class DeviceType,
-    class MDFieldType1,
-    class MDFieldType2,
-    class MDFieldType3>
+template <class DeviceType, class MDFieldType1, class MDFieldType2, class MDFieldType3>
 class VecInterpolation
 {
   MDFieldType1 BF_;
@@ -64,19 +60,8 @@ class VecInterpolation
  public:
   typedef DeviceType device_type;
 
-  VecInterpolation(
-      MDFieldType1& BF,
-      MDFieldType2& val_node,
-      MDFieldType3& U,
-      int           numQPs,
-      int           numNodes,
-      int           vecDims)
-      : BF_(BF),
-        val_node_(val_node),
-        U_(U),
-        numQPs_(numQPs),
-        numNodes_(numNodes),
-        vecDims_(vecDims)
+  VecInterpolation(MDFieldType1& BF, MDFieldType2& val_node, MDFieldType3& U, int numQPs, int numNodes, int vecDims)
+      : BF_(BF), val_node_(val_node), U_(U), numQPs_(numQPs), numNodes_(numNodes), vecDims_(vecDims)
   {
   }
 
@@ -87,9 +72,7 @@ class VecInterpolation
     for (int qp = 0; qp < numQPs_; ++qp) {
       for (int vec = 0; vec < vecDims_; vec++) {
         U_(i, qp, vec) = val_node_(i, 0, vec) * BF_(i, 0, qp);
-        for (int node = 1; node < numNodes_; ++node) {
-          U_(i, qp, vec) += val_node_(i, node, vec) * BF_(i, node, qp);
-        }
+        for (int node = 1; node < numNodes_; ++node) { U_(i, qp, vec) += val_node_(i, node, vec) * BF_(i, node, qp); }
       }
     }
   }
@@ -98,8 +81,7 @@ class VecInterpolation
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
 #if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();
@@ -107,21 +89,15 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
 
   Kokkos::parallel_for(
       workset.numCells,
-      VecInterpolation<
-          PHX::Device,
-          decltype(BF),
-          decltype(val_node),
-          decltype(val_qp)>(BF, val_node, val_qp, numQPs, numNodes, vecDim));
+      VecInterpolation<PHX::Device, decltype(BF), decltype(val_node), decltype(val_qp)>(
+          BF, val_node, val_qp, numQPs, numNodes, vecDim));
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
-  auto      elapsed = std::chrono::high_resolution_clock::now() - start;
-  long long microseconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-  long long millisec =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-  std::cout << "DOFVecInterpolationBase Residual time = " << millisec << "  "
-            << microseconds << std::endl;
+  auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
+  long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+  long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+  std::cout << "DOFVecInterpolationBase Residual time = " << millisec << "  " << microseconds << std::endl;
 #endif
 }
 
@@ -131,12 +107,7 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 
 // Kokkos kernel for Jacobian
-template <
-    typename ScalarT,
-    class Device,
-    class MDFieldType,
-    class MDFieldTypeFad1,
-    class MDFieldTypeFad2>
+template <typename ScalarT, class Device, class MDFieldType, class MDFieldTypeFad1, class MDFieldTypeFad2>
 class VecInterpolationJacob
 {
   MDFieldType     BF_;
@@ -178,16 +149,12 @@ class VecInterpolationJacob
     int const neq = num_dof_ / numNodes_;
     for (int qp = 0; qp < numQPs_; ++qp) {
       for (int vec = 0; vec < vecDims_; vec++) {
-        U_(i, qp, vec) =
-            ScalarT(num_dof_, val_node_(i, 0, vec).val() * BF_(i, 0, qp));
-        (U_(i, qp, vec)).fastAccessDx(offset_ + vec) =
-            val_node_(i, 0, vec).fastAccessDx(offset_ + vec) * BF_(i, 0, qp);
+        U_(i, qp, vec)                               = ScalarT(num_dof_, val_node_(i, 0, vec).val() * BF_(i, 0, qp));
+        (U_(i, qp, vec)).fastAccessDx(offset_ + vec) = val_node_(i, 0, vec).fastAccessDx(offset_ + vec) * BF_(i, 0, qp);
         for (int node = 1; node < numNodes_; ++node) {
-          (U_(i, qp, vec)).val() +=
-              val_node_(i, node, vec).val() * BF_(i, node, qp);
+          (U_(i, qp, vec)).val() += val_node_(i, node, vec).val() * BF_(i, node, qp);
           (U_(i, qp, vec)).fastAccessDx(neq * node + offset_ + vec) +=
-              val_node_(i, node, vec).fastAccessDx(neq * node + offset_ + vec) *
-              BF_(i, node, qp);
+              val_node_(i, node, vec).fastAccessDx(neq * node + offset_ + vec) * BF_(i, node, qp);
         }
       }
     }
@@ -197,29 +164,14 @@ class VecInterpolationJacob
 //*****
 template <typename Traits>
 void
-FastSolutionVecInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
+FastSolutionVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
     evaluateFields(typename Traits::EvalData workset)
 {
   int num_dof = this->val_node(0, 0, 0).size();
   Kokkos::parallel_for(
       workset.numCells,
-      VecInterpolationJacob<
-          ScalarT,
-          PHX::Device,
-          decltype(this->BF),
-          decltype(this->val_node),
-          decltype(this->val_qp)>(
-          this->BF,
-          this->val_node,
-          this->val_qp,
-          this->numNodes,
-          this->numQPs,
-          this->vecDim,
-          num_dof,
-          offset));
+      VecInterpolationJacob<ScalarT, PHX::Device, decltype(this->BF), decltype(this->val_node), decltype(this->val_qp)>(
+          this->BF, this->val_node, this->val_qp, this->numNodes, this->numQPs, this->vecDim, num_dof, offset));
 }
 #endif  // ALBANY_MESH_DEPENDS_ON_SOLUTION
 

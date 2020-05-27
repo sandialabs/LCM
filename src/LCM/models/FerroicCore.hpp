@@ -166,9 +166,7 @@ computeResidual(
 //! model.
 //  Unknowns: transition rates
 template <typename EvalT, minitensor::Index M = FM::MAX_TRNS>
-class DomainSwitching
-    : public minitensor::
-          Function_Base<DomainSwitching<EvalT, M>, typename EvalT::ScalarT, M>
+class DomainSwitching : public minitensor::Function_Base<DomainSwitching<EvalT, M>, typename EvalT::ScalarT, M>
 {
   using ArgT = typename EvalT::ScalarT;
 
@@ -186,8 +184,7 @@ class DomainSwitching
 
   static constexpr char const* const NAME{"Domain Switching Nonlinear System"};
 
-  using Base = minitensor::
-      Function_Base<DomainSwitching<EvalT, M>, typename EvalT::ScalarT, M>;
+  using Base = minitensor::Function_Base<DomainSwitching<EvalT, M>, typename EvalT::ScalarT, M>;
 
   //! Default implementation of value function.
   template <typename T, minitensor::Index N = minitensor::DYNAMIC>

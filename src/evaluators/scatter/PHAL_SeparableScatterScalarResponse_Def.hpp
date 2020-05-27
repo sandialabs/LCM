@@ -18,10 +18,9 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-SeparableScatterScalarResponseBase<EvalT, Traits>::
-    SeparableScatterScalarResponseBase(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+SeparableScatterScalarResponseBase<EvalT, Traits>::SeparableScatterScalarResponseBase(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
 {
   setup(p, dl);
 }
@@ -45,9 +44,8 @@ SeparableScatterScalarResponseBase<EvalT, Traits>::setup(
   this->stand_alone = p.get<bool>("Stand-alone Evaluator");
 
   // Setup fields we require
-  auto local_response_tag =
-      p.get<PHX::Tag<ScalarT>>("Local Response Field Tag");
-  local_response = decltype(local_response)(local_response_tag);
+  auto local_response_tag = p.get<PHX::Tag<ScalarT>>("Local Response Field Tag");
+  local_response          = decltype(local_response)(local_response_tag);
   if (this->stand_alone) {
     this->addDependentField(local_response);
   } else {
@@ -61,18 +59,16 @@ SeparableScatterScalarResponseBase<EvalT, Traits>::setup(
 // **********************************************************************
 
 template <typename Traits>
-SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
-    SeparableScatterScalarResponse(
-        Teuchos::ParameterList const&        p,
-        const Teuchos::RCP<Albany::Layouts>& dl)
+SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::SeparableScatterScalarResponse(
+    Teuchos::ParameterList const&        p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
 {
   this->setup(p, dl);
 }
 
 template <typename Traits>
 void
-SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
-    preEvaluate(typename Traits::PreEvalData workset)
+SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::preEvaluate(typename Traits::PreEvalData workset)
 {
   // Initialize derivatives
   Teuchos::RCP<Thyra_MultiVector> dgdx            = workset.dgdx;
@@ -82,9 +78,8 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
     overlapped_dgdx->assign(0.0);
   }
 
-  Teuchos::RCP<Thyra_MultiVector> dgdxdot = workset.dgdxdot;
-  Teuchos::RCP<Thyra_MultiVector> overlapped_dgdxdot =
-      workset.overlapped_dgdxdot;
+  Teuchos::RCP<Thyra_MultiVector> dgdxdot            = workset.dgdxdot;
+  Teuchos::RCP<Thyra_MultiVector> overlapped_dgdxdot = workset.overlapped_dgdxdot;
   if (dgdxdot != Teuchos::null) {
     dgdxdot->assign(0.0);
     overlapped_dgdxdot->assign(0.0);
@@ -93,8 +88,7 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
 
 template <typename Traits>
 void
-SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
-    evaluateFields(typename Traits::EvalData workset)
+SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Here we scatter the *local* response derivative
   auto                            nodeID  = workset.wsElNodeEqID;
@@ -141,11 +135,10 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
 
 template <typename Traits>
 void
-SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
-    evaluate2DFieldsDerivativesDueToExtrudedSolution(
-        typename Traits::EvalData            workset,
-        std::string&                         sideset,
-        Teuchos::RCP<const CellTopologyData> cellTopo)
+SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::evaluate2DFieldsDerivativesDueToExtrudedSolution(
+    typename Traits::EvalData            workset,
+    std::string&                         sideset,
+    Teuchos::RCP<const CellTopologyData> cellTopo)
 {
   // Here we scatter the *local* response derivative
   Teuchos::RCP<Thyra_MultiVector> dgdx    = workset.overlapped_dgdx;
@@ -158,17 +151,13 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
   }
   auto dg_data = Albany::getNonconstLocalData(dg);
 
-  int const                      neq = workset.wsElNodeEqID.extent(2);
-  const Albany::NodalDOFManager& solDOFManager =
-      workset.disc->getOverlapDOFManager("ordinary_solution");
-  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering =
-      *workset.disc->getLayeredMeshNumbering();
-  int numLayers = layeredMeshNumbering.numLayers;
-  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID =
-      workset.disc->getWsElNodeID()[workset.wsIndex];
+  int const                               neq           = workset.wsElNodeEqID.extent(2);
+  const Albany::NodalDOFManager&          solDOFManager = workset.disc->getOverlapDOFManager("ordinary_solution");
+  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering = *workset.disc->getLayeredMeshNumbering();
+  int                                     numLayers            = layeredMeshNumbering.numLayers;
+  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID   = workset.disc->getWsElNodeID()[workset.wsIndex];
 
-  if (workset.sideSets == Teuchos::null)
-    ALBANY_ABORT("Side sets not properly specified on the mesh" << std::endl);
+  if (workset.sideSets == Teuchos::null) ALBANY_ABORT("Side sets not properly specified on the mesh" << std::endl);
 
   const Albany::SideSetList&          ssList = *(workset.sideSets);
   Albany::SideSetList::const_iterator it     = ssList.find(sideset);
@@ -179,12 +168,11 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
     auto overlapNodeVS   = workset.disc->getOverlapNodeVectorSpace();
     auto ov_node_indexer = Albany::createGlobalLocalIndexer(overlapNodeVS);
 
-    for (std::size_t iSide = 0; iSide < sideSet.size();
-         ++iSide) {  // loop over the sides on this ws and name
+    for (std::size_t iSide = 0; iSide < sideSet.size(); ++iSide) {  // loop over the sides on this ws and name
       // Get the data that corresponds to the side
-      int const                       elem_LID  = sideSet[iSide].elem_LID;
-      int const                       elem_side = sideSet[iSide].side_local_id;
-      const CellTopologyData_Subcell& side      = cellTopo->side[elem_side];
+      int const                       elem_LID     = sideSet[iSide].elem_LID;
+      int const                       elem_side    = sideSet[iSide].side_local_id;
+      const CellTopologyData_Subcell& side         = cellTopo->side[elem_side];
       int                             numSideNodes = side.topology->node_count;
 
       const Teuchos::ArrayRCP<GO>& elNodeID = wsElNodeID[elem_LID];
@@ -192,15 +180,14 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
         auto val = this->local_response(elem_LID, res);
         LO   base_id, ilayer;
         for (int i = 0; i < numSideNodes; ++i) {
-          std::size_t node = side.node[i];
-          const LO lnodeId = ov_node_indexer->getLocalElement(elNodeID[node]);
+          std::size_t node    = side.node[i];
+          const LO    lnodeId = ov_node_indexer->getLocalElement(elNodeID[node]);
           layeredMeshNumbering.getIndices(lnodeId, base_id, ilayer);
           for (unsigned int il_col = 0; il_col < numLayers + 1; il_col++) {
             const LO inode = layeredMeshNumbering.getId(base_id, il_col);
             for (unsigned int eq_col = 0; eq_col < neq; eq_col++) {
-              const LO dof = solDOFManager.getLocalDOF(inode, eq_col);
-              int deriv = neq * this->numNodes + il_col * neq * numSideNodes +
-                          neq * i + eq_col;
+              const LO dof   = solDOFManager.getLocalDOF(inode, eq_col);
+              int      deriv = neq * this->numNodes + il_col * neq * numSideNodes + neq * i + eq_col;
               dg_data[res][dof] += val.dx(deriv);
             }
           }
@@ -212,33 +199,26 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
 
 template <typename Traits>
 void
-SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::
-    postEvaluate(typename Traits::PostEvalData workset)
+SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::postEvaluate(
+    typename Traits::PostEvalData workset)
 {
   // Here we scatter the *global* response
   Teuchos::RCP<Thyra_Vector> g = workset.g;
   if (g != Teuchos::null) {
     Teuchos::ArrayRCP<ST> g_nonconstView = Albany::getNonconstLocalData(g);
-    for (PHAL::MDFieldIterator<ScalarT const> gr(this->global_response);
-         !gr.done();
-         ++gr)
+    for (PHAL::MDFieldIterator<ScalarT const> gr(this->global_response); !gr.done(); ++gr)
       g_nonconstView[gr.idx()] = gr.ref().val();
   }
 
   // Here we scatter the *global* response derivatives
   Teuchos::RCP<Thyra_MultiVector> dgdx            = workset.dgdx;
   Teuchos::RCP<Thyra_MultiVector> overlapped_dgdx = workset.overlapped_dgdx;
-  if (dgdx != Teuchos::null) {
-    workset.x_cas_manager->combine(
-        overlapped_dgdx, dgdx, Albany::CombineMode::ADD);
-  }
+  if (dgdx != Teuchos::null) { workset.x_cas_manager->combine(overlapped_dgdx, dgdx, Albany::CombineMode::ADD); }
 
-  Teuchos::RCP<Thyra_MultiVector> dgdxdot = workset.dgdxdot;
-  Teuchos::RCP<Thyra_MultiVector> overlapped_dgdxdot =
-      workset.overlapped_dgdxdot;
+  Teuchos::RCP<Thyra_MultiVector> dgdxdot            = workset.dgdxdot;
+  Teuchos::RCP<Thyra_MultiVector> overlapped_dgdxdot = workset.overlapped_dgdxdot;
   if (dgdxdot != Teuchos::null) {
-    workset.x_cas_manager->combine(
-        overlapped_dgdxdot, dgdxdot, Albany::CombineMode::ADD);
+    workset.x_cas_manager->combine(overlapped_dgdxdot, dgdxdot, Albany::CombineMode::ADD);
   }
 }
 

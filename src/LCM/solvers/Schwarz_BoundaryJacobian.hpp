@@ -28,8 +28,8 @@ class Schwarz_BoundaryJacobian : public Thyra_LinearOp
       Teuchos::RCP<Teuchos_Comm const> const&                     comm,
       Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> const& ca,
       Teuchos::Array<Teuchos::RCP<Thyra_LinearOp>>                jacs,
-      int const this_app_index    = 0,
-      int const coupled_app_index = 0);
+      int const                                                   this_app_index    = 0,
+      int const                                                   coupled_app_index = 0);
 
   ~Schwarz_BoundaryJacobian() = default;
 
@@ -46,8 +46,8 @@ class Schwarz_BoundaryJacobian : public Thyra_LinearOp
       const Thyra::EOpTransp                 M_trans,
       const Thyra_MultiVector&               X,
       const Teuchos::Ptr<Thyra_MultiVector>& Y,
-      const ST alpha = Teuchos::ScalarTraits<ST>::one(),
-      const ST beta  = Teuchos::ScalarTraits<ST>::zero()) const;
+      const ST                               alpha = Teuchos::ScalarTraits<ST>::one(),
+      const ST                               beta  = Teuchos::ScalarTraits<ST>::zero()) const;
 
   //! Overrides Thyra::LinearOpBase purely virtual method
   bool opSupportedImpl(Thyra::EOpTransp /*M_trans*/) const

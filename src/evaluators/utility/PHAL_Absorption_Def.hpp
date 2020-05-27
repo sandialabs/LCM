@@ -12,15 +12,11 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 Absorption<EvalT, Traits>::Absorption(Teuchos::ParameterList& p)
-    : absorption(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+    : absorption(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  Teuchos::ParameterList* cond_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* cond_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numQPs  = dims[1];
@@ -32,8 +28,7 @@ Absorption<EvalT, Traits>::Absorption(Teuchos::ParameterList& p)
     constant_value = cond_list->get("Value", 1.0);
 
     // Add absorption as a Sacado-ized parameter
-    Teuchos::RCP<ParamLib> paramLib =
-        p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+    Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
     this->registerSacadoParameter("Absorption", paramLib);
   } else {
     ALBANY_ABORT("Invalid absorption type " << type);
@@ -46,9 +41,7 @@ Absorption<EvalT, Traits>::Absorption(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-Absorption<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+Absorption<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(absorption, fm);
   if (!is_constant) this->utils.setFieldData(coordVec, fm);
@@ -61,9 +54,7 @@ Absorption<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   if (is_constant) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t qp = 0; qp < numQPs; ++qp) {
-        absorption(cell, qp) = constant_value;
-      }
+      for (std::size_t qp = 0; qp < numQPs; ++qp) { absorption(cell, qp) = constant_value; }
     }
   }
   /*else {
@@ -91,8 +82,7 @@ Absorption<EvalT, Traits>::getValue(std::string const& n)
   }*/
   ALBANY_ABORT(
       std::endl
-      << "Error! Logic error in getting paramter " << n
-      << " in Absorption::getValue()" << std::endl);
+      << "Error! Logic error in getting paramter " << n << " in Absorption::getValue()" << std::endl);
   return constant_value;
 }
 

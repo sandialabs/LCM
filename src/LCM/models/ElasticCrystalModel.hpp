@@ -54,9 +54,7 @@ class ElasticCrystalModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  ElasticCrystalModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ElasticCrystalModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Destructor
@@ -69,17 +67,11 @@ class ElasticCrystalModel : public LCM::ConstitutiveModel<EvalT, Traits>
   /// Method to compute the state (e.g. energy, stress, tangent)
   ///
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   // This capability not implemented yet.
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields)
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
   {
     ALBANY_ABORT("Not implemented.");
   }
@@ -97,8 +89,7 @@ class ElasticCrystalModel : public LCM::ConstitutiveModel<EvalT, Traits>
   operator=(const ElasticCrystalModel&);
 
   // Elastic crystal coefficients
-  RealType c11_, c22_, c33_, c44_, c55_, c66_, c12_, c13_, c23_, c15_, c25_,
-      c35_, c46_;
+  RealType c11_, c22_, c33_, c44_, c55_, c66_, c12_, c13_, c23_, c15_, c25_, c35_, c46_;
 
   // Fourth-order tensor of elastic coefficients.
   minitensor::Tensor4<RealType, EC::MAX_DIM> C_;

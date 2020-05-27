@@ -35,17 +35,13 @@ class ConstitutiveModelInterface : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Constructor
   ///
-  ConstitutiveModelInterface(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  ConstitutiveModelInterface(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Phalanx method to allocate space
   ///
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   ///
   /// Implementation of physics
@@ -72,9 +68,7 @@ class ConstitutiveModelInterface : public PHX::EvaluatorWithBaseImpl<Traits>,
   /// Initialization routine
   ///
   void
-  initializeModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  initializeModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Retrieve SV name from the state variable registration struct
@@ -137,8 +131,7 @@ class ConstitutiveModelInterface : public PHX::EvaluatorWithBaseImpl<Traits>,
   ///
   /// Dependent MDFields
   ///
-  std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT const>>>
-      dep_fields_map_;
+  std::map<std::string, Teuchos::RCP<PHX::MDField<ScalarT const>>> dep_fields_map_;
 
   ///
   /// Evaluated MDFields

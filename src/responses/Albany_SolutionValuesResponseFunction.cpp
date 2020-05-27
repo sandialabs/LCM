@@ -31,18 +31,13 @@ class SolutionValuesResponseFunction::SolutionPrinter
   const Teuchos::RCP<const Application>& app_;
 
  public:
-  SolutionPrinter(
-      const Teuchos::RCP<const Application>& app,
-      Teuchos::ParameterList&                response_parms)
-      : app_(app)
+  SolutionPrinter(const Teuchos::RCP<const Application>& app, Teuchos::ParameterList& response_parms) : app_(app)
   {
     filename_ = response_parms.get<std::string>("Output File");
   }
 
   static Teuchos::RCP<SolutionPrinter>
-  create(
-      const Teuchos::RCP<const Application>& app,
-      Teuchos::ParameterList&                response_parms)
+  create(const Teuchos::RCP<const Application>& app, Teuchos::ParameterList& response_parms)
   {
     if (response_parms.isType<std::string>("Output File"))
       return Teuchos::rcp(new SolutionPrinter(app, response_parms));
@@ -50,9 +45,7 @@ class SolutionValuesResponseFunction::SolutionPrinter
   }
 
   void
-  print(
-      Teuchos::RCP<Thyra_Vector const> const& g,
-      const Teuchos::Array<GO>&               eq_gids)
+  print(Teuchos::RCP<Thyra_Vector const> const& g, const Teuchos::Array<GO>& eq_gids)
   {
     do_print(getLocalData(g), eq_gids);
   }
@@ -64,9 +57,7 @@ class SolutionValuesResponseFunction::SolutionPrinter
   };
 
   void
-  do_print(
-      const Teuchos::ArrayRCP<const ST>& g,
-      const Teuchos::Array<GO>&          eq_gids)
+  do_print(const Teuchos::ArrayRCP<const ST>& g, const Teuchos::Array<GO>& eq_gids)
   {
     ALBANY_PANIC(g.size() != eq_gids.size(), "g.size() != eq_gids.size()");
 
@@ -91,8 +82,7 @@ class SolutionValuesResponseFunction::SolutionPrinter
       // Generally the node gid for the user starts at 1.
       out << std::setw(11) << node_gids[i] + 1;
       out << std::scientific;
-      for (int j = 0; j < ndim; ++j)
-        out << " " << std::setw(22) << coords[i].p[j];
+      for (int j = 0; j < ndim; ++j) out << " " << std::setw(22) << coords[i].p[j];
       out << " " << std::setw(22) << g[idxs[i]] << std::endl;
     }
     out.close();
@@ -107,16 +97,14 @@ class SolutionValuesResponseFunction::SolutionPrinter
       int&                      ndim,
       std::vector<std::size_t>& idxs)
   {
-    Teuchos::RCP<AbstractDiscretization> disc      = app_->getDiscretization();
-    const Teuchos::ArrayRCP<double>&     ov_coords = disc->getCoordinates();
-    Teuchos::RCP<const Thyra_SpmdVectorSpace> ov_node_vs =
-        getSpmdVectorSpace(disc->getOverlapNodeVectorSpace());
-    Teuchos::RCP<const Thyra_SpmdVectorSpace> node_vs =
-        getSpmdVectorSpace(disc->getNodeVectorSpace());
-    auto ov_node_indexer = createGlobalLocalIndexer(ov_node_vs);
-    auto node_indexer    = createGlobalLocalIndexer(node_vs);
-    ndim                 = disc->getNumDim();
-    int const neq        = disc->getNumEq();
+    Teuchos::RCP<AbstractDiscretization>      disc            = app_->getDiscretization();
+    const Teuchos::ArrayRCP<double>&          ov_coords       = disc->getCoordinates();
+    Teuchos::RCP<const Thyra_SpmdVectorSpace> ov_node_vs      = getSpmdVectorSpace(disc->getOverlapNodeVectorSpace());
+    Teuchos::RCP<const Thyra_SpmdVectorSpace> node_vs         = getSpmdVectorSpace(disc->getNodeVectorSpace());
+    auto                                      ov_node_indexer = createGlobalLocalIndexer(ov_node_vs);
+    auto                                      node_indexer    = createGlobalLocalIndexer(node_vs);
+    ndim                                                      = disc->getNumDim();
+    int const neq                                             = disc->getNumEq();
     for (int i = 0; i < eq_gids.size(); ++i) {
       const GO node_gid = eq_gids[i] / neq;
       if (!node_indexer->isLocallyOwnedElement(node_gid)) { continue; }
@@ -153,8 +141,7 @@ unsigned int
 SolutionValuesResponseFunction::numResponses() const
 {
   if (Teuchos::nonnull(cas_manager)) {
-    return getSpmdVectorSpace(cas_manager->getOverlappedVectorSpace())
-        ->localSubDim();
+    return getSpmdVectorSpace(cas_manager->getOverlappedVectorSpace())->localSubDim();
   }
   return 0u;
 }
@@ -173,8 +160,7 @@ SolutionValuesResponseFunction::evaluateResponse(
   cas_manager->scatter(*x, *culledVec, CombineMode::INSERT);
   getNonconstLocalData(g).deepCopy(getLocalData(culledVec.getConst())());
   if (Teuchos::nonnull(sol_printer_)) {
-    sol_printer_->print(
-        g, cullingStrategy_->selectedGIDs(app_->getVectorSpace()));
+    sol_printer_->print(g, cullingStrategy_->selectedGIDs(app_->getVectorSpace()));
   }
 }
 
@@ -198,16 +184,13 @@ SolutionValuesResponseFunction::evaluateGradient(
     // Import the selected gids
     cas_manager->scatter(*x, *culledVec, CombineMode::INSERT);
     getNonconstLocalData(g).deepCopy(getLocalData(culledVec.getConst())());
-    if (Teuchos::nonnull(sol_printer_))
-      sol_printer_->print(
-          g, cullingStrategy_->selectedGIDs(app_->getVectorSpace()));
+    if (Teuchos::nonnull(sol_printer_)) sol_printer_->print(g, cullingStrategy_->selectedGIDs(app_->getVectorSpace()));
   }
 
   if (!dg_dx.is_null()) {
     dg_dx->assign(0.0);
 
-    auto ov_vs_indexer =
-        createGlobalLocalIndexer(cas_manager->getOverlappedVectorSpace());
+    auto      ov_vs_indexer    = createGlobalLocalIndexer(cas_manager->getOverlappedVectorSpace());
     auto      deriv_vs_indexer = createGlobalLocalIndexer(dg_dx->range());
     int const colCount         = dg_dx->domain()->dim();
     for (int icol = 0; icol < colCount; ++icol) {
@@ -229,14 +212,10 @@ SolutionValuesResponseFunction::evaluateGradient(
 void
 SolutionValuesResponseFunction::updateCASManager()
 {
-  Teuchos::RCP<Thyra_VectorSpace const> const solutionVS =
-      app_->getVectorSpace();
-  if (cas_manager.is_null() ||
-      !sameAs(solutionVS, cas_manager->getOwnedVectorSpace())) {
-    const Teuchos::Array<GO> selectedGIDs =
-        cullingStrategy_->selectedGIDs(solutionVS);
-    Teuchos::RCP<Thyra_VectorSpace const> targetVS =
-        createVectorSpace(app_->getComm(), selectedGIDs);
+  Teuchos::RCP<Thyra_VectorSpace const> const solutionVS = app_->getVectorSpace();
+  if (cas_manager.is_null() || !sameAs(solutionVS, cas_manager->getOwnedVectorSpace())) {
+    const Teuchos::Array<GO>              selectedGIDs = cullingStrategy_->selectedGIDs(solutionVS);
+    Teuchos::RCP<Thyra_VectorSpace const> targetVS     = createVectorSpace(app_->getComm(), selectedGIDs);
 
     cas_manager = createCombineAndScatterManager(solutionVS, targetVS);
     culledVec   = Thyra::createMember(targetVS);

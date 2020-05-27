@@ -202,12 +202,7 @@ class SegmentT
   input, function will not evaluate derivatives.
   */
   bool
-  EvaluateFunction(
-      int           id,
-      const double* xi,
-      double*       val,
-      int           valdim,
-      double*       deriv);
+  EvaluateFunction(int id, const double* xi, double* val, int valdim, double* deriv);
 
   /*!
   \brief Build normal at a node adjacent to this Segment
@@ -303,14 +298,12 @@ class SegmentT
   //@}
 
  protected:
-  int              Id_;  // this segments unique id
-  int              outputlevel_;
-  std::vector<int> nodeId_;  // vector of unique node ids
-  std::vector<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>
-      nodeptr_;  // vector with ptrs to nodes adj to me
+  int                                                   Id_;  // this segments unique id
+  int                                                   outputlevel_;
+  std::vector<int>                                      nodeId_;   // vector of unique node ids
+  std::vector<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*> nodeptr_;  // vector with ptrs to nodes adj to me
 
-  std::map<int, Teuchos::RCP<MoertelT::FunctionT<FUNCT>>>
-      functions_;  // functions that live on this segment
+  std::map<int, Teuchos::RCP<MoertelT::FunctionT<FUNCT>>> functions_;  // functions that live on this segment
 };
 
 // Template specializations
@@ -474,9 +467,7 @@ struct BiLinearQuadSeg
 // << operator
 SEGMENT_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg);
+operator<<(std::ostream& os, const MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg);
 
 #ifndef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
 #include "Moertel_SegmentT_Def.hpp"

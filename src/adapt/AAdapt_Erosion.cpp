@@ -17,8 +17,7 @@ AAdapt::Erosion::Erosion(
     Teuchos::RCP<ParamLib> const&               param_lib,
     Albany::StateManager const&                 state_mgr,
     Teuchos::RCP<Teuchos_Comm const> const&     comm)
-    : AAdapt::AbstractAdapter(params, param_lib, state_mgr, comm),
-      remesh_file_index_(1)
+    : AAdapt::AbstractAdapter(params, param_lib, state_mgr, comm), remesh_file_index_(1)
 {
   discretization_     = state_mgr_.getDiscretization();
   auto* pdisc         = discretization_.get();
@@ -30,10 +29,8 @@ AAdapt::Erosion::Erosion(
 
   // Save the initial output file name
   base_exo_filename_      = stk_mesh_struct_->exoOutFile;
-  auto const lower_corner = params->get<Teuchos::Array<double>>(
-      "Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
-  auto const upper_corner = params->get<Teuchos::Array<double>>(
-      "Maximal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+  auto const lower_corner = params->get<Teuchos::Array<double>>("Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+  auto const upper_corner = params->get<Teuchos::Array<double>>("Maximal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
   params->validateParameters(*(getValidAdapterParameters()));
   auto const xm           = lower_corner[0];
   auto const ym           = lower_corner[1];
@@ -44,11 +41,9 @@ AAdapt::Erosion::Erosion(
   auto const bluff_height = zp - zm;
   auto const bluff_width  = yp - ym;
   cross_section_          = bluff_height * bluff_width;
-  topology_               = Teuchos::rcp(
-      new LCM::Topology(discretization_, "", "", xm, ym, zm, xp, yp, zp));
+  topology_               = Teuchos::rcp(new LCM::Topology(discretization_, "", "", xm, ym, zm, xp, yp, zp));
   std::string const failure_indicator_name = "Failure Indicator";
-  failure_criterion_                       = Teuchos::rcp(
-      new LCM::BulkFailureCriterion(*topology_, failure_indicator_name));
+  failure_criterion_ = Teuchos::rcp(new LCM::BulkFailureCriterion(*topology_, failure_indicator_name));
   topology_->set_failure_criterion(failure_criterion_);
 }
 
@@ -61,10 +56,7 @@ AAdapt::Erosion::queryAdaptationCriteria(int)
 namespace {
 
 void
-copyStateArray(
-    Albany::StateArrayVec const& src,
-    Albany::StateArrayVec&       dst,
-    AAdapt::StoreT&              store)
+copyStateArray(Albany::StateArrayVec const& src, Albany::StateArrayVec& dst, AAdapt::StoreT& store)
 {
   auto const num_ws = src.size();
   dst.resize(num_ws);
@@ -148,29 +140,21 @@ AAdapt::Erosion::transferStateArrays()
     return old_esa[old_ws][state](old_lid, qp);
   };
 
-  auto oldValue3 =
-      [&](int ws, std::string const& state, int lid, int qp, int i) {
-        auto old_wslid = mapWsLID(ws, lid);
-        auto old_ws    = old_wslid.first;
-        auto old_lid   = old_wslid.second;
-        return old_esa[old_ws][state](old_lid, qp, i);
-      };
+  auto oldValue3 = [&](int ws, std::string const& state, int lid, int qp, int i) {
+    auto old_wslid = mapWsLID(ws, lid);
+    auto old_ws    = old_wslid.first;
+    auto old_lid   = old_wslid.second;
+    return old_esa[old_ws][state](old_lid, qp, i);
+  };
 
-  auto oldValue4 =
-      [&](int ws, std::string const& state, int lid, int qp, int i, int j) {
-        auto old_wslid = mapWsLID(ws, lid);
-        auto old_ws    = old_wslid.first;
-        auto old_lid   = old_wslid.second;
-        return old_esa[old_ws][state](old_lid, qp, i, j);
-      };
+  auto oldValue4 = [&](int ws, std::string const& state, int lid, int qp, int i, int j) {
+    auto old_wslid = mapWsLID(ws, lid);
+    auto old_ws    = old_wslid.first;
+    auto old_lid   = old_wslid.second;
+    return old_esa[old_ws][state](old_lid, qp, i, j);
+  };
 
-  auto oldValue5 = [&](int                ws,
-                       std::string const& state,
-                       int                lid,
-                       int                qp,
-                       int                i,
-                       int                j,
-                       int                k) {
+  auto oldValue5 = [&](int ws, std::string const& state, int lid, int qp, int i, int j, int k) {
     auto old_wslid = mapWsLID(ws, lid);
     auto old_ws    = old_wslid.first;
     auto old_lid   = old_wslid.second;
@@ -229,7 +213,7 @@ AAdapt::Erosion::transferStateArrays()
                 for (int j = 0; j < dims[3]; ++j) {
                   for (int k = 0; k < dims[4]; ++k) {
                     double& value = new_esa[ws][state_name](cell, qp, i, j, k);
-                    value = oldValue5(ws, state_name, cell, qp, i, j, k);
+                    value         = oldValue5(ws, state_name, cell, qp, i, j, k);
                   }
                 }
               }
@@ -276,16 +260,13 @@ AAdapt::Erosion::adaptMesh()
   auto const rebalance = adapt_params_->get<bool>("Rebalance", false);
   if (rebalance == true) {
     auto stk_mesh_struct =
-        Teuchos::rcp_dynamic_cast<Albany::GenericSTKMeshStruct>(
-            stk_discretization_->getSTKMeshStruct());
+        Teuchos::rcp_dynamic_cast<Albany::GenericSTKMeshStruct>(stk_discretization_->getSTKMeshStruct());
     stk_mesh_struct->rebalanceAdaptedMeshT(adapt_params_, teuchos_comm_);
   }
   stk_discretization_->updateMesh();
 
-  *output_stream_ << "*** ACE INFO: Eroded Volume : " << erosion_volume_
-                  << '\n';
-  *output_stream_ << "*** ACE INFO: Eroded Length : "
-                  << erosion_volume_ / cross_section_ << '\n';
+  *output_stream_ << "*** ACE INFO: Eroded Volume : " << erosion_volume_ << '\n';
+  *output_stream_ << "*** ACE INFO: Eroded Length : " << erosion_volume_ / cross_section_ << '\n';
 
   return true;
 }
@@ -299,18 +280,12 @@ Teuchos::RCP<Teuchos::ParameterList const>
 AAdapt::Erosion::getValidAdapterParameters() const
 {
   auto valid_pl = this->getGenericAdapterParams("Valid Erosion Params");
-  valid_pl->set<bool>(
-      "Equilibrate", false, "Perform a steady solve after adaptation");
-  valid_pl->set<bool>(
-      "Rebalance", true, "Rebalance mesh after adaptation in parallel runs");
+  valid_pl->set<bool>("Equilibrate", false, "Perform a steady solve after adaptation");
+  valid_pl->set<bool>("Rebalance", true, "Rebalance mesh after adaptation in parallel runs");
   valid_pl->set<Teuchos::Array<double>>(
-      "Minimal Point",
-      Teuchos::tuple<double>(0.0, 0.0, 0.0),
-      "Minimal coordinates defining erosion block");
+      "Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0), "Minimal coordinates defining erosion block");
   valid_pl->set<Teuchos::Array<double>>(
-      "Maximal Point",
-      Teuchos::tuple<double>(0.0, 0.0, 0.0),
-      "Maximal coordinates defining erosion block");
+      "Maximal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0), "Maximal coordinates defining erosion block");
   return valid_pl;
 }
 

@@ -8,9 +8,7 @@
 
 #include "Albany_Utils.hpp"
 
-NOX::StatusTest::ModelEvaluatorFlag::ModelEvaluatorFlag() : status_(Unevaluated)
-{
-}
+NOX::StatusTest::ModelEvaluatorFlag::ModelEvaluatorFlag() : status_(Unevaluated) {}
 
 NOX::StatusTest::ModelEvaluatorFlag::~ModelEvaluatorFlag() {}
 
@@ -63,10 +61,8 @@ NOX::StatusTest::ModelEvaluatorFlag::syncFlag()
     localVal[0] = 3;
   }
 
-  Teuchos::RCP<Teuchos_Comm const> teuchosComm =
-      Albany::createTeuchosCommFromMpiComm(Albany_MPI_COMM_WORLD);
-  Teuchos::reduceAll(
-      *teuchosComm, Teuchos::REDUCE_MAX, 1, &localVal[0], &globalVal[0]);
+  Teuchos::RCP<Teuchos_Comm const> teuchosComm = Albany::createTeuchosCommFromMpiComm(Albany_MPI_COMM_WORLD);
+  Teuchos::reduceAll(*teuchosComm, Teuchos::REDUCE_MAX, 1, &localVal[0], &globalVal[0]);
 
   if (globalVal[0] == 0) {
     status_ = NOX::StatusTest::Unevaluated;
@@ -80,8 +76,7 @@ NOX::StatusTest::ModelEvaluatorFlag::syncFlag()
 }
 
 std::ostream&
-NOX::StatusTest::ModelEvaluatorFlag::print(std::ostream& stream, int indent)
-    const
+NOX::StatusTest::ModelEvaluatorFlag::print(std::ostream& stream, int indent) const
 {
   for (int j = 0; j < indent; j++) { stream << ' '; }
   stream << status_;

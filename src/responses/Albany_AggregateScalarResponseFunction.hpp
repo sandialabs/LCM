@@ -14,8 +14,7 @@ namespace Albany {
  * \brief A response function that aggregates together multiple response
  * functions into one.
  */
-class AggregateScalarResponseFunction
-    : public SamplingBasedScalarResponseFunction
+class AggregateScalarResponseFunction : public SamplingBasedScalarResponseFunction
 {
  public:
   //! Default constructor

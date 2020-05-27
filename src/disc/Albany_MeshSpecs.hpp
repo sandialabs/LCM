@@ -75,9 +75,8 @@ struct MeshSpecsStruct
   Intrepid2::EPolyType cubatureRule;
 
   // We store the side meshes names so we have a way to index them with a number
-  std::map<std::string, Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>>>
-                           sideSetMeshSpecs;
-  std::vector<std::string> sideSetMeshNames;
+  std::map<std::string, Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>>> sideSetMeshSpecs;
+  std::vector<std::string>                                                sideSetMeshNames;
 };
 
 }  // namespace Albany

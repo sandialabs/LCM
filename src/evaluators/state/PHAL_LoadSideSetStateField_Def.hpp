@@ -12,22 +12,18 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits, typename ScalarType>
-LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::LoadSideSetStateFieldBase(
-    Teuchos::ParameterList const& p)
+LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::LoadSideSetStateFieldBase(Teuchos::ParameterList const& p)
 {
   sideSetName = p.get<std::string>("Side Set Name");
 
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");
 
-  field = PHX::MDField<ScalarType>(
-      fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout"));
+  field = PHX::MDField<ScalarType>(fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout"));
 
   this->addEvaluatedField(field);
 
-  this->setName(
-      "Load Side Set Field " + fieldName + " from Side Set State " + stateName +
-      PHX::print<EvalT>());
+  this->setName("Load Side Set Field " + fieldName + " from Side Set State " + stateName + PHX::print<EvalT>());
 }
 
 // **********************************************************************
@@ -44,41 +40,27 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits, typename ScalarType>
 void
-LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
-    typename Traits::EvalData workset)
+LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(typename Traits::EvalData workset)
 {
-  ALBANY_PANIC(
-      workset.sideSets == Teuchos::null,
-      "Error! The mesh does not store any side set.\n");
+  ALBANY_PANIC(workset.sideSets == Teuchos::null, "Error! The mesh does not store any side set.\n");
 
-  if (workset.sideSets->find(sideSetName) == workset.sideSets->end())
-    return;  // Side set not present in this workset
+  if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) return;  // Side set not present in this workset
 
-  ALBANY_PANIC(
-      workset.disc == Teuchos::null,
-      "Error! The workset must store a valid discretization pointer.\n");
+  ALBANY_PANIC(workset.disc == Teuchos::null, "Error! The workset must store a valid discretization pointer.\n");
 
-  const Albany::AbstractDiscretization::SideSetDiscretizationsType& ssDiscs =
-      workset.disc->getSideSetDiscretizations();
+  const Albany::AbstractDiscretization::SideSetDiscretizationsType& ssDiscs = workset.disc->getSideSetDiscretizations();
 
-  ALBANY_PANIC(
-      ssDiscs.size() == 0,
-      "Error! The discretization must store side set discretizations.\n");
+  ALBANY_PANIC(ssDiscs.size() == 0, "Error! The discretization must store side set discretizations.\n");
 
   ALBANY_PANIC(
       ssDiscs.find(sideSetName) == ssDiscs.end(),
       "Error! No discretization found for side set " << sideSetName << ".\n");
 
-  Teuchos::RCP<Albany::AbstractDiscretization> ss_disc =
-      ssDiscs.at(sideSetName);
+  Teuchos::RCP<Albany::AbstractDiscretization> ss_disc = ssDiscs.at(sideSetName);
 
-  ALBANY_PANIC(
-      ss_disc == Teuchos::null,
-      "Error! Side discretization is invalid for side set " << sideSetName
-                                                            << ".\n");
+  ALBANY_PANIC(ss_disc == Teuchos::null, "Error! Side discretization is invalid for side set " << sideSetName << ".\n");
 
-  std::map<std::string, std::map<GO, GO>> const& ss_maps =
-      workset.disc->getSideToSideSetCellMap();
+  std::map<std::string, std::map<GO, GO>> const& ss_maps = workset.disc->getSideToSideSetCellMap();
 
   ALBANY_PANIC(
       ss_maps.find(sideSetName) == ss_maps.end(),
@@ -95,8 +77,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
 
   // Get side_node->side_set_cell_node map from discretization
   ALBANY_PANIC(
-      workset.disc->getSideNodeNumerationMap().find(sideSetName) ==
-          workset.disc->getSideNodeNumerationMap().end(),
+      workset.disc->getSideNodeNumerationMap().find(sideSetName) == workset.disc->getSideNodeNumerationMap().end(),
       "Error! Sideset " << sideSetName << " has no sideNodeNumeration map.\n");
   std::map<GO, std::vector<int>> const& sideNodeNumerationMap =
       workset.disc->getSideNodeNumerationMap().at(sideSetName);
@@ -105,15 +86,13 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
   int                size = dims.size();
-  std::string const& tag2 =
-      size > 2 ? field.fieldTag().dataLayout().name(2) : "";
+  std::string const& tag2 = size > 2 ? field.fieldTag().dataLayout().name(2) : "";
   ALBANY_PANIC(
       size > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim",
       "Error! Invalid field layout in LoadSideSetStateField.\n");
 
   // Loop on the sides of this sideSet that are in this workset
-  std::vector<Albany::SideStruct> const& sideSet =
-      workset.sideSets->at(sideSetName);
+  std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
     // Get the data that corresponds to the side
     int const side_GID = it_side.side_GID;
@@ -143,8 +122,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
     // state in the right 2D-ws
     ALBANY_PANIC(
         esa[wsIndex2D].find(stateName) == esa[wsIndex2D].end(),
-        "Error! Cannot locate " << stateName
-                                << " in PHAL_LoadSideSetStateField_Def.\n");
+        "Error! Cannot locate " << stateName << " in PHAL_LoadSideSetStateField_Def.\n");
     Albany::MDArray state = esa[wsIndex2D].at(stateName);
 
     std::vector<int> const& nodeMap = sideNodeNumerationMap.at(side_GID);
@@ -161,14 +139,10 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
       case 3:
         if (tag2 == "Node") {
           // side set node scalar
-          for (int node = 0; node < dims[2]; ++node) {
-            field(cell, side, node) = state(ss_cell, nodeMap[node]);
-          }
+          for (int node = 0; node < dims[2]; ++node) { field(cell, side, node) = state(ss_cell, nodeMap[node]); }
         } else {
           // side set cell vector/gradient
-          for (int idim = 0; idim < dims[2]; ++idim) {
-            field(cell, side, idim) = state(ss_cell, idim);
-          }
+          for (int idim = 0; idim < dims[2]; ++idim) { field(cell, side, idim) = state(ss_cell, idim); }
         }
         break;
 
@@ -176,22 +150,17 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(
         if (tag2 == "Node") {
           // side set node vector/gradient
           for (int node = 0; node < dims[2]; ++node) {
-            for (int dim = 0; dim < dims[3]; ++dim)
-              field(cell, side, node, dim) = state(ss_cell, nodeMap[node], dim);
+            for (int dim = 0; dim < dims[3]; ++dim) field(cell, side, node, dim) = state(ss_cell, nodeMap[node], dim);
           }
         } else {
           // side set cell tensor
           for (int idim = 0; idim < dims[2]; ++idim) {
-            for (int jdim = 0; jdim < dims[3]; ++jdim)
-              field(cell, side, idim, jdim) = state(ss_cell, idim, jdim);
+            for (int jdim = 0; jdim < dims[3]; ++jdim) field(cell, side, idim, jdim) = state(ss_cell, idim, jdim);
           }
         }
         break;
 
-      default:
-        ALBANY_ABORT(
-            "Error! Unexpected array dimensions in LoadSideSetStateField: "
-            << size << ".\n");
+      default: ALBANY_ABORT("Error! Unexpected array dimensions in LoadSideSetStateField: " << size << ".\n");
     }
   }
 }

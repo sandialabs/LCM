@@ -21,10 +21,7 @@ class ParameterEnum
   using ValueType = typename MapType::value_type;
 
   ParameterEnum() : m_default(T()) {}
-  ParameterEnum(
-      std::string const&               name,
-      T                                def,
-      std::initializer_list<ValueType> init);
+  ParameterEnum(std::string const& name, T def, std::initializer_list<ValueType> init);
 
   T
   get(std::string const& key) const;
@@ -44,9 +41,7 @@ template <typename T>
 class BadParameterEnumException : std::exception
 {
  public:
-  explicit BadParameterEnumException(
-      std::string const&      key,
-      ParameterEnum<T> const& e);
+  explicit BadParameterEnumException(std::string const& key, ParameterEnum<T> const& e);
 
   virtual char const*
   what() const noexcept
@@ -60,10 +55,7 @@ class BadParameterEnumException : std::exception
 }  // namespace utility
 
 template <typename T>
-utility::ParameterEnum<T>::ParameterEnum(
-    std::string const&               name,
-    T                                def,
-    std::initializer_list<ValueType> init)
+utility::ParameterEnum<T>::ParameterEnum(std::string const& name, T def, std::initializer_list<ValueType> init)
     : m_map(init), m_default(def), m_name(name)
 {
 }
@@ -89,13 +81,11 @@ utility::ParameterEnum<T>::get(Teuchos::ParameterList const* p) const
 }
 
 template <typename T>
-utility::BadParameterEnumException<T>::BadParameterEnumException(
-    std::string const&      key,
-    ParameterEnum<T> const& e)
+utility::BadParameterEnumException<T>::BadParameterEnumException(std::string const& key, ParameterEnum<T> const& e)
 {
   std::stringstream ss;
-  ss << "\n**** Bad Parameter Enum: invalid value \"" << key << "\" for enum \""
-     << e.m_name << "\". Must be one of the following:\n";
+  ss << "\n**** Bad Parameter Enum: invalid value \"" << key << "\" for enum \"" << e.m_name
+     << "\". Must be one of the following:\n";
 
   for (auto&& iter : e.m_map) ss << "\t" << iter.first << "\n";
 

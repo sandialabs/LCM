@@ -31,9 +31,7 @@ class Application;  // Forward declaration
 
 //! Factory function
 Teuchos::RCP<SolutionCullingStrategyBase>
-createSolutionCullingStrategy(
-    const Teuchos::RCP<const Application>& app,
-    Teuchos::ParameterList&                params);
+createSolutionCullingStrategy(const Teuchos::RCP<const Application>& app, Teuchos::ParameterList& params);
 
 }  // namespace Albany
 

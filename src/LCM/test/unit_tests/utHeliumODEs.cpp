@@ -20,13 +20,12 @@
 
 namespace {
 
-typedef PHX::MDField<PHAL::AlbanyTraits::Residual::ScalarT>::size_type
-                                                   size_type;
-typedef PHAL::AlbanyTraits::Residual               Residual;
-typedef PHAL::AlbanyTraits::Residual::ScalarT      ScalarT;
-typedef PHAL::AlbanyTraits                         Traits;
-typedef Kokkos::DynRankView<RealType, PHX::Device> FC;
-typedef shards::CellTopology                       CT;
+typedef PHX::MDField<PHAL::AlbanyTraits::Residual::ScalarT>::size_type size_type;
+typedef PHAL::AlbanyTraits::Residual                                   Residual;
+typedef PHAL::AlbanyTraits::Residual::ScalarT                          ScalarT;
+typedef PHAL::AlbanyTraits                                             Traits;
+typedef Kokkos::DynRankView<RealType, PHX::Device>                     FC;
+typedef shards::CellTopology                                           CT;
 using minitensor::bun;
 using minitensor::eye;
 using minitensor::norm;
@@ -40,8 +39,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
 {
   // A mpi object must be instantiated
   Teuchos::GlobalMPISession        mpi_session(void);
-  Teuchos::RCP<Teuchos_Comm const> commT =
-      Albany::createTeuchosCommFromMpiComm(Albany_MPI_COMM_WORLD);
+  Teuchos::RCP<Teuchos_Comm const> commT = Albany::createTeuchosCommFromMpiComm(Albany_MPI_COMM_WORLD);
 
   // Get the name of the material model to be used (and make sure there is one)
   std::string element_block_name = "Block0";
@@ -54,8 +52,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   int const                  num_dims     = 3;
   int const                  num_vertices = 8;
   int const                  num_nodes    = 8;
-  const RCP<Albany::Layouts> dl           = rcp(new Albany::Layouts(
-      workset_size, num_vertices, num_nodes, num_pts, num_dims));
+  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(workset_size, num_vertices, num_nodes, num_pts, num_dims));
 
   // total concentration
   ArrayRCP<ScalarT> total_concentration(1);
@@ -65,8 +62,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   tcPL.set<std::string>("Evaluated Field Name", "Total Concentration");
   tcPL.set<ArrayRCP<ScalarT>>("Field Values", total_concentration);
   tcPL.set<RCP<PHX::DataLayout>>("Evaluated Field Data Layout", dl->qp_scalar);
-  RCP<LCM::SetField<Residual, Traits>> setFieldTotalConcentration =
-      rcp(new LCM::SetField<Residual, Traits>(tcPL));
+  RCP<LCM::SetField<Residual, Traits>> setFieldTotalConcentration = rcp(new LCM::SetField<Residual, Traits>(tcPL));
 
   // delta time
   ArrayRCP<ScalarT> delta_time(1);
@@ -75,10 +71,8 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   Teuchos::ParameterList dtPL;
   dtPL.set<std::string>("Evaluated Field Name", "Delta Time");
   dtPL.set<ArrayRCP<ScalarT>>("Field Values", delta_time);
-  dtPL.set<RCP<PHX::DataLayout>>(
-      "Evaluated Field Data Layout", dl->workset_scalar);
-  RCP<LCM::SetField<Residual, Traits>> setFieldDeltaTime =
-      rcp(new LCM::SetField<Residual, Traits>(dtPL));
+  dtPL.set<RCP<PHX::DataLayout>>("Evaluated Field Data Layout", dl->workset_scalar);
+  RCP<LCM::SetField<Residual, Traits>> setFieldDeltaTime = rcp(new LCM::SetField<Residual, Traits>(dtPL));
 
   // diffusion coeffecient
   ArrayRCP<ScalarT> diff_coeff(1);
@@ -88,8 +82,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   dcPL.set<std::string>("Evaluated Field Name", "Diffusion Coefficient");
   dcPL.set<ArrayRCP<ScalarT>>("Field Values", diff_coeff);
   dcPL.set<RCP<PHX::DataLayout>>("Evaluated Field Data Layout", dl->qp_scalar);
-  RCP<LCM::SetField<Residual, Traits>> setFieldDiffCoeff =
-      rcp(new LCM::SetField<Residual, Traits>(dcPL));
+  RCP<LCM::SetField<Residual, Traits>> setFieldDiffCoeff = rcp(new LCM::SetField<Residual, Traits>(dcPL));
 
   // helium ODEs evaluator
   Teuchos::ParameterList hoPL;
@@ -98,8 +91,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   hoPL.set<std::string>("Diffusion Coefficient Name", "Diffusion Coefficient");
   hoPL.set<std::string>("He Concentration Name", "He Concentration");
   hoPL.set<std::string>("Total Bubble Density Name", "Total Bubble Density");
-  hoPL.set<std::string>(
-      "Bubble Volume Fraction Name", "Bubble Volume Fraction");
+  hoPL.set<std::string>("Bubble Volume Fraction Name", "Bubble Volume Fraction");
   // Transport Parameters
   Teuchos::ParameterList trans_params;
   trans_params.set<double>("Avogadro's Number", 6.0221413e11);
@@ -117,8 +109,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   mol_vol.set<double>("Value", 7.116);
   hoPL.set<Teuchos::ParameterList*>("Molar Volume", &mol_vol);
 
-  RCP<LCM::HeliumODEs<Residual, Traits>> HeODEs =
-      rcp(new LCM::HeliumODEs<Residual, Traits>(hoPL, dl));
+  RCP<LCM::HeliumODEs<Residual, Traits>> HeODEs = rcp(new LCM::HeliumODEs<Residual, Traits>(hoPL, dl));
 
   // Instantiate a field manager.
   PHX::FieldManager<Traits> field_manager;
@@ -139,8 +130,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   state_field_manager.registerEvaluator<Residual>(HeODEs);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it =
-           HeODEs->evaluatedFields().begin();
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = HeODEs->evaluatedFields().begin();
        it != HeODEs->evaluatedFields().end();
        it++)
     field_manager.requireField<Residual>(**it);
@@ -207,17 +197,13 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   PHAL::Setup setupData;
   field_manager.postRegistrationSetup(setupData);
 
-  Teuchos::RCP<PHX::DataLayout> dummy =
-      Teuchos::rcp(new PHX::MDALayout<Dummy>(0));
-  std::vector<std::string> responseIDs =
-      stateMgr.getResidResponseIDsToRequire(element_block_name);
+  Teuchos::RCP<PHX::DataLayout>            dummy       = Teuchos::rcp(new PHX::MDALayout<Dummy>(0));
+  std::vector<std::string>                 responseIDs = stateMgr.getResidResponseIDsToRequire(element_block_name);
   std::vector<std::string>::const_iterator it;
   for (it = responseIDs.begin(); it != responseIDs.end(); it++) {
     std::string const&                              responseID = *it;
-    PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT> res_response_tag(
-        responseID, dummy);
-    state_field_manager.requireField<PHAL::AlbanyTraits::Residual>(
-        res_response_tag);
+    PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT> res_response_tag(responseID, dummy);
+    state_field_manager.requireField<PHAL::AlbanyTraits::Residual>(res_response_tag);
   }
   state_field_manager.postRegistrationSetup(setupData);
 
@@ -236,20 +222,17 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   discretizationParameterList->set<int>("3D Elements", 1);
   discretizationParameterList->set<std::string>("Method", "STK3D");
   discretizationParameterList->set<int>("Number Of Time Derivatives", 0);
-  discretizationParameterList->set<std::string>(
-      "Exodus Output File Name", output_file);
+  discretizationParameterList->set<std::string>("Exodus Output File Name", output_file);
   Teuchos::RCP<Thyra_VectorSpace const> space =
-      Albany::createLocallyReplicatedVectorSpace(
-          workset_size * num_dims * num_nodes, commT);
+      Albany::createLocallyReplicatedVectorSpace(workset_size * num_dims * num_nodes, commT);
 
   Teuchos::RCP<Thyra_Vector> solution_vector = Thyra::createMember(space);
 
-  int numberOfEquations = 3;
+  int                                                        numberOfEquations = 3;
   Albany::AbstractFieldContainer::FieldContainerRequirements req;
 
   Teuchos::RCP<Albany::AbstractSTKMeshStruct> stkMeshStruct =
-      Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(
-          discretizationParameterList, Teuchos::null, commT));
+      Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(discretizationParameterList, Teuchos::null, commT));
   stkMeshStruct->setFieldAndBulkData(
       commT,
       discretizationParameterList,
@@ -259,8 +242,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
       stkMeshStruct->getMeshSpecs()[0]->worksetSize);
 
   Teuchos::RCP<Albany::AbstractDiscretization> discretization =
-      Teuchos::rcp(new Albany::STKDiscretization(
-          discretizationParameterList, stkMeshStruct, commT));
+      Teuchos::rcp(new Albany::STKDiscretization(discretizationParameterList, stkMeshStruct, commT));
   auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discretization);
   stk_disc.updateMesh();
 
@@ -269,9 +251,8 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
 
   // Create a workset
   PHAL::Workset workset;
-  workset.numCells = workset_size;
-  workset.stateArrayPtr =
-      &stateMgr.getStateArray(Albany::StateManager::ELEM, 0);
+  workset.numCells      = workset_size;
+  workset.stateArrayPtr = &stateMgr.getStateArray(Albany::StateManager::ELEM, 0);
 
   // loop over time and call evaluators
   double end_time = 100.0;
@@ -295,39 +276,33 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   }
 
   // Pull the He concentration
-  PHX::MDField<ScalarT, Cell, QuadPoint> he_conc(
-      "He Concentration", dl->qp_scalar);
+  PHX::MDField<ScalarT, Cell, QuadPoint> he_conc("He Concentration", dl->qp_scalar);
   field_manager.getFieldData<Residual>(he_conc);
 
   // Record the expected concentration
   double expected_conc(0.0);
   for (size_type cell = 0; cell < workset_size; ++cell)
-    for (size_type pt = 0; pt < num_pts; ++pt)
-      TEST_COMPARE(fabs(he_conc(cell, pt) - expected_conc), <=, tolerance);
+    for (size_type pt = 0; pt < num_pts; ++pt) TEST_COMPARE(fabs(he_conc(cell, pt) - expected_conc), <=, tolerance);
 
   // Pull the total bubble density
-  PHX::MDField<ScalarT, Cell, QuadPoint> tot_bub_density(
-      "Total Bubble Density", dl->qp_scalar);
+  PHX::MDField<ScalarT, Cell, QuadPoint> tot_bub_density("Total Bubble Density", dl->qp_scalar);
   field_manager.getFieldData<Residual>(tot_bub_density);
 
   // Record the bubble density
   double expected_density(0.0);
   for (size_type cell = 0; cell < workset_size; ++cell)
     for (size_type pt = 0; pt < num_pts; ++pt)
-      TEST_COMPARE(
-          fabs(tot_bub_density(cell, pt) - expected_density), <=, tolerance);
+      TEST_COMPARE(fabs(tot_bub_density(cell, pt) - expected_density), <=, tolerance);
 
   // Pull the bubble volume fraction
-  PHX::MDField<ScalarT, Cell, QuadPoint> bub_vol_frac(
-      "Bubble Volume Fraction", dl->qp_scalar);
+  PHX::MDField<ScalarT, Cell, QuadPoint> bub_vol_frac("Bubble Volume Fraction", dl->qp_scalar);
   field_manager.getFieldData<Residual>(bub_vol_frac);
 
   // Record the bubble volume fraction
   double expected_vol_frac(0.0);
   for (size_type cell = 0; cell < workset_size; ++cell)
     for (size_type pt = 0; pt < num_pts; ++pt)
-      TEST_COMPARE(
-          fabs(bub_vol_frac(cell, pt) - expected_vol_frac), <=, tolerance);
+      TEST_COMPARE(fabs(bub_vol_frac(cell, pt) - expected_vol_frac), <=, tolerance);
 }
 
 }  // namespace

@@ -193,24 +193,21 @@ class PointT
   PointT(MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) & old);
 
  private:
-  int    id_;  // id of this point
-  int    outputlevel_;
-  double xi_[2];  // local coords in some slave elements coord system
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>
-                      node_;  // a node at this point (contains real world coords)
-  std::vector<double> vals_[3];  // [0] values of shape function 0 from sseg
-                                 // [1] values of shape function 1 from sseg
-                                 // [2] values of shape function 0 from mseg
-};                               // class Point
+  int                                                   id_;  // id of this point
+  int                                                   outputlevel_;
+  double                                                xi_[2];    // local coords in some slave elements coord system
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> node_;     // a node at this point (contains real world coords)
+  std::vector<double>                                   vals_[3];  // [0] values of shape function 0 from sseg
+                                                                   // [1] values of shape function 1 from sseg
+                                                                   // [2] values of shape function 0 from mseg
+};                                                                 // class Point
 
 }  // namespace MoertelT
 
 // << operator
 MOERTEL_TEMPLATE_STATEMENT
 std::ostream&
-operator<<(
-    std::ostream& os,
-    const MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) & point);
+operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) & point);
 
 #ifndef HAVE_MOERTEL_EXPLICIT_INSTANTIATION
 #include "Moertel_PointT_Def.hpp"

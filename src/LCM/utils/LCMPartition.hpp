@@ -129,9 +129,7 @@ template <typename Node>
 class KDTree
 {
  public:
-  KDTree(
-      std::vector<minitensor::Vector<double>> const& points,
-      minitensor::Index const                        number_centers);
+  KDTree(std::vector<minitensor::Vector<double>> const& points, minitensor::Index const number_centers);
 
   std::shared_ptr<Node>&
   get_root()
@@ -202,9 +200,7 @@ struct OutputVisitor
 template <typename Node, typename Center>
 struct FilterVisitor
 {
-  FilterVisitor(
-      std::vector<minitensor::Vector<double>>& p,
-      std::vector<Center>&                     c);
+  FilterVisitor(std::vector<minitensor::Vector<double>>& p, std::vector<Center>& c);
 
   void
   operator()(Node const& node) const;
@@ -237,9 +233,7 @@ class ConnectivityArray
   /// \param input_file Exodus II input file name
   /// \param output_file Exodus II output file name
   ///
-  ConnectivityArray(
-      std::string const& input_file,
-      std::string const& output_file);
+  ConnectivityArray(std::string const& input_file, std::string const& output_file);
 
   ///
   /// \return Number of nodes on the array
@@ -440,9 +434,7 @@ class ConnectivityArray
   /// \return Partition number for each element
   ///
   std::map<int, int>
-  partition(
-      const PARTITION::Scheme partition_scheme,
-      double const            length_scale);
+  partition(const PARTITION::Scheme partition_scheme, double const length_scale);
 
   ///
   /// Partition mesh with Zoltan Hypergraph algorithm
@@ -936,12 +928,7 @@ class ZoltanHyperGraph
   /// \param ierr  Error code to be set by function.
   ///
   static void
-  getHyperGraphSize(
-      void* data,
-      int*  num_lists,
-      int*  num_pins,
-      int*  format,
-      int*  ierr);
+  getHyperGraphSize(void* data, int* num_lists, int* num_pins, int* format, int* ierr);
 
   ///
   /// Zoltan interface function that returns the hypergraph in
@@ -1029,9 +1016,7 @@ operator>>(std::istream& input_stream, ConnectivityArray& connectivity_array);
 /// \param connectivity_array Connectivity array
 ///
 std::ostream&
-operator<<(
-    std::ostream&            output_stream,
-    ConnectivityArray const& connectivity_array);
+operator<<(std::ostream& output_stream, ConnectivityArray const& connectivity_array);
 
 ///
 /// Read a Zoltan Hyperedge Graph from an input stream
@@ -1047,9 +1032,7 @@ operator>>(std::istream& input_stream, ZoltanHyperGraph& zoltan_hypergraph);
 /// \param zoltan_hypergraph Zoltan Hypergraph
 ///
 std::ostream&
-operator<<(
-    std::ostream&           output_stream,
-    ZoltanHyperGraph const& zoltan_hypergraph);
+operator<<(std::ostream& output_stream, ZoltanHyperGraph const& zoltan_hypergraph);
 
 }  // namespace LCM
 

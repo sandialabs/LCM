@@ -17,40 +17,20 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
-      intrepidBasis(
-          p.get<
-              Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>(
-              "Intrepid2 Basis")),
-      scalarGrad(
-          p.get<std::string>("Surface Transport Gradient Name"),
-          dl->qp_vector),
-      surface_Grad_BF(
-          p.get<std::string>("Surface Scalar Gradient Operator Transport Name"),
-          dl->node_qp_gradient),
-      refDualBasis(
-          p.get<std::string>("Reference Dual Basis Name"),
-          dl->qp_tensor),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
+      scalarGrad(p.get<std::string>("Surface Transport Gradient Name"), dl->qp_vector),
+      surface_Grad_BF(p.get<std::string>("Surface Scalar Gradient Operator Transport Name"), dl->node_qp_gradient),
+      refDualBasis(p.get<std::string>("Reference Dual Basis Name"), dl->qp_tensor),
       refNormal(p.get<std::string>("Reference Normal Name"), dl->qp_vector),
       refArea(p.get<std::string>("Reference Area Name"), dl->qp_scalar),
       transport_(p.get<std::string>("Transport Name"), dl->qp_scalar),
-      nodal_transport_(
-          p.get<std::string>("Nodal Transport Name"),
-          dl->node_scalar),
+      nodal_transport_(p.get<std::string>("Nodal Transport Name"), dl->node_scalar),
       dL_(p.get<std::string>("Diffusion Coefficient Name"), dl->qp_scalar),
-      eff_diff_(
-          p.get<std::string>("Effective Diffusivity Name"),
-          dl->qp_scalar),
-      convection_coefficient_(
-          p.get<std::string>("Tau Contribution Name"),
-          dl->qp_scalar),
-      strain_rate_factor_(
-          p.get<std::string>("Strain Rate Factor Name"),
-          dl->qp_scalar),
-      hydro_stress_gradient_(
-          p.get<std::string>("Surface HydroStress Gradient Name"),
-          dl->qp_vector),
+      eff_diff_(p.get<std::string>("Effective Diffusivity Name"), dl->qp_scalar),
+      convection_coefficient_(p.get<std::string>("Tau Contribution Name"), dl->qp_scalar),
+      strain_rate_factor_(p.get<std::string>("Strain Rate Factor Name"), dl->qp_scalar),
+      hydro_stress_gradient_(p.get<std::string>("Surface HydroStress Gradient Name"), dl->qp_vector),
       eqps_(p.get<std::string>("eqps Name"), dl->qp_scalar),
       deltaTime(p.get<std::string>("Delta Time Name"), dl->workset_scalar),
       element_length_(p.get<std::string>("Element Length Name"), dl->qp_scalar),
@@ -82,8 +62,7 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
   if (p.isType<std::string>("DefGrad Name")) {
     haveMech = true;
 
-    defGrad =
-        decltype(defGrad)(p.get<std::string>("DefGrad Name"), dl->qp_tensor);
+    defGrad = decltype(defGrad)(p.get<std::string>("DefGrad Name"), dl->qp_tensor);
     this->addDependentField(defGrad);
 
     J = decltype(J)(p.get<std::string>("DetDefGrad Name"), dl->qp_scalar);
@@ -106,10 +85,8 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
   std::cout << " numPlaneNodes: " << numPlaneNodes << std::endl;
   std::cout << " numPlaneDims: " << numPlaneDims << std::endl;
   std::cout << " numQPs: " << numQPs << std::endl;
-  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints()
-            << std::endl;
-  std::cout << " cubature->getDimension(): " << cubature->getDimension()
-            << std::endl;
+  std::cout << " cubature->getNumPoints(): " << cubature->getNumPoints() << std::endl;
+  std::cout << " cubature->getDimension(): " << cubature->getDimension() << std::endl;
 #endif
 
   transportName = p.get<std::string>("Transport Name") + "_old";
@@ -147,24 +124,17 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::postRegistrationSetup(
   }
 
   // Allocate Temporary Views
-  refValues =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
-  refGrads = Kokkos::DynRankView<RealType, PHX::Device>(
-      "XXX", numPlaneNodes, numQPs, numPlaneDims);
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
+  refValues  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs);
+  refGrads   = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numPlaneNodes, numQPs, numPlaneDims);
+  refPoints  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numPlaneDims);
   refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
 
   // Allocate workspace
-  artificalDL = Kokkos::createDynRankView(
-      scalarGrad.get_view(), "XXX", worksetSize, numQPs);
-  stabilizedDL = Kokkos::createDynRankView(
-      scalarGrad.get_view(), "XXX", worksetSize, numQPs);
-  flux = Kokkos::createDynRankView(
-      scalarGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
+  artificalDL  = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
+  stabilizedDL = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
+  flux         = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
 
-  pterm = Kokkos::createDynRankView(
-      scalarGrad.get_view(), "XXX", worksetSize, numQPs);
+  pterm = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
 
   // Pre-Calculate reference element quantitites
   cubature->getCubature(refPoints, refWeights);
@@ -175,8 +145,7 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::postRegistrationSetup(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   //   typedef Intrepid2::FunctionSpaceTools<PHX::Device> FST;
   //    typedef Intrepid2::RealSpaceTools<ScalarT> RST;
@@ -199,44 +168,34 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
       if (dt == 0) {
         artificalDL(cell, pt) = 0;
       } else {
-        temp = thickness * thickness / 6.0 * eff_diff_(cell, pt) /
-               dL_(cell, pt) / dt;
+        temp = thickness * thickness / 6.0 * eff_diff_(cell, pt) / dL_(cell, pt) / dt;
 
         ScalarT temp2 = ((temp - 1.0) / dL_(cell, pt));
 
         if (temp2 < 10.0 && temp2 > -10.0)
-          artificalDL(cell, pt) = stab_param_ * temp *
-                                  (0.5 + 0.5 * std::tanh(temp2)) *
-                                  dL_(cell, pt);
+          artificalDL(cell, pt) = stab_param_ * temp * (0.5 + 0.5 * std::tanh(temp2)) * dL_(cell, pt);
         else if (temp2 >= 10.0)
           artificalDL(cell, pt) = stab_param_ * temp * dL_(cell, pt);
         else
           artificalDL(cell, pt) = 0.0;
       }
-      stabilizedDL(cell, pt) =
-          artificalDL(cell, pt) / (dL_(cell, pt) + artificalDL(cell, pt));
+      stabilizedDL(cell, pt) = artificalDL(cell, pt) / (dL_(cell, pt) + artificalDL(cell, pt));
     }
   }
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int pt = 0; pt < numQPs; ++pt) {
-      minitensor::Tensor<ScalarT> F(
-          minitensor::Source::ARRAY, numDims, defGrad, cell, pt, 0, 0);
+      minitensor::Tensor<ScalarT> F(minitensor::Source::ARRAY, numDims, defGrad, cell, pt, 0, 0);
 
       minitensor::Tensor<ScalarT> C_tensor_ = minitensor::t_dot(F, F);
 
-      minitensor::Tensor<ScalarT> C_inv_tensor_ =
-          minitensor::inverse(C_tensor_);
+      minitensor::Tensor<ScalarT> C_inv_tensor_ = minitensor::inverse(C_tensor_);
 
-      minitensor::Vector<ScalarT> C_grad_(
-          minitensor::Source::ARRAY, numDims, scalarGrad, cell, pt, 0);
+      minitensor::Vector<ScalarT> C_grad_(minitensor::Source::ARRAY, numDims, scalarGrad, cell, pt, 0);
 
-      minitensor::Vector<ScalarT> C_grad_in_ref_ =
-          minitensor::dot(C_inv_tensor_, C_grad_);
+      minitensor::Vector<ScalarT> C_grad_in_ref_ = minitensor::dot(C_inv_tensor_, C_grad_);
 
-      for (int j = 0; j < numDims; j++) {
-        flux(cell, pt, j) = (1 - stabilizedDL(cell, pt)) * C_grad_in_ref_(j);
-      }
+      for (int j = 0; j < numDims; j++) { flux(cell, pt, j) = (1 - stabilizedDL(cell, pt)) * C_grad_in_ref_(j); }
     }
   }
 
@@ -253,17 +212,13 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
     for (int node(0); node < numPlaneNodes; ++node) {
       int topNode = node + numPlaneNodes;
       for (int pt = 0; pt < numQPs; ++pt) {
-        temp =
-            (dL_(cell, pt) + artificalDL(cell, pt));  // GB changed 08/14/2015
+        temp = (dL_(cell, pt) + artificalDL(cell, pt));  // GB changed 08/14/2015
         for (std::size_t dim = 0; dim < numDims; ++dim) {
-          transport_residual_(cell, node) +=
-              flux(cell, pt, dim) * dt * surface_Grad_BF(cell, node, pt, dim) *
-              refArea(cell, pt) * thickness * temp;  // GB changed 08/14/2015
+          transport_residual_(cell, node) += flux(cell, pt, dim) * dt * surface_Grad_BF(cell, node, pt, dim) *
+                                             refArea(cell, pt) * thickness * temp;  // GB changed 08/14/2015
 
-          transport_residual_(cell, topNode) +=
-              flux(cell, pt, dim) * dt *
-              surface_Grad_BF(cell, topNode, pt, dim) * refArea(cell, pt) *
-              thickness * temp;  // GB changed 08/14/2015
+          transport_residual_(cell, topNode) += flux(cell, pt, dim) * dt * surface_Grad_BF(cell, topNode, pt, dim) *
+                                                refArea(cell, pt) * thickness * temp;  // GB changed 08/14/2015
         }
       }
     }
@@ -282,11 +237,8 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
         // 08/14/2015
 
         // Local rate of change volumetric constraint term
-        transientTerm = refValues(node, pt) *
-                        (eff_diff_(cell, pt) *
-                         (transport_(cell, pt) - transportold(cell, pt))) *
-                        refArea(cell, pt) *
-                        thickness;  //*temp; GB changed 08/14/2015
+        transientTerm = refValues(node, pt) * (eff_diff_(cell, pt) * (transport_(cell, pt) - transportold(cell, pt))) *
+                        refArea(cell, pt) * thickness;  //*temp; GB changed 08/14/2015
 
         transport_residual_(cell, node) += transientTerm;
 
@@ -294,10 +246,8 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
 
         if (haveMech) {
           // Strain rate source term
-          transientTerm = refValues(node, pt) * strain_rate_factor_(cell, pt) *
-                          (eqps_(cell, pt) - eqps_old(cell, pt)) *
-                          refArea(cell, pt) *
-                          thickness;  //*temp; GB changed 08/14/2015
+          transientTerm = refValues(node, pt) * strain_rate_factor_(cell, pt) * (eqps_(cell, pt) - eqps_old(cell, pt)) *
+                          refArea(cell, pt) * thickness;  //*temp; GB changed 08/14/2015
 
           transport_residual_(cell, node) += transientTerm;
 
@@ -307,36 +257,25 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
           // MUST BE FIXED: Add C_inverse term into hydrostatic residual - added
           // but need to do this nicely.
           for (int dim = 0; dim < numDims; ++dim) {
-            minitensor::Tensor<ScalarT> F(
-                minitensor::Source::ARRAY, numDims, defGrad, cell, pt, 0, 0);
+            minitensor::Tensor<ScalarT> F(minitensor::Source::ARRAY, numDims, defGrad, cell, pt, 0, 0);
 
             minitensor::Tensor<ScalarT> C_tensor = minitensor::t_dot(F, F);
 
-            minitensor::Tensor<ScalarT> C_inv_tensor =
-                minitensor::inverse(C_tensor);
+            minitensor::Tensor<ScalarT> C_inv_tensor = minitensor::inverse(C_tensor);
 
             minitensor::Vector<ScalarT> hydro_stress_grad(
-                minitensor::Source::ARRAY,
-                numDims,
-                hydro_stress_gradient_,
-                cell,
-                pt,
-                0);
+                minitensor::Source::ARRAY, numDims, hydro_stress_gradient_, cell, pt, 0);
 
-            minitensor::Vector<ScalarT> C_inv_hydro_stress_grad =
-                minitensor::dot(C_inv_tensor, hydro_stress_grad);
+            minitensor::Vector<ScalarT> C_inv_hydro_stress_grad = minitensor::dot(C_inv_tensor, hydro_stress_grad);
 
-            transport_residual_(cell, node) -=
-                surface_Grad_BF(cell, node, pt, dim) *
-                convection_coefficient_(cell, pt) * transport_(cell, pt) *
-                hydro_stress_gradient_(cell, pt, dim) * dt * refArea(cell, pt) *
-                thickness;  //*temp; GB changed 08/14/2015
+            transport_residual_(cell, node) -= surface_Grad_BF(cell, node, pt, dim) *
+                                               convection_coefficient_(cell, pt) * transport_(cell, pt) *
+                                               hydro_stress_gradient_(cell, pt, dim) * dt * refArea(cell, pt) *
+                                               thickness;  //*temp; GB changed 08/14/2015
 
             transport_residual_(cell, topNode) -=
-                surface_Grad_BF(cell, topNode, pt, dim) *
-                convection_coefficient_(cell, pt) * transport_(cell, pt) *
-                C_inv_hydro_stress_grad(dim) * dt * refArea(cell, pt) *
-                thickness;  //*temp; GB changed 08/14/2015
+                surface_Grad_BF(cell, topNode, pt, dim) * convection_coefficient_(cell, pt) * transport_(cell, pt) *
+                C_inv_hydro_stress_grad(dim) * dt * refArea(cell, pt) * thickness;  //*temp; GB changed 08/14/2015
           }
         }
       }  // end integrartion point loop
@@ -352,8 +291,7 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
     CLPbar = 0.0;
     vol    = 0.0;
     for (int qp = 0; qp < numQPs; ++qp) {
-      CLPbar += refArea(cell, qp) * thickness *
-                (transport_(cell, qp) - transportold(cell, qp));
+      CLPbar += refArea(cell, qp) * thickness * (transport_(cell, qp) - transportold(cell, qp));
       vol += refArea(cell, qp) * thickness;
     }
     CLPbar /= vol;
@@ -367,11 +305,9 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(
       for (int qp = 0; qp < numQPs; ++qp) {
         temp = 1.0 / dL_(cell, qp) + artificalDL(cell, qp);
 
-        stabilizationTerm =
-            stab_param_ * eff_diff_(cell, qp) *
-            (-transport_(cell, qp) + transportold(cell, qp) + pterm(cell, qp)) *
-            refValues(node, qp) * refArea(cell, qp) *
-            thickness;  //*temp;  GB changed 08/14/2015
+        stabilizationTerm = stab_param_ * eff_diff_(cell, qp) *
+                            (-transport_(cell, qp) + transportold(cell, qp) + pterm(cell, qp)) * refValues(node, qp) *
+                            refArea(cell, qp) * thickness;  //*temp;  GB changed 08/14/2015
 
         transport_residual_(cell, node) -= stabilizationTerm;
         transport_residual_(cell, topNode) -= stabilizationTerm;

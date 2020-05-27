@@ -13,12 +13,8 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 LameStressBase<EvalT, Traits>::LameStressBase(Teuchos::ParameterList& p)
-    : defGradField(
-          p.get<std::string>("DefGrad Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      stressField(
-          p.get<std::string>("Stress Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+    : defGradField(p.get<std::string>("DefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      stressField(p.get<std::string>("Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       lameMaterialModel(Teuchos::RCP<LameMaterial>())
 {
   // Pull out numQPs and numDims from a Layout
@@ -28,9 +24,7 @@ LameStressBase<EvalT, Traits>::LameStressBase(Teuchos::ParameterList& p)
   numQPs  = dims[1];
   numDims = dims[2];
 
-  ALBANY_PANIC(
-      this->numDims != 3,
-      " LAME materials enabled only for three-dimensional analyses.");
+  ALBANY_PANIC(this->numDims != 3, " LAME materials enabled only for three-dimensional analyses.");
 
   defGradName = p.get<std::string>("DefGrad Name") + "_old";
   this->addDependentField(defGradField);
@@ -42,9 +36,8 @@ LameStressBase<EvalT, Traits>::LameStressBase(Teuchos::ParameterList& p)
 
   // Default to getting material info form base input file (possibley
   // overwritten later)
-  lameMaterialModelName = p.get<std::string>("Lame Material Model", "Elastic");
-  Teuchos::ParameterList& lameMaterialParameters =
-      p.sublist("Lame Material Parameters");
+  lameMaterialModelName                          = p.get<std::string>("Lame Material Model", "Elastic");
+  Teuchos::ParameterList& lameMaterialParameters = p.sublist("Lame Material Parameters");
 
   // Code to allow material data to come from materials.xml data file
   int haveMatDB = p.get<bool>("Have MatDB", false);
@@ -54,18 +47,14 @@ LameStressBase<EvalT, Traits>::LameStressBase(Teuchos::ParameterList& p)
   // Check for material database file
   if (haveMatDB) {
     // Check if material database will be supplying the data
-    bool dataFromDatabase = lameMaterialParameters.get<bool>(
-        "Material Dependent Data Source", false);
+    bool dataFromDatabase = lameMaterialParameters.get<bool>("Material Dependent Data Source", false);
 
     // If so, overwrite material model and data from database file
     if (dataFromDatabase) {
-      Teuchos::RCP<Albany::MaterialDatabase> materialDB =
-          p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
+      Teuchos::RCP<Albany::MaterialDatabase> materialDB = p.get<Teuchos::RCP<Albany::MaterialDatabase>>("MaterialDB");
 
-      lameMaterialModelName = materialDB->getElementBlockParam<std::string>(
-          ebName, "Lame Material Model");
-      lameMaterialParameters = materialDB->getElementBlockSublist(
-          ebName, "Lame Material Parameters");
+      lameMaterialModelName  = materialDB->getElementBlockParam<std::string>(ebName, "Lame Material Model");
+      lameMaterialParameters = materialDB->getElementBlockSublist(ebName, "Lame Material Parameters");
     }
   }
 
@@ -73,88 +62,67 @@ LameStressBase<EvalT, Traits>::LameStressBase(Teuchos::ParameterList& p)
   // This assumes that there is a single material model associated with this
   // evaluator and that the material properties are constant (read directly
   // from input deck parameter list)
-  lameMaterialModel = LameUtils::constructLameMaterialModel(
-      lameMaterialModelName, lameMaterialParameters);
+  lameMaterialModel = LameUtils::constructLameMaterialModel(lameMaterialModelName, lameMaterialParameters);
 
   // Get a list of the LAME material model state variable names
-  lameMaterialModelStateVariableNames = LameUtils::getStateVariableNames(
-      lameMaterialModelName, lameMaterialParameters);
+  lameMaterialModelStateVariableNames = LameUtils::getStateVariableNames(lameMaterialModelName, lameMaterialParameters);
 
   // Declare the state variables as evaluated fields (type is always double)
-  Teuchos::RCP<PHX::DataLayout> dataLayout =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-  for (unsigned int i = 0; i < lameMaterialModelStateVariableNames.size();
-       ++i) {
+  Teuchos::RCP<PHX::DataLayout> dataLayout = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+  for (unsigned int i = 0; i < lameMaterialModelStateVariableNames.size(); ++i) {
     PHX::MDField<ScalarT, Cell, QuadPoint> lameMaterialModelStateVariableField(
         lameMaterialModelStateVariableNames[i], dataLayout);
     this->addEvaluatedField(lameMaterialModelStateVariableField);
-    lameMaterialModelStateVariableFields.push_back(
-        lameMaterialModelStateVariableField);
+    lameMaterialModelStateVariableFields.push_back(lameMaterialModelStateVariableField);
   }
 }
 
 template <typename EvalT, typename Traits>
 void
-LameStressBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+LameStressBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(defGradField, fm);
   this->utils.setFieldData(stressField, fm);
   for (unsigned int i = 0; i < lameMaterialModelStateVariableFields.size(); ++i)
     this->utils.setFieldData(lameMaterialModelStateVariableFields[i], fm);
 
-  typedef PHX::
-      KokkosViewFactory<RealType, PHX::Device::array_layout, PHX::Device>
-          ViewFactory;
-  this->stressFieldRealType = PHX::MDField<RealType, Cell, QuadPoint, Dim, Dim>(
-      "stress_RealType", this->tensor_dl);
-  this->defGradFieldRealType =
-      PHX::MDField<RealType, Cell, QuadPoint, Dim, Dim>(
-          "defGrad_RealType", this->tensor_dl);
-  this->stressFieldRealType.setFieldData(
-      ViewFactory::buildView(this->stressFieldRealType.fieldTag()));
-  this->defGradFieldRealType.setFieldData(
-      ViewFactory::buildView(this->defGradFieldRealType.fieldTag()));
+  typedef PHX::KokkosViewFactory<RealType, PHX::Device::array_layout, PHX::Device> ViewFactory;
+  this->stressFieldRealType  = PHX::MDField<RealType, Cell, QuadPoint, Dim, Dim>("stress_RealType", this->tensor_dl);
+  this->defGradFieldRealType = PHX::MDField<RealType, Cell, QuadPoint, Dim, Dim>("defGrad_RealType", this->tensor_dl);
+  this->stressFieldRealType.setFieldData(ViewFactory::buildView(this->stressFieldRealType.fieldTag()));
+  this->defGradFieldRealType.setFieldData(ViewFactory::buildView(this->defGradFieldRealType.fieldTag()));
 }
 
 template <typename EvalT, typename Traits>
 void
 LameStressBase<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  ALBANY_PANIC(
-      "LameStressBase::evaluateFields not implemented for this template type",
-      "Need specialization.");
+  ALBANY_PANIC("LameStressBase::evaluateFields not implemented for this template type", "Need specialization.");
 }
 
 template <typename Traits>
 void
-LameStress<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+LameStress<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   Teuchos::RCP<LameMatParams> matp = Teuchos::rcp(new LameMatParams());
   this->setMatP(matp, workset);
 
-  this->calcStressRealType(
-      this->stressField, this->defGradField, workset, matp);
+  this->calcStressRealType(this->stressField, this->defGradField, workset, matp);
 
   this->freeMatP(matp);
 }
 
 template <typename Traits>
 void
-LameStress<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+LameStress<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // This block forces stressField Fad to allocate deriv array --is ther a
   // better way?
-  PHAL::AlbanyTraits::Jacobian::ScalarT scalarToForceAllocation =
-      this->defGradField(0, 0, 0, 0);
+  PHAL::AlbanyTraits::Jacobian::ScalarT scalarToForceAllocation = this->defGradField(0, 0, 0, 0);
   for (int cell = 0; cell < (int)workset.numCells; ++cell)
     for (int qp = 0; qp < (int)this->numQPs; ++qp)
       for (int i = 0; i < (int)this->numDims; ++i)
-        for (int j = 0; j < (int)this->numDims; ++j)
-          this->stressField(cell, qp, i, j) = scalarToForceAllocation;
+        for (int j = 0; j < (int)this->numDims; ++j) this->stressField(cell, qp, i, j) = scalarToForceAllocation;
 
   // Allocate double arrays in matp
   Teuchos::RCP<LameMatParams> matp = Teuchos::rcp(new LameMatParams());
@@ -166,18 +134,15 @@ LameStress<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
     for (int qp = 0; qp < (int)this->numQPs; ++qp)
       for (int i = 0; i < (int)this->numDims; ++i)
         for (int j = 0; j < (int)this->numDims; ++j)
-          this->defGradFieldRealType(cell, qp, i, j) =
-              this->defGradField(cell, qp, i, j).val();
+          this->defGradFieldRealType(cell, qp, i, j) = this->defGradField(cell, qp, i, j).val();
 
-  this->calcStressRealType(
-      this->stressFieldRealType, this->defGradFieldRealType, workset, matp);
+  this->calcStressRealType(this->stressFieldRealType, this->defGradFieldRealType, workset, matp);
 
   for (int cell = 0; cell < (int)workset.numCells; ++cell)
     for (int qp = 0; qp < (int)this->numQPs; ++qp)
       for (int i = 0; i < (int)this->numDims; ++i)
         for (int j = 0; j < (int)this->numDims; ++j)
-          this->stressField(cell, qp, i, j).val() =
-              this->stressFieldRealType(cell, qp, i, j);
+          this->stressField(cell, qp, i, j).val() = this->stressFieldRealType(cell, qp, i, j);
 
   // Do Perturbations
   double pert   = 1.0e-6;
@@ -188,20 +153,16 @@ LameStress<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
         for (int i = 0; i < (int)this->numDims; ++i)
           for (int j = 0; j < (int)this->numDims; ++j)
             this->defGradFieldRealType(cell, qp, i, j) =
-                this->defGradField(cell, qp, i, j).val() +
-                pert * this->defGradField(cell, qp, i, j).fastAccessDx(iv);
+                this->defGradField(cell, qp, i, j).val() + pert * this->defGradField(cell, qp, i, j).fastAccessDx(iv);
 
-    this->calcStressRealType(
-        this->stressFieldRealType, this->defGradFieldRealType, workset, matp);
+    this->calcStressRealType(this->stressFieldRealType, this->defGradFieldRealType, workset, matp);
 
     for (int cell = 0; cell < (int)workset.numCells; ++cell)
       for (int qp = 0; qp < (int)this->numQPs; ++qp)
         for (int i = 0; i < (int)this->numDims; ++i)
           for (int j = 0; j < (int)this->numDims; ++j)
             this->stressField(cell, qp, i, j).fastAccessDx(iv) =
-                (this->stressFieldRealType(cell, qp, i, j) -
-                 this->stressField(cell, qp, i, j).val()) /
-                pert;
+                (this->stressFieldRealType(cell, qp, i, j) - this->stressField(cell, qp, i, j).val()) / pert;
   }
 
   // Free double arrays allocated in matp
@@ -211,17 +172,14 @@ LameStress<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 // Tangent implementation is Identical to Jacobian
 template <typename Traits>
 void
-LameStress<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+LameStress<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // This block forces stressField Fad to allocate deriv array
-  PHAL::AlbanyTraits::Tangent::ScalarT scalarToForceAllocation =
-      this->defGradField(0, 0, 0, 0);
+  PHAL::AlbanyTraits::Tangent::ScalarT scalarToForceAllocation = this->defGradField(0, 0, 0, 0);
   for (int cell = 0; cell < (int)workset.numCells; ++cell)
     for (int qp = 0; qp < (int)this->numQPs; ++qp)
       for (int i = 0; i < (int)this->numDims; ++i)
-        for (int j = 0; j < (int)this->numDims; ++j)
-          this->stressField(cell, qp, i, j) = scalarToForceAllocation;
+        for (int j = 0; j < (int)this->numDims; ++j) this->stressField(cell, qp, i, j) = scalarToForceAllocation;
 
   // Allocate double arrays in matp
   Teuchos::RCP<LameMatParams> matp = Teuchos::rcp(new LameMatParams());
@@ -233,18 +191,15 @@ LameStress<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
     for (int qp = 0; qp < (int)this->numQPs; ++qp)
       for (int i = 0; i < (int)this->numDims; ++i)
         for (int j = 0; j < (int)this->numDims; ++j)
-          this->defGradFieldRealType(cell, qp, i, j) =
-              this->defGradField(cell, qp, i, j).val();
+          this->defGradFieldRealType(cell, qp, i, j) = this->defGradField(cell, qp, i, j).val();
 
-  this->calcStressRealType(
-      this->stressFieldRealType, this->defGradFieldRealType, workset, matp);
+  this->calcStressRealType(this->stressFieldRealType, this->defGradFieldRealType, workset, matp);
 
   for (int cell = 0; cell < (int)workset.numCells; ++cell)
     for (int qp = 0; qp < (int)this->numQPs; ++qp)
       for (int i = 0; i < (int)this->numDims; ++i)
         for (int j = 0; j < (int)this->numDims; ++j)
-          this->stressField(cell, qp, i, j).val() =
-              this->stressFieldRealType(cell, qp, i, j);
+          this->stressField(cell, qp, i, j).val() = this->stressFieldRealType(cell, qp, i, j);
 
   // Do Perturbations
   double pert   = 1.0e-8;
@@ -255,20 +210,16 @@ LameStress<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
         for (int i = 0; i < (int)this->numDims; ++i)
           for (int j = 0; j < (int)this->numDims; ++j)
             this->defGradFieldRealType(cell, qp, i, j) =
-                this->defGradField(cell, qp, i, j).val() +
-                pert * this->defGradField(cell, qp, i, j).fastAccessDx(iv);
+                this->defGradField(cell, qp, i, j).val() + pert * this->defGradField(cell, qp, i, j).fastAccessDx(iv);
 
-    this->calcStressRealType(
-        this->stressFieldRealType, this->defGradFieldRealType, workset, matp);
+    this->calcStressRealType(this->stressFieldRealType, this->defGradFieldRealType, workset, matp);
 
     for (int cell = 0; cell < (int)workset.numCells; ++cell)
       for (int qp = 0; qp < (int)this->numQPs; ++qp)
         for (int i = 0; i < (int)this->numDims; ++i)
           for (int j = 0; j < (int)this->numDims; ++j)
             this->stressField(cell, qp, i, j).fastAccessDx(iv) =
-                (this->stressFieldRealType(cell, qp, i, j) -
-                 this->stressField(cell, qp, i, j).val()) /
-                pert;
+                (this->stressFieldRealType(cell, qp, i, j) - this->stressField(cell, qp, i, j).val()) / pert;
   }
 
   // Free double arrays allocated in matp
@@ -277,38 +228,26 @@ LameStress<PHAL::AlbanyTraits::Tangent, Traits>::evaluateFields(
 
 template <typename EvalT, typename Traits>
 void
-LameStressBase<EvalT, Traits>::setMatP(
-    Teuchos::RCP<LameMatParams>& matp,
-    typename Traits::EvalData    workset)
+LameStressBase<EvalT, Traits>::setMatP(Teuchos::RCP<LameMatParams>& matp, typename Traits::EvalData workset)
 {
   // \todo Get actual time step for calls to LAME materials.
   RealType deltaT = 1.0;
 
-  int numStateVariables =
-      (int)(this->lameMaterialModelStateVariableNames.size());
+  int numStateVariables = (int)(this->lameMaterialModelStateVariableNames.size());
 
   // Allocate workset space
   // Lame is called one time (called for all material points in the workset at
   // once)
   int numMaterialEvaluations = workset.numCells * this->numQPs;
 
-  double* strainRate =
-      new double[6 * numMaterialEvaluations];  // symmetric tensor5
-  double* spin =
-      new double[3 * numMaterialEvaluations];  // skew-symmetric tensor
-  double* leftStretch =
-      new double[6 * numMaterialEvaluations];  // symmetric tensor
-  double* rotation = new double[9 * numMaterialEvaluations];  // full tensor
-  double* stressOld =
-      new double[6 * numMaterialEvaluations];  // symmetric tensor
-  double* stressNew =
-      new double[6 * numMaterialEvaluations];  // symmetric tensor
-  double* stateOld = new double
-      [numStateVariables *
-       numMaterialEvaluations];  // a single double for each state variable
-  double* stateNew = new double
-      [numStateVariables *
-       numMaterialEvaluations];  // a single double for each state variable
+  double* strainRate  = new double[6 * numMaterialEvaluations];               // symmetric tensor5
+  double* spin        = new double[3 * numMaterialEvaluations];               // skew-symmetric tensor
+  double* leftStretch = new double[6 * numMaterialEvaluations];               // symmetric tensor
+  double* rotation    = new double[9 * numMaterialEvaluations];               // full tensor
+  double* stressOld   = new double[6 * numMaterialEvaluations];               // symmetric tensor
+  double* stressNew   = new double[6 * numMaterialEvaluations];               // symmetric tensor
+  double* stateOld = new double[numStateVariables * numMaterialEvaluations];  // a single double for each state variable
+  double* stateNew = new double[numStateVariables * numMaterialEvaluations];  // a single double for each state variable
 
   // \todo Set up scratch space for material models using getNumScratchVars()
   // and setScratchPtr().
@@ -363,8 +302,7 @@ LameStressBase<EvalT, Traits>::calcStressRealType(
   Albany::MDArray oldDefGrad = (*workset.stateArrayPtr)[defGradName];
   Albany::MDArray oldStress  = (*workset.stateArrayPtr)[stressName];
 
-  int numStateVariables =
-      (int)(this->lameMaterialModelStateVariableNames.size());
+  int numStateVariables = (int)(this->lameMaterialModelStateVariableNames.size());
 
   // Pointers used for filling the matParams structure
   double* strainRatePtr  = matp->strain_rate;
@@ -519,10 +457,9 @@ LameStressBase<EvalT, Traits>::calcStressRealType(
         // this->lameMaterialModelStateVariableNames[iVar]; const
         // Intrepid2::FieldContainer_Kokkos<RealType, PHX::Layout, PHX::Device>&
         // stateVar = *oldState[variableName];
-        std::string const& variableName =
-            this->lameMaterialModelStateVariableNames[iVar] + "_old";
-        Albany::MDArray stateVar = (*workset.stateArrayPtr)[variableName];
-        *stateOldPtr             = stateVar(cell, qp);
+        std::string const& variableName = this->lameMaterialModelStateVariableNames[iVar] + "_old";
+        Albany::MDArray    stateVar     = (*workset.stateArrayPtr)[variableName];
+        *stateOldPtr                    = stateVar(cell, qp);
       }
     }
   }
@@ -560,8 +497,7 @@ LameStressBase<EvalT, Traits>::calcStressRealType(
       // copy state_new data from the LAME data structure to the corresponding
       // state variable field
       for (int iVar = 0; iVar < numStateVariables; iVar++, stateNewPtr++)
-        this->lameMaterialModelStateVariableFields[iVar](cell, qp) =
-            *stateNewPtr;
+        this->lameMaterialModelStateVariableFields[iVar](cell, qp) = *stateNewPtr;
     }
   }
 }

@@ -38,9 +38,7 @@ class FerroicDriver : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  FerroicDriver(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  FerroicDriver(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Destructor
@@ -51,17 +49,11 @@ class FerroicDriver : public LCM::ConstitutiveModel<EvalT, Traits>
   /// Method to compute the state (e.g. energy, stress, tangent)
   ///
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   // Kokkos
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
  private:
   Teuchos::RCP<FM::FerroicModel<EvalT>> ferroicModel;
@@ -96,26 +88,16 @@ class FerroicDriver : public LCM::ConstitutiveModel<EvalT, Traits>
 };
 
 void
-parseBasis(
-    Teuchos::ParameterList const&              pBasis,
-    minitensor::Tensor<RealType, FM::THREE_D>& R);
+parseBasis(Teuchos::ParameterList const& pBasis, minitensor::Tensor<RealType, FM::THREE_D>& R);
 void
-parseTensor4(
-    Teuchos::ParameterList const&               pConsts,
-    minitensor::Tensor4<RealType, FM::THREE_D>& tensor);
+parseTensor4(Teuchos::ParameterList const& pConsts, minitensor::Tensor4<RealType, FM::THREE_D>& tensor);
 void
-parseTensor3(
-    Teuchos::ParameterList const&               pConsts,
-    minitensor::Tensor3<RealType, FM::THREE_D>& tensor);
+parseTensor3(Teuchos::ParameterList const& pConsts, minitensor::Tensor3<RealType, FM::THREE_D>& tensor);
 void
-parseTensor(
-    Teuchos::ParameterList const&              pConsts,
-    minitensor::Tensor<RealType, FM::THREE_D>& tensor);
+parseTensor(Teuchos::ParameterList const& pConsts, minitensor::Tensor<RealType, FM::THREE_D>& tensor);
 
 FM::CrystalVariant
-parseCrystalVariant(
-    const Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& phases,
-    Teuchos::ParameterList const&                         vParam);
+parseCrystalVariant(const Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& phases, Teuchos::ParameterList const& vParam);
 
 }  // namespace LCM
 

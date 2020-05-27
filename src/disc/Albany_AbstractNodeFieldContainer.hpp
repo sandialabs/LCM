@@ -25,13 +25,10 @@ class AbstractNodeFieldContainer
 
   // MV version
   virtual void
-  saveFieldVector(
-      const Teuchos::RCP<const Thyra_MultiVector>& mv,
-      int                                          offset) = 0;
+  saveFieldVector(const Teuchos::RCP<const Thyra_MultiVector>& mv, int offset) = 0;
 };
 
-typedef std::map<std::string, Teuchos::RCP<AbstractNodeFieldContainer>>
-    NodeFieldContainer;
+typedef std::map<std::string, Teuchos::RCP<AbstractNodeFieldContainer>> NodeFieldContainer;
 
 }  // namespace Albany
 

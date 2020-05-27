@@ -18,8 +18,7 @@ Subgraph::Subgraph(
     : topology_(topology)
 {
   // Insert vertices and create the vertex map
-  for (std::set<stk::mesh::Entity>::iterator entity_iterator = first_entity;
-       entity_iterator != last_entity;
+  for (std::set<stk::mesh::Entity>::iterator entity_iterator = first_entity; entity_iterator != last_entity;
        ++entity_iterator) {
     // get global vertex
     stk::mesh::Entity entity = *entity_iterator;
@@ -30,11 +29,9 @@ Subgraph::Subgraph(
     // create new local vertex
     Vertex vertex = boost::add_vertex(*this);
 
-    std::pair<Vertex, stk::mesh::Entity> vertex_entity_pair =
-        std::make_pair(vertex, entity);
+    std::pair<Vertex, stk::mesh::Entity> vertex_entity_pair = std::make_pair(vertex, entity);
 
-    std::pair<stk::mesh::Entity, Vertex> entity_vertex_pair =
-        std::make_pair(entity, vertex);
+    std::pair<stk::mesh::Entity, Vertex> entity_vertex_pair = std::make_pair(entity, vertex);
 
     vertex_entity_map_.insert(vertex_entity_pair);
 
@@ -47,9 +44,7 @@ Subgraph::Subgraph(
   }
 
   // Add edges to the subgraph
-  for (std::set<STKEdge>::iterator edge_iterator = first_edge;
-       edge_iterator != last_edge;
-       ++edge_iterator) {
+  for (std::set<STKEdge>::iterator edge_iterator = first_edge; edge_iterator != last_edge; ++edge_iterator) {
     // Get the edge
     STKEdge stk_edge = *edge_iterator;
 
@@ -69,8 +64,7 @@ Subgraph::Subgraph(
 
     bool is_inserted = false;
 
-    boost::tie(graph_edge, is_inserted) =
-        boost::add_edge(source_vertex, target_vertex, *this);
+    boost::tie(graph_edge, is_inserted) = boost::add_edge(source_vertex, target_vertex, *this);
 
     assert(is_inserted == true);
 
@@ -160,8 +154,7 @@ Subgraph::is_internal_and_open(stk::mesh::Entity e)
 stk::mesh::Entity
 Subgraph::entityFromVertex(Vertex vertex)
 {
-  VertexEntityMap::const_iterator vertex_entity_map_iterator =
-      vertex_entity_map_.find(vertex);
+  VertexEntityMap::const_iterator vertex_entity_map_iterator = vertex_entity_map_.find(vertex);
 
   assert(vertex_entity_map_iterator != vertex_entity_map_.end());
 
@@ -174,8 +167,7 @@ Subgraph::entityFromVertex(Vertex vertex)
 Vertex
 Subgraph::vertexFromEntity(stk::mesh::Entity entity)
 {
-  EntityVertexMap::const_iterator entity_vertex_map_iterator =
-      entity_vertex_map_.find(entity);
+  EntityVertexMap::const_iterator entity_vertex_map_iterator = entity_vertex_map_.find(entity);
 
   assert(entity_vertex_map_iterator != entity_vertex_map_.end());
 
@@ -196,56 +188,45 @@ Subgraph::addVertex(stk::mesh::EntityRank vertex_rank, stk::mesh::Entity entity)
 
   int const parallel_rank = get_bulk_data().parallel_rank();
 
-  stk::mesh::EntityId high_id =
-      high_id_from_low_id(dimension, parallel_rank, vertex_rank, low_id);
+  stk::mesh::EntityId high_id = high_id_from_low_id(dimension, parallel_rank, vertex_rank, low_id);
 
   stk::mesh::PartVector add_parts;
 
   // If the entity passed is a node, propagate parts to new entities.
-  bool const propagate_parts =
-      entity != INVALID_ENTITY && vertex_rank == stk::topology::NODE_RANK;
+  bool const propagate_parts = entity != INVALID_ENTITY && vertex_rank == stk::topology::NODE_RANK;
 
   if (propagate_parts == true) {
-    std::map<std::string, stk::mesh::Part*>& ns_parts =
-        get_stk_mesh_struct()->nsPartVec;
+    std::map<std::string, stk::mesh::Part*>& ns_parts = get_stk_mesh_struct()->nsPartVec;
 
-    stk::mesh::Selector select_local =
-        stk::mesh::Selector(get_meta_data().locally_owned_part());
+    stk::mesh::Selector select_local = stk::mesh::Selector(get_meta_data().locally_owned_part());
 
     for (auto it = ns_parts.begin(); it != ns_parts.end(); ++it) {
       stk::mesh::Part& ns_part = *(it->second);
 
       stk::mesh::Selector select_in_nodeset = stk::mesh::Selector(ns_part);
 
-      stk::mesh::Selector select_local_in_nodeset =
-          select_local & select_in_nodeset;
+      stk::mesh::Selector select_local_in_nodeset = select_local & select_in_nodeset;
 
       std::vector<stk::mesh::Entity> ns_nodes;
 
       stk::mesh::get_selected_entities(
-          select_local_in_nodeset,
-          get_bulk_data().buckets(stk::topology::NODE_RANK),
-          ns_nodes);
+          select_local_in_nodeset, get_bulk_data().buckets(stk::topology::NODE_RANK), ns_nodes);
 
-      bool const is_local_and_in_nodeset =
-          std::find(ns_nodes.begin(), ns_nodes.end(), entity) != ns_nodes.end();
+      bool const is_local_and_in_nodeset = std::find(ns_nodes.begin(), ns_nodes.end(), entity) != ns_nodes.end();
 
       if (is_local_and_in_nodeset == true) { add_parts.push_back(&ns_part); }
     }
   }
 
-  stk::mesh::Entity new_entity =
-      get_bulk_data().declare_entity(vertex_rank, high_id, add_parts);
+  stk::mesh::Entity new_entity = get_bulk_data().declare_entity(vertex_rank, high_id, add_parts);
 
   // Add the vertex to the subgraph
   Vertex new_vertex = boost::add_vertex(*this);
 
   // Update maps
-  std::pair<Vertex, stk::mesh::Entity> vertex_entity_pair =
-      std::make_pair(new_vertex, new_entity);
+  std::pair<Vertex, stk::mesh::Entity> vertex_entity_pair = std::make_pair(new_vertex, new_entity);
 
-  std::pair<stk::mesh::Entity, Vertex> entity_vertex_pair =
-      std::make_pair(new_entity, new_vertex);
+  std::pair<stk::mesh::Entity, Vertex> entity_vertex_pair = std::make_pair(new_entity, new_vertex);
 
   vertex_entity_map_.insert(vertex_entity_pair);
 
@@ -287,24 +268,17 @@ Subgraph::removeVertex(Vertex const vertex)
 
 // Add edge to local graph.
 std::pair<Edge, bool>
-Subgraph::addEdge(
-    EdgeId const edge_id,
-    Vertex const source_vertex,
-    Vertex const target_vertex)
+Subgraph::addEdge(EdgeId const edge_id, Vertex const source_vertex, Vertex const target_vertex)
 {
   // get global entities
   stk::mesh::Entity source_entity = entityFromVertex(source_vertex);
 
   stk::mesh::Entity target_entity = entityFromVertex(target_vertex);
 
-  assert(
-      get_bulk_data().entity_rank(source_entity) -
-          get_bulk_data().entity_rank(target_entity) ==
-      1);
+  assert(get_bulk_data().entity_rank(source_entity) - get_bulk_data().entity_rank(target_entity) == 1);
 
   // Add edge to local graph
-  std::pair<Edge, bool> graph_edge =
-      boost::add_edge(source_vertex, target_vertex, *this);
+  std::pair<Edge, bool> graph_edge = boost::add_edge(source_vertex, target_vertex, *this);
 
   // If edge exists in graph, skip adding it to STK.
   if (graph_edge.second == false) return graph_edge;
@@ -443,8 +417,7 @@ Subgraph::testArticulationPoint(
     // skip it.
     if (source == articulation_vertex) continue;
 
-    std::map<Vertex, UVertex>::const_iterator source_map_iterator =
-        sub_u_vertex_map.find(source);
+    std::map<Vertex, UVertex>::const_iterator source_map_iterator = sub_u_vertex_map.find(source);
 
     UVertex usource = (*source_map_iterator).second;
 
@@ -463,8 +436,7 @@ Subgraph::testArticulationPoint(
       // skip it.
       if (target == articulation_vertex) continue;
 
-      std::map<Vertex, UVertex>::const_iterator target_map_iterator =
-          sub_u_vertex_map.find(target);
+      std::map<Vertex, UVertex>::const_iterator target_map_iterator = sub_u_vertex_map.find(target);
 
       UVertex utarget = (*target_map_iterator).second;
 
@@ -476,15 +448,12 @@ Subgraph::testArticulationPoint(
 
   number_components = boost::connected_components(graph, &components[0]);
 
-  for (std::map<UVertex, Vertex>::iterator i = u_sub_vertex_map.begin();
-       i != u_sub_vertex_map.end();
-       ++i) {
+  for (std::map<UVertex, Vertex>::iterator i = u_sub_vertex_map.begin(); i != u_sub_vertex_map.end(); ++i) {
     Vertex vertex = (*i).second;
 
     size_t u_vertex = static_cast<size_t>((*i).first);
 
-    std::pair<Vertex, size_t> component =
-        std::make_pair(vertex, components[u_vertex]);
+    std::pair<Vertex, size_t> component = std::make_pair(vertex, components[u_vertex]);
 
     vertex_component_map.insert(component);
   }
@@ -508,8 +477,7 @@ Subgraph::cloneBoundaryVertex(Vertex boundary_vertex)
 
   OutEdgeIterator out_edge_end;
 
-  boost::tie(out_edge_begin, out_edge_end) =
-      boost::out_edges(boundary_vertex, *this);
+  boost::tie(out_edge_begin, out_edge_end) = boost::out_edges(boundary_vertex, *this);
 
   for (OutEdgeIterator i = out_edge_begin; i != out_edge_end; ++i) {
     Edge edge = *i;
@@ -529,8 +497,7 @@ Subgraph::cloneBoundaryVertex(Vertex boundary_vertex)
 
   InEdgeIterator in_edge_end;
 
-  boost::tie(in_edge_begin, in_edge_end) =
-      boost::in_edges(boundary_vertex, *this);
+  boost::tie(in_edge_begin, in_edge_end) = boost::in_edges(boundary_vertex, *this);
 
   // Arbitrarily remove the first edge from original vertex
   Edge edge = *(in_edge_begin);
@@ -555,20 +522,15 @@ Subgraph::cloneBoundaryVertex(Vertex boundary_vertex)
 
 // Restore element to node connectivity needed by STK.
 void
-Subgraph::updateEntityPointConnectivity(
-    stk::mesh::Entity old_point,
-    EntityEntityMap&  entity_new_point_map)
+Subgraph::updateEntityPointConnectivity(stk::mesh::Entity old_point, EntityEntityMap& entity_new_point_map)
 {
-  for (EntityEntityMap::iterator i = entity_new_point_map.begin();
-       i != entity_new_point_map.end();
-       ++i) {
+  for (EntityEntityMap::iterator i = entity_new_point_map.begin(); i != entity_new_point_map.end(); ++i) {
     stk::mesh::Entity entity = i->first;
 
     // Identify relation id and remove
     stk::mesh::Entity const* relations = get_bulk_data().begin_nodes(entity);
 
-    stk::mesh::ConnectivityOrdinal const* ords =
-        get_bulk_data().begin_node_ordinals(entity);
+    stk::mesh::ConnectivityOrdinal const* ords = get_bulk_data().begin_node_ordinals(entity);
 
     size_t const num_relations = get_bulk_data().num_nodes(entity);
 
@@ -605,8 +567,7 @@ Subgraph::splitArticulation(Vertex articulation_vertex)
 
   VertexComponentMap vertex_component_map;
 
-  testArticulationPoint(
-      articulation_vertex, num_components, vertex_component_map);
+  testArticulationPoint(articulation_vertex, num_components, vertex_component_map);
 
   assert(num_components > 0);
 
@@ -630,12 +591,9 @@ Subgraph::splitArticulation(Vertex articulation_vertex)
   // Create a map of entities to new node numbers
   // only if the articulation vertex is a node
   if (articulation_rank == stk::topology::NODE_RANK) {
-    stk::mesh::Entity articulation_point =
-        entityFromVertex(articulation_vertex);
+    stk::mesh::Entity articulation_point = entityFromVertex(articulation_vertex);
 
-    for (VertexComponentMap::iterator i = vertex_component_map.begin();
-         i != vertex_component_map.end();
-         ++i) {
+    for (VertexComponentMap::iterator i = vertex_component_map.begin(); i != vertex_component_map.end(); ++i) {
       Vertex component_vertex = (*i).first;
 
       size_t component_number = (*i).second;
@@ -654,8 +612,7 @@ Subgraph::splitArticulation(Vertex articulation_vertex)
 
       stk::mesh::Entity split_point = entityFromVertex(split_vertex);
 
-      std::pair<stk::mesh::Entity, stk::mesh::Entity> nc =
-          std::make_pair(component_entity, split_point);
+      std::pair<stk::mesh::Entity, stk::mesh::Entity> nc = std::make_pair(component_entity, split_point);
 
       entity_split_point_map.insert(nc);
     }
@@ -678,16 +635,14 @@ Subgraph::splitArticulation(Vertex articulation_vertex)
 
   InEdgeIterator in_edge_end;
 
-  boost::tie(in_edge_begin, in_edge_end) =
-      boost::in_edges(articulation_vertex, *this);
+  boost::tie(in_edge_begin, in_edge_end) = boost::in_edges(articulation_vertex, *this);
 
   for (InEdgeIterator i = in_edge_begin; i != in_edge_end; ++i) {
     Edge edge = *i;
 
     Vertex source_vertex = boost::source(edge, *this);
 
-    VertexComponentMap::const_iterator component_iterator =
-        vertex_component_map.find(source_vertex);
+    VertexComponentMap::const_iterator component_iterator = vertex_component_map.find(source_vertex);
 
     assert(component_iterator != vertex_component_map.end());
 
@@ -703,18 +658,14 @@ Subgraph::splitArticulation(Vertex articulation_vertex)
   }
 
   // Remove all edges in vector removed and replace with new edges
-  for (std::vector<std::pair<Vertex, EdgeId>>::iterator i =
-           edges_to_remove.begin();
-       i != edges_to_remove.end();
-       ++i) {
+  for (std::vector<std::pair<Vertex, EdgeId>>::iterator i = edges_to_remove.begin(); i != edges_to_remove.end(); ++i) {
     std::pair<Vertex, EdgeId> edge = *i;
 
     Vertex source_vertex = edge.first;
 
     EdgeId edge_id = edge.second;
 
-    VertexComponentMap::const_iterator component_iterator =
-        vertex_component_map.find(source_vertex);
+    VertexComponentMap::const_iterator component_iterator = vertex_component_map.find(source_vertex);
 
     assert(component_iterator != vertex_component_map.end());
 
@@ -726,8 +677,7 @@ Subgraph::splitArticulation(Vertex articulation_vertex)
 
     Vertex split_vertex = split_vertices[source_component];
 
-    std::pair<Edge, bool> inserted =
-        addEdge(edge_id, source_vertex, split_vertex);
+    std::pair<Edge, bool> inserted = addEdge(edge_id, source_vertex, split_vertex);
 
     assert(inserted.second == true);
 
@@ -752,28 +702,21 @@ Subgraph::cloneOutEdges(Vertex old_vertex, Vertex new_vertex)
 
   // Iterate over the out edges of the old vertex and check against the
   // out edges of the new vertex. If the edge does not exist, add.
-  stk::mesh::EntityRank const top_rank =
-      get_bulk_data().entity_rank(old_entity);
+  stk::mesh::EntityRank const top_rank = get_bulk_data().entity_rank(old_entity);
 
   assert(get_bulk_data().entity_rank(new_entity) == top_rank);
 
-  for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK; rank <= top_rank;
-       ++rank) {
-    stk::mesh::Entity const* old_relations =
-        get_bulk_data().begin(old_entity, rank);
+  for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK; rank <= top_rank; ++rank) {
+    stk::mesh::Entity const* old_relations = get_bulk_data().begin(old_entity, rank);
 
-    size_t const num_old_relations =
-        get_bulk_data().num_connectivity(old_entity, rank);
+    size_t const num_old_relations = get_bulk_data().num_connectivity(old_entity, rank);
 
-    stk::mesh::ConnectivityOrdinal const* old_relation_ords =
-        get_bulk_data().begin_ordinals(old_entity, rank);
+    stk::mesh::ConnectivityOrdinal const* old_relation_ords = get_bulk_data().begin_ordinals(old_entity, rank);
 
     for (size_t i = 0; i < num_old_relations; ++i) {
-      stk::mesh::Entity const* new_relations =
-          get_bulk_data().begin(new_entity, rank);
+      stk::mesh::Entity const* new_relations = get_bulk_data().begin(new_entity, rank);
 
-      size_t const num_new_relations =
-          get_bulk_data().num_connectivity(new_entity, rank);
+      size_t const num_new_relations = get_bulk_data().num_connectivity(new_entity, rank);
 
       // Assume that the edge does not exist
       bool exists = false;
@@ -845,12 +788,7 @@ Subgraph::outputToGraphviz(std::string const& output_filename)
     stk::mesh::EntityId const entity_id = get_entity_id(entity);
 
     gviz_out << dot_entity(
-        get_space_dimension(),
-        get_topology().get_parallel_rank(),
-        entity,
-        entity_id,
-        rank,
-        failure_state);
+        get_space_dimension(), get_topology().get_parallel_rank(), entity, entity_id, rank, failure_state);
 
     // write the edges in the subgraph
     OutEdgeIterator out_edge_begin;

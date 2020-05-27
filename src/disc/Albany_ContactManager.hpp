@@ -67,10 +67,9 @@ class ContactManager
 {
  public:
   ContactManager(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Albany::AbstractDiscretization&       disc,
-      const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>&
-          meshSpecs);
+      const Teuchos::RCP<Teuchos::ParameterList>&                     params,
+      const Albany::AbstractDiscretization&                           disc,
+      const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>& meshSpecs);
 
   //! Destructor
   virtual ~ContactManager() {}
@@ -100,12 +99,10 @@ class ContactManager
   // Is this a contact problem?
   bool have_contact;
 
-  Teuchos::Array<std::string>
-                              masterSideNames;  // master (non-mortar) side names
-  Teuchos::Array<std::string> slaveSideNames;   // slave (mortar) side names
-  Teuchos::Array<std::string> sideSetIDs;       // sideset ids
-  Teuchos::Array<std::string>
-      constrainedFields;  // names of fields to be constrained
+  Teuchos::Array<std::string> masterSideNames;    // master (non-mortar) side names
+  Teuchos::Array<std::string> slaveSideNames;     // slave (mortar) side names
+  Teuchos::Array<std::string> sideSetIDs;         // sideset ids
+  Teuchos::Array<std::string> constrainedFields;  // names of fields to be constrained
 
   const Teuchos::ArrayRCP<double>&                                coordArray;
   const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>& meshSpecs;
@@ -114,8 +111,7 @@ class ContactManager
   int probDim;
 
   // Moertel-specific library data
-  Teuchos::RCP<MoertelT::ManagerT<ST, LO, Tpetra_GO, KokkosNode>>
-      moertelManager;
+  Teuchos::RCP<MoertelT::ManagerT<ST, LO, Tpetra_GO, KokkosNode>> moertelManager;
 
   std::ofstream sfile, mfile;
 

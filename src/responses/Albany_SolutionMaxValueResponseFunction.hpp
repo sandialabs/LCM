@@ -12,8 +12,7 @@ namespace Albany {
 /*!
  * \brief Reponse function representing the max of the solution values
  */
-class SolutionMaxValueResponseFunction
-    : public SamplingBasedScalarResponseFunction
+class SolutionMaxValueResponseFunction : public SamplingBasedScalarResponseFunction
 {
  public:
   //! Default constructor

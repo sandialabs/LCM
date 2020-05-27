@@ -35,8 +35,7 @@ class NodalDataBase
   }
 
   void
-  updateNodalGraph(
-      const Teuchos::RCP<const Albany::ThyraCrsMatrixFactory>& nGraph);
+  updateNodalGraph(const Teuchos::RCP<const Albany::ThyraCrsMatrixFactory>& nGraph);
 
   const Teuchos::RCP<const Albany::ThyraCrsMatrixFactory>&
   getNodalOpFactory() const
@@ -51,14 +50,10 @@ class NodalDataBase
   replaceOverlapVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> const& vs);
 
   void
-  replaceOwnedVectorSpace(
-      const Teuchos::Array<GO>&               local_nodeGIDs,
-      const Teuchos::RCP<Teuchos_Comm const>& comm_);
+  replaceOwnedVectorSpace(const Teuchos::Array<GO>& local_nodeGIDs, const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   void
-  replaceOverlapVectorSpace(
-      const Teuchos::Array<GO>&               overlap_nodeGIDs,
-      const Teuchos::RCP<Teuchos_Comm const>& comm_);
+  replaceOverlapVectorSpace(const Teuchos::Array<GO>& overlap_nodeGIDs, const Teuchos::RCP<Teuchos_Comm const>& comm_);
 
   bool
   isNodeDataPresent()
@@ -78,9 +73,7 @@ class NodalDataBase
   Teuchos::RCP<Adapt::NodalDataVector>
   getNodalDataVector()
   {
-    ALBANY_PANIC(
-        nodal_data_vector.is_null(),
-        "nodal_data_vector has not been allocated.");
+    ALBANY_PANIC(nodal_data_vector.is_null(), "nodal_data_vector has not been allocated.");
     return nodal_data_vector;
   }
 

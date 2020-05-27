@@ -25,9 +25,7 @@ class PerformanceContext
   instance();
 
   void
-  summarizeAll(
-      Teuchos::Ptr<Teuchos::Comm<int> const> comm,
-      std::ostream&                          out = std::cout);
+  summarizeAll(Teuchos::Ptr<Teuchos::Comm<int> const> comm, std::ostream& out = std::cout);
   void
   summarizeAll(std::ostream& out = std::cout);
 

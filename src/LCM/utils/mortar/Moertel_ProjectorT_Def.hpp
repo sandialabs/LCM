@@ -12,8 +12,7 @@
  |  ctor (public)                                            mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::Projector(bool twoD, int outlevel)
-    : twoD_(twoD), outputlevel_(outlevel)
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::Projector(bool twoD, int outlevel) : twoD_(twoD), outputlevel_(outlevel)
 {
 }
 
@@ -28,12 +27,11 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::~Projector() {}
  |    modded by gah 07/2010                                             |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    ProjectNodetoSegment_NodalNormal(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double  xi[],
-        double& gap)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_NodalNormal(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double  xi[],
+    double& gap)
 {
   bool ok = true;
   // 2D version of the problem
@@ -64,11 +62,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
                      "MoertelT::Projector::ProjectNodetoSegment_NodalNormal:\n"
                   << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
                   << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-                  << "MOERTEL: ***WRN*** F(eta) = " << F
-                  << " gradF(eta) = " << dF << " eta = " << eta
+                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta
                   << " delta(eta) = " << deta << "\n"
-                  << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/"
-                  << __LINE__ << "\n";
+                  << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
     std::cout << "#iterations = " << i << " F = " << F << " eta = " << eta << std::endl;
@@ -110,15 +106,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
     if (eps > 1.0e-10) {
       ok = false;
       if (OutLevel() > 3)
-        std::cout
-            << "MOERTEL: ***WRN*** "
-               "MoertelT::Projector::ProjectNodetoSegment_NodalNormal:\n"
-            << "MOERTEL: ***WRN*** 3D Newton iteration failed to converge\n"
-            << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-            << "MOERTEL: ***WRN*** eps = " << eps << " eta[3] = " << eta[0]
-            << "/" << eta[1] << "/" << alpha << "\n"
-            << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__
-            << "\n";
+        std::cout << "MOERTEL: ***WRN*** "
+                     "MoertelT::Projector::ProjectNodetoSegment_NodalNormal:\n"
+                  << "MOERTEL: ***WRN*** 3D Newton iteration failed to converge\n"
+                  << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
+                  << "MOERTEL: ***WRN*** eps = " << eps << " eta[3] = " << eta[0] << "/" << eta[1] << "/" << alpha
+                  << "\n"
+                  << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
     if (i>10)
@@ -150,8 +144,7 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_NodalNormal(
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::Projector::evaluate_F_2D_NodalNormal:\n"
@@ -221,16 +214,14 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_NodalNormal(
  |      nxs,nys outward normal of node (slave side)                     |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double
-    MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_NodalNormal(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double eta)
+double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_NodalNormal(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double eta)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::Projector::evaluate_gradF_2D_NodalNormal:\n"
@@ -274,12 +265,11 @@ double
  |                                                           mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    ProjectNodetoSegment_SegmentNormal(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double  xi[],
-        double& gap)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentNormal(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double  xi[],
+    double& gap)
 {
 #if 0
   std::cout << "----- Projector: Node " << node.Id() << " Segment " << seg.Id() << std::endl;
@@ -302,15 +292,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
     bool const ok = abs(F) <= 1.0e-9;
     if (!ok) {
       if (OutLevel() > 3)
-        std::cout
-            << "MOERTEL: ***WRN*** "
-               "MoertelT::Projector::ProjectNodetoSegment_SegmentNormal:\n"
-            << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
-            << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-            << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF
-            << " eta = " << eta << " delta(eta) = " << deta << "\n"
-            << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__
-            << "\n";
+        std::cout << "MOERTEL: ***WRN*** "
+                     "MoertelT::Projector::ProjectNodetoSegment_SegmentNormal:\n"
+                  << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
+                  << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
+                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta
+                  << " delta(eta) = " << deta << "\n"
+                  << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
     std::cout << "#iterations = " << i << " F = " << F << " eta = " << eta << std::endl;
@@ -359,15 +347,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
 
     if (eps > 1.0e-10) {
       if (OutLevel() > 3)
-        std::cout
-            << "MOERTEL: ***WRN*** "
-               "MoertelT::Projector::ProjectNodetoSegment_SegmentNormal:\n"
-            << "MOERTEL: ***WRN*** 3D Newton iteration failed to converge\n"
-            << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-            << "MOERTEL: ***WRN*** eps = " << eps << " eta[3] = " << eta[0]
-            << "/" << eta[1] << "/" << alpha << "\n"
-            << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__
-            << "\n";
+        std::cout << "MOERTEL: ***WRN*** "
+                     "MoertelT::Projector::ProjectNodetoSegment_SegmentNormal:\n"
+                  << "MOERTEL: ***WRN*** 3D Newton iteration failed to converge\n"
+                  << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
+                  << "MOERTEL: ***WRN*** eps = " << eps << " eta[3] = " << eta[0] << "/" << eta[1] << "/" << alpha
+                  << "\n"
+                  << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
     if (i>10)
@@ -394,17 +380,15 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
  |      njs nodal outward normal of nodes xs (slave side)               |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double
-    MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentNormal(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double  eta,
-        double& gap)
+double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentNormal(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double  eta,
+    double& gap)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::Projector::evaluate_F_2D_SegmentNormal:\n"
@@ -472,16 +456,14 @@ double
  |      nxjs,nyjs outward normals of node j (slave side)                |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    evaluate_gradF_2D_SegmentNormal(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double eta)
+double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentNormal(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double eta)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::Projector::evaluate_gradF_2D_SegmentNormal:\n"
@@ -537,8 +519,7 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
   const double* xm = node.XCoords();
 
   // calculate gradF
-  double gradF = Nxeta[0] * NN[1] + (Nx[0] - xm[0]) * NNeta[1] -
-                 Nxeta[1] * NN[0] - (Nx[1] - xm[1]) * NNeta[0];
+  double gradF = Nxeta[0] * NN[1] + (Nx[0] - xm[0]) * NNeta[1] - Nxeta[1] * NN[0] - (Nx[1] - xm[1]) * NNeta[0];
   return gradF;
 }
 
@@ -546,12 +527,11 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
  |                                                           mwgee 08/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    ProjectNodetoSegment_SegmentOrthogonal(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double  xi[],
-        double& gap)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentOrthogonal(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double  xi[],
+    double& gap)
 {
 #if 0
   std::cout << "----- Projector: Node " << node.Id() << " Segment " << seg.Id() << std::endl;
@@ -571,15 +551,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
     }
     if (abs(F) > 1.0e-10) {
       if (OutLevel() > 3)
-        std::cout
-            << "MOERTEL: ***WRN*** "
-               "MoertelT::Projector::ProjectNodetoSegment_SegmentOrthogonal:\n"
-            << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
-            << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-            << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF
-            << " eta = " << eta << " delta(eta) = " << deta << "\n"
-            << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__
-            << "\n";
+        std::cout << "MOERTEL: ***WRN*** "
+                     "MoertelT::Projector::ProjectNodetoSegment_SegmentOrthogonal:\n"
+                  << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
+                  << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
+                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta
+                  << " delta(eta) = " << deta << "\n"
+                  << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
     std::cout << "#iterations = " << i << " F = " << F << " eta = " << eta << std::endl;
@@ -608,17 +586,15 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
  |      njs nodal outward normal of nodes xs (slave side)               |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    evaluate_F_2D_SegmentOrthogonal(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double  eta,
-        double& gap)
+double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentOrthogonal(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double  eta,
+    double& gap)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::Projector::evaluate_F_2D_SegmentOrthogonal:\n"
@@ -680,16 +656,14 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
  |      xis nodal coords of segment's nodes i (slave side)              |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    evaluate_gradF_2D_SegmentOrthogonal(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double eta)
+double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentOrthogonal(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double eta)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** "
@@ -735,13 +709,12 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
  |                                                           mwgee 08/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    ProjectNodetoSegment_Orthogonal_to_Slave(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & snode,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double  xi[],
-        double& gap,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_Orthogonal_to_Slave(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & snode,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double  xi[],
+    double& gap,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg)
 {
 #if 0
   std::cout << "----- Projector: Node " << snode.Id() << " Segment " << seg.Id() << std::endl;
@@ -786,11 +759,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
                      "Slave:\n"
                   << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
                   << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-                  << "MOERTEL: ***WRN*** F(eta) = " << F
-                  << " gradF(eta) = " << dF << " eta = " << eta
+                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta
                   << " delta(eta) = " << deta << "\n"
-                  << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/"
-                  << __LINE__ << "\n";
+                  << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
     std::cout << "#iterations = " << i << " F = " << F << " eta = " << eta << std::endl;
@@ -819,18 +790,16 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
  |      njs nodal outward normal of nodes xs (slave side)               |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    evaluate_F_2D_SegmentOrthogonal_to_g(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double  eta,
-        double& gap,
-        double* g)
+double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentOrthogonal_to_g(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double  eta,
+    double& gap,
+    double* g)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** "
@@ -890,17 +859,15 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
  |      xis nodal coords of segment's nodes i (slave side)              |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::
-    evaluate_gradF_2D_SegmentOrthogonal_to_g(
-        MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-        MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-        double  eta,
-        double* g)
+double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentOrthogonal_to_g(
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
+    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
+    double  eta,
+    double* g)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
-  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type =
-      seg.FunctionType(0);
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
   if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** "

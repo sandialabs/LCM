@@ -16,8 +16,7 @@ namespace LCM {
 
 //! \brief Anisotropic Viscoplastic Constitutive Model
 template <typename EvalT, typename Traits>
-class AnisotropicViscoplasticModel
-    : public LCM::ConstitutiveModel<EvalT, Traits>
+class AnisotropicViscoplasticModel : public LCM::ConstitutiveModel<EvalT, Traits>
 {
  public:
   using Base        = LCM::ConstitutiveModel<EvalT, Traits>;
@@ -42,9 +41,7 @@ class AnisotropicViscoplasticModel
   ///
   /// Constructor
   ///
-  AnisotropicViscoplasticModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  AnisotropicViscoplasticModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Denstructor
@@ -55,16 +52,10 @@ class AnisotropicViscoplasticModel
   /// Method to compute the state (e.g. energy, stress, tangent)
   ///
   virtual void
-  computeState(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields);
+  computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields);
 
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      DepFieldMap               dep_fields,
-      FieldMap                  eval_fields)
+  computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
   {
     ALBANY_ABORT("Not implemented.");
   }

@@ -20,8 +20,7 @@ Albany::fix_node_sharing(stk::mesh::BulkData& bulk_data)
   for (int phase = 0; phase < 2; ++phase) {
     for (int i = 0; i < bulk_data.parallel_size(); ++i) {
       if (i != bulk_data.parallel_rank()) {
-        const stk::mesh::BucketVector& buckets =
-            bulk_data.buckets(stk::topology::NODE_RANK);
+        const stk::mesh::BucketVector& buckets = bulk_data.buckets(stk::topology::NODE_RANK);
         for (size_t j = 0; j < buckets.size(); ++j) {
           const stk::mesh::Bucket& bucket = *buckets[j];
           if (bucket.owned()) {

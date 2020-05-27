@@ -9,13 +9,8 @@
 #include "ParallelConstitutiveModel_Def.hpp"
 
 template <typename EvalT, typename Traits>
-LCM::J2MiniSolver<EvalT, Traits>::J2MiniSolver(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
-    : LCM::
-          ParallelConstitutiveModel<EvalT, Traits, J2MiniKernel<EvalT, Traits>>(
-              p,
-              dl)
+LCM::J2MiniSolver<EvalT, Traits>::J2MiniSolver(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
+    : LCM::ParallelConstitutiveModel<EvalT, Traits, J2MiniKernel<EvalT, Traits>>(p, dl)
 {
 }
 

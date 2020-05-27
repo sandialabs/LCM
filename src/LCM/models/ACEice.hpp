@@ -131,10 +131,7 @@ struct ACEiceMiniKernel : public ParallelKernel<EvalT, Traits>
   std::string block_name_{""};
 
   void
-  init(
-      Workset&                 workset,
-      FieldMap<ScalarT const>& input_fields,
-      FieldMap<ScalarT>&       output_fields);
+  init(Workset& workset, FieldMap<ScalarT const>& input_fields, FieldMap<ScalarT>& output_fields);
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -142,10 +139,7 @@ struct ACEiceMiniKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class ACEice : public LCM::ParallelConstitutiveModel<
-                   EvalT,
-                   Traits,
-                   ACEiceMiniKernel<EvalT, Traits>>
+class ACEice : public LCM::ParallelConstitutiveModel<EvalT, Traits, ACEiceMiniKernel<EvalT, Traits>>
 {
  public:
   ACEice(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);

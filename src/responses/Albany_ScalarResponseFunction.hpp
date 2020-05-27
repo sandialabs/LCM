@@ -21,8 +21,7 @@ class ScalarResponseFunction : public AbstractResponseFunction
 {
  public:
   //! Default constructor
-  ScalarResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm_)
-      : comm(comm_)
+  ScalarResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm_) : comm(comm_)
   {
     // Nothing to be done here
   }

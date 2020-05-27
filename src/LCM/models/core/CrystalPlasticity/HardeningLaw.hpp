@@ -90,11 +90,9 @@ struct HardeningParameterBase
  *	\tparam NumSlipT	Static number of slip systems in a slip family
  */
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
-struct LinearMinusRecoveryHardeningParameters final
-    : public HardeningParameterBase<NumDimT, NumSlipT>
+struct LinearMinusRecoveryHardeningParameters final : public HardeningParameterBase<NumDimT, NumSlipT>
 {
-  using ParamIndex =
-      typename HardeningParameterBase<NumDimT, NumSlipT>::ParamIndex;
+  using ParamIndex = typename HardeningParameterBase<NumDimT, NumSlipT>::ParamIndex;
 
   enum HardeningParamTypes : ParamIndex
   {
@@ -120,9 +118,8 @@ struct LinearMinusRecoveryHardeningParameters final
   }
 
   virtual void
-  createLatentMatrix(
-      SlipFamily<NumDimT, NumSlipT>&          slip_family,
-      std::vector<SlipSystem<NumDimT>> const& slip_systems) override;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems)
+      override;
 
   virtual void
   setValueAsymptotic() override
@@ -136,8 +133,7 @@ struct LinearMinusRecoveryHardeningParameters final
         this->asymptotic_value_ = CP::HUGE_;
       }
     } else {
-      this->asymptotic_value_ =
-          this->hardening_params_(STATE_HARDENING_INITIAL);
+      this->asymptotic_value_ = this->hardening_params_(STATE_HARDENING_INITIAL);
     }
     return;
   }
@@ -152,11 +148,9 @@ struct LinearMinusRecoveryHardeningParameters final
  *	\tparam NumSlipT	Static number of slip systems in a slip family
  */
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
-struct SaturationHardeningParameters final
-    : public HardeningParameterBase<NumDimT, NumSlipT>
+struct SaturationHardeningParameters final : public HardeningParameterBase<NumDimT, NumSlipT>
 {
-  using ParamIndex =
-      typename HardeningParameterBase<NumDimT, NumSlipT>::ParamIndex;
+  using ParamIndex = typename HardeningParameterBase<NumDimT, NumSlipT>::ParamIndex;
 
   enum HardeningParamTypes : ParamIndex
   {
@@ -182,8 +176,7 @@ struct SaturationHardeningParameters final
   virtual void
   setTolerance() override
   {
-    RealType const exponent_saturation =
-        this->hardening_params_(EXPONENT_SATURATION);
+    RealType const exponent_saturation = this->hardening_params_(EXPONENT_SATURATION);
 
     this->min_tol_ = std::pow(2.0 * TINY, 0.5 / exponent_saturation);
 
@@ -191,9 +184,8 @@ struct SaturationHardeningParameters final
   }
 
   virtual void
-  createLatentMatrix(
-      SlipFamily<NumDimT, NumSlipT>&          slip_family,
-      std::vector<SlipSystem<NumDimT>> const& slip_systems) override;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems)
+      override;
 
   virtual void
   setValueAsymptotic() override
@@ -214,11 +206,9 @@ struct SaturationHardeningParameters final
  *	\tparam NumSlipT	Static number of slip systems in a slip family
  */
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
-struct DislocationDensityHardeningParameters final
-    : public HardeningParameterBase<NumDimT, NumSlipT>
+struct DislocationDensityHardeningParameters final : public HardeningParameterBase<NumDimT, NumSlipT>
 {
-  using ParamIndex =
-      typename HardeningParameterBase<NumDimT, NumSlipT>::ParamIndex;
+  using ParamIndex = typename HardeningParameterBase<NumDimT, NumSlipT>::ParamIndex;
 
   enum HardeningParamTypes : ParamIndex
   {
@@ -250,9 +240,8 @@ struct DislocationDensityHardeningParameters final
   }
 
   virtual void
-  createLatentMatrix(
-      SlipFamily<NumDimT, NumSlipT>&          slip_family,
-      std::vector<SlipSystem<NumDimT>> const& slip_systems) override;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems)
+      override;
 
   virtual void
   setValueAsymptotic() override
@@ -274,8 +263,7 @@ struct DislocationDensityHardeningParameters final
  *	\tparam NumSlipT	Static number of slip systems in a slip family
  */
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT>
-struct NoHardeningParameters final
-    : public HardeningParameterBase<NumDimT, NumSlipT>
+struct NoHardeningParameters final : public HardeningParameterBase<NumDimT, NumSlipT>
 {
   NoHardeningParameters() { return; }
 
@@ -286,9 +274,8 @@ struct NoHardeningParameters final
   }
 
   virtual void
-  createLatentMatrix(
-      SlipFamily<NumDimT, NumSlipT>&          slip_family,
-      std::vector<SlipSystem<NumDimT>> const& slip_systems) override;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems)
+      override;
 
   virtual void
   setValueAsymptotic() override
@@ -351,8 +338,7 @@ class HardeningLawFactory
  *	\tparam ArgT		Scalar type used for hardening
  */
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
-struct LinearMinusRecoveryHardeningLaw final
-    : public HardeningLawBase<NumDimT, NumSlipT, ArgT>
+struct LinearMinusRecoveryHardeningLaw final : public HardeningLawBase<NumDimT, NumSlipT, ArgT>
 {
   virtual void
   harden(
@@ -376,8 +362,7 @@ struct LinearMinusRecoveryHardeningLaw final
  *	\tparam ArgT		Scalar type used for hardening
  */
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
-struct SaturationHardeningLaw final
-    : public HardeningLawBase<NumDimT, NumSlipT, ArgT>
+struct SaturationHardeningLaw final : public HardeningLawBase<NumDimT, NumSlipT, ArgT>
 {
   virtual void
   harden(
@@ -401,8 +386,7 @@ struct SaturationHardeningLaw final
  *	\tparam ArgT		Scalar type used for hardening
  */
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename ArgT>
-struct DislocationDensityHardeningLaw final
-    : public HardeningLawBase<NumDimT, NumSlipT, ArgT>
+struct DislocationDensityHardeningLaw final : public HardeningLawBase<NumDimT, NumSlipT, ArgT>
 {
   virtual void
   harden(

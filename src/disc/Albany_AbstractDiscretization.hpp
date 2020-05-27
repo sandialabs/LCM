@@ -23,8 +23,7 @@ class ContactManager;
 class AbstractDiscretization
 {
  public:
-  typedef std::map<std::string, Teuchos::RCP<AbstractDiscretization>>
-      SideSetDiscretizationsType;
+  typedef std::map<std::string, Teuchos::RCP<AbstractDiscretization>> SideSetDiscretizationsType;
 
   //! Constructor
   AbstractDiscretization() = default;
@@ -105,8 +104,7 @@ class AbstractDiscretization
   getOverlapDOFManager(std::string const& field_name) const = 0;
 
   //! Retrieve coodinate ptr_field (ws, el, node)
-  virtual const WorksetArray<
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type&
+  virtual const WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type&
   getCoords() const = 0;
 
   //! Get coordinates (overlap map).
@@ -120,8 +118,7 @@ class AbstractDiscretization
   //! configuration. This is only relevant, and also only optional, in the
   //! case of mesh adaptation.
   virtual void
-  setReferenceConfigurationManager(
-      const Teuchos::RCP<AAdapt::rc::Manager>& rcm) = 0;
+  setReferenceConfigurationManager(const Teuchos::RCP<AAdapt::rc::Manager>& rcm) = 0;
 
 #if defined(ALBANY_CONTACT)
   //! Get the contact manager
@@ -252,19 +249,13 @@ class AbstractDiscretization
   virtual void
   getField(Thyra_Vector& field_vector, std::string const& field_name) const = 0;
   virtual void
-  setField(
-      Thyra_Vector const& field_vector,
-      std::string const&  field_name,
-      bool                overlapped) = 0;
+  setField(Thyra_Vector const& field_vector, std::string const& field_name, bool overlapped) = 0;
 
   // --- Methods to write solution in the output file --- //
 
   //! Write the solution to the output file. Calls next two together.
   virtual void
-  writeSolution(
-      Thyra_Vector const& solution,
-      double const        time,
-      bool const          overlapped = false) = 0;
+  writeSolution(Thyra_Vector const& solution, double const time, bool const overlapped = false) = 0;
   virtual void
   writeSolution(
       Thyra_Vector const& solution,
@@ -279,16 +270,10 @@ class AbstractDiscretization
       double const        time,
       bool const          overlapped = false) = 0;
   virtual void
-  writeSolutionMV(
-      const Thyra_MultiVector& solution,
-      double const             time,
-      bool const               overlapped = false) = 0;
+  writeSolutionMV(const Thyra_MultiVector& solution, double const time, bool const overlapped = false) = 0;
   //! Write the solution to the mesh database.
   virtual void
-  writeSolutionToMeshDatabase(
-      Thyra_Vector const& solution,
-      double const        time,
-      bool const          overlapped = false) = 0;
+  writeSolutionToMeshDatabase(Thyra_Vector const& solution, double const time, bool const overlapped = false) = 0;
   virtual void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
@@ -310,15 +295,9 @@ class AbstractDiscretization
 
   //! Write the solution to file. Must call writeSolution first.
   virtual void
-  writeSolutionToFile(
-      Thyra_Vector const& solution,
-      double const        time,
-      bool const          overlapped = false) = 0;
+  writeSolutionToFile(Thyra_Vector const& solution, double const time, bool const overlapped = false) = 0;
   virtual void
-  writeSolutionMVToFile(
-      const Thyra_MultiVector& solution,
-      double const             time,
-      bool const               overlapped = false) = 0;
+  writeSolutionMVToFile(const Thyra_MultiVector& solution, double const time, bool const overlapped = false) = 0;
 };
 
 }  // namespace Albany

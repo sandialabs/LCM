@@ -12,10 +12,7 @@ class MyPairIterRelation
 
   MyPairIterRelation();
   MyPairIterRelation(const MyPairIterRelation& mp);
-  MyPairIterRelation(
-      unsigned                              size,
-      const stk::mesh::Entity*              entities,
-      const stk::mesh::ConnectivityOrdinal* ordinals)
+  MyPairIterRelation(unsigned size, const stk::mesh::Entity* entities, const stk::mesh::ConnectivityOrdinal* ordinals)
       : m_size(size), m_entities(entities), m_ordinals(ordinals)
   {
   }
@@ -30,10 +27,7 @@ class MyPairIterRelation
   //  m_ordinals ( eMesh.get_bulk_data()->begin_ordinals(entity, entity_rank) )
   //{}
 
-  MyPairIterRelation(
-      const stk::mesh::BulkData& bulk_data,
-      stk::mesh::Entity          entity,
-      stk::mesh::EntityRank      entity_rank)
+  MyPairIterRelation(const stk::mesh::BulkData& bulk_data, stk::mesh::Entity entity, stk::mesh::EntityRank entity_rank)
       : m_size(bulk_data.num_connectivity(entity, entity_rank)),
         m_entities(bulk_data.begin(entity, entity_rank)),
         m_ordinals(bulk_data.begin_ordinals(entity, entity_rank))

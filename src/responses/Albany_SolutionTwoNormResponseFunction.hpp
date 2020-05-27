@@ -12,13 +12,11 @@ namespace Albany {
 /*!
  * \brief Reponse function representing the average of the solution values
  */
-class SolutionTwoNormResponseFunction
-    : public SamplingBasedScalarResponseFunction
+class SolutionTwoNormResponseFunction : public SamplingBasedScalarResponseFunction
 {
  public:
   //! Default constructor
-  SolutionTwoNormResponseFunction(
-      const Teuchos::RCP<Teuchos_Comm const>& commT);
+  SolutionTwoNormResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Destructor
   virtual ~SolutionTwoNormResponseFunction();

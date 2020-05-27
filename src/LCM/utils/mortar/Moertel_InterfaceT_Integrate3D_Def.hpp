@@ -20,8 +20,7 @@ double const CONSTRAINT_MATRIX_ZERO = 1.0e-11;
  *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(
-    Teuchos::RCP<Teuchos::ParameterList> intparams)
+MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(Teuchos::RCP<Teuchos::ParameterList> intparams)
 {
   bool ok    = false;
   intparams_ = intparams;
@@ -35,8 +34,7 @@ MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(
       std::cout << "***ERR*** MoertelT::InterfaceT::Mortar_Integrate:\n"
                 << "***ERR*** This is not a 3D problem, we're in the wrong "
                    "method here!!!\n"
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
 
     return false;
   }
@@ -45,10 +43,8 @@ MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(
   if (!IsComplete()) {
     if (gcomm_->getRank() == 0)
       std::cout << "***ERR*** MoertelT::InterfaceT::Mortar_Integrate:\n"
-                << "***ERR*** Complete() not called on interface " << Id_
-                << "\n"
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** Complete() not called on interface " << Id_ << "\n"
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
 
     return false;
   }
@@ -60,29 +56,24 @@ MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(
   if (MortarSide() == -1) {
     if (gcomm_->getRank() == 0)
       std::cout << "***ERR*** MoertelT::InterfaceT::Mortar_Integrate:\n"
-                << "***ERR*** mortar side was not assigned on interface " << Id_
-                << "\n"
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** mortar side was not assigned on interface " << Id_ << "\n"
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
 
     return false;
   }
 
   // interface segments need to have at least one function on the mortar side
   // and two functions on the slave side
-  int mside = MortarSide();
-  int sside = OtherSide(mside);
-  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-      iterator scurr;
+  int                                                                               mside = MortarSide();
+  int                                                                               sside = OtherSide(mside);
+  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::iterator scurr;
 
   for (scurr = seg_[mside].begin(); scurr != seg_[mside].end(); ++scurr)
     if (scurr->second->Nfunctions() < 1) {
       std::cout << "***ERR*** MoertelT::InterfaceT::Mortar_Integrate:\n"
                 << "***ERR*** interface " << Id_ << ", mortar side\n"
-                << "***ERR*** segment " << scurr->second->Id()
-                << " needs at least 1 function set\n"
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** segment " << scurr->second->Id() << " needs at least 1 function set\n"
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       return false;
     }
 
@@ -90,10 +81,8 @@ MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(
     if (scurr->second->Nfunctions() < 2) {
       std::cout << "***ERR*** MoertelT::InterfaceT::Mortar_Integrate:\n"
                 << "***ERR*** interface " << Id_ << ", slave side\n"
-                << "***ERR*** segment " << scurr->second->Id()
-                << " needs at least 2 function set\n"
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** segment " << scurr->second->Id() << " needs at least 2 function set\n"
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       return false;
     }
 
@@ -107,8 +96,7 @@ MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(
 
   // time this process
   if (OutLevel() > 5) {
-    std::cout << "MoertelT::Interface " << Id() << ": Integration on proc "
-              << gcomm_->getRank() << " finished in "
+    std::cout << "MoertelT::Interface " << Id() << ": Integration on proc " << gcomm_->getRank() << " finished in "
               << time.totalElapsedTime(true) << " sec\n";
     fflush(stdout);
   }
@@ -125,10 +113,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D()
   if (!IsComplete()) {
     if (gcomm_->getRank() == 0)
       std::cout << "***ERR*** MoertelT::InterfaceT::Integrate_3D:\n"
-                << "***ERR*** Complete() not called on interface " << Id_
-                << "\n"
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** Complete() not called on interface " << Id_ << "\n"
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
 
     return false;
   }
@@ -140,13 +126,11 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D()
   int sside = OtherSide(mside);
 
   // loop over all segments of slave side
-  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-      iterator scurr;
+  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::iterator scurr;
 
   for (scurr = rseg_[sside].begin(); scurr != rseg_[sside].end(); ++scurr) {
     // the segment to be integrated
-    Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> actsseg =
-        scurr->second;
+    Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> actsseg = scurr->second;
 
 #if 0
     std::cout << "\n\nActive sseg id " << actsseg->Id() << "\n";
@@ -171,12 +155,10 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D()
     // time.ResetStartTime();
 
     // loop over all segments on the master side
-    std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::
-        iterator mcurr;
+    std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>::iterator mcurr;
 
     for (mcurr = rseg_[mside].begin(); mcurr != rseg_[mside].end(); ++mcurr) {
-      Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> actmseg =
-          mcurr->second;
+      Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> actmseg = mcurr->second;
 #if 0
       std::cout << "Active mseg id " << actmseg->Id() << std::endl;
 #endif
@@ -204,14 +186,10 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
 {
-  if ((sseg.Type() !=
-           MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
-       sseg.Type() !=
-           MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad) ||
-      (mseg.Type() !=
-           MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
-       mseg.Type() !=
-           MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad)) {
+  if ((sseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
+       sseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad) ||
+      (mseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
+       mseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad)) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::InterfaceT::Integrate_3D_Section:\n"
         << "***ERR*** Integration of other then bilinear triangles/quads not "
@@ -226,8 +204,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
   // first determine whether there is an overlap between sseg and mseg
   // for this purpose, the 'overlapper' class is used
   // It also builds a triangulation of the overlap polygon if there is any
-  MoertelT::OverlapT<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)> overlap(
-      sseg, mseg, *this, exactvalues, OutLevel());
+  MoertelT::OverlapT<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)> overlap(sseg, mseg, *this, exactvalues, OutLevel());
 
   // determine the overlap triangulation if any
   bool ok = overlap.ComputeOverlap();
@@ -242,8 +219,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
 
   // integrator object
   int ngp = intparams_->get("number gaussian points 2D", 12);
-  MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)
-      integrator(ngp, IsOneDimensional(), OutLevel());
+  MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT) integrator(ngp, IsOneDimensional(), OutLevel());
 
   // loop segments and integrate them
   for (int s = 0; s < nseg; ++s) {
@@ -252,8 +228,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
     // integrate master and slave part of this segment
     Teuchos::SerialDenseMatrix<LO, ST>* Ddense = NULL;
     Teuchos::SerialDenseMatrix<LO, ST>* Mdense = NULL;
-    bool                                ok     = integrator.Integrate(
-        actseg, sseg, mseg, &Ddense, &Mdense, overlap, 1.0e-04, exactvalues);
+    bool ok = integrator.Integrate(actseg, sseg, mseg, &Ddense, &Mdense, overlap, 1.0e-04, exactvalues);
     if (!ok) continue;
 
     // assemble temporarily into the nodes
@@ -275,9 +250,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
   |  assemble integration of master/slave side in 3D (2D interface)      |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
-    Tpetra::CrsMatrix<ST, LO, GO, N>& D,
-    Tpetra::CrsMatrix<ST, LO, GO, N>& M)
+bool MoertelT::MOERTEL_TEMPLATE_CLASS(
+    InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M)
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
@@ -293,26 +267,23 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
   int sside = OtherSide(mside);
 
   // loop over all slave nodes
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator
-      curr;
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator curr;
 
   for (curr = rnode_[sside].begin(); curr != rnode_[sside].end(); ++curr) {
     // loop only my own nodes
     if (NodePID(curr->second->Id()) != lcomm_->getRank()) continue;
 
     // get std::maps D and M and Mmod from node
-    Teuchos::RCP<std::map<int, double>> Drow = curr->second->GetD();
-    Teuchos::RCP<std::map<int, double>> Mrow = curr->second->GetM();
-    Teuchos::RCP<std::vector<std::map<int, double>>> Mmod =
-        curr->second->GetMmod();
+    Teuchos::RCP<std::map<int, double>>              Drow = curr->second->GetD();
+    Teuchos::RCP<std::map<int, double>>              Mrow = curr->second->GetM();
+    Teuchos::RCP<std::vector<std::map<int, double>>> Mmod = curr->second->GetMmod();
 
     // if there's no D or M there's nothing to do
     if (Drow == Teuchos::null && Mrow == Teuchos::null) continue;
 
-    Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> rowsnode =
-        curr->second;
-    int        snlmdof = rowsnode->Nlmdof();
-    int const* slmdof  = rowsnode->LMDof();
+    Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> rowsnode = curr->second;
+    int                                                   snlmdof  = rowsnode->Nlmdof();
+    int const*                                            slmdof   = rowsnode->LMDof();
     // std::cout << "Current row snode: " << rowsnode->Id() << std::endl;
 
     std::map<int, double>::iterator rowcurr;
@@ -328,15 +299,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
         // std::cout << "Current col snode: " << colnode << std::endl;
 
         // get the colsnode
-        Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colsnode =
-            GetNodeView(colnode);
+        Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colsnode = GetNodeView(colnode);
 
         if (colsnode == Teuchos::null) {
           std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                    << "***ERR*** interface " << Id_
-                    << ": cannot get view of node " << colnode << "\n"
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** interface " << Id_ << ": cannot get view of node " << colnode << "\n"
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           return false;
         }
 
@@ -345,11 +313,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
         int const* sdof  = colsnode->Dof();
 
         if (snlmdof != sndof) {
-          std::cout
-              << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-              << "***ERR*** interface " << Id_
-              << ": mismatch in # lagrange multipliers and primal variables\n"
-              << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
+          std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
+                    << "***ERR*** interface " << Id_ << ": mismatch in # lagrange multipliers and primal variables\n"
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           return false;
         }
 
@@ -364,24 +330,19 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
 
           if (err < 0) {
             std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "***ERR*** interface " << Id_
-                      << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
-                      << err << "\n"
-                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                      << "\n";
+                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
+                      << "\n"
+                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
             return false;
           }
 
           if (err && OutLevel() > 0) {
-            std::cout
-                << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
-                << "MoertelT: ***WRN*** interface " << Id_
-                << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
-                << "\n"
-                << "MoertelT: ***WRN*** indicating that initial guess for "
-                   "memory of D too small\n"
-                << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/"
-                << __LINE__ << "\n";
+            std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
+                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
+                      << err << "\n"
+                      << "MoertelT: ***WRN*** indicating that initial guess for "
+                         "memory of D too small\n"
+                      << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           }
         }  // for (int i=0; i<snlmdof; ++i)
       }    // for (rowcurr=Drow->begin(); rowcurr!=Drow->end(); ++rowcurr)
@@ -398,15 +359,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
         // std::cout << "Current colmnode: " << colnode << std::endl;
 
         // get the colmnode
-        Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colmnode =
-            GetNodeView(colnode);
+        Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colmnode = GetNodeView(colnode);
 
         if (colmnode == Teuchos::null) {
           std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                    << "***ERR*** interface " << Id_
-                    << ": cannot get view of node " << colnode << "\n"
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** interface " << Id_ << ": cannot get view of node " << colnode << "\n"
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           return false;
         }
 
@@ -415,11 +373,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
         int const* mdof  = colmnode->Dof();
 
         if (snlmdof != mndof) {
-          std::cout
-              << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-              << "***ERR*** interface " << Id_
-              << ": mismatch in # lagrange multipliers and primal variables\n"
-              << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
+          std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
+                    << "***ERR*** interface " << Id_ << ": mismatch in # lagrange multipliers and primal variables\n"
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           return false;
         }
 
@@ -434,24 +390,19 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
 
           if (err < 0) {
             std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "***ERR*** interface " << Id_
-                      << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
-                      << err << "\n"
-                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                      << "\n";
+                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
+                      << "\n"
+                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
             return false;
           }
 
           if (err && OutLevel() > 0) {
-            std::cout
-                << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
-                << "MoertelT: ***WRN*** interface " << Id_
-                << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
-                << "\n"
-                << "MoertelT: ***WRN*** indicating that initial guess for "
-                   "memory of M too small\n"
-                << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/"
-                << __LINE__ << "\n";
+            std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
+                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
+                      << err << "\n"
+                      << "MoertelT: ***WRN*** indicating that initial guess for "
+                         "memory of M too small\n"
+                      << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           }
         }  // for (int i=0; i<snlmdof; ++i)
       }    // for (rowcurr=Mrow->begin(); rowcurr!=Mrow->end(); ++rowcurr)
@@ -480,24 +431,19 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
 
           if (err < 0) {
             std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "***ERR*** interface " << Id_
-                      << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
-                      << err << "\n"
-                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                      << "\n";
+                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
+                      << "\n"
+                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
             return false;
           }
 
           if (err && OutLevel() > 0) {
-            std::cout
-                << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
-                << "MoertelT: ***WRN*** interface " << Id_
-                << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
-                << "\n"
-                << "MoertelT: ***WRN*** indicating that initial guess for "
-                   "memory of M too small\n"
-                << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/"
-                << __LINE__ << "\n";
+            std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
+                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
+                      << err << "\n"
+                      << "MoertelT: ***WRN*** indicating that initial guess for "
+                         "memory of M too small\n"
+                      << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           }
 
         }  // for (rowcurr=Mrow->begin(); rowcurr!=Mrow->end(); ++rowcurr)
@@ -633,16 +579,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
           // find whether I am owner of this node
           if (NodePID(nodeid) == lcomm_->getRank()) {
             // get the node
-            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode =
-                GetNodeView(nodeid);
+            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode = GetNodeView(nodeid);
 
             if (snode == Teuchos::null) {
               std::stringstream oss;
               oss << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                  << "***ERR*** Cannot find view of node " << nodeid
-                  << std::endl
-                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                  << "\n";
+                  << "***ERR*** Cannot find view of node " << nodeid << std::endl
+                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
               throw MoertelT::ReportError(oss);
             }
 
@@ -658,16 +601,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
               if (abs(val) < CONSTRAINT_MATRIX_ZERO) continue;
 
               // get view of column node and primal dofs
-              Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colnode =
-                  GetNodeView(colsnode);
+              Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colnode = GetNodeView(colsnode);
 
               if (colnode == Teuchos::null) {
                 std::stringstream oss;
                 oss << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                    << "***ERR*** Cannot find view of node " << colsnode
-                    << std::endl
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** Cannot find view of node " << colsnode << std::endl
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 throw MoertelT::ReportError(oss);
               }
 
@@ -679,8 +619,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
                 oss << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
                     << "***ERR*** Mismatch in # primal dofs and Lagrange "
                        "multipliers\n"
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 throw MoertelT::ReportError(oss);
               }
 
@@ -698,22 +637,18 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
                   std::stringstream oss;
                   oss << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
                       << "***ERR*** Serious error=" << err << " in assembly\n"
-                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                      << "\n";
+                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                   throw MoertelT::ReportError(oss);
                 }
 
                 if (err && OutLevel() > 0) {
-                  std::cout
-                      << "MoertelT: ***WRN*** "
-                         "MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "MoertelT: ***WRN*** interface " << Id()
-                      << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
-                      << err << "\n"
-                      << "MoertelT: ***WRN*** indicating that initial guess "
-                         "for memory of D too small\n"
-                      << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/"
-                      << __LINE__ << "\n";
+                  std::cout << "MoertelT: ***WRN*** "
+                               "MoertelT::InterfaceT::Assemble_3D:\n"
+                            << "MoertelT: ***WRN*** interface " << Id()
+                            << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
+                            << "MoertelT: ***WRN*** indicating that initial guess "
+                               "for memory of D too small\n"
+                            << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 }
               }  // for (int k=0; k<nslmdof; ++k)
             }    // for (int j=0; j<size; ++j)
@@ -734,16 +669,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
           // find whether I am owner of this node
           if (NodePID(nodeid) == lcomm_->getRank()) {
             // get the node
-            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode =
-                GetNodeView(nodeid);
+            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode = GetNodeView(nodeid);
 
             if (snode == Teuchos::null) {
               std::stringstream oss;
               oss << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                  << "***ERR*** Cannot find view of node " << nodeid
-                  << std::endl
-                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                  << "\n";
+                  << "***ERR*** Cannot find view of node " << nodeid << std::endl
+                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
               throw MoertelT::ReportError(oss);
             }
 
@@ -759,16 +691,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
               if (abs(val) < CONSTRAINT_MATRIX_ZERO) continue;
 
               // get view of column node and primal dofs
-              Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colnode =
-                  GetNodeView(colmnode);
+              Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colnode = GetNodeView(colmnode);
 
               if (colnode == Teuchos::null) {
                 std::stringstream oss;
                 oss << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                    << "***ERR*** Cannot find view of node " << colmnode
-                    << std::endl
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** Cannot find view of node " << colmnode << std::endl
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 throw MoertelT::ReportError(oss);
               }
 
@@ -780,8 +709,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
                 oss << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
                     << "***ERR*** Mismatch in # primal dofs and Lagrange "
                        "multipliers\n"
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 throw MoertelT::ReportError(oss);
               }
 
@@ -799,22 +727,18 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(
                   std::stringstream oss;
                   oss << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
                       << "***ERR*** Serious error=" << err << " in assembly\n"
-                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                      << "\n";
+                      << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                   throw MoertelT::ReportError(oss);
                 }
 
                 if (err && OutLevel() > 0) {
-                  std::cout
-                      << "MoertelT: ***WRN*** "
-                         "MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "MoertelT: ***WRN*** interface " << Id()
-                      << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
-                      << err << "\n"
-                      << "MoertelT: ***WRN*** indicating that initial guess "
-                         "for memory of M too small\n"
-                      << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/"
-                      << __LINE__ << "\n";
+                  std::cout << "MoertelT: ***WRN*** "
+                               "MoertelT::InterfaceT::Assemble_3D:\n"
+                            << "MoertelT: ***WRN*** interface " << Id()
+                            << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
+                            << "MoertelT: ***WRN*** indicating that initial guess "
+                               "for memory of M too small\n"
+                            << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 }
               }  // for (int k=0; k<nslmdof; ++k)
             }    // for (int j=0; j<size; ++j)
@@ -867,24 +791,16 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
   int sside = OtherSide(mside);
 
   // loop over all slave nodes
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator
-      curr;
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator curr;
 
 #if defined(PDANDM)  // Save and print the D and M for debugging
   int              size = rnode_[sside].size();
   int              cnt  = 0;
   std::vector<int> dtable(size);
 
-  for (curr = rnode_[sside].begin(); curr != rnode_[sside].end(); ++curr)
+  for (curr = rnode_[sside].begin(); curr != rnode_[sside].end(); ++curr) dtable[cnt++] = curr->second->Id();
 
-    dtable[cnt++] = curr->second->Id();
-
-  Tpetra::Map<LO, GO, N> Dmap(
-      Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(),
-      &dtable[0],
-      size,
-      0,
-      lcomm_);
+  Tpetra::Map<LO, GO, N> Dmap(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(), &dtable[0], size, 0, lcomm_);
   Tpetra::CrsMatrix<ST, LO, GO, N> Dmat(Dmap, 4);
   Tpetra::CrsMatrix<ST, LO, GO, N> Mmat(Dmap, 4);
 
@@ -897,18 +813,16 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
     //  std::cout << curr->second->Id() << std::endl;
 
     // get maps D and M and Mmod from node
-    Teuchos::RCP<std::map<int, double>> Drow = curr->second->GetD();
-    Teuchos::RCP<std::map<int, double>> Mrow = curr->second->GetM();
-    Teuchos::RCP<std::vector<std::map<int, double>>> Mmod =
-        curr->second->GetMmod();
+    Teuchos::RCP<std::map<int, double>>              Drow = curr->second->GetD();
+    Teuchos::RCP<std::map<int, double>>              Mrow = curr->second->GetM();
+    Teuchos::RCP<std::vector<std::map<int, double>>> Mmod = curr->second->GetMmod();
 
     // if there's no D or M there's nothing to do
     if (Drow == Teuchos::null && Mrow == Teuchos::null) continue;
 
-    Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> rowsnode =
-        curr->second;
-    int        snlmdof = rowsnode->Nlmdof();
-    int const* slmdof  = rowsnode->LMDof();
+    Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> rowsnode = curr->second;
+    int                                                   snlmdof  = rowsnode->Nlmdof();
+    int const*                                            slmdof   = rowsnode->LMDof();
     // std::cout << "Current row snode: " << rowsnode->Id() << std::endl;
 
     std::map<int, double>::iterator rowcurr;
@@ -919,8 +833,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
         int    colnode = rowcurr->first;
         double val     = rowcurr->second;
 
-        if (abs(val) <
-            CONSTRAINT_MATRIX_ZERO)  // this entry of D is effectively zero
+        if (abs(val) < CONSTRAINT_MATRIX_ZERO)  // this entry of D is effectively zero
           continue;
 #if defined(PDANDM)  // Save the row, col, and value
         Dmat.insertGlobalValues(curr->second->Id(), 1, &val, &colnode);
@@ -929,15 +842,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
         // std::cout << "Current col snode: " << colnode << std::endl;
 
         // get the colsnode
-        Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colsnode =
-            GetNodeView(colnode);
+        Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colsnode = GetNodeView(colnode);
 
         if (colsnode == Teuchos::null) {
           std::cout << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
-                    << "***ERR*** interface " << Id_
-                    << ": cannot get view of node " << colnode << "\n"
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** interface " << Id_ << ": cannot get view of node " << colnode << "\n"
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           return false;
         }
 
@@ -946,17 +856,14 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
         int const* sdof  = colsnode->Dof();
 
         if (snlmdof != sndof) {
-          std::cout
-              << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
-              << "***ERR*** interface " << Id_
-              << ": mismatch in # lagrange multipliers and primal variables\n"
-              << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
+          std::cout << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
+                    << "***ERR*** interface " << Id_ << ": mismatch in # lagrange multipliers and primal variables\n"
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           return false;
         }
 
         for (int i = 0; i < snlmdof; ++i) {
-          if (!sel->EvaluateLM(
-                  rowsnode, i))  // Continue if this LM is not active
+          if (!sel->EvaluateLM(rowsnode, i))  // Continue if this LM is not active
             continue;
 
           int row = slmdof[i];
@@ -994,15 +901,12 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 #endif
 
         // get the colmnode
-        Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colmnode =
-            GetNodeView(colnode);
+        Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colmnode = GetNodeView(colnode);
 
         if (colmnode == Teuchos::null) {
           std::cout << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
-                    << "***ERR*** interface " << Id_
-                    << ": cannot get view of node " << colnode << "\n"
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** interface " << Id_ << ": cannot get view of node " << colnode << "\n"
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           return false;
         }
 
@@ -1011,11 +915,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
         int const* mdof  = colmnode->Dof();
 
         if (snlmdof != mndof) {
-          std::cout
-              << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
-              << "***ERR*** interface " << Id_
-              << ": mismatch in # lagrange multipliers and primal variables\n"
-              << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
+          std::cout << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
+                    << "***ERR*** interface " << Id_ << ": mismatch in # lagrange multipliers and primal variables\n"
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           return false;
         }
 
@@ -1224,16 +1126,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
           // find whether I am owner of this node
           if (NodePID(nodeid) == lcomm_->getRank()) {
             // get the node
-            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode =
-                GetNodeView(nodeid);
+            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode = GetNodeView(nodeid);
 
             if (snode == Teuchos::null) {
               std::stringstream oss;
               oss << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
-                  << "***ERR*** Cannot find view of node " << nodeid
-                  << std::endl
-                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                  << "\n";
+                  << "***ERR*** Cannot find view of node " << nodeid << std::endl
+                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
               throw MoertelT::ReportError(oss);
             }
 
@@ -1249,16 +1148,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
               if (abs(val) < CONSTRAINT_MATRIX_ZERO) continue;
 
               // get view of column node and primal dofs
-              Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colnode =
-                  GetNodeView(colsnode);
+              Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colnode = GetNodeView(colsnode);
 
               if (colnode == Teuchos::null) {
                 std::stringstream oss;
                 oss << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
-                    << "***ERR*** Cannot find view of node " << colsnode
-                    << std::endl
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** Cannot find view of node " << colsnode << std::endl
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 throw MoertelT::ReportError(oss);
               }
 
@@ -1270,8 +1166,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
                 oss << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
                     << "***ERR*** Mismatch in # primal dofs and lagrange "
                        "mutlipliers\n"
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 throw MoertelT::ReportError(oss);
               }
 
@@ -1316,16 +1211,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
           // find whether I am owner of this node
           if (NodePID(nodeid) == lcomm_->getRank()) {
             // get the node
-            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode =
-                GetNodeView(nodeid);
+            Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> snode = GetNodeView(nodeid);
 
             if (snode == Teuchos::null) {
               std::stringstream oss;
               oss << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
-                  << "***ERR*** Cannot find view of node " << nodeid
-                  << std::endl
-                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                  << "\n";
+                  << "***ERR*** Cannot find view of node " << nodeid << std::endl
+                  << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
               throw MoertelT::ReportError(oss);
             }
 
@@ -1341,16 +1233,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
               if (abs(val) < CONSTRAINT_MATRIX_ZERO) continue;
 
               // get view of column node and primal dofs
-              Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colnode =
-                  GetNodeView(colmnode);
+              Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> colnode = GetNodeView(colmnode);
 
               if (colnode == Teuchos::null) {
                 std::stringstream oss;
                 oss << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
-                    << "***ERR*** Cannot find view of node " << colmnode
-                    << std::endl
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** Cannot find view of node " << colmnode << std::endl
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 throw MoertelT::ReportError(oss);
               }
 
@@ -1362,8 +1251,7 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
                 oss << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"
                     << "***ERR*** Mismatch in # primal dofs and lagrange "
                        "mutlipliers\n"
-                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                    << "\n";
+                    << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 throw MoertelT::ReportError(oss);
               }
 

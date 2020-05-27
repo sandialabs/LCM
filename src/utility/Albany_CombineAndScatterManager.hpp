@@ -74,61 +74,43 @@ class CombineAndScatterManager
 
   // Combine methods
   virtual void
-  combine(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM)
-      const = 0;
+  combine(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM) const = 0;
   virtual void
-  combine(
-      const Thyra_MultiVector& src,
-      Thyra_MultiVector&       dst,
-      const CombineMode        CM) const = 0;
+  combine(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM) const = 0;
   virtual void
-  combine(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM)
-      const = 0;
+  combine(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM) const = 0;
 
   virtual void
-  combine(
-      Teuchos::RCP<Thyra_Vector const> const& src,
-      Teuchos::RCP<Thyra_Vector> const&       dst,
-      const CombineMode                       CM) const = 0;
+  combine(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM)
+      const = 0;
   virtual void
   combine(
       const Teuchos::RCP<const Thyra_MultiVector>& src,
       Teuchos::RCP<Thyra_MultiVector> const&       dst,
       const CombineMode                            CM) const = 0;
   virtual void
-  combine(
-      const Teuchos::RCP<const Thyra_LinearOp>& src,
-      const Teuchos::RCP<Thyra_LinearOp>&       dst,
-      const CombineMode                         CM) const = 0;
+  combine(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM)
+      const = 0;
 
   // Scatter methods
   virtual void
-  scatter(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM)
-      const = 0;
+  scatter(Thyra_Vector const& src, Thyra_Vector& dst, const CombineMode CM) const = 0;
   virtual void
-  scatter(
-      const Thyra_MultiVector& src,
-      Thyra_MultiVector&       dst,
-      const CombineMode        CM) const = 0;
+  scatter(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM) const = 0;
   virtual void
-  scatter(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM)
-      const = 0;
+  scatter(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM) const = 0;
 
   virtual void
-  scatter(
-      Teuchos::RCP<Thyra_Vector const> const& src,
-      Teuchos::RCP<Thyra_Vector> const&       dst,
-      const CombineMode                       CM) const = 0;
+  scatter(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM)
+      const = 0;
   virtual void
   scatter(
       const Teuchos::RCP<const Thyra_MultiVector>& src,
       Teuchos::RCP<Thyra_MultiVector> const&       dst,
       const CombineMode                            CM) const = 0;
   virtual void
-  scatter(
-      const Teuchos::RCP<const Thyra_LinearOp>& src,
-      const Teuchos::RCP<Thyra_LinearOp>&       dst,
-      const CombineMode                         CM) const = 0;
+  scatter(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM)
+      const = 0;
 
  protected:
   void

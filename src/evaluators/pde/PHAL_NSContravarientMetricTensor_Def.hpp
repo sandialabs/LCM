@@ -10,13 +10,11 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(
-    Teuchos::ParameterList const& p)
+NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(Teuchos::ParameterList const& p)
     : coordVec(
           p.get<std::string>("Coordinate Vector Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Coordinate Data Layout")),
-      cubature(
-          p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
+      cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       cellType(p.get<Teuchos::RCP<shards::CellTopology>>("Cell Type")),
       Gc(p.get<std::string>("Contravarient Metric Tensor Name"),
          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout"))
@@ -25,8 +23,7 @@ NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(
   this->addEvaluatedField(Gc);
 
   // Get Dimensions
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
   std::vector<PHX::DataLayout::size_type> dim;
   vector_dl->dimensions(dim);
   numCells = dim[0];
@@ -47,22 +44,18 @@ NSContravarientMetricTensor<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(Gc, fm);
 
   // Pre-Calculate reference element quantitites
-  refPoints =
-      Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numDims);
+  refPoints  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numDims);
   refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
   cubature->getCubature(refPoints, refWeights);
 
-  jacobian = Kokkos::createDynRankView(
-      Gc.get_view(), "XXX", numCells, numQPs, numDims, numDims);
-  jacobian_inv = Kokkos::createDynRankView(
-      Gc.get_view(), "XXX", numCells, numQPs, numDims, numDims);
+  jacobian     = Kokkos::createDynRankView(Gc.get_view(), "XXX", numCells, numQPs, numDims, numDims);
+  jacobian_inv = Kokkos::createDynRankView(Gc.get_view(), "XXX", numCells, numQPs, numDims, numDims);
 }
 
 //*****
 template <typename EvalT, typename Traits>
 void
-NSContravarientMetricTensor<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+NSContravarientMetricTensor<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   /** The allocated size of the Field Containers must currently
     * match the full workset size of the allocated PHX Fields,
@@ -72,8 +65,7 @@ NSContravarientMetricTensor<EvalT, Traits>::evaluateFields(
   //int containerSize = workset.numCells;
     */
 
-  Intrepid2::CellTools<PHX::Device>::setJacobian(
-      jacobian, refPoints, coordVec.get_view(), *cellType);
+  Intrepid2::CellTools<PHX::Device>::setJacobian(jacobian, refPoints, coordVec.get_view(), *cellType);
   Intrepid2::CellTools<PHX::Device>::setJacobianInv(jacobian_inv, jacobian);
 
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
@@ -82,8 +74,7 @@ NSContravarientMetricTensor<EvalT, Traits>::evaluateFields(
         for (std::size_t j = 0; j < numDims; ++j) {
           Gc(cell, qp, i, j) = 0.0;
           for (std::size_t alpha = 0; alpha < numDims; ++alpha) {
-            Gc(cell, qp, i, j) += jacobian_inv(cell, qp, alpha, i) *
-                                  jacobian_inv(cell, qp, alpha, j);
+            Gc(cell, qp, i, j) += jacobian_inv(cell, qp, alpha, i) * jacobian_inv(cell, qp, alpha, j);
           }
         }
       }

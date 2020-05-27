@@ -14,8 +14,7 @@ main(int ac, char* av[])
   Teuchos::GlobalMPISession     mpiSession(&ac, &av);
   Teuchos::CommandLineProcessor command_line_processor;
 
-  command_line_processor.setDocString(
-      "Computation of connected components of an Exodus mesh.\n");
+  command_line_processor.setDocString("Computation of connected components of an Exodus mesh.\n");
 
   std::string input_file = "input.e";
   command_line_processor.setOption("input", &input_file, "Input File Name");
@@ -30,16 +29,11 @@ main(int ac, char* av[])
   command_line_processor.throwExceptions(false);
 
   // Parse command line
-  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return =
-      command_line_processor.parse(ac, av);
+  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return = command_line_processor.parse(ac, av);
 
-  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) {
-    return 0;
-  }
+  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) { return 0; }
 
-  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) {
-    return 1;
-  }
+  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) { return 1; }
 
   // Read mesh
   LCM::ConnectivityArray connectivity_array(input_file, output_file);
@@ -54,21 +48,17 @@ main(int ac, char* av[])
 
   // Get abstract discretization from connectivity array and convert
   // to stk discretization to use stk-specific methods.
-  Albany::AbstractDiscretization& discretization =
-      connectivity_array.getDiscretization();
+  Albany::AbstractDiscretization& discretization = connectivity_array.getDiscretization();
 
-  Albany::STKDiscretization& stk_discretization =
-      static_cast<Albany::STKDiscretization&>(discretization);
+  Albany::STKDiscretization& stk_discretization = static_cast<Albany::STKDiscretization&>(discretization);
 
   // Get MDArray which is memeopru in stk for "Partition" element variable
-  Albany::MDArray stk_component =
-      stk_discretization.getStateArrays().elemStateArrays[0]["Partition"];
+  Albany::MDArray stk_component = stk_discretization.getStateArrays().elemStateArrays[0]["Partition"];
 
   // Output components
 
   // Assumption: numbering of elements is contiguous.
-  for (std::vector<int>::size_type element = 0; element < components.size();
-       ++element) {
+  for (std::vector<int>::size_type element = 0; element < components.size(); ++element) {
     int const component = components[element];
 
     // set component number in stk field memory
@@ -76,8 +66,7 @@ main(int ac, char* av[])
   }
 
   // Need solution for output call
-  Teuchos::RCP<Thyra_Vector> solution_field =
-      stk_discretization.getSolutionField();
+  Teuchos::RCP<Thyra_Vector> solution_field = stk_discretization.getSolutionField();
 
   // second arg to output is (pseudo)time
   //  stk_discretization.outputToExodus(*solution_field, 1.0);
@@ -98,8 +87,7 @@ main(int ac, char* av[])
   std::cout << "------------------------------------------";
   std::cout << std::endl;
 
-  for (std::vector<int>::size_type element = 0; element < components.size();
-       ++element) {
+  for (std::vector<int>::size_type element = 0; element < components.size(); ++element) {
     std::cout << std::setw(8) << element;
     std::cout << std::setw(8) << components[element] << std::endl;
   }

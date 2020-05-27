@@ -17,10 +17,8 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
 //  deltaTime("Delta Time",dl->workset_scalar)
 {
   // get and validate Response parameter list
-  Teuchos::ParameterList* plist =
-      p.get<Teuchos::ParameterList*>("Parameter List");
-  Teuchos::RCP<Teuchos::ParameterList const> reflist =
-      this->getValidResponseParameters();
+  Teuchos::ParameterList*                    plist   = p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::RCP<Teuchos::ParameterList const> reflist = this->getValidResponseParameters();
   plist->validateParameters(*reflist, 0);
 
   // get parameters from problem
@@ -65,14 +63,10 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
 
   // Setup scatter evaluator
   p.set("Stand-alone Evaluator", false);
-  std::string local_response_name =
-      field_name + " Local Response Field Integral";
-  std::string global_response_name =
-      field_name + " Global Response Field Integral";
-  PHX::Tag<ScalarT> local_response_tag(
-      local_response_name, local_response_layout);
-  PHX::Tag<ScalarT> global_response_tag(
-      global_response_name, global_response_layout);
+  std::string       local_response_name  = field_name + " Local Response Field Integral";
+  std::string       global_response_name = field_name + " Global Response Field Integral";
+  PHX::Tag<ScalarT> local_response_tag(local_response_name, local_response_layout);
+  PHX::Tag<ScalarT> global_response_tag(global_response_name, global_response_layout);
   p.set("Local Response Field Tag", local_response_tag);
   p.set("Global Response Field Tag", global_response_tag);
   PHAL::SeparableScatterScalarResponse<EvalT, Traits>::setup(p, dl);
@@ -90,15 +84,13 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(weights, fm);
   //  this->utils.setFieldData(time,fm);
   //  this->utils.setFieldData(deltaTime,fm);
-  PHAL::SeparableScatterScalarResponse<EvalT, Traits>::postRegistrationSetup(
-      d, fm);
+  PHAL::SeparableScatterScalarResponse<EvalT, Traits>::postRegistrationSetup(d, fm);
 }
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::ResponseThermalEnergy<EvalT, Traits>::preEvaluate(
-    typename Traits::PreEvalData workset)
+PHAL::ResponseThermalEnergy<EvalT, Traits>::preEvaluate(typename Traits::PreEvalData workset)
 {
   PHAL::set(this->global_response_eval, 0.0);
   // Do global initialization
@@ -108,8 +100,7 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::preEvaluate(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::ResponseThermalEnergy<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+PHAL::ResponseThermalEnergy<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // Zero out local response
   PHAL::set(this->local_response_eval, 0.0);
@@ -130,11 +121,9 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::evaluateFields(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::ResponseThermalEnergy<EvalT, Traits>::postEvaluate(
-    typename Traits::PostEvalData workset)
+PHAL::ResponseThermalEnergy<EvalT, Traits>::postEvaluate(typename Traits::PostEvalData workset)
 {
-  PHAL::reduceAll<ScalarT>(
-      *workset.comm, Teuchos::REDUCE_SUM, this->global_response_eval);
+  PHAL::reduceAll<ScalarT>(*workset.comm, Teuchos::REDUCE_SUM, this->global_response_eval);
   PHAL::SeparableScatterScalarResponse<EvalT, Traits>::postEvaluate(workset);
 }
 
@@ -143,18 +132,13 @@ template <typename EvalT, typename Traits>
 Teuchos::RCP<Teuchos::ParameterList const>
 PHAL::ResponseThermalEnergy<EvalT, Traits>::getValidResponseParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      rcp(new Teuchos::ParameterList("Valid ResponseThermalEnergy Params"));
+  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("Valid ResponseThermalEnergy Params"));
   Teuchos::RCP<Teuchos::ParameterList const> baseValidPL =
-      PHAL::SeparableScatterScalarResponse<EvalT, Traits>::
-          getValidResponseParameters();
+      PHAL::SeparableScatterScalarResponse<EvalT, Traits>::getValidResponseParameters();
   validPL->setParameters(*baseValidPL);
 
   validPL->set<std::string>("Name", "", "Name of response function");
-  validPL->set<int>(
-      "Phalanx Graph Visualization Detail",
-      0,
-      "Make dot file to visualize phalanx graph");
+  validPL->set<int>("Phalanx Graph Visualization Detail", 0, "Make dot file to visualize phalanx graph");
   validPL->set<std::string>("Field Type", "", "Type of field (scalar)");
   validPL->set<std::string>("Field Name", "", "Field to integrate");
 

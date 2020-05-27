@@ -30,16 +30,11 @@ main(int ac, char* av[])
   command_line_processor.throwExceptions(false);
 
   // Parse command line
-  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return =
-      command_line_processor.parse(ac, av);
+  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return = command_line_processor.parse(ac, av);
 
-  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) {
-    return 0;
-  }
+  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) { return 0; }
 
-  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) {
-    return 1;
-  }
+  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) { return 1; }
 
   // Read the mesh
   // Copied from Partition.cc
@@ -98,10 +93,8 @@ main(int ac, char* av[])
   // Need to update the mesh to reflect changes in duplicate_entity routine.
   //   Redefine connectivity and coordinate arrays with updated values.
   //   Mesh must only have relations between elements and nodes.
-  Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr =
-      topology.get_discretization();
-  Albany::STKDiscretization& stk_discretization =
-      static_cast<Albany::STKDiscretization&>(*discretization_ptr);
+  Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr = topology.get_discretization();
+  Albany::STKDiscretization& stk_discretization = static_cast<Albany::STKDiscretization&>(*discretization_ptr);
 
   Teuchos::ArrayRCP<double> coordinates = stk_discretization.getCoordinates();
 
@@ -109,11 +102,9 @@ main(int ac, char* av[])
   //   disconnected nature of the final mesh
 
   // Create a vector to hold displacement values for nodes
-  Teuchos::RCP<Thyra_VectorSpace const> dof_space =
-      stk_discretization.getVectorSpace();
-  Teuchos::RCP<Thyra_Vector> displacement = Thyra::createMember(dof_space);
-  Teuchos::ArrayRCP<ST>      displacement_nonconstView =
-      Albany::getNonconstLocalData(displacement);
+  Teuchos::RCP<Thyra_VectorSpace const> dof_space                 = stk_discretization.getVectorSpace();
+  Teuchos::RCP<Thyra_Vector>            displacement              = Thyra::createMember(dof_space);
+  Teuchos::ArrayRCP<ST>                 displacement_nonconstView = Albany::getNonconstLocalData(displacement);
 
   // Add displacement to nodes
   stk::mesh::get_entities(bulkData, stk::topology::ELEMENT_RANK, element_lst);
@@ -124,7 +115,7 @@ main(int ac, char* av[])
   for (int i = 0; i < element_lst.size(); ++i) {
     std::vector<double>      centroid(3);
     std::vector<double>      disp(3);
-    stk::mesh::Entity const* relations = bulkData.begin_nodes(element_lst[i]);
+    stk::mesh::Entity const* relations     = bulkData.begin_nodes(element_lst[i]);
     int const                num_relations = bulkData.num_nodes(element_lst[i]);
     // Get centroid of the element
     for (int j = 0; j < num_relations; ++j) {
@@ -153,8 +144,7 @@ main(int ac, char* av[])
 
   stk_discretization.setResidualField(*displacement);
 
-  Teuchos::RCP<Thyra_Vector> solution_field =
-      stk_discretization.getSolutionField();
+  Teuchos::RCP<Thyra_Vector> solution_field = stk_discretization.getSolutionField();
 
   // Write final mesh to exodus file
   // second arg to output is (pseudo)time

@@ -10,7 +10,7 @@
 
 #include "Albany_AbstractFieldContainer.hpp"  //has typedef needed to list the field requirements of the problem
 #include "Albany_DataTypes.hpp"
-#include "Albany_NullSpaceUtils.hpp"  // has defn of struct that holds null space info for ML
+#include "Albany_NullSpaceUtils.hpp"   // has defn of struct that holds null space info for ML
 #include "Albany_StateInfoStruct.hpp"  // contains MeshSpecsStuct
 #include "Albany_StateManager.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
@@ -100,9 +100,7 @@ class AbstractProblem
   //! Build the PDE instantiations, boundary conditions, and initial solution
   //! And construct the evaluators and field managers
   virtual void
-  buildProblem(
-      Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-      StateManager&                                            stateMgr) = 0;
+  buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr) = 0;
 
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
@@ -147,11 +145,9 @@ class AbstractProblem
   };
 
   virtual void getAllocatedStates(
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-          Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>>
+      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>>
       /* oldState_ */,
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<
-          Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>>
+      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<Kokkos::DynRankView<RealType, PHX::Device>>>>
       /* newState_ */) const {};
 
   //! Get a list of the Special fields needed to implement the problem
@@ -161,19 +157,15 @@ class AbstractProblem
     return requirements;
   }
 
-  const std::
-      map<std::string, AbstractFieldContainer::FieldContainerRequirements>&
-      getSideSetFieldRequirements() const
+  const std::map<std::string, AbstractFieldContainer::FieldContainerRequirements>&
+  getSideSetFieldRequirements() const
   {
     return ss_requirements;
   }
 
   //! Allow the Problem to modify the solver settings, for example by adding a
   //! custom status test.
-  virtual void applyProblemSpecificSolverSettings(
-      Teuchos::RCP<Teuchos::ParameterList>)
-  {
-  }
+  virtual void applyProblemSpecificSolverSettings(Teuchos::RCP<Teuchos::ParameterList>) {}
 
  protected:
   Teuchos::Array<Teuchos::Array<int>> offsets_;
@@ -220,8 +212,7 @@ class AbstractProblem
   //! Special fields needed to implement the problem
   AbstractFieldContainer::FieldContainerRequirements requirements;
   //! Special fields defined on the side sets needed to implement the problem
-  std::map<std::string, AbstractFieldContainer::FieldContainerRequirements>
-      ss_requirements;
+  std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> ss_requirements;
 
   //! Null space object used to communicate with MP
   Teuchos::RCP<Albany::RigidBodyModes> rigidBodyModes;
@@ -267,7 +258,7 @@ struct ConstructEvaluatorsOp
       PHX::FieldManager<PHAL::AlbanyTraits>&      fm_,
       Albany::MeshSpecsStruct const&              meshSpecs_,
       Albany::StateManager&                       stateMgr_,
-      Albany::FieldManagerChoice                  fmchoice_ = BUILD_RESID_FM,
+      Albany::FieldManagerChoice                  fmchoice_     = BUILD_RESID_FM,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList_ = Teuchos::null)
       : prob(prob_),
         fm(fm_),
@@ -281,8 +272,7 @@ struct ConstructEvaluatorsOp
   template <typename T>
   void operator()(T /* x */) const
   {
-    tags->push_back(prob.template constructEvaluators<T>(
-        fm, meshSpecs, stateMgr, fmchoice, responseList));
+    tags->push_back(prob.template constructEvaluators<T>(fm, meshSpecs, stateMgr, fmchoice, responseList));
   }
 };
 }  // namespace Albany

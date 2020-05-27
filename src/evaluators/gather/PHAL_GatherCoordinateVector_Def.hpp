@@ -14,9 +14,7 @@ template <typename EvalT, typename Traits>
 GatherCoordinateVector<EvalT, Traits>::GatherCoordinateVector(
     Teuchos::ParameterList const&        p,
     const Teuchos::RCP<Albany::Layouts>& dl)
-    : coordVec(
-          p.get<std::string>("Coordinate Vector Name"),
-          dl->vertices_vector),
+    : coordVec(p.get<std::string>("Coordinate Vector Name"), dl->vertices_vector),
       numVertices(0),
       numDim(0),
       worksetSize(0)
@@ -27,9 +25,8 @@ GatherCoordinateVector<EvalT, Traits>::GatherCoordinateVector(
     periodic = false;
 
   if (p.isType<std::string>("Current Displacement Vector Name")) {
-    std::string strDispVec =
-        p.get<std::string>("Current Displacement Vector Name");
-    dispVecName = Teuchos::rcp(new std::string(strDispVec));
+    std::string strDispVec = p.get<std::string>("Current Displacement Vector Name");
+    dispVecName            = Teuchos::rcp(new std::string(strDispVec));
   }
 
   this->addEvaluatedField(coordVec);
@@ -37,8 +34,7 @@ GatherCoordinateVector<EvalT, Traits>::GatherCoordinateVector(
 }
 
 template <typename EvalT, typename Traits>
-GatherCoordinateVector<EvalT, Traits>::GatherCoordinateVector(
-    Teuchos::ParameterList const& p)
+GatherCoordinateVector<EvalT, Traits>::GatherCoordinateVector(Teuchos::ParameterList const& p)
     : coordVec(
           p.get<std::string>("Coordinate Vector Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("Coordinate Data Layout")),
@@ -64,9 +60,7 @@ GatherCoordinateVector<EvalT, Traits>::postRegistrationSetup(
 {
   this->utils.setFieldData(coordVec, fm);
 
-  typename std::vector<
-      typename PHX::template MDField<MeshScalarT, Cell, Vertex, Dim>::size_type>
-      dims;
+  typename std::vector<typename PHX::template MDField<MeshScalarT, Cell, Vertex, Dim>::size_type> dims;
   coordVec.dimensions(dims);  // get dimensions
 
   worksetSize = dims[0];
@@ -79,8 +73,7 @@ GatherCoordinateVector<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-GatherCoordinateVector<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+GatherCoordinateVector<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   unsigned int                                  numCells = workset.numCells;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>> wsCoords = workset.wsCoords;
@@ -90,23 +83,18 @@ GatherCoordinateVector<EvalT, Traits>::evaluateFields(
 
   // host_view_type coordVecHost = Kokkos::create_mirror_view
   // (coordVec.get_view());
-  host_view_type coordVecHost =
-      Kokkos::create_mirror_view(coordVec.get_static_view());
+  host_view_type coordVecHost = Kokkos::create_mirror_view(coordVec.get_static_view());
 
   if (dispVecName.is_null()) {
     for (std::size_t cell = 0; cell < numCells; ++cell) {
       for (std::size_t node = 0; node < numVertices; ++node) {
-        for (std::size_t eq = 0; eq < numDim; ++eq) {
-          coordVecHost(cell, node, eq) = wsCoords[cell][node][eq];
-        }
+        for (std::size_t eq = 0; eq < numDim; ++eq) { coordVecHost(cell, node, eq) = wsCoords[cell][node][eq]; }
       }
     }
 
     for (std::size_t cell = numCells; cell < worksetSize; ++cell) {
       for (std::size_t node = 0; node < numVertices; ++node) {
-        for (std::size_t eq = 0; eq < numDim; ++eq) {
-          coordVecHost(cell, node, eq) = coordVecHost(0, node, eq);
-        }
+        for (std::size_t eq = 0; eq < numDim; ++eq) { coordVecHost(cell, node, eq) = coordVecHost(0, node, eq); }
       }
     }
   } else {
@@ -116,24 +104,21 @@ GatherCoordinateVector<EvalT, Traits>::evaluateFields(
     ALBANY_PANIC(
         (it == workset.stateArrayPtr->end()),
         std::endl
-            << "Error: cannot locate " << *dispVecName
-            << " in PHAL_GatherCoordinateVector_Def" << std::endl);
+            << "Error: cannot locate " << *dispVecName << " in PHAL_GatherCoordinateVector_Def" << std::endl);
 
     Albany::MDArray dVec = it->second;
 
     for (std::size_t cell = 0; cell < numCells; ++cell) {
       for (std::size_t node = 0; node < numVertices; ++node) {
         for (std::size_t eq = 0; eq < numDim; ++eq) {
-          coordVecHost(cell, node, eq) =
-              wsCoords[cell][node][eq] + dVec(cell, node, eq);
+          coordVecHost(cell, node, eq) = wsCoords[cell][node][eq] + dVec(cell, node, eq);
         }
       }
     }
     for (std::size_t cell = numCells; cell < worksetSize; ++cell) {
       for (std::size_t node = 0; node < numVertices; ++node) {
         for (std::size_t eq = 0; eq < numDim; ++eq) {
-          coordVecHost(cell, node, eq) =
-              coordVecHost(0, node, eq) + dVec(cell, node, eq);
+          coordVecHost(cell, node, eq) = coordVecHost(0, node, eq) + dVec(cell, node, eq);
         }
       }
     }

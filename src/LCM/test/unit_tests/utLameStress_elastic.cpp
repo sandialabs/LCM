@@ -27,8 +27,7 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
   Teuchos::RCP<PHX::MDALayout<Cell, QuadPoint>> qp_scalar =
       Teuchos::rcp(new PHX::MDALayout<Cell, QuadPoint>(worksetSize, numQPts));
   Teuchos::RCP<PHX::MDALayout<Cell, QuadPoint, Dim, Dim>> qp_tensor =
-      Teuchos::rcp(new PHX::MDALayout<Cell, QuadPoint, Dim, Dim>(
-          worksetSize, numQPts, numDim, numDim));
+      Teuchos::rcp(new PHX::MDALayout<Cell, QuadPoint, Dim, Dim>(worksetSize, numQPts, numDim, numDim));
 
   // Instantiate the required evaluators with EvalT =
   // PHAL::AlbanyTraits::Residual and Traits = PHAL::AlbanyTraits
@@ -49,39 +48,24 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
   // SetField evaluator, which will be used to manually assign a value to the
   // DefGrad field
   Teuchos::ParameterList setFieldParameterList("SetField");
-  setFieldParameterList.set<std::string>(
-      "Evaluated Field Name", "Deformation Gradient");
-  setFieldParameterList.set<Teuchos::RCP<PHX::DataLayout>>(
-      "Evaluated Field Data Layout", qp_tensor);
-  setFieldParameterList
-      .set<Teuchos::ArrayRCP<PHAL::AlbanyTraits::Residual::ScalarT>>(
-          "Field Values", tensorValue);
-  Teuchos::RCP<LCM::SetField<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>>
-      setField = Teuchos::rcp(
-          new LCM::SetField<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>(
-              setFieldParameterList));
+  setFieldParameterList.set<std::string>("Evaluated Field Name", "Deformation Gradient");
+  setFieldParameterList.set<Teuchos::RCP<PHX::DataLayout>>("Evaluated Field Data Layout", qp_tensor);
+  setFieldParameterList.set<Teuchos::ArrayRCP<PHAL::AlbanyTraits::Residual::ScalarT>>("Field Values", tensorValue);
+  Teuchos::RCP<LCM::SetField<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>> setField =
+      Teuchos::rcp(new LCM::SetField<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>(setFieldParameterList));
 
   // LameStress evaluator
-  Teuchos::RCP<Teuchos::ParameterList> lameStressParameterList =
-      Teuchos::rcp(new Teuchos::ParameterList("Stress"));
-  lameStressParameterList->set<std::string>(
-      "DefGrad Name", "Deformation Gradient");
+  Teuchos::RCP<Teuchos::ParameterList> lameStressParameterList = Teuchos::rcp(new Teuchos::ParameterList("Stress"));
+  lameStressParameterList->set<std::string>("DefGrad Name", "Deformation Gradient");
   lameStressParameterList->set<std::string>("Stress Name", "Stress");
-  lameStressParameterList->set<Teuchos::RCP<PHX::DataLayout>>(
-      "QP Scalar Data Layout", qp_scalar);
-  lameStressParameterList->set<Teuchos::RCP<PHX::DataLayout>>(
-      "QP Tensor Data Layout", qp_tensor);
-  lameStressParameterList->set<std::string>(
-      "Lame Material Model", "Elastic_New");
-  Teuchos::ParameterList& materialModelParametersList =
-      lameStressParameterList->sublist("Lame Material Parameters");
+  lameStressParameterList->set<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout", qp_scalar);
+  lameStressParameterList->set<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout", qp_tensor);
+  lameStressParameterList->set<std::string>("Lame Material Model", "Elastic_New");
+  Teuchos::ParameterList& materialModelParametersList = lameStressParameterList->sublist("Lame Material Parameters");
   materialModelParametersList.set<double>("Youngs Modulus", 1.0);
   materialModelParametersList.set<double>("Poissons Ratio", 0.25);
-  Teuchos::RCP<
-      LCM::LameStress<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>>
-      lameStress = Teuchos::rcp(
-          new LCM::LameStress<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>(
-              *lameStressParameterList));
+  Teuchos::RCP<LCM::LameStress<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>> lameStress =
+      Teuchos::rcp(new LCM::LameStress<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>(*lameStressParameterList));
 
   // Instantiate a field manager.
   PHX::FieldManager<PHAL::AlbanyTraits> fieldManager;
@@ -91,8 +75,7 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
   fieldManager.registerEvaluator<PHAL::AlbanyTraits::Residual>(lameStress);
 
   // Set the LameStress evaluated fields as required fields
-  for (std::vector<Teuchos::RCP<PHX::FieldTag>>::const_iterator it =
-           lameStress->evaluatedFields().begin();
+  for (std::vector<Teuchos::RCP<PHX::FieldTag>>::const_iterator it = lameStress->evaluatedFields().begin();
        it != lameStress->evaluatedFields().end();
        it++)
     fieldManager.requireField<PHAL::AlbanyTraits::Residual>(**it);
@@ -104,27 +87,20 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
   // Create a state manager with required fields
   Albany::StateManager stateMgr;
   // Stress and DefGrad are required for all LAME models
-  stateMgr.registerStateVariable(
-      "Stress", qp_tensor, "dummy", "scalar", 0.0, true);
-  stateMgr.registerStateVariable(
-      "Deformation Gradient", qp_tensor, "dummy", "identity", 1.0, true);
+  stateMgr.registerStateVariable("Stress", qp_tensor, "dummy", "scalar", 0.0, true);
+  stateMgr.registerStateVariable("Deformation Gradient", qp_tensor, "dummy", "identity", 1.0, true);
   // Add material-model specific state variables
-  std::string lameMaterialModelName =
-      lameStressParameterList->get<std::string>("Lame Material Model");
+  std::string              lameMaterialModelName = lameStressParameterList->get<std::string>("Lame Material Model");
   std::vector<std::string> lameMaterialModelStateVariableNames =
-      LameUtils::getStateVariableNames(
-          lameMaterialModelName, materialModelParametersList);
+      LameUtils::getStateVariableNames(lameMaterialModelName, materialModelParametersList);
   std::vector<double> lameMaterialModelStateVariableInitialValues =
-      LameUtils::getStateVariableInitialValues(
-          lameMaterialModelName, materialModelParametersList);
-  for (unsigned int i = 0; i < lameMaterialModelStateVariableNames.size();
-       ++i) {
+      LameUtils::getStateVariableInitialValues(lameMaterialModelName, materialModelParametersList);
+  for (unsigned int i = 0; i < lameMaterialModelStateVariableNames.size(); ++i) {
     stateMgr.registerStateVariable(
         lameMaterialModelStateVariableNames[i],
         qp_scalar,
         "dummy",
-        Albany::doubleToInitString(
-            lameMaterialModelStateVariableInitialValues[i]),
+        Albany::doubleToInitString(lameMaterialModelStateVariableInitialValues[i]),
         true);
   }
 
@@ -136,16 +112,12 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
   discretizationParameterList->set<int>("3D Elements", 1);
   discretizationParameterList->set<std::string>("Method", "STK3D");
   discretizationParameterList->set<int>("Number Of Time Derivatives", 0);
-  discretizationParameterList->set<std::string>(
-      "Exodus Output File Name", "unitTestOutput.exo");  // Is this required?
-  Teuchos::RCP<Teuchos_Comm const> commT =
-      Albany::createTeuchosCommFromMpiComm(MPI_COMM_WORLD);
-  int numberOfEquations = 3;
-  Albany::AbstractFieldContainer::FieldContainerRequirements
-                                             req;  // The default fields
-  Teuchos::RCP<Albany::GenericSTKMeshStruct> stkMeshStruct =
-      Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(
-          discretizationParameterList, Teuchos::null, commT));
+  discretizationParameterList->set<std::string>("Exodus Output File Name", "unitTestOutput.exo");  // Is this required?
+  Teuchos::RCP<Teuchos_Comm const> commT             = Albany::createTeuchosCommFromMpiComm(MPI_COMM_WORLD);
+  int                              numberOfEquations = 3;
+  Albany::AbstractFieldContainer::FieldContainerRequirements req;  // The default fields
+  Teuchos::RCP<Albany::GenericSTKMeshStruct>                 stkMeshStruct =
+      Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(discretizationParameterList, Teuchos::null, commT));
   stkMeshStruct->setFieldAndBulkData(
       commT,
       discretizationParameterList,
@@ -161,9 +133,8 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
 
   // Create a workset
   PHAL::Workset workset;
-  workset.numCells = worksetSize;
-  workset.stateArrayPtr =
-      &stateMgr.getStateArray(Albany::StateManager::ELEM, 0);
+  workset.numCells      = worksetSize;
+  workset.stateArrayPtr = &stateMgr.getStateArray(Albany::StateManager::ELEM, 0);
 
   // Call the evaluators, evaluateFields() is the function that computes stress
   // based on deformation gradient
@@ -172,8 +143,7 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
   fieldManager.postEvaluate<PHAL::AlbanyTraits::Residual>(workset);
 
   // Pull the stress from the FieldManager
-  PHX::MDField<PHAL::AlbanyTraits::Residual::ScalarT, Cell, QuadPoint, Dim, Dim>
-      stressField("Stress", qp_tensor);
+  PHX::MDField<PHAL::AlbanyTraits::Residual::ScalarT, Cell, QuadPoint, Dim, Dim> stressField("Stress", qp_tensor);
   fieldManager.getFieldData<PHAL::AlbanyTraits::Residual>(stressField);
 
   // Assert the dimensions of the stress field
@@ -182,23 +152,13 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
 
   // Record the expected stress, which will be used to check the computed stress
   minitensor::Tensor<PHAL::AlbanyTraits::Residual::ScalarT> expectedStress(
-      materialModelParametersList.get<double>("Youngs Modulus") * 0.01,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0);
+      materialModelParametersList.get<double>("Youngs Modulus") * 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   // Check the computed stresses
-  typedef PHX::MDField<PHAL::AlbanyTraits::Residual::ScalarT>::size_type
-      size_type;
+  typedef PHX::MDField<PHAL::AlbanyTraits::Residual::ScalarT>::size_type size_type;
   for (size_type cell = 0; cell < worksetSize; ++cell) {
     for (size_type qp = 0; qp < numQPts; ++qp) {
-      std::cout << "Stress tensor at cell " << cell << ", quadrature point "
-                << qp << ":" << std::endl;
+      std::cout << "Stress tensor at cell " << cell << ", quadrature point " << qp << ":" << std::endl;
       std::cout << "  " << stressField(cell, qp, 0, 0);
       std::cout << "  " << stressField(cell, qp, 0, 1);
       std::cout << "  " << stressField(cell, qp, 0, 2) << std::endl;
@@ -225,10 +185,7 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
       double tolerance = 1.0e-15;
       for (size_type i = 0; i < numDim; ++i) {
         for (size_type j = 0; j < numDim; ++j) {
-          TEST_COMPARE(
-              fabs(stressField(cell, qp, i, j) - expectedStress(i, j)),
-              <=,
-              tolerance);
+          TEST_COMPARE(fabs(stressField(cell, qp, i, j) - expectedStress(i, j)), <=, tolerance);
         }
       }
     }

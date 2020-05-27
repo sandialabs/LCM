@@ -5,8 +5,7 @@
 #include <map>
 
 template <typename EvalT, typename Traits>
-CP::ParameterReader<EvalT, Traits>::ParameterReader(Teuchos::ParameterList* p)
-    : p_(p)
+CP::ParameterReader<EvalT, Traits>::ParameterReader(Teuchos::ParameterList* p) : p_(p)
 {
 }
 
@@ -34,8 +33,7 @@ CP::ParameterReader<EvalT, Traits>::getIntegrationScheme() const
   static utility::ParameterEnum<CP::IntegrationScheme> const imap(
       "Integration Scheme",
       CP::IntegrationScheme::EXPLICIT,
-      {{"Implicit", CP::IntegrationScheme::IMPLICIT},
-       {"Explicit", CP::IntegrationScheme::EXPLICIT}});
+      {{"Implicit", CP::IntegrationScheme::IMPLICIT}, {"Explicit", CP::IntegrationScheme::EXPLICIT}});
 
   return imap.get(p_);
 }
@@ -49,8 +47,7 @@ CP::ParameterReader<EvalT, Traits>::getResidualType() const
       CP::ResidualType::SLIP,
       {{"Slip", CP::ResidualType::SLIP},
        {"Slip Hardness", CP::ResidualType::SLIP_HARDNESS},
-       {"Constrained Slip Hardness",
-        CP::ResidualType::CONSTRAINED_SLIP_HARDNESS}});
+       {"Constrained Slip Hardness", CP::ResidualType::CONSTRAINED_SLIP_HARDNESS}});
 
   return rmap.get(p_);
 }
@@ -62,9 +59,7 @@ CP::ParameterReader<EvalT, Traits>::getPredictorSlip() const
   static utility::ParameterEnum<CP::PredictorSlip> const pmap(
       "Slip Predictor",
       CP::PredictorSlip::RATE,
-      {{"None", CP::PredictorSlip::NONE},
-       {"Rate", CP::PredictorSlip::RATE},
-       {"Solve", CP::PredictorSlip::SOLVE}});
+      {{"None", CP::PredictorSlip::NONE}, {"Rate", CP::PredictorSlip::RATE}, {"Solve", CP::PredictorSlip::SOLVE}});
 
   return pmap.get(p_);
 }
@@ -92,20 +87,14 @@ CP::ParameterReader<EvalT, Traits>::getMinimizer() const
   // TODO: This code works differently from the previous. Is this preferable?
   Minimizer min;
 
-  min.rel_tol =
-      p_->get<RealType>("Implicit Integration Relative Tolerance", 1.0e-6);
-  min.abs_tol =
-      p_->get<RealType>("Implicit Integration Absolute Tolerance", 1.0e-10);
-  min.acc_tol =
-      p_->get<RealType>("Implicit Integration Acceptable Tolerance", 1.0e-14);
-  min.max_num_iter = p_->get<int>("Implicit Integration Max Iterations", 100);
-  min.min_num_iter = p_->get<int>("Implicit Integration Min Iterations", 2);
-  min.enforce_non_stagnation =
-      p_->get<bool>("Implicit Integration Enforce Non-Stagnation", false);
-  min.max_stagnation_iter =
-      p_->get<int>("Implicit Integration Max Stagnation Iterations", 100);
-  min.stagnation_tol =
-      p_->get<RealType>("Implicit Integration Stagnation Tolerance", 1.0);
+  min.rel_tol                = p_->get<RealType>("Implicit Integration Relative Tolerance", 1.0e-6);
+  min.abs_tol                = p_->get<RealType>("Implicit Integration Absolute Tolerance", 1.0e-10);
+  min.acc_tol                = p_->get<RealType>("Implicit Integration Acceptable Tolerance", 1.0e-14);
+  min.max_num_iter           = p_->get<int>("Implicit Integration Max Iterations", 100);
+  min.min_num_iter           = p_->get<int>("Implicit Integration Min Iterations", 2);
+  min.enforce_non_stagnation = p_->get<bool>("Implicit Integration Enforce Non-Stagnation", false);
+  min.max_stagnation_iter    = p_->get<int>("Implicit Integration Max Stagnation Iterations", 100);
+  min.stagnation_tol         = p_->get<RealType>("Implicit Integration Stagnation Tolerance", 1.0);
 
   return min;
 }
@@ -150,8 +139,7 @@ CP::ParameterReader<EvalT, Traits>::getSlipFamily(int index)
   slip_family.pflow_parameters_->setTolerance();
 
   // set max slip increment if user specified
-  RealType const max_incr =
-      family_plist.get<RealType>("Max Slip Increment", LOG_HUGE);
+  RealType const max_incr = family_plist.get<RealType>("Max Slip Increment", LOG_HUGE);
 
   slip_family.pflow_parameters_->setMaxIncrement(max_incr);
 

@@ -17,9 +17,7 @@ ConstitutiveModelDriver<EvalT, Traits>::ConstitutiveModelDriver(
     : residual_(p.get<std::string>("Residual Name"), dl->node_tensor),
       def_grad_(p.get<std::string>("F Name"), dl->qp_tensor),
       stress_(p.get<std::string>("Stress Name"), dl->qp_tensor),
-      prescribed_def_grad_(
-          p.get<std::string>("Prescribed F Name"),
-          dl->qp_tensor)
+      prescribed_def_grad_(p.get<std::string>("Prescribed F Name"), dl->qp_tensor)
 {
   this->addDependentField(def_grad_);
   this->addDependentField(prescribed_def_grad_);
@@ -48,15 +46,13 @@ ConstitutiveModelDriver<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelDriver<EvalT, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ConstitutiveModelDriver<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   bool print = false;
   if (typeid(ScalarT) == typeid(RealType)) print = true;
   std::cout.precision(15);
 
-  std::cout << "ConstitutiveModelDriver<EvalT, Traits>::evaluateFields"
-            << std::endl;
+  std::cout << "ConstitutiveModelDriver<EvalT, Traits>::evaluateFields" << std::endl;
   minitensor::Tensor<ScalarT> F(num_dims_), P(num_dims_), sig(num_dims_);
 
   minitensor::Tensor<ScalarT> F0(num_dims_), P0(num_dims_);
@@ -75,8 +71,7 @@ ConstitutiveModelDriver<EvalT, Traits>::evaluateFields(
       for (int node = 0; node < num_nodes_; ++node) {
         for (int dim1 = 0; dim1 < num_dims_; ++dim1) {
           for (int dim2 = 0; dim2 < num_dims_; ++dim2) {
-            residual_(cell, node, dim1, dim2) =
-                (F(dim1, dim2) - F0(dim1, dim2));
+            residual_(cell, node, dim1, dim2) = (F(dim1, dim2) - F0(dim1, dim2));
             //* (P(dim1,dim2) - P0(dim1,dim2));
           }
         }

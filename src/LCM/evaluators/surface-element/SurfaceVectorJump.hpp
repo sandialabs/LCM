@@ -23,18 +23,13 @@ namespace LCM {
  **/
 
 template <typename EvalT, typename Traits>
-class SurfaceVectorJump : public PHX::EvaluatorWithBaseImpl<Traits>,
-                          public PHX::EvaluatorDerived<EvalT, Traits>
+class SurfaceVectorJump : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  SurfaceVectorJump(
-      Teuchos::ParameterList const&        p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  SurfaceVectorJump(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -48,8 +43,7 @@ class SurfaceVectorJump : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature_;
 
   //! Finite element basis for the midplane
-  Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>
-      intrepid_basis_;
+  Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepid_basis_;
 
   //! Vector to take the jump of
   PHX::MDField<ScalarT const, Cell, Vertex, Dim> vector_;

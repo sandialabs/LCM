@@ -12,8 +12,7 @@ namespace Albany {
 /*!
  * \brief Reponse function representing the min of the solution values
  */
-class SolutionMinValueResponseFunction
-    : public SamplingBasedScalarResponseFunction
+class SolutionMinValueResponseFunction : public SamplingBasedScalarResponseFunction
 {
  public:
   //! Default constructor

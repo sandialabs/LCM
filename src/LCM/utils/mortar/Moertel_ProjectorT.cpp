@@ -18,23 +18,15 @@ MOERTEL_INSTANTIATE_TEMPLATE_CLASS(ProjectorT)
 // non-member operators at global scope
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
 template std::ostream&
-operator<<(
-    std::ostream&                                                os,
-    const MoertelT::ProjectorT<3, double, int, int, KokkosNode>& inter);
+operator<<(std::ostream& os, const MoertelT::ProjectorT<3, double, int, int, KokkosNode>& inter);
 template std::ostream&
-operator<<(
-    std::ostream&                                                os,
-    const MoertelT::ProjectorT<2, double, int, int, KokkosNode>& inter);
+operator<<(std::ostream& os, const MoertelT::ProjectorT<2, double, int, int, KokkosNode>& inter);
 #endif
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
 template std::ostream&
-operator<<(
-    std::ostream&                                                      os,
-    const MoertelT::ProjectorT<3, double, int, long long, KokkosNode>& inter);
+operator<<(std::ostream& os, const MoertelT::ProjectorT<3, double, int, long long, KokkosNode>& inter);
 template std::ostream&
-operator<<(
-    std::ostream&                                                      os,
-    const MoertelT::ProjectorT<2, double, int, long long, KokkosNode>& inter);
+operator<<(std::ostream& os, const MoertelT::ProjectorT<2, double, int, long long, KokkosNode>& inter);
 #endif
 
 #endif

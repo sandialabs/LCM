@@ -41,8 +41,7 @@ MoertelT::solve33T(double const A[][3], double* x, double const* b)
     oss << BB;
     oss << XX;
     oss << "***WRN*** MoertelT::solve33T:\n"
-        << "***WRN*** Teuchos::SerialDenseSolver::solve returned " << err
-        << "\n"
+        << "***WRN*** Teuchos::SerialDenseSolver::solve returned " << err << "\n"
         << "***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     throw MoertelT::ReportError(oss);
   }
@@ -86,8 +85,7 @@ MoertelT::MatMatMult(
   if (!transA)
     C = Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(A.getRangeMap(), 20));
   else
-    C = Teuchos::rcp(
-        new Tpetra::CrsMatrix<ST, LO, GO, N>(A.getDomainMap(), 20));
+    C = Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(A.getDomainMap(), 20));
 
   Tpetra::MatrixMatrix::Multiply(A, transA, B, transB, *C);
 
@@ -99,13 +97,10 @@ MoertelT::MatMatMult(
  *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
-MoertelT::PaddedMatrix(
-    const Tpetra::Map<LO, GO, N>& rowmap,
-    double                        val,
-    int const                     numentriesperrow)
+MoertelT::PaddedMatrix(const Tpetra::Map<LO, GO, N>& rowmap, double val, int const numentriesperrow)
 {
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> tmp = Teuchos::rcp(
-      new Tpetra::CrsMatrix<ST, LO, GO, N>(rowmap, numentriesperrow));
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> tmp =
+      Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(rowmap, numentriesperrow));
   int const numrows = tmp->getGlobalNumRows();
   for (int i = 0; i < numrows; ++i) {
     int grid = tmp->getRangeMap()->getGlobalElement(i);
@@ -113,8 +108,7 @@ MoertelT::PaddedMatrix(
     if (err < 0) {
       std::cout << "***ERR*** MoertelT::PaddedMatrix:\n"
                 << "***ERR*** Cannot insert values into matrix\n"
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       tmp = Teuchos::null;  // release the memory
       return Teuchos::null;
     }
@@ -134,10 +128,9 @@ MoertelT::StripZeros(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, double eps)
   for (size_t lrow = 0; lrow < A.getNodeNumRows(); ++lrow) {
     GO grow = A.getRowMap()->getGlobalElement(lrow);
     if (grow < 0) {
-      std::cout
-          << "***ERR*** MoertelT::StripZeros:\n"
-          << "***ERR*** Cannot find global row indes from local row index\n"
-          << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
+      std::cout << "***ERR*** MoertelT::StripZeros:\n"
+                << "***ERR*** Cannot find global row indes from local row index\n"
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       out = Teuchos::null;  // Free memory
       return Teuchos::null;
     }
@@ -149,8 +142,7 @@ MoertelT::StripZeros(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, double eps)
     if (err) {
       std::cout << "***ERR*** MoertelT::StripZeros:\n"
                 << "***ERR*** A.ExtractMyRowView returned " << err << std::endl
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       out = Teuchos::null;
       return Teuchos::null;
     }
@@ -177,10 +169,7 @@ MoertelT::StripZeros(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, double eps)
  *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::Print_Matrix(
-    std::string                             name,
-    const Tpetra::CrsMatrix<ST, LO, GO, N>& A,
-    int                                     ibase)
+MoertelT::Print_Matrix(std::string name, const Tpetra::CrsMatrix<ST, LO, GO, N>& A, int ibase)
 {
   char mypidc[100];
   sprintf(mypidc, "%d", A.Comm().getRank());
@@ -195,18 +184,13 @@ MoertelT::Print_Matrix(
   }
 
   // write global and local dimensions of this operator
-  fprintf(
-      out,
-      "%d %d 0\n",
-      A.RangeMap().NumGlobalElements(),
-      A.DomainMap().NumGlobalElements());
+  fprintf(out, "%d %d 0\n", A.RangeMap().NumGlobalElements(), A.DomainMap().NumGlobalElements());
   for (int lrow = 0; lrow < A.NumMyRows(); ++lrow) {
     int grow = A.GRID(lrow);
     if (grow < 0) {
-      std::cout
-          << "***ERR*** MoertelT::Print_Matrix:\n"
-          << "***ERR*** Cannot gind global row index from local row index\n"
-          << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
+      std::cout << "***ERR*** MoertelT::Print_Matrix:\n"
+                << "***ERR*** Cannot gind global row index from local row index\n"
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       fclose(out);
       return false;
     }
@@ -217,8 +201,7 @@ MoertelT::Print_Matrix(
     if (err) {
       std::cout << "***ERR*** MoertelT::Print_Matrix:\n"
                 << "***ERR*** A.ExtractMyRowView returned " << err << std::endl
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       fclose(out);
       return false;
     }
@@ -230,8 +213,7 @@ MoertelT::Print_Matrix(
         oss << "ERROR: gcol<0 \n";
         throw MoertelT::ReportError(oss);
       }
-      fprintf(
-          out, " %d   %d   %20.10e\n", grow + ibase, gcol + ibase, values[j]);
+      fprintf(out, " %d   %d   %20.10e\n", grow + ibase, gcol + ibase, values[j]);
     }
   }
   fflush(out);
@@ -246,10 +228,7 @@ MoertelT::Print_Matrix(
  *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::Print_Vector(
-    std::string                          name,
-    const Tpetra::Vector<ST, LO, GO, N>& v,
-    int                                  ibase)
+MoertelT::Print_Vector(std::string name, const Tpetra::Vector<ST, LO, GO, N>& v, int ibase)
 {
   char mypidc[100];
   sprintf(mypidc, "%d", v.Comm().getRank());
@@ -264,9 +243,7 @@ MoertelT::Print_Vector(
               << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return false;
   }
-  for (int lrow = 0; lrow < v->getLocalLength(); ++lrow) {
-    fprintf(out, "  %20.10e\n", vv[lrow]);
-  }
+  for (int lrow = 0; lrow < v->getLocalLength(); ++lrow) { fprintf(out, "  %20.10e\n", vv[lrow]); }
   fflush(out);
   fclose(out);
   std::cout << "Tpetra_Vector is written to file " << name << std::endl;
@@ -279,10 +256,7 @@ MoertelT::Print_Vector(
  *----------------------------------------------------------------------*/
 template <class LO, class GO, class N>
 bool
-MoertelT::Print_Graph(
-    std::string                        name,
-    const Tpetra::CrsGraph<LO, GO, N>& A,
-    int                                ibase)
+MoertelT::Print_Graph(std::string name, const Tpetra::CrsGraph<LO, GO, N>& A, int ibase)
 {
   char mypidc[100];
   sprintf(mypidc, "%d", A.Comm().getRank());
@@ -297,18 +271,13 @@ MoertelT::Print_Graph(
   }
 
   // write global and local dimensions of this operator
-  fprintf(
-      out,
-      "%d %d 0\n",
-      A.RangeMap().NumGlobalElements(),
-      A.DomainMap().NumGlobalElements());
+  fprintf(out, "%d %d 0\n", A.RangeMap().NumGlobalElements(), A.DomainMap().NumGlobalElements());
   for (int lrow = 0; lrow < A.NumMyRows(); ++lrow) {
     int grow = A.GRID(lrow);
     if (grow < 0) {
-      std::cout
-          << "***ERR*** MoertelT::Print_Graph:\n"
-          << "***ERR*** Cannot gind global row index from local row index\n"
-          << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
+      std::cout << "***ERR*** MoertelT::Print_Graph:\n"
+                << "***ERR*** Cannot gind global row index from local row index\n"
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       fclose(out);
       return false;
     }
@@ -318,8 +287,7 @@ MoertelT::Print_Graph(
     if (err) {
       std::cout << "***ERR*** MoertelT::Print_Graph:\n"
                 << "***ERR*** A.ExtractMyRowView returned " << err << std::endl
-                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__
-                << "\n";
+                << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
       fclose(out);
       return false;
     }
@@ -446,8 +414,7 @@ MoertelT::SplitMatrix2x2(
       }
       // std::cout << std::endl; fflush(stdout);
       // add this filtered row to A22
-      err =
-          A22->insertGlobalValues(grid, count, &a22values[0], &a22gcindices[0]);
+      err = A22->insertGlobalValues(grid, count, &a22values[0], &a22gcindices[0]);
       if (err < 0) {
         std::stringstream oss;
         oss << "***ERR*** MoertelT::SplitMatrix2x2_A22row_given:\n"
@@ -495,8 +462,7 @@ MoertelT::SplitMatrix2x2(
         a11values[count]    = values[j];
         ++count;
       }
-      err =
-          A11->insertGlobalValues(grid, count, &a11values[0], &a11gcindices[0]);
+      err = A11->insertGlobalValues(grid, count, &a11values[0], &a11gcindices[0]);
       if (err < 0) {
         std::stringstream oss;
         oss << "***ERR*** MoertelT::SplitMatrix2x2_A22row_given:\n"
@@ -544,8 +510,7 @@ MoertelT::SplitMatrix2x2(
         a12values[count]    = values[j];
         ++count;
       }
-      err =
-          A12->insertGlobalValues(grid, count, &a12values[0], &a12gcindices[0]);
+      err = A12->insertGlobalValues(grid, count, &a12values[0], &a12gcindices[0]);
       if (err < 0) {
         std::stringstream oss;
         oss << "***ERR*** MoertelT::SplitMatrix2x2_A22row_given:\n"
@@ -593,8 +558,7 @@ MoertelT::SplitMatrix2x2(
         a21values[count]    = values[j];
         ++count;
       }
-      err =
-          A21->insertGlobalValues(grid, count, &a21values[0], &a21gcindices[0]);
+      err = A21->insertGlobalValues(grid, count, &a21values[0], &a21gcindices[0]);
       if (err < 0) {
         std::stringstream oss;
         oss << "***ERR*** MoertelT::SplitMatrix2x2_A22row_given:\n"
@@ -619,9 +583,7 @@ MoertelT::SplitMatrix2x2(
  *----------------------------------------------------------------------*/
 template <class LO, class GO, class N>
 Teuchos::RCP<Tpetra::Map<LO, GO, N>>
-MoertelT::SplitMap(
-    const Tpetra::Map<LO, GO, N>& Amap,
-    const Tpetra::Map<LO, GO, N>& Agiven)
+MoertelT::SplitMap(const Tpetra::Map<LO, GO, N>& Amap, const Tpetra::Map<LO, GO, N>& Agiven)
 {
   const Teuchos::Comm<LO>&      Comm = Amap.Comm();
   const Tpetra::Map<LO, GO, N>& Ag   = Agiven;
@@ -637,8 +599,8 @@ MoertelT::SplitMap(
   myaugids.resize(count);
   int gcount;
   Teuchos::reduceAll(Comm, Teuchos::REDUCE_SUM, 1, &count, &gcount);
-  Teuchos::RCP<Tpetra::Map<LO, GO, N>> Aunknown = Teuchos::rcp(
-      new Tpetra::Map<LO, GO, N>(gcount, count, &myaugids[0], 0, Comm));
+  Teuchos::RCP<Tpetra::Map<LO, GO, N>> Aunknown =
+      Teuchos::rcp(new Tpetra::Map<LO, GO, N>(gcount, count, &myaugids[0], 0, Comm));
   myaugids.clear();
   return Aunknown;
 }

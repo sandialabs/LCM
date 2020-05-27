@@ -165,60 +165,30 @@ class OverlapT
       double*              N);
   // test whether a point is inside or outside of a clip edge
   bool
-  Clip_TestPoint(
-      double const* N,
-      double const* PE,
-      double const* P,
-      double        eps);
+  Clip_TestPoint(double const* N, double const* PE, double const* P, double eps);
   // find intersection of clipping edge with line
   bool
-  Clip_Intersect(
-      double const* N,
-      double const* PE,
-      double const* P0,
-      double const* P1,
-      double*       xi);
+  Clip_Intersect(double const* N, double const* PE, double const* P0, double const* P1, double* xi);
   // find intersection of clipping edge with line when one knows that P0 and P1
   // are on opposite sides of the clipping plane
   bool
-  Guarded_Clip_Intersect(
-      double const* N,
-      double const* PE,
-      double const* P0,
-      double const* P1,
-      double*       xi);
+  Guarded_Clip_Intersect(double const* N, double const* PE, double const* P0, double const* P1, double* xi);
   // find parameterization alpha for point on line
   double
-  Clip_ParameterPointOnLine(
-      double const* P0,
-      double const* P1,
-      double const* P);
+  Clip_ParameterPointOnLine(double const* P0, double const* P1, double const* P);
 
   // -------------------------------------finding a convex hull for the polygon
   // create a convex hull of a set of given points in 2D
   bool
-  ConvexHull(
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p);
+  ConvexHull(std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p);
   bool
-  MakeRightTurnUpper(
-      int i,
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
-          hull);
+  MakeRightTurnUpper(int i, std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull);
   bool
-  MakeRightTurnLower(
-      int i,
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
-          hull);
+  MakeRightTurnLower(int i, std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull);
   void
-  RemovePointBefore(
-      int i,
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
-          hull);
+  RemovePointBefore(int i, std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull);
   void
-  RemovePointAfter(
-      int i,
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
-          hull);
+  RemovePointAfter(int i, std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull);
 
   //-------------------------------------------make triangulization of polygon
   bool
@@ -226,9 +196,7 @@ class OverlapT
 
   //-----------------------------------------------------------collapse points
   bool
-  CollapsePoints(
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
-      double const eps);
+  CollapsePoints(std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p, double const eps);
 
  protected:
   // @{ \name Methods to construct triangulation of overlap region
@@ -244,9 +212,7 @@ class OverlapT
   }
   // get view of segments in triangulation map
   void
-  SegmentView(
-      std::vector<Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>&
-          segs);
+  SegmentView(std::vector<Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>& segs);
 
   // @{ \name Methods to construct an overlap polygon
 
@@ -269,33 +235,24 @@ class OverlapT
   }
   // get view of point in polygon, calling routine is responsible for freeing
   void
-  PointView(std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
-                points);
+  PointView(std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& points);
   void
   PointView(
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) l>>&
-          p,
-      std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
-          points);
+      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) l>>& p,
+      std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&     points);
   void
-  PointView(
-      std::vector<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) *>& p,
-      int const*                                               nodeids,
-      int const                                                np);
+  PointView(std::vector<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT) *>& p, int const* nodeids, int const np);
   // copy a point polygon to another polygon
   bool
   CopyPointPolygon(
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
-          from,
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>&
-          to);
+      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& from,
+      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& to);
   // compute the centroid of a polygon (which is defined anti-clockwise)
   bool
   Centroid(
-      double xi[],
-      std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> const&
-                points,
-      int const np);
+      double                                                                     xi[],
+      std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> const& points,
+      int const                                                                  np);
 
   //@}
 
@@ -313,8 +270,8 @@ class OverlapT
 
   double sxi_[4][2];  // local coords of snodes in sseg's coord system
   double sn_[4][2];   // outward normal to slave segment's edges in local coords
-  double mn_[4][2];  // outward normal to master segment's edges in local coords
-  bool   havesxi_;   // flag indicating whether sxi_ and sin_ have been build
+  double mn_[4][2];   // outward normal to master segment's edges in local coords
+  bool   havesxi_;    // flag indicating whether sxi_ and sin_ have been build
 
   double sline_[4][4];  // 3 lines of sseg_ in sseg_'s local coords
   double mline_[4][4];  // 3 lines of mseg_in sseg_'s local coords
@@ -326,8 +283,7 @@ class OverlapT
 
   double slinem_[4][4];  // 3 lines of sseg_ in mseg_'s local coords
   double mlinem_[4][4];  // 3 lines of mseg_in mseg_'s local coords
-  bool
-      havelinem_;  // flag indicating built of line information in master coords
+  bool   havelinem_;     // flag indicating built of line information in master coords
 
   bool exactvalues_;  // use exact function values at gauss points
 

@@ -14,21 +14,13 @@ CP::flowParameterFactory(CP::FlowRuleType type_flow_rule)
       exit(1);
       break;
 
-    case FlowRuleType::POWER_LAW:
-      return FPUP(new CP::PowerLawFlowParameters());
-      break;
+    case FlowRuleType::POWER_LAW: return FPUP(new CP::PowerLawFlowParameters()); break;
 
-    case FlowRuleType::POWER_LAW_DRAG:
-      return FPUP(new CP::PowerLawDragFlowParameters());
-      break;
+    case FlowRuleType::POWER_LAW_DRAG: return FPUP(new CP::PowerLawDragFlowParameters()); break;
 
-    case FlowRuleType::THERMAL_ACTIVATION:
-      return FPUP(new CP::ThermalActivationFlowParameters());
-      break;
+    case FlowRuleType::THERMAL_ACTIVATION: return FPUP(new CP::ThermalActivationFlowParameters()); break;
 
-    case FlowRuleType::UNDEFINED:
-      return FPUP(new CP::NoFlowParameters());
-      break;
+    case FlowRuleType::UNDEFINED: return FPUP(new CP::NoFlowParameters()); break;
   }
 
   return FPUP(nullptr);
@@ -46,21 +38,13 @@ CP::FlowRuleFactory::createFlowRule(FlowRuleType type_flow_rule) const
       exit(1);
       break;
 
-    case FlowRuleType::POWER_LAW:
-      return allocator_.create<PowerLawFlowRule<ArgT>>();
-      break;
+    case FlowRuleType::POWER_LAW: return allocator_.create<PowerLawFlowRule<ArgT>>(); break;
 
-    case FlowRuleType::POWER_LAW_DRAG:
-      return allocator_.create<PowerLawDragFlowRule<ArgT>>();
-      break;
+    case FlowRuleType::POWER_LAW_DRAG: return allocator_.create<PowerLawDragFlowRule<ArgT>>(); break;
 
-    case FlowRuleType::THERMAL_ACTIVATION:
-      return allocator_.create<ThermalActivationFlowRule<ArgT>>();
-      break;
+    case FlowRuleType::THERMAL_ACTIVATION: return allocator_.create<ThermalActivationFlowRule<ArgT>>(); break;
 
-    case FlowRuleType::UNDEFINED:
-      return allocator_.create<NoFlowRule<ArgT>>();
-      break;
+    case FlowRuleType::UNDEFINED: return allocator_.create<NoFlowRule<ArgT>>(); break;
   }
 
   return nullptr;
@@ -80,8 +64,7 @@ CP::PowerLawFlowRule<ArgT>::computeRateSlip(
   // Material properties
   RealType const m = pflow_parameters->getParameter(Params::EXPONENT_RATE);
 
-  RealType const g0 =
-      pflow_parameters->getParameter(Params::RATE_SLIP_REFERENCE);
+  RealType const g0 = pflow_parameters->getParameter(Params::RATE_SLIP_REFERENCE);
 
   RealType const min_tol = pflow_parameters->min_tol_;
 
@@ -120,13 +103,11 @@ CP::ThermalActivationFlowRule<ArgT>::computeRateSlip(
   using Params = ThermalActivationFlowParameters;
 
   // Material properties
-  RealType const g0 =
-      pflow_parameters->getParameter(Params::RATE_SLIP_REFERENCE);
+  RealType const g0 = pflow_parameters->getParameter(Params::RATE_SLIP_REFERENCE);
 
   RealType const F0 = pflow_parameters->getParameter(Params::ENERGY_ACTIVATION);
 
-  RealType const s_t =
-      pflow_parameters->getParameter(Params::RESISTANCE_THERMAL);
+  RealType const s_t = pflow_parameters->getParameter(Params::RESISTANCE_THERMAL);
 
   RealType const p = pflow_parameters->getParameter(Params::EXPONENT_P);
 
@@ -134,8 +115,7 @@ CP::ThermalActivationFlowRule<ArgT>::computeRateSlip(
 
   RealType const min_tol = pflow_parameters->min_tol_;
 
-  ArgT const ratio_stress =
-      std::max(0.0, (std::fabs(shear) - slip_resistance) / s_t);
+  ArgT const ratio_stress = std::max(0.0, (std::fabs(shear) - slip_resistance) / s_t);
 
   // carry derivative info from ratio_stress
   ArgT rate_slip{0.0 * ratio_stress};
@@ -144,9 +124,7 @@ CP::ThermalActivationFlowRule<ArgT>::computeRateSlip(
   if (ratio_stress > min_tol) {
     RealType const sign = shear < 0.0 ? -1.0 : 1.0;
 
-    rate_slip = g0 *
-                std::exp(-F0 * std::pow(1.0 - std::pow(ratio_stress, p), q)) *
-                sign;
+    rate_slip = g0 * std::exp(-F0 * std::pow(1.0 - std::pow(ratio_stress, p), q)) * sign;
   }
 
   return rate_slip;
@@ -166,11 +144,9 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   // Material properties
   RealType const m = pflow_parameters->getParameter(Params::EXPONENT_RATE);
 
-  RealType const g0 =
-      pflow_parameters->getParameter(Params::RATE_SLIP_REFERENCE);
+  RealType const g0 = pflow_parameters->getParameter(Params::RATE_SLIP_REFERENCE);
 
-  RealType const coefficient_drag =
-      pflow_parameters->getParameter(Params::COEFFICIENT_DRAG);
+  RealType const coefficient_drag = pflow_parameters->getParameter(Params::COEFFICIENT_DRAG);
 
   RealType const min_tol = pflow_parameters->min_tol_;
 
@@ -215,9 +191,7 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   // The power law and viscous drag terms are both significant in the
   // intermediate stress regime, so the full consitutive calculation is
   // performed
-  if (vd_active == true) {
-    effective = 1.0 / ((1.0 / power_law) + (1.0 / viscous_drag));
-  }
+  if (vd_active == true) { effective = 1.0 / ((1.0 / power_law) + (1.0 / viscous_drag)); }
 
   // compute slip increment
   return g0 * effective;

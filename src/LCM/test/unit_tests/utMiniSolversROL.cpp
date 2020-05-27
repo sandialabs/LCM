@@ -62,10 +62,7 @@ bananaRosenbrock()
   // Set parameters.
   Teuchos::ParameterList params;
 
-  params.sublist("Step")
-      .sublist("Line Search")
-      .sublist("Descent Method")
-      .set("Type", "Newton-Krylov");
+  params.sublist("Step").sublist("Line Search").sublist("Descent Method").set("Type", "Newton-Krylov");
 
   params.sublist("Status Test").set("Gradient Tolerance", 1.0e-16);
   params.sublist("Status Test").set("Step Tolerance", 1.0e-16);
@@ -76,8 +73,7 @@ bananaRosenbrock()
   x(0) = 0.0;
   x(1) = 3.0;
 
-  LCM::MiniSolverROL<MIN, FN, EvalT, DIM> mini_solver(
-      minimizer, algoname, params, fn, x);
+  LCM::MiniSolverROL<MIN, FN, EvalT, DIM> mini_solver(minimizer, algoname, params, fn, x);
 
   minimizer.printReport(os);
 
@@ -138,10 +134,7 @@ paraboloid()
   // Set parameters.
   Teuchos::ParameterList params;
 
-  params.sublist("Step")
-      .sublist("Line Search")
-      .sublist("Descent Method")
-      .set("Type", "Newton-Krylov");
+  params.sublist("Step").sublist("Line Search").sublist("Descent Method").set("Type", "Newton-Krylov");
 
   params.sublist("Status Test").set("Gradient Tolerance", 1.0e-16);
   params.sublist("Status Test").set("Step Tolerance", 1.0e-16);
@@ -152,8 +145,7 @@ paraboloid()
   x(0) = 10.0 * minitensor::random<ValueT>();
   x(1) = 10.0 * minitensor::random<ValueT>();
 
-  LCM::MiniSolverROL<MIN, FN, EvalT, DIM> mini_solver(
-      minimizer, algoname, params, fn, x);
+  LCM::MiniSolverROL<MIN, FN, EvalT, DIM> mini_solver(minimizer, algoname, params, fn, x);
 
   minimizer.printReport(os);
 
@@ -224,10 +216,7 @@ paraboloidBounds()
   // Set parameters.
   Teuchos::ParameterList params;
 
-  params.sublist("Step")
-      .sublist("Line Search")
-      .sublist("Descent Method")
-      .set("Type", "Newton-Krylov");
+  params.sublist("Step").sublist("Line Search").sublist("Descent Method").set("Type", "Newton-Krylov");
 
   params.sublist("Status Test").set("Gradient Tolerance", 1.0e-16);
   params.sublist("Status Test").set("Step Tolerance", 1.0e-16);
@@ -238,8 +227,7 @@ paraboloidBounds()
   x(0) = 10.0 * minitensor::random<ValueT>();
   x(1) = 10.0 * minitensor::random<ValueT>();
 
-  LCM::MiniSolverBoundsROL<MIN, FN, BC, EvalT, DIM> mini_solver(
-      minimizer, algoname, params, fn, bounds, x);
+  LCM::MiniSolverBoundsROL<MIN, FN, BC, EvalT, DIM> mini_solver(minimizer, algoname, params, fn, bounds, x);
 
   minimizer.printReport(os);
 
@@ -308,25 +296,13 @@ paraboloidEquality()
   // Set parameters.
   Teuchos::ParameterList params;
 
-  params.sublist("Step")
-      .sublist(algoname)
-      .sublist("Optimality System Solver")
-      .set("Nominal Relative Tolerance", 1.e-8);
+  params.sublist("Step").sublist(algoname).sublist("Optimality System Solver").set("Nominal Relative Tolerance", 1.e-8);
 
-  params.sublist("Step")
-      .sublist(algoname)
-      .sublist("Optimality System Solver")
-      .set("Fix Tolerance", true);
+  params.sublist("Step").sublist(algoname).sublist("Optimality System Solver").set("Fix Tolerance", true);
 
-  params.sublist("Step")
-      .sublist(algoname)
-      .sublist("Tangential Subproblem Solver")
-      .set("Iteration Limit", 128);
+  params.sublist("Step").sublist(algoname).sublist("Tangential Subproblem Solver").set("Iteration Limit", 128);
 
-  params.sublist("Step")
-      .sublist(algoname)
-      .sublist("Tangential Subproblem Solver")
-      .set("Relative Tolerance", 1e-6);
+  params.sublist("Step").sublist(algoname).sublist("Tangential Subproblem Solver").set("Relative Tolerance", 1e-6);
 
   params.sublist("Step").sublist(algoname).set("Output Level", 0);
   params.sublist("Status Test").set("Gradient Tolerance", 1.0e-12);
@@ -340,8 +316,8 @@ paraboloidEquality()
   // Set constraint vector
   minitensor::Vector<ScalarT, NUM_CONSTR> c(minitensor::Filler::ZEROS);
 
-  LCM::MiniSolverEqIneqROL<MIN, FN, EIC, EvalT, NUM_VAR, NUM_CONSTR>
-      mini_solver(minimizer, algoname, params, fn, eq_constr, x, c);
+  LCM::MiniSolverEqIneqROL<MIN, FN, EIC, EvalT, NUM_VAR, NUM_CONSTR> mini_solver(
+      minimizer, algoname, params, fn, eq_constr, x, c);
 
   minimizer.printReport(os);
 
@@ -393,25 +369,13 @@ TEST(MiniTensor_ROL, Paraboloid_EqualityConstraint)
   // Set parameters.
   Teuchos::ParameterList params;
 
-  params.sublist("Step")
-      .sublist(algoname)
-      .sublist("Optimality System Solver")
-      .set("Nominal Relative Tolerance", 1.e-8);
+  params.sublist("Step").sublist(algoname).sublist("Optimality System Solver").set("Nominal Relative Tolerance", 1.e-8);
 
-  params.sublist("Step")
-      .sublist(algoname)
-      .sublist("Optimality System Solver")
-      .set("Fix Tolerance", true);
+  params.sublist("Step").sublist(algoname).sublist("Optimality System Solver").set("Fix Tolerance", true);
 
-  params.sublist("Step")
-      .sublist(algoname)
-      .sublist("Tangential Subproblem Solver")
-      .set("Iteration Limit", 128);
+  params.sublist("Step").sublist(algoname).sublist("Tangential Subproblem Solver").set("Iteration Limit", 128);
 
-  params.sublist("Step")
-      .sublist(algoname)
-      .sublist("Tangential Subproblem Solver")
-      .set("Relative Tolerance", 1e-6);
+  params.sublist("Step").sublist(algoname).sublist("Tangential Subproblem Solver").set("Relative Tolerance", 1e-6);
 
   params.sublist("Step").sublist(algoname).set("Output Level", 0);
   params.sublist("Status Test").set("Gradient Tolerance", 1.0e-12);

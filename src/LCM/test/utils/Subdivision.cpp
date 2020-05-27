@@ -33,16 +33,11 @@ main(int ac, char* av[])
   command_line_processor.throwExceptions(false);
 
   // Parse command line
-  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return =
-      command_line_processor.parse(ac, av);
+  Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return = command_line_processor.parse(ac, av);
 
-  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) {
-    return 0;
-  }
+  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) { return 0; }
 
-  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) {
-    return 1;
-  }
+  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) { return 1; }
 
   // Read the mesh
   // Copied from Partition.cc
@@ -98,16 +93,12 @@ main(int ac, char* av[])
   LCM::display_connectivity(topology, stk::topology::ELEMENT_RANK);
 
   std::cout << std::endl;
-  std::cout << "topology.barycentricSubdivision() takes " << cpu_time_used
-            << " seconds" << std::endl;
+  std::cout << "topology.barycentricSubdivision() takes " << cpu_time_used << " seconds" << std::endl;
 
-  Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr =
-      topology.get_discretization();
-  Albany::STKDiscretization& stk_discretization =
-      static_cast<Albany::STKDiscretization&>(*discretization_ptr);
+  Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr = topology.get_discretization();
+  Albany::STKDiscretization& stk_discretization = static_cast<Albany::STKDiscretization&>(*discretization_ptr);
 
-  Teuchos::RCP<Thyra_Vector> solution_field =
-      stk_discretization.getSolutionField();
+  Teuchos::RCP<Thyra_Vector> solution_field = stk_discretization.getSolutionField();
 
   // Write final mesh to exodus file
   // second arg to output is (pseudo)time

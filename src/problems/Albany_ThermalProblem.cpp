@@ -28,11 +28,8 @@ Albany::ThermalProblem::ThermalProblem(
 
   Teuchos::Array<double> defaultData;
   defaultData.resize(numDim, 1.0);
-  kappa =
-      params->get<Teuchos::Array<double>>("Thermal Conductivity", defaultData);
-  if (kappa.size() != numDim) {
-    ALBANY_ABORT("Thermal Conductivity array must have length = numDim!");
-  }
+  kappa = params->get<Teuchos::Array<double>>("Thermal Conductivity", defaultData);
+  if (kappa.size() != numDim) { ALBANY_ABORT("Thermal Conductivity array must have length = numDim!"); }
   rho = params->get<double>("Density", 1.0);
   C   = params->get<double>("Heat Capacity", 1.0);
 }
@@ -51,12 +48,10 @@ Albany::ThermalProblem::buildProblem(
 
   for (int ps = 0; ps < physSets; ps++) {
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-    buildEvaluators(
-        *fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
+    buildEvaluators(*fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
   }
 
-  if (meshSpecs[0]->nsNames.size() >
-      0) {  // Build a nodeset evaluator if nodesets are present
+  if (meshSpecs[0]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
     constructDirichletEvaluators(meshSpecs[0]->nsNames);
   }
 
@@ -64,12 +59,10 @@ Albany::ThermalProblem::buildProblem(
   // Neumann BCs, but there are no sidesets in the input mesh
   bool isNeumannPL = params->isSublist("Neumann BCs");
   if (isNeumannPL && !(meshSpecs[0]->ssNames.size() > 0)) {
-    ALBANY_ABORT(
-        "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+    ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
   }
 
-  if (meshSpecs[0]->ssNames.size() >
-      0) {  // Build a sideset evaluator if sidesets are present
+  if (meshSpecs[0]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
     constructNeumannEvaluators(meshSpecs[0]);
   }
 }
@@ -84,23 +77,20 @@ Albany::ThermalProblem::buildEvaluators(
 {
   // Call constructEvaluators<EvalT>(*rfm[0], *meshSpecs[0], stateMgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<ThermalProblem> op(
-      *this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
+  ConstructEvaluatorsOp<ThermalProblem>                 op(*this, fm0, meshSpecs, stateMgr, fmchoice, responseList);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 // Dirichlet BCs
 void
-Albany::ThermalProblem::constructDirichletEvaluators(
-    std::vector<std::string> const& nodeSetIDs)
+Albany::ThermalProblem::constructDirichletEvaluators(std::vector<std::string> const& nodeSetIDs)
 {
   // Construct BC evaluators for all node sets and names
   std::vector<std::string> bcNames(neq);
   bcNames[0] = "T";
   Albany::BCUtils<Albany::DirichletTraits> bcUtils;
-  dfm = bcUtils.constructBCEvaluators(
-      nodeSetIDs, bcNames, this->params, this->paramLib);
+  dfm         = bcUtils.constructBCEvaluators(nodeSetIDs, bcNames, this->params, this->paramLib);
   use_sdbcs_  = bcUtils.useSDBCs();
   offsets_    = bcUtils.getOffsets();
   nodeSetIDs_ = bcUtils.getNodeSetIDs();
@@ -108,8 +98,7 @@ Albany::ThermalProblem::constructDirichletEvaluators(
 
 // Neumann BCs
 void
-Albany::ThermalProblem::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
+Albany::ThermalProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
   // i.e. meshSpecs.ssNames.size() > 0
@@ -146,9 +135,7 @@ Albany::ThermalProblem::constructNeumannEvaluators(
   else if (numDim == 3)
     condNames[0] = "(dudx, dudy, dudz)";
   else
-    ALBANY_ABORT(
-        std::endl
-        << "Error: Sidesets only supported in 2 and 3D." << std::endl);
+    ALBANY_ABORT(std::endl << "Error: Sidesets only supported in 2 and 3D." << std::endl);
 
   condNames[1] = "dudn";
   condNames[2] = "scaled jump";
@@ -157,32 +144,19 @@ Albany::ThermalProblem::constructNeumannEvaluators(
 
   nfm.resize(1);  // Heat problem only has one physics set
   nfm[0] = bcUtils.constructBCEvaluators(
-      meshSpecs,
-      bcNames,
-      dof_names,
-      false,
-      0,
-      condNames,
-      offsets,
-      dl,
-      this->params,
-      this->paramLib);
+      meshSpecs, bcNames, dof_names, false, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ThermalProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidThermalProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidThermalProblemParams");
 
   Teuchos::Array<double> defaultData;
   defaultData.resize(numDim, 1.0);
   validPL->set<Teuchos::Array<double>>(
-      "Thermal Conductivity",
-      defaultData,
-      "Arrays of values of thermal conductivities in x, y, z [required]");
-  validPL->set<double>(
-      "Heat Capacity", 1.0, "Value of heat capacity [required]");
+      "Thermal Conductivity", defaultData, "Arrays of values of thermal conductivities in x, y, z [required]");
+  validPL->set<double>("Heat Capacity", 1.0, "Value of heat capacity [required]");
   validPL->set<double>("Density", 1.0, "Value of density [required]");
 
   return validPL;

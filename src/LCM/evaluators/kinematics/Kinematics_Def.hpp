@@ -16,9 +16,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-Kinematics<EvalT, Traits>::Kinematics(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+Kinematics<EvalT, Traits>::Kinematics(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : grad_u_(p.get<std::string>("Gradient QP Variable Name"), dl->qp_tensor),
       weights_(p.get<std::string>("Weights Name"), dl->qp_scalar),
       def_grad_(p.get<std::string>("DefGrad Name"), dl->qp_tensor),
@@ -28,12 +26,10 @@ Kinematics<EvalT, Traits>::Kinematics(
       needs_vel_grad_(false),
       needs_strain_(false)
 {
-  if (p.isType<bool>("Velocity Gradient Flag"))
-    needs_vel_grad_ = p.get<bool>("Velocity Gradient Flag");
+  if (p.isType<bool>("Velocity Gradient Flag")) needs_vel_grad_ = p.get<bool>("Velocity Gradient Flag");
   if (p.isType<std::string>("Strain Name")) {
     needs_strain_ = true;
-    strain_ =
-        decltype(strain_)(p.get<std::string>("Strain Name"), dl->qp_tensor);
+    strain_       = decltype(strain_)(p.get<std::string>("Strain Name"), dl->qp_tensor);
     this->addEvaluatedField(strain_);
   }
 
@@ -49,15 +45,13 @@ Kinematics<EvalT, Traits>::Kinematics(
   this->addEvaluatedField(j_);
 
   if (needs_vel_grad_) {
-    vel_grad_ = decltype(vel_grad_)(
-        p.get<std::string>("Velocity Gradient Name"), dl->qp_tensor);
+    vel_grad_ = decltype(vel_grad_)(p.get<std::string>("Velocity Gradient Name"), dl->qp_tensor);
     this->addEvaluatedField(vel_grad_);
   }
 
   this->setName("Kinematics" + PHX::print<EvalT>());
 
-  if (def_grad_rc_.init(p, p.get<std::string>("DefGrad Name")))
-    this->addDependentField(def_grad_rc_());
+  if (def_grad_rc_.init(p, p.get<std::string>("DefGrad Name"))) this->addDependentField(def_grad_rc_());
   if (def_grad_rc_) {
     u_ = decltype(u_)(p.get<std::string>("Displacement Name"), dl->node_vector);
     this->addDependentField(u_);
@@ -66,9 +60,7 @@ Kinematics<EvalT, Traits>::Kinematics(
 
 template <typename EvalT, typename Traits>
 void
-Kinematics<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+Kinematics<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(weights_, fm);
   this->utils.setFieldData(def_grad_, fm);
@@ -82,10 +74,7 @@ Kinematics<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 bool
-Kinematics<EvalT, Traits>::check_det(
-    typename Traits::EvalData workset,
-    int                       cell,
-    int                       pt)
+Kinematics<EvalT, Traits>::check_det(typename Traits::EvalData workset, int cell, int pt)
 {
   minitensor::Tensor<ScalarT> F(num_dims_);
   F.fill(def_grad_, cell, pt, 0, 0);
@@ -93,8 +82,8 @@ Kinematics<EvalT, Traits>::check_det(
   bool neg_det = false;
   if (pt == 0 && j_(cell, pt) < 1e-16) {
     neg_det = true;
-    std::cout << "amb: (neg det) rcu Kinematics check_det " << j_(cell, pt)
-              << " " << cell << " " << pt << "\nF_incr = [" << F << "];\n";
+    std::cout << "amb: (neg det) rcu Kinematics check_det " << j_(cell, pt) << " " << cell << " " << pt
+              << "\nF_incr = [" << F << "];\n";
     const Teuchos::ArrayRCP<GO>& gid = workset.wsElNodeID[cell];
     std::cout << "gid_matlab = [";
     for (int i = 0; i < gid.size(); ++i) std::cout << " " << gid[i] + 1;
@@ -118,9 +107,7 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         F            = I + gradu;
         j_(cell, pt) = minitensor::det(F);
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) {
-            def_grad_(cell, pt, i, j) = F(i, j);
-          }
+          for (int j(0); j < num_dims_; ++j) { def_grad_(cell, pt, i, j) = F(i, j); }
         }
       }
     }
@@ -131,8 +118,7 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         gradu.fill(grad_u_, cell, pt, 0, 0);
         F = I + gradu;
         for (int i = 0; i < num_dims_; ++i)
-          for (int j = 0; j < num_dims_; ++j)
-            def_grad_(cell, pt, i, j) = F(i, j);
+          for (int j = 0; j < num_dims_; ++j) def_grad_(cell, pt, i, j) = F(i, j);
         if (first && check_det(workset, cell, pt)) first = false;
         // F[n,0] = F[n,n-1] F[n-1,0].
         def_grad_rc_.multiplyInto<ScalarT>(def_grad_, cell, pt);
@@ -160,9 +146,7 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         F *= p;
         j_(cell, pt) = weighted_jbar;
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) {
-            def_grad_(cell, pt, i, j) = F(i, j);
-          }
+          for (int j(0); j < num_dims_; ++j) { def_grad_(cell, pt, i, j) = F(i, j); }
         }
       }
     }
@@ -175,9 +159,7 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
           gradu.fill(grad_u_, cell, pt, 0, 0);
           strain = 0.5 * (gradu + minitensor::transpose(gradu));
           for (int i(0); i < num_dims_; ++i) {
-            for (int j(0); j < num_dims_; ++j) {
-              strain_(cell, pt, i, j) = strain(i, j);
-            }
+            for (int j(0); j < num_dims_; ++j) { strain_(cell, pt, i, j) = strain(i, j); }
           }
         }
       }
@@ -190,8 +172,7 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
           // strain = 1/2 (dU/dx[0] + dU/dx[0]^T).
           strain = 0.5 * (gradu + minitensor::transpose(gradu));
           for (int i = 0; i < num_dims_; ++i)
-            for (int j = 0; j < num_dims_; ++j)
-              strain_(cell, pt, i, j) = strain(i, j);
+            for (int j = 0; j < num_dims_; ++j) strain_(cell, pt, i, j) = strain(i, j);
         }
       }
     }

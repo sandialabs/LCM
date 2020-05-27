@@ -38,13 +38,7 @@ NeohookeanKernel<EvalT, Traits>::NeohookeanKernel(
   setEvaluatedField("Material Tangent", dl->qp_tensor4);
 
   // define the state variables
-  addStateVariable(
-      cauchy,
-      dl->qp_tensor,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output Cauchy Stress", false));
+  addStateVariable(cauchy, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
 }
 
 template <typename EvalT, typename Traits>
@@ -90,11 +84,10 @@ NeohookeanKernel<EvalT, Traits>::operator()(int cell, int pt) const
   util::Tensor4<ScalarT> dsigmadb;
   util::Tensor4<ScalarT> I1(util::identity_1<ScalarT>(num_dims_));
   util::Tensor4<ScalarT> I3(util::identity_3<ScalarT>(num_dims_));
-  kappa =
-      elastic_modulus(cell, pt) / (3. * (1. - 2. * poissons_ratio(cell, pt)));
-  mu   = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
-  Jm53 = std::pow(J(cell, pt), -5. / 3.);
-  Jm23 = Jm53 * J(cell, pt);
+  kappa = elastic_modulus(cell, pt) / (3. * (1. - 2. * poissons_ratio(cell, pt)));
+  mu    = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
+  Jm53  = std::pow(J(cell, pt), -5. / 3.);
+  Jm23  = Jm53 * J(cell, pt);
 
   for (int i = 0; i < num_dims_; ++i) {
     for (int j = 0; j < num_dims_; ++j) { F(i, j) = def_grad(cell, pt, i, j); }
@@ -102,20 +95,15 @@ NeohookeanKernel<EvalT, Traits>::operator()(int cell, int pt) const
   b     = F * util::transpose(F);
   mubar = (1.0 / 3.0) * mu * Jm23 * util::trace(b);
 
-  sigma = 0.5 * kappa * (J(cell, pt) - 1. / J(cell, pt)) * I +
-          mu * Jm53 * util::dev(b);
+  sigma = 0.5 * kappa * (J(cell, pt) - 1. / J(cell, pt)) * I + mu * Jm53 * util::dev(b);
 
   for (int i = 0; i < num_dims_; ++i) {
-    for (int j = 0; j < num_dims_; ++j) {
-      stress(cell, pt, i, j) = sigma(i, j);
-    }
+    for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
   }
 
   if (compute_energy_) {  // compute energy
-    energy(cell, pt) =
-        0.5 * kappa *
-            (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) +
-        0.5 * mu * (Jm23 * util::trace(b) - 3.0);
+    energy(cell, pt) = 0.5 * kappa * (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) +
+                       0.5 * mu * (Jm23 * util::trace(b) - 3.0);
   }
 
   if (compute_tangent_) {  // compute tangent
@@ -124,17 +112,13 @@ NeohookeanKernel<EvalT, Traits>::operator()(int cell, int pt) const
     smag = util::norm(s);
     n    = s / smag;
 
-    dsigmadb = kappa * J(cell, pt) * J(cell, pt) * I3 -
-               kappa * (J(cell, pt) * J(cell, pt) - 1.0) * I1 +
-               2.0 * mubar * (I1 - (1.0 / 3.0) * I3) -
-               2.0 / 3.0 * smag * (util::tensor(n, I) + util::tensor(I, n));
+    dsigmadb = kappa * J(cell, pt) * J(cell, pt) * I3 - kappa * (J(cell, pt) * J(cell, pt) - 1.0) * I1 +
+               2.0 * mubar * (I1 - (1.0 / 3.0) * I3) - 2.0 / 3.0 * smag * (util::tensor(n, I) + util::tensor(I, n));
 
     for (int i = 0; i < num_dims_; ++i) {
       for (int j = 0; j < num_dims_; ++j) {
         for (int k = 0; k < num_dims_; ++k) {
-          for (int l = 0; l < num_dims_; ++l) {
-            tangent(cell, pt, i, j, k, l) = dsigmadb(i, j, k, l);
-          }
+          for (int l = 0; l < num_dims_; ++l) { tangent(cell, pt, i, j, k, l) = dsigmadb(i, j, k, l); }
         }
       }
     }

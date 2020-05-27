@@ -22,9 +22,8 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class QuadPointsToCellInterpolationBase
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<EvalT, Traits>
+class QuadPointsToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                          public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   QuadPointsToCellInterpolationBase(
@@ -34,17 +33,14 @@ class QuadPointsToCellInterpolationBase
       const Teuchos::RCP<PHX::DataLayout>& cell_layout);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& fm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm);
 
   void
   evaluateFields(typename Traits::EvalData d);
 
  private:
-  typedef typename EvalT::MeshScalarT MeshScalarT;
-  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type
-      OutputScalarT;
+  typedef typename EvalT::MeshScalarT                                      MeshScalarT;
+  typedef typename Albany::StrongestScalarType<ScalarT, MeshScalarT>::type OutputScalarT;
 
   std::vector<PHX::DataLayout::size_type> qp_dims;
 
@@ -58,20 +54,14 @@ class QuadPointsToCellInterpolationBase
 
 // Some shortcut names
 template <typename EvalT, typename Traits>
-using QuadPointsToCellInterpolation =
-    QuadPointsToCellInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
+using QuadPointsToCellInterpolation = QuadPointsToCellInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using QuadPointsToCellInterpolationMesh = QuadPointsToCellInterpolationBase<
-    EvalT,
-    Traits,
-    typename EvalT::MeshScalarT>;
+using QuadPointsToCellInterpolationMesh = QuadPointsToCellInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using QuadPointsToCellInterpolationParam = QuadPointsToCellInterpolationBase<
-    EvalT,
-    Traits,
-    typename EvalT::ParamScalarT>;
+using QuadPointsToCellInterpolationParam =
+    QuadPointsToCellInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

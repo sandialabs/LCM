@@ -70,10 +70,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
   virtual ~CrystalPlasticityKernel() {}
 
   void
-  init(
-      Workset&                 workset,
-      FieldMap<ScalarT const>& dep_fields,
-      FieldMap<ScalarT>&       eval_fields);
+  init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields);
 
   ///
   /// Method to compute the state for a single cell and quadrature point
@@ -85,12 +82,11 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
 
   void
   finalize(
-      CP::StateMechanical<ScalarT, CP::MAX_DIM> const& state_mechanical,
-      CP::StateInternal<ScalarT, CP::MAX_SLIP> const&  state_internal,
-      utility::StaticPointer<
-          CP::Integrator<EvalT, CP::MAX_DIM, CP::MAX_SLIP>> const& integrator,
-      int const                                                    cell,
-      int const                                                    pt) const;
+      CP::StateMechanical<ScalarT, CP::MAX_DIM> const&                                state_mechanical,
+      CP::StateInternal<ScalarT, CP::MAX_SLIP> const&                                 state_internal,
+      utility::StaticPointer<CP::Integrator<EvalT, CP::MAX_DIM, CP::MAX_SLIP>> const& integrator,
+      int const                                                                       cell,
+      int const                                                                       pt) const;
 
   ///
   ///  Set a NOX status test to Failed, which will trigger Piro to cut the
@@ -100,8 +96,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
   void
   forceGlobalLoadStepReduction(std::string const& message) const
   {
-    ALBANY_ASSERT(
-        nox_status_test_.is_null() == false, "Invalid NOX status test");
+    ALBANY_ASSERT(nox_status_test_.is_null() == false, "Invalid NOX status test");
     nox_status_test_->status_         = NOX::StatusTest::Failed;
     nox_status_test_->status_message_ = message;
   }
@@ -275,15 +270,11 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class CrystalPlasticityModel : public LCM::ParallelConstitutiveModel<
-                                   EvalT,
-                                   Traits,
-                                   CrystalPlasticityKernel<EvalT, Traits>>
+class CrystalPlasticityModel
+    : public LCM::ParallelConstitutiveModel<EvalT, Traits, CrystalPlasticityKernel<EvalT, Traits>>
 {
  public:
-  CrystalPlasticityModel(
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  CrystalPlasticityModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 };
 
 }  // namespace LCM

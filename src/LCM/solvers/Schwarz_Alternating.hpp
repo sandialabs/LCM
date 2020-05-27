@@ -143,9 +143,7 @@ class SchwarzAlternating : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   doQuasistaticOutput(ST const time) const;
 
   void
-  setExplicitUpdateInitialGuessForSchwarz(
-      ST const current_time,
-      ST const time_step) const;
+  setExplicitUpdateInitialGuessForSchwarz(ST const current_time, ST const time_step) const;
 
   void
   setDynamicICVecsAndDoOutput(ST const time) const;
@@ -155,8 +153,8 @@ class SchwarzAlternating : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>                 apps_;
-  std::vector<Teuchos::RCP<Albany::AbstractSTKMeshStruct>>  stk_mesh_structs_;
-  std::vector<Teuchos::RCP<Albany::AbstractDiscretization>> discs_;
+  std::vector<Teuchos::RCP<Albany::AbstractSTKMeshStruct>>             stk_mesh_structs_;
+  std::vector<Teuchos::RCP<Albany::AbstractDiscretization>>            discs_;
 
   char const*  failure_message_{"No failure detected"};
   int          num_subdomains_{0};
@@ -188,22 +186,20 @@ class SchwarzAlternating : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable ConvergenceLogicalOperator operator_{ConvergenceLogicalOperator::AND};
 
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST> const>> curr_disp_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST> const>>
-      prev_step_disp_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST> const>> prev_step_disp_;
 
-  mutable std::vector<Thyra::ModelEvaluatorBase::InArgs<ST>>  sub_inargs_;
-  mutable std::vector<Thyra::ModelEvaluatorBase::OutArgs<ST>> sub_outargs_;
-  mutable std::vector<Teuchos::RCP<Thyra::ModelEvaluator<ST>>>
-                                                           model_evaluators_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> ics_disp_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> ics_velo_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> ics_acce_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> prev_disp_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> prev_velo_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> prev_acce_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> this_disp_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> this_velo_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>> this_acce_;
+  mutable std::vector<Thyra::ModelEvaluatorBase::InArgs<ST>>   sub_inargs_;
+  mutable std::vector<Thyra::ModelEvaluatorBase::OutArgs<ST>>  sub_outargs_;
+  mutable std::vector<Teuchos::RCP<Thyra::ModelEvaluator<ST>>> model_evaluators_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_disp_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_velo_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_acce_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_disp_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_velo_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_acce_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_disp_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_velo_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_acce_;
 
   mutable std::vector<LCM::StateArrays> internal_states_;
   mutable std::vector<bool>             do_outputs_;

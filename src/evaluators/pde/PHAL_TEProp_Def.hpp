@@ -10,9 +10,7 @@
 
 template <typename EvalT, typename Traits>
 PHAL::TEProp<EvalT, Traits>::TEProp(Teuchos::ParameterList& p)
-    : rhoCp(
-          p.get<std::string>("QP Variable Name 3"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+    : rhoCp(p.get<std::string>("QP Variable Name 3"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       permittivity(
           p.get<std::string>("QP Variable Name 2"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
@@ -26,13 +24,10 @@ PHAL::TEProp<EvalT, Traits>::TEProp(Teuchos::ParameterList& p)
           p.get<std::string>("Coordinate Vector Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"))
 {
-  Teuchos::ParameterList* teprop_list =
-      p.get<Teuchos::ParameterList*>("Parameter List");
+  Teuchos::ParameterList* teprop_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
-  Teuchos::RCP<PHX::DataLayout> scalar_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-  Teuchos::RCP<PHX::DataLayout> vector_dl =
-      p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numQPs  = dims[1];
@@ -42,23 +37,17 @@ PHAL::TEProp<EvalT, Traits>::TEProp(Teuchos::ParameterList& p)
   ;
 
   Teuchos::Array<double> dbl_elecCs =
-      Teuchos::getArrayFromStringParameter<double>(
-          *teprop_list, "Electrical Conductivity", mats, true);
+      Teuchos::getArrayFromStringParameter<double>(*teprop_list, "Electrical Conductivity", mats, true);
   elecCs.resize(dbl_elecCs.size());
   for (int i = 0; i < dbl_elecCs.size(); i++) elecCs[i] = dbl_elecCs[i];
 
-  thermCs = Teuchos::getArrayFromStringParameter<double>(
-      *teprop_list, "ThermalConductivity", mats, true);
-  rhoCps = Teuchos::getArrayFromStringParameter<double>(
-      *teprop_list, "Rho Cp", mats, true);
-  factor = Teuchos::getArrayFromStringParameter<double>(
-      *teprop_list, "Coupling Factor", mats, true);
-  xBounds = Teuchos::getArrayFromStringParameter<double>(
-      *teprop_list, "X Bounds", mats + 1, true);
+  thermCs = Teuchos::getArrayFromStringParameter<double>(*teprop_list, "ThermalConductivity", mats, true);
+  rhoCps  = Teuchos::getArrayFromStringParameter<double>(*teprop_list, "Rho Cp", mats, true);
+  factor  = Teuchos::getArrayFromStringParameter<double>(*teprop_list, "Coupling Factor", mats, true);
+  xBounds = Teuchos::getArrayFromStringParameter<double>(*teprop_list, "X Bounds", mats + 1, true);
 
   // Add Electrical Conductivity as a Sacado-ized parameter
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
 
   for (int i = 0; i < mats; i++) {
     std::stringstream ss;
@@ -77,9 +66,7 @@ PHAL::TEProp<EvalT, Traits>::TEProp(Teuchos::ParameterList& p)
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::TEProp<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+PHAL::TEProp<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(permittivity, fm);
   this->utils.setFieldData(thermalCond, fm);
@@ -97,11 +84,10 @@ PHAL::TEProp<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   for (std::size_t cell = 0; cell < numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
-      int mat = whichMat(coordVec(cell, qp, 0));
-      permittivity(cell, qp) =
-          elecCs[mat] / (1.0 + factor[mat] * Temp(cell, qp));
-      thermalCond(cell, qp) = thermCs[mat];
-      rhoCp(cell, qp)       = rhoCps[mat];
+      int mat                = whichMat(coordVec(cell, qp, 0));
+      permittivity(cell, qp) = elecCs[mat] / (1.0 + factor[mat] * Temp(cell, qp));
+      thermalCond(cell, qp)  = thermCs[mat];
+      rhoCp(cell, qp)        = rhoCps[mat];
     }
   }
 }
@@ -111,9 +97,7 @@ template <typename EvalT, typename Traits>
 int
 PHAL::TEProp<EvalT, Traits>::whichMat(const MeshScalarT& x)
 {
-  ALBANY_PANIC(
-      x < xBounds[0] || x > xBounds[mats],
-      "Quadrature point " << x << " not within bounds \n");
+  ALBANY_PANIC(x < xBounds[0] || x > xBounds[mats], "Quadrature point " << x << " not within bounds \n");
   for (int i = 0; i < mats; i++)
     if (x < xBounds[i + 1]) return i;
   ALBANY_ABORT("Quadrature point " << x << " not within bounds \n");

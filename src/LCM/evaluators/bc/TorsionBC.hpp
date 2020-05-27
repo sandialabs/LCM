@@ -46,8 +46,7 @@ class TorsionBC_Base : public PHAL::DirichletBase<EvalT, Traits>
 // Residual
 // **************************************************************
 template <typename Traits>
-class TorsionBC<PHAL::AlbanyTraits::Residual, Traits>
-    : public TorsionBC_Base<PHAL::AlbanyTraits::Residual, Traits>
+class TorsionBC<PHAL::AlbanyTraits::Residual, Traits> : public TorsionBC_Base<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   TorsionBC(Teuchos::ParameterList& p);
@@ -60,8 +59,7 @@ class TorsionBC<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public TorsionBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>
+class TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits> : public TorsionBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   TorsionBC(Teuchos::ParameterList& p);

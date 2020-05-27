@@ -28,8 +28,7 @@ class UniformSolutionCullingStrategy : public SolutionCullingStrategyBase
 };
 
 Teuchos::Array<GO>
-UniformSolutionCullingStrategy::selectedGIDs(
-    Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
+UniformSolutionCullingStrategy::selectedGIDs(Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
 {
   auto source_indexer = createGlobalLocalIndexer(sourceVS);
 
@@ -37,9 +36,7 @@ UniformSolutionCullingStrategy::selectedGIDs(
   Teuchos::Array<GO> allGIDs(sourceVS->dim());
   Teuchos::Array<GO> myGIDs(localDim);
 
-  for (LO lid = 0; lid < localDim; ++lid) {
-    myGIDs[lid] = source_indexer->getGlobalElement(lid);
-  }
+  for (LO lid = 0; lid < localDim; ++lid) { myGIDs[lid] = source_indexer->getGlobalElement(lid); }
 
   gatherAllV(source_indexer->getComm(), myGIDs(), allGIDs);
   std::sort(allGIDs.begin(), allGIDs.end());
@@ -53,9 +50,7 @@ UniformSolutionCullingStrategy::selectedGIDs(
 class NodeSetSolutionCullingStrategy : public SolutionCullingStrategyBase
 {
  public:
-  NodeSetSolutionCullingStrategy(
-      std::string const&                     nodeSetLabel,
-      const Teuchos::RCP<const Application>& app)
+  NodeSetSolutionCullingStrategy(std::string const& nodeSetLabel, const Teuchos::RCP<const Application>& app)
       : nodeSetLabel_(nodeSetLabel), app_(app), comm(app->getComm())
   {
     // Nothing to be done
@@ -80,8 +75,7 @@ class NodeSetSolutionCullingStrategy : public SolutionCullingStrategyBase
 };
 
 Teuchos::Array<GO>
-NodeSetSolutionCullingStrategy::selectedGIDs(
-    Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
+NodeSetSolutionCullingStrategy::selectedGIDs(Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
 {
   auto source_indexer = createGlobalLocalIndexer(sourceVS);
 
@@ -94,14 +88,10 @@ NodeSetSolutionCullingStrategy::selectedGIDs(
     typedef NodeSetList::mapped_type NodeSetEntryList;
     NodeSetEntryList const&          sampleNodeEntries = it->second;
 
-    for (NodeSetEntryList::const_iterator jt = sampleNodeEntries.begin();
-         jt != sampleNodeEntries.end();
-         ++jt) {
+    for (NodeSetEntryList::const_iterator jt = sampleNodeEntries.begin(); jt != sampleNodeEntries.end(); ++jt) {
       typedef NodeSetEntryList::value_type NodeEntryList;
       NodeEntryList const&                 sampleEntries = *jt;
-      for (NodeEntryList::const_iterator kt = sampleEntries.begin();
-           kt != sampleEntries.end();
-           ++kt) {
+      for (NodeEntryList::const_iterator kt = sampleEntries.begin(); kt != sampleEntries.end(); ++kt) {
         mySelectedGIDs.push_back(source_indexer->getGlobalElement(*kt));
       }
     }
@@ -110,8 +100,7 @@ NodeSetSolutionCullingStrategy::selectedGIDs(
   // Sum the number of selected gids across all ranks
   GO selectedGIDCount;
   GO mySelectedGIDCount = mySelectedGIDs.size();
-  Teuchos::reduceAll<LO, GO>(
-      *comm, Teuchos::REDUCE_SUM, 1, &mySelectedGIDCount, &selectedGIDCount);
+  Teuchos::reduceAll<LO, GO>(*comm, Teuchos::REDUCE_SUM, 1, &mySelectedGIDCount, &selectedGIDCount);
 
   // Gather all selected gids
   Teuchos::Array<GO> target_gids;
@@ -126,13 +115,8 @@ NodeSetSolutionCullingStrategy::selectedGIDs(
 class NodeGIDsSolutionCullingStrategy : public SolutionCullingStrategyBase
 {
  public:
-  NodeGIDsSolutionCullingStrategy(
-      const Teuchos::Array<int>&             nodeGIDs,
-      const Teuchos::RCP<const Application>& app)
-      : nodeGIDs_(nodeGIDs),
-        app_(app),
-        comm(app->getComm()),
-        disc_(Teuchos::null)
+  NodeGIDsSolutionCullingStrategy(const Teuchos::Array<int>& nodeGIDs, const Teuchos::RCP<const Application>& app)
+      : nodeGIDs_(nodeGIDs), app_(app), comm(app->getComm()), disc_(Teuchos::null)
   {
     // Nothing to be done
   }
@@ -160,23 +144,19 @@ NodeGIDsSolutionCullingStrategy::setup()
 }
 
 Teuchos::Array<GO>
-NodeGIDsSolutionCullingStrategy::selectedGIDs(
-    Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
+NodeGIDsSolutionCullingStrategy::selectedGIDs(Teuchos::RCP<Thyra_VectorSpace const> const& sourceVS) const
 {
   Teuchos::Array<GO> mySelectedGIDs;
 
   // Subract 1 to convert exodus GIDs to our GIDs
   auto source_indexer = createGlobalLocalIndexer(sourceVS);
   for (int i = 0; i < nodeGIDs_.size(); ++i) {
-    if (source_indexer->isLocallyOwnedElement(nodeGIDs_[i] - 1)) {
-      mySelectedGIDs.push_back(nodeGIDs_[i] - 1);
-    }
+    if (source_indexer->isLocallyOwnedElement(nodeGIDs_[i] - 1)) { mySelectedGIDs.push_back(nodeGIDs_[i] - 1); }
   }
 
   GO selectedGIDCount;
   GO mySelectedGIDCount = mySelectedGIDs.size();
-  Teuchos::reduceAll<LO, GO>(
-      *comm, Teuchos::REDUCE_SUM, 1, &mySelectedGIDCount, &selectedGIDCount);
+  Teuchos::reduceAll<LO, GO>(*comm, Teuchos::REDUCE_SUM, 1, &mySelectedGIDCount, &selectedGIDCount);
 
   Teuchos::Array<GO> result(selectedGIDCount);
 
@@ -187,12 +167,9 @@ NodeGIDsSolutionCullingStrategy::selectedGIDs(
 }
 
 Teuchos::RCP<SolutionCullingStrategyBase>
-createSolutionCullingStrategy(
-    const Teuchos::RCP<const Application>& app,
-    Teuchos::ParameterList&                params)
+createSolutionCullingStrategy(const Teuchos::RCP<const Application>& app, Teuchos::ParameterList& params)
 {
-  std::string const cullingStrategyToken =
-      params.get("Culling Strategy", "Uniform");
+  std::string const cullingStrategyToken = params.get("Culling Strategy", "Uniform");
 
   if (cullingStrategyToken == "Uniform") {
     int const numValues = params.get("Num Values", 10);
@@ -201,8 +178,7 @@ createSolutionCullingStrategy(
     std::string const nodeSetLabel = params.get<std::string>("Node Set Label");
     return Teuchos::rcp(new NodeSetSolutionCullingStrategy(nodeSetLabel, app));
   } else if (cullingStrategyToken == "Node GIDs") {
-    Teuchos::Array<int> nodeGIDs =
-        params.get<Teuchos::Array<int>>("Node GID Array");
+    Teuchos::Array<int> nodeGIDs = params.get<Teuchos::Array<int>>("Node GID Array");
     return Teuchos::rcp(new NodeGIDsSolutionCullingStrategy(nodeGIDs, app));
   }
 

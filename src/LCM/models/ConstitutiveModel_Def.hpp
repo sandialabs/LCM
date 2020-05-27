@@ -9,9 +9,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(
-    Teuchos::ParameterList*              p,
-    Teuchos::RCP<Albany::Layouts> const& dl)
+ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl)
 {
   // extract number of integration points and dimensions
   std::vector<PHX::DataLayout::size_type> dims;
@@ -21,8 +19,7 @@ ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(
   num_pts_  = dims[1];
   num_dims_ = dims[2];
 
-  field_name_map_ =
-      p->get<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map");
+  field_name_map_ = p->get<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map");
 
   if (p->isType<bool>("Have Temperature") == true) {
     have_temperature_ = p->get<bool>("Have Temperature");
@@ -32,9 +29,7 @@ ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(
     density_          = p->get<RealType>("Density", 1.0);
   }
 
-  if (p->isType<bool>("Have Damage") == true) {
-    have_damage_ = p->get<bool>("Have Damage");
-  }
+  if (p->isType<bool>("Have Damage") == true) { have_damage_ = p->get<bool>("Have Damage"); }
 
   if (p->isType<bool>("Have Total Concentration")) {
     have_total_concentration_ = p->get<bool>("Have Total Concentration");
@@ -48,9 +43,7 @@ ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(
     have_bubble_volume_fraction_ = p->get<bool>("Have Bubble Volume Fraction");
   }
 
-  if (p->isType<bool>("Compute Tangent")) {
-    compute_tangent_ = p->get<bool>("Compute Tangent");
-  }
+  if (p->isType<bool>("Compute Tangent")) { compute_tangent_ = p->get<bool>("Compute Tangent"); }
 }
 
 // Kokkos Kernel for computeVolumeAverage
@@ -76,11 +69,7 @@ class computeVolumeAverageKernel
       ArrayJ const&       j,
       int const           num_pts,
       int const           num_dims)
-      : stress(stress_),
-        weights_(weights),
-        j_(j),
-        num_pts_(num_pts),
-        num_dims_(num_dims)
+      : stress(stress_), weights_(weights), j_(j), num_pts_(num_pts), num_dims_(num_dims)
   {
     return;
   }
@@ -112,26 +101,21 @@ class computeVolumeAverageKernel
       p = (1. / num_dims_) * minitensor::trace(sig);
       sig += (pbar - p) * I;
 
-      for (int i = 0; i < num_dims_; ++i) {
-        stress(cell, pt, i, i) = sig(i, i);
-      }
+      for (int i = 0; i < num_dims_; ++i) { stress(cell, pt, i, i) = sig(i, i); }
     }
   }
 };
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModel<EvalT, Traits>::computeVolumeAverage(
-    Workset     workset,
-    DepFieldMap dep_fields,
-    FieldMap    eval_fields)
+ConstitutiveModel<EvalT, Traits>::computeVolumeAverage(Workset workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   int const& num_dims = this->num_dims_;
 
   int const& num_pts = this->num_pts_;
 
-  std::string           cauchy = (*this->field_name_map_)["Cauchy_Stress"];
-  PHX::MDField<ScalarT> stress = *eval_fields[cauchy];
+  std::string                 cauchy = (*this->field_name_map_)["Cauchy_Stress"];
+  PHX::MDField<ScalarT>       stress = *eval_fields[cauchy];
   minitensor::Tensor<ScalarT> sig(num_dims);
   minitensor::Tensor<ScalarT> I(minitensor::eye<ScalarT>(num_dims));
 

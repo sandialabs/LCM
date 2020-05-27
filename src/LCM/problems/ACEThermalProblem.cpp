@@ -13,8 +13,8 @@
 Albany::ACEThermalProblem::ACEThermalProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params,
     const Teuchos::RCP<ParamLib>&               param_lib,
-    int const                               num_dim,
-    Teuchos::RCP<Teuchos::Comm<int> const>& comm)
+    int const                                   num_dim,
+    Teuchos::RCP<Teuchos::Comm<int> const>&     comm)
     : Albany::AbstractProblem(params, param_lib /*, distParamLib_*/),
       params_(params),
       num_dim_(num_dim),
@@ -27,7 +27,7 @@ Albany::ACEThermalProblem::ACEThermalProblem(
 
   if (params->isType<std::string>("MaterialDB Filename")) {
     std::string mtrl_db_filename = params->get<std::string>("MaterialDB Filename");
- // Create Material Database
+    // Create Material Database
     material_db_ = Teuchos::rcp(new Albany::MaterialDatabase(mtrl_db_filename, comm_));
   }
 }
@@ -40,22 +40,18 @@ Albany::ACEThermalProblem::buildProblem(
     Albany::StateManager&                                    state_mgr)
 {
   /* Construct All Phalanx Evaluators */
-  int phys_sets = mesh_specs.size(); //number of blocks
-  Teuchos::RCP<Teuchos::FancyOStream> out =
-      Teuchos::VerboseObjectBase::getDefaultOStream();
-  *out << "ACE Thermal Problem Num MeshSpecs: " << phys_sets << "\n"; 
+  int                                 phys_sets = mesh_specs.size();  // number of blocks
+  Teuchos::RCP<Teuchos::FancyOStream> out       = Teuchos::VerboseObjectBase::getDefaultOStream();
+  *out << "ACE Thermal Problem Num MeshSpecs: " << phys_sets << "\n";
   fm.resize(phys_sets);
-  eb_names_.resize(phys_sets); 
-  bool init_step = true; 
+  eb_names_.resize(phys_sets);
+  bool init_step = true;
   for (int ps = 0; ps < phys_sets; ps++) {
-    if (ps < phys_sets-1) {
-      eb_names_.resize(ps+1); 
-    }
+    if (ps < phys_sets - 1) { eb_names_.resize(ps + 1); }
     std::string element_block_name = mesh_specs[ps]->ebName;
-    eb_names_[ps] = element_block_name;
-    fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
-    buildEvaluators(
-        *fm[ps], *mesh_specs[ps], state_mgr, BUILD_RESID_FM, Teuchos::null);
+    eb_names_[ps]                  = element_block_name;
+    fm[ps]                         = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
+    buildEvaluators(*fm[ps], *mesh_specs[ps], state_mgr, BUILD_RESID_FM, Teuchos::null);
 
     if (mesh_specs[ps]->nsNames.size() > 0) {  // Build a nodeset evaluator if nodesets are present
       constructDirichletEvaluators(mesh_specs[ps]->nsNames);
@@ -65,14 +61,13 @@ Albany::ACEThermalProblem::buildProblem(
     // Neumann BCs, but there are no sidesets in the input mesh
     bool is_neumann_pl = params->isSublist("Neumann BCs");
     if (is_neumann_pl && !(mesh_specs[ps]->ssNames.size() > 0)) {
-      ALBANY_ABORT(
-          "You are attempting to set Neumann BCs on a mesh with no sidesets!");
+      ALBANY_ABORT("You are attempting to set Neumann BCs on a mesh with no sidesets!");
     }
 
     if (mesh_specs[ps]->ssNames.size() > 0) {  // Build a sideset evaluator if sidesets are present
       constructNeumannEvaluators(mesh_specs[ps]);
     }
-    eb_names_.resize(phys_sets); 
+    eb_names_.resize(phys_sets);
   }
 }
 
@@ -86,23 +81,20 @@ Albany::ACEThermalProblem::buildEvaluators(
 {
   // Call constructEvaluators<EvalT>(*rfm[0], *mesh_specs[0], state_mgr);
   // for each EvalT in PHAL::AlbanyTraits::BEvalTypes
-  ConstructEvaluatorsOp<ACEThermalProblem> op(
-      *this, fm0, mesh_specs, state_mgr, fmchoice, response_list);
+  ConstructEvaluatorsOp<ACEThermalProblem>              op(*this, fm0, mesh_specs, state_mgr, fmchoice, response_list);
   Sacado::mpl::for_each<PHAL::AlbanyTraits::BEvalTypes> fe(op);
   return *op.tags;
 }
 
 // Dirichlet BCs
 void
-Albany::ACEThermalProblem::constructDirichletEvaluators(
-    std::vector<std::string> const& node_set_ids)
+Albany::ACEThermalProblem::constructDirichletEvaluators(std::vector<std::string> const& node_set_ids)
 {
   // Construct BC evaluators for all node sets and names
   std::vector<std::string> bc_names(neq);
   bc_names[0] = "T";
   Albany::BCUtils<Albany::DirichletTraits> bc_utils;
-  dfm = bc_utils.constructBCEvaluators(
-      node_set_ids, bc_names, this->params, this->paramLib);
+  dfm         = bc_utils.constructBCEvaluators(node_set_ids, bc_names, this->params, this->paramLib);
   use_sdbcs_  = bc_utils.useSDBCs();
   offsets_    = bc_utils.getOffsets();
   nodeSetIDs_ = bc_utils.getNodeSetIDs();
@@ -110,8 +102,7 @@ Albany::ACEThermalProblem::constructDirichletEvaluators(
 
 // Neumann BCs
 void
-Albany::ACEThermalProblem::constructNeumannEvaluators(
-    const Teuchos::RCP<Albany::MeshSpecsStruct>& mesh_specs)
+Albany::ACEThermalProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSpecsStruct>& mesh_specs)
 {
   // Note: we only enter this function if sidesets are defined in the mesh file
   // i.e. mesh_specs.ssNames.size() > 0
@@ -130,7 +121,7 @@ Albany::ACEThermalProblem::constructNeumannEvaluators(
   Teuchos::Array<Teuchos::Array<int>> offsets;
   offsets.resize(neq);
 
-  bc_names[0]   = "T";
+  bc_names[0]  = "T";
   dof_names[0] = "Temperature";
   offsets[0].resize(1);
   offsets[0][0] = 0;
@@ -157,25 +148,15 @@ Albany::ACEThermalProblem::constructNeumannEvaluators(
 
   nfm.resize(1);  // Heat problem only has one physics set
   nfm[0] = bc_utils.constructBCEvaluators(
-      mesh_specs,
-      bc_names,
-      dof_names,
-      false,
-      0,
-      cond_names,
-      offsets,
-      dl_,
-      this->params,
-      this->paramLib);
+      mesh_specs, bc_names, dof_names, false, 0, cond_names, offsets, dl_, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ACEThermalProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> valid_pl =
-      this->getGenericProblemParams("ValidACEThermalProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> valid_pl = this->getGenericProblemParams("ValidACEThermalProblemParams");
 
-  valid_pl->set<std::string>("MaterialDB Filename","materials.xml","Filename of material database xml file");
+  valid_pl->set<std::string>("MaterialDB Filename", "materials.xml", "Filename of material database xml file");
 
   return valid_pl;
 }

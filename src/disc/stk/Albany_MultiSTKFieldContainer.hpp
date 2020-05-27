@@ -23,7 +23,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       int const                                                 numDim_,
       const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
       const Teuchos::Array<Teuchos::Array<std::string>>&        solution_vector,
-      const Teuchos::Array<std::string>& residual_vector);
+      const Teuchos::Array<std::string>&                        residual_vector);
 
   ~MultiSTKFieldContainer() = default;
 
@@ -65,10 +65,7 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   }
 
   void
-  fillSolnVector(
-      Thyra_Vector&                                soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
+  fillSolnVector(Thyra_Vector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
   fillVector(
       Thyra_Vector&                                field_vector,
@@ -163,10 +160,8 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
 }  // namespace Albany
 
 // Define macro for explicit template instantiation
-#define MULTISTKFIELDCONTAINER_INSTANTIATE_TEMPLATE_CLASS_NONINTERLEAVED(name) \
-  template class name<false>;
-#define MULTISTKFIELDCONTAINER_INSTANTIATE_TEMPLATE_CLASS_INTERLEAVED(name) \
-  template class name<true>;
+#define MULTISTKFIELDCONTAINER_INSTANTIATE_TEMPLATE_CLASS_NONINTERLEAVED(name) template class name<false>;
+#define MULTISTKFIELDCONTAINER_INSTANTIATE_TEMPLATE_CLASS_INTERLEAVED(name) template class name<true>;
 
 #define MULTISTKFIELDCONTAINER_INSTANTIATE_TEMPLATE_CLASS(name)          \
   MULTISTKFIELDCONTAINER_INSTANTIATE_TEMPLATE_CLASS_NONINTERLEAVED(name) \

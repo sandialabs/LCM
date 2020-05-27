@@ -19,16 +19,13 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarType>
-class LoadStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                           public PHX::EvaluatorDerived<EvalT, Traits>
+class LoadStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   LoadStateFieldBase(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -40,16 +37,13 @@ class LoadStateFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 };
 
 template <typename EvalT, typename Traits>
-class LoadStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
-                       public PHX::EvaluatorDerived<EvalT, Traits>
+class LoadStateField : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   LoadStateField(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);
@@ -64,16 +58,13 @@ class LoadStateField : public PHX::EvaluatorWithBaseImpl<Traits>,
 
 // Shortcut names
 template <typename EvalT, typename Traits>
-using LoadStateFieldST =
-    LoadStateFieldBase<EvalT, Traits, typename EvalT::ScalarT>;
+using LoadStateFieldST = LoadStateFieldBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using LoadStateFieldPST =
-    LoadStateFieldBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using LoadStateFieldPST = LoadStateFieldBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
-using LoadStateFieldMST =
-    LoadStateFieldBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using LoadStateFieldMST = LoadStateFieldBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
 using LoadStateFieldRT = LoadStateFieldBase<EvalT, Traits, RealType>;

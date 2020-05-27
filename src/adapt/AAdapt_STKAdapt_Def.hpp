@@ -25,8 +25,7 @@ STKAdapt<SizeField>::STKAdapt(
 
   stk_discretization = static_cast<Albany::STKDiscretization*>(disc.get());
 
-  genericMeshStruct = Teuchos::rcp_dynamic_cast<Albany::GenericSTKMeshStruct>(
-      stk_discretization->getSTKMeshStruct());
+  genericMeshStruct = Teuchos::rcp_dynamic_cast<Albany::GenericSTKMeshStruct>(stk_discretization->getSTKMeshStruct());
 
   eMesh = genericMeshStruct->getPerceptMesh();
   ALBANY_PANIC(eMesh.is_null());
@@ -34,8 +33,7 @@ STKAdapt<SizeField>::STKAdapt(
   refinerPattern = genericMeshStruct->getRefinerPattern();
   ALBANY_PANIC(refinerPattern.is_null());
 
-  num_iterations =
-      adapt_params_->get<int>("Max Number of STK Adapt Iterations", 1);
+  num_iterations = adapt_params_->get<int>("Max Number of STK Adapt Iterations", 1);
 
   // Save the initial output file name
   base_exo_filename = stk_discretization->getSTKMeshStruct()->exoOutFile;
@@ -45,8 +43,7 @@ template <class SizeField>
 bool
 STKAdapt<SizeField>::queryAdaptationCriteria(int iteration)
 {
-  if (adapt_params_->get<std::string>("Remesh Strategy", "None")
-          .compare("Continuous") == 0) {
+  if (adapt_params_->get<std::string>("Remesh Strategy", "None").compare("Continuous") == 0) {
     if (iteration > 1) {
       return true;
     } else {
@@ -54,8 +51,7 @@ STKAdapt<SizeField>::queryAdaptationCriteria(int iteration)
     }
   }
 
-  Teuchos::Array<int> remesh_iter =
-      adapt_params_->get<Teuchos::Array<int>>("Remesh Step Number");
+  Teuchos::Array<int> remesh_iter = adapt_params_->get<Teuchos::Array<int>>("Remesh Step Number");
 
   for (int i = 0; i < remesh_iter.size(); i++) {
     if (iteration == remesh_iter[i]) { return true; }
@@ -68,11 +64,10 @@ template <class SizeField>
 void
 STKAdapt<SizeField>::printElementData()
 {
-  Albany::StateArrays&                  sa  = disc->getStateArrays();
-  Albany::StateArrayVec&                esa = sa.elemStateArrays;
+  Albany::StateArrays&                  sa              = disc->getStateArrays();
+  Albany::StateArrayVec&                esa             = sa.elemStateArrays;
   int                                   numElemWorksets = esa.size();
-  Teuchos::RCP<Albany::StateInfoStruct> stateInfo =
-      state_mgr_.getStateInfoStruct();
+  Teuchos::RCP<Albany::StateInfoStruct> stateInfo       = state_mgr_.getStateInfoStruct();
 
   std::cout << "Num Worksets = " << numElemWorksets << std::endl;
 
@@ -83,8 +78,7 @@ STKAdapt<SizeField>::printElementData()
     esa[0][stateName].dimensions(dims);
     int size = dims.size();
 
-    std::cout << "Meshadapt: have element field \"" << stateName
-              << "\" of type \"" << init_type << "\"" << std::endl;
+    std::cout << "Meshadapt: have element field \"" << stateName << "\" of type \"" << init_type << "\"" << std::endl;
 
     if (init_type == "scalar") {
       switch (size) {
@@ -100,14 +94,12 @@ STKAdapt<SizeField>::printElementData()
 
         case 3:
           std::cout << "esa[ws][stateName](cell, qp, i)" << std::endl;
-          std::cout << "Size = " << dims[0] << " , " << dims[1] << " , "
-                    << dims[2] << std::endl;
+          std::cout << "Size = " << dims[0] << " , " << dims[1] << " , " << dims[2] << std::endl;
           break;
 
         case 4:
           std::cout << "esa[ws][stateName](cell, qp, i, j)" << std::endl;
-          std::cout << "Size = " << dims[0] << " , " << dims[1] << " , "
-                    << dims[2] << " , " << dims[3] << std::endl;
+          std::cout << "Size = " << dims[0] << " , " << dims[1] << " , " << dims[2] << " , " << dims[3] << std::endl;
           break;
       }
     } else if (init_type == "identity") {
@@ -123,11 +115,9 @@ STKAdapt<SizeField>::adaptMesh(
     const Teuchos::RCP<const Tpetra_Vector>& /* solution_ */,
     const Teuchos::RCP<const Tpetra_Vector>& /* ovlp_solution_ */)
 {
-  *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-                  << std::endl;
+  *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
   *output_stream_ << "Adapting mesh using STKAdapt method        " << std::endl;
-  *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-                  << std::endl;
+  *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
   Albany::AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field =
       genericMeshStruct->getFieldContainer()->getProcRankField();
@@ -143,8 +133,7 @@ STKAdapt<SizeField>::adaptMesh(
   ss << "_" << remeshFileIndex << ".";
   str.replace(str.find('.'), 1, ss.str());
 
-  *output_stream_ << "Remeshing: renaming output file to - " << str
-                  << std::endl;
+  *output_stream_ << "Remeshing: renaming output file to - " << str << std::endl;
 
   // Open the new exodus file for results
   stk_discretization->reNameExodusOutput(str);
@@ -163,8 +152,8 @@ STKAdapt<SizeField>::adaptMesh(
 
   stk::adapt::ElementRefinePredicate erp(0, refine_field, 0.0);
 
-  stk::adapt::PredicateBasedElementAdapter<stk::adapt::ElementRefinePredicate>
-      breaker(erp, *eMesh, *refinerPattern, proc_rank_field);
+  stk::adapt::PredicateBasedElementAdapter<stk::adapt::ElementRefinePredicate> breaker(
+      erp, *eMesh, *refinerPattern, proc_rank_field);
 
   breaker.setRemoveOldElements(false);
   breaker.setAlwaysInitializeNodeRegistry(false);
@@ -218,31 +207,16 @@ template <class SizeField>
 Teuchos::RCP<Teuchos::ParameterList const>
 STKAdapt<SizeField>::getValidAdapterParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericAdapterParams("ValidSTKTAdaptParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericAdapterParams("ValidSTKTAdaptParams");
 
   Teuchos::Array<int> defaultArgs;
 
-  validPL->set<Teuchos::Array<int>>(
-      "Remesh Step Number",
-      defaultArgs,
-      "Iteration step at which to remesh the problem");
-  validPL->set<std::string>(
-      "Remesh Strategy",
-      "",
-      "Strategy to use when remeshing: Continuous - remesh every step.");
-  validPL->set<int>(
-      "Max Number of STK Adapt Iterations",
-      1,
-      "Number of iterations to limit stk_adapt to");
-  validPL->set<std::string>(
-      "Refiner Pattern", "", "Element pattern to use for refinement");
-  validPL->set<double>(
-      "Target Element Size",
-      0.1,
-      "Seek this element size when isotropically adapting");
-  validPL->set<bool>(
-      "Rebalance", "1", "Rebalance mesh after each refinement operation");
+  validPL->set<Teuchos::Array<int>>("Remesh Step Number", defaultArgs, "Iteration step at which to remesh the problem");
+  validPL->set<std::string>("Remesh Strategy", "", "Strategy to use when remeshing: Continuous - remesh every step.");
+  validPL->set<int>("Max Number of STK Adapt Iterations", 1, "Number of iterations to limit stk_adapt to");
+  validPL->set<std::string>("Refiner Pattern", "", "Element pattern to use for refinement");
+  validPL->set<double>("Target Element Size", 0.1, "Seek this element size when isotropically adapting");
+  validPL->set<bool>("Rebalance", "1", "Rebalance mesh after each refinement operation");
 
   return validPL;
 }

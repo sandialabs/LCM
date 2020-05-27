@@ -8,9 +8,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-AAAModel<EvalT, Traits>::AAAModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+AAAModel<EvalT, Traits>::AAAModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       alpha_(p->get<RealType>("alpha", 0.0)),
       beta_(p->get<RealType>("beta", 0.0)),
@@ -36,10 +34,7 @@ AAAModel<EvalT, Traits>::AAAModel(
 
 template <typename EvalT, typename Traits>
 void
-AAAModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+AAAModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto defGrad = *dep_fields["F"];
@@ -50,8 +45,7 @@ AAAModel<EvalT, Traits>::computeState(
 
   minitensor::Tensor<ScalarT> F(num_dims_);
   minitensor::Tensor<ScalarT> S(num_dims_);
-  minitensor::Tensor<ScalarT> B(
-      num_dims_);  // left Cauchy-Green deformation tensor
+  minitensor::Tensor<ScalarT> B(num_dims_);  // left Cauchy-Green deformation tensor
   minitensor::Tensor<ScalarT> Id = minitensor::identity<ScalarT>(num_dims_);
 
   // per Rajagopal and Tao, Journal of Elasticity 28(2) (1992), 165-184
@@ -68,8 +62,7 @@ AAAModel<EvalT, Traits>::computeState(
       ScalarT pressure = kappa * (J(cell, pt) - 1.0);
 
       // Cauchy stress
-      S = -pressure * Id +
-          2.0 * (alpha_ + 2.0 * beta_ * (minitensor::I1(B) - 3.0)) * B;
+      S = -pressure * Id + 2.0 * (alpha_ + 2.0 * beta_ * (minitensor::I1(B) - 3.0)) * B;
 
       for (int i(0); i < num_dims_; ++i) {
         for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = S(i, j); }

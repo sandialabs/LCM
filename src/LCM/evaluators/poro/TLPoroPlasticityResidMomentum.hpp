@@ -20,17 +20,14 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class TLPoroPlasticityResidMomentum
-    : public PHX::EvaluatorWithBaseImpl<Traits>,
-      public PHX::EvaluatorDerived<EvalT, Traits>
+class TLPoroPlasticityResidMomentum : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                      public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   TLPoroPlasticityResidMomentum(Teuchos::ParameterList const& p);
 
   void
-  postRegistrationSetup(
-      typename Traits::SetupData d,
-      PHX::FieldManager<Traits>& vm);
+  postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
 
   void
   evaluateFields(typename Traits::EvalData d);

@@ -108,6 +108,7 @@ function(lcm_do_trilinos)
       "-DTrilinos_ENABLE_STKIO:BOOL=ON"
       "-DTrilinos_ENABLE_STKMesh:BOOL=ON"
       "-DTrilinos_ENABLE_Sacado:BOOL=ON"
+      "-DSacado_NEW_FAD_DESIGN_IS_DEFAULT:BOOL=OFF"
       "-DTrilinos_ENABLE_Shards:BOOL=ON"
       "-DTrilinos_ENABLE_Stratimikos:BOOL=ON"
       "-DTrilinos_ENABLE_TESTS:BOOL=OFF"

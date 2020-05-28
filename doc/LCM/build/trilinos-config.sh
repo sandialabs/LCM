@@ -110,6 +110,7 @@ cmake \
  -D Trilinos_ENABLE_STKIO:BOOL=ON \
  -D Trilinos_ENABLE_STKMesh:BOOL=ON \
  -D Trilinos_ENABLE_Sacado:BOOL=ON \
+ -D Sacado_NEW_FAD_DESIGN_IS_DEFAULT:BOOL=OFF \
  -D Trilinos_ENABLE_Shards:BOOL=ON \
  -D Trilinos_ENABLE_Stratimikos:BOOL=ON \
  -D Trilinos_ENABLE_TESTS:BOOL=OFF \

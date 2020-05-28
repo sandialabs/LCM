@@ -1,13 +1,10 @@
 #
-# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
-# Sandia, LLC (NTESS). This Software is released under the BSD license detailed
-# in the file license.txt in the top-level Albany directory.
+# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of Sandia, LLC (NTESS). This Software is
+# released under the BSD license detailed in the file license.txt in the top-level Albany directory.
 #
 
-# Configure the file containing Albany configuration macros, and add its folder
-# to the include directories
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Albany_config.h.in
-               ${CMAKE_CURRENT_BINARY_DIR}/Albany_config.h)
+# Configure the file containing Albany configuration macros, and add its folder to the include directories
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Albany_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Albany_config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 include(CheckCXXSourceCompiles)
@@ -210,9 +207,8 @@ set(HEADERS
     responses/Albany_SolutionValuesResponseFunction.hpp)
 
 # discretization
-set(SOURCES
-    ${SOURCES} disc/Adapt_NodalDataBase.cpp disc/Adapt_NodalDataVector.cpp
-    disc/Albany_DiscretizationFactory.cpp disc/Albany_MeshSpecs.cpp)
+set(SOURCES ${SOURCES} disc/Adapt_NodalDataBase.cpp disc/Adapt_NodalDataVector.cpp
+            disc/Albany_DiscretizationFactory.cpp disc/Albany_MeshSpecs.cpp)
 set(HEADERS
     ${HEADERS}
     disc/Adapt_NodalDataBase.hpp
@@ -229,12 +225,9 @@ set(HEADERS
 
 if(ALBANY_CONTACT)
 
-  set(SOURCES ${SOURCES} disc/Albany_ContactManager.cpp
-              evaluators/scatter/PHAL_MortarContactResidual.cpp)
-  set(HEADERS
-      ${HEADERS} disc/Albany_ContactManager.hpp
-      evaluators/scatter/PHAL_MortarContactResidual.hpp
-      evaluators/scatter/PHAL_MortarContactResidual_Def.hpp)
+  set(SOURCES ${SOURCES} disc/Albany_ContactManager.cpp evaluators/scatter/PHAL_MortarContactResidual.cpp)
+  set(HEADERS ${HEADERS} disc/Albany_ContactManager.hpp evaluators/scatter/PHAL_MortarContactResidual.hpp
+              evaluators/scatter/PHAL_MortarContactResidual_Def.hpp)
 endif()
 
 # evaluators
@@ -535,8 +528,7 @@ set(ALB_TRILINOS_LIBS ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES})
 
 # We may not want warnings from Trilinos and/or its TPLs...
 if(ALBANY_SUPPRESS_TRILINOS_WARNINGS)
-  include_directories(SYSTEM ${Trilinos_INCLUDE_DIRS}
-                      ${Trilinos_TPL_INCLUDE_DIRS})
+  include_directories(SYSTEM ${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
 else()
   include_directories(${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
 endif()
@@ -594,11 +586,9 @@ if(NOT ALBANY_LIBRARIES_ONLY)
 endif(NOT ALBANY_LIBRARIES_ONLY)
 # End declaration of executables
 
-# Note: Albany_EXTRA_LIBRARIES is to allow users to specify libraries that one
-# cannot get out of Trilinos directly.
-set(ALL_LIBRARIES
-    ${ALB_TRILINOS_LIBS} ${Trilinos_EXTRA_LD_FLAGS} ${Albany_EXTRA_LIBRARIES}
-    ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
+# Note: Albany_EXTRA_LIBRARIES is to allow users to specify libraries that one cannot get out of Trilinos directly.
+set(ALL_LIBRARIES ${ALB_TRILINOS_LIBS} ${Trilinos_EXTRA_LD_FLAGS} ${Albany_EXTRA_LIBRARIES}
+                  ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
 
 # Add Albany internal libraries/physics sets, as enabled.
 
@@ -621,8 +611,7 @@ if(ALBANY_STK_REBALANCE)
 endif()
 
 # Repeat libraries twice to catch circular dependencies
-set(ALBANY_LIBRARIES ${ALBANY_LIBRARIES} ${ALBANY_LIBRARIES}
-                     ${ALBANY_LIBRARIES})
+set(ALBANY_LIBRARIES ${ALBANY_LIBRARIES} ${ALBANY_LIBRARIES} ${ALBANY_LIBRARIES})
 
 message("\n-- Albany Executables to link: ${ALBANY_EXECUTABLES}")
 
@@ -646,13 +635,10 @@ if(INSTALL_ALBANY)
     INCLUDE_INSTALL_DIR
     LIB_INSTALL_DIR)
   install(FILES ${HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR})
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Albany_config.h
-          DESTINATION ${INCLUDE_INSTALL_DIR})
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/AlbanyConfig.cmake
-          DESTINATION ${LIB_INSTALL_DIR}/LCM/cmake)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Albany_config.h DESTINATION ${INCLUDE_INSTALL_DIR})
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/AlbanyConfig.cmake DESTINATION ${LIB_INSTALL_DIR}/LCM/cmake)
   # Install each binary in the list
-  install(TARGETS ${ALBANY_EXECUTABLES}
-          RUNTIME DESTINATION ${BINARY_INSTALL_DIR})
+  install(TARGETS ${ALBANY_EXECUTABLES} RUNTIME DESTINATION ${BINARY_INSTALL_DIR})
   install(
     TARGETS albanyLib
     EXPORT albany-export
@@ -674,8 +660,7 @@ if(INSTALL_ALBANY)
 
   message("-- Exporting link libs to: ${CMAKE_INSTALL_PREFIX}/export_albany.in")
   string(REGEX REPLACE ";/" " /" TMP2 "${TMP1}")
-  string(REPLACE ";" " -l" ALBANY_LINK_LIBS
-                 "-L${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}"
+  string(REPLACE ";" " -l" ALBANY_LINK_LIBS "-L${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}"
                  " -L${Trilinos_LIBRARY_DIRS}" " -l${TMP2}")
   configure_file(export_albany.in ${CMAKE_INSTALL_PREFIX}/export_albany.in)
 

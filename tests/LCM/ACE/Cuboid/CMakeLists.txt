@@ -1,16 +1,12 @@
 #
-# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
-# Sandia, LLC (NTESS). This Software is released under the BSD license detailed
-# in the file license.txt in the top-level Albany directory.
+# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of Sandia, LLC (NTESS). This Software is
+# released under the BSD license detailed in the file license.txt in the top-level Albany directory.
 #
 
 # Copy Input file from source to binary dir
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cuboid.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/cuboid.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cuboid.g
-               ${CMAKE_CURRENT_BINARY_DIR}/cuboid.g COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cuboid.yaml ${CMAKE_CURRENT_BINARY_DIR}/cuboid.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cuboid.g ${CMAKE_CURRENT_BINARY_DIR}/cuboid.g COPYONLY)
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 add_test(ACE_${testName} ${SerialAlbany.exe} cuboid.yaml)

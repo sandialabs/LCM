@@ -1,7 +1,6 @@
 #
-# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
-# Sandia, LLC (NTESS). This Software is released under the BSD license detailed
-# in the file license.txt in the top-level Albany directory.
+# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of Sandia, LLC (NTESS). This Software is
+# released under the BSD license detailed in the file license.txt in the top-level Albany directory.
 #
 # LCM DIR
 set(LCM_DIR ${Albany_SOURCE_DIR}/src/LCM)
@@ -60,30 +59,20 @@ set(evaluator-headers
 
 # LCM model evaluators
 set(model-eval-sources
-    "${LCM_DIR}/solvers/Schwarz_Alternating.cpp"
-    "${LCM_DIR}/solvers/Schwarz_ObserverImpl.cpp"
-    "${LCM_DIR}/solvers/Schwarz_PiroObserver.cpp"
-    "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.cpp")
+    "${LCM_DIR}/solvers/Schwarz_Alternating.cpp" "${LCM_DIR}/solvers/Schwarz_ObserverImpl.cpp"
+    "${LCM_DIR}/solvers/Schwarz_PiroObserver.cpp" "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.cpp")
 set(model-eval-headers
-    "${LCM_DIR}/solvers/Schwarz_Alternating.hpp"
-    "${LCM_DIR}/solvers/Schwarz_ObserverImpl.hpp"
-    "${LCM_DIR}/solvers/Schwarz_PiroObserver.hpp"
-    "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.hpp")
-set(model-eval-sources
-    ${model-eval-sources} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.cpp"
-    "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.cpp"
-    "${LCM_DIR}/solvers/Schwarz_Coupled.cpp")
-set(model-eval-headers
-    ${model-eval-headers} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.hpp"
-    "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.hpp"
-    "${LCM_DIR}/solvers/Schwarz_Coupled.hpp")
+    "${LCM_DIR}/solvers/Schwarz_Alternating.hpp" "${LCM_DIR}/solvers/Schwarz_ObserverImpl.hpp"
+    "${LCM_DIR}/solvers/Schwarz_PiroObserver.hpp" "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.hpp")
+set(model-eval-sources ${model-eval-sources} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.cpp"
+                       "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.cpp" "${LCM_DIR}/solvers/Schwarz_Coupled.cpp")
+set(model-eval-headers ${model-eval-headers} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.hpp"
+                       "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.hpp" "${LCM_DIR}/solvers/Schwarz_Coupled.hpp")
 
 # LCM special boundary conditions
 set(bc-sources
-    "${LCM_DIR}/evaluators/bc/EquilibriumConcentrationBC.cpp"
-    "${LCM_DIR}/evaluators/bc/KfieldBC.cpp"
-    "${LCM_DIR}/evaluators/bc/RigidContactBC.cpp"
-    "${LCM_DIR}/evaluators/bc/TimeTracBC.cpp"
+    "${LCM_DIR}/evaluators/bc/EquilibriumConcentrationBC.cpp" "${LCM_DIR}/evaluators/bc/KfieldBC.cpp"
+    "${LCM_DIR}/evaluators/bc/RigidContactBC.cpp" "${LCM_DIR}/evaluators/bc/TimeTracBC.cpp"
     "${LCM_DIR}/evaluators/bc/TorsionBC.cpp")
 set(bc-headers
     "${LCM_DIR}/evaluators/bc/EquilibriumConcentrationBC_Def.hpp"
@@ -97,21 +86,14 @@ set(bc-headers
     "${LCM_DIR}/evaluators/bc/TorsionBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/TorsionBC.hpp")
 
-set(bc-sources ${bc-sources} "${LCM_DIR}/evaluators/bc/SchwarzBC.cpp"
-               "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.cpp")
-set(bc-headers
-    ${bc-headers}
-    "${LCM_DIR}/evaluators/bc/SchwarzBC.hpp"
-    "${LCM_DIR}/evaluators/bc/SchwarzBC_Def.hpp"
-    "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.hpp"
-    "${LCM_DIR}/evaluators/bc/StrongSchwarzBC_Def.hpp")
+set(bc-sources ${bc-sources} "${LCM_DIR}/evaluators/bc/SchwarzBC.cpp" "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.cpp")
+set(bc-headers ${bc-headers} "${LCM_DIR}/evaluators/bc/SchwarzBC.hpp" "${LCM_DIR}/evaluators/bc/SchwarzBC_Def.hpp"
+               "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.hpp" "${LCM_DIR}/evaluators/bc/StrongSchwarzBC_Def.hpp")
 
 # LCM HMC evaluators
 set(hmc-sources
-    "${LCM_DIR}/evaluators/HMC/HMC_MicroResidual.cpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_StrainDifference.cpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_Stresses.cpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_TotalStress.cpp"
+    "${LCM_DIR}/evaluators/HMC/HMC_MicroResidual.cpp" "${LCM_DIR}/evaluators/HMC/HMC_StrainDifference.cpp"
+    "${LCM_DIR}/evaluators/HMC/HMC_Stresses.cpp" "${LCM_DIR}/evaluators/HMC/HMC_TotalStress.cpp"
     "${LCM_DIR}/evaluators/HMC/UpdateField.cpp")
 set(hmc-headers
     "${LCM_DIR}/evaluators/HMC/HMC_MicroResidual_Def.hpp"
@@ -127,10 +109,8 @@ set(hmc-headers
 
 # LCM kinematics evaluators
 set(kin-sources
-    "${LCM_DIR}/evaluators/kinematics/CurrentCoords.cpp"
-    "${LCM_DIR}/evaluators/kinematics/DefGrad.cpp"
-    "${LCM_DIR}/evaluators/kinematics/FirstPK.cpp"
-    "${LCM_DIR}/evaluators/kinematics/Kinematics.cpp"
+    "${LCM_DIR}/evaluators/kinematics/CurrentCoords.cpp" "${LCM_DIR}/evaluators/kinematics/DefGrad.cpp"
+    "${LCM_DIR}/evaluators/kinematics/FirstPK.cpp" "${LCM_DIR}/evaluators/kinematics/Kinematics.cpp"
     "${LCM_DIR}/evaluators/kinematics/LatticeDefGrad.cpp")
 set(kin-headers
     "${LCM_DIR}/evaluators/kinematics/CurrentCoords_Def.hpp"
@@ -147,8 +127,7 @@ set(kin-headers
 # LCM linear elasticity evaluators
 set(lin-sources
     "${LCM_DIR}/evaluators/linear-elasticity/ElasticModulus.cpp"
-    "${LCM_DIR}/evaluators/linear-elasticity/PoissonsRatio.cpp"
-    "${LCM_DIR}/evaluators/linear-elasticity/Strain.cpp"
+    "${LCM_DIR}/evaluators/linear-elasticity/PoissonsRatio.cpp" "${LCM_DIR}/evaluators/linear-elasticity/Strain.cpp"
     "${LCM_DIR}/evaluators/linear-elasticity/Stress.cpp")
 set(lin-headers
     "${LCM_DIR}/evaluators/linear-elasticity/ElasticModulus_Def.hpp"
@@ -198,11 +177,9 @@ set(poro-headers
     "${LCM_DIR}/evaluators/poro/TLPoroStress.hpp")
 
 # LCM projection evaluators
-set(proj-sources
-    "${LCM_DIR}/evaluators/projection/ScalarL2ProjectionResidual.cpp")
-set(proj-headers
-    "${LCM_DIR}/evaluators/projection/ScalarL2ProjectionResidual_Def.hpp"
-    "${LCM_DIR}/evaluators/projection/ScalarL2ProjectionResidual.hpp")
+set(proj-sources "${LCM_DIR}/evaluators/projection/ScalarL2ProjectionResidual.cpp")
+set(proj-headers "${LCM_DIR}/evaluators/projection/ScalarL2ProjectionResidual_Def.hpp"
+                 "${LCM_DIR}/evaluators/projection/ScalarL2ProjectionResidual.hpp")
 
 # LCM residual evaluators
 set(residual-sources
@@ -236,12 +213,10 @@ set(residual-headers
     "${LCM_DIR}/evaluators/residuals/TLElasResid_Def.hpp")
 
 # LCM response evaluators
-set(response-sources
-    "${LCM_DIR}/evaluators/responses/IPtoNodalField.cpp"
-    "${LCM_DIR}/evaluators/responses/ProjectIPtoNodalField.cpp")
+set(response-sources "${LCM_DIR}/evaluators/responses/IPtoNodalField.cpp"
+                     "${LCM_DIR}/evaluators/responses/ProjectIPtoNodalField.cpp")
 set(response-headers
-    "${LCM_DIR}/evaluators/responses/IPtoNodalField_Def.hpp"
-    "${LCM_DIR}/evaluators/responses/IPtoNodalField.hpp"
+    "${LCM_DIR}/evaluators/responses/IPtoNodalField_Def.hpp" "${LCM_DIR}/evaluators/responses/IPtoNodalField.hpp"
     "${LCM_DIR}/evaluators/responses/ProjectIPtoNodalField_Def.hpp"
     "${LCM_DIR}/evaluators/responses/ProjectIPtoNodalField.hpp")
 
@@ -457,12 +432,8 @@ set(models-headers
     "${LCM_DIR}/parallel_models/ParallelNeohookeanModel_Def.hpp"
     "${LCM_DIR}/parallel_models/ParallelNeohookeanModel.hpp")
 set(models-sources
-    ${models-sources}
-    "${LCM_DIR}/models/CrystalPlasticityModel.cpp"
-    "${LCM_DIR}/models/FM_AlbanyInterface.cpp"
-    "${LCM_DIR}/models/FerroicCore.cpp"
-    "${LCM_DIR}/models/GursonHMRModel.cpp"
-    "${LCM_DIR}/models/GursonModel.cpp")
+    ${models-sources} "${LCM_DIR}/models/CrystalPlasticityModel.cpp" "${LCM_DIR}/models/FM_AlbanyInterface.cpp"
+    "${LCM_DIR}/models/FerroicCore.cpp" "${LCM_DIR}/models/GursonHMRModel.cpp" "${LCM_DIR}/models/GursonModel.cpp")
 set(models-headers
     ${models-headers}
     "${LCM_DIR}/models/CrystalPlasticityModel.hpp"
@@ -480,23 +451,15 @@ set(models-headers
 
 # LCM utils
 set(utils-sources
-    "${LCM_DIR}/utils/LocalNonlinearSolver.cpp"
-    "${LCM_DIR}/utils/NOX_StatusTest_ModelEvaluatorFlag.cpp"
-    "${LCM_DIR}/utils/Projection.cpp"
-    "${LCM_DIR}/utils/SolutionSniffer.cpp"
-    "${LCM_DIR}/utils/StateVarUtils.cpp")
+    "${LCM_DIR}/utils/LocalNonlinearSolver.cpp" "${LCM_DIR}/utils/NOX_StatusTest_ModelEvaluatorFlag.cpp"
+    "${LCM_DIR}/utils/Projection.cpp" "${LCM_DIR}/utils/SolutionSniffer.cpp" "${LCM_DIR}/utils/StateVarUtils.cpp")
 set(utils-headers
-    "${LCM_DIR}/utils/LocalNonlinearSolver.hpp"
-    "${LCM_DIR}/utils/LocalNonlinearSolver_Def.hpp"
-    "${LCM_DIR}/utils/NOX_StatusTest_ModelEvaluatorFlag.hpp"
-    "${LCM_DIR}/utils/Projection.hpp"
-    "${LCM_DIR}/utils/SolutionSniffer.hpp"
-    "${LCM_DIR}/utils/StateVarUtils.hpp")
+    "${LCM_DIR}/utils/LocalNonlinearSolver.hpp" "${LCM_DIR}/utils/LocalNonlinearSolver_Def.hpp"
+    "${LCM_DIR}/utils/NOX_StatusTest_ModelEvaluatorFlag.hpp" "${LCM_DIR}/utils/Projection.hpp"
+    "${LCM_DIR}/utils/SolutionSniffer.hpp" "${LCM_DIR}/utils/StateVarUtils.hpp")
 
-set(utils-sources
-    ${utils-sources} "${LCM_DIR}/utils/LCMPartition.cpp"
-    "${LCM_DIR}/utils/MiniLinearSolver.cpp"
-    "${LCM_DIR}/utils/MiniNonlinearSolver.cpp")
+set(utils-sources ${utils-sources} "${LCM_DIR}/utils/LCMPartition.cpp" "${LCM_DIR}/utils/MiniLinearSolver.cpp"
+                  "${LCM_DIR}/utils/MiniNonlinearSolver.cpp")
 set(utils-headers
     ${utils-headers}
     "${LCM_DIR}/utils/LCMPartition.hpp"
@@ -508,17 +471,12 @@ set(utils-headers
 
 # LCM utils / topology
 set(topology-sources
-    "${LCM_DIR}/utils/topology/BarycentricSubdivision.cpp"
-    "${LCM_DIR}/utils/topology/MinimumSurface.cpp"
-    "${LCM_DIR}/utils/topology/Subgraph.cpp"
-    "${LCM_DIR}/utils/topology/Topology.cpp"
-    "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp"
-    "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
+    "${LCM_DIR}/utils/topology/BarycentricSubdivision.cpp" "${LCM_DIR}/utils/topology/MinimumSurface.cpp"
+    "${LCM_DIR}/utils/topology/Subgraph.cpp" "${LCM_DIR}/utils/topology/Topology.cpp"
+    "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp" "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
 set(topology-headers
-    "${LCM_DIR}/utils/topology/Subgraph.hpp"
-    "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
-    "${LCM_DIR}/utils/topology/Topology.hpp"
-    "${LCM_DIR}/utils/topology/Topology_Types.hpp"
+    "${LCM_DIR}/utils/topology/Subgraph.hpp" "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
+    "${LCM_DIR}/utils/topology/Topology.hpp" "${LCM_DIR}/utils/topology/Topology_Types.hpp"
     "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
 
 set(SOURCES
@@ -565,22 +523,18 @@ set(HEADERS
     ${sf-headers})
 
 if(ALBANY_LAME OR ALBANY_LAMENT)
-  set(SOURCES ${SOURCES} ${LCM_DIR}/utils/lame/LameUtils.cpp
-              ${LCM_DIR}/problems/lame/LameProblem.cpp)
-  set(HEADERS ${HEADERS} ${LCM_DIR}/utils/lame/LameUtils.hpp
-              ${LCM_DIR}/problems/lame/LameProblem.hpp)
+  set(SOURCES ${SOURCES} ${LCM_DIR}/utils/lame/LameUtils.cpp ${LCM_DIR}/problems/lame/LameProblem.cpp)
+  set(HEADERS ${HEADERS} ${LCM_DIR}/utils/lame/LameUtils.hpp ${LCM_DIR}/problems/lame/LameProblem.hpp)
 endif()
 
 if(ALBANY_LAME)
   set(SOURCES ${SOURCES} ${LCM_DIR}/evaluators/lame/LameStress.cpp)
-  set(HEADERS ${HEADERS} ${LCM_DIR}/evaluators/lame/LameStress.hpp
-              ${LCM_DIR}/evaluators/lame/LameStress_Def.hpp)
+  set(HEADERS ${HEADERS} ${LCM_DIR}/evaluators/lame/LameStress.hpp ${LCM_DIR}/evaluators/lame/LameStress_Def.hpp)
 endif()
 
 if(ALBANY_LAMENT)
   set(SOURCES ${SOURCES} ${LCM_DIR}/evaluators/lame/LamentStress.cpp)
-  set(HEADERS ${HEADERS} ${LCM_DIR}/evaluators/lame/LamentStress.hpp
-              ${LCM_DIR}/evaluators/lame/LamentStress_Def.hpp)
+  set(HEADERS ${HEADERS} ${LCM_DIR}/evaluators/lame/LamentStress.hpp ${LCM_DIR}/evaluators/lame/LamentStress_Def.hpp)
 endif()
 
 set(INCLUDE_DIRS
@@ -617,10 +571,8 @@ set(INCLUDE_DIRS
 
 include_directories(${INCLUDE_DIRS})
 if(ALBANY_STK_REBALANCE)
-  include_directories(
-    ${Albany_SOURCE_DIR}/src/disc/stk/percept
-    ${Albany_SOURCE_DIR}/src/disc/stk/percept/stk_rebalance
-    ${Albany_SOURCE_DIR}/src/disc/stk/percept/stk_rebalance_utils)
+  include_directories(${Albany_SOURCE_DIR}/src/disc/stk/percept ${Albany_SOURCE_DIR}/src/disc/stk/percept/stk_rebalance
+                      ${Albany_SOURCE_DIR}/src/disc/stk/percept/stk_rebalance_utils)
 endif()
 
 link_directories(${Trilinos_LIBRARY_DIRS} ${Trilinos_TPL_LIBRARY_DIRS})
@@ -638,10 +590,8 @@ if(INSTALL_ALBANY)
 endif()
 
 if(LCM_TEST_EXES AND ALBANY_DTK)
-  add_executable(DTK_Interp_and_Error
-                 utils/dtk_interp_and_error/dtk_interp_and_error.cpp)
-  add_executable(DTK_Interp_Volume_to_NS
-                 utils/dtk_interp_and_error/interpolation_volume_to_ns.cpp)
+  add_executable(DTK_Interp_and_Error utils/dtk_interp_and_error/dtk_interp_and_error.cpp)
+  add_executable(DTK_Interp_Volume_to_NS utils/dtk_interp_and_error/interpolation_volume_to_ns.cpp)
 endif()
 
 if(LCM_TEST_EXES)
@@ -658,15 +608,12 @@ if(LCM_TEST_EXES)
   add_executable(Test2_Subdivision test/utils/Test2_Subdivision.cpp)
   add_executable(TopologyBase test/utils/TopologyBase.cpp)
 
-  add_executable(
-    utLocalNonlinearSolver test/unit_tests/StandardUnitTestMain.cpp
-                           test/unit_tests/utLocalNonlinearSolver.cpp)
+  add_executable(utLocalNonlinearSolver test/unit_tests/StandardUnitTestMain.cpp
+                                        test/unit_tests/utLocalNonlinearSolver.cpp)
 
-  add_executable(utSurfaceElement test/unit_tests/StandardUnitTestMain.cpp
-                                  test/unit_tests/utSurfaceElement.cpp)
+  add_executable(utSurfaceElement test/unit_tests/StandardUnitTestMain.cpp test/unit_tests/utSurfaceElement.cpp)
 
-  add_executable(utHeliumODEs test/unit_tests/StandardUnitTestMain.cpp
-                              test/unit_tests/utHeliumODEs.cpp)
+  add_executable(utHeliumODEs test/unit_tests/StandardUnitTestMain.cpp test/unit_tests/utHeliumODEs.cpp)
 
   if(NOT BUILD_SHARED_LIBS)
     add_executable(utStaticAllocator test/unit_tests/utStaticAllocator.cpp)
@@ -736,14 +683,12 @@ endif()
 
 # Linking tests
 if(LCM_TEST_EXES AND ALBANY_DTK)
-  set(repeat_libs ${LCM_UT_LIBS} ${ALBANY_LIBRARIES} ${LCM_UT_LIBS}
-                  ${ALBANY_LIBRARIES})
+  set(repeat_libs ${LCM_UT_LIBS} ${ALBANY_LIBRARIES} ${LCM_UT_LIBS} ${ALBANY_LIBRARIES})
   target_link_libraries(DTK_Interp_and_Error ${repeat_libs} ${ALL_LIBRARIES})
   target_link_libraries(DTK_Interp_Volume_to_NS ${repeat_libs} ${ALL_LIBRARIES})
 endif()
 if(LCM_TEST_EXES)
-  set(repeat_libs ${LCM_UT_LIBS} ${ALBANY_LIBRARIES} ${LCM_UT_LIBS}
-                  ${ALBANY_LIBRARIES})
+  set(repeat_libs ${LCM_UT_LIBS} ${ALBANY_LIBRARIES} ${LCM_UT_LIBS} ${ALBANY_LIBRARIES})
   target_link_libraries(BifurcationTest ${repeat_libs} ${ALL_LIBRARIES})
   target_link_libraries(BoundarySurfaceOutput ${repeat_libs} ${ALL_LIBRARIES})
   target_link_libraries(MaterialPointSimulator ${repeat_libs} ${ALL_LIBRARIES})

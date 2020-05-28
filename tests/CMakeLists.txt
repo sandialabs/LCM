@@ -1,7 +1,6 @@
 #
-# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
-# Sandia, LLC (NTESS). This Software is released under the BSD license detailed
-# in the file license.txt in the top-level Albany directory.
+# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of Sandia, LLC (NTESS). This Software is
+# released under the BSD license detailed in the file license.txt in the top-level Albany directory.
 #
 
 # Setup paths for SEACAS tools needed to run some of the tests
@@ -50,9 +49,8 @@ set(AlbanyPath ${Albany_BINARY_DIR}/src/Albany)
 
 if(ALBANY_MPI)
   set(SerialAlbany.exe ${SERIAL_CALL} ${AlbanyPath})
-  # Do not test on greater than Trilinos_MPI_EXEC_MAX_NUMPROCS configured in
-  # Trilinos build or explicity given at Albany configure time -D
-  # ALBANY_MPI_EXEC_MAX_NUMPROCS
+  # Do not test on greater than Trilinos_MPI_EXEC_MAX_NUMPROCS configured in Trilinos build or explicity given at Albany
+  # configure time -D ALBANY_MPI_EXEC_MAX_NUMPROCS
   if(DEFINED MPIMNP)
     if(MPIMNP LESS 8)
       set(MAX_MPI_RANKS ${MPIMNP})
@@ -63,8 +61,7 @@ if(ALBANY_MPI)
     set(MAX_MPI_RANKS 4)
   endif(DEFINED MPIMNP)
   set(Albany.exe ${PARALLEL_CALL} ${AlbanyPath})
-  set(Albany8.exe ${MPIEX} ${MPIPRE} ${MPINPF} ${MAX_MPI_RANKS} ${MPIPOST}
-                  ${AlbanyPath})
+  set(Albany8.exe ${MPIEX} ${MPIPRE} ${MPINPF} ${MAX_MPI_RANKS} ${MPIPOST} ${AlbanyPath})
 else()
   set(SerialAlbany.exe ${AlbanyPath})
   set(Albany.exe ${AlbanyPath})
@@ -75,13 +72,10 @@ set(Subdivision.exe ${Albany_BINARY_DIR}/src/LCM/Subdivision)
 set(MPS.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulator)
 set(MPST.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulatorT)
 set(DTK_Interp_and_Error.exe ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_and_Error)
-set(DTK_Interp_Volume_to_NS.exe
-    ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_Volume_to_NS)
+set(DTK_Interp_Volume_to_NS.exe ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_Volume_to_NS)
 if(ALBANY_MPI)
-  set(Parallel_DTK_Interp_and_Error.exe ${PARALLEL_CALL}
-                                        ${DTK_Interp_and_Error.exe})
-  set(Parallel_DTK_Interp_Volume_to_NS.exe ${PARALLEL_CALL}
-                                           ${DTK_Interp_Volume_to_NS.exe})
+  set(Parallel_DTK_Interp_and_Error.exe ${PARALLEL_CALL} ${DTK_Interp_and_Error.exe})
+  set(Parallel_DTK_Interp_Volume_to_NS.exe ${PARALLEL_CALL} ${DTK_Interp_Volume_to_NS.exe})
 endif()
 
 #

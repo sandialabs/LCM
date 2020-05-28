@@ -1,6 +1,5 @@
-# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
-# Sandia, LLC (NTESS). This Software is released under the BSD license detailed
-# in the file license.txt in the top-level Albany directory.
+# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of Sandia, LLC (NTESS). This Software is
+# released under the BSD license detailed in the file license.txt in the top-level Albany directory.
 #
 
 # CMAKE File for Albany building against an installed Trilinos
@@ -8,8 +7,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 include(CMakeDependentOption)
 
-option(USE_NEW_POLICY_CMP0060 "Flag to turn on new behavior for policy CMP0060"
-       OFF)
+option(USE_NEW_POLICY_CMP0060 "Flag to turn on new behavior for policy CMP0060" OFF)
 if(USE_NEW_POLICY_CMP0060)
   cmake_policy(SET CMP0060 NEW)
 endif()
@@ -32,26 +30,20 @@ if(DEFINED ALBANY_TRILINOS_DIR)
 endif()
 find_package(Trilinos REQUIRED)
 
-option(
-  ALBANY_SUPPRESS_TRILINOS_WARNINGS
-  "Whether or not Trilinos headers should be treated as 'system' headers (hence, without issuing warnings)"
-  OFF)
+option(ALBANY_SUPPRESS_TRILINOS_WARNINGS
+       "Whether or not Trilinos headers should be treated as 'system' headers (hence, without issuing warnings)" OFF)
 
-# Trilinos_BIN_DIRS probably should be defined in the Trilinos config. Until it
-# is, set it here. This is needed to find SEACAS tools used during testing (epu,
-# etc).
+# Trilinos_BIN_DIRS probably should be defined in the Trilinos config. Until it is, set it here. This is needed to find
+# SEACAS tools used during testing (epu, etc).
 set(Trilinos_BIN_DIRS "${Trilinos_DIR}/../../../bin")
 set(Trilinos_LIB_DIRS "${Trilinos_DIR}/../../../lib")
 
 # Set Trilinos commit id
 if(EXISTS "${Trilinos_DIR}/../../../TrilinosRepoVersion.txt")
-  file(STRINGS "${Trilinos_DIR}/../../../TrilinosRepoVersion.txt"
-       TRILINOS_VERSION_FILE)
+  file(STRINGS "${Trilinos_DIR}/../../../TrilinosRepoVersion.txt" TRILINOS_VERSION_FILE)
   set(TRILINOS_GIT_COMMIT_ID_LINE_LOC 1)
-  list(GET TRILINOS_VERSION_FILE ${TRILINOS_GIT_COMMIT_ID_LINE_LOC}
-           TRILINOS_GIT_COMMIT_ID_LINE)
-  string(REGEX MATCH "^[^ ]+" Trilinos_GIT_COMMIT_ID
-               ${TRILINOS_GIT_COMMIT_ID_LINE})
+  list(GET TRILINOS_VERSION_FILE ${TRILINOS_GIT_COMMIT_ID_LINE_LOC} TRILINOS_GIT_COMMIT_ID_LINE)
+  string(REGEX MATCH "^[^ ]+" Trilinos_GIT_COMMIT_ID ${TRILINOS_GIT_COMMIT_ID_LINE})
   set(ALBANY_TRILINOS_GIT_COMMIT_ID ${Trilinos_GIT_COMMIT_ID})
 endif()
 
@@ -85,9 +77,7 @@ list(REVERSE Trilinos_TPL_LIBRARIES)
 
 list(FIND Trilinos_PACKAGE_LIST STKClassic STKClassic_List_ID)
 if(STKClassic_List_ID GREATER -1)
-  message(
-    FATAL_ERROR
-      "STKClassic is no longer used and conflicts with STKIo and STKMesh.")
+  message(FATAL_ERROR "STKClassic is no longer used and conflicts with STKIo and STKMesh.")
 endif()
 
 # Set Albany branch and commit id
@@ -106,8 +96,7 @@ message("-- ALBANY_GIT_BRANCH = ${ALBANY_GIT_BRANCH}")
 message("-- ALBANY_GIT_COMMIT_ID = ${ALBANY_GIT_COMMIT_ID}")
 message("End of Albany version details\n")
 
-# Optional Installation helpers Note that some of this functionality depends on
-# CMAKE > 2.8.8
+# Optional Installation helpers Note that some of this functionality depends on CMAKE > 2.8.8
 set(INSTALL_ALBANY
     FALSE
     CACHE BOOL "Whether Albany should be installed")
@@ -133,14 +122,11 @@ else()
   if(NOT ${Trilinos_CXX_COMPILER} STREQUAL ${CMAKE_CXX_COMPILER})
     message(
       FATAL_ERROR
-        "C++ compilers don't match (Trilinos: ${Trilinos_CXX_COMPILER}, ${PROJECT_NAME}: ${CMAKE_CXX_COMPILER})."
-    )
+        "C++ compilers don't match (Trilinos: ${Trilinos_CXX_COMPILER}, ${PROJECT_NAME}: ${CMAKE_CXX_COMPILER}).")
   endif()
   if(NOT ${Trilinos_C_COMPILER} STREQUAL ${CMAKE_C_COMPILER})
     message(
-      FATAL_ERROR
-        "C compilers don't match (Trilinos: ${Trilinos_C_COMPILER}, ${PROJECT_NAME}: ${CMAKE_C_COMPILER})."
-    )
+      FATAL_ERROR "C compilers don't match (Trilinos: ${Trilinos_C_COMPILER}, ${PROJECT_NAME}: ${CMAKE_C_COMPILER}).")
   endif()
   if(NOT ${Trilinos_Fortran_COMPILER} STREQUAL ${CMAKE_Fortran_COMPILER})
     message(
@@ -162,15 +148,13 @@ else(Trilinos_BUILD_SHARED_LIBS)
   set(Albany_LIBRARY_TYPE STATIC)
 endif(Trilinos_BUILD_SHARED_LIBS)
 
-option(Albany_BUILD_STATIC_EXE
-       "Flag to turn on building of static executables in Albany" OFF)
+option(Albany_BUILD_STATIC_EXE "Flag to turn on building of static executables in Albany" OFF)
 if((NOT BUILD_SHARED_LIBS) AND (Albany_BUILD_STATIC_EXE))
   message("-- Building Albany with static executables")
 endif((NOT BUILD_SHARED_LIBS) AND (Albany_BUILD_STATIC_EXE))
 
 # Option to turn on and off deprecation warnings
-option(Albany_DEPRECATED_DECLARATIONS
-       "Flag to turn on warnings for deprecated code" ON)
+option(Albany_DEPRECATED_DECLARATIONS "Flag to turn on warnings for deprecated code" ON)
 if(Albany_DEPRECATED_DECLARATIONS)
   set(ALBANY_ENABLE_DEPRECATED ON)
   message("-- Deprecated code warnings Enabled")
@@ -178,24 +162,22 @@ else()
   message("-- Deprecated code warnings are NOT Enabled.")
 endif()
 
-# End of setup and error checking NOTE: PROJECT command checks for compilers, so
-# this statement is moved AFTER setting CMAKE_CXX_COMPILER from Trilinos
+# End of setup and error checking NOTE: PROJECT command checks for compilers, so this statement is moved AFTER setting
+# CMAKE_CXX_COMPILER from Trilinos
 
 if(SET_COMPILERS_AUTOMATICALLY)
   project(Albany)
 endif()
 
-# AGS: Adding these lines so Ctest can be run to submit to cdash dashboard Uses
-# CTestConfig.cmake file for Cdash info.
+# AGS: Adding these lines so Ctest can be run to submit to cdash dashboard Uses CTestConfig.cmake file for Cdash info.
 enable_testing()
 include(CTest)
 
-# Make Albany inherit Trilinos compiler flags. The most important are the
-# presence or absence of -NDEBUG (which can affect linking for complicated
-# reasons) and -std=c++11.
+# Make Albany inherit Trilinos compiler flags. The most important are the presence or absence of -NDEBUG (which can
+# affect linking for complicated reasons) and -std=c++11.
 set(CMAKE_CXX_FLAGS "${Trilinos_CXX_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}")
-# GAH - temporarily set Albany flags for clang debugging SET(CMAKE_CXX_FLAGS
-# "-ggdb -std=c++11 -O2 -march=native -DNDEBUG")
+# GAH - temporarily set Albany flags for clang debugging SET(CMAKE_CXX_FLAGS "-ggdb -std=c++11 -O2 -march=native
+# -DNDEBUG")
 
 if(SET_COMPILERS_AUTOMATICALLY)
   set(CMAKE_AR ${Trilinos_AR})
@@ -208,25 +190,22 @@ message("-- ALBANY_CXX_COMPILER_ID = ${ALBANY_CXX_COMPILER_ID}")
 set(ALBANY_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION})
 message("-- ALBANY_CXX_COMPILER_VERSION = ${ALBANY_CXX_COMPILER_VERSION}")
 if(EXISTS "${Trilinos_INCLUDE_DIRS}/KokkosCore_config.h")
-  file(READ "${Trilinos_INCLUDE_DIRS}/KokkosCore_config.h"
-       KOKKOS_CORE_CONFIG_FILE)
+  file(READ "${Trilinos_INCLUDE_DIRS}/KokkosCore_config.h" KOKKOS_CORE_CONFIG_FILE)
   set(ALBANY_ENABLE_OPENMP OFF)
   if(ALBANY_ENABLE_OPENMP)
     message("-- Kokkos is configured to use OpenMP, Albany will also.")
   endif()
 else()
-  message(
-    FATAL_ERROR
-      "\nError: ${Trilinos_INCLUDE_DIRS}/KokkosCore_config.h not found!")
+  message(FATAL_ERROR "\nError: ${Trilinos_INCLUDE_DIRS}/KokkosCore_config.h not found!")
 endif()
 message("End of compiler details\n")
 
 # Check for some required Trilinos package dependencies (Piro, Phalanx) ##
 message("Checking Trilinos build for required and optional packages")
 
-# ##############################################################################
+# ######################################################################################################################
 # Check REQUIRED packages ###
-# ##############################################################################
+# ######################################################################################################################
 
 message("\n  **********************************")
 message("  *** Required Trilinos Packages ***")
@@ -234,94 +213,67 @@ message("  **********************************\n")
 # Piro
 list(FIND Trilinos_PACKAGE_LIST Piro Piro_List_ID)
 if(Piro_List_ID GREATER -1)
-  message(
-    "-- Looking for Piro (required) in Trilinos ...                Found!")
+  message("-- Looking for Piro (required) in Trilinos ...                Found!")
 else()
-  message(
-    "-- Looking for Piro (required) in Trilinos ...                NOT Found!")
-  message(
-    FATAL_ERROR
-      "Albany REQUIRES Piro. See file trilinos-cmake in doc directory.")
+  message("-- Looking for Piro (required) in Trilinos ...                NOT Found!")
+  message(FATAL_ERROR "Albany REQUIRES Piro. See file trilinos-cmake in doc directory.")
 endif()
 
 # Phalanx
 list(FIND Trilinos_PACKAGE_LIST Phalanx Phalanx_List_ID)
 if(Piro_List_ID GREATER -1)
-  message(
-    "-- Looking for Phalanx (required) in Trilinos ...             Found!")
+  message("-- Looking for Phalanx (required) in Trilinos ...             Found!")
 else()
-  message(
-    "-- Looking for Phalanx (required) in Trilinos ...             NOT Found!")
-  message(
-    FATAL_ERROR
-      "Albany REQUIRES Phalanx. See file trilinos-cmake in doc directory.")
+  message("-- Looking for Phalanx (required) in Trilinos ...             NOT Found!")
+  message(FATAL_ERROR "Albany REQUIRES Phalanx. See file trilinos-cmake in doc directory.")
 endif()
 
 # NOX
 list(FIND Trilinos_PACKAGE_LIST NOX NOX_List_ID)
 if(Piro_List_ID GREATER -1)
-  message(
-    "-- Looking for NOX (required) in Trilinos ...                 Found!")
+  message("-- Looking for NOX (required) in Trilinos ...                 Found!")
 else()
-  message(
-    "-- Looking for NOX (required) in Trilinos ...                 NOT Found!")
-  message(
-    FATAL_ERROR "Albany REQUIRES NOX. See file trilinos-cmake in doc directory."
-  )
+  message("-- Looking for NOX (required) in Trilinos ...                 NOT Found!")
+  message(FATAL_ERROR "Albany REQUIRES NOX. See file trilinos-cmake in doc directory.")
 endif()
 
 # ThyraTpetraAdapters
 list(FIND Trilinos_PACKAGE_LIST ThyraTpetraAdapters ThyraTpetraAdapters_List_ID)
 if(Piro_List_ID GREATER -1)
-  message(
-    "-- Looking for ThyraTpetraAdapters (required) in Trilinos ... Found!")
+  message("-- Looking for ThyraTpetraAdapters (required) in Trilinos ... Found!")
 else()
-  message(
-    "-- Looking for ThyraTpetraAdapters (required) in Trilinos ... NOT Found!")
-  message(
-    FATAL_ERROR
-      "Albany REQUIRES ThyraTpetraAdapters. See file trilinos-cmake in doc directory."
-  )
+  message("-- Looking for ThyraTpetraAdapters (required) in Trilinos ... NOT Found!")
+  message(FATAL_ERROR "Albany REQUIRES ThyraTpetraAdapters. See file trilinos-cmake in doc directory.")
 endif()
 
 # Intrepid2
 list(FIND Trilinos_PACKAGE_LIST Intrepid2 Intrepid2_List_ID)
 if(Piro_List_ID GREATER -1)
-  message(
-    "-- Looking for Intrepid2 (required) in Trilinos ...           Found!")
+  message("-- Looking for Intrepid2 (required) in Trilinos ...           Found!")
 else()
-  message(
-    "-- Looking for Intrepid2 (required) in Trilinos ...           NOT Found!")
-  message(
-    FATAL_ERROR
-      "Albany REQUIRES Intrepid2. See file trilinos-cmake in doc directory.")
+  message("-- Looking for Intrepid2 (required) in Trilinos ...           NOT Found!")
+  message(FATAL_ERROR "Albany REQUIRES Intrepid2. See file trilinos-cmake in doc directory.")
 endif()
 
 # MiniTensor
 list(FIND Trilinos_PACKAGE_LIST MiniTensor MiniTensor_List_ID)
 if(Piro_List_ID GREATER -1)
-  message(
-    "-- Looking for MiniTensor (required) in Trilinos ...          Found!")
+  message("-- Looking for MiniTensor (required) in Trilinos ...          Found!")
 else()
-  message(
-    "-- Looking for MiniTensor (required) in Trilinos ...          NOT Found!")
-  message(
-    FATAL_ERROR
-      "Albany REQUIRES MiniTensor. See file trilinos-cmake in doc directory.")
+  message("-- Looking for MiniTensor (required) in Trilinos ...          NOT Found!")
+  message(FATAL_ERROR "Albany REQUIRES MiniTensor. See file trilinos-cmake in doc directory.")
 endif()
 
-# ##############################################################################
+# ######################################################################################################################
 # Check OPTIONAL packages ###
-# ##############################################################################
+# ######################################################################################################################
 
 message("\n  **********************************")
 message("  *** Optional Trilinos Packages ***")
 message("  **********************************\n")
-# Check for some OPTIONAL trilinos packages, which set DEFINES in Alany build
-# ###
+# Check for some OPTIONAL trilinos packages, which set DEFINES in Alany build ###
 
-# MPI check -- defaults to TRUE MESSAGE("-- Checking if MPI is enabled in
-# Trilinos:")
+# MPI check -- defaults to TRUE MESSAGE("-- Checking if MPI is enabled in Trilinos:")
 
 list(FIND Trilinos_TPL_LIST MPI MPI_List_ID)
 if(MPI_List_ID GREATER -1)
@@ -337,8 +289,7 @@ list(FIND Trilinos_PACKAGE_LIST STK have_stk_List_ID)
 if(have_stk_List_ID GREATER -1)
   message("-- Looking for STK:                  Found")
 
-  # set dependency on SEACAS, for I/O via stk_io MESSAGE("-- Looking for
-  # SEACAS:")
+  # set dependency on SEACAS, for I/O via stk_io MESSAGE("-- Looking for SEACAS:")
   list(FIND Trilinos_PACKAGE_LIST SEACASIoss SEACASIoss_List_ID)
   if(SEACASIoss_List_ID GREATER -1)
     message("  -- Looking for SEACASIoss:         Found")
@@ -368,8 +319,7 @@ else()
   message(FATAL_ERROR "STK is required.")
 endif()
 
-# set optional dependency on Zoltan, for partitioning MESSAGE("-- Looking for
-# Zoltan:")
+# set optional dependency on Zoltan, for partitioning MESSAGE("-- Looking for Zoltan:")
 list(FIND Trilinos_PACKAGE_LIST Zoltan Zoltan_List_ID)
 if(Zoltan_List_ID GREATER -1)
   set(ALBANY_ZOLTAN TRUE)
@@ -386,9 +336,8 @@ list(FIND Trilinos_PACKAGE_LIST Amesos2 Amesos2_List_ID)
 if(Amesos2_List_ID GREATER -1)
   message("-- Looking for Amesos2:              Found.")
   set(ALBANY_AMESOS2 TRUE)
-  # We can't rely on Amesos2_TPL_LIST any longer; KLU2 and Basker are not TPLs.
-  # These will soon be enabled by default in Amesos2. So we'll just assume we
-  # have a coarse direct solver.
+  # We can't rely on Amesos2_TPL_LIST any longer; KLU2 and Basker are not TPLs. These will soon be enabled by default in
+  # Amesos2. So we'll just assume we have a coarse direct solver.
   set(ALBANY_AMESOS2_OPERATIONAL_SOLVER TRUE)
 else()
   message("-- Looking for Amesos2:              NOT found.")
@@ -417,9 +366,7 @@ if(MueLu_List_ID GREATER -1)
     message("  -- MueLu tests enabled")
     set(ALBANY_MUELU_EXAMPLES TRUE)
   else()
-    message(
-      "  -- MueLu tests NOT enabled. Ifpack2 and Amesos2 compiled with an operational solver are required."
-    )
+    message("  -- MueLu tests NOT enabled. Ifpack2 and Amesos2 compiled with an operational solver are required.")
     set(ALBANY_MUELU_EXAMPLES FALSE)
   endif()
 else()
@@ -475,9 +422,9 @@ else()
   message(FATAL_ERROR "Tempus is required.")
 endif()
 
-# ##############################################################################
+# ######################################################################################################################
 # Check for optional physics sets in Albany ###
-# ##############################################################################
+# ######################################################################################################################
 
 message("\nChecking which Albany physics sets are enabled:")
 
@@ -491,8 +438,7 @@ else()
   set(ALBANY_DEMO_PDES FALSE)
 endif()
 
-option(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS
-       "Flag to turn off LCM exodiff sensitive tests" OFF)
+option(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS "Flag to turn off LCM exodiff sensitive tests" OFF)
 set(LCM_TEST_EXES TRUE)
 if(NOT ALBANY_ROL)
   message(FATAL_ERROR "ROL not installed from Trilinos (LCM needs ROL)")
@@ -503,10 +449,8 @@ if(DISABLE_LCM_EXODIFF_SENSITIVE_TESTS)
 endif()
 
 # set optional dependency of mesh on parameters, defaults to Disabled
-option(
-  ENABLE_MESH_DEPENDS_ON_PARAMETERS
-  "Flag to turn on dependency of mesh on parameters, e.g for shape optimization"
-  OFF)
+option(ENABLE_MESH_DEPENDS_ON_PARAMETERS "Flag to turn on dependency of mesh on parameters, e.g for shape optimization"
+       OFF)
 if(ENABLE_MESH_DEPENDS_ON_PARAMETERS)
   message("-- MESH_DEPENDS_ON_PARAMETERS      is Enabled")
   set(ALBANY_MESH_DEPENDS_ON_PARAMETERS TRUE)
@@ -516,8 +460,7 @@ else()
 endif()
 
 # set optional dependency of mesh on solution, defaults to Disabled
-option(ENABLE_MESH_DEPENDS_ON_SOLUTION
-       "Flag to turn on dependency of mesh on solution" OFF)
+option(ENABLE_MESH_DEPENDS_ON_SOLUTION "Flag to turn on dependency of mesh on solution" OFF)
 if(ENABLE_MESH_DEPENDS_ON_SOLUTION)
   message("-- MESH_DEPENDS_ON_SOLUTION        is Enabled")
   set(ALBANY_MESH_DEPENDS_ON_SOLUTION TRUE)
@@ -527,15 +470,12 @@ else()
 endif()
 
 # set optional dependency of dist parameters on solution, defaults to Disabled
-option(ENABLE_PARAMETERS_DEPEND_ON_SOLUTION
-       "Flag to turn on dependency of mesh on solution" OFF)
+option(ENABLE_PARAMETERS_DEPEND_ON_SOLUTION "Flag to turn on dependency of mesh on solution" OFF)
 if(ENABLE_PARAMETERS_DEPEND_ON_SOLUTION)
   message("-- PARAMETERS_DEPEND_ON_SOLUTION   is Enabled")
   set(ALBANY_PARAMETERS_DEPEND_ON_SOLUTION TRUE)
 elseif(ENABLE_MESH_DEPENDS_ON_SOLUTION)
-  message(
-    "-- PARAMETERS_DEPEND_ON_SOLUTION   is Enabled because MESH_DEPENDS_ON_SOLUTION is enabled"
-  )
+  message("-- PARAMETERS_DEPEND_ON_SOLUTION   is Enabled because MESH_DEPENDS_ON_SOLUTION is enabled")
   set(ALBANY_PARAMETERS_DEPEND_ON_SOLUTION TRUE)
 else()
   message("-- PARAMETERS_DEPEND_ON_SOLUTION   is NOT Enabled.")
@@ -627,65 +567,43 @@ if(ENABLE_FAD_TYPE STREQUAL "SFad")
       32
       CACHE INT "Number of derivative components chosen at compile-time for AD")
   message("-- FAD_TYPE  is SFad, ALBANY_SFAD_SIZE=${ALBANY_SFAD_SIZE}")
-  message(
-    "---> WARNING: problems with elemental DOFs > ${ALBANY_SFAD_SIZE} will fail"
-  )
+  message("---> WARNING: problems with elemental DOFs > ${ALBANY_SFAD_SIZE} will fail")
 elseif(ENABLE_FAD_TYPE STREQUAL "SLFad")
   set(ALBANY_FAD_TYPE_SLFAD TRUE)
   set(ALBANY_SLFAD_SIZE
       32
-      CACHE
-        INT
-        "Maximum number of derivative components chosen at compile-time for AD")
+      CACHE INT "Maximum number of derivative components chosen at compile-time for AD")
   message("-- FAD_TYPE  is SLFad, ALBANY_SLFAD_SIZE=${ALBANY_SLFAD_SIZE}")
-  message(
-    "---> WARNING: problems with elemental DOFs > ${ALBANY_SLFAD_SIZE} will fail"
-  )
+  message("---> WARNING: problems with elemental DOFs > ${ALBANY_SLFAD_SIZE} will fail")
 elseif(ENABLE_FAD_TYPE STREQUAL "DFad")
   message("-- FAD_TYPE  is DFad (default)")
 else()
-  message(
-    FATAL_ERROR
-      "\nError: ENABLE_FAD_TYPE = ${ENABLE_FAD_TYPE} is not recognized!
+  message(FATAL_ERROR "\nError: ENABLE_FAD_TYPE = ${ENABLE_FAD_TYPE} is not recognized!
   Options: SFad, SLFad, DFad (default)")
 endif()
 
 # Set FAD data type for Tangent
 set(ENABLE_TAN_FAD_TYPE
     "DFad"
-    CACHE STRING
-          "Sacado forward mode automatic differentiation data type for Tangent")
+    CACHE STRING "Sacado forward mode automatic differentiation data type for Tangent")
 if(ENABLE_TAN_FAD_TYPE STREQUAL "SFad")
   set(ALBANY_TAN_FAD_TYPE_SFAD TRUE)
   set(ALBANY_TAN_SFAD_SIZE
       32
-      CACHE
-        INT
-        "Number of derivative components chosen at compile-time for Tangent AD")
-  message(
-    "-- TAN_FAD_TYPE is SFad, ALBANY_TAN_SFAD_SIZE=${ALBANY_TAN_SFAD_SIZE}")
-  message(
-    "---> WARNING: problems with Tangent elemental DOFs > ${ALBANY_TAN_SFAD_SIZE} will fail"
-  )
+      CACHE INT "Number of derivative components chosen at compile-time for Tangent AD")
+  message("-- TAN_FAD_TYPE is SFad, ALBANY_TAN_SFAD_SIZE=${ALBANY_TAN_SFAD_SIZE}")
+  message("---> WARNING: problems with Tangent elemental DOFs > ${ALBANY_TAN_SFAD_SIZE} will fail")
 elseif(ENABLE_TAN_FAD_TYPE STREQUAL "SLFad")
   set(ALBANY_TAN_FAD_TYPE_SLFAD TRUE)
   set(ALBANY_TAN_SLFAD_SIZE
       32
-      CACHE
-        INT
-        "Maximum number of derivative components chosen at compile-time for Tangent AD"
-  )
-  message(
-    "-- TAN_FAD_TYPE is SLFad, ALBANY_TAN_SLFAD_SIZE=${ALBANY_TAN_SLFAD_SIZE}")
-  message(
-    "---> WARNING: problems with Tangent elemental DOFs > ${ALBANY_TAN_SLFAD_SIZE} will fail"
-  )
+      CACHE INT "Maximum number of derivative components chosen at compile-time for Tangent AD")
+  message("-- TAN_FAD_TYPE is SLFad, ALBANY_TAN_SLFAD_SIZE=${ALBANY_TAN_SLFAD_SIZE}")
+  message("---> WARNING: problems with Tangent elemental DOFs > ${ALBANY_TAN_SLFAD_SIZE} will fail")
 elseif(ENABLE_TAN_FAD_TYPE STREQUAL "DFad")
   message("-- TAN_FAD_TYPE is DFad (default)")
 else()
-  message(
-    FATAL_ERROR
-      "\nError: ENABLE_TAN_FAD_TYPE = ${ENABLE_TAN_FAD_TYPE} is not recognized!
+  message(FATAL_ERROR "\nError: ENABLE_TAN_FAD_TYPE = ${ENABLE_TAN_FAD_TYPE} is not recognized!
   Options: SFad, SLFad, DFad")
 endif()
 
@@ -694,8 +612,7 @@ if(ENABLE_FAD_TYPE STREQUAL ENABLE_TAN_FAD_TYPE)
   if(ALBANY_FAD_TYPE_SFAD AND NOT ALBANY_SFAD_SIZE EQUAL ALBANY_TAN_SFAD_SIZE)
     set(ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE TRUE)
     message("-- SFAD_SIZE is not TAN_SFAD_SIZE")
-  elseif(ALBANY_FAD_TYPE_SLFAD AND NOT ALBANY_SLFAD_SIZE EQUAL
-                                   ALBANY_TAN_SLFAD_SIZE)
+  elseif(ALBANY_FAD_TYPE_SLFAD AND NOT ALBANY_SLFAD_SIZE EQUAL ALBANY_TAN_SLFAD_SIZE)
     set(ALBANY_FADTYPE_NOTEQUAL_TANFADTYPE TRUE)
     message("-- SLFAD_SIZE is not TAN_SLFAD_SIZE")
   endif()
@@ -717,32 +634,23 @@ endif()
 # Other Miscellaneous Albany Options here:
 message("\nMiscellaneous Albany Options:")
 
-# set optional dependency on the BGL, defaults to Enabled This option is added
-# due to issued with compiling BGL with the intel compilers see Trilinos
-# bugzilla bug #6343
+# set optional dependency on the BGL, defaults to Enabled This option is added due to issued with compiling BGL with the
+# intel compilers see Trilinos bugzilla bug #6343
 #
-option(ENABLE_BGL
-       "Flag to turn on the Phalanx graphviz capabilities (dependent on BGL)"
-       ON)
+option(ENABLE_BGL "Flag to turn on the Phalanx graphviz capabilities (dependent on BGL)" ON)
 if(ENABLE_BGL)
   message("-- BGL                       is Enabled")
   set(ALBANY_BGL TRUE)
 else()
-  message(
-    "-- BGL                       is NOT Enabled. Graph visualization in Phalanx will not be available!"
-  )
+  message("-- BGL                       is NOT Enabled. Graph visualization in Phalanx will not be available!")
   set(ALBANY_BGL FALSE)
 endif()
 
-# Add option to check for hardware floating point exceptions using SSE, defaults
-# to disabled
-option(ENABLE_CHECK_FPE
-       "Flag to turn on floating point exception (NAN) checking" OFF)
+# Add option to check for hardware floating point exceptions using SSE, defaults to disabled
+option(ENABLE_CHECK_FPE "Flag to turn on floating point exception (NAN) checking" OFF)
 
-# Add option to check for hardware floating point exceptions using SSE, defaults
-# to disabled
-option(ENABLE_CHECK_FPE
-       "Flag to turn on floating point exception (NAN) checking" OFF)
+# Add option to check for hardware floating point exceptions using SSE, defaults to disabled
+option(ENABLE_CHECK_FPE "Flag to turn on floating point exception (NAN) checking" OFF)
 if(ENABLE_CHECK_FPE)
   message("-- FPE checking              is Enabled")
   set(ALBANY_CHECK_FPE TRUE)
@@ -751,8 +659,7 @@ else()
   set(ALBANY_CHECK_FPE FALSE)
 endif()
 
-option(ENABLE_STRONG_FPE_CHECK
-       "Flag to turn on strong checking for floating point exceptions" OFF)
+option(ENABLE_STRONG_FPE_CHECK "Flag to turn on strong checking for floating point exceptions" OFF)
 if(ENABLE_STRONG_FPE_CHECK)
   message("-- Strong FPE checking       is Enabled")
   set(ALBANY_STRONG_FPE_CHECK TRUE)
@@ -790,10 +697,8 @@ else()
   set(ALBANY_DEBUG FALSE)
 endif()
 
-# Add option to build libraries but not link any executables (for LandIce uner
-# MPAS)
-option(ALBANY_LIBRARIES_ONLY
-       "Flag to only build libraries and not link executables" OFF)
+# Add option to build libraries but not link any executables (for LandIce uner MPAS)
+option(ALBANY_LIBRARIES_ONLY "Flag to only build libraries and not link executables" OFF)
 if(ALBANY_LIBRARIES_ONLY)
   message("-- ALBANY_LIBRARIES_ONLY is ON")
   if(LCM_TEST_EXES)
@@ -805,8 +710,7 @@ endif()
 # Set which memory analysis system routines are available.
 option(ENABLE_MALLINFO "Use mallinfo() in Albany::printMemoryAnalysis()" off)
 option(ENABLE_GETRUSAGE "Use getrusage() in Albany::printMemoryAnalysis()" off)
-option(ENABLE_KERNELGETMEMORYSIZE
-       "Use Kernel_GetMemorySize() in Albany::printMemoryAnalysis()" off)
+option(ENABLE_KERNELGETMEMORYSIZE "Use Kernel_GetMemorySize() in Albany::printMemoryAnalysis()" off)
 if(ENABLE_MALLINFO)
   set(ALBANY_HAVE_MALLINFO TRUE)
   message("-- Memory: mallinfo()        is Enabled.")
@@ -831,8 +735,7 @@ endif()
 if(NOT DISABLE_DOXYGEN)
   find_package(Doxygen)
   if(DOXYGEN_FOUND)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile.in
-                   ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/albanyMainPage.doc
                    ${CMAKE_CURRENT_BINARY_DIR}/albanyMainPage.doc)
     add_custom_target(
@@ -855,8 +758,7 @@ message(" ***********************\n")
 # Add option to enable performance tests. Results are machine-specific
 option(ENABLE_PERFORMANCE_TESTS "Flag to turn on Performance Tests" OFF)
 if(ENABLE_PERFORMANCE_TESTS)
-  message(
-    "-- Performance Tests         are Enabled, adding tests/*/PerformanceTests")
+  message("-- Performance Tests         are Enabled, adding tests/*/PerformanceTests")
   set(ALBANY_PERFORMANCE_TESTS TRUE)
 else()
   message("-- Performance Tests         are NOT Enabled.")
@@ -873,11 +775,9 @@ else()
   set(ALBANY_LARGE_TESTS FALSE)
 endif()
 
-# Set option to disable compiling some code for nightly tests Some code sections
-# take so long to compile with NVCC that nightly tests are timing out. This
-# option allows disabling those sections.
-option(NIGHTLY_TESTING "Flag to turn off selected code during nightly testing"
-       OFF)
+# Set option to disable compiling some code for nightly tests Some code sections take so long to compile with NVCC that
+# nightly tests are timing out. This option allows disabling those sections.
+option(NIGHTLY_TESTING "Flag to turn off selected code during nightly testing" OFF)
 if(NIGHTLY_TESTING)
   message("-- NIGHTLY_TESTING           is Enabled")
   set(ALBANY_NIGHTLY_TESTING TRUE)
@@ -888,9 +788,7 @@ endif()
 
 # Timeout real long running tests
 if(ALBANY_CTEST_TIMEOUT)
-  message(
-    "\n-- Setting maximum test run time to be       ${ALBANY_CTEST_TIMEOUT} seconds"
-  )
+  message("\n-- Setting maximum test run time to be       ${ALBANY_CTEST_TIMEOUT} seconds")
 else()
   message("\n-- No limits are set on maximum test run time")
 endif()
@@ -901,12 +799,9 @@ add_custom_target(
   cmake_clean
   COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/CMakeCache.txt
   COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/Makefile
-  COMMAND ${CMAKE_COMMAND} -E remove_directory
-          ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles
-  COMMAND ${CMAKE_COMMAND} -E remove
-          ${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake
-  COMMAND ${CMAKE_COMMAND} -E remove
-          ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake)
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles
+  COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake
+  COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake)
 
 option(ALBANY_PARALLEL_ONLY "Only run the parallel tests" OFF)
 
@@ -942,8 +837,7 @@ if(ALBANY_MPI)
   message("-- CTest parallel call: ${PARALLEL_CALL_TEXT}")
 endif(ALBANY_MPI)
 
-# Add option to run any pretest executables in a specific environment
-# (mpiexec.hydra, srun, or other)
+# Add option to run any pretest executables in a specific environment (mpiexec.hydra, srun, or other)
 if(DEFINED ALBANY_PRETEST_EXEC)
   message("-- ALBANY_PRETEST_EXEC is ${ALBANY_PRETEST_EXEC}")
 else()

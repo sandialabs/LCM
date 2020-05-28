@@ -1,28 +1,20 @@
 # Create a symbolic link for exodiff
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SEACAS_EXODIFF}
-                        ${CMAKE_CURRENT_BINARY_DIR}/exodiff)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SEACAS_EXODIFF} ${CMAKE_CURRENT_BINARY_DIR}/exodiff)
 
 # Copy Input files from source to binary dir
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest.cmake}
-                        ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest.cmake} ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake)
 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.g
-  ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.g COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.g
+               ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.g COPYONLY)
 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.yaml
-  ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.yaml COPYONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening_Material.yaml
-  ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening_Material.yaml
-  COPYONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.exodiff
-  ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.exodiff COPYONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.gold.e
-  ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.gold.e COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening_Material.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening_Material.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.exodiff
+               ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.exodiff COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DislocationDensityHardening.gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/DislocationDensityHardening.gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -32,11 +24,7 @@ set(REF_FILE "DislocationDensityHardening.gold.e")
 add_test(
   NAME CrystalPlasticity_${testName}
   COMMAND
-    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
-    -DTEST_NAME=DislocationDensityHardening
-    -DTEST_ARGS=DislocationDensityHardening.yaml -DMPIMNP=1
-    -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
-    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-    ${runtest.cmake})
-set_tests_properties(CrystalPlasticity_${testName}
-                     PROPERTIES LABELS "LCM;Tpetra;Forward")
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=DislocationDensityHardening
+    -DTEST_ARGS=DislocationDensityHardening.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")

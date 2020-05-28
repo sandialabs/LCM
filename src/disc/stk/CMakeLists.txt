@@ -1,7 +1,6 @@
 #
-# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
-# Sandia, LLC (NTESS). This Software is released under the BSD license detailed
-# in the file license.txt in the top-level Albany directory.
+# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of Sandia, LLC (NTESS). This Software is
+# released under the BSD license detailed in the file license.txt in the top-level Albany directory.
 #
 
 # stk
@@ -46,8 +45,7 @@ set(HEADERS
     Albany_TmplSTKMeshStruct.hpp
     Albany_TmplSTKMeshStruct_Def.hpp)
 
-include_directories(${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS}
-                    ${Albany_SOURCE_DIR}/src)
+include_directories(${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS} ${Albany_SOURCE_DIR}/src)
 
 add_library(albanySTK ${Albany_LIBRARY_TYPE} ${SOURCES} ${HEADERS})
 target_link_libraries(albanySTK ${Trilinos_LIBRARIES})

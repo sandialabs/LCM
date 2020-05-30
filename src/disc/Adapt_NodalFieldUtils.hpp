@@ -8,7 +8,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <string> 
 
 namespace Adapt {
 

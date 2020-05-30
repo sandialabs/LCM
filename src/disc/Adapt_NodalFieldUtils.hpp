@@ -6,6 +6,7 @@
 #define ADAPT_NODAL_FIELD_UTILS_HPP
 
 #include <map>
+#include <string>
 #include <vector>
 #include <string> 
 

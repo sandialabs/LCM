@@ -264,9 +264,10 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         auto peat_frac = interpolateVectors(z_above_mean_sea_level_eb, peat_from_file_eb, height);
         v              = (peat_frac * 5.0) + (sand_frac * 5.0) + (silt_frac * 25.0) + (clay_frac * 70.0);
       }
-
-      ScalarT const arg1 = -B * Tdiff;
-      ScalarT const qebt = Q * std::exp(-B * Tdiff);
+      //IKT, 5/29/20: the following is needed to prevent overflow when taking exponent 
+      ScalarT const largest_value_exp = 650.0; 
+      ScalarT const arg1 = (-B * Tdiff < largest_value_exp) ? -B * Tdiff : largest_value_exp;
+      ScalarT const qebt = Q * std::exp(arg1);
 
       if (arg1 < -tol) {
         dfdT  = 0.0;

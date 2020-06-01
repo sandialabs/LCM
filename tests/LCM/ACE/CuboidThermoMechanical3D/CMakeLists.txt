@@ -3,8 +3,10 @@ if(NOT ALBANY_PARALLEL_ONLY)
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
   # Copy Input file from source to binary dir
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/simulation.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/simulation.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/simulation_thermal_only.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/simulation_thermal_only.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/simulation_thermomechanical.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/simulation_thermomechanical.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bluff_salinity.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/bluff_salinity.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clay_frac.txt
@@ -21,8 +23,10 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/grid.g.4.2 COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/grid.g.4.3
                  ${CMAKE_CURRENT_BINARY_DIR}/grid.g.4.3 COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal_only.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/materials_thermal_only.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermomechanical.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/materials_thermomechanical.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/peat_frac.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/peat_frac.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/porosity.txt
@@ -37,6 +41,9 @@ if(NOT ALBANY_PARALLEL_ONLY)
          	  ${CMAKE_CURRENT_BINARY_DIR}/waterH_fake.txt COPYONLY)
 
   # Create the test with this name and standard executable
-  add_test(${testName} ${Albany.exe} simulation.yaml)
+  add_test(${testName}_ThermalOnly ${Albany.exe} simulation_thermal_only.yaml)
+  set_tests_properties(${testName}_ThermalOnly PROPERTIES LABELS "Demo;Tpetra;Forward")
+  
+  add_test(${testName} ${Albany.exe} simulation_thermomechanical.yaml)
   set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
 endif()

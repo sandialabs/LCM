@@ -6,7 +6,7 @@ LCM:
       Parameter 0: Time
     Solution Method: Continuation
     Phalanx Graph Visualization Detail: 0
-    MaterialDB Filename: './materials_thermal_mechanical.yaml'
+    MaterialDB Filename: './materials_thermomechanical.yaml'
     Displacement:
       Variable Type: DOF
     ACE Temperature:
@@ -52,6 +52,11 @@ LCM:
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 1
     Exodus Write Interval: 5
+  Regression Results: 
+    Number of Comparisons: 4
+    Test Values: [6.566971859955e+01, 0.000000000000e+00, 0.000000000000e+00, 0.000000000000e+00]
+    Relative Tolerance: 1.00000000000000002e-03
+    Absolute Tolerance: 1.00000000000000008e-05
   Piro:
     LOCA:
       Bifurcation: { }
@@ -64,7 +69,8 @@ LCM:
         Continuation Parameter: Time
         Max Steps: 1000000000
         Min Value: 0.0        
-        Max Value: 17280000.0 # 200 days in seconds
+        #Max Value: 17280000.0 # 200 days in seconds
+        Max Value: 864000.0 #10 days in seconds
         Return Failed on Reaching Max Steps: false
         Hit Continuation Bound: false
       Step Size:

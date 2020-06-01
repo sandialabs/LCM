@@ -1,0 +1,101 @@
+LCM:
+
+  ElementBlocks:
+    permafrost1:
+      material: Permafrost
+    ice2:
+      material: Ice
+    permafrost3:
+      material: Permafrost
+      
+  Materials:
+    Permafrost:
+      Material Model:
+      #=======================================#
+      # This material describes permafrost    #
+      # soil within a permafrost polygon.     #
+      #=======================================#
+        Model Name: ACE permafrost
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 0.15e+09
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.30
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 3.0e+06
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 0.0
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      Output Cauchy Stress: true
+      Output eqps: true
+      Output ACE Ice Saturation: true
+      Output ACE Water Saturation: true
+      ACE Ice Density: 920.0 #[kg/m3]
+      ACE Water Density: 1000.0 #[kg/m3]
+      ACE Sediment Density: 2650.0 #[kg/m3]
+      ACE Ice Thermal Conductivity: 2.1 #1.60  #[W/K/m]
+      ACE Water Thermal Conductivity: 0.60 #[W/K/m]
+      ACE Sediment Thermal Conductivity: 4.365 #[W/K/m] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Ice Heat Capacity: 2.0e+03  #[J/kg/K]
+      ACE Water Heat Capacity: 4.0e+03  #[J/kg/K]
+      ACE Sediment Heat Capacity: 0.70e+03  #[J/kg/K] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Sand File: './sand_frac.txt'
+      ACE Silt File: './silt_frac.txt'
+      ACE Clay File: './clay_frac.txt'
+      ACE Peat File: './peat_frac.txt'
+      ACE Base Salinity: 5.0  # Used if 'bluff_salinity.txt' vector not given.
+      ACE Salinity File: './bluff_salinity.txt'
+      ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
+      ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
+      ACE Porosity File: './porosity.txt'
+      ACE Latent Heat: 334.0e+04 #[J/kg]
+      ACE Z Depth File: './depth.txt'
+      ACE Time File: './time_fake.txt'  # {0.0, 10368000.0}
+      ACE Sea Level File: './waterH_fake.txt'  # {-999.0, -999.0}
+      ACE Element Size: 0.25  # [m]
+      
+    Ice:
+      Material Model:
+      #=======================================#
+      # This material describes an ice wedge  #
+      # within a permafrost polygon.          #
+      #=======================================#
+        Model Name: ACE ice
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 0.15e+09
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.30
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 3.0e+06
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 0.0
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      Output Cauchy Stress: true
+      Output eqps: true
+      Output ACE Ice Saturation: true
+      Output ACE Water Saturation: true
+      ACE Ice Density: 920.0 #[kg/m3]
+      ACE Water Density: 1000.0 #[kg/m3]
+      ACE Sediment Density: 2650.0 #[kg/m3]
+      ACE Ice Thermal Conductivity: 2.1 #1.60  #[W/K/m]
+      ACE Water Thermal Conductivity: 0.60 #[W/K/m]
+      ACE Sediment Thermal Conductivity: 4.365 #[W/K/m] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Ice Heat Capacity: 2.0e+03  #[J/kg/K]
+      ACE Water Heat Capacity: 4.0e+03  #[J/kg/K]
+      ACE Sediment Heat Capacity: 0.70e+03  #[J/kg/K] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Base Salinity: 1.0  # Used if 'bluff_salinity.txt' vector not given.
+      ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
+      ACE Bulk Porosity: 1.0  # Used if porosity.txt not given.
+      ACE Latent Heat: 334.0e+04 #[J/kg]
+      ACE Time File: './time_fake.txt'  # {0.0, 10368000.0}
+      ACE Sea Level File: './waterH_fake.txt'  # {-999.0, -999.0}
+      ACE Element Size: 0.25  # [m]

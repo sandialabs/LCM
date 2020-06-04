@@ -12,6 +12,16 @@
 #include "Piro_LOCASolver.hpp"
 #include "Piro_TempusSolver.hpp"
 
+namespace {
+// In "Mechanics 3D", extract "Mechanics".
+inline std::string
+getName(std::string const& method)
+{
+  if (method.size() < 3) return method;
+  return method.substr(0, method.size() - 3);
+}
+}
+
 namespace LCM {
 
 ACEThermoMechanical::ACEThermoMechanical(
@@ -30,6 +40,7 @@ ACEThermoMechanical::ACEThermoMechanical(
   max_iters_         = alt_system_params.get<int>("Maximum Iterations", 1024);
   rel_tol_           = alt_system_params.get<ST>("Relative Tolerance", 1.0e-08);
   abs_tol_           = alt_system_params.get<ST>("Absolute Tolerance", 1.0e-08);
+  
   maximum_steps_     = alt_system_params.get<int>("Maximum Steps", 0);
   initial_time_      = alt_system_params.get<ST>("Initial Time", 0.0);
   final_time_        = alt_system_params.get<ST>("Final Time", 0.0);
@@ -150,6 +161,20 @@ ACEThermoMechanical::ACEThermoMechanical(
 
     Teuchos::ParameterList& params = solver_factory.getParameters();
 
+    Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
+
+    //Get problem name to figure out if we have a thermal or mechanical problem for 
+    //this subdomain, and populate subdomain_no_problem_name_map_ using this information
+    //IKT 6/4/2020: This is added to allow user to specify mechanics and thermal problems in 
+    //different orders.  I'm not sure if this will be of interest ultimately or not. 
+    const std::string problem_name = problem_params.get<std::string>("Name");
+    //Throw error if problem name is not Mechanics or ACE Thermal. 
+    //IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
+    if ((getName(problem_name) != "Mechanics") && (getName(problem_name) != "ACE Thermal")) {
+      ALBANY_ASSERT(false, "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
+    }
+    subdomain_no_problem_name_map_[subdomain] = problem_name; 
+    
     // Add application array for later use in Schwarz BC.
     params.set("Application Array", apps_);
 
@@ -408,8 +433,6 @@ void
 ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&)
     const
 {
-  std::cout << "IKT in evalModelImpl!\n"; 
-  exit(1); 
   if (is_dynamic_ == true) { ThermoMechanicalLoopDynamics(); }
   //IKT 6/4/2020: for now, throw error if trying to run quasi-statically.
   //Not sure if we want to ultimately support that case or not.
@@ -509,6 +532,8 @@ ACEThermoMechanical::reportFinals(std::ostream& os) const
 void
 ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 {
+  std::cout << "IKT in ThermoMechanicalLoopDynamics()!\n";
+
   minitensor::Filler const ZEROS{minitensor::Filler::ZEROS};
   minitensor::Vector<ST>   norms_init(num_subdomains_, ZEROS);
   minitensor::Vector<ST>   norms_final(num_subdomains_, ZEROS);
@@ -516,11 +541,14 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   std::string const        delim(72, '=');
   auto&                    fos = *Teuchos::VerboseObjectBase::getDefaultOStream();
 
-  fos << delim << std::endl;
-  fos << "ACE Sequential Thermo-Mechancial Method with " << num_subdomains_;
-  fos << " subdomains\n";
   fos << std::scientific << std::setprecision(17);
 
+  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    const std::string prob_name = this->querySubdomainProblemNameMap(subdomain, subdomain_no_problem_name_map_); 
+    std::cout << "IKT subdomain, problem name = " << subdomain << ", " << prob_name << "\n"; 
+  }
+
+  exit(1); 
   ST  time_step{initial_time_step_};
   int stop{0};
   ST  current_time{initial_time_};
@@ -969,9 +997,6 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
   std::string const delim(72, '=');
   auto&             fos = *Teuchos::VerboseObjectBase::getDefaultOStream();
 
-  fos << delim << std::endl;
-  fos << "ACE Sequential Thermo-Mechanical Method with " << num_subdomains_;
-  fos << " subdomains\n";
   fos << std::scientific << std::setprecision(17);
 
   ST  time_step{initial_time_step_};
@@ -1234,6 +1259,16 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
     }
 
   }  // Continuation loop */
+}
+
+//Routine which quesries map from subdomain numbers to problem names 
+std::string
+ACEThermoMechanical::querySubdomainProblemNameMap(const int subdomain, const std::map<int, std::string> map) const
+{
+  typename std::map<int, std::string>::const_iterator it;
+  it = map.find(subdomain);
+  if (it == map.end()) { ALBANY_ABORT("\nError! Subdomain " << subdomain << " was not found in map!\n"); }
+  return it->second;
 }
 
 }  // namespace LCM

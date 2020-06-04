@@ -150,6 +150,9 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   void
   reportFinals(std::ostream& os) const;
+  
+  std::string
+  querySubdomainProblemNameMap(const int subdomain, const std::map<int, std::string> map) const;
 
   std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>                 apps_;
@@ -209,6 +212,9 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   bool is_static_{false};
   bool is_dynamic_{false};
   bool std_init_guess_{false};
+  
+  //Map keeping track of which is first, thermal or mechanical 
+  std::map<int, std::string> subdomain_no_problem_name_map_;
 };
 
 }  // namespace LCM

@@ -39,7 +39,7 @@ ALBANY:
   Discretization: 
     Method: Ioss
     Exodus Input File Name: './grid.g'
-    Exodus Output File Name: './grid.e'
+    Exodus Output File Name: './thermal.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
   Regression Results: 
@@ -59,30 +59,11 @@ ALBANY:
           Storage Type: Unlimited
           Storage Limit: 20
         Time Step Control: 
-          Initial Time: 0.00000000000000000e+00
           Initial Time Index: 0
-          Initial Time Step: 7200.0 # 2 hr in seconds
-          Initial Order: 0
-          #Final Time: 17280000.0 # 200 days in seconds
-          Final Time: 864000.0 # 10 days in seconds
-          Final Time Index: 20000
-          Maximum Absolute Error: 1.00000000000000002e-08
-          Maximum Relative Error: 1.00000000000000002e-08
-          Integrator Step Type: Variable
-          Time Step Control Strategy: 
-            Time Step Control Strategy List: basic_vs
-            basic_vs: 
-              Name: Basic VS
-              Reduction Factor: 5.00000000000000000e-01
-              Amplification Factor: 1.50000000000000000e+00
-              Minimum Value Monitoring Function: 1.0e-12
-              Maximum Value Monitoring Function: 1.0e20
+          Final Time Index: 1000000
+          Integrator Step Type: Constant
           Output Time List: ''
           Output Index List: ''
-          Output Time Interval: 43200.0 # 12 hrs in seconds
-          Output Index Interval: 1000
-          Maximum Number of Stepper Failures: 10
-          Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
         Stepper Type: Backward Euler
         Solver Name: Demo Solver

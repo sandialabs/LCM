@@ -23,6 +23,9 @@ ACEThermoMechanical::ACEThermoMechanical(
   // Get names of individual model input files
   Teuchos::Array<std::string> model_filenames = alt_system_params.get<Teuchos::Array<std::string>>("Model Input Files");
 
+  //IKT FIXME - 6/4/2020: I believe the following 4 values are not relevant, except if we want 
+  //to try to make the coupling tighter later.  Not sure if we want to keepe or remove these...
+  //Keeping for now.
   min_iters_         = alt_system_params.get<int>("Minimum Iterations", 1);
   max_iters_         = alt_system_params.get<int>("Maximum Iterations", 1024);
   rel_tol_           = alt_system_params.get<ST>("Relative Tolerance", 1.0e-08);
@@ -133,8 +136,9 @@ ACEThermoMechanical::ACEThermoMechanical(
   do_outputs_.resize(num_subdomains_);
   do_outputs_init_.resize(num_subdomains_);
 
+  //IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
+  //coupling??  Leaving it in for now.
   bool is_static{false};
-
   bool is_dynamic{false};
 
   // Initialization
@@ -200,6 +204,11 @@ ACEThermoMechanical::ACEThermoMechanical(
 
     solvers_[subdomain] = solver;
 
+    //IKT 6/4/2020: I think we still need to call the following,
+    //looking at the code, but we may want to rename the routine if
+    //it ends up being used for thermo-mechanical too in addition
+    //to Schwarz.
+
     app->setSchwarzAlternating(true);
 
     apps_[subdomain] = app;
@@ -225,16 +234,13 @@ ACEThermoMechanical::ACEThermoMechanical(
 
   // Parameters
   Teuchos::ParameterList& problem_params = app_params->sublist("Problem");
-
   bool const have_parameters = problem_params.isSublist("Parameters");
-
   ALBANY_ASSERT(have_parameters == false, "Parameters not supported.");
 
   // Responses
   bool const have_responses = problem_params.isSublist("Response Functions");
-
   ALBANY_ASSERT(have_responses == false, "Responses not supported.");
-
+  
   return;
 }
 
@@ -402,8 +408,13 @@ void
 ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&)
     const
 {
+  std::cout << "IKT in evalModelImpl!\n"; 
+  exit(1); 
   if (is_dynamic_ == true) { ThermoMechanicalLoopDynamics(); }
-  if (is_static_ == true) { ThermoMechanicalLoopQuasistatics(); }
+  //IKT 6/4/2020: for now, throw error if trying to run quasi-statically.
+  //Not sure if we want to ultimately support that case or not.
+  ALBANY_ASSERT(is_static_ == false, "ACE Sequential Thermo-Mechanical solver currently supports dynamics only!"); 
+  //if (is_static_ == true) { ThermoMechanicalLoopQuasistatics(); }
   return;
 }
 
@@ -483,7 +494,7 @@ ACEThermoMechanical::reportFinals(std::ostream& os) const
   std::string const conv_str = converged_ == true ? "YES" : "NO";
 
   os << '\n';
-  os << "Schwarz Alternating Method converged: " << conv_str << '\n';
+  os << "ACE Sequential Thermo-Mechanical Method converged: " << conv_str << '\n';
   os << "Minimum iterations :" << min_iters_ << '\n';
   os << "Maximum iterations :" << max_iters_ << '\n';
   os << "Total iterations   :" << num_iter_ << '\n';
@@ -494,7 +505,7 @@ ACEThermoMechanical::reportFinals(std::ostream& os) const
   os << std::endl;
 }
 
-// Schwarz Alternating loop, dynamic
+// Sequential ThermoMechanical coupling loop, dynamic
 void
 ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 {
@@ -506,7 +517,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   auto&                    fos = *Teuchos::VerboseObjectBase::getDefaultOStream();
 
   fos << delim << std::endl;
-  fos << "Schwarz Alternating Method with " << num_subdomains_;
+  fos << "ACE Sequential Thermo-Mechancial Method with " << num_subdomains_;
   fos << " subdomains\n";
   fos << std::scientific << std::setprecision(17);
 
@@ -938,11 +949,19 @@ ACEThermoMechanical::doQuasistaticOutput(ST const time) const
   }
 }
 
-// Schwarz Alternating loop, quasistatic
+// Sequential ThermoMechanical coupling loop, quasistatic
 void
 ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
 {
-  minitensor::Filler const ZEROS{minitensor::Filler::ZEROS};
+  //IKT FIXME 6/4/2020: the code below that is commented out is cut/paste
+  //from Schwarz_Alternating.cpp.  I'm not sure if we want to support 
+  //quasistatic ACE sequential thermo-mechanical coupling.  If we do,
+  //the code below needs to be uncommented and modified for this case.  
+  //If not, this routine should be removed.  For now, I am throwing 
+  //an error if the user tries to run the code quasi-statically. 
+  
+  
+  /*minitensor::Filler const ZEROS{minitensor::Filler::ZEROS};
   minitensor::Vector<ST>   norms_init(num_subdomains_, ZEROS);
   minitensor::Vector<ST>   norms_final(num_subdomains_, ZEROS);
   minitensor::Vector<ST>   norms_diff(num_subdomains_, ZEROS);
@@ -951,7 +970,7 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
   auto&             fos = *Teuchos::VerboseObjectBase::getDefaultOStream();
 
   fos << delim << std::endl;
-  fos << "Schwarz Alternating Method with " << num_subdomains_;
+  fos << "ACE Sequential Thermo-Mechanical Method with " << num_subdomains_;
   fos << " subdomains\n";
   fos << std::scientific << std::setprecision(17);
 
@@ -1214,7 +1233,7 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
       fos << "\nINFO: Cannot increase step. Using " << time_step << '\n';
     }
 
-  }  // Continuation loop
+  }  // Continuation loop */
 }
 
 }  // namespace LCM

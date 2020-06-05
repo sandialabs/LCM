@@ -714,13 +714,13 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
         // restore the solution in the discretization so the schwarz solver gets
         // the right boundary conditions!
-        Teuchos::RCP<Thyra_Vector const> disp_rcp_thyra = ics_x_[subdomain];
-        Teuchos::RCP<Thyra_Vector const> velo_rcp_thyra = ics_xdot_[subdomain];
-        Teuchos::RCP<Thyra_Vector const> acce_rcp_thyra = ics_xdotdot_[subdomain];
+        Teuchos::RCP<Thyra_Vector const> x_rcp_thyra = ics_x_[subdomain];
+        Teuchos::RCP<Thyra_Vector const> xdot_rcp_thyra = ics_xdot_[subdomain];
+        Teuchos::RCP<Thyra_Vector const> xdotdot_rcp_thyra = ics_xdotdot_[subdomain];
 
         Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = app.getDiscretization();
 
-        app_disc->writeSolutionToMeshDatabase(*disp_rcp_thyra, *velo_rcp_thyra, *acce_rcp_thyra, current_time);
+        app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, *xdotdot_rcp_thyra, current_time);
       }
 
       // Jump to the beginning of the time-step loop without advancing
@@ -810,18 +810,18 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
   
-  Teuchos::RCP<Thyra_Vector>                ic_disp_rcp = Thyra::createMember(me.get_x_space());
-  Teuchos::RCP<Thyra_Vector> ic_velo_rcp = Thyra::createMember(me.get_x_space());
+  Teuchos::RCP<Thyra_Vector>                ic_x_rcp = Thyra::createMember(me.get_x_space());
+  Teuchos::RCP<Thyra_Vector> ic_xdot_rcp = Thyra::createMember(me.get_x_space());
 
-  // set ic_disp_rcp and ic_velo_rcp
+  // set ic_x_rcp and ic_xdot_rcp
   // by making copy of what is in ics_x_[subdomain], etc.
-  Thyra_Vector& ic_disp = *ics_x_[subdomain];
-  Thyra_Vector& ic_velo = *ics_xdot_[subdomain];
+  Thyra_Vector& ic_x = *ics_x_[subdomain];
+  Thyra_Vector& ic_xdot = *ics_xdot_[subdomain];
 
-  Thyra::copy(ic_disp, ic_disp_rcp.ptr());
-  Thyra::copy(ic_velo, ic_velo_rcp.ptr());
+  Thyra::copy(ic_x, ic_x_rcp.ptr());
+  Thyra::copy(ic_xdot, ic_xdot_rcp.ptr());
 
-  piro_tempus_solver.setInitialState(current_time, ic_disp_rcp, ic_velo_rcp);
+  piro_tempus_solver.setInitialState(current_time, ic_x_rcp, ic_xdot_rcp);
 
   if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
 
@@ -848,26 +848,26 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
   Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
   Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
 
-  Teuchos::RCP<Thyra_Vector> disp_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, disp_diff_rcp.ptr());
-  Thyra::V_VpStV(disp_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
+  Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
+  Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
+  Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
 
-  Teuchos::RCP<Thyra_Vector> velo_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, velo_diff_rcp.ptr());
-  Thyra::V_VpStV(velo_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
+  Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
+  Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
+  Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
 
   // After solve, save solution and get info to check convergence
   // IKT 6/5/2020: the following came from Schwarz and is irrelevant here for now,
   // so I am commenting it out .
   /*norms_init(subdomain)  = Thyra::norm(*prev_x_[subdomain]);
   norms_final(subdomain) = Thyra::norm(*this_x_[subdomain]);
-  norms_diff(subdomain)  = Thyra::norm(*disp_diff_rcp);
+  norms_diff(subdomain)  = Thyra::norm(*x_diff_rcp);
 
   auto const dt = tol_factor_vel_;
 
   norms_init(subdomain) += dt * Thyra::norm(*prev_xdot_[subdomain]);
   norms_final(subdomain) += dt * Thyra::norm(*this_xdot_[subdomain]);
-  norms_diff(subdomain) += dt * Thyra::norm(*velo_diff_rcp);*/
+  norms_diff(subdomain) += dt * Thyra::norm(*xdot_diff_rcp);*/
 
   return false; 
 }
@@ -925,23 +925,23 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
 
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
-  Teuchos::RCP<Thyra_Vector>                ic_disp_rcp = Thyra::createMember(me.get_x_space());
+  Teuchos::RCP<Thyra_Vector>                ic_x_rcp = Thyra::createMember(me.get_x_space());
 
-  Teuchos::RCP<Thyra_Vector> ic_velo_rcp = Thyra::createMember(me.get_x_space());
+  Teuchos::RCP<Thyra_Vector> ic_xdot_rcp = Thyra::createMember(me.get_x_space());
 
-  Teuchos::RCP<Thyra_Vector> ic_acce_rcp = Thyra::createMember(me.get_x_space());
+  Teuchos::RCP<Thyra_Vector> ic_xdotdot_rcp = Thyra::createMember(me.get_x_space());
 
-  // set ic_disp_rcp, ic_velo_rcp and ic_acce_rcp
+  // set ic_x_rcp, ic_xdot_rcp and ic_xdotdot_rcp
   // by making copy of what is in ics_x_[subdomain], etc.
-  Thyra_Vector& ic_disp = *ics_x_[subdomain];
-  Thyra_Vector& ic_velo = *ics_xdot_[subdomain];
-  Thyra_Vector& ic_acce = *ics_xdotdot_[subdomain];
+  Thyra_Vector& ic_x = *ics_x_[subdomain];
+  Thyra_Vector& ic_xdot = *ics_xdot_[subdomain];
+  Thyra_Vector& ic_xdotdot = *ics_xdotdot_[subdomain];
 
-  Thyra::copy(ic_disp, ic_disp_rcp.ptr());
-  Thyra::copy(ic_velo, ic_velo_rcp.ptr());
-  Thyra::copy(ic_acce, ic_acce_rcp.ptr());
+  Thyra::copy(ic_x, ic_x_rcp.ptr());
+  Thyra::copy(ic_xdot, ic_xdot_rcp.ptr());
+  Thyra::copy(ic_xdotdot, ic_xdotdot_rcp.ptr());
 
-  piro_tempus_solver.setInitialState(current_time, ic_disp_rcp, ic_velo_rcp, ic_acce_rcp);
+  piro_tempus_solver.setInitialState(current_time, ic_x_rcp, ic_xdot_rcp, ic_xdotdot_rcp);
 
   if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
 
@@ -969,36 +969,36 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
   Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
   Thyra::copy(*current_state->getXDotDot(), this_xdotdot_[subdomain].ptr());
 
-  Teuchos::RCP<Thyra_Vector> disp_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, disp_diff_rcp.ptr());
-  Thyra::V_VpStV(disp_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
+  Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
+  Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
+  Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
 
-  Teuchos::RCP<Thyra_Vector> velo_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, velo_diff_rcp.ptr());
-  Thyra::V_VpStV(velo_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
+  Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
+  Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
+  Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
 
-  Teuchos::RCP<Thyra_Vector> acce_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, acce_diff_rcp.ptr());
-  Thyra::V_VpStV(acce_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
+  Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
+  Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
+  Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
 
   // After solve, save solution and get info to check convergence
   // IKT 6/5/2020: the following came from Schwarz and is irrelevant here for now,
   // so I am commenting it out 
   /*norms_init(subdomain)  = Thyra::norm(*prev_x_[subdomain]);
   norms_final(subdomain) = Thyra::norm(*this_x_[subdomain]);
-  norms_diff(subdomain)  = Thyra::norm(*disp_diff_rcp);
+  norms_diff(subdomain)  = Thyra::norm(*x_diff_rcp);
 
   auto const dt = tol_factor_vel_;
 
   norms_init(subdomain) += dt * Thyra::norm(*prev_xdot_[subdomain]);
   norms_final(subdomain) += dt * Thyra::norm(*this_xdot_[subdomain]);
-  norms_diff(subdomain) += dt * Thyra::norm(*velo_diff_rcp);
+  norms_diff(subdomain) += dt * Thyra::norm(*xdot_diff_rcp);
 
   auto const dt2 = tol_factor_acc_;
 
   norms_init(subdomain) += dt2 * Thyra::norm(*prev_xdotdot_[subdomain]);
   norms_final(subdomain) += dt2 * Thyra::norm(*this_xdotdot_[subdomain]);
-  norms_diff(subdomain) += dt2 * Thyra::norm(*acce_diff_rcp);*/
+  norms_diff(subdomain) += dt2 * Thyra::norm(*xdotdot_diff_rcp);*/
 
   return false; 
 }
@@ -1011,9 +1011,9 @@ ACEThermoMechanical::setExplicitUpdateInitialGuessForSchwarz(ST const current_ti
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     auto& app = *apps_[subdomain];
 
-    Thyra_Vector& ic_disp = *ics_x_[subdomain];
-    Thyra_Vector& ic_velo = *ics_xdot_[subdomain];
-    Thyra_Vector& ic_acce = *ics_xdotdot_[subdomain];
+    Thyra_Vector& ic_x = *ics_x_[subdomain];
+    Thyra_Vector& ic_xdot = *ics_xdot_[subdomain];
+    Thyra_Vector& ic_xdotdot = *ics_xdotdot_[subdomain];
 
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
     if (current_time == 0) {
@@ -1023,25 +1023,25 @@ ACEThermoMechanical::setExplicitUpdateInitialGuessForSchwarz(ST const current_ti
     }
 
     const ST aConst = time_step * time_step / 2.0;
-    Thyra::V_StVpStV(this_x_[subdomain].ptr(), time_step, ic_velo, aConst, ic_acce);
-    Thyra::Vp_V(this_x_[subdomain].ptr(), ic_disp, 1.0);
+    Thyra::V_StVpStV(this_x_[subdomain].ptr(), time_step, ic_xdot, aConst, ic_xdotdot);
+    Thyra::Vp_V(this_x_[subdomain].ptr(), ic_x, 1.0);
 
     // This is the initial guess that I want to apply to the subdomains before
     // the schwarz solver starts
-    auto disp_rcp = this_x_[subdomain];
-    auto velo_rcp = this_xdot_[subdomain];
-    auto acce_rcp = this_xdotdot_[subdomain];
+    auto x_rcp = this_x_[subdomain];
+    auto xdot_rcp = this_xdot_[subdomain];
+    auto xdotdot_rcp = this_xdotdot_[subdomain];
 
-    // setting the displacement in the albany application
-    app.setX(disp_rcp);
-    app.setXdot(velo_rcp);
-    app.setXdotdot(acce_rcp);
+    // setting x, xdot and xdotdot in the albany application
+    app.setX(x_rcp);
+    app.setXdot(xdot_rcp);
+    app.setXdotdot(xdotdot_rcp);
 
     // in order to get the Schwarz boundary conditions right, we need to set the
     // state in the discretization
     Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = app.getDiscretization();
 
-    app_disc->writeSolutionToMeshDatabase(*disp_rcp, *velo_rcp, *acce_rcp, current_time);
+    app_disc->writeSolutionToMeshDatabase(*x_rcp, *xdot_rcp, *xdotdot_rcp, current_time);
   }
 }
 
@@ -1093,23 +1093,23 @@ ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
     else {  // subsequent time steps: update ic vecs based on fields in stk
             // discretization
 
-      Teuchos::RCP<Thyra_MultiVector> disp_mv = stk_disc.getSolutionMV();
+      Teuchos::RCP<Thyra_MultiVector> x_mv = stk_disc.getSolutionMV();
 
       // Update ics_x_ and its time-derivatives
-      ics_x_[subdomain] = Thyra::createMember(disp_mv->col(0)->space());
-      Thyra::copy(*disp_mv->col(0), ics_x_[subdomain].ptr());
+      ics_x_[subdomain] = Thyra::createMember(x_mv->col(0)->space());
+      Thyra::copy(*x_mv->col(0), ics_x_[subdomain].ptr());
 
-      ics_xdot_[subdomain] = Thyra::createMember(disp_mv->col(1)->space());
-      Thyra::copy(*disp_mv->col(1), ics_xdot_[subdomain].ptr());
+      ics_xdot_[subdomain] = Thyra::createMember(x_mv->col(1)->space());
+      Thyra::copy(*x_mv->col(1), ics_xdot_[subdomain].ptr());
 
       if (prob_type == MECHANICS) {
-        ics_xdotdot_[subdomain] = Thyra::createMember(disp_mv->col(2)->space());
-        Thyra::copy(*disp_mv->col(2), ics_xdotdot_[subdomain].ptr());
+        ics_xdotdot_[subdomain] = Thyra::createMember(x_mv->col(2)->space());
+        Thyra::copy(*x_mv->col(2), ics_xdotdot_[subdomain].ptr());
       }
 
       if (do_outputs_[subdomain] == true) {  // write solution to Exodus
 
-        stk_disc.writeSolutionMV(*disp_mv, time);
+        stk_disc.writeSolutionMV(*x_mv, time);
       }
     }
 
@@ -1131,8 +1131,8 @@ ACEThermoMechanical::doQuasistaticOutput(ST const time) const
       auto& stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
 
       // Do not dereference this RCP. Leads to SEGFAULT (!?)
-      auto disp_mv_rcp = stk_disc.getSolutionMV();
-      stk_disc.writeSolutionMV(*disp_mv_rcp, time);
+      auto x_mv_rcp = stk_disc.getSolutionMV();
+      stk_disc.writeSolutionMV(*x_mv_rcp, time);
       stk_mesh_struct.exoOutput = false;
     }
   }
@@ -1197,13 +1197,13 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
       if (stop == 0) {
         auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
-        auto zero_disp_rcp = Thyra::createMember(me.get_x_space());
-        auto zero_disp_ptr = zero_disp_rcp.ptr();
+        auto zero_x_rcp = Thyra::createMember(me.get_x_space());
+        auto zero_x_ptr = zero_x_rcp.ptr();
 
-        Thyra::put_scalar<ST>(0.0, zero_disp_ptr);
+        Thyra::put_scalar<ST>(0.0, zero_x_ptr);
 
-        prev_step_x_[subdomain] = zero_disp_rcp;
-        curr_x_[subdomain]      = zero_disp_rcp;
+        prev_step_x_[subdomain] = zero_x_rcp;
+        curr_x_[subdomain]      = zero_x_rcp;
       } else {
         prev_step_x_[subdomain] = curr_x_[subdomain];
       }
@@ -1231,7 +1231,7 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
         auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
         auto        prev_x_rcp = curr_x_[subdomain];
-        auto const& prev_disp     = *prev_x_rcp;
+        auto const& prev_x     = *prev_x_rcp;
 
         // Restore internal states
         auto& app       = *apps_[subdomain];
@@ -1273,19 +1273,19 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
         auto const& curr_x     = *curr_x_rcp;
 
         // Compute difference between previous and current solutions
-        auto disp_diff_rcp = Thyra::createMember(me.get_x_space());
-        auto disp_diff_ptr = disp_diff_rcp.ptr();
+        auto x_diff_rcp = Thyra::createMember(me.get_x_space());
+        auto x_diff_ptr = x_diff_rcp.ptr();
 
-        Thyra::put_scalar<ST>(0.0, disp_diff_ptr);
-        Thyra::V_VpStV(disp_diff_ptr, curr_x, -1.0, prev_disp);
+        Thyra::put_scalar<ST>(0.0, x_diff_ptr);
+        Thyra::V_VpStV(x_diff_ptr, curr_x, -1.0, prev_x);
 
-        auto& disp_diff = *disp_diff_rcp;
+        auto& x_diff = *x_diff_rcp;
 
         // After solve, save solution and get info to check convergence
         curr_x_[subdomain]  = curr_x_rcp;
-        norms_init(subdomain)  = Thyra::norm(prev_disp);
+        norms_init(subdomain)  = Thyra::norm(prev_x);
         norms_final(subdomain) = Thyra::norm(curr_x);
-        norms_diff(subdomain)  = Thyra::norm(disp_diff);
+        norms_diff(subdomain)  = Thyra::norm(x_diff);
 
       }  // Subdomain loop
 
@@ -1381,10 +1381,10 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
 
         // Restore the solution in the discretization so the schwarz solver gets
         // the right boundary conditions!
-        Teuchos::RCP<Thyra_Vector const>                    disp_rcp_thyra = curr_x_[subdomain];
+        Teuchos::RCP<Thyra_Vector const>                    x_rcp_thyra = curr_x_[subdomain];
         Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc       = app.getDiscretization();
 
-        app_disc->writeSolutionToMeshDatabase(*disp_rcp_thyra, current_time);
+        app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, current_time);
       }
 
       // Jump to the beginning of the continuation loop without advancing

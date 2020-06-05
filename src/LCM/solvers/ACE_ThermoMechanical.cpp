@@ -558,8 +558,6 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
   fos << std::scientific << std::setprecision(17);
 
-  exit(1); 
-  
   ST  time_step{initial_time_step_};
   int stop{0};
   ST  current_time{initial_time_};

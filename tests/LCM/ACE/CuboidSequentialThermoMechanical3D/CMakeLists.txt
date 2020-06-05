@@ -40,10 +40,22 @@ if(NOT ALBANY_PARALLEL_ONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time_fake.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/time_fake.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/waterH_fake.txt
-         	  ${CMAKE_CURRENT_BINARY_DIR}/waterH_fake.txt COPYONLY)
+         	 ${CMAKE_CURRENT_BINARY_DIR}/waterH_fake.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
+         	 ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.exodiff
+         	 ${CMAKE_CURRENT_BINARY_DIR}/thermal.exodiff COPYONLY)
+  set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
 
-  # Create the test with this name and standard executable
-  #add_test(${testName} ${Albany.exe} coupled.yaml)
-  #set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
-  
+  # Name the test with the directory name
+  get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+  # Add the tests
+  set(OUTFILE "thermal.e")
+  set(REF_FILE "${CMAKE_CURRENT_BINARY_DIR}/../CuboidThermoMechanical3D/grid.e")
+  add_test(NAME ${testName}
+    COMMAND ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=thermal -DTEST_ARGS=coupled.yaml
+    -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE}
+    -P ${runtest.cmake})
+  set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
+  set_tests_properties(${testName} PROPERTIES DEPENDS CuboidThermoMechanical3D_ThermalOnly)
 endif()

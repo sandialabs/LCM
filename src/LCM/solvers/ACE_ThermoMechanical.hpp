@@ -143,9 +143,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
                            const double current_time, const double next_time, 
 			   const double time_step) const; 
 
-  void
-  updateConvergenceCriterion() const;
-
   bool
   continueSolve() const;
 
@@ -158,9 +155,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   void
   setDynamicICVecsAndDoOutput(ST const time) const;
 
-  void
-  reportFinals(std::ostream& os) const;
-
   std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>                 apps_;
   std::vector<Teuchos::RCP<Albany::AbstractSTKMeshStruct>>             stk_mesh_structs_;
@@ -168,16 +162,10 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   char const*  failure_message_{"No failure detected"};
   int          num_subdomains_{0};
-  int          min_iters_{0};
-  int          max_iters_{0};
-  ST           rel_tol_{0.0};
-  ST           abs_tol_{0.0};
   int          maximum_steps_{0};
   ST           initial_time_{0.0};
   ST           final_time_{0.0};
   ST           initial_time_step_{0.0};
-  ST           tol_factor_vel_{0.0};
-  ST           tol_factor_acc_{0.0};
   ST           min_time_step_{0.0};
   ST           max_time_step_{0.0};
   ST           reduction_factor_{0.0};
@@ -186,11 +174,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable bool failed_{false};
   mutable bool converged_{false};
   mutable int  num_iter_{0};
-  mutable ST   rel_error_{0.0};
-  mutable ST   abs_error_{0.0};
-  mutable ST   norm_init_{0.0};
-  mutable ST   norm_final_{0.0};
-  mutable ST   norm_diff_{0.0};
 
   mutable ConvergenceCriterion       criterion_{ConvergenceCriterion::BOTH};
   mutable ConvergenceLogicalOperator operator_{ConvergenceLogicalOperator::AND};

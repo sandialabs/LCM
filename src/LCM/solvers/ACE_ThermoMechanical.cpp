@@ -57,13 +57,11 @@ ACEThermoMechanical::ACEThermoMechanical(
   output_interval_  = alt_system_params.get<int>("Exodus Write Interval", 1);
   std_init_guess_   = alt_system_params.get<bool>("Standard Initial Guess", false);
 
+  //IKT FIXME 6/5/2020: the following 2 values are not relevant if not doing Schwarz 
   tol_factor_vel_ = alt_system_params.get<ST>("Tolerance Factor Velocity", dt);
   tol_factor_acc_ = alt_system_params.get<ST>("Tolerance Factor Acceleration", dt2);
-
   std::string convergence_str = alt_system_params.get<std::string>("Convergence Criterion", "BOTH");
-
   std::transform(convergence_str.begin(), convergence_str.end(), convergence_str.begin(), ::toupper);
-
   if (convergence_str == "ABSOLUTE") {
     criterion_ = ConvergenceCriterion::ABSOLUTE;
   } else if (convergence_str == "RELATIVE") {

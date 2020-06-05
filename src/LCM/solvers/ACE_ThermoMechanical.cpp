@@ -481,8 +481,12 @@ centered(std::string const& str, int width)
 
 void
 ACEThermoMechanical::updateConvergenceCriterion() const
-{
-  abs_error_ = norm_diff_;
+{ 
+  //IKT 6/5/2020: the following commented out code is from Schwarz.
+  //Currently, we're not doing any Schwarz-like iterations, so this routine does nothing.
+  return; 
+
+  /*abs_error_ = norm_diff_;
   rel_error_ = norm_final_ > 0.0 ? norm_diff_ / norm_final_ : norm_diff_;
 
   bool const converged_absolute = abs_error_ <= abs_tol_;
@@ -499,15 +503,23 @@ ACEThermoMechanical::updateConvergenceCriterion() const
         case ConvergenceLogicalOperator::OR: converged_ = converged_absolute || converged_relative; break;
       }
       break;
-  }
+  }*/
 }
 
 bool
 ACEThermoMechanical::continueSolve() const
 {
   ++num_iter_;
+  //IKT 6/5/2020: right now, we want to do just 1 Schwarz iteration.
+  //Therefore return false if we've hit num_iter_ = 1;
+  //Also set converged_ to true, which is equally irrelevant unless doing Schwarz
+  converged_ = true;  
+  if (num_iter_ > 0) return false; 
 
-  // If failure has occurred, stop immediately.
+  //IKT 6/5/2020: the following is left over from Schwarz.  Keeping it here
+  //in case we want to use it in the future. 
+  
+  /*// If failure has occurred, stop immediately.
   if (failed_ == true) return false;
 
   // Regardless of other criteria, if error is zero stop solving.
@@ -530,12 +542,13 @@ ACEThermoMechanical::continueSolve() const
   // Lastly check for convergence.
   bool const continue_solve = (converged_ == false);
 
-  return continue_solve;
+  return continue_solve;*/
 }
 
 void
 ACEThermoMechanical::reportFinals(std::ostream& os) const
 {
+  //IKT 6/5/2020: this routine is only relevant for Schwarz 
   std::string const conv_str = converged_ == true ? "YES" : "NO";
 
   os << '\n';
@@ -554,12 +567,12 @@ ACEThermoMechanical::reportFinals(std::ostream& os) const
 void
 ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 {
-  std::cout << "IKT in ThermoMechanicalLoopDynamics()!\n";
-
-  minitensor::Filler const ZEROS{minitensor::Filler::ZEROS};
+  //IKT 6/5/2020: commenting out the following lines, which are not relevant
+  //when not doing Schwarz 
+  /*minitensor::Filler const ZEROS{minitensor::Filler::ZEROS};
   minitensor::Vector<ST>   norms_init(num_subdomains_, ZEROS);
   minitensor::Vector<ST>   norms_final(num_subdomains_, ZEROS);
-  minitensor::Vector<ST>   norms_diff(num_subdomains_, ZEROS);
+  minitensor::Vector<ST>   norms_diff(num_subdomains_, ZEROS);*/
   std::string const        delim(72, '=');
 
   *fos_ << std::scientific << std::setprecision(17);
@@ -595,8 +608,9 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
         *fos_ << delim << std::endl;
         const PROB_TYPE prob_type = prob_types_[subdomain]; 
-	//IKT FIXME 6/5/2020: remove the following print statment 
-        *fos_ << "Schwarz iteration  :" << num_iter_ << '\n';
+	//IKT 6/5/2020: removed the following line since it's not relevant unless 
+	//we're doing Schwarz
+        //*fos_ << "Schwarz iteration  :" << num_iter_ << '\n';
         *fos_ << "Subdomain          :" << subdomain << '\n';
 	//IKT FIXME 6/5/2020: currently there is a lot of code duplication in 
 	//AdvanceMechanicsDynamics and AdvanceThermalDynamics b/c they effectively 
@@ -620,18 +634,27 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       }  // Subdomains loop
 
       if (failed_ == true) {
-        *fos_ << "INFO: Unable to continue Schwarz iteration " << num_iter_;
-        *fos_ << "\n";
+	//IKT 6/5/2020: disabling the following print statement for now, which may 
+	//be confusing w/ thermo-mechanical coupling, since we're not doing Schwarz. 
+        /**fos_ << "INFO: Unable to continue Schwarz iteration " << num_iter_;
+        *fos_ << "\n";*/
         // Break out of the Schwarz loop.
         break;
       }
 
-      norm_init_  = minitensor::norm(norms_init);
+      //IKT 6/5/2020: commenting out the following, since it is not relevant 
+      //for Schwarz 
+      /*norm_init_  = minitensor::norm(norms_init);
       norm_final_ = minitensor::norm(norms_final);
-      norm_diff_  = minitensor::norm(norms_diff);
+      norm_diff_  = minitensor::norm(norms_diff);*/
 
+      //IKT 6/5/2020: keeping the following routine from Schwarz, which does nothing 
+      //currently. 
       updateConvergenceCriterion();
 
+      //IKT 6/5/2020: disabling the following printing, since it is irrelevant
+      //when not doing Schwarz.
+      /*
       *fos_ << delim << std::endl;
       *fos_ << "Schwarz iteration         :" << num_iter_ << '\n';
 
@@ -670,7 +693,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       *fos_ << "Absolute tolerance :" << abs_tol_ << '\n';
       *fos_ << "Relative error     :" << rel_error_ << '\n';
       *fos_ << "Relative tolerance :" << rel_tol_ << '\n';
-      *fos_ << delim << std::endl;
+      *fos_ << delim << std::endl;*/
 
     } while (continueSolve() == true);
 
@@ -699,12 +722,15 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
       // Restore previous solutions
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+        const PROB_TYPE prob_type = prob_types_[subdomain]; 
         Thyra::put_scalar(0.0, this_x_[subdomain].ptr());
         Thyra::copy(*ics_x_[subdomain], this_x_[subdomain].ptr());
         Thyra::put_scalar(0.0, this_xdot_[subdomain].ptr());
         Thyra::copy(*ics_xdot_[subdomain], this_xdot_[subdomain].ptr());
-        Thyra::put_scalar(0.0, this_xdotdot_[subdomain].ptr());
-        Thyra::copy(*ics_xdotdot_[subdomain], this_xdotdot_[subdomain].ptr());
+	if (prob_type == MECHANICS) {
+          Thyra::put_scalar(0.0, this_xdotdot_[subdomain].ptr());
+          Thyra::copy(*ics_xdotdot_[subdomain], this_xdotdot_[subdomain].ptr());
+	}
 
         // restore the state manager with the state variables from the previous
         // loadstep.
@@ -716,11 +742,16 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         // the right boundary conditions!
         Teuchos::RCP<Thyra_Vector const> x_rcp_thyra = ics_x_[subdomain];
         Teuchos::RCP<Thyra_Vector const> xdot_rcp_thyra = ics_xdot_[subdomain];
-        Teuchos::RCP<Thyra_Vector const> xdotdot_rcp_thyra = ics_xdotdot_[subdomain];
+        Teuchos::RCP<Thyra_Vector const> xdotdot_rcp_thyra = (prob_type == MECHANICS) ? ics_xdotdot_[subdomain] : Teuchos::null; 
 
         Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = app.getDiscretization();
-
-        app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, *xdotdot_rcp_thyra, current_time);
+        
+	if (prob_type == MECHANICS) {
+          app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, *xdotdot_rcp_thyra, current_time);
+	}
+	else {
+          app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, current_time);
+	}
       }
 
       // Jump to the beginning of the time-step loop without advancing
@@ -728,7 +759,9 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       continue;
     }
 
-    reportFinals(*fos_);
+    //IKT 6/5/2020: commenting the following b/c it doesn't give any useful information unless 
+    //we're doing Schwarz
+    //reportFinals(*fos_);
 
     // Update IC vecs and output solution to exodus file
 
@@ -764,7 +797,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
                                             const double current_time, const double next_time, 
 					    const double time_step) const 
 {
-  std::cout << "IKT in AdvanceThermalDynamics()\n"; 
   // Restore solution from previous Schwarz iteration before solve
   if (is_initial_state == true) {
     auto&       me        = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
@@ -877,7 +909,6 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
                                               const double current_time, const double next_time, 
 					      const double time_step) const 
 {
-  std::cout << "IKT in AdvanceMechanicsDynamics()\n"; 
   // Restore solution from previous Schwarz iteration before solve
   if (is_initial_state == true) {
     auto&       me        = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);

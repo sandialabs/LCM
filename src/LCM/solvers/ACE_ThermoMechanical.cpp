@@ -146,6 +146,7 @@ ACEThermoMechanical::ACEThermoMechanical(
   this_acce_.resize(num_subdomains_);
   do_outputs_.resize(num_subdomains_);
   do_outputs_init_.resize(num_subdomains_);
+  prob_types_.resize(num_subdomains_); 
 
   //IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
   //coupling??  Leaving it in for now.
@@ -164,16 +165,21 @@ ACEThermoMechanical::ACEThermoMechanical(
     Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
 
     //Get problem name to figure out if we have a thermal or mechanical problem for 
-    //this subdomain, and populate subdomain_no_problem_name_map_ using this information
+    //this subdomain, and populate prob_types_ vector using this information.
     //IKT 6/4/2020: This is added to allow user to specify mechanics and thermal problems in 
     //different orders.  I'm not sure if this will be of interest ultimately or not. 
-    const std::string problem_name = problem_params.get<std::string>("Name");
-    //Throw error if problem name is not Mechanics or ACE Thermal. 
-    //IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
-    if ((getName(problem_name) != "Mechanics") && (getName(problem_name) != "ACE Thermal")) {
+    const std::string problem_name = getName(problem_params.get<std::string>("Name"));
+    if (problem_name == "Mechanics") {
+      prob_types_[subdomain] = MECHANICS; 
+    }
+    else if (problem_name == "ACE Thermal") {
+      prob_types_[subdomain] = THERMAL; 
+    }
+    else {
+      //Throw error if problem name is not Mechanics or ACE Thermal. 
+      //IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
       ALBANY_ASSERT(false, "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
     }
-    subdomain_no_problem_name_map_[subdomain] = problem_name; 
     
     // Add application array for later use in Schwarz BC.
     params.set("Application Array", apps_);
@@ -270,11 +276,11 @@ ACEThermoMechanical::ACEThermoMechanical(
   bool mechanics_found = false;
   bool thermal_found = false; 
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    const std::string prob_name = this->querySubdomainProblemNameMap(subdomain, subdomain_no_problem_name_map_);
-    if (getName(prob_name) == "Mechanics") {
+    PROB_TYPE prob_type = prob_types_[subdomain];
+    if (prob_type == MECHANICS) {
       mechanics_found = true; 
     }
-    else if (getName(prob_name) == "ACE Thermal") {
+    else if (prob_type == THERMAL) {
       thermal_found = true; 
     } 
   }
@@ -908,6 +914,9 @@ ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
   if (time == initial_time_) is_initial_time = true;
 
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+
+    const PROB_TYPE prob_type = prob_types_[subdomain]; 
+
     Albany::AbstractSTKMeshStruct& stk_mesh_struct = *stk_mesh_structs_[subdomain];
 
     Albany::AbstractDiscretization& abs_disc = *discs_[subdomain];
@@ -930,8 +939,10 @@ ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
       ics_velo_[subdomain] = Thyra::createMember(me.get_x_space());
       Thyra::copy(*(nv.get_x_dot()), ics_velo_[subdomain].ptr());
 
-      ics_acce_[subdomain] = Thyra::createMember(me.get_x_space());
-      Thyra::copy(*(nv.get_x_dot_dot()), ics_acce_[subdomain].ptr());
+      if (prob_type == MECHANICS) {
+        ics_acce_[subdomain] = Thyra::createMember(me.get_x_space());
+        Thyra::copy(*(nv.get_x_dot_dot()), ics_acce_[subdomain].ptr());
+      }
 
       // Write initial condition to STK mesh
       Teuchos::RCP<Thyra_MultiVector const> const xMV = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
@@ -952,8 +963,10 @@ ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
       ics_velo_[subdomain] = Thyra::createMember(disp_mv->col(1)->space());
       Thyra::copy(*disp_mv->col(1), ics_velo_[subdomain].ptr());
 
-      ics_acce_[subdomain] = Thyra::createMember(disp_mv->col(2)->space());
-      Thyra::copy(*disp_mv->col(2), ics_acce_[subdomain].ptr());
+      if (prob_type == MECHANICS) {
+        ics_acce_[subdomain] = Thyra::createMember(disp_mv->col(2)->space());
+        Thyra::copy(*disp_mv->col(2), ics_acce_[subdomain].ptr());
+      }
 
       if (do_outputs_[subdomain] == true) {  // write solution to Exodus
 
@@ -1268,16 +1281,6 @@ ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
     }
 
   }  // Continuation loop */
-}
-
-//Routine which quesries map from subdomain numbers to problem names 
-std::string
-ACEThermoMechanical::querySubdomainProblemNameMap(const int subdomain, const std::map<int, std::string> map) const
-{
-  typename std::map<int, std::string>::const_iterator it;
-  it = map.find(subdomain);
-  if (it == map.end()) { ALBANY_ABORT("\nError! Subdomain " << subdomain << " was not found in map!\n"); }
-  return it->second;
 }
 
 }  // namespace LCM

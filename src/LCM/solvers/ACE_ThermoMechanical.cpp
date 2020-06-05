@@ -266,6 +266,21 @@ ACEThermoMechanical::ACEThermoMechanical(
   bool const have_responses = problem_params.isSublist("Response Functions");
   ALBANY_ASSERT(have_responses == false, "Responses not supported.");
   
+  //Check that map has both mechanics and thermal problem; if not, throw error.
+  bool mechanics_found = false;
+  bool thermal_found = false; 
+  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    const std::string prob_name = this->querySubdomainProblemNameMap(subdomain, subdomain_no_problem_name_map_);
+    if (getName(prob_name) == "Mechanics") {
+      mechanics_found = true; 
+    }
+    else if (getName(prob_name) == "ACE Thermal") {
+      thermal_found = true; 
+    } 
+  }
+  ALBANY_ASSERT(mechanics_found == true, "'Mechanics' needs to be one of the coupled problems, but it is not found!");
+  ALBANY_ASSERT(thermal_found == true, "'ACE Thermal' needs to be one of the coupled problems, but it is not found!");
+
   return;
 }
 
@@ -543,12 +558,8 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
   fos << std::scientific << std::setprecision(17);
 
-  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    const std::string prob_name = this->querySubdomainProblemNameMap(subdomain, subdomain_no_problem_name_map_); 
-    std::cout << "IKT subdomain, problem name = " << subdomain << ", " << prob_name << "\n"; 
-  }
-
   exit(1); 
+  
   ST  time_step{initial_time_step_};
   int stop{0};
   ST  current_time{initial_time_};

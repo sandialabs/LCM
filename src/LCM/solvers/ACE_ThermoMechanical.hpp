@@ -126,12 +126,22 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   Thyra::ModelEvaluatorBase::InArgs<ST>
   createInArgsImpl() const;
 
-  /// Schwarz Alternating loops
+  /// Sequential thermo-mechanical coupling loops
   void
   ThermoMechanicalLoopQuasistatics() const;
 
   void
   ThermoMechanicalLoopDynamics() const;
+
+  bool
+  AdvanceThermalDynamics(const int subdomain, const bool is_initial_state,
+                         const double current_time, const double next_time, 
+			 const double time_step) const; 
+
+  bool
+  AdvanceMechanicsDynamics(const int subdomain, const bool is_initial_state,
+                           const double current_time, const double next_time, 
+			   const double time_step) const; 
 
   void
   updateConvergenceCriterion() const;
@@ -185,21 +195,21 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable ConvergenceCriterion       criterion_{ConvergenceCriterion::BOTH};
   mutable ConvergenceLogicalOperator operator_{ConvergenceLogicalOperator::AND};
 
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST> const>> curr_disp_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST> const>> prev_step_disp_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST> const>> curr_x_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST> const>> prev_step_x_;
 
   mutable std::vector<Thyra::ModelEvaluatorBase::InArgs<ST>>   sub_inargs_;
   mutable std::vector<Thyra::ModelEvaluatorBase::OutArgs<ST>>  sub_outargs_;
   mutable std::vector<Teuchos::RCP<Thyra::ModelEvaluator<ST>>> model_evaluators_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_disp_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_velo_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_acce_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_disp_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_velo_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_acce_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_disp_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_velo_;
-  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_acce_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_x_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_xdot_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     ics_xdotdot_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_x_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_xdot_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     prev_xdotdot_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_x_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdot_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdotdot_;
 
   mutable std::vector<LCM::StateArrays> internal_states_;
   mutable std::vector<bool>             do_outputs_;
@@ -213,7 +223,10 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   enum PROB_TYPE {THERMAL, MECHANICS};
 
   //std::vector mapping subdomain number to PROB_TYPE; 
-  std::vector<PROB_TYPE> prob_types_; 
+  std::vector<PROB_TYPE> prob_types_;
+
+  Teuchos::RCP<Teuchos::FancyOStream> fos_; 
+ 
 };
 
 }  // namespace LCM

@@ -34,14 +34,6 @@ ACEThermoMechanical::ACEThermoMechanical(
   // Get names of individual model input files
   Teuchos::Array<std::string> model_filenames = alt_system_params.get<Teuchos::Array<std::string>>("Model Input Files");
 
-  //IKT FIXME - 6/4/2020: I believe the following 4 values are not relevant, except if we want 
-  //to try to make the coupling tighter later.  Not sure if we want to keepe or remove these...
-  //Keeping for now.
-  min_iters_         = alt_system_params.get<int>("Minimum Iterations", 1);
-  max_iters_         = alt_system_params.get<int>("Maximum Iterations", 1024);
-  rel_tol_           = alt_system_params.get<ST>("Relative Tolerance", 1.0e-08);
-  abs_tol_           = alt_system_params.get<ST>("Absolute Tolerance", 1.0e-08);
-  
   maximum_steps_     = alt_system_params.get<int>("Maximum Steps", 0);
   initial_time_      = alt_system_params.get<ST>("Initial Time", 0.0);
   final_time_        = alt_system_params.get<ST>("Final Time", 0.0);
@@ -57,39 +49,7 @@ ACEThermoMechanical::ACEThermoMechanical(
   output_interval_  = alt_system_params.get<int>("Exodus Write Interval", 1);
   std_init_guess_   = alt_system_params.get<bool>("Standard Initial Guess", false);
 
-  //IKT FIXME 6/5/2020: the following 2 values are not relevant if not doing Schwarz 
-  tol_factor_vel_ = alt_system_params.get<ST>("Tolerance Factor Velocity", dt);
-  tol_factor_acc_ = alt_system_params.get<ST>("Tolerance Factor Acceleration", dt2);
-  std::string convergence_str = alt_system_params.get<std::string>("Convergence Criterion", "BOTH");
-  std::transform(convergence_str.begin(), convergence_str.end(), convergence_str.begin(), ::toupper);
-  if (convergence_str == "ABSOLUTE") {
-    criterion_ = ConvergenceCriterion::ABSOLUTE;
-  } else if (convergence_str == "RELATIVE") {
-    criterion_ = ConvergenceCriterion::RELATIVE;
-  } else if (convergence_str == "BOTH") {
-    criterion_ = ConvergenceCriterion::BOTH;
-  } else {
-    ALBANY_ABORT("Unknown Convergence Criterion");
-  }
-
-  std::string operator_str = alt_system_params.get<std::string>("Convergence Operator", "AND");
-
-  std::transform(operator_str.begin(), operator_str.end(), operator_str.begin(), ::toupper);
-
-  if (operator_str == "AND") {
-    operator_ = ConvergenceLogicalOperator::AND;
-  } else if (operator_str == "OR") {
-    operator_ = ConvergenceLogicalOperator::OR;
-  } else {
-    ALBANY_ABORT("Unknown Convergence Logical Operator");
-  }
-
   // Firewalls
-  ALBANY_ASSERT(min_iters_ >= 1, "");
-  ALBANY_ASSERT(max_iters_ >= 1, "");
-  ALBANY_ASSERT(max_iters_ >= min_iters_, "");
-  ALBANY_ASSERT(rel_tol_ >= 0.0, "");
-  ALBANY_ASSERT(abs_tol_ >= 0.0, "");
   ALBANY_ASSERT(maximum_steps_ >= 1, "");
   ALBANY_ASSERT(final_time_ >= initial_time_, "");
   ALBANY_ASSERT(initial_time_step_ > 0.0, "");
@@ -238,7 +198,6 @@ ACEThermoMechanical::ACEThermoMechanical(
     //looking at the code, but we may want to rename the routine if
     //it ends up being used for thermo-mechanical too in addition
     //to Schwarz.
-
     app->setSchwarzAlternating(true);
 
     apps_[subdomain] = app;
@@ -477,33 +436,6 @@ centered(std::string const& str, int width)
 
 }  // namespace
 
-void
-ACEThermoMechanical::updateConvergenceCriterion() const
-{ 
-  //IKT 6/5/2020: the following commented out code is from Schwarz.
-  //Currently, we're not doing any Schwarz-like iterations, so this routine does nothing.
-  return; 
-
-  /*abs_error_ = norm_diff_;
-  rel_error_ = norm_final_ > 0.0 ? norm_diff_ / norm_final_ : norm_diff_;
-
-  bool const converged_absolute = abs_error_ <= abs_tol_;
-  bool const converged_relative = rel_error_ <= rel_tol_;
-
-  switch (criterion_) {
-    default: ALBANY_ABORT("Unknown Convergence Criterion"); break;
-    case ConvergenceCriterion::ABSOLUTE: converged_ = converged_absolute; break;
-    case ConvergenceCriterion::RELATIVE: converged_ = converged_relative; break;
-    case ConvergenceCriterion::BOTH:
-      switch (operator_) {
-        default: ALBANY_ABORT("Unknown Convergence Logical Operator"); break;
-        case ConvergenceLogicalOperator::AND: converged_ = converged_absolute && converged_relative; break;
-        case ConvergenceLogicalOperator::OR: converged_ = converged_absolute || converged_relative; break;
-      }
-      break;
-  }*/
-}
-
 bool
 ACEThermoMechanical::continueSolve() const
 {
@@ -512,65 +444,14 @@ ACEThermoMechanical::continueSolve() const
   //Therefore return false if we've hit num_iter_ = 1;
   //Also set converged_ to true, which is equally irrelevant unless doing Schwarz
   converged_ = true;  
-  if (num_iter_ > 0) return false; 
-
-  //IKT 6/5/2020: the following is left over from Schwarz.  Keeping it here
-  //in case we want to use it in the future. 
-  
-  /*// If failure has occurred, stop immediately.
-  if (failed_ == true) return false;
-
-  // Regardless of other criteria, if error is zero stop solving.
-  bool const zero_error = ((abs_error_ > 0.0) == false);
-
-  if (zero_error == true) return false;
-
-  // Minimum iterations takes precedence over maximum iterations and
-  // convergence. Continue solving if not exceeded.
-  bool const exceeds_min_iter = num_iter_ >= min_iters_;
-
-  if (exceeds_min_iter == false) return true;
-
-  // Maximum iterations takes precedence over convergence.
-  // Stop solving if exceeded.
-  bool const exceeds_max_iter = num_iter_ >= max_iters_;
-
-  if (exceeds_max_iter == true) return false;
-
-  // Lastly check for convergence.
-  bool const continue_solve = (converged_ == false);
-
-  return continue_solve;*/
-}
-
-void
-ACEThermoMechanical::reportFinals(std::ostream& os) const
-{
-  //IKT 6/5/2020: this routine is only relevant for Schwarz 
-  std::string const conv_str = converged_ == true ? "YES" : "NO";
-
-  os << '\n';
-  os << "ACE Sequential Thermo-Mechanical Method converged: " << conv_str << '\n';
-  os << "Minimum iterations :" << min_iters_ << '\n';
-  os << "Maximum iterations :" << max_iters_ << '\n';
-  os << "Total iterations   :" << num_iter_ << '\n';
-  os << "Last absolute error:" << abs_error_ << '\n';
-  os << "Absolute tolerance :" << abs_tol_ << '\n';
-  os << "Last relative error:" << rel_error_ << '\n';
-  os << "Relative tolerance :" << rel_tol_ << '\n';
-  os << std::endl;
+  if (num_iter_ > 0) return false;
+  else return true;  
 }
 
 // Sequential ThermoMechanical coupling loop, dynamic
 void
 ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 {
-  //IKT 6/5/2020: commenting out the following lines, which are not relevant
-  //when not doing Schwarz 
-  /*minitensor::Filler const ZEROS{minitensor::Filler::ZEROS};
-  minitensor::Vector<ST>   norms_init(num_subdomains_, ZEROS);
-  minitensor::Vector<ST>   norms_final(num_subdomains_, ZEROS);
-  minitensor::Vector<ST>   norms_diff(num_subdomains_, ZEROS);*/
   std::string const        delim(72, '=');
 
   *fos_ << std::scientific << std::setprecision(17);
@@ -606,9 +487,6 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
         *fos_ << delim << std::endl;
         const PROB_TYPE prob_type = prob_types_[subdomain]; 
-	//IKT 6/5/2020: removed the following line since it's not relevant unless 
-	//we're doing Schwarz
-        //*fos_ << "Schwarz iteration  :" << num_iter_ << '\n';
         *fos_ << "Subdomain          :" << subdomain << '\n';
 	//IKT FIXME 6/5/2020: currently there is a lot of code duplication in 
 	//AdvanceMechanicsDynamics and AdvanceThermalDynamics b/c they effectively 
@@ -632,67 +510,9 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       }  // Subdomains loop
 
       if (failed_ == true) {
-	//IKT 6/5/2020: disabling the following print statement for now, which may 
-	//be confusing w/ thermo-mechanical coupling, since we're not doing Schwarz. 
-        /**fos_ << "INFO: Unable to continue Schwarz iteration " << num_iter_;
-        *fos_ << "\n";*/
         // Break out of the Schwarz loop.
         break;
       }
-
-      //IKT 6/5/2020: commenting out the following, since it is not relevant 
-      //for Schwarz 
-      /*norm_init_  = minitensor::norm(norms_init);
-      norm_final_ = minitensor::norm(norms_final);
-      norm_diff_  = minitensor::norm(norms_diff);*/
-
-      //IKT 6/5/2020: keeping the following routine from Schwarz, which does nothing 
-      //currently. 
-      updateConvergenceCriterion();
-
-      //IKT 6/5/2020: disabling the following printing, since it is irrelevant
-      //when not doing Schwarz.
-      /*
-      *fos_ << delim << std::endl;
-      *fos_ << "Schwarz iteration         :" << num_iter_ << '\n';
-
-      std::string const line(72, '-');
-
-      *fos_ << line << std::endl;
-
-      *fos_ << centered("Sub", 6);
-      *fos_ << centered("Initial norm", 22);
-      *fos_ << centered("Final norm", 22);
-      *fos_ << centered("Difference norm", 22);
-      *fos_ << std::endl;
-      *fos_ << centered("dom", 6);
-      *fos_ << centered("||X0||", 22);
-      *fos_ << centered("||Xf||", 22);
-      *fos_ << centered("||Xf-X0||", 22);
-      *fos_ << std::endl;
-      *fos_ << line << std::endl;
-
-      for (auto m = 0; m < num_subdomains_; ++m) {
-        *fos_ << std::setw(6) << m;
-        *fos_ << std::setw(22) << norms_init(m);
-        *fos_ << std::setw(22) << norms_final(m);
-        *fos_ << std::setw(22) << norms_diff(m);
-        *fos_ << std::endl;
-      }
-
-      *fos_ << line << std::endl;
-      *fos_ << centered("Norm", 6);
-      *fos_ << std::setw(22) << norm_init_;
-      *fos_ << std::setw(22) << norm_final_;
-      *fos_ << std::setw(22) << norm_diff_;
-      *fos_ << std::endl;
-      *fos_ << line << std::endl;
-      *fos_ << "Absolute error     :" << abs_error_ << '\n';
-      *fos_ << "Absolute tolerance :" << abs_tol_ << '\n';
-      *fos_ << "Relative error     :" << rel_error_ << '\n';
-      *fos_ << "Relative tolerance :" << rel_tol_ << '\n';
-      *fos_ << delim << std::endl;*/
-
     } while (continueSolve() == true);
 
     // One of the subdomains failed to solve. Reduce step.
@@ -756,10 +576,6 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       // time to try to use a reduced step.
       continue;
     }
-
-    //IKT 6/5/2020: commenting the following b/c it doesn't give any useful information unless 
-    //we're doing Schwarz
-    //reportFinals(*fos_);
 
     // Update IC vecs and output solution to exodus file
 
@@ -886,19 +702,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
   Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
   Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
 
-  // After solve, save solution and get info to check convergence
-  // IKT 6/5/2020: the following came from Schwarz and is irrelevant here for now,
-  // so I am commenting it out .
-  /*norms_init(subdomain)  = Thyra::norm(*prev_x_[subdomain]);
-  norms_final(subdomain) = Thyra::norm(*this_x_[subdomain]);
-  norms_diff(subdomain)  = Thyra::norm(*x_diff_rcp);
-
-  auto const dt = tol_factor_vel_;
-
-  norms_init(subdomain) += dt * Thyra::norm(*prev_xdot_[subdomain]);
-  norms_final(subdomain) += dt * Thyra::norm(*this_xdot_[subdomain]);
-  norms_diff(subdomain) += dt * Thyra::norm(*xdot_diff_rcp);*/
-
   return false; 
 }
 
@@ -1009,25 +812,6 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
   Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
   Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
   Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
-
-  // After solve, save solution and get info to check convergence
-  // IKT 6/5/2020: the following came from Schwarz and is irrelevant here for now,
-  // so I am commenting it out 
-  /*norms_init(subdomain)  = Thyra::norm(*prev_x_[subdomain]);
-  norms_final(subdomain) = Thyra::norm(*this_x_[subdomain]);
-  norms_diff(subdomain)  = Thyra::norm(*x_diff_rcp);
-
-  auto const dt = tol_factor_vel_;
-
-  norms_init(subdomain) += dt * Thyra::norm(*prev_xdot_[subdomain]);
-  norms_final(subdomain) += dt * Thyra::norm(*this_xdot_[subdomain]);
-  norms_diff(subdomain) += dt * Thyra::norm(*xdot_diff_rcp);
-
-  auto const dt2 = tol_factor_acc_;
-
-  norms_init(subdomain) += dt2 * Thyra::norm(*prev_xdotdot_[subdomain]);
-  norms_final(subdomain) += dt2 * Thyra::norm(*this_xdotdot_[subdomain]);
-  norms_diff(subdomain) += dt2 * Thyra::norm(*xdotdot_diff_rcp);*/
 
   return false; 
 }
@@ -1171,283 +955,7 @@ ACEThermoMechanical::doQuasistaticOutput(ST const time) const
 void
 ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
 {
-  //IKT FIXME 6/4/2020: the code below that is commented out is cut/paste
-  //from Schwarz_Alternating.cpp.  I'm not sure if we want to support 
-  //quasistatic ACE sequential thermo-mechanical coupling.  If we do,
-  //the code below needs to be uncommented and modified for this case.  
-  //If not, this routine should be removed.  For now, I am throwing 
-  //an error if the user tries to run the code quasi-statically. 
-  
-  
-  /*minitensor::Filler const ZEROS{minitensor::Filler::ZEROS};
-  minitensor::Vector<ST>   norms_init(num_subdomains_, ZEROS);
-  minitensor::Vector<ST>   norms_final(num_subdomains_, ZEROS);
-  minitensor::Vector<ST>   norms_diff(num_subdomains_, ZEROS);
-
-  std::string const delim(72, '=');
-
-  *fos_ << std::scientific << std::setprecision(17);
-
-  ST  time_step{initial_time_step_};
-  int stop{0};
-  ST  current_time{initial_time_};
-
-  // Output initial configuration.
-  doQuasistaticOutput(current_time);
-
-  // Continuation loop. We do continuation manually for Schwarz instead of
-  // using LOCA. It turned out to be too complicated to use LOCA to sync
-  // continuation between different subdomains.
-  while (stop < maximum_steps_ && current_time < final_time_) {
-    ST const next_time{current_time + time_step};
-
-    *fos_ << delim << std::endl;
-    *fos_ << "Global time stop   :" << stop << '\n';
-    *fos_ << "Start time         :" << current_time << '\n';
-    *fos_ << "Stop time          :" << next_time << '\n';
-    *fos_ << "Time step          :" << time_step << '\n';
-    *fos_ << delim << std::endl;
-
-    // This object is necessary to be able to set an initial solution
-    // for the model evaluator to a desired value. This is used to save
-    // previous values of the solution at each Schwarz iteration for
-    // each subdomain.
-    Thyra::ModelEvaluatorBase::InArgsSetup<ST> nv;
-    nv.setModelEvalDescription(this->description());
-    nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x, true);
-
-    // Before the Schwarz loop, save the solutions for each subdomain in case
-    // the solve fails. Then the load step is reduced and the Schwarz
-    // loop is restarted from scratch.
-    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-      // Set these initial values explicitly to zero so that no
-      // extra logic is necessary for initial values in the
-      // Schwarz and subdomain loops.
-      if (stop == 0) {
-        auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-
-        auto zero_x_rcp = Thyra::createMember(me.get_x_space());
-        auto zero_x_ptr = zero_x_rcp.ptr();
-
-        Thyra::put_scalar<ST>(0.0, zero_x_ptr);
-
-        prev_step_x_[subdomain] = zero_x_rcp;
-        curr_x_[subdomain]      = zero_x_rcp;
-      } else {
-        prev_step_x_[subdomain] = curr_x_[subdomain];
-      }
-
-      auto& app       = *apps_[subdomain];
-      auto& state_mgr = app.getStateMgr();
-      fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-    }
-
-    num_iter_ = 0;
-
-    // Schwarz loop
-    do {
-      // Subdomain loop
-      for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-        *fos_ << delim << std::endl;
-        *fos_ << "Schwarz iteration  :" << num_iter_ << '\n';
-        *fos_ << "Subdomain          :" << subdomain << '\n';
-        *fos_ << "Start time         :" << current_time << '\n';
-        *fos_ << "Stop time          :" << next_time << '\n';
-        *fos_ << "Time step          :" << time_step << '\n';
-        *fos_ << delim << std::endl;
-
-        // Save solution from previous Schwarz iteration before solve
-        auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-
-        auto        prev_x_rcp = curr_x_[subdomain];
-        auto const& prev_x     = *prev_x_rcp;
-
-        // Restore internal states
-        auto& app       = *apps_[subdomain];
-        auto& state_mgr = app.getStateMgr();
-        fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-
-        // Restore solution from previous time step
-        auto prev_step_x_rcp = prev_step_x_[subdomain];
-
-        nv.set_x(prev_x_rcp);
-        me.setNominalValues(nv);
-
-        // Target time
-        me.setCurrentTime(next_time);
-
-        // Solve for each subdomain
-        auto& solver          = *(solvers_[subdomain]);
-        auto& piro_nox_solver = dynamic_cast<Piro::NOXSolver<ST>&>(solver);
-        auto  in_args         = solver.createInArgs();
-        auto  out_args        = solver.createOutArgs();
-
-        solver.evalModel(in_args, out_args);
-
-        // Check whether solver did OK.
-        auto const& thyra_nox_solver = *piro_nox_solver.getSolver();
-        auto const& const_nox_solver = *thyra_nox_solver.getNOXSolver();
-        auto&       nox_solver       = const_cast<NOX::Solver::Generic&>(const_nox_solver);
-        auto const  status           = nox_solver.getStatus();
-
-        if (status == NOX::StatusTest::Failed) {
-          *fos_ << "\nINFO: Unable to solve for subdomain " << subdomain << '\n';
-          failed_ = true;
-          // Break out of the subdomain loop
-          break;
-        }
-
-        // Solver OK, extract solution
-        auto        curr_x_rcp = thyra_nox_solver.get_current_x()->clone_v();
-        auto const& curr_x     = *curr_x_rcp;
-
-        // Compute difference between previous and current solutions
-        auto x_diff_rcp = Thyra::createMember(me.get_x_space());
-        auto x_diff_ptr = x_diff_rcp.ptr();
-
-        Thyra::put_scalar<ST>(0.0, x_diff_ptr);
-        Thyra::V_VpStV(x_diff_ptr, curr_x, -1.0, prev_x);
-
-        auto& x_diff = *x_diff_rcp;
-
-        // After solve, save solution and get info to check convergence
-        curr_x_[subdomain]  = curr_x_rcp;
-        norms_init(subdomain)  = Thyra::norm(prev_x);
-        norms_final(subdomain) = Thyra::norm(curr_x);
-        norms_diff(subdomain)  = Thyra::norm(x_diff);
-
-      }  // Subdomain loop
-
-      if (failed_ == true) {
-        *fos_ << "INFO: Unable to continue Schwarz iteration " << num_iter_;
-        *fos_ << "\n";
-        // Break out of the Schwarz loop.
-        break;
-      }
-
-      norm_init_  = minitensor::norm(norms_init);
-      norm_final_ = minitensor::norm(norms_final);
-      norm_diff_  = minitensor::norm(norms_diff);
-
-      updateConvergenceCriterion();
-
-      *fos_ << delim << std::endl;
-      *fos_ << "Schwarz iteration         :" << num_iter_ << '\n';
-
-      std::string const line(72, '-');
-
-      *fos_ << line << std::endl;
-
-      *fos_ << centered("Sub", 6);
-      *fos_ << centered("Initial norm", 22);
-      *fos_ << centered("Final norm", 22);
-      *fos_ << centered("Difference norm", 22);
-      *fos_ << std::endl;
-      *fos_ << centered("dom", 6);
-      *fos_ << centered("||X0||", 22);
-      *fos_ << centered("||Xf||", 22);
-      *fos_ << centered("||Xf-X0||", 22);
-      *fos_ << std::endl;
-      *fos_ << line << std::endl;
-
-      for (auto m = 0; m < num_subdomains_; ++m) {
-        *fos_ << std::setw(6) << m;
-        *fos_ << std::setw(22) << norms_init(m);
-        *fos_ << std::setw(22) << norms_final(m);
-        *fos_ << std::setw(22) << norms_diff(m);
-        *fos_ << std::endl;
-      }
-
-      *fos_ << line << std::endl;
-      *fos_ << centered("Norm", 6);
-      *fos_ << std::setw(22) << norm_init_;
-      *fos_ << std::setw(22) << norm_final_;
-      *fos_ << std::setw(22) << norm_diff_;
-      *fos_ << std::endl;
-      *fos_ << line << std::endl;
-      *fos_ << "Absolute error     :" << abs_error_ << '\n';
-      *fos_ << "Absolute tolerance :" << abs_tol_ << '\n';
-      *fos_ << "Relative error     :" << rel_error_ << '\n';
-      *fos_ << "Relative tolerance :" << rel_tol_ << '\n';
-      *fos_ << delim << std::endl;
-
-    } while (continueSolve() == true);  // Schwarz loop
-
-    // One or more of the subdomains failed to solve. Reduce step.
-    if (failed_ == true) {
-      failed_ = false;
-
-      auto const reduced_step = reduction_factor_ * time_step;
-
-      if (time_step <= min_time_step_) {
-        *fos_ << "ERROR: Cannot reduce step. Stopping execution.\n";
-        *fos_ << "INFO: Requested step    :" << reduced_step << '\n';
-        *fos_ << "INFO: Minimum time step :" << min_time_step_ << '\n';
-        return;
-      }
-
-      if (reduced_step > min_time_step_) {
-        *fos_ << "INFO: Reducing step from " << time_step << " to ";
-        *fos_ << reduced_step << '\n';
-        time_step = reduced_step;
-      } else {
-        *fos_ << "INFO: Reducing step from " << time_step << " to ";
-        *fos_ << min_time_step_ << '\n';
-        time_step = min_time_step_;
-      }
-
-      // Restore previous solutions
-      for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-        curr_x_[subdomain] = prev_step_x_[subdomain];
-
-        // Restore the state manager with the state variables from the previous
-        // load step.
-        auto& app = *apps_[subdomain];
-
-        auto& state_mgr = app.getStateMgr();
-
-        fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-
-        // Restore the solution in the discretization so the schwarz solver gets
-        // the right boundary conditions!
-        Teuchos::RCP<Thyra_Vector const>                    x_rcp_thyra = curr_x_[subdomain];
-        Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc       = app.getDiscretization();
-
-        app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, current_time);
-      }
-
-      // Jump to the beginning of the continuation loop without advancing
-      // time to try to use a reduced step.
-      continue;
-    }
-
-    reportFinals(*fos_);
-
-    // Output converged solution if at specified interval
-
-    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-      if (do_outputs_init_[subdomain] == true) {
-        do_outputs_[subdomain] = output_interval_ > 0 ? (stop + 1) % output_interval_ == 0 : false;
-      }
-    }
-
-    doQuasistaticOutput(next_time);
-
-    ++stop;
-    current_time += time_step;
-
-    // Step successful. Try to increase the time step.
-    auto const increased_step = std::min(max_time_step_, increase_factor_ * time_step);
-
-    if (increased_step > time_step) {
-      *fos_ << "\nINFO: Increasing step from " << time_step << " to ";
-      *fos_ << increased_step << '\n';
-      time_step = increased_step;
-    } else {
-      *fos_ << "\nINFO: Cannot increase step. Using " << time_step << '\n';
-    }
-
-  }  // Continuation loop */
+  //IKT 6/5/2020: not implemented for now.
 }
 
 }  // namespace LCM

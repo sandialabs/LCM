@@ -224,7 +224,8 @@ KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
 }
 
 template <typename S, typename T, int O>
-KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(S s, const BasicTensor<T, O>& rhs)
+KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
+                       operator*(S s, const BasicTensor<T, O>& rhs)
 {
   BasicTensor<Promotion<S, T>, O> ret(rhs.dim());
 
@@ -239,7 +240,8 @@ KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(S s, const Basi
 }
 
 template <typename S, typename T, int O>
-KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O> operator*(const BasicTensor<S, O>& lhs, T s)
+KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
+                       operator*(const BasicTensor<S, O>& lhs, T s)
 {
   BasicTensor<Promotion<S, T>, O> ret(lhs.dim());
 
@@ -286,7 +288,8 @@ KOKKOS_INLINE_FUNCTION BasicTensor<Promotion<S, T>, O>
 }
 
 template <typename S, typename T>
-KOKKOS_INLINE_FUNCTION Tensor2<Promotion<S, T>> operator*(const Tensor2<S>& lhs, const Tensor2<T>& rhs)
+KOKKOS_INLINE_FUNCTION Tensor2<Promotion<S, T>>
+                       operator*(const Tensor2<S>& lhs, const Tensor2<T>& rhs)
 {
   using ValueType = typename Tensor2<T>::value_type;
   assert(lhs.dim() == rhs.dim());

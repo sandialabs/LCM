@@ -30,9 +30,10 @@ static char const* res_tag_name[1] = {
 };
 
 #if defined(ALBANY_DTK)
-static char const* sol_dtk_tag_name[3] = {"Exodus Solution DTK Name",
-                                          "Exodus SolutionDot DTK Name",
-                                          "Exodus SolutionDotDot DTK Name"};
+static char const* sol_dtk_tag_name[3] = {
+    "Exodus Solution DTK Name",
+    "Exodus SolutionDot DTK Name",
+    "Exodus SolutionDotDot DTK Name"};
 #endif
 
 static char const* res_id_name[1] = {

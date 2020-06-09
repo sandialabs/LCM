@@ -145,7 +145,7 @@ Albany::LameProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>>> cubature =
+  RCP<Intrepid2::Cubature<PHX::Device>> > cubature =
       cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   numDim                = cubature->getDimension();

@@ -4,6 +4,7 @@
 
 #include "Albany_SolverFactory.hpp"
 
+#include "ACE_ThermoMechanical.hpp"
 #include "Albany_Application.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ModelEvaluator.hpp"
@@ -17,7 +18,6 @@
 #include "Schwarz_Alternating.hpp"
 #include "Schwarz_Coupled.hpp"
 #include "Schwarz_PiroObserver.hpp"
-#include "ACE_ThermoMechanical.hpp"
 #include "Stratimikos_DefaultLinearSolverBuilder.hpp"
 #include "Teuchos_AbstractFactoryStd.hpp"
 #include "Thyra_Ifpack2PreconditionerFactory.hpp"
@@ -143,7 +143,7 @@ SolverFactory::createAndGetAlbanyApp(
   std::string const                          solutionMethod = problemParams->get("Solution Method", "Steady");
 
   bool const is_schwarz = solutionMethod == "Coupled Schwarz" || solutionMethod == "Schwarz Alternating";
-  
+
   bool const is_ace_thermo_mech = solutionMethod == "ACE Sequential Thermo-Mechanical";
 
   if (is_schwarz == true) {
@@ -187,7 +187,7 @@ SolverFactory::createAndGetAlbanyApp(
   if (solutionMethod == "Schwarz Alternating") {
     return Teuchos::rcp(new LCM::SchwarzAlternating(appParams, solverComm));
   }
-  
+
   if (solutionMethod == "ACE Sequential Thermo-Mechanical") {
     return Teuchos::rcp(new LCM::ACEThermoMechanical(appParams, solverComm));
   }

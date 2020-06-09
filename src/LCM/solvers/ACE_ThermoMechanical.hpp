@@ -134,14 +134,20 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   ThermoMechanicalLoopDynamics() const;
 
   bool
-  AdvanceThermalDynamics(const int subdomain, const bool is_initial_state,
-                         const double current_time, const double next_time, 
-			 const double time_step) const; 
+  AdvanceThermalDynamics(
+      const int    subdomain,
+      const bool   is_initial_state,
+      const double current_time,
+      const double next_time,
+      const double time_step) const;
 
   bool
-  AdvanceMechanicsDynamics(const int subdomain, const bool is_initial_state,
-                           const double current_time, const double next_time, 
-			   const double time_step) const; 
+  AdvanceMechanicsDynamics(
+      const int    subdomain,
+      const bool   is_initial_state,
+      const double current_time,
+      const double next_time,
+      const double time_step) const;
 
   bool
   continueSolve() const;
@@ -202,14 +208,17 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   bool is_static_{false};
   bool is_dynamic_{false};
   bool std_init_guess_{false};
-  
-  enum PROB_TYPE {THERMAL, MECHANICS};
 
-  //std::vector mapping subdomain number to PROB_TYPE; 
+  enum PROB_TYPE
+  {
+    THERMAL,
+    MECHANICS
+  };
+
+  // std::vector mapping subdomain number to PROB_TYPE;
   std::vector<PROB_TYPE> prob_types_;
 
-  Teuchos::RCP<Teuchos::FancyOStream> fos_; 
- 
+  Teuchos::RCP<Teuchos::FancyOStream> fos_;
 };
 
 }  // namespace LCM

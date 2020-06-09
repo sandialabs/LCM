@@ -76,11 +76,19 @@ class MDFieldIterator
   return_type
   ref();
   //! Syntactic wrapper to \c ref().
-  return_type operator*() { return ref(); }
+  return_type
+  operator*()
+  {
+    return ref();
+  }
   //! Pointer type for \c operator->.
   class PtrT;
   //! Syntactic wrapper to \c (*it). .
-  PtrT operator->() { return PtrT(ref()); }
+  PtrT
+  operator->()
+  {
+    return PtrT(ref());
+  }
   //! Get the index of the current value.
   int
   idx() const

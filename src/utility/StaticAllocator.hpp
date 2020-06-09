@@ -40,8 +40,10 @@ class StaticPointer
   StaticPointer<T>&
   operator=(StaticPointer<U>&& other);
 
-  typename std::add_lvalue_reference<T>::type operator*() const;
-  pointer                                     operator->() const;
+  typename std::add_lvalue_reference<T>::type
+  operator*() const;
+  pointer
+  operator->() const;
 
   pointer
   get() const;
@@ -157,13 +159,15 @@ StaticPointer<T>::~StaticPointer()
 }
 
 template <typename T>
-typename std::add_lvalue_reference<T>::type StaticPointer<T>::operator*() const
+typename std::add_lvalue_reference<T>::type
+StaticPointer<T>::operator*() const
 {
   return *ptr_;
 }
 
 template <typename T>
-typename StaticPointer<T>::pointer StaticPointer<T>::operator->() const
+typename StaticPointer<T>::pointer
+StaticPointer<T>::operator->() const
 {
   return ptr_;
 }

@@ -40,7 +40,8 @@ class MonitorBase
   MonitorBase();
   virtual ~MonitorBase() {}
 
-  pointer_type operator[](const key_type& item);
+  pointer_type
+  operator[](const key_type& item);
 
   void
   summarize(Teuchos::Ptr<Teuchos::Comm<int> const> comm, std::ostream& out = std::cout);
@@ -65,7 +66,8 @@ inline MonitorBase<MonitoredType>::MonitorBase() : title_("Monitor"), itemTypeLa
 }
 
 template <class MonitoredType>
-inline typename MonitorBase<MonitoredType>::pointer_type MonitorBase<MonitoredType>::operator[](const key_type& item)
+inline typename MonitorBase<MonitoredType>::pointer_type
+MonitorBase<MonitoredType>::operator[](const key_type& item)
 {
   auto pos = itemMap_.find(item);
   if (pos == itemMap_.end()) pos = itemMap_.insert(std::make_pair(item, pointer_type(new monitored_type(item)))).first;

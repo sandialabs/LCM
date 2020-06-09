@@ -15,11 +15,19 @@ class MDFieldIterator<T>::PtrT
 
  public:
   PtrT(const typename Ref<T>::type& val) : val_(val) {}
-  typename Ref<T>::type operator*() { return val_; }
+  typename Ref<T>::type
+  operator*()
+  {
+    return val_;
+  }
   // This is why we have to implement a pointer type: operator-> requires a raw
   // pointer to end its recursive invocation. val_ holds an object in memory so
   // that the pointer remains valid for the duration of it->'s use of it.
-  typename Ref<T>::type* operator->() { return &val_; }
+  typename Ref<T>::type*
+  operator->()
+  {
+    return &val_;
+  }
 };
 
 template <typename T>

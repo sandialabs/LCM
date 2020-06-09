@@ -64,7 +64,8 @@ class MyPairIterRelation
   {
     return m_size;
   }
-  inline const MyRelation operator[](int i) const
+  inline const MyRelation
+  operator[](int i) const
   {
     MyRelation mr = {m_entities[i], m_ordinals[i]};
     return mr;

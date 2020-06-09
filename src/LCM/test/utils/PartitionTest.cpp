@@ -35,12 +35,13 @@ main(int ac, char* av[])
 
   int const number_schemes = 6;
 
-  LCM::PARTITION::Scheme const scheme_values[] = {LCM::PARTITION::Scheme::RANDOM,
-                                                  LCM::PARTITION::Scheme::HYPERGRAPH,
-                                                  LCM::PARTITION::Scheme::GEOMETRIC,
-                                                  LCM::PARTITION::Scheme::KMEANS,
-                                                  LCM::PARTITION::Scheme::SEQUENTIAL,
-                                                  LCM::PARTITION::Scheme::KDTREE};
+  LCM::PARTITION::Scheme const scheme_values[] = {
+      LCM::PARTITION::Scheme::RANDOM,
+      LCM::PARTITION::Scheme::HYPERGRAPH,
+      LCM::PARTITION::Scheme::GEOMETRIC,
+      LCM::PARTITION::Scheme::KMEANS,
+      LCM::PARTITION::Scheme::SEQUENTIAL,
+      LCM::PARTITION::Scheme::KDTREE};
 
   char const* scheme_names[] = {"random", "hypergraph", "geometric", "kmeans", "sequential", "kdtree"};
 

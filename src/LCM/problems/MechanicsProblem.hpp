@@ -320,14 +320,15 @@ class MechanicsProblem : public AbstractProblem
 
   std::vector<std::string> variables_problem_ = {"Displacement"};
 
-  std::vector<std::string> variables_auxiliary_ = {"Temperature",
-                                                   "ACE Temperature",
-                                                   "DislocationDensity",
-                                                   "Pore Pressure",
-                                                   "Transport",
-                                                   "HydroStress",
-                                                   "Damage",
-                                                   "Stabilized Pressure"};
+  std::vector<std::string> variables_auxiliary_ = {
+      "Temperature",
+      "ACE Temperature",
+      "DislocationDensity",
+      "Pore Pressure",
+      "Transport",
+      "HydroStress",
+      "Damage",
+      "Stabilized Pressure"};
 
 };  // class MechanicsProblem
 

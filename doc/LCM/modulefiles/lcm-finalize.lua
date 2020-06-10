@@ -8,7 +8,7 @@ local build_type = os.getenv("BUILD_TYPE")
 local build = arch .. tool_chain .. build_type
 local lcm_dir = os.getenv("LCM_DIR")
 local install_dir = lcm_dir .. "/trilinos-install-" .. build
-local alb_exe_dir = lcm_dir .. "/albany-build-" .. build .. "/src"
+local alb_exe_dir = lcm_dir .. "/lcm-build-" .. build .. "/src"
 
 setenv("BUILD", build)
 setenv("INSTALL_DIR", install_dir)

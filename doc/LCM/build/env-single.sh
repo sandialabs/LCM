@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_NAME=`basename $0`
-PACKAGE=$1
+PACKAGE="${$1,,}"
 NUM_PROCS=$2
 export LCM_DIR=`pwd`
 TRILINOS="trilinos"
@@ -9,7 +9,7 @@ INTEL_DIR=/opt/intel
 
 # Some basic error checking.
 if [ -z "$PACKAGE" ]; then
-    echo "Specifiy package [trilinos|albany]"
+    echo "Specifiy package [trilinos|lcm]"
     exit 1
 fi
 
@@ -37,12 +37,13 @@ case "$PACKAGE" in
 	PACKAGE_STRING="TRILINOS"
 	PACKAGE_NAME="Trilinos"
 	;;
-    albany)
-	PACKAGE_STRING="ALBANY"
-	PACKAGE_NAME="Albany"
+    lcm)
+	PACKAGE_STRING="LCM"
+	PACKAGE_NAME="LCM"
 	;;
     *)
 	echo "Unrecognized package option in env-single: $PACKAGE"
+  	echo "Valid options are: trilinos | lcm"
 	exit 1
 	;;
 esac
@@ -54,6 +55,7 @@ case "$ARCH" in
 	;;
     *)
 	echo "Unrecognized architecture option in env-single: $ARCH"
+ 	echo "Valid options are: serial"
 	exit 1
 	;;
 esac
@@ -85,6 +87,7 @@ case "$TOOL_CHAIN" in
 	;;
     *)
 	echo "Unrecognized tool chain option in env-single: $TOOL_CHAIN"
+	echo "Valid options are: gcc | clang | intel"
 	exit 1
 	;;
 esac
@@ -180,7 +183,7 @@ STATUS_LOG="$LCM_DIR/$PREFIX-status.log"
 TEST_LOG="$LCM_DIR/$PREFIX-test.log"
 HOST=`hostname`
 FROM=`whoami`"@sandia.gov"
-TO="albany-regression@software.sandia.gov"
+TO="amota@sandia.gov"
 PROJECT_XML_FILE="Project.xml"
 CTEST_FILE="ctest.cmake"
 CTEST_TYPE="Nightly"

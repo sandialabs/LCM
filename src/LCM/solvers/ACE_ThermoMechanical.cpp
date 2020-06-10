@@ -67,7 +67,8 @@ ACEThermoMechanical::ACEThermoMechanical(
   // throw error if number of model filenames provided is not 2.
   ALBANY_ASSERT(num_subdomains_ == 2, "ACEThermoMechanical solver requires 2 models!"); 
 
-  //IKT FIXME 6/4/2020 - not sure if the following is needed for ACE 
+  //IKT FIXME 6/4/2020 - not sure if the following is needed for ACE
+  //I think it may not be if we are not using DTK.
   // Create application name-index map used for Schwarz BC.
   Teuchos::RCP<std::map<std::string, int>> app_name_index_map = Teuchos::rcp(new std::map<std::string, int>);
 
@@ -117,6 +118,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     // Get parameters for each subdomain
     Albany::SolverFactory solver_factory(model_filenames[subdomain], comm);
 
+    //IKT FIXME - change to setCoupled? 
     solver_factory.setSchwarz(true);
 
     Teuchos::ParameterList& params = solver_factory.getParameters();
@@ -140,6 +142,8 @@ ACEThermoMechanical::ACEThermoMechanical(
       ALBANY_ASSERT(false, "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
     }
     
+    //IKT FIXME - are we going to need this for coupled?  I think not if 
+    //we are not using DTK. 
     // Add application array for later use in Schwarz BC.
     params.set("Application Array", apps_);
 
@@ -179,9 +183,9 @@ ACEThermoMechanical::ACEThermoMechanical(
 
       std::string const msg2{
           "Non-constant time-stepping through Tempus not supported "
-          "with dynamic alternating Schwarz; \n"
+          "with ACE sequential thermo-mechanical coupling; \n"
           "In this case, variable time-stepping is "
-          "handled within the Schwarz loop.\n"
+          "handled within the coupling loop.\n"
           "Please rerun with 'Integrator Step Type: "
           "Constant' in 'Time Step Control' sublist.\n"};
       ALBANY_ASSERT(integrator_step_type == "Constant", msg2);
@@ -198,6 +202,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     //looking at the code, but we may want to rename the routine if
     //it ends up being used for thermo-mechanical too in addition
     //to Schwarz.
+    //Should we rename the following as 'setCoupling(true)'? 
     app->setSchwarzAlternating(true);
 
     apps_[subdomain] = app;
@@ -440,9 +445,10 @@ bool
 ACEThermoMechanical::continueSolve() const
 {
   ++num_iter_;
-  //IKT 6/5/2020: right now, we want to do just 1 Schwarz iteration.
+  //IKT 6/5/2020: right now, we want to do just 1 coupling iteration.
   //Therefore return false if we've hit num_iter_ = 1;
-  //Also set converged_ to true, which is equally irrelevant unless doing Schwarz
+  //Also set converged_ to true, which is equally irrelevant unless doing 
+  //Schwarz-like coupling
   converged_ = true;  
   if (num_iter_ > 0) return false;
   else return true;  
@@ -471,7 +477,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     *fos_ << "Time step          :" << time_step << '\n';
     *fos_ << delim << std::endl;
 
-    // Before the Schwarz loop, get internal states
+    // Before the coupling loop, get internal states
     for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
       auto& app       = *apps_[subdomain];
       auto& state_mgr = app.getStateMgr();
@@ -481,7 +487,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     ST const next_time{current_time + time_step};
     num_iter_ = 0;
 
-    // Schwarz loop
+    // Coupling loop
     do {
       bool const is_initial_state = stop == 0 && num_iter_ == 0;
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
@@ -495,13 +501,13 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 	//of ways to combine them at a later point to avoid some of the code duplication.
 	if (prob_type == MECHANICS) {
 	  *fos_ << "Problem            :Mechanics\n";
-	  failed_ = AdvanceMechanicsDynamics(subdomain, is_initial_state,
-			                      current_time, next_time, time_step);  
+	  AdvanceMechanicsDynamics(subdomain, is_initial_state,
+			           current_time, next_time, time_step);  
 	}
 	else {
           *fos_ << "Problem            :Thermal\n"; 
-	  failed_ = AdvanceThermalDynamics(subdomain, is_initial_state, current_time,
-			            next_time, time_step);  
+	  AdvanceThermalDynamics(subdomain, is_initial_state, current_time,
+	                         next_time, time_step);  
 	}
         if (failed_ == true) { 
           // Break out of the subdomain loop
@@ -510,7 +516,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       }  // Subdomains loop
 
       if (failed_ == true) {
-        // Break out of the Schwarz loop.
+        // Break out of the coupling loop.
         break;
       }
     } while (continueSolve() == true);
@@ -606,12 +612,12 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   return;
 }
 
-bool
+void
 ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_initial_state,
                                             const double current_time, const double next_time, 
 					    const double time_step) const 
 {
-  // Restore solution from previous Schwarz iteration before solve
+  // Restore solution from previous coupling iteration before solve
   if (is_initial_state == true) {
     auto&       me        = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
     auto const& nv        = me.getNominalValues();
@@ -682,8 +688,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
 
   if (status == Tempus::Status::FAILED) {
     *fos_ << "\nINFO: Unable to solve Thermal problem for subdomain " << subdomain << '\n';
-    //the following sets failed_ = true
-    return true;  
+    failed_ = true; 
   }
         
   // If solver is OK, extract solution
@@ -702,15 +707,15 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
   Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
   Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
 
-  return false; 
+  failed_ = false; 
 }
 
-bool
+void
 ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is_initial_state,
                                               const double current_time, const double next_time, 
 					      const double time_step) const 
 {
-  // Restore solution from previous Schwarz iteration before solve
+  // Restore solution from previous coupling iteration before solve
   if (is_initial_state == true) {
     auto&       me        = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
     auto const& nv        = me.getNominalValues();
@@ -789,8 +794,7 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
 
   if (status == Tempus::Status::FAILED) {
     *fos_ << "\nINFO: Unable to solve Mechanics problem for subdomain " << subdomain << '\n';
-    //The following sets failed_ = true 
-    return true;  
+    failed_ = true;  
   }
   // If solver is OK, extract solution
 
@@ -813,11 +817,11 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
   Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
   Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
 
-  return false; 
+  failed_ =  false; 
 }
 
 void
-ACEThermoMechanical::setExplicitUpdateInitialGuessForSchwarz(ST const current_time, ST const time_step) const
+ACEThermoMechanical::setExplicitUpdateInitialGuessForCoupling(ST const current_time, ST const time_step) const
 {
   // do an explicit update to form the initial guess for the schwarz
   // iteration
@@ -851,7 +855,7 @@ ACEThermoMechanical::setExplicitUpdateInitialGuessForSchwarz(ST const current_ti
     app.setXdotdot(xdotdot_rcp);
 
     // in order to get the Schwarz boundary conditions right, we need to set the
-    // state in the discretization
+    // state in the discretization - IKT FIXME: may not be relevant for ACE coupling
     Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = app.getDiscretization();
 
     app_disc->writeSolutionToMeshDatabase(*x_rcp, *xdot_rcp, *xdotdot_rcp, current_time);

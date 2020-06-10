@@ -164,8 +164,16 @@ class StateInfoStruct
  public:
   typedef std::vector<Teuchos::RCP<StateStruct>>::const_iterator const_iterator;
 
-  Teuchos::RCP<StateStruct>&      operator[](int index) { return sis[index]; }
-  const Teuchos::RCP<StateStruct> operator[](int index) const { return sis[index]; }
+  Teuchos::RCP<StateStruct>&
+  operator[](int index)
+  {
+    return sis[index];
+  }
+  const Teuchos::RCP<StateStruct>
+  operator[](int index) const
+  {
+    return sis[index];
+  }
   void
   push_back(const Teuchos::RCP<StateStruct>& ss)
   {

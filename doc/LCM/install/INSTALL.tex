@@ -364,7 +364,7 @@ Build directories are created within the \lcm{} top-level directory
 and named according to the loaded module and package specified to the
 build.sh script, e.g.:
 \begin{verbatim}
-albany-build-gcc-release
+lcm-build-gcc-release
 \end{verbatim}
 In addition, for \trilinos{} an install directory similarly named is
 created at the \lcm{} top-level directory.
@@ -397,12 +397,12 @@ For example, if you want to build using 16 processors, type:
 \end{verbatim}
 Finally, repeat the procedure for \albany{}:
 \begin{verbatim}
-./clean-config-build.sh albany [# processors]
+./clean-config-build.sh lcm [# processors]
 \end{verbatim}
 For example, if you want to build a version of the code using 16
 processors, type:
 \begin{verbatim}
-./clean-config-build.sh albany 16
+./clean-config-build.sh lcm 16
 \end{verbatim}
 
 Note that to compile a version of \albany{} with a specific thread model,
@@ -415,7 +415,7 @@ now on, configuration is no longer required so you can rebuild the
 code after any modification by simply using the \verb+build.sh+
 script. For example:
 \begin{verbatim}
-./build.sh albany 16
+./build.sh lcm 16
 \end{verbatim}
 There are times when it is necessary to reconfigure, for example when
 adding or deleting files under the \verb+LCM/LCM/src/LCM+

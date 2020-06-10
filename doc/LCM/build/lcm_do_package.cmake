@@ -41,11 +41,11 @@ function(lcm_do_package)
   # all other arguments passed to do_trilinos or do_albany
   if ("${ARG_PACKAGE}" STREQUAL "trilinos")
     lcm_do_trilinos(${PASS_ARGS})
-  elseif ("${ARG_PACKAGE}" STREQUAL "albany")
+  elseif ("${ARG_PACKAGE}" STREQUAL "lcm")
     lcm_do_albany(${PASS_ARGS})
   else()
     message(FATAL_ERROR 
-      "PACKAGE was \"${ARG_PACKAGE}\", should be \"trilinos\" or \"albany\"")
+      "PACKAGE was \"${ARG_PACKAGE}\", should be \"trilinos\" or \"lcm\"")
   endif()
   if (ARG_RESULT_VARIABLE)
     set(${ARG_RESULT_VARIABLE} ${PACKAGE_ERR} PARENT_SCOPE)

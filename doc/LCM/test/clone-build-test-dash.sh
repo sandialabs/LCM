@@ -12,8 +12,8 @@ for PACKAGE in $PACKAGES; do
 	    REPO="git@github.com:trilinos/Trilinos.git"
             BRANCH="develop"
 	    ;;
-	albany)
-	    PACKAGE_NAME="Albany"
+	lcm)
+	    PACKAGE_NAME="LCM"
 	    REPO="git@github.com:SNLComputation/LCM.git"
             BRANCH="master"
 	    ;;

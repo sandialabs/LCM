@@ -6,8 +6,8 @@ export MODULEPATH=$LCM_DIR/LCM/doc/LCM/modulefiles
 unset https_proxy
 unset http_proxy
 
-# trilinos required before albany
-PACKAGES="trilinos albany"
+# trilinos required before lcm
+PACKAGES="trilinos lcm"
 ARCHES="serial"
 TOOL_CHAINS="gcc"
 BUILD_TYPES="release"

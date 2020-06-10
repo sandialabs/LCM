@@ -20,14 +20,14 @@ getName(std::string const& method)
   if (method.size() < 3) return method;
   return method.substr(0, method.size() - 3);
 }
-}
+}  // namespace
 
 namespace LCM {
 
 ACEThermoMechanical::ACEThermoMechanical(
     Teuchos::RCP<Teuchos::ParameterList> const&   app_params,
-    Teuchos::RCP<Teuchos::Comm<int> const> const& comm) :
-       fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
+    Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
+    : fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   Teuchos::ParameterList& alt_system_params = app_params->sublist("Alternating System");
 
@@ -65,7 +65,7 @@ ACEThermoMechanical::ACEThermoMechanical(
   num_subdomains_ = model_filenames.size();
 
   // throw error if number of model filenames provided is not 2.
-  ALBANY_ASSERT(num_subdomains_ == 2, "ACEThermoMechanical solver requires 2 models!"); 
+  ALBANY_ASSERT(num_subdomains_ == 2, "ACEThermoMechanical solver requires 2 models!");
 
   //IKT FIXME 6/4/2020 - not sure if the following is needed for ACE
   //I think it may not be if we are not using DTK.
@@ -92,9 +92,9 @@ ACEThermoMechanical::ACEThermoMechanical(
   prev_step_x_.resize(num_subdomains_);
   internal_states_.resize(num_subdomains_);
 
-  //IKT NOTE 6/4/2020:the xdotdot arrays are 
-  //not relevant for thermal problems,
-  //but they are constructed anyway. 
+  // IKT NOTE 6/4/2020:the xdotdot arrays are
+  // not relevant for thermal problems,
+  // but they are constructed anyway.
   ics_x_.resize(num_subdomains_);
   ics_xdot_.resize(num_subdomains_);
   ics_xdotdot_.resize(num_subdomains_);
@@ -106,10 +106,10 @@ ACEThermoMechanical::ACEThermoMechanical(
   this_xdotdot_.resize(num_subdomains_);
   do_outputs_.resize(num_subdomains_);
   do_outputs_init_.resize(num_subdomains_);
-  prob_types_.resize(num_subdomains_); 
+  prob_types_.resize(num_subdomains_);
 
-  //IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
-  //coupling??  Leaving it in for now.
+  // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
+  // coupling??  Leaving it in for now.
   bool is_static{false};
   bool is_dynamic{false};
 
@@ -125,23 +125,22 @@ ACEThermoMechanical::ACEThermoMechanical(
 
     Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
 
-    //Get problem name to figure out if we have a thermal or mechanical problem for 
-    //this subdomain, and populate prob_types_ vector using this information.
-    //IKT 6/4/2020: This is added to allow user to specify mechanics and thermal problems in 
-    //different orders.  I'm not sure if this will be of interest ultimately or not. 
+    // Get problem name to figure out if we have a thermal or mechanical problem for
+    // this subdomain, and populate prob_types_ vector using this information.
+    // IKT 6/4/2020: This is added to allow user to specify mechanics and thermal problems in
+    // different orders.  I'm not sure if this will be of interest ultimately or not.
     const std::string problem_name = getName(problem_params.get<std::string>("Name"));
     if (problem_name == "Mechanics") {
-      prob_types_[subdomain] = MECHANICS; 
+      prob_types_[subdomain] = MECHANICS;
+    } else if (problem_name == "ACE Thermal") {
+      prob_types_[subdomain] = THERMAL;
+    } else {
+      // Throw error if problem name is not Mechanics or ACE Thermal.
+      // IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
+      ALBANY_ASSERT(
+          false,
+          "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
     }
-    else if (problem_name == "ACE Thermal") {
-      prob_types_[subdomain] = THERMAL; 
-    }
-    else {
-      //Throw error if problem name is not Mechanics or ACE Thermal. 
-      //IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
-      ALBANY_ASSERT(false, "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
-    }
-    
     //IKT FIXME - are we going to need this for coupled?  I think not if 
     //we are not using DTK. 
     // Add application array for later use in Schwarz BC.
@@ -227,25 +226,24 @@ ACEThermoMechanical::ACEThermoMechanical(
   }
 
   // Parameters
-  Teuchos::ParameterList& problem_params = app_params->sublist("Problem");
-  bool const have_parameters = problem_params.isSublist("Parameters");
+  Teuchos::ParameterList& problem_params  = app_params->sublist("Problem");
+  bool const              have_parameters = problem_params.isSublist("Parameters");
   ALBANY_ASSERT(have_parameters == false, "Parameters not supported.");
 
   // Responses
   bool const have_responses = problem_params.isSublist("Response Functions");
   ALBANY_ASSERT(have_responses == false, "Responses not supported.");
-  
-  //Check that map has both mechanics and thermal problem; if not, throw error.
+
+  // Check that map has both mechanics and thermal problem; if not, throw error.
   bool mechanics_found = false;
-  bool thermal_found = false; 
+  bool thermal_found   = false;
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     PROB_TYPE prob_type = prob_types_[subdomain];
     if (prob_type == MECHANICS) {
-      mechanics_found = true; 
+      mechanics_found = true;
+    } else if (prob_type == THERMAL) {
+      thermal_found = true;
     }
-    else if (prob_type == THERMAL) {
-      thermal_found = true; 
-    } 
   }
   ALBANY_ASSERT(mechanics_found == true, "'Mechanics' needs to be one of the coupled problems, but it is not found!");
   ALBANY_ASSERT(thermal_found == true, "'ACE Thermal' needs to be one of the coupled problems, but it is not found!");
@@ -418,10 +416,10 @@ ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyr
     const
 {
   if (is_dynamic_ == true) { ThermoMechanicalLoopDynamics(); }
-  //IKT 6/4/2020: for now, throw error if trying to run quasi-statically.
-  //Not sure if we want to ultimately support that case or not.
-  ALBANY_ASSERT(is_static_ == false, "ACE Sequential Thermo-Mechanical solver currently supports dynamics only!"); 
-  //if (is_static_ == true) { ThermoMechanicalLoopQuasistatics(); }
+  // IKT 6/4/2020: for now, throw error if trying to run quasi-statically.
+  // Not sure if we want to ultimately support that case or not.
+  ALBANY_ASSERT(is_static_ == false, "ACE Sequential Thermo-Mechanical solver currently supports dynamics only!");
+  // if (is_static_ == true) { ThermoMechanicalLoopQuasistatics(); }
   return;
 }
 
@@ -458,7 +456,7 @@ ACEThermoMechanical::continueSolve() const
 void
 ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 {
-  std::string const        delim(72, '=');
+  std::string const delim(72, '=');
 
   *fos_ << std::scientific << std::setprecision(17);
 
@@ -492,7 +490,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       bool const is_initial_state = stop == 0 && num_iter_ == 0;
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
         *fos_ << delim << std::endl;
-        const PROB_TYPE prob_type = prob_types_[subdomain]; 
+        const PROB_TYPE prob_type = prob_types_[subdomain];
         *fos_ << "Subdomain          :" << subdomain << '\n';
 	//IKT FIXME 6/5/2020: currently there is a lot of code duplication in 
 	//AdvanceMechanicsDynamics and AdvanceThermalDynamics b/c they effectively 
@@ -512,7 +510,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         if (failed_ == true) { 
           // Break out of the subdomain loop
           break;
-	}
+        }
       }  // Subdomains loop
 
       if (failed_ == true) {
@@ -546,15 +544,15 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
       // Restore previous solutions
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-        const PROB_TYPE prob_type = prob_types_[subdomain]; 
+        const PROB_TYPE prob_type = prob_types_[subdomain];
         Thyra::put_scalar(0.0, this_x_[subdomain].ptr());
         Thyra::copy(*ics_x_[subdomain], this_x_[subdomain].ptr());
         Thyra::put_scalar(0.0, this_xdot_[subdomain].ptr());
         Thyra::copy(*ics_xdot_[subdomain], this_xdot_[subdomain].ptr());
-	if (prob_type == MECHANICS) {
+        if (prob_type == MECHANICS) {
           Thyra::put_scalar(0.0, this_xdotdot_[subdomain].ptr());
           Thyra::copy(*ics_xdotdot_[subdomain], this_xdotdot_[subdomain].ptr());
-	}
+        }
 
         // restore the state manager with the state variables from the previous
         // loadstep.
@@ -564,18 +562,18 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
         // restore the solution in the discretization so the schwarz solver gets
         // the right boundary conditions!
-        Teuchos::RCP<Thyra_Vector const> x_rcp_thyra = ics_x_[subdomain];
+        Teuchos::RCP<Thyra_Vector const> x_rcp_thyra    = ics_x_[subdomain];
         Teuchos::RCP<Thyra_Vector const> xdot_rcp_thyra = ics_xdot_[subdomain];
-        Teuchos::RCP<Thyra_Vector const> xdotdot_rcp_thyra = (prob_type == MECHANICS) ? ics_xdotdot_[subdomain] : Teuchos::null; 
+        Teuchos::RCP<Thyra_Vector const> xdotdot_rcp_thyra =
+            (prob_type == MECHANICS) ? ics_xdotdot_[subdomain] : Teuchos::null;
 
         Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = app.getDiscretization();
-        
-	if (prob_type == MECHANICS) {
+
+        if (prob_type == MECHANICS) {
           app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, *xdotdot_rcp_thyra, current_time);
-	}
-	else {
+        } else {
           app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, current_time);
-	}
+        }
       }
 
       // Jump to the beginning of the time-step loop without advancing
@@ -619,14 +617,13 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
 {
   // Restore solution from previous coupling iteration before solve
   if (is_initial_state == true) {
-    auto&       me        = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-    auto const& nv        = me.getNominalValues();
+    auto&       me     = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+    auto const& nv     = me.getNominalValues();
     prev_x_[subdomain] = Thyra::createMember(me.get_x_space());
     Thyra::copy(*(nv.get_x()), prev_x_[subdomain].ptr());
     prev_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
     Thyra::copy(*(nv.get_x_dot()), prev_xdot_[subdomain].ptr());
-  } 
-  else {
+  } else {
     Thyra::put_scalar(0.0, prev_x_[subdomain].ptr());
     Thyra::copy(*this_x_[subdomain], prev_x_[subdomain].ptr());
     Thyra::put_scalar(0.0, prev_xdot_[subdomain].ptr());
@@ -641,7 +638,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
   piro_tempus_solver.setFinalTime(next_time);
   piro_tempus_solver.setInitTimeStep(time_step);
 
-  std::string const        delim(72, '=');
+  std::string const delim(72, '=');
   *fos_ << "Initial time       :" << current_time << '\n';
   *fos_ << "Final time         :" << next_time << '\n';
   *fos_ << "Time step          :" << time_step << '\n';
@@ -652,8 +649,8 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
 
   auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
-  //IKT FIXME 6/5/2020: need to check if this does the right thing for thermal problem
-  //The only relevant internal state here would be the ice saturation
+  // IKT FIXME 6/5/2020: need to check if this does the right thing for thermal problem
+  // The only relevant internal state here would be the ice saturation
   // Restore internal states
   auto& app       = *apps_[subdomain];
   auto& state_mgr = app.getStateMgr();
@@ -661,13 +658,13 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
 
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
-  
-  Teuchos::RCP<Thyra_Vector>                ic_x_rcp = Thyra::createMember(me.get_x_space());
+
+  Teuchos::RCP<Thyra_Vector> ic_x_rcp    = Thyra::createMember(me.get_x_space());
   Teuchos::RCP<Thyra_Vector> ic_xdot_rcp = Thyra::createMember(me.get_x_space());
 
   // set ic_x_rcp and ic_xdot_rcp
   // by making copy of what is in ics_x_[subdomain], etc.
-  Thyra_Vector& ic_x = *ics_x_[subdomain];
+  Thyra_Vector& ic_x    = *ics_x_[subdomain];
   Thyra_Vector& ic_xdot = *ics_xdot_[subdomain];
 
   Thyra::copy(ic_x, ic_x_rcp.ptr());
@@ -680,7 +677,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
   solver.evalModel(in_args, out_args);
 
   // Allocate current solution vectors
-  this_x_[subdomain] = Thyra::createMember(me.get_x_space());
+  this_x_[subdomain]    = Thyra::createMember(me.get_x_space());
   this_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
 
   // Check whether solver did OK.
@@ -690,7 +687,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
     *fos_ << "\nINFO: Unable to solve Thermal problem for subdomain " << subdomain << '\n';
     failed_ = true; 
   }
-        
+
   // If solver is OK, extract solution
 
   solution_history = piro_tempus_solver.getSolutionHistory();
@@ -717,16 +714,15 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
 {
   // Restore solution from previous coupling iteration before solve
   if (is_initial_state == true) {
-    auto&       me        = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-    auto const& nv        = me.getNominalValues();
+    auto&       me     = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+    auto const& nv     = me.getNominalValues();
     prev_x_[subdomain] = Thyra::createMember(me.get_x_space());
     Thyra::copy(*(nv.get_x()), prev_x_[subdomain].ptr());
     prev_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
     Thyra::copy(*(nv.get_x_dot()), prev_xdot_[subdomain].ptr());
     prev_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
     Thyra::copy(*(nv.get_x_dot_dot()), prev_xdotdot_[subdomain].ptr());
-  } 
-  else {
+  } else {
     Thyra::put_scalar(0.0, prev_x_[subdomain].ptr());
     Thyra::copy(*this_x_[subdomain], prev_x_[subdomain].ptr());
     Thyra::put_scalar(0.0, prev_xdot_[subdomain].ptr());
@@ -743,7 +739,7 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
   piro_tempus_solver.setFinalTime(next_time);
   piro_tempus_solver.setInitTimeStep(time_step);
 
-  std::string const        delim(72, '=');
+  std::string const delim(72, '=');
   *fos_ << "Initial time       :" << current_time << '\n';
   *fos_ << "Final time         :" << next_time << '\n';
   *fos_ << "Time step          :" << time_step << '\n';
@@ -770,8 +766,8 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
 
   // set ic_x_rcp, ic_xdot_rcp and ic_xdotdot_rcp
   // by making copy of what is in ics_x_[subdomain], etc.
-  Thyra_Vector& ic_x = *ics_x_[subdomain];
-  Thyra_Vector& ic_xdot = *ics_xdot_[subdomain];
+  Thyra_Vector& ic_x       = *ics_x_[subdomain];
+  Thyra_Vector& ic_xdot    = *ics_xdot_[subdomain];
   Thyra_Vector& ic_xdotdot = *ics_xdotdot_[subdomain];
 
   Thyra::copy(ic_x, ic_x_rcp.ptr());
@@ -785,8 +781,8 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
   solver.evalModel(in_args, out_args);
 
   // Allocate current solution vectors
-  this_x_[subdomain] = Thyra::createMember(me.get_x_space());
-  this_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
+  this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
+  this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
   this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
 
   // Check whether solver did OK.
@@ -828,14 +824,14 @@ ACEThermoMechanical::setExplicitUpdateInitialGuessForCoupling(ST const current_t
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     auto& app = *apps_[subdomain];
 
-    Thyra_Vector& ic_x = *ics_x_[subdomain];
-    Thyra_Vector& ic_xdot = *ics_xdot_[subdomain];
+    Thyra_Vector& ic_x       = *ics_x_[subdomain];
+    Thyra_Vector& ic_xdot    = *ics_xdot_[subdomain];
     Thyra_Vector& ic_xdotdot = *ics_xdotdot_[subdomain];
 
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
     if (current_time == 0) {
-      this_x_[subdomain] = Thyra::createMember(me.get_x_space());
-      this_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
+      this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
+      this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
       this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
     }
 
@@ -845,8 +841,8 @@ ACEThermoMechanical::setExplicitUpdateInitialGuessForCoupling(ST const current_t
 
     // This is the initial guess that I want to apply to the subdomains before
     // the schwarz solver starts
-    auto x_rcp = this_x_[subdomain];
-    auto xdot_rcp = this_xdot_[subdomain];
+    auto x_rcp       = this_x_[subdomain];
+    auto xdot_rcp    = this_xdot_[subdomain];
     auto xdotdot_rcp = this_xdotdot_[subdomain];
 
     // setting x, xdot and xdotdot in the albany application
@@ -870,8 +866,7 @@ ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
   if (time == initial_time_) is_initial_time = true;
 
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-
-    const PROB_TYPE prob_type = prob_types_[subdomain]; 
+    const PROB_TYPE prob_type = prob_types_[subdomain];
 
     Albany::AbstractSTKMeshStruct& stk_mesh_struct = *stk_mesh_structs_[subdomain];
 
@@ -959,7 +954,7 @@ ACEThermoMechanical::doQuasistaticOutput(ST const time) const
 void
 ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
 {
-  //IKT 6/5/2020: not implemented for now.
+  // IKT 6/5/2020: not implemented for now.
 }
 
 }  // namespace LCM

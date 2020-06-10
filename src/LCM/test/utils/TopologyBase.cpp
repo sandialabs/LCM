@@ -41,10 +41,11 @@ main(int ac, char* av[])
 
   int const num_styles = 4;
 
-  LCM::Topology::OutputType const style_values[] = {LCM::Topology::UNIDIRECTIONAL_UNILEVEL,
-                                                    LCM::Topology::UNIDIRECTIONAL_MULTILEVEL,
-                                                    LCM::Topology::BIDIRECTIONAL_UNILEVEL,
-                                                    LCM::Topology::BIDIRECTIONAL_MULTILEVEL};
+  LCM::Topology::OutputType const style_values[] = {
+      LCM::Topology::UNIDIRECTIONAL_UNILEVEL,
+      LCM::Topology::UNIDIRECTIONAL_MULTILEVEL,
+      LCM::Topology::BIDIRECTIONAL_UNILEVEL,
+      LCM::Topology::BIDIRECTIONAL_MULTILEVEL};
 
   char const* style_names[] = {"UU", "UM", "BU", "BM"};
 

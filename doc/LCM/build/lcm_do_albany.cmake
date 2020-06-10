@@ -51,7 +51,7 @@ function(lcm_do_albany)
       DO_PROJECT
       "PROJECT" "Albany"
       SOURCE_DIR "$ENV{LCM_DIR}/LCM"
-      BUILD_DIR "$ENV{LCM_DIR}/albany-build-${ARG_BUILD_ID_STRING}"
+      BUILD_DIR "$ENV{LCM_DIR}/lcm-build-${ARG_BUILD_ID_STRING}"
       CONFIG_OPTS "${CONFIG_OPTS}"
       BUILD_THREADS "${ARG_BUILD_THREADS}"
       RESULT_VARIABLE ERR

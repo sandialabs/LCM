@@ -3,7 +3,7 @@
 module-whatis "LCM Clang compiler"
 
 if { [is-loaded lcm-sems] } {
-  module load sems-clang/3.9.0
+  module load sierra-devel/clang
 }
 
 setenv TOOL_CHAIN clang
@@ -13,7 +13,7 @@ setenv CXX [exec which clang++]
 setenv FC [exec which gfortran]
 
 if { [is-loaded lcm-fedora] } {
-  setenv CXXFLAGS "-std=c++17 -Wno-deprecated-declarations"
+  setenv CXXFLAGS "-std=c++17 -Wno-implicit-int-float-conversion"
 } else {
   setenv CXXFLAGS "-std=c++17"
 }

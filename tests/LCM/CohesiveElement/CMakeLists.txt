@@ -21,7 +21,7 @@ if(SEACAS_EXODIFF AND SEACAS_ALGEBRA)
                  COPYONLY)
 
   # algebra file
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/alg.i ${CMAKE_CURRENT_BINARY_DIR}/alg.i COPYONLY)
+  #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/alg.i ${CMAKE_CURRENT_BINARY_DIR}/alg.i COPYONLY)
 
   # exodiff files
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Cohesive.exodiff ${CMAKE_CURRENT_BINARY_DIR}/Cohesive.exodiff COPYONLY)
@@ -46,7 +46,7 @@ if(SEACAS_EXODIFF AND SEACAS_ALGEBRA)
       COMMAND
         ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=Cohesive -DTEST_ARGS=inputCohesive.yaml
         -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DSEACAS_ALGEBRA=${SEACAS_ALGEBRA} -DREF_FILENAME=${REF_FILE}
-        -DOUTPUT_FILENAME=${ALG_OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+        -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
         ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
 
     set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")

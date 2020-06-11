@@ -17,17 +17,17 @@ if (NOT SEACAS_EXODIFF)
   message(FATAL_ERROR "Cannot find exodiff")
 endif()
 
-if (NOT SEACAS_ALGEBRA)
-  message(FATAL_ERROR "Cannot find algebra")
-endif()
+#if (NOT SEACAS_ALGEBRA)
+#  message(FATAL_ERROR "Cannot find algebra")
+#endif()
 
 
-EXECUTE_PROCESS(COMMAND bash 
-    INPUT_FILE run_algebra.sh
-    RESULT_VARIABLE ALG_ERROR)
-if(ALG_ERROR)
-	message(FATAL_ERROR "Algebra step failed")
-endif()
+#EXECUTE_PROCESS(COMMAND bash 
+#    INPUT_FILE run_algebra.sh
+#    RESULT_VARIABLE ALG_ERROR)
+#if(ALG_ERROR)
+#	message(FATAL_ERROR "Algebra step failed")
+#endif()
 
 if(DEFINED MPIMNP AND ${MPIMNP} GREATER 1)
   SET(EXODIFF_TEST ${SEACAS_EXODIFF} -i -m -f ${DATA_DIR}/${TEST_NAME}.exodiff ${OUTPUT_FILENAME} ${DATA_DIR}/${REF_FILENAME})

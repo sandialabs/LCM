@@ -87,7 +87,7 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(Teuchos::ParameterList const& p)
         << "baseFlow data should have length numDims + 2 =  " << numDims + 2 << "." << std::endl);
   }
 
-  if (eqn_type == EULER & vecDim != numDims + 1) {
+  if ((eqn_type == EULER) && (vecDim != numDims + 1)) {
     ALBANY_ABORT(
         std::endl
         << "Error in PHAL::LinComprNS constructor:  "
@@ -95,7 +95,7 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(Teuchos::ParameterList const& p)
         << std::endl);
   }
 
-  if (eqn_type == NS & vecDim != numDims + 2) {
+  if ((eqn_type == NS) & (vecDim != numDims + 2)) {
     ALBANY_ABORT(
         std::endl
         << "Error in PHAL::LinComprNS constructor:  "

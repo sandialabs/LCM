@@ -67,8 +67,8 @@ ACEThermoMechanical::ACEThermoMechanical(
   // throw error if number of model filenames provided is not 2.
   ALBANY_ASSERT(num_subdomains_ == 2, "ACEThermoMechanical solver requires 2 models!");
 
-  //IKT FIXME 6/4/2020 - not sure if the following is needed for ACE
-  //I think it may not be if we are not using DTK.
+  // IKT FIXME 6/4/2020 - not sure if the following is needed for ACE
+  // I think it may not be if we are not using DTK.
   // Create application name-index map used for Schwarz BC.
   Teuchos::RCP<std::map<std::string, int>> app_name_index_map = Teuchos::rcp(new std::map<std::string, int>);
 
@@ -118,7 +118,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     // Get parameters for each subdomain
     Albany::SolverFactory solver_factory(model_filenames[subdomain], comm);
 
-    //IKT FIXME - change to setCoupled? 
+    // IKT FIXME - change to setCoupled?
     solver_factory.setSchwarz(true);
 
     Teuchos::ParameterList& params = solver_factory.getParameters();
@@ -141,8 +141,8 @@ ACEThermoMechanical::ACEThermoMechanical(
           false,
           "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
     }
-    //IKT FIXME - are we going to need this for coupled?  I think not if 
-    //we are not using DTK. 
+    // IKT FIXME - are we going to need this for coupled?  I think not if
+    // we are not using DTK.
     // Add application array for later use in Schwarz BC.
     params.set("Application Array", apps_);
 
@@ -197,11 +197,11 @@ ACEThermoMechanical::ACEThermoMechanical(
 
     solvers_[subdomain] = solver;
 
-    //IKT 6/4/2020: I think we still need to call the following,
-    //looking at the code, but we may want to rename the routine if
-    //it ends up being used for thermo-mechanical too in addition
-    //to Schwarz.
-    //Should we rename the following as 'setCoupling(true)'? 
+    // IKT 6/4/2020: I think we still need to call the following,
+    // looking at the code, but we may want to rename the routine if
+    // it ends up being used for thermo-mechanical too in addition
+    // to Schwarz.
+    // Should we rename the following as 'setCoupling(true)'?
     app->setSchwarzAlternating(true);
 
     apps_[subdomain] = app;
@@ -443,13 +443,15 @@ bool
 ACEThermoMechanical::continueSolve() const
 {
   ++num_iter_;
-  //IKT 6/5/2020: right now, we want to do just 1 coupling iteration.
-  //Therefore return false if we've hit num_iter_ = 1;
-  //Also set converged_ to true, which is equally irrelevant unless doing 
-  //Schwarz-like coupling
-  converged_ = true;  
-  if (num_iter_ > 0) return false;
-  else return true;  
+  // IKT 6/5/2020: right now, we want to do just 1 coupling iteration.
+  // Therefore return false if we've hit num_iter_ = 1;
+  // Also set converged_ to true, which is equally irrelevant unless doing
+  // Schwarz-like coupling
+  converged_ = true;
+  if (num_iter_ > 0)
+    return false;
+  else
+    return true;
 }
 
 // Sequential ThermoMechanical coupling loop, dynamic
@@ -492,22 +494,19 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         *fos_ << delim << std::endl;
         const PROB_TYPE prob_type = prob_types_[subdomain];
         *fos_ << "Subdomain          :" << subdomain << '\n';
-	//IKT FIXME 6/5/2020: currently there is a lot of code duplication in 
-	//AdvanceMechanicsDynamics and AdvanceThermalDynamics b/c they effectively 
-	//do the thing.  These routines may diverge as we modify them to do the
-	//sequential coupling, which is why I kept them separate.  We may want to think 
-	//of ways to combine them at a later point to avoid some of the code duplication.
-	if (prob_type == MECHANICS) {
-	  *fos_ << "Problem            :Mechanics\n";
-	  AdvanceMechanicsDynamics(subdomain, is_initial_state,
-			           current_time, next_time, time_step);  
-	}
-	else {
-          *fos_ << "Problem            :Thermal\n"; 
-	  AdvanceThermalDynamics(subdomain, is_initial_state, current_time,
-	                         next_time, time_step);  
-	}
-        if (failed_ == true) { 
+        // IKT FIXME 6/5/2020: currently there is a lot of code duplication in
+        // AdvanceMechanicsDynamics and AdvanceThermalDynamics b/c they effectively
+        // do the thing.  These routines may diverge as we modify them to do the
+        // sequential coupling, which is why I kept them separate.  We may want to think
+        // of ways to combine them at a later point to avoid some of the code duplication.
+        if (prob_type == MECHANICS) {
+          *fos_ << "Problem            :Mechanics\n";
+          AdvanceMechanicsDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+        } else {
+          *fos_ << "Problem            :Thermal\n";
+          AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+        }
+        if (failed_ == true) {
           // Break out of the subdomain loop
           break;
         }
@@ -611,9 +610,12 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 }
 
 void
-ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_initial_state,
-                                            const double current_time, const double next_time, 
-					    const double time_step) const 
+ACEThermoMechanical::AdvanceThermalDynamics(
+    const int    subdomain,
+    const bool   is_initial_state,
+    const double current_time,
+    const double next_time,
+    const double time_step) const
 {
   // Restore solution from previous coupling iteration before solve
   if (is_initial_state == true) {
@@ -685,7 +687,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
 
   if (status == Tempus::Status::FAILED) {
     *fos_ << "\nINFO: Unable to solve Thermal problem for subdomain " << subdomain << '\n';
-    failed_ = true; 
+    failed_ = true;
   }
 
   // If solver is OK, extract solution
@@ -704,13 +706,16 @@ ACEThermoMechanical::AdvanceThermalDynamics(const int subdomain, const bool is_i
   Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
   Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
 
-  failed_ = false; 
+  failed_ = false;
 }
 
 void
-ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is_initial_state,
-                                              const double current_time, const double next_time, 
-					      const double time_step) const 
+ACEThermoMechanical::AdvanceMechanicsDynamics(
+    const int    subdomain,
+    const bool   is_initial_state,
+    const double current_time,
+    const double next_time,
+    const double time_step) const
 {
   // Restore solution from previous coupling iteration before solve
   if (is_initial_state == true) {
@@ -790,7 +795,7 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
 
   if (status == Tempus::Status::FAILED) {
     *fos_ << "\nINFO: Unable to solve Mechanics problem for subdomain " << subdomain << '\n';
-    failed_ = true;  
+    failed_ = true;
   }
   // If solver is OK, extract solution
 
@@ -813,7 +818,7 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(const int subdomain, const bool is
   Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
   Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
 
-  failed_ =  false; 
+  failed_ = false;
 }
 
 void

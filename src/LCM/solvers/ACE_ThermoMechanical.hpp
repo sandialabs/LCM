@@ -134,14 +134,20 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   ThermoMechanicalLoopDynamics() const;
 
   void
-  AdvanceThermalDynamics(const int subdomain, const bool is_initial_state,
-                         const double current_time, const double next_time, 
-			 const double time_step) const; 
+  AdvanceThermalDynamics(
+      const int    subdomain,
+      const bool   is_initial_state,
+      const double current_time,
+      const double next_time,
+      const double time_step) const;
 
   void
-  AdvanceMechanicsDynamics(const int subdomain, const bool is_initial_state,
-                           const double current_time, const double next_time, 
-			   const double time_step) const; 
+  AdvanceMechanicsDynamics(
+      const int    subdomain,
+      const bool   is_initial_state,
+      const double current_time,
+      const double next_time,
+      const double time_step) const;
 
   bool
   continueSolve() const;

@@ -151,11 +151,6 @@ SolverFactory::createAndGetAlbanyApp(
     ALBANY_ASSERT(appComm->getSize() == 1, "Parallel Schwarz requires DTK");
 #endif  // ALBANY_DTK
   }
-  if (is_ace_thermo_mech == true) {
-#if !defined(ALBANY_DTK)
-    ALBANY_ASSERT(appComm->getSize() == 1, "Parallel ACE Sequential Thermo-Mechanical solver requires DTK");
-#endif  // ALBANY_DTK
-  }
   if (solutionMethod == "Coupled Schwarz") {
     // IKT: We are assuming the "Piro" list will come from the main coupled
     // Schwarz input file (not the sub-input

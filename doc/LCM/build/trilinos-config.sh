@@ -94,7 +94,6 @@ cmake \
  -D Trilinos_ENABLE_KokkosAlgorithms:BOOL=ON \
  -D Trilinos_ENABLE_KokkosContainers:BOOL=ON \
  -D Trilinos_ENABLE_KokkosCore:BOOL=ON \
- -D Trilinos_ENABLE_KokkosExample:BOOL=OFF \
  -D Trilinos_ENABLE_MiniTensor:BOOL=ON \
  -D Trilinos_ENABLE_ML:BOOL=ON \
  -D Trilinos_ENABLE_MueLu:BOOL=ON \

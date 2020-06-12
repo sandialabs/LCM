@@ -1,6 +1,7 @@
 #
-# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of Sandia, LLC (NTESS). This Software is
-# released under the BSD license detailed in the file license.txt in the top-level Albany directory.
+# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+# Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+# in the file license.txt in the top-level Albany directory.
 #
 
 # Adaptation
@@ -43,7 +44,8 @@ endif()
 if(ALBANY_STK_PERCEPT)
   set(SOURCES ${SOURCES} AAdapt_STKAdapt.cpp AAdapt_STKConstantSizeField.cpp)
 
-  set(HEADERS ${HEADERS} AAdapt_STKAdapt.hpp AAdapt_STKAdapt_Def.hpp AAdapt_STKConstantSizeField.hpp)
+  set(HEADERS ${HEADERS} AAdapt_STKAdapt.hpp AAdapt_STKAdapt_Def.hpp
+              AAdapt_STKConstantSizeField.hpp)
 
 endif()
 

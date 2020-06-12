@@ -1,5 +1,7 @@
-set(SOURCES GeomDecomp.cpp Partition.cpp Rebalance.cpp RebalanceUtils.cpp ZoltanPartition.cpp)
-set(HEADERS GeomDecomp.hpp Partition.hpp Rebalance.hpp RebalanceUtils.hpp ZoltanPartition.hpp)
+set(SOURCES GeomDecomp.cpp Partition.cpp Rebalance.cpp RebalanceUtils.cpp
+            ZoltanPartition.cpp)
+set(HEADERS GeomDecomp.hpp Partition.hpp Rebalance.hpp RebalanceUtils.hpp
+            ZoltanPartition.hpp)
 
 add_library(albanySTKRebalance ${Albany_LIBRARY_TYPE} ${SOURCES} ${HEADERS})
 target_link_libraries(albanySTKRebalance ${Trilinos_LIBRARIES})

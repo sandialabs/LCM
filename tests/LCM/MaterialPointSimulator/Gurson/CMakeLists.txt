@@ -1,24 +1,30 @@
 #
-# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of Sandia, LLC (NTESS). This Software is
-# released under the BSD license detailed in the file license.txt in the top-level Albany directory.
+# Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
+# Sandia, LLC (NTESS). This Software is released under the BSD license detailed
+# in the file license.txt in the top-level Albany directory.
 #
 
 if(SEACAS_EXODIFF)
   # Create a symlink to the runtest.py script
-  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest.py} ${CMAKE_CURRENT_BINARY_DIR}/runtest.py)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${MPS.cmake} ${CMAKE_CURRENT_BINARY_DIR}/MPS.cmake)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest.py}
+                          ${CMAKE_CURRENT_BINARY_DIR}/runtest.py)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${MPS.cmake}
+                          ${CMAKE_CURRENT_BINARY_DIR}/MPS.cmake)
 
   # Create a symlink to the MPS
-  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${MPS.exe} ${CMAKE_CURRENT_BINARY_DIR}/MPS)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${MPS.exe}
+                          ${CMAKE_CURRENT_BINARY_DIR}/MPS)
 
   # Create a symlink to exodiff
-  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SEACAS_EXODIFF} ${CMAKE_CURRENT_BINARY_DIR}/exodiff)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SEACAS_EXODIFF}
+                          ${CMAKE_CURRENT_BINARY_DIR}/exodiff)
 
   # Copy Input files from source to binary dir
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-uniaxial.yaml ${CMAKE_CURRENT_BINARY_DIR}/Gurson-uniaxial.yaml
-                 COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-uniaxial.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/Gurson-uniaxial.yaml COPYONLY)
 
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-shear.yaml ${CMAKE_CURRENT_BINARY_DIR}/Gurson-shear.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-shear.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/Gurson-shear.yaml COPYONLY)
 
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-hydrostatic.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/Gurson-hydrostatic.yaml COPYONLY)
@@ -29,15 +35,17 @@ if(SEACAS_EXODIFF)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-uniaxial.exodiff
                  ${CMAKE_CURRENT_BINARY_DIR}/Gurson-uniaxial.exodiff COPYONLY)
 
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-shear.gold.exo ${CMAKE_CURRENT_BINARY_DIR}/Gurson-shear.gold.exo
-                 COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-shear.exodiff ${CMAKE_CURRENT_BINARY_DIR}/Gurson-shear.exodiff
-                 COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-shear.gold.exo
+                 ${CMAKE_CURRENT_BINARY_DIR}/Gurson-shear.gold.exo COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-shear.exodiff
+                 ${CMAKE_CURRENT_BINARY_DIR}/Gurson-shear.exodiff COPYONLY)
 
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-hydrostatic.gold.exo
-                 ${CMAKE_CURRENT_BINARY_DIR}/Gurson-hydrostatic.gold.exo COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Gurson-hydrostatic.exodiff
-                 ${CMAKE_CURRENT_BINARY_DIR}/Gurson-hydrostatic.exodiff COPYONLY)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Gurson-hydrostatic.gold.exo
+    ${CMAKE_CURRENT_BINARY_DIR}/Gurson-hydrostatic.gold.exo COPYONLY)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Gurson-hydrostatic.exodiff
+    ${CMAKE_CURRENT_BINARY_DIR}/Gurson-hydrostatic.exodiff COPYONLY)
 
   # Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -48,19 +56,24 @@ if(SEACAS_EXODIFF)
   add_test(
     NAME ${testName}_uniaxial
     COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${MPS.exe}" -DTEST_NAME=Gurson-uniaxial -DTEST_ARGS=--input=Gurson-uniaxial.yaml
-      -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE}
-      -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${MPS.cmake})
-  set_tests_properties(${testName}_uniaxial PROPERTIES LABELS "LCM;Tpetra;Forward")
+      ${CMAKE_COMMAND} "-DTEST_PROG=${MPS.exe}" -DTEST_NAME=Gurson-uniaxial
+      -DTEST_ARGS=--input=Gurson-uniaxial.yaml -DMPIMNP=1
+      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+      ${MPS.cmake})
+  set_tests_properties(${testName}_uniaxial PROPERTIES LABELS
+                                                       "LCM;Tpetra;Forward")
   # test 2 - shear
   set(OUTFILE "Gurson-shear.exo")
   set(REF_FILE "Gurson-shear.gold.exo")
   add_test(
     NAME ${testName}_shear
     COMMAND
-      ${CMAKE_COMMAND} "-DTEST_PROG=${MPS.exe}" -DTEST_NAME=Gurson-shear -DTEST_ARGS=--input=Gurson-shear.yaml
-      -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE}
-      -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${MPS.cmake})
+      ${CMAKE_COMMAND} "-DTEST_PROG=${MPS.exe}" -DTEST_NAME=Gurson-shear
+      -DTEST_ARGS=--input=Gurson-shear.yaml -DMPIMNP=1
+      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+      ${MPS.cmake})
   set_tests_properties(${testName}_shear PROPERTIES LABELS "LCM;Tpetra;Forward")
   # test 3 - hydrostatic
   set(OUTFILE "Gurson-hydrostatic.exo")
@@ -69,8 +82,11 @@ if(SEACAS_EXODIFF)
     NAME ${testName}_hydrostatic
     COMMAND
       ${CMAKE_COMMAND} "-DTEST_PROG=${MPS.exe}" -DTEST_NAME=Gurson-hydrostatic
-      -DTEST_ARGS=--input=Gurson-hydrostatic.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-      -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${MPS.cmake})
-  set_tests_properties(${testName}_hydrostatic PROPERTIES LABELS "LCM;Tpetra;Forward")
+      -DTEST_ARGS=--input=Gurson-hydrostatic.yaml -DMPIMNP=1
+      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+      -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+      ${MPS.cmake})
+  set_tests_properties(${testName}_hydrostatic PROPERTIES LABELS
+                                                          "LCM;Tpetra;Forward")
 
 endif(SEACAS_EXODIFF)

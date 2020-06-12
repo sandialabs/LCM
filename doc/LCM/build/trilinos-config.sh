@@ -95,7 +95,7 @@ cmake \
  -D Trilinos_ENABLE_KokkosContainers:BOOL=ON \
  -D Trilinos_ENABLE_KokkosCore:BOOL=ON \
  -D Trilinos_ENABLE_MiniTensor:BOOL=ON \
- -D Trilinos_ENABLE_ML:BOOL=ON \
+ -D Trilinos_ENABLE_ML:BOOL=OFF \
  -D Trilinos_ENABLE_MueLu:BOOL=ON \
  -D Trilinos_ENABLE_NOX:BOOL=ON \
  -D Trilinos_ENABLE_OpenMP:BOOL=lcm_enable_openmp \
@@ -117,6 +117,6 @@ cmake \
  -D Trilinos_ENABLE_Teuchos:BOOL=ON \
  -D Trilinos_ENABLE_Thyra:BOOL=ON \
  -D Trilinos_ENABLE_Tpetra:BOOL=ON \
- -D Trilinos_ENABLE_Zoltan2:BOOL=ON \
+ -D Trilinos_ENABLE_Zoltan2:BOOL=OFF \
  -D Trilinos_ENABLE_Zoltan:BOOL=ON \
  lcm_package_dir

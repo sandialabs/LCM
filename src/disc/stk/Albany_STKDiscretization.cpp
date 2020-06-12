@@ -902,17 +902,6 @@ STKDiscretization::writeSolutionToFile(Thyra_Vector const& soln, double const ti
       *out << " to index " << out_step << " in file " << stkMeshStruct->exoOutFile << std::endl;
     }
   }
-  if (stkMeshStruct->cdfOutput && !(outputInterval % stkMeshStruct->cdfOutputInterval)) {
-    double time_label = monotonicTimeLabel(time);
-
-    int const out_step = processNetCDFOutputRequest(soln);
-
-    if (comm->getRank() == 0) {
-      *out << "STKDiscretization::writeSolution: writing time " << time;
-      if (time_label != time) *out << " with label " << time_label;
-      *out << " to index " << out_step << " in file " << stkMeshStruct->cdfOutFile << std::endl;
-    }
-  }
   outputInterval++;
 
   for (auto it : sideSetDiscretizations) {
@@ -964,17 +953,6 @@ STKDiscretization::writeSolutionMVToFile(const Thyra_MultiVector& soln, double c
       *out << "STKDiscretization::writeSolution: writing time " << time;
       if (time_label != time) *out << " with label " << time_label;
       *out << " to index " << out_step << " in file " << stkMeshStruct->exoOutFile << std::endl;
-    }
-  }
-  if (stkMeshStruct->cdfOutput && !(outputInterval % stkMeshStruct->cdfOutputInterval)) {
-    double time_label = monotonicTimeLabel(time);
-
-    int const out_step = processNetCDFOutputRequestMV(soln);
-
-    if (comm->getRank() == 0) {
-      *out << "STKDiscretization::writeSolution: writing time " << time;
-      if (time_label != time) *out << " with label " << time_label;
-      *out << " to index " << out_step << " in file " << stkMeshStruct->cdfOutFile << std::endl;
     }
   }
   outputInterval++;
@@ -2272,142 +2250,6 @@ STKDiscretization::setupExodusOutput()
   }
 }
 
-int
-STKDiscretization::processNetCDFOutputRequest(Thyra_Vector const& /* solution_field */)
-{
-  // IK, 10/13/14: need to implement!
-  return 0;
-}
-
-int
-STKDiscretization::processNetCDFOutputRequestMV(const Thyra_MultiVector& /* solution_field */)
-{
-  // IK, 10/13/14: need to implement!
-  return 0;
-}
-
-void
-STKDiscretization::setupNetCDFOutput()
-{
-  const long long unsigned rank = comm->getRank();
-  if (stkMeshStruct->cdfOutput) {
-    outputInterval      = 0;
-    const unsigned nlat = stkMeshStruct->nLat;
-    const unsigned nlon = stkMeshStruct->nLon;
-
-    std::string str = stkMeshStruct->cdfOutFile;
-
-    interpolateData.resize(coords.size());
-    for (int b = 0; b < coords.size(); b++) interpolateData[b].resize(coords[b].size());
-
-    setup_latlon_interp(nlat, nlon, coords, interpolateData, comm);
-
-    std::string const name = stkMeshStruct->cdfOutFile;
-    netCDFp                = 0;
-    netCDFOutputRequest    = 0;
-
-#if defined(ALBANY_PAR_NETCDF)
-    MPI_Comm theMPIComm = getMpiCommFromTeuchosComm(comm);
-    MPI_Info info;
-    MPI_Info_create(&info);
-    if (int const ierr = nc_create_par(
-            name.c_str(), NC_NETCDF4 | NC_MPIIO | NC_CLOBBER | NC_64BIT_OFFSET, theMPIComm, info, &netCDFp))
-      ALBANY_ABORT("nc_create_par returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-    MPI_Info_free(&info);
-#else
-    if (!rank)
-      if (int const ierr =
-              nc_create(name.c_str(), NC_CLOBBER | NC_SHARE | NC_64BIT_OFFSET | NC_CLASSIC_MODEL, &netCDFp))
-        ALBANY_ABORT("nc_create returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-#endif
-
-    const size_t nlev       = 1;
-    char const*  dimnames[] = {"time", "lev", "lat", "lon"};
-    const size_t dimlen[]   = {NC_UNLIMITED, nlev, nlat, nlon};
-    int          dimID[4]   = {0, 0, 0, 0};
-
-    for (unsigned i = 0; i < 4; ++i) {
-      if (netCDFp)
-        if (int const ierr = nc_def_dim(netCDFp, dimnames[i], dimlen[i], &dimID[i]))
-          ALBANY_ABORT("nc_def_dim returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-    }
-    varSolns.resize(neq, 0);
-
-    for (unsigned n = 0; n < neq; ++n) {
-      std::ostringstream var;
-      var << "variable_" << n;
-      char const* field_name = var.str().c_str();
-      if (netCDFp)
-        if (int const ierr = nc_def_var(netCDFp, field_name, NC_DOUBLE, 4, dimID, &varSolns[n]))
-          ALBANY_ABORT(
-              "nc_def_var " << field_name << " returned error code " << ierr << " - " << nc_strerror(ierr)
-                            << std::endl);
-
-      double const fillVal = -9999.0;
-      if (netCDFp)
-        if (int const ierr = nc_put_att(netCDFp, varSolns[n], "FillValue", NC_DOUBLE, 1, &fillVal))
-          ALBANY_ABORT("nc_put_att FillValue returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-    }
-
-    char const lat_name[] = "latitude";
-    char const lat_unit[] = "degrees_north";
-    char const lon_name[] = "longitude";
-    char const lon_unit[] = "degrees_east";
-    int        latVarID   = 0;
-    if (netCDFp)
-      if (int const ierr = nc_def_var(netCDFp, "lat", NC_DOUBLE, 1, &dimID[2], &latVarID))
-        ALBANY_ABORT("nc_def_var lat returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-    if (netCDFp)
-      if (int const ierr = nc_put_att_text(netCDFp, latVarID, "long_name", sizeof(lat_name), lat_name))
-        ALBANY_ABORT(
-            "nc_put_att_text " << lat_name << " returned error code " << ierr << " - " << nc_strerror(ierr)
-                               << std::endl);
-    if (netCDFp)
-      if (int const ierr = nc_put_att_text(netCDFp, latVarID, "units", sizeof(lat_unit), lat_unit))
-        ALBANY_ABORT(
-            "nc_put_att_text " << lat_unit << " returned error code " << ierr << " - " << nc_strerror(ierr)
-                               << std::endl);
-
-    int lonVarID = 0;
-    if (netCDFp)
-      if (int const ierr = nc_def_var(netCDFp, "lon", NC_DOUBLE, 1, &dimID[3], &lonVarID))
-        ALBANY_ABORT("nc_def_var lon returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-    if (netCDFp)
-      if (int const ierr = nc_put_att_text(netCDFp, lonVarID, "long_name", sizeof(lon_name), lon_name))
-        ALBANY_ABORT(
-            "nc_put_att_text " << lon_name << " returned error code " << ierr << " - " << nc_strerror(ierr)
-                               << std::endl);
-    if (netCDFp)
-      if (int const ierr = nc_put_att_text(netCDFp, lonVarID, "units", sizeof(lon_unit), lon_unit))
-        ALBANY_ABORT(
-            "nc_put_att_text " << lon_unit << " returned error code " << ierr << " - " << nc_strerror(ierr)
-                               << std::endl);
-
-    char const history[] = "Created by Albany";
-    if (netCDFp)
-      if (int const ierr = nc_put_att_text(netCDFp, NC_GLOBAL, "history", sizeof(history), history))
-        ALBANY_ABORT(
-            "nc_put_att_text " << history << " returned error code " << ierr << " - " << nc_strerror(ierr)
-                               << std::endl);
-
-    if (netCDFp)
-      if (int const ierr = nc_enddef(netCDFp))
-        ALBANY_ABORT("nc_enddef returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-
-    std::vector<double> deglon(nlon);
-    std::vector<double> deglat(nlat);
-    for (unsigned i = 0; i < nlon; ++i) deglon[i] = ((2 * i * pi / nlon) * (180 / pi)) - 180;
-    for (unsigned i = 0; i < nlat; ++i) deglat[i] = (-pi / 2 + i * pi / (nlat - 1)) * (180 / pi);
-
-    if (netCDFp)
-      if (int const ierr = nc_put_var(netCDFp, lonVarID, &deglon[0]))
-        ALBANY_ABORT("nc_put_var lon returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-    if (netCDFp)
-      if (int const ierr = nc_put_var(netCDFp, latVarID, &deglat[0]))
-        ALBANY_ABORT("nc_put_var lat returned error code " << ierr << " - " << nc_strerror(ierr) << std::endl);
-  }
-}
-
 void
 STKDiscretization::reNameExodusOutput(std::string& filename)
 {
@@ -2656,7 +2498,6 @@ STKDiscretization::updateMesh()
   // response
   meshToGraph();
   //  printVertexConnectivity();
-  setupNetCDFOutput();
   // meshToGraph();
   // printVertexConnectivity();
 

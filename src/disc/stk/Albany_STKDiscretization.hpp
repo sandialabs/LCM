@@ -579,14 +579,6 @@ class STKDiscretization : public AbstractDiscretization
   //! Call stk_io for creating exodus output file
   void
   setupExodusOutput();
-  //! Call stk_io for creating NetCDF output file
-  void
-  setupNetCDFOutput();
-
-  int
-  processNetCDFOutputRequest(Thyra_Vector const&);
-  int
-  processNetCDFOutputRequestMV(const Thyra_MultiVector&);
 
   //! Find the local side id number within parent element
   unsigned

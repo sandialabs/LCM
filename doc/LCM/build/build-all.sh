@@ -67,7 +67,7 @@ for P in $PACKAGES; do
             for BT in $BUILD_TYPES; do
                 MODULE="$A"-"$TC"-"$BT"
                 echo "MODULE: $MODULE"
-		            echo "PLATFORM: $PLATFORM"
+                echo "PLATFORM: $PLATFORM"
                 module purge
                 module load "$MODULE"
                 "$COMMAND" "$P" "$NUM_PROCS"

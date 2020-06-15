@@ -27,27 +27,27 @@ namespace LCM {
 ACEThermoMechanical::ACEThermoMechanical(
     Teuchos::RCP<Teuchos::ParameterList> const&   app_params,
     Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
-    : fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
+    : fos_(Teuchos::VerboseObjectBase::getDefaultOStream()),
+      comm_(comm)
 {
-  Teuchos::ParameterList& alt_system_params = app_params->sublist("Alternating System");
-
+  alt_system_params_ = Teuchos::sublist(app_params, "Alternating System");
   // Get names of individual model input files
-  Teuchos::Array<std::string> model_filenames = alt_system_params.get<Teuchos::Array<std::string>>("Model Input Files");
+  model_filenames_ = alt_system_params_->get<Teuchos::Array<std::string>>("Model Input Files");
 
-  maximum_steps_     = alt_system_params.get<int>("Maximum Steps", 0);
-  initial_time_      = alt_system_params.get<ST>("Initial Time", 0.0);
-  final_time_        = alt_system_params.get<ST>("Final Time", 0.0);
-  initial_time_step_ = alt_system_params.get<ST>("Initial Time Step", 1.0);
+  maximum_steps_     = alt_system_params_->get<int>("Maximum Steps", 0);
+  initial_time_      = alt_system_params_->get<ST>("Initial Time", 0.0);
+  final_time_        = alt_system_params_->get<ST>("Final Time", 0.0);
+  initial_time_step_ = alt_system_params_->get<ST>("Initial Time Step", 1.0);
 
   auto const dt  = initial_time_step_;
   auto const dt2 = dt * dt;
 
-  min_time_step_    = alt_system_params.get<ST>("Minimum Time Step", dt);
-  max_time_step_    = alt_system_params.get<ST>("Maximum Time Step", dt);
-  reduction_factor_ = alt_system_params.get<ST>("Reduction Factor", 1.0);
-  increase_factor_  = alt_system_params.get<ST>("Amplification Factor", 1.0);
-  output_interval_  = alt_system_params.get<int>("Exodus Write Interval", 1);
-  std_init_guess_   = alt_system_params.get<bool>("Standard Initial Guess", false);
+  min_time_step_    = alt_system_params_->get<ST>("Minimum Time Step", dt);
+  max_time_step_    = alt_system_params_->get<ST>("Maximum Time Step", dt);
+  reduction_factor_ = alt_system_params_->get<ST>("Reduction Factor", 1.0);
+  increase_factor_  = alt_system_params_->get<ST>("Amplification Factor", 1.0);
+  output_interval_  = alt_system_params_->get<int>("Exodus Write Interval", 1);
+  std_init_guess_   = alt_system_params_->get<bool>("Standard Initial Guess", false);
 
   // Firewalls
   ALBANY_ASSERT(maximum_steps_ >= 1, "");
@@ -62,7 +62,7 @@ ACEThermoMechanical::ACEThermoMechanical(
   ALBANY_ASSERT(output_interval_ >= 1, "");
 
   // number of models
-  num_subdomains_ = model_filenames.size();
+  num_subdomains_ = model_filenames_.size();
 
   // throw error if number of model filenames provided is not 2.
   ALBANY_ASSERT(num_subdomains_ == 2, "ACEThermoMechanical solver requires 2 models!");
@@ -70,14 +70,14 @@ ACEThermoMechanical::ACEThermoMechanical(
   // IKT FIXME 6/4/2020 - not sure if the following is needed for ACE
   // I think it may not be if we are not using DTK.
   // Create application name-index map used for Schwarz BC.
-  Teuchos::RCP<std::map<std::string, int>> app_name_index_map = Teuchos::rcp(new std::map<std::string, int>);
+  app_name_index_map_ = Teuchos::rcp(new std::map<std::string, int>);
 
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    std::string const& app_name = model_filenames[subdomain];
+    std::string const& app_name = model_filenames_[subdomain];
 
     std::pair<std::string, int> app_name_index = std::make_pair(app_name, subdomain);
 
-    app_name_index_map->insert(app_name_index);
+    app_name_index_map_->insert(app_name_index);
   }
 
   // Arrays to cache useful info for each subdomain for later use
@@ -108,15 +108,51 @@ ACEThermoMechanical::ACEThermoMechanical(
   do_outputs_init_.resize(num_subdomains_);
   prob_types_.resize(num_subdomains_);
 
+  this->createSolversAppsDiscsMEs();
+
+  // Parameters
+  Teuchos::ParameterList& problem_params  = app_params->sublist("Problem");
+  bool const              have_parameters = problem_params.isSublist("Parameters");
+  ALBANY_ASSERT(have_parameters == false, "Parameters not supported.");
+
+  // Responses
+  bool const have_responses = problem_params.isSublist("Response Functions");
+  ALBANY_ASSERT(have_responses == false, "Responses not supported.");
+
+  // Check that map has both mechanics and thermal problem; if not, throw error.
+  bool mechanics_found = false;
+  bool thermal_found   = false;
+  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    PROB_TYPE prob_type = prob_types_[subdomain];
+    if (prob_type == MECHANICS) {
+      mechanics_found = true;
+    } else if (prob_type == THERMAL) {
+      thermal_found = true;
+    }
+  }
+  ALBANY_ASSERT(mechanics_found == true, "'Mechanics' needs to be one of the coupled problems, but it is not found!");
+  ALBANY_ASSERT(thermal_found == true, "'ACE Thermal' needs to be one of the coupled problems, but it is not found!");
+
+  return;
+}
+
+ACEThermoMechanical::~ACEThermoMechanical() { return; }
+
+//The following routine creates the solvers, applications, discretizations
+//and model evaluators for the run.  It is a separate routine to easily allow
+//for recreation of these options from the coupling loops.
+void
+ACEThermoMechanical::createSolversAppsDiscsMEs() 
+{
   // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
   // coupling??  Leaving it in for now.
   bool is_static{false};
   bool is_dynamic{false};
 
-  // Initialization
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+
     // Get parameters for each subdomain
-    Albany::SolverFactory solver_factory(model_filenames[subdomain], comm);
+    Albany::SolverFactory solver_factory(model_filenames_[subdomain], comm_);
 
     // IKT FIXME - change to setCoupled?
     solver_factory.setSchwarz(true);
@@ -150,7 +186,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     params.set("Application Index", subdomain);
 
     // Add application name-index map for later use in Schwarz BC.
-    params.set("Application Name Index Map", app_name_index_map);
+    params.set("Application Name Index Map", app_name_index_map_);
 
     // Add NOX pre-post-operator for Schwarz loop convergence criterion.
     bool const have_piro = params.isSublist("Piro");
@@ -193,7 +229,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     Teuchos::RCP<Albany::Application> app{Teuchos::null};
 
     Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
-        solver_factory.createAndGetAlbanyApp(app, comm, comm);
+        solver_factory.createAndGetAlbanyApp(app, comm_, comm_);
 
     solvers_[subdomain] = solver;
 
@@ -224,34 +260,7 @@ ACEThermoMechanical::ACEThermoMechanical(
 
     curr_x_[subdomain] = Teuchos::null;
   }
-
-  // Parameters
-  Teuchos::ParameterList& problem_params  = app_params->sublist("Problem");
-  bool const              have_parameters = problem_params.isSublist("Parameters");
-  ALBANY_ASSERT(have_parameters == false, "Parameters not supported.");
-
-  // Responses
-  bool const have_responses = problem_params.isSublist("Response Functions");
-  ALBANY_ASSERT(have_responses == false, "Responses not supported.");
-
-  // Check that map has both mechanics and thermal problem; if not, throw error.
-  bool mechanics_found = false;
-  bool thermal_found   = false;
-  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    PROB_TYPE prob_type = prob_types_[subdomain];
-    if (prob_type == MECHANICS) {
-      mechanics_found = true;
-    } else if (prob_type == THERMAL) {
-      thermal_found = true;
-    }
-  }
-  ALBANY_ASSERT(mechanics_found == true, "'Mechanics' needs to be one of the coupled problems, but it is not found!");
-  ALBANY_ASSERT(thermal_found == true, "'ACE Thermal' needs to be one of the coupled problems, but it is not found!");
-
-  return;
 }
-
-ACEThermoMechanical::~ACEThermoMechanical() { return; }
 
 Teuchos::RCP<Thyra_VectorSpace const>
 ACEThermoMechanical::get_x_space() const

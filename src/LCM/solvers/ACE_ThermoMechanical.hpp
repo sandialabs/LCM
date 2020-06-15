@@ -149,6 +149,9 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
       const double next_time,
       const double time_step) const;
 
+  void 
+  createSolversAppsDiscsMEs();
+
   bool
   continueSolve() const;
 
@@ -219,6 +222,11 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   std::vector<PROB_TYPE> prob_types_;
 
   Teuchos::RCP<Teuchos::FancyOStream> fos_;
+
+  Teuchos::RCP<Teuchos::ParameterList> alt_system_params_; 
+  Teuchos::RCP<Teuchos::Comm<int> const> comm_;
+  Teuchos::RCP<std::map<std::string, int>> app_name_index_map_; 
+  Teuchos::Array<std::string> model_filenames_; 
 };
 
 }  // namespace LCM

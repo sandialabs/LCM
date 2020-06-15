@@ -5,10 +5,22 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # Copy Input file from source to binary dir
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/coupled.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_vardt.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/coupled_vardt.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_less_output.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/coupled_less_output.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/thermal.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_vardt.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/thermal_vardt.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_less_output.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/thermal_less_output.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/mechanical.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_vardt.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/mechanical_vardt.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_less_output.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/mechanical_less_output.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bluff_salinity.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/bluff_salinity.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clay_frac.txt
@@ -45,6 +57,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.exodiff
                  ${CMAKE_CURRENT_BINARY_DIR}/thermal.exodiff COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal-vardt.exodiff
+                 ${CMAKE_CURRENT_BINARY_DIR}/thermal-vardt.exodiff COPYONLY)
   set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
 
   # Name the test with the directory name
@@ -62,4 +76,20 @@ if(NOT ALBANY_PARALLEL_ONLY)
   set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
   set_tests_properties(${testName}
                        PROPERTIES DEPENDS CuboidThermoMechanical3D_ThermalOnly)
+  
+  add_test(${testName}_less_output ${Albany.exe} coupled_less_output.yaml)
+  set_tests_properties(${testName}_less_output PROPERTIES LABELS "Demo;Tpetra;Forward")
+  
+  set(OUTFILE "thermal-vardt.e")
+  set(REF_FILE "thermal-less-output.e")
+  add_test(
+    NAME ${testName}_vardt
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=thermal-vardt
+      -DTEST_ARGS=coupled_vardt.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+      -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -P
+      ${runtest.cmake})
+  set_tests_properties(${testName}_vardt PROPERTIES LABELS "Demo;Tpetra;Forward")
+  set_tests_properties(${testName}_vardt
+	  PROPERTIES DEPENDS ${testName}_less_output)
 endif()

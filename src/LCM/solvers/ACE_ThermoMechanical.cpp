@@ -697,6 +697,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   if (status == Tempus::Status::FAILED) {
     *fos_ << "\nINFO: Unable to solve Thermal problem for subdomain " << subdomain << '\n';
     failed_ = true;
+    return;  
   }
 
   // If solver is OK, extract solution
@@ -805,6 +806,7 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(
   if (status == Tempus::Status::FAILED) {
     *fos_ << "\nINFO: Unable to solve Mechanics problem for subdomain " << subdomain << '\n';
     failed_ = true;
+    return; 
   }
   // If solver is OK, extract solution
 

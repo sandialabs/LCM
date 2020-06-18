@@ -119,6 +119,16 @@ ACEThermoMechanical::ACEThermoMechanical(
   bool const have_responses = problem_params.isSublist("Response Functions");
   ALBANY_ASSERT(have_responses == false, "Responses not supported.");
 
+  // Check that the first problem type is thermal and the second problem type is mechanics,
+  // as the current version of the coupling algorithm requires this ordering. 
+  // If ordering is wrong, through error. 
+  PROB_TYPE prob_type = prob_types_[0]; 
+  ALBANY_ASSERT(prob_type == THERMAL, "The first problem type needs to be 'ACE Thermal'!");
+  prob_type = prob_types_[1]; 
+  ALBANY_ASSERT(prob_type == MECHANICS, "The second problem type needs to be 'Mechanics'!");
+  
+  //IKT 6/18/2020: keeping older ordering logic, in case we want to revive it.
+  /*
   // Check that map has both mechanics and thermal problem; if not, throw error.
   bool mechanics_found = false;
   bool thermal_found   = false;
@@ -131,18 +141,19 @@ ACEThermoMechanical::ACEThermoMechanical(
     }
   }
   ALBANY_ASSERT(mechanics_found == true, "'Mechanics' needs to be one of the coupled problems, but it is not found!");
-  ALBANY_ASSERT(thermal_found == true, "'ACE Thermal' needs to be one of the coupled problems, but it is not found!");
-
+  ALBANY_ASSERT(thermal_found == true, "'ACE Thermal' needs to be one of the coupled problems, but it is not found!");*/
+  
   return;
 }
 
 ACEThermoMechanical::~ACEThermoMechanical() { return; }
 
+
 //The following routine creates the solvers, applications, discretizations
 //and model evaluators for the run.  It is a separate routine to easily allow
 //for recreation of these options from the coupling loops.
 void
-ACEThermoMechanical::createSolversAppsDiscsMEs() 
+ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) 
 {
   // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
   // coupling??  Leaving it in for now.
@@ -225,6 +236,28 @@ ACEThermoMechanical::createSolversAppsDiscsMEs()
           "Constant' in 'Time Step Control' sublist.\n"};
       ALBANY_ASSERT(integrator_step_type == "Constant", msg2);
     }
+
+    Teuchos::ParameterList& disc_params = params.sublist("Discretization", true);
+    //Rename output file to append index to it
+    //IKT WARNING: this is a little bit fragile because it assumed output file name 
+    //ends with ".e" or ".exo".  An error is thrown if a different ending is found.
+    std::ostringstream ss;
+    std::string str = disc_params.get<std::string>("Exodus Output File Name");
+    if (str.find(".exo") != std::string::npos) {
+      ss << file_index << ".exo";
+      str.replace(str.find(".exo"), std::string::npos, ss.str());
+    }
+    else {
+      if (str.find(".e") != std::string::npos) {
+        ss << file_index << ".e";
+        str.replace(str.find(".e"), std::string::npos, ss.str());
+      }
+      else {
+        ALBANY_ASSERT(false, "Exodus output file does not end in '.e' or '.exo' - cannot rename!\n"); 
+      }
+    }
+    *fos_ << "Renaming output file to - " << str << '\n';
+    disc_params.set<const std::string>("Exodus Output File Name", str); 
 
     Teuchos::RCP<Albany::Application> app{Teuchos::null};
 
@@ -887,6 +920,7 @@ ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
     Albany::AbstractSTKMeshStruct& stk_mesh_struct = *stk_mesh_structs_[subdomain];
 
     Albany::AbstractDiscretization& abs_disc = *discs_[subdomain];
+
 
     Albany::STKDiscretization& stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
 

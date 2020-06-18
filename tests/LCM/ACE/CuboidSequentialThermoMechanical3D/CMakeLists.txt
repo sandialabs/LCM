@@ -64,7 +64,7 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
   # Add the tests
-  set(OUTFILE "thermal.e")
+  set(OUTFILE "thermal0.e")
   set(REF_FILE "${CMAKE_CURRENT_BINARY_DIR}/../CuboidThermoMechanical3D/grid.e")
   add_test(
     NAME ${testName}
@@ -80,8 +80,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
   add_test(${testName}_less_output ${Albany.exe} coupled_less_output.yaml)
   set_tests_properties(${testName}_less_output PROPERTIES LABELS "Demo;Tpetra;Forward")
   
-  set(OUTFILE "thermal-vardt.e")
-  set(REF_FILE "thermal-less-output.e")
+  set(OUTFILE "thermal-vardt0.e")
+  set(REF_FILE "thermal-less-output0.e")
   add_test(
     NAME ${testName}_vardt
     COMMAND

@@ -153,7 +153,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   continueSolve() const;
 
   void 
-  createSolversAppsDiscsMEs(const int file_index = 0);
+  createSolversAppsDiscsMEs(const int file_index = 0) const;
 
   void
   doQuasistaticOutput(ST const time) const;
@@ -164,10 +164,10 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   void
   setDynamicICVecsAndDoOutput(ST const time) const;
 
-  std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
-  Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>                 apps_;
-  std::vector<Teuchos::RCP<Albany::AbstractSTKMeshStruct>>             stk_mesh_structs_;
-  std::vector<Teuchos::RCP<Albany::AbstractDiscretization>>            discs_;
+  mutable std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
+  mutable Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>                 apps_;
+  mutable std::vector<Teuchos::RCP<Albany::AbstractSTKMeshStruct>>             stk_mesh_structs_;
+  mutable std::vector<Teuchos::RCP<Albany::AbstractDiscretization>>            discs_;
 
   char const*  failure_message_{"No failure detected"};
   int          num_subdomains_{0};
@@ -208,8 +208,8 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<bool>             do_outputs_init_;
 
   // Used if solving with loca or tempus
-  bool is_static_{false};
-  bool is_dynamic_{false};
+  mutable bool is_static_{false};
+  mutable bool is_dynamic_{false};
   bool std_init_guess_{false};
 
   enum PROB_TYPE
@@ -219,7 +219,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   };
 
   // std::vector mapping subdomain number to PROB_TYPE;
-  std::vector<PROB_TYPE> prob_types_;
+  mutable std::vector<PROB_TYPE> prob_types_;
 
   Teuchos::RCP<Teuchos::FancyOStream> fos_;
 

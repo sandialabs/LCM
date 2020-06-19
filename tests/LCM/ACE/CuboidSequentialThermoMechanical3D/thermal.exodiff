@@ -24,10 +24,9 @@ COORDINATES absolute 1.e-6    # min separation not calculated
 
 TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:              10 @ t11
 
-
 # No GLOBAL VARIABLES
 
-NODAL VARIABLES relative 1.e-6 floor 1.0e-12
+NODAL VARIABLES relative 2.e-6 floor 1.0e-12
 	solution                             # min:               0 @ t1,n1	max:               0 @ t1,n1
 	solution_dot                         # min:               0 @ t1,n1	max:               0 @ t1,n1
 	residual                             # min:               0 @ t1,n1	max:               0 @ t1,n1

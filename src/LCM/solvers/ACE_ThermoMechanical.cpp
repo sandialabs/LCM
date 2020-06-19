@@ -107,7 +107,8 @@ ACEThermoMechanical::ACEThermoMechanical(
   do_outputs_.resize(num_subdomains_);
   do_outputs_init_.resize(num_subdomains_);
   prob_types_.resize(num_subdomains_);
-
+ 
+  //Create initial solvers, appds, discs, model evaluators
   this->createSolversAppsDiscsMEs();
 
   // Parameters
@@ -153,7 +154,7 @@ ACEThermoMechanical::~ACEThermoMechanical() { return; }
 //and model evaluators for the run.  It is a separate routine to easily allow
 //for recreation of these options from the coupling loops.
 void
-ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) 
+ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const 
 {
   // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
   // coupling??  Leaving it in for now.
@@ -518,6 +519,11 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     *fos_ << "Time               :" << current_time << '\n';
     *fos_ << "Time step          :" << time_step << '\n';
     *fos_ << delim << std::endl;
+
+    if (stop > 0) {
+      //Create new solvers, apps, discs and model evaluators  
+      this->createSolversAppsDiscsMEs(stop);
+    }
 
     // Before the coupling loop, get internal states
     for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {

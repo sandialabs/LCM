@@ -45,10 +45,10 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/waterH_fake.txt COPYONLY)
 
   # Create the test with this name and standard executable
-  add_test(${testName}_ThermalOnly ${Albany.exe} simulation_thermal_only.yaml)
-  set_tests_properties(${testName}_ThermalOnly PROPERTIES LABELS
+  add_test(ACE_${testName}_ThermalOnly ${Albany.exe} simulation_thermal_only.yaml)
+  set_tests_properties(ACE_${testName}_ThermalOnly PROPERTIES LABELS
                                                           "Demo;Tpetra;Forward")
 
-  add_test(${testName} ${Albany.exe} simulation_thermomechanical.yaml)
-  set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
+  add_test(ACE_${testName} ${Albany.exe} simulation_thermomechanical.yaml)
+  set_tests_properties(ACE_${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
 endif()

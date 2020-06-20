@@ -61,26 +61,26 @@ if(NOT ALBANY_PARALLEL_ONLY)
   set(OUTFILE "thermal119.e")
   set(REF_FILE "${CMAKE_CURRENT_BINARY_DIR}/../CuboidThermoMechanical3D/grid.e")
   add_test(
-    NAME ${testName}
+	  NAME ACE_${testName}
     COMMAND
       ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=thermal
       -DTEST_ARGS=coupled.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
       -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -P
       ${runtest.cmake})
-  set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
-  set_tests_properties(${testName}
+  set_tests_properties(ACE_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
+  set_tests_properties(ACE_${testName}
                        PROPERTIES DEPENDS CuboidThermoMechanical3D_ThermalOnly)
   
   set(OUTFILE "thermal-vardt40.e")
   set(REF_FILE "thermal119.e")
   add_test(
-    NAME ${testName}_vardt
+    NAME ACE_${testName}_vardt
     COMMAND
       ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=thermal-vardt
       -DTEST_ARGS=coupled_vardt.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
       -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -P
       ${runtest.cmake})
-  set_tests_properties(${testName}_vardt PROPERTIES LABELS "Demo;Tpetra;Forward")
-  set_tests_properties(${testName}_vardt
+  set_tests_properties(ACE_${testName}_vardt PROPERTIES LABELS "Demo;Tpetra;Forward")
+  set_tests_properties(ACE_${testName}_vardt
 	  PROPERTIES DEPENDS ${testName})
 endif()

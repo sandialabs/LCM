@@ -67,19 +67,6 @@ ACEThermoMechanical::ACEThermoMechanical(
   // throw error if number of model filenames provided is not 2.
   ALBANY_ASSERT(num_subdomains_ == 2, "ACEThermoMechanical solver requires 2 models!");
 
-  // IKT FIXME 6/4/2020 - not sure if the following is needed for ACE
-  // I think it may not be if we are not using DTK.
-  // Create application name-index map used for Schwarz BC.
-  app_name_index_map_ = Teuchos::rcp(new std::map<std::string, int>);
-
-  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    std::string const& app_name = model_filenames_[subdomain];
-
-    std::pair<std::string, int> app_name_index = std::make_pair(app_name, subdomain);
-
-    app_name_index_map_->insert(app_name_index);
-  }
-
   // Arrays to cache useful info for each subdomain for later use
   apps_.resize(num_subdomains_);
   solvers_.resize(num_subdomains_);
@@ -191,16 +178,6 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const
           false,
           "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
     }
-    // IKT FIXME - are we going to need this for coupled?  I think not if
-    // we are not using DTK.
-    // Add application array for later use in Schwarz BC.
-    params.set("Application Array", apps_);
-
-    // See application index for use with Schwarz BC.
-    params.set("Application Index", subdomain);
-
-    // Add application name-index map for later use in Schwarz BC.
-    params.set("Application Name Index Map", app_name_index_map_);
 
     // Add NOX pre-post-operator for Schwarz loop convergence criterion.
     bool const have_piro = params.isSublist("Piro");
@@ -683,6 +660,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(
     const double time_step) const
 {
   // Restore solution from previous coupling iteration before solve
+  // IKT 6/20/2020: do we still need this stuff when we do restarts?
   if (is_initial_state == true) {
     auto&       me     = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
     auto const& nv     = me.getNominalValues();

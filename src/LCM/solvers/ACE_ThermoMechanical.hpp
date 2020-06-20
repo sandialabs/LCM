@@ -229,7 +229,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   Teuchos::RCP<Teuchos::ParameterList> alt_system_params_; 
   Teuchos::RCP<Teuchos::Comm<int> const> comm_;
-  Teuchos::RCP<std::map<std::string, int>> app_name_index_map_; 
   Teuchos::Array<std::string> model_filenames_; 
 };
 

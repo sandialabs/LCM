@@ -285,7 +285,11 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const
     model_evaluators_[subdomain] = solver_factory.returnModel();
 
     curr_x_[subdomain] = Teuchos::null;
-    
+   
+    //IKT FIXME 6/20/2020: currently I am having the thermal problem
+    //restart from the thermal exodus output file, and the mechanical problem
+    //restart from the mechanical exodus output file, which I think
+    //will change when we put in the coupling. 
     prev_exo_outfile_name_[subdomain] = str; 
   }
 }

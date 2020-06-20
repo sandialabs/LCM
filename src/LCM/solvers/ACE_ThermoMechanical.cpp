@@ -108,6 +108,8 @@ ACEThermoMechanical::ACEThermoMechanical(
   do_outputs_init_.resize(num_subdomains_);
   prob_types_.resize(num_subdomains_);
  
+  prev_exo_outfile_name_.resize(num_subdomains_);
+  prev_exo_outfile_num_snapshots_.resize(num_subdomains_); 
   //Create initial solvers, appds, discs, model evaluators
   this->createSolversAppsDiscsMEs();
 
@@ -260,6 +262,16 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const
     *fos_ << "Renaming output file to - " << str << '\n';
     disc_params.set<const std::string>("Exodus Output File Name", str); 
 
+    if (file_index > 0) {
+      //Change input Exodus file to previous Exodus output file, for restarts.
+      disc_params.set<const std::string>("Exodus Input File Name", prev_exo_outfile_name_[subdomain]); 
+      //IKT FIXME, 6/20/2020: currently, w/o coupling, we need to restart
+      //from index 2, unless Exodus file has less than 2 snapshots.  
+      //This will change once we put in the coupling, and if dt \neq the controller time-step.   
+      const int restart_index = (prev_exo_outfile_num_snapshots_[subdomain] < 2) ? 1 : 2;
+      disc_params.set<const int>("Restart Index", restart_index);
+    }
+
     Teuchos::RCP<Albany::Application> app{Teuchos::null};
 
     Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
@@ -284,6 +296,9 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const
     Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
 
     Teuchos::RCP<Albany::AbstractSTKMeshStruct> ams = stk_disc.getSTKMeshStruct();
+    //Save number of snapshots in Exodus file for restarts
+    const int num_snapshots = ams->getSolutionFieldHistoryDepth(); 
+    prev_exo_outfile_num_snapshots_[subdomain] = num_snapshots;
 
     do_outputs_[subdomain]      = ams->exoOutput;
     do_outputs_init_[subdomain] = ams->exoOutput;
@@ -293,6 +308,8 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const
     model_evaluators_[subdomain] = solver_factory.returnModel();
 
     curr_x_[subdomain] = Teuchos::null;
+    
+    prev_exo_outfile_name_[subdomain] = str; 
   }
 }
 

@@ -35,11 +35,11 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/square_4blocks.e.4.3 COPYONLY)
 
   # Create the test with this name and standard executable
-  add_test(${testName}_2Blocks ${Albany.exe} input_block_dept_2blks.yaml)
-  set_tests_properties(${testName}_2Blocks PROPERTIES LABELS
+  add_test(ACE_${testName}_2Blocks ${Albany.exe} input_block_dept_2blks.yaml)
+  set_tests_properties(ACE_${testName}_2Blocks PROPERTIES LABELS
                                                       "Demo;Tpetra;Forward")
 
-  add_test(${testName}_4Blocks ${Albany.exe} input_block_dept_4blks.yaml)
-  set_tests_properties(${testName}_4Blocks PROPERTIES LABELS
+  add_test(ACE_${testName}_4Blocks ${Albany.exe} input_block_dept_4blks.yaml)
+  set_tests_properties(ACE_${testName}_4Blocks PROPERTIES LABELS
                                                       "Demo;Tpetra;Forward")
 endif()

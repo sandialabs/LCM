@@ -2,8 +2,8 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#ifndef ACETEMPSTANDALONERESID_HPP
-#define ACETEMPSTANDALONERESID_HPP
+#ifndef ACETEMPSTABILIZATION_HPP
+#define ACETEMPSTABILIZATION_HPP
 
 #include "Albany_Types.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
@@ -20,10 +20,10 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
+class ACETempStabilization : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
-  ACETempStandAloneResid(Teuchos::ParameterList const& p);
+  ACETempStabilization(Teuchos::ParameterList const& p);
 
   void
   postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
@@ -36,16 +36,14 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>, public
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>      wbf_;
   PHX::MDField<ScalarT const, Cell, QuadPoint>                tdot_;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wgradbf_;
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           tgrad_;
   PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_conductivity_;  // thermal conductivity
   PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_inertia_;       // thermal inertia = rho * C
-  PHX::MDField<const ScalarT, Cell, Node>                     stab_;      //SUPG stabilization term
 
   // Output:
-  PHX::MDField<ScalarT, Cell, Node> residual_;
+  PHX::MDField<ScalarT, Cell, Node> stab_;
 
   unsigned int num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
 };

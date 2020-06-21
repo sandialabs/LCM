@@ -110,6 +110,7 @@ class ACEThermalProblem : public AbstractProblem
 }  // namespace Albany
 
 #include "ACETempStandAloneResid.hpp"
+#include "ACETempStabilization.hpp"
 #include "ACEThermalParameters.hpp"
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
@@ -364,6 +365,31 @@ Albany::ACEThermalProblem::constructEvaluators(
     }
   }
 
+  {  // Temperature stabilization
+    RCP<ParameterList> p = rcp(new ParameterList("Temperature Stabilization"));
+
+    // Input
+    p->set<string>("QP Time Derivative Variable Name", "Temperature_dot");
+    p->set<string>("Gradient QP Variable Name", "Temperature Gradient");
+    p->set<string>("Weighted Gradient BF Name", "wGrad BF");
+
+    p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl_->node_qp_scalar);
+    p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
+    p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
+
+    p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
+    p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
+    p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
+
+    // Output
+    p->set<string>("Stabilization Name", "ACE Temperature Stabilization");
+    p->set<RCP<DataLayout>>("Node Scalar Data Layout", dl_->node_scalar);
+
+    ev = rcp(new LCM::ACETempStabilization<EvalT, AlbanyTraits>(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+  }
+
   {  // Temperature Resid
     RCP<ParameterList> p = rcp(new ParameterList("Temperature Resid"));
 
@@ -381,6 +407,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set<string>("Stabilization Name", "ACE Temperature Stabilization");
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");

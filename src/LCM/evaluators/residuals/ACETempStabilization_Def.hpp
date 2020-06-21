@@ -11,10 +11,8 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::ParameterList const& p)
-    : wbf_(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      stab_(p.get<std::string>("Stabilization Name"), 
-            p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
+ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList const& p)
+    : 
       tdot_(
           p.get<std::string>("QP Time Derivative Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
@@ -24,7 +22,8 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
       tgrad_(
           p.get<std::string>("Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      residual_(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
+      stab_(p.get<std::string>("Stabilization Name"), 
+            p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       thermal_conductivity_(
           p.get<std::string>("ACE Thermal Conductivity QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
@@ -32,14 +31,12 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
           p.get<std::string>("ACE Thermal Inertia QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  this->addDependentField(wbf_);
   this->addDependentField(tdot_);
   this->addDependentField(tgrad_);
   this->addDependentField(wgradbf_);
   this->addDependentField(thermal_conductivity_);
   this->addDependentField(thermal_inertia_);
-  this->addDependentField(stab_);
-  this->addEvaluatedField(residual_);
+  this->addEvaluatedField(stab_);
 
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
@@ -48,47 +45,33 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
   num_nodes_    = dims[1];
   num_qps_      = dims[2];
   num_dims_     = dims[3];
-  this->setName("ACETempStandAloneResid");
+  this->setName("ACETempStabilization");
 }
 
 //*****
 template <typename EvalT, typename Traits>
 void
-ACETempStandAloneResid<EvalT, Traits>::postRegistrationSetup(
+ACETempStabilization<EvalT, Traits>::postRegistrationSetup(
     typename Traits::SetupData d,
     PHX::FieldManager<Traits>& fm)
 {
-  this->utils.setFieldData(wbf_, fm);
   this->utils.setFieldData(tgrad_, fm);
   this->utils.setFieldData(wgradbf_, fm);
   this->utils.setFieldData(tdot_, fm);
-  this->utils.setFieldData(residual_, fm);
+  this->utils.setFieldData(stab_, fm);
   this->utils.setFieldData(thermal_conductivity_, fm);
   this->utils.setFieldData(thermal_inertia_, fm);
-  this->utils.setFieldData(stab_, fm);
 }
 
 //*****
 template <typename EvalT, typename Traits>
 void
-ACETempStandAloneResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
+ACETempStabilization<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  // We are solving the following PDE:
-  // thermal_inertia_ * dT/dt - thermal_conductivity_ * \nabla T = 0 in 3D
+  //IKT FIXME - FILL IN!
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (std::size_t node = 0; node < num_nodes_; ++node) {
-      residual_(cell, node) = 0.0;
-      for (std::size_t qp = 0; qp < num_qps_; ++qp) {
-        // Time-derivative contribution to residual
-        residual_(cell, node) += thermal_inertia_(cell, qp) * tdot_(cell, qp) * wbf_(cell, node, qp);
-        // Diffusion part of residual
-        for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
-          residual_(cell, node) +=
-              thermal_conductivity_(cell, qp) * tgrad_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim);
-        }
-	// Stabilization contribution to residual
-	residual_(cell, node) += stab_(cell, node); 
-      }
+      stab_(cell, node) = 0.0;
     }
   }
 }

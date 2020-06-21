@@ -203,6 +203,8 @@ Albany::ACEThermalProblem::constructEvaluators(
     RCP<ParameterList> p = rcp(new ParameterList);
 
     p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
+    p->set<string>("Weighted Gradient BF Name", "wGrad BF");
+    p->set<string>("BF Name", "BF");
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<string>("ACE Bluff Salinity QP Variable Name", "ACE Bluff Salinity");
     p->set<string>("ACE Ice Saturation QP Variable Name", "ACE Ice Saturation");
@@ -211,10 +213,16 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE Water Saturation QP Variable Name", "ACE Water Saturation");
     p->set<string>("ACE Porosity QP Variable Name", "ACE Porosity");
     p->set<string>("ACE Temperature QP Variable Name", "Temperature");
+    p->set<string>("ACE Thermal Conductivity Gradient Node Variable Name", 
+		        "ACE Thermal Conductivity Gradient Node");  
+    p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
+		        "ACE Thermal Conductivity Gradient QP");  
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
     p->set<RCP<DataLayout>>("Node Data Layout", dl_->node_scalar);
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
+    p->set<RCP<DataLayout>>("Node Vector Data Layout", dl_->node_vector);
+    p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
 
     p->set<RCP<ParamLib>>("Parameter Library", paramLib);
     Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Parameters");

@@ -386,7 +386,8 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
 		        "ACE Thermal Conductivity Gradient QP");  
     p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
-    p->set<bool>("Use Stabilization", use_stab_); 
+    p->set<bool>("Use Stabilization", use_stab_);
+    p->set<std::string>("Jacobian Det Name", "Jacobian Det");
 
     // Output
     p->set<string>("Stabilization Name", "ACE Temperature Stabilization");

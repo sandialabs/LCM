@@ -48,6 +48,8 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>, public
   PHX::MDField<ScalarT, Cell, Node> residual_;
 
   unsigned int num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
+  
+  Teuchos::RCP<Teuchos::FancyOStream> fos_;
 };
 }  // namespace LCM
 

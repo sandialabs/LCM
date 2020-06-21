@@ -30,7 +30,8 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       thermal_inertia_(
           p.get<std::string>("ACE Thermal Inertia QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   this->addDependentField(wbf_);
   this->addDependentField(tdot_);
@@ -86,9 +87,9 @@ ACETempStandAloneResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData 
           residual_(cell, node) +=
               thermal_conductivity_(cell, qp) * tgrad_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim);
         }
-	// Stabilization contribution to residual
-	residual_(cell, node) += stab_(cell, node); 
       }
+      // Stabilization contribution to residual
+      residual_(cell, node) += stab_(cell, node);
     }
   }
 }

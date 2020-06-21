@@ -24,9 +24,8 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       stab_(p.get<std::string>("Stabilization Name"), 
             p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
-      thermal_conductivity_(
-          p.get<std::string>("ACE Thermal Conductivity QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      thermal_cond_grad_at_qps_(p.get<std::string>("ACE Thermal Conductivity Gradient QP Variable Name"), 
+			        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")), 
       thermal_inertia_(
           p.get<std::string>("ACE Thermal Inertia QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
@@ -34,7 +33,7 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
   this->addDependentField(tdot_);
   this->addDependentField(tgrad_);
   this->addDependentField(wgradbf_);
-  this->addDependentField(thermal_conductivity_);
+  this->addDependentField(thermal_cond_grad_at_qps_);
   this->addDependentField(thermal_inertia_);
   this->addEvaluatedField(stab_);
 
@@ -59,8 +58,8 @@ ACETempStabilization<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(wgradbf_, fm);
   this->utils.setFieldData(tdot_, fm);
   this->utils.setFieldData(stab_, fm);
-  this->utils.setFieldData(thermal_conductivity_, fm);
   this->utils.setFieldData(thermal_inertia_, fm);
+  this->utils.setFieldData(thermal_cond_grad_at_qps_, fm);
 }
 
 //*****

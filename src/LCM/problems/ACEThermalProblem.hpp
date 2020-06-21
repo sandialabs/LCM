@@ -378,9 +378,10 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
 
-    p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
+		        "ACE Thermal Conductivity Gradient QP");  
 
     // Output
     p->set<string>("Stabilization Name", "ACE Temperature Stabilization");

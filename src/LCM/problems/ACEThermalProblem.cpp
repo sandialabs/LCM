@@ -31,6 +31,7 @@ Albany::ACEThermalProblem::ACEThermalProblem(
     material_db_ = Teuchos::rcp(new Albany::MaterialDatabase(mtrl_db_filename, comm_));
   }
   use_stab_ = params->get<bool>("Use Stabilization", false);
+  stab_value_ = params->get<double>("Stabilization Parameter Value", 0.0);
 }
 
 Albany::ACEThermalProblem::~ACEThermalProblem() {}
@@ -159,5 +160,6 @@ Albany::ACEThermalProblem::getValidProblemParameters() const
 
   valid_pl->set<std::string>("MaterialDB Filename", "materials.xml", "Filename of material database xml file");
   valid_pl->set<bool>("Use Stabilization", false, "Flag to turn on stabilization"); 
+  valid_pl->set<double>("Stabilization Parameter Value", 0.0, "Value of stabilization parameter"); 
   return valid_pl;
 }

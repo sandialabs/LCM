@@ -41,6 +41,7 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
   this->addEvaluatedField(tau_);
 
   use_stab_ = p.get<bool>("Use Stabilization"); 
+  stab_value_ = p.get<double>("Stabilization Parameter Value"); 
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
@@ -84,9 +85,9 @@ ACETempStabilization<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     //Here we use a GLS-type stabilization which takes the form:
     //stab = -grad(kappa)*grad(w)*tau*(c*dT/dt - (grad(kappa)*grad(T))) 
     //for this problem, where tau is the stabilization parameter.
-    //Here, we use tau = h^num_dims_/2.0/|grad(kappa)| 
+    //Here, we use tau = stab_value_ * pos(h, num_dims_)/2.0/|grad(kappa)| 
     //as the stabilization parameter, following a common choice
-    //in the literature.
+    //in the literature.  Here h = mesh size. 
     for (std::size_t cell = 0; cell < workset_size_; ++cell) {
       for (std::size_t qp = 0; qp < num_qps_; ++qp) {
         ScalarT norm_grad_kappa = 0.0;
@@ -97,7 +98,7 @@ ACETempStabilization<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 	  h_pow_num_dims *= mesh_size; 
 	}
 	norm_grad_kappa = std::sqrt(norm_grad_kappa);
-        tau_(cell, qp) = h_pow_num_dims / 2.0 / norm_grad_kappa;  	
+        tau_(cell, qp) = stab_value_ * h_pow_num_dims / 2.0 / norm_grad_kappa;
       }
     }
     for (std::size_t cell = 0; cell < workset_size_; ++cell) {

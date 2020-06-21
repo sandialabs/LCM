@@ -105,6 +105,9 @@ class ACEThermalProblem : public AbstractProblem
 
   /// Boolean marking whether SDBCs are used
   bool use_sdbcs_;
+
+  bool use_stab_{false}; 
+
 };
 
 }  // namespace Albany
@@ -382,6 +385,8 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
     p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
 		        "ACE Thermal Conductivity Gradient QP");  
+    p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
+    p->set<bool>("Use Stabilization", use_stab_); 
 
     // Output
     p->set<string>("Stabilization Name", "ACE Temperature Stabilization");

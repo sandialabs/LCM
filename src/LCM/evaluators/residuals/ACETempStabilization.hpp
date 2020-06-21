@@ -45,8 +45,11 @@ class ACETempStabilization : public PHX::EvaluatorWithBaseImpl<Traits>, public P
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> stab_;
+  PHX::MDField<ScalarT, Cell, Node> tau_;
 
   unsigned int num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
+
+  bool use_stab_{false}; 
 };
 }  // namespace LCM
 

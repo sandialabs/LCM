@@ -379,7 +379,6 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
    * serially, or a Nemspread fileset if ALBANY_MPI is true.
    *
    */
-
   {  // running in Serial or Parallel read from Nemspread files
     bulkData->modification_begin();
     mesh_data->populate_bulk_data();

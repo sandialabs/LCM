@@ -105,11 +105,21 @@ class ACEThermalProblem : public AbstractProblem
 
   /// Boolean marking whether SDBCs are used
   bool use_sdbcs_;
+
+  //Stabilization-related parameters 
+  bool use_stab_{false}; 
+  double stab_value_{1.0}; 
+  double x_max_{0.0}; 
+  double z_max_{0.0};
+  double max_time_stab_{1.0e10}; 
+  std::string tau_type_; 
+  std::string stab_type_;  
 };
 
 }  // namespace Albany
 
 #include "ACETempStandAloneResid.hpp"
+#include "ACETempStabilization.hpp"
 #include "ACEThermalParameters.hpp"
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
@@ -203,6 +213,8 @@ Albany::ACEThermalProblem::constructEvaluators(
     RCP<ParameterList> p = rcp(new ParameterList);
 
     p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
+    p->set<string>("Weighted Gradient BF Name", "wGrad BF");
+    p->set<string>("BF Name", "BF");
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<string>("ACE Bluff Salinity QP Variable Name", "ACE Bluff Salinity");
     p->set<string>("ACE Ice Saturation QP Variable Name", "ACE Ice Saturation");
@@ -211,10 +223,16 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE Water Saturation QP Variable Name", "ACE Water Saturation");
     p->set<string>("ACE Porosity QP Variable Name", "ACE Porosity");
     p->set<string>("ACE Temperature QP Variable Name", "Temperature");
+    p->set<string>("ACE Thermal Conductivity Gradient Node Variable Name", 
+		        "ACE Thermal Conductivity Gradient Node");  
+    p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
+		        "ACE Thermal Conductivity Gradient QP");  
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
     p->set<RCP<DataLayout>>("Node Data Layout", dl_->node_scalar);
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
+    p->set<RCP<DataLayout>>("Node Vector Data Layout", dl_->node_vector);
+    p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
 
     p->set<RCP<ParamLib>>("Parameter Library", paramLib);
     Teuchos::ParameterList& paramList = params->sublist("ACE Thermal Parameters");
@@ -356,6 +374,28 @@ Albany::ACEThermalProblem::constructEvaluators(
     }
   }
 
+  {  // Temperature stabilization
+    RCP<ParameterList> p = rcp(new ParameterList("Temperature Stabilization"));
+
+    // Input
+    p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl_->node_qp_scalar);
+    p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
+    p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
+    p->set<double>("Stabilization Parameter Value", stab_value_);
+    p->set<std::string>("Jacobian Det Name", "Jacobian Det");
+    p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
+		        "ACE Thermal Conductivity Gradient QP");  
+    p->set<string>("Tau Type", tau_type_);
+
+    // Output
+    p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
+    p->set<RCP<DataLayout>>("Node Scalar Data Layout", dl_->node_scalar);
+
+    ev = rcp(new LCM::ACETempStabilization<EvalT, AlbanyTraits>(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+  }
+
   {  // Temperature Resid
     RCP<ParameterList> p = rcp(new ParameterList("Temperature Resid"));
 
@@ -373,6 +413,16 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
+    p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
+		        "ACE Thermal Conductivity Gradient QP");  
+    p->set<std::string>("Jacobian Det Name", "Jacobian Det");
+    p->set<bool>("Use Stabilization", use_stab_);
+    p->set<double>("Max Value of x-Coord", x_max_);
+    p->set<double>("Max Value of z-Coord", z_max_);
+    p->set<double>("Max Stabilization Time", max_time_stab_); 
+    p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
+    p->set<string>("QP Coordinate Vector Name", "Coord Vec");
+    p->set<string>("Stabilization Type", stab_type_); 
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");

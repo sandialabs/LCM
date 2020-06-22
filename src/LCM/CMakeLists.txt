@@ -214,6 +214,7 @@ set(residual-sources
     "${LCM_DIR}/evaluators/residuals/HDiffusionDeformationMatterResidual.cpp"
     "${LCM_DIR}/evaluators/residuals/ACETemperatureResidual.cpp"
     "${LCM_DIR}/evaluators/residuals/ACETempStandAloneResid.cpp"
+    "${LCM_DIR}/evaluators/residuals/ACETempStabilization.cpp"
     "${LCM_DIR}/evaluators/residuals/MechanicsResidual.cpp"
     "${LCM_DIR}/evaluators/residuals/StabilizedPressureResidual.cpp"
     "${LCM_DIR}/evaluators/residuals/TLElasResid.cpp")
@@ -230,6 +231,8 @@ set(residual-headers
     "${LCM_DIR}/evaluators/residuals/ACETemperatureResidual_Def.hpp"
     "${LCM_DIR}/evaluators/residuals/ACETempStandAloneResid.hpp"
     "${LCM_DIR}/evaluators/residuals/ACETempStandAloneResid_Def.hpp"
+    "${LCM_DIR}/evaluators/residuals/ACETempStabilization.hpp"
+    "${LCM_DIR}/evaluators/residuals/ACETempStabilization_Def.hpp"
     "${LCM_DIR}/evaluators/residuals/MechanicsResidual.hpp"
     "${LCM_DIR}/evaluators/residuals/MechanicsResidual_Def.hpp"
     "${LCM_DIR}/evaluators/residuals/StabilizedPressureResidual.hpp"

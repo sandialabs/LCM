@@ -36,20 +36,13 @@ class ACETempStabilization : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<ScalarT const, Cell, QuadPoint>                tdot_;
-  PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wgradbf_;
-  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           tgrad_;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_inertia_;       // thermal inertia = rho * C
   PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           thermal_cond_grad_at_qps_; //thermal conductivity
                                                                                          //grad at qps
   PHX::MDField<const MeshScalarT,Cell,QuadPoint> jacobian_det_; //jacobian determinant - for getting mesh size h
   // Output:
-  PHX::MDField<ScalarT, Cell, Node> stab_;
   PHX::MDField<ScalarT, Cell, Node> tau_;
 
   unsigned int num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
-
-  bool use_stab_{false};
 
   double stab_value_{0.0};  
   

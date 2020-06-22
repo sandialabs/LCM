@@ -42,13 +42,17 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>, public
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           tgrad_;
   PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_conductivity_;  // thermal conductivity
   PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_inertia_;       // thermal inertia = rho * C
-  PHX::MDField<const ScalarT, Cell, Node>                     stab_;      //SUPG stabilization term
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           thermal_cond_grad_at_qps_; //thermal conductivity
+                                                                                         //grad at qps
+  PHX::MDField<ScalarT, Cell, Node> tau_;
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> residual_;
 
   unsigned int num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
   
+  bool use_stab_{false};
+
   Teuchos::RCP<Teuchos::FancyOStream> fos_;
 };
 }  // namespace LCM

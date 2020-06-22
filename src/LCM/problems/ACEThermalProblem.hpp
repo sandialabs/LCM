@@ -373,26 +373,17 @@ Albany::ACEThermalProblem::constructEvaluators(
     RCP<ParameterList> p = rcp(new ParameterList("Temperature Stabilization"));
 
     // Input
-    p->set<string>("QP Time Derivative Variable Name", "Temperature_dot");
-    p->set<string>("Gradient QP Variable Name", "Temperature Gradient");
-    p->set<string>("Weighted Gradient BF Name", "wGrad BF");
-
     p->set<RCP<DataLayout>>("Node QP Scalar Data Layout", dl_->node_qp_scalar);
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
-
-    p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
-    p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
-    p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
-		        "ACE Thermal Conductivity Gradient QP");  
-    p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
-    p->set<bool>("Use Stabilization", use_stab_);
     p->set<double>("Stabilization Parameter Value", stab_value_);
     p->set<std::string>("Jacobian Det Name", "Jacobian Det");
+    p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
+		        "ACE Thermal Conductivity Gradient QP");  
 
     // Output
-    p->set<string>("Stabilization Name", "ACE Temperature Stabilization");
+    p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
     p->set<RCP<DataLayout>>("Node Scalar Data Layout", dl_->node_scalar);
 
     ev = rcp(new LCM::ACETempStabilization<EvalT, AlbanyTraits>(*p));
@@ -416,7 +407,10 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE Thermal Conductivity QP Variable Name", "ACE Thermal Conductivity");
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
-    p->set<string>("Stabilization Name", "ACE Temperature Stabilization");
+    p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
+		        "ACE Thermal Conductivity Gradient QP");  
+    p->set<bool>("Use Stabilization", use_stab_);
+    p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");

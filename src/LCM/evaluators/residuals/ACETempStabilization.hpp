@@ -44,9 +44,11 @@ class ACETempStabilization : public PHX::EvaluatorWithBaseImpl<Traits>, public P
 
   unsigned int num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
 
-  double stab_value_{0.0};  
-  
   Teuchos::RCP<Teuchos::FancyOStream> fos_;
+
+  //Stabilization parameters
+  double stab_value_{0.0};  
+  std::string tau_type_; 
 };
 }  // namespace LCM
 

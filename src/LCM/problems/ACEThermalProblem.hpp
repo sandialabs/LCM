@@ -106,9 +106,14 @@ class ACEThermalProblem : public AbstractProblem
   /// Boolean marking whether SDBCs are used
   bool use_sdbcs_;
 
+  //Stabilization-related parameters 
   bool use_stab_{false}; 
-
-  double stab_value_{0.0}; 
+  double stab_value_{1.0}; 
+  double x_max_{0.0}; 
+  double z_max_{0.0};
+  double max_time_stab_{1.0e10}; 
+  std::string tau_type_; 
+  std::string stab_type_;  
 };
 
 }  // namespace Albany
@@ -381,6 +386,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<std::string>("Jacobian Det Name", "Jacobian Det");
     p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
 		        "ACE Thermal Conductivity Gradient QP");  
+    p->set<string>("Tau Type", tau_type_);
 
     // Output
     p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
@@ -409,8 +415,14 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
     p->set<string>("ACE Thermal Conductivity Gradient QP Variable Name", 
 		        "ACE Thermal Conductivity Gradient QP");  
+    p->set<std::string>("Jacobian Det Name", "Jacobian Det");
     p->set<bool>("Use Stabilization", use_stab_);
+    p->set<double>("Max Value of x-Coord", x_max_);
+    p->set<double>("Max Value of z-Coord", z_max_);
+    p->set<double>("Max Stabilization Time", max_time_stab_); 
     p->set<string>("Tau Name", "ACE Thermal Stabilization Parameter Tau");  
+    p->set<string>("QP Coordinate Vector Name", "Coord Vec");
+    p->set<string>("Stabilization Type", stab_type_); 
 
     // Output
     p->set<string>("Residual Name", "Temperature Residual");

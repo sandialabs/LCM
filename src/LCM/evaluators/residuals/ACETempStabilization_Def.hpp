@@ -26,6 +26,7 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
   this->addEvaluatedField(tau_);
 
   stab_value_ = p.get<double>("Stabilization Parameter Value"); 
+  tau_type_ = p.get<std::string>("Tau Type"); 
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
@@ -66,7 +67,13 @@ ACETempStabilization<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         h_pow_num_dims *= mesh_size; 
       }
       norm_grad_kappa = std::sqrt(norm_grad_kappa);
-      tau_(cell, qp) = stab_value_ * h_pow_num_dims / 2.0 / norm_grad_kappa;
+      //IKT FIXME?  switch tau_type_ to enum?
+      if (tau_type_ == "SUPG") {
+        tau_(cell, qp) = stab_value_ * h_pow_num_dims / 2.0 / norm_grad_kappa;
+      }
+      else if (tau_type_ == "Proportional to Mesh Size") {
+        tau_(cell, qp) = stab_value_ * h_pow_num_dims; 
+      }
     }
   }
 }

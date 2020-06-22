@@ -1,0 +1,62 @@
+ALBANY:
+  ElementBlocks:
+    polygon1:
+      material: Ice
+    icewedge1:
+      material: Ice
+      
+  Materials:
+    Permafrost:
+      #=======================================#
+      # This material describes permafrost    #
+      # soil within a permafrost polygon.     #
+      #=======================================#
+      ACE Ice Density: 920.0 #[kg/m3]
+      ACE Water Density: 1000.0 #[kg/m3]
+      ACE Sediment Density: 2650.0 #[kg/m3]
+      ACE Ice Thermal Conductivity: 2.1 #1.60  #[W/K/m]
+      ACE Water Thermal Conductivity: 0.60 #[W/K/m]
+      ACE Sediment Thermal Conductivity: 4.365 #[W/K/m] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Ice Heat Capacity: 2.0e+03  #[J/kg/K]
+      ACE Water Heat Capacity: 4.0e+03  #[J/kg/K]
+      ACE Sediment Heat Capacity: 0.70e+03  #[J/kg/K] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Sand File: './sand_frac.txt'
+      ACE Silt File: './silt_frac.txt'
+      ACE Clay File: './clay_frac.txt'
+      ACE Peat File: './peat_frac.txt'
+      ACE Base Salinity: 5.0  # Used if 'bluff_salinity.txt' vector not given.
+      ACE Salinity File: './bluff_salinity.txt'
+      ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
+      ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
+      ACE Porosity File: './porosity.txt'
+      ACE Latent Heat: 334.0e+03 #[J/kg]
+      ACE Z Depth File: './depth.txt'
+      ACE Time File: './TimeHis_ExSec3600_2011.txt'
+      ACE Sea Level File: './waterH_ExSec3600_Grid0.02_2011.txt'
+      ACE Ocean Salinity File: './ocean_salinity_ExSec3600_Grid0.02_2011.txt'
+      ACE Element Size: 0.10  # [m]
+    Ice:
+      #=======================================#
+      # This material describes an ice wedge  #
+      # within a permafrost polygon.          #
+      #=======================================#
+      ACE Ice Density: 920.0 #[kg/m3]
+      ACE Water Density: 1000.0 #[kg/m3]
+      ACE Sediment Density: 2650.0 #[kg/m3]
+      ACE Ice Thermal Conductivity: 2.1 #1.60  #[W/K/m]
+      ACE Water Thermal Conductivity: 0.60 #[W/K/m]
+      ACE Sediment Thermal Conductivity: 4.365 #[W/K/m] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Ice Heat Capacity: 2.0e+03  #[J/kg/K]
+      ACE Water Heat Capacity: 4.0e+03  #[J/kg/K]
+      ACE Sediment Heat Capacity: 0.70e+03  #[J/kg/K] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Base Salinity: 1.0  # Used if 'bluff_salinity.txt' vector not given.
+      ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
+      ACE Bulk Porosity: 1.0  # Used if porosity.txt not given.
+      ACE Latent Heat: 334.0e+03 #[J/kg]
+      ACE Z Depth File: './depth.txt'
+      ACE Time File: './TimeHis_ExSec3600_2011.txt'
+      ACE Sea Level File: './waterH_ExSec3600_Grid0.02_2011.txt'
+      ACE Ocean Salinity File: './ocean_salinity_ExSec3600_Grid0.02_2011.txt'
+      ACE Element Size: 0.10  # [m]
+
+

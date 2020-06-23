@@ -153,7 +153,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   continueSolve() const;
 
   void 
-  createSolversAppsDiscsMEs(const int file_index = 0) const;
+  createSolversAppsDiscsMEs(const int file_index, const double this_time = 0.0) const;
 
   void
   doQuasistaticOutput(ST const time) const;

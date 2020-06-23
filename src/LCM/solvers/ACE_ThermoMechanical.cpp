@@ -98,7 +98,7 @@ ACEThermoMechanical::ACEThermoMechanical(
   prev_exo_outfile_name_.resize(num_subdomains_);
   prev_exo_outfile_num_snapshots_.resize(num_subdomains_); 
   //Create initial solvers, appds, discs, model evaluators
-  this->createSolversAppsDiscsMEs();
+  this->createSolversAppsDiscsMEs(0);
 
   // Parameters
   Teuchos::ParameterList& problem_params  = app_params->sublist("Problem");
@@ -128,7 +128,7 @@ ACEThermoMechanical::~ACEThermoMechanical() { return; }
 //and model evaluators for the run.  It is a separate routine to easily allow
 //for recreation of these options from the coupling loops.
 void
-ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const 
+ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const double this_time) const 
 {
   // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
   // coupling??  Leaving it in for now.
@@ -227,12 +227,8 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const
     if (file_index > 0) {
       //Change input Exodus file to previous Exodus output file, for restarts.
       disc_params.set<const std::string>("Exodus Input File Name", prev_exo_outfile_name_[subdomain]); 
-      //IKT FIXME, 6/20/2020: currently, w/o coupling, we need to restart
-      //from index 2, unless Exodus file has less than 2 snapshots.  
-      //This will change once we put in the coupling, and if dt \neq the controller time-step.   
-      const int restart_index = (prev_exo_outfile_num_snapshots_[subdomain] < 2) ? 1 : 2;
-      std::cout << "IKT file_index, restart_index = " << file_index << ", " << restart_index << "\n"; 
-      disc_params.set<const int>("Restart Index", restart_index);
+      //Restart from time at beginning of when this function is called 
+      disc_params.set<double>("Restart Time", this_time);
       //Get problem parameter list and remove Initial Condition sublist 
       Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
       problem_params.remove("Initial Condition", true); 
@@ -509,7 +505,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
     if (stop > 0) {
       //Create new solvers, apps, discs and model evaluators  
-      this->createSolversAppsDiscsMEs(stop);
+      this->createSolversAppsDiscsMEs(stop, current_time);
     }
 
     // Before the coupling loop, get internal states

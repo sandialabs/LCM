@@ -64,8 +64,8 @@ ACEThermoMechanical::ACEThermoMechanical(
   // number of models
   num_subdomains_ = model_filenames_.size();
 
-  // throw error if number of model filenames provided is not 2.
-  ALBANY_ASSERT(num_subdomains_ == 2, "ACEThermoMechanical solver requires 2 models!");
+  // throw error if number of model filenames provided is > 2
+  ALBANY_ASSERT(num_subdomains_ <= 2, "ACEThermoMechanical solver requires no more than 2 models!");
 
   // Arrays to cache useful info for each subdomain for later use
   apps_.resize(num_subdomains_);
@@ -114,25 +114,10 @@ ACEThermoMechanical::ACEThermoMechanical(
   // If ordering is wrong, through error. 
   PROB_TYPE prob_type = prob_types_[0]; 
   ALBANY_ASSERT(prob_type == THERMAL, "The first problem type needs to be 'ACE Thermal'!");
-  prob_type = prob_types_[1]; 
-  ALBANY_ASSERT(prob_type == MECHANICS, "The second problem type needs to be 'Mechanics'!");
-  
-  //IKT 6/18/2020: keeping older ordering logic, in case we want to revive it.
-  /*
-  // Check that map has both mechanics and thermal problem; if not, throw error.
-  bool mechanics_found = false;
-  bool thermal_found   = false;
-  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    PROB_TYPE prob_type = prob_types_[subdomain];
-    if (prob_type == MECHANICS) {
-      mechanics_found = true;
-    } else if (prob_type == THERMAL) {
-      thermal_found = true;
-    }
+  if (num_subdomains_ > 1) {
+    prob_type = prob_types_[1]; 
+    ALBANY_ASSERT(prob_type == MECHANICS, "The second problem type needs to be 'Mechanics'!");
   }
-  ALBANY_ASSERT(mechanics_found == true, "'Mechanics' needs to be one of the coupled problems, but it is not found!");
-  ALBANY_ASSERT(thermal_found == true, "'ACE Thermal' needs to be one of the coupled problems, but it is not found!");*/
-  
   return;
 }
 

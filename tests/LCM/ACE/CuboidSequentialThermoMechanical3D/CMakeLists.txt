@@ -5,6 +5,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # Copy Input file from source to binary dir
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/coupled.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_thermalOnly.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/coupled_thermalOnly.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_vardt.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/coupled_vardt.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.yaml

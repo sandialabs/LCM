@@ -231,7 +231,11 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index) const
       //from index 2, unless Exodus file has less than 2 snapshots.  
       //This will change once we put in the coupling, and if dt \neq the controller time-step.   
       const int restart_index = (prev_exo_outfile_num_snapshots_[subdomain] < 2) ? 1 : 2;
+      std::cout << "IKT file_index, restart_index = " << file_index << ", " << restart_index << "\n"; 
       disc_params.set<const int>("Restart Index", restart_index);
+      //Get problem parameter list and remove Initial Condition sublist 
+      Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
+      problem_params.remove("Initial Condition", true); 
     }
 
     Teuchos::RCP<Albany::Application> app{Teuchos::null};

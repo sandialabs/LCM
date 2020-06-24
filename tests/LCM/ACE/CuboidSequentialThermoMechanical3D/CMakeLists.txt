@@ -11,6 +11,10 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/coupled_vardt.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/thermal.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_standalone.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/thermal_standalone.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_standalone_restart.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/thermal_standalone_restart.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_vardt.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/thermal_vardt.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical.yaml

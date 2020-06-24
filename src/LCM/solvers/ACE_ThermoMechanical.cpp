@@ -870,9 +870,10 @@ ACEThermoMechanical::setExplicitUpdateInitialGuessForCoupling(ST const current_t
 void
 ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
 {
+  *fos_ << "IKT setDynamicICVecsAndDoOutput time = " << time << "\n"; 
   bool is_initial_time = false;
 
-  if (time == initial_time_) is_initial_time = true;
+  if (time <= initial_time_ + initial_time_step_) is_initial_time = true;
 
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     const PROB_TYPE prob_type = prob_types_[subdomain];
@@ -908,7 +909,7 @@ ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
       // Write initial condition to STK mesh
       Teuchos::RCP<Thyra_MultiVector const> const xMV = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
 
-      stk_disc.writeSolutionMV(*xMV, initial_time_, true);
+      stk_disc.writeSolutionMV(*xMV, time, true);
 
     }
 
@@ -929,10 +930,6 @@ ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
         Thyra::copy(*x_mv->col(2), ics_xdotdot_[subdomain].ptr());
       }
 
-      if (do_outputs_[subdomain] == true) {  // write solution to Exodus
-
-        stk_disc.writeSolutionMV(*x_mv, time);
-      }
     }
 
     stk_mesh_struct.exoOutput = false;

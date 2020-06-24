@@ -1907,6 +1907,7 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
       "Requires SEACAS build");
 
   validPL->set<bool>("Use Serial Mesh", false, "Read in a single mesh on PE 0 and rebalance");
+  validPL->set<bool>("Disable Exodus Output Initial Time", false, "Flag to disable Exodus output at initial time");
   validPL->set<bool>(
       "Transfer Solution to Coordinates", false, "Copies the solution vector to the coordinates for output");
 

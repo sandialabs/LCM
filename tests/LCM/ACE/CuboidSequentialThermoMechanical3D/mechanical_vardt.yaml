@@ -31,7 +31,6 @@ LCM:
     Exodus Output File Name: './mechanics-vardt.e'
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 2
-    Exodus Write Interval: 5
   Regression Results:
     Number of Comparisons: 0
     Test Values: [0.000000000000e+00, -1.442043556017e-05, 3.715203484204e-04, -3.715203339250e-04]

@@ -883,7 +883,6 @@ ACEThermoMechanical::setExplicitUpdateInitialGuessForCoupling(ST const current_t
 void
 ACEThermoMechanical::setDynamicICVecsAndDoOutput(ST const time) const
 {
-  *fos_ << "IKT setDynamicICVecsAndDoOutput time = " << time << "\n"; 
   bool is_initial_time = false;
 
   if (time <= initial_time_ + initial_time_step_) is_initial_time = true;

@@ -298,6 +298,10 @@ class AbstractDiscretization
   writeSolutionToFile(Thyra_Vector const& solution, double const time, bool const overlapped = false) = 0;
   virtual void
   writeSolutionMVToFile(const Thyra_MultiVector& solution, double const time, bool const overlapped = false) = 0;
+  
+  //Routine that disables writing out of initial condition to Exodus file
+  virtual void
+  disableExoOutputInitialTime() = 0; 
 };
 
 }  // namespace Albany

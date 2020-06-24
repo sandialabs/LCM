@@ -693,21 +693,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-  //IKT FIXME 6/23/2020: delete the following commented out code 
-  //when confident restarts are working correctly.
-  /*Teuchos::RCP<Thyra_Vector> ic_x_rcp    = Thyra::createMember(me.get_x_space());
-  Teuchos::RCP<Thyra_Vector> ic_xdot_rcp = Thyra::createMember(me.get_x_space());
-
-  // set ic_x_rcp and ic_xdot_rcp
-  // by making copy of what is in ics_x_[subdomain], etc.
-  Thyra_Vector& ic_x    = *ics_x_[subdomain];
-  Thyra_Vector& ic_xdot = *ics_xdot_[subdomain];
-
-  Thyra::copy(ic_x, ic_x_rcp.ptr());
-  Thyra::copy(ic_xdot, ic_xdot_rcp.ptr());
-
-  piro_tempus_solver.setInitialState(current_time, ic_x_rcp, ic_xdot_rcp);*/
-
   if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
 
   solver.evalModel(in_args, out_args);
@@ -799,25 +784,6 @@ ACEThermoMechanical::AdvanceMechanicsDynamics(
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
   
-  //IKT FIXME 6/23/2020: delete the following commented out code 
-  //when confident restarts are working correctly.
-  /*
-  Teuchos::RCP<Thyra_Vector>                ic_x_rcp = Thyra::createMember(me.get_x_space());
-  Teuchos::RCP<Thyra_Vector> ic_xdot_rcp = Thyra::createMember(me.get_x_space());
-  Teuchos::RCP<Thyra_Vector> ic_xdotdot_rcp = Thyra::createMember(me.get_x_space());
-
-  // set ic_x_rcp, ic_xdot_rcp and ic_xdotdot_rcp
-  // by making copy of what is in ics_x_[subdomain], etc.
-  Thyra_Vector& ic_x       = *ics_x_[subdomain];
-  Thyra_Vector& ic_xdot    = *ics_xdot_[subdomain];
-  Thyra_Vector& ic_xdotdot = *ics_xdotdot_[subdomain];
-
-  Thyra::copy(ic_x, ic_x_rcp.ptr());
-  Thyra::copy(ic_xdot, ic_xdot_rcp.ptr());
-  Thyra::copy(ic_xdotdot, ic_xdotdot_rcp.ptr());
-
-  piro_tempus_solver.setInitialState(current_time, ic_x_rcp, ic_xdot_rcp, ic_xdotdot_rcp);*/
-
   if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
 
   solver.evalModel(in_args, out_args);

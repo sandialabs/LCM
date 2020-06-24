@@ -209,12 +209,12 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     std::ostringstream ss;
     std::string str = disc_params.get<std::string>("Exodus Output File Name");
     if (str.find(".exo") != std::string::npos) {
-      ss << file_index << ".exo";
+      ss << ".e-s." << file_index;
       str.replace(str.find(".exo"), std::string::npos, ss.str());
     }
     else {
       if (str.find(".e") != std::string::npos) {
-        ss << file_index << ".e";
+        ss << ".e-s." << file_index;
         str.replace(str.find(".e"), std::string::npos, ss.str());
       }
       else {

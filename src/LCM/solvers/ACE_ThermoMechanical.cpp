@@ -224,11 +224,24 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     *fos_ << "Renaming output file to - " << str << '\n';
     disc_params.set<const std::string>("Exodus Output File Name", str); 
 
+    //After the initial run, we will do restarts from the previously written Exodus output file.
+    //IKT 6/24/2020 FIXME: currently this does the restart from the previously written Exodus output file by 
+    //the same problem.  We'll want to change the logic to read the file from the alternate problem (thermal 
+    //will read the mechanics output file, and vice versa).
     if (file_index > 0) {
       //Change input Exodus file to previous Exodus output file, for restarts.
       disc_params.set<const std::string>("Exodus Input File Name", prev_exo_outfile_name_[subdomain]); 
       //Restart from time at beginning of when this function is called 
       disc_params.set<double>("Restart Time", this_time);
+      const PROB_TYPE prob_type = prob_types_[subdomain];
+      if (prob_type == MECHANICS) {
+        //Give the names of the fields (other than solution, solution_dot, solution_dotdot) 
+        //in the restart file that we want to use when we do the restart.  Currently, I'm 
+        //only specifying "ACE_Ice_Saturation" and only for the mechanics problem
+        Teuchos::Array<std::string> restart_fields;
+        restart_fields.push_back("ACE_Ice_Saturation");
+        disc_params.set<Teuchos::Array<std::string>>("Restart Fields", restart_fields);
+      }
       //Get problem parameter list and remove Initial Condition sublist 
       Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
       problem_params.remove("Initial Condition", true); 

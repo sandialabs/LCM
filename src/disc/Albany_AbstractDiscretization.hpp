@@ -301,7 +301,7 @@ class AbstractDiscretization
   
   //Routine that disables writing out of initial condition to Exodus file
   virtual void
-  disableExoOutputInitialTime() = 0; 
+  outputExodusSolutionInitialTime(const bool output_initial_soln_to_exo_file_) = 0; 
 };
 
 }  // namespace Albany

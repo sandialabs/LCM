@@ -42,6 +42,7 @@ ALBANY:
     Exodus Output File Name: './thermal-vardt.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
+    Disable Exodus Output Initial Time: true
   Regression Results: 
     Number of Comparisons: 4
     Test Values: [0.000000000000e+00, 0.000000000000e+00, 0.000000000000e+00, 2.632636121004e+02]

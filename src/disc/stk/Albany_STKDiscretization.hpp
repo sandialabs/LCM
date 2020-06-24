@@ -522,9 +522,9 @@ class STKDiscretization : public AbstractDiscretization
   writeSolutionMVToFile(const Thyra_MultiVector& solution, double const time, bool const overlapped = false);
 
   void
-  disableExoOutputInitialTime()
+  outputExodusSolutionInitialTime(const bool output_initial_soln_to_exo_file_)
   {
-    output_initial_soln_to_exo_file = false; 
+    output_initial_soln_to_exo_file = output_initial_soln_to_exo_file_; 
   };
 
   //! used when NetCDF output on a latitude-longitude grid is requested.

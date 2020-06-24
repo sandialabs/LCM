@@ -269,6 +269,9 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     discs_[subdomain] = disc;
 
     Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
+    if (file_index == 0) {
+      stk_disc.outputExodusSolutionInitialTime(true); 
+    }
 
     Teuchos::RCP<Albany::AbstractSTKMeshStruct> ams = stk_disc.getSTKMeshStruct();
     //Save number of snapshots in Exodus file for restarts

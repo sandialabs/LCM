@@ -17,6 +17,7 @@
 #include "Thyra_DefaultProductVector.hpp"
 #include "Thyra_DefaultProductVectorSpace.hpp"
 #include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
+#include "Albany_SolverFactory.hpp"
 
 namespace LCM {
 
@@ -164,10 +165,12 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   void
   setDynamicICVecsAndDoOutput(ST const time) const;
 
+  std::vector<Teuchos::RCP<Albany::SolverFactory>>                             solver_factories_;
   mutable std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
   mutable Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>                 apps_;
   mutable std::vector<Teuchos::RCP<Albany::AbstractSTKMeshStruct>>             stk_mesh_structs_;
   mutable std::vector<Teuchos::RCP<Albany::AbstractDiscretization>>            discs_;
+  std::vector<Teuchos::RCP<Teuchos::ParameterList>>                            init_pls_; 
 
   char const*  failure_message_{"No failure detected"};
   int          num_subdomains_{0};

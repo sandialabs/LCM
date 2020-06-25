@@ -70,6 +70,7 @@ ACEThermoMechanical::ACEThermoMechanical(
   // Arrays to cache useful info for each subdomain for later use
   apps_.resize(num_subdomains_);
   solvers_.resize(num_subdomains_);
+  solver_factories_.resize(num_subdomains_);
   stk_mesh_structs_.resize(num_subdomains_);
   discs_.resize(num_subdomains_);
   model_evaluators_.resize(num_subdomains_);
@@ -97,6 +98,79 @@ ACEThermoMechanical::ACEThermoMechanical(
  
   prev_exo_outfile_name_.resize(num_subdomains_);
   prev_exo_outfile_num_snapshots_.resize(num_subdomains_); 
+  
+  // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
+  // coupling??  Leaving it in for now.
+  bool is_static{false};
+  bool is_dynamic{false};
+
+  //Create solver factories once at the beginning
+  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    // Get parameters for each subdomain
+    solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(model_filenames_[subdomain], comm_)); 
+    // IKT FIXME - change to setCoupled?
+    solver_factories_[subdomain]->setSchwarz(true);
+    //Get parameters from solver_factories_
+    Teuchos::ParameterList& params = solver_factories_[subdomain]->getParameters();
+
+    Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
+
+    // Get problem name to figure out if we have a thermal or mechanical problem for
+    // this subdomain, and populate prob_types_ vector using this information.
+    // IKT 6/4/2020: This is added to allow user to specify mechanics and thermal problems in
+    // different orders.  I'm not sure if this will be of interest ultimately or not.
+    const std::string problem_name = getName(problem_params.get<std::string>("Name"));
+    if (problem_name == "Mechanics") {
+      prob_types_[subdomain] = MECHANICS;
+    } else if (problem_name == "ACE Thermal") {
+      prob_types_[subdomain] = THERMAL;
+    } else {
+      // Throw error if problem name is not Mechanics or ACE Thermal.
+      // IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
+      ALBANY_ASSERT(
+          false,
+          "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
+    }
+   
+    //Error checks - only needs to be done once at the beginning  
+    bool const have_piro = params.isSublist("Piro");
+    ALBANY_ASSERT(have_piro == true, "Error! Piro sublist not found.\n");
+
+    Teuchos::ParameterList& piro_params = params.sublist("Piro");
+
+    std::string const msg{"All subdomains must have the same solution method (NOX or Tempus)"};
+
+    if (subdomain == 0) {
+      is_dynamic  = piro_params.isSublist("Tempus");
+      is_static   = !is_dynamic;
+      is_static_  = is_static;
+      is_dynamic_ = is_dynamic;
+    }
+    if (is_static == true) { ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg); }
+    if (is_dynamic == true) {
+      ALBANY_ASSERT(piro_params.isSublist("Tempus") == true, msg);
+
+      Teuchos::ParameterList& tempus_params = piro_params.sublist("Tempus");
+
+      tempus_params.set("Abort on Failure", false);
+
+      Teuchos::ParameterList& time_step_control_params =
+          piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control");
+
+      std::string const integrator_step_type = time_step_control_params.get("Integrator Step Type", "Constant");
+      
+      std::string const msg2{
+          "Non-constant time-stepping through Tempus not supported "
+          "with ACE sequential thermo-mechanical coupling; \n"
+          "In this case, variable time-stepping is "
+          "handled within the coupling loop.\n"
+          "Please rerun with 'Integrator Step Type: "
+          "Constant' in 'Time Step Control' sublist.\n"};
+      ALBANY_ASSERT(integrator_step_type == "Constant", msg2);
+    }
+
+  }
+    
   //Create initial solvers, appds, discs, model evaluators
   this->createSolversAppsDiscsMEs(0);
 
@@ -130,77 +204,11 @@ ACEThermoMechanical::~ACEThermoMechanical() { return; }
 void
 ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const double this_time) const 
 {
-  // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
-  // coupling??  Leaving it in for now.
-  bool is_static{false};
-  bool is_dynamic{false};
-
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
 
-    // Get parameters for each subdomain
-    Albany::SolverFactory solver_factory(model_filenames_[subdomain], comm_);
-
-    // IKT FIXME - change to setCoupled?
-    solver_factory.setSchwarz(true);
-
-    Teuchos::ParameterList& params = solver_factory.getParameters();
-
+    //Get parameters from solver_factories_
+    Teuchos::ParameterList& params = solver_factories_[subdomain]->getParameters();
     Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
-
-    // Get problem name to figure out if we have a thermal or mechanical problem for
-    // this subdomain, and populate prob_types_ vector using this information.
-    // IKT 6/4/2020: This is added to allow user to specify mechanics and thermal problems in
-    // different orders.  I'm not sure if this will be of interest ultimately or not.
-    const std::string problem_name = getName(problem_params.get<std::string>("Name"));
-    if (problem_name == "Mechanics") {
-      prob_types_[subdomain] = MECHANICS;
-    } else if (problem_name == "ACE Thermal") {
-      prob_types_[subdomain] = THERMAL;
-    } else {
-      // Throw error if problem name is not Mechanics or ACE Thermal.
-      // IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
-      ALBANY_ASSERT(
-          false,
-          "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
-    }
-
-    // Add NOX pre-post-operator for Schwarz loop convergence criterion.
-    bool const have_piro = params.isSublist("Piro");
-
-    ALBANY_ASSERT(have_piro == true, "Error! Piro sublist not found.\n");
-
-    Teuchos::ParameterList& piro_params = params.sublist("Piro");
-
-    std::string const msg{"All subdomains must have the same solution method (NOX or Tempus)"};
-
-    if (subdomain == 0) {
-      is_dynamic  = piro_params.isSublist("Tempus");
-      is_static   = !is_dynamic;
-      is_static_  = is_static;
-      is_dynamic_ = is_dynamic;
-    }
-    if (is_static == true) { ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg); }
-    if (is_dynamic == true) {
-      ALBANY_ASSERT(piro_params.isSublist("Tempus") == true, msg);
-
-      Teuchos::ParameterList& tempus_params = piro_params.sublist("Tempus");
-
-      tempus_params.set("Abort on Failure", false);
-
-      Teuchos::ParameterList& time_step_control_params =
-          piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control");
-
-      std::string const integrator_step_type = time_step_control_params.get("Integrator Step Type", "Constant");
-
-      std::string const msg2{
-          "Non-constant time-stepping through Tempus not supported "
-          "with ACE sequential thermo-mechanical coupling; \n"
-          "In this case, variable time-stepping is "
-          "handled within the coupling loop.\n"
-          "Please rerun with 'Integrator Step Type: "
-          "Constant' in 'Time Step Control' sublist.\n"};
-      ALBANY_ASSERT(integrator_step_type == "Constant", msg2);
-    }
 
     Teuchos::ParameterList& disc_params = params.sublist("Discretization", true);
     //Rename output file to append index to it
@@ -250,7 +258,7 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     Teuchos::RCP<Albany::Application> app{Teuchos::null};
 
     Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
-        solver_factory.createAndGetAlbanyApp(app, comm_, comm_);
+        solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
 
     solvers_[subdomain] = solver;
 
@@ -283,7 +291,7 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
 
     stk_mesh_structs_[subdomain] = ams;
 
-    model_evaluators_[subdomain] = solver_factory.returnModel();
+    model_evaluators_[subdomain] = solver_factories_[subdomain]->returnModel();
 
     curr_x_[subdomain] = Teuchos::null;
    

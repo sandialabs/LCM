@@ -26,7 +26,20 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
   this->addEvaluatedField(tau_);
 
   stab_value_ = p.get<double>("Stabilization Parameter Value"); 
-  tau_type_ = p.get<std::string>("Tau Type"); 
+  std::string tau_type_string = p.get<std::string>("Tau Type");
+  std::cout << "IKT tau_type_string = " << tau_type_string << "\n";  
+  if (tau_type_string == "None") {
+    tau_type_ = NONE; 
+  }
+  else if (tau_type_string == "SUPG") {
+    tau_type_ = SUPG; 
+  }
+  else if (tau_type_string == "Proportional to Mesh Size") {
+    tau_type_ = PROP_TO_H; 
+  }
+  else {
+    ALBANY_ASSERT(false, "Invalid stabilization parameter value!  Valid values are 'None', 'SUPG' and 'Proportional to Mesh Size'.");
+  }
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
@@ -59,19 +72,28 @@ ACETempStabilization<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
   //in the literature, where  h = mesh size. 
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
-      ScalarT norm_grad_kappa = 0.0;
       ScalarT mesh_size = 2.0*std::pow(jacobian_det_(cell, qp), 1.0/num_dims_);	
       ScalarT h_pow_num_dims = 1.0; 
       for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
-        norm_grad_kappa += thermal_cond_grad_at_qps_(cell, qp, ndim)*thermal_cond_grad_at_qps_(cell, qp, ndim); 
         h_pow_num_dims *= mesh_size; 
       }
-      norm_grad_kappa = std::sqrt(norm_grad_kappa);
-      //IKT FIXME?  switch tau_type_ to enum?
-      if (tau_type_ == "SUPG") {
-        tau_(cell, qp) = stab_value_ * h_pow_num_dims / 2.0 / norm_grad_kappa;
+      if (tau_type_ == NONE) {
+        tau_(cell, qp) = 0.0; 
       }
-      else if (tau_type_ == "Proportional to Mesh Size") {
+      else if (tau_type_ == SUPG) {
+        ScalarT norm_grad_kappa = 0.0;
+        for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
+          norm_grad_kappa += thermal_cond_grad_at_qps_(cell, qp, ndim)*thermal_cond_grad_at_qps_(cell, qp, ndim); 
+        }
+        if (std::abs(norm_grad_kappa) > 1.0e-12) {
+          norm_grad_kappa = std::sqrt(norm_grad_kappa);
+        }
+        else {
+          norm_grad_kappa = 0.0; 
+        }
+          tau_(cell, qp) = stab_value_ * h_pow_num_dims / 2.0 / norm_grad_kappa;
+        }
+      else if (tau_type_ == PROP_TO_H) {
         tau_(cell, qp) = stab_value_ * h_pow_num_dims; 
       }
     }

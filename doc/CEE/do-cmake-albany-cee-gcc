@@ -1,0 +1,16 @@
+#!/bin/bash
+ 
+rm -rf CMake*
+
+cmake \
+      -D ALBANY_TRILINOS_DIR:FILEPATH=/projects/albany/lcm/Trilinos/build-gcc-release/install \
+      -D ENABLE_DEMO_PDES:BOOL=ON \
+      -D CMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
+      -D ENABLE_DEBUGGING:BOOL=OFF \
+      -D ENABLE_CHECK_FPE:BOOL=OFF \
+      -D ENABLE_STRONG_FPE_CHECK:BOOL=OFF \
+      -D ENABLE_PERFORMANCE_TESTS:BOOL=OFF \
+      -D ALBANY_CTEST_TIMEOUT:INTEGER=70 \
+\
+../
+

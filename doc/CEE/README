@@ -1,0 +1,53 @@
+This file contains instructions for how to build Trilinos
+and Albany on the CEE using sems modules and a gcc compiler.
+
+1.) Checkout the Albany LCM repo:
+
+git clone git@github.com:SNLComputation/LCM.git Albany-LCM
+
+If you are reading this file, you have done so already.
+
+2.) Checkout Trilinos, develop branch:
+
+git clone git@github.com:trilinos/Trilinos.git 
+cd Trilinos
+git checkout develop 
+
+3.) Checkout DataTransferKit, dtk-2.0-tpetra-static-graph branch:
+
+git@github.com:ikalash/DataTransferKit.git
+cd DataTransferKit
+git checkout dtk-2.0-tpetra-static-graph
+
+4.) Build Trilinos as follows:
+
+cd /path/to/Trilinos
+mkdir build
+cd build
+cp /path/to/Albany-LCM/doc/CEE/sems-gcc-modules.sh .
+cp /path/to/Albany-LCM/doc/CEE/do-cmake-trilinos-cee-gcc .
+source sems-gcc-modules.sh 
+./do-cmake-trilinos-cee-gcc -r
+make -j32
+make install -j32
+
+5.) Build Albany-LCM on top of your Trilinos build as follows:
+cd /path/to/Albany-LCM
+mkdir build
+cd build
+cp /path/to/Albany-LCM/doc/CEE/sems-gcc-modules.sh .
+cp /path/to/Albany-LCM/doc/CEE/do-cmake-albany-cee-gcc .
+source sems-gcc-modules.sh 
+Edit do-cmake-albany-cee-gcc by modifying  -D ALBANY_TRILINOS_DIR:FILEPATH to point to /path/to/Trilinos/build/install .
+./do-cmake-albany-cee-gcc 
+make -j32 
+
+6.) You should be good to go!  Make sure to source sems-gcc-modules.sh each time you 
+log on before running Albany.  To automate this, you can cut/paste the contents of this file 
+into your ~/.bashrc file on the CEE.  
+
+7.) Optional: run Albany tests and make sure they run clean 
+cd /path/to/Albany-LCM/build
+source sems-gcc-modules.sh
+ctest  
+

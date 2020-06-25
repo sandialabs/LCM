@@ -5,6 +5,8 @@
 #
 
 set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
+set(runtest_serial_exodiff.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial_exodiff.cmake)
+set(runtest_parallel_exodiff.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_parallel_exodiff.cmake)
 add_subdirectory(Alternating)
 #
 # These are big examples. Any problems in the Schwarz implementation will be

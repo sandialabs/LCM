@@ -67,7 +67,7 @@ if(NOT ALBANY_PARALLEL_ONLY)
   set(OUTFILE "thermal.e-s.119")
   set(REF_FILE "${CMAKE_CURRENT_BINARY_DIR}/../CuboidThermoMechanical3D/grid.e")
   add_test(
-	  NAME ACE_${testName}
+    NAME ACE_${testName}
     COMMAND
       ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=thermal
       -DTEST_ARGS=coupled.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}

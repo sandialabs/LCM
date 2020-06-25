@@ -35,7 +35,7 @@ ENDIF()
 #ENDIF()
 
 message("Running the command:")
-message("${EXODIFF_TEST}")
+message("${EXODIFF_TEST0}")
 
 EXECUTE_PROCESS(
     COMMAND ${EXODIFF_TEST0}
@@ -45,6 +45,9 @@ if(HAD_ERROR)
 	message(FATAL_ERROR "Test failed")
 endif()
 
+message("Running the command:")
+message("${EXODIFF_TEST1}")
+
 EXECUTE_PROCESS(
     COMMAND ${EXODIFF_TEST1}
     #OUTPUT_FILE ${TEST_NAME}.exodiff.out
@@ -53,6 +56,9 @@ if(HAD_ERROR)
 	message(FATAL_ERROR "Test failed")
 endif()
 
+message("Running the command:")
+message("${EXODIFF_TEST2}")
+
 EXECUTE_PROCESS(
     COMMAND ${EXODIFF_TEST2}
     #OUTPUT_FILE ${TEST_NAME}.exodiff.out
@@ -60,6 +66,9 @@ EXECUTE_PROCESS(
 if(HAD_ERROR)
 	message(FATAL_ERROR "Test failed")
 endif()
+
+message("Running the command:")
+message("${EXODIFF_TEST3}")
 
 EXECUTE_PROCESS(
     COMMAND ${EXODIFF_TEST3}

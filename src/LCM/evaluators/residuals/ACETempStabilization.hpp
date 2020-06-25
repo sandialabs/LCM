@@ -48,7 +48,10 @@ class ACETempStabilization : public PHX::EvaluatorWithBaseImpl<Traits>, public P
 
   //Stabilization parameters
   double stab_value_{0.0};  
-  std::string tau_type_; 
+  
+  enum TAU_TYPE {NONE, SUPG, PROP_TO_H};
+  TAU_TYPE tau_type_;
+
 };
 }  // namespace LCM
 

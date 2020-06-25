@@ -43,9 +43,6 @@ Albany::ACEThermalProblem::ACEThermalProblem(
     //IKT 6/21/20 TODO? set this to the maximum time in the input file 
     max_time_stab_ = stab_pl.get<double>("Max Stabilization Time", 1.0e10);
     tau_type_ = stab_pl.get<std::string>("Tau Type", "Proportional to Mesh Size");
-    if ((tau_type_ != "SUPG") && (tau_type_ != "Proportional to Mesh Size")) {
-      ALBANY_ASSERT(false, "Invalid Tau Type!  Valid options are 'SUPG' and 'Proportional to Mesh Size'.");
-    } 
     stab_type_ = stab_pl.get<std::string>("Stabilization Type", "Laplacian"); 
     if ((stab_type_ != "SUPG") && (stab_type_ != "Laplacian")) {
       ALBANY_ASSERT(false, "Invalid Stabilization Type!  Valid options are 'SUPG' and 'Laplacian'.");
@@ -56,6 +53,10 @@ Albany::ACEThermalProblem::ACEThermalProblem(
       *out << "   Tau Type = " << tau_type_ << "\n"; 
       *out << "   Stabilization Parameter Value = " << stab_value_ << "\n"; 
     }
+  }
+  else {
+    tau_type_ = "None"; 
+    stab_value_ = 0.0; 
   }
 }
 

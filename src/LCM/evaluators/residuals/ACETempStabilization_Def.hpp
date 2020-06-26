@@ -27,7 +27,6 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
 
   stab_value_ = p.get<double>("Stabilization Parameter Value"); 
   std::string tau_type_string = p.get<std::string>("Tau Type");
-  std::cout << "IKT tau_type_string = " << tau_type_string << "\n";  
   if (tau_type_string == "None") {
     tau_type_ = NONE; 
   }

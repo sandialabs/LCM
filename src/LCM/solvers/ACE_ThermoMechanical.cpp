@@ -108,8 +108,6 @@ ACEThermoMechanical::ACEThermoMechanical(
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     // Get parameters for each subdomain
     solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(model_filenames_[subdomain], comm_)); 
-    // IKT FIXME - change to setCoupled?
-    solver_factories_[subdomain]->setSchwarz(true);
     //Get parameters from solver_factories_
     Teuchos::ParameterList& params = solver_factories_[subdomain]->getParameters();
 
@@ -230,7 +228,18 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     }
     *fos_ << "Renaming output file to - " << str << '\n';
     disc_params.set<const std::string>("Exodus Output File Name", str); 
-
+    
+    const PROB_TYPE prob_type = prob_types_[subdomain];
+    if (prob_type == THERMAL) {
+      disc_params.set<std::string>("Exodus Solution Name", "temperature"); 
+      disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot"); 
+    }
+    else if (prob_type == MECHANICS) {
+      disc_params.set<std::string>("Exodus Solution Name", "disp"); 
+      disc_params.set<std::string>("Exodus SolutionDot Name", "disp_dot"); 
+      disc_params.set<std::string>("Exodus SolutionDotDot Name", "disp_dotdot"); 
+    }
+    disc_params.set<bool>("Output DTK Field to Exodus", false); 
     //After the initial run, we will do restarts from the previously written Exodus output file.
     //IKT 6/24/2020 FIXME: currently this does the restart from the previously written Exodus output file by 
     //the same problem.  We'll want to change the logic to read the file from the alternate problem (thermal 
@@ -240,7 +249,6 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
       disc_params.set<const std::string>("Exodus Input File Name", prev_exo_outfile_name_[subdomain]); 
       //Restart from time at beginning of when this function is called 
       disc_params.set<double>("Restart Time", this_time);
-      const PROB_TYPE prob_type = prob_types_[subdomain];
       if (prob_type == MECHANICS) {
         //Give the names of the fields (other than solution, solution_dot, solution_dotdot) 
         //in the restart file that we want to use when we do the restart.  Currently, I'm 
@@ -260,13 +268,6 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
         solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
 
     solvers_[subdomain] = solver;
-
-    // IKT 6/4/2020: I think we still need to call the following,
-    // looking at the code, but we may want to rename the routine if
-    // it ends up being used for thermo-mechanical too in addition
-    // to Schwarz.
-    // Should we rename the following as 'setCoupling(true)'?
-    app->setSchwarzAlternating(true);
 
     apps_[subdomain] = app;
 

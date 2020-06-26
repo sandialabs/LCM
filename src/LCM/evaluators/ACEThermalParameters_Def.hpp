@@ -20,10 +20,12 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thermal_conductivity_(p.get<std::string>("ACE Thermal Conductivity QP Variable Name"), dl->qp_scalar),
-      thermal_cond_grad_at_nodes_(p.get<std::string>("ACE Thermal Conductivity Gradient Node Variable Name"), 
-			          dl->node_vector), 
-      thermal_cond_grad_at_qps_(p.get<std::string>("ACE Thermal Conductivity Gradient QP Variable Name"), 
-			          dl->qp_vector), 
+      thermal_cond_grad_at_nodes_(
+          p.get<std::string>("ACE Thermal Conductivity Gradient Node Variable Name"),
+          dl->node_vector),
+      thermal_cond_grad_at_qps_(
+          p.get<std::string>("ACE Thermal Conductivity Gradient QP Variable Name"),
+          dl->qp_vector),
       wgradbf_(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       bf_(p.get<std::string>("BF Name"), dl->node_qp_scalar),
       thermal_inertia_(p.get<std::string>("ACE Thermal Inertia QP Variable Name"), dl->qp_scalar),
@@ -45,8 +47,7 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
 
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   coord_vec_ = decltype(coord_vec_)(p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
-  Teuchos::RCP<PHX::DataLayout> node_qp_vector_dl = 
-	   p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout> node_qp_vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   node_qp_vector_dl->dimensions(dims);
   workset_size_ = dims[0];
@@ -79,8 +80,8 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
   this->addEvaluatedField(heat_capacity_);
   this->addEvaluatedField(water_saturation_);
   this->addEvaluatedField(porosity_);
-  this->addEvaluatedField(thermal_cond_grad_at_nodes_); 
-  this->addEvaluatedField(thermal_cond_grad_at_qps_); 
+  this->addEvaluatedField(thermal_cond_grad_at_nodes_);
+  this->addEvaluatedField(thermal_cond_grad_at_qps_);
 
   this->setName("ACE Thermal Parameters");
 }
@@ -100,10 +101,10 @@ ACEThermalParameters<EvalT, Traits>::postRegistrationSetup(typename Traits::Setu
   this->utils.setFieldData(porosity_, fm);
   this->utils.setFieldData(coord_vec_, fm);
   this->utils.setFieldData(temperature_, fm);
-  this->utils.setFieldData(thermal_cond_grad_at_nodes_, fm); 
-  this->utils.setFieldData(thermal_cond_grad_at_qps_, fm); 
-  this->utils.setFieldData(wgradbf_, fm); 
-  this->utils.setFieldData(bf_, fm); 
+  this->utils.setFieldData(thermal_cond_grad_at_nodes_, fm);
+  this->utils.setFieldData(thermal_cond_grad_at_qps_, fm);
+  this->utils.setFieldData(wgradbf_, fm);
+  this->utils.setFieldData(bf_, fm);
 }
 
 // **********************************************************************
@@ -114,24 +115,20 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
   std::string eb_name            = workset.EBName;
   ScalarT     thermal_conduct_eb = this->queryElementBlockParameterMap(eb_name, const_thermal_conduct_map_);
   ScalarT     thermal_inertia_eb = this->queryElementBlockParameterMap(eb_name, const_thermal_inertia_map_);
-  //Initialize thermal_cond_grad_at_nodes to zero 
+  // Initialize thermal_cond_grad_at_nodes to zero
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (std::size_t node = 0; node < num_nodes_; ++node) {
-      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
-        thermal_cond_grad_at_nodes_(cell, node, ndim) = 0.0; 
-      }
+      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) { thermal_cond_grad_at_nodes_(cell, node, ndim) = 0.0; }
     }
   }
-  //Initialize thermal_cond_grad_at_qps to zero
+  // Initialize thermal_cond_grad_at_qps to zero
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
-      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
-        thermal_cond_grad_at_qps_(cell, qp, ndim) = 0.0; 
-      }
+      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) { thermal_cond_grad_at_qps_(cell, qp, ndim) = 0.0; }
     }
   }
 
-  //Set thermal conductivity, thermal inertia and other fields 
+  // Set thermal conductivity, thermal inertia and other fields
   if ((thermal_conduct_eb >= 0) || (thermal_inertia_eb >= 0)) {
     for (std::size_t cell = 0; cell < workset_size_; ++cell) {
       for (std::size_t qp = 0; qp < num_qps_; ++qp) {
@@ -403,7 +400,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       water_saturation_(cell, qp) = wcurr;
     }
   }
-  //Calculate thermal conductivity gradient at nodes using thermal conductivity and wgradbf
+  // Calculate thermal conductivity gradient at nodes using thermal conductivity and wgradbf
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (std::size_t node = 0; node < num_nodes_; ++node) {
       for (std::size_t qp = 0; qp < num_qps_; ++qp) {
@@ -414,14 +411,14 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
     }
   }
-  //Calculate thermal conductivity gradient at qps using thermal conductivity gradient at 
-  //nodes and bf_  
+  // Calculate thermal conductivity gradient at qps using thermal conductivity gradient at
+  // nodes and bf_
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (int qp = 0; qp < num_qps_; ++qp) {
       for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
         for (std::size_t node = 0; node < num_nodes_; ++node) {
-          thermal_cond_grad_at_qps_(cell, qp, ndim) += 
-	  	thermal_cond_grad_at_nodes_(cell, node, ndim) * bf_(cell, node, qp);
+          thermal_cond_grad_at_qps_(cell, qp, ndim) +=
+              thermal_cond_grad_at_nodes_(cell, node, ndim) * bf_(cell, node, qp);
         }
       }
     }

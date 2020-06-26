@@ -36,9 +36,9 @@ class ACETempStabilization : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   typedef typename EvalT::MeshScalarT MeshScalarT;
 
   // Input:
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           thermal_cond_grad_at_qps_; //thermal conductivity
-                                                                                         //grad at qps
-  PHX::MDField<const MeshScalarT,Cell,QuadPoint> jacobian_det_; //jacobian determinant - for getting mesh size h
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> thermal_cond_grad_at_qps_;  // thermal conductivity
+                                                                                // grad at qps
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint> jacobian_det_;  // jacobian determinant - for getting mesh size h
   // Output:
   PHX::MDField<ScalarT, Cell, Node> tau_;
 
@@ -46,12 +46,16 @@ class ACETempStabilization : public PHX::EvaluatorWithBaseImpl<Traits>, public P
 
   Teuchos::RCP<Teuchos::FancyOStream> fos_;
 
-  //Stabilization parameters
-  double stab_value_{0.0};  
-  
-  enum TAU_TYPE {NONE, SUPG, PROP_TO_H};
-  TAU_TYPE tau_type_;
+  // Stabilization parameters
+  double stab_value_{0.0};
 
+  enum TAU_TYPE
+  {
+    NONE,
+    SUPG,
+    PROP_TO_H
+  };
+  TAU_TYPE tau_type_;
 };
 }  // namespace LCM
 

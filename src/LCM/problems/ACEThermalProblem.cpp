@@ -30,33 +30,32 @@ Albany::ACEThermalProblem::ACEThermalProblem(
     // Create Material Database
     material_db_ = Teuchos::rcp(new Albany::MaterialDatabase(mtrl_db_filename, comm_));
   }
-  Teuchos::RCP<Teuchos::FancyOStream> out       = Teuchos::VerboseObjectBase::getDefaultOStream();
+  Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
   if (params->isSublist("Stabilization")) {
-    Teuchos::ParameterList& stab_pl = params->sublist("Stabilization"); 
-    use_stab_ = stab_pl.get<bool>("Use Stabilization", false);
-    stab_value_ = stab_pl.get<double>("Stabilization Parameter Value", 1.0);
-    //Maximum value of x and z in the domain
-    //IKT 6/21/20 TODO: figure these out from the geometry
+    Teuchos::ParameterList& stab_pl = params->sublist("Stabilization");
+    use_stab_                       = stab_pl.get<bool>("Use Stabilization", false);
+    stab_value_                     = stab_pl.get<double>("Stabilization Parameter Value", 1.0);
+    // Maximum value of x and z in the domain
+    // IKT 6/21/20 TODO: figure these out from the geometry
     x_max_ = stab_pl.get<double>("Max Value of x-Coord", 0.0);
     z_max_ = stab_pl.get<double>("Max Value of z-Coord", 0.0);
-    //Maximum time up t0 which you want to apply stabilization
-    //IKT 6/21/20 TODO? set this to the maximum time in the input file 
+    // Maximum time up t0 which you want to apply stabilization
+    // IKT 6/21/20 TODO? set this to the maximum time in the input file
     max_time_stab_ = stab_pl.get<double>("Max Stabilization Time", 1.0e10);
-    tau_type_ = stab_pl.get<std::string>("Tau Type", "Proportional to Mesh Size");
-    stab_type_ = stab_pl.get<std::string>("Stabilization Type", "Laplacian"); 
+    tau_type_      = stab_pl.get<std::string>("Tau Type", "Proportional to Mesh Size");
+    stab_type_     = stab_pl.get<std::string>("Stabilization Type", "Laplacian");
     if ((stab_type_ != "SUPG") && (stab_type_ != "Laplacian")) {
       ALBANY_ASSERT(false, "Invalid Stabilization Type!  Valid options are 'SUPG' and 'Laplacian'.");
     }
     if (use_stab_ == true) {
-      *out << "Thermal problem: using stabilization.\n"; 
-      *out << "   Stabilization Type = " << stab_type_ << "\n"; 
-      *out << "   Tau Type = " << tau_type_ << "\n"; 
-      *out << "   Stabilization Parameter Value = " << stab_value_ << "\n"; 
+      *out << "Thermal problem: using stabilization.\n";
+      *out << "   Stabilization Type = " << stab_type_ << "\n";
+      *out << "   Tau Type = " << tau_type_ << "\n";
+      *out << "   Stabilization Parameter Value = " << stab_value_ << "\n";
     }
-  }
-  else {
-    tau_type_ = "None"; 
-    stab_value_ = 0.0; 
+  } else {
+    tau_type_   = "None";
+    stab_value_ = 0.0;
   }
 }
 
@@ -186,7 +185,7 @@ Albany::ACEThermalProblem::getValidProblemParameters() const
 
   valid_pl->set<std::string>("MaterialDB Filename", "materials.xml", "Filename of material database xml file");
   valid_pl->sublist("Stabilization", false, "Parameter list with stabilization parameters");
-  //valid_pl->set<bool>("Use Stabilization", false, "Flag to turn on stabilization"); 
-  //valid_pl->set<double>("Stabilization Parameter Value", 1.0, "Value of stabilization parameter"); 
+  // valid_pl->set<bool>("Use Stabilization", false, "Flag to turn on stabilization");
+  // valid_pl->set<double>("Stabilization Parameter Value", 1.0, "Value of stabilization parameter");
   return valid_pl;
 }

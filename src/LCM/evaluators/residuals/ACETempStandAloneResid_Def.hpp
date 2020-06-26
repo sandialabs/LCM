@@ -29,12 +29,13 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
       thermal_inertia_(
           p.get<std::string>("ACE Thermal Inertia QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      thermal_cond_grad_at_qps_(p.get<std::string>("ACE Thermal Conductivity Gradient QP Variable Name"), 
-			        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")), 
-      tau_(p.get<std::string>("Tau Name"), 
-           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      jacobian_det_(p.get<std::string>  ("Jacobian Det Name"), 
-           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      thermal_cond_grad_at_qps_(
+          p.get<std::string>("ACE Thermal Conductivity Gradient QP Variable Name"),
+          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      tau_(p.get<std::string>("Tau Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      jacobian_det_(
+          p.get<std::string>("Jacobian Det Name"),
+          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   this->addDependentField(wbf_);
@@ -48,17 +49,16 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
   this->addDependentField(jacobian_det_);
   this->addEvaluatedField(residual_);
 
-  use_stab_ = p.get<bool>("Use Stabilization"); 
-  x_max_ = p.get<double>("Max Value of x-Coord"); 
-  z_max_ = p.get<double>("Max Value of z-Coord"); 
-  max_time_stab_ = p.get<double>("Max Stabilization Time"); 
-  stab_type_ = p.get<std::string>("Stabilization Type"); 
+  use_stab_                               = p.get<bool>("Use Stabilization");
+  x_max_                                  = p.get<double>("Max Value of x-Coord");
+  z_max_                                  = p.get<double>("Max Value of z-Coord");
+  max_time_stab_                          = p.get<double>("Max Stabilization Time");
+  stab_type_                              = p.get<std::string>("Stabilization Type");
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   coord_vec_ = decltype(coord_vec_)(p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
   this->addDependentField(coord_vec_);
-  
-  Teuchos::RCP<PHX::DataLayout> node_qp_vector_dl = 
-	  p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+
+  Teuchos::RCP<PHX::DataLayout> node_qp_vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   node_qp_vector_dl->dimensions(dims);
   workset_size_ = dims[0];
@@ -110,32 +110,31 @@ ACETempStandAloneResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData 
     }
   }
   if (use_stab_) {
-    //Here we use a SUPG-type stabilization which takes the form:
-    //stab = -grad(kappa)*grad(w)*tau*(c*dT/dt - (grad(kappa)*grad(T))) 
-    //for this problem, where tau is the stabilization parameter.
+    // Here we use a SUPG-type stabilization which takes the form:
+    // stab = -grad(kappa)*grad(w)*tau*(c*dT/dt - (grad(kappa)*grad(T)))
+    // for this problem, where tau is the stabilization parameter.
     for (std::size_t cell = 0; cell < workset_size_; ++cell) {
       for (std::size_t node = 0; node < num_nodes_; ++node) {
         for (std::size_t qp = 0; qp < num_qps_; ++qp) {
-  	  //IKT WARNING: the following may not be quite right if we don't have a uniform mesh
-          const ScalarT mesh_size = 2.0*std::pow(jacobian_det_(cell, qp), 1.0/num_dims_);	
-          const auto x = coord_vec_(cell, qp, 0);
-          const auto y = coord_vec_(cell, qp, 1);
-          const auto z = coord_vec_(cell, qp, 2);
+          // IKT WARNING: the following may not be quite right if we don't have a uniform mesh
+          const ScalarT mesh_size = 2.0 * std::pow(jacobian_det_(cell, qp), 1.0 / num_dims_);
+          const auto    x         = coord_vec_(cell, qp, 0);
+          const auto    y         = coord_vec_(cell, qp, 1);
+          const auto    z         = coord_vec_(cell, qp, 2);
           for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
-	    //Apply stabilization only for x > x_max_ - 1.5*h, z > z_max_ - 1.5*h
-	    //and t < max_time_stab_ 
-            if (((x > x_max_ - 1.5*mesh_size) || z > (z_max_ - 1.5*mesh_size)) 
-	            && (workset.current_time < max_time_stab_)) {
+            // Apply stabilization only for x > x_max_ - 1.5*h, z > z_max_ - 1.5*h
+            // and t < max_time_stab_
+            if (((x > x_max_ - 1.5 * mesh_size) || z > (z_max_ - 1.5 * mesh_size)) &&
+                (workset.current_time < max_time_stab_)) {
               if (stab_type_ == "SUPG") {
-                residual_(cell, node) -= thermal_cond_grad_at_qps_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim)
-                                      * tau_(cell, qp) * (thermal_inertia_(cell, qp) * tdot_(cell, qp)  -
-                                      thermal_cond_grad_at_qps_(cell, qp, ndim) * tgrad_(cell, qp, ndim));
-	      }
-	      else if (stab_type_ == "Laplacian") {
-                residual_(cell, node) += wgradbf_(cell, node, qp, ndim)
-                                      * tau_(cell, qp) * tgrad_(cell, qp, ndim);
-	      }
-	    }
+                residual_(cell, node) -= thermal_cond_grad_at_qps_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim) *
+                                         tau_(cell, qp) *
+                                         (thermal_inertia_(cell, qp) * tdot_(cell, qp) -
+                                          thermal_cond_grad_at_qps_(cell, qp, ndim) * tgrad_(cell, qp, ndim));
+              } else if (stab_type_ == "Laplacian") {
+                residual_(cell, node) += wgradbf_(cell, node, qp, ndim) * tau_(cell, qp) * tgrad_(cell, qp, ndim);
+              }
+            }
           }
         }
       }

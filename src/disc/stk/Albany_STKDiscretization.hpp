@@ -524,7 +524,7 @@ class STKDiscretization : public AbstractDiscretization
   void
   outputExodusSolutionInitialTime(const bool output_initial_soln_to_exo_file_)
   {
-    output_initial_soln_to_exo_file = output_initial_soln_to_exo_file_; 
+    output_initial_soln_to_exo_file = output_initial_soln_to_exo_file_;
   };
 
   //! used when NetCDF output on a latitude-longitude grid is requested.
@@ -728,8 +728,9 @@ class STKDiscretization : public AbstractDiscretization
   size_t outputFileIdx;
   bool   interleavedOrdering;
 
-  //Boolean for disabling output of initial solution to Exodus file 
-  bool output_initial_soln_to_exo_file{true};  
+  // Boolean for disabling output of initial solution to Exodus file
+  bool output_initial_soln_to_exo_file{true};
+
  private:
   Teuchos::RCP<ThyraCrsMatrixFactory> nodalMatrixFactory;
 

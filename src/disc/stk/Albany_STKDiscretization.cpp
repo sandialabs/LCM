@@ -884,7 +884,7 @@ STKDiscretization::writeSolutionToFile(Thyra_Vector const& soln, double const ti
 
   // Skip this write unless the proper interval has been reached
   if (stkMeshStruct->exoOutput && !(outputInterval % stkMeshStruct->exoOutputInterval)) {
-    //Skip this write if outputInterval == 0 and output_initial_soln_to_exo_file == false 
+    // Skip this write if outputInterval == 0 and output_initial_soln_to_exo_file == false
     if ((output_initial_soln_to_exo_file == true) || (outputInterval > 0)) {
       double time_label = monotonicTimeLabel(time);
       mesh_data->begin_output_step(outputFileIdx, time_label);
@@ -938,7 +938,7 @@ STKDiscretization::writeSolutionMVToFile(const Thyra_MultiVector& soln, double c
   }
 
   if (stkMeshStruct->exoOutput && !(outputInterval % stkMeshStruct->exoOutputInterval)) {
-    //Skip this write if outputInterval == 0 and output_initial_soln_to_exo_file == false 
+    // Skip this write if outputInterval == 0 and output_initial_soln_to_exo_file == false
     if ((output_initial_soln_to_exo_file == true) || (outputInterval > 0)) {
       double time_label = monotonicTimeLabel(time);
       mesh_data->begin_output_step(outputFileIdx, time_label);

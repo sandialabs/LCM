@@ -38,7 +38,7 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
     tau_type_ = PROP_TO_H; 
   }
   else {
-    ALBANY_ASSERT(false, "Invalid stabilization parameter value!  Valid values are 'None', 'SUPG' and 'Proportional to Mesh Size'.");
+    ALBANY_ABORT("Invalid stabilization parameter value!  Valid values are 'None', 'SUPG' and 'Proportional to Mesh Size'.");
   }
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;

@@ -127,8 +127,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     } else {
       // Throw error if problem name is not Mechanics or ACE Thermal.
       // IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
-      ALBANY_ASSERT(
-          false,
+      ALBANY_ABORT(
           "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
     }
    
@@ -226,7 +225,7 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
         str.replace(str.find(".e"), std::string::npos, ss.str());
       }
       else {
-        ALBANY_ASSERT(false, "Exodus output file does not end in '.e' or '.exo' - cannot rename!\n"); 
+        ALBANY_ABORT("Exodus output file does not end in '.e' or '.exo' - cannot rename!\n"); 
       }
     }
     *fos_ << "Renaming output file to - " << str << '\n';

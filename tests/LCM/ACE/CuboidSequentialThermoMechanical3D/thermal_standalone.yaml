@@ -6,7 +6,7 @@ ALBANY:
   Problem: 
     Name: ACE Thermal 3D
     Solution Method: Transient Tempus
-    MaterialDB Filename: './materials_thermal_only.yaml'
+    MaterialDB Filename: './materials_thermal.yaml'
     Dirichlet BCs: 
       DBC on NS z- for DOF T: 260.0
       DBC on NS z+ for DOF T: 300.0
@@ -39,13 +39,10 @@ ALBANY:
   Discretization: 
     Method: Ioss
     Exodus Input File Name: './grid.g'
-    Exodus Output File Name: './grid.e'
-    Workset Size: -1
-    Exodus Write Interval: 120
-    Disable Exodus Output Initial Time: true
+    Exodus Output File Name: './thermal_standalone.e'
     Separate Evaluators by Element Block: true
-    Exodus Solution Name: temperature
-    Exodus SolutionDot Name: temperature_dot
+    Workset Size: -1
+    Exodus Write Interval: 3
   Regression Results: 
     Number of Comparisons: 4
     Test Values: [0.000000000000e+00, 0.000000000000e+00, 0.000000000000e+00, 2.632636121004e+02]
@@ -62,31 +59,15 @@ ALBANY:
         Solution History: 
           Storage Type: Unlimited
           Storage Limit: 20
-        Time Step Control: 
-          Initial Time: 0.00000000000000000e+00
+        Time Step Control:
+          Initial Time: 0.0
+          Final Time: 21600.0
+          Initial Time Step: 7200.0 
           Initial Time Index: 0
-          Initial Time Step: 7200.0 # 2 hr in seconds
-          Initial Order: 0
-          #Final Time: 17280000.0 # 200 days in seconds
-          Final Time: 864000.0 # 10 days in seconds
-          Final Time Index: 20000
-          Maximum Absolute Error: 1.00000000000000002e-08
-          Maximum Relative Error: 1.00000000000000002e-08
-          Integrator Step Type: Variable
-          Time Step Control Strategy: 
-            Time Step Control Strategy List: basic_vs
-            basic_vs: 
-              Name: Basic VS
-              Reduction Factor: 5.00000000000000000e-01
-              Amplification Factor: 1.50000000000000000e+00
-              Minimum Value Monitoring Function: 1.0e-12
-              Maximum Value Monitoring Function: 1.0e20
+          Final Time Index: 1000000
+          Integrator Step Type: Constant
           Output Time List: ''
           Output Index List: ''
-          Output Time Interval: 43200.0 # 12 hrs in seconds
-          Output Index Interval: 1000
-          Maximum Number of Stepper Failures: 10
-          Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
         Stepper Type: Backward Euler
         Solver Name: Demo Solver

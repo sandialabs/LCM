@@ -521,6 +521,12 @@ class STKDiscretization : public AbstractDiscretization
   void
   writeSolutionMVToFile(const Thyra_MultiVector& solution, double const time, bool const overlapped = false);
 
+  void
+  outputExodusSolutionInitialTime(const bool output_initial_soln_to_exo_file_)
+  {
+    output_initial_soln_to_exo_file = output_initial_soln_to_exo_file_; 
+  };
+
   //! used when NetCDF output on a latitude-longitude grid is requested.
   // Each struct contains a latitude/longitude index and it's parametric
   // coordinates in an element.
@@ -722,6 +728,8 @@ class STKDiscretization : public AbstractDiscretization
   size_t outputFileIdx;
   bool   interleavedOrdering;
 
+  //Boolean for disabling output of initial solution to Exodus file 
+  bool output_initial_soln_to_exo_file{true};  
  private:
   Teuchos::RCP<ThyraCrsMatrixFactory> nodalMatrixFactory;
 

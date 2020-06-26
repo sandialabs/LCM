@@ -124,10 +124,13 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
       "Flag to create signal that this problem will creat its own "
       "preconditioner");
   validPL->set<std::string>("Physics-Based Preconditioner", "None", "Type of preconditioner that problem will create");
+  Teuchos::RCP<Albany::Application> dummy_app; 
+  validPL->set<Teuchos::RCP<Albany::Application>>("Application", dummy_app, "Application to couple to");
 
   validPL->set<Teuchos::Array<std::string>>(
       "Required Fields", Teuchos::Array<std::string>(), "List of field requirements");
   validPL->sublist("Initial Condition", false, "");
+  validPL->sublist("ACE Thermal Parameters", false, "");
   validPL->sublist("Initial Condition Dot", false, "");
   validPL->sublist("Initial Condition DotDot", false, "");
   validPL->sublist("Source Functions", false, "");

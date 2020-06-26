@@ -10,9 +10,6 @@ ALBANY:
     Dirichlet BCs: 
       DBC on NS z- for DOF T: 260.0
       DBC on NS z+ for DOF T: 300.0
-    Initial Condition:
-      Function: Constant
-      Function Data: [260.0]
     Response Functions:
       Number: 2
       Response 0: Project IP to Nodal Field
@@ -38,8 +35,9 @@ ALBANY:
       Response 1: Solution Average
   Discretization: 
     Method: Ioss
-    Exodus Input File Name: './grid.g'
-    Exodus Output File Name: './thermal-less-output.e'
+    Exodus Input File Name: './thermal0.e'
+    Restart Index: 2
+    Exodus Output File Name: './thermal_standalone_restart.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
   Regression Results: 
@@ -58,7 +56,10 @@ ALBANY:
         Solution History: 
           Storage Type: Unlimited
           Storage Limit: 20
-        Time Step Control: 
+        Time Step Control:
+          Initial Time: 7200.0
+          Final Time: 14400.0
+          Initial Time Step: 7200.0 
           Initial Time Index: 0
           Final Time Index: 1000000
           Integrator Step Type: Constant

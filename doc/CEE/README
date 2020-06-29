@@ -1,6 +1,14 @@
 This file contains instructions for how to build Trilinos
 and Albany on the CEE using sems modules and a gcc compiler.
 
+IMPORTANT NOTE: the instructions below assume you are on a RHEL7 cee 
+machine, which should be most of the cee machines, except ceesrv02.  If you 
+get a message that some of the modules loaded are not available, you 
+are likely on a RHEL6 machine.  You can check your RHEL version by executing
+the command: 'cat /etc/redhat-release'. If you are on a RHEL6 machine, please 
+ssh onto an RHEL7 machine (e.g. one of the cee-compute nodes, or your 
+graphics/dedicated workstation). 
+
 1.) Checkout the Albany LCM repo:
 
 git clone git@github.com:SNLComputation/LCM.git Albany-LCM

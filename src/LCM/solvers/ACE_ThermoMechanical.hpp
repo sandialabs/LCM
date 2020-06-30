@@ -208,7 +208,10 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   // std::vector for holding names of previous Exodus output files, for restarts.
   mutable std::vector<std::string> prev_exo_outfile_name_;
-  mutable std::vector<int>         prev_exo_outfile_num_snapshots_;
+  // variable with previous thermal Exodus output file, for mechanics restarts
+  mutable std::string              prev_thermal_exo_outfile_name_;
+  // variable with previous mechanics Exodus output file, for thermal restarts
+  mutable std::string              prev_mechanics_exo_outfile_name_;
 
   mutable std::vector<LCM::StateArrays> internal_states_;
   mutable std::vector<bool>             do_outputs_;

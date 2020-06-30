@@ -27,12 +27,16 @@ LCM:
       Response 3: Solution Min Value
   Discretization:
     Method: Ioss
-    Exodus Input File Name: './thermal.e-s.0'
+    #Exodus Input File Name: './thermal.e-s.0'
+    Exodus Input File Name: './mechanics_standalone_restart.e'
     Restart Index: 2
-    Exodus Output File Name: './mechanics_standalone_restart.e'
+    Exodus Output File Name: './mechanics_standalone_restart2.e'
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 2
     Restart Fields: [ACE_Ice_Saturation, ace_ice_saturation]
+    Exodus Solution Name: 'disp'
+    Exodus SolutionDot Name: 'disp_dot'
+    Exodus SolutionDotDot Name: 'disp_dotdot'
   Regression Results:
     Number of Comparisons: 0
     Test Values: [0.000000000000e+00, -1.442043556017e-05, 3.715203484204e-04, -3.715203339250e-04]
@@ -48,8 +52,8 @@ LCM:
           Storage Type: Unlimited
           Storage Limit: 2000
         Time Step Control:
-          Initial Time: 7200.0
-          Final Time: 14400.0
+          Initial Time: 14400.0
+          Final Time: 21600.0
           Initial Time Step: 7200.0 
           Initial Time Index: 0
           Final Time Index: 1000000

@@ -43,6 +43,8 @@ ALBANY:
     Separate Evaluators by Element Block: true
     Workset Size: -1
     Exodus Write Interval: 3
+    Exodus Solution Name: 'temperature'
+    Exodus SolutionDot Name: 'temperature_dot'
   Regression Results: 
     Number of Comparisons: 4
     Test Values: [0.000000000000e+00, 0.000000000000e+00, 0.000000000000e+00, 2.632636121004e+02]

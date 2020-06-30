@@ -96,7 +96,6 @@ ACEThermoMechanical::ACEThermoMechanical(
   prob_types_.resize(num_subdomains_);
 
   prev_exo_outfile_name_.resize(num_subdomains_);
-  prev_exo_outfile_num_snapshots_.resize(num_subdomains_);
 
   // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
   // coupling??  Leaving it in for now.
@@ -234,15 +233,15 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     }
     disc_params.set<bool>("Output DTK Field to Exodus", false);
     // After the initial run, we will do restarts from the previously written Exodus output file.
-    // IKT 6/24/2020 FIXME: currently this does the restart from the previously written Exodus output file by
-    // the same problem.  We'll want to change the logic to read the file from the alternate problem (thermal
-    // will read the mechanics output file, and vice versa).
     if (file_index > 0) {
       // Change input Exodus file to previous Exodus output file, for restarts.
-      disc_params.set<const std::string>("Exodus Input File Name", prev_exo_outfile_name_[subdomain]);
-      // Restart from time at beginning of when this function is called
-      disc_params.set<double>("Restart Time", this_time);
-      if (prob_type == MECHANICS) {
+      if (prob_type == THERMAL) {
+        // Change input Exodus file to previous mechanics Exodus output file, for restarts.
+        disc_params.set<const std::string>("Exodus Input File Name", prev_mechanics_exo_outfile_name_);
+      }
+      else if (prob_type == MECHANICS) {
+        // Change input Exodus file to previous thermal Exodus output file, for restarts.
+        disc_params.set<const std::string>("Exodus Input File Name", prev_thermal_exo_outfile_name_);
         // Give the names of the fields (other than solution, solution_dot, solution_dotdot)
         // in the restart file that we want to use when we do the restart.  Currently, I'm
         // only specifying "ACE_Ice_Saturation" and only for the mechanics problem.
@@ -254,6 +253,8 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
         restart_fields.push_back("ace_ice_saturation");
         disc_params.set<Teuchos::Array<std::string>>("Restart Fields", restart_fields);
       }
+      // Restart from time at beginning of when this function is called
+      disc_params.set<double>("Restart Time", this_time);
       // Get problem parameter list and remove Initial Condition sublist
       Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
       problem_params.remove("Initial Condition", true);
@@ -277,10 +278,6 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     if (file_index == 0) { stk_disc.outputExodusSolutionInitialTime(true); }
 
     Teuchos::RCP<Albany::AbstractSTKMeshStruct> ams = stk_disc.getSTKMeshStruct();
-    // Save number of snapshots in Exodus file for restarts
-    const int num_snapshots                    = ams->getSolutionFieldHistoryDepth();
-    prev_exo_outfile_num_snapshots_[subdomain] = num_snapshots;
-
     do_outputs_[subdomain]      = ams->exoOutput;
     do_outputs_init_[subdomain] = ams->exoOutput;
 
@@ -290,11 +287,16 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
 
     curr_x_[subdomain] = Teuchos::null;
 
-    // IKT FIXME 6/20/2020: currently I am having the thermal problem
-    // restart from the thermal exodus output file, and the mechanical problem
-    // restart from the mechanical exodus output file, which I think
-    // will change when we put in the coupling.
     prev_exo_outfile_name_[subdomain] = str;
+    // Set strings such that thermal problem restarts from previous mechanics 
+    // Exodus output file, and vice versa for mechanics 
+    if (prob_type == THERMAL) {
+      prev_thermal_exo_outfile_name_ = prev_exo_outfile_name_[1];
+    }
+    else if (prob_type == MECHANICS) {
+      prev_mechanics_exo_outfile_name_ = prev_exo_outfile_name_[0];
+    }
+
   }
 }
 

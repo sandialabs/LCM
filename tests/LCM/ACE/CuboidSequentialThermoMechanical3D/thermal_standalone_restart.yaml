@@ -35,7 +35,7 @@ ALBANY:
       Response 1: Solution Average
   Discretization: 
     Method: Ioss
-    Exodus Input File Name: './thermal0.e'
+    Exodus Input File Name: './thermal.e-s.0'
     Restart Index: 2
     Exodus Output File Name: './thermal_standalone_restart.e'
     Separate Evaluators by Element Block: true

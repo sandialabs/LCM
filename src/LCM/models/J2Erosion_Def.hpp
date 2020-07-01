@@ -57,7 +57,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
 
   // define the evaluated fields
   setEvaluatedField("Failure Indicator", dl->cell_scalar);
-  setEvaluatedField("Exposure Time", dl->qp_scalar);
   setEvaluatedField(cauchy_string, dl->qp_tensor);
   setEvaluatedField(Fp_string, dl->qp_tensor);
   setEvaluatedField(eqps_string, dl->qp_scalar);
@@ -92,9 +91,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   // failed state
   addStateVariable(
       "Failure Indicator", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output Failure Indicator", true));
-
-  // exposure time
-  addStateVariable("Exposure Time", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Exposure Time", true));
 }
 
 template <typename EvalT, typename Traits>
@@ -122,12 +118,11 @@ J2ErosionKernel<EvalT, Traits>::init(
   delta_time_        = *dep_fields["Delta Time"];
 
   // extract evaluated MDFields
-  stress_        = *eval_fields[cauchy_string];
-  Fp_            = *eval_fields[Fp_string];
-  eqps_          = *eval_fields[eqps_string];
-  yield_surf_    = *eval_fields[yieldSurface_string];
-  failed_        = *eval_fields["Failure Indicator"];
-  exposure_time_ = *eval_fields["Exposure Time"];
+  stress_     = *eval_fields[cauchy_string];
+  Fp_         = *eval_fields[Fp_string];
+  eqps_       = *eval_fields[eqps_string];
+  yield_surf_ = *eval_fields[yieldSurface_string];
+  failed_     = *eval_fields["Failure Indicator"];
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_string];
@@ -263,9 +258,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT const J1    = J_(cell, pt);
   ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
 
-  auto&& delta_time    = delta_time_(0);
-  auto&& failed        = failed_(cell, 0);
-  auto&& exposure_time = exposure_time_(cell, pt);
+  auto&& delta_time = delta_time_(0);
+  auto&& failed     = failed_(cell, 0);
 
   // Determine if erosion has occurred.
   auto const element_size        = element_size_;

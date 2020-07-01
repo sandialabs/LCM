@@ -238,16 +238,15 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
       if (prob_type == THERMAL) {
         // Change input Exodus file to previous mechanics Exodus output file, for restarts.
         disc_params.set<const std::string>("Exodus Input File Name", prev_mechanics_exo_outfile_name_);
-      }
-      else if (prob_type == MECHANICS) {
+      } else if (prob_type == MECHANICS) {
         // Change input Exodus file to previous thermal Exodus output file, for restarts.
         disc_params.set<const std::string>("Exodus Input File Name", prev_thermal_exo_outfile_name_);
         // Give the names of the fields (other than solution, solution_dot, solution_dotdot)
         // in the restart file that we want to use when we do the restart.  Currently, I'm
         // only specifying "ACE_Ice_Saturation" and only for the mechanics problem.
-	// NOTE: it appears the fields become all lower case upon restarts in some cases, 
-	// therefore defining 2 version of the 'ACE_Ice_Saturation' field, one with cases, one all 
-	// lower case.
+        // NOTE: it appears the fields become all lower case upon restarts in some cases,
+        // therefore defining 2 version of the 'ACE_Ice_Saturation' field, one with cases, one all
+        // lower case.
         Teuchos::Array<std::string> restart_fields;
         restart_fields.push_back("ACE_Ice_Saturation");
         restart_fields.push_back("ace_ice_saturation");
@@ -278,8 +277,8 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     if (file_index == 0) { stk_disc.outputExodusSolutionInitialTime(true); }
 
     Teuchos::RCP<Albany::AbstractSTKMeshStruct> ams = stk_disc.getSTKMeshStruct();
-    do_outputs_[subdomain]      = ams->exoOutput;
-    do_outputs_init_[subdomain] = ams->exoOutput;
+    do_outputs_[subdomain]                          = ams->exoOutput;
+    do_outputs_init_[subdomain]                     = ams->exoOutput;
 
     stk_mesh_structs_[subdomain] = ams;
 
@@ -288,15 +287,13 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
     curr_x_[subdomain] = Teuchos::null;
 
     prev_exo_outfile_name_[subdomain] = str;
-    // Set strings such that thermal problem restarts from previous mechanics 
-    // Exodus output file, and vice versa for mechanics 
+    // Set strings such that thermal problem restarts from previous mechanics
+    // Exodus output file, and vice versa for mechanics
     if (prob_type == THERMAL) {
       prev_thermal_exo_outfile_name_ = prev_exo_outfile_name_[1];
-    }
-    else if (prob_type == MECHANICS) {
+    } else if (prob_type == MECHANICS) {
       prev_mechanics_exo_outfile_name_ = prev_exo_outfile_name_[0];
     }
-
   }
 }
 

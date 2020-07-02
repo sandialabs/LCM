@@ -53,6 +53,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("Elastic Modulus", dl->qp_scalar);
   setDependentField("Yield Strength", dl->qp_scalar);
   setDependentField("Hardening Modulus", dl->qp_scalar);
+  setDependentField("ACE Ice Saturation", dl->qp_scalar);
   setDependentField("Delta Time", dl->workset_scalar);
 
   // define the evaluated fields
@@ -68,27 +69,18 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
 
   // define the state variables
 
-  // stress
   addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
-
-  // Fp
   addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
-
-  // eqps
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
-
-  // yield surface
   addStateVariable(
       yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
-  // mechanical source
+
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
-
     addStateVariable(
         source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
-  // failed state
   addStateVariable(
       "Failure Indicator", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output Failure Indicator", true));
 }

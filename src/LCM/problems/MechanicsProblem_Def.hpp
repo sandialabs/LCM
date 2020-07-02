@@ -781,6 +781,15 @@ MechanicsProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
+  if (is_ace_sequential_thermomechanical_ == true) {
+    std::string stateName = "ACE_Ice_Saturation";
+    auto const entity     = Albany::StateStruct::QuadPoint;
+    p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
+    p->set<std::string>("Field Name", "ACE Ice Saturation");
+    p->set("Field Layout", dl_->qp_scalar);
+    p->set<bool>("Nodal State", false);
+  }
+
   if ((have_pore_pressure_eq_ == true) || (have_pore_pressure_ == true)) {
     Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save Pore Pressure"));
 

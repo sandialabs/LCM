@@ -251,7 +251,6 @@ Albany::ACEThermalProblem::constructEvaluators(
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
-      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
@@ -267,7 +266,6 @@ Albany::ACEThermalProblem::constructEvaluators(
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
-      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
@@ -283,7 +281,6 @@ Albany::ACEThermalProblem::constructEvaluators(
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
-      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
@@ -299,7 +296,6 @@ Albany::ACEThermalProblem::constructEvaluators(
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
-      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
@@ -315,7 +311,6 @@ Albany::ACEThermalProblem::constructEvaluators(
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
-      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
@@ -331,7 +326,6 @@ Albany::ACEThermalProblem::constructEvaluators(
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
-      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
@@ -347,7 +341,6 @@ Albany::ACEThermalProblem::constructEvaluators(
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
-      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 
@@ -363,7 +356,6 @@ Albany::ACEThermalProblem::constructEvaluators(
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
-      Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl_);
       ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
       fm0.template registerEvaluator<EvalT>(ev);
 

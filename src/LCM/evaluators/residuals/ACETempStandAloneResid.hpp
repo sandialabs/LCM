@@ -40,10 +40,10 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>, public
   PHX::MDField<ScalarT const, Cell, QuadPoint>                tdot_;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wgradbf_;
   PHX::MDField<ScalarT const, Cell, QuadPoint, Dim>           tgrad_;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_conductivity_;  // thermal conductivity
-  PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_inertia_;       // thermal inertia = rho * C
-  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim> thermal_cond_grad_at_qps_;        // thermal conductivity
-                                                                                // grad at qps
+  PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_conductivity_;      // thermal conductivity
+  PHX::MDField<const ScalarT, Cell, QuadPoint>                thermal_inertia_;           // thermal inertia = rho * C
+  PHX::MDField<const ScalarT, Cell, QuadPoint, Dim>           thermal_cond_grad_at_qps_;  // thermal conductivity
+                                                                                          // grad at qps
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
   PHX::MDField<ScalarT, Cell, Node>                     tau_;
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> jacobian_det_;  // jacobian determinant - for getting mesh size h

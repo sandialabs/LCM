@@ -73,7 +73,6 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField stress_;
   ScalarField yield_surf_;
   ScalarField failed_;
-  ScalarField exposure_time_;
 
   // Workspace arrays
   Albany::MDArray Fp_old_;

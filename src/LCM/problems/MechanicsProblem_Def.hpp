@@ -786,7 +786,6 @@ MechanicsProblem::constructEvaluators(
   // similar to dirichlet_field - I still have no idea why it's needed for mechanics problem...
   // IKT FIXME: may  want to add this logic: if (is_ace_sequential_thermomechanical_ == true) { ...
   if (ace_ice_sat_field_count == 0) {
-    std::cout << "IKT registering ACE_Ice_Saturation\n"; 
     std::string stateName = "ACE_Ice_Saturation";
     Albany::StateStruct::MeshFieldEntity entity = Albany::StateStruct::QuadPoint;
     p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");

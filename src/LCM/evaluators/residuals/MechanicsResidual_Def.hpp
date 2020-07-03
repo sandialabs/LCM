@@ -23,6 +23,7 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
       w_bf_(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       residual_(p.get<std::string>("Residual Name"), dl->node_vector),
       mass_(p.get<std::string>("Analytic Mass Name"), dl->node_vector),
+      ice_saturation_(p.get<std::string>("ACE Ice Saturation QP Variable Name"), dl->qp_scalar),
       have_body_force_(p.isType<bool>("Has Body Force")),
       density_(p.get<RealType>("Density", 1.0))
 {
@@ -30,6 +31,7 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
   this->addDependentField(stress_);
   this->addDependentField(w_grad_bf_);
   this->addDependentField(w_bf_);
+  this->addDependentField(ice_saturation_);
 
   this->addEvaluatedField(residual_);
 
@@ -71,6 +73,7 @@ MechanicsResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
   this->utils.setFieldData(w_grad_bf_, fm);
   this->utils.setFieldData(w_bf_, fm);
   this->utils.setFieldData(residual_, fm);
+  this->utils.setFieldData(ice_saturation_, fm);
   if (have_body_force_) { this->utils.setFieldData(body_force_, fm); }
   if (enable_dynamics_) {
     this->utils.setFieldData(acceleration_, fm);
@@ -162,6 +165,12 @@ template <typename EvalT, typename Traits>
 void
 MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
+  for (int cell = 0; cell < workset.numCells; ++cell) {
+    for (int pt = 0; pt < num_pts_; ++pt) {
+      std::cout << "IKT cell, pt, ice_sat = " << cell << ", " << pt << ", " 
+                << ice_saturation_(cell, pt) << "\n"; 
+    }
+  }
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < num_nodes_; ++node)
       for (int dim = 0; dim < num_dims_; ++dim) residual_(cell, node, dim) = ScalarT(0);

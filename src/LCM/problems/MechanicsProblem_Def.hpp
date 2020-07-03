@@ -781,18 +781,10 @@ MechanicsProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
-  /*if (is_ace_sequential_thermomechanical_ == true) {
-    std::string stateName = "ACE_Ice_Saturation";
-    auto const entity     = Albany::StateStruct::QuadPoint;
-    p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
-    p->set<std::string>("Field Name", "ACE Ice Saturation");
-    p->set("Field Layout", dl_->qp_scalar);
-    p->set<bool>("Nodal State", false);
-  }*/
-  
   // Register ACE Ice Saturation 
   // IKT: the if-statement a hack to prevent redundant registration of params
   // similar to dirichlet_field - I still have no idea why it's needed for mechanics problem...
+  // IKT FIXME: may  want to add this logic: if (is_ace_sequential_thermomechanical_ == true) { ...
   if (ace_ice_sat_field_count == 0) {
     std::cout << "IKT registering ACE_Ice_Saturation\n"; 
     std::string stateName = "ACE_Ice_Saturation";
@@ -1425,7 +1417,6 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Acceleration Name", "Acceleration");
       p->set<std::string>("Body Force Name", "Body Force");
       p->set<std::string>("Analytic Mass Name", "Analytic Mass Residual");
-      //p->set<std::string>("temp", "temp");
       p->set<std::string>("ACE Ice Saturation QP Variable Name", "ACE Ice Saturation");
       bool const use_analytic_mass = material_db_->getElementBlockParam<bool>(eb_name, "Use Analytic Mass", false);
       p->set<bool>("Use Analytic Mass", use_analytic_mass);

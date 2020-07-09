@@ -18,7 +18,8 @@
 #include "PHAL_Workset.hpp"
 #include "SolutionSniffer.hpp"
 
-static int dir_count = 0;  // counter for registration of dirichlet_field
+static int dir_count               = 0;  // counter for registration of dirichlet_field
+static int ace_ice_sat_field_count = 0;
 
 namespace Albany {
 
@@ -237,66 +238,62 @@ class MechanicsProblem : public AbstractProblem
   stab_pressure_type_;
 
   /// Mechanics
-  bool have_mech_;
-
-  bool have_mech_eq_;
+  bool have_mech_{true};
+  bool have_mech_eq_{true};
 
   /// Temperature
-  bool have_temperature_;
+  bool have_temperature_{false};
 
   /// Use default "classic" heat conduction equation
-  bool have_temperature_eq_;
+  bool have_temperature_eq_{false};
 
   /// Have ACE temperature (handling is different than temperature above)
-  bool have_ace_temperature_;
+  bool have_ace_temperature_{false};
 
   /// Use ACE heat conduction equation
-  bool have_ace_temperature_eq_;
+  bool have_ace_temperature_eq_{false};
 
   /// Pore pressure
-  bool have_pore_pressure_;
-
-  bool have_pore_pressure_eq_;
+  bool have_pore_pressure_{false};
+  bool have_pore_pressure_eq_{false};
 
   /// Transport
-  bool have_transport_;
-
-  bool have_transport_eq_;
+  bool have_transport_{false};
+  bool have_transport_eq_{false};
 
   /// Projected hydrostatic stress term in transport equation
-  bool have_hydrostress_;
-
-  bool have_hydrostress_eq_;
+  bool have_hydrostress_{false};
+  bool have_hydrostress_eq_{false};
 
   /// Damage
-  bool have_damage_;
-
-  bool have_damage_eq_;
+  bool have_damage_{false};
+  bool have_damage_eq_{false};
 
   /// Stabilized pressure
-  bool have_stab_pressure_;
-
-  bool have_stab_pressure_eq_;
+  bool have_stab_pressure_{false};
+  bool have_stab_pressure_eq_{false};
 
   /// Dislocation transport physics
-  bool have_dislocation_density_;
-
-  bool have_dislocation_density_eq_;
+  bool have_dislocation_density_{false};
+  bool have_dislocation_density_eq_{false};
 
   /// Have mesh adaptation - both the "Adaptation" sublist exists and the user
   /// has specified that the method
   ///    is "RPI Albany Size"
   ///
-  bool have_sizefield_adaptation_;
+  bool have_sizefield_adaptation_{false};
 
   /// Dynamic tempus solution method
-  bool dynamic_tempus_;
+  bool dynamic_tempus_{false};
 
   /// Have a Peridynamics block
-  bool have_peridynamics_;
+  bool have_peridynamics_{false};
 
   /// Topology adaptation (adaptive insertion)
-  bool have_topmod_adaptation_;
+  bool have_topmod_adaptation_{false};
+
+  /// Is a coupled sequential ACE thermo-mechanical problem
+  bool is_ace_sequential_thermomechanical_{false};
 
   /// Data layouts
   Teuchos::RCP<Layouts> dl_;

@@ -17,25 +17,25 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   this->setIntegrationPointLocationFlag(true);
 
   // Baseline constants
-  sat_mod_         = p->get<RealType>("Saturation Modulus", 0.0);
-  sat_exp_         = p->get<RealType>("Saturation Exponent", 0.0);
-  erosion_rate_    = p->get<RealType>("Erosion Rate", 0.0);
-  element_size_    = p->get<RealType>("Element Size", 0.0);
-  critical_stress_ = p->get<RealType>("Critical Stress", 0.0);
-  critical_angle_  = p->get<RealType>("Critical Angle", 0.0);
+  sat_mod_             = p->get<RealType>("Saturation Modulus", 0.0);
+  sat_exp_             = p->get<RealType>("Saturation Exponent", 0.0);
+  bulk_porosity_       = p->get<RealType>("ACE Bulk Porosity", 0.0);
+  critical_angle_      = p->get<RealType>("ACE Critical Angle", 0.0);
+  soil_yield_strength_ = p->get<RealType>("ACE Soil Yield Strength", 0.0);
 
-  if (p->isParameter("Time File") == true) {
-    std::string const filename = p->get<std::string>("Time File");
-    time_                      = vectorFromFile(filename);
+  if (p->isParameter("ACE Z Depth File") == true) {
+    auto const filename     = p->get<std::string>("ACE Z Depth File");
+    z_above_mean_sea_level_ = vectorFromFile(filename);
   }
 
-  if (p->isParameter("Sea Level File") == true) {
-    std::string const filename = p->get<std::string>("Sea Level File");
-    sea_level_                 = vectorFromFile(filename);
+  if (p->isParameter("ACE Porosity File") == true) {
+    auto const filename = p->get<std::string>("ACE Porosity File");
+    porosity_from_file_ = vectorFromFile(filename);
+    ALBANY_ASSERT(
+        z_above_mean_sea_level_.size() == porosity_from_file_.size(),
+        "*** ERROR: Number of z values and number of porosity values in "
+        "ACE Porosity File must match.");
   }
-
-  ALBANY_ASSERT(
-      time_.size() == sea_level_.size(), "*** ERROR: Number of times and number of sea level values must match");
 
   // retrieve appropriate field name strings
   std::string const cauchy_string       = field_name_map_["Cauchy_Stress"];
@@ -53,6 +53,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("Elastic Modulus", dl->qp_scalar);
   setDependentField("Yield Strength", dl->qp_scalar);
   setDependentField("Hardening Modulus", dl->qp_scalar);
+  setDependentField("ACE Ice Saturation", dl->qp_scalar);
   setDependentField("Delta Time", dl->workset_scalar);
 
   // define the evaluated fields
@@ -68,27 +69,18 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
 
   // define the state variables
 
-  // stress
   addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
-
-  // Fp
   addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
-
-  // eqps
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
-
-  // yield surface
   addStateVariable(
       yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
-  // mechanical source
+
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
-
     addStateVariable(
         source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
-  // failed state
   addStateVariable(
       "Failure Indicator", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output Failure Indicator", true));
 }
@@ -109,13 +101,14 @@ J2ErosionKernel<EvalT, Traits>::init(
   std::string J_string            = field_name_map_["J"];
 
   // extract dependent MDFields
-  def_grad_          = *dep_fields[F_string];
-  J_                 = *dep_fields[J_string];
-  poissons_ratio_    = *dep_fields["Poissons Ratio"];
-  elastic_modulus_   = *dep_fields["Elastic Modulus"];
-  yield_strength_    = *dep_fields["Yield Strength"];
-  hardening_modulus_ = *dep_fields["Hardening Modulus"];
-  delta_time_        = *dep_fields["Delta Time"];
+  def_grad_           = *dep_fields[F_string];
+  J_                  = *dep_fields[J_string];
+  poissons_ratio_     = *dep_fields["Poissons Ratio"];
+  elastic_modulus_    = *dep_fields["Elastic Modulus"];
+  yield_strength_     = *dep_fields["Yield Strength"];
+  hardening_modulus_  = *dep_fields["Hardening Modulus"];
+  delta_time_         = *dep_fields["Delta Time"];
+  ace_ice_saturation_ = *dep_fields["ACE Ice Saturation"];
 
   // extract evaluated MDFields
   stress_     = *eval_fields[cauchy_string];
@@ -138,9 +131,6 @@ J2ErosionKernel<EvalT, Traits>::init(
   auto& mesh_struct             = *(stk_disc.getSTKMeshStruct());
   auto& field_cont              = *(mesh_struct.getFieldContainer());
   have_cell_boundary_indicator_ = field_cont.hasCellBoundaryIndicatorField();
-
-  elemWsLIDGIDMap_ = stk_disc.getElemWsLIDGIDMap();
-  ws_index_        = workset.wsIndex;
 
   if (have_cell_boundary_indicator_ == true) {
     cell_boundary_indicator_ = workset.cell_boundary_indicator;
@@ -249,23 +239,25 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
 
-  ScalarT const E     = elastic_modulus_(cell, pt);
-  ScalarT const nu    = poissons_ratio_(cell, pt);
-  ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
-  ScalarT const mu    = E / (2.0 * (1.0 + nu));
-  ScalarT const K     = hardening_modulus_(cell, pt);
-  ScalarT const Y     = yield_strength_(cell, pt);
-  ScalarT const J1    = J_(cell, pt);
-  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
+  ScalarT const E              = elastic_modulus_(cell, pt);
+  ScalarT const nu             = poissons_ratio_(cell, pt);
+  ScalarT const kappa          = E / (3.0 * (1.0 - 2.0 * nu));
+  ScalarT const mu             = E / (2.0 * (1.0 + nu));
+  ScalarT const K              = hardening_modulus_(cell, pt);
+  ScalarT const J1             = J_(cell, pt);
+  ScalarT const Jm23           = 1.0 / std::cbrt(J1 * J1);
+  ScalarT const ice_saturation = ace_ice_saturation_(cell, pt);
+  ScalarT       Y              = yield_strength_(cell, pt);
 
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 
-  // Determine if erosion has occurred.
-  auto const element_size        = element_size_;
-  auto const sea_level           = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : 0.0;
-  bool const is_exposed_to_water = (height <= sea_level);
-  bool const is_erodible = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) == 2.0 : false;
+  auto const porosity = porosity_from_file_.size() > 0 ?
+                            interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
+                            bulk_porosity_;
+
+  // Compute effective yield strength
+  Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);

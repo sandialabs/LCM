@@ -41,11 +41,8 @@ MechanicsProblem::MechanicsProblem(
       rc_mgr_(rc_mgr)
 {
   std::string& method = params->get("Name", "Mechanics ");
-
   *out << "Problem Name = " << method << '\n';
-
   std::string& sol_method = params->get("Solution Method", "Steady");
-
   *out << "Solution Method = " << sol_method << '\n';
 
   if (sol_method == "Transient Tempus") {
@@ -84,20 +81,17 @@ MechanicsProblem::MechanicsProblem(
       params->sublist("Stabilized Pressure"), "None", stab_pressure_type_, have_stab_pressure_, have_stab_pressure_eq_);
 
   bool const have_both_temps = (have_temperature_ == true) && (have_ace_temperature_ == true);
-
   ALBANY_ASSERT(have_both_temps == false, "Cannot have two temperatures");
-
   bool const have_both_temp_eqs = (have_temperature_eq_ == true) && (have_ace_temperature_eq_ == true);
-
   ALBANY_ASSERT(have_both_temp_eqs == false, "Cannot have two temperature equations");
-
-  bool const have_both_ace = (have_ace_temperature_ == true) && (have_ace_temperature_eq_ == true);
-
+  bool const have_both_ace  = (have_ace_temperature_ == true) && (have_ace_temperature_eq_ == true);
   bool const is_ace_problem = (have_ace_temperature_ == true) || (have_ace_temperature_eq_ == true);
 
   if (is_ace_problem == true) {
     ALBANY_ASSERT(have_both_ace == true, "Cannot have ACE temperature without its equation");
   }
+
+  is_ace_sequential_thermomechanical_ = params->isParameter("ACE Sequential Thermomechanical");
 
   // Compute number of equations
   int num_eq{0};

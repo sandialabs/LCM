@@ -79,6 +79,11 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   PHX::MDField<ScalarT const, Cell, Node, Dim> mass_;
 
   ///
+  /// Input: ACE Ice Saturation field
+  ///
+  PHX::MDField<ScalarT, Cell, QuadPoint> ice_saturation_;
+
+  ///
   /// Output: Residual Forces
   ///
   PHX::MDField<ScalarT, Cell, Node, Dim> residual_;
@@ -117,6 +122,9 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   /// Flag to mark if using mass from AnalyticMassResidual evaluator
   ///
   bool use_analytic_mass_;
+
+  /// Is a coupled sequential ACE thermo-mechanical problem
+  bool is_ace_sequential_thermomechanical_{false};
 
   ///
   /// Input, if RCU.

@@ -39,6 +39,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/grid.g.4.2 COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/grid.g.4.3
                  ${CMAKE_CURRENT_BINARY_DIR}/grid.g.4.3 COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/grid_with_temp.e
+                 ${CMAKE_CURRENT_BINARY_DIR}/grid_with_temp.e COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/materials_thermal.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_mechanical.yaml

@@ -65,6 +65,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ConstScalarField poissons_ratio_;
   ConstScalarField yield_strength_;
   ConstScalarField temperature_;
+  ConstScalarField ace_ice_saturation_;
 
   // Output MDFields
   ScalarField eqps_;
@@ -84,18 +85,16 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   // Baseline constants
   RealType sat_mod_{0.0};
   RealType sat_exp_{0.0};
-  RealType erosion_rate_{0.0};
-  RealType element_size_{0.0};
-  RealType critical_stress_{0.0};
   RealType critical_angle_{0.0};
+  RealType bulk_porosity_{0.0};
+  RealType soil_yield_strength_{0.0};
+
+  // Params with depth:
+  std::vector<RealType> z_above_mean_sea_level_;
+  std::vector<RealType> porosity_from_file_;
 
   // Sea level arrays
-  std::vector<RealType> time_;
-  std::vector<RealType> sea_level_;
-  RealType              current_time_{0.0};
-
-  std::map<std::pair<int, int>, GO> elemWsLIDGIDMap_;
-  int                               ws_index_{0};
+  RealType current_time_{0.0};
 
   void
   init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields);

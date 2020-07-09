@@ -259,6 +259,11 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
       problem_params.remove("Initial Condition", true);
     }
 
+    // Set a flag to inform the mechanics problem to register the field ACE Ice Saturation
+    if (prob_type == MECHANICS) {
+      problem_params.set("ACE Sequential Thermomechanical", true, "ACE Sequential Thermomechanical Problem");
+    }
+
     Teuchos::RCP<Albany::Application> app{Teuchos::null};
 
     Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =

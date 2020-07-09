@@ -195,5 +195,7 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
       "NOX status test that facilitates communication between a ModelEvaluator "
       "and a NOX solver");
 
+  validPL->set<bool>("ACE Sequential Thermomechanical", false, "ACE Sequential Thermomechanical Problem");
+
   return validPL;
 }

@@ -166,12 +166,6 @@ void
 MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   for (int cell = 0; cell < workset.numCells; ++cell) {
-    for (int pt = 0; pt < num_pts_; ++pt) {
-      std::cout << "IKT cell, pt, ice_sat = " << cell << ", " << pt << ", " 
-                << ice_saturation_(cell, pt) << "\n"; 
-    }
-  }
-  for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < num_nodes_; ++node)
       for (int dim = 0; dim < num_dims_; ++dim) residual_(cell, node, dim) = ScalarT(0);
     if (def_grad_rc_) {

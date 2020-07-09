@@ -123,6 +123,9 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   ///
   bool use_analytic_mass_;
 
+  /// Is a coupled sequential ACE thermo-mechanical problem
+  bool is_ace_sequential_thermomechanical_{false};
+
   ///
   /// Input, if RCU.
   ///

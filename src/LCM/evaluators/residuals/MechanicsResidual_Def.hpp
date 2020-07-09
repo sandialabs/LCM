@@ -23,7 +23,6 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
       w_bf_(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       residual_(p.get<std::string>("Residual Name"), dl->node_vector),
       mass_(p.get<std::string>("Analytic Mass Name"), dl->node_vector),
-      ice_saturation_(p.get<std::string>("ACE Ice Saturation QP Variable Name"), dl->qp_scalar),
       have_body_force_(p.isType<bool>("Has Body Force")),
       density_(p.get<RealType>("Density", 1.0))
 {
@@ -31,7 +30,13 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
   this->addDependentField(stress_);
   this->addDependentField(w_grad_bf_);
   this->addDependentField(w_bf_);
-  this->addDependentField(ice_saturation_);
+
+  is_ace_sequential_thermomechanical_ = p.isParameter("ACE Ice Saturation QP Variable Name");
+  if (is_ace_sequential_thermomechanical_ == true) {
+    ice_saturation_ =
+        decltype(ice_saturation_)(p.get<std::string>("ACE Ice Saturation QP Variable Name"), dl->qp_scalar);
+    this->addDependentField(ice_saturation_);
+  }
 
   this->addEvaluatedField(residual_);
 
@@ -73,7 +78,7 @@ MechanicsResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
   this->utils.setFieldData(w_grad_bf_, fm);
   this->utils.setFieldData(w_bf_, fm);
   this->utils.setFieldData(residual_, fm);
-  this->utils.setFieldData(ice_saturation_, fm);
+  if (is_ace_sequential_thermomechanical_ == true) { this->utils.setFieldData(ice_saturation_, fm); }
   if (have_body_force_) { this->utils.setFieldData(body_force_, fm); }
   if (enable_dynamics_) {
     this->utils.setFieldData(acceleration_, fm);

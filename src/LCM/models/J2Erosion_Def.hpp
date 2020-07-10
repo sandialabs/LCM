@@ -73,8 +73,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
   addStateVariable(
-      "ACE Ice Saturation", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Ice Saturation", false));
-  addStateVariable(
       yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
 
   if (have_temperature_ == true) {

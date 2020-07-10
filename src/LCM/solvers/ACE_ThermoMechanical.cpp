@@ -554,7 +554,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         // sequential coupling, which is why I kept them separate.  We may want to think
         // of ways to combine them at a later point to avoid some of the code duplication.
         if (prob_type == MECHANICS) {
-          *fos_ << "Problem            :Mechanics\n";
+          *fos_ << "Problem            :Mechanical\n";
           AdvanceMechanicsDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
         } else {
           *fos_ << "Problem            :Thermal\n";

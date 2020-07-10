@@ -584,8 +584,13 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
   ALBANY_PANIC((unsigned int)numElemWorksets != elemStatesToCopyFrom.size());
   ALBANY_PANIC((unsigned int)numNodeWorksets != nodeStatesToCopyFrom.size());
 
-  Teuchos::RCP<Teuchos::FancyOStream> out(Teuchos::VerboseObjectBase::getDefaultOStream());
-  *out << std::endl;
+#if defined(VERBOSE_OUTPUT)
+  auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream();
+#else
+  Teuchos::oblackholestream fos;
+#endif
+
+  fos << std::endl;
 
   for (unsigned int i = 0; i < stateInfo->size(); i++) {
     std::string const stateName = (*stateInfo)[i]->name;
@@ -598,12 +603,12 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
 
         // check if state exists in statesToCopyFrom (check first workset only)
         if (elemStatesToCopyFrom[0].find(stateName) == elemStatesToCopyFrom[0].end()) {
-          //*out << "StateManager: state " << stateName << " not present, so not
+          // fos << "StateManager: state " << stateName << " not present, so not
           // filled" << std::endl;
           continue;
         }
 
-        *out << "StateManager: filling state:  " << stateName << std::endl;
+        fos << "StateManager: filling state:  " << stateName << std::endl;
         for (int ws = 0; ws < numElemWorksets; ws++) {
           Albany::StateStruct::FieldDims dims;
           esa[ws][stateName].dimensions(dims);
@@ -642,12 +647,12 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
 
         // check if state exists in statesToCopyFrom (check first workset only)
         if (nodeStatesToCopyFrom[0].find(stateName) == nodeStatesToCopyFrom[0].end()) {
-          //*out << "StateManager: state " << stateName << " not present, so not
+          // fos << "StateManager: state " << stateName << " not present, so not
           // filled" << std::endl;
           continue;
         }
 
-        *out << "StateManager: filling state:  " << stateName << std::endl;
+        fos << "StateManager: filling state:  " << stateName << std::endl;
         for (int ws = 0; ws < numNodeWorksets; ws++) {
           Albany::StateStruct::FieldDims dims;
           nsa[ws][stateName].dimensions(dims);
@@ -677,7 +682,7 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
     }
   }
 
-  *out << std::endl;
+  fos << std::endl;
 }
 
 Albany::StateArray&
@@ -815,7 +820,11 @@ Albany::StateManager::doSetStateArrays(
     const Teuchos::RCP<Albany::AbstractDiscretization>& disc,
     const Teuchos::RCP<StateInfoStruct>&                stateInfoPtr)
 {
-  Teuchos::RCP<Teuchos::FancyOStream> out(Teuchos::VerboseObjectBase::getDefaultOStream());
+#if defined(VERBOSE_OUTPUT)
+  auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream();
+#else
+  Teuchos::oblackholestream fos;
+#endif
 
   // Get states from STK mesh
   Albany::StateArrays&   sa  = disc->getStateArrays();
@@ -842,7 +851,7 @@ Albany::StateManager::doSetStateArrays(
     //   init_type = "scalar";
     // }
 
-    *out << "StateManager: initializing state:  " << stateName << "\n";
+    fos << "StateManager: initializing state:  " << stateName << "\n";
     switch ((*stateInfoPtr)[i]->entity) {
       case Albany::StateStruct::WorksetValue:
       case Albany::StateStruct::ElemData:
@@ -850,12 +859,12 @@ Albany::StateManager::doSetStateArrays(
       case Albany::StateStruct::ElemNode:
 
         if (have_restart) {
-          *out << " from restart file." << std::endl;
+          fos << " from restart file." << std::endl;
           // If we are restarting, arrays should already be initialized from
           // exodus file
           continue;
         } else if (pParentStruct && pParentStruct->restartDataAvailable) {
-          *out << " from restarted parent state." << std::endl;
+          fos << " from restarted parent state." << std::endl;
           // If we are restarting, my parent is initialized from exodus file
           // Copy over parent's state
 
@@ -863,9 +872,9 @@ Albany::StateManager::doSetStateArrays(
 
           continue;
         } else if (init_type == "scalar")
-          *out << " with initialization type 'scalar' and value: " << init_val << std::endl;
+          fos << " with initialization type 'scalar' and value: " << init_val << std::endl;
         else if (init_type == "identity")
-          *out << " with initialization type 'identity'" << std::endl;
+          fos << " with initialization type 'identity'" << std::endl;
 
         for (int ws = 0; ws < numElemWorksets; ws++) {
           /* because we loop over all worksets above, we need to check
@@ -943,12 +952,12 @@ Albany::StateManager::doSetStateArrays(
       case Albany::StateStruct::NodalData:
 
         if (have_restart) {
-          *out << " from restart file." << std::endl;
+          fos << " from restart file." << std::endl;
           // If we are restarting, arrays should already be initialized from
           // exodus file
           continue;
         } else if (pParentStruct && pParentStruct->restartDataAvailable) {
-          *out << " from restarted parent state." << std::endl;
+          fos << " from restarted parent state." << std::endl;
           // If we are restarting, my parent is initialized from exodus file
           // Copy over parent's state
 
@@ -956,9 +965,9 @@ Albany::StateManager::doSetStateArrays(
 
           continue;
         } else if (init_type == "scalar")
-          *out << " with initialization type 'scalar' and value: " << init_val << std::endl;
+          fos << " with initialization type 'scalar' and value: " << init_val << std::endl;
         else if (init_type == "identity")
-          *out << " with initialization type 'identity'" << std::endl;
+          fos << " with initialization type 'identity'" << std::endl;
 
         for (int ws = 0; ws < numNodeWorksets; ws++) {
           Albany::StateStruct::FieldDims dims;
@@ -1010,7 +1019,7 @@ Albany::StateManager::doSetStateArrays(
       case Albany::StateStruct::NodalDistParameter:
 
         if (have_restart) {
-          *out << " from restart file." << std::endl;
+          fos << " from restart file." << std::endl;
           // If we are restarting, arrays should already be initialized from
           // exodus file
           continue;
@@ -1029,5 +1038,5 @@ Albany::StateManager::doSetStateArrays(
         }
     }
   }
-  *out << std::endl;
+  fos << std::endl;
 }

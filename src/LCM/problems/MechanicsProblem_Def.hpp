@@ -785,7 +785,7 @@ MechanicsProblem::constructEvaluators(
   // IKT: the if-statement a hack to prevent redundant registration of params
   // similar to dirichlet_field - I still have no idea why it's needed for mechanics problem...
   if (is_ace_sequential_thermomechanical_ == true && ace_ice_sat_field_count == 0) {
-    std::string                          stateName = "ACE_Ice_Saturation";
+    std::string                          stateName = "ACE Ice Saturation";
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
     p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
     ace_ice_sat_field_count++;
@@ -795,7 +795,7 @@ MechanicsProblem::constructEvaluators(
     // Load parameter using its field name
     std::string fieldName = "ACE Ice Saturation";
     p->set<std::string>("Field Name", fieldName);
-    p->set<std::string>("State Name", "ACE_Ice_Saturation");
+    p->set<std::string>("State Name", "ACE Ice Saturation");
     p->set<Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl_->qp_scalar);
     ev = Teuchos::rcp(new PHAL::LoadStateField<EvalT, PHAL::AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);

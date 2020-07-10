@@ -259,7 +259,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     }
     // Save ACE Ice Saturation to the output Exodus file
     {
-      std::string stateName = "ACE_Ice_Saturation";
+      std::string stateName = "ACE Ice Saturation";
       entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
       p->set<std::string>("Field Name", "ACE Ice Saturation");

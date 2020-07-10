@@ -48,14 +48,14 @@ ELEMENT VARIABLES relative 1.e-6 floor 1.0e-12
 	"ACE_Density_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
 	"ACE_Density_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
 	"ACE_Density_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Ice_Saturation_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Ice_Saturation_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Ice_Saturation_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Ice_Saturation_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Ice_Saturation_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Ice_Saturation_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Ice_Saturation_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Ice_Saturation_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	"ACE Ice Saturation_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	"ACE Ice Saturation_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	"ACE Ice Saturation_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	"ACE Ice Saturation_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	"ACE Ice Saturation_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	"ACE Ice Saturation_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	"ACE Ice Saturation_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	"ACE Ice Saturation_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
 	"ACE_Porosity_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
 	"ACE_Porosity_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
 	"ACE_Porosity_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1

@@ -243,12 +243,12 @@ ACEThermoMechanical::createSolversAppsDiscsMEs(const int file_index, const doubl
         disc_params.set<const std::string>("Exodus Input File Name", prev_thermal_exo_outfile_name_);
         // Give the names of the fields (other than solution, solution_dot, solution_dotdot)
         // in the restart file that we want to use when we do the restart.  Currently, I'm
-        // only specifying "ACE_Ice_Saturation" and only for the mechanics problem.
+        // only specifying "ACE Ice Saturation" and only for the mechanics problem.
         // NOTE: it appears the fields become all lower case upon restarts in some cases,
-        // therefore defining 2 version of the 'ACE_Ice_Saturation' field, one with cases, one all
+        // therefore defining 2 version of the 'ACE Ice Saturation' field, one with cases, one all
         // lower case.
         Teuchos::Array<std::string> restart_fields;
-        restart_fields.push_back("ACE_Ice_Saturation");
+        restart_fields.push_back("ACE Ice Saturation");
         restart_fields.push_back("ace_ice_saturation");
         disc_params.set<Teuchos::Array<std::string>>("Restart Fields", restart_fields);
       }

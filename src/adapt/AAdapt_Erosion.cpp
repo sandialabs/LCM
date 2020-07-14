@@ -31,6 +31,7 @@ AAdapt::Erosion::Erosion(
   base_exo_filename_      = stk_mesh_struct_->exoOutFile;
   auto const lower_corner = params->get<Teuchos::Array<double>>("Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
   auto const upper_corner = params->get<Teuchos::Array<double>>("Maximal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+  rename_exodus_output_   = params->get<bool>("Rename Exodus Output", false);
   params->validateParameters(*(getValidAdapterParameters()));
   auto const xm           = lower_corner[0];
   auto const ym           = lower_corner[1];
@@ -243,7 +244,7 @@ AAdapt::Erosion::adaptMesh()
   *output_stream_ << "Remeshing: renaming output file to - " << str << '\n';
 
   // Open the new exodus file for results
-  stk_discretization_->reNameExodusOutput(str);
+  if (rename_exodus_output_ == true) { stk_discretization_->reNameExodusOutput(str); }
   remesh_file_index_++;
 
   // Start the mesh update process
@@ -282,6 +283,7 @@ AAdapt::Erosion::getValidAdapterParameters() const
   auto valid_pl = this->getGenericAdapterParams("Valid Erosion Params");
   valid_pl->set<bool>("Equilibrate", false, "Perform a steady solve after adaptation");
   valid_pl->set<bool>("Rebalance", true, "Rebalance mesh after adaptation in parallel runs");
+  valid_pl->set<bool>("Rename Exodus Output", false, "Use different exodus file names for adapted meshes");
   valid_pl->set<Teuchos::Array<double>>(
       "Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0), "Minimal coordinates defining erosion block");
   valid_pl->set<Teuchos::Array<double>>(

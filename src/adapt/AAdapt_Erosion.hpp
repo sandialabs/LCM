@@ -98,6 +98,7 @@ class Erosion : public AbstractAdapter
   std::string base_exo_filename_{""};
   double      erosion_volume_{0.0};
   double      cross_section_{1.0};
+  bool        rename_exodus_output_{false};
 };
 
 }  // namespace AAdapt

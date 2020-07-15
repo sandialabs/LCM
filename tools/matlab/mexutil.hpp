@@ -55,9 +55,7 @@ class Exception
 struct BaseMexMat
 {
   const size_t m, n;
-  BaseMexMat(const mxArray* ma) : m(ma ? mxGetM(ma) : 0), n(ma ? mxGetN(ma) : 0)
-  {
-  }
+  BaseMexMat(const mxArray* ma) : m(ma ? mxGetM(ma) : 0), n(ma ? mxGetN(ma) : 0) {}
   BaseMexMat(size_t m, size_t n) : m(m), n(n) {}
   virtual ~BaseMexMat() {}
   size_t
@@ -69,29 +67,32 @@ struct BaseMexMat
 struct ConstDenseMexMat : public BaseMexMat
 {
   const double* a;
-  ConstDenseMexMat(const mxArray* ma)
-      : BaseMexMat(ma), a(ma ? mxGetPr(ma) : NULL)
+  ConstDenseMexMat(const mxArray* ma) : BaseMexMat(ma), a(ma ? mxGetPr(ma) : NULL) {}
+  const double&
+  operator[](const size_t i) const
   {
+    return a[i];
   }
-  const double& operator[](const size_t i) const { return a[i]; }
 };
 struct DenseMexMatRef : public BaseMexMat
 {
   double*  a;
   mxArray* ma;
-  DenseMexMatRef(mxArray* ma)
-      : BaseMexMat(ma), a(ma ? mxGetPr(ma) : NULL), ma(ma)
+  DenseMexMatRef(mxArray* ma) : BaseMexMat(ma), a(ma ? mxGetPr(ma) : NULL), ma(ma) {}
+  const double&
+  operator[](const size_t i) const
   {
+    return a[i];
   }
-  const double& operator[](const size_t i) const { return a[i]; }
-  double&       operator[](const size_t i) { return a[i]; }
+  double&
+  operator[](const size_t i)
+  {
+    return a[i];
+  }
 };
 struct DenseMexMat : public DenseMexMatRef
 {
-  DenseMexMat(size_t m, size_t n)
-      : DenseMexMatRef(mxCreateDoubleMatrix(m, n, mxREAL))
-  {
-  }
+  DenseMexMat(size_t m, size_t n) : DenseMexMatRef(mxCreateDoubleMatrix(m, n, mxREAL)) {}
   void
   free()
   {
@@ -117,20 +118,9 @@ dgemv_(
     double*,
     const blas_int*);
 double
-ddot_(
-    const blas_int*,
-    const double*,
-    const blas_int*,
-    const double*,
-    const blas_int*);
+ddot_(const blas_int*, const double*, const blas_int*, const double*, const blas_int*);
 void
-daxpy_(
-    const blas_int*,
-    double*,
-    const double*,
-    const blas_int*,
-    double*,
-    const blas_int*);
+daxpy_(const blas_int*, double*, const double*, const blas_int*, double*, const blas_int*);
 }
 
 inline void
@@ -153,13 +143,7 @@ dot(blas_int n, const double* x, blas_int incx, const double* y, blas_int incy)
   return ddot_(&n, x, &incx, y, &incy);
 }
 inline void
-axpy(
-    blas_int      n,
-    double        a,
-    const double* x,
-    blas_int      incx,
-    double*       y,
-    blas_int      incy)
+axpy(blas_int n, double a, const double* x, blas_int incx, double* y, blas_int incy)
 {
   daxpy_(&n, &a, x, &incx, y, &incy);
 }

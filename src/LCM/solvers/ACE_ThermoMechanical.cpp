@@ -597,13 +597,14 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
       // Restore previous solutions
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-        const PROB_TYPE prob_type = prob_types_[subdomain];
-        Thyra::put_scalar(0.0, this_x_[subdomain].ptr());
+        auto& me           = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+        this_x_[subdomain] = Thyra::createMember(me.get_x_space());
         Thyra::copy(*ics_x_[subdomain], this_x_[subdomain].ptr());
-        Thyra::put_scalar(0.0, this_xdot_[subdomain].ptr());
+        this_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
         Thyra::copy(*ics_xdot_[subdomain], this_xdot_[subdomain].ptr());
+        auto const prob_type = prob_types_[subdomain];
         if (prob_type == MECHANICS) {
-          Thyra::put_scalar(0.0, this_xdotdot_[subdomain].ptr());
+          this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
           Thyra::copy(*ics_xdotdot_[subdomain], this_xdotdot_[subdomain].ptr());
         }
 

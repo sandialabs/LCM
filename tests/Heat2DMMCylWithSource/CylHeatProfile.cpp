@@ -36,8 +36,7 @@ main()
 
   double T3 = 313.15;
 
-  double T1 =
-      (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
+  double T1 = (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
 
   double T2 = (q * sqr(r1) / 2.0) * (log(r3 / r2) / k3) + T3;
 
@@ -83,8 +82,7 @@ main()
           return -1;
         }
 
-      for (int i = 0; i < num_nodes - 1;
-           i++)  // grab the y coordinate values (all but the last one)
+      for (int i = 0; i < num_nodes - 1; i++)  // grab the y coordinate values (all but the last one)
 
         if (fscanf(ifp, "%lf,", &y[i]) != 1) {  // comma follows
           cout << "Error" << endl;
@@ -109,8 +107,7 @@ main()
 
   out << "%%MatrixMarket matrix array real general" << endl;
 
-  out << "% Steady 2D Heat Equation, multimaterial, cylindrical geometry"
-      << endl;
+  out << "% Steady 2D Heat Equation, multimaterial, cylindrical geometry" << endl;
 
   out << num_nodes << " 1" << endl;  // Write M and N values
 
@@ -122,9 +119,8 @@ main()
     // Three regions, fuel, clad, and cask
 
     if (rad <= r1) {
-      value = (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) +
-              (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) +
-              T3;
+      value =
+          (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) + (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
 
     } else if (rad <= r2) {
       value = (T1 - T2) / log(r1 / r2) * log(rad / r2) + T2;
@@ -155,13 +151,11 @@ main()
   output <<
 
       "set ylabel \"Temperature (K)\"				" << endl
-         << "set ytics nomirror						"
-         << endl
+         << "set ytics nomirror						" << endl
          << "								"
             "		"
          << endl
-         << "set xtics nomirror						"
-         << endl
+         << "set xtics nomirror						" << endl
          << "set xlabel \"Radius (m)\"					"
             "	"
          << endl
@@ -179,9 +173,8 @@ main()
     // Three regions, fuel, clad, and cask
 
     if (rad <= r1) {
-      value = (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) +
-              (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) +
-              T3;
+      value =
+          (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) + (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
 
     } else if (rad <= r2) {
       value = (T1 - T2) / log(r1 / r2) * log(rad / r2) + T2;

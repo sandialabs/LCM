@@ -7,10 +7,15 @@ if(NOT ALBANY_PARALLEL_ONLY)
     ${CMAKE_CURRENT_SOURCE_DIR}/input_block_dept_2blks.yaml
     ${CMAKE_CURRENT_BINARY_DIR}/input_block_dept_2blks.yaml COPYONLY)
   configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/input_block_dept_2blks_explicit.yaml
+    ${CMAKE_CURRENT_BINARY_DIR}/input_block_dept_2blks_explicit.yaml COPYONLY)
+  configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/input_block_dept_4blks.yaml
     ${CMAKE_CURRENT_BINARY_DIR}/input_block_dept_4blks.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_2blks.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/materials_2blks.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_2blks_explicit.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/materials_2blks_explicit.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_4blks.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/materials_4blks.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/square_2blocks.e

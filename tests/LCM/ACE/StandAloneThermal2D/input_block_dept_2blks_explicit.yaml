@@ -53,6 +53,8 @@ ALBANY:
   Piro: 
     Tempus: 
       Integrator Name: Tempus Integrator
+      Invert Mass Matrix: true
+      Lump Mass Matrix: true
       Tempus Integrator: 
         Integrator Type: Integrator Basic
         Screen Output Index List: '1'

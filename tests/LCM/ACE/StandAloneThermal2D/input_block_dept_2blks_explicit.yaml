@@ -41,9 +41,8 @@ ALBANY:
   Discretization: 
     Method: Ioss
     Exodus Input File Name: square_2blocks.e
-    Exodus Output File Name: square_2blocks_block_dept_out.exo
+    Exodus Output File Name: square_2blocks_block_dept_explicit_out.exo
     Separate Evaluators by Element Block: true
-    Exodus Write Interval: 100000
     Workset Size: -1
   Regression Results: 
     Number of Comparisons: 0
@@ -53,8 +52,8 @@ ALBANY:
   Piro: 
     Tempus: 
       Integrator Name: Tempus Integrator
-      Invert Mass Matrix: true
-      Lump Mass Matrix: true
+        #Invert Mass Matrix: true
+        #Lump Mass Matrix: false
       Tempus Integrator: 
         Integrator Type: Integrator Basic
         Screen Output Index List: '1'
@@ -66,7 +65,7 @@ ALBANY:
         Time Step Control: 
           Initial Time: 0.00000000000000000e+00
           Initial Time Index: 0
-          Initial Time Step: 3.0e-01
+          Initial Time Step: 1.0e+03
           Initial Order: 0
           Final Time: 1.0e+5
           Final Time Index: 10000000

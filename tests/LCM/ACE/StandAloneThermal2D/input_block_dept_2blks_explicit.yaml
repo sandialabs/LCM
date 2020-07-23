@@ -5,7 +5,7 @@ ALBANY:
   Problem: 
     Name: ACE Thermal 2D
     Solution Method: Transient Tempus
-    MaterialDB Filename: materials_2blks_explicit.yaml
+    MaterialDB Filename: materials_2blks.yaml
     Dirichlet BCs: 
       ExpressionEvaluated SDBC on NS top_right for DOF T: '200.0 + 5.0e-04 * t'
       ExpressionEvaluated SDBC on NS top_left for DOF T: '200.0 + 5.0e-04 * t'
@@ -52,8 +52,8 @@ ALBANY:
   Piro: 
     Tempus: 
       Integrator Name: Tempus Integrator
-        #Invert Mass Matrix: true
-        #Lump Mass Matrix: false
+      Invert Mass Matrix: true
+      Lump Mass Matrix: true
       Tempus Integrator: 
         Integrator Type: Integrator Basic
         Screen Output Index List: '1'
@@ -87,5 +87,5 @@ ALBANY:
           Maximum Number of Stepper Failures: 10
           Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
-        Stepper Type: Forward Euler
+        Stepper Type: RK Forward Euler
 ...

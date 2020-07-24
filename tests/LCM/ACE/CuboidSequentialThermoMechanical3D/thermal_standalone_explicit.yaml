@@ -6,11 +6,10 @@ ALBANY:
   Problem: 
     Name: ACE Thermal 3D
     Solution Method: Transient Tempus
-    #MaterialDB Filename: './materials_thermal.yaml'
-    MaterialDB Filename: './materials_thermal_constant_1block.yaml'
+    MaterialDB Filename: './materials_thermal.yaml'
     Dirichlet BCs: 
-      DBC on NS z- for DOF T: 260.0
-      DBC on NS z+ for DOF T: 300.0
+      SDBC on NS z- for DOF T: 260.0
+      SDBC on NS z+ for DOF T: 300.0
     Initial Condition:
       Function: Constant
       Function Data: [260.0]
@@ -39,9 +38,8 @@ ALBANY:
       Response 1: Solution Average
   Discretization: 
     Method: Ioss
-    #Exodus Input File Name: './grid.g'
-    Exodus Input File Name: './grid_1block.g'
-    Exodus Output File Name: './thermal_standalone.e'
+    Exodus Input File Name: './grid.g'
+    Exodus Output File Name: './thermal_standalone_explicit.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
     Exodus Write Interval: 3

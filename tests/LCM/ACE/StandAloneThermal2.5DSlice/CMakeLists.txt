@@ -70,6 +70,9 @@ if(NOT ALBANY_PARALLEL_ONLY)
     ${CMAKE_CURRENT_SOURCE_DIR}/simulation_unstab.yaml
     ${CMAKE_CURRENT_BINARY_DIR}/simulation_unstab.yaml COPYONLY)
   configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/simulation_unstab_explicit.yaml
+    ${CMAKE_CURRENT_BINARY_DIR}/simulation_unstab_explicit.yaml COPYONLY)
+  configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/simulation_stab.yaml
     ${CMAKE_CURRENT_BINARY_DIR}/simulation_stab.yaml COPYONLY)
   configure_file(
@@ -82,6 +85,10 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # Create the test with this name and standard executable
   add_test(ACE_${testName}_unstab ${Albany.exe} simulation_unstab.yaml)
   set_tests_properties(ACE_${testName}_unstab PROPERTIES LABELS
+                                                      "Demo;Tpetra;Forward")
+  
+  add_test(ACE_${testName}_unstab_Explicit ${Albany.exe} simulation_unstab_explicit.yaml)
+  set_tests_properties(ACE_${testName}_unstab_Explicit PROPERTIES LABELS
                                                       "Demo;Tpetra;Forward")
 
   add_test(ACE_${testName}_stab ${Albany.exe} simulation_stab.yaml)

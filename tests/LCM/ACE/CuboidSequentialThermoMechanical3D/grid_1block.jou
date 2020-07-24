@@ -1,0 +1,69 @@
+## /usr/local/cubit-14.1/bin/clarox
+## Cubit Version 14.1
+## Cubit Build 389326
+## Revised 2013-11-07 16:00:31 -0700 (Thu, 07 Nov 2013)
+## Running 03/13/2014 03:10:55 PM
+## Command Options:
+## -warning = On
+## -information = On
+reset
+logging off
+undo off
+
+#
+# Define parameters
+#
+
+#{h = 0.25}
+#{eps = 0.001 * h}
+
+#
+# Define the grid
+#
+
+create brick x {1.0} y {1.0} z {1.0}
+create brick x {1.0} y {1.0} z {1.0}
+create brick x {1.0} y {1.0} z {1.0}
+move volume 1 x {1.0/2.0} y {1.0/2.0} z {0.0}
+move volume 2 x {1.0/2.0} y {1.0/2.0} z {+1.0}
+move volume 3 x {1.0/2.0} y {1.0/2.0} z {-1.0}
+
+#
+# Mesh
+#
+
+imprint all 
+merge all
+volume all size {h}
+volume all scheme auto
+mesh volume all
+
+#
+# Name the volumes
+#
+
+block 1 volume 1 2 3
+block 1 name "ice"
+
+#
+# Define nodesets (DBCs) and sidesets (NBCs)
+#
+
+nodeset 1 surface with (x_coord < {0 + eps})
+nodeset 1 name "x-"
+nodeset 2 surface with (x_coord > {1.0 - eps})
+nodeset 2 name "x+"
+nodeset 3 surface with (y_coord < {0 + eps})
+nodeset 3 name "y-"
+nodeset 4 surface with (y_coord > {1.0 - eps})
+nodeset 4 name "y+"
+nodeset 5 surface with (z_coord < {-1.5 + eps})
+nodeset 5 name "z-"
+sideset 1 surface with (z_coord < {-1.5 + eps})
+sideset 1 name "bottom"
+nodeset 6 surface with (z_coord > {+1.5 - eps})
+nodeset 6 name "z+"
+
+
+set large exodus file off
+export mesh "grid_1block.g" overwrite

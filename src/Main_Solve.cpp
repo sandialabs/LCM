@@ -280,6 +280,7 @@ main(int argc, char* argv[])
       if (debugParams.get<bool>("Analyze Memory", false)) Albany::printMemoryAnalysis(std::cout, comm);
 
       if (writeToMatrixMarketDistrSolnMap == true) {
+        Albany::writeMatrixMarket(xfinal, "xfinal_distributed");
         Albany::writeMatrixMarket(xfinal->space(), "xfinal_distributed_map");
       }
     }

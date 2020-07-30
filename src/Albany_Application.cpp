@@ -1178,20 +1178,26 @@ Application::computeGlobalResidual(
   // every time it arises or at requested count#
   auto const write_sol_mm =
       writeToMatrixMarketSol != 0 && (writeToMatrixMarketSol == -1 || countSol == writeToMatrixMarketSol);
-  if (write_sol_mm == true) { writeMatrixMarket(x, "sol", countSol); }
+  if (write_sol_mm == true) { 
+    *out << "Writing global solution #" << countSol << " to MatrixMarket at time t = " << current_time << ".\n"; 
+    writeMatrixMarket(x, "sol", countSol); 
+  }
   auto const write_sol_co = writeToCoutSol != 0 && (writeToCoutSol == -1 || countSol == writeToCoutSol);
   if (write_sol_co == true) {
-    std::cout << "Global Solution #" << countSol << ": " << std::endl;
+    *out << "Global solution #" << countSol << " corresponding to time t = " << current_time << ":\n";
     describe(x.getConst(), *out, Teuchos::VERB_EXTREME);
   }
   if (writeToMatrixMarketSol != 0 || writeToCoutSol != 0) { countSol++; }
 
-  auto const write_red_mm =
+  auto const write_res_mm =
       writeToMatrixMarketRes != 0 && (writeToMatrixMarketRes == -1 || countRes == writeToMatrixMarketRes);
-  if (write_red_mm == true) { writeMatrixMarket(f, "rhs", countRes); }
-  auto const write_red_co = writeToCoutRes != 0 && (writeToCoutRes == -1 || countRes == writeToCoutRes);
-  if (write_red_co == true) {
-    std::cout << "Global Residual #" << countRes << ": " << std::endl;
+  if (write_res_mm == true) { 
+    *out << "Writing global residual #" << countRes << " to MatrixMarket at time t = " << current_time << ".\n"; 
+    writeMatrixMarket(f, "rhs", countRes); 
+  }
+  auto const write_res_co = writeToCoutRes != 0 && (writeToCoutRes == -1 || countRes == writeToCoutRes);
+  if (write_res_co == true) {
+    *out << "Global residual #" << countRes << " corresponding to time t = " << current_time << ":\n";
     describe(f.getConst(), *out, Teuchos::VERB_EXTREME);
   }
   if (writeToMatrixMarketRes != 0 || writeToCoutRes != 0) { countRes++; }
@@ -1392,20 +1398,22 @@ Application::computeGlobalJacobian(
     // If requesting writing to MatrixMarket of Jacobian...
     if (writeToMatrixMarketJac == -1) {
       // write jacobian to MatrixMarket every time it arises
+      *out << "Writing global Jacobian #" << countJac << " to MatrixMarket at time t = " << current_time << ".\n"; 
       writeMatrixMarket(jac.getConst(), "jac", countJac);
     } else if (countJac == writeToMatrixMarketJac) {
       // write jacobian only at requested count#
+      *out << "Writing global Jacobian #" << countJac << " to MatrixMarket at time t = " << current_time << ".\n"; 
       writeMatrixMarket(jac.getConst(), "jac", countJac);
     }
   }
   if (writeToCoutJac != 0) {
     // If requesting writing Jacobian to standard output (cout)...
     if (writeToCoutJac == -1) {  // cout jacobian every time it arises
-      *out << "Global Jacobian #" << countJac << ":\n";
+      *out << "Global Jacobian #" << countJac << " corresponding to time t = " << current_time << ":\n";
       describe(jac.getConst(), *out, Teuchos::VERB_EXTREME);
     } else if (countJac == writeToCoutJac) {
       // cout jacobian only at requested count#
-      *out << "Global Jacobian #" << countJac << ":\n";
+      *out << "Global Jacobian #" << countJac << " corresponding to time t = " << current_time << ":\n";
       describe(jac.getConst(), *out, Teuchos::VERB_EXTREME);
     }
   }

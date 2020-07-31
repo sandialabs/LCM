@@ -2,6 +2,7 @@ ALBANY:
   #Debug Output: 
   #  Write Jacobian to MatrixMarket: -1
   #  Write Residual to MatrixMarket: -1
+  Enable TimeMonitor Output: true 
   Problem: 
     Name: Thermal 2D
     Solution Method: Transient Tempus

@@ -552,6 +552,7 @@ SolverFactory::getValidAppParameters() const
   validPL->sublist("Piro", false, "Piro sublist");
   validPL->sublist("Coupled System", false, "Coupled system sublist");
   validPL->sublist("Alternating System", false, "Alternating system sublist");
+  validPL->set<bool>("Enable TimeMonitor Output", false, "Flag to enable TimeMonitor output");
 
   // validPL->set<std::string>("Jacobian Operator", "Have Jacobian", "Flag to
   // allow Matrix-Free specification in Piro");

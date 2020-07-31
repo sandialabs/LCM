@@ -87,5 +87,5 @@ ALBANY:
           Maximum Number of Stepper Failures: 10
           Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
-        Stepper Type: RK Forward Euler
+        Stepper Type: Forward Euler
 ...

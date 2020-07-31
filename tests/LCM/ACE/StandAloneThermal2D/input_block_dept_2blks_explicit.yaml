@@ -45,8 +45,8 @@ ALBANY:
     Separate Evaluators by Element Block: true
     Workset Size: -1
   Regression Results: 
-    Number of Comparisons: 0
-    Test Values: [0.0, 0.0, 2.118151805082e+02]
+    Number of Comparisons: 3
+    Test Values: [0.0, 0.0, 2.119057844140e+02]
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
   Piro: 
@@ -87,5 +87,5 @@ ALBANY:
           Maximum Number of Stepper Failures: 10
           Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
-        Stepper Type: RK Forward Euler
+        Stepper Type: Forward Euler
 ...

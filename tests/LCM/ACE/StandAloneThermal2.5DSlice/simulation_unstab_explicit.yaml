@@ -1,6 +1,6 @@
 ALBANY:
   Debug Output: 
-    Write Jacobian to MatrixMarket: -1
+    Write Jacobian to MatrixMarket: 0
     Write Residual to MatrixMarket: 0
     Write Solution to MatrixMarket: 0
   Problem: 
@@ -78,7 +78,7 @@ ALBANY:
   Discretization: 
     Method: Ioss
     Exodus Input File Name: 'quasi2D.g'
-    Exodus Output File Name: './quasi2D_unstab.e'
+    Exodus Output File Name: './quasi2D_unstab_explicit.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
     Exodus Write Interval: 1 
@@ -121,5 +121,5 @@ ALBANY:
           Maximum Number of Stepper Failures: 10
           Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
-        Stepper Type: RK Forward Euler
+        Stepper Type: Forward Euler
 ...

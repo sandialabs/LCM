@@ -78,7 +78,7 @@ ALBANY:
   Discretization: 
     Method: Ioss
     Exodus Input File Name: 'quasi2D.g'
-    Exodus Output File Name: './quasi2D_unstab.e'
+    Exodus Output File Name: './quasi2D_unstab_implicit.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
     Exodus Write Interval: 1 

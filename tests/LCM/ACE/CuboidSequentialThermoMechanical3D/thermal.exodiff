@@ -26,76 +26,76 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 
 # No GLOBAL VARIABLES
 
-NODAL VARIABLES relative 1.e-6 floor 1.0e-12
+NODAL VARIABLES relative 1.05e-4 floor 1.0e-12
 	temperature                             # min:               0 @ t1,n1	max:               0 @ t1,n1
-	temperature_dot                         # min:               0 @ t1,n1	max:               0 @ t1,n1
-	residual                                # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#temperature_dot                         # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#residual                                # min:               0 @ t1,n1	max:               0 @ t1,n1
 
-ELEMENT VARIABLES relative 1.e-6 floor 1.0e-12
-	"ACE_Bluff_Salinity_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Bluff_Salinity_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Bluff_Salinity_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Bluff_Salinity_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Bluff_Salinity_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Bluff_Salinity_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Bluff_Salinity_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Bluff_Salinity_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Density_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Density_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Density_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Density_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Density_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Density_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Density_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Density_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE Ice Saturation_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE Ice Saturation_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE Ice Saturation_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE Ice Saturation_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE Ice Saturation_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE Ice Saturation_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE Ice Saturation_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE Ice Saturation_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Porosity_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Porosity_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Porosity_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Porosity_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Porosity_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Porosity_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Porosity_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Porosity_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Heat_Capacity_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Heat_Capacity_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Heat_Capacity_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Heat_Capacity_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Heat_Capacity_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Heat_Capacity_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Heat_Capacity_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Heat_Capacity_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Inertia_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Inertia_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Inertia_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Inertia_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Inertia_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Inertia_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Inertia_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Inertia_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Cond_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Cond_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Cond_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Cond_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Cond_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Cond_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Cond_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Thermal_Cond_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Water_Saturation_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Water_Saturation_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Water_Saturation_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Water_Saturation_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Water_Saturation_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Water_Saturation_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Water_Saturation_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
-	"ACE_Water_Saturation_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+#ELEMENT VARIABLES relative 1.e-6 floor 1.0e-12
+	#"ACE_Bluff_Salinity_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Bluff_Salinity_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Bluff_Salinity_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Bluff_Salinity_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Bluff_Salinity_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Bluff_Salinity_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Bluff_Salinity_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Bluff_Salinity_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Density_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Density_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Density_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Density_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Density_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Density_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Density_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Density_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE Ice Saturation_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE Ice Saturation_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE Ice Saturation_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE Ice Saturation_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE Ice Saturation_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE Ice Saturation_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE Ice Saturation_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE Ice Saturation_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Porosity_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Porosity_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Porosity_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Porosity_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Porosity_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Porosity_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Porosity_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Porosity_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Heat_Capacity_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Heat_Capacity_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Heat_Capacity_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Heat_Capacity_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Heat_Capacity_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Heat_Capacity_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Heat_Capacity_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Heat_Capacity_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Inertia_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Inertia_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Inertia_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Inertia_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Inertia_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Inertia_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Inertia_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Inertia_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Cond_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Cond_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Cond_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Cond_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Cond_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Cond_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Cond_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Thermal_Cond_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Water_Saturation_1"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Water_Saturation_2"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Water_Saturation_3"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Water_Saturation_4"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Water_Saturation_5"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Water_Saturation_6"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Water_Saturation_7"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
+	#"ACE_Water_Saturation_8"                 # min:               0 @ t1,n1	max:               0 @ t1,n1
 
 
 

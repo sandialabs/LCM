@@ -797,7 +797,9 @@ MechanicsProblem::constructEvaluators(
     p->set<std::string>("Field Name", fieldName);
     p->set<std::string>("State Name", "ACE Ice Saturation");
     p->set<Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl_->qp_scalar);
-    ev = Teuchos::rcp(new PHAL::LoadStateField<EvalT, PHAL::AlbanyTraits>(*p));
+    using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT,PHAL::AlbanyTraits,typename EvalT::ScalarT>;
+    ev = Teuchos::rcp(new LoadStateFieldST(*p));
+    //ev = Teuchos::rcp(new PHAL::LoadStateField<EvalT, PHAL::AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
 

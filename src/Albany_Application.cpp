@@ -1178,9 +1178,9 @@ Application::computeGlobalResidual(
   // every time it arises or at requested count#
   auto const write_sol_mm =
       writeToMatrixMarketSol != 0 && (writeToMatrixMarketSol == -1 || countSol == writeToMatrixMarketSol);
-  if (write_sol_mm == true) { 
-    *out << "Writing global solution #" << countSol << " to MatrixMarket at time t = " << current_time << ".\n"; 
-    writeMatrixMarket(x, "sol", countSol); 
+  if (write_sol_mm == true) {
+    *out << "Writing global solution #" << countSol << " to MatrixMarket at time t = " << current_time << ".\n";
+    writeMatrixMarket(x, "sol", countSol);
   }
   auto const write_sol_co = writeToCoutSol != 0 && (writeToCoutSol == -1 || countSol == writeToCoutSol);
   if (write_sol_co == true) {
@@ -1191,9 +1191,9 @@ Application::computeGlobalResidual(
 
   auto const write_res_mm =
       writeToMatrixMarketRes != 0 && (writeToMatrixMarketRes == -1 || countRes == writeToMatrixMarketRes);
-  if (write_res_mm == true) { 
-    *out << "Writing global residual #" << countRes << " to MatrixMarket at time t = " << current_time << ".\n"; 
-    writeMatrixMarket(f, "rhs", countRes); 
+  if (write_res_mm == true) {
+    *out << "Writing global residual #" << countRes << " to MatrixMarket at time t = " << current_time << ".\n";
+    writeMatrixMarket(f, "rhs", countRes);
   }
   auto const write_res_co = writeToCoutRes != 0 && (writeToCoutRes == -1 || countRes == writeToCoutRes);
   if (write_res_co == true) {
@@ -1398,11 +1398,11 @@ Application::computeGlobalJacobian(
     // If requesting writing to MatrixMarket of Jacobian...
     if (writeToMatrixMarketJac == -1) {
       // write jacobian to MatrixMarket every time it arises
-      *out << "Writing global Jacobian #" << countJac << " to MatrixMarket at time t = " << current_time << ".\n"; 
+      *out << "Writing global Jacobian #" << countJac << " to MatrixMarket at time t = " << current_time << ".\n";
       writeMatrixMarket(jac.getConst(), "jac", countJac);
     } else if (countJac == writeToMatrixMarketJac) {
       // write jacobian only at requested count#
-      *out << "Writing global Jacobian #" << countJac << " to MatrixMarket at time t = " << current_time << ".\n"; 
+      *out << "Writing global Jacobian #" << countJac << " to MatrixMarket at time t = " << current_time << ".\n";
       writeMatrixMarket(jac.getConst(), "jac", countJac);
     }
   }

@@ -1719,7 +1719,7 @@ GenericSTKMeshStruct::checkFieldIsInMesh(std::string const& fname, std::string c
   switch (dim) {
     case 1: missing = (metaData->get_field<SFT>(entity_rank, fname) == 0); break;
     case 2: missing = (metaData->get_field<VFT>(entity_rank, fname) == 0); break;
-    case 3: missing = (metaData->get_field<TFT>(entity_rank, fname) == 0);
+    case 3: missing = (metaData->get_field<TFT>(entity_rank, fname) == 0); break;
     default: ALBANY_ABORT("Error! Invalid field dimension.\n");
   }
 

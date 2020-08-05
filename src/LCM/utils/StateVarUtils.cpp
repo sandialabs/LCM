@@ -10,7 +10,6 @@ void
 fromTo(Albany::StateArrayVec const& src, LCM::StateArrayVec& dst)
 {
   auto const num_ws = src.size();
-  dst.clear();
   dst.resize(num_ws);
   for (auto ws = 0; ws < num_ws; ++ws) {
     auto&& src_map = src[ws];
@@ -20,7 +19,6 @@ fromTo(Albany::StateArrayVec const& src, LCM::StateArrayVec& dst)
       auto&&     src_states = kv.second;
       auto&&     dst_states = dst_map[state_name];
       auto const num_states = src_states.size();
-      dst_states.clear();
       dst_states.resize(num_states);
       for (auto s = 0; s < num_states; ++s) { dst_states[s] = src_states[s]; }
     }

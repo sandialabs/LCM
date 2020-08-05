@@ -135,7 +135,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
 
   // define evaluated fields
   setEvaluatedField("ACE Bluff Salinity", dl->qp_scalar);
-  setEvaluatedField("ACE Ice Saturation", dl->qp_scalar);
+  setEvaluatedField("ACE_Ice_Saturation", dl->qp_scalar);
   setEvaluatedField("ACE Density", dl->qp_scalar);
   setEvaluatedField("ACE Heat Capacity", dl->qp_scalar);
   setEvaluatedField("ACE Thermal Conductivity", dl->qp_scalar);
@@ -171,12 +171,12 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
 
   // ACE Ice saturation
   addStateVariable(
-      "ACE Ice Saturation",
+      "ACE_Ice_Saturation",
       dl->qp_scalar,
       "scalar",
       ice_saturation_init_,
       true,
-      p->get<bool>("Output ACE Ice Saturation", false));
+      p->get<bool>("Output ACE_Ice_Saturation", false));
 
   // ACE Density
   addStateVariable("ACE Density", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Density", false));
@@ -248,7 +248,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::init(
   eqps_             = *output_fields[eqps_string];
   yield_surf_       = *output_fields[yieldSurface_string];
   bluff_salinity_   = *output_fields["ACE Bluff Salinity"];
-  ice_saturation_   = *output_fields["ACE Ice Saturation"];
+  ice_saturation_   = *output_fields["ACE_Ice_Saturation"];
   density_          = *output_fields["ACE Density"];
   heat_capacity_    = *output_fields["ACE Heat Capacity"];
   thermal_cond_     = *output_fields["ACE Thermal Conductivity"];
@@ -263,7 +263,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::init(
   Fp_old_             = (*workset.stateArrayPtr)[Fp_string + "_old"];
   eqps_old_           = (*workset.stateArrayPtr)[eqps_string + "_old"];
   T_old_              = (*workset.stateArrayPtr)["ACE Temperature_old"];
-  ice_saturation_old_ = (*workset.stateArrayPtr)["ACE Ice Saturation_old"];
+  ice_saturation_old_ = (*workset.stateArrayPtr)["ACE_Ice_Saturation_old"];
 
   auto& disc                    = *workset.disc;
   auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);

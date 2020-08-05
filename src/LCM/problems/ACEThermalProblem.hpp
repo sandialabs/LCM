@@ -217,7 +217,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("BF Name", "BF");
     p->set<string>("ACE Thermal Inertia QP Variable Name", "ACE Thermal Inertia");
     p->set<string>("ACE Bluff Salinity QP Variable Name", "ACE Bluff Salinity");
-    p->set<string>("ACE Ice Saturation QP Variable Name", "ACE Ice Saturation");
+    p->set<string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
     p->set<string>("ACE Density QP Variable Name", "ACE Density");
     p->set<string>("ACE Heat Capacity QP Variable Name", "ACE Heat Capacity");
     p->set<string>("ACE Water Saturation QP Variable Name", "ACE Water Saturation");
@@ -257,12 +257,12 @@ Albany::ACEThermalProblem::constructEvaluators(
       if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE Ice Saturation to the output Exodus file
+    // Save ACE_Ice_Saturation to the output Exodus file
     {
       std::string stateName = "ACE Ice Saturation";
       entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
-      p->set<std::string>("Field Name", "ACE Ice Saturation");
+      p->set<std::string>("Field Name", "ACE_Ice_Saturation");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 

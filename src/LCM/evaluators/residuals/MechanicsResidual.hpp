@@ -79,7 +79,7 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   PHX::MDField<ScalarT const, Cell, Node, Dim> mass_;
 
   ///
-  /// Input: ACE Ice Saturation field
+  /// Input: ACE_Ice_Saturation field 
   ///
   PHX::MDField<ScalarT, Cell, QuadPoint> ice_saturation_;
 

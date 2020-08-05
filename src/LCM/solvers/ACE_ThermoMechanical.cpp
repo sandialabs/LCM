@@ -476,7 +476,7 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   disc_params.set<double>("Restart Time", this_time);
   // Remove Initial Condition sublist
   problem_params.remove("Initial Condition", true);
-  // Set a flag to inform the mechanical problem to register the field ACE Ice Saturation
+  // Set flag to tell code that we have an ACE Sequential Thermomechanical Problem
   problem_params.set("ACE Sequential Thermomechanical", true, "ACE Sequential Thermomechanical Problem");
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};

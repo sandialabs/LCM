@@ -40,7 +40,7 @@ LCM:
         Number of Fields: 3
         IP Field Name 0: ACE Temperature
         IP Field Layout 0: Scalar
-        IP Field Name 1: ACE Ice Saturation
+        IP Field Name 1: ACE_Ice_Saturation
         IP Field Layout 1: Scalar
         IP Field Name 2: ACE Water Saturation
         IP Field Layout 2: Scalar

@@ -20,7 +20,7 @@ ALBANY:
         Number of Fields: 8
         IP Field Name 0: ACE Bluff Salinity
         IP Field Layout 0: Scalar
-        IP Field Name 1: ACE Ice Saturation
+        IP Field Name 1: ACE_Ice_Saturation
         IP Field Layout 1: Scalar
         IP Field Name 2: ACE Density
         IP Field Layout 2: Scalar

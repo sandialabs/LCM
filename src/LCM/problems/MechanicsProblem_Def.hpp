@@ -125,6 +125,10 @@ MechanicsProblem::constructEvaluators(
     FieldManagerChoice                          fieldManagerChoice,
     Teuchos::RCP<Teuchos::ParameterList> const& responseList)
 {
+  //IKT: uncomment the following if wish to run stand-alone mechanics problem 
+  //with ACE_Ice_Saturation field.
+  //is_ace_sequential_thermomechanical_ = true;
+
   using Intrepid2Basis = typename Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>;
 
   // Collect problem-specific response parameters
@@ -781,25 +785,23 @@ MechanicsProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
-  // Register ACE Ice Saturation
-  // IKT: the if-statement a hack to prevent redundant registration of params
-  // similar to dirichlet_field - I still have no idea why it's needed for mechanics problem...
-  if (is_ace_sequential_thermomechanical_ == true && ace_ice_sat_field_count == 0) {
-    std::string                          stateName = "ACE Ice Saturation";
+  // Register ACE_Ice_Saturation 
+  if (is_ace_sequential_thermomechanical_ == true) {
+    //std::string                          stateName = "ACE_Ice_Saturation";
+    std::string                          stateName = "ACE_Ice_Saturation";
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
     p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
-    ace_ice_sat_field_count++;
   }
 
   if (is_ace_sequential_thermomechanical_ == true) {
     // Load parameter using its field name
-    std::string fieldName = "ACE Ice Saturation";
+    std::string fieldName = "ACE_Ice_Saturation";
     p->set<std::string>("Field Name", fieldName);
-    p->set<std::string>("State Name", "ACE Ice Saturation");
+    //p->set<std::string>("State Name", "ACE_Ice_Saturation");
+    p->set<std::string>("State Name", "ACE_Ice_Saturation");
     p->set<Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl_->qp_scalar);
-    using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT, PHAL::AlbanyTraits, typename EvalT::ScalarT>;
-    ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
-    // ev = Teuchos::rcp(new PHAL::LoadStateField<EvalT, PHAL::AlbanyTraits>(*p));
+    using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT,PHAL::AlbanyTraits,typename EvalT::ScalarT>;
+    ev = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
@@ -940,13 +942,13 @@ MechanicsProblem::constructEvaluators(
       param_list.set<bool>("Have ACE Temperature", true);
     }
 
-    param_list.set<bool>("Have ACE Ice Saturation", false);
+    param_list.set<bool>("Have ACE_Ice_Saturation", false);
     if (is_ace_sequential_thermomechanical_ == true) {
-      p->set<std::string>("ACE Ice Saturation QP Variable Name", "ACE Ice Saturation");
-      param_list.set<bool>("Have ACE Ice Saturation", true);
+      p->set<std::string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
+      param_list.set<bool>("Have ACE_Ice_Saturation", true);
     }
 
-    param_list.set<bool>("Have Total Concentration", false);
+   param_list.set<bool>("Have Total Concentration", false);
     if (have_transport_ == true) {
       p->set<std::string>("Total Concentration Name", totalConcentration);
       param_list.set<bool>("Have Total Concentration", true);
@@ -1427,7 +1429,7 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Body Force Name", "Body Force");
       p->set<std::string>("Analytic Mass Name", "Analytic Mass Residual");
       if (is_ace_sequential_thermomechanical_ == true) {
-        p->set<std::string>("ACE Ice Saturation QP Variable Name", "ACE Ice Saturation");
+        p->set<std::string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
       }
       bool const use_analytic_mass = material_db_->getElementBlockParam<bool>(eb_name, "Use Analytic Mass", false);
       p->set<bool>("Use Analytic Mass", use_analytic_mass);

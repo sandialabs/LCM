@@ -31,10 +31,10 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
   this->addDependentField(w_grad_bf_);
   this->addDependentField(w_bf_);
 
-  is_ace_sequential_thermomechanical_ = p.isParameter("ACE Ice Saturation QP Variable Name");
+  is_ace_sequential_thermomechanical_ = p.isParameter("ACE_Ice_Saturation QP Variable Name");
   if (is_ace_sequential_thermomechanical_ == true) {
     ice_saturation_ =
-        decltype(ice_saturation_)(p.get<std::string>("ACE Ice Saturation QP Variable Name"), dl->qp_scalar);
+        decltype(ice_saturation_)(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar);
     this->addDependentField(ice_saturation_);
   }
 
@@ -170,6 +170,14 @@ template <typename EvalT, typename Traits>
 void
 MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
+  //IKT: uncomment if wish to print ice_sat.  Note that if ice_sat is not present, 
+  //trying to print it will cause seg fault. 
+  /*for (int cell = 0; cell < workset.numCells; ++cell) {
+    for (int pt = 0; pt < num_pts_; ++pt) {
+      std::cout << "IKT cell, pt, ice_sat = " << cell << ", " << pt << ", " 
+                << ice_saturation_(cell, pt) << "\n"; 
+    }
+  }*/
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < num_nodes_; ++node)
       for (int dim = 0; dim < num_dims_; ++dim) residual_(cell, node, dim) = ScalarT(0);

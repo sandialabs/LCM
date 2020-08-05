@@ -1,0 +1,91 @@
+ALBANY:
+  #Debug Output: 
+  #  Write Jacobian to MatrixMarket: -1
+  #  Write Residual to MatrixMarket: -1
+  Problem: 
+    Name: ACE Thermal 2D
+    Solution Method: Transient Tempus
+    MaterialDB Filename: materials_2blks.yaml
+    Dirichlet BCs: 
+      ExpressionEvaluated SDBC on NS top_right for DOF T: '200.0 + 5.0e-04 * t'
+      ExpressionEvaluated SDBC on NS top_left for DOF T: '200.0 + 5.0e-04 * t'
+      #ExpressionEvaluated SDBC on NS top_right for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
+      #ExpressionEvaluated SDBC on NS top_left for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
+    Initial Condition:
+      Function: Expression Parser
+      Function Expressions: ['200']
+      #Function Expressions: ['250 * cosh(5.421312110550360e-02*x)']
+    Response Functions:
+      Number: 2
+      Response 0: Project IP to Nodal Field
+      ResponseParams 0:
+        Number of Fields: 8
+        IP Field Name 0: ACE Bluff Salinity
+        IP Field Layout 0: Scalar
+        IP Field Name 1: ACE Ice Saturation
+        IP Field Layout 1: Scalar
+        IP Field Name 2: ACE Density
+        IP Field Layout 2: Scalar
+        IP Field Name 3: ACE Heat Capacity
+        IP Field Layout 3: Scalar
+        IP Field Name 4: ACE Thermal Conductivity
+        IP Field Layout 4: Scalar
+        IP Field Name 5: ACE Thermal Inertia
+        IP Field Layout 5: Scalar
+        IP Field Name 6: ACE Water Saturation
+        IP Field Layout 6: Scalar
+        IP Field Name 7: ACE Porosity
+        IP Field Layout 7: Scalar
+        Output to File: true
+      Response 1: Solution Average
+  Discretization: 
+    Method: Ioss
+    Exodus Input File Name: square_2blocks.e
+    Exodus Output File Name: square_2blocks_block_dept_explicit_out.exo
+    Separate Evaluators by Element Block: true
+    Workset Size: -1
+  Regression Results: 
+    Number of Comparisons: 3
+    Test Values: [0.0, 0.0, 2.119057844140e+02]
+    Relative Tolerance: 1.00000000000000002e-03
+    Absolute Tolerance: 1.00000000000000008e-05
+  Piro: 
+    Tempus: 
+      Integrator Name: Tempus Integrator
+      Invert Mass Matrix: true
+      Lump Mass Matrix: true
+      Tempus Integrator: 
+        Integrator Type: Integrator Basic
+        Screen Output Index List: '1'
+        Screen Output Index Interval: 100
+        Stepper Name: Tempus Stepper
+        Solution History: 
+          Storage Type: Unlimited
+          Storage Limit: 20
+        Time Step Control: 
+          Initial Time: 0.00000000000000000e+00
+          Initial Time Index: 0
+          Initial Time Step: 1.0e+03
+          Initial Order: 0
+          Final Time: 1.0e+5
+          Final Time Index: 10000000
+          Maximum Absolute Error: 1.00000000000000002e-08
+          Maximum Relative Error: 1.00000000000000002e-08
+          Integrator Step Type: Constant
+          Time Step Control Strategy: 
+            Time Step Control Strategy List: basic_vs
+            basic_vs: 
+              Name: Basic VS
+              Reduction Factor: 5.00000000000000000e-01
+              Amplification Factor: 1.50000000000000000e+00
+              Minimum Value Monitoring Function: 1.0e-12
+              Maximum Value Monitoring Function: 1.0e20
+          Output Time List: ''
+          Output Index List: ''
+          Output Time Interval: 1.00000000000000000e+01
+          Output Index Interval: 1000
+          Maximum Number of Stepper Failures: 10
+          Maximum Number of Consecutive Stepper Failures: 5
+      Tempus Stepper: 
+        Stepper Type: Forward Euler
+...

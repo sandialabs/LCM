@@ -1,0 +1,71 @@
+LCM:
+  Problem:
+    Name: Mechanics 3D
+    Phalanx Graph Visualization Detail: 0
+    MaterialDB Filename: './materials_mechanical.yaml'
+    Solution Method: Transient Tempus
+    #IKT FIXME - verify BCs with Alejandro and Jenn
+    Dirichlet BCs: 
+      SDBC on NS x- for DOF X: 0.0
+      SDBC on NS y- for DOF Y: 0.0
+      SDBC on NS z- for DOF Z: 0.0
+    Initial Condition:
+      Function: Constant
+      Function Data: [0.0, 0.0, 0.0]
+    Response Functions:
+      Number: 4
+      Response 0: Project IP to Nodal Field
+      ResponseParams 0:
+        Number of Fields: 1
+        IP Field Name 0: Cauchy_Stress
+        IP Field Layout 0: Tensor
+        #IP Field Name 1: eqps
+        #IP Field Layout 1: Scalar
+        Output to File: true
+      Response 1: Solution Average
+      Response 2: Solution Max Value
+      Response 3: Solution Min Value
+  Discretization:
+    Method: Ioss
+    Exodus Input File Name: './grid_with_temp.e'
+    Restart Index: 2
+    Exodus Output File Name: './mechanics_standalone_restart2.e'
+    Separate Evaluators by Element Block: true
+    Number Of Time Derivatives: 2
+    Restart Fields: [ACE Ice Saturation]
+    Exodus Solution Name: 'disp'
+    Exodus SolutionDot Name: 'disp_dot'
+    Exodus SolutionDotDot Name: 'disp_dotdot'
+  Regression Results:
+    Number of Comparisons: 0
+    Test Values: [0.000000000000e+00, -1.442043556017e-05, 3.715203484204e-04, -3.715203339250e-04]
+    Relative Tolerance: 1.0e-7
+    Absolute Tolerance: 1.0e-7
+  Piro:
+    Tempus:
+      Invert Mass Matrix: true
+      Lump Mass Matrix: true
+      Integrator Name: Tempus Integrator
+      Tempus Integrator:
+        Integrator Type: Integrator Basic
+        Stepper Name: Tempus Stepper
+        Solution History:
+          Storage Type: Unlimited
+          Storage Limit: 2000
+        Time Step Control:
+          Initial Time: 14400.0
+          Final Time: 21600.0
+          Initial Time Step: 7200.0 
+          Maximum Absolute Error: 1.0e-8
+          Maximum Relative Error: 1.0e-8
+          Integrator Step Type: Constant
+          Output Time List: ''
+          Output Index List: ''
+          #Output Time Interval: 1.0
+          #Output Index Interval: 1000
+          #Maximum Number of Stepper Failures: 10
+          #Maximum Number of Consecutive Stepper Failures: 5
+      Tempus Stepper:
+        Stepper Type: 'Newmark Explicit a-Form'
+        Newmark Explicit Parameters:
+          Gamma: 0.50

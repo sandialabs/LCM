@@ -136,25 +136,31 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   void
   AdvanceThermalDynamics(
-      const int    subdomain,
-      const bool   is_initial_state,
-      const double current_time,
-      const double next_time,
-      const double time_step) const;
+      int const    subdomain,
+      bool const   is_initial_state,
+      double const current_time,
+      double const next_time,
+      double const time_step) const;
 
   void
-  AdvanceMechanicsDynamics(
-      const int    subdomain,
-      const bool   is_initial_state,
-      const double current_time,
-      const double next_time,
-      const double time_step) const;
+  AdvanceMechanicalDynamics(
+      int const    subdomain,
+      bool const   is_initial_state,
+      double const current_time,
+      double const next_time,
+      double const time_step) const;
 
   bool
   continueSolve() const;
 
   void
-  createSolversAppsDiscsMEs(const int file_index, const double this_time = 0.0) const;
+  createSolversAppsDiscsMEs(int const file_index, double const this_time = 0.0) const;
+
+  void
+  createThermalSolverAppDiscME(int const file_index, double const this_time) const;
+
+  void
+  createMechanicalSolverAppDiscME(int const file_index, double const this_time) const;
 
   void
   doQuasistaticOutput(ST const time) const;
@@ -163,7 +169,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   setExplicitUpdateInitialGuessForCoupling(ST const current_time, ST const time_step) const;
 
   void
-  setDynamicICVecsAndDoOutput(ST const time) const;
+  setICVecsAndOutput(ST const time, int const subdomain) const;
 
   std::vector<Teuchos::RCP<Albany::SolverFactory>>                             solver_factories_;
   mutable std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
@@ -206,12 +212,10 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdot_;
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdotdot_;
 
-  // std::vector for holding names of previous Exodus output files, for restarts.
-  mutable std::vector<std::string> prev_exo_outfile_name_;
-  // variable with previous thermal Exodus output file, for mechanics restarts
+  // variable with previous thermal Exodus output file, for mechanical restarts
   mutable std::string prev_thermal_exo_outfile_name_;
-  // variable with previous mechanics Exodus output file, for thermal restarts
-  mutable std::string prev_mechanics_exo_outfile_name_;
+  // variable with previous mechanical Exodus output file, for thermal restarts
+  mutable std::string prev_mechanical_exo_outfile_name_;
 
   mutable std::vector<LCM::StateArrays> internal_states_;
   mutable std::vector<bool>             do_outputs_;
@@ -225,7 +229,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   enum PROB_TYPE
   {
     THERMAL,
-    MECHANICS
+    MECHANICAL
   };
 
   // std::vector mapping subdomain number to PROB_TYPE;

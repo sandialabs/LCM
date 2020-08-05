@@ -197,6 +197,5 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
 
   validPL->set<bool>("ACE Sequential Thermomechanical", false, "ACE Sequential Thermomechanical Problem");
 
-
   return validPL;
 }

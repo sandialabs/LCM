@@ -249,9 +249,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
   ScalarT       Y              = yield_strength_(cell, pt);
 
+  //IKT: comment out the following lines to suppress writing of ice_saturation to std output 
   if (cell == 0) {
     std::cout << "IKT in J2ErosionKernel: pt, ice_saturation = " << pt << ", " << pt << ", " << ice_saturation << "\n"; 
   }
+  
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 

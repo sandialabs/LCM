@@ -38,13 +38,21 @@ class ArrayList
   {
     return &v_[0] + n_ * i;
   }
-  T* operator[](Int i) { return &v_[0] + n_ * i; }
+  T*
+  operator[](Int i)
+  {
+    return &v_[0] + n_ * i;
+  }
   const T*
   operator()(Int i) const
   {
     return &v_[0] + n_ * i;
   }
-  const T* operator[](Int i) const { return &v_[0] + n_ * i; }
+  const T*
+  operator[](Int i) const
+  {
+    return &v_[0] + n_ * i;
+  }
   size_t
   size() const
   {
@@ -145,7 +153,7 @@ get_all_edgesigs(const Tris& tris)
 inline std::vector<TriSignature>
 get_all_trisigs(const Tets& tets)
 {
-  const Int idxs[4][3] = {{1, 0, 2}, {3, 0, 1}, {3, 1, 2}, {3, 2, 0}};
+  const Int                 idxs[4][3] = {{1, 0, 2}, {3, 0, 1}, {3, 1, 2}, {3, 2, 0}};
   std::vector<TriSignature> tss;
   for (size_t itet = 0, k = 0; itet < tets.size(); ++itet) {
     const Int* tet = tets(itet);
@@ -204,15 +212,7 @@ get_unique_edges(const IntArrayList& polys, const IntArrayList& pis)
 // LAPACK and BLAS declarations.
 typedef long long blas_int;
 extern "C" void
-dgeqrf_(
-    blas_int* m,
-    blas_int* n,
-    double*   A,
-    blas_int* lda,
-    double*   tau,
-    double*   work,
-    blas_int* lwork,
-    blas_int* info);
+dgeqrf_(blas_int* m, blas_int* n, double* A, blas_int* lda, double* tau, double* work, blas_int* lwork, blas_int* info);
 extern "C" void
 dorgqr_(
     blas_int* m,
@@ -227,39 +227,15 @@ dorgqr_(
 // Wrapper declarations.
 template <typename T>
 void
-geqrf(
-    blas_int  m,
-    blas_int  n,
-    T*        A,
-    blas_int  lda,
-    T*        tau,
-    T*        work,
-    blas_int  lwork,
-    blas_int& info);
+geqrf(blas_int m, blas_int n, T* A, blas_int lda, T* tau, T* work, blas_int lwork, blas_int& info);
 template <typename T>
 void
-orgqr(
-    blas_int  m,
-    blas_int  n,
-    blas_int  k,
-    T*        A,
-    blas_int  lda,
-    T*        tau,
-    T*        work,
-    blas_int  lwork,
-    blas_int& info);
+orgqr(blas_int m, blas_int n, blas_int k, T* A, blas_int lda, T* tau, T* work, blas_int lwork, blas_int& info);
 // Specializations.
 template <>
 inline void
-geqrf<double>(
-    blas_int  m,
-    blas_int  n,
-    double*   A,
-    blas_int  lda,
-    double*   tau,
-    double*   work,
-    blas_int  lwork,
-    blas_int& info)
+geqrf<
+    double>(blas_int m, blas_int n, double* A, blas_int lda, double* tau, double* work, blas_int lwork, blas_int& info)
 {
   dgeqrf_(&m, &n, A, &lda, tau, work, &lwork, &info);
 }
@@ -632,8 +608,7 @@ signed_dist(const Point<3>& p, const TriWithData<3>& t)
   else {
     Real ls_dist2;
     for (Int i = 0; i < 3; ++i) {
-      const Real lsd2i =
-          dist2(p, LineSegment<3>(t.vertex(i), t.vertex((i + 1) % 3)));
+      const Real lsd2i = dist2(p, LineSegment<3>(t.vertex(i), t.vertex((i + 1) % 3)));
       if (i == 0 || lsd2i < ls_dist2) ls_dist2 = lsd2i;
     }
     return sign(sd) * std::sqrt(ls_dist2);
@@ -653,18 +628,12 @@ signed_dist(const TriWithData<3>& t, const Point<3>& p)
 //   Eventually I'd like to use a bounding volume hierarchy, at least with
 // spheres, to do this calculation. For now I brute force it.
 void
-dist(
-    const Vertices& ps,
-    const Tris&     tris,
-    const Vertices& xs,
-    Real*           d,
-    Int*            tri_idxs)
+dist(const Vertices& ps, const Tris& tris, const Vertices& xs, Real* d, Int* tri_idxs)
 {
   if (tris.empty()) return;
 
   std::vector<TriWithData<3>> tris_wd(tris.size());
-  for (size_t i = 0; i < tris_wd.size(); ++i)
-    tris_wd[i].init(Tri<3>(xs[tris(i)[0]], xs[tris(i)[1]], xs[tris(i)[2]]));
+  for (size_t i = 0; i < tris_wd.size(); ++i) tris_wd[i].init(Tri<3>(xs[tris(i)[0]], xs[tris(i)[1]], xs[tris(i)[2]]));
 
   for (size_t ip = 0; ip < ps.size(); ++ip) {
     const Point<3>& p(ps(ip));
@@ -696,8 +665,7 @@ convert(const mexutil::ConstDenseMexMat& mp, ArrayList<T>& p, const T add = 0)
 {
   p.resize(mp.m);
   for (size_t i = 0; i < mp.m; ++i)
-    for (int j = 0; j < p.n(); ++j)
-      p(i)[j] = static_cast<T>(mp.a[mp.m * j + i]) + add;
+    for (int j = 0; j < p.n(); ++j) p(i)[j] = static_cast<T>(mp.a[mp.m * j + i]) + add;
 }
 
 template <typename T>
@@ -706,8 +674,7 @@ convert(const ArrayList<T>& p, const double add = 0)
 {
   mexutil::DenseMexMat mp(p.size(), p.n());
   for (size_t i = 0; i < mp.m; ++i)
-    for (int j = 0; j < p.n(); ++j)
-      mp[mp.m * j + i] = static_cast<double>(p(i)[j]) + add;
+    for (int j = 0; j < p.n(); ++j) mp[mp.m * j + i] = static_cast<double>(p(i)[j]) + add;
   return mp;
 }
 
@@ -736,10 +703,8 @@ mexFunction(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs)
     mexutil::DenseMexMat medges = convert(edges);
     plhs[0]                     = medges.ma;
   } else if (cmd == "signed_dist_ps_tris") {
-    if (nlhs != 2 || nrhs != 3)
-      mexErrMsgTxt("[sd idx] = signed_dist_ps_tris(points, tris, verts)");
-    const mexutil::ConstDenseMexMat mps(prhs[0]), mtris(prhs[1]),
-        mverts(prhs[2]);
+    if (nlhs != 2 || nrhs != 3) mexErrMsgTxt("[sd idx] = signed_dist_ps_tris(points, tris, verts)");
+    const mexutil::ConstDenseMexMat mps(prhs[0]), mtris(prhs[1]), mverts(prhs[2]);
     reqorexit(mps.n == 3);
     reqorexit(mtris.n == 3);
     reqorexit(mverts.n == 3);
@@ -755,11 +720,9 @@ mexFunction(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs)
     dist(ps, tris, verts, sd.a, &tri_idxs[0]);
     mexutil::DenseMexMat idxs(mps.m, 1);
     plhs[1] = idxs.ma;
-    for (size_t i = 0; i < mps.m; ++i)
-      idxs.a[i] = static_cast<double>(tri_idxs[i]) + 1;
+    for (size_t i = 0; i < mps.m; ++i) idxs.a[i] = static_cast<double>(tri_idxs[i]) + 1;
   } else if (cmd == "dist2_ps_ls") {
-    if (nlhs != 1 || nrhs != 2)
-      mexErrMsgTxt("dist2 = dist2_ps_ls(points, line_segment)");
+    if (nlhs != 1 || nrhs != 2) mexErrMsgTxt("dist2 = dist2_ps_ls(points, line_segment)");
     const mexutil::ConstDenseMexMat mps(prhs[0]), mls(prhs[1]);
     reqorexit(mps.n == 3);
     reqorexit(mls.m == 2 && mls.n == 3);
@@ -775,8 +738,7 @@ mexFunction(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs)
       d2.a[i] = dist2(p, ls);
     }
   } else if (cmd == "signed_dist_ps_tri") {
-    if (nlhs != 1 || nrhs != 2)
-      mexErrMsgTxt("dist2 = signed_dist_ps_tri(points, tri_verts)");
+    if (nlhs != 1 || nrhs != 2) mexErrMsgTxt("dist2 = signed_dist_ps_tri(points, tri_verts)");
     const mexutil::ConstDenseMexMat mps(prhs[0]), mtri(prhs[1]);
     reqorexit(mps.n == 3);
     reqorexit(mtri.m == 3 && mtri.n == 3);

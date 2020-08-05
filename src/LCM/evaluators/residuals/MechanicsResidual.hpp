@@ -81,8 +81,8 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   ///
   /// Input: ACE_Ice_Saturation field 
   ///
-  PHX::MDField<ScalarT, Cell, QuadPoint>                ice_saturation_;
-  
+  PHX::MDField<ScalarT, Cell, QuadPoint> ice_saturation_;
+
   ///
   /// Output: Residual Forces
   ///

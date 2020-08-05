@@ -63,14 +63,7 @@ main(int argc, char* argv[])
   while (true) {
     // Get the stress tensor
 
-    MPI_Recv(
-        &albany_stress_tensor[0],
-        albany_stress_tensor.size(),
-        MPI_DOUBLE,
-        0,
-        MPI_ANY_TAG,
-        albany,
-        &status);
+    MPI_Recv(&albany_stress_tensor[0], albany_stress_tensor.size(), MPI_DOUBLE, 0, MPI_ANY_TAG, albany, &status);
 
     // TIme to die?
 
@@ -82,13 +75,7 @@ main(int argc, char* argv[])
 
     // Send it back out
 
-    MPI_Send(
-        &mpale_stress_tensor[0],
-        mpale_stress_tensor.size(),
-        MPI_DOUBLE,
-        0,
-        STRESS_TENSOR,
-        albany);
+    MPI_Send(&mpale_stress_tensor[0], mpale_stress_tensor.size(), MPI_DOUBLE, 0, STRESS_TENSOR, albany);
   }
 
   MPI_Finalize();

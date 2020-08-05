@@ -791,7 +791,6 @@ MechanicsProblem::constructEvaluators(
     std::string                          stateName = "ACE_Ice_Saturation";
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
     p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
-    ace_ice_sat_field_count++; 
   }
 
   if (is_ace_sequential_thermomechanical_ == true) {

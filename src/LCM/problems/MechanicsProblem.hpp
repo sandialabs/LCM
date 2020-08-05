@@ -19,7 +19,6 @@
 #include "SolutionSniffer.hpp"
 
 static int dir_count = 0;  // counter for registration of dirichlet_field
-static int ace_ice_sat_field_count = 0;
 
 namespace Albany {
 

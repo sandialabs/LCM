@@ -53,7 +53,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("Elastic Modulus", dl->qp_scalar);
   setDependentField("Yield Strength", dl->qp_scalar);
   setDependentField("Hardening Modulus", dl->qp_scalar);
-  setDependentField("ACE Ice Saturation", dl->qp_scalar);
+  setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
   setDependentField("Delta Time", dl->workset_scalar);
 
   // define the evaluated fields
@@ -108,7 +108,7 @@ J2ErosionKernel<EvalT, Traits>::init(
   yield_strength_     = *dep_fields["Yield Strength"];
   hardening_modulus_  = *dep_fields["Hardening Modulus"];
   delta_time_         = *dep_fields["Delta Time"];
-  ace_ice_saturation_ = *dep_fields["ACE Ice Saturation"];
+  ace_ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
 
   // extract evaluated MDFields
   stress_     = *eval_fields[cauchy_string];

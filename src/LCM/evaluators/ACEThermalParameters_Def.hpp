@@ -30,7 +30,7 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
       bf_(p.get<std::string>("BF Name"), dl->node_qp_scalar),
       thermal_inertia_(p.get<std::string>("ACE Thermal Inertia QP Variable Name"), dl->qp_scalar),
       bluff_salinity_(p.get<std::string>("ACE Bluff Salinity QP Variable Name"), dl->qp_scalar),
-      ice_saturation_(p.get<std::string>("ACE Ice Saturation QP Variable Name"), dl->qp_scalar),
+      ice_saturation_(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar),
       density_(p.get<std::string>("ACE Density QP Variable Name"), dl->qp_scalar),
       heat_capacity_(p.get<std::string>("ACE Heat Capacity QP Variable Name"), dl->qp_scalar),
       water_saturation_(p.get<std::string>("ACE Water Saturation QP Variable Name"), dl->qp_scalar),

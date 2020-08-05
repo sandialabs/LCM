@@ -65,7 +65,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ConstScalarField poissons_ratio_;
   ConstScalarField yield_strength_;
   ConstScalarField temperature_;
-  ConstScalarField ace_ice_saturation_;
+  ConstScalarField ice_saturation_;
 
   // Output MDFields
   ScalarField eqps_;

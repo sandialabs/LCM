@@ -101,14 +101,14 @@ J2ErosionKernel<EvalT, Traits>::init(
   std::string J_string            = field_name_map_["J"];
 
   // extract dependent MDFields
-  def_grad_           = *dep_fields[F_string];
-  J_                  = *dep_fields[J_string];
-  poissons_ratio_     = *dep_fields["Poissons Ratio"];
-  elastic_modulus_    = *dep_fields["Elastic Modulus"];
-  yield_strength_     = *dep_fields["Yield Strength"];
-  hardening_modulus_  = *dep_fields["Hardening Modulus"];
-  delta_time_         = *dep_fields["Delta Time"];
-  ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
+  def_grad_          = *dep_fields[F_string];
+  J_                 = *dep_fields[J_string];
+  poissons_ratio_    = *dep_fields["Poissons Ratio"];
+  elastic_modulus_   = *dep_fields["Elastic Modulus"];
+  yield_strength_    = *dep_fields["Yield Strength"];
+  hardening_modulus_ = *dep_fields["Hardening Modulus"];
+  delta_time_        = *dep_fields["Delta Time"];
+  ice_saturation_    = *dep_fields["ACE_Ice_Saturation"];
 
   // extract evaluated MDFields
   stress_     = *eval_fields[cauchy_string];
@@ -249,11 +249,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
   ScalarT       Y              = yield_strength_(cell, pt);
 
-  //IKT: comment out the following lines to suppress writing of ice_saturation to std output 
-  if (cell == 0) {
-    std::cout << "IKT in J2ErosionKernel: pt, ice_saturation = " << pt << ", " << pt << ", " << ice_saturation << "\n"; 
-  }
-  
+  //ALBANY_DUMP("**** CELL : " << cell << ", POINT : " << pt << ", ICE SATURATION : " << ice_saturation);
+
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 

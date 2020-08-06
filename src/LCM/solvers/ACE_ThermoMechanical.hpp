@@ -166,10 +166,13 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   doQuasistaticOutput(ST const time) const;
 
   void
+  doDynamicInitialOutput(ST const time, int const subdomain, int const stop) const;
+
+  void
   setExplicitUpdateInitialGuessForCoupling(ST const current_time, ST const time_step) const;
 
   void
-  setICVecsAndOutput(ST const time, int const subdomain) const;
+  setICVecs(ST const time, int const subdomain) const;
 
   std::vector<Teuchos::RCP<Albany::SolverFactory>>                             solver_factories_;
   mutable std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;

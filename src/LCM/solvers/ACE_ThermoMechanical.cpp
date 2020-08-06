@@ -578,40 +578,31 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 	  setICVecs(initial_time_, subdomain);
 	  doDynamicInitialOutput(initial_time_, subdomain, stop);  
 	}
-        // Before the coupling loop, get internal states
+        // Before the coupling loop, get internal states, and figure out whether 
+	// output needs to be done or not.
         if (num_iter_ == 0) {
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
           fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+	  do_outputs_[subdomain] = true; //We always want output in the initial step
         }
+	else {
+          if (do_outputs_init_[subdomain] == true) {
+            do_outputs_[subdomain] = output_interval_ > 0 ? (stop + 1) % output_interval_ == 0 : false;
+          }
+	}
         *fos_ << delim << std::endl;
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == MECHANICAL) {
           *fos_ << "Problem            :Mechanical\n";
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
-	  if (failed_ == false) { //If mechanical solve passed, output solution to Exodus file
-	    if (num_iter_ == 0) {
-	      do_outputs_[subdomain] = true; 
-	    }
-	    else {
-              if (do_outputs_init_[subdomain] == true) {
-                do_outputs_[subdomain] = output_interval_ > 0 ? (stop + 1) % output_interval_ == 0 : false;
-              }
-	    }
+	  if (!failed_) { //If mechanical solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
 	  }
         } else {
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
-	  if (failed_ == false) { //If thermal solve passed, output solution to Exodus file
-	    if (num_iter_ == 0) {
-	      do_outputs_[subdomain] = true; 
-	    }
-	    else {
-              if (do_outputs_init_[subdomain] == true) {
-                do_outputs_[subdomain] = output_interval_ > 0 ? (stop + 1) % output_interval_ == 0 : false;
-              }
-	    }
+	  if (!failed_) { //If thermal solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
 	  }
         }

@@ -424,8 +424,15 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   if (file_index > 0) {
     // Change input Exodus file to previous mechanical Exodus output file, for restarts.
     disc_params.set<const std::string>("Exodus Input File Name", prev_mechanical_exo_outfile_name_);
-    // Restart from time at beginning of when this function is called
-    disc_params.set<double>("Restart Time", this_time);
+    //Set restart index based on 'disable exodus output initial time' variable 
+    const bool disable_exo_out_init_time 
+	    = disc_params.get<bool>("Disable Exodus Output Initial Time", false); 
+    if (disable_exo_out_init_time == true) {
+      disc_params.set<int>("Restart Index", 1);   
+    }
+    else {
+      disc_params.set<int>("Restart Index", 2);   
+    }
     // Remove Initial Condition sublist
     problem_params.remove("Initial Condition", true);
   }
@@ -472,8 +479,22 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   // After the initial run, we will do restarts from the previously written Exodus output file.
   // Change input Exodus file to previous thermal Exodus output file, for restarts.
   disc_params.set<const std::string>("Exodus Input File Name", prev_thermal_exo_outfile_name_);
-  // Restart from time at beginning of when this function is called
-  disc_params.set<double>("Restart Time", this_time);
+  //Set restart index based on where we are in the simulation 
+  if (file_index == 0) {
+    disc_params.set<int>("Restart Index", 1);   
+  }
+  else {
+    //Set restart index based on 'disable exodus output initial time' variable 
+    //after initial time step
+    const bool disable_exo_out_init_time 
+        = disc_params.get<bool>("Disable Exodus Output Initial Time", false); 
+    if (disable_exo_out_init_time == true) {
+      disc_params.set<int>("Restart Index", 1);   
+    }
+    else {
+      disc_params.set<int>("Restart Index", 2);   
+    }
+  }
   // Remove Initial Condition sublist
   problem_params.remove("Initial Condition", true);
   // Set flag to tell code that we have an ACE Sequential Thermomechanical Problem
@@ -546,7 +567,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
         // Create new solvers, apps, discs and model evaluators
         auto const prob_type = prob_types_[subdomain];
-        if (prob_type == THERMAL) {
+        /*if (prob_type == THERMAL) {
           createThermalSolverAppDiscME(stop, current_time);
         } else if (prob_type == MECHANICAL) {
           createMechanicalSolverAppDiscME(stop, current_time);
@@ -557,14 +578,30 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
           fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-        }
+        }*/
         *fos_ << delim << std::endl;
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == MECHANICAL) {
           *fos_ << "Problem            :Mechanical\n";
+          createMechanicalSolverAppDiscME(stop, current_time);
+          if (stop == 0) { setICVecsAndOutput(initial_time_, subdomain); }
+          // Before the coupling loop, get internal states
+          if (num_iter_ == 0) {
+            auto& app       = *apps_[subdomain];
+            auto& state_mgr = app.getStateMgr();
+            fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+          }
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
         } else {
           *fos_ << "Problem            :Thermal\n";
+          createThermalSolverAppDiscME(stop, current_time);
+          if (stop == 0) { setICVecsAndOutput(initial_time_, subdomain); }
+          // Before the coupling loop, get internal states
+          if (num_iter_ == 0) {
+            auto& app       = *apps_[subdomain];
+            auto& state_mgr = app.getStateMgr();
+            fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+          }
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
         }
         if (failed_ == true) {

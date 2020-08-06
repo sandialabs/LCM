@@ -25,10 +25,10 @@ ACETemperatureResidual<EvalT, Traits>::ACETemperatureResidual(
           p.get<std::string>("ACE Temperature Gradient Name"),
           dl->qp_vector),
       thermal_conductivity_(  // dependent
-          p.get<std::string>("ACE Thermal Conductivity Name"),
+          p.get<std::string>("ACE_Thermal_Conductivity Name"),
           dl->qp_scalar),
       thermal_inertia_(  // dependent
-          p.get<std::string>("ACE Thermal Inertia Name"),
+          p.get<std::string>("ACE_Thermal_Inertia Name"),
           dl->qp_scalar),
       residual_(  // evaluated
           p.get<std::string>("ACE Residual Name"),

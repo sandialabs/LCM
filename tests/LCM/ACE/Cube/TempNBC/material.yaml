@@ -31,7 +31,7 @@ LCM:
       Output Cauchy Stress: true
       Output eqps: true
       Output ACE Ice Saturation: true
-      Output ACE Water Saturation: true
+      Output ACE_Water_Saturation: true
       Output ACE Temperature Dot: true
       ACE Soil Yield Strength: 1.0e+06
       ACE Ice Density: 920.0  #[kg/m3]

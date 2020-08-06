@@ -6,9 +6,9 @@ ALBANY:
       material: Permafrost
   Materials: 
     Ice:
-      ACE Thermal Conductivity Value: 1.6
-      ACE Thermal Inertia Value: 1.9228e6 #rho*C = 2.09e3*920.0
+      ACE_Thermal_Conductivity Value: 1.6
+      ACE_Thermal_Inertia Value: 1.9228e6 #rho*C = 2.09e3*920.0
     Permafrost: 
-      ACE Thermal Conductivity Value: 1.6
-      ACE Thermal Inertia Value: 1.9228e6 #rho*C = 2.09e3*920.0
+      ACE_Thermal_Conductivity Value: 1.6
+      ACE_Thermal_Inertia Value: 1.9228e6 #rho*C = 2.09e3*920.0
 ...

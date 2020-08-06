@@ -40,7 +40,7 @@ LCM:
       ACE Ice Maximum Saturation: 1.0
       ACE Water Minimum Saturation: 0.0
       ACE Surface Porosity: 1.0
-      ACE Porosity E-Depth: 1.0e+04
+      ACE_Porosity E-Depth: 1.0e+04
       ACE Latent Heat: 334.0e+03 #[J/kg]
       ACE Base Salinity: 35.0
       ACE Freezing Curve Width: 4.0

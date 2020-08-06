@@ -35,7 +35,7 @@ LCM:
         IP Field Layout 1: Scalar
         IP Field Name 2: ACE_Ice_Saturation
         IP Field Layout 2: Scalar
-        IP Field Name 3: ACE Water Saturation
+        IP Field Name 3: ACE_Water_Saturation
         IP Field Layout 3: Scalar
         IP Field Name 4: Cauchy_Stress
         IP Field Layout 4: Tensor

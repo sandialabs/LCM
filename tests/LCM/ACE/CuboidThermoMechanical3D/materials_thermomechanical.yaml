@@ -33,7 +33,7 @@ LCM:
       Output Cauchy Stress: true
       Output eqps: true
       Output ACE Ice Saturation: true
-      Output ACE Water Saturation: true
+      Output ACE_Water_Saturation: true
       ACE Ice Density: 920.0 #[kg/m3]
       ACE Water Density: 1000.0 #[kg/m3]
       ACE Sediment Density: 2650.0 #[kg/m3]
@@ -51,7 +51,7 @@ LCM:
       ACE Salinity File: './bluff_salinity.txt'
       ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
       ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
-      ACE Porosity File: './porosity.txt'
+      ACE_Porosity File: './porosity.txt'
       ACE Latent Heat: 334.0e+04 #[J/kg]
       ACE Z Depth File: './depth.txt'
       ACE Time File: './time_fake.txt'  # {0.0, 10368000.0}
@@ -82,7 +82,7 @@ LCM:
       Output Cauchy Stress: true
       Output eqps: true
       Output ACE Ice Saturation: true
-      Output ACE Water Saturation: true
+      Output ACE_Water_Saturation: true
       ACE Ice Density: 920.0 #[kg/m3]
       ACE Water Density: 1000.0 #[kg/m3]
       ACE Sediment Density: 2650.0 #[kg/m3]

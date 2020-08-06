@@ -32,7 +32,7 @@ LCM:
       Output Cauchy Stress: true
       Output eqps: true
       Output ACE Ice Saturation: true
-      Output ACE Water Saturation: true
+      Output ACE_Water_Saturation: true
       ACE Ice Density: 920.0  #[kg/m3]
       ACE Water Density: 1000.0 #[kg/m3]
       ACE Ice Thermal Conductivity: 1.60  #[W/K/m]
@@ -44,7 +44,7 @@ LCM:
       ACE Ice Maximum Saturation: 1.0
       ACE Water Minimum Saturation: 0.0
       ACE Surface Porosity: 1.0
-      ACE Porosity E-Depth: 1.0e+04
+      ACE_Porosity E-Depth: 1.0e+04
       ACE Latent Heat: 334.0e+03 #[J/kg]
       
     Permafrost:
@@ -71,7 +71,7 @@ LCM:
       Output Cauchy Stress: true
       Output eqps: true
       Output ACE Ice Saturation: true
-      Output ACE Water Saturation: true
+      Output ACE_Water_Saturation: true
       ACE Ice Density: 920.0  #[kg/m3]
       ACE Water Density: 1000.0 #[kg/m3]
       ACE Sediment Density: 2700.0 #[kg/m3]
@@ -86,5 +86,5 @@ LCM:
       ACE Water Minimum Saturation: 0.0
       ACE Initial Temperature: 265.0
       ACE Surface Porosity: 0.50
-      ACE Porosity E-Depth: 1.0e+04
+      ACE_Porosity E-Depth: 1.0e+04
       ACE Latent Heat: 334.0e+03 #[J/kg]

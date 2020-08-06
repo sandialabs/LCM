@@ -42,7 +42,7 @@ LCM:
         IP Field Layout 0: Scalar
         IP Field Name 1: ACE_Ice_Saturation
         IP Field Layout 1: Scalar
-        IP Field Name 2: ACE Water Saturation
+        IP Field Name 2: ACE_Water_Saturation
         IP Field Layout 2: Scalar
         Output to File: true
   Discretization:

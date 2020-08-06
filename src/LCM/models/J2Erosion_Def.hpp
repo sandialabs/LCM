@@ -28,13 +28,13 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
     z_above_mean_sea_level_ = vectorFromFile(filename);
   }
 
-  if (p->isParameter("ACE Porosity File") == true) {
-    auto const filename = p->get<std::string>("ACE Porosity File");
+  if (p->isParameter("ACE_Porosity File") == true) {
+    auto const filename = p->get<std::string>("ACE_Porosity File");
     porosity_from_file_ = vectorFromFile(filename);
     ALBANY_ASSERT(
         z_above_mean_sea_level_.size() == porosity_from_file_.size(),
         "*** ERROR: Number of z values and number of porosity values in "
-        "ACE Porosity File must match.");
+        "ACE_Porosity File must match.");
   }
 
   // retrieve appropriate field name strings

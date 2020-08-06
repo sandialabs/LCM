@@ -19,22 +19,22 @@ template <typename EvalT, typename Traits>
 ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl)
-    : thermal_conductivity_(p.get<std::string>("ACE Thermal Conductivity QP Variable Name"), dl->qp_scalar),
+    : thermal_conductivity_(p.get<std::string>("ACE_Thermal_Conductivity QP Variable Name"), dl->qp_scalar),
       thermal_cond_grad_at_nodes_(
-          p.get<std::string>("ACE Thermal Conductivity Gradient Node Variable Name"),
+          p.get<std::string>("ACE_Thermal_Conductivity Gradient Node Variable Name"),
           dl->node_vector),
       thermal_cond_grad_at_qps_(
-          p.get<std::string>("ACE Thermal Conductivity Gradient QP Variable Name"),
+          p.get<std::string>("ACE_Thermal_Conductivity Gradient QP Variable Name"),
           dl->qp_vector),
       wgradbf_(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       bf_(p.get<std::string>("BF Name"), dl->node_qp_scalar),
-      thermal_inertia_(p.get<std::string>("ACE Thermal Inertia QP Variable Name"), dl->qp_scalar),
-      bluff_salinity_(p.get<std::string>("ACE Bluff Salinity QP Variable Name"), dl->qp_scalar),
+      thermal_inertia_(p.get<std::string>("ACE_Thermal_Inertia QP Variable Name"), dl->qp_scalar),
+      bluff_salinity_(p.get<std::string>("ACE_Bluff_Salinity QP Variable Name"), dl->qp_scalar),
       ice_saturation_(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar),
-      density_(p.get<std::string>("ACE Density QP Variable Name"), dl->qp_scalar),
-      heat_capacity_(p.get<std::string>("ACE Heat Capacity QP Variable Name"), dl->qp_scalar),
-      water_saturation_(p.get<std::string>("ACE Water Saturation QP Variable Name"), dl->qp_scalar),
-      porosity_(p.get<std::string>("ACE Porosity QP Variable Name"), dl->qp_scalar),
+      density_(p.get<std::string>("ACE_Density QP Variable Name"), dl->qp_scalar),
+      heat_capacity_(p.get<std::string>("ACE_Heat_Capacity QP Variable Name"), dl->qp_scalar),
+      water_saturation_(p.get<std::string>("ACE_Water_Saturation QP Variable Name"), dl->qp_scalar),
+      porosity_(p.get<std::string>("ACE_Porosity QP Variable Name"), dl->qp_scalar),
       temperature_(p.get<std::string>("ACE Temperature QP Variable Name"), dl->qp_scalar)
 {
   Teuchos::ParameterList* cond_list = p.get<Teuchos::ParameterList*>("Parameter List");
@@ -432,8 +432,8 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> valid_pl = rcp(new Teuchos::ParameterList("Valid ACE Thermal Parameters"));
   valid_pl->set<double>(
-      "ACE Thermal Conductivity Value", 1.0, "Constant thermal conductivity value across element block");
-  valid_pl->set<double>("ACE Thermal Inertia Value", 1.0, "Constant thermal inertia value across element block");
+      "ACE_Thermal_Conductivity Value", 1.0, "Constant thermal conductivity value across element block");
+  valid_pl->set<double>("ACE_Thermal_Inertia Value", 1.0, "Constant thermal inertia value across element block");
   valid_pl->set<double>("ACE Ice Density", 920.0, "Constant value of ice density in element block");
   valid_pl->set<double>("ACE Water Density", 1000.0, "Constant value of water density in element block");
   valid_pl->set<double>("ACE Sediment Density", 2650.0, "Constant value of sediment density in element block");
@@ -463,16 +463,16 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
   for (int i = 0; i < eb_names_.size(); i++) {
     std::string eb_name = eb_names_[i];
     const_thermal_conduct_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Conductivity Value", -1.0);
+        material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Thermal_Conductivity Value", -1.0);
     if (const_thermal_conduct_map_[eb_name] != -1.0) {
       ALBANY_ASSERT(
-          (const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE Thermal Conductivity Value must be positive!");
+          (const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE_Thermal_Conductivity Value must be positive!");
     }
     const_thermal_inertia_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Inertia Value", -1.0);
+        material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Thermal_Inertia Value", -1.0);
     if (const_thermal_inertia_map_[eb_name] != -1.0) {
       ALBANY_ASSERT(
-          (const_thermal_inertia_map_[eb_name] > 0.0), "*** ERROR: ACE Thermal Inertia Value must be positive!");
+          (const_thermal_inertia_map_[eb_name] > 0.0), "*** ERROR: ACE_Thermal_Inertia Value must be positive!");
     }
     ice_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Density", 920.0);
     ALBANY_ASSERT((ice_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Density must be non-negative!");
@@ -544,13 +544,13 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "values in "
           "ACE Ocean Salinity File must match.");
     }
-    if (material_db_->isElementBlockParam(eb_name, "ACE Porosity File") == true) {
-      const std::string filename       = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Porosity File");
+    if (material_db_->isElementBlockParam(eb_name, "ACE_Porosity File") == true) {
+      const std::string filename       = material_db_->getElementBlockParam<std::string>(eb_name, "ACE_Porosity File");
       porosity_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == porosity_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of porosity values in "
-          "ACE Porosity File must match. \n"
+          "ACE_Porosity File must match. \n"
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Sand File") == true) {

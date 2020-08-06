@@ -28,7 +28,7 @@ ALBANY:
       ACE Salinity File: './bluff_salinity.txt'
       ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
       ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
-      ACE Porosity File: './porosity.txt'
+      ACE_Porosity File: './porosity.txt'
       ACE Latent Heat: 334.0e+03 #[J/kg]
       ACE Z Depth File: './depth.txt'
       ACE Time File: './TimeHis_ExSec3600_2011.txt'

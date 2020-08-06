@@ -13,7 +13,7 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList const& p)
     : thermal_cond_grad_at_qps_(
-          p.get<std::string>("ACE Thermal Conductivity Gradient QP Variable Name"),
+          p.get<std::string>("ACE_Thermal_Conductivity Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       jacobian_det_(
           p.get<std::string>("Jacobian Det Name"),

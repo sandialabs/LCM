@@ -423,20 +423,17 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   if (file_index > 0) {
     // Change input Exodus file to previous mechanical Exodus output file, for restarts.
     disc_params.set<const std::string>("Exodus Input File Name", prev_mechanical_exo_outfile_name_);
-    //Set restart index based on 'disable exodus output initial time' variable
-    //provided in input file  
-    const bool disable_exo_out_init_time 
-	    = disc_params.get<bool>("Disable Exodus Output Initial Time", false); 
+    // Set restart index based on 'disable exodus output initial time' variable
+    // provided in input file
+    const bool disable_exo_out_init_time = disc_params.get<bool>("Disable Exodus Output Initial Time", false);
     if (disable_exo_out_init_time == true) {
-      disc_params.set<int>("Restart Index", 1);   
-    }
-    else {
-      disc_params.set<int>("Restart Index", 2);   
+      disc_params.set<int>("Restart Index", 1);
+    } else {
+      disc_params.set<int>("Restart Index", 2);
     }
     // Remove Initial Condition sublist
     problem_params.remove("Initial Condition", true);
   }
-
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
   Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
@@ -480,21 +477,18 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   // After the initial run, we will do restarts from the previously written Exodus output file.
   // Change input Exodus file to previous thermal Exodus output file, for restarts.
   disc_params.set<const std::string>("Exodus Input File Name", prev_thermal_exo_outfile_name_);
-  //Set restart index based on where we are in the simulation 
-  if (file_index == 0) { //Initially, restart index = 2, since initial file will have 2 snapshots
-	                 //and the second one is the one we want to restart from
-    disc_params.set<int>("Restart Index", 2);   
-  }
-  else {
-    //Set restart index based on 'disable exodus output initial time' variable 
-    //after initial time step
-    const bool disable_exo_out_init_time 
-        = disc_params.get<bool>("Disable Exodus Output Initial Time", false); 
+  // Set restart index based on where we are in the simulation
+  if (file_index == 0) {  // Initially, restart index = 2, since initial file will have 2 snapshots
+                          // and the second one is the one we want to restart from
+    disc_params.set<int>("Restart Index", 2);
+  } else {
+    // Set restart index based on 'disable exodus output initial time' variable
+    // after initial time step
+    const bool disable_exo_out_init_time = disc_params.get<bool>("Disable Exodus Output Initial Time", false);
     if (disable_exo_out_init_time == true) {
-      disc_params.set<int>("Restart Index", 1);   
-    }
-    else {
-      disc_params.set<int>("Restart Index", 2);   
+      disc_params.set<int>("Restart Index", 1);
+    } else {
+      disc_params.set<int>("Restart Index", 2);
     }
   }
   // Remove Initial Condition sublist
@@ -574,37 +568,36 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         } else if (prob_type == MECHANICAL) {
           createMechanicalSolverAppDiscME(stop, current_time);
         }
-        if (stop == 0) { 
-	  setICVecs(initial_time_, subdomain);
-	  doDynamicInitialOutput(initial_time_, subdomain, stop);  
-	}
-        // Before the coupling loop, get internal states, and figure out whether 
-	// output needs to be done or not.
+        if (stop == 0) {
+          setICVecs(initial_time_, subdomain);
+          doDynamicInitialOutput(initial_time_, subdomain, stop);
+        }
+        // Before the coupling loop, get internal states, and figure out whether
+        // output needs to be done or not.
         if (num_iter_ == 0) {
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
           fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-	  do_outputs_[subdomain] = true; //We always want output in the initial step
-        }
-	else {
+          do_outputs_[subdomain] = true;  // We always want output in the initial step
+        } else {
           if (do_outputs_init_[subdomain] == true) {
             do_outputs_[subdomain] = output_interval_ > 0 ? (stop + 1) % output_interval_ == 0 : false;
           }
-	}
+        }
         *fos_ << delim << std::endl;
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == MECHANICAL) {
           *fos_ << "Problem            :Mechanical\n";
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
-	  if (!failed_) { //If mechanical solve passed, output solution to Exodus file
+          if (!failed_) {  // If mechanical solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
-	  }
+          }
         } else {
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
-	  if (!failed_) { //If thermal solve passed, output solution to Exodus file
+          if (!failed_) {  // If thermal solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
-	  }
+          }
         }
         if (failed_ == true) {
           // Break out of the subdomain loop
@@ -681,10 +674,8 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       continue;
     }
 
-    // Update IC vecs 
-    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-      setICVecs(next_time, subdomain);
-    }
+    // Update IC vecs
+    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) { setICVecs(next_time, subdomain); }
 
     ++stop;
     current_time += time_step;
@@ -958,9 +949,9 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
   else {
     // subsequent time steps: update ic vecs based on fields in stk discretization
 
-    auto&      abs_disc        = *discs_[subdomain];
-    auto&      stk_disc        = static_cast<Albany::STKDiscretization&>(abs_disc);
-    Teuchos::RCP<Thyra_MultiVector> x_mv = stk_disc.getSolutionMV();
+    auto&                           abs_disc = *discs_[subdomain];
+    auto&                           stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
+    Teuchos::RCP<Thyra_MultiVector> x_mv     = stk_disc.getSolutionMV();
 
     // Update ics_x_ and its time-derivatives
     ics_x_[subdomain] = Thyra::createMember(x_mv->col(0)->space());
@@ -1001,16 +992,14 @@ void
 ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain, int const stop) const
 {
   auto const is_initial_time = time <= initial_time_ + initial_time_step_;
-  if (is_initial_time == false) {
-    return; 
-  }
+  if (is_initial_time == false) { return; }
   // Write solution at specified time to STK mesh
-  Teuchos::RCP<Thyra_MultiVector const> const xMV = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
-  auto&      abs_disc        = *discs_[subdomain];
-  auto&      stk_disc        = static_cast<Albany::STKDiscretization&>(abs_disc);
-  auto&      stk_mesh_struct = *stk_mesh_structs_[subdomain];
-  stk_mesh_struct.exoOutputInterval = 1;
-  stk_mesh_struct.exoOutput         = do_outputs_[subdomain];
+  Teuchos::RCP<Thyra_MultiVector const> const xMV      = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
+  auto&                                       abs_disc = *discs_[subdomain];
+  auto&                                       stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
+  auto&                                       stk_mesh_struct = *stk_mesh_structs_[subdomain];
+  stk_mesh_struct.exoOutputInterval                           = 1;
+  stk_mesh_struct.exoOutput                                   = do_outputs_[subdomain];
   stk_disc.writeSolutionMV(*xMV, time, true);
   stk_mesh_struct.exoOutput = false;
 }

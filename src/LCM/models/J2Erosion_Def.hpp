@@ -249,7 +249,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
   ScalarT       Y              = yield_strength_(cell, pt);
 
-  //ALBANY_DUMP("**** CELL : " << cell << ", POINT : " << pt << ", ICE SATURATION : " << ice_saturation);
+  // ALBANY_DUMP("**** CELL : " << cell << ", POINT : " << pt << ", ICE SATURATION : " << ice_saturation);
 
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);

@@ -42,7 +42,6 @@ LCM:
     Absolute Tolerance: 1.0e-8
   Piro:
     Tempus:
-      Invert Mass Matrix: true
       Lump Mass Matrix: true
       Integrator Name: Tempus Integrator
       Tempus Integrator:

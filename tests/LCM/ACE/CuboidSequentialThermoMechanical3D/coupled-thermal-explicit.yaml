@@ -1,0 +1,19 @@
+LCM:
+  Alternating System:
+    Model Input Files: [thermal-explicit.yaml, mechanical.yaml]
+    Initial Time: 0.00000000000000000e+00
+    #Final Time: 17280000.0 # 200 days in seconds
+    Final Time: 864000.0 # 10 days in seconds
+    Initial Time Step: 7200.0 # 2 hr in seconds
+    Maximum Steps: 10000
+    Reduction Factor: 5.00000000000000000e-01
+    #Amplification Factor: 1.50000000000000000e+00
+    Amplification Factor: 1.00000000000000000e+00
+    Exodus Write Interval: 1
+  # MODEL DECLARATION, Look in the Problem directory
+  Problem:
+    # Transient or Steady (Quasi-Static) or Continuation (load steps)
+    Solution Method: ACE Sequential Thermo-Mechanical
+    # Have Phalanx output a graph of the used evaluators
+    Phalanx Graph Visualization Detail: 0
+...

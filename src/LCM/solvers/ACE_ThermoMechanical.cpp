@@ -373,17 +373,12 @@ centered(std::string const& str, int width)
 void
 renameExodusFile(int const file_index, std::string& filename)
 {
-  std::ostringstream ss;
-  if (filename.find(".exo") != std::string::npos) {
+  if (filename.find(".e") != std::string::npos) {
+    std::ostringstream ss;
     ss << ".e-s." << file_index;
-    filename.replace(filename.find(".exo"), std::string::npos, ss.str());
+    filename.replace(filename.find(".e"), std::string::npos, ss.str());
   } else {
-    if (filename.find(".e") != std::string::npos) {
-      ss << ".e-s." << file_index;
-      filename.replace(filename.find(".e"), std::string::npos, ss.str());
-    } else {
-      ALBANY_ABORT("Exodus output file does not end in '.e' or '.exo' - cannot rename!\n");
-    }
+    ALBANY_ABORT("Exodus output file does not end in '.e*' - cannot rename!\n");
   }
 }
 
@@ -449,13 +444,14 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
   if (file_index == 0) { stk_disc.outputExodusSolutionInitialTime(true); }
 
-  Teuchos::RCP<Albany::AbstractSTKMeshStruct> ams = stk_disc.getSTKMeshStruct();
-  do_outputs_[subdomain]                          = ams->exoOutput;
-  do_outputs_init_[subdomain]                     = ams->exoOutput;
-  stk_mesh_structs_[subdomain]                    = ams;
-  model_evaluators_[subdomain]                    = solver_factories_[subdomain]->returnModel();
-  curr_x_[subdomain]                              = Teuchos::null;
-  prev_thermal_exo_outfile_name_                  = filename;
+  auto  abs_stk_mesh_struct_rcp  = stk_disc.getSTKMeshStruct();
+  auto& abs_stk_mesh_struct      = *abs_stk_mesh_struct_rcp;
+  do_outputs_[subdomain]         = abs_stk_mesh_struct.exoOutput;
+  do_outputs_init_[subdomain]    = abs_stk_mesh_struct.exoOutput;
+  stk_mesh_structs_[subdomain]   = abs_stk_mesh_struct_rcp;
+  model_evaluators_[subdomain]   = solver_factories_[subdomain]->returnModel();
+  curr_x_[subdomain]             = Teuchos::null;
+  prev_thermal_exo_outfile_name_ = filename;
 }
 
 void
@@ -510,13 +506,14 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
   if (file_index == 0) { stk_disc.outputExodusSolutionInitialTime(true); }
 
-  Teuchos::RCP<Albany::AbstractSTKMeshStruct> ams = stk_disc.getSTKMeshStruct();
-  do_outputs_[subdomain]                          = ams->exoOutput;
-  do_outputs_init_[subdomain]                     = ams->exoOutput;
-  stk_mesh_structs_[subdomain]                    = ams;
-  model_evaluators_[subdomain]                    = solver_factories_[subdomain]->returnModel();
-  curr_x_[subdomain]                              = Teuchos::null;
-  prev_mechanical_exo_outfile_name_               = filename;
+  auto  abs_stk_mesh_struct_rcp     = stk_disc.getSTKMeshStruct();
+  auto& abs_stk_mesh_struct         = *abs_stk_mesh_struct_rcp;
+  do_outputs_[subdomain]            = abs_stk_mesh_struct.exoOutput;
+  do_outputs_init_[subdomain]       = abs_stk_mesh_struct.exoOutput;
+  stk_mesh_structs_[subdomain]      = abs_stk_mesh_struct_rcp;
+  model_evaluators_[subdomain]      = solver_factories_[subdomain]->returnModel();
+  curr_x_[subdomain]                = Teuchos::null;
+  prev_mechanical_exo_outfile_name_ = filename;
 }
 
 bool

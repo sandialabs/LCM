@@ -211,9 +211,7 @@ GenericSTKMeshStruct::SetupFieldData(
 
   // Exodus is only for 2D and 3D. Have 1D version as well
   exoOutput = params->isType<std::string>("Exodus Output File Name");
-  if (exoOutput == true) {
-    exoOutFile             = params->get<std::string>("Exodus Output File Name");
-  }
+  if (exoOutput == true) { exoOutFile = params->get<std::string>("Exodus Output File Name"); }
   exoOutputInterval = params->get<int>("Exodus Write Interval", 1);
   cdfOutput         = params->isType<std::string>("NetCDF Output File Name");
   if (cdfOutput == true) { cdfOutFile = params->get<std::string>("NetCDF Output File Name"); }

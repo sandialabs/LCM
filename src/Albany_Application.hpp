@@ -543,6 +543,12 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     return is_schwarz_alternating_;
   }
 
+  Teuchos::RCP<AAdapt::AdaptiveSolutionManager>
+  getSolutionManager() const
+  {
+    return solMgr;
+  }
+
  private:
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> apps_;
 

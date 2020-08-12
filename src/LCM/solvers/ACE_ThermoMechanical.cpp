@@ -4,6 +4,7 @@
 
 #include "ACE_ThermoMechanical.hpp"
 
+#include "AAdapt_Erosion.hpp"
 #include "Albany_ModelEvaluator.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SolverFactory.hpp"
@@ -474,10 +475,13 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
   disc_params.set<bool>("Output DTK Field to Exodus", false);
   if (!disc_params.isParameter("Disable Exodus Output Initial Time")) {
-    disc_params.set<bool>("Disable Exodus Output Initial Time", true); 
+    disc_params.set<bool>("Disable Exodus Output Initial Time", true);
   }
-  int const thermal_exo_write_interval = disc_params.get<int>("Exodus Write Interval", 1); 
-  ALBANY_ASSERT(thermal_exo_write_interval == 1, "'Exodus Write Interval' for Thermal Problem must be 1!  This parameter is controlled by variables in coupled input file.");
+  int const thermal_exo_write_interval = disc_params.get<int>("Exodus Write Interval", 1);
+  ALBANY_ASSERT(
+      thermal_exo_write_interval == 1,
+      "'Exodus Write Interval' for Thermal Problem must be 1!  This parameter is controlled by variables in coupled "
+      "input file.");
   if (file_index > 0) {
     // Change input Exodus file to previous mechanical Exodus output file, for restarts.
     disc_params.set<std::string>("Exodus Input File Name", prev_mechanical_exo_outfile_name_);
@@ -537,14 +541,17 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   disc_params.set<std::string>("Exodus SolutionDot Name", "disp_dot");
   disc_params.set<std::string>("Exodus SolutionDotDot Name", "disp_dotdot");
   disc_params.set<bool>("Output DTK Field to Exodus", false);
-  int const mechanics_exo_write_interval = disc_params.get<int>("Exodus Write Interval", 1); 
-  ALBANY_ASSERT(mechanics_exo_write_interval == 1, "'Exodus Write Interval' for Mechanics Problem must be 1!  This parameter is controlled by variables in coupled input file.");
-  
+  int const mechanics_exo_write_interval = disc_params.get<int>("Exodus Write Interval", 1);
+  ALBANY_ASSERT(
+      mechanics_exo_write_interval == 1,
+      "'Exodus Write Interval' for Mechanics Problem must be 1!  This parameter is controlled by variables in coupled "
+      "input file.");
+
   // After the initial run, we will do restarts from the previously written Exodus output file.
   // Change input Exodus file to previous thermal Exodus output file, for restarts.
   disc_params.set<std::string>("Exodus Input File Name", prev_thermal_exo_outfile_name_);
   if (!disc_params.isParameter("Disable Exodus Output Initial Time")) {
-    disc_params.set<bool>("Disable Exodus Output Initial Time", true); 
+    disc_params.set<bool>("Disable Exodus Output Initial Time", true);
   }
   // Set restart index based on where we are in the simulation
   if (file_index == 0) {  // Initially, restart index = 2, since initial file will have 2 snapshots
@@ -923,6 +930,13 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
 
   solver.evalModel(in_args, out_args);
+
+  // Adapt mesh if needed.
+  auto& sol_mgr = *(app.getSolutionManager());
+  if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
+    auto& erosion_adaptor = dynamic_cast<AAdapt::Erosion&>(sol_mgr);
+    erosion_adaptor.adaptMesh();
+  }
 
   // Allocate current solution vectors
   this_x_[subdomain]       = Thyra::createMember(me.get_x_space());

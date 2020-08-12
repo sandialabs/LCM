@@ -109,6 +109,12 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
   void
   scatterX(const Thyra_MultiVector& soln);
 
+  bool
+  isAdaptive()
+  {
+    return adapter_ != Teuchos::null;
+  }
+
  private:
   Teuchos::RCP<const Albany::CombineAndScatterManager> cas_manager;
 

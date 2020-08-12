@@ -213,12 +213,6 @@ GenericSTKMeshStruct::SetupFieldData(
   exoOutput = params->isType<std::string>("Exodus Output File Name");
   if (exoOutput == true) {
     exoOutFile             = params->get<std::string>("Exodus Output File Name");
-    auto const is_adaptive = adaptParams != Teuchos::null;
-    if (is_adaptive == true) {
-      std::ostringstream ss;
-      ss << ".e-s.0";
-      exoOutFile.replace(exoOutFile.find('.'), std::string::npos, ss.str());
-    }
   }
   exoOutputInterval = params->get<int>("Exodus Write Interval", 1);
   cdfOutput         = params->isType<std::string>("NetCDF Output File Name");

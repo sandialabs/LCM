@@ -415,12 +415,15 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   disc_params.set<std::string>("Exodus Solution Name", "temperature");
   disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
   disc_params.set<bool>("Output DTK Field to Exodus", false);
+  if (!disc_params.isParameter("Disable Exodus Output Initial Time")) {
+    disc_params.set<bool>("Disable Exodus Output Initial Time", true); 
+  }
   if (file_index > 0) {
     // Change input Exodus file to previous mechanical Exodus output file, for restarts.
     disc_params.set<std::string>("Exodus Input File Name", prev_mechanical_exo_outfile_name_);
     // Set restart index based on 'disable exodus output initial time' variable
     // provided in input file
-    const bool disable_exo_out_init_time = disc_params.get<bool>("Disable Exodus Output Initial Time", false);
+    const bool disable_exo_out_init_time = disc_params.get<bool>("Disable Exodus Output Initial Time");
     if (disable_exo_out_init_time == true) {
       disc_params.set<int>("Restart Index", 1);
     } else {
@@ -473,6 +476,9 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   // After the initial run, we will do restarts from the previously written Exodus output file.
   // Change input Exodus file to previous thermal Exodus output file, for restarts.
   disc_params.set<std::string>("Exodus Input File Name", prev_thermal_exo_outfile_name_);
+  if (!disc_params.isParameter("Disable Exodus Output Initial Time")) {
+    disc_params.set<bool>("Disable Exodus Output Initial Time", true); 
+  }
   // Set restart index based on where we are in the simulation
   if (file_index == 0) {  // Initially, restart index = 2, since initial file will have 2 snapshots
                           // and the second one is the one we want to restart from
@@ -480,7 +486,7 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   } else {
     // Set restart index based on 'disable exodus output initial time' variable
     // after initial time step
-    const bool disable_exo_out_init_time = disc_params.get<bool>("Disable Exodus Output Initial Time", false);
+    const bool disable_exo_out_init_time = disc_params.get<bool>("Disable Exodus Output Initial Time");
     if (disable_exo_out_init_time == true) {
       disc_params.set<int>("Restart Index", 1);
     } else {

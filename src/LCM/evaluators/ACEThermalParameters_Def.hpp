@@ -515,19 +515,19 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), "*** ERROR: ACE Element Size must be non-negative!");
 
     if (material_db_->isElementBlockParam(eb_name, "ACE Time File") == true) {
-      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");
+      std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");
       time_map_[eb_name]         = vectorFromFile(filename);
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Sea Level File") == true) {
-      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Sea Level File");
+      std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Sea Level File");
       sea_level_map_[eb_name]    = vectorFromFile(filename);
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Z Depth File") == true) {
-      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Z Depth File");
+      std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Z Depth File");
       z_above_mean_sea_level_map_[eb_name] = vectorFromFile(filename);
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Salinity File") == true) {
-      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Salinity File");
+      std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Salinity File");
       salinity_map_[eb_name]     = vectorFromFile(filename);
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == salinity_map_[eb_name].size(),
@@ -536,7 +536,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Ocean Salinity File") == true) {
-      const std::string filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Ocean Salinity File");
+      std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Ocean Salinity File");
       ocean_salinity_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           time_map_[eb_name].size() == ocean_salinity_map_[eb_name].size(),
@@ -545,7 +545,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "ACE Ocean Salinity File must match.");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE_Porosity File") == true) {
-      const std::string filename       = material_db_->getElementBlockParam<std::string>(eb_name, "ACE_Porosity File");
+      std::string const filename       = material_db_->getElementBlockParam<std::string>(eb_name, "ACE_Porosity File");
       porosity_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == porosity_from_file_map_[eb_name].size(),
@@ -554,7 +554,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Sand File") == true) {
-      const std::string filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Sand File");
+      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Sand File");
       sand_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == sand_from_file_map_[eb_name].size(),
@@ -563,7 +563,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Clay File") == true) {
-      const std::string filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Clay File");
+      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Clay File");
       clay_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == clay_from_file_map_[eb_name].size(),
@@ -572,7 +572,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Silt File") == true) {
-      const std::string filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Silt File");
+      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Silt File");
       silt_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == silt_from_file_map_[eb_name].size(),
@@ -581,7 +581,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Peat File") == true) {
-      const std::string filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Peat File");
+      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Peat File");
       peat_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == peat_from_file_map_[eb_name].size(),
@@ -601,7 +601,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
 ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(
-    const std::string                     eb_name,
+    std::string const                     eb_name,
     const std::map<std::string, RealType> map)
 {
   typename std::map<std::string, RealType>::const_iterator it;
@@ -614,7 +614,7 @@ ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(
 template <typename EvalT, typename Traits>
 std::vector<RealType>
 ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(
-    const std::string                                  eb_name,
+    std::string const                                  eb_name,
     const std::map<std::string, std::vector<RealType>> map)
 {
   typename std::map<std::string, std::vector<RealType>>::const_iterator it;

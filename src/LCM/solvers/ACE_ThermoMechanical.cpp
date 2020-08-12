@@ -113,7 +113,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     // this subdomain, and populate prob_types_ vector using this information.
     // IKT 6/4/2020: This is added to allow user to specify mechanical and thermal problems in
     // different orders.  I'm not sure if this will be of interest ultimately or not.
-    const std::string problem_name = getName(problem_params.get<std::string>("Name"));
+    std::string const problem_name = getName(problem_params.get<std::string>("Name"));
     if (problem_name == "Mechanics") {
       prob_types_[subdomain] = MECHANICAL;
     } else if (problem_name == "ACE Thermal") {

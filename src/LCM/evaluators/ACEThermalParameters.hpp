@@ -40,10 +40,10 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   createElementBlockParameterMaps();
 
   ScalarT
-  queryElementBlockParameterMap(const std::string eb_name, const std::map<std::string, RealType> map);
+  queryElementBlockParameterMap(std::string const eb_name, const std::map<std::string, RealType> map);
 
   std::vector<RealType>
-  queryElementBlockParameterMap(const std::string eb_name, const std::map<std::string, std::vector<RealType>> map);
+  queryElementBlockParameterMap(std::string const eb_name, const std::map<std::string, std::vector<RealType>> map);
 
  private:
   //! Validate the name strings under "ACE Thermal Parameters" section in input

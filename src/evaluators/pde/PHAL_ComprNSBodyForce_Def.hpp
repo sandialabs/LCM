@@ -53,7 +53,9 @@ template <typename EvalT, typename Traits>
 void
 ComprNSBodyForce<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
-  if (bf_type == TAYLOR_GREEN_VORTEX) { this->utils.setFieldData(coordVec, fm); }
+  if (bf_type == TAYLOR_GREEN_VORTEX) {
+    this->utils.setFieldData(coordVec, fm);
+  }
   this->utils.setFieldData(force, fm);
 }
 

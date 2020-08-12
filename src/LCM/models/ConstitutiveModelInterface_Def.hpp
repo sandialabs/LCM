@@ -68,7 +68,9 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
 
   // register dependent fields
   typename decltype(dep_fields_map_)::iterator it;
-  for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) { this->addDependentField(*(it->second)); }
+  for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) {
+    this->addDependentField(*(it->second));
+  }
 
   // optionally deal with integration point locations
   if (model_->getIntegrationPointLocationFlag()) {
@@ -131,7 +133,9 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
   }
 
   // register evaluated fields
-  for (auto& pair : eval_fields_map_) { this->addEvaluatedField(*(pair.second)); }
+  for (auto& pair : eval_fields_map_) {
+    this->addEvaluatedField(*(pair.second));
+  }
 
   this->setName("ConstitutiveModelInterface" + PHX::print<EvalT>());
 }
@@ -146,7 +150,9 @@ ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
   ALBANY_PANIC(eval_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
   // dependent fields
   typename decltype(dep_fields_map_)::iterator it;
-  for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) { this->utils.setFieldData(*(it->second), fm); }
+  for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) {
+    this->utils.setFieldData(*(it->second), fm);
+  }
 
   // optionally deal with integration point locations
   if (model_->getIntegrationPointLocationFlag()) {
@@ -205,7 +211,9 @@ ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
   }
 
   // evaluated fields
-  for (auto& pair : eval_fields_map_) { this->utils.setFieldData(*(pair.second), fm); }
+  for (auto& pair : eval_fields_map_) {
+    this->utils.setFieldData(*(pair.second), fm);
+  }
 }
 
 template <typename EvalT, typename Traits>
@@ -213,7 +221,9 @@ void
 ConstitutiveModelInterface<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   model_->computeState(workset, dep_fields_map_, eval_fields_map_);
-  if (volume_average_pressure_) { model_->computeVolumeAverage(workset, dep_fields_map_, eval_fields_map_); }
+  if (volume_average_pressure_) {
+    model_->computeVolumeAverage(workset, dep_fields_map_, eval_fields_map_);
+  }
 }
 
 template <typename EvalT, typename Traits>

@@ -22,7 +22,9 @@ fromTo(Albany::StateArrayVec const& src, LCM::StateArrayVec& dst)
       auto const num_states = src_states.size();
       dst_states.clear();
       dst_states.resize(num_states);
-      for (auto s = 0; s < num_states; ++s) { dst_states[s] = src_states[s]; }
+      for (auto s = 0; s < num_states; ++s) {
+        dst_states[s] = src_states[s];
+      }
     }
   }
 }
@@ -44,7 +46,9 @@ fromTo(LCM::StateArrayVec const& src, Albany::StateArrayVec& dst)
       auto&&    dst_states = dst_map[state_name];
       int const num_states = src_states.size();
       ALBANY_ASSERT(num_states == dst_states.size(), "Source and destination maps have different sizes");
-      for (auto s = 0; s < num_states; ++s) { dst_states[s] = src_states[s]; }
+      for (auto s = 0; s < num_states; ++s) {
+        dst_states[s] = src_states[s];
+      }
     }
   }
 }

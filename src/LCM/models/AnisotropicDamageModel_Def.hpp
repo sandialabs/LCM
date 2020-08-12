@@ -57,7 +57,9 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
   this->eval_field_map_.insert(std::make_pair(f1_damage_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(f2_damage_string, dl->qp_scalar));
 
-  if (compute_tangent_) { this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4)); }
+  if (compute_tangent_) {
+    this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4));
+  }
 
   // define the state variables
   // stress
@@ -154,7 +156,9 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
   auto                  damage_f2 = *eval_fields[f2_damage_string];
   PHX::MDField<ScalarT> tangent;
 
-  if (compute_tangent_) { tangent = *eval_fields[tangent_string]; }
+  if (compute_tangent_) {
+    tangent = *eval_fields[tangent_string];
+  }
 
   // previous state
   Albany::MDArray energy_m_old  = (*workset.stateArrayPtr)[matrix_energy_string + "_old"];
@@ -264,11 +268,15 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
 
       // Fiber orientation vectors
       // fiber 1
-      for (int i = 0; i < num_dims_; ++i) { M1(i) = direction_f1_[i]; }
+      for (int i = 0; i < num_dims_; ++i) {
+        M1(i) = direction_f1_[i];
+      }
       M1 = M1 / norm(M1);
 
       // fiber 2
-      for (int i = 0; i < num_dims_; ++i) { M2(i) = direction_f2_[i]; }
+      for (int i = 0; i < num_dims_; ++i) {
+        M2(i) = direction_f2_[i];
+      }
       M2 = M2 / norm(M2);
 
       // Anisotropic invariants I4 = M_{i} * C * M_{i}

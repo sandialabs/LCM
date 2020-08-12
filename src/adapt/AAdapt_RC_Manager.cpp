@@ -246,7 +246,9 @@ Projector::fillMassMatrix(const PHAL::Workset& workset, const BasisField& bf, co
     for (size_type rnode = 0; rnode < num_node; ++rnode) {
       const GO           row = workset.wsElNodeID[cell][rnode];
       Teuchos::Array<GO> cols;
-      for (size_type cnode = 0; cnode < num_node; ++cnode) { cols.push_back(workset.wsElNodeID[cell][cnode]); }
+      for (size_type cnode = 0; cnode < num_node; ++cnode) {
+        cols.push_back(workset.wsElNodeID[cell][cnode]);
+      }
       M_factory_->insertGlobalIndices(row, cols);
     }
   }
@@ -279,7 +281,9 @@ Projector::fillRhs(
 
   if (f.data_->mv[0].is_null()) {
     int const ncol = rank == 0 ? 1 : rank == 1 ? ndim : ndim * ndim;
-    for (int fi = 0; fi < f.num_g_fields; ++fi) { f.data_->mv[fi] = Thyra::createMembers(ol_node_vs_, ncol); }
+    for (int fi = 0; fi < f.num_g_fields; ++fi) {
+      f.data_->mv[fi] = Thyra::createMembers(ol_node_vs_, ncol);
+    }
   }
 
   auto                       indexer        = Albany::createGlobalLocalIndexer(f.data_->mv[0]->range());
@@ -407,7 +411,9 @@ Projector::interp(
 bool
 Projector::is_filled(int wi)
 {
-  if (static_cast<int>(filled_.size()) <= wi) { filled_.insert(filled_.end(), wi - filled_.size() + 1, false); }
+  if (static_cast<int>(filled_.size()) <= wi) {
+    filled_.insert(filled_.end(), wi - filled_.size() + 1, false);
+  }
   return filled_[wi];
 }
 
@@ -552,7 +558,9 @@ struct Manager::Impl
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
       Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
   {
-    if (Teuchos::nonnull(proj_)) { proj_->init(node_vs, ol_node_vs); }
+    if (Teuchos::nonnull(proj_)) {
+      proj_->init(node_vs, ol_node_vs);
+    }
   }
 
   void
@@ -661,7 +669,9 @@ struct Manager::Impl
   {
     transform_    = do_transform;
     building_sfm_ = false;
-    if (use_projection) { proj_ = Teuchos::rcp(new Projector()); }
+    if (use_projection) {
+      proj_ = Teuchos::rcp(new Projector());
+    }
   }
 
   void
@@ -739,7 +749,9 @@ Manager::getValidParameters(Teuchos::RCP<Teuchos::ParameterList>& valid_pl)
 void
 Manager::init_x_if_not(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
-  if (Teuchos::nonnull(impl_->x_)) { return; }
+  if (Teuchos::nonnull(impl_->x_)) {
+    return;
+  }
   impl_->x_ = Thyra::createMember(vs);
   impl_->x_->assign(0);
 }
@@ -1154,7 +1166,9 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         }
         double err1[9], errmax[9], scale[9];
         auto   data = Albany::getLocalData(f.data_->mv[0].getConst());
-        for (int k = 0; k < ncol; ++k) { err1[k] = errmax[k] = scale[k] = 0; }
+        for (int k = 0; k < ncol; ++k) {
+          err1[k] = errmax[k] = scale[k] = 0;
+        }
         for (int iv = 0; iv < nverts; ++iv)
           for (int k = 0; k < ncol; ++k) {
             double const d = std::abs(data[k][iv] - f_true[ncol * iv + k]);
@@ -1175,7 +1189,9 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
 
       {  // Compare with true values at IP.
         double err1[9], errmax[9], scale[9];
-        for (int k = 0; k < 9; ++k) { err1[k] = errmax[k] = scale[k] = 0; }
+        for (int k = 0; k < 9; ++k) {
+          err1[k] = errmax[k] = scale[k] = 0;
+        }
         loop(f_mdf, cell, 0)
             loop(f_mdf, qp, 1) for (int i = 0, k = 0; i < static_cast<int>(f_mdf.dimension(2));
                                     ++i) for (int j = 0; j < static_cast<int>(f_mdf.dimension(3)); ++j, ++k)
@@ -1263,7 +1279,9 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       const Manager::BasisField&                          wbf,
       const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
   {
-    if (d->finished) { return; }
+    if (d->finished) {
+      return;
+    }
     int const num_qp = coord_qp.dimension(1);
     if (workset.numCells > 0 && num_qp > 0) {
       Impl::Point p;
@@ -1391,12 +1409,16 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       Impl::TestData& td = d->td[test];
       // Compare with true values at IP.
       double err1[9], errmax[9], scale[9];
-      for (int k = 0; k < 9; ++k) { err1[k] = errmax[k] = scale[k] = 0; }
+      for (int k = 0; k < 9; ++k) {
+        err1[k] = errmax[k] = scale[k] = 0;
+      }
       for (Impl::Map::const_iterator it = td.f_true_qp.begin(); it != td.f_true_qp.end(); ++it) {
         const Impl::Point&              p         = it->first;
         const Impl::FValues&            fv_true   = it->second;
         const Impl::Map::const_iterator it_interp = td.f_interp_qp.find(p);
-        if (it_interp == td.f_interp_qp.end()) { break; }
+        if (it_interp == td.f_interp_qp.end()) {
+          break;
+        }
         const Impl::FValues& fv_interp = it_interp->second;
         for (int k = 0; k < 9; ++k) {
           double const diff = std::abs(fv_true.f[k] - fv_interp.f[k]);

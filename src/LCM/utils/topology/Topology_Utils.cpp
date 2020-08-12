@@ -370,11 +370,15 @@ new_id_from_old_id(
       break;
 
     case 2:
-      if (rank == stk::topology::EDGE_RANK) { is_face_or_edge = true; }
+      if (rank == stk::topology::EDGE_RANK) {
+        is_face_or_edge = true;
+      }
       break;
 
     case 3:
-      if (rank == stk::topology::EDGE_RANK || rank == stk::topology::FACE_RANK) { is_face_or_edge = true; }
+      if (rank == stk::topology::EDGE_RANK || rank == stk::topology::FACE_RANK) {
+        is_face_or_edge = true;
+      }
       break;
   }
 

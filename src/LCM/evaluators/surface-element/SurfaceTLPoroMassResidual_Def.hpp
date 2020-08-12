@@ -145,7 +145,9 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
 
   Albany::MDArray porePressureold = (*workset.stateArrayPtr)[porePressureName];
   Albany::MDArray Jold;
-  if (haveMech) { Jold = (*workset.stateArrayPtr)[JName]; }
+  if (haveMech) {
+    Jold = (*workset.stateArrayPtr)[JName];
+  }
 
   ScalarT dt = deltaTime(0);
 

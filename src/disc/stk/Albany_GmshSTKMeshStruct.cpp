@@ -57,7 +57,9 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
   // GenericSTKMeshStruct's constructor could not initialize metaData, cause the
   // dimension was not set.
   std::vector<std::string> entity_rank_names = stk::mesh::entity_rank_names();
-  if (this->buildEMesh) { entity_rank_names.push_back("FAMILY_TREE"); }
+  if (this->buildEMesh) {
+    entity_rank_names.push_back("FAMILY_TREE");
+  }
   metaData->initialize(this->numDim, entity_rank_names);
 
   params->validateParameters(*getValidDiscretizationParameters(), 0);
@@ -76,25 +78,37 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
     case 2:
       if (NumElemNodes == 3) {
         stk::mesh::set_topology(*partVec[0], stk::topology::TRI_3_2D);
-        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::LINE_2); }
+        for (auto ss : ssPartVec) {
+          stk::mesh::set_topology(*ss.second, stk::topology::LINE_2);
+        }
       } else if (NumElemNodes == 6) {
         stk::mesh::set_topology(*partVec[0], stk::topology::TRI_6_2D);
-        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::LINE_3); }
+        for (auto ss : ssPartVec) {
+          stk::mesh::set_topology(*ss.second, stk::topology::LINE_3);
+        }
       } else {
         stk::mesh::set_topology(*partVec[0], stk::topology::QUAD_4_2D);
-        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::LINE_2); }
+        for (auto ss : ssPartVec) {
+          stk::mesh::set_topology(*ss.second, stk::topology::LINE_2);
+        }
       }
       break;
     case 3:
       if (NumElemNodes == 4) {
         stk::mesh::set_topology(*partVec[0], stk::topology::TET_4);
-        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::TRI_3); }
+        for (auto ss : ssPartVec) {
+          stk::mesh::set_topology(*ss.second, stk::topology::TRI_3);
+        }
       } else if (NumElemNodes == 10) {
         stk::mesh::set_topology(*partVec[0], stk::topology::TET_10);
-        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::TRI_6); }
+        for (auto ss : ssPartVec) {
+          stk::mesh::set_topology(*ss.second, stk::topology::TRI_6);
+        }
       } else {
         stk::mesh::set_topology(*partVec[0], stk::topology::HEX_8);
-        for (auto ss : ssPartVec) { stk::mesh::set_topology(*ss.second, stk::topology::QUAD_4); }
+        for (auto ss : ssPartVec) {
+          stk::mesh::set_topology(*ss.second, stk::topology::QUAD_4);
+        }
       }
       break;
     default:
@@ -123,28 +137,44 @@ Albany::GmshSTKMeshStruct::~GmshSTKMeshStruct()
   // In theory, if one is nonnull, then they all are,
   // but for safety, check each ptr individually
   if (tetra != nullptr) {
-    for (int i(0); i < 5; ++i) { delete[] tetra[i]; }
+    for (int i(0); i < 5; ++i) {
+      delete[] tetra[i];
+    }
   }
   if (tet10 != nullptr) {
-    for (int i(0); i < 11; ++i) { delete[] tet10[i]; }
+    for (int i(0); i < 11; ++i) {
+      delete[] tet10[i];
+    }
   }
   if (trias != nullptr) {
-    for (int i(0); i < 4; ++i) { delete[] trias[i]; }
+    for (int i(0); i < 4; ++i) {
+      delete[] trias[i];
+    }
   }
   if (tri6 != nullptr) {
-    for (int i(0); i < 7; ++i) { delete[] tri6[i]; }
+    for (int i(0); i < 7; ++i) {
+      delete[] tri6[i];
+    }
   }
   if (hexas != nullptr) {
-    for (int i(0); i < 9; ++i) { delete[] hexas[i]; }
+    for (int i(0); i < 9; ++i) {
+      delete[] hexas[i];
+    }
   }
   if (quads != nullptr) {
-    for (int i(0); i < 5; ++i) { delete[] quads[i]; }
+    for (int i(0); i < 5; ++i) {
+      delete[] quads[i];
+    }
   }
   if (lines != nullptr) {
-    for (int i(0); i < 3; ++i) { delete[] lines[i]; }
+    for (int i(0); i < 3; ++i) {
+      delete[] lines[i];
+    }
   }
   if (line3 != nullptr) {
-    for (int i(0); i < 4; ++i) { delete[] line3[i]; }
+    for (int i(0); i < 4; ++i) {
+      delete[] line3[i];
+    }
   }
 
   delete[] tetra;
@@ -299,7 +329,9 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
 
         int                      num_e = bulkData->num_elements(node_j);
         const stk::mesh::Entity* e     = bulkData->begin_elements(node_j);
-        for (int k(0); k < num_e; ++k) { ++elm_count[bulkData->identifier(e[k])]; }
+        for (int k(0); k < num_e; ++k) {
+          ++elm_count[bulkData->identifier(e[k])];
+        }
       }
 
       // We have to find out what element has this side as a side. We check the
@@ -380,7 +412,9 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
 
   // Read the nodes
   int id;
-  for (int i = 0; i < NumNodes; ++i) { ifile >> id >> pts[i][0] >> pts[i][1] >> pts[i][2]; }
+  for (int i = 0; i < NumNodes; ++i) {
+    ifile >> id >> pts[i][0] >> pts[i][1] >> pts[i][2];
+  }
 
   // Start reading elements (cells and sides)
   ifile.seekg(0, std::ios::beg);
@@ -415,11 +449,21 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
   trias = new int*[4];
   hexas = new int*[9];
   quads = new int*[5];
-  for (int i(0); i < 5; ++i) { tetra[i] = new int[nb_tetra]; }
-  for (int i(0); i < 5; ++i) { trias[i] = new int[nb_trias]; }
-  for (int i(0); i < 9; ++i) { hexas[i] = new int[nb_hexas]; }
-  for (int i(0); i < 5; ++i) { quads[i] = new int[nb_quads]; }
-  for (int i(0); i < 3; ++i) { lines[i] = new int[nb_lines]; }
+  for (int i(0); i < 5; ++i) {
+    tetra[i] = new int[nb_tetra];
+  }
+  for (int i(0); i < 5; ++i) {
+    trias[i] = new int[nb_trias];
+  }
+  for (int i(0); i < 9; ++i) {
+    hexas[i] = new int[nb_hexas];
+  }
+  for (int i(0); i < 5; ++i) {
+    quads[i] = new int[nb_quads];
+  }
+  for (int i(0); i < 3; ++i) {
+    lines[i] = new int[nb_lines];
+  }
 
   if (nb_tetra > 0) {
     this->numDim = 3;
@@ -556,7 +600,9 @@ Albany::GmshSTKMeshStruct::load_node_data(std::ifstream& ifile)
 {
   if (version == GmshVersion::V2_2) {
     int id = 0;
-    for (int i = 0; i < NumNodes; ++i) { ifile >> id >> pts[i][0] >> pts[i][1] >> pts[i][2]; }
+    for (int i = 0; i < NumNodes; ++i) {
+      ifile >> id >> pts[i][0] >> pts[i][1] >> pts[i][2];
+    }
   } else if (version == GmshVersion::V4_1) {
     int accounted_nodes = 0;
     while (accounted_nodes < NumNodes) {
@@ -568,7 +614,9 @@ Albany::GmshSTKMeshStruct::load_node_data(std::ifstream& ifile)
 
       // First get the node id's
       int* node_IDs = new int[num_node_block];
-      for (int i = 0; i < num_node_block; i++) { ifile >> node_IDs[i]; }
+      for (int i = 0; i < num_node_block; i++) {
+        ifile >> node_IDs[i];
+      }
 
       // Put node coordinates into proper ID place
       for (int i = 0; i < num_node_block; i++) {
@@ -727,14 +775,30 @@ Albany::GmshSTKMeshStruct::size_all_element_pointers()
   tri6  = new int*[7];
   hexas = new int*[9];
   quads = new int*[5];
-  for (int i(0); i < 5; ++i) { tetra[i] = new int[nb_tetra]; }
-  for (int i(0); i < 11; ++i) { tet10[i] = new int[nb_tet10]; }
-  for (int i(0); i < 4; ++i) { trias[i] = new int[nb_trias]; }
-  for (int i(0); i < 7; ++i) { tri6[i] = new int[nb_tri6]; }
-  for (int i(0); i < 9; ++i) { hexas[i] = new int[nb_hexas]; }
-  for (int i(0); i < 5; ++i) { quads[i] = new int[nb_quads]; }
-  for (int i(0); i < 3; ++i) { lines[i] = new int[nb_lines]; }
-  for (int i(0); i < 4; ++i) { line3[i] = new int[nb_line3]; }
+  for (int i(0); i < 5; ++i) {
+    tetra[i] = new int[nb_tetra];
+  }
+  for (int i(0); i < 11; ++i) {
+    tet10[i] = new int[nb_tet10];
+  }
+  for (int i(0); i < 4; ++i) {
+    trias[i] = new int[nb_trias];
+  }
+  for (int i(0); i < 7; ++i) {
+    tri6[i] = new int[nb_tri6];
+  }
+  for (int i(0); i < 9; ++i) {
+    hexas[i] = new int[nb_hexas];
+  }
+  for (int i(0); i < 5; ++i) {
+    quads[i] = new int[nb_quads];
+  }
+  for (int i(0); i < 3; ++i) {
+    lines[i] = new int[nb_lines];
+  }
+  for (int i(0); i < 4; ++i) {
+    line3[i] = new int[nb_line3];
+  }
 
   return;
 }
@@ -899,7 +963,9 @@ Albany::GmshSTKMeshStruct::load_element_data(std::ifstream& ifile)
       ss >> id >> e_type >> n_tags;
       ALBANY_PANIC(n_tags <= 0, "Error! Number of tags must be positive.\n");
       tags.resize(n_tags + 1);
-      for (int j(0); j < n_tags; ++j) { ss >> tags[j]; }
+      for (int j(0); j < n_tags; ++j) {
+        ss >> tags[j];
+      }
       tags[n_tags] = 0;
 
       store_element_info(e_type, iline, iline3, itria, itri6, iquad, itetra, itet10, ihexa, tags, ss);
@@ -1082,11 +1148,21 @@ Albany::GmshSTKMeshStruct::loadBinaryMesh()
   trias = new int*[4];
   hexas = new int*[9];
   quads = new int*[5];
-  for (int i(0); i < 5; ++i) { tetra[i] = new int[nb_tetra]; }
-  for (int i(0); i < 5; ++i) { trias[i] = new int[nb_trias]; }
-  for (int i(0); i < 9; ++i) { hexas[i] = new int[nb_hexas]; }
-  for (int i(0); i < 5; ++i) { quads[i] = new int[nb_quads]; }
-  for (int i(0); i < 3; ++i) { lines[i] = new int[nb_lines]; }
+  for (int i(0); i < 5; ++i) {
+    tetra[i] = new int[nb_tetra];
+  }
+  for (int i(0); i < 5; ++i) {
+    trias[i] = new int[nb_trias];
+  }
+  for (int i(0); i < 9; ++i) {
+    hexas[i] = new int[nb_hexas];
+  }
+  for (int i(0); i < 5; ++i) {
+    quads[i] = new int[nb_quads];
+  }
+  for (int i(0); i < 3; ++i) {
+    lines[i] = new int[nb_lines];
+  }
 
   if (nb_tetra > 0) {
     this->numDim = 3;
@@ -1253,14 +1329,18 @@ Albany::GmshSTKMeshStruct::set_boundaries(
 
   // Counting boundaries (only proc 0 has any stored, so far)
   std::set<int> bdTags;
-  for (int i(0); i < NumSides; ++i) { bdTags.insert(sides[NumSideNodes][i]); }
+  for (int i(0); i < NumSides; ++i) {
+    bdTags.insert(sides[NumSideNodes][i]);
+  }
 
   // Broadcasting the tags
   int numBdTags = bdTags.size();
   Teuchos::broadcast<LO, LO>(*commT, 0, 1, &numBdTags);
   int*                    bdTagsArray = new int[numBdTags];
   std::set<int>::iterator it          = bdTags.begin();
-  for (int k = 0; it != bdTags.end(); ++it, ++k) { bdTagsArray[k] = *it; }
+  for (int k = 0; it != bdTags.end(); ++it, ++k) {
+    bdTagsArray[k] = *it;
+  }
   Teuchos::broadcast<LO, LO>(*commT, 0, numBdTags, bdTagsArray);
 
   // Adding boundary nodesets and sidesets separating different labels
@@ -1376,7 +1456,9 @@ void
 Albany::GmshSTKMeshStruct::open_fname(std::ifstream& ifile)
 {
   ifile.open(fname.c_str());
-  if (!ifile.is_open()) { ALBANY_ABORT("Error! Cannot open mesh file '" << fname << "'.\n"); }
+  if (!ifile.is_open()) {
+    ALBANY_ABORT("Error! Cannot open mesh file '" << fname << "'.\n");
+  }
 
   return;
 }
@@ -1437,7 +1519,9 @@ Albany::GmshSTKMeshStruct::get_physical_tag_to_surface_tag_map(
 
     ALBANY_PANIC(num_physical_tags < 0, "Cannot have a negative number of physical tags per surface.\n");
 
-    if (num_physical_tags == 1) { physical_surface_tags.insert(std::make_pair(physical_tag, surface_tag)); }
+    if (num_physical_tags == 1) {
+      physical_surface_tags.insert(std::make_pair(physical_tag, surface_tag));
+    }
   }
 
   return;
@@ -1482,7 +1566,9 @@ Albany::GmshSTKMeshStruct::read_physical_names_from_file(std::map<std::string, i
 
     // Skip to the surfaces
     int num_lines_to_skip = num_points + num_curves;
-    for (int i = 0; i < num_lines_to_skip; i++) { std::getline(ifile, line); }
+    for (int i = 0; i < num_lines_to_skip; i++) {
+      std::getline(ifile, line);
+    }
     std::map<int, int> physical_surface_tags;
     get_physical_tag_to_surface_tag_map(ifile, physical_surface_tags, num_surfaces);
 
@@ -1567,7 +1653,9 @@ Albany::GmshSTKMeshStruct::broadcast_physical_names(
 
   // Broadcast names and tags
   Teuchos::broadcast<LO, LO>(*commT, 0, num_pairs, tags_array);
-  for (int i = 0; i < num_pairs; i++) { broadcast_name_tag_pair(names, tags_array, i, commT, physical_names); }
+  for (int i = 0; i < num_pairs; i++) {
+    broadcast_name_tag_pair(names, tags_array, i, commT, physical_names);
+  }
 
   delete[] tags_array;
   return;
@@ -1578,7 +1666,9 @@ Albany::GmshSTKMeshStruct::get_physical_names(
     std::map<std::string, int>&             physical_names,
     const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
-  if (commT->getRank() == 0) { read_physical_names_from_file(physical_names); }
+  if (commT->getRank() == 0) {
+    read_physical_names_from_file(physical_names);
+  }
   broadcast_physical_names(physical_names, commT);
 
   return;

@@ -74,7 +74,9 @@ StabilizedPressureResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalD
   if (small_strain_) {
     // small strain version needs no pull back
     for (int cell = 0; cell < workset.numCells; ++cell) {
-      for (int node = 0; node < num_nodes_; ++node) { residual_(cell, node) = 0.0; }
+      for (int node = 0; node < num_nodes_; ++node) {
+        residual_(cell, node) = 0.0;
+      }
       for (int pt = 0; pt < num_pts_; ++pt) {
         sigma.fill(stress_, cell, pt, 0, 0);
         ScalarT dUdJ = (1.0 / num_dims_) * minitensor::trace(sigma);
@@ -99,7 +101,9 @@ StabilizedPressureResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalD
     minitensor::Tensor<ScalarT> Cinv(num_dims_);
 
     for (int cell = 0; cell < workset.numCells; ++cell) {
-      for (int node = 0; node < num_nodes_; ++node) { residual_(cell, node) = 0.0; }
+      for (int node = 0; node < num_nodes_; ++node) {
+        residual_(cell, node) = 0.0;
+      }
       for (int pt = 0; pt < num_pts_; ++pt) {
         sigma.fill(stress_, cell, pt, 0, 0);
         ScalarT dUdJ = (1.0 / num_dims_) * minitensor::trace(sigma);

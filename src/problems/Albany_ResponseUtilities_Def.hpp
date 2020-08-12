@@ -119,7 +119,9 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
   // PHAL::ScatterScalarResponse
   Teuchos::RCP<PHAL::ScatterScalarResponseBase<EvalT, Traits>> sc_resp;
   sc_resp = Teuchos::rcp_dynamic_cast<PHAL::ScatterScalarResponseBase<EvalT, Traits>>(res_ev);
-  if (sc_resp != Teuchos::null) { ev_tag = sc_resp->getResponseFieldTag(); }
+  if (sc_resp != Teuchos::null) {
+    ev_tag = sc_resp->getResponseFieldTag();
+  }
 
   // Require the response tag;
   fm.requireField<EvalT>(*ev_tag);

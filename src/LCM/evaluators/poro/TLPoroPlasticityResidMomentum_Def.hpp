@@ -107,7 +107,9 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::evaluateFields(typename Traits::Ev
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int node = 0; node < numNodes; ++node) {
         for (int qp = 0; qp < numQPs; ++qp) {
-          for (int i = 0; i < numDims; i++) { ExResidual(cell, node, i) += uDotDot(cell, qp, i) * wBF(cell, node, qp); }
+          for (int i = 0; i < numDims; i++) {
+            ExResidual(cell, node, i) += uDotDot(cell, qp, i) * wBF(cell, node, qp);
+          }
         }
       }
     }

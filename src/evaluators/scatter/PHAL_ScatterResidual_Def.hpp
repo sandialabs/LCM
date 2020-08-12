@@ -69,7 +69,9 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
     numFieldsBase = (dl->node_tensor->extent(2)) * (dl->node_tensor->extent(3));
   }
 
-  if (tensorRank == 0) { val_kokkos.resize(numFieldsBase); }
+  if (tensorRank == 0) {
+    val_kokkos.resize(numFieldsBase);
+  }
 
   if (p.isType<int>("Offset of First DOF")) {
     offset = p.get<int>("Offset of First DOF");
@@ -88,7 +90,9 @@ void
 ScatterResidualBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   if (tensorRank == 0) {
-    for (std::size_t eq = 0; eq < numFieldsBase; ++eq) { this->utils.setFieldData(val[eq], fm); }
+    for (std::size_t eq = 0; eq < numFieldsBase; ++eq) {
+      this->utils.setFieldData(val[eq], fm);
+    }
     numNodes = val[0].extent(1);
   } else if (tensorRank == 1) {
     this->utils.setFieldData(valVec, fm);
@@ -230,10 +234,14 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   LO col[500];
   LO row;
 
-  if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
+  if (nunk > 500) {
+    Kokkos::abort("ERROR (ScatterResidual): nunk > 500");
+  }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -260,10 +268,14 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
   LO col[500];
   ST vals[500];
 
-  if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
+  if (nunk > 500) {
+    Kokkos::abort("ERROR (ScatterResidual): nunk > 500");
+  }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -301,10 +313,14 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   LO col[500];
   LO row;
 
-  if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
+  if (nunk > 500) {
+    Kokkos::abort("ERROR (ScatterResidual): nunk > 500");
+  }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -332,10 +348,14 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
   LO row;
   ST vals[500];
 
-  if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
+  if (nunk > 500) {
+    Kokkos::abort("ERROR (ScatterResidual): nunk > 500");
+  }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -374,10 +394,14 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   LO col[500];
   LO row;
 
-  if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
+  if (nunk > 500) {
+    Kokkos::abort("ERROR (ScatterResidual): nunk > 500");
+  }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -405,10 +429,14 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
   LO row;
   ST vals[500];
 
-  if (nunk > 500) { Kokkos::abort("ERROR (ScatterResidual): nunk > 500"); }
+  if (nunk > 500) {
+    Kokkos::abort("ERROR (ScatterResidual): nunk > 500");
+  }
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      col[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -440,7 +468,9 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename T
 
   // Get Kokkos vector view and local matrix
   bool const loadResid = Teuchos::nonnull(workset.f);
-  if (loadResid) { f_kokkos = workset.f_kokkos; }
+  if (loadResid) {
+    f_kokkos = workset.f_kokkos;
+  }
   Jac_kokkos = workset.Jac_kokkos;
 
   if (this->tensorRank == 0) {

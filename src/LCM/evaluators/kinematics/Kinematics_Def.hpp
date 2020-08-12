@@ -107,7 +107,9 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         F            = I + gradu;
         j_(cell, pt) = minitensor::det(F);
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) { def_grad_(cell, pt, i, j) = F(i, j); }
+          for (int j(0); j < num_dims_; ++j) {
+            def_grad_(cell, pt, i, j) = F(i, j);
+          }
         }
       }
     }
@@ -146,7 +148,9 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         F *= p;
         j_(cell, pt) = weighted_jbar;
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) { def_grad_(cell, pt, i, j) = F(i, j); }
+          for (int j(0); j < num_dims_; ++j) {
+            def_grad_(cell, pt, i, j) = F(i, j);
+          }
         }
       }
     }
@@ -159,7 +163,9 @@ Kinematics<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
           gradu.fill(grad_u_, cell, pt, 0, 0);
           strain = 0.5 * (gradu + minitensor::transpose(gradu));
           for (int i(0); i < num_dims_; ++i) {
-            for (int j(0); j < num_dims_; ++j) { strain_(cell, pt, i, j) = strain(i, j); }
+            for (int j(0); j < num_dims_; ++j) {
+              strain_(cell, pt, i, j) = strain(i, j);
+            }
           }
         }
       }

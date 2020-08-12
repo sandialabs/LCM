@@ -105,7 +105,9 @@ Albany::PNPProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSp
 
   // Check to make sure that Neumann BCs are given in the input file
 
-  if (!nbcUtils.haveBCSpecified(this->params)) { return; }
+  if (!nbcUtils.haveBCSpecified(this->params)) {
+    return;
+  }
 
   // Construct BC evaluators for all side sets and names
   // Note that the string index sets up the equation offset, so ordering is

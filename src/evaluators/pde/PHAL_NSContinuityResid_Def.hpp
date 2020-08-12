@@ -78,7 +78,9 @@ NSContinuityResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
       divergence(cell, qp) = 0.0;
-      for (std::size_t i = 0; i < numDims; ++i) { divergence(cell, qp) += rho(cell, qp) * VGrad(cell, qp, i, i); }
+      for (std::size_t i = 0; i < numDims; ++i) {
+        divergence(cell, qp) += rho(cell, qp) * VGrad(cell, qp, i, i);
+      }
     }
   }
 

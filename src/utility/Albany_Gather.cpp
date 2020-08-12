@@ -38,7 +38,9 @@ gatherAllV(
     ALBANY_PANIC(ierr != 0);
 
     Teuchos::Array<int> allValDisps(cpuCount, 0);
-    for (int i = 1; i < cpuCount; ++i) { allValDisps[i] = allValDisps[i - 1] + allValCounts[i - 1]; }
+    for (int i = 1; i < cpuCount; ++i) {
+      allValDisps[i] = allValDisps[i - 1] + allValCounts[i - 1];
+    }
     ALBANY_EXPECT(allCount == allValCounts.back() + allValDisps.back(), "Error! Mismatch in values counts.\n");
 
     auto GO_type = Teuchos::Details::MpiTypeTraits<GO>::getType();
@@ -87,7 +89,9 @@ gatherV(
     ALBANY_PANIC(ierr != 0);
 
     Teuchos::Array<int> allValDisps(cpuCount, 0);
-    for (int i = 1; i < cpuCount; ++i) { allValDisps[i] = allValDisps[i - 1] + allValCounts[i - 1]; }
+    for (int i = 1; i < cpuCount; ++i) {
+      allValDisps[i] = allValDisps[i - 1] + allValCounts[i - 1];
+    }
     ALBANY_EXPECT(
         myRank != root_rank || (allCount == allValCounts.back() + allValDisps.back()),
         "Error! Mismatch in values counts.\n");

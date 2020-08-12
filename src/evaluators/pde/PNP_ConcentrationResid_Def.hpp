@@ -78,7 +78,9 @@ PNP::ConcentrationResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData
 
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t node = 0; node < numNodes; ++node) {
-      for (std::size_t j = 0; j < numSpecies; ++j) { ConcentrationResidual(cell, node, j) = 0.0; }
+      for (std::size_t j = 0; j < numSpecies; ++j) {
+        ConcentrationResidual(cell, node, j) = 0.0;
+      }
     }
   }
 

@@ -85,7 +85,9 @@ template <typename EvalT, typename Traits>
 void
 SideLaplacianResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
-  if (sideSetEquation) { this->utils.setFieldData(metric, fm); }
+  if (sideSetEquation) {
+    this->utils.setFieldData(metric, fm);
+  }
 
   this->utils.setFieldData(u, fm);
   this->utils.setFieldData(grad_u, fm);

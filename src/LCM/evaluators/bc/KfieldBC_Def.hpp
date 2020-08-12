@@ -177,7 +177,9 @@ KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::
   std::vector<double*> const&          nsNodeCoords = dirichletWorkset.nodeSetCoords->find(this->nodeSetID)->second;
 
   bool fillResid = (f != Teuchos::null);
-  if (fillResid) { f_nonconstView = Albany::getNonconstLocalData(f); }
+  if (fillResid) {
+    f_nonconstView = Albany::getNonconstLocalData(f);
+  }
 
   int     xlunk, ylunk;  // local indicies into unknown vector
   double* coord;
@@ -198,14 +200,18 @@ KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::
 
     // replace jac values for the X dof
     Albany::getLocalRowValues(jac, xlunk, matrixIndices, matrixEntries);
-    for (auto& val : matrixEntries) { val = 0.0; }
+    for (auto& val : matrixEntries) {
+      val = 0.0;
+    }
     Albany::setLocalRowValues(jac, xlunk, matrixIndices(), matrixEntries());
     index[0] = xlunk;
     Albany::setLocalRowValues(jac, xlunk, index(), value());
 
     // replace jac values for the y dof
     Albany::getLocalRowValues(jac, ylunk, matrixIndices, matrixEntries);
-    for (auto& val : matrixEntries) { val = 0.0; }
+    for (auto& val : matrixEntries) {
+      val = 0.0;
+    }
     Albany::setLocalRowValues(jac, ylunk, matrixIndices(), matrixEntries());
     index[0] = ylunk;
     Albany::setLocalRowValues(jac, ylunk, index(), value());

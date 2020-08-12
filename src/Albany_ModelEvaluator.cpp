@@ -21,7 +21,9 @@ namespace {
 void
 sanitize_nans(const Thyra_Derivative& v)
 {
-  if (!v.isEmpty() && Teuchos::nonnull(v.getMultiVector())) { v.getMultiVector()->assign(0.0); }
+  if (!v.isEmpty() && Teuchos::nonnull(v.getMultiVector())) {
+    v.getMultiVector()->assign(0.0);
+  }
 }
 }  // namespace
 
@@ -43,7 +45,9 @@ ModelEvaluator::ModelEvaluator(
   Teuchos::ParameterList& parameterParams = problemParams.sublist("Parameters");
 
   std::string const soln_method = problemParams.get("Solution Method", "Steady");
-  if (soln_method == "Transient Tempus") { use_tempus = true; }
+  if (soln_method == "Transient Tempus") {
+    use_tempus = true;
+  }
 
   num_param_vecs                = parameterParams.get("Number of Parameter Vectors", 0);
   bool using_old_parameter_list = false;
@@ -163,7 +167,9 @@ ModelEvaluator::ModelEvaluator(
       ALBANY_PANIC(lb.size() != numParameters, "Error! Input lower bounds array has the wrong dimension.\n");
 
       auto param_lower_bd_nonConstView = getNonconstLocalData(param_lower_bds[l]);
-      for (int k = 0; k < numParameters; ++k) { param_lower_bd_nonConstView[k] = lb[k]; }
+      for (int k = 0; k < numParameters; ++k) {
+        param_lower_bd_nonConstView[k] = lb[k];
+      }
     }
 
     // Loading upper bounds (if any)
@@ -173,7 +179,9 @@ ModelEvaluator::ModelEvaluator(
       ALBANY_PANIC(ub.size() != numParameters, "Error! Input upper bounds array has the wrong dimension.\n");
 
       auto param_upper_bd_nonConstView = getNonconstLocalData(param_upper_bds[l]);
-      for (int k = 0; k < numParameters; ++k) { param_upper_bd_nonConstView[k] = ub[k]; }
+      for (int k = 0; k < numParameters; ++k) {
+        param_upper_bd_nonConstView[k] = ub[k];
+      }
     }
 
     // Loading nominal values (if any)
@@ -186,7 +194,9 @@ ModelEvaluator::ModelEvaluator(
         sacado_param_vec[l][k].baseValue = param_vec_nonConstView[k] = nvals[k];
       }
     } else {
-      for (int k = 0; k < numParameters; ++k) { param_vec_nonConstView[k] = sacado_param_vec[l][k].baseValue; }
+      for (int k = 0; k < numParameters; ++k) {
+        param_vec_nonConstView[k] = sacado_param_vec[l][k].baseValue;
+      }
     }
   }
 
@@ -263,8 +273,12 @@ ModelEvaluator::ModelEvaluator(
   // TODO: Check if correct nominal values for parameters
   for (int l = 0; l < num_param_vecs; ++l) {
     nominalValues.set_p(l, param_vecs[l]);
-    if (Teuchos::nonnull(param_lower_bds[l])) { lowerBounds.set_p(l, param_lower_bds[l]); }
-    if (Teuchos::nonnull(param_upper_bds[l])) { upperBounds.set_p(l, param_upper_bds[l]); }
+    if (Teuchos::nonnull(param_lower_bds[l])) {
+      lowerBounds.set_p(l, param_lower_bds[l]);
+    }
+    if (Teuchos::nonnull(param_upper_bds[l])) {
+      upperBounds.set_p(l, param_upper_bds[l]);
+    }
   }
   for (int l = 0; l < num_dist_param_vecs; ++l) {
     nominalValues.set_p(l + num_param_vecs, distParamLib->get(dist_param_names[l])->vector());
@@ -406,7 +420,9 @@ void
 ModelEvaluator::reportFinalPoint(const Thyra_ModelEvaluator::InArgs<ST>& finalPoint, bool const wasSolved)
 {
   // Set nominal values to the final point, if the model was solved
-  if (overwriteNominalValuesWithFinalPoint && wasSolved) { nominalValues = finalPoint; }
+  if (overwriteNominalValuesWithFinalPoint && wasSolved) {
+    nominalValues = finalPoint;
+  }
 }
 
 Teuchos::RCP<Thyra_LinearOp>
@@ -478,7 +494,9 @@ ModelEvaluator::createOutArgsImpl() const
     }
 
     result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DgDx, i, dgdx_support);
-    if (supports_xdot) { result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DgDx_dot, i, dgdx_support); }
+    if (supports_xdot) {
+      result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DgDx_dot, i, dgdx_support);
+    }
 
     // AGS: x_dotdot time integrators not imlemented in Thyra ME yet
     // result.setSupports(
@@ -586,7 +604,9 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
   ST const curr_time = is_dynamic == true ? inArgs.get_t() : getCurrentTime();
 
   double dt = 0.0;  // time step
-  if (is_dynamic == true) { dt = inArgs.get_step_size(); }
+  if (is_dynamic == true) {
+    dt = inArgs.get_step_size();
+  }
 
   for (int l = 0; l < num_param_vecs + num_dist_param_vecs; ++l) {
     Teuchos::RCP<Thyra_Vector const> const p = inArgs.get_p(l);
@@ -662,7 +682,9 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
     const Thyra_Derivative dgdx_out = outArgs.get_DgDx(j);
     Thyra_Derivative       dgdxdot_out;
 
-    if (supports_xdot) { dgdxdot_out = outArgs.get_DgDx_dot(j); }
+    if (supports_xdot) {
+      dgdxdot_out = outArgs.get_DgDx_dot(j);
+    }
 
     const Thyra_Derivative dgdxdotdot_out;
 
@@ -671,23 +693,31 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
     sanitize_nans(dgdxdotdot_out);
 
     // dg/dx, dg/dxdot
-    if (!dgdx_out.isEmpty() || !dgdxdot_out.isEmpty()) { ALBANY_ABORT("This functionality is no longer supported."); }
+    if (!dgdx_out.isEmpty() || !dgdxdot_out.isEmpty()) {
+      ALBANY_ABORT("This functionality is no longer supported.");
+    }
 
     // dg/dp
     for (int l = 0; l < num_param_vecs; ++l) {
       Teuchos::RCP<Thyra_MultiVector> const dgdp_out = outArgs.get_DgDp(j, l).getMultiVector();
 
-      if (Teuchos::nonnull(dgdp_out)) { ALBANY_ABORT("This functionality is no longer supported."); }
+      if (Teuchos::nonnull(dgdp_out)) {
+        ALBANY_ABORT("This functionality is no longer supported.");
+      }
     }
 
     // Need to handle dg/dp for distributed p
     for (int l = 0; l < num_dist_param_vecs; l++) {
       Teuchos::RCP<Thyra_MultiVector> const dgdp_out = outArgs.get_DgDp(j, l + num_param_vecs).getMultiVector();
 
-      if (Teuchos::nonnull(dgdp_out)) { ALBANY_ABORT("This functionality is no longer supported."); }
+      if (Teuchos::nonnull(dgdp_out)) {
+        ALBANY_ABORT("This functionality is no longer supported.");
+      }
     }
 
-    if (Teuchos::nonnull(g_out)) { app->evaluateResponse(j, curr_time, x, x_dot, x_dotdot, sacado_param_vec, g_out); }
+    if (Teuchos::nonnull(g_out)) {
+      app->evaluateResponse(j, curr_time, x, x_dot, x_dotdot, sacado_param_vec, g_out);
+    }
   }
 }
 

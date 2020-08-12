@@ -1090,7 +1090,9 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ClipelementsSH()
 
     // Do we still have a polygon? If not, just move on
 
-    if (t_poly_xi.size() < 3) { return false; }
+    if (t_poly_xi.size() < 3) {
+      return false;
+    }
 
     // Store it in the polygon
 

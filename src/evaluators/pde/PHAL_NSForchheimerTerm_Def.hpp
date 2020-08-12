@@ -72,7 +72,9 @@ NSForchheimerTerm<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
       normV(cell, qp) = 0.0;
-      for (std::size_t i = 0; i < numDims; ++i) { normV(cell, qp) += V(cell, qp, i) * V(cell, qp, i); }
+      for (std::size_t i = 0; i < numDims; ++i) {
+        normV(cell, qp) += V(cell, qp, i) * V(cell, qp, i);
+      }
       if (normV(cell, qp) > 0)
         normV(cell, qp) = std::sqrt(normV(cell, qp));
       else

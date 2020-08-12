@@ -116,7 +116,9 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   if (surface_flag) {
     std::map<std::string, std::string>::iterator it;
 
-    for (it = name_map->begin(); it != name_map->end(); ++it) { it->second = "surf_" + it->second; }
+    for (it = name_map->begin(); it != name_map->end(); ++it) {
+      it->second = "surf_" + it->second;
+    }
   }
 
   field_name_map_ = name_map;

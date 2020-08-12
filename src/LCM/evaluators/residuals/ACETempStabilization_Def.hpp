@@ -69,7 +69,9 @@ ACETempStabilization<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
       ScalarT mesh_size      = 2.0 * std::pow(jacobian_det_(cell, qp), 1.0 / num_dims_);
       ScalarT h_pow_num_dims = 1.0;
-      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) { h_pow_num_dims *= mesh_size; }
+      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
+        h_pow_num_dims *= mesh_size;
+      }
       if (tau_type_ == NONE) {
         tau_(cell, qp) = 0.0;
       } else if (tau_type_ == SUPG) {

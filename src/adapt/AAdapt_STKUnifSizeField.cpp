@@ -59,7 +59,9 @@ plane_dot_product(double plane_point[3], double plane_normal[3], double point[3]
   normalize(plane_normal, normal);
   double dot = 0.0;
 
-  for (int i = 0; i < 3; i++) { dot += (point[i] - plane_point[i]) * normal[i]; }
+  for (int i = 0; i < 3; i++) {
+    dot += (point[i] - plane_point[i]) * normal[i];
+  }
 
   return dot;
 }

@@ -896,7 +896,9 @@ Albany::HMCProblem::constructEvaluators(
     // end required
 
     p->set<bool>("Volume Average Pressure", volume_average_pressure);
-    if (volume_average_pressure) { p->set<std::string>("Weights Name", "Weights"); }
+    if (volume_average_pressure) {
+      p->set<std::string>("Weights Name", "Weights");
+    }
 
     RCP<LCM::ConstitutiveModelInterface<EvalT, AlbanyTraits>> cmiEv =
         rcp(new LCM::ConstitutiveModelInterface<EvalT, AlbanyTraits>(*p, dl));

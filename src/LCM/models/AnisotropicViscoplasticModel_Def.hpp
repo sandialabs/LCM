@@ -43,7 +43,9 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(Fp_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
-  if (have_temperature_) { this->eval_field_map_.insert(std::make_pair(source_string, dl->qp_scalar)); }
+  if (have_temperature_) {
+    this->eval_field_map_.insert(std::make_pair(source_string, dl->qp_scalar));
+  }
 
   // define the state variables
   // stress
@@ -132,7 +134,9 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
   auto                  ess    = *eval_fields[ess_string];
   auto                  kappa  = *eval_fields[kappa_string];
   PHX::MDField<ScalarT> source;
-  if (have_temperature_) { source = *eval_fields[source_string]; }
+  if (have_temperature_) {
+    source = *eval_fields[source_string];
+  }
 
   // get State Variables
   Albany::MDArray Fpold   = (*workset.stateArrayPtr)[Fp_string + "_old"];
@@ -176,7 +180,9 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
 
       // Fpn.fill( &Fpold(cell,pt,int(0),int(0)) );
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fpold(cell, pt, i, j)); }
+        for (int j(0); j < num_dims_; ++j) {
+          Fpn(i, j) = ScalarT(Fpold(cell, pt, i, j));
+        }
       }
 
       // compute trial state
@@ -258,13 +264,17 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
         expA  = minitensor::exp(A);
         Fpnew = expA * Fpn;
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fpnew(i, j); }
+          for (int j(0); j < num_dims_; ++j) {
+            Fp(cell, pt, i, j) = Fpnew(i, j);
+          }
         }
       } else {
         eqps(cell, pt) = eqpsold(cell, pt);
         if (have_temperature_) source(cell, pt) = 0.0;
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fpn(i, j); }
+          for (int j(0); j < num_dims_; ++j) {
+            Fp(cell, pt, i, j) = Fpn(i, j);
+          }
         }
       }
 
@@ -274,7 +284,9 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
       // compute stress
       sigma = p * I + s / J(cell, pt);
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+        for (int j(0); j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = sigma(i, j);
+        }
       }
     }
   }

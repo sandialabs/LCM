@@ -64,7 +64,9 @@ ThyraCrsMatrixFactory::insertGlobalIndices(const GO row, const Teuchos::ArrayVie
   if (lrow < 0) return;
 
   auto& row_indices = t_local_graph[lrow];
-  for (int i = 0; i < indices.size(); ++i) { row_indices.emplace(static_cast<Tpetra_GO>(indices[i])); }
+  for (int i = 0; i < indices.size(); ++i) {
+    row_indices.emplace(static_cast<Tpetra_GO>(indices[i]));
+  }
 }
 
 void

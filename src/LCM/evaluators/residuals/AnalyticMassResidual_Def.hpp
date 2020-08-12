@@ -467,7 +467,9 @@ AnalyticMassResidualBase<EvalT, Traits>::hex8LocalMassRowLumped(int const cell, 
   }
   const RealType elt_vol = computeElementVolume(cell);
   const RealType scale   = elt_vol / 8.0 * density_;
-  for (int i = 0; i < mass_row.size(); i++) { mass_row[i] *= scale; }
+  for (int i = 0; i < mass_row.size(); i++) {
+    mass_row[i] *= scale;
+  }
   return mass_row;
 }
 
@@ -646,7 +648,9 @@ RealType
 AnalyticMassResidualBase<EvalT, Traits>::computeElementVolScaling(int const cell, int const node) const
 {
   RealType elt_vol_scale_at_node = 0.0;
-  for (int pt = 0; pt < num_pts_; ++pt) { elt_vol_scale_at_node += w_bf_(cell, node, pt); }
+  for (int pt = 0; pt < num_pts_; ++pt) {
+    elt_vol_scale_at_node += w_bf_(cell, node, pt);
+  }
   return elt_vol_scale_at_node;
 }
 
@@ -655,7 +659,9 @@ RealType
 AnalyticMassResidualBase<EvalT, Traits>::computeElementVolume(int const cell) const
 {
   RealType elt_vol = 0.0;
-  for (int pt = 0; pt < num_pts_; ++pt) { elt_vol += Albany::ADValue(weights_(cell, pt)); }
+  for (int pt = 0; pt < num_pts_; ++pt) {
+    elt_vol += Albany::ADValue(weights_(cell, pt));
+  }
   return elt_vol;
 }
 
@@ -666,7 +672,9 @@ AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(typename Traits::E
   // Zero out mass_
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < this->num_nodes_; ++node) {
-      for (int dim = 0; dim < this->num_dims_; ++dim) { (this->mass_)(cell, node, dim) = ScalarT(0.0); }
+      for (int dim = 0; dim < this->num_dims_; ++dim) {
+        (this->mass_)(cell, node, dim) = ScalarT(0.0);
+      }
     }
   }
   if (resid_using_cub_ == true) {

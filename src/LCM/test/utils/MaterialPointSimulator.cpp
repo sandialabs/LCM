@@ -86,9 +86,13 @@ main(int ac, char* av[])
 
   std::ofstream tout(timing_file.c_str());
 
-  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) { return 0; }
+  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) {
+    return 0;
+  }
 
-  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) { return 1; }
+  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) {
+    return 1;
+  }
 
   util::TimeMonitor&          tmonitor     = util::PerformanceContext::instance().timeMonitor();
   Teuchos::RCP<Teuchos::Time> total_time   = tmonitor["MPS: Total Time"];
@@ -264,7 +268,9 @@ main(int ac, char* av[])
   // << std::endl;
   Teuchos::ParameterList cmiPL;
   cmiPL.set<Teuchos::ParameterList*>("Material Parameters", &paramList);
-  if (have_temperature) { cmiPL.set<std::string>("Temperature Name", "Temperature"); }
+  if (have_temperature) {
+    cmiPL.set<std::string>("Temperature Name", "Temperature");
+  }
   Teuchos::RCP<LCM::ConstitutiveModelInterface<Residual, Traits>> CMI =
       Teuchos::rcp(new LCM::ConstitutiveModelInterface<Residual, Traits>(cmiPL, dl));
   fieldManager.registerEvaluator<Residual>(CMI);
@@ -472,7 +478,9 @@ main(int ac, char* av[])
     // std::cout << "current F\n" << current_F << std::endl;
 
     for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 3; ++j) { def_grad[3 * i + j] = current_F(i, j); }
+      for (int j = 0; j < 3; ++j) {
+        def_grad[3 * i + j] = current_F(i, j);
+      }
     }
 
     // jacobian
@@ -483,7 +491,9 @@ main(int ac, char* av[])
     current_strain = 0.5 * (current_F + minitensor::transpose(current_F)) - minitensor::eye<ScalarT>(3);
 
     for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 3; ++j) { strain[3 * i + j] = current_strain(i, j); }
+      for (int j = 0; j < 3; ++j) {
+        strain[3 * i + j] = current_strain(i, j);
+      }
     }
     // std::cout << "current strain\n" << current_strain << std::endl;
 
@@ -518,7 +528,9 @@ main(int ac, char* av[])
       // get current minDet(A)
       stateFieldManager.getFieldData<Residual>(minDetA);
 
-      if (istep == 0) { mu_0 = minDetA(0, 0); }
+      if (istep == 0) {
+        mu_0 = minDetA(0, 0);
+      }
 
       if (minDetA(0, 0) <= 0 && !bifurcation_flag) {
         mu_k                  = minDetA(0, 0);
@@ -547,7 +559,9 @@ main(int ac, char* av[])
           minitensor::Tensor<ScalarT> current_F           = minitensor::exp(scaled_log_F_tensor);
 
           for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) { def_grad[3 * i + j] = current_F(i, j); }
+            for (int j = 0; j < 3; ++j) {
+              def_grad[3 * i + j] = current_F(i, j);
+            }
           }
 
           // jacobian
@@ -556,7 +570,9 @@ main(int ac, char* av[])
           current_strain = 0.5 * (current_F + minitensor::transpose(current_F)) - minitensor::eye<ScalarT>(3);
 
           for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) { strain[3 * i + j] = current_strain(i, j); }
+            for (int j = 0; j < 3; ++j) {
+              strain[3 * i + j] = current_strain(i, j);
+            }
           }
 
           // Call the evaluators, evaluateFields() is the function that

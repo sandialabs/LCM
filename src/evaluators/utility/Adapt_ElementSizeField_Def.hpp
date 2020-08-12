@@ -236,7 +236,9 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename 
 
         for (int node = 0; node < l_nV; ++node) {  // loop over all the "corners" of each element
           const GO global_row = wsElNodeID[cell][node];
-          if (!node_indexer->isLocallyOwnedElement(global_row)) { continue; }
+          if (!node_indexer->isLocallyOwnedElement(global_row)) {
+            continue;
+          }
 
           const LO lid = node_indexer->getLocalElement(global_row);
           // accumulate 1/2 of the element width in each dimension - into each
@@ -254,7 +256,9 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename 
         // entry accumulates the weight
         for (int node = 0; node < l_nV; ++node) {  // loop over all the "corners" of each element
           const GO global_row = wsElNodeID[cell][node];
-          if (!node_indexer->isLocallyOwnedElement(global_row)) { continue; }
+          if (!node_indexer->isLocallyOwnedElement(global_row)) {
+            continue;
+          }
 
           const LO lid = node_indexer->getLocalElement(global_row);
 
@@ -309,7 +313,9 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(typename Tr
 
     for (int k = 0; k < node_var_ndofs; ++k) {
       Teuchos::ArrayRCP<ST> v = Albany::getNonconstLocalData(node_data_vector->col(node_var_offset + k));
-      for (int overlap_node = 0; overlap_node < numNodes; ++overlap_node) { v[overlap_node] /= weights[overlap_node]; }
+      for (int overlap_node = 0; overlap_node < numNodes; ++overlap_node) {
+        v[overlap_node] /= weights[overlap_node];
+      }
     }
 
     // Export the data from the local to overlapped decomposition

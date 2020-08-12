@@ -139,7 +139,9 @@ GursonModel<EvalT, Traits>::computeState(
       F.fill(def_grad, cell, pt, 0, 0);
       // Fpn.fill( &Fpold(cell,pt,int(0),int(0)) );
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j)); }
+        for (int j(0); j < num_dims_; ++j) {
+          Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j));
+        }
       }
 
       // compute trial state
@@ -213,7 +215,9 @@ GursonModel<EvalT, Traits>::computeState(
         // accounts for void coalescence
         fvoid_star = fvoid;
         if ((fvoid > fc_) && (fvoid < ff_)) {
-          if ((ff_ - fc_) != 0.0) { fvoid_star = fc_ + (fvoid - fc_) * (1.0 / q1_ - fc_) / (ff_ - fc_); }
+          if ((ff_ - fc_) != 0.0) {
+            fvoid_star = fc_ + (fvoid - fc_) * (1.0 / q1_ - fc_) / (ff_ - fc_);
+          }
         } else if (fvoid >= ff_) {
           fvoid_star = 1.0 / q1_;
           if (fvoid_star > 1.0) fvoid_star = 1.0;
@@ -237,7 +241,9 @@ GursonModel<EvalT, Traits>::computeState(
         for (int i(0); i < num_dims_; ++i) {
           for (int j(0); j < num_dims_; ++j) {
             Fp(cell, pt, i, j) = 0.0;
-            for (int k(0); k < num_dims_; ++k) { Fp(cell, pt, i, j) += expA(i, k) * Fpn(k, j); }
+            for (int k(0); k < num_dims_; ++k) {
+              Fp(cell, pt, i, j) += expA(i, k) * Fpn(k, j);
+            }
           }
         }
 
@@ -251,7 +257,9 @@ GursonModel<EvalT, Traits>::computeState(
         void_volume(cell, pt) = void_volume_old(cell, pt);
 
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fp_old(cell, pt, i, j); }
+          for (int j(0); j < num_dims_; ++j) {
+            Fp(cell, pt, i, j) = Fp_old(cell, pt, i, j);
+          }
         }
 
       }  // end of elasticity
@@ -260,7 +268,9 @@ GursonModel<EvalT, Traits>::computeState(
       // note that p also has to be divided by J
       // because the one computed from return mapping is the Kirchhoff pressure
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = s(i, j) / J(cell, pt); }
+        for (int j(0); j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = s(i, j) / J(cell, pt);
+        }
         stress(cell, pt, i, i) += p / J(cell, pt);
       }
 
@@ -293,7 +303,9 @@ GursonModel<EvalT, Traits>::YieldFunction(
   // acounts for void coalescence
   ScalarT fvoid_star = fvoid;
   if ((fvoid > fc_) && (fvoid < ff_)) {
-    if ((ff_ - fc_) != 0.0) { fvoid_star = fc_ + (fvoid - fc_) * (1. / q1_ - fc_) / (ff_ - fc_); }
+    if ((ff_ - fc_) != 0.0) {
+      fvoid_star = fc_ + (fvoid - fc_) * (1. / q1_ - fc_) / (ff_ - fc_);
+    }
   } else if (fvoid >= ff_) {
     fvoid_star = 1.0 / q1_;
     if (fvoid_star > 1.0) fvoid_star = 1.0;
@@ -353,7 +365,9 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
   DFadType fvoidFad_star = fvoidFad;
 
   if ((fvoidFad > fc_) && (fvoidFad < ff_)) {
-    if ((ff_ - fc_) != 0.0) { fvoidFad_star = fc_ + (fvoidFad - fc_) * (1. / q1_ - fc_) / (ff_ - fc_); }
+    if ((ff_ - fc_) != 0.0) {
+      fvoidFad_star = fc_ + (fvoidFad - fc_) * (1. / q1_ - fc_) / (ff_ - fc_);
+    }
   } else if (fvoidFad >= ff_) {
     fvoidFad_star = 1.0 / q1_;
     if (fvoidFad_star > 1.0) fvoidFad_star = 1.0;
@@ -374,7 +388,9 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
   // valid for assumption Ntr = N;
   minitensor::Tensor<DFadType> sfad(num_dims_);
   for (int i = 0; i < num_dims_; ++i) {
-    for (int j = 0; j < num_dims_; ++j) { sfad(i, j) = factor * s(i, j); }
+    for (int j = 0; j < num_dims_; ++j) {
+      sfad(i, j) = factor * s(i, j);
+    }
   }
 
   // currently complaining error in promotion tensor type
@@ -404,7 +420,9 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
   eratio = -0.5 * (eqFad - eN_) * (eqFad - eN_) / sN_ / sN_;
 
   double const pi = acos(-1.0);
-  if (pFad >= 0.0) { An = fN_ / sN_ / (std::sqrt(2.0 * pi)) * std::exp(eratio); }
+  if (pFad >= 0.0) {
+    An = fN_ / sN_ / (std::sqrt(2.0 * pi)) * std::exp(eratio);
+  }
 
   dfn = An * deq;
 

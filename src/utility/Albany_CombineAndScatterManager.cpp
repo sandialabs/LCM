@@ -38,7 +38,9 @@ CombineAndScatterManager::create_aura_vss() const
   auto               indexer = createGlobalLocalIndexer(overlapped_vs);
   Teuchos::Array<GO> aura_gids;
   for (int lid = 0; lid < data.size(); ++lid) {
-    if (data[lid] != 1.0) { aura_gids.push_back(indexer->getGlobalElement(lid)); }
+    if (data[lid] != 1.0) {
+      aura_gids.push_back(indexer->getGlobalElement(lid));
+    }
   }
 
   // Recall the three aura types:

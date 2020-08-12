@@ -120,7 +120,9 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
   stk::io::MeshField::TimeMatchOption tmo = stk::io::MeshField::CLOSEST;
 
-  if (interpolation_intervals > 1) { tmo = stk::io::MeshField::LINEAR_INTERPOLATION; }
+  if (interpolation_intervals > 1) {
+    tmo = stk::io::MeshField::LINEAR_INTERPOLATION;
+  }
 
   src_broker.add_all_mesh_fields_as_input_fields(tmo);
   src_broker.populate_bulk_data();
@@ -200,8 +202,12 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
   // Get number of time steps in source mesh
   int tgt_timestep_count = tgt_io_region->get_property("state_count").get_int();
 
-  if (src_timestep_count < 1) { ALBANY_ABORT(std::endl << "Source file has 0 snapshots!" << std::endl); }
-  if (tgt_timestep_count < 1) { ALBANY_ABORT(std::endl << "Target file has 0 snapshots!" << std::endl); }
+  if (src_timestep_count < 1) {
+    ALBANY_ABORT(std::endl << "Source file has 0 snapshots!" << std::endl);
+  }
+  if (tgt_timestep_count < 1) {
+    ALBANY_ABORT(std::endl << "Target file has 0 snapshots!" << std::endl);
+  }
   if (((src_snap_no == -1) && (tgt_snap_no != -1)) || ((tgt_snap_no == -1) && (src_snap_no != -1))) {
     ALBANY_ABORT(
         std::endl
@@ -297,7 +303,9 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
     }
 
     time = tgt_io_region->get_state_time(tgt_time_step_indices[index]);
-    if (tgt_time_step_indices[index] == tgt_timestep_count) { interpolation_intervals = 1; }
+    if (tgt_time_step_indices[index] == tgt_timestep_count) {
+      interpolation_intervals = 1;
+    }
 
     step_end = tgt_time_step_indices[index] < tgt_timestep_count ? tgt_time_step_indices[index] + 1 :
                                                                    tgt_time_step_indices[index];
@@ -436,7 +444,9 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
       if (scale_by_norm_soln_vec == false) {
         for (int n = 0; n < num_tgt_part_nodes; ++n) {
           rel_err_field_data = stk::mesh::field_data(target_rel_error_field, tgt_part_nodes[n]);
-          if (field_l2_norm_global > 1.0e-14) { rel_err_field_data[component] /= field_l2_norm_global; }
+          if (field_l2_norm_global > 1.0e-14) {
+            rel_err_field_data[component] /= field_l2_norm_global;
+          }
         }
       }
 
@@ -471,7 +481,9 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
       for (int component = 0; component < neq; component++) {
         for (int n = 0; n < num_tgt_part_nodes; ++n) {
           rel_err_field_data = stk::mesh::field_data(target_rel_error_field, tgt_part_nodes[n]);
-          if (field_l2_norm_global_vec > 1.0e-14) { rel_err_field_data[component] /= field_l2_norm_global_vec; }
+          if (field_l2_norm_global_vec > 1.0e-14) {
+            rel_err_field_data[component] /= field_l2_norm_global_vec;
+          }
         }
       }
     }

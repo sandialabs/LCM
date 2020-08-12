@@ -23,12 +23,16 @@ DisplayTable::write(std::ostream& strm)
   for (auto& row : rows_) {
     if (widths.size() < row.size()) widths.resize(row.size());
 
-    for (size_t i = 0; i < row.size(); ++i) { widths[i] = std::max(widths[i], row[i].length() + 1); }
+    for (size_t i = 0; i < row.size(); ++i) {
+      widths[i] = std::max(widths[i], row[i].length() + 1);
+    }
   }
 
   // Display
   for (auto& row : rows_) {
-    for (size_t i = 0; i < row.size(); ++i) { strm << std::setw(widths[i]) << std::left << row[i]; }
+    for (size_t i = 0; i < row.size(); ++i) {
+      strm << std::setw(widths[i]) << std::left << row[i];
+    }
 
     strm << "\n";
   }
@@ -44,7 +48,9 @@ DisplayTable::writeCSV(std::ostream& strm, char const delim)
 
     strm << "\"" << row[0] << "\"";
 
-    for (size_t i = 1; i < row.size(); ++i) { strm << delim << "\"" << row[i] << "\""; }
+    for (size_t i = 1; i < row.size(); ++i) {
+      strm << delim << "\"" << row[i] << "\"";
+    }
 
     strm << '\n';
   }

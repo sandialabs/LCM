@@ -53,7 +53,9 @@ CreepModel<EvalT, Traits>::CreepModel(Teuchos::ParameterList* p, const Teuchos::
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(Fp_string, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
-  if (have_temperature_) { this->eval_field_map_.insert(std::make_pair(source_string, dl->qp_scalar)); }
+  if (have_temperature_) {
+    this->eval_field_map_.insert(std::make_pair(source_string, dl->qp_scalar));
+  }
 
   // define the state variables
   // stress
@@ -131,7 +133,9 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
   auto                  Fp     = *eval_fields[Fp_string];
   auto                  eqps   = *eval_fields[eqps_string];
   PHX::MDField<ScalarT> source;
-  if (have_temperature_) { source = *eval_fields[source_string]; }
+  if (have_temperature_) {
+    source = *eval_fields[source_string];
+  }
 
   // get State Variables
   Albany::MDArray Fpold   = (*workset.stateArrayPtr)[Fp_string + "_old"];
@@ -175,7 +179,9 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
       F.fill(def_grad, cell, pt, 0, 0);
 
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fpold(cell, pt, i, j)); }
+        for (int j(0); j < num_dims_; ++j) {
+          Fpn(i, j) = ScalarT(Fpold(cell, pt, i, j));
+        }
       }
 
       // compute trial state
@@ -272,7 +278,9 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
             res              = std::abs(F[0]);
             debug_res[count] = res;
             res_norm         = res / original_res;
-            if (res_norm < return_map_tolerance) { converged = true; }
+            if (res_norm < return_map_tolerance) {
+              converged = true;
+            }
 
             if (count == max_count) {
               std::cerr << "detected NaN, here are the X, F, dfdX values at "
@@ -321,12 +329,16 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
           expA           = minitensor::exp(A);
           Fpnew          = expA * Fpn;
           for (int i(0); i < num_dims_; ++i) {
-            for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fpnew(i, j); }
+            for (int j(0); j < num_dims_; ++j) {
+              Fp(cell, pt, i, j) = Fpnew(i, j);
+            }
           }
         } else {
           eqps(cell, pt) = eqpsold(cell, pt);
           for (int i(0); i < num_dims_; ++i) {
-            for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fpn(i, j); }
+            for (int j(0); j < num_dims_; ++j) {
+              Fp(cell, pt, i, j) = Fpn(i, j);
+            }
           }
         }
       } else {
@@ -404,7 +416,9 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
         expA  = minitensor::exp(A);
         Fpnew = expA * Fpn;
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fpnew(i, j); }
+          for (int j(0); j < num_dims_; ++j) {
+            Fp(cell, pt, i, j) = Fpnew(i, j);
+          }
         }
       }
 
@@ -413,7 +427,9 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
       // compute stress
       sigma = p * I + s / J(cell, pt);
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+        for (int j(0); j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = sigma(i, j);
+        }
       }
     }
   }
@@ -428,7 +444,9 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
         sigma -=
             three_kappa * expansion_coeff_ * (1.0 + 1.0 / (J * J)) * (temperature_(cell, pt) - ref_temperature_) * I;
         for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+          for (int j = 0; j < num_dims_; ++j) {
+            stress(cell, pt, i, j) = sigma(i, j);
+          }
         }
       }
     }

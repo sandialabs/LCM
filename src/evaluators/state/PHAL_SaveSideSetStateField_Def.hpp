@@ -212,10 +212,14 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(typen
       case 3:
         if (tag2 == "Node") {
           // side set node scalar
-          for (int node = 0; node < dims[2]; ++node) { state(ss_cell, nodeMap[node]) = field(cell, side, node); }
+          for (int node = 0; node < dims[2]; ++node) {
+            state(ss_cell, nodeMap[node]) = field(cell, side, node);
+          }
         } else {
           // side set cell vector/gradient
-          for (int idim = 0; idim < dims[2]; ++idim) { state(ss_cell, idim) = field(cell, side, idim); }
+          for (int idim = 0; idim < dims[2]; ++idim) {
+            state(ss_cell, idim) = field(cell, side, idim);
+          }
         }
         break;
 

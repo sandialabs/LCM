@@ -199,7 +199,9 @@ STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldT
       // In source, j varies over neq (num phys vectors * numDim)
       // We want target to only vary over the first numDim components
       // Not sure how to do this generally...
-      for (int j = 0; j < num_target_components; ++j) { access(target_array, j, i) = access(source_array, j, i); }
+      for (int j = 0; j < num_target_components; ++j) {
+        access(target_array, j, i) = access(source_array, j, i);
+      }
     }
   }
 }

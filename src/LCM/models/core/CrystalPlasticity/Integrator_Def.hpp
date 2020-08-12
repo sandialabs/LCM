@@ -16,7 +16,9 @@ void
 CP::Integrator<EvalT, NumDimT, NumSlipT>::setWarningStatus(std::string const& message) const
 {
   // only output warning messages if desired
-  if (verbosity_ >= CP::Verbosity::LOW) { std::cout << "Warning: " << message << std::endl; }
+  if (verbosity_ >= CP::Verbosity::LOW) {
+    std::cout << "Warning: " << message << std::endl;
+  }
 }
 
 template <typename EvalT, minitensor::Index NumDimT, minitensor::Index NumSlipT>
@@ -54,7 +56,9 @@ CP::IntegratorFactory<EvalT, NumDimT, NumSlipT>::operator()(
     CP::IntegrationScheme integration_scheme,
     CP::ResidualType      residual_type) const
 {
-  if (verbosity_ >= CP::Verbosity::MEDIUM) { std::cout << ">>> in IntegratorFactory::operator\n"; }
+  if (verbosity_ >= CP::Verbosity::MEDIUM) {
+    std::cout << ">>> in IntegratorFactory::operator\n";
+  }
 
   switch (integration_scheme) {
     case CP::IntegrationScheme::EXPLICIT: {
@@ -257,7 +261,9 @@ CP::ExplicitIntegrator<EvalT, NumDimT, NumSlipT>::update() const
 
   this->norm_residual_ = Sacado::ScalarValue<ScalarT>::eval(norm(residual));
 
-  if (dt_ > 0.0) { state_internal_.rates_slip_ = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_; }
+  if (dt_ > 0.0) {
+    state_internal_.rates_slip_ = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_;
+  }
 
   return;
 }
@@ -287,14 +293,18 @@ template <typename EvalT, minitensor::Index NumDimT, minitensor::Index NumSlipT>
 void
 CP::ImplicitIntegrator<EvalT, NumDimT, NumSlipT>::reevaluateState() const
 {
-  if (verbosity_ >= CP::Verbosity::MEDIUM) { std::cout << ">>> in ImplicitIntegrator::reevaluateState" << std::endl; }
+  if (verbosity_ >= CP::Verbosity::MEDIUM) {
+    std::cout << ">>> in ImplicitIntegrator::reevaluateState" << std::endl;
+  }
 
   std::ofstream     outfile;
   std::stringstream ss;
   ss << "slips_" << state_internal_.cell_ << "_" << state_internal_.pt_ << ".out";
   std::string file = ss.str();
 
-  if (state_internal_.cell_ != -1) { outfile.open(file, std::fstream::app); }
+  if (state_internal_.cell_ != -1) {
+    outfile.open(file, std::fstream::app);
+  }
 
   bool minimizer_failed(minimizer_.failed);
 
@@ -382,7 +392,9 @@ CP::ImplicitIntegrator<EvalT, NumDimT, NumSlipT>::reevaluateState() const
     outfile.close();
   }
 
-  if (dt_ > 0.0) { state_internal_.rates_slip_ = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_; }
+  if (dt_ > 0.0) {
+    state_internal_.rates_slip_ = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_;
+  }
 
   // Compute the residual norm
   if (!using_rol_minimizer_) {
@@ -428,7 +440,9 @@ template <typename EvalT, minitensor::Index NumDimT, minitensor::Index NumSlipT>
 void
 CP::ImplicitSlipIntegrator<EvalT, NumDimT, NumSlipT>::update() const
 {
-  if (verbosity_ >= CP::Verbosity::MEDIUM) { std::cout << ">>> in ImplicitSlipIntegrator::update" << std::endl; }
+  if (verbosity_ >= CP::Verbosity::MEDIUM) {
+    std::cout << ">>> in ImplicitSlipIntegrator::update" << std::endl;
+  }
 
   // Unknown for solver
   minitensor::Vector<ScalarT, CP::NlsDim<NumSlipT>::value> x(this->num_slip_);
@@ -462,7 +476,9 @@ CP::ImplicitSlipIntegrator<EvalT, NumDimT, NumSlipT>::update() const
       minitensor::stepFactory<NonlinearSolver, ValueT, CP::NlsDim<NumSlipT>::value>(step_type_);
 
   // Initial guess for x should be slip_np1
-  for (int i = 0; i < this->num_slip_; ++i) { x(i) = Sacado::ScalarValue<ScalarT>::eval(state_internal_.slip_np1_(i)); }
+  for (int i = 0; i < this->num_slip_; ++i) {
+    x(i) = Sacado::ScalarValue<ScalarT>::eval(state_internal_.slip_np1_(i));
+  }
 
   if (verbosity_ >= CP::Verbosity::MEDIUM) {
     std::cout << "x_{n+1}^(0)" << std::endl;
@@ -495,7 +511,9 @@ CP::ImplicitSlipIntegrator<EvalT, NumDimT, NumSlipT>::update() const
   minitensor::Vector<ScalarT, NumSlipT> slip_rate(state_internal_.rates_slip_.get_dimension());
 
   slip_rate.fill(minitensor::Filler::ZEROS);
-  if (dt_ > 0.0) { slip_rate = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_; }
+  if (dt_ > 0.0) {
+    slip_rate = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_;
+  }
 
   // Update hardness
   bool hardness_failed = false;
@@ -581,7 +599,9 @@ CP::ImplicitSlipHardnessIntegrator<EvalT, NumDimT, NumSlipT>::update() const
   ss << "slips_" << state_internal_.cell_ << "_" << state_internal_.pt_ << ".out";
   std::string file = ss.str();
 
-  if (state_internal_.cell_ != -1) { outfile.open(file, std::fstream::app); }
+  if (state_internal_.cell_ != -1) {
+    outfile.open(file, std::fstream::app);
+  }
 
   for (int i = 0; i < this->num_slip_; ++i) {
     // initial guess for x(0:this->num_slip_-1) from predictor
@@ -641,7 +661,9 @@ CP::ImplicitSlipHardnessIntegrator<EvalT, NumDimT, NumSlipT>::update() const
   minitensor::Vector<ScalarT, NumSlipT> slip_rate(this->num_slip_);
 
   slip_rate.fill(minitensor::Filler::ZEROS);
-  if (dt_ > 0.0) { slip_rate = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_; }
+  if (dt_ > 0.0) {
+    slip_rate = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_;
+  }
 
   // Update hardness
   bool hardness_failed = false;
@@ -727,7 +749,9 @@ CP::ImplicitConstrainedSlipHardnessIntegrator<EvalT, NumDimT, NumSlipT>::update(
   ss << "slips_" << state_internal_.cell_ << "_" << state_internal_.pt_ << ".out";
   std::string file = ss.str();
 
-  if (state_internal_.cell_ != -1) { outfile.open(file, std::fstream::app); }
+  if (state_internal_.cell_ != -1) {
+    outfile.open(file, std::fstream::app);
+  }
 
   for (int i = 0; i < this->num_slip_; ++i) {
     // initial guess for x(0:this->num_slip_-1) from predictor
@@ -808,7 +832,9 @@ CP::ImplicitConstrainedSlipHardnessIntegrator<EvalT, NumDimT, NumSlipT>::update(
   minitensor::Vector<ScalarT, NumSlipT> slip_rate(this->num_slip_);
 
   slip_rate.fill(minitensor::Filler::ZEROS);
-  if (dt_ > 0.0) { slip_rate = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_; }
+  if (dt_ > 0.0) {
+    slip_rate = (state_internal_.slip_np1_ - state_internal_.slip_n_) / dt_;
+  }
 
   // Update hardness
   bool hardness_failed = false;

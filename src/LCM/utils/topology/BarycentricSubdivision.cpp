@@ -216,7 +216,9 @@ Topology::findAdjacentSegments(const stk::mesh::Entity segment, stk::mesh::Entit
     // Which segment is connected to the input node?
     for (Iterator_adj_seg = adjacent_segments.begin(); Iterator_adj_seg != adjacent_segments.end();
          ++Iterator_adj_seg) {
-      if (segmentIsConnected(*Iterator_adj_seg, node)) { adjacent_segments_final.push_back(*Iterator_adj_seg); }
+      if (segmentIsConnected(*Iterator_adj_seg, node)) {
+        adjacent_segments_final.push_back(*Iterator_adj_seg);
+      }
     }
   }
   return adjacent_segments_final;
@@ -282,9 +284,13 @@ Topology::facesShareTwoPoints(const stk::mesh::Entity face1, const stk::mesh::En
        ++iterator_entity_faces) {
     // If the entity pointed to by iterator_entity_faces is in the
     // vector face1_nodes, save the entity in common_nodes
-    if (findEntityInVector(face1_nodes, *iterator_entity_faces)) { common_nodes.push_back(*iterator_entity_faces); }
+    if (findEntityInVector(face1_nodes, *iterator_entity_faces)) {
+      common_nodes.push_back(*iterator_entity_faces);
+    }
   }
-  if (common_nodes.size() == 2) { num = true; }
+  if (common_nodes.size() == 2) {
+    num = true;
+  }
   return num;
 }
 
@@ -754,7 +760,9 @@ Topology::barycentricSubdivision()
   std::vector<stk::mesh::Entity> elements_centroids;
   int                            _start = initial_entities_2D.size();
   int                            _end   = initial_entities_2D.size() + initial_entities_3d.size();
-  for (int ii = _start; ii < _end; ++ii) { elements_centroids.push_back(modified2_entities_0D[ii]); }
+  for (int ii = _start; ii < _end; ++ii) {
+    elements_centroids.push_back(modified2_entities_0D[ii]);
+  }
 
   // Add the coordinates of all the elements centroids
   std::vector<stk::mesh::Entity> boundary_nodes_elements;
@@ -818,7 +826,9 @@ Topology::barycentricSubdivision()
   int const                      Start_ = Num_segments_face * initial_entities_2D.size() + initial_entities_1D.size();
   int const                      End_   = modified3_entities_1D.size() - initial_entities_1D.size();
   std::vector<stk::mesh::Entity> segments_connected_centroid;
-  for (int ii = Start_; ii < End_; ++ii) { segments_connected_centroid.push_back(modified3_entities_1D[ii]); }
+  for (int ii = Start_; ii < End_; ++ii) {
+    segments_connected_centroid.push_back(modified3_entities_1D[ii]);
+  }
 
   // Connect the new segments to the corresponding nodes
   for (unsigned int ii = 0; ii < segments_connected_centroid.size(); ++ii) {
@@ -903,7 +913,9 @@ Topology::barycentricSubdivision()
   int const number_new_elements = _faces_element.size() * initial_entities_3d.size();
 
   // Add the new elements
-  for (int ii = 0; ii < number_new_elements; ++ii) { add_element(stk::topology::ELEMENT_RANK); }
+  for (int ii = 0; ii < number_new_elements; ++ii) {
+    add_element(stk::topology::ELEMENT_RANK);
+  }
   std::vector<stk::mesh::Entity> modified1_entities_3d =
       get_rank_entities(get_bulk_data(), stk::topology::ELEMENT_RANK);
 
@@ -966,7 +978,9 @@ Topology::barycentricSubdivision()
       volume =
           v12x * (v13y * v14z - v14y * v13z) - v12y * (v13x * v14z - v14x * v13z) + v12z * (v13x * v14y - v14x * v13y);
     }
-    if (volume < 0) { std::reverse(++entities.begin(), --entities.end()); }
+    if (volume < 0) {
+      std::reverse(++entities.begin(), --entities.end());
+    }
     connectivity_temp[ii] = entities;
   }
   connectivity_.clear();

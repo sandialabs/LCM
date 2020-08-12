@@ -80,7 +80,9 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::solve(
   std::vector<RealType> dFdX(numLocalVars * numLocalVars);
   for (int i(0); i < numLocalVars; ++i) {
     F[i] = B[i].val();
-    for (int j(0); j < numLocalVars; ++j) { dFdX[i + numLocalVars * j] = A[i + numLocalVars * j].val(); }
+    for (int j(0); j < numLocalVars; ++j) {
+      dFdX[i + numLocalVars * j] = A[i + numLocalVars * j].val();
+    }
   }
 
   // call LAPACK
@@ -112,13 +114,17 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::computeFadInfo(
   // extract sensitivities of objective function(s) wrt p
   std::vector<RealType> dBdP(numLocalVars * numGlobalVars);
   for (int i(0); i < numLocalVars; ++i) {
-    for (int j(0); j < numGlobalVars; ++j) { dBdP[i + numLocalVars * j] = B[i].dx(j); }
+    for (int j(0); j < numGlobalVars; ++j) {
+      dBdP[i + numLocalVars * j] = B[i].dx(j);
+    }
   }
 
   // extract the jacobian
   std::vector<RealType> dBdX(A.size());
   for (int i(0); i < numLocalVars; ++i) {
-    for (int j(0); j < numLocalVars; ++j) { dBdX[i + numLocalVars * j] = A[i + numLocalVars * j].val(); }
+    for (int j(0); j < numLocalVars; ++j) {
+      dBdX[i + numLocalVars * j] = A[i + numLocalVars * j].val();
+    }
   }
   // call LAPACK to simultaneously solve for all dXdP
   this->lapack.GESV(numLocalVars, numGlobalVars, &dBdX[0], numLocalVars, &IPIV[0], &dBdP[0], numLocalVars, &info);
@@ -126,7 +132,9 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::computeFadInfo(
   // unpack into globalX (recall that LAPACK stores dXdP in dBdP)
   for (int i(0); i < numLocalVars; ++i) {
     X[i].resize(numGlobalVars);
-    for (int j(0); j < numGlobalVars; ++j) { X[i].fastAccessDx(j) = -dBdP[i + numLocalVars * j]; }
+    for (int j(0); j < numGlobalVars; ++j) {
+      X[i].fastAccessDx(j) = -dBdP[i + numLocalVars * j];
+    }
   }
 }
 

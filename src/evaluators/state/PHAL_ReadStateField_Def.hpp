@@ -99,7 +99,9 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(typename Tra
   using GIDT                 = decltype(elem_gid_wslid.begin()->first);
   std::map<LIDT, GIDT> elem_lid_2_gid;
   for (auto&& gid_wslid : elem_gid_wslid) {
-    if (gid_wslid.second.ws == workset.wsIndex) { elem_lid_2_gid.emplace(gid_wslid.second.LID, gid_wslid.first); }
+    if (gid_wslid.second.ws == workset.wsIndex) {
+      elem_lid_2_gid.emplace(gid_wslid.second.LID, gid_wslid.first);
+    }
   }
 
   std::vector<PHX::DataLayout::size_type> dims;

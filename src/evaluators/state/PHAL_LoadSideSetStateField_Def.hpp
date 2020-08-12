@@ -139,10 +139,14 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(typename Tr
       case 3:
         if (tag2 == "Node") {
           // side set node scalar
-          for (int node = 0; node < dims[2]; ++node) { field(cell, side, node) = state(ss_cell, nodeMap[node]); }
+          for (int node = 0; node < dims[2]; ++node) {
+            field(cell, side, node) = state(ss_cell, nodeMap[node]);
+          }
         } else {
           // side set cell vector/gradient
-          for (int idim = 0; idim < dims[2]; ++idim) { field(cell, side, idim) = state(ss_cell, idim); }
+          for (int idim = 0; idim < dims[2]; ++idim) {
+            field(cell, side, idim) = state(ss_cell, idim);
+          }
         }
         break;
 

@@ -12,7 +12,9 @@ createGlobalLocalIndexer(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
-  if (!tmap.is_null()) { indexer = Teuchos::rcp(new GlobalLocalIndexerTpetra(vs, tmap)); }
+  if (!tmap.is_null()) {
+    indexer = Teuchos::rcp(new GlobalLocalIndexerTpetra(vs, tmap));
+  }
 
   ALBANY_PANIC(
       indexer.is_null(),

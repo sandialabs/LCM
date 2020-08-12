@@ -51,7 +51,9 @@ STKNodeField<DataType, ArrayDim, traits>::STKNodeField(
   // amb-leak Look into this later.
   node_field = traits_type::createField(name, dims, metaData_.get());
 
-  if (output) { stk::io::set_field_role(*node_field, Ioss::Field::TRANSIENT); }
+  if (output) {
+    stk::io::set_field_role(*node_field, Ioss::Field::TRANSIENT);
+  }
 }
 
 template <typename DataType, unsigned ArrayDim, class traits>

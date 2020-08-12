@@ -254,10 +254,12 @@ ElasticCrystalModel<EvalT, Traits>::computeState(
         for (int j = 0; j < num_dims_; ++j) {
           S(i, j) = 0.0;
           for (int k = 0; k < num_dims_; ++k) {
-            for (int l = 0; l < num_dims_; ++l) { S(i, j) = S(i, j) + C_(i, j, k, l) * E(k, l); }  // end l
-          }                                                                                        // end k
-        }                                                                                          // end j
-      }                                                                                            // end i
+            for (int l = 0; l < num_dims_; ++l) {
+              S(i, j) = S(i, j) + C_(i, j, k, l) * E(k, l);
+            }  // end l
+          }    // end k
+        }      // end j
+      }        // end i
 
       // temporal variable
       tmp1        = S * C;
@@ -280,7 +282,9 @@ ElasticCrystalModel<EvalT, Traits>::computeState(
 
       // fill Cauchy stress
       for (int i = 0; i < num_dims_; i++) {
-        for (int j = 0; j < num_dims_; j++) { stress(cell, pt, i, j) = sigma(i, j); }
+        for (int j = 0; j < num_dims_; j++) {
+          stress(cell, pt, i, j) = sigma(i, j);
+        }
       }
 
     }  // end pt

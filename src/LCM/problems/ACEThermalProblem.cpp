@@ -74,7 +74,9 @@ Albany::ACEThermalProblem::buildProblem(
   eb_names_.resize(phys_sets);
   bool init_step = true;
   for (int ps = 0; ps < phys_sets; ps++) {
-    if (ps < phys_sets - 1) { eb_names_.resize(ps + 1); }
+    if (ps < phys_sets - 1) {
+      eb_names_.resize(ps + 1);
+    }
     std::string element_block_name = mesh_specs[ps]->ebName;
     eb_names_[ps]                  = element_block_name;
     fm[ps]                         = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);

@@ -109,9 +109,13 @@ MechanicsProblem::getValidProblemParameters() const
 
   validPL->set<std::string>("MaterialDB Filename", "materials.xml", "Filename of material database xml file");
 
-  for (std::string const& variable : variables_problem_) { validPL->sublist(variable, false, ""); }
+  for (std::string const& variable : variables_problem_) {
+    validPL->sublist(variable, false, "");
+  }
 
-  for (std::string const& variable : variables_auxiliary_) { validPL->sublist(variable, false, ""); }
+  for (std::string const& variable : variables_auxiliary_) {
+    validPL->sublist(variable, false, "");
+  }
 
   return validPL;
 }
@@ -179,7 +183,9 @@ MechanicsProblem::constructEvaluators(
   bool small_strain =
       material_model_name == "Linear Elastic" || material_model_name == "Linear Elastic Volumetric Deviatoric";
 
-  if (material_db_->isElementBlockParam(eb_name, "Strain Flag")) { small_strain = true; }
+  if (material_db_->isElementBlockParam(eb_name, "Strain Flag")) {
+    small_strain = true;
+  }
 
   // Surface element checking
   bool const surface_element = material_db_->getElementBlockParam<bool>(eb_name, "Surface Element", false);
@@ -509,7 +515,9 @@ MechanicsProblem::constructEvaluators(
 
     std::string const temp_type = paramList.get<std::string>("Variable Type", "None");
 
-    if (temp_type == "Time Dependent") { paramList.set<std::string>("Type", temp_type); }
+    if (temp_type == "Time Dependent") {
+      paramList.set<std::string>("Type", temp_type);
+    }
 
     p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
 
@@ -1000,7 +1008,9 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Reference Coordinates Name", "Coord Vec");
       p->set<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature", surfaceCubature);
       p->set<Intrepid2Basis>("Intrepid2 Basis", surfaceBasis);
-      if (have_mech_eq_) { p->set<std::string>("Current Coordinates Name", "Current Coordinates"); }
+      if (have_mech_eq_) {
+        p->set<std::string>("Current Coordinates Name", "Current Coordinates");
+      }
 
       // outputs
       p->set<std::string>("Reference Basis Name", "Reference Basis");
@@ -1250,7 +1260,9 @@ MechanicsProblem::constructEvaluators(
       p->set<RealType>("Average J Stabilization Parameter", volume_average_stabilization_param);
 
       // strain
-      if (small_strain) { p->set<std::string>("Strain Name", "Strain"); }
+      if (small_strain) {
+        p->set<std::string>("Strain Name", "Strain");
+      }
 
       // set flag for return strain and velocity gradient
       bool have_velocity_gradient(false);
@@ -1262,7 +1274,9 @@ MechanicsProblem::constructEvaluators(
 
         have_velocity_gradient = material_db_->getElementBlockParam<bool>(eb_name, flag);
 
-        if (have_velocity_gradient) { p->set<std::string>("Velocity Gradient Name", "Velocity Gradient"); }
+        if (have_velocity_gradient) {
+          p->set<std::string>("Velocity Gradient Name", "Velocity Gradient");
+        }
       }
 
       // set flag for return strain and plastic velocity gradient
@@ -1484,7 +1498,9 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Pressure Name", pressure);
     }
 
-    if (small_strain) { p->set<bool>("Small Strain", true); }
+    if (small_strain) {
+      p->set<bool>("Small Strain", true);
+    }
 
     // Output
     p->set<std::string>("First PK Stress Name", firstPK);

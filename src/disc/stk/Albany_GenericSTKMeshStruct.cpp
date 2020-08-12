@@ -88,7 +88,9 @@ printCTD(const CellTopologyData& t)
 
       std::cout << sub.topology->name;
       std::cout << " ,";
-      for (unsigned j = 0; j < sub.topology->node_count; ++j) { std::cout << " " << sub.node[j]; }
+      for (unsigned j = 0; j < sub.topology->node_count; ++j) {
+        std::cout << " " << sub.node[j];
+      }
       std::cout << " }" << std::endl;
     }
   }
@@ -211,10 +213,14 @@ GenericSTKMeshStruct::SetupFieldData(
 
   // Exodus is only for 2D and 3D. Have 1D version as well
   exoOutput = params->isType<std::string>("Exodus Output File Name");
-  if (exoOutput == true) { exoOutFile = params->get<std::string>("Exodus Output File Name"); }
+  if (exoOutput == true) {
+    exoOutFile = params->get<std::string>("Exodus Output File Name");
+  }
   exoOutputInterval = params->get<int>("Exodus Write Interval", 1);
   cdfOutput         = params->isType<std::string>("NetCDF Output File Name");
-  if (cdfOutput == true) { cdfOutFile = params->get<std::string>("NetCDF Output File Name"); }
+  if (cdfOutput == true) {
+    cdfOutFile = params->get<std::string>("NetCDF Output File Name");
+  }
 
   nLat              = params->get("NetCDF Output Number of Latitudes", 100);
   nLon              = params->get("NetCDF Output Number of Longitudes", 100);
@@ -508,8 +514,12 @@ GenericSTKMeshStruct::setDefaultCoordinates3d()
     values3d = stk::mesh::field_data(*this->getCoordinatesField3d(), node);
     values   = stk::mesh::field_data(*this->getCoordinatesField(), node);
 
-    for (int iDim = 0; iDim < numDim; ++iDim) { values3d[iDim] = values[iDim]; }
-    for (int iDim = numDim; iDim < 3; ++iDim) { values3d[iDim] = 0.0; }
+    for (int iDim = 0; iDim < numDim; ++iDim) {
+      values3d[iDim] = values[iDim];
+    }
+    for (int iDim = numDim; iDim < 3; ++iDim) {
+      values3d[iDim] = 0.0;
+    }
   }
 }
 
@@ -541,7 +551,9 @@ GenericSTKMeshStruct::uniformRefineMesh(const Teuchos::RCP<Teuchos_Comm const>& 
     if (refinerPattern->getFromTopology()->name != refinerPattern->getToTopology()->name) {
       int numEB = partVec.size();
 
-      for (int eb = 0; eb < numEB; eb++) { meshSpecs[eb]->ctd = *refinerPattern->getToTopology(); }
+      for (int eb = 0; eb < numEB; eb++) {
+        meshSpecs[eb]->ctd = *refinerPattern->getToTopology();
+      }
     }
   }
 #else
@@ -556,7 +568,9 @@ GenericSTKMeshStruct::rebalanceInitialMeshT(Teuchos::RCP<Teuchos::Comm<int> cons
   bool rebalance     = params->get<bool>("Rebalance Mesh", false);
   bool useSerialMesh = params->get<bool>("Use Serial Mesh", false);
 
-  if (rebalance || (useSerialMesh && comm->getSize() > 1)) { rebalanceAdaptedMeshT(params, comm); }
+  if (rebalance || (useSerialMesh && comm->getSize() > 1)) {
+    rebalanceAdaptedMeshT(params, comm);
+  }
 }
 
 void
@@ -1036,8 +1050,12 @@ GenericSTKMeshStruct::loadRequiredInputFields(
   stk::mesh::get_selected_entities(select_owned_in_part, bulkData->buckets(stk::topology::ELEM_RANK), elems);
 
   Teuchos::Array<GO> nodeIndices(nodes.size()), elemIndices(elems.size());
-  for (unsigned int i = 0; i < nodes.size(); ++i) { nodeIndices[i] = bulkData->identifier(nodes[i]) - 1; }
-  for (unsigned int i = 0; i < elems.size(); ++i) { elemIndices[i] = bulkData->identifier(elems[i]) - 1; }
+  for (unsigned int i = 0; i < nodes.size(); ++i) {
+    nodeIndices[i] = bulkData->identifier(nodes[i]) - 1;
+  }
+  for (unsigned int i = 0; i < elems.size(); ++i) {
+    elemIndices[i] = bulkData->identifier(elems[i]) - 1;
+  }
 
   auto nodes_vs = createVectorSpace(comm, nodeIndices);
   auto elems_vs = createVectorSpace(comm, elemIndices);
@@ -1108,7 +1126,9 @@ GenericSTKMeshStruct::loadRequiredInputFields(
   auto cas_manager_elem = createCombineAndScatterManager(serial_elems_vs, elems_vs);
 
   std::set<std::string> missing;
-  for (auto rname : req) { missing.insert(rname); }
+  for (auto rname : req) {
+    missing.insert(rname);
+  }
 
   for (int ifield = 0; ifield < num_fields; ++ifield) {
     std::stringstream ss;
@@ -1292,13 +1312,17 @@ GenericSTKMeshStruct::loadRequiredInputFields(
 
       gid = bulkData->identifier((*entities)[i]) - 1;
       lid = indexer->getLocalElement(GO(gid));
-      for (int iDim(0); iDim < field_mv_view.size(); ++iDim) { values[iDim] = field_mv_view[iDim][lid]; }
+      for (int iDim(0); iDim < field_mv_view.size(); ++iDim) {
+        values[iDim] = field_mv_view[iDim][lid];
+      }
     }
   }
 
   if (missing.size() > 0) {
     std::string missing_list;
-    for (auto i : missing) { missing_list += " '" + i + "',"; }
+    for (auto i : missing) {
+      missing_list += " '" + i + "',";
+    }
     missing_list.erase(missing_list.size() - 1);
 
     ALBANY_ABORT(
@@ -1383,10 +1407,14 @@ GenericSTKMeshStruct::loadField(
     }
 
     *out << "   - Scaling " << field_type << " field '" << field_name << "' with scaling factors [" << scale_factors[0];
-    for (int i = 1; i < scale_factors.size(); ++i) { *out << " " << scale_factors[i]; }
+    for (int i = 1; i < scale_factors.size(); ++i) {
+      *out << " " << scale_factors[i];
+    }
     *out << "]\n";
 
-    for (int i = 0; i < scale_factors.size(); ++i) { serial_req_mvec->col(i)->scale(scale_factors[i]); }
+    for (int i = 0; i < scale_factors.size(); ++i) {
+      serial_req_mvec->col(i)->scale(scale_factors[i]);
+    }
   }
 
   // Fill the (possibly) parallel vector
@@ -1428,7 +1456,9 @@ GenericSTKMeshStruct::fillField(
         int    n_int          = size - 1;
         double dx             = 1. / n_int;
         norm_layers_coords[0] = 0.;
-        for (int i = 0; i < n_int; ++i) { norm_layers_coords[i + 1] = norm_layers_coords[i] + dx; }
+        for (int i = 0; i < n_int; ++i) {
+          norm_layers_coords[i + 1] = norm_layers_coords[i] + dx;
+        }
       }
     }
 
@@ -1496,14 +1526,18 @@ GenericSTKMeshStruct::fillField(
         int    n_int          = size - 1;
         double dx             = 1. / n_int;
         norm_layers_coords[0] = 0.;
-        for (int i = 0; i < n_int; ++i) { norm_layers_coords[i + 1] = norm_layers_coords[i] + dx; }
+        for (int i = 0; i < n_int; ++i) {
+          norm_layers_coords[i + 1] = norm_layers_coords[i] + dx;
+        }
       }
     } else {
       *out << "  - Filling " << field_type << " field '" << field_name << "' with constant value " << values << ".\n";
     }
 
     field_mv = Thyra::createMembers(entities_vs, values.size());
-    for (int iv(0); iv < field_mv->domain()->dim(); ++iv) { field_mv->col(iv)->assign(values[iv]); }
+    for (int iv(0); iv < field_mv->domain()->dim(); ++iv) {
+      field_mv->col(iv)->assign(values[iv]);
+    }
   }
 }
 
@@ -1553,7 +1587,9 @@ GenericSTKMeshStruct::readScalarFileSerial(
                                                                 << "is different from the number expected ("
                                                                 << nonConstView.size() << ").\n");
 
-  for (GO i = 0; i < numNodes; i++) { ifile >> nonConstView[i]; }
+  for (GO i = 0; i < numNodes; i++) {
+    ifile >> nonConstView[i];
+  }
 
   ifile.close();
 }
@@ -1630,10 +1666,14 @@ GenericSTKMeshStruct::readLayeredScalarFileSerial(
             << " To fix this, please specify the correct layered data "
                "dimension when you register the state.\n");
 
-    for (size_t il = 0; il < numLayers; ++il) { ifile >> normalizedLayersCoords[il]; }
+    for (size_t il = 0; il < numLayers; ++il) {
+      ifile >> normalizedLayersCoords[il];
+    }
 
     for (size_t il = 0; il < numLayers; ++il) {
-      for (GO i = 0; i < numNodes; ++i) { ifile >> nonConstView[il][i]; }
+      for (GO i = 0; i < numNodes; ++i) {
+        ifile >> nonConstView[il][i];
+      }
     }
     ifile.close();
   }
@@ -1672,7 +1712,9 @@ GenericSTKMeshStruct::readLayeredVectorFileSerial(
                                                                   << nonConstView[0].size() << ").\n");
 
     normalizedLayersCoords.resize(numLayers);
-    for (int il = 0; il < numLayers; ++il) { ifile >> normalizedLayersCoords[il]; }
+    for (int il = 0; il < numLayers; ++il) {
+      ifile >> normalizedLayersCoords[il];
+    }
 
     // Layer ordering: before switching component, we first do all the layers of
     // the current component This is because with the stk field (natural
@@ -1683,7 +1725,9 @@ GenericSTKMeshStruct::readLayeredVectorFileSerial(
     for (int il = 0; il < numLayers; ++il) {
       for (int icomp(0); icomp < numComponents; ++icomp) {
         Teuchos::ArrayRCP<ST> col_vals = nonConstView[icomp * numLayers + il];
-        for (GO i = 0; i < numNodes; ++i) { ifile >> col_vals[i]; }
+        for (GO i = 0; i < numNodes; ++i) {
+          ifile >> col_vals[i];
+        }
       }
     }
     ifile.close();
@@ -1701,8 +1745,12 @@ GenericSTKMeshStruct::checkFieldIsInMesh(std::string const& fname, std::string c
   }
 
   int dim = 1;
-  if (ftype.find("Vector") != std::string::npos) { ++dim; }
-  if (ftype.find("Layered") != std::string::npos) { ++dim; }
+  if (ftype.find("Vector") != std::string::npos) {
+    ++dim;
+  }
+  if (ftype.find("Layered") != std::string::npos) {
+    ++dim;
+  }
 
   typedef AbstractSTKFieldContainer::ScalarFieldType SFT;
   typedef AbstractSTKFieldContainer::VectorFieldType VFT;

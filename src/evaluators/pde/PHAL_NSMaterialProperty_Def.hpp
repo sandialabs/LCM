@@ -138,12 +138,16 @@ NSMaterialProperty<EvalT, Traits>::evaluateFields(typename Traits::EvalData work
 {
   if (matPropType == SCALAR_CONSTANT) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t qp = 0; qp < dims[1]; ++qp) { matprop(cell, qp) = scalar_constant_value; }
+      for (std::size_t qp = 0; qp < dims[1]; ++qp) {
+        matprop(cell, qp) = scalar_constant_value;
+      }
     }
   } else if (matPropType == VECTOR_CONSTANT) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < dims[1]; ++qp) {
-        for (std::size_t dim = 0; dim < dims[2]; ++dim) { matprop(cell, qp, dim) = vector_constant_value[dim]; }
+        for (std::size_t dim = 0; dim < dims[2]; ++dim) {
+          matprop(cell, qp, dim) = vector_constant_value[dim];
+        }
       }
     }
   } else if (matPropType == TENSOR_CONSTANT) {
@@ -191,7 +195,9 @@ NSMaterialProperty<EvalT, Traits>::evaluateFields(typename Traits::EvalData work
     }
 
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t qp = 0; qp < dims[1]; ++qp) { matprop(cell, qp) = scalar_constant_value; }
+      for (std::size_t qp = 0; qp < dims[1]; ++qp) {
+        matprop(cell, qp) = scalar_constant_value;
+      }
     }
   }
 }

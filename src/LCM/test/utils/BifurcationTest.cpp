@@ -648,7 +648,9 @@ projective_newton_raphson(
     }
 
     minitensor::Vector<D2FadType, 3> Xfad2_sub;
-    for (int i = 0; i < 3; ++i) { Xfad2_sub[i] = Xfad2[i]; }
+    for (int i = 0; i < 3; ++i) {
+      Xfad2_sub[i] = Xfad2[i];
+    }
     n = projective_get_normal(Xfad2_sub);
 
     detA = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n))) +

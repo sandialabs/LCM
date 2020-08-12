@@ -137,11 +137,15 @@ SchwarzCoupled::SchwarzCoupled(
 
       auto const have_opts = nox_list.isSublist("Solver Options");
 
-      if (have_opts == true) { solver_options_pl = Teuchos::rcpFromRef(nox_list.sublist("Solver Options")); }
+      if (have_opts == true) {
+        solver_options_pl = Teuchos::rcpFromRef(nox_list.sublist("Solver Options"));
+      }
 
       auto const have_tests = nox_list.isSublist("Status Tests");
 
-      if (have_tests == true) { status_tests_pl = Teuchos::rcpFromRef(nox_list.sublist("Status Tests")); }
+      if (have_tests == true) {
+        status_tests_pl = Teuchos::rcpFromRef(nox_list.sublist("Status Tests"));
+      }
     }
   }
 
@@ -372,7 +376,9 @@ SchwarzCoupled::SchwarzCoupled(
     // these will have same graph as Jacobians for now
     precs_[m] = Teuchos::nonnull(jac_temp) ? Teuchos::rcp_dynamic_cast<Thyra_LinearOp>(jac_temp, true) : Teuchos::null;
 
-    if (Albany::isFillActive(precs_[m])) { Albany::fillComplete(precs_[m]); }
+    if (Albany::isFillActive(precs_[m])) {
+      Albany::fillComplete(precs_[m]);
+    }
   }
 
   // Now get vss, InArgs, OutArgs for each model.
@@ -394,7 +400,9 @@ SchwarzCoupled::SchwarzCoupled(
   // for use in evalModelImpl
   sacado_param_vecs_.resize(num_models_);
 
-  for (auto m = 0; m < num_models_; ++m) { sacado_param_vecs_[m].resize(num_params_total_); }
+  for (auto m = 0; m < num_models_; ++m) {
+    sacado_param_vecs_[m].resize(num_params_total_);
+  }
 
   for (auto m = 0; m < num_models_; ++m) {
     for (auto l = 0; l < num_params_total_; ++l) {
@@ -412,7 +420,9 @@ SchwarzCoupled::SchwarzCoupled(
         std::cout << "This is probably due to something incorrect in the";
         std::cout << " \"Parameters\" list in the input file, ";
         std::cout << "one of the lines:" << '\n';
-        for (auto k = 0; k < param_names_[l]->size(); ++k) { std::cout << "      " << (*param_names_[l])[k] << '\n'; }
+        for (auto k = 0; k < param_names_[l]->size(); ++k) {
+          std::cout << "      " << (*param_names_[l])[k] << '\n';
+        }
         throw le;  // rethrow to shut things down
       }
     }
@@ -434,13 +444,17 @@ SchwarzCoupled::SchwarzCoupled(
   for (auto l = 0; l < num_params_total_; ++l) {
     Teuchos::Array<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> p_spaces(num_models_);
 
-    for (auto m = 0; m < num_models_; ++m) { p_spaces[m] = models_[m]->get_p_space(l); }
+    for (auto m = 0; m < num_models_; ++m) {
+      p_spaces[m] = models_[m]->get_p_space(l);
+    }
 
     Teuchos::RCP<Thyra::DefaultProductVectorSpace<ST> const> p_space = Thyra::productVectorSpace<ST>(p_spaces);
 
     Teuchos::ArrayRCP<Teuchos::RCP<Thyra::VectorBase<ST> const>> p_vecs(num_models_);
 
-    for (auto m = 0; m < num_models_; ++m) { p_vecs[m] = models_[m]->getNominalValues().get_p(l); }
+    for (auto m = 0; m < num_models_; ++m) {
+      p_vecs[m] = models_[m]->getNominalValues().get_p(l);
+    }
 
     Teuchos::RCP<Thyra::DefaultProductVector<ST>> p_prod_vec = Thyra::defaultProductVector<ST>(p_space, p_vecs());
 
@@ -472,7 +486,9 @@ SchwarzCoupled::getThyraRangeSpace() const
     // loop over all vectors and build the vector space
     std::vector<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> vs_array;
 
-    for (auto m = 0; m < num_models_; ++m) { vs_array.push_back(disc_vss_[m]); }
+    for (auto m = 0; m < num_models_; ++m) {
+      vs_array.push_back(disc_vss_[m]);
+    }
 
     range_space_ = Thyra::productVectorSpace<ST>(vs_array);
   }
@@ -486,7 +502,9 @@ SchwarzCoupled::getThyraDomainSpace() const
     // loop over all vectors and build the vector space
     std::vector<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> vs_array;
 
-    for (auto m = 0; m < num_models_; ++m) { vs_array.push_back(disc_vss_[m]); }
+    for (auto m = 0; m < num_models_; ++m) {
+      vs_array.push_back(disc_vss_[m]);
+    }
 
     domain_space_ = Thyra::productVectorSpace<ST>(vs_array);
   }
@@ -502,7 +520,9 @@ SchwarzCoupled::getThyraResponseSpace(int l) const
     // loop over all vectors and build the vector space
     std::vector<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> vs_array;
 
-    for (auto m = 0; m < num_models_; ++m) { vs_array.push_back(apps_[m]->getResponse(l)->responseVectorSpace()); }
+    for (auto m = 0; m < num_models_; ++m) {
+      vs_array.push_back(apps_[m]->getResponse(l)->responseVectorSpace());
+    }
 
     response_space_ = Thyra::productVectorSpace<ST>(vs_array);
   }
@@ -517,7 +537,9 @@ SchwarzCoupled::getThyraParamSpace(int l) const
     // loop over all vectors and build the vector space
     std::vector<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> vs_array;
 
-    for (auto m = 0; m < num_models_; ++m) { vs_array.push_back(models_[m]->get_p_space(l)); }
+    for (auto m = 0; m < num_models_; ++m) {
+      vs_array.push_back(models_[m]->get_p_space(l));
+    }
 
     param_space_ = Thyra::productVectorSpace<ST>(vs_array);
   }
@@ -650,7 +672,9 @@ SchwarzCoupled::allocateVectors()
   // nominal_values_ for the coupled model.
   Teuchos::Array<Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>> spaces(num_models_);
 
-  for (auto m = 0; m < num_models_; ++m) { spaces[m] = disc_vss_[m]; }
+  for (auto m = 0; m < num_models_; ++m) {
+    spaces[m] = disc_vss_[m];
+  }
 
   Teuchos::RCP<Thyra::DefaultProductVectorSpace<ST> const> space = Thyra::productVectorSpace<ST>(spaces);
 
@@ -753,7 +777,9 @@ SchwarzCoupled::evalModelImpl(
     // Get each Thyra vector
     xs[m] = x->getVectorBlock(m);
 
-    if (!x_dot.is_null()) { x_dots[m] = x_dot->getVectorBlock(m); }
+    if (!x_dot.is_null()) {
+      x_dots[m] = x_dot->getVectorBlock(m);
+    }
   }
 
   double const alpha = (!x_dot.is_null() || !x_dotdot.is_null()) ? in_args.get_alpha() : 0.0;
@@ -770,7 +796,9 @@ SchwarzCoupled::evalModelImpl(
     auto p = Albany::getConstProductVector(in_args.get_p(l), true);
 
     // Don't set it if there is nothing. Avoid null pointer.
-    if (p.is_null()) { continue; }
+    if (p.is_null()) {
+      continue;
+    }
 
     for (auto m = 0; m < num_models_; ++m) {
       ParamVec& sacado_param_vector = sacado_param_vecs_[m][l];
@@ -789,7 +817,9 @@ SchwarzCoupled::evalModelImpl(
   }
   // Get the output arguments
   Teuchos::RCP<Thyra_ProductVector> f_out;
-  if (!out_args.get_f().is_null()) { f_out = Albany::getProductVector(out_args.get_f()); }
+  if (!out_args.get_f().is_null()) {
+    f_out = Albany::getProductVector(out_args.get_f());
+  }
 
   // Create a Teuchos array of the f_out for each model.
   Teuchos::Array<Teuchos::RCP<Thyra_Vector>> fs_out(num_models_);
@@ -922,7 +952,9 @@ SchwarzCoupled::evalModelImpl(
             Albany::replaceGlobalValues(precs_[m], global_row, matrixIndicesT(), matrixEntriesT());
           }
         }
-        if (Albany::isFillActive(precs_[m])) { Albany::fillComplete(precs_[m]); }
+        if (Albany::isFillActive(precs_[m])) {
+          Albany::fillComplete(precs_[m]);
+        }
       }
       Schwarz_CoupledJacobian                        jac(comm_);
       Teuchos::RCP<Thyra_LinearOp>                   W_op   = jac.getThyraCoupledJacobian(precs_, apps_);

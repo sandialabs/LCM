@@ -838,7 +838,9 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::E
       for (auto dim = 0; dim < this->numDOFsSet; ++dim) {
         row[0]         = nodeID(cell, node, this->offset[dim]);
         auto const neq = nodeID.extent(2);
-        if (fill == true) { f_view[row[0]] += this->neumann(cell, node, dim).val(); }
+        if (fill == true) {
+          f_view[row[0]] += this->neumann(cell, node, dim).val();
+        }
 
         // Check derivative array is nonzero
         if (this->neumann(cell, node, dim).hasFastAccess()) {

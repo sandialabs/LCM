@@ -46,7 +46,9 @@ NodalDataBase::registerVectorState(std::string const& stateName, int ndofs)
 void
 NodalDataBase::initialize()
 {
-  if (initialized) { return; }
+  if (initialized) {
+    return;
+  }
 
   if (vectorsize > 0) {
     nodal_data_vector = Teuchos::rcp(new NodalDataVector(nodeContainer, nodeVectorLayout, nodeVectorMap, vectorsize));
@@ -68,7 +70,9 @@ NodalDataBase::replaceOwnedVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> con
 {
   initialize();
 
-  if (Teuchos::nonnull(nodal_data_vector)) { nodal_data_vector->replaceOwnedVectorSpace(vs); }
+  if (Teuchos::nonnull(nodal_data_vector)) {
+    nodal_data_vector->replaceOwnedVectorSpace(vs);
+  }
 }
 
 void
@@ -78,7 +82,9 @@ NodalDataBase::replaceOverlapVectorSpace(
 {
   initialize();
 
-  if (Teuchos::nonnull(nodal_data_vector)) { nodal_data_vector->replaceOverlapVectorSpace(overlap_nodeGIDs, comm_); }
+  if (Teuchos::nonnull(nodal_data_vector)) {
+    nodal_data_vector->replaceOverlapVectorSpace(overlap_nodeGIDs, comm_);
+  }
 }
 
 void
@@ -88,7 +94,9 @@ NodalDataBase::replaceOwnedVectorSpace(
 {
   initialize();
 
-  if (Teuchos::nonnull(nodal_data_vector)) { nodal_data_vector->replaceOwnedVectorSpace(local_nodeGIDs, comm_); }
+  if (Teuchos::nonnull(nodal_data_vector)) {
+    nodal_data_vector->replaceOwnedVectorSpace(local_nodeGIDs, comm_);
+  }
 }
 
 void

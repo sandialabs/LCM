@@ -78,8 +78,12 @@ MechanicsResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
   this->utils.setFieldData(w_grad_bf_, fm);
   this->utils.setFieldData(w_bf_, fm);
   this->utils.setFieldData(residual_, fm);
-  if (is_ace_sequential_thermomechanical_ == true) { this->utils.setFieldData(ice_saturation_, fm); }
-  if (have_body_force_) { this->utils.setFieldData(body_force_, fm); }
+  if (is_ace_sequential_thermomechanical_ == true) {
+    this->utils.setFieldData(ice_saturation_, fm);
+  }
+  if (have_body_force_) {
+    this->utils.setFieldData(body_force_, fm);
+  }
   if (enable_dynamics_) {
     this->utils.setFieldData(acceleration_, fm);
     if (use_analytic_mass_) this->utils.setFieldData(mass_, fm);
@@ -94,7 +98,9 @@ KOKKOS_INLINE_FUNCTION void
 MechanicsResidual<EvalT, Traits>::compute_Stress(int const i) const
 {
   for (int node = 0; node < num_nodes_; ++node) {
-    for (int dim = 0; dim < num_dims_; ++dim) { residual_(i, node, dim) = typename EvalT::ScalarT(0.0); }
+    for (int dim = 0; dim < num_dims_; ++dim) {
+      residual_(i, node, dim) = typename EvalT::ScalarT(0.0);
+    }
   }
   for (int pt = 0; pt < num_pts_; ++pt) {
     for (int node = 0; node < num_nodes_; ++node) {
@@ -237,7 +243,9 @@ MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
               // evaluator
       for (int cell = 0; cell < workset.numCells; ++cell) {
         for (int node = 0; node < num_nodes_; ++node) {
-          for (int dim = 0; dim < num_dims_; ++dim) { residual_(cell, node, dim) += mass_(cell, node, dim); }
+          for (int dim = 0; dim < num_dims_; ++dim) {
+            residual_(cell, node, dim) += mass_(cell, node, dim);
+          }
         }
       }
     }

@@ -82,7 +82,9 @@ printThyraVector(
 inline void
 printThyraVector(std::ostream& os, const Teuchos::RCP<const Thyra_ProductVector>& vec)
 {
-  for (int i = 0; i < vec->productSpace()->numBlocks(); ++i) { printThyraVector(os, vec->getVectorBlock(i)); }
+  for (int i = 0; i < vec->productSpace()->numBlocks(); ++i) {
+    printThyraVector(os, vec->getVectorBlock(i));
+  }
 }
 
 //! Nicely prints out a Thyra MultiVector
@@ -98,7 +100,9 @@ printThyraMultiVector(
 inline void
 printThyraVector(std::ostream& os, const Teuchos::RCP<const Thyra_ProductMultiVector>& vec)
 {
-  for (int i = 0; i < vec->productSpace()->numBlocks(); ++i) { printThyraMultiVector(os, vec->getMultiVectorBlock(i)); }
+  for (int i = 0; i < vec->productSpace()->numBlocks(); ++i) {
+    printThyraMultiVector(os, vec->getMultiVectorBlock(i));
+  }
 }
 
 /// Write to matrix market format a vector, matrix or map.

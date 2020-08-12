@@ -81,7 +81,9 @@ FieldManagerScalarResponseFunction::setup(Teuchos::ParameterList& responseParams
   bool const  reb_parm_present = responseParams.isType<bool>(reb_parm),
              reb               = reb_parm_present && responseParams.get<bool>(reb_parm, false);
   element_block_index          = reb ? meshSpecs->ebNameToIndex[meshSpecs->ebName] : -1;
-  if (reb_parm_present) { responseParams.remove(reb_parm, false); }
+  if (reb_parm_present) {
+    responseParams.remove(reb_parm, false);
+  }
   // Create field manager
   rfm = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
 
@@ -90,7 +92,9 @@ FieldManagerScalarResponseFunction::setup(Teuchos::ParameterList& responseParams
       problem->buildEvaluators(*rfm, *meshSpecs, *stateMgr, BUILD_RESPONSE_FM, Teuchos::rcp(&responseParams, false));
   int rank      = tags[0]->dataLayout().rank();
   num_responses = tags[0]->dataLayout().extent(rank - 1);
-  if (num_responses == 0) { num_responses = 1; }
+  if (num_responses == 0) {
+    num_responses = 1;
+  }
   // MPerego: In order to do post-registration setup, need to call postRegSetup
   // function, which is now called in AlbanyApplications (at this point the
   // derivative dimensions cannot be computed correctly because the

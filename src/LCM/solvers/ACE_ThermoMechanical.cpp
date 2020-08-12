@@ -199,7 +199,9 @@ ACEThermoMechanical::ACEThermoMechanical(
       is_static_  = is_static;
       is_dynamic_ = is_dynamic;
     }
-    if (is_static == true) { ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg); }
+    if (is_static == true) {
+      ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg);
+    }
     if (is_dynamic == true) {
       ALBANY_ASSERT(piro_params.isSublist("Tempus") == true, msg);
 
@@ -408,7 +410,9 @@ void
 ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&)
     const
 {
-  if (is_dynamic_ == true) { ThermoMechanicalLoopDynamics(); }
+  if (is_dynamic_ == true) {
+    ThermoMechanicalLoopDynamics();
+  }
   // IKT 6/4/2020: for now, throw error if trying to run quasi-statically.
   // Not sure if we want to ultimately support that case or not.
   ALBANY_ASSERT(is_static_ == false, "ACE Sequential Thermo-Mechanical solver currently supports dynamics only!");
@@ -509,7 +513,9 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   discs_[subdomain]                                 = disc;
 
   Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
-  if (file_index == 0) { stk_disc.outputExodusSolutionInitialTime(true); }
+  if (file_index == 0) {
+    stk_disc.outputExodusSolutionInitialTime(true);
+  }
 
   auto  abs_stk_mesh_struct_rcp  = stk_disc.getSTKMeshStruct();
   auto& abs_stk_mesh_struct      = *abs_stk_mesh_struct_rcp;
@@ -584,7 +590,9 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   discs_[subdomain]                                 = disc;
 
   Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
-  if (file_index == 0) { stk_disc.outputExodusSolutionInitialTime(true); }
+  if (file_index == 0) {
+    stk_disc.outputExodusSolutionInitialTime(true);
+  }
 
   auto  abs_stk_mesh_struct_rcp     = stk_disc.getSTKMeshStruct();
   auto& abs_stk_mesh_struct         = *abs_stk_mesh_struct_rcp;
@@ -758,7 +766,9 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     }
 
     // Update IC vecs
-    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) { setICVecs(next_time, subdomain); }
+    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+      setICVecs(next_time, subdomain);
+    }
 
     ++stop;
     current_time += time_step;
@@ -836,7 +846,9 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-  if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
+  if (std_init_guess_ == false) {
+    piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
+  }
 
   solver.evalModel(in_args, out_args);
 
@@ -927,7 +939,9 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-  if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
+  if (std_init_guess_ == false) {
+    piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
+  }
 
   solver.evalModel(in_args, out_args);
 
@@ -1101,7 +1115,9 @@ void
 ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain, int const stop) const
 {
   auto const is_initial_time = time <= initial_time_ + initial_time_step_;
-  if (is_initial_time == false) { return; }
+  if (is_initial_time == false) {
+    return;
+  }
   // Write solution at specified time to STK mesh
   Teuchos::RCP<Thyra_MultiVector const> const xMV      = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
   auto&                                       abs_disc = *discs_[subdomain];

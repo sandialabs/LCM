@@ -384,7 +384,9 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
         p->set<string>("Node Set ID", nodeSetIDs[i]);
         p->set<int>("Number of Equations", numEqn);
         p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) { offsets_[i].push_back(j); }
+        for (std::size_t j = 0; j < bcNames.size(); j++) {
+          offsets_[i].push_back(j);
+        }
         p->set<RCP<ParamLib>>("Parameter Library", paramLib);
 
         evaluators_to_build[evaluatorsToBuildName(ss)] = p;
@@ -584,7 +586,9 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
         p->set<string>("Node Set ID", nodeSetIDs[i]);
         // p->set< int >     ("Number of Equations", dirichletNames.size());
         p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) { offsets_[i].push_back(j); }
+        for (std::size_t j = 0; j < bcNames.size(); j++) {
+          offsets_[i].push_back(j);
+        }
         p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));  // if set to zero, the
                                                                              // cubature degree of the side
                                                                              // will be set to that of the
@@ -751,7 +755,9 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
         p->set<RealType>("Dirichlet Value", 0.0);
         p->set<string>("Node Set ID", nodeSetIDs[i]);
         p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) { offsets_[i].push_back(j); }
+        for (std::size_t j = 0; j < bcNames.size(); j++) {
+          offsets_[i].push_back(j);
+        }
         // if set to zero, the cubature degree of the side
         // will be set to that of the element
         p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));
@@ -799,7 +805,9 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
         p->set<RealType>("Dirichlet Value", 0.0);
         p->set<string>("Node Set ID", nodeSetIDs[i]);
         p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) { offsets_[i].push_back(j); }
+        for (std::size_t j = 0; j < bcNames.size(); j++) {
+          offsets_[i].push_back(j);
+        }
         // if set to zero, the cubature degree of the side
         // will be set to that of the element
         p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));
@@ -848,7 +856,9 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
         p->set<string>("Node Set ID", nodeSetIDs[i]);
         // p->set< int >     ("Number of Equations", dirichletNames.size());
         p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) { offsets_[i].push_back(j); }
+        for (std::size_t j = 0; j < bcNames.size(); j++) {
+          offsets_[i].push_back(j);
+        }
         p->set<RCP<ParamLib>>("Parameter Library", paramLib);
         evaluators_to_build[evaluatorsToBuildName(ss)] = p;
 
@@ -1036,9 +1046,13 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
             }
           } else {
             if ((conditions[k] == "robin") || (conditions[k] == "radiate")) {
-              if (niv.size() != 2) { ALBANY_ABORT("Robin NBC takes a 2-array!"); }
+              if (niv.size() != 2) {
+                ALBANY_ABORT("Robin NBC takes a 2-array!");
+              }
             } else {
-              if (niv.size() != meshSpecs->numDim) { ALBANY_ABORT("Traction NBC takes an array of size numDim!"); }
+              if (niv.size() != meshSpecs->numDim) {
+                ALBANY_ABORT("Traction NBC takes an array of size numDim!");
+              }
             }
           }
 

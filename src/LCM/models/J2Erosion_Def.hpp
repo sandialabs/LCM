@@ -140,7 +140,9 @@ J2ErosionKernel<EvalT, Traits>::init(
   current_time_ = workset.current_time;
 
   auto const num_cells = workset.numCells;
-  for (auto cell = 0; cell < num_cells; ++cell) { failed_(cell, 0) = 0.0; }
+  for (auto cell = 0; cell < num_cells; ++cell) {
+    failed_(cell, 0) = 0.0;
+  }
 }
 
 // J2 nonlinear system
@@ -275,7 +277,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Tensor Fpn(num_dims_);
 
   for (int i{0}; i < num_dims_; ++i) {
-    for (int j{0}; j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j)); }
+    for (int j{0}; j < num_dims_; ++j) {
+      Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j));
+    }
   }
 
   // compute trial state
@@ -338,7 +342,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     Tensor const Fpnew = expA * Fpn;
 
     for (int i{0}; i < num_dims_; ++i) {
-      for (int j{0}; j < num_dims_; ++j) { Fp_(cell, pt, i, j) = Fpnew(i, j); }
+      for (int j{0}; j < num_dims_; ++j) {
+        Fp_(cell, pt, i, j) = Fpnew(i, j);
+      }
     }
   } else {
     eqps_(cell, pt) = eqps_old_(cell, pt);
@@ -346,7 +352,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     if (have_temperature_ == true) source_(cell, pt) = 0.0;
 
     for (int i{0}; i < num_dims_; ++i) {
-      for (int j{0}; j < num_dims_; ++j) { Fp_(cell, pt, i, j) = Fpn(i, j); }
+      for (int j{0}; j < num_dims_; ++j) {
+        Fp_(cell, pt, i, j) = Fpn(i, j);
+      }
     }
   }
 
@@ -360,11 +368,15 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   sigma = p * I + s / J_(cell, pt);
 
   for (int i(0); i < num_dims_; ++i) {
-    for (int j(0); j < num_dims_; ++j) { stress_(cell, pt, i, j) = sigma(i, j); }
+    for (int j(0); j < num_dims_; ++j) {
+      stress_(cell, pt, i, j) = sigma(i, j);
+    }
   }
 
   // Determine if critical stress is exceeded
-  if (yielded == true) failed += 1.0;
+  if (yielded == true) {
+    failed += 1.0;
+  }
 
   // Determine if kinematic failure occurred
   auto const critical_angle = critical_angle_;
@@ -375,7 +387,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     cosine            = cosine > 1.0 ? 1.0 : cosine;
     cosine            = cosine < -1.0 ? -1.0 : cosine;
     auto const theta  = std::acos(cosine);
-    if (std::abs(theta) >= critical_angle) failed += 1.0;
+    if (std::abs(theta) >= critical_angle) {
+      failed += 1.0;
+    }
   }
 }
 }  // namespace LCM

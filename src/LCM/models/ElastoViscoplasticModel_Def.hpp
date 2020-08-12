@@ -66,7 +66,9 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
   this->eval_field_map_.insert(std::make_pair(eps_ss_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(kappa_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(void_volume_fraction_string, dl->qp_scalar));
-  if (have_temperature_) { this->eval_field_map_.insert(std::make_pair(source_string, dl->qp_scalar)); }
+  if (have_temperature_) {
+    this->eval_field_map_.insert(std::make_pair(source_string, dl->qp_scalar));
+  }
 
   // define the state variables
   // stress
@@ -300,7 +302,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
   auto                  kappa_field                = *eval_fields[kappa_string];
   auto                  void_volume_fraction_field = *eval_fields[void_volume_fraction_string];
   PHX::MDField<ScalarT> source_field;
-  if (have_temperature_) { source_field = *eval_fields[source_string]; }
+  if (have_temperature_) {
+    source_field = *eval_fields[source_string];
+  }
 
   // get State Variables
   Albany::MDArray Fp_field_old                   = (*workset.stateArrayPtr)[Fp_string + "_old"];
@@ -384,7 +388,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
         }
 
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fp_field_old(cell, pt, i, j)); }
+          for (int j(0); j < num_dims_; ++j) {
+            Fpn(i, j) = ScalarT(Fp_field_old(cell, pt, i, j));
+          }
         }
 
         // compute trial state
@@ -472,7 +478,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
           // model create a copy of be as a Fad
           minitensor::Tensor<Fad> beF(num_dims_);
           for (std::size_t i = 0; i < num_dims_; ++i) {
-            for (std::size_t j = 0; j < num_dims_; ++j) { beF(i, j) = be(i, j); }
+            for (std::size_t j = 0; j < num_dims_; ++j) {
+              beF(i, j) = be(i, j);
+            }
           }
           Fad two_mubarF = 2.0 * minitensor::trace(beF) * mu / (num_dims_);
 
@@ -534,7 +542,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             // deviatoric stress
             minitensor::Tensor<Fad> sF(num_dims_);
             for (int k(0); k < num_dims_; ++k) {
-              for (int l(0); l < num_dims_; ++l) { sF(k, l) = factor * s(k, l); }
+              for (int l(0); l < num_dims_; ++l) {
+                sF(k, l) = factor * s(k, l);
+              }
             }
 
             // shear dependent term for void growth
@@ -558,11 +568,15 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             Fad sinh_argF = std::sinh(argF);
             if (std::abs(sinh_argF) > max_value) {
               sinh_argF = max_value;
-              if (std::sinh(argF) < 0.0) { sinh_argF *= -1.0; }
+              if (std::sinh(argF) < 0.0) {
+                sinh_argF *= -1.0;
+              }
             }
 
             Fad deq = dgamF * (q1_ * q2_ * pF * YbarF * fstarF * sinh_argF) / (1.0 - fstarF) / YbarF;
-            if (smag != 0.0) { deq += dgamF * smag2 / (1.0 - fstarF) / YbarF; }
+            if (smag != 0.0) {
+              deq += dgamF * smag2 / (1.0 - fstarF) / YbarF;
+            }
 
             // compute the hardening residual
             Fad deps_ssF = (H - Rd * eps_ssF) * deq;
@@ -580,7 +594,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
 
             // void growth
             Fad dfg = dgamF * q1_ * q2_ * (1.0 - fstarF) * fstarF * YbarF * sinh_argF;
-            if (taue > 0.0) { dfg += sq23 * dgamF * kw_ * fstarF * omega * smag; }
+            if (taue > 0.0) {
+              dfg += sq23 * dgamF * kw_ * fstarF * omega * smag;
+            }
 
             // yield surface
             Fad PhiF = 0.5 * smag2 - psiF * YbarF * YbarF / 3.0;
@@ -593,7 +609,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
             RFad[4] = eqpsF - eqps_old - deq;
 
             // extract the values of the residuals
-            for (int i = 0; i < num_vars; ++i) { R[i] = RFad[i].val(); }
+            for (int i = 0; i < num_vars; ++i) {
+              R[i] = RFad[i].val();
+            }
 
             // compute the norm of the residual
             // (ahh! this hurts my eyes!)
@@ -707,7 +725,9 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
           minitensor::Tensor<ScalarT> dPhi     = s + 1.0 / 3.0 * q1_ * q2_ * Ybar * fstar * sinh_arg * I;
           Fpnew                                = minitensor::exp(dgam * dPhi) * Fpn;
           for (std::size_t i(0); i < num_dims_; ++i) {
-            for (std::size_t j(0); j < num_dims_; ++j) { Fp_field(cell, pt, i, j) = Fpnew(i, j); }
+            for (std::size_t j(0); j < num_dims_; ++j) {
+              Fp_field(cell, pt, i, j) = Fpnew(i, j);
+            }
           }
 
           // update other plasticity state variables
@@ -724,14 +744,18 @@ ElastoViscoplasticModel<EvalT, Traits>::computeState(
           void_volume_fraction_field(cell, pt) = void_volume_fraction_old;
           if (have_temperature_) source_field(cell, pt) = 0.0;
           for (std::size_t i(0); i < num_dims_; ++i) {
-            for (std::size_t j(0); j < num_dims_; ++j) { Fp_field(cell, pt, i, j) = Fpn(i, j); }
+            for (std::size_t j(0); j < num_dims_; ++j) {
+              Fp_field(cell, pt, i, j) = Fpn(i, j);
+            }
           }
         }
 
         // compute stress
         sigma = p / Je * I + s / Je;
         for (std::size_t i(0); i < num_dims_; ++i) {
-          for (std::size_t j(0); j < num_dims_; ++j) { stress_field(cell, pt, i, j) = sigma(i, j); }
+          for (std::size_t j(0); j < num_dims_; ++j) {
+            stress_field(cell, pt, i, j) = sigma(i, j);
+          }
         }
       } else {  // this point has failed
         eps_ss_field(cell, pt) = eps_ss_field_old(cell, pt);
@@ -755,7 +779,9 @@ ElastoViscoplasticModel<EvalT, Traits>::compute_fstar(T f, double fcrit, double 
 {
   T fstar = f;
   if ((f > fcrit) && (f < ffail)) {
-    if ((ffail - fcrit) != 0.0) { fstar = fcrit + (f - fcrit) * ((1.0 / q1) - fcrit) / (ffail - fcrit); }
+    if ((ffail - fcrit) != 0.0) {
+      fstar = fcrit + (f - fcrit) * ((1.0 / q1) - fcrit) / (ffail - fcrit);
+    }
   } else if (f >= ffail) {
     fstar -= (f - (1.0 / q1));
   }

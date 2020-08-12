@@ -67,7 +67,9 @@ StVenantKirchhoffModel<EvalT, Traits>::computeState(
       S     = lambda * minitensor::trace(E) * I + 2.0 * mu * E;
       sigma = (1.0 / minitensor::det(F)) * F * S * minitensor::transpose(F);
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+        for (int j = 0; j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = sigma(i, j);
+        }
       }
     }
   }

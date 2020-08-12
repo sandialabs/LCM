@@ -192,10 +192,14 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Trai
     for (LO row_entry = 0; row_entry < num_row_entries; ++row_entry) {
       auto local_col         = indices[row_entry];
       auto is_diagonal_entry = local_col == local_row;
-      if (is_diagonal_entry) { continue; }
+      if (is_diagonal_entry) {
+        continue;
+      }
 
       auto col_is_dbc = col_is_dbc_data[local_col] > 0;
-      if (row_is_dbc || col_is_dbc) { entries[row_entry] = 0.0; }
+      if (row_is_dbc || col_is_dbc) {
+        entries[row_entry] = 0.0;
+      }
     }
     Albany::setLocalRowValues(J, local_row, indices(), entries());
   }

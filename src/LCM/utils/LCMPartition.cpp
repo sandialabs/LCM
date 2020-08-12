@@ -47,28 +47,44 @@ PrintPartitionInfo(
   output_stream << "Number to export  : " << num_export << '\n';
 
   output_stream << "Import GIDs:" << '\n';
-  for (int i = 0; i < num_import; ++i) { output_stream << import_global_ids[i] << '\n'; }
+  for (int i = 0; i < num_import; ++i) {
+    output_stream << import_global_ids[i] << '\n';
+  }
 
   output_stream << "Import LIDs:" << '\n';
-  for (int i = 0; i < num_import; ++i) { output_stream << import_local_ids[i] << '\n'; }
+  for (int i = 0; i < num_import; ++i) {
+    output_stream << import_local_ids[i] << '\n';
+  }
 
   output_stream << "Import procs:" << '\n';
-  for (int i = 0; i < num_import; ++i) { output_stream << import_procs[i] << '\n'; }
+  for (int i = 0; i < num_import; ++i) {
+    output_stream << import_procs[i] << '\n';
+  }
 
   output_stream << "Import parts:" << '\n';
-  for (int i = 0; i < num_import; ++i) { output_stream << import_to_part[i] << '\n'; }
+  for (int i = 0; i < num_import; ++i) {
+    output_stream << import_to_part[i] << '\n';
+  }
 
   output_stream << "Export GIDs:" << '\n';
-  for (int i = 0; i < num_export; ++i) { output_stream << export_global_ids[i] << '\n'; }
+  for (int i = 0; i < num_export; ++i) {
+    output_stream << export_global_ids[i] << '\n';
+  }
 
   output_stream << "Export LIDs:" << '\n';
-  for (int i = 0; i < num_export; ++i) { output_stream << export_local_ids[i] << '\n'; }
+  for (int i = 0; i < num_export; ++i) {
+    output_stream << export_local_ids[i] << '\n';
+  }
 
   output_stream << "Export procs:" << '\n';
-  for (int i = 0; i < num_export; ++i) { output_stream << export_procs[i] << '\n'; }
+  for (int i = 0; i < num_export; ++i) {
+    output_stream << export_procs[i] << '\n';
+  }
 
   output_stream << "Export parts:" << '\n';
-  for (int i = 0; i < num_export; ++i) { output_stream << export_to_part[i] << '\n'; }
+  for (int i = 0; i < num_export; ++i) {
+    output_stream << export_to_part[i] << '\n';
+  }
 
   return;
 }
@@ -245,7 +261,9 @@ buildKDTree(std::vector<minitensor::Vector<double>> const& points)
 
   std::set<minitensor::Index> points_indices;
 
-  for (minitensor::Index i = 0; i < number_points; ++i) { points_indices.insert(i); }
+  for (minitensor::Index i = 0; i < number_points; ++i) {
+    points_indices.insert(i);
+  }
 
   std::shared_ptr<Node> dummy;
 
@@ -267,7 +285,9 @@ createKDTreeNode(
     std::vector<minitensor::Vector<double>> const& points,
     std::set<minitensor::Index> const&             points_indices)
 {
-  if (name.length() >= 64) { std::cout << "Name is too long: " << name << '\n'; }
+  if (name.length() >= 64) {
+    std::cout << "Name is too long: " << name << '\n';
+  }
 
   // Create and fill in node.
   std::shared_ptr<Node> node(new Node);
@@ -326,7 +346,9 @@ KDTree<Node>::KDTree(std::vector<minitensor::Vector<double>> const& points, mini
   // Set candidate centers to all
   std::set<minitensor::Index> candidate_centers;
 
-  for (minitensor::Index i = 0; i < number_centers; ++i) { candidate_centers.insert(i); }
+  for (minitensor::Index i = 0; i < number_centers; ++i) {
+    candidate_centers.insert(i);
+  }
 
   root_->candidate_centers = candidate_centers;
 
@@ -484,9 +506,13 @@ box_proximity_to_centers(
 
     minitensor::Vector<double> v(N);
 
-    for (minitensor::Index j = 0; j < N; ++j) { v(j) = u(j) >= 0.0 ? upper_corner(j) : lower_corner(j); }
+    for (minitensor::Index j = 0; j < N; ++j) {
+      v(j) = u(j) >= 0.0 ? upper_corner(j) : lower_corner(j);
+    }
 
-    if (norm_square(p - v) < norm_square(closest_to_midcell - v)) { indices_candidates.insert(i); }
+    if (norm_square(p - v) < norm_square(closest_to_midcell - v)) {
+      indices_candidates.insert(i);
+    }
   }
 
   return std::make_pair(index_closest, indices_candidates);
@@ -501,7 +527,9 @@ FilterVisitor<Node, Center>::operator()(Node const& node) const
 {
   bool const node_is_empty = node->count == 0;
 
-  if (node_is_empty == true) { return; }
+  if (node_is_empty == true) {
+    return;
+  }
 
   bool const node_is_leaf = node->count == 1;
 
@@ -686,7 +714,9 @@ ConnectivityArray::ConnectivityArray(std::string const& input_file, std::string 
   for (size_t node = 0; node < number_nodes; ++node) {
     minitensor::Vector<double> point(0.0, 0.0, 0.0);
 
-    for (minitensor::Index j = 0; j < dimension; ++j) { point(j) = coordinates[node * dimension + j]; }
+    for (minitensor::Index j = 0; j < dimension; ++j) {
+      point(j) = coordinates[node * dimension + j];
+    }
 
     nodes_.insert(std::make_pair(node, point));
   }
@@ -909,7 +939,9 @@ ConnectivityArray::getVolume() const
 
   const ScalarMap volumes = getVolumes();
 
-  for (auto&& partition_volume : volumes) { volume += partition_volume.second; }
+  for (auto&& partition_volume : volumes) {
+    volume += partition_volume.second;
+  }
 
   return volume;
 }
@@ -1176,7 +1208,9 @@ ConnectivityArray::createGrid()
     grid_[i].resize(points_per_dim(1));
     for (minitensor::Index j = 0; j < points_per_dim(1); ++j) {
       grid_[i][j].resize(points_per_dim(2));
-      for (minitensor::Index k = 0; k < points_per_dim(2); ++k) { grid_[i][j][k] = false; }
+      for (minitensor::Index k = 0; k < points_per_dim(2); ++k) {
+        grid_[i][j][k] = false;
+      }
     }
   }
 
@@ -1240,7 +1274,9 @@ ConnectivityArray::createGrid()
 
     minitensor::Vector<double> origin(parametric_dimension);
 
-    for (minitensor::Index i = 0; i < dimension; ++i) { origin(i) = lower_limit; }
+    for (minitensor::Index i = 0; i < dimension; ++i) {
+      origin(i) = lower_limit;
+    }
 
     minitensor::Vector<double> xi(parametric_dimension);
 
@@ -1353,7 +1389,9 @@ bool
 ConnectivityArray::isInsideMeshByElement(minitensor::Vector<double> const& point) const
 {
   // Check bounding box first
-  if (in_box(point, lower_corner_, upper_corner_) == false) { return false; }
+  if (in_box(point, lower_corner_, upper_corner_) == false) {
+    return false;
+  }
 
   // Now check element by element
   for (auto&& element_nodes : connectivity_) {
@@ -1413,7 +1451,9 @@ shuffled_sequence(int number_elements)
 
   std::vector<int> unshuffled;
 
-  for (int i = 0; i < number_elements; ++i) { unshuffled.push_back(i); }
+  for (int i = 0; i < number_elements; ++i) {
+    unshuffled.push_back(i);
+  }
 
   // Happens to be a Mersenne prime for int_32
   int const prime = std::numeric_limits<int>::max();
@@ -1496,7 +1536,9 @@ ConnectivityArray::checkNullVolume() const
 
     double const volume = partition_volume.second;
 
-    if (volume == 0.0) { zero_volume.push_back(partition); }
+    if (volume == 0.0) {
+      zero_volume.push_back(partition);
+    }
   }
 
   minitensor::Index const number_null_partitions = zero_volume.size();
@@ -1507,7 +1549,9 @@ ConnectivityArray::checkNullVolume() const
     std::cerr << "Length scale may be too small:";
     std::cerr << '\n';
 
-    for (minitensor::Index i = 0; i < number_null_partitions; ++i) { std::cerr << " " << zero_volume[i]; }
+    for (minitensor::Index i = 0; i < number_null_partitions; ++i) {
+      std::cerr << " " << zero_volume[i];
+    }
 
     std::cerr << '\n';
 
@@ -1604,19 +1648,25 @@ ConnectivityArray::partitionByCenters(std::vector<minitensor::Vector<double>> co
 
     std::set<minitensor::Index>::const_iterator it = unassigned_partitions.find(partition);
 
-    if (it != unassigned_partitions.end()) { unassigned_partitions.erase(it); }
+    if (it != unassigned_partitions.end()) {
+      unassigned_partitions.erase(it);
+    }
   }
 
   if (unassigned_partitions.size() > 0) {
     std::cout << "WARNING: The following partitions were not" << '\n';
     std::cout << "assigned any elements (mesh too coarse?):" << '\n';
 
-    for (auto&& unassigned : unassigned_partitions) { std::cout << unassigned << '\n'; }
+    for (auto&& unassigned : unassigned_partitions) {
+      std::cout << unassigned << '\n';
+    }
   }
 
   std::ofstream generators_ofs("centers.csv");
   generators_ofs << "X,Y,Z" << '\n';
-  for (minitensor::Index i = 0; i < centers.size(); ++i) { generators_ofs << centers[i] << '\n'; }
+  for (minitensor::Index i = 0; i < centers.size(); ++i) {
+    generators_ofs << centers[i] << '\n';
+  }
 
   return partitions;
 }
@@ -1874,7 +1924,9 @@ ConnectivityArray::partitionKMeans(double const length_scale)
 
   std::vector<double> steps(number_partitions);
 
-  for (minitensor::Index i = 0; i < number_partitions; ++i) { steps[i] = diagonal_distance; }
+  for (minitensor::Index i = 0; i < number_partitions; ++i) {
+    steps[i] = diagonal_distance;
+  }
 
   minitensor::Index const number_points = domain_points_.size();
 
@@ -1995,7 +2047,9 @@ ConnectivityArray::partitionKDTree(double const length_scale)
 
   std::vector<double> steps(number_partitions);
 
-  for (minitensor::Index i = 0; i < number_partitions; ++i) { steps[i] = diagonal_distance; }
+  for (minitensor::Index i = 0; i < number_partitions; ++i) {
+    steps[i] = diagonal_distance;
+  }
 
   while (step_norm >= tolerance && number_iterations < max_iterations) {
     // Initialize centers
@@ -2036,7 +2090,9 @@ ConnectivityArray::partitionKDTree(double const length_scale)
     ++number_iterations;
   }
 
-  for (minitensor::Index i = 0; i < number_partitions; i++) { center_positions[i] = centers[i].position; }
+  for (minitensor::Index i = 0; i < number_partitions; i++) {
+    center_positions[i] = centers[i].position;
+  }
 
   // Partition map.
   std::map<int, int> partitions = partitionByCenters(center_positions);
@@ -2075,7 +2131,9 @@ ConnectivityArray::partitionSequential(double const length_scale)
 
   std::vector<minitensor::Index> weights(number_partitions);
 
-  for (int i = 0; i < number_partitions; ++i) { weights[i] = 1; }
+  for (int i = 0; i < number_partitions; ++i) {
+    weights[i] = 1;
+  }
 
   // K-means sequential iteration
   minitensor::Index const number_random_points = getMaximumIterations() * number_partitions;
@@ -2090,7 +2148,9 @@ ConnectivityArray::partitionSequential(double const length_scale)
 
   std::vector<double> steps(number_partitions);
 
-  for (int i = 0; i < number_partitions; ++i) { steps[i] = diagonal_distance; }
+  for (int i = 0; i < number_partitions; ++i) {
+    steps[i] = diagonal_distance;
+  }
 
   double step_norm = diagonal_distance;
 
@@ -2360,7 +2420,9 @@ operator<<(std::ostream& output_stream, ConnectivityArray const& connectivity_ar
 
     IDList const& node_list = element_conn.second;
 
-    for (IDList::size_type j = 0; j < node_list.size(); ++j) { output_stream << std::setw(12) << node_list[j]; }
+    for (IDList::size_type j = 0; j < node_list.size(); ++j) {
+      output_stream << std::setw(12) << node_list[j];
+    }
 
     // Element volume
     ScalarMap::const_iterator volumes_iter = volumes.find(element);
@@ -2631,7 +2693,9 @@ DualGraph::print() const
 
     IDList edges = graph[vertex];
 
-    for (auto&& edge : edges) { std::cout << std::setw(8) << edge; }
+    for (auto&& edge : edges) {
+      std::cout << std::setw(8) << edge;
+    }
 
     std::cout << '\n';
   }
@@ -2656,7 +2720,9 @@ DualGraph::print() const
     std::cout << std::setw(8) << edge;
     const IDList vertices = edge_vertices.second;
 
-    for (auto&& vertex : vertices) { std::cout << std::setw(8) << vertex; }
+    for (auto&& vertex : vertices) {
+      std::cout << std::setw(8) << vertex;
+    }
 
     std::cout << '\n';
   }
@@ -2711,7 +2777,9 @@ DualGraph::getFaceConnectivity(minitensor::ELEMENT::Type const type) const
   }
 
   face_connectivity.resize(number_faces);
-  for (int i = 0; i < number_faces; ++i) { face_connectivity[i].resize(nodes_per_face); }
+  for (int i = 0; i < number_faces; ++i) {
+    face_connectivity[i].resize(nodes_per_face);
+  }
 
   // Just for abbreviation
   std::vector<std::vector<int>>& f = face_connectivity;
@@ -2860,7 +2928,9 @@ ZoltanHyperGraph::getEdgeIDs() const
   for (auto&& vertex_hyperedges : graph_) {
     IDList hyperedges = vertex_hyperedges.second;
 
-    for (auto&& hyperedge : hyperedges) { edges.push_back(hyperedge); }
+    for (auto&& hyperedge : hyperedges) {
+      edges.push_back(hyperedge);
+    }
   }
 
   return edges;
@@ -2879,7 +2949,9 @@ ZoltanHyperGraph::getEdgePointers() const
 
     IDList hyperedges = vertex_hyperedges.second;
 
-    for (auto&& hyperedge : hyperedges) { ++pointer; }
+    for (auto&& hyperedge : hyperedges) {
+      ++pointer;
+    }
   }
 
   return pointers;
@@ -3004,11 +3076,17 @@ ZoltanHyperGraph::getHyperGraph(
 
   std::vector<int> edge_pointers = zoltan_hypergraph.getEdgePointers();
 
-  for (std::vector<ZOLTAN_ID_TYPE>::size_type i = 0; i < vertex_IDs.size(); ++i) { vtxedge_GID[i] = vertex_IDs[i]; }
+  for (std::vector<ZOLTAN_ID_TYPE>::size_type i = 0; i < vertex_IDs.size(); ++i) {
+    vtxedge_GID[i] = vertex_IDs[i];
+  }
 
-  for (std::vector<ZOLTAN_ID_TYPE>::size_type i = 0; i < edge_IDs.size(); ++i) { pin_GID[i] = edge_IDs[i]; }
+  for (std::vector<ZOLTAN_ID_TYPE>::size_type i = 0; i < edge_IDs.size(); ++i) {
+    pin_GID[i] = edge_IDs[i];
+  }
 
-  for (std::vector<int>::size_type i = 0; i < edge_pointers.size(); ++i) { vtxedge_ptr[i] = edge_pointers[i]; }
+  for (std::vector<int>::size_type i = 0; i < edge_pointers.size(); ++i) {
+    vtxedge_ptr[i] = edge_pointers[i];
+  }
 
   return;
 }
@@ -3094,7 +3172,9 @@ operator<<(std::ostream& output_stream, ZoltanHyperGraph const& zoltan_hypergrap
 
     IDList const& hyperedges = vertex_hyperedges.second;
 
-    for (auto&& hyperedge : hyperedges) { output_stream << std::setw(12) << hyperedge; }
+    for (auto&& hyperedge : hyperedges) {
+      output_stream << std::setw(12) << hyperedge;
+    }
 
     output_stream << '\n';
   }

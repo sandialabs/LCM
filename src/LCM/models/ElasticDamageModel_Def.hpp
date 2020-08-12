@@ -33,7 +33,9 @@ ElasticDamageModel<EvalT, Traits>::ElasticDamageModel(
   this->eval_field_map_.insert(std::make_pair(energy_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(damage_string, dl->qp_scalar));
 
-  if (compute_tangent_) { this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4)); }
+  if (compute_tangent_) {
+    this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4));
+  }
 
   // define the state variables
   // stress
@@ -89,7 +91,9 @@ ElasticDamageModel<EvalT, Traits>::computeState(
   auto                  damage = *eval_fields[damage_string];
   PHX::MDField<ScalarT> tangent;
 
-  if (compute_tangent_) { tangent = *eval_fields[tangent_string]; }
+  if (compute_tangent_) {
+    tangent = *eval_fields[tangent_string];
+  }
 
   // previous state
   Albany::MDArray energy_old = (*workset.stateArrayPtr)[energy_string + "_old"];
@@ -137,11 +141,15 @@ ElasticDamageModel<EvalT, Traits>::computeState(
       damage_deriv = max_damage_ / saturation_ * std::exp(-alpha / saturation_);
 
       // tangent for matrix considering damage
-      if (compute_tangent_) { Ce = (1.0 - damage(cell, pt)) * Ce - damage_deriv * minitensor::tensor(sigma, sigma); }
+      if (compute_tangent_) {
+        Ce = (1.0 - damage(cell, pt)) * Ce - damage_deriv * minitensor::tensor(sigma, sigma);
+      }
 
       // total Cauchy stress
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = (1.0 - damage(cell, pt)) * sigma(i, j); }
+        for (int j(0); j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = (1.0 - damage(cell, pt)) * sigma(i, j);
+        }
       }
 
       // total tangent
@@ -149,7 +157,9 @@ ElasticDamageModel<EvalT, Traits>::computeState(
         for (int i(0); i < num_dims_; ++i) {
           for (int j(0); j < num_dims_; ++j) {
             for (int k(0); k < num_dims_; ++k) {
-              for (int l(0); l < num_dims_; ++l) { tangent(cell, pt, i, j, k, l) = Ce(i, j, k, l); }
+              for (int l(0); l < num_dims_; ++l) {
+                tangent(cell, pt, i, j, k, l) = Ce(i, j, k, l);
+              }
             }
           }
         }

@@ -336,7 +336,9 @@ SolverFactory::checkSolveTestResults(
   else if (testParams->isSublist(sensitivity_sublist_name))
     sensitivityParams = &(testParams->sublist(sensitivity_sublist_name));
   int numSensTests = 0;
-  if (sensitivityParams != 0) { numSensTests = sensitivityParams->get<int>("Number of Sensitivity Comparisons", 0); }
+  if (sensitivityParams != 0) {
+    numSensTests = sensitivityParams->get<int>("Number of Sensitivity Comparisons", 0);
+  }
   if (numSensTests > 0) {
     ALBANY_ASSERT(
         dgdp != Teuchos::null,
@@ -476,7 +478,9 @@ SolverFactory::scaledCompare(double x1, double x2, double relTol, double absTol,
   auto rel_ok  = (d <= (avg_mag * relTol));
   auto abs_ok  = (d <= fabs(absTol));
   auto ok      = rel_ok || abs_ok;
-  if (!ok) { *out << name << ": " << x1 << " != " << x2 << " (rel " << relTol << " abs " << absTol << ")\n"; }
+  if (!ok) {
+    *out << name << ": " << x1 << " != " << x2 << " (rel " << relTol << " abs " << absTol << ")\n";
+  }
   return !ok;
 }
 
@@ -677,7 +681,9 @@ SolverFactory::getValidParameterParameters() const
 
   validPL->set<int>("Number", 0);
   int const maxParameters = 100;
-  for (int i = 0; i < maxParameters; i++) { validPL->set<std::string>(strint("Parameter", i), ""); }
+  for (int i = 0; i < maxParameters; i++) {
+    validPL->set<std::string>(strint("Parameter", i), "");
+  }
   return validPL;
 }
 

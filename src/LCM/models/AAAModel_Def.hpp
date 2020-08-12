@@ -65,7 +65,9 @@ AAAModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFiel
       S = -pressure * Id + 2.0 * (alpha_ + 2.0 * beta_ * (minitensor::I1(B) - 3.0)) * B;
 
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = S(i, j); }
+        for (int j(0); j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = S(i, j);
+        }
       }
     }
   }

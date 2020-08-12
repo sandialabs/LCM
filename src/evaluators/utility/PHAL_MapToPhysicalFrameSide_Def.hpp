@@ -78,7 +78,9 @@ template <typename EvalT, typename Traits>
 void
 MapToPhysicalFrameSide<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) { return; }
+  if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) {
+    return;
+  }
 
   std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {

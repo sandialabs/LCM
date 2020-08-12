@@ -153,7 +153,9 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
   Albany::MDArray transportold   = (*workset.stateArrayPtr)[transportName];
   Albany::MDArray scalarGrad_old = (*workset.stateArrayPtr)[CLGradName];
   Albany::MDArray eqps_old;
-  if (haveMech) { eqps_old = (*workset.stateArrayPtr)[eqpsName]; }
+  if (haveMech) {
+    eqps_old = (*workset.stateArrayPtr)[eqpsName];
+  }
 
   ScalarT dt = deltaTime(0);
   ScalarT temp(0.0);
@@ -195,7 +197,9 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
 
       minitensor::Vector<ScalarT> C_grad_in_ref_ = minitensor::dot(C_inv_tensor_, C_grad_);
 
-      for (int j = 0; j < numDims; j++) { flux(cell, pt, j) = (1 - stabilizedDL(cell, pt)) * C_grad_in_ref_(j); }
+      for (int j = 0; j < numDims; j++) {
+        flux(cell, pt, j) = (1 - stabilizedDL(cell, pt)) * C_grad_in_ref_(j);
+      }
     }
   }
 
@@ -295,7 +299,9 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
       vol += refArea(cell, qp) * thickness;
     }
     CLPbar /= vol;
-    for (int qp = 0; qp < numQPs; ++qp) { pterm(cell, qp) = CLPbar; }
+    for (int qp = 0; qp < numQPs; ++qp) {
+      pterm(cell, qp) = CLPbar;
+    }
   }
 
   for (int cell = 0; cell < workset.numCells; ++cell) {

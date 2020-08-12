@@ -93,7 +93,9 @@ ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::evaluateField
       const LO lid_overlap = wsElDofs((int)cell, (int)node, 0);
       const GO gid_overlap = param_ov_indexer->getGlobalElement(lid_overlap);
       const LO lid         = param_indexer->getLocalElement(gid_overlap);
-      if (lid >= 0) { pvec_view[lid] = (this->val)(cell, node); }
+      if (lid >= 0) {
+        pvec_view[lid] = (this->val)(cell, node);
+      }
     }
   }
 }
@@ -138,7 +140,9 @@ ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::eva
       layeredMeshNumbering.getIndices(lnodeId, base_id, ilayer);
       if (ilayer == fieldLevel) {
         const LO lid = param_indexer->getLocalElement(elNodeID[node]);
-        if (lid >= 0) { pvec_view[lid] = (this->val)(cell, node); }
+        if (lid >= 0) {
+          pvec_view[lid] = (this->val)(cell, node);
+        }
       }
     }
   }

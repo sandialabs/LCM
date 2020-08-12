@@ -226,7 +226,9 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Tensor Fpn(num_dims_);
 
   for (int i{0}; i < num_dims_; ++i) {
-    for (int j{0}; j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j)); }
+    for (int j{0}; j < num_dims_; ++j) {
+      Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j));
+    }
   }
 
   // compute trial state
@@ -288,7 +290,9 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     Tensor const Fpnew = expA * Fpn;
 
     for (int i{0}; i < num_dims_; ++i) {
-      for (int j{0}; j < num_dims_; ++j) { Fp_(cell, pt, i, j) = Fpnew(i, j); }
+      for (int j{0}; j < num_dims_; ++j) {
+        Fp_(cell, pt, i, j) = Fpnew(i, j);
+      }
     }
   } else {
     eqps_(cell, pt) = eqps_old_(cell, pt);
@@ -296,7 +300,9 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     if (have_temperature_ == true) source_(cell, pt) = 0.0;
 
     for (int i{0}; i < num_dims_; ++i) {
-      for (int j{0}; j < num_dims_; ++j) { Fp_(cell, pt, i, j) = Fpn(i, j); }
+      for (int j{0}; j < num_dims_; ++j) {
+        Fp_(cell, pt, i, j) = Fpn(i, j);
+      }
     }
   }
 
@@ -310,7 +316,9 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   sigma = p * I + s / J_(cell, pt);
 
   for (int i(0); i < num_dims_; ++i) {
-    for (int j(0); j < num_dims_; ++j) { stress_(cell, pt, i, j) = sigma(i, j); }
+    for (int j(0); j < num_dims_; ++j) {
+      stress_(cell, pt, i, j) = sigma(i, j);
+    }
   }
 }
 }  // namespace LCM

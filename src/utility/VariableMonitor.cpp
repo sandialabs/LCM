@@ -21,7 +21,9 @@ string
 VariableMonitor::getStringValue(const monitored_type& val)
 {
   std::stringstream ret;
-  for (auto&& v : val.getHistory()) { ret << v << " "; }
+  for (auto&& v : val.getHistory()) {
+    ret << v << " ";
+  }
 
   return ret.str();
 }

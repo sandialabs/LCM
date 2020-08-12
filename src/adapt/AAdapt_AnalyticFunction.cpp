@@ -169,7 +169,9 @@ AAdapt::TemperatureStep::compute(double* x, double const* X)
   int coord = static_cast<int>(data[5]);
 
   // check that coordinate is valid
-  if ((coord > 2) || (coord < 0)) { ALBANY_ABORT("Error! Coordinate not valid!" << std::endl); }
+  if ((coord > 2) || (coord < 0)) {
+    ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
+  }
 
   double const TOL = 1.0e-12;
 
@@ -215,7 +217,9 @@ AAdapt::DispConstTemperatureStep::compute(double* x, double const* X)
   int coord = static_cast<int>(data[8]);
 
   // check that coordinate is valid
-  if ((coord > 2) || (coord < 0)) { ALBANY_ABORT("Error! Coordinate not valid!" << std::endl); }
+  if ((coord > 2) || (coord < 0)) {
+    ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
+  }
 
   double const TOL = 1.0e-12;
 
@@ -259,14 +263,20 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, double const* X)
   int coord = static_cast<int>(data[7]);
 
   // check that coordinate is valid
-  if ((coord > 2) || (coord < 0)) { ALBANY_ABORT("Error! Coordinate not valid!" << std::endl); }
+  if ((coord > 2) || (coord < 0)) {
+    ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
+  }
 
   double const TOL = 1.0e-12;
 
   // check that temperatures are not equal
-  if (std::abs(T0 - T1) <= TOL) { ALBANY_ABORT("Error! Temperature are equals!" << std::endl); }
+  if (std::abs(T0 - T1) <= TOL) {
+    ALBANY_ABORT("Error! Temperature are equals!" << std::endl);
+  }
   // check coordinates are not equal
-  if (std::abs(Z0 - Z1) <= TOL) { ALBANY_ABORT("Error! Z-coordinates are the same!" << std::endl); }
+  if (std::abs(Z0 - Z1) <= TOL) {
+    ALBANY_ABORT("Error! Z-coordinates are the same!" << std::endl);
+  }
 
   // We interpolate Temperature as a linear function of z-ccordinate: T = b +
   // m*z
@@ -305,14 +315,20 @@ AAdapt::TemperatureLinear::compute(double* x, double const* X)
   int coord = static_cast<int>(data[4]);
 
   // check that coordinate is valid
-  if ((coord > 2) || (coord < 0)) { ALBANY_ABORT("Error! Coordinate not valid!" << std::endl); }
+  if ((coord > 2) || (coord < 0)) {
+    ALBANY_ABORT("Error! Coordinate not valid!" << std::endl);
+  }
 
   double const TOL = 1.0e-12;
 
   // check that temperatures are not equal
-  if (std::abs(T0 - T1) <= TOL) { ALBANY_ABORT("Error! Temperature are equals!" << std::endl); }
+  if (std::abs(T0 - T1) <= TOL) {
+    ALBANY_ABORT("Error! Temperature are equals!" << std::endl);
+  }
   // check coordinates are not equal
-  if (std::abs(Z0 - Z1) <= TOL) { ALBANY_ABORT("Error! Z-coordinates are the same!" << std::endl); }
+  if (std::abs(Z0 - Z1) <= TOL) {
+    ALBANY_ABORT("Error! Z-coordinates are the same!" << std::endl);
+  }
 
   // We interpolate Temperature as a linear function of z-ccordinate: T = b +
   // m*z
@@ -464,7 +480,9 @@ AAdapt::Linear::compute(double* x, double const* X)
 {
   for (auto eq = 0; eq < neq; ++eq) {
     double s{0.0};
-    for (auto dim = 0; dim < numDim; ++dim) { s += data[eq * numDim + dim] * X[dim]; }
+    for (auto dim = 0; dim < numDim; ++dim) {
+      s += data[eq * numDim + dim] * X[dim];
+    }
     x[eq] = s;
   }
 }
@@ -487,7 +505,9 @@ AAdapt::ConstantBox::compute(double* x, double const* X)
   }
 
   if (in_box == true) {
-    for (auto eq = 0; eq < neq; ++eq) { x[eq] = data[2 * numDim + eq]; }
+    for (auto eq = 0; eq < neq; ++eq) {
+      x[eq] = data[2 * numDim + eq];
+    }
   }
 }
 
@@ -590,7 +610,9 @@ AAdapt::GaussianPress::GaussianPress(int neq_, int numDim_, Teuchos::Array<doubl
 void
 AAdapt::GaussianPress::compute(double* x, double const* X)
 {
-  for (int i = 0; i < neq - 1; i++) { x[i] = 0.0; }
+  for (int i = 0; i < neq - 1; i++) {
+    x[i] = 0.0;
+  }
 
   x[neq - 1] = data[0] * exp(-data[1] * ((X[0] - data[2]) * (X[0] - data[2]) + (X[1] - data[3]) * (X[1] - data[3])));
 }
@@ -620,7 +642,9 @@ void
 AAdapt::SinScalar::compute(double* x, double const* X)
 {
   x[0] = 1.0;
-  for (int dim{0}; dim < numDim; ++dim) { x[0] *= sin(pi / data[dim] * X[dim]); }
+  for (int dim{0}; dim < numDim; ++dim) {
+    x[0] *= sin(pi / data[dim] * X[dim]);
+  }
 }
 
 AAdapt::TaylorGreenVortex::TaylorGreenVortex(int neq_, int numDim_, Teuchos::Array<double> data_)
@@ -674,7 +698,9 @@ AAdapt::ExpressionParser::compute(double* unknowns, double const* coords)
     auto const&         expr_str = expr[eq];
     stk::expreval::Eval expr_eval(expr_str);
     expr_eval.parse();
-    for (auto i = 0; i < dim; ++i) { expr_eval.bindVariable(coord_str[i], X[i]); }
+    for (auto i = 0; i < dim; ++i) {
+      expr_eval.bindVariable(coord_str[i], X[i]);
+    }
     unknowns[eq] = expr_eval.evaluate();
   }
 }

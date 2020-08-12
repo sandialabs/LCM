@@ -116,9 +116,13 @@ TransportResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
   this->utils.setFieldData(w_bf_, fm);
   this->utils.setFieldData(w_grad_bf_, fm);
 
-  if (have_source_) { this->utils.setFieldData(source_, fm); }
+  if (have_source_) {
+    this->utils.setFieldData(source_, fm);
+  }
 
-  if (have_second_source_) { this->utils.setFieldData(second_source_, fm); }
+  if (have_second_source_) {
+    this->utils.setFieldData(second_source_, fm);
+  }
 
   if (have_transient_) {
     this->utils.setFieldData(transient_coeff_, fm);
@@ -126,15 +130,25 @@ TransportResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
     this->utils.setFieldData(delta_time_, fm);
   }
 
-  if (have_diffusion_) { this->utils.setFieldData(diffusivity_, fm); }
+  if (have_diffusion_) {
+    this->utils.setFieldData(diffusivity_, fm);
+  }
 
-  if (have_convection_) { this->utils.setFieldData(convection_vector_, fm); }
+  if (have_convection_) {
+    this->utils.setFieldData(convection_vector_, fm);
+  }
 
-  if (have_species_coupling_) { this->utils.setFieldData(species_coupling_, fm); }
+  if (have_species_coupling_) {
+    this->utils.setFieldData(species_coupling_, fm);
+  }
 
-  if (have_stabilization_) { this->utils.setFieldData(stabilization_, fm); }
+  if (have_stabilization_) {
+    this->utils.setFieldData(stabilization_, fm);
+  }
 
-  if (have_contact_) { this->utils.setFieldData(M_operator_, fm); }
+  if (have_contact_) {
+    this->utils.setFieldData(M_operator_, fm);
+  }
 
   if (have_transient_ && have_mechanics_ && (SolutionType_ != "Continuation")) {
     this->utils.setFieldData(stress_, fm);
@@ -153,7 +167,9 @@ TransportResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
 {
   // zero out residual
   for (int cell = 0; cell < workset.numCells; ++cell) {
-    for (int node = 0; node < num_nodes_; ++node) { residual_(cell, node) = 0.0; }
+    for (int node = 0; node < num_nodes_; ++node) {
+      residual_(cell, node) = 0.0;
+    }
   }
 
   // transient term
@@ -176,7 +192,9 @@ TransportResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
         // zeros.
         term1_(cell, pt) = ScalarT(0.0);
         for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) { sum += stress_(cell, pt, i, j) * vel_grad_(cell, pt, i, j); }
+          for (int j = 0; j < num_dims_; ++j) {
+            sum += stress_(cell, pt, i, j) * vel_grad_(cell, pt, i, j);
+          }
         }
         term1_(cell, pt) = sum;
       }

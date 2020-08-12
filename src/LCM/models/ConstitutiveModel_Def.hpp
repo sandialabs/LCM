@@ -29,7 +29,9 @@ ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(Teuchos::ParameterList* p, T
     density_          = p->get<RealType>("Density", 1.0);
   }
 
-  if (p->isType<bool>("Have Damage") == true) { have_damage_ = p->get<bool>("Have Damage"); }
+  if (p->isType<bool>("Have Damage") == true) {
+    have_damage_ = p->get<bool>("Have Damage");
+  }
 
   if (p->isType<bool>("Have Total Concentration")) {
     have_total_concentration_ = p->get<bool>("Have Total Concentration");
@@ -43,7 +45,9 @@ ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(Teuchos::ParameterList* p, T
     have_bubble_volume_fraction_ = p->get<bool>("Have Bubble Volume Fraction");
   }
 
-  if (p->isType<bool>("Compute Tangent")) { compute_tangent_ = p->get<bool>("Compute Tangent"); }
+  if (p->isType<bool>("Compute Tangent")) {
+    compute_tangent_ = p->get<bool>("Compute Tangent");
+  }
 }
 
 // Kokkos Kernel for computeVolumeAverage
@@ -101,7 +105,9 @@ class computeVolumeAverageKernel
       p = (1. / num_dims_) * minitensor::trace(sig);
       sig += (pbar - p) * I;
 
-      for (int i = 0; i < num_dims_; ++i) { stress(cell, pt, i, i) = sig(i, i); }
+      for (int i = 0; i < num_dims_; ++i) {
+        stress(cell, pt, i, i) = sig(i, i);
+      }
     }
   }
 };
@@ -136,7 +142,9 @@ ConstitutiveModel<EvalT, Traits>::computeVolumeAverage(Workset workset, DepField
       p = (1. / num_dims) * minitensor::trace(sig);
       sig += (pbar - p) * I;
 
-      for (int i = 0; i < num_dims; ++i) { stress(cell, pt, i, i) = sig(i, i); }
+      for (int i = 0; i < num_dims; ++i) {
+        stress(cell, pt, i, i) = sig(i, i);
+      }
     }
   }
 }

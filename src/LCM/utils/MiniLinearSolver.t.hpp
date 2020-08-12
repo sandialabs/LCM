@@ -33,18 +33,24 @@ MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N>::solve(
 
   for (auto i = 0; i < dimension; ++i) {
     Df(i) = b(i).val();
-    for (auto j = 0; j < dimension; ++j) { DfDx(i, j) = A(i, j).val(); }
+    for (auto j = 0; j < dimension; ++j) {
+      DfDx(i, j) = A(i, j).val();
+    }
   }
 
   minitensor::Vector<ValueT, N> const Dx = minitensor::solve(DfDx, Df);
-  for (auto i = 0; i < dimension; ++i) { x(i).val() = Dx(i); }
+  for (auto i = 0; i < dimension; ++i) {
+    x(i).val() = Dx(i);
+  }
 
   // Then deal with derivatives
   minitensor::Tensor<ValueT> DbDx(dimension);
 
   // extract the jacobian
   for (auto i = 0; i < dimension; ++i) {
-    for (auto j = 0; j < dimension; ++j) { DbDx(i, j) = A(i, j).val(); }
+    for (auto j = 0; j < dimension; ++j) {
+      DbDx(i, j) = A(i, j).val();
+    }
   }
   computeFADInfo(b, DbDx, x);
 }

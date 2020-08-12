@@ -52,7 +52,9 @@ DOFInterpolationBase<EvalT, Traits, ScalarT>::operator()(const DOFInterpolationB
 {
   for (int qp = 0; qp < numQPs; ++qp) {
     val_qp(cell, qp) = val_node(cell, 0) * BF(cell, 0, qp);
-    for (int node = 1; node < numNodes; ++node) { val_qp(cell, qp) += val_node(cell, node) * BF(cell, node, qp); }
+    for (int node = 1; node < numNodes; ++node) {
+      val_qp(cell, qp) += val_node(cell, node) * BF(cell, node, qp);
+    }
   }
 }
 

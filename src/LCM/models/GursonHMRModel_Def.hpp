@@ -170,7 +170,9 @@ GursonHMRModel<EvalT, Traits>::computeState(
       F.fill(def_grad, cell, pt, 0, 0);
       // Fpn.fill( &Fpold(cell,pt,int(0),int(0)) );
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j)); }
+        for (int j(0); j < num_dims_; ++j) {
+          Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j));
+        }
       }
 
       // compute trial state
@@ -281,7 +283,9 @@ GursonHMRModel<EvalT, Traits>::computeState(
         for (int i(0); i < num_dims_; ++i) {
           for (int j(0); j < num_dims_; ++j) {
             Fp(cell, pt, i, j) = 0.0;
-            for (int k(0); k < num_dims_; ++k) { Fp(cell, pt, i, j) += expA(i, k) * Fpn(k, j); }
+            for (int k(0); k < num_dims_; ++k) {
+              Fp(cell, pt, i, j) += expA(i, k) * Fpn(k, j);
+            }
           }
         }
 
@@ -299,7 +303,9 @@ GursonHMRModel<EvalT, Traits>::computeState(
         void_volume(cell, pt)  = void_volume_old(cell, pt);
 
         for (int i(0); i < num_dims_; ++i) {
-          for (int j(0); j < num_dims_; ++j) { Fp(cell, pt, i, j) = Fp_old(cell, pt, i, j); }
+          for (int j(0); j < num_dims_; ++j) {
+            Fp(cell, pt, i, j) = Fp_old(cell, pt, i, j);
+          }
         }
 
       }  // end of elasticity
@@ -308,7 +314,9 @@ GursonHMRModel<EvalT, Traits>::computeState(
       // note that p also has to be divided by J
       // because the one computed from return mapping is the Kirchhoff pressure
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = s(i, j) / J(cell, pt); }
+        for (int j(0); j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = s(i, j) / J(cell, pt);
+        }
         stress(cell, pt, i, i) += p / J(cell, pt);
       }
 
@@ -434,7 +442,9 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
   // valid for assumption Ntr = N;
   minitensor::Tensor<DFadType> sfad(num_dims_);
   for (int i = 0; i < num_dims_; ++i) {
-    for (int j = 0; j < num_dims_; ++j) { sfad(i, j) = factor * s(i, j); }
+    for (int j = 0; j < num_dims_; ++j) {
+      sfad(i, j) = factor * s(i, j);
+    }
   }
 
   // currently complaining error in promotion tensor type

@@ -106,7 +106,9 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename 
       // Calculate Euclidean distance of the element in each of the master
       // directions
       for (int ref_dim = 0; ref_dim < numDims; ++ref_dim) {  // xi, eta, zeta
-        for (int dim = 0; dim < numDims; ++dim) { dEDdxi(ref_dim) += Sqr(dxdxi(dim, ref_dim)); }
+        for (int dim = 0; dim < numDims; ++dim) {
+          dEDdxi(ref_dim) += Sqr(dxdxi(dim, ref_dim));
+        }
         dEDdxi(ref_dim) = std::sqrt(dEDdxi(ref_dim));
       }
 
@@ -210,7 +212,9 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typenam
       // Calculate Euclidean distance of the element in each of the master
       // directions
       for (int ref_dim = 0; ref_dim < numDims; ++ref_dim) {  // xi, eta, zeta
-        for (int dim = 0; dim < numDims; ++dim) { anisoMeshSizeField(cell, qp, ref_dim) += Sqr(dxdxi(dim, ref_dim)); }
+        for (int dim = 0; dim < numDims; ++dim) {
+          anisoMeshSizeField(cell, qp, ref_dim) += Sqr(dxdxi(dim, ref_dim));
+        }
         anisoMeshSizeField(cell, qp, ref_dim) = std::sqrt(anisoMeshSizeField(cell, qp, ref_dim));
       }
     }

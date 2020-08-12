@@ -99,7 +99,9 @@ MechanicsProblem::MechanicsProblem(
   if (have_mech_eq_) num_eq += num_dims_;
   if (have_temperature_eq_) num_eq++;
   if (have_ace_temperature_eq_) num_eq++;
-  if (have_dislocation_density_eq_) { num_eq += LCM::DislocationDensity::get_num_slip(num_dims_); }
+  if (have_dislocation_density_eq_) {
+    num_eq += LCM::DislocationDensity::get_num_slip(num_dims_);
+  }
   if (have_pore_pressure_eq_) num_eq++;
   if (have_transport_eq_) num_eq++;
   if (have_hydrostress_eq_) num_eq++;
@@ -131,7 +133,9 @@ MechanicsProblem::MechanicsProblem(
       Teuchos::ParameterList& thSrcPL = params->sublist("Source Functions").sublist("Thermal Source");
 
       if (thSrcPL.get<std::string>("Thermal Source Type", "None") == "Block Dependent") {
-        if (Teuchos::nonnull(material_db_)) { thermal_source_ = SOURCE_TYPE_MATERIAL; }
+        if (Teuchos::nonnull(material_db_)) {
+          thermal_source_ = SOURCE_TYPE_MATERIAL;
+        }
       } else {
         thermal_source_ = SOURCE_TYPE_INPUT;
       }
@@ -208,10 +212,14 @@ MechanicsProblem::MechanicsProblem(
         material_db_->getAllMatchingParams<bool>("Read Lattice Orientation From Mesh");
 
     for (unsigned int i = 0; i < readOrientationFromMesh.size(); i++) {
-      if (readOrientationFromMesh[i]) { requireLatticeOrientationOnMesh = true; }
+      if (readOrientationFromMesh[i]) {
+        requireLatticeOrientationOnMesh = true;
+      }
     }
   }
-  if (requireLatticeOrientationOnMesh == true) { requirements.push_back("Lattice_Orientation"); }
+  if (requireLatticeOrientationOnMesh == true) {
+    requirements.push_back("Lattice_Orientation");
+  }
   if (have_erosion == true) {
     requirements.push_back("cell_boundary_indicator");
     // requirements.push_back("face_boundary_indicator");
@@ -237,7 +245,9 @@ MechanicsProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> 
     fm[ps] = Teuchos::rcp(new PHX::FieldManager<PHAL::AlbanyTraits>);
     buildEvaluators(*fm[ps], *meshSpecs[ps], stateMgr, BUILD_RESID_FM, Teuchos::null);
 
-    if (meshSpecs[ps]->ssNames.size() > 0) { haveSidesets = true; }
+    if (meshSpecs[ps]->ssNames.size() > 0) {
+      haveSidesets = true;
+    }
   }
   *out << "Calling MechanicsProblem::constructDirichletEvaluators" << '\n';
   constructDirichletEvaluators(*meshSpecs[0]);
@@ -278,8 +288,12 @@ MechanicsProblem::applyProblemSpecificSolverSettings(Teuchos::RCP<Teuchos::Param
 
   if (params->isSublist("Piro")) {
     if (params->sublist("Piro").isSublist("NOX")) {
-      if (params->sublist("Piro").sublist("NOX").isSublist("Solver Options")) { have_solver_opts = true; }
-      if (params->sublist("Piro").sublist("NOX").isSublist("Status Tests")) { have_status_test = true; }
+      if (params->sublist("Piro").sublist("NOX").isSublist("Solver Options")) {
+        have_solver_opts = true;
+      }
+      if (params->sublist("Piro").sublist("NOX").isSublist("Status Tests")) {
+        have_status_test = true;
+      }
     }
   }
 
@@ -386,7 +400,9 @@ MechanicsProblem::constructNeumannEvaluators(Teuchos::RCP<MeshSpecsStruct> const
   BCUtils<NeumannTraits> neuUtils;
 
   // Check to make sure that Neumann BCs are given in the input file
-  if (!neuUtils.haveBCSpecified(this->params)) { return; }
+  if (!neuUtils.haveBCSpecified(this->params)) {
+    return;
+  }
 
   // Construct BC evaluators for all side sets and names
   // Note that the string index sets up the equation offset,
@@ -410,7 +426,9 @@ MechanicsProblem::constructNeumannEvaluators(Teuchos::RCP<MeshSpecsStruct> const
   if (have_mech_eq_) {
     // There are num_dims_ components of the traction vector, so set accordingly
     offsets[neq].resize(num_dims_);
-    for (int i{0}; i < num_dims_; ++i) { offsets[neq][i] = i; }
+    for (int i{0}; i < num_dims_; ++i) {
+      offsets[neq][i] = i;
+    }
 
     // Components of the traction vector
     char components[] = "xyz";

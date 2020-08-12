@@ -286,7 +286,9 @@ ACEpermafrostMiniKernel<EvalT, Traits>::init(
     for (auto pt = 0; pt < num_pts_; ++pt) {
       auto const height = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
       ScalarT    sal    = salinity_base_;
-      if (salinity_.size() > 0) { sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height); }
+      if (salinity_.size() > 0) {
+        sal = interpolateVectors(z_above_mean_sea_level_, salinity_, height);
+      }
       bluff_salinity_(cell, pt) = sal;
     }
   }
@@ -349,7 +351,9 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     ScalarT const  zero_sal(0.0);
     ScalarT const  sal_curr  = bluff_salinity_(cell, pt);
     ScalarT        ocean_sal = salinity_base_;
-    if (ocean_salinity_.size() > 0) { ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time); }
+    if (ocean_salinity_.size() > 0) {
+      ocean_sal = interpolateVectors(time_, ocean_salinity_, current_time);
+    }
     ScalarT const sal_diff   = ocean_sal - sal_curr;
     ScalarT const sal_grad   = sal_diff / cell_half_width;
     ScalarT const sal_update = sal_grad * delta_time * factor;
@@ -362,7 +366,9 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Calculate melting temperature
   ScalarT sal15(0.0);
-  if (sal > 0.0) { sal15 = std::sqrt(sal * sal * sal); }
+  if (sal > 0.0) {
+    sal15 = std::sqrt(sal * sal * sal);
+  }
   auto const pressure_fixed = 1.0;
   // Tmelt is in Kelvin
   ScalarT const Tmelt =
@@ -537,7 +543,9 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Tensor Fpn(num_dims_);
 
   for (int i{0}; i < num_dims_; ++i) {
-    for (int j{0}; j < num_dims_; ++j) { Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j)); }
+    for (int j{0}; j < num_dims_; ++j) {
+      Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j));
+    }
   }
 
   // compute trial state
@@ -594,13 +602,17 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     Tensor const Fpnew = expA * Fpn;
 
     for (int i{0}; i < num_dims_; ++i) {
-      for (int j{0}; j < num_dims_; ++j) { Fp_(cell, pt, i, j) = Fpnew(i, j); }
+      for (int j{0}; j < num_dims_; ++j) {
+        Fp_(cell, pt, i, j) = Fpnew(i, j);
+      }
     }
   } else {
     eqps_(cell, pt) = eqps_old_(cell, pt);
 
     for (int i{0}; i < num_dims_; ++i) {
-      for (int j{0}; j < num_dims_; ++j) { Fp_(cell, pt, i, j) = Fpn(i, j); }
+      for (int j{0}; j < num_dims_; ++j) {
+        Fp_(cell, pt, i, j) = Fpn(i, j);
+      }
     }
   }
 
@@ -614,7 +626,9 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   sigma = pressure * I + s / J_(cell, pt);
 
   for (int i(0); i < num_dims_; ++i) {
-    for (int j(0); j < num_dims_; ++j) { stress_(cell, pt, i, j) = sigma(i, j); }
+    for (int j(0); j < num_dims_; ++j) {
+      stress_(cell, pt, i, j) = sigma(i, j);
+    }
   }
 
   // Determine if critical stress is exceeded

@@ -73,7 +73,9 @@ ThermoMechanicalCoefficients<EvalT, Traits>::postRegistrationSetup(
   this->utils.setFieldData(thermal_transient_coeff_, fm);
   this->utils.setFieldData(thermal_diffusivity_, fm);
 
-  if (have_mech_) { this->utils.setFieldData(def_grad_, fm); }
+  if (have_mech_) {
+    this->utils.setFieldData(def_grad_, fm);
+  }
 }
 
 template <typename EvalT, typename Traits>
@@ -112,7 +114,9 @@ ThermoMechanicalCoefficients<EvalT, Traits>::evaluateFields(typename Traits::Eva
         minitensor::Tensor<ScalarT> diffusivity = thermal_cond_(cell, pt) / (density_ * heat_capacity_) * tensor;
 
         for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) { thermal_diffusivity_(cell, pt, i, j) = diffusivity(i, j); }
+          for (int j = 0; j < num_dims_; ++j) {
+            thermal_diffusivity_(cell, pt, i, j) = diffusivity(i, j);
+          }
         }
       }
     }
@@ -126,7 +130,9 @@ ThermoMechanicalCoefficients<EvalT, Traits>::evaluateFields(typename Traits::Eva
         minitensor::Tensor<ScalarT> diffusivity = thermal_cond_(cell, pt) / (density_ * heat_capacity_) * I;
 
         for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) { thermal_diffusivity_(cell, pt, i, j) = diffusivity(i, j); }
+          for (int j = 0; j < num_dims_; ++j) {
+            thermal_diffusivity_(cell, pt, i, j) = diffusivity(i, j);
+          }
         }
       }
     }

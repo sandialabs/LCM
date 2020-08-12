@@ -55,7 +55,9 @@ DamageCoefficients<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupD
   this->utils.setFieldData(delta_time_, fm);
   this->utils.setFieldData(damage_transient_coeff_, fm);
   this->utils.setFieldData(damage_diffusivity_, fm);
-  if (have_mech_) { this->utils.setFieldData(def_grad_, fm); }
+  if (have_mech_) {
+    this->utils.setFieldData(def_grad_, fm);
+  }
 }
 
 template <typename EvalT, typename Traits>
@@ -71,7 +73,9 @@ DamageCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData work
   if (dt == 0.0) dt = 1.e-15;
   Albany::MDArray damage_old = (*workset.stateArrayPtr)[damage_name_];
   for (int cell = 0; cell < workset.numCells; ++cell) {
-    for (int pt = 0; pt < num_pts_; ++pt) { damage_dot_(cell, pt) = (damage_(cell, pt) - damage_old(cell, pt)) / dt; }
+    for (int pt = 0; pt < num_pts_; ++pt) {
+      damage_dot_(cell, pt) = (damage_(cell, pt) - damage_old(cell, pt)) / dt;
+    }
   }
 
   if (have_mech_) {
@@ -82,7 +86,9 @@ DamageCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData work
         damage_transient_coeff_(cell, pt) = transient_coeff_;
         diffusivity                       = diffusivity_coeff_ * tensor;
         for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) { damage_diffusivity_(cell, pt, i, j) = diffusivity(i, j); }
+          for (int j = 0; j < num_dims_; ++j) {
+            damage_diffusivity_(cell, pt, i, j) = diffusivity(i, j);
+          }
         }
       }
     }
@@ -92,7 +98,9 @@ DamageCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData work
         damage_transient_coeff_(cell, pt) = transient_coeff_;
         diffusivity                       = diffusivity_coeff_ * I;
         for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) { damage_diffusivity_(cell, pt, i, j) = diffusivity(i, j); }
+          for (int j = 0; j < num_dims_; ++j) {
+            damage_diffusivity_(cell, pt, i, j) = diffusivity(i, j);
+          }
         }
       }
     }

@@ -64,7 +64,9 @@ Schwarz_PiroObserver::observeSolutionImpl(Thyra::VectorBase<ST> const& solution,
 
   Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> null_array;
   null_array.resize(n_models_);
-  for (int m = 0; m < n_models_; m++) { null_array[m] = Teuchos::null; }
+  for (int m = 0; m < n_models_; m++) {
+    null_array[m] = Teuchos::null;
+  }
 
   impl_->observeSolution(default_stamp, solutions, null_array);
 }

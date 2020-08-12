@@ -79,7 +79,9 @@ main(int ac, char* av[])
   std::vector<std::vector<double>> mNormals(numberNormals_, std::vector<double>(3, 0));
 
   if (normals_.is_open()) {
-    for (int i = 0; i < numberNormals_; i++) { normals_ >> mNormals[i][0] >> mNormals[i][1] >> mNormals[i][2]; }
+    for (int i = 0; i < numberNormals_; i++) {
+      normals_ >> mNormals[i][0] >> mNormals[i][1] >> mNormals[i][2];
+    }
   }
 
   // Extract the numbers from the matrix that contains the normals
@@ -124,7 +126,9 @@ main(int ac, char* av[])
       // nodesIdentifiers, but without repeated indices
       std::vector<int>                 setOfNodes;
       std::vector<int>::const_iterator iteratorInt;
-      for (unsigned int i = 0; i < nodesIdentifiers.size(); i = i + 2) { setOfNodes.push_back(nodesIdentifiers[i]); }
+      for (unsigned int i = 0; i < nodesIdentifiers.size(); i = i + 2) {
+        setOfNodes.push_back(nodesIdentifiers[i]);
+      }
 
       int dimension          = 3;
       int NumNodesPerElement = 2;

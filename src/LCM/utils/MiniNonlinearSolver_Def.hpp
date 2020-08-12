@@ -51,7 +51,9 @@ MiniSolver<MIN, STEP, FN, PHAL::AlbanyTraits::Jacobian, N>::MiniSolver(
   auto const dimension = soln.get_dimension();
 
   // Put values back in solution vector
-  for (auto i = 0; i < dimension; ++i) { soln(i).val() = soln_val(i); }
+  for (auto i = 0; i < dimension; ++i) {
+    soln(i).val() = soln_val(i);
+  }
 
   // Get the Hessian evaluated at the solution.
   minitensor::Tensor<ValueT, N> DrDx = function.hessian(soln_val);
@@ -115,7 +117,9 @@ MiniSolverROL<MIN, FN, PHAL::AlbanyTraits::Jacobian, N>::MiniSolverROL(
   auto const dimension = soln.get_dimension();
 
   // Put values back in solution vector
-  for (auto i = 0; i < dimension; ++i) { soln(i).val() = soln_val(i); }
+  for (auto i = 0; i < dimension; ++i) {
+    soln(i).val() = soln_val(i);
+  }
 
   // Get the Hessian evaluated at the solution.
   minitensor::Tensor<ValueT, N> DrDx = function.hessian(soln_val);
@@ -182,7 +186,9 @@ MiniSolverBoundsROL<MIN, FN, BC, PHAL::AlbanyTraits::Jacobian, N>::MiniSolverBou
   auto const dimension = soln.get_dimension();
 
   // Put values back in solution vector
-  for (auto i = 0; i < dimension; ++i) { soln(i).val() = soln_val(i); }
+  for (auto i = 0; i < dimension; ++i) {
+    soln(i).val() = soln_val(i);
+  }
 
   // Get the Hessian evaluated at the solution.
   minitensor::Tensor<ValueT, N> DrDx = function.hessian(soln_val);
@@ -253,7 +259,9 @@ MiniSolverEqIneqROL<MIN, FN, EIC, PHAL::AlbanyTraits::Jacobian, N, NC>::MiniSolv
   auto const dimension = soln.get_dimension();
 
   // Put values back in solution vector
-  for (auto i = 0; i < dimension; ++i) { soln(i).val() = soln_val(i); }
+  for (auto i = 0; i < dimension; ++i) {
+    soln(i).val() = soln_val(i);
+  }
 
   // Get the Hessian evaluated at the solution.
   minitensor::Tensor<ValueT, N> DrDx = function.hessian(soln_val);
@@ -288,7 +296,9 @@ computeFADInfo(minitensor::Vector<T, N> const& r, minitensor::Tensor<S, N> const
   minitensor::Matrix<S, N, minitensor::DYNAMIC> DrDp(dimension, order);
 
   for (auto i = 0; i < dimension; ++i) {
-    for (auto j = 0; j < order; ++j) { DrDp(i, j) = r(i).dx(j); }
+    for (auto j = 0; j < order; ++j) {
+      DrDp(i, j) = r(i).dx(j);
+    }
   }
 
   // Solve for all DxDp
@@ -297,7 +307,9 @@ computeFADInfo(minitensor::Vector<T, N> const& r, minitensor::Tensor<S, N> const
   // Pack into x.
   for (auto i = 0; i < dimension; ++i) {
     x(i).resize(order);
-    for (auto j = 0; j < order; ++j) { x(i).fastAccessDx(j) = -DxDp(i, j); }
+    for (auto j = 0; j < order; ++j) {
+      x(i).fastAccessDx(j) = -DxDp(i, j);
+    }
   }
 }
 

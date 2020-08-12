@@ -41,9 +41,15 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveCellStateField(Teu
   i_index = 0;
   j_index = 0;
   k_index = 0;
-  if (p.isType<int>("component i")) { i_index = p.get<int>("component i"); }
-  if (p.isType<int>("component j")) { j_index = p.get<int>("component j"); }
-  if (p.isType<int>("component k")) { k_index = p.get<int>("component k"); }
+  if (p.isType<int>("component i")) {
+    i_index = p.get<int>("component i");
+  }
+  if (p.isType<int>("component j")) {
+    j_index = p.get<int>("component j");
+  }
+  if (p.isType<int>("component k")) {
+    k_index = p.get<int>("component k");
+  }
 
   fieldName = p.get<std::string>("Field Name");
   stateName = p.get<std::string>("State Name");

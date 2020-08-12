@@ -235,7 +235,9 @@ CP::computeStress(
   for (int i = 0; i < num_dim; ++i) {
     for (int j = 0; j < num_dim; ++j) {
       for (int k = 0; k < num_dim; ++k) {
-        for (int l = 0; l < num_dim; ++l) { S(i, j) += C(i, j, k, l) * strain_elastic(k, l); }
+        for (int l = 0; l < num_dim; ++l) {
+          S(i, j) += C(i, j, k, l) * strain_elastic(k, l);
+        }
       }
     }
   }
@@ -249,7 +251,9 @@ CP::computeStress(
   shear.fill(minitensor::Filler::ZEROS);
   for (minitensor::Index s(0); s < num_slip; ++s) {
     for (int i = 0; i < num_dim; ++i) {
-      for (int j = 0; j < num_dim; ++j) { shear[s] += slip_systems.at(s).projector_(i, j) * s_trans(i, j); }
+      for (int j = 0; j < num_dim; ++j) {
+        shear[s] += slip_systems.at(s).projector_(i, j) * s_trans(i, j);
+      }
     }
   }
 }

@@ -203,11 +203,15 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::computeState(
 
       // Fiber orientation vectors
       // fiber 1
-      for (int i = 0; i < num_dims_; ++i) { M1(i) = direction_f1_[i]; }
+      for (int i = 0; i < num_dims_; ++i) {
+        M1(i) = direction_f1_[i];
+      }
       M1 = M1 / norm(M1);
 
       // fiber 2
-      for (int i = 0; i < num_dims_; ++i) { M2(i) = direction_f2_[i]; }
+      for (int i = 0; i < num_dims_; ++i) {
+        M2(i) = direction_f2_[i];
+      }
       M2 = M2 / norm(M2);
 
       // Anisotropic invariants I4 = M_{i} * C * M_{i}

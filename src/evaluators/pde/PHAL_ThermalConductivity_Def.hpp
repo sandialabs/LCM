@@ -118,7 +118,9 @@ ThermalConductivity<EvalT, Traits>::evaluateFields(typename Traits::EvalData wor
 {
   if (is_constant) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t qp = 0; qp < numQPs; ++qp) { thermalCond(cell, qp) = constant_value; }
+      for (std::size_t qp = 0; qp < numQPs; ++qp) {
+        thermalCond(cell, qp) = constant_value;
+      }
     }
   }
 }
@@ -128,7 +130,9 @@ template <typename EvalT, typename Traits>
 typename ThermalConductivity<EvalT, Traits>::ScalarT&
 ThermalConductivity<EvalT, Traits>::getValue(std::string const& n)
 {
-  if (is_constant) { return constant_value; }
+  if (is_constant) {
+    return constant_value;
+  }
   ALBANY_ABORT(
       std::endl
       << "Error! Logic error in getting paramter " << n << " in ThermalConductivity::getValue()" << std::endl);

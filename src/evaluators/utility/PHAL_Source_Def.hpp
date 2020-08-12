@@ -383,7 +383,9 @@ Trigonometric<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
                  "constant source."
               << std::endl;
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t iqp = 0; iqp < m_num_qp; iqp++) { m_source(cell, iqp) = m_constant; }
+      for (std::size_t iqp = 0; iqp < m_num_qp; iqp++) {
+        m_source(cell, iqp) = m_constant;
+      }
     }
   }
 }
@@ -651,7 +653,9 @@ void
 MVQuadratic<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   ScalarT a = 0.0;
-  for (unsigned int j = 0; j < m_factor.size(); j++) { a += m_factor[j]; }
+  for (unsigned int j = 0; j < m_factor.size(); j++) {
+    a += m_factor[j];
+  }
   a /= static_cast<double>(m_factor.size());
 
   // Loop over cells, quad points: compute MVQuadratic Source Term
@@ -761,7 +765,9 @@ void
 MVExponential<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   ScalarT a = 0.0;
-  for (unsigned int j = 0; j < m_factor.size(); j++) { a += m_factor[j]; }
+  for (unsigned int j = 0; j < m_factor.size(); j++) {
+    a += m_factor[j];
+  }
   a /= static_cast<double>(m_factor.size());
 
   // Loop over cells, quad points: compute MVExponential Source Term
@@ -839,7 +845,9 @@ Gaussian<EvalT>::evaluateFields(std::vector<typename EvalT::MeshScalarT> const& 
 {
   MeshScalarT       exponent = 0;
   std::size_t const nsd      = coords.size();
-  for (std::size_t i = 0; i < nsd; ++i) { exponent += std::pow(m_centroid[i] - coords[i], 2); }
+  for (std::size_t i = 0; i < nsd; ++i) {
+    exponent += std::pow(m_centroid[i] - coords[i], 2);
+  }
   exponent *= m_sigma_sq;
   MeshScalarT x(0.0);
   if (nsd == 1)

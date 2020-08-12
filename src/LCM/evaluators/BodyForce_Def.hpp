@@ -40,10 +40,14 @@ BodyForce<EvalT, Traits>::BodyForce(Teuchos::ParameterList& p, Teuchos::RCP<Alba
 
     // Ensure that axisDirection is normalized
     double len = 0.0;
-    for (int i = 0; i < 3; i++) { len += this->rotation_axis_[i] * this->rotation_axis_[i]; }
+    for (int i = 0; i < 3; i++) {
+      len += this->rotation_axis_[i] * this->rotation_axis_[i];
+    }
 
     len = sqrt(len);
-    for (int i = 0; i < 3; i++) { this->rotation_axis_[i] /= len; }
+    for (int i = 0; i < 3; i++) {
+      this->rotation_axis_[i] /= len;
+    }
   } else {
     ALBANY_ABORT("Invalid body force type " << type);
   }
@@ -72,7 +76,9 @@ BodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   if (is_constant_ == true) {
     for (int cell = 0; cell < num_cells; ++cell) {
       for (int qp = 0; qp < num_qp_; ++qp) {
-        for (int dim = 0; dim < num_dim_; ++dim) { body_force_(cell, qp, dim) = constant_value_[dim]; }
+        for (int dim = 0; dim < num_dim_; ++dim) {
+          body_force_(cell, qp, dim) = constant_value_[dim];
+        }
       }
     }
   } else {
@@ -98,7 +104,9 @@ BodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
           len2 += f_dir[dim] * f_dir[dim];
         }
         MeshScalarT len_reciprocal = 1. / sqrt(len2);
-        for (std::size_t dim = 0; dim < num_dim_; dim++) { f_dir[dim] *= len_reciprocal; }
+        for (std::size_t dim = 0; dim < num_dim_; dim++) {
+          f_dir[dim] *= len_reciprocal;
+        }
 
         // Determine the qp's mass
         // qpmass = weights_(cell,qp) * density_(cell, qp);

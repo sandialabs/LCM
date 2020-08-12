@@ -30,7 +30,9 @@ FM::DomainSwitching<EvalT, M>::DomainSwitching(
   // set all transitions active for first residual eval
   int nTransitions = m_transitions.size();
   m_transitionMap.resize(nTransitions);
-  for (int J = 0; J < nTransitions; J++) { m_transitionMap[J] = J; }
+  for (int J = 0; J < nTransitions; J++) {
+    m_transitionMap[J] = J;
+  }
 
   // evaluate residual at current bin fractions
   minitensor::Vector<ArgT, FM::MAX_TRNS> zero;
@@ -221,7 +223,9 @@ FM::computeBinFractions(
   for (int I = 0; I < nVariants; I++) {
     newFractions[I] = oldFractions[I];
     for (int i = 0; i < nTransitions; i++) {
-      if (transitionMap[i] >= 0) { newFractions[I] += xi(transitionMap[i]) * aMatrix(I, i); }
+      if (transitionMap[i] >= 0) {
+        newFractions[I] += xi(transitionMap[i]) * aMatrix(I, i);
+      }
     }
   }
 }

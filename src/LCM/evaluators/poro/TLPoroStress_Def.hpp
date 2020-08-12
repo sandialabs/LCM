@@ -96,7 +96,9 @@ TLPoroStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {
         for (int dim = 0; dim < numDims; ++dim) {
-          for (int j = 0; j < numDims; ++j) { totstress(cell, qp, dim, j) -= JBpF_invT(cell, qp, dim, j); }
+          for (int j = 0; j < numDims; ++j) {
+            totstress(cell, qp, dim, j) -= JBpF_invT(cell, qp, dim, j);
+          }
         }
       }
     }

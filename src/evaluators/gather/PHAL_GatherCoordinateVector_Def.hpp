@@ -88,13 +88,17 @@ GatherCoordinateVector<EvalT, Traits>::evaluateFields(typename Traits::EvalData 
   if (dispVecName.is_null()) {
     for (std::size_t cell = 0; cell < numCells; ++cell) {
       for (std::size_t node = 0; node < numVertices; ++node) {
-        for (std::size_t eq = 0; eq < numDim; ++eq) { coordVecHost(cell, node, eq) = wsCoords[cell][node][eq]; }
+        for (std::size_t eq = 0; eq < numDim; ++eq) {
+          coordVecHost(cell, node, eq) = wsCoords[cell][node][eq];
+        }
       }
     }
 
     for (std::size_t cell = numCells; cell < worksetSize; ++cell) {
       for (std::size_t node = 0; node < numVertices; ++node) {
-        for (std::size_t eq = 0; eq < numDim; ++eq) { coordVecHost(cell, node, eq) = coordVecHost(0, node, eq); }
+        for (std::size_t eq = 0; eq < numDim; ++eq) {
+          coordVecHost(cell, node, eq) = coordVecHost(0, node, eq);
+        }
       }
     }
   } else {

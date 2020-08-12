@@ -135,7 +135,9 @@ SideLaplacian::constructEvaluators(
     Albany::FieldManagerChoice                  fieldManagerChoice,
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
 {
-  if (numDim == 2) { return constructEvaluators2D<EvalT>(fm0, meshSpecs, stateMgr, fieldManagerChoice, responseList); }
+  if (numDim == 2) {
+    return constructEvaluators2D<EvalT>(fm0, meshSpecs, stateMgr, fieldManagerChoice, responseList);
+  }
   return constructEvaluators3D<EvalT>(fm0, meshSpecs, stateMgr, fieldManagerChoice, responseList);
 }
 

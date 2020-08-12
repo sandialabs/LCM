@@ -620,7 +620,9 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorJump)
       std::cout << std::endl;
 
       double tolerance = 1.0e-6;
-      for (size_type i = 0; i < numDim; ++i) { TEST_COMPARE(jumpField(cell, pt, i) - expectedJump(i), <=, tolerance); }
+      for (size_type i = 0; i < numDim; ++i) {
+        TEST_COMPARE(jumpField(cell, pt, i) - expectedJump(i), <=, tolerance);
+      }
     }
   }
   std::cout << std::endl;

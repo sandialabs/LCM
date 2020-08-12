@@ -98,7 +98,9 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 {
   this->utils.setFieldData(val_cell, fm);
   this->utils.setFieldData(val_side_qp, fm);
-  if (layout == NODE_SCALAR || layout == NODE_VECTOR || layout == NODE_TENSOR) { this->utils.setFieldData(BF, fm); }
+  if (layout == NODE_SCALAR || layout == NODE_VECTOR || layout == NODE_TENSOR) {
+    this->utils.setFieldData(BF, fm);
+  }
 
   val_side_qp.dimensions(dims_side);
 
@@ -110,7 +112,9 @@ template <typename EvalT, typename Traits, typename ScalarT>
 void
 DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
-  if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) { return; }
+  if (workset.sideSets->find(sideSetName) == workset.sideSets->end()) {
+    return;
+  }
 
   std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
   for (auto const& it_side : sideSet) {
@@ -120,19 +124,25 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::Eva
 
     switch (layout) {
       case CELL_SCALAR:
-        for (int qp = 0; qp < dims_side[2]; ++qp) { val_side_qp(cell, side, qp) = val_cell(cell); }
+        for (int qp = 0; qp < dims_side[2]; ++qp) {
+          val_side_qp(cell, side, qp) = val_cell(cell);
+        }
         break;
 
       case CELL_VECTOR:
         for (int qp = 0; qp < dims_side[2]; ++qp) {
-          for (int i = 0; i < dims_side[3]; ++i) { val_side_qp(cell, side, qp, i) = val_cell(cell, i); }
+          for (int i = 0; i < dims_side[3]; ++i) {
+            val_side_qp(cell, side, qp, i) = val_cell(cell, i);
+          }
         }
         break;
 
       case CELL_TENSOR:
         for (int qp = 0; qp < dims_side[2]; ++qp) {
           for (int i = 0; i < dims_side[3]; ++i) {
-            for (int j = 0; j < dims_side[4]; ++j) { val_side_qp(cell, side, qp, i, j) = val_cell(cell, i, j); }
+            for (int j = 0; j < dims_side[4]; ++j) {
+              val_side_qp(cell, side, qp, i, j) = val_cell(cell, i, j);
+            }
           }
         }
         break;

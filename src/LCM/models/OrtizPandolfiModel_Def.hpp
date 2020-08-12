@@ -136,7 +136,9 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
       ScalarT const jump_s2 = minitensor::dot(vec_jump_s, vec_jump_s);
 
       ScalarT jump_s = 0.0;
-      if (jump_s2 > 0.0) { jump_s = std::sqrt(jump_s2); }
+      if (jump_s2 > 0.0) {
+        jump_s = std::sqrt(jump_s2);
+      }
 
       // define the effective jump
       // for interpenetration, only employ shear component
@@ -148,7 +150,9 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
         // Be careful regarding Sacado and sqrt()
         ScalarT const jump_eff2 = beta * beta * jump_s * jump_s + jump_n * jump_n;
 
-        if (jump_eff2 > 0.0) { jump_eff = std::sqrt(jump_eff2); }
+        if (jump_eff2 > 0.0) {
+          jump_eff = std::sqrt(jump_eff2);
+        }
       } else {
         jump_eff = beta * jump_s;
       }
@@ -207,7 +211,9 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
       // Shear traction, default to zero.
       minitensor::Vector<ScalarT> traction_shear(3, minitensor::Filler::ZEROS);
 
-      if (jump_eff > 0.0) { traction_shear = t_eff / jump_eff * beta * beta * vec_jump_s; }
+      if (jump_eff > 0.0) {
+        traction_shear = t_eff / jump_eff * beta * beta * vec_jump_s;
+      }
 
       minitensor::Vector<ScalarT> traction_vector = traction_normal + traction_shear;
 
@@ -231,7 +237,9 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
       // Be careful regarding Sacado and sqrt()
       ScalarT traction_s2 = minitensor::dot(vec_traction_s, vec_traction_s);
       ScalarT traction_s  = 0.0;
-      if (traction_s2 > 0.0) { traction_s = std::sqrt(traction_s2); }
+      if (traction_s2 > 0.0) {
+        traction_s = std::sqrt(traction_s2);
+      }
       mdf_traction_normal(cell, pt) = traction_n;
       mdf_traction_shear(cell, pt)  = traction_s;
 
@@ -240,7 +248,9 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(
       mdf_jump_shear(cell, pt)  = jump_s;
 
       // only true state variable is mdf_jump_max
-      if (jump_eff > jump_m) { mdf_jump_max(cell, pt) = jump_eff; }
+      if (jump_eff > jump_m) {
+        mdf_jump_max(cell, pt) = jump_eff;
+      }
     }
   }
 }

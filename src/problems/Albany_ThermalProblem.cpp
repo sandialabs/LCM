@@ -29,7 +29,9 @@ Albany::ThermalProblem::ThermalProblem(
   Teuchos::Array<double> defaultData;
   defaultData.resize(numDim, 1.0);
   kappa = params->get<Teuchos::Array<double>>("Thermal Conductivity", defaultData);
-  if (kappa.size() != numDim) { ALBANY_ABORT("Thermal Conductivity array must have length = numDim!"); }
+  if (kappa.size() != numDim) {
+    ALBANY_ABORT("Thermal Conductivity array must have length = numDim!");
+  }
   rho = params->get<double>("Density", 1.0);
   C   = params->get<double>("Heat Capacity", 1.0);
 }

@@ -54,7 +54,9 @@ STKAdapt<SizeField>::queryAdaptationCriteria(int iteration)
   Teuchos::Array<int> remesh_iter = adapt_params_->get<Teuchos::Array<int>>("Remesh Step Number");
 
   for (int i = 0; i < remesh_iter.size(); i++) {
-    if (iteration == remesh_iter[i]) { return true; }
+    if (iteration == remesh_iter[i]) {
+      return true;
+    }
   }
 
   return false;

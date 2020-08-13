@@ -948,8 +948,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   // Adapt mesh if needed.
   auto& sol_mgr = *(app.getSolutionManager());
   if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
-    auto& erosion_adaptor = dynamic_cast<AAdapt::Erosion&>(sol_mgr);
-    erosion_adaptor.adaptMesh();
+    sol_mgr.adaptProblem();
   }
 
   // Allocate current solution vectors

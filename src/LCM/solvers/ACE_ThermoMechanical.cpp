@@ -5,7 +5,6 @@
 #include "ACE_ThermoMechanical.hpp"
 
 #include "AAdapt_Erosion.hpp"
-#include "Albany_ModelEvaluator.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Albany_Utils.hpp"
@@ -945,15 +944,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
 
   solver.evalModel(in_args, out_args);
 
-  // Adapt mesh if needed.
-  auto& sol_mgr = *(app.getSolutionManager());
-  if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
-    auto me_rcp             = model_evaluators_[subdomain];
-    auto adaptive_state_rcp = Teuchos::rcp(new ACEAdaptiveState(me_rcp));
-    sol_mgr.initialize(adaptive_state_rcp);
-    sol_mgr.adaptProblem();
-  }
-
   // Allocate current solution vectors
   this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
   this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
@@ -987,6 +977,16 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
   Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
   Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
+
+  // Adapt mesh if needed.
+  auto& sol_mgr = *(app.getSolutionManager());
+  if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
+    auto me_rcp             = model_evaluators_[subdomain];
+    auto delegator          = Teuchos::rcp(new ACEModelEvaluatorDelegator(me_rcp));
+    auto adaptive_state_rcp = Teuchos::rcp(new ACEAdaptiveState(delegator));
+    sol_mgr.initialize(adaptive_state_rcp);
+    sol_mgr.adaptProblem();
+  }
 
   failed_ = false;
 }

@@ -948,6 +948,9 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   // Adapt mesh if needed.
   auto& sol_mgr = *(app.getSolutionManager());
   if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
+    auto me_rcp             = model_evaluators_[subdomain];
+    auto adaptive_state_rcp = Teuchos::rcp(new ACEAdaptiveState(me_rcp));
+    sol_mgr.initialize(adaptive_state_rcp);
     sol_mgr.adaptProblem();
   }
 

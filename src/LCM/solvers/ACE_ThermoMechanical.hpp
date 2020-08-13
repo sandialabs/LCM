@@ -15,11 +15,23 @@
 #include "Albany_SolverFactory.hpp"
 #include "Piro_NOXSolver.hpp"
 #include "StateVarUtils.hpp"
+#include "Thyra_AdaptiveSolutionManager.hpp"
 #include "Thyra_DefaultProductVector.hpp"
 #include "Thyra_DefaultProductVectorSpace.hpp"
 #include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
 
 namespace LCM {
+
+class ACEAdaptiveState : public Thyra::AdaptiveStateBase
+{
+ public:
+  ACEAdaptiveState(Teuchos::RCP<::Thyra::ModelEvaluator<double>> const& model) : AdaptiveStateBase(model) {}
+  ~ACEAdaptiveState() {}
+  void
+  buildSolutionGroup()
+  {
+  }
+};
 
 ///
 /// ACEThermoMechanical coupling class

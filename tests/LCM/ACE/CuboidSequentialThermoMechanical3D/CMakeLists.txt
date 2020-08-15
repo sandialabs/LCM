@@ -76,7 +76,7 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # Name the test with the directory name
   get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
   # Add the tests
-  set(OUTFILE "thermal.e-s.119")
+  set(OUTFILE "thermal.e-s.17")
   set(REF_FILE "${CMAKE_CURRENT_BINARY_DIR}/../CuboidThermoMechanical3D/grid.e")
   add_test(
     NAME ACE_${testName}
@@ -89,8 +89,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
   set_tests_properties(ACE_${testName}
                        PROPERTIES DEPENDS CuboidThermoMechanical3D_ThermalOnly)
   
-  set(OUTFILE "thermal-vardt.e-s.40")
-  set(REF_FILE "thermal.e-s.119")
+  set(OUTFILE "thermal-vardt.e-s.8")
+  set(REF_FILE "thermal.e-s.17")
   add_test(
     NAME ACE_${testName}_vardt
     COMMAND

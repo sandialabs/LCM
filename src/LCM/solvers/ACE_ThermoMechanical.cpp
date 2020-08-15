@@ -20,7 +20,66 @@ getName(std::string const& method)
   if (method.size() < 3) return method;
   return method.substr(0, method.size() - 3);
 }
+
+void deletePrevWrittenExoFile(const std::string file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm) 
+{
+  Teuchos::RCP<Teuchos::FancyOStream> fos_ = Teuchos::VerboseObjectBase::getDefaultOStream(); 
+  const int num_ranks = comm->getSize(); 
+  int file_removed; 
+  if (num_ranks > 1) {
+    const int this_rank = comm->getRank();  
+    std::string full_file_name = file_name + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank); 
+    char cstr[full_file_name.size()+1]; 
+    strcpy(cstr, full_file_name.c_str()); 
+    file_removed = remove(cstr); 
+  }
+  else {
+    char cstr[file_name.size()+1]; 
+    strcpy(cstr, file_name.c_str()); 
+    file_removed = remove(cstr); 
+  }
+  if (file_removed == 0) {
+    *fos_  << "Exodus files based off of " << file_name << " deleted successfully!\n";
+  }
+  else {
+    *fos_ << "Unable to delete Exodus files based off of " << file_name << "!\n";
+  }
+}
+void renamePrevWrittenExoFile(const std::string old_file_name, const std::string new_file_name, 
+		              Teuchos::RCP<Teuchos::Comm<int> const> comm) 
+{
+  Teuchos::RCP<Teuchos::FancyOStream> fos_ = Teuchos::VerboseObjectBase::getDefaultOStream(); 
+  const int num_ranks = comm->getSize(); 
+  int file_renamed; 
+  if (num_ranks > 1) {
+    const int this_rank = comm->getRank();  
+    std::string full_old_file_name = old_file_name + "." + std::to_string(num_ranks) 
+	                           + "." + std::to_string(this_rank); 
+    std::string full_new_file_name = new_file_name + "." + std::to_string(num_ranks) 
+	                           + "." + std::to_string(this_rank); 
+    char oldname[full_old_file_name.size()+1]; 
+    char newname[full_new_file_name.size()+1]; 
+    strcpy(oldname, full_old_file_name.c_str()); 
+    strcpy(newname, full_new_file_name.c_str()); 
+    file_renamed = rename(oldname, newname);
+  }
+  else {
+    char oldname[old_file_name.size()+1]; 
+    char newname[new_file_name.size()+1]; 
+    strcpy(oldname, old_file_name.c_str()); 
+    strcpy(newname, new_file_name.c_str()); 
+    file_renamed = rename(oldname, newname);
+  }
+  if (file_renamed == 0) {
+    *fos_  << "Exodus files based off of " << old_file_name << " renamed successfully to"
+	    << " files based off of " << new_file_name << "\n";
+  }
+  else {
+    *fos_ << "Unable to rename Exodus files based off of " << old_file_name << "!\n";
+  }
+}
 }  // namespace
+
 
 namespace LCM {
 
@@ -411,7 +470,6 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   renameExodusFile(file_index, filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
-
   disc_params.set<std::string>("Exodus Solution Name", "temperature");
   disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
   disc_params.set<bool>("Output DTK Field to Exodus", false);
@@ -457,6 +515,10 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   model_evaluators_[subdomain]   = solver_factories_[subdomain]->returnModel();
   curr_x_[subdomain]             = Teuchos::null;
   prev_thermal_exo_outfile_name_ = filename;
+  //Delete previously-written Exodus files to not have inundation of output files
+  if (((file_index-1) % output_interval_) != 0) {
+    deletePrevWrittenExoFile(prev_mechanical_exo_outfile_name_, comm_); 
+  }
 }
 
 void
@@ -525,6 +587,10 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   model_evaluators_[subdomain]      = solver_factories_[subdomain]->returnModel();
   curr_x_[subdomain]                = Teuchos::null;
   prev_mechanical_exo_outfile_name_ = filename;
+  //Delete previously-written Exodus files to not have inundation of output files
+  if ((file_index % output_interval_) != 0) {
+    deletePrevWrittenExoFile(prev_thermal_exo_outfile_name_, comm_); 
+  }
 }
 
 bool
@@ -599,12 +665,14 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (!failed_) {  // If mechanical solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
+            renamePrevWrittenExoFiles(subdomain, stop); 
           }
         } else {
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (!failed_) {  // If thermal solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
+            renamePrevWrittenExoFiles(subdomain, stop); 
           }
         }
         if (failed_ == true) {
@@ -701,6 +769,10 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
   }  // Time-step loop
 
+  //Rename final Exodus output file 
+  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    renamePrevWrittenExoFiles(subdomain, stop); 
+  }
   return;
 }
 
@@ -993,6 +1065,21 @@ ACEThermoMechanical::doQuasistaticOutput(ST const time) const
       stk_disc.writeSolutionMV(*x_mv_rcp, time);
       stk_mesh_struct.exoOutput = false;
     }
+  }
+}
+
+void 
+ACEThermoMechanical::renamePrevWrittenExoFiles(const int subdomain, const int file_index) const 
+{
+  if (((file_index-1) % output_interval_) == 0) {
+    Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
+    Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
+    Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
+    std::string filename_old = disc_params.get<std::string>("Exodus Output File Name");
+    renameExodusFile(file_index-1, filename_old);
+    std::string filename_new = filename_old; 
+    renameExodusFile((file_index-1)/output_interval_, filename_new);
+    renamePrevWrittenExoFile(filename_old, filename_new, comm_); 
   }
 }
 

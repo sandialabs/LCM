@@ -649,38 +649,14 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (!failed_) {  // If mechanical solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
-            if (((stop-1) % output_interval_) == 0) {
-              Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
-              Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
-              Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
-              std::string filename_old = disc_params.get<std::string>("Exodus Output File Name");
-	      renameExodusFile(stop-1, filename_old);
-	      std::string filename_new = filename_old; 
-	      std::cout << "IKT mechanics exo out file name = " << filename_old << "\n"; 
-	      renameExodusFile((stop-1)/output_interval_, filename_new);
-	      std::cout << "IKT mechanics new exo out file name = " << filename_new << "\n"; 
-              renamePrevWrittenExoFile(filename_old, filename_new, comm_); 
-	    }
+            renamePrevWrittenExoFiles(subdomain, stop); 
           }
         } else {
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (!failed_) {  // If thermal solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
-            std::cout << "IKT thermal stop, stop/output_interval_ = " << stop << ", " << stop/output_interval_ << "\n"; 
-            std::cout << "IKT thermal mod(stop, output_interval_) = " << stop % output_interval_ << "\n"; 
-            if (((stop-1) % output_interval_) == 0) {
-              Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
-              Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
-              Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
-              std::string filename_old = disc_params.get<std::string>("Exodus Output File Name");
-	      renameExodusFile(stop-1, filename_old);
-	      std::string filename_new = filename_old; 
-	      std::cout << "IKT thermal exo out file name = " << filename_old << "\n"; 
-	      renameExodusFile((stop-1)/output_interval_, filename_new);
-	      std::cout << "IKT thermal new exo out file name = " << filename_new << "\n"; 
-              renamePrevWrittenExoFile(filename_old, filename_new, comm_); 
-	    }
+            renamePrevWrittenExoFiles(subdomain, stop); 
           }
         }
         if (failed_ == true) {
@@ -776,21 +752,10 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     }
 
   }  // Time-step loop
-  std::cout << "IKT last stop = " << stop << "\n"; 
- 
+
+  //Rename final Exodus output file 
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    if (((stop-1) % output_interval_) == 0) {
-      Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
-      Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
-      Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
-      std::string filename_old = disc_params.get<std::string>("Exodus Output File Name");
-      renameExodusFile(stop-1, filename_old);
-      std::string filename_new = filename_old; 
-      std::cout << "IKT thermal exo out file name = " << filename_old << "\n"; 
-      renameExodusFile((stop-1)/output_interval_, filename_new);
-      std::cout << "IKT thermal new exo out file name = " << filename_new << "\n"; 
-      renamePrevWrittenExoFile(filename_old, filename_new, comm_); 
-    }
+    renamePrevWrittenExoFiles(subdomain, stop); 
   }
   return;
 }
@@ -1084,6 +1049,21 @@ ACEThermoMechanical::doQuasistaticOutput(ST const time) const
       stk_disc.writeSolutionMV(*x_mv_rcp, time);
       stk_mesh_struct.exoOutput = false;
     }
+  }
+}
+
+void 
+ACEThermoMechanical::renamePrevWrittenExoFiles(const int subdomain, const int file_index) const 
+{
+  if (((file_index-1) % output_interval_) == 0) {
+    Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
+    Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
+    Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
+    std::string filename_old = disc_params.get<std::string>("Exodus Output File Name");
+    renameExodusFile(file_index-1, filename_old);
+    std::string filename_new = filename_old; 
+    renameExodusFile((file_index-1)/output_interval_, filename_new);
+    renamePrevWrittenExoFile(filename_old, filename_new, comm_); 
   }
 }
 

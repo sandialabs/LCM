@@ -21,15 +21,23 @@ getName(std::string const& method)
   return method.substr(0, method.size() - 3);
 }
 
-void deleteExoFile(const std::string file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm) 
+void deletePrevWrittenExoFile(const std::string file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm) 
 {
   Teuchos::RCP<Teuchos::FancyOStream> fos_ = Teuchos::VerboseObjectBase::getDefaultOStream(); 
   const int num_ranks = comm->getSize(); 
-  const int this_rank = comm->getRank();  
-  std::string full_file_name = file_name + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank); 
-  char cstr[full_file_name.size()+1]; 
-  strcpy(cstr, full_file_name.c_str()); 
-  int const file_removed = remove(cstr); 
+  int file_removed; 
+  if (num_ranks > 1) {
+    const int this_rank = comm->getRank();  
+    std::string full_file_name = file_name + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank); 
+    char cstr[full_file_name.size()+1]; 
+    strcpy(cstr, full_file_name.c_str()); 
+    file_removed = remove(cstr); 
+  }
+  else {
+    char cstr[file_name.size()+1]; 
+    strcpy(cstr, file_name.c_str()); 
+    file_removed = remove(cstr); 
+  }
   if (file_removed == 0) {
     *fos_  << "Exodus files based off of " << file_name << " deleted successfully!\n";
   }
@@ -475,7 +483,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   prev_thermal_exo_outfile_name_ = filename;
   //Delete previously-written Exodus files to not have inundation of output files
   if (((file_index-1) % output_interval_) != 0) {
-    deleteExoFile(prev_mechanical_exo_outfile_name_, comm_); 
+    deletePrevWrittenExoFile(prev_mechanical_exo_outfile_name_, comm_); 
   }
 }
 
@@ -547,7 +555,7 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   prev_mechanical_exo_outfile_name_ = filename;
   //Delete previously-written Exodus files to not have inundation of output files
   if ((file_index % output_interval_) != 0) {
-    deleteExoFile(prev_thermal_exo_outfile_name_, comm_); 
+    deletePrevWrittenExoFile(prev_thermal_exo_outfile_name_, comm_); 
   }
 }
 

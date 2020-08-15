@@ -9,7 +9,7 @@ LCM:
     Reduction Factor: 5.00000000000000000e-01
     #Amplification Factor: 1.50000000000000000e+00
     Amplification Factor: 1.00000000000000000e+00
-    Exodus Write Interval: 1
+    Exodus Write Interval: 7
   # MODEL DECLARATION, Look in the Problem directory
   Problem:
     # Transient or Steady (Quasi-Static) or Continuation (load steps)

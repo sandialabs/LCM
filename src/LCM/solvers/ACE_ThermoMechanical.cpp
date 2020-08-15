@@ -49,11 +49,27 @@ void renamePrevWrittenExoFile(const std::string old_file_name, const std::string
 		              Teuchos::RCP<Teuchos::Comm<int> const> comm) 
 {
   Teuchos::RCP<Teuchos::FancyOStream> fos_ = Teuchos::VerboseObjectBase::getDefaultOStream(); 
-  char oldname[old_file_name.size()+1]; 
-  char newname[new_file_name.size()+1]; 
-  strcpy(oldname, old_file_name.c_str()); 
-  strcpy(newname, new_file_name.c_str()); 
-  int const file_renamed = rename(oldname, newname);
+  const int num_ranks = comm->getSize(); 
+  int file_renamed; 
+  if (num_ranks > 1) {
+    const int this_rank = comm->getRank();  
+    std::string full_old_file_name = old_file_name + "." + std::to_string(num_ranks) 
+	                           + "." + std::to_string(this_rank); 
+    std::string full_new_file_name = new_file_name + "." + std::to_string(num_ranks) 
+	                           + "." + std::to_string(this_rank); 
+    char oldname[full_old_file_name.size()+1]; 
+    char newname[full_new_file_name.size()+1]; 
+    strcpy(oldname, full_old_file_name.c_str()); 
+    strcpy(newname, full_new_file_name.c_str()); 
+    file_renamed = rename(oldname, newname);
+  }
+  else {
+    char oldname[old_file_name.size()+1]; 
+    char newname[new_file_name.size()+1]; 
+    strcpy(oldname, old_file_name.c_str()); 
+    strcpy(newname, new_file_name.c_str()); 
+    file_renamed = rename(oldname, newname);
+  }
   if (file_renamed == 0) {
     *fos_  << "Exodus files based off of " << old_file_name << " renamed successfully to"
 	    << " files based off of " << new_file_name << "\n";

@@ -5,6 +5,8 @@
 #
 
 # Copy Input file from source to binary dir
+add_subdirectory(ClampedSDBC)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dynamics.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/dynamics.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/elastic.yaml

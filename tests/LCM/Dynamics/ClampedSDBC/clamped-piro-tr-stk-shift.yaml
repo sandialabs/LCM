@@ -1,0 +1,163 @@
+LCM:
+  Debug Output:
+    Write Jacobian to MatrixMarket: 0
+    Write Jacobian to Standard Output: 0
+    Write Residual to MatrixMarket: 0
+    Write Residual to Standard Output: 0
+    Write Solution to MatrixMarket: 0
+    Write Solution to Standard Output: 0
+  Problem:
+    Name: Mechanics 3D
+    Solution Method: Transient
+    Phalanx Graph Visualization Detail: 0
+    MaterialDB Filename: 'material-clamped-stk.yaml'
+    Second Order: Trapezoid Rule
+    Initial Condition:
+      Function: Gaussian Z
+      Function Data: [0.01, 1.0, 0.02]
+    Initial Condition Dot:
+      Function: Constant
+      Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00]
+    Dirichlet BCs:
+      SDBC on NS NodeSet0 for DOF X: 0.00000000e+00
+      SDBC on NS NodeSet1 for DOF X: 0.00000000e+00
+      SDBC on NS NodeSet2 for DOF Y: 0.00000000e+00
+      SDBC on NS NodeSet3 for DOF Y: 0.00000000e+00
+      SDBC on NS NodeSet4 for DOF Z: 0.00000000e+00
+      SDBC on NS NodeSet5 for DOF Z: 0.00000000e+00
+    Response Functions:
+      Number: 4
+      Response 0: Project IP to Nodal Field
+      ResponseParams 0:
+        Number of Fields: 1
+        IP Field Name 0: Cauchy_Stress
+        IP Field Layout 0: Tensor
+        Output to File: true
+      Response 1: Solution Average
+      Response 2: Solution Max Value
+      Response 3: Solution Min Value
+  Discretization:
+    Method: STK3D
+    1D Elements: 1
+    1D Scale: 0.01
+    2D Elements: 1
+    2D Scale: 0.01
+    3D Elements: 100
+    3D Scale: 1.0
+    Transform Type: Shift
+    x-shift: 0.0
+    y-shift: 0.0
+    z-shift: 0.5
+    Exodus Output File Name: 'clamped-stk-shift-piro-tr.e'
+    Exodus Solution Name: disp
+    Exodus Residual Name: resid
+    Separate Evaluators by Element Block: true
+    Number Of Time Derivatives: 2
+    Exodus Write Interval: 10
+  Regression Results:
+    Number of Comparisons: 4
+    Test Values: [ 0, -0.000165453927025, 0, 0]
+    Relative Tolerance: 1.0e-7
+    Absolute Tolerance: 1.0e-7
+  Piro:
+    Trapezoid Rule:
+      Initial Time: 0.00000000e+00
+      Num Time Steps: 1000
+      Final Time: 1.0e-3
+      NOX:
+        Direction:
+          Method: Newton
+          Newton:
+            Forcing Term Method: Constant
+            Rescue Bad Newton Solve: true
+            Linear Solver:
+              Tolerance: 1.0e-5
+            Stratimikos Linear Solver:
+              NOX Stratimikos Options: { }
+              Stratimikos:
+                Linear Solver Type: Belos
+                Linear Solver Types:
+                  Belos:
+                    VerboseObject:
+                      Verbosity Level: high
+                    Solver Type: Block GMRES
+                    Solver Types:
+                      Block GMRES:
+                        Output Frequency: 10
+                        Output Style: 1
+                        Verbosity: 33
+                        Maximum Iterations: 100
+                        Num Blocks: 100
+                Preconditioner Type: None
+                Preconditioner Types:
+                  Ifpack2:
+                    Overlap: 1
+                    Prec Type: ILUT
+                    Ifpack2 Settings:
+                      'fact: ilut level-of-fill': 1.00000000
+                      'fact: drop tolerance': 0.00000000e+00
+        Line Search:
+          Method: Full Step
+        Nonlinear Solver: Line Search Based
+        Printing:
+          Output Information: 103
+          Output Precision: 3
+          Output Processor: 0
+        Status Tests:
+          Test Type: Combo
+          Combo Type: OR
+          Number of Tests: 2
+          Test 0:
+            Test Type: NormF
+            Norm Type: Two Norm
+            Scale Type: Scaled
+            Tolerance: 1.00000000e-8
+          Test 1:
+            Test Type: MaxIters
+            Maximum Iterations: 128
+    NOX:
+      Direction:
+        Method: Newton
+        Newton:
+          Forcing Term Method: Constant
+          Rescue Bad Newton Solve: true
+          Linear Solver:
+            Tolerance: 1.0e-5
+          Stratimikos Linear Solver:
+            NOX Stratimikos Options: { }
+            Stratimikos:
+              Linear Solver Type: Belos
+              Linear Solver Types:
+                Belos:
+                  VerboseObject:
+                    Verbosity Level: high
+                  Solver Type: Block GMRES
+                  Solver Types:
+                    Block GMRES:
+                      Output Frequency: 10
+                      Output Style: 1
+                      Verbosity: 33
+                      Maximum Iterations: 100
+                      Block Size: 1
+                      Num Blocks: 100
+                      Flexible Gmres: false
+              Preconditioner Type: Ifpack2
+              Preconditioner Types:
+                Ifpack2:
+                  Overlap: 1
+                  Prec Type: ILUT
+                  Ifpack2 Settings:
+                    'fact: ilut level-of-fill': 1.00000000
+                    'fact: drop tolerance': 0.00000000e+00
+      Line Search:
+        Full Step:
+          Full Step: 1.00000000
+        Method: Full Step
+      Nonlinear Solver: Line Search Based
+      Printing:
+        Output Information: 103
+        Output Precision: 3
+        Output Processor: 0
+      Solver Options:
+        Status Test Check Type: Minimal
+...

@@ -45,7 +45,25 @@ void deletePrevWrittenExoFile(const std::string file_name, Teuchos::RCP<Teuchos:
     *fos_ << "Unable to delete Exodus files based off of " << file_name << "!\n";
   }
 }
+void renamePrevWrittenExoFile(const std::string old_file_name, const std::string new_file_name, 
+		              Teuchos::RCP<Teuchos::Comm<int> const> comm) 
+{
+  Teuchos::RCP<Teuchos::FancyOStream> fos_ = Teuchos::VerboseObjectBase::getDefaultOStream(); 
+  char oldname[old_file_name.size()+1]; 
+  char newname[new_file_name.size()+1]; 
+  strcpy(oldname, old_file_name.c_str()); 
+  strcpy(newname, new_file_name.c_str()); 
+  int const file_renamed = rename(oldname, newname);
+  if (file_renamed == 0) {
+    *fos_  << "Exodus files based off of " << old_file_name << " renamed successfully to"
+	    << " files based off of " << new_file_name << "\n";
+  }
+  else {
+    *fos_ << "Unable to rename Exodus files based off of " << old_file_name << "!\n";
+  }
+}
 }  // namespace
+
 
 namespace LCM {
 
@@ -631,12 +649,38 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (!failed_) {  // If mechanical solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
+            if (((stop-1) % output_interval_) == 0) {
+              Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
+              Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
+              Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
+              std::string filename_old = disc_params.get<std::string>("Exodus Output File Name");
+	      renameExodusFile(stop-1, filename_old);
+	      std::string filename_new = filename_old; 
+	      std::cout << "IKT mechanics exo out file name = " << filename_old << "\n"; 
+	      renameExodusFile((stop-1)/output_interval_, filename_new);
+	      std::cout << "IKT mechanics new exo out file name = " << filename_new << "\n"; 
+              renamePrevWrittenExoFile(filename_old, filename_new, comm_); 
+	    }
           }
         } else {
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (!failed_) {  // If thermal solve passed, output solution to Exodus file
             doDynamicInitialOutput(next_time, subdomain, stop);
+            std::cout << "IKT thermal stop, stop/output_interval_ = " << stop << ", " << stop/output_interval_ << "\n"; 
+            std::cout << "IKT thermal mod(stop, output_interval_) = " << stop % output_interval_ << "\n"; 
+            if (((stop-1) % output_interval_) == 0) {
+              Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
+              Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
+              Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
+              std::string filename_old = disc_params.get<std::string>("Exodus Output File Name");
+	      renameExodusFile(stop-1, filename_old);
+	      std::string filename_new = filename_old; 
+	      std::cout << "IKT thermal exo out file name = " << filename_old << "\n"; 
+	      renameExodusFile((stop-1)/output_interval_, filename_new);
+	      std::cout << "IKT thermal new exo out file name = " << filename_new << "\n"; 
+              renamePrevWrittenExoFile(filename_old, filename_new, comm_); 
+	    }
           }
         }
         if (failed_ == true) {
@@ -732,7 +776,22 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     }
 
   }  // Time-step loop
-
+  std::cout << "IKT last stop = " << stop << "\n"; 
+ 
+  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    if (((stop-1) % output_interval_) == 0) {
+      Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
+      Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
+      Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
+      std::string filename_old = disc_params.get<std::string>("Exodus Output File Name");
+      renameExodusFile(stop-1, filename_old);
+      std::string filename_new = filename_old; 
+      std::cout << "IKT thermal exo out file name = " << filename_old << "\n"; 
+      renameExodusFile((stop-1)/output_interval_, filename_new);
+      std::cout << "IKT thermal new exo out file name = " << filename_new << "\n"; 
+      renamePrevWrittenExoFile(filename_old, filename_new, comm_); 
+    }
+  }
   return;
 }
 

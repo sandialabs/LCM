@@ -20,6 +20,22 @@ getName(std::string const& method)
   if (method.size() < 3) return method;
   return method.substr(0, method.size() - 3);
 }
+
+void deleteExoFile(const std::string file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm) 
+{
+  const int num_ranks = comm->getSize(); 
+  const int this_rank = comm->getRank();  
+  std::string full_file_name = file_name + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank); 
+  char cstr[full_file_name.size()+1]; 
+  strcpy(cstr, full_file_name.c_str()); 
+  int const file_removed = remove(cstr); 
+  if (file_removed == 0) {
+    std::cout  << "Exodus file " << full_file_name << " deleted successfully!\n";
+  }
+  else {
+    std::cout << "Unable to delete Exodus file " << full_file_name << "!\n";
+  }
+}
 }  // namespace
 
 namespace LCM {
@@ -411,7 +427,6 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   renameExodusFile(file_index, filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
-
   disc_params.set<std::string>("Exodus Solution Name", "temperature");
   disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
   disc_params.set<bool>("Output DTK Field to Exodus", false);
@@ -457,6 +472,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   model_evaluators_[subdomain]   = solver_factories_[subdomain]->returnModel();
   curr_x_[subdomain]             = Teuchos::null;
   prev_thermal_exo_outfile_name_ = filename;
+  deleteExoFile(prev_mechanical_exo_outfile_name_, comm_); 
 }
 
 void
@@ -525,6 +541,7 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   model_evaluators_[subdomain]      = solver_factories_[subdomain]->returnModel();
   curr_x_[subdomain]                = Teuchos::null;
   prev_mechanical_exo_outfile_name_ = filename;
+  //deleteExoFile(prev_thermal_exo_outfile_name_, comm_); 
 }
 
 bool

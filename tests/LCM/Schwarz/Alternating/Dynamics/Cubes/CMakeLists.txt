@@ -23,6 +23,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_00.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials_00.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_01.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials_01.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Cubes.exodiff
+               ${CMAKE_CURRENT_BINARY_DIR}/Cubes.exodiff COPYONLY)
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
                         ${CMAKE_CURRENT_BINARY_DIR}/Albany)

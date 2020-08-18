@@ -19,6 +19,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/thermal_standalone.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_standalone_explicit.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/thermal_standalone_explicit.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_standalone_explicit_no_lumping.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/thermal_standalone_explicit_no_lumping.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_standalone_explicit_rythmos.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/thermal_standalone_explicit_rythmos.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_standalone_restart.yaml

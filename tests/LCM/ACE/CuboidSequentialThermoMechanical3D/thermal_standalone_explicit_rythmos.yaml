@@ -1,0 +1,100 @@
+ALBANY:
+  Debug Output: 
+    Write Jacobian to MatrixMarket: -1
+    Write Residual to MatrixMarket: -1
+    Write Solution to MatrixMarket: 0
+  Problem: 
+    Name: ACE Thermal 3D
+    Solution Method: Transient
+    MaterialDB Filename: './materials_thermal.yaml'
+    Dirichlet BCs: 
+      SDBC on NS z- for DOF T: 260.0
+      SDBC on NS z+ for DOF T: 300.0
+    Initial Condition:
+      Function: Constant
+      Function Data: [260.0]
+    Response Functions:
+      Number: 2
+      Response 0: Project IP to Nodal Field
+      ResponseParams 0:
+        Number of Fields: 8
+        IP Field Name 0: ACE_Bluff_Salinity
+        IP Field Layout 0: Scalar
+        IP Field Name 1: ACE_Ice_Saturation
+        IP Field Layout 1: Scalar
+        IP Field Name 2: ACE_Density
+        IP Field Layout 2: Scalar
+        IP Field Name 3: ACE_Heat_Capacity
+        IP Field Layout 3: Scalar
+        IP Field Name 4: ACE_Thermal_Conductivity
+        IP Field Layout 4: Scalar
+        IP Field Name 5: ACE_Thermal_Inertia
+        IP Field Layout 5: Scalar
+        IP Field Name 6: ACE_Water_Saturation
+        IP Field Layout 6: Scalar
+        IP Field Name 7: ACE_Porosity
+        IP Field Layout 7: Scalar
+        Output to File: true
+      Response 1: Solution Average
+  Discretization: 
+    Method: Ioss
+    Exodus Input File Name: './grid.g'
+    Exodus Output File Name: './thermal_standalone_explicit.e'
+    Separate Evaluators by Element Block: true
+    Workset Size: -1
+    Exodus Write Interval: 3
+    Exodus Solution Name: 'temperature'
+    Exodus SolutionDot Name: 'temperature_dot'
+  Regression Results: 
+    Number of Comparisons: 4
+    Test Values: [0.000000000000e+00, 0.000000000000e+00, 0.000000000000e+00, 2.632636121004e+02]
+    Relative Tolerance: 1.00000000000000002e-03
+    Absolute Tolerance: 1.00000000000000008e-05
+  Piro: 
+    Rythmos Solver: 
+      Lump Mass Matrix: true
+      Invert Mass Matrix: true
+      NonLinear Solver: 
+        VerboseObject: 
+          Verbosity Level: low
+      Rythmos: 
+        Integrator Settings: 
+          Final Time: 21600.0
+          Integrator Selection: 
+            Integrator Type: Default Integrator
+            Default Integrator: 
+              VerboseObject: 
+                Verbosity Level: low
+        Stepper Settings: 
+          Stepper Selection: 
+            Stepper Type: Forward Euler
+        Integration Control Strategy Selection: 
+          Integration Control Strategy Type: Simple Integration Control Strategy
+          Simple Integration Control Strategy: 
+            Take Variable Steps: false
+            Fixed dt: 7200.0
+            VerboseObject: 
+              Verbosity Level: low
+      Stratimikos: 
+        Linear Solver Type: Belos
+        Linear Solver Types: 
+          Belos: 
+            Solver Type: Block GMRES
+            Solver Types: 
+              Block GMRES: 
+                Convergence Tolerance: 1.00000000000000008e-05
+                Output Frequency: 10
+                Output Style: 1
+                Verbosity: 0
+                Maximum Iterations: 100
+                Block Size: 1
+                Num Blocks: 100
+                Flexible Gmres: false
+        Preconditioner Type: Ifpack2
+        Preconditioner Types: 
+          Ifpack2: 
+            Prec Type: ILUT
+            Overlap: 1
+            Ifpack2 Settings: 
+              'fact: ilut level-of-fill': 1.00000000000000000e+00
+...

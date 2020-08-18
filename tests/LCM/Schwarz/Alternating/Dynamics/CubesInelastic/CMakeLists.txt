@@ -55,6 +55,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_00.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials_00.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_01.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials_01.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CubesInelastic.exodiff
+	       ${CMAKE_CURRENT_BINARY_DIR}/CubesInelastic.exodiff COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CubesInelasticParallel.exodiff
+	       ${CMAKE_CURRENT_BINARY_DIR}/CubesInelasticParallel.exodiff COPYONLY)
 if(ALBANY_DTK)
   execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest_parallel_exodiff.cmake}
                           ${CMAKE_CURRENT_BINARY_DIR}/runtest_parallel_exodiff.cmake)
@@ -74,7 +78,7 @@ set(OUTFILE1 "cuboid_01.e")
 set(REF_FILE1 "cuboid_01.gold.e")
 add_test(NAME Schwarz_Alternating_Dynamics_${testName}
   COMMAND
-  ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=Cubes
+  ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=CubesInelastic
     -DTEST_ARGS=cuboids.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
     -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0} 
     -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 
@@ -85,7 +89,7 @@ set_tests_properties(Schwarz_Alternating_Dynamics_${testName}
 if(ALBANY_DTK)
   add_test(NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
     COMMAND
-    ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=CubesParallel
+    ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=CubesInelasticParallel
       -DTEST_ARGS=cuboids.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
       -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0} 
       -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 

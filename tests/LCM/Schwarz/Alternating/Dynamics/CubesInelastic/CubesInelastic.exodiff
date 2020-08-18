@@ -1,0 +1,39 @@
+
+#  *****************************************************************
+#             EXODIFF	(Version: 2.81) Modified: 2015-06-03
+#             Authors:  Richard Drake, rrdrake@sandia.gov           
+#                       Greg Sjaardema, gdsjaar@sandia.gov          
+#             Run on    2015/08/18   08:33:14 PDT
+#  *****************************************************************
+
+#  FILE 1: /home/jwfoulk/LCM/Albany/examples/LCM/MechWithHydrogenFastPath/channel_diffusion/channelDiffusion.gold.e
+#   Title: Sierra Output Default Title
+#          Dim = 3, Blocks = 2, Nodes = 3624, Elements = 1650, Nodesets = 6, Sidesets = 0
+#          Vars: Global = 0, Nodal = 10, Element = 96, Nodeset = 0, Sideset = 0, Times = 11
+
+
+# ==============================================================
+#  NOTE: All node and element ids are reported as global ids.
+
+# NOTES:  - The min/max values are reporting the min/max in absolute value.
+#         - Time values (t) are 1-offset time step numbers.
+#         - Element block numbers are the block ids.
+#         - Node(n) and element(e) numbers are 1-offset.
+
+COORDINATES absolute 1.e-10    # min separation not calculated
+
+TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:              10 @ t11
+
+# No GLOBAL VARIABLES
+
+NODAL VARIABLES relative 1.0e-10 floor 1.0e-12
+
+ELEMENT VARIABLES relative 1.0e-5 floor 1.0e-12
+
+
+
+
+# No NODESET VARIABLES
+
+# No SIDESET VARIABLES
+

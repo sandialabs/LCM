@@ -201,22 +201,22 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
 
     Teuchos::ParameterList nox_params;
 
-    //The following code checks if we are using an Explicit stepper in Tempus, so as 
-    //to do appropriate error checking (e.g., disallow DBCs, which do not work with explicit steppers). 
-    //IKT, 8/13/2020: warning - the logic here may not encompass all explicit steppers
-    //in Tempus! 
-    std::string const expl_str = "Explicit"; 
-    std::string const forward_eul = "Forward Euler"; 
-    bool is_explicit_scheme = false; 
-    std::size_t found = stepper_type.find(expl_str); 
-    std::size_t found2 = stepper_type.find(forward_eul); 
+    // The following code checks if we are using an Explicit stepper in Tempus, so as
+    // to do appropriate error checking (e.g., disallow DBCs, which do not work with explicit steppers).
+    // IKT, 8/13/2020: warning - the logic here may not encompass all explicit steppers
+    // in Tempus!
+    std::string const expl_str           = "Explicit";
+    std::string const forward_eul        = "Forward Euler";
+    bool              is_explicit_scheme = false;
+    std::size_t       found              = stepper_type.find(expl_str);
+    std::size_t       found2             = stepper_type.find(forward_eul);
     if ((found != std::string::npos) || (found2 != std::string::npos)) {
-      is_explicit_scheme = true; 
+      is_explicit_scheme = true;
     }
     if ((stepper_type == "General ERK") || (stepper_type == "RK1")) {
       is_explicit_scheme = true;
-    } 
-    
+    }
+
     if ((stepper_type == "Newmark Implicit d-Form") || (stepper_type == "Newmark Implicit a-Form")) {
       bool const have_solver_name = tempus_stepper_params.isType<std::string>("Solver Name");
 
@@ -243,9 +243,11 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
                  "Search Based'.");
         }
       }
-      if (stepper_type == "Newmark Implicit a-Form") { requires_orig_dbcs_ = true; }
-    } 
-    //Explicit steppers require SDBCs
+      if (stepper_type == "Newmark Implicit a-Form") {
+        requires_orig_dbcs_ = true;
+      }
+    }
+    // Explicit steppers require SDBCs
     if (is_explicit_scheme == true) {
       requires_sdbcs_ = true;
     }

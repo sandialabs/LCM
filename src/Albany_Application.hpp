@@ -394,12 +394,12 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   double
   fixTime(double const current_time) const
   {
-    bool const use_time_param =
-        (paramLib->isParameter("Time") == true) && (getSchwarzAlternating() == false) && (solMethod != TransientTempus);
-
+    bool const   has_time       = paramLib->isParameter("Time") == true;
+    bool const   is_schwarz     = getSchwarzAlternating();
+    bool const   is_transient   = solMethod == TransientTempus || solMethod == Transient;
+    bool const   use_time_param = has_time == true && is_schwarz == false && is_transient == false;
     double const this_time =
         use_time_param == true ? paramLib->getRealValue<PHAL::AlbanyTraits::Residual>("Time") : current_time;
-
     return this_time;
   }
 

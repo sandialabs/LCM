@@ -91,7 +91,9 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
   this->utils.setFieldData(sourceField, fm);
   this->utils.setFieldData(w_measure, fm);
 
-  if (!target_value) { this->utils.setFieldData(targetField, fm); }
+  if (!target_value) {
+    this->utils.setFieldData(targetField, fm);
+  }
 
   PHAL::SeparableScatterScalarResponse<EvalT, Traits>::postRegistrationSetup(d, fm);
 }

@@ -46,7 +46,9 @@ Albany::fix_node_sharing(stk::mesh::BulkData& bulk_data)
         stk::mesh::EntityKey key;
         comm.recv_buffer(i).unpack<stk::mesh::EntityKey>(key);
         stk::mesh::Entity node = bulk_data.get_entity(key);
-        if (bulk_data.is_valid(node)) { bulk_data.add_node_sharing(node, i); }
+        if (bulk_data.is_valid(node)) {
+          bulk_data.add_node_sharing(node, i);
+        }
       }
     }
   }

@@ -37,7 +37,9 @@ balance_comm_spec_domain(Partition* partition, mesh::EntityProcVec& rebal_spec)
     int tot_elems;
     all_reduce_sum(partition->parallel(), &num_elems, &tot_elems, 1);
 
-    if (tot_elems) { partition->determine_new_partition(rebalancingHasOccurred); }
+    if (tot_elems) {
+      partition->determine_new_partition(rebalancingHasOccurred);
+    }
   }
   if (rebalancingHasOccurred) partition->get_new_partition(rebal_spec);
 
@@ -64,11 +66,17 @@ get_entities_through_relations(
     for (; i != i_end; ++i) {
       percept::MyPairIterRelation r(bulk_data, (*i), bulk_data.entity_rank(e));
       unsigned                    j = 0;
-      while (j < r.size() && e != r[j].entity()) { ++j; }
-      if (j == r.size() - 1) { break; }
+      while (j < r.size() && e != r[j].entity()) {
+        ++j;
+      }
+      if (j == r.size() - 1) {
+        break;
+      }
     }
 
-    if (i == i_end) { entities_related.push_back(e); }
+    if (i == i_end) {
+      entities_related.push_back(e);
+    }
   }
 }
 
@@ -192,7 +200,9 @@ full_rebalance(mesh::BulkData& bulk_data, Partition* partition, const stk::mesh:
       rebalance_dependent_entities(bulk_data, partition, constraint_rank, cs_elem, rank);
   }
 
-  if (rebalancingHasOccurred) { bulk_data.change_entity_owner(cs_elem); }
+  if (rebalancingHasOccurred) {
+    bulk_data.change_entity_owner(cs_elem);
+  }
 
   //: Finished
   return rebalancingHasOccurred;
@@ -229,7 +239,9 @@ stk::rebalance::rebalance(
           "Rebalance weight field is not defined on entities but should be "
           "defined on all entities.");
       // Should this be a throw instead???
-      if (*w <= 0.0) { *w = 1.0; }
+      if (*w <= 0.0) {
+        *w = 1.0;
+      }
     }
     rebal_elem_ptrs.push_back(*iA);
   }

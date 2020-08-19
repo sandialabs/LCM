@@ -146,11 +146,15 @@ Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits:
 
     // Extract the row, zero it out, then put j_coeff on diagonal
     Albany::getLocalRowValues(J, dof, indices, entries);
-    for (auto& val : entries) { val = 0.0; }
+    for (auto& val : entries) {
+      val = 0.0;
+    }
     Albany::setLocalRowValues(J, dof, indices(), entries());
     Albany::setLocalRowValues(J, dof, index(), value());
 
-    if (fill == true) { f_view[dof] = x_view[dof] - this->value.val(); }
+    if (fill == true) {
+      f_view[dof] = x_view[dof] - this->value.val();
+    }
   }
 }
 

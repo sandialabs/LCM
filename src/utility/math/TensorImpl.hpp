@@ -42,7 +42,9 @@ BasicTensor<T, Order>::BasicTensor(index_t dimension, value_type initialValue)
        data_(new T[arraySize()])*/
 {
   // assert(data_);
-  for (value_type& element : *this) { element = initialValue; }
+  for (value_type& element : *this) {
+    element = initialValue;
+  }
 }
 
 template <typename T, index_t Order>
@@ -158,7 +160,9 @@ KOKKOS_INLINE_FUNCTION void
 BasicTensor<T, Order>::fill(Array arr, Indices... fixed_indices)
 {
   // For now just support rank-1 copies
-  for (index_t i = 0; i < arraySize(); ++i) { data_[i] = arr(fixed_indices..., i); }
+  for (index_t i = 0; i < arraySize(); ++i) {
+    data_[i] = arr(fixed_indices..., i);
+  }
 }
 
 template <typename T, index_t Order>
@@ -298,7 +302,9 @@ KOKKOS_INLINE_FUNCTION Tensor2<Promotion<S, T>>
     for (index_t j = 0; j < lhs.dim(); ++j) {
       ValueType s = ValueType(0);
 
-      for (index_t k = 0; k < lhs.dim(); ++k) { s += lhs(i, k) * rhs(k, j); }
+      for (index_t k = 0; k < lhs.dim(); ++k) {
+        s += lhs(i, k) * rhs(k, j);
+      }
       ret(i, j) = s;
     }
   }
@@ -312,7 +318,9 @@ KOKKOS_INLINE_FUNCTION Tensor2<T>
 {
   using ValueType = typename Tensor2<T>::value_type;
   Tensor2<T> ret(dim);
-  for (index_t i = 0; i < dim; ++i) { ret(i, i) = typename Tensor2<T>::value_type(1); }
+  for (index_t i = 0; i < dim; ++i) {
+    ret(i, i) = typename Tensor2<T>::value_type(1);
+  }
 
   return ret;
 }
@@ -328,7 +336,9 @@ KOKKOS_INLINE_FUNCTION Tensor4<T>
     for (index_t j = 0; j < dim; ++j) {
       for (index_t k = 0; k < dim; ++k) {
         for (index_t l = 0; l < dim; ++l) {
-          if (i == k && j == l) { ret(i, j, k, l) = ValueType(1); }
+          if (i == k && j == l) {
+            ret(i, j, k, l) = ValueType(1);
+          }
         }
       }
     }
@@ -348,7 +358,9 @@ KOKKOS_INLINE_FUNCTION Tensor4<T>
     for (index_t j = 0; j < dim; ++j) {
       for (index_t k = 0; k < dim; ++k) {
         for (index_t l = 0; l < dim; ++l) {
-          if (i == l && j == k) { ret(i, j, k, l) = ValueType(1); }
+          if (i == l && j == k) {
+            ret(i, j, k, l) = ValueType(1);
+          }
         }
       }
     }
@@ -368,7 +380,9 @@ KOKKOS_INLINE_FUNCTION Tensor4<T>
     for (index_t j = 0; j < dim; ++j) {
       for (index_t k = 0; k < dim; ++k) {
         for (index_t l = 0; l < dim; ++l) {
-          if (i == j && k == l) { ret(i, j, k, l) = ValueType(1); }
+          if (i == j && k == l) {
+            ret(i, j, k, l) = ValueType(1);
+          }
         }
       }
     }
@@ -384,7 +398,9 @@ KOKKOS_INLINE_FUNCTION Tensor2<T>
   index_t    dim = tens.dim();
   Tensor2<T> ret(dim);
   for (index_t i = 0; i < dim; ++i) {
-    for (index_t j = 0; j < dim; ++j) { ret(i, j) = tens(j, i); }
+    for (index_t j = 0; j < dim; ++j) {
+      ret(i, j) = tens(j, i);
+    }
   }
 
   return ret;
@@ -397,7 +413,9 @@ trace(const Tensor2<T>& tens)
   using ValueType = typename Tensor2<T>::value_type;
   index_t   dim   = tens.dim();
   ValueType ret   = ValueType(0);
-  for (index_t i = 0; i < dim; ++i) { ret += tens(i, i); }
+  for (index_t i = 0; i < dim; ++i) {
+    ret += tens(i, i);
+  }
 
   return ret;
 }
@@ -428,7 +446,9 @@ norm(const Tensor2<T>& tens)
 {
   using ValueType = typename Tensor2<T>::value_type;
   ValueType ret   = ValueType(0);
-  for (index_t i = 0; i < tens.arraySize(); ++i) { ret += tens(i) * tens(i); }
+  for (index_t i = 0; i < tens.arraySize(); ++i) {
+    ret += tens(i) * tens(i);
+  }
 
   return sqrt(ret);
 }
@@ -444,7 +464,9 @@ KOKKOS_INLINE_FUNCTION Tensor4<T>
   for (index_t i = 0; i < dim; ++i) {
     for (index_t j = 0; j < dim; ++j) {
       for (index_t k = 0; k < dim; ++k) {
-        for (index_t l = 0; l < dim; ++l) { ret(i, j, k, l) = lhs(i, j) * rhs(k, l); }
+        for (index_t l = 0; l < dim; ++l) {
+          ret(i, j, k, l) = lhs(i, j) * rhs(k, l);
+        }
       }
     }
   }

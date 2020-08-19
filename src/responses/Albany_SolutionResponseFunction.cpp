@@ -50,7 +50,9 @@ Albany::SolutionResponseFunction::setup()
   Teuchos::Array<LO> subspace_components(N_new);
   for (int ieqn = 0, idx = 0; ieqn < Neqns; ++ieqn) {
     if (keepDOF[ieqn]) {
-      for (int inode = 0; inode < nnodes; ++inode, ++idx) { subspace_components[idx] = inode * Neqns + ieqn; }
+      for (int inode = 0; inode < nnodes; ++inode, ++idx) {
+        subspace_components[idx] = inode * Neqns + ieqn;
+      }
     }
   }
   culled_vs = getSpmdVectorSpace(createSubspace(solution_vs, subspace_components));
@@ -104,7 +106,9 @@ SolutionResponseFunction::evaluateGradient(
     const Teuchos::RCP<Thyra_LinearOp>&    dg_dxdotdot,
     Teuchos::RCP<Thyra_MultiVector> const& dg_dp)
 {
-  if (!g.is_null()) { cullSolution(x, g); }
+  if (!g.is_null()) {
+    cullSolution(x, g);
+  }
 
   if (!dg_dx.is_null()) {
     assign(dg_dx, 1.0);  // matrix only stores the diagonal
@@ -118,7 +122,9 @@ SolutionResponseFunction::evaluateGradient(
     assign(dg_dxdotdot, 0.0);  // matrix only stores the diagonal
   }
 
-  if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
+  if (!dg_dp.is_null()) {
+    dg_dp->assign(0.0);
+  }
 }
 
 void

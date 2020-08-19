@@ -275,13 +275,19 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(typename Trai
     }
     CLPbar /= vol;
 
-    for (int qp = 0; qp < numQPs; ++qp) { pterm(cell, qp) = CLPbar; }
+    for (int qp = 0; qp < numQPs; ++qp) {
+      pterm(cell, qp) = CLPbar;
+    }
 
     for (int node = 0; node < numNodes; ++node) {
       trialPbar = 0.0;
-      for (int qp = 0; qp < numQPs; ++qp) { trialPbar += wBF(cell, node, qp); }
+      for (int qp = 0; qp < numQPs; ++qp) {
+        trialPbar += wBF(cell, node, qp);
+      }
       trialPbar /= vol;
-      for (int qp = 0; qp < numQPs; ++qp) { tpterm(cell, node, qp) = trialPbar; }
+      for (int qp = 0; qp < numQPs; ++qp) {
+        tpterm(cell, node, qp) = trialPbar;
+      }
     }
   }
 

@@ -199,7 +199,9 @@ TLPoroPlasticityResidMass<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
   Albany::MDArray porePressureold = (*workset.stateArrayPtr)[porePressureName];
 
   Albany::MDArray Jold;
-  if (haveMechanics) { Jold = (*workset.stateArrayPtr)[JName]; }
+  if (haveMechanics) {
+    Jold = (*workset.stateArrayPtr)[JName];
+  }
 
   // Pore-fluid diffusion coupling.
   for (int cell = 0; cell < workset.numCells; ++cell) {
@@ -235,7 +237,9 @@ TLPoroPlasticityResidMass<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
-      for (int dim = 0; dim < numDims; ++dim) { fluxdt(cell, qp, dim) = -flux(cell, qp, dim) * dt; }
+      for (int dim = 0; dim < numDims; ++dim) {
+        fluxdt(cell, qp, dim) = -flux(cell, qp, dim) * dt;
+      }
     }
   }
   FST::integrate(TResidual.get_view(), fluxdt, wGradBF.get_view(),
@@ -252,13 +256,19 @@ TLPoroPlasticityResidMass<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
       vol += weights(cell, qp);
     }
     porePbar /= vol;
-    for (int qp = 0; qp < numQPs; ++qp) { pterm(cell, qp) = porePbar; }
+    for (int qp = 0; qp < numQPs; ++qp) {
+      pterm(cell, qp) = porePbar;
+    }
 
     for (int node = 0; node < numNodes; ++node) {
       trialPbar = 0.0;
-      for (int qp = 0; qp < numQPs; ++qp) { trialPbar += wBF(cell, node, qp); }
+      for (int qp = 0; qp < numQPs; ++qp) {
+        trialPbar += wBF(cell, node, qp);
+      }
       trialPbar /= vol;
-      for (int qp = 0; qp < numQPs; ++qp) { tpterm(cell, node, qp) = trialPbar; }
+      for (int qp = 0; qp < numQPs; ++qp) {
+        tpterm(cell, node, qp) = trialPbar;
+      }
     }
   }
   ScalarT temp(0);

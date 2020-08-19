@@ -98,7 +98,9 @@ ElasticityResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < numNodes; ++node) {
-      for (int dim = 0; dim < numDims; dim++) { ExResidual(cell, node, dim) = 0.0; }
+      for (int dim = 0; dim < numDims; dim++) {
+        ExResidual(cell, node, dim) = 0.0;
+      }
       for (int qp = 0; qp < numQPs; ++qp) {
         for (int i = 0; i < numDims; i++) {
           for (int dim = 0; dim < numDims; dim++) {
@@ -120,7 +122,9 @@ ElasticityResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int node = 0; node < numNodes; ++node) {
       for (int qp = 0; qp < numQPs; ++qp) {
-        for (int i = 0; i < numDims; i++) { ExResidual(cell, node, i) += body_force[i] * wBF(cell, node, qp); }
+        for (int i = 0; i < numDims; i++) {
+          ExResidual(cell, node, i) += body_force[i] * wBF(cell, node, qp);
+        }
       }
     }
   }

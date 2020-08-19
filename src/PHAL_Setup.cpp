@@ -127,7 +127,9 @@ Setup::check_fields(std::vector<Teuchos::RCP<PHX::FieldTag>> const& fields) cons
     }
     if (!missingFields.empty()) {
       std::ostringstream os;
-      for (const auto& missingField : missingFields) { os << missingField << "\n"; }
+      for (const auto& missingField : missingFields) {
+        os << missingField << "\n";
+      }
       ALBANY_ABORT("The following fields could not be found:\n" + os.str());
     }
   }

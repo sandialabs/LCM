@@ -342,7 +342,9 @@ CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
       // std::cout << state_hardening_np1;
     }
   }
-  if (dd_negative) { std::cout << "Warning: Dislocation density at np1 is negative" << std::endl; }
+  if (dd_negative) {
+    std::cout << "Warning: Dislocation density at np1 is negative" << std::endl;
+  }
 
   minitensor::Vector<ArgT, NumSlipT> densities_forest = slip_family.latent_matrix_ * state_hardening_np1;
 

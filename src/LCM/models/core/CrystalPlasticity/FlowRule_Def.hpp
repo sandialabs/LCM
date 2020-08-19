@@ -160,7 +160,9 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   // Ultra-low stress regime:
   // if ratio_stress < min_tol, computation of pow_ratio_stress will introduce
   // denormalized numbers into subsequent computations, so retun power_law = 0.0
-  if (std::fabs(ratio_stress) < min_tol) { return power_law; }
+  if (std::fabs(ratio_stress) < min_tol) {
+    return power_law;
+  }
 
   ArgT pl_vd_ratio{ratio_stress};
 
@@ -172,7 +174,9 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   // denormalized numbers into subsequent computations. Additionally, such a
   // large stress value indicates that we are in the viscous drag-dominated
   // regime, so return the slip rate computed by the drag constitutive relation
-  if (std::fabs(ratio_stress) > max_tol) { return g0 * viscous_drag; }
+  if (std::fabs(ratio_stress) > max_tol) {
+    return g0 * viscous_drag;
+  }
 
   ArgT pow_ratio_stress = std::pow(std::fabs(ratio_stress), m - 1);
 
@@ -191,7 +195,9 @@ CP::PowerLawDragFlowRule<ArgT>::computeRateSlip(
   // The power law and viscous drag terms are both significant in the
   // intermediate stress regime, so the full consitutive calculation is
   // performed
-  if (vd_active == true) { effective = 1.0 / ((1.0 / power_law) + (1.0 / viscous_drag)); }
+  if (vd_active == true) {
+    effective = 1.0 / ((1.0 / power_law) + (1.0 / viscous_drag));
+  }
 
   // compute slip increment
   return g0 * effective;

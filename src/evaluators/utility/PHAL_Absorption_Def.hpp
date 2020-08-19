@@ -54,7 +54,9 @@ Absorption<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   if (is_constant) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t qp = 0; qp < numQPs; ++qp) { absorption(cell, qp) = constant_value; }
+      for (std::size_t qp = 0; qp < numQPs; ++qp) {
+        absorption(cell, qp) = constant_value;
+      }
     }
   }
   /*else {

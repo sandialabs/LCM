@@ -42,12 +42,16 @@ SetField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   int dim1 = evaluatedFieldDimensions[0];
 
   if (numDimensions == 1) {
-    for (int i = 0; i < dim1; ++i) { evaluatedField(i) = fieldValues[i]; }
+    for (int i = 0; i < dim1; ++i) {
+      evaluatedField(i) = fieldValues[i];
+    }
   } else if (numDimensions == 2) {
     int dim2 = evaluatedFieldDimensions[1];
     ALBANY_PANIC(fieldValues.size() != dim1 * dim2, "SetField::evaluateFields(), inconsistent data sizes.");
     for (int i = 0; i < dim1; ++i) {
-      for (int j = 0; j < dim2; ++j) { evaluatedField(i, j) = fieldValues[i * dim2 + j]; }
+      for (int j = 0; j < dim2; ++j) {
+        evaluatedField(i, j) = fieldValues[i * dim2 + j];
+      }
     }
   } else if (numDimensions == 3) {
     int dim2 = evaluatedFieldDimensions[1];
@@ -55,7 +59,9 @@ SetField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     ALBANY_PANIC(fieldValues.size() != dim1 * dim2 * dim3, "SetField::evaluateFields(), inconsistent data sizes.");
     for (int i = 0; i < dim1; ++i) {
       for (int j = 0; j < dim2; ++j) {
-        for (int m = 0; m < dim3; ++m) { evaluatedField(i, j, m) = fieldValues[i * dim2 * dim3 + j * dim3 + m]; }
+        for (int m = 0; m < dim3; ++m) {
+          evaluatedField(i, j, m) = fieldValues[i * dim2 * dim3 + j * dim3 + m];
+        }
       }
     }
   } else if (numDimensions == 4) {

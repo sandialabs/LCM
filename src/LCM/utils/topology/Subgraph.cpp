@@ -214,7 +214,9 @@ Subgraph::addVertex(stk::mesh::EntityRank vertex_rank, stk::mesh::Entity entity)
 
       bool const is_local_and_in_nodeset = std::find(ns_nodes.begin(), ns_nodes.end(), entity) != ns_nodes.end();
 
-      if (is_local_and_in_nodeset == true) { add_parts.push_back(&ns_part); }
+      if (is_local_and_in_nodeset == true) {
+        add_parts.push_back(&ns_part);
+      }
     }
   }
 

@@ -74,7 +74,9 @@ KCPermeability<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   if (is_constant) {
     for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) { kcPermeability(cell, qp) = constant_value; }
+      for (int qp = 0; qp < numQPs; ++qp) {
+        kcPermeability(cell, qp) = constant_value;
+      }
     }
   }
   if (isPoroElastic) {

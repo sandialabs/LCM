@@ -121,7 +121,9 @@ SurfaceScalarGradient<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
       }
 
       // normal (perpendicular) contribution
-      for (int i(0); i < numDims; ++i) { scalarGradPerpendicular(i) = jump(cell, pt) / thickness * invG_2(i); }
+      for (int i(0); i < numDims; ++i) {
+        scalarGradPerpendicular(i) = jump(cell, pt) / thickness * invG_2(i);
+      }
 
       // assign components to MDfield ScalarGrad
       for (int i(0); i < numDims; ++i) scalarGrad(cell, pt, i) = scalarGradParallel(i) + scalarGradPerpendicular(i);

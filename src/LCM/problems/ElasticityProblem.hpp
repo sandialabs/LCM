@@ -186,7 +186,9 @@ Albany::ElasticityProblem::constructEvaluators(
   bool supportsTransient = false;
   if (params->isParameter("Solution Method")) {
     std::string solutionMethod = params->get<std::string>("Solution Method");
-    if (solutionMethod == "Transient") { supportsTransient = true; }
+    if (solutionMethod == "Transient") {
+      supportsTransient = true;
+    }
   }
 
   // Displacement Fields

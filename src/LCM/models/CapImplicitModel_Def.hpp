@@ -55,7 +55,9 @@ CapImplicitModel<EvalT, Traits>::CapImplicitModel(Teuchos::ParameterList* p, con
   this->eval_field_map_.insert(std::make_pair(volPlasticStrain_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair("Material Tangent", dl->qp_tensor4));
 
-  if (compute_tangent_) { this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4)); }
+  if (compute_tangent_) {
+    this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4));
+  }
 
   // define the state variables
   // strain
@@ -324,7 +326,9 @@ CapImplicitModel<EvalT, Traits>::computeState(
         for (int i(0); i < num_dims_; ++i) {
           for (int j(0); j < num_dims_; ++j) {
             for (int k(0); k < num_dims_; ++k) {
-              for (int l(0); l < num_dims_; ++l) { tangent(cell, qp, i, j, k, l) = Cep(i, j, k, l); }
+              for (int l(0); l < num_dims_; ++l) {
+                tangent(cell, qp, i, j, k, l) = Cep(i, j, k, l);
+              }
             }
           }
         }
@@ -472,37 +476,49 @@ CapImplicitModel<EvalT, Traits>::compute_ResidJacobian(
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) { t = t + Celastic(0, 0, i, j) * dgdsigma(i, j); }
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(0, 0, i, j) * dgdsigma(i, j);
+    }
   }
   Rfad[0] = dgamma * t + sigma(0, 0) - sigmaVal(0, 0);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) { t = t + Celastic(1, 1, i, j) * dgdsigma(i, j); }
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(1, 1, i, j) * dgdsigma(i, j);
+    }
   }
   Rfad[1] = dgamma * t + sigma(1, 1) - sigmaVal(1, 1);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) { t = t + Celastic(2, 2, i, j) * dgdsigma(i, j); }
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(2, 2, i, j) * dgdsigma(i, j);
+    }
   }
   Rfad[2] = dgamma * t + sigma(2, 2) - sigmaVal(2, 2);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) { t = t + Celastic(1, 2, i, j) * dgdsigma(i, j); }
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(1, 2, i, j) * dgdsigma(i, j);
+    }
   }
   Rfad[3] = dgamma * t + sigma(1, 2) - sigmaVal(1, 2);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) { t = t + Celastic(0, 2, i, j) * dgdsigma(i, j); }
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(0, 2, i, j) * dgdsigma(i, j);
+    }
   }
   Rfad[4] = dgamma * t + sigma(0, 2) - sigmaVal(0, 2);
 
   t = 0;
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) { t = t + Celastic(0, 1, i, j) * dgdsigma(i, j); }
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(0, 1, i, j) * dgdsigma(i, j);
+    }
   }
   Rfad[5] = dgamma * t + sigma(0, 1) - sigmaVal(0, 1);
 
@@ -823,7 +839,9 @@ CapImplicitModel<EvalT, Traits>::compute_halpha(minitensor::Tensor<T> const& dgd
   // defined;
   minitensor::Tensor<T> halpha(3);
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) { halpha(i, j) = calpha * Galpha * s(i, j); }
+    for (int j = 0; j < 3; j++) {
+      halpha(i, j) = calpha * Galpha * s(i, j);
+    }
   }
 
   return halpha;

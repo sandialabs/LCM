@@ -48,7 +48,9 @@ CP::ResidualSlipNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vector<T, N>
   minitensor::Vector<T, N> residual(num_unknowns, minitensor::Filler::ZEROS);
 
   // Return immediately if something failed catastrophically.
-  if (this->get_failed() == true) { return residual; }
+  if (this->get_failed() == true) {
+    return residual;
+  }
 
   minitensor::Vector<T, NumSlipT> slip_np1(num_slip_, minitensor::Filler::ZEROS);
 
@@ -61,7 +63,9 @@ CP::ResidualSlipNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vector<T, N>
 
   minitensor::Vector<T, NumSlipT> rate_slip(num_slip_, minitensor::Filler::ZEROS);
 
-  if (dt_ > 0.0) { rate_slip = (slip_np1 - slip_n_) / dt_; }
+  if (dt_ > 0.0) {
+    rate_slip = (slip_np1 - slip_n_) / dt_;
+  }
 
   // Ensure that the slip increment will not cause overflow
   if (minitensor::norm(rate_slip * dt_) > LOG_HUGE) {
@@ -122,7 +126,9 @@ CP::ResidualSlipNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vector<T, N>
     return residual;
   }
 
-  for (int i = 0; i < num_slip_; ++i) { residual[i] = slip_np1[i] - slip_computed[i]; }
+  for (int i = 0; i < num_slip_; ++i) {
+    residual[i] = slip_np1[i] - slip_computed[i];
+  }
 
   return residual;
 }
@@ -265,7 +271,9 @@ CP::ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vect
   minitensor::Vector<T, N> residual(x.get_dimension(), minitensor::Filler::ZEROS);
 
   // Return immediately if something failed catastrophically.
-  if (this->get_failed() == true) { return residual; }
+  if (this->get_failed() == true) {
+    return residual;
+  }
 
   minitensor::Vector<T, NumSlipT> slip_np1(num_slip_, minitensor::Filler::ZEROS);
 
@@ -278,7 +286,9 @@ CP::ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vect
 
   minitensor::Vector<T, NumSlipT> rate_slip(num_slip_, minitensor::Filler::ZEROS);
 
-  if (dt_ > 0.0) { rate_slip = (slip_np1 - slip_n_) / dt_; }
+  if (dt_ > 0.0) {
+    rate_slip = (slip_np1 - slip_n_) / dt_;
+  }
 
   // Ensure that the slip increment is bounded
   if (minitensor::norm_infinity(rate_slip * dt_) > LOG_HUGE) {
@@ -446,7 +456,9 @@ CP::ResidualSlipHardnessFN<NumDimT, NumSlipT, EvalT>::value(minitensor::Vector<T
 
   minitensor::Vector<T, NumSlipT> rates_slip(num_slip_, minitensor::Filler::ZEROS);
 
-  if (dt_ > 0.0) { rates_slip = (slip_np1 - slip_n_) / dt_; }
+  if (dt_ > 0.0) {
+    rates_slip = (slip_np1 - slip_n_) / dt_;
+  }
 
   // Ensure that the slip increment is bounded
   if (minitensor::norm(rate_slip * dt_) > LOG_HUGE) {

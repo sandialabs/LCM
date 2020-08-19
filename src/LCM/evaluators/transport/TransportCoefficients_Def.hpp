@@ -157,7 +157,9 @@ TransportCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
     }
   } else {
     for (int cell(0); cell < workset.numCells; ++cell) {
-      for (int pt(0); pt < num_pts_; ++pt) { n_trap_(cell, pt) = (1.0 / avogadros_num_) * std::pow(10.0, (a_ - b_)); }
+      for (int pt(0); pt < num_pts_; ++pt) {
+        n_trap_(cell, pt) = (1.0 / avogadros_num_) * std::pow(10.0, (a_ - b_));
+      }
     }
   }
 
@@ -218,7 +220,9 @@ TransportCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
     for (int pt(0); pt < num_pts_; ++pt) {
       Fmech.fill(F_, cell, pt, 0, 0);
       for (std::size_t i(0); i < num_dims_; ++i) {
-        for (std::size_t j(0); j < num_dims_; ++j) { F_mech_(cell, pt, i, j) = Fmech(i, j); }
+        for (std::size_t j(0); j < num_dims_; ++j) {
+          F_mech_(cell, pt, i, j) = Fmech(i, j);
+        }
       }
     }
   }
@@ -238,7 +242,9 @@ TransportCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
       for (std::size_t qp = 0; qp < num_pts_; ++qp) {
         JH = 1.0 + lambda_ * (total_concentration_(cell, qp) - ref_total_concentration_);
         for (std::size_t i = 0; i < num_dims_; ++i) {
-          for (std::size_t j = 0; j < num_dims_; ++j) { F_mech_(cell, qp, i, j) *= std::pow(JH, -1. / 3.); }
+          for (std::size_t j = 0; j < num_dims_; ++j) {
+            F_mech_(cell, qp, i, j) *= std::pow(JH, -1. / 3.);
+          }
         }
       }
     }

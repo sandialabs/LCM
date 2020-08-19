@@ -85,7 +85,9 @@ copyStateArray(Albany::StateArrayVec const& src, Albany::StateArrayVec& dst, AAd
       auto*   ptag = &tags[0];
       MDArray mda(pval, rank, pdim, ptag);
       dst_states = mda;
-      for (auto s = 0; s < num_states; ++s) { dst_states[s] = src_states[s]; }
+      for (auto s = 0; s < num_states; ++s) {
+        dst_states[s] = src_states[s];
+      }
     }
   }
 }
@@ -244,7 +246,9 @@ AAdapt::Erosion::adaptMesh()
   *output_stream_ << "Remeshing: renaming output file to - " << str << '\n';
 
   // Open the new exodus file for results
-  if (rename_exodus_output_ == true) { stk_discretization_->reNameExodusOutput(str); }
+  if (rename_exodus_output_ == true) {
+    stk_discretization_->reNameExodusOutput(str);
+  }
   remesh_file_index_++;
 
   // Start the mesh update process

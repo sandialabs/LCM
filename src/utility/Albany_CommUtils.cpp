@@ -48,7 +48,9 @@ createTeuchosCommFromThyraComm(const Teuchos::RCP<const Teuchos::Comm<Teuchos::O
 #if defined(HAVE_MPI)
   const Teuchos::RCP<const Teuchos::MpiComm<Teuchos::Ordinal>> mpiCommIn =
       Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<Teuchos::Ordinal>>(tc_in);
-  if (nonnull(mpiCommIn)) { return Teuchos::createMpiComm<int>(mpiCommIn->getRawMpiComm()); }
+  if (nonnull(mpiCommIn)) {
+    return Teuchos::createMpiComm<int>(mpiCommIn->getRawMpiComm());
+  }
 #endif  // HAVE_MPI
 
   // Assert conversion to Teuchos::SerialComm as a last resort (or throw)
@@ -63,7 +65,9 @@ createThyraCommFromTeuchosComm(const Teuchos::RCP<Teuchos_Comm const>& tc_in)
 #if defined(HAVE_MPI)
   const Teuchos::RCP<const Teuchos::MpiComm<int>> mpiCommIn =
       Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(tc_in);
-  if (nonnull(mpiCommIn)) { return Teuchos::createMpiComm<Teuchos::Ordinal>(mpiCommIn->getRawMpiComm()); }
+  if (nonnull(mpiCommIn)) {
+    return Teuchos::createMpiComm<Teuchos::Ordinal>(mpiCommIn->getRawMpiComm());
+  }
 #endif  // HAVE_MPI
 
   // Assert conversion to Teuchos::SerialComm as a last resort (or throw)

@@ -28,7 +28,9 @@ getComm(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
-  if (!tmap.is_null()) { return tmap->getComm(); }
+  if (!tmap.is_null()) {
+    return tmap->getComm();
+  }
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
       "Error in getComm! Could not cast Thyra_VectorSpace to any of the "
@@ -40,7 +42,9 @@ getMaxAllGlobalIndex(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
-  if (!tmap.is_null()) { return tmap->getMaxAllGlobalIndex(); }
+  if (!tmap.is_null()) {
+    return tmap->getMaxAllGlobalIndex();
+  }
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
       "Error in getMaxAllGlobalIndex! Could not cast Thyra_VectorSpace to any "
@@ -52,7 +56,9 @@ getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos
 {
   auto               indexer = createGlobalLocalIndexer(vs);
   Teuchos::Array<GO> gids(lids.size());
-  for (LO i = 0; i < lids.size(); ++i) { gids[i] = indexer->getGlobalElement(lids[i]); }
+  for (LO i = 0; i < lids.size(); ++i) {
+    gids[i] = indexer->getGlobalElement(lids[i]);
+  }
   return gids;
 }
 
@@ -61,7 +67,9 @@ getLocalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos:
 {
   auto               indexer = createGlobalLocalIndexer(vs);
   Teuchos::Array<LO> lids(gids.size());
-  for (LO i = 0; i < gids.size(); ++i) { lids[i] = indexer->getLocalElement(gids[i]); }
+  for (LO i = 0; i < gids.size(); ++i) {
+    lids[i] = indexer->getLocalElement(gids[i]);
+  }
   return lids;
 }
 
@@ -72,7 +80,9 @@ getGlobalElements(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos
   const LO localDim = indexer->getNumLocalElements();
   ALBANY_PANIC(gids.size() != localDim, "Error! ArrayView for gids not properly dimensioned.\n");
 
-  for (LO i = 0; i < localDim; ++i) { gids[i] = indexer->getGlobalElement(i); }
+  for (LO i = 0; i < localDim; ++i) {
+    gids[i] = indexer->getGlobalElement(i);
+  }
 }
 
 Teuchos::Array<GO>
@@ -233,7 +243,9 @@ getColumnSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
-  if (!tmat.is_null()) { return createThyraVectorSpace(tmat->getColMap()); }
+  if (!tmat.is_null()) {
+    return createThyraVectorSpace(tmat->getColMap());
+  }
 
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
@@ -249,7 +261,9 @@ getRowSpace(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
-  if (!tmat.is_null()) { return createThyraVectorSpace(tmat->getRowMap()); }
+  if (!tmat.is_null()) {
+    return createThyraVectorSpace(tmat->getRowMap());
+  }
 
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
@@ -265,7 +279,9 @@ getNumEntriesInLocalRow(const Teuchos::RCP<const Thyra_LinearOp>& lop, const LO 
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
-  if (!tmat.is_null()) { return tmat->getNumEntriesInLocalRow(lrow); }
+  if (!tmat.is_null()) {
+    return tmat->getNumEntriesInLocalRow(lrow);
+  }
 
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
@@ -281,7 +297,9 @@ isFillActive(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
-  if (!tmat.is_null()) { return tmat->isFillActive(); }
+  if (!tmat.is_null()) {
+    return tmat->isFillActive();
+  }
 
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
@@ -297,7 +315,9 @@ isFillComplete(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
-  if (!tmat.is_null()) { return tmat->isFillComplete(); }
+  if (!tmat.is_null()) {
+    return tmat->isFillComplete();
+  }
 
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
@@ -355,7 +375,9 @@ assign(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST value)
 
     tmat->setAllToScalar(value);
 
-    if (callFillComplete) { tmat->fillComplete(); }
+    if (callFillComplete) {
+      tmat->fillComplete();
+    }
 
     return;
   }
@@ -379,7 +401,9 @@ getDiagonalCopy(const Teuchos::RCP<const Thyra_LinearOp>& lop, Teuchos::RCP<Thyr
       "operator.\n");
 
   // If diag is not created, do it.
-  if (diag.is_null()) { diag = Thyra::createMember(lop->range()); }
+  if (diag.is_null()) {
+    diag = Thyra::createMember(lop->range());
+  }
 
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
@@ -607,7 +631,9 @@ isStaticGraph(const Teuchos::RCP<Thyra_LinearOp>& lop)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getTpetraMatrix(lop, false);
-  if (!tmat.is_null()) { return tmat->isStaticGraph(); }
+  if (!tmat.is_null()) {
+    return tmat->isStaticGraph();
+  }
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
       "Error in isStaticGraph! Could not cast Thyra_LinearOp to any of the "
@@ -619,7 +645,9 @@ isStaticGraph(const Teuchos::RCP<const Thyra_LinearOp>& lop)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
-  if (!tmat.is_null()) { return tmat->isStaticGraph(); }
+  if (!tmat.is_null()) {
+    return tmat->isStaticGraph();
+  }
 
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
@@ -816,7 +844,9 @@ int
 getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv)
 {
   auto tv = getConstTpetraMultiVector(mv, false);
-  if (!tv.is_null()) { return tv->getNumVectors(); }
+  if (!tv.is_null()) {
+    return tv->getNumVectors();
+  }
   // If all the tries above are unsuccessful, throw an error.
   ALBANY_ABORT(
       "Error in getNumVectors! Could not cast Thyra_MultiVector to any of the "
@@ -826,20 +856,28 @@ getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv)
 Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>
 getNonconstLocalData(Teuchos::RCP<Thyra_MultiVector> const& mv)
 {
-  if (mv.is_null()) { return Teuchos::null; }
+  if (mv.is_null()) {
+    return Teuchos::null;
+  }
 
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> data(mv->domain()->dim());
-  for (int i = 0; i < mv->domain()->dim(); ++i) { data[i] = getNonconstLocalData(mv->col(i)); }
+  for (int i = 0; i < mv->domain()->dim(); ++i) {
+    data[i] = getNonconstLocalData(mv->col(i));
+  }
   return data;
 }
 
 Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>>
 getLocalData(const Teuchos::RCP<const Thyra_MultiVector>& mv)
 {
-  if (mv.is_null()) { return Teuchos::null; }
+  if (mv.is_null()) {
+    return Teuchos::null;
+  }
 
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> data(mv->domain()->dim());
-  for (int i = 0; i < mv->domain()->dim(); ++i) { data[i] = getLocalData(mv->col(i)); }
+  for (int i = 0; i < mv->domain()->dim(); ++i) {
+    data[i] = getLocalData(mv->col(i));
+  }
   return data;
 }
 
@@ -903,7 +941,9 @@ Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>>
 getNonconstLocalData(Thyra_MultiVector& mv)
 {
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> data(mv.domain()->dim());
-  for (int i = 0; i < mv.domain()->dim(); ++i) { data[i] = getNonconstLocalData(mv.col(i)); }
+  for (int i = 0; i < mv.domain()->dim(); ++i) {
+    data[i] = getNonconstLocalData(mv.col(i));
+  }
   return data;
 }
 
@@ -911,7 +951,9 @@ Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>>
 getLocalData(const Thyra_MultiVector& mv)
 {
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> data(mv.domain()->dim());
-  for (int i = 0; i < mv.domain()->dim(); ++i) { data[i] = getLocalData(mv.col(i)); }
+  for (int i = 0; i < mv.domain()->dim(); ++i) {
+    data[i] = getLocalData(mv.col(i));
+  }
   return data;
 }
 
@@ -978,7 +1020,9 @@ means(const Teuchos::RCP<const Thyra_MultiVector>& mv)
 {
   int const          numVecs = mv->domain()->dim();
   Teuchos::Array<ST> vals(numVecs);
-  for (int i = 0; i < numVecs; ++i) { vals[i] = mean(mv->col(i)); }
+  for (int i = 0; i < numVecs; ++i) {
+    vals[i] = mean(mv->col(i));
+  }
 
   return vals;
 }

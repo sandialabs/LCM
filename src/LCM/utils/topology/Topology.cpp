@@ -142,7 +142,9 @@ Topology::initializeFailureState()
   for (auto rank = node_rank; rank <= cell_rank; ++rank) {
     stk::mesh::EntityVector entities;
     stk::mesh::get_entities(bulk_data, rank, entities);
-    for (auto entity : entities) { set_failure_state(entity, INTACT); }
+    for (auto entity : entities) {
+      set_failure_state(entity, INTACT);
+    }
   }
 }
 
@@ -154,7 +156,9 @@ Topology::initializeCellFailureState()
   auto const              cell_rank = stk::topology::ELEMENT_RANK;
   stk::mesh::EntityVector cells;
   stk::mesh::get_entities(bulk_data, cell_rank, cells);
-  for (auto cell : cells) { set_failure_state(cell, INTACT); }
+  for (auto cell : cells) {
+    set_failure_state(cell, INTACT);
+  }
 }
 
 // Set boundary indicators
@@ -323,7 +327,9 @@ Topology::createBoundary()
   stk::mesh::EntityVector        boundary_faces;
   stk::mesh::get_selected_entities(del_selector, face_buckets, boundary_faces);
   boundary_.clear();
-  for (auto face : boundary_faces) { boundary_.emplace(face); }
+  for (auto face : boundary_faces) {
+    boundary_.emplace(face);
+  }
 }
 
 // Create the full mesh representation. This must be done prior to
@@ -373,7 +379,9 @@ Topology::removeNodeRelations()
 
     connectivity_.push_back(nodes);
 
-    for (size_t j = 0; j < nodes.size(); ++j) { get_bulk_data().destroy_relation(elements[i], nodes[j], j); }
+    for (size_t j = 0; j < nodes.size(); ++j) {
+      get_bulk_data().destroy_relation(elements[i], nodes[j], j);
+    }
   }
 
   Albany::fix_node_sharing(get_bulk_data());
@@ -546,7 +554,9 @@ Topology::getBoundaryEntityNodes(stk::mesh::Entity boundary_entity)
 
     // Brute force approach. Maybe there is a better way to do this?
     for (size_t j = 0; j < num_cell_nodes; ++j) {
-      if (node_ords[j] == cell_order) { nodes.push_back(node_relations[j]); }
+      if (node_ords[j] == cell_order) {
+        nodes.push_back(node_relations[j]);
+      }
     }
   }
 
@@ -580,7 +590,9 @@ Topology::getNodalCoordinates()
 
     double const* const pointer_coordinates = stk::mesh::field_data(node_coordinates, node);
 
-    for (size_t j = 0; j < dimension; ++j) { X(j) = pointer_coordinates[j]; }
+    for (size_t j = 0; j < dimension; ++j) {
+      X(j) = pointer_coordinates[j];
+    }
 
     coordinates[i] = X;
   }
@@ -634,7 +646,9 @@ Topology::outputBoundary(std::string const& output_filename)
 
   size_t cell_list_size = 0;
 
-  for (size_t i = 0; i < number_cells; ++i) { cell_list_size += connectivity[i].size() + 1; }
+  for (size_t i = 0; i < number_cells; ++i) {
+    cell_list_size += connectivity[i].size() + 1;
+  }
 
   // Boundary cell connectivity
   ofs << "CELLS " << number_cells << " " << cell_list_size << '\n';
@@ -643,7 +657,9 @@ Topology::outputBoundary(std::string const& output_filename)
 
     ofs << number_cell_nodes;
 
-    for (size_t j = 0; j < number_cell_nodes; ++j) { ofs << ' ' << connectivity[i][j] - 1; }
+    for (size_t j = 0; j < number_cell_nodes; ++j) {
+      ofs << ' ' << connectivity[i][j] - 1;
+    }
     ofs << '\n';
   }
 
@@ -758,7 +774,9 @@ Topology::getBoundary()
 
     std::vector<stk::mesh::EntityId> node_ids(number_nodes);
 
-    for (EntityVectorIndex i = 0; i < number_nodes; ++i) { node_ids[i] = get_entity_id(nodes[i]); }
+    for (EntityVectorIndex i = 0; i < number_nodes; ++i) {
+      node_ids[i] = get_entity_id(nodes[i]);
+    }
 
     connectivity.push_back(node_ids);
   }
@@ -801,7 +819,9 @@ Topology::get_normal(stk::mesh::Entity boundary_entity)
 
     X.set_dimension(dimension);
 
-    for (size_t j = 0; j < dimension; ++j) { X(j) = pointer_coordinates[j]; }
+    for (size_t j = 0; j < dimension; ++j) {
+      X(j) = pointer_coordinates[j];
+    }
   }
 
   minitensor::Vector<double> const v1 = nodal_coords[1] - nodal_coords[0];
@@ -856,7 +876,9 @@ Topology::createSurfaceElementConnectivity(stk::mesh::Entity face_top, stk::mesh
 
     minitensor::Vector<double> X(dimension);
 
-    for (size_t n = 0; n < dimension; ++n) { X(n) = p_top[n]; }
+    for (size_t n = 0; n < dimension; ++n) {
+      X(n) = p_top[n];
+    }
 
     bool found = false;
 
@@ -867,7 +889,9 @@ Topology::createSurfaceElementConnectivity(stk::mesh::Entity face_top, stk::mesh
 
       minitensor::Vector<double> Y(dimension);
 
-      for (size_t n = 0; n < dimension; ++n) { Y(n) = p_bottom[n]; }
+      for (size_t n = 0; n < dimension; ++n) {
+        Y(n) = p_bottom[n];
+      }
 
       if (X == Y) {
         reordered.push_back(node_bottom);
@@ -960,7 +984,9 @@ Topology::splitOpenFaces()
   for (stk::mesh::EntityVector::iterator i = points.begin(); i != points.end(); ++i) {
     stk::mesh::Entity point = *i;
 
-    if (get_failure_state(point) == FAILED) { open_points.push_back(point); }
+    if (get_failure_state(point) == FAILED) {
+      open_points.push_back(point);
+    }
   }
 
   modification_begin();
@@ -985,7 +1011,9 @@ Topology::splitOpenFaces()
 
       bool const is_local_and_open_segment = is_local_segment == true && is_open_segment == true;
 
-      if (is_local_and_open_segment == true) { open_segments.push_back(segment); }
+      if (is_local_and_open_segment == true) {
+        open_segments.push_back(segment);
+      }
     }
 
     // Iterate over open segments and fracture them.
@@ -1026,7 +1054,9 @@ Topology::splitOpenFaces()
 
         bool const is_local_and_open_face = is_local_face == true && is_open_face == true;
 
-        if (is_local_and_open_face == true) { open_faces.push_back(face); }
+        if (is_local_and_open_face == true) {
+          open_faces.push_back(face);
+        }
       }
 
       // Iterate over the open faces
@@ -1097,7 +1127,9 @@ Topology::splitOpenFaces()
 
   bool const insert_surface_elements = false;
 
-  if (insert_surface_elements == true) { insertSurfaceElements(fractured_faces); }
+  if (insert_surface_elements == true) {
+    insertSurfaceElements(fractured_faces);
+  }
 
   return;
 }
@@ -1189,7 +1221,9 @@ Topology::erodeFailedElements()
   stk::mesh::get_selected_entities(locally_owned, face_buckets, faces);
   for (auto face : faces) {
     auto const num_elems = bulk_data.num_elements(face);
-    if (num_elems == 0) { remove_entity_and_up_relations(face); }
+    if (num_elems == 0) {
+      remove_entity_and_up_relations(face);
+    }
   }
   auto const&             edge_buckets = bulk_data.buckets(edge_rank);
   stk::mesh::EntityVector edges;
@@ -1197,7 +1231,9 @@ Topology::erodeFailedElements()
   for (auto edge : edges) {
     auto const num_elems = bulk_data.num_elements(edge);
     auto const num_faces = bulk_data.num_faces(edge);
-    if (num_elems == 0 || num_faces == 0) { remove_entity_and_up_relations(edge); }
+    if (num_elems == 0 || num_faces == 0) {
+      remove_entity_and_up_relations(edge);
+    }
   }
   auto const&             node_buckets = bulk_data.buckets(node_rank);
   stk::mesh::EntityVector nodes;
@@ -1206,7 +1242,9 @@ Topology::erodeFailedElements()
     auto const num_elems = bulk_data.num_elements(node);
     auto const num_faces = bulk_data.num_faces(node);
     auto const num_edges = bulk_data.num_edges(node);
-    if (num_elems == 0 || num_faces == 0 || num_edges == 0) { remove_entity_and_up_relations(node); }
+    if (num_elems == 0 || num_faces == 0 || num_edges == 0) {
+      remove_entity_and_up_relations(node);
+    }
   }
   modification_end();
   Albany::fix_node_sharing(bulk_data);
@@ -1528,7 +1566,9 @@ Topology::get_num_entities(stk::mesh::EntityRank const entity_rank)
 
   EntityVectorIndex number_entities = 0;
 
-  for (EntityVectorIndex i = 0; i < buckets.size(); ++i) { number_entities += buckets[i]->size(); }
+  for (EntityVectorIndex i = 0; i < buckets.size(); ++i) {
+    number_entities += buckets[i]->size();
+  }
 
   return number_entities;
 }

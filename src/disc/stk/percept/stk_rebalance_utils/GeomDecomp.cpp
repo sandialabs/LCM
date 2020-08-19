@@ -63,7 +63,9 @@ GeomDecomp::entity_coordinates(
               "not exist.");
         }
         std::vector<double> temp(ndim);
-        for (unsigned i = 0; i < ndim; ++i) { temp[i] = coor[i]; }
+        for (unsigned i = 0; i < ndim; ++i) {
+          temp[i] = coor[i];
+        }
         coordinates.push_back(temp);
         mesh_nodes.push_back(nent);
       }
@@ -99,12 +101,18 @@ GeomDecomp::compute_entity_centroid(
   int const ndim      = coordinates.front().size();
 
   centroid.resize(ndim);
-  for (int i = 0; i < ndim; ++i) { centroid[i] = 0; }
+  for (int i = 0; i < ndim; ++i) {
+    centroid[i] = 0;
+  }
   for (int j = 0; j < num_nodes; ++j) {
-    for (int i = 0; i < ndim; ++i) { centroid[i] += coordinates[j][i]; }
+    for (int i = 0; i < ndim; ++i) {
+      centroid[i] += coordinates[j][i];
+    }
   }
   if (1 != num_nodes) {
-    for (int i = 0; i < ndim; ++i) { centroid[i] /= num_nodes; }
+    for (int i = 0; i < ndim; ++i) {
+      centroid[i] /= num_nodes;
+    }
   }
   return coordinates;
 }

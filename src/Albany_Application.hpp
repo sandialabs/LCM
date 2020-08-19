@@ -543,6 +543,12 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     return is_schwarz_alternating_;
   }
 
+  Teuchos::RCP<AAdapt::AdaptiveSolutionManager>
+  getSolutionManager() const
+  {
+    return solMgr;
+  }
+
  private:
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> apps_;
 
@@ -702,10 +708,18 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
   auto const has_edge = edge_boundary_indicator != Teuchos::null && ws < edge_boundary_indicator.size();
   auto const has_node = node_boundary_indicator.size() > 0;
 
-  if (has_cell == true) { workset.cell_boundary_indicator = cell_boundary_indicator[ws]; }
-  if (has_face == true) { workset.face_boundary_indicator = face_boundary_indicator[ws]; }
-  if (has_edge == true) { workset.edge_boundary_indicator = edge_boundary_indicator[ws]; }
-  if (has_node == true) { workset.node_boundary_indicator = node_boundary_indicator; }
+  if (has_cell == true) {
+    workset.cell_boundary_indicator = cell_boundary_indicator[ws];
+  }
+  if (has_face == true) {
+    workset.face_boundary_indicator = face_boundary_indicator[ws];
+  }
+  if (has_edge == true) {
+    workset.edge_boundary_indicator = edge_boundary_indicator[ws];
+  }
+  if (has_node == true) {
+    workset.node_boundary_indicator = node_boundary_indicator;
+  }
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);
   workset.wsElNodeEqID         = wsElNodeEqID[ws];

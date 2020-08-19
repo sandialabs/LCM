@@ -107,7 +107,9 @@ class SolutionValuesResponseFunction::SolutionPrinter
     int const neq                                             = disc->getNumEq();
     for (int i = 0; i < eq_gids.size(); ++i) {
       const GO node_gid = eq_gids[i] / neq;
-      if (!node_indexer->isLocallyOwnedElement(node_gid)) { continue; }
+      if (!node_indexer->isLocallyOwnedElement(node_gid)) {
+        continue;
+      }
       idxs.push_back(i);
       node_gids.push_back(node_gid);
       const LO ov_node_lid = ov_node_indexer->getLocalElement(node_gid);
@@ -203,10 +205,16 @@ SolutionValuesResponseFunction::evaluateGradient(
     }
   }
 
-  if (!dg_dxdot.is_null()) { dg_dxdot->assign(0.0); }
-  if (!dg_dxdotdot.is_null()) { dg_dxdotdot->assign(0.0); }
+  if (!dg_dxdot.is_null()) {
+    dg_dxdot->assign(0.0);
+  }
+  if (!dg_dxdotdot.is_null()) {
+    dg_dxdotdot->assign(0.0);
+  }
 
-  if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
+  if (!dg_dp.is_null()) {
+    dg_dp->assign(0.0);
+  }
 }
 
 void

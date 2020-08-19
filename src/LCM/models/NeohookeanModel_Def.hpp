@@ -105,7 +105,9 @@ NeohookeanModel<EvalT, Traits>::computeState(
       sigma = 0.5 * kappa * (J - 1.0 / J) * I + mu * Jm53 * minitensor::dev(b);
 
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+        for (int j = 0; j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = sigma(i, j);
+        }
       }
 
       if (compute_energy_ == true) {
@@ -124,7 +126,9 @@ NeohookeanModel<EvalT, Traits>::computeState(
         for (int i = 0; i < num_dims_; ++i) {
           for (int j = 0; j < num_dims_; ++j) {
             for (int k = 0; k < num_dims_; ++k) {
-              for (int l = 0; l < num_dims_; ++l) { tangent(cell, pt, i, j, k, l) = dsigmadb(i, j, k, l); }
+              for (int l = 0; l < num_dims_; ++l) {
+                tangent(cell, pt, i, j, k, l) = dsigmadb(i, j, k, l);
+              }
             }
           }
         }

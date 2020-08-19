@@ -36,14 +36,18 @@ UniformSolutionCullingStrategy::selectedGIDs(Teuchos::RCP<Thyra_VectorSpace cons
   Teuchos::Array<GO> allGIDs(sourceVS->dim());
   Teuchos::Array<GO> myGIDs(localDim);
 
-  for (LO lid = 0; lid < localDim; ++lid) { myGIDs[lid] = source_indexer->getGlobalElement(lid); }
+  for (LO lid = 0; lid < localDim; ++lid) {
+    myGIDs[lid] = source_indexer->getGlobalElement(lid);
+  }
 
   gatherAllV(source_indexer->getComm(), myGIDs(), allGIDs);
   std::sort(allGIDs.begin(), allGIDs.end());
 
   Teuchos::Array<GO> target_gids(numValues_);
   int const          stride = 1 + (allGIDs.size() - 1) / numValues_;
-  for (int i = 0; i < numValues_; ++i) { target_gids[i] = allGIDs[i * stride]; }
+  for (int i = 0; i < numValues_; ++i) {
+    target_gids[i] = allGIDs[i * stride];
+  }
   return target_gids;
 }
 
@@ -151,7 +155,9 @@ NodeGIDsSolutionCullingStrategy::selectedGIDs(Teuchos::RCP<Thyra_VectorSpace con
   // Subract 1 to convert exodus GIDs to our GIDs
   auto source_indexer = createGlobalLocalIndexer(sourceVS);
   for (int i = 0; i < nodeGIDs_.size(); ++i) {
-    if (source_indexer->isLocallyOwnedElement(nodeGIDs_[i] - 1)) { mySelectedGIDs.push_back(nodeGIDs_[i] - 1); }
+    if (source_indexer->isLocallyOwnedElement(nodeGIDs_[i] - 1)) {
+      mySelectedGIDs.push_back(nodeGIDs_[i] - 1);
+    }
   }
 
   GO selectedGIDCount;

@@ -71,7 +71,9 @@ HyperelasticDamageModel<EvalT, Traits>::computeState(
   auto                  stress = *eval_fields[cauchy];
   auto                  alpha  = *eval_fields["alpha"];
   PHX::MDField<ScalarT> damage;
-  if (!have_damage_) { damage = *eval_fields["local damage"]; }
+  if (!have_damage_) {
+    damage = *eval_fields["local damage"];
+  }
   PHX::MDField<ScalarT> source = *eval_fields["Damage_Source"];
   // get state variables
   Albany::MDArray alpha_old = (*workset.stateArrayPtr)["alpha_old"];
@@ -129,10 +131,14 @@ HyperelasticDamageModel<EvalT, Traits>::computeState(
       source(cell, pt) = (max_damage_ / damage_saturation_) * std::exp(-alpha(cell, pt) / damage_saturation_) *
                          (alpha(cell, pt) - alpha_old(cell, pt)) / dt;
 
-      if (!have_damage_) { damage(cell, pt) = max_damage_ * (1.0 - std::exp(-alpha(cell, pt) / damage_saturation_)); }
+      if (!have_damage_) {
+        damage(cell, pt) = max_damage_ * (1.0 - std::exp(-alpha(cell, pt) / damage_saturation_));
+      }
 
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = (1.0 - damage(cell, pt)) * sigma(i, j); }
+        for (int j = 0; j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = (1.0 - damage(cell, pt)) * sigma(i, j);
+        }
       }
     }
   }

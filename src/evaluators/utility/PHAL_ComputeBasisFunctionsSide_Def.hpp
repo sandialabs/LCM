@@ -107,7 +107,9 @@ ComputeBasisFunctionsSide<EvalT, Traits>::postRegistrationSetup(
   for (int cell = 0; cell < numCells; ++cell) {
     for (int side = 0; side < numSides; ++side) {
       for (int node = 0; node < numSideNodes; ++node) {
-        for (int qp = 0; qp < numSideQPs; ++qp) { BF(cell, side, node, qp) = val_at_cub_points(node, qp); }
+        for (int qp = 0; qp < numSideQPs; ++qp) {
+          BF(cell, side, node, qp) = val_at_cub_points(node, qp);
+        }
       }
     }
   }

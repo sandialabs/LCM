@@ -32,7 +32,9 @@ double
 static_zoltan_version(double const v = 0)
 {
   static double version = 0;
-  if (v) { version = v; }
+  if (v) {
+    version = v;
+  }
   return version;
 }
 
@@ -489,7 +491,9 @@ stkCallback_Edge_List(
 
     nbor_procs[counter] = zdata->m_bulk.parallel_owner_rank(n);
 
-    if (wgt_dim) { ewgts[counter] = 1; }
+    if (wgt_dim) {
+      ewgts[counter] = 1;
+    }
     ++counter;
   }
 }
@@ -617,7 +621,9 @@ Zoltan::init(const vector<pair<std::string, std::string>>& dynamicLoadRebalancin
    */
 
   m_zoltan_id_ = Zoltan_Create(comm_);
-  if (m_zoltan_id_ == NULL) { throw runtime_error("(FATAL ERROR) Zoltan_Create() returned NULL"); }
+  if (m_zoltan_id_ == NULL) {
+    throw runtime_error("(FATAL ERROR) Zoltan_Create() returned NULL");
+  }
 
   /**
    * Set up dynamic load rebalancing
@@ -670,7 +676,9 @@ Zoltan::init_zoltan_library()
 
 Zoltan::~Zoltan()
 {
-  if (m_zoltan_id_ != NULL) { Zoltan_Destroy(&m_zoltan_id_); }
+  if (m_zoltan_id_ != NULL) {
+    Zoltan_Destroy(&m_zoltan_id_);
+  }
   m_zoltan_id_ = NULL;
   if (Name_Conversion) {
     delete Name_Conversion;

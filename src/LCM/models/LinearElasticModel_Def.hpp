@@ -58,7 +58,9 @@ LinearElasticModel<EvalT, Traits>::computeState(
   minitensor::Tensor<ScalarT> eps(num_dims_), sigma(num_dims_);
   minitensor::Tensor<ScalarT> I(minitensor::eye<ScalarT>(num_dims_));
 
-  if (print) { std::cout << "========" << std::endl; }
+  if (print) {
+    std::cout << "========" << std::endl;
+  }
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
@@ -80,7 +82,9 @@ LinearElasticModel<EvalT, Traits>::computeState(
       }
 
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+        for (int j = 0; j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = sigma(i, j);
+        }
       }
     }
   }
@@ -102,7 +106,9 @@ LinearElasticModel<EvalT, Traits>::computeState(
         }
 
         for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+          for (int j = 0; j < num_dims_; ++j) {
+            stress(cell, pt, i, j) = sigma(i, j);
+          }
         }
       }
     }

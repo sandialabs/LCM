@@ -54,7 +54,9 @@ ParallelConstitutiveModel<EvalT, Traits, Kernel>::computeState(
   auto kernel_ptr = kernel_.get();
 
   Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::Schedule<Kokkos::Dynamic>>(0, workset.numCells), [=](int cell) {
-    for (int pt = 0; pt < num_pts_; ++pt) { (*kernel_ptr)(cell, pt); }
+    for (int pt = 0; pt < num_pts_; ++pt) {
+      (*kernel_ptr)(cell, pt);
+    }
   });
 
   Kokkos::fence();

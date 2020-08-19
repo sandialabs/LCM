@@ -23,13 +23,19 @@ Albany::DiscretizationFactory::DiscretizationFactory(
 {
   discParams = Teuchos::sublist(topLevelParams, "Discretization", true);
 
-  if (topLevelParams->isSublist("Piro")) { piroParams = Teuchos::sublist(topLevelParams, "Piro", true); }
+  if (topLevelParams->isSublist("Piro")) {
+    piroParams = Teuchos::sublist(topLevelParams, "Piro", true);
+  }
 
   if (topLevelParams->isSublist("Problem")) {
     Teuchos::RCP<Teuchos::ParameterList> problemParams = Teuchos::sublist(topLevelParams, "Problem", true);
 
-    if (problemParams->isSublist("Adaptation")) { adaptParams = Teuchos::sublist(problemParams, "Adaptation", true); }
-    if (problemParams->isSublist("Catalyst")) { catalystParams = Teuchos::sublist(problemParams, "Catalyst", true); }
+    if (problemParams->isSublist("Adaptation")) {
+      adaptParams = Teuchos::sublist(problemParams, "Adaptation", true);
+    }
+    if (problemParams->isSublist("Catalyst")) {
+      catalystParams = Teuchos::sublist(problemParams, "Catalyst", true);
+    }
   }
 }
 
@@ -262,7 +268,9 @@ Albany::DiscretizationFactory::createDiscretizationFromInternalMeshStruct(
     std::map<int, std::vector<std::string>> const& sideSetEquations,
     const Teuchos::RCP<Albany::RigidBodyModes>&    rigidBodyModes)
 {
-  if (!piroParams.is_null() && !rigidBodyModes.is_null()) { rigidBodyModes->setPiroPL(piroParams); }
+  if (!piroParams.is_null() && !rigidBodyModes.is_null()) {
+    rigidBodyModes->setPiroPL(piroParams);
+  }
   auto ms   = Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(meshStruct);
   auto disc = Teuchos::rcp(new Albany::STKDiscretization(discParams, ms, commT, rigidBodyModes, sideSetEquations));
   disc->updateMesh();

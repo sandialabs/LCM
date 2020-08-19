@@ -653,7 +653,9 @@ CapExplicitModel<EvalT, Traits>::compute_halpha(minitensor::Tensor<ScalarT>& dgd
   s = dgdsigma - p * I;
 
   for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) { halpha(i, j) = calpha * Galpha * s(i, j); }
+    for (int j = 0; j < 3; j++) {
+      halpha(i, j) = calpha * Galpha * s(i, j);
+    }
   }
 
   return halpha;

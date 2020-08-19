@@ -244,7 +244,9 @@ DruckerPragerModel<EvalT, Traits>::computeState(
       friction(cell, pt) = alpha;
 
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+        for (int j(0); j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = sigma(i, j);
+        }
       }
 
     }  // end loop over pt

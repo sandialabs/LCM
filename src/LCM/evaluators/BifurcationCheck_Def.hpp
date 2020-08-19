@@ -142,7 +142,9 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(typename Traits::EvalData workse
 
       // std::cout << "\n" << min_detA << " @ " << direction << std::endl;
 
-      for (int i(0); i < num_dims_; ++i) { direction_(cell, pt, i) = direction(i); }
+      for (int i(0); i < num_dims_; ++i) {
+        direction_(cell, pt, i) = direction(i);
+      }
     }
   }
 }
@@ -208,9 +210,13 @@ BifurcationCheck<EvalT, Traits>::spherical_sweep(
   //<< "  " << sphere_param.get_normal_minimum() << std::endl;
 
   ScalarT min_detA = sphere_param.get_minimum();
-  for (int i(0); i < 3; ++i) { direction(i) = (sphere_param.get_normal_minimum())(i); }
+  for (int i(0); i < 3; ++i) {
+    direction(i) = (sphere_param.get_normal_minimum())(i);
+  }
 
-  for (int i(0); i < 2; ++i) { arg_minimum(i) = (sphere_param.get_arg_minimum())(i); }
+  for (int i(0); i < 2; ++i) {
+    arg_minimum(i) = (sphere_param.get_arg_minimum())(i);
+  }
 
   return min_detA;
 }
@@ -278,9 +284,13 @@ BifurcationCheck<EvalT, Traits>::stereographic_sweep(
   //<< "  " << stereographic_param.get_normal_minimum() << std::endl;
 
   ScalarT min_detA = stereographic_param.get_minimum();
-  for (int i(0); i < 3; ++i) { direction(i) = (stereographic_param.get_normal_minimum())(i); }
+  for (int i(0); i < 3; ++i) {
+    direction(i) = (stereographic_param.get_normal_minimum())(i);
+  }
 
-  for (int i(0); i < 2; ++i) { arg_minimum(i) = (stereographic_param.get_arg_minimum())(i); }
+  for (int i(0); i < 2; ++i) {
+    arg_minimum(i) = (stereographic_param.get_arg_minimum())(i);
+  }
 
   return min_detA;
 }
@@ -353,9 +363,13 @@ BifurcationCheck<EvalT, Traits>::projective_sweep(
   //<< "  " << projective_param.get_normal_minimum() << std::endl;
 
   ScalarT min_detA = projective_param.get_minimum();
-  for (int i(0); i < 3; ++i) { direction(i) = (projective_param.get_normal_minimum())(i); }
+  for (int i(0); i < 3; ++i) {
+    direction(i) = (projective_param.get_normal_minimum())(i);
+  }
 
-  for (int i(0); i < 3; ++i) { arg_minimum(i) = (projective_param.get_arg_minimum())(i); }
+  for (int i(0); i < 3; ++i) {
+    arg_minimum(i) = (projective_param.get_arg_minimum())(i);
+  }
 
   return min_detA;
 }
@@ -420,9 +434,13 @@ BifurcationCheck<EvalT, Traits>::tangent_sweep(
   //<< "  " << tangent_param.get_normal_minimum() << std::endl;
 
   ScalarT min_detA = tangent_param.get_minimum();
-  for (int i(0); i < 3; ++i) { direction(i) = (tangent_param.get_normal_minimum())(i); }
+  for (int i(0); i < 3; ++i) {
+    direction(i) = (tangent_param.get_normal_minimum())(i);
+  }
 
-  for (int i(0); i < 2; ++i) { arg_minimum(i) = (tangent_param.get_arg_minimum())(i); }
+  for (int i(0); i < 2; ++i) {
+    arg_minimum(i) = (tangent_param.get_arg_minimum())(i);
+  }
 
   return min_detA;
 }
@@ -488,7 +506,9 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
     min_detA       = cartesian1_param.get_minimum();
     arg_minimum(0) = (cartesian1_param.get_arg_minimum())(1);
     arg_minimum(1) = (cartesian1_param.get_arg_minimum())(2);
-    for (int i(0); i < 3; ++i) { direction(i) = (cartesian1_param.get_normal_minimum())(i); }
+    for (int i(0); i < 3; ++i) {
+      direction(i) = (cartesian1_param.get_normal_minimum())(i);
+    }
   }
 
   if (surface_index == 2) {
@@ -518,7 +538,9 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
     min_detA       = cartesian2_param.get_minimum();
     arg_minimum(0) = (cartesian2_param.get_arg_minimum())(0);
     arg_minimum(1) = (cartesian2_param.get_arg_minimum())(2);
-    for (int i(0); i < 3; ++i) { direction(i) = (cartesian2_param.get_normal_minimum())(i); }
+    for (int i(0); i < 3; ++i) {
+      direction(i) = (cartesian2_param.get_normal_minimum())(i);
+    }
   }
 
   if (surface_index == 3) {
@@ -548,7 +570,9 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
     min_detA       = cartesian3_param.get_minimum();
     arg_minimum(0) = (cartesian3_param.get_arg_minimum())(0);
     arg_minimum(1) = (cartesian3_param.get_arg_minimum())(1);
-    for (int i(0); i < 3; ++i) { direction(i) = (cartesian3_param.get_normal_minimum())(i); }
+    for (int i(0); i < 3; ++i) {
+      direction(i) = (cartesian3_param.get_normal_minimum())(i);
+    }
   }
 
   return min_detA;
@@ -809,7 +833,9 @@ BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
     }
 
     minitensor::Vector<D2FadType, 3> Xfad2_sub;
-    for (int i = 0; i < 3; ++i) { Xfad2_sub[i] = Xfad2[i]; }
+    for (int i = 0; i < 3; ++i) {
+      Xfad2_sub[i] = Xfad2[i];
+    }
     n = projective_get_normal(Xfad2_sub);
 
     detA = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n))) +
@@ -1192,9 +1218,13 @@ BifurcationCheck<EvalT, Traits>::stereographic_pso(
   minitensor::Vector<ScalarT, 3> n(2.0 * arg_gbest[0], 2.0 * arg_gbest[1], r2 - 1.0);
   n /= (r2 + 1.0);
 
-  for (int i(0); i < 3; ++i) { direction(i) = n(i); }
+  for (int i(0); i < 3; ++i) {
+    direction(i) = n(i);
+  }
 
-  for (int i(0); i < 2; ++i) { arg_minimum(i) = arg_gbest(i); }
+  for (int i(0); i < 2; ++i) {
+    arg_minimum(i) = arg_gbest(i);
+  }
 
   return detA_gbest;
 }

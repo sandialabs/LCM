@@ -28,7 +28,9 @@ getValidInitialConditionParameters(const Teuchos::ArrayRCP<std::string>& wsEBNam
 
   // Validate element block constant data
 
-  for (int i = 0; i < wsEBNames.size(); i++) { validPL->set<Teuchos::Array<double>>(wsEBNames[i], defaultData, ""); }
+  for (int i = 0; i < wsEBNames.size(); i++) {
+    validPL->set<Teuchos::Array<double>>(wsEBNames[i], defaultData, "");
+  }
 
   // For EBConstant data, we can optionally randomly perturb the IC on each
   // variable some amount
@@ -63,7 +65,9 @@ InitialConditions(
   else
     name = icParams.get("Function", "Restart");
 
-  if (name == "Restart") { return; }
+  if (name == "Restart") {
+    return;
+  }
   // Handle element block specific constant data
   if (name == "EBPerturb" || name == "EBPerturbGaussian" || name == "EBConstant") {
     bool perturb_values = false;
@@ -103,7 +107,9 @@ InitialConditions(
     auto lumpedMMT_data = Albany::getNonconstLocalData(lumpedMMT);
 
     // Make sure soln is zeroed - we are accumulating into it
-    for (int i = 0; i < soln_data.size(); ++i) { soln_data[i] = 0.0; }
+    for (int i = 0; i < soln_data.size(); ++i) {
+      soln_data[i] = 0.0;
+    }
 
     // Loop over all worksets, elements, all local nodes: compute soln as a
     // function of coord and wsEBName
@@ -156,7 +162,9 @@ InitialConditions(
 
     //  Apply the inverted lumped mass matrix to get the final nodal projection
 
-    for (int i = 0; i < soln_data.size(); ++i) { soln_data[i] /= lumpedMMT_data[i]; }
+    for (int i = 0; i < soln_data.size(); ++i) {
+      soln_data[i] /= lumpedMMT_data[i];
+    }
 
     return;
   }
@@ -178,7 +186,9 @@ InitialConditions(
     }
   } else if (name == "Expression Parser") {
     Teuchos::Array<std::string> default_expr(neq);
-    for (auto i = 0; i < default_expr.size(); ++i) { default_expr[i] = "0.0"; }
+    for (auto i = 0; i < default_expr.size(); ++i) {
+      default_expr[i] = "0.0";
+    }
     Teuchos::Array<std::string> expr = icParams.get("Function Expressions", default_expr);
 
     Teuchos::RCP<AAdapt::AnalyticFunction> initFunc = Teuchos::rcp(new AAdapt::ExpressionParser(neq, numDim, expr));
@@ -191,9 +201,13 @@ InitialConditions(
       for (unsigned el = 0; el < wsElNodeEqID[ws].extent(0); el++) {
         for (unsigned ln = 0; ln < wsElNodeEqID[ws].extent(1); ln++) {
           double const* X = coords[ws][el][ln];
-          for (int i = 0; i < neq; i++) { x[i] = soln_data[wsElNodeEqID[ws](el, ln, i)]; }
+          for (int i = 0; i < neq; i++) {
+            x[i] = soln_data[wsElNodeEqID[ws](el, ln, i)];
+          }
           initFunc->compute(&x[0], X);
-          for (int i = 0; i < neq; i++) { soln_data[wsElNodeEqID[ws](el, ln, i)] = x[i]; }
+          for (int i = 0; i < neq; i++) {
+            soln_data[wsElNodeEqID[ws](el, ln, i)] = x[i];
+          }
         }
       }
     }
@@ -212,9 +226,13 @@ InitialConditions(
       for (unsigned el = 0; el < wsElNodeEqID[ws].extent(0); el++) {
         for (unsigned ln = 0; ln < wsElNodeEqID[ws].extent(1); ln++) {
           double const* X = coords[ws][el][ln];
-          for (int i = 0; i < neq; i++) { x[i] = soln_data[wsElNodeEqID[ws](el, ln, i)]; }
+          for (int i = 0; i < neq; i++) {
+            x[i] = soln_data[wsElNodeEqID[ws](el, ln, i)];
+          }
           initFunc->compute(&x[0], X);
-          for (int i = 0; i < neq; i++) { soln_data[wsElNodeEqID[ws](el, ln, i)] = x[i]; }
+          for (int i = 0; i < neq; i++) {
+            soln_data[wsElNodeEqID[ws](el, ln, i)] = x[i];
+          }
         }
       }
     }

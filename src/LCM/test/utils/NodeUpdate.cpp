@@ -32,9 +32,13 @@ main(int ac, char* av[])
   // Parse command line
   Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return = command_line_processor.parse(ac, av);
 
-  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) { return 0; }
+  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) {
+    return 0;
+  }
 
-  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) { return 1; }
+  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) {
+    return 1;
+  }
 
   // Read the mesh
   // Copied from Partition.cc
@@ -130,7 +134,9 @@ main(int ac, char* av[])
     centroid[2] /= num_relations;
 
     // Determine displacement
-    for (int j = 0; j < 3; ++j) { disp[j] = alpha * centroid[j]; }
+    for (int j = 0; j < 3; ++j) {
+      disp[j] = alpha * centroid[j];
+    }
 
     // Add displacement to nodes
     for (int j = 0; j < num_relations; ++j) {

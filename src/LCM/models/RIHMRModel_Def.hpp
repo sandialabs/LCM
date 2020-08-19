@@ -232,7 +232,9 @@ RIHMRModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
         for (int i = 0; i < num_dims_; ++i) {
           for (int j = 0; j < num_dims_; ++j) {
             Fp(i, j) = 0.0;
-            for (int p = 0; p < num_dims_; ++p) { Fp(i, j) += expA(i, p) * Fpold(p, j); }
+            for (int p = 0; p < num_dims_; ++p) {
+              Fp(i, j) += expA(i, p) * Fpold(p, j);
+            }
           }
         }
 
@@ -254,7 +256,9 @@ RIHMRModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
 
       // compute stress
       for (int i = 0; i < num_dims_; ++i) {
-        for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = s(i, j) / J(cell, pt); }
+        for (int j = 0; j < num_dims_; ++j) {
+          stress(cell, pt, i, j) = s(i, j) / J(cell, pt);
+        }
         stress(cell, pt, i, i) += p;
       }
     }

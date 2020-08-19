@@ -28,5 +28,7 @@ Albany::FieldManagerResidualOnlyResponseFunction::evaluateGradient(
     Teuchos::RCP<Thyra_MultiVector> const& /*dg_dxdotdot*/,
     Teuchos::RCP<Thyra_MultiVector> const& /*dg_dp*/)
 {
-  if (!g.is_null()) { this->evaluateResponse(current_time, x, xdot, xdotdot, p, g); }
+  if (!g.is_null()) {
+    this->evaluateResponse(current_time, x, xdot, xdotdot, p, g);
+  }
 }

@@ -326,7 +326,9 @@ struct peel_vector
     minitensor::Index const  dimension = s.get_dimension();
     minitensor::Vector<T, N> t(dimension);
     minitensor::Index const  num_components = s.get_number_components();
-    for (minitensor::Index i = 0; i < num_components; ++i) { t[i] = peel<EvalT, T, M>()(s[i]); }
+    for (minitensor::Index i = 0; i < num_components; ++i) {
+      t[i] = peel<EvalT, T, M>()(s[i]);
+    }
     return t;
   }
 };
@@ -343,7 +345,9 @@ struct peel_tensor
     minitensor::Tensor<T, N> t(dimension);
     minitensor::Index const  num_components = s.get_number_components();
 
-    for (minitensor::Index i = 0; i < num_components; ++i) { t[i] = peel<EvalT, T, M>()(s[i]); }
+    for (minitensor::Index i = 0; i < num_components; ++i) {
+      t[i] = peel<EvalT, T, M>()(s[i]);
+    }
     return t;
   }
 };
@@ -360,7 +364,9 @@ struct peel_tensor3
     minitensor::Tensor3<T, N> t(dimension);
     minitensor::Index const   num_components = s.get_number_components();
 
-    for (minitensor::Index i = 0; i < num_components; ++i) { t[i] = peel<EvalT, T, M>()(s[i]); }
+    for (minitensor::Index i = 0; i < num_components; ++i) {
+      t[i] = peel<EvalT, T, M>()(s[i]);
+    }
     return t;
   }
 };
@@ -377,7 +383,9 @@ struct peel_tensor4
     minitensor::Tensor4<T, N> t(dimension);
     minitensor::Index const   num_components = s.get_number_components();
 
-    for (minitensor::Index i = 0; i < num_components; ++i) { t[i] = peel<EvalT, T, M>()(s[i]); }
+    for (minitensor::Index i = 0; i < num_components; ++i) {
+      t[i] = peel<EvalT, T, M>()(s[i]);
+    }
     return t;
   }
 };

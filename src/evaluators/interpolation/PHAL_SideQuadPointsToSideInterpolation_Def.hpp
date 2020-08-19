@@ -65,7 +65,9 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(ty
     int const side = it_side.side_local_id;
 
     MeshScalarT meas = 0.0;
-    for (int qp(0); qp < dims[2]; ++qp) { meas += w_measure(cell, side, qp); }
+    for (int qp(0); qp < dims[2]; ++qp) {
+      meas += w_measure(cell, side, qp);
+    }
 
     switch (fieldDim) {
       case 0:

@@ -114,7 +114,9 @@ NodalDataVector::saveNodalDataState(const Teuchos::RCP<const Thyra_MultiVector>&
   // Save the nodal data arrays back to stk.
   const size_t nv = mv->domain()->dim();
   for (auto it = nodeVectorLayout.begin(); it != nodeVectorLayout.end(); ++it) {
-    if (it->offset < start_col || static_cast<unsigned long>(it->offset) >= start_col + nv) { continue; }
+    if (it->offset < start_col || static_cast<unsigned long>(it->offset) >= start_col + nv) {
+      continue;
+    }
     (*nodeContainer)[it->name]->saveFieldVector(mv, it->offset - start_col);
   }
 }

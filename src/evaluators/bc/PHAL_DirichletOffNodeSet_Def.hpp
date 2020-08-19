@@ -34,7 +34,9 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typena
   std::set<int> nodeSetsRows;
   for (int ins(0); ins < nodeSets.size(); ++ins) {
     std::vector<std::vector<int>> const& nsNodes = dirichletWorkset.nodeSets->find(nodeSets[ins])->second;
-    for (int inode = 0; inode < nsNodes.size(); ++inode) { nodeSetsRows.insert(nsNodes[inode][this->offset]); }
+    for (int inode = 0; inode < nsNodes.size(); ++inode) {
+      nodeSetsRows.insert(nsNodes[inode][this->offset]);
+    }
   }
 
   Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
@@ -46,7 +48,9 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typena
   // Loop on all local dofs and set the BC on those not in nodeSetsRows
   LO num_local_dofs = Albany::getSpmdVectorSpace(f->space())->localSubDim();
   for (LO row = 0; row < num_local_dofs; ++row) {
-    if (nodeSetsRows.find(row) == nodeSetsRows.end()) { f_nonconstView[row] = x_constView[row] - this->value; }
+    if (nodeSetsRows.find(row) == nodeSetsRows.end()) {
+      f_nonconstView[row] = x_constView[row] - this->value;
+    }
   }
 }
 
@@ -69,7 +73,9 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typena
   std::set<int> nodeSetsRows;
   for (int ins(0); ins < nodeSets.size(); ++ins) {
     std::vector<std::vector<int>> const& nsNodes = dirichletWorkset.nodeSets->find(nodeSets[ins])->second;
-    for (int inode = 0; inode < nsNodes.size(); ++inode) { nodeSetsRows.insert(nsNodes[inode][this->offset]); }
+    for (int inode = 0; inode < nsNodes.size(); ++inode) {
+      nodeSetsRows.insert(nsNodes[inode][this->offset]);
+    }
   }
 
   Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
@@ -102,11 +108,15 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typena
 
       // Extract the row, zero it out, then put j_coeff on diagonal
       Albany::getLocalRowValues(jac, row, matrixIndices, matrixEntries);
-      for (auto& val : matrixEntries) { val = 0.0; }
+      for (auto& val : matrixEntries) {
+        val = 0.0;
+      }
       Albany::setLocalRowValues(jac, row, matrixIndices(), matrixEntries());
       Albany::setLocalRowValues(jac, row, index(), value());
 
-      if (fillResid) { f_nonconstView[row] = x_constView[row] - this->value.val(); }
+      if (fillResid) {
+        f_nonconstView[row] = x_constView[row] - this->value.val();
+      }
     }
   }
 }

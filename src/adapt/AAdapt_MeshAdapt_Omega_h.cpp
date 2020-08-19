@@ -49,7 +49,9 @@ Omega_h_Method::adaptMesh(const Teuchos::RCP<Teuchos::ParameterList>& adapt_para
   mesh_osh.set_parting(OMEGA_H_GHOSTED);
   Omega_h::add_implied_metric_tag(&mesh_osh);
   Omega_h::generate_target_metric_tag(&mesh_osh, metric_opts);
-  while (Omega_h::approach_metric(&mesh_osh, adapt_opts)) { Omega_h::adapt(&mesh_osh, adapt_opts); }
+  while (Omega_h::approach_metric(&mesh_osh, adapt_opts)) {
+    Omega_h::adapt(&mesh_osh, adapt_opts);
+  }
   apf::from_omega_h(mesh_apf, &mesh_osh);
   mesh_osh = Omega_h::Mesh(&library_osh);
 }

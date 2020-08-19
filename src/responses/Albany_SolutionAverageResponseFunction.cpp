@@ -41,19 +41,29 @@ SolutionAverageResponseFunction::evaluateGradient(
     Teuchos::RCP<Thyra_MultiVector> const& dg_dp)
 {
   // Evaluate response g
-  if (!g.is_null()) { evaluateResponseImpl(*x, *g); }
+  if (!g.is_null()) {
+    evaluateResponseImpl(*x, *g);
+  }
 
   // Evaluate dg/dx
-  if (!dg_dx.is_null()) { dg_dx->assign(1.0 / x->space()->dim()); }
+  if (!dg_dx.is_null()) {
+    dg_dx->assign(1.0 / x->space()->dim());
+  }
 
   // Evaluate dg/dxdot
-  if (!dg_dxdot.is_null()) { dg_dxdot->assign(0.0); }
+  if (!dg_dxdot.is_null()) {
+    dg_dxdot->assign(0.0);
+  }
 
   // Evaluate dg/dxdotdot
-  if (!dg_dxdotdot.is_null()) { dg_dxdotdot->assign(0.0); }
+  if (!dg_dxdotdot.is_null()) {
+    dg_dxdotdot->assign(0.0);
+  }
 
   // Evaluate dg/dp
-  if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
+  if (!dg_dp.is_null()) {
+    dg_dp->assign(0.0);
+  }
 }
 
 void

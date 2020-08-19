@@ -64,7 +64,9 @@ NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Tr
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     meas = 0.0;
-    for (int qp(0); qp < numQPs; ++qp) { meas += w_measure(cell, qp); }
+    for (int qp(0); qp < numQPs; ++qp) {
+      meas += w_measure(cell, qp);
+    }
 
     if (isVectorField) {
       for (int dim(0); dim < vecDim; ++dim) {

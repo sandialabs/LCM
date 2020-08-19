@@ -147,7 +147,9 @@ ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(
     parseParameters(f_exp, p, paramLib);
   }
   // register evaluated fields
-  for (auto& pair : field_map_) { this->addEvaluatedField(pair.second); }
+  for (auto& pair : field_map_) {
+    this->addEvaluatedField(pair.second);
+  }
   this->setName("Constitutive Model Parameters" + PHX::print<EvalT>());
 }
 
@@ -159,7 +161,9 @@ ConstitutiveModelParameters<EvalT, Traits>::postRegistrationSetup(
 {
   for (auto& pair : field_map_) {
     this->utils.setFieldData(pair.second, fm);
-    if (!is_constant_map_[pair.first]) { this->utils.setFieldData(coord_vec_, fm); }
+    if (!is_constant_map_[pair.first]) {
+      this->utils.setFieldData(coord_vec_, fm);
+    }
   }
 
   if (have_temperature_) this->utils.setFieldData(temperature_, fm);
@@ -172,7 +176,9 @@ ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(typename Traits::Eval
     ScalarT constant_value = constant_value_map_[pair.first];
     if (is_constant_map_[pair.first]) {
       for (int cell(0); cell < workset.numCells; ++cell) {
-        for (int pt(0); pt < num_pts_; ++pt) { pair.second(cell, pt) = constant_value; }
+        for (int pt(0); pt < num_pts_; ++pt) {
+          pair.second(cell, pt) = constant_value;
+        }
       }
     } else {
       for (int cell(0); cell < workset.numCells; ++cell) {
@@ -187,7 +193,9 @@ ConstitutiveModelParameters<EvalT, Traits>::evaluateFields(typename Traits::Eval
         RealType dPdT     = dparam_dtemp_map_[pair.first];
         RealType ref_temp = ref_temp_map_[pair.first];
         for (int cell(0); cell < workset.numCells; ++cell) {
-          for (int pt(0); pt < num_pts_; ++pt) { pair.second(cell, pt) += dPdT * (temperature_(cell, pt) - ref_temp); }
+          for (int pt(0); pt < num_pts_; ++pt) {
+            pair.second(cell, pt) += dPdT * (temperature_(cell, pt) - ref_temp);
+          }
         }
       } else if (temp_type_map_[pair.first] == "Arrhenius") {
         RealType pre_exp_   = pre_exp_map_[pair.first];
@@ -206,7 +214,9 @@ typename ConstitutiveModelParameters<EvalT, Traits>::ScalarT&
 ConstitutiveModelParameters<EvalT, Traits>::getValue(std::string const& n)
 {
   for (auto& pair : constant_value_map_) {
-    if (n == pair.first) { return constant_value_map_[pair.first]; }
+    if (n == pair.first) {
+      return constant_value_map_[pair.first];
+    }
   }
   typename std::map<std::string, Teuchos::Array<ScalarT>>::iterator it2;
   for (int i(0); i < rv_map_[it2->first].size(); ++i) {

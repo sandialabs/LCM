@@ -38,8 +38,12 @@ Coord2RBM(
 
   Teuchos::ArrayRCP<const ST> x = data[0];
   Teuchos::ArrayRCP<const ST> y, z;
-  if (numSpaceDim > 1) { y = data[1]; }
-  if (numSpaceDim > 2) { z = data[2]; }
+  if (numSpaceDim > 1) {
+    y = data[1];
+  }
+  if (numSpaceDim > 2) {
+    z = data[2];
+  }
 
   traits_class.zero();
 
@@ -48,12 +52,16 @@ Coord2RBM(
     switch (Ndof - NscalarDof) {
       case 6:
         for (ii = 3; ii < 6 + NscalarDof; ii++) { /* lower half = [ 0 I ] */
-          for (jj = 0; jj < 6 + NscalarDof; jj++) { traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0; }
+          for (jj = 0; jj < 6 + NscalarDof; jj++) {
+            traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0;
+          }
         }
         /* There is no break here and that is on purpose */
       case 3:
         for (ii = 0; ii < 3 + NscalarDof; ii++) { /* upper left = [ I ] */
-          for (jj = 0; jj < 3 + NscalarDof; jj++) { traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0; }
+          for (jj = 0; jj < 3 + NscalarDof; jj++) {
+            traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0;
+          }
         }
         for (ii = 0; ii < 3; ii++) { /* upper right = [ Q ] */
           for (jj = 3 + NscalarDof; jj < 6 + NscalarDof; jj++) {
@@ -85,7 +93,9 @@ Coord2RBM(
 
       case 2:
         for (ii = 0; ii < 2 + NscalarDof; ii++) { /* upper left = [ I ] */
-          for (jj = 0; jj < 2 + NscalarDof; jj++) { traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0; }
+          for (jj = 0; jj < 2 + NscalarDof; jj++) {
+            traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0;
+          }
         }
         for (ii = 0; ii < 2 + NscalarDof; ii++) { /* upper right = [ Q ] */
           for (jj = 2 + NscalarDof; jj < 3 + NscalarDof; jj++) {
@@ -103,7 +113,9 @@ Coord2RBM(
 
       case 1:
         for (ii = 0; ii < 1 + NscalarDof; ii++) {
-          for (jj = 0; jj < 1 + NscalarDof; jj++) { traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0; }
+          for (jj = 0; jj < 1 + NscalarDof; jj++) {
+            traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0;
+          }
         }
         break;
 
@@ -140,8 +152,12 @@ Coord2RBM_nonElasticity(
 
   Teuchos::ArrayRCP<const ST> x = data[0];
   Teuchos::ArrayRCP<const ST> y, z;
-  if (numSpaceDim > 1) { y = data[1]; }
-  if (numSpaceDim > 2) { z = data[2]; }
+  if (numSpaceDim > 1) {
+    y = data[1];
+  }
+  if (numSpaceDim > 2) {
+    z = data[2];
+  }
 
   traits_class.zero();
 
@@ -166,7 +182,9 @@ Coord2RBM_nonElasticity(
         /* There is no break here and that is on purpose */
       case 2:
         for (ii = 0; ii < 2 + NscalarDof; ii++) { /* upper left = [ I ] */
-          for (jj = 0; jj < 2 + NscalarDof; jj++) { traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0; }
+          for (jj = 0; jj < 2 + NscalarDof; jj++) {
+            traits_class.ArrObj(dof, ii, jj) = (ii == jj) ? 1.0 : 0.0;
+          }
         }
         break;
 

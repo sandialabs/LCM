@@ -516,7 +516,9 @@ J2HMCModel<EvalT, Traits>::converged(std::vector<ScalarT>& R, int iteration, Sca
 
   int     nvals = R.size();
   ScalarT norm  = 0.0;
-  for (int ival = 0; ival < nvals; ival++) { norm += R[ival] * R[ival]; }
+  for (int ival = 0; ival < nvals; ival++) {
+    norm += R[ival] * R[ival];
+  }
   if (norm > 0.0) norm = sqrt(norm);
 
   if (iteration == 0) initNorm = norm;
@@ -1074,7 +1076,9 @@ J2HMCModel<EvalT, Traits>::computeVolumeAverage(
       p = (1. / num_dims_) * minitensor::trace(sig);
       sig += (pbar - p) * I;
 
-      for (int i = 0; i < num_dims_; ++i) { stress(cell, pt, i, i) = sig(i, i); }
+      for (int i = 0; i < num_dims_; ++i) {
+        stress(cell, pt, i, i) = sig(i, i);
+      }
     }
   }
 }

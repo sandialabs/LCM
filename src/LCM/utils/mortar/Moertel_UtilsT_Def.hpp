@@ -243,7 +243,9 @@ MoertelT::Print_Vector(std::string name, const Tpetra::Vector<ST, LO, GO, N>& v,
               << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return false;
   }
-  for (int lrow = 0; lrow < v->getLocalLength(); ++lrow) { fprintf(out, "  %20.10e\n", vv[lrow]); }
+  for (int lrow = 0; lrow < v->getLocalLength(); ++lrow) {
+    fprintf(out, "  %20.10e\n", vv[lrow]);
+  }
   fflush(out);
   fclose(out);
   std::cout << "Tpetra_Vector is written to file " << name << std::endl;

@@ -90,7 +90,9 @@ InvAbsRowSum(Teuchos::RCP<Tpetra_Vector>& invAbsRowSumsTpetra, const Teuchos::RC
     Teuchos::Array<ST> values(numEntriesRow);
     matrix->getLocalRowCopy(row, indices(), values(), numEntriesRow);
     ST scale = 0.0;
-    for (size_t j = 0; j < numEntriesRow; j++) { scale += std::abs(values[j]); }
+    for (size_t j = 0; j < numEntriesRow; j++) {
+      scale += std::abs(values[j]);
+    }
 
     if (scale < 1.0e-16) {
       invAbsRowSumsTpetra_nonconstView[row] = 0.0;
@@ -116,7 +118,9 @@ AbsRowSum(Teuchos::RCP<Tpetra_Vector>& absRowSumsTpetra, const Teuchos::RCP<Tpet
     Teuchos::Array<ST> values(numEntriesRow);
     matrix->getLocalRowCopy(row, indices(), values(), numEntriesRow);
     ST scale = 0.0;
-    for (size_t j = 0; j < numEntriesRow; j++) { scale += std::abs(values[j]); }
+    for (size_t j = 0; j < numEntriesRow; j++) {
+      scale += std::abs(values[j]);
+    }
     absRowSumsTpetra_nonconstView[row] = scale;
   }
 }
@@ -172,7 +176,9 @@ splitStringOnDelim(std::string const& s, char delim, std::vector<std::string>& e
 {
   std::stringstream ss(s);
   std::string       item;
-  while (std::getline(ss, item, delim)) { elems.push_back(item); }
+  while (std::getline(ss, item, delim)) {
+    elems.push_back(item);
+  }
 }
 
 std::string
@@ -258,11 +264,15 @@ writeMatrixMarket<const Tpetra_Map>(
     std::string const&                    prefix,
     int const                             counter)
 {
-  if (map.is_null()) { return; }
+  if (map.is_null()) {
+    return;
+  }
 
   std::ostringstream oss;
   oss << prefix;
-  if (counter >= 0) { oss << '-' << std::setfill('0') << std::setw(3) << counter; }
+  if (counter >= 0) {
+    oss << '-' << std::setfill('0') << std::setw(3) << counter;
+  }
   oss << ".mm";
 
   std::string const& filename = oss.str();
@@ -277,12 +287,16 @@ writeMatrixMarket<const Tpetra_Vector>(
     std::string const&                       prefix,
     int const                                counter)
 {
-  if (v.is_null()) { return; }
+  if (v.is_null()) {
+    return;
+  }
 
   std::ostringstream oss;
 
   oss << prefix;
-  if (counter >= 0) { oss << '-' << std::setfill('0') << std::setw(3) << counter; }
+  if (counter >= 0) {
+    oss << '-' << std::setfill('0') << std::setw(3) << counter;
+  }
   oss << ".mm";
 
   std::string const& filename = oss.str();
@@ -297,12 +311,16 @@ writeMatrixMarket<const Tpetra_MultiVector>(
     std::string const&                            prefix,
     int const                                     counter)
 {
-  if (mv.is_null()) { return; }
+  if (mv.is_null()) {
+    return;
+  }
 
   std::ostringstream oss;
 
   oss << prefix;
-  if (counter >= 0) { oss << '-' << std::setfill('0') << std::setw(3) << counter; }
+  if (counter >= 0) {
+    oss << '-' << std::setfill('0') << std::setw(3) << counter;
+  }
   oss << ".mm";
 
   std::string const& filename = oss.str();
@@ -317,12 +335,16 @@ writeMatrixMarket<const Tpetra_CrsMatrix>(
     std::string const&                          prefix,
     int const                                   counter)
 {
-  if (A.is_null()) { return; }
+  if (A.is_null()) {
+    return;
+  }
 
   std::ostringstream oss;
 
   oss << prefix;
-  if (counter >= 0) { oss << '-' << std::setfill('0') << std::setw(3) << counter; }
+  if (counter >= 0) {
+    oss << '-' << std::setfill('0') << std::setw(3) << counter;
+  }
   oss << ".mm";
 
   std::string const& filename = oss.str();
@@ -393,7 +415,9 @@ do_stack_trace()
   void*  callstack[128];
   int    i, frames = backtrace(callstack, 128);
   char** strs = backtrace_symbols(callstack, frames);
-  for (i = 0; i < frames; ++i) { printf("%s\n", strs[i]); }
+  for (i = 0; i < frames; ++i) {
+    printf("%s\n", strs[i]);
+  }
   free(strs);
 }
 

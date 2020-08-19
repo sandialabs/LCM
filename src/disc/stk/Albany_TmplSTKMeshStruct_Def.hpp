@@ -320,7 +320,9 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
   }
 
   // Upon request, add a nodeset for each sideset
-  if (params->get<bool>("Build Node Sets From Side Sets", false)) { this->addNodeSetsFromSideSets(); }
+  if (params->get<bool>("Build Node Sets From Side Sets", false)) {
+    this->addNodeSetsFromSideSets();
+  }
 
   // Create a mesh specs object for EACH side set
   this->initializeSideSetMeshSpecs(commT);

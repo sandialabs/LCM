@@ -89,7 +89,9 @@ main(int argc, char* argv[])
     RCP<Teuchos_Comm const> comm = Albany::getDefaultComm();
 
     // Connect vtune for performance profiling
-    if (cmd.vtune) { Albany::connect_vtune(comm->getRank()); }
+    if (cmd.vtune) {
+      Albany::connect_vtune(comm->getRank());
+    }
 
     Albany::SolverFactory slvrfctry(cmd.yaml_filename, comm);
 

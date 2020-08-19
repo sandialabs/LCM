@@ -261,7 +261,9 @@ ThermoPoroPlasticityResidMass<EvalT, Traits>::evaluateFields(typename Traits::Ev
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
-      for (int dim = 0; dim < numDims; ++dim) { fluxdt(cell, qp, dim) = -flux(cell, qp, dim) * dt; }
+      for (int dim = 0; dim < numDims; ++dim) {
+        fluxdt(cell, qp, dim) = -flux(cell, qp, dim) * dt;
+      }
     }
   }
   FST::integrate(TResidual.get_view(), fluxdt, wGradBF.get_view(),

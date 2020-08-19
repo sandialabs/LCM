@@ -134,7 +134,9 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   if (is_constant) {
     for (int cell = 0; cell < numCells; ++cell) {
-      for (int qp = 0; qp < numQPs; ++qp) { porosity(cell, qp) = constant_value; }
+      for (int qp = 0; qp < numQPs; ++qp) {
+        porosity(cell, qp) = constant_value;
+      }
     }
   }
 
@@ -154,7 +156,9 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
                 porePressure(cell, qp) * (biotCoefficient(cell, qp) - initialPorosityValue) / GrainBulkModulus;
           }
           // Set Warning message
-          if (porosity(cell, qp) < 0) { std::cout << "negative porosity detected. Error! \n"; }
+          if (porosity(cell, qp) < 0) {
+            std::cout << "negative porosity detected. Error! \n";
+          }
           // // for debug
           // std::cout << "initial Porosity: " << initialPorosity_value << endl;
           // std::cout << "Pore Pressure: " << porePressure << endl;
@@ -194,7 +198,9 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
           }
 
           // Set Warning message
-          if (porosity(cell, qp) < 0) { std::cout << "negative porosity detected. Error! \n"; }
+          if (porosity(cell, qp) < 0) {
+            std::cout << "negative porosity detected. Error! \n";
+          }
         }
       }
   } else {

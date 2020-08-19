@@ -66,7 +66,9 @@ struct BucketArray<stk::mesh::Field<ScalarType, void, void, void, void, void, vo
 
   BucketArray(const field_type& f, const stk::mesh::Bucket& k)
   {
-    if (k.field_data_is_allocated(f)) { array_type::assign((ScalarType*)(k.field_data_location(f)), k.size()); }
+    if (k.field_data_is_allocated(f)) {
+      array_type::assign((ScalarType*)(k.field_data_location(f)), k.size());
+    }
   }
 };
 

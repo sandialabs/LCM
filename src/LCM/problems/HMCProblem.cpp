@@ -40,8 +40,12 @@ Albany::HMCProblem::HMCProblem(
   if (numDim == 1) {
     nullSpaceDim = 0;
   } else {
-    if (numDim == 2) { nullSpaceDim = 3; }
-    if (numDim == 3) { nullSpaceDim = 6; }
+    if (numDim == 2) {
+      nullSpaceDim = 3;
+    }
+    if (numDim == 3) {
+      nullSpaceDim = 6;
+    }
   }
 
   int numPDEs = numMicroScales * numDim * numDim;

@@ -78,7 +78,9 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields
   std::vector<std::vector<int>> const& nsNodes = dirichletWorkset.nodeSets->find(this->nodeSetID)->second;
 
   bool fillResid = (f != Teuchos::null);
-  if (fillResid) { f_nonconstView = Albany::getNonconstLocalData(f); }
+  if (fillResid) {
+    f_nonconstView = Albany::getNonconstLocalData(f);
+  }
 
   int     cunk, punk;
   ScalarT Cval;
@@ -98,12 +100,16 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields
 
     // replace jac values for the C dof
     Albany::getLocalRowValues(jac, cunk, matrixIndices, matrixEntries);
-    for (auto& val : matrixEntries) { val = 0.0; }
+    for (auto& val : matrixEntries) {
+      val = 0.0;
+    }
     Albany::setLocalRowValues(jac, cunk, matrixIndices(), matrixEntries());
     index[0] = cunk;
     Albany::setLocalRowValues(jac, cunk, index(), value());
 
-    if (fillResid) { f_nonconstView[cunk] = x_constView[cunk] - Cval.val(); }
+    if (fillResid) {
+      f_nonconstView[cunk] = x_constView[cunk] - Cval.val();
+    }
   }
 }
 

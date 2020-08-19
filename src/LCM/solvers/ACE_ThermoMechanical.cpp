@@ -4,12 +4,15 @@
 
 #include "ACE_ThermoMechanical.hpp"
 
-#include "Albany_ModelEvaluator.hpp"
+#include "AAdapt_Erosion.hpp"
+#include "Albany_PiroObserver.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Albany_Utils.hpp"
 #include "MiniTensor.h"
+#include "Piro_LOCAAdaptiveSolver.hpp"
 #include "Piro_LOCASolver.hpp"
+#include "Piro_ObserverToLOCASaveDataStrategyAdapter.hpp"
 #include "Piro_TempusSolver.hpp"
 
 namespace {
@@ -198,7 +201,9 @@ ACEThermoMechanical::ACEThermoMechanical(
       is_static_  = is_static;
       is_dynamic_ = is_dynamic;
     }
-    if (is_static == true) { ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg); }
+    if (is_static == true) {
+      ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg);
+    }
     if (is_dynamic == true) {
       ALBANY_ASSERT(piro_params.isSublist("Tempus") == true, msg);
 
@@ -407,7 +412,9 @@ void
 ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&)
     const
 {
-  if (is_dynamic_ == true) { ThermoMechanicalLoopDynamics(); }
+  if (is_dynamic_ == true) {
+    ThermoMechanicalLoopDynamics();
+  }
   // IKT 6/4/2020: for now, throw error if trying to run quasi-statically.
   // Not sure if we want to ultimately support that case or not.
   ALBANY_ASSERT(is_static_ == false, "ACE Sequential Thermo-Mechanical solver currently supports dynamics only!");
@@ -474,10 +481,13 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
   disc_params.set<bool>("Output DTK Field to Exodus", false);
   if (!disc_params.isParameter("Disable Exodus Output Initial Time")) {
-    disc_params.set<bool>("Disable Exodus Output Initial Time", true); 
+    disc_params.set<bool>("Disable Exodus Output Initial Time", true);
   }
-  int const thermal_exo_write_interval = disc_params.get<int>("Exodus Write Interval", 1); 
-  ALBANY_ASSERT(thermal_exo_write_interval == 1, "'Exodus Write Interval' for Thermal Problem must be 1!  This parameter is controlled by variables in coupled input file.");
+  int const thermal_exo_write_interval = disc_params.get<int>("Exodus Write Interval", 1);
+  ALBANY_ASSERT(
+      thermal_exo_write_interval == 1,
+      "'Exodus Write Interval' for Thermal Problem must be 1!  This parameter is controlled by variables in coupled "
+      "input file.");
   if (file_index > 0) {
     // Change input Exodus file to previous mechanical Exodus output file, for restarts.
     disc_params.set<std::string>("Exodus Input File Name", prev_mechanical_exo_outfile_name_);
@@ -505,7 +515,9 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   discs_[subdomain]                                 = disc;
 
   Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
-  if (file_index == 0) { stk_disc.outputExodusSolutionInitialTime(true); }
+  if (file_index == 0) {
+    stk_disc.outputExodusSolutionInitialTime(true);
+  }
 
   auto  abs_stk_mesh_struct_rcp  = stk_disc.getSTKMeshStruct();
   auto& abs_stk_mesh_struct      = *abs_stk_mesh_struct_rcp;
@@ -537,14 +549,17 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   disc_params.set<std::string>("Exodus SolutionDot Name", "disp_dot");
   disc_params.set<std::string>("Exodus SolutionDotDot Name", "disp_dotdot");
   disc_params.set<bool>("Output DTK Field to Exodus", false);
-  int const mechanics_exo_write_interval = disc_params.get<int>("Exodus Write Interval", 1); 
-  ALBANY_ASSERT(mechanics_exo_write_interval == 1, "'Exodus Write Interval' for Mechanics Problem must be 1!  This parameter is controlled by variables in coupled input file.");
-  
+  int const mechanics_exo_write_interval = disc_params.get<int>("Exodus Write Interval", 1);
+  ALBANY_ASSERT(
+      mechanics_exo_write_interval == 1,
+      "'Exodus Write Interval' for Mechanics Problem must be 1!  This parameter is controlled by variables in coupled "
+      "input file.");
+
   // After the initial run, we will do restarts from the previously written Exodus output file.
   // Change input Exodus file to previous thermal Exodus output file, for restarts.
   disc_params.set<std::string>("Exodus Input File Name", prev_thermal_exo_outfile_name_);
   if (!disc_params.isParameter("Disable Exodus Output Initial Time")) {
-    disc_params.set<bool>("Disable Exodus Output Initial Time", true); 
+    disc_params.set<bool>("Disable Exodus Output Initial Time", true);
   }
   // Set restart index based on where we are in the simulation
   if (file_index == 0) {  // Initially, restart index = 2, since initial file will have 2 snapshots
@@ -577,7 +592,9 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   discs_[subdomain]                                 = disc;
 
   Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
-  if (file_index == 0) { stk_disc.outputExodusSolutionInitialTime(true); }
+  if (file_index == 0) {
+    stk_disc.outputExodusSolutionInitialTime(true);
+  }
 
   auto  abs_stk_mesh_struct_rcp     = stk_disc.getSTKMeshStruct();
   auto& abs_stk_mesh_struct         = *abs_stk_mesh_struct_rcp;
@@ -751,7 +768,9 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     }
 
     // Update IC vecs
-    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) { setICVecs(next_time, subdomain); }
+    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+      setICVecs(next_time, subdomain);
+    }
 
     ++stop;
     current_time += time_step;
@@ -829,7 +848,9 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-  if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
+  if (std_init_guess_ == false) {
+    piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
+  }
 
   solver.evalModel(in_args, out_args);
 
@@ -920,9 +941,28 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-  if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_x_[subdomain]); }
+  if (std_init_guess_ == false) {
+    piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
+  }
 
   solver.evalModel(in_args, out_args);
+
+  // Adapt mesh if needed.
+  auto& sol_mgr = *(app.getSolutionManager());
+  if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
+//    auto lsb         = Stratimikos::DefaultLinearSolverBuilder();
+//    auto lss         = createLinearSolveStrategy(lsb);
+//    auto me_rcp      = model_evaluators_[subdomain];
+//    auto mewsf       = rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(me_rcp, lss));
+//    auto app_rcp     = apps_[subdomain];
+//    auto po          = Teuchos::rcp(new Albany::PiroObserver(app_rcp, mewsf));
+//    auto sds         = Teuchos::rcp(new Piro::ObserverToLOCASaveDataStrategyAdapter(po));
+//    auto params      = solver_factories_[subdomain]->getParametersRCP();
+//    auto pp          = Teuchos::sublist(params, "Piro");
+//    auto sol_mgr_rcp = app.getSolutionManager();
+//    Piro::LOCAAdaptiveSolver<ST>(pp, mewsf, sol_mgr_rcp, sds);
+    sol_mgr.adaptProblem();
+  }
 
   // Allocate current solution vectors
   this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
@@ -1087,7 +1127,9 @@ void
 ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain, int const stop) const
 {
   auto const is_initial_time = time <= initial_time_ + initial_time_step_;
-  if (is_initial_time == false) { return; }
+  if (is_initial_time == false) {
+    return;
+  }
   // Write solution at specified time to STK mesh
   Teuchos::RCP<Thyra_MultiVector const> const xMV      = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
   auto&                                       abs_disc = *discs_[subdomain];

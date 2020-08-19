@@ -120,7 +120,9 @@ Permittivity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   if (is_constant) {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t qp = 0; qp < numQPs; ++qp) { permittivity(cell, qp) = constant_value; }
+      for (std::size_t qp = 0; qp < numQPs; ++qp) {
+        permittivity(cell, qp) = constant_value;
+      }
     }
   }
 
@@ -140,7 +142,9 @@ template <typename EvalT, typename Traits>
 typename Permittivity<EvalT, Traits>::ScalarT&
 Permittivity<EvalT, Traits>::getValue(std::string const& n)
 {
-  if (is_constant) { return constant_value; }
+  if (is_constant) {
+    return constant_value;
+  }
 
   for (int i = 0; i < rv.size(); i++) {
     if (n == Albany::strint("Permittivity KL Random Variable", i)) return rv[i];

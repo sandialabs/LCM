@@ -90,12 +90,16 @@ ScalarL2ProjectionResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalD
       minitensor::Tensor<ScalarT> F(minitensor::Source::ARRAY, numDims, DefGrad, cell, qp, 0, 0);
       J              = minitensor::det(F);
       tauH(cell, qp) = 0.0;
-      for (int i = 0; i < numDims; i++) { tauH(cell, qp) += J * Pstress(cell, qp, i, i) / numDims; }
+      for (int i = 0; i < numDims; i++) {
+        tauH(cell, qp) += J * Pstress(cell, qp, i, i) / numDims;
+      }
     }
   }
 
   for (int cell = 0; cell < workset.numCells; ++cell) {
-    for (int node = 0; node < numNodes; ++node) { TResidual(cell, node) = 0.0; }
+    for (int node = 0; node < numNodes; ++node) {
+      TResidual(cell, node) = 0.0;
+    }
   }
 
   for (int cell = 0; cell < workset.numCells; ++cell) {

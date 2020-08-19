@@ -119,11 +119,15 @@ DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>:
 
       // Extract the row, zero it out, then put j_coeff on diagonal
       Albany::getLocalRowValues(jac, offset, matrixIndices, matrixEntries);
-      for (auto& val : matrixEntries) { val = 0.0; }
+      for (auto& val : matrixEntries) {
+        val = 0.0;
+      }
       Albany::setLocalRowValues(jac, offset, matrixIndices(), matrixEntries());
       Albany::setLocalRowValues(jac, offset, index(), value());
 
-      if (fillResid) { f_nonconstView[offset] = (x_constView[offset] - BCVals[j].val()); }
+      if (fillResid) {
+        f_nonconstView[offset] = (x_constView[offset] - BCVals[j].val());
+      }
     }
   }
 }

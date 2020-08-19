@@ -87,12 +87,18 @@ point_inside(const Teuchos::ArrayRCP<double*>& coords, std::vector<double> const
   double const        elem_diam  = std::max(::distance(coords[0], coords[2]), ::distance(coords[1], coords[3]));
   std::vector<double> center(3, 0);
   for (unsigned i = 0; i < 4; ++i) {
-    for (unsigned j = 0; j < 3; ++j) { center[j] += coords[i][j]; }
+    for (unsigned j = 0; j < 3; ++j) {
+      center[j] += coords[i][j];
+    }
   }
-  for (unsigned j = 0; j < 3; ++j) { center[j] /= 4; }
+  for (unsigned j = 0; j < 3; ++j) {
+    center[j] /= 4;
+  }
   bool inside = true;
 
-  if (::distance(&center[0], &sphere_xyz[0]) > 1.0 * elem_diam) { inside = false; }
+  if (::distance(&center[0], &sphere_xyz[0]) > 1.0 * elem_diam) {
+    inside = false;
+  }
 
   unsigned j = 3;
   for (unsigned i = 0; i < 4 && inside; ++i) {
@@ -107,7 +113,9 @@ point_inside(const Teuchos::ArrayRCP<double*>& coords, std::vector<double> const
 
     // dot product is proportional to elem_diam. positive means outside,
     // but allow machine precision tolorence:
-    if (tol_inside * elem_diam < dotprod) { inside = false; }
+    if (tol_inside * elem_diam < dotprod) {
+      inside = false;
+    }
   }
   return inside;
 }
@@ -132,8 +140,12 @@ Basis(int const C)
           << std::endl);
 
   // Quick return for linear or quad
-  if (C == 4) { return HGRAD_Basis_4; }
-  if (C == 9) { return HGRAD_Basis_9; }
+  if (C == 4) {
+    return HGRAD_Basis_4;
+  }
+  if (C == 9) {
+    return HGRAD_Basis_9;
+  }
 
   // Spectral bases
   return Teuchos::rcp(new Intrepid2::Basis_HGRAD_QUAD_Cn_FEM<PHX::Device>(deg, Intrepid2::POINTTYPE_WARPBLEND));
@@ -154,7 +166,9 @@ value(std::vector<double> const& soln, std::pair<double, double> const& ref)
   HGRAD_Basis->getValues(basisVals, tempPoints, Intrepid2::OPERATOR_VALUE);
 
   double x = 0;
-  for (int j = 0; j < C; ++j) { x += soln[j] * basisVals(j, 0); }
+  for (int j = 0; j < C; ++j) {
+    x += soln[j] * basisVals(j, 0);
+  }
   return x;
 }
 
@@ -172,9 +186,13 @@ value(double x[3], const Teuchos::ArrayRCP<double*>& coords, std::pair<double, d
 
   HGRAD_Basis->getValues(basisVals, tempPoints, Intrepid2::OPERATOR_VALUE);
 
-  for (unsigned i = 0; i < 3; ++i) { x[i] = 0; }
   for (unsigned i = 0; i < 3; ++i) {
-    for (int j = 0; j < C; ++j) { x[i] += coords[j][i] * basisVals(j, 0); }
+    x[i] = 0;
+  }
+  for (unsigned i = 0; i < 3; ++i) {
+    for (int j = 0; j < C; ++j) {
+      x[i] += coords[j][i] * basisVals(j, 0);
+    }
   }
 }
 
@@ -192,7 +210,9 @@ grad(double x[3][2], const Teuchos::ArrayRCP<double*>& coords, std::pair<double,
 
   HGRAD_Basis->getValues(basisGrad, tempPoints, Intrepid2::OPERATOR_GRAD);
 
-  for (unsigned i = 0; i < 3; ++i) { x[i][0] = x[i][1] = 0; }
+  for (unsigned i = 0; i < 3; ++i) {
+    x[i][0] = x[i][1] = 0;
+  }
   for (unsigned i = 0; i < 3; ++i) {
     for (int j = 0; j < C; ++j) {
       x[i][0] += coords[j][i] * basisGrad(j, 0, 0);
@@ -211,7 +231,9 @@ ref2sphere(const Teuchos::ArrayRCP<double*>& coords, std::pair<double, double> c
 
   double const r = std::sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
 
-  for (unsigned i = 0; i < 3; ++i) { x[i] /= r; }
+  for (unsigned i = 0; i < 3; ++i) {
+    x[i] /= r;
+  }
 
   std::pair<double, double> sphere(std::asin(x[2]), std::atan2(x[1], x[0]));
 
@@ -259,17 +281,23 @@ Dmap(
   double D4[3][2] = {{0}};
   for (unsigned i = 0; i < 3; ++i) {
     for (unsigned j = 0; j < 2; ++j) {
-      for (unsigned k = 0; k < 3; ++k) { D4[i][j] += D2[i][k] * D3[k][j]; }
+      for (unsigned k = 0; k < 3; ++k) {
+        D4[i][j] += D2[i][k] * D3[k][j];
+      }
     }
   }
 
   for (unsigned i = 0; i < 2; ++i) {
-    for (unsigned j = 0; j < 2; ++j) { D[i][j] = 0; }
+    for (unsigned j = 0; j < 2; ++j) {
+      D[i][j] = 0;
+    }
   }
 
   for (unsigned i = 0; i < 2; ++i) {
     for (unsigned j = 0; j < 2; ++j) {
-      for (unsigned k = 0; k < 3; ++k) { D[i][j] += D1[i][k] * D4[k][j]; }
+      for (unsigned k = 0; k < 3; ++k) {
+        D[i][j] += D1[i][k] * D4[k][j];
+      }
     }
   }
 }
@@ -290,8 +318,12 @@ parametric_coordinates(const Teuchos::ArrayRCP<double*>& coords, std::pair<doubl
     resa                                = sph.first - sphere.first;
     resb                                = sph.second - sphere.second;
 
-    if (resb > pi) { resb -= 2 * pi; }
-    if (resb < -pi) { resb += 2 * pi; }
+    if (resb > pi) {
+      resb -= 2 * pi;
+    }
+    if (resb < -pi) {
+      resb += 2 * pi;
+    }
 
     Dmap(coords, sph, ref, D);
     double const detD = D[0][0] * D[1][1] - D[0][1] * D[1][0];
@@ -490,7 +522,9 @@ STKDiscretization::getCoordinates() const
     int node_lid = ov_node_indexer->getLocalElement(node_gid);
 
     double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
-    for (int dim = 0; dim < meshDim; ++dim) { coordinates[meshDim * node_lid + dim] = x[dim]; }
+    for (int dim = 0; dim < meshDim; ++dim) {
+      coordinates[meshDim * node_lid + dim] = x[dim];
+    }
   }
 
   return coordinates;
@@ -529,7 +563,9 @@ STKDiscretization::transformMesh()
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       double  r = 0.0;
-      for (int n = 0; n < numDim; n++) { r += x[n] * x[n]; }
+      for (int n = 0; n < numDim; n++) {
+        r += x[n] * x[n];
+      }
       r = sqrt(r);
       for (int n = 0; n < numDim; n++) {
         // FIXME: there could be division by 0 here!
@@ -752,8 +788,12 @@ STKDiscretization::transformMesh()
 void
 STKDiscretization::setupMLCoords()
 {
-  if (rigidBodyModes.is_null()) { return; }
-  if (!rigidBodyModes->isMueLuUsed() && !rigidBodyModes->isFROSchUsed()) { return; }
+  if (rigidBodyModes.is_null()) {
+    return;
+  }
+  if (!rigidBodyModes->isMueLuUsed() && !rigidBodyModes->isFROSchUsed()) {
+    return;
+  }
 
   int const                                   numDim            = stkMeshStruct->numDim;
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
@@ -765,7 +805,9 @@ STKDiscretization::setupMLCoords()
     GO      node_gid = gid(ownednodes[i]);
     int     node_lid = node_indexer->getLocalElement(node_gid);
     double* X        = stk::mesh::field_data(*coordinates_field, ownednodes[i]);
-    for (int j = 0; j < numDim; j++) { coordMV_data[j][node_lid] = X[j]; }
+    for (int j = 0; j < numDim; j++) {
+      coordMV_data[j][node_lid] = X[j];
+    }
   }
 
   rigidBodyModes->setCoordinatesAndNullspace(coordMV, m_vs, m_overlap_vs);
@@ -781,10 +823,16 @@ STKDiscretization::writeCoordsToMatrixMarket() const
   // if user wants to write the coordinates to matrix market file, write them to
   // matrix market file
   if ((rigidBodyModes->isMueLuUsed() || rigidBodyModes->isFROSchUsed()) && stkMeshStruct->writeCoordsToMMFile) {
-    if (comm->getRank() == 0) { std::cout << "Writing mesh coordinates to Matrix Market file." << std::endl; }
+    if (comm->getRank() == 0) {
+      std::cout << "Writing mesh coordinates to Matrix Market file." << std::endl;
+    }
     writeMatrixMarket(coordMV->col(0), "xCoords");
-    if (coordMV->domain()->dim() > 1) { writeMatrixMarket(coordMV->col(1), "yCoords"); }
-    if (coordMV->domain()->dim() > 2) { writeMatrixMarket(coordMV->col(2), "zCoords"); }
+    if (coordMV->domain()->dim() > 1) {
+      writeMatrixMarket(coordMV->col(1), "yCoords");
+    }
+    if (coordMV->domain()->dim() > 2) {
+      writeMatrixMarket(coordMV->col(2), "zCoords");
+    }
   }
 }
 
@@ -1156,7 +1204,9 @@ STKDiscretization::setField(Thyra_Vector const& result, std::string const& name,
   // over each bucket.
   if (part.size()) {
     std::map<std::string, stk::mesh::Part*>::const_iterator it = stkMeshStruct->nsPartVec.find(part);
-    if (it != stkMeshStruct->nsPartVec.end()) { selector &= stk::mesh::Selector(*(it->second)); }
+    if (it != stkMeshStruct->nsPartVec.end()) {
+      selector &= stk::mesh::Selector(*(it->second));
+    }
   }
 
   const DOFsStruct& dofsStruct = nodalDOFsStructContainer.getDOFsStruct(name);
@@ -1175,7 +1225,9 @@ STKDiscretization::setSolutionField(Thyra_Vector const& soln, bool const overlap
 
   // Select the proper mesh part and node vector space
   stk::mesh::Selector part = metaData.locally_owned_part();
-  if (overlapped) { part |= metaData.globally_shared_part(); }
+  if (overlapped) {
+    part |= metaData.globally_shared_part();
+  }
   auto node_vs = overlapped ? m_overlap_node_vs : m_node_vs;
 
   container->saveSolnVector(soln, part, node_vs);
@@ -1188,7 +1240,9 @@ STKDiscretization::setSolutionField(Thyra_Vector const& soln, Thyra_Vector const
 
   // Select the proper mesh part and node vector space
   stk::mesh::Selector part = metaData.locally_owned_part();
-  if (overlapped) { part |= metaData.globally_shared_part(); }
+  if (overlapped) {
+    part |= metaData.globally_shared_part();
+  }
   auto node_vs = overlapped ? m_overlap_node_vs : m_node_vs;
 
   container->saveSolnVector(soln, soln_dot, part, node_vs);
@@ -1205,7 +1259,9 @@ STKDiscretization::setSolutionField(
 
   // Select the proper mesh part and node vector space
   stk::mesh::Selector part = metaData.locally_owned_part();
-  if (overlapped) { part |= metaData.globally_shared_part(); }
+  if (overlapped) {
+    part |= metaData.globally_shared_part();
+  }
   auto node_vs = overlapped ? m_overlap_node_vs : m_node_vs;
 
   container->saveSolnVector(soln, soln_dot, soln_dotdot, part, node_vs);
@@ -1218,7 +1274,9 @@ STKDiscretization::setSolutionFieldMV(const Thyra_MultiVector& soln, bool const 
 
   // Select the proper mesh part and node vector space
   stk::mesh::Selector part = metaData.locally_owned_part();
-  if (overlapped) { part |= metaData.globally_shared_part(); }
+  if (overlapped) {
+    part |= metaData.globally_shared_part();
+  }
   auto node_vs = overlapped ? m_overlap_node_vs : m_node_vs;
 
   container->saveSolnMultiVector(soln, part, node_vs);
@@ -1283,7 +1341,9 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
   // maps for owned nodes and unknowns
 
   stk::mesh::Selector vs_type_selector = metaData.locally_owned_part();
-  if (overlapped) { vs_type_selector |= metaData.globally_shared_part(); }
+  if (overlapped) {
+    vs_type_selector |= metaData.globally_shared_part();
+  }
 
   NodalDOFsStructContainer::MapOfDOFsStructs& mapOfDOFsStructs = nodalDOFsStructContainer.mapOfDOFsStructs;
   std::vector<stk::mesh::Entity>              nodes;
@@ -1293,7 +1353,9 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
   stk::mesh::get_selected_entities(vs_type_selector, bulkData.buckets(stk::topology::NODE_RANK), nodes);
 
   GO maxID(0), maxGID(0);
-  for (size_t i = 0; i < nodes.size(); ++i) { maxID = std::max(maxID, gid(nodes[i])); }
+  for (size_t i = 0; i < nodes.size(); ++i) {
+    maxID = std::max(maxID, gid(nodes[i]));
+  }
   Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 1, &maxID, &maxGID);
   maxGlobalNodeGID = maxGID + 1;  // maxGID is the same for overlapped and unique maps
 
@@ -1304,7 +1366,9 @@ STKDiscretization::computeNodalVectorSpaces(bool overlapped)
 
   // map[part_name][num_components] = dofs_struct;
   std::map<std::string, std::map<int, DOFsStruct*>> tmp_map;
-  for (auto& it : mapOfDOFsStructs) { tmp_map[it.first.first][it.first.second] = &it.second; }
+  for (auto& it : mapOfDOFsStructs) {
+    tmp_map[it.first.first][it.first.second] = &it.second;
+  }
 
   // Build vector spaces
   Teuchos::Array<GO> indices;
@@ -1458,7 +1522,9 @@ STKDiscretization::computeGraphsUpToFillComplete()
   // determining the equations that are defined on the whole domain
   std::vector<int> globalEqns;
   for (unsigned int k(0); k < neq; ++k) {
-    if (sideSetEquations.find(k) == sideSetEquations.end()) { globalEqns.push_back(k); }
+    if (sideSetEquations.find(k) == sideSetEquations.end()) {
+      globalEqns.push_back(k);
+    }
   }
 
   for (std::size_t i = 0; i < cells.size(); i++) {
@@ -1679,7 +1745,9 @@ STKDiscretization::computeWorksetInfo()
 
   wsPhysIndex.resize(num_buckets);
   if (stkMeshStruct->allElementBlocksHaveSamePhysics) {
-    for (int i = 0; i < num_buckets; ++i) { wsPhysIndex[i] = 0; }
+    for (int i = 0; i < num_buckets; ++i) {
+      wsPhysIndex[i] = 0;
+    }
   } else {
     for (int i = 0; i < num_buckets; ++i) {
       wsPhysIndex[i] = stkMeshStruct->getMeshSpecs()[0]->ebNameToIndex[wsEBNames[i]];
@@ -1698,7 +1766,9 @@ STKDiscretization::computeWorksetInfo()
   const StateInfoStruct& nodal_states = stkMeshStruct->getFieldContainer()->getNodalSIS();
 
   // Clear map if remeshing
-  if (!elemGIDws.empty()) { elemGIDws.clear(); }
+  if (!elemGIDws.empty()) {
+    elemGIDws.clear();
+  }
 
   typedef stk::mesh::Cartesian NodeTag;
   typedef stk::mesh::Cartesian ElemTag;
@@ -1765,7 +1835,9 @@ STKDiscretization::computeWorksetInfo()
               for (int j = 0; j < static_cast<int>(dim[1]); j++) {
                 stk::mesh::Entity rowNode = rel[j];
                 double*           entry   = stk::mesh::field_data(field, rowNode);
-                for (int k = 0; k < static_cast<int>(dim[2]); k++) { array(i, j, k) = entry[k]; }
+                for (int k = 0; k < static_cast<int>(dim[2]); k++) {
+                  array(i, j, k) = entry[k];
+                }
               }
             }
             break;
@@ -1796,8 +1868,12 @@ STKDiscretization::computeWorksetInfo()
       }
     }
 
-    if (stkMeshStruct->getFieldContainer()->hasSphereVolumeField()) { sphereVolume[b].resize(buck.size()); }
-    if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) { latticeOrientation[b].resize(buck.size()); }
+    if (stkMeshStruct->getFieldContainer()->hasSphereVolumeField()) {
+      sphereVolume[b].resize(buck.size());
+    }
+    if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
+      latticeOrientation[b].resize(buck.size());
+    }
 
     stk::mesh::Entity element           = buck[0];
     int               nodes_per_element = bulkData.num_nodes(element);
@@ -1846,7 +1922,9 @@ STKDiscretization::computeWorksetInfo()
 
       if (stkMeshStruct->getFieldContainer()->hasSphereVolumeField() && nodes_per_element == 1) {
         double* volumeTemp = stk::mesh::field_data(*sphereVolume_field, element);
-        if (volumeTemp) { sphereVolume[b][i] = volumeTemp[0]; }
+        if (volumeTemp) {
+          sphereVolume[b][i] = volumeTemp[0];
+        }
       }
       if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
         latticeOrientation[b][i] = static_cast<double*>(stk::mesh::field_data(*latticeOrientation_field, element));
@@ -2130,7 +2208,9 @@ STKDiscretization::determine_local_side_id(const stk::mesh::Entity elem, stk::me
       msg << " , Element[ ";
       msg << bulkData.identifier(elem);
       msg << " ]{";
-      for (unsigned i = 0; i < num_sides; ++i) { msg << " " << bulkData.identifier(elem_sides[i]); }
+      for (unsigned i = 0; i < num_sides; ++i) {
+        msg << " " << bulkData.identifier(elem_sides[i]);
+      }
       msg << " } , Side[ ";
       msg << bulkData.identifier(side);
       msg << " ] ) FAILED";
@@ -2152,9 +2232,13 @@ STKDiscretization::determine_local_side_id(const stk::mesh::Entity elem, stk::me
 
           bool found = false;
 
-          for (unsigned k = 0; !found && k < side_top.num_nodes(); ++k) { found = elem_node == side_nodes[k]; }
+          for (unsigned k = 0; !found && k < side_top.num_nodes(); ++k) {
+            found = elem_node == side_nodes[k];
+          }
 
-          if (!found) { side_id = -1; }
+          if (!found) {
+            side_id = -1;
+          }
         }
       }
     }
@@ -2166,11 +2250,15 @@ STKDiscretization::determine_local_side_id(const stk::mesh::Entity elem, stk::me
       msg << " , Element[ ";
       msg << bulkData.identifier(elem);
       msg << " ]{";
-      for (unsigned i = 0; i < num_elem_nodes; ++i) { msg << " " << bulkData.identifier(elem_nodes[i]); }
+      for (unsigned i = 0; i < num_elem_nodes; ++i) {
+        msg << " " << bulkData.identifier(elem_nodes[i]);
+      }
       msg << " } , Side[ ";
       msg << bulkData.identifier(side);
       msg << " ]{";
-      for (unsigned i = 0; i < num_side_nodes; ++i) { msg << " " << bulkData.identifier(side_nodes[i]); }
+      for (unsigned i = 0; i < num_side_nodes; ++i) {
+        msg << " " << bulkData.identifier(side_nodes[i]);
+      }
       msg << " } ) FAILED";
       throw std::runtime_error(msg.str());
     }
@@ -2204,7 +2292,9 @@ STKDiscretization::computeNodeSets()
       int node_lid              = node_indexer->getLocalElement(node_gid);
       nodeSetGIDs[ns->first][i] = node_gid;
       nodeSets[ns->first][i].resize(neq);
-      for (std::size_t eq = 0; eq < neq; ++eq) { nodeSets[ns->first][i][eq] = getOwnedDOF(node_lid, eq); }
+      for (std::size_t eq = 0; eq < neq; ++eq) {
+        nodeSets[ns->first][i][eq] = getOwnedDOF(node_lid, eq);
+      }
       nodeSetCoords[ns->first][i] = stk::mesh::field_data(*coordinates_field, nodes[i]);
     }
     ns++;
@@ -2249,7 +2339,9 @@ STKDiscretization::setupExodusOutput()
     const stk::mesh::FieldVector& fields = mesh_data->meta_data().get_fields();
     for (size_t i = 0; i < fields.size(); i++) {
       auto attr = fields[i]->attribute<Ioss::Field::RoleType>();
-      if (attr != nullptr && *attr == Ioss::Field::TRANSIENT) { mesh_data->add_field(outputFileIdx, *fields[i]); }
+      if (attr != nullptr && *attr == Ioss::Field::TRANSIENT) {
+        mesh_data->add_field(outputFileIdx, *fields[i]);
+      }
     }
   }
 }
@@ -2274,8 +2366,12 @@ STKDiscretization::reNameExodusOutput(std::string& filename)
 void
 STKDiscretization::meshToGraph()
 {
-  if (Teuchos::is_null(stkMeshStruct->nodal_data_base)) { return; }
-  if (!stkMeshStruct->nodal_data_base->isNodeDataPresent()) { return; }
+  if (Teuchos::is_null(stkMeshStruct->nodal_data_base)) {
+    return;
+  }
+  if (!stkMeshStruct->nodal_data_base->isNodeDataPresent()) {
+    return;
+  }
 
   // Set up the CRS graph used for solution transfer and projection mass
   // matrices. Assume the Crs row size is 27, which is the maximum number
@@ -2313,7 +2409,9 @@ STKDiscretization::meshToGraph()
         // the connect table twice, need to check to make sure that this element
         // is not already listed as surrounding this node.
         std::vector<stk::mesh::Entity> const sur_elem_node_lid = sur_elem[nodeLID];
-        if (sur_elem[nodeLID].empty() || !in_list(e, sur_elem_node_lid)) { sur_elem[nodeLID].push_back(e); }
+        if (sur_elem[nodeLID].empty() || !in_list(e, sur_elem_node_lid)) {
+          sur_elem[nodeLID].push_back(e);
+        }
       }
     }
   }
@@ -2351,7 +2449,9 @@ STKDiscretization::meshToGraph()
         GO entry = gid(node_a);
         // Every node in an element adjacent to node 'globalrow' is in this
         // graph.
-        if (!in_list(entry, adjacency)) { adjacency.push_back(entry); }
+        if (!in_list(entry, adjacency)) {
+          adjacency.push_back(entry);
+        }
       }
     }
     nodalMatrixFactory->insertGlobalIndices(globalrow, adjacency());
@@ -2367,7 +2467,9 @@ STKDiscretization::meshToGraph()
 void
 STKDiscretization::printVertexConnectivity()
 {
-  if (Teuchos::is_null(nodalMatrixFactory)) { return; }
+  if (Teuchos::is_null(nodalMatrixFactory)) {
+    return;
+  }
 
   auto               ov_node_indexer = createGlobalLocalIndexer(m_overlap_node_vs);
   auto               dummy_op        = nodalMatrixFactory->createOp();

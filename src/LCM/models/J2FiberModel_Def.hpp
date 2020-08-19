@@ -40,7 +40,9 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(Teuchos::ParameterList* p, const Teuch
   this->dep_field_map_.insert(std::make_pair("Yield Strength", dl->qp_scalar));
   this->dep_field_map_.insert(std::make_pair("Hardening Modulus", dl->qp_scalar));
 
-  if (local_coord_flag_) { need_integration_pt_locations_ = true; }
+  if (local_coord_flag_) {
+    need_integration_pt_locations_ = true;
+  }
 
   // retrieve appropriate field name strings
   std::string cauchy_string        = (*field_name_map_)["Cauchy_Stress"];
@@ -155,7 +157,9 @@ J2FiberModel<EvalT, Traits>::computeState(
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> gpt_location;
 
   // for now, force using global fiber direction
-  if (local_coord_flag_) { gpt_location = this->coord_vec_; }
+  if (local_coord_flag_) {
+    gpt_location = this->coord_vec_;
+  }
 
   // retrive appropriate field name strings
   std::string cauchy_string        = (*field_name_map_)["Cauchy_Stress"];
@@ -222,7 +226,9 @@ J2FiberModel<EvalT, Traits>::computeState(
       F.fill(def_grad, cell, pt, 0, 0);
       // Fpn.fill( &Fpold(cell,pt,int(0),int(0)) );
       for (int i(0); i < num_dims_; ++i) {
-        for (int j(0); j < num_dims_; ++j) { Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j)); }
+        for (int j(0); j < num_dims_; ++j) {
+          Fpn(i, j) = static_cast<ScalarT>(Fp_old(cell, pt, i, j));
+        }
       }
 
       // compute Cpinv = inv(Fp) * inv(Fp)^T

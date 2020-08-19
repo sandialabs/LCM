@@ -111,7 +111,9 @@ Topology::getClosestNodesOnSurface(std::vector<std::vector<double>> points)
     temp = getDirectlyConnectedEntities(*I_faces, stk::topology::ELEMENT_RANK);
     // If the number of boundary entities of rank 3 is 1 then, this is
     // a boundary face
-    if (temp.size() == 1) { BoundaryFaces.push_back(*I_faces); }
+    if (temp.size() == 1) {
+      BoundaryFaces.push_back(*I_faces);
+    }
   }
 
   // Obtain the Edges that belong to the Boundary Faces delete the
@@ -123,7 +125,9 @@ Topology::getClosestNodesOnSurface(std::vector<std::vector<double>> points)
     std::vector<stk::mesh::Entity> boundaryEdges =
         getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
     for (I_Edges = boundaryEdges.begin(); I_Edges != boundaryEdges.end(); I_Edges++) {
-      if (findEntityInVector(MeshEdges, *I_Edges) == false) { MeshEdges.push_back(*I_Edges); }
+      if (findEntityInVector(MeshEdges, *I_Edges) == false) {
+        MeshEdges.push_back(*I_Edges);
+      }
     }
   }
 
@@ -255,7 +259,9 @@ Topology::getCoordinatesOfTriangle(std::vector<double> const normalToPlane)
 
   // Find a perpendicular vector to the input one
 
-  for (int i = 0; i < 3; i++) { vectorN.push_back(normalToPlane[i] - coordOfCenter[i]); }
+  for (int i = 0; i < 3; i++) {
+    vectorN.push_back(normalToPlane[i] - coordOfCenter[i]);
+  }
 
   std::vector<double> vectorA;
 
@@ -447,13 +453,25 @@ Topology::getCoordinatesOfMaxAndMin()
     // Compare the x,y, and z coordinates to the max and min for x y
     // and z if value is more extreme than max or min update max or
     // min
-    if (x_coordinate > maxX) { maxX = x_coordinate; }
-    if (y_coordinate > maxY) { maxY = y_coordinate; }
-    if (z_coordinate > maxZ) { maxZ = z_coordinate; }
+    if (x_coordinate > maxX) {
+      maxX = x_coordinate;
+    }
+    if (y_coordinate > maxY) {
+      maxY = y_coordinate;
+    }
+    if (z_coordinate > maxZ) {
+      maxZ = z_coordinate;
+    }
 
-    if (x_coordinate < minX) { minX = x_coordinate; }
-    if (y_coordinate < minY) { minY = y_coordinate; }
-    if (z_coordinate < minZ) { minZ = z_coordinate; }
+    if (x_coordinate < minX) {
+      minX = x_coordinate;
+    }
+    if (y_coordinate < minY) {
+      minY = y_coordinate;
+    }
+    if (z_coordinate < minZ) {
+      minZ = z_coordinate;
+    }
   }
   coordOfMaxAndMin.push_back(maxX);
   coordOfMaxAndMin.push_back(minX);
@@ -481,7 +499,9 @@ Topology::meshEdgesShortestPath()
     temp = getDirectlyConnectedEntities(*I_faces, stk::topology::ELEMENT_RANK);
     // If the number of boundary entities of rank 3 is 1
     // then, this is a boundary face
-    if (temp.size() == 1) { BoundaryFaces.push_back(*I_faces); }
+    if (temp.size() == 1) {
+      BoundaryFaces.push_back(*I_faces);
+    }
   }
 
   // Obtain the Edges that belong to the Boundary Faces
@@ -493,7 +513,9 @@ Topology::meshEdgesShortestPath()
     std::vector<stk::mesh::Entity> boundaryEdges =
         getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
     for (I_Edges = boundaryEdges.begin(); I_Edges != boundaryEdges.end(); I_Edges++) {
-      if (findEntityInVector(MeshEdges, *I_Edges) == false) { MeshEdges.push_back(*I_Edges); }
+      if (findEntityInVector(MeshEdges, *I_Edges) == false) {
+        MeshEdges.push_back(*I_Edges);
+      }
     }
   }
 
@@ -678,7 +700,9 @@ Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
     temp = getDirectlyConnectedEntities(*I_faces, stk::topology::ELEMENT_RANK);
     // If the number of boundary entities of rank 3 is 1
     // then, this is a boundary face
-    if (temp.size() == 1) { BoundaryFaces.push_back(*I_faces); }
+    if (temp.size() == 1) {
+      BoundaryFaces.push_back(*I_faces);
+    }
   }
 
   // Obtain the Edges that belong to the Boundary Faces
@@ -690,7 +714,9 @@ Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
     std::vector<stk::mesh::Entity> boundaryEdges =
         getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
     for (I_Edges = boundaryEdges.begin(); I_Edges != boundaryEdges.end(); I_Edges++) {
-      if (findEntityInVector(MeshEdges, *I_Edges) == false) { MeshEdges.push_back(*I_Edges); }
+      if (findEntityInVector(MeshEdges, *I_Edges) == false) {
+        MeshEdges.push_back(*I_Edges);
+      }
     }
   }
 
@@ -865,7 +891,9 @@ Topology::edgesDirectionsOuterSurface()
     temp = getDirectlyConnectedEntities(*I_faces, stk::topology::ELEMENT_RANK);
     // If the number of boundary entities of rank 3 is 1
     // then, this is a boundary face
-    if (temp.size() == 1) { BoundaryFaces.push_back(*I_faces); }
+    if (temp.size() == 1) {
+      BoundaryFaces.push_back(*I_faces);
+    }
   }
 
   // Obtain the Edges that belong to the Boundary Faces
@@ -877,7 +905,9 @@ Topology::edgesDirectionsOuterSurface()
     std::vector<stk::mesh::Entity> boundaryEdges =
         getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
     for (I_Edges = boundaryEdges.begin(); I_Edges != boundaryEdges.end(); I_Edges++) {
-      if (findEntityInVector(setOfEdges, *I_Edges) == false) { setOfEdges.push_back(*I_Edges); }
+      if (findEntityInVector(setOfEdges, *I_Edges) == false) {
+        setOfEdges.push_back(*I_Edges);
+      }
     }
   }
 
@@ -965,7 +995,9 @@ Topology::facesAreas()
 
   // Initialize facesAreas as a vector of zeros
   std::vector<double> facesAreas;
-  for (unsigned int i = 0; i < (setOfFaces.size()); i++) { facesAreas.push_back(0); }
+  for (unsigned int i = 0; i < (setOfFaces.size()); i++) {
+    facesAreas.push_back(0);
+  }
 
   // Iterate through the map
   std::map<stk::mesh::Entity, int>::const_iterator mapIter;
@@ -1234,8 +1266,12 @@ Topology::minimumSurfaceFaces(std::vector<int> VectorFromLPSolver)
   std::vector<stk::mesh::Entity> MinSurfaceEntities;
   int                            count = 0;
   for (unsigned int i = 0; i < VectorFromLPSolver.size(); i += 2) {
-    if (VectorFromLPSolver[i] != 0) { MinSurfaceEntities.push_back(face_map.find(count)->second); }
-    if (VectorFromLPSolver[i + 1] != 0) { MinSurfaceEntities.push_back(face_map.find(count)->second); }
+    if (VectorFromLPSolver[i] != 0) {
+      MinSurfaceEntities.push_back(face_map.find(count)->second);
+    }
+    if (VectorFromLPSolver[i + 1] != 0) {
+      MinSurfaceEntities.push_back(face_map.find(count)->second);
+    }
     count++;
   }
 
@@ -1249,7 +1285,9 @@ Topology::numberOfRepetitions(std::vector<stk::mesh::Entity>& entities, stk::mes
   std::vector<stk::mesh::Entity>::iterator iterator_entities;
   int                                      count = 0;
   for (iterator_entities = entities.begin(); iterator_entities != entities.end(); ++iterator_entities) {
-    if (*iterator_entities == entity) { count++; }
+    if (*iterator_entities == entity) {
+      count++;
+    }
   }
   return count;
 }

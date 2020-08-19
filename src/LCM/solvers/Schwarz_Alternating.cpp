@@ -163,7 +163,9 @@ SchwarzAlternating::SchwarzAlternating(
       is_static_  = is_static;
       is_dynamic_ = is_dynamic;
     }
-    if (is_static == true) { ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg); }
+    if (is_static == true) {
+      ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg);
+    }
     if (is_dynamic == true) {
       ALBANY_ASSERT(piro_params.isSublist("Tempus") == true, msg);
 
@@ -395,8 +397,12 @@ void
 SchwarzAlternating::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&)
     const
 {
-  if (is_dynamic_ == true) { SchwarzLoopDynamics(); }
-  if (is_static_ == true) { SchwarzLoopQuasistatics(); }
+  if (is_dynamic_ == true) {
+    SchwarzLoopDynamics();
+  }
+  if (is_static_ == true) {
+    SchwarzLoopQuasistatics();
+  }
   return;
 }
 
@@ -602,7 +608,9 @@ SchwarzAlternating::SchwarzLoopDynamics() const
 
         piro_tempus_solver.setInitialState(current_time, ic_disp_rcp, ic_velo_rcp, ic_acce_rcp);
 
-        if (std_init_guess_ == false) { piro_tempus_solver.setInitialGuess(prev_disp_[subdomain]); }
+        if (std_init_guess_ == false) {
+          piro_tempus_solver.setInitialGuess(prev_disp_[subdomain]);
+        }
 
         solver.evalModel(in_args, out_args);
 

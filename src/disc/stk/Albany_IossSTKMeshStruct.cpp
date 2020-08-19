@@ -28,7 +28,9 @@ get_element_block_sizes(stk::io::StkMeshIoBroker& mesh_data, std::vector<int>& e
   const Ioss::ElementBlockContainer& elem_blocks = io.get_element_blocks();
   for (Ioss::ElementBlockContainer::const_iterator it = elem_blocks.begin(); it != elem_blocks.end(); ++it) {
     Ioss::ElementBlock* entity = *it;
-    if (stk::io::include_entity(entity)) { el_blocks.push_back(entity->get_property("entity_count").get_int()); }
+    if (stk::io::include_entity(entity)) {
+      el_blocks.push_back(entity->get_property("entity_count").get_int());
+    }
   }
 }
 
@@ -54,7 +56,9 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   std::vector<std::string>     entity_rank_names = stk::mesh::entity_rank_names();
 
   // eMesh needs "FAMILY_TREE" entity
-  if (buildEMesh) { entity_rank_names.push_back("FAMILY_TREE"); }
+  if (buildEMesh) {
+    entity_rank_names.push_back("FAMILY_TREE");
+  }
 
   const Teuchos::MpiComm<int>* theComm = dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
 
@@ -109,7 +113,9 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     if (!stk::io::is_part_io_part(newNodeSet)) {
       stk::mesh::Field<double>* const distrFactorfield =
           metaData->get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "distribution_factors");
-      if (distrFactorfield != NULL) { stk::mesh::put_field_on_mesh(*distrFactorfield, newNodeSet, nullptr); }
+      if (distrFactorfield != NULL) {
+        stk::mesh::put_field_on_mesh(*distrFactorfield, newNodeSet, nullptr);
+      }
       stk::io::put_io_part_attribute(newNodeSet);
     }
   }
@@ -151,7 +157,9 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   auto& sss = r->get_sidesets();
   for (auto ss : sss) {
     auto& ssb = ss->get_side_blocks();
-    if (ssb.size() == 0) { continue; }
+    if (ssb.size() == 0) {
+      continue;
+    }
     ALBANY_PANIC(
         ssb.size() == 0, "Error! There is a sideset (" + ss->name() + ") in the input mesh with zero side sets.\n");
 
@@ -212,7 +220,9 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
 
   // Build a map to get the EB name given the index
   std::map<std::string, int> ebNameToIndex;
-  for (int eb = 0; eb < numEB; eb++) { ebNameToIndex[partVec[eb]->name()] = eb; }
+  for (int eb = 0; eb < numEB; eb++) {
+    ebNameToIndex[partVec[eb]->name()] = eb;
+  }
 
   // Construct MeshSpecsStruct
   if (!params->get("Separate Evaluators by Element Block", false)) {
@@ -261,7 +271,9 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   }
 
   // Upon request, add a nodeset for each sideset
-  if (params->get<bool>("Build Node Sets From Side Sets", false)) { this->addNodeSetsFromSideSets(); }
+  if (params->get<bool>("Build Node Sets From Side Sets", false)) {
+    this->addNodeSetsFromSideSets();
+  }
 
   // If requested, mark all parts as io parts
   if (params->get<bool>("Set All Parts IO", false)) this->setAllPartsIO();
@@ -575,12 +587,16 @@ Albany::IossSTKMeshStruct::loadOrSetCoordinates3d(int index)
     // care of resetting the index back to the original configuration.
     int const current_step = region->get_current_state();
     if (current_step != index) {
-      if (current_step != -1) { region->end_state(current_step); }
+      if (current_step != -1) {
+        region->end_state(current_step);
+      }
       region->begin_state(index);
     }
 
     stk::io::field_data_from_ioss(*bulkData, this->getCoordinatesField3d(), nodes, nb, coords3d_name);
-    if (current_step != -1) { region->begin_state(index); }
+    if (current_step != -1) {
+      region->begin_state(index);
+    }
   } else {
     if (nb->field_exists(coords3d_name)) {
       // The 3d coords field exists in the input mesh, but the restart index was

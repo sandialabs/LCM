@@ -42,7 +42,9 @@ GatherSolutionBase<EvalT, Traits>::GatherSolutionBase(
   }
 
   Teuchos::ArrayRCP<std::string> solution_names;
-  if (p.getEntryPtr("Solution Names")) { solution_names = p.get<Teuchos::ArrayRCP<std::string>>("Solution Names"); }
+  if (p.getEntryPtr("Solution Names")) {
+    solution_names = p.get<Teuchos::ArrayRCP<std::string>>("Solution Names");
+  }
 
   // scalar
   if (tensorRank == 0) {
@@ -307,8 +309,12 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
 
   // Get vector view from a specific device
   x_constView = Albany::getDeviceData(x);
-  if (!xdot.is_null()) { xdot_constView = Albany::getDeviceData(xdot); }
-  if (!xdotdot.is_null()) { xdotdot_constView = Albany::getDeviceData(xdotdot); }
+  if (!xdot.is_null()) {
+    xdot_constView = Albany::getDeviceData(xdot);
+  }
+  if (!xdotdot.is_null()) {
+    xdotdot_constView = Albany::getDeviceData(xdotdot);
+  }
 
   if (this->tensorRank == 2) {
     numDim = this->valTensor.extent(2);
@@ -571,8 +577,12 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Tr
 
   // Get vector view from a specific device
   x_constView = Albany::getDeviceData(x);
-  if (!xdot.is_null()) { xdot_constView = Albany::getDeviceData(xdot); }
-  if (!xdotdot.is_null()) { xdotdot_constView = Albany::getDeviceData(xdotdot); }
+  if (!xdot.is_null()) {
+    xdot_constView = Albany::getDeviceData(xdot);
+  }
+  if (!xdotdot.is_null()) {
+    xdotdot_constView = Albany::getDeviceData(xdotdot);
+  }
 
   if (this->tensorRank == 2) {
     numDim = this->valTensor.extent(2);

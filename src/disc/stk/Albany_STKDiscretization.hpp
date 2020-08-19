@@ -739,7 +739,9 @@ class STKDiscretization : public AbstractDiscretization
   in_list(const T& value, const ContainerType& list)
   {
     for (const T& item : list) {
-      if (item == value) { return true; }
+      if (item == value) {
+        return true;
+      }
     }
     return false;
   }

@@ -118,13 +118,17 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
   // Initialize thermal_cond_grad_at_nodes to zero
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (std::size_t node = 0; node < num_nodes_; ++node) {
-      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) { thermal_cond_grad_at_nodes_(cell, node, ndim) = 0.0; }
+      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
+        thermal_cond_grad_at_nodes_(cell, node, ndim) = 0.0;
+      }
     }
   }
   // Initialize thermal_cond_grad_at_qps to zero
   for (std::size_t cell = 0; cell < workset_size_; ++cell) {
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
-      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) { thermal_cond_grad_at_qps_(cell, qp, ndim) = 0.0; }
+      for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
+        thermal_cond_grad_at_qps_(cell, qp, ndim) = 0.0;
+      }
     }
   }
 
@@ -163,7 +167,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       std::vector<RealType> const salinity_eb      = this->queryElementBlockParameterMap(eb_name, salinity_map_);
       std::vector<RealType> const z_above_mean_sea_level_eb =
           this->queryElementBlockParameterMap(eb_name, z_above_mean_sea_level_map_);
-      if (salinity_eb.size() > 0) { sal_eb = interpolateVectors(z_above_mean_sea_level_eb, salinity_eb, height); }
+      if (salinity_eb.size() > 0) {
+        sal_eb = interpolateVectors(z_above_mean_sea_level_eb, salinity_eb, height);
+      }
       bluff_salinity_(cell, qp)                = sal_eb;
       std::vector<RealType> const time_eb      = this->queryElementBlockParameterMap(eb_name, time_map_);
       std::vector<RealType> const sea_level_eb = this->queryElementBlockParameterMap(eb_name, sea_level_map_);
@@ -198,7 +204,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         // make it just a std::vector, to avoid creating and querying a map.
         ScalarT const         zero_sal(0.0);
         std::vector<RealType> ocean_salinity_eb = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
-        if (ocean_salinity_eb.size() > 0) { ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time); }
+        if (ocean_salinity_eb.size() > 0) {
+          ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
+        }
         ScalarT const sal_diff   = ocean_sal - sal_curr;
         ScalarT const sal_grad   = sal_diff / cell_half_width;
         ScalarT const sal_update = sal_grad * delta_time * factor;
@@ -211,7 +219,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       // Calculate melting temperature
       ScalarT sal15(0.0);
-      if (sal > 0.0) { sal15 = std::sqrt(sal * sal * sal); }
+      if (sal > 0.0) {
+        sal15 = std::sqrt(sal * sal * sal);
+      }
       ScalarT const pressure_fixed = 1.0;
       // Tmelt is in Kelvin
       ScalarT const Tmelt =
@@ -606,7 +616,9 @@ ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(
 {
   typename std::map<std::string, RealType>::const_iterator it;
   it = map.find(eb_name);
-  if (it == map.end()) { ALBANY_ABORT("\nError! Element block = " << eb_name << " was not found in map!\n"); }
+  if (it == map.end()) {
+    ALBANY_ABORT("\nError! Element block = " << eb_name << " was not found in map!\n");
+  }
   return it->second;
 }
 // **********************************************************************

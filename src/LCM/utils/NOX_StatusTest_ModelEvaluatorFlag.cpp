@@ -30,7 +30,9 @@ NOX::StatusTest::ModelEvaluatorFlag::checkStatus(
       // If a ModelEveluator wants to trigger a NOX failure,
       // the ModelEvaluator will have set status_ to Failed.
 
-      if (status_ == Unevaluated) { status_ = Unconverged; }
+      if (status_ == Unevaluated) {
+        status_ = Unconverged;
+      }
 
       break;
 
@@ -78,7 +80,9 @@ NOX::StatusTest::ModelEvaluatorFlag::syncFlag()
 std::ostream&
 NOX::StatusTest::ModelEvaluatorFlag::print(std::ostream& stream, int indent) const
 {
-  for (int j = 0; j < indent; j++) { stream << ' '; }
+  for (int j = 0; j < indent; j++) {
+    stream << ' ';
+  }
   stream << status_;
   stream << "Model Evaluator Flag: ";
   stream << status_message_;

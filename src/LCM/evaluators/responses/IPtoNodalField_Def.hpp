@@ -115,7 +115,9 @@ void
 IPtoNodalFieldBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(weights_, fm);
-  for (int field(0); field < number_of_fields_; ++field) { this->utils.setFieldData(ip_fields_[field], fm); }
+  for (int field(0); field < number_of_fields_; ++field) {
+    this->utils.setFieldData(ip_fields_[field], fm);
+  }
 }
 
 // Specialization: Residual

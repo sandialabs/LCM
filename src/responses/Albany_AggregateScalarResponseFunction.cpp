@@ -23,11 +23,15 @@ void
 AggregateScalarResponseFunction::setup()
 {
   typedef Teuchos::Array<Teuchos::RCP<ScalarResponseFunction>> ResponseArray;
-  for (ResponseArray::iterator it = responses.begin(), it_end = responses.end(); it != it_end; ++it) { (*it)->setup(); }
+  for (ResponseArray::iterator it = responses.begin(), it_end = responses.end(); it != it_end; ++it) {
+    (*it)->setup();
+  }
 
   // Now that all responses are setup, build the product vector space
   Teuchos::Array<Teuchos::RCP<Thyra_VectorSpace const>> vss(responses.size());
-  for (int i = 0; i < responses.size(); ++i) { vss[i] = responses[i]->responseVectorSpace(); }
+  for (int i = 0; i < responses.size(); ++i) {
+    vss[i] = responses[i]->responseVectorSpace();
+  }
 
   productVectorSpace = Thyra::productVectorSpace(vss());
 }
@@ -58,7 +62,9 @@ AggregateScalarResponseFunction::evaluateResponse(
     const Teuchos::Array<ParamVec>&         p,
     Teuchos::RCP<Thyra_Vector> const&       g)
 {
-  if (g.is_null()) { return; }
+  if (g.is_null()) {
+    return;
+  }
 
   // NOTE: You CANNOT use ProductVector's if you want to maintain support for
   // EpetraExt::ModelEvaluator,
@@ -92,7 +98,9 @@ AggregateScalarResponseFunction::evaluateResponse(
     responses[i]->evaluateResponse(current_time, x, xdot, xdotdot, p, g_i);
 
     // Copy into the monolithic vector
-    for (unsigned int j = 0; j < responses[i]->numResponses(); ++j) { g_data[offset + j] = gi_data[j]; }
+    for (unsigned int j = 0; j < responses[i]->numResponses(); ++j) {
+      g_data[offset + j] = gi_data[j];
+    }
 
     // Update offset
     offset += responses[i]->numResponses();
@@ -127,8 +135,12 @@ AggregateScalarResponseFunction::evaluateGradient(
   Teuchos::ArrayRCP<ST>                    g_data;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<ST>> dgdp_data;
 
-  if (!g.is_null()) { g_data = getNonconstLocalData(g); }
-  if (!dg_dp.is_null()) { dgdp_data = getNonconstLocalData(dg_dp); }
+  if (!g.is_null()) {
+    g_data = getNonconstLocalData(g);
+  }
+  if (!dg_dp.is_null()) {
+    dgdp_data = getNonconstLocalData(dg_dp);
+  }
 
   Teuchos::ArrayRCP<const ST>                    g_i_data;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<const ST>> dgdp_i_data;
@@ -149,9 +161,15 @@ AggregateScalarResponseFunction::evaluateGradient(
       g_i      = Thyra::createMember(vs_i);
       g_i_data = getLocalData(g_i.getConst());
     }
-    if (!dg_dx.is_null()) { dgdx_i = dg_dx->subView(colRange); }
-    if (!dg_dxdot.is_null()) { dgdxdot_i = dg_dxdot->subView(colRange); }
-    if (!dg_dxdotdot.is_null()) { dgdxdotdot_i = dg_dxdotdot->subView(colRange); }
+    if (!dg_dx.is_null()) {
+      dgdx_i = dg_dx->subView(colRange);
+    }
+    if (!dg_dxdot.is_null()) {
+      dgdxdot_i = dg_dxdot->subView(colRange);
+    }
+    if (!dg_dxdotdot.is_null()) {
+      dgdxdotdot_i = dg_dxdotdot->subView(colRange);
+    }
     if (!dg_dp.is_null()) {
       dgdp_i      = Thyra::createMembers(vs_i, dg_dp->domain()->dim());
       dgdp_i_data = getLocalData(dgdp_i.getConst());
@@ -163,9 +181,13 @@ AggregateScalarResponseFunction::evaluateGradient(
 
     // Copy into the monolithic (multi)vectors
     for (unsigned int j = 0; j < responses[i]->numResponses(); ++j) {
-      if (!g.is_null()) { g_data[offset + j] = g_i_data[j]; }
+      if (!g.is_null()) {
+        g_data[offset + j] = g_i_data[j];
+      }
       if (!dg_dp.is_null()) {
-        for (int col = 0; col < dg_dp->domain()->dim(); ++col) { dgdp_data[col][offset + j] = dgdp_i_data[col][j]; }
+        for (int col = 0; col < dg_dp->domain()->dim(); ++col) {
+          dgdp_data[col][offset + j] = dgdp_i_data[col][j];
+        }
       }
     }
 

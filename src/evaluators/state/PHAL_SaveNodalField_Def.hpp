@@ -112,11 +112,17 @@ SaveNodalField<AlbanyTraits::Residual, Traits>::postEvaluate(typename Traits::Po
   Teuchos::RCP<Adapt::NodalDataVector> node_data =
       this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
 
-  if (this->xName.length() > 0) { node_data->saveNodalDataVector(this->xName, x, 0); }
+  if (this->xName.length() > 0) {
+    node_data->saveNodalDataVector(this->xName, x, 0);
+  }
 
-  if (this->xdotName.length() > 0) { node_data->saveNodalDataVector(this->xdotName, xdot, 0); }
+  if (this->xdotName.length() > 0) {
+    node_data->saveNodalDataVector(this->xdotName, xdot, 0);
+  }
 
-  if (this->xdotdotName.length() > 0) { node_data->saveNodalDataVector(this->xdotdotName, xdotdot, 0); }
+  if (this->xdotdotName.length() > 0) {
+    node_data->saveNodalDataVector(this->xdotdotName, xdotdot, 0);
+  }
 }
 
 }  // namespace PHAL

@@ -26,10 +26,14 @@ isnaninf(const T& x)
 {
   typedef typename Sacado::ValueType<T>::type ValueT;
 
-  if (Teuchos::ScalarTraits<ValueT>::isnaninf(x.val())) { return true; }
+  if (Teuchos::ScalarTraits<ValueT>::isnaninf(x.val())) {
+    return true;
+  }
 
   for (int i = 0; i < x.size(); i++) {
-    if (Teuchos::ScalarTraits<ValueT>::isnaninf(x.dx(i))) { return true; }
+    if (Teuchos::ScalarTraits<ValueT>::isnaninf(x.dx(i))) {
+      return true;
+    }
   }
 
   return false;
@@ -82,14 +86,18 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
       minitensor::Vector<RealType, CP::MAX_DIM> basis(CP::MAX_DIM);
 
-      for (int dim = 0; dim < CP::MAX_DIM; ++dim) { basis[dim] = b_temp[dim]; }
+      for (int dim = 0; dim < CP::MAX_DIM; ++dim) {
+        basis[dim] = b_temp[dim];
+      }
 
       basis = minitensor::unit(basis);
 
       // TODO check zero, rh system
       // Filling columns of transformation with basis vectors
       // We are forming R^{T} which is equivalent to the direction cosine matrix
-      for (int j = 0; j < CP::MAX_DIM; ++j) { element_block_orientation_(j, i) = basis[j]; }
+      for (int j = 0; j < CP::MAX_DIM; ++j) {
+        element_block_orientation_(j, i) = basis[j];
+      }
     }
   }
 
@@ -108,7 +116,9 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
       "Specified absolute tolerance is too tight:"
       " minimum tolerance: 1.0e-14");
 
-  if (verbosity_ >= CP::Verbosity::HIGH) { std::cout << "Slip predictor: " << int(predictor_slip_) << std::endl; }
+  if (verbosity_ >= CP::Verbosity::HIGH) {
+    std::cout << "Slip predictor: " << int(predictor_slip_) << std::endl;
+  }
 
   write_data_file_ = p->get<bool>("Write Data File", false);
 
@@ -175,7 +185,9 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
     minitensor::Vector<RealType, CP::MAX_DIM> s_temp_normalized(CP::MAX_DIM);
 
-    for (int i = 0; i < CP::MAX_DIM; ++i) { s_temp_normalized[i] = s_temp[i]; }
+    for (int i = 0; i < CP::MAX_DIM; ++i) {
+      s_temp_normalized[i] = s_temp[i];
+    }
     s_temp_normalized = minitensor::unit(s_temp_normalized);
     slip_systems_.at(num_ss).s_.set_dimension(CP::MAX_DIM);
     slip_systems_.at(num_ss).s_ = s_temp_normalized;
@@ -185,7 +197,9 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
     minitensor::Vector<RealType, CP::MAX_DIM> n_temp_normalized(CP::MAX_DIM);
 
-    for (int i = 0; i < CP::MAX_DIM; ++i) { n_temp_normalized[i] = n_temp[i]; }
+    for (int i = 0; i < CP::MAX_DIM; ++i) {
+      n_temp_normalized[i] = n_temp[i];
+    }
 
     n_temp_normalized = minitensor::unit(n_temp_normalized);
     slip_systems_.at(num_ss).n_.set_dimension(CP::MAX_DIM);
@@ -210,7 +224,9 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
     // Create latent matrix for hardening law
     slip_family.phardening_parameters_->createLatentMatrix(slip_family, slip_systems_);
 
-    if (verbosity_ >= CP::Verbosity::HIGH) { std::cout << slip_family.latent_matrix_ << std::endl; }
+    if (verbosity_ >= CP::Verbosity::HIGH) {
+      std::cout << slip_family.latent_matrix_ << std::endl;
+    }
 
     slip_family.slip_system_indices_.set_dimension(slip_family.num_slip_sys_);
 
@@ -224,7 +240,9 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
   setDependentField(F_string_, dl->qp_tensor);
   setDependentField(J_string_, dl->qp_scalar);
   setDependentField(dt_string_, dl->workset_scalar);
-  if (write_data_file_) { setDependentField(time_string_, dl->workset_scalar); }
+  if (write_data_file_) {
+    setDependentField(time_string_, dl->workset_scalar);
+  }
 
   // Define the evaluated fields
   setEvaluatedField(eqps_string_, dl->qp_scalar);
@@ -344,7 +362,9 @@ CrystalPlasticityKernel<EvalT, Traits>::init(
     index_element_ = -1;
   }
 
-  if (verbosity_ >= CP::Verbosity::MEDIUM) { std::cout << ">>> kernel::init\n"; }
+  if (verbosity_ >= CP::Verbosity::MEDIUM) {
+    std::cout << ">>> kernel::init\n";
+  }
 
   if (read_orientations_from_mesh_) {
     rotation_matrix_transpose_ = workset.wsLatticeOrientation;
@@ -353,7 +373,9 @@ CrystalPlasticityKernel<EvalT, Traits>::init(
 
   // extract dependent MDFields
   def_grad_ = *dep_fields[F_string_];
-  if (write_data_file_) { time_ = *dep_fields[time_string_]; }
+  if (write_data_file_) {
+    time_ = *dep_fields[time_string_];
+  }
   delta_time_ = *dep_fields[dt_string_];
   if (have_temperature_) {
     temperature_ = *dep_fields[temperature_string_];
@@ -404,7 +426,9 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   // If a previous constitutive calculation has failed, exit immediately.
   if (nox_status_test_->status_ == NOX::StatusTest::Failed) {
-    if (verbosity_ == CP::Verbosity::DEBUG) { std::cout << "  ****Returning on failed****" << std::endl; }
+    if (verbosity_ == CP::Verbosity::DEBUG) {
+      std::cout << "  ****Returning on failed****" << std::endl;
+    }
     return;
   }
   // TODO: In the future for CUDA this should be moved out of the kernel because
@@ -542,7 +566,9 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
           slip_np1[s]   = slip_n[s] + dt_ * rates_slip[s];
         }
 
-        if (verbosity_ == CP::Verbosity::DEBUG) { std::cout << slip_np1 << std::endl; }
+        if (verbosity_ == CP::Verbosity::DEBUG) {
+          std::cout << slip_np1 << std::endl;
+        }
 
         CP::updateHardness<CP::MAX_DIM, CP::MAX_SLIP, ScalarT>(
             slip_systems_,
@@ -566,7 +592,9 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
         minitensor::Tensor<RealType, CP::MAX_DIM> const L = 1.0 / dt_ * (F_np1_peeled * inv_F - eye);
 
-        if (minitensor::norm(L) < CP::MACHINE_EPS) { break; }
+        if (minitensor::norm(L) < CP::MACHINE_EPS) {
+          break;
+        }
 
         auto const size_problem = std::max(num_slip_, num_dims_ * num_dims_);
 
@@ -586,7 +614,9 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
         boost::tie(U_svd, S_svd, V_svd) = minitensor::svd(dyad_matrix);
 
-        for (int s(0); s < num_slip_; ++s) { S_svd(s, s) = S_svd(s, s) > 1.0e-12 ? 1.0 / S_svd(s, s) : 0.0; }
+        for (int s(0); s < num_slip_; ++s) {
+          S_svd(s, s) = S_svd(s, s) > 1.0e-12 ? 1.0 / S_svd(s, s) : 0.0;
+        }
 
         minitensor::Tensor<RealType, CP::MAX_SLIP> const Pinv = V_svd * S_svd * S_svd * minitensor::transpose(V_svd);
 
@@ -610,7 +640,9 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
           RealType const portion_L = p * inc_portion;
 
           for (int i = 0; i < num_dims_; ++i) {
-            for (int j = 0; j < num_dims_; ++j) { L_vec(i * num_dims_ + j) = portion_L * SSV::eval(L(i, j)); }
+            for (int j = 0; j < num_dims_; ++j) {
+              L_vec(i * num_dims_ + j) = portion_L * SSV::eval(L(i, j));
+            }
           }
 
           minitensor::Vector<RealType, CP::MAX_SLIP> const dm_lv = minitensor::transpose(dyad_matrix) * L_vec;
@@ -650,7 +682,9 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
           minitensor::Vector<RealType, CP::MAX_SLIP> Lp_vec = dyad_matrix * rates_slip_trial;
 
           for (int i = 0; i < num_dims_; ++i) {
-            for (int j = 0; j < num_dims_; ++j) { Lp_trial(i, j) = Lp_vec(i * num_dims_ + j); }
+            for (int j = 0; j < num_dims_; ++j) {
+              Lp_trial(i, j) = Lp_vec(i * num_dims_ + j);
+            }
           }
 
           if (verbosity_ == CP::Verbosity::DEBUG) {
@@ -893,7 +927,9 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ALBANY_ASSERT(integrator->getStatus() == nox_status_test_->status_);
 
   // Exit early if update state is not successful
-  if (nox_status_test_->status_ == NOX::StatusTest::Failed) { return; }
+  if (nox_status_test_->status_ == NOX::StatusTest::Failed) {
+    return;
+  }
 
   finalize(state_mechanical, state_internal, integrator, cell, pt);
 
@@ -1048,7 +1084,9 @@ CrystalPlasticityKernel<EvalT, Traits>::finalize(
 
   minitensor::Tensor<ScalarT, CP::MAX_DIM> L(num_dims_, minitensor::Filler::ZEROS);
 
-  if (dt_ > 0.0) { L = 1.0 / dt_ * (F_np1 * inv_F - eye); }
+  if (dt_ > 0.0) {
+    L = 1.0 / dt_ * (F_np1 * inv_F - eye);
+  }
 
   // num_dims_ x num_dims_ dimensional array variables
   for (int i(0); i < num_dims_; ++i) {

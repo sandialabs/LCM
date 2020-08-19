@@ -18,7 +18,9 @@ namespace Albany {
 
 MaterialDatabase::MaterialDatabase(std::string const& input_file, Teuchos::RCP<Teuchos::Comm<int> const>& tcomm)
 {
-  if (input_file.length() == 0) { return; }
+  if (input_file.length() == 0) {
+    return;
+  }
 
   if (tcomm->getRank() == 0) {
     std::cout << "Initializing material database from ";
@@ -41,9 +43,13 @@ MaterialDatabase::MaterialDatabase(std::string const& input_file, Teuchos::RCP<T
   p_materials_list_ = &(data_.sublist("Materials"));
   p_eb_list_        = &(data_.sublist("ElementBlocks"));
 
-  if (data_.isSublist("NodeSets")) { p_ns_list_ = &(data_.sublist("NodeSets")); }
+  if (data_.isSublist("NodeSets")) {
+    p_ns_list_ = &(data_.sublist("NodeSets"));
+  }
 
-  if (data_.isSublist("SideSets")) { p_ss_list_ = &(data_.sublist("SideSets")); }
+  if (data_.isSublist("SideSets")) {
+    p_ss_list_ = &(data_.sublist("SideSets"));
+  }
 }
 
 bool
@@ -148,7 +154,9 @@ MaterialDatabase::getElementBlockParam(std::string const& eb_name, std::string c
   // "ElementBlocks" list
   auto& sublist = p_eb_list_->sublist(new_name);
 
-  if (sublist.isParameter(param_name)) { return sublist.get<T>(param_name); }
+  if (sublist.isParameter(param_name)) {
+    return sublist.get<T>(param_name);
+  }
 
   // check if related material exists (it always should)
   ALBANY_ASSERT(
@@ -187,7 +195,9 @@ MaterialDatabase::getElementBlockParam(std::string const& eb_name, std::string c
 
   auto& sublist = p_eb_list_->sublist(new_name);
 
-  if (sublist.isParameter(param_name)) { return sublist.get<T>(param_name); }
+  if (sublist.isParameter(param_name)) {
+    return sublist.get<T>(param_name);
+  }
 
   // check if related material exists - if not return default
   if (!sublist.isParameter("material")) return def_value;
@@ -243,7 +253,9 @@ MaterialDatabase::getElementBlockSublist(std::string const& eb_name, std::string
   // "ElementBlocks" list
   auto& sublist = p_eb_list_->sublist(new_name);
 
-  if (sublist.isSublist(sublist_name)) { return sublist.sublist(sublist_name); }
+  if (sublist.isSublist(sublist_name)) {
+    return sublist.sublist(sublist_name);
+  }
 
   // Didn't find the requested sublist directly in the EB sublist.
   // Drill down to the material next.
@@ -265,7 +277,9 @@ MaterialDatabase::getElementBlockSublist(std::string const& eb_name, std::string
   auto& mat_sublist = p_materials_list_->sublist(material_name);
 
   // In case the entire material sublist is desired
-  if (material_name == sublist_name) { return mat_sublist; }
+  if (material_name == sublist_name) {
+    return mat_sublist;
+  }
 
   // Does the requested sublist appear in the material sublist?
   ALBANY_ASSERT(

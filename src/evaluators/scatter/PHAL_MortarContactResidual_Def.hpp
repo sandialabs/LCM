@@ -124,7 +124,9 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(type
   f_kokkos = Albany::getNonconstDeviceData(workset.f);
 
   // Get MDField views from std::vector
-  for (int i = 0; i < numFields; i++) { val_kokkos[i] = this->val[i].get_view(); }
+  for (int i = 0; i < numFields; i++) {
+    val_kokkos[i] = this->val[i].get_view();
+  }
 
   Kokkos::parallel_for(PHAL_MortarContactResRank0_Policy(0, workset.numCells), *this);
   cudaCheckError();
@@ -183,7 +185,9 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -217,7 +221,9 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -262,7 +268,9 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -297,7 +305,9 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -342,7 +352,9 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -377,7 +389,9 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
   if (nunk > 500) Kokkos::abort("ERROR (MortarContactResidual): nunk > 500");
 
   for (int node_col = 0, i = 0; node_col < this->numNodes; node_col++) {
-    for (int eq_col = 0; eq_col < neq; eq_col++) { colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col); }
+    for (int eq_col = 0; eq_col < neq; eq_col++) {
+      colT[neq * node_col + eq_col] = nodeID(cell, node_col, eq_col);
+    }
   }
 
   for (int node = 0; node < this->numNodes; ++node) {
@@ -409,7 +423,9 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(type
 
   // Get Tpetra vector view and local matrix
   bool const loadResid = Teuchos::nonnull(workset.f);
-  if (loadResid) { f_kokkos = Albany::getNonconstDeviceData(workset.f); }
+  if (loadResid) {
+    f_kokkos = Albany::getNonconstDeviceData(workset.f);
+  }
   Jac_kokkos = Albany::getNonconstDeviceData(workset.Jac);
 
   // Get MDField views from std::vector

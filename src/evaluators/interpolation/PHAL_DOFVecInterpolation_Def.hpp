@@ -72,7 +72,9 @@ class VecInterpolation
     for (int qp = 0; qp < numQPs_; ++qp) {
       for (int vec = 0; vec < vecDims_; vec++) {
         U_(i, qp, vec) = val_node_(i, 0, vec) * BF_(i, 0, qp);
-        for (int node = 1; node < numNodes_; ++node) { U_(i, qp, vec) += val_node_(i, node, vec) * BF_(i, node, qp); }
+        for (int node = 1; node < numNodes_; ++node) {
+          U_(i, qp, vec) += val_node_(i, node, vec) * BF_(i, node, qp);
+        }
       }
     }
   }

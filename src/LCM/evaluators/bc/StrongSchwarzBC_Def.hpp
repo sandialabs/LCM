@@ -167,13 +167,17 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, 
   Kokkos::DynRankView<RealType, PHX::Device> parametric_point(
       "par_point", number_cells, number_points, parametric_dimension);
 
-  for (unsigned j = 0; j < parametric_dimension; ++j) { parametric_point(0, 0, j) = 0.0; }
+  for (unsigned j = 0; j < parametric_dimension; ++j) {
+    parametric_point(0, 0, j) = 0.0;
+  }
 
   // Container for the physical point
   Kokkos::DynRankView<RealType, PHX::Device> physical_coordinates(
       "phys_point", number_cells, number_points, coupled_dimension);
 
-  for (unsigned i = 0; i < coupled_dimension; ++i) { physical_coordinates(0, 0, i) = point(i); }
+  for (unsigned i = 0; i < coupled_dimension; ++i) {
+    physical_coordinates(0, 0, i) = point(i);
+  }
 
   // Container for the physical nodal coordinates
   Kokkos::DynRankView<RealType, PHX::Device> nodal_coordinates(
@@ -205,7 +209,9 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, 
       }  // node loop
 
       for (unsigned i = 0; i < coupled_node_count; ++i) {
-        for (unsigned j = 0; j < coupled_dimension; ++j) { nodal_coordinates(0, i, j) = coupled_element_nodes[i](j); }
+        for (unsigned j = 0; j < coupled_dimension; ++j) {
+          nodal_coordinates(0, i, j) = coupled_element_nodes[i](j);
+        }
       }
 
       // Get parametric coordinates
@@ -226,7 +232,9 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, 
 
     }  // element loop
 
-    if (found == true) { break; }
+    if (found == true) {
+      break;
+    }
 
   }  // workset loop
 
@@ -240,14 +248,18 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, 
   // but here basis->getValues requires a rank 2 view :(
   Kokkos::DynRankView<RealType, PHX::Device> pp_reduced("par_point", number_points, parametric_dimension);
 
-  for (unsigned j = 0; j < parametric_dimension; ++j) { pp_reduced(0, j) = parametric_point(0, 0, j); }
+  for (unsigned j = 0; j < parametric_dimension; ++j) {
+    pp_reduced(0, j) = parametric_point(0, 0, j);
+  }
   basis->getValues(basis_values, pp_reduced, Intrepid2::OPERATOR_VALUE);
 
   // Evaluate solution at parametric point using values of shape
   // functions just computed.
   minitensor::Vector<double> value(coupled_dimension, minitensor::Filler::ZEROS);
 
-  for (unsigned i = 0; i < coupled_node_count; ++i) { value += basis_values(i, 0) * coupled_element_solution[i]; }
+  for (unsigned i = 0; i < coupled_node_count; ++i) {
+    value += basis_values(i, 0) * coupled_element_solution[i];
+  }
 
   x_val = value(0);
   y_val = value(1);
@@ -505,18 +517,30 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
 
     if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       disp_view[x_dof] = bcs_disp_const_view_x[dof];
-      if (has_velo) { velo_view[x_dof] = bcs_velo_const_view_x[dof]; }
-      if (has_acce) { acce_view[x_dof] = bcs_acce_const_view_x[dof]; }
+      if (has_velo) {
+        velo_view[x_dof] = bcs_velo_const_view_x[dof];
+      }
+      if (has_acce) {
+        acce_view[x_dof] = bcs_acce_const_view_x[dof];
+      }
     }
     if (fixed_dofs.find(y_dof) == fixed_dofs.end()) {
       disp_view[y_dof] = bcs_disp_const_view_y[dof];
-      if (has_velo) { velo_view[y_dof] = bcs_velo_const_view_y[dof]; }
-      if (has_acce) { acce_view[y_dof] = bcs_acce_const_view_y[dof]; }
+      if (has_velo) {
+        velo_view[y_dof] = bcs_velo_const_view_y[dof];
+      }
+      if (has_acce) {
+        acce_view[y_dof] = bcs_acce_const_view_y[dof];
+      }
     }
     if (fixed_dofs.find(z_dof) == fixed_dofs.end()) {
       disp_view[z_dof] = bcs_disp_const_view_z[dof];
-      if (has_velo) { velo_view[z_dof] = bcs_velo_const_view_z[dof]; }
-      if (has_acce) { acce_view[z_dof] = bcs_acce_const_view_z[dof]; }
+      if (has_velo) {
+        velo_view[z_dof] = bcs_velo_const_view_z[dof];
+      }
+      if (has_acce) {
+        acce_view[z_dof] = bcs_acce_const_view_z[dof];
+      }
     }
   }
 #else   // ALBANY_DTK
@@ -528,9 +552,15 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
     auto const           z_dof      = ns_nodes[ns_node][2];
     std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
-    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) { disp_view[x_dof] = x_val; }
-    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) { disp_view[y_dof] = y_val; }
-    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) { disp_view[z_dof] = z_val; }
+    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
+      disp_view[x_dof] = x_val;
+    }
+    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) {
+      disp_view[y_dof] = y_val;
+    }
+    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) {
+      disp_view[z_dof] = z_val;
+    }
 
   }  // node in node set loop
 #endif  // ALBANY_DTK
@@ -556,9 +586,15 @@ fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
 
     std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
-    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) { f_view[x_dof] = 0.0; }
-    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) { f_view[y_dof] = 0.0; }
-    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) { f_view[z_dof] = 0.0; }
+    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
+      f_view[x_dof] = 0.0;
+    }
+    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) {
+      f_view[y_dof] = 0.0;
+    }
+    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) {
+      f_view[z_dof] = 0.0;
+    }
   }
 }
 

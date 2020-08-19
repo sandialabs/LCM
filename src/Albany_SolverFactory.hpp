@@ -69,6 +69,12 @@ class SolverFactory
     return *appParams;
   }
 
+  Teuchos::RCP<Teuchos::ParameterList> const
+  getParametersRCP() const
+  {
+    return appParams;
+  }
+
   void
   setSchwarz(bool const schwarz)
   {

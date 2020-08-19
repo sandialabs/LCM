@@ -90,7 +90,9 @@ NeohookeanKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Jm23  = Jm53 * J(cell, pt);
 
   for (int i = 0; i < num_dims_; ++i) {
-    for (int j = 0; j < num_dims_; ++j) { F(i, j) = def_grad(cell, pt, i, j); }
+    for (int j = 0; j < num_dims_; ++j) {
+      F(i, j) = def_grad(cell, pt, i, j);
+    }
   }
   b     = F * util::transpose(F);
   mubar = (1.0 / 3.0) * mu * Jm23 * util::trace(b);
@@ -98,7 +100,9 @@ NeohookeanKernel<EvalT, Traits>::operator()(int cell, int pt) const
   sigma = 0.5 * kappa * (J(cell, pt) - 1. / J(cell, pt)) * I + mu * Jm53 * util::dev(b);
 
   for (int i = 0; i < num_dims_; ++i) {
-    for (int j = 0; j < num_dims_; ++j) { stress(cell, pt, i, j) = sigma(i, j); }
+    for (int j = 0; j < num_dims_; ++j) {
+      stress(cell, pt, i, j) = sigma(i, j);
+    }
   }
 
   if (compute_energy_) {  // compute energy
@@ -118,7 +122,9 @@ NeohookeanKernel<EvalT, Traits>::operator()(int cell, int pt) const
     for (int i = 0; i < num_dims_; ++i) {
       for (int j = 0; j < num_dims_; ++j) {
         for (int k = 0; k < num_dims_; ++k) {
-          for (int l = 0; l < num_dims_; ++l) { tangent(cell, pt, i, j, k, l) = dsigmadb(i, j, k, l); }
+          for (int l = 0; l < num_dims_; ++l) {
+            tangent(cell, pt, i, j, k, l) = dsigmadb(i, j, k, l);
+          }
         }
       }
     }

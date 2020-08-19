@@ -32,7 +32,9 @@ SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
     PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(local_response, fm);
-  if (!this->stand_alone) { this->utils.setFieldData(local_response_eval, fm); }
+  if (!this->stand_alone) {
+    this->utils.setFieldData(local_response_eval, fm);
+  }
 }
 
 template <typename EvalT, typename Traits>
@@ -213,7 +215,9 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::postEvalua
   // Here we scatter the *global* response derivatives
   Teuchos::RCP<Thyra_MultiVector> dgdx            = workset.dgdx;
   Teuchos::RCP<Thyra_MultiVector> overlapped_dgdx = workset.overlapped_dgdx;
-  if (dgdx != Teuchos::null) { workset.x_cas_manager->combine(overlapped_dgdx, dgdx, Albany::CombineMode::ADD); }
+  if (dgdx != Teuchos::null) {
+    workset.x_cas_manager->combine(overlapped_dgdx, dgdx, Albany::CombineMode::ADD);
+  }
 
   Teuchos::RCP<Thyra_MultiVector> dgdxdot            = workset.dgdxdot;
   Teuchos::RCP<Thyra_MultiVector> overlapped_dgdxdot = workset.overlapped_dgdxdot;

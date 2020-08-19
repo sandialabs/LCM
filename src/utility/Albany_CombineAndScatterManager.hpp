@@ -143,21 +143,27 @@ class CombineAndScatterManager
 inline Teuchos::RCP<Thyra_VectorSpace const>
 CombineAndScatterManager::getSharedAuraVectorSpace() const
 {
-  if (shared_aura_vs.is_null()) { create_aura_vss(); }
+  if (shared_aura_vs.is_null()) {
+    create_aura_vss();
+  }
   return shared_aura_vs;
 }
 
 inline Teuchos::RCP<Thyra_VectorSpace const>
 CombineAndScatterManager::getOwnedAuraVectorSpace() const
 {
-  if (owned_aura_vs.is_null()) { create_aura_vss(); }
+  if (owned_aura_vs.is_null()) {
+    create_aura_vss();
+  }
   return owned_aura_vs;
 }
 
 inline Teuchos::RCP<Thyra_VectorSpace const>
 CombineAndScatterManager::getGhostedAuraVectorSpace() const
 {
-  if (ghosted_aura_vs.is_null()) { create_aura_vss(); }
+  if (ghosted_aura_vs.is_null()) {
+    create_aura_vss();
+  }
   return ghosted_aura_vs;
 }
 

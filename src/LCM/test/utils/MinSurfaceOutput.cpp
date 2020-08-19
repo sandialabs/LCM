@@ -87,7 +87,9 @@ main(int ac, char* av[])
   // Record ones (1s) at the corresponding positions specified by the solver
   std::vector<int> resultsVector(facesDirec.size() * 2, 0);  // Initialize vector with zeros
 
-  for (unsigned int i = 0; i < resutsFromSolver.size(); i++) { resultsVector[resutsFromSolver[i] - 1] = 1; }
+  for (unsigned int i = 0; i < resutsFromSolver.size(); i++) {
+    resultsVector[resutsFromSolver[i] - 1] = 1;
+  }
 
   // Call the function "MinimumSurfaceFaces" that returns the entities
   // associated with the solution given by the solver
@@ -125,7 +127,9 @@ main(int ac, char* av[])
   // Compute the total area of the faces that conform the minimum surface
   // Initialize MinSurfaceAreas as a vector of zeros
   std::vector<double> MinSurfaceAreas;
-  for (unsigned int i = 0; i < (EntitiesMinSurface.size()); i++) { MinSurfaceAreas.push_back(0); }
+  for (unsigned int i = 0; i < (EntitiesMinSurface.size()); i++) {
+    MinSurfaceAreas.push_back(0);
+  }
 
   // Iterate through the vector of Entities that build the minimum surface
   for (unsigned int i = 0; i < (EntitiesMinSurface.size()); i++) {
@@ -145,7 +149,9 @@ main(int ac, char* av[])
   // Add up all the areas of the faces that represent the minimum surface
   std::vector<double>::const_iterator I_areas;
   double                              MinSurfaceArea = 0;
-  for (I_areas = MinSurfaceAreas.begin(); I_areas != MinSurfaceAreas.end(); I_areas++) { MinSurfaceArea += *I_areas; }
+  for (I_areas = MinSurfaceAreas.begin(); I_areas != MinSurfaceAreas.end(); I_areas++) {
+    MinSurfaceArea += *I_areas;
+  }
 
   cout << endl;
   cout << "The area of the minimum surface computed is :" << MinSurfaceArea << endl;

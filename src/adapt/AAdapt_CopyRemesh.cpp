@@ -49,7 +49,9 @@ CopyRemesh::queryAdaptationCriteria(int iter)
   Teuchos::Array<int> remesh_iter = adapt_params_->get<Teuchos::Array<int>>("Remesh Step Number");
 
   for (int i = 0; i < remesh_iter.size(); i++) {
-    if (iter == remesh_iter[i]) { return true; }
+    if (iter == remesh_iter[i]) {
+      return true;
+    }
   }
 
   return false;

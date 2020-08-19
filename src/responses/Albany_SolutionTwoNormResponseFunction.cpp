@@ -49,7 +49,9 @@ Albany::SolutionTwoNormResponseFunction::evaluateGradient(
   Teuchos::ScalarTraits<ST>::magnitudeType nrm = x->norm_2();
 
   // Evaluate response g
-  if (!g.is_null()) { g->assign(nrm); }
+  if (!g.is_null()) {
+    g->assign(nrm);
+  }
 
   // Evaluate dg/dx
   if (!dg_dx.is_null()) {
@@ -58,11 +60,17 @@ Albany::SolutionTwoNormResponseFunction::evaluateGradient(
   }
 
   // Evaluate dg/dxdot
-  if (!dg_dxdot.is_null()) { dg_dxdot->assign(0.0); }
+  if (!dg_dxdot.is_null()) {
+    dg_dxdot->assign(0.0);
+  }
 
   // Evaluate dg/dxdot
-  if (!dg_dxdotdot.is_null()) { dg_dxdotdot->assign(0.0); }
+  if (!dg_dxdotdot.is_null()) {
+    dg_dxdotdot->assign(0.0);
+  }
 
   // Evaluate dg/dp
-  if (!dg_dp.is_null()) { dg_dp->assign(0.0); }
+  if (!dg_dp.is_null()) {
+    dg_dp->assign(0.0);
+  }
 }

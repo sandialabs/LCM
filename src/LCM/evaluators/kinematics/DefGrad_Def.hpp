@@ -67,7 +67,9 @@ DefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
       for (int i = 0; i < numDims; ++i) {
-        for (int j = 0; j < numDims; ++j) { defgrad(cell, qp, i, j) = GradU(cell, qp, i, j); }
+        for (int j = 0; j < numDims; ++j) {
+          defgrad(cell, qp, i, j) = GradU(cell, qp, i, j);
+        }
         defgrad(cell, qp, i, i) += 1.0;
       }
     }
@@ -77,7 +79,9 @@ DefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   // values. Leaving this out leads to inversion of 0 tensors.
   for (int cell = workset.numCells; cell < worksetSize; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
-      for (int i = 0; i < numDims; ++i) { defgrad(cell, qp, i, i) = 1.0; }
+      for (int i = 0; i < numDims; ++i) {
+        defgrad(cell, qp, i, i) = 1.0;
+      }
     }
   }
 

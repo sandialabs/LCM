@@ -62,9 +62,13 @@ main(int ac, char* av[])
   // Parse command line
   Teuchos::CommandLineProcessor::EParseCommandLineReturn parse_return = command_line_processor.parse(ac, av);
 
-  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) { return 0; }
+  if (parse_return == Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED) {
+    return 0;
+  }
 
-  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) { return 1; }
+  if (parse_return != Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL) {
+    return 1;
+  }
 
   // Read the mesh
   Teuchos::GlobalMPISession mpiSession(&ac, &av);

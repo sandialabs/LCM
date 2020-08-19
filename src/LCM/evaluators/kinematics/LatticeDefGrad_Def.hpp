@@ -83,7 +83,9 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
       for (int i = 0; i < numDims; ++i) {
-        for (int j = 0; j < numDims; ++j) { latticeDefGrad(cell, qp, i, j) = defgrad(cell, qp, i, j); }
+        for (int j = 0; j < numDims; ++j) {
+          latticeDefGrad(cell, qp, i, j) = defgrad(cell, qp, i, j);
+        }
       }
       JH(cell, qp) = J(cell, qp);
     }
@@ -122,7 +124,9 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       for (int qp = 0; qp < numQPs; ++qp) {
         JH(cell, qp) *= (1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp)));
         for (int i = 0; i < numDims; ++i) {
-          for (int j = 0; j < numDims; ++j) { latticeDefGrad(cell, qp, i, j) *= std::pow(JH(cell, qp), -1. / 3.); }
+          for (int j = 0; j < numDims; ++j) {
+            latticeDefGrad(cell, qp, i, j) *= std::pow(JH(cell, qp), -1. / 3.);
+          }
         }
       }
     }

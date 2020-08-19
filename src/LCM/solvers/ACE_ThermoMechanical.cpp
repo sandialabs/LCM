@@ -5,11 +5,14 @@
 #include "ACE_ThermoMechanical.hpp"
 
 #include "AAdapt_Erosion.hpp"
+#include "Albany_PiroObserver.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Albany_Utils.hpp"
 #include "MiniTensor.h"
+#include "Piro_LOCAAdaptiveSolver.hpp"
 #include "Piro_LOCASolver.hpp"
+#include "Piro_ObserverToLOCASaveDataStrategyAdapter.hpp"
 #include "Piro_TempusSolver.hpp"
 
 namespace {
@@ -944,6 +947,23 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
 
   solver.evalModel(in_args, out_args);
 
+  // Adapt mesh if needed.
+  auto& sol_mgr = *(app.getSolutionManager());
+  if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
+//    auto lsb         = Stratimikos::DefaultLinearSolverBuilder();
+//    auto lss         = createLinearSolveStrategy(lsb);
+//    auto me_rcp      = model_evaluators_[subdomain];
+//    auto mewsf       = rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(me_rcp, lss));
+//    auto app_rcp     = apps_[subdomain];
+//    auto po          = Teuchos::rcp(new Albany::PiroObserver(app_rcp, mewsf));
+//    auto sds         = Teuchos::rcp(new Piro::ObserverToLOCASaveDataStrategyAdapter(po));
+//    auto params      = solver_factories_[subdomain]->getParametersRCP();
+//    auto pp          = Teuchos::sublist(params, "Piro");
+//    auto sol_mgr_rcp = app.getSolutionManager();
+//    Piro::LOCAAdaptiveSolver<ST>(pp, mewsf, sol_mgr_rcp, sds);
+    sol_mgr.adaptProblem();
+  }
+
   // Allocate current solution vectors
   this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
   this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
@@ -977,16 +997,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
   Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
   Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
-
-  // Adapt mesh if needed.
-  auto& sol_mgr = *(app.getSolutionManager());
-  if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
-    auto me_rcp             = model_evaluators_[subdomain];
-    auto delegator          = Teuchos::rcp(new ACEModelEvaluatorDelegator(me_rcp));
-    auto adaptive_state_rcp = Teuchos::rcp(new ACEAdaptiveState(delegator));
-    sol_mgr.initialize(adaptive_state_rcp);
-    sol_mgr.adaptProblem();
-  }
 
   failed_ = false;
 }

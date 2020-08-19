@@ -16,31 +16,31 @@ ALBANY:
       Tau Type: 'Proportional to Mesh Size'
       Stabilization Type: 'Laplacian'
     Dirichlet BCs:
-      Time Dependent DBC on NS z+ for DOF T:
+      Time Dependent SDBC on NS z+ for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         #BC File: './Ablufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
         BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS intervalrest for DOF T:
+      Time Dependent SDBC on NS intervalrest for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         #BC File: './Ablufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
         BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval5 for DOF T:
+      Time Dependent SDBC on NS interval5 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp5_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval4 for DOF T:
+      Time Dependent SDBC on NS interval4 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp4_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval3 for DOF T:
+      Time Dependent SDBC on NS interval3 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp3_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval2 for DOF T:
+      Time Dependent SDBC on NS interval2 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp2_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval1 for DOF T:
+      Time Dependent SDBC on NS interval1 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp1_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
@@ -80,7 +80,7 @@ ALBANY:
       Response 1: Solution Average
   Regression Results: 
     Number of Comparisons: 3
-    Test Values: [0.0, 0.0, 2.646631740052e+02]
+    Test Values: [0.0, 0.0, 2.649372314250e+02]
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
   Discretization: 
@@ -129,6 +129,7 @@ ALBANY:
           Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
         Stepper Type: Backward Euler
+        Initial Condition Consistency: Consistent
         Solver Name: Demo Solver
         Predictor Name: None
         Demo Solver: 

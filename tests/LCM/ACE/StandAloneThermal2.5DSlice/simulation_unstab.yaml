@@ -8,31 +8,31 @@ ALBANY:
     Solution Method: Transient Tempus
     MaterialDB Filename: './materials.yaml'
     Dirichlet BCs:
-      Time Dependent DBC on NS z+ for DOF T:
+      Time Dependent SDBC on NS z+ for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         #BC File: './Ablufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
         BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS intervalrest for DOF T:
+      Time Dependent SDBC on NS intervalrest for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         #BC File: './Ablufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
         BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval5 for DOF T:
+      Time Dependent SDBC on NS interval5 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp5_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval4 for DOF T:
+      Time Dependent SDBC on NS interval4 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp4_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval3 for DOF T:
+      Time Dependent SDBC on NS interval3 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp3_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval2 for DOF T:
+      Time Dependent SDBC on NS interval2 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp2_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent DBC on NS interval1 for DOF T:
+      Time Dependent SDBC on NS interval1 for DOF T:
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp1_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
@@ -121,6 +121,7 @@ ALBANY:
           Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
         Stepper Type: Backward Euler
+        Initial Condition Consistency: Consistent
         Solver Name: Demo Solver
         Predictor Name: None
         Demo Solver: 

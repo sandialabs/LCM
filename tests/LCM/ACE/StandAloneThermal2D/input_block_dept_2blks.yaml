@@ -86,6 +86,7 @@ ALBANY:
           Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper: 
         Stepper Type: Backward Euler
+        Initial Condition Consistency: Consistent
         Solver Name: Demo Solver
         Predictor Name: None
         Demo Solver: 

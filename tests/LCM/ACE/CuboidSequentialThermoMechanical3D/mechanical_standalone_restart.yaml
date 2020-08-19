@@ -6,9 +6,9 @@ LCM:
     Solution Method: Transient Tempus
     #IKT FIXME - verify BCs with Alejandro and Jenn
     Dirichlet BCs: 
-      DBC on NS x- for DOF X: 0.0
-      DBC on NS y- for DOF Y: 0.0
-      DBC on NS z- for DOF Z: 0.0
+      SDBC on NS x- for DOF X: 0.0
+      SDBC on NS y- for DOF Y: 0.0
+      SDBC on NS z- for DOF Z: 0.0
     Initial Condition:
       Function: Constant
       Function Data: [0.0, 0.0, 0.0]

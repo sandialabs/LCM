@@ -8,8 +8,8 @@ ALBANY:
     Solution Method: Transient Tempus
     MaterialDB Filename: './materials_thermal.yaml'
     Dirichlet BCs: 
-      DBC on NS z- for DOF T: 260.0
-      DBC on NS z+ for DOF T: 300.0
+      SDBC on NS z- for DOF T: 260.0
+      SDBC on NS z+ for DOF T: 300.0
     Initial Condition:
       Function: Constant
       Function Data: [260.0]
@@ -72,6 +72,7 @@ ALBANY:
           Output Index List: ''
       Tempus Stepper: 
         Stepper Type: Backward Euler
+        Initial Condition Consistency: Consistent
         Solver Name: Demo Solver
         Predictor Name: None
         Demo Solver: 

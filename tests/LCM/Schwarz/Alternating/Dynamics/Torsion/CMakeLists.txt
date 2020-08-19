@@ -31,6 +31,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nobcs_01.gold.e.4.2
                ${CMAKE_CURRENT_BINARY_DIR}/nobcs_01.gold.e.4.2 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nobcs_01.gold.e.4.3
                ${CMAKE_CURRENT_BINARY_DIR}/nobcs_01.gold.e.4.3 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/TorsionParallel.exodiff
+               ${CMAKE_CURRENT_BINARY_DIR}/TorsionParallel.exodiff COPYONLY)
 
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}

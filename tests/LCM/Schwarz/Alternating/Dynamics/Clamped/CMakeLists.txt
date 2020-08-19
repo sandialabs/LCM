@@ -7,6 +7,8 @@
 # Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/clamped_00.yaml COPYONLY)
+       configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Clamped.exodiff
+	       ${CMAKE_CURRENT_BINARY_DIR}/Clamped.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_01.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/clamped_01.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped.yaml

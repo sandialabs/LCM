@@ -5,6 +5,8 @@
 #include "Albany_STKDiscretization.hpp"
 #include "J2Erosion.hpp"
 
+#define ICE_SATURATION
+
 namespace LCM {
 
 template <typename EvalT, typename Traits>
@@ -53,7 +55,9 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("Elastic Modulus", dl->qp_scalar);
   setDependentField("Yield Strength", dl->qp_scalar);
   setDependentField("Hardening Modulus", dl->qp_scalar);
+#if defined(ICE_SATURATION)
   setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
+#endif
   setDependentField("Delta Time", dl->workset_scalar);
 
   // define the evaluated fields
@@ -108,7 +112,9 @@ J2ErosionKernel<EvalT, Traits>::init(
   yield_strength_    = *dep_fields["Yield Strength"];
   hardening_modulus_ = *dep_fields["Hardening Modulus"];
   delta_time_        = *dep_fields["Delta Time"];
+#if defined(ICE_SATURATION)
   ice_saturation_    = *dep_fields["ACE_Ice_Saturation"];
+#endif
 
   // extract evaluated MDFields
   stress_     = *eval_fields[cauchy_string];
@@ -248,10 +254,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT const K              = hardening_modulus_(cell, pt);
   ScalarT const J1             = J_(cell, pt);
   ScalarT const Jm23           = 1.0 / std::cbrt(J1 * J1);
+#if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
+#endif
   ScalarT       Y              = yield_strength_(cell, pt);
-
-  // ALBANY_DUMP("**** CELL : " << cell << ", POINT : " << pt << ", ICE SATURATION : " << ice_saturation);
 
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
@@ -261,7 +267,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
                             bulk_porosity_;
 
   // Compute effective yield strength
+#if defined(ICE_SATURATION)
   Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
+#endif
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);

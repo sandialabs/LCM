@@ -569,6 +569,14 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
   // Set flag to tell code that we have an ACE Sequential Thermomechanical Problem
   problem_params.set("ACE Sequential Thermomechanical", true, "ACE Sequential Thermomechanical Problem");
 
+  if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
+    Teuchos::ParameterList& piro_params = params.sublist("Piro", true);
+    Teuchos::ParameterList& tr_params   = params.sublist("Trapezoid Rule", true);
+    tr_params.set<int>("Num Time Steps", 1);
+    tr_params.set<double>("Initial Time", current_time);
+    tr_params.set<double>("Final Time", next_time);
+  }
+
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
   Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
       solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);

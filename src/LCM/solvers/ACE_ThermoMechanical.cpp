@@ -154,35 +154,24 @@ ACEThermoMechanical::ACEThermoMechanical(
   do_outputs_init_.resize(num_subdomains_);
   prob_types_.resize(num_subdomains_);
 
-  // IKT QUESTION 6/4/2020: do we want to support quasistatic for thermo-mechanical
-  // coupling??  Leaving it in for now.
-  bool is_static{false};
-  bool is_dynamic{false};
-
   // Create solver factories once at the beginning
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    // Get parameters for each subdomain
-    solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(model_filenames_[subdomain], comm_));
-    // Get parameters from solver_factories_
+    solver_factories_[subdomain]   = Teuchos::rcp(new Albany::SolverFactory(model_filenames_[subdomain], comm_));
     Teuchos::ParameterList& params = solver_factories_[subdomain]->getParameters();
 
     Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
 
-    // Get problem name to figure out if we have a thermal or mechanical problem for
-    // this subdomain, and populate prob_types_ vector using this information.
-    // IKT 6/4/2020: This is added to allow user to specify mechanical and thermal problems in
-    // different orders.  I'm not sure if this will be of interest ultimately or not.
     std::string const problem_name = getName(problem_params.get<std::string>("Name"));
     if (problem_name == "Mechanics") {
       prob_types_[subdomain] = MECHANICAL;
     } else if (problem_name == "ACE Thermal") {
       prob_types_[subdomain] = THERMAL;
     } else {
-      // Throw error if problem name is not Mechanics or ACE Thermal.
-      // IKT 6/4/2020: I assume we only want to support Mechanics and ACE Thermal coupling.
       ALBANY_ABORT(
           "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
     }
+
+    auto const problem_type = prob_types_[subdomain];
 
     // Error checks - only needs to be done once at the beginning
     bool const have_piro = params.isSublist("Piro");
@@ -192,17 +181,9 @@ ACEThermoMechanical::ACEThermoMechanical(
 
     std::string const msg{"All subdomains must have the same solution method (NOX or Tempus)"};
 
-    if (subdomain == 0) {
-      is_dynamic  = piro_params.isSublist("Tempus");
-      is_static   = !is_dynamic;
-      is_static_  = is_static;
-      is_dynamic_ = is_dynamic;
-    }
-    if (is_static == true) {
-      ALBANY_ASSERT(piro_params.isSublist("NOX") == true, msg);
-    }
-    if (is_dynamic == true) {
-      ALBANY_ASSERT(piro_params.isSublist("Tempus") == true, msg);
+    if (problem_type == THERMAL) {
+      auto const is_dynamic = piro_params.isSublist("Tempus");
+      ALBANY_ASSERT(is_dynamic == true, "ACE Thermomechanical Coupling requires Tempus for thermal solve.");
 
       Teuchos::ParameterList& tempus_params = piro_params.sublist("Tempus");
 
@@ -213,14 +194,41 @@ ACEThermoMechanical::ACEThermoMechanical(
 
       std::string const integrator_step_type = time_step_control_params.get("Integrator Step Type", "Constant");
 
-      std::string const msg2{
+      std::string const msg{
           "Non-constant time-stepping through Tempus not supported "
           "with ACE sequential thermo-mechanical coupling; \n"
           "In this case, variable time-stepping is "
           "handled within the coupling loop.\n"
           "Please rerun with 'Integrator Step Type: "
           "Constant' in 'Time Step Control' sublist.\n"};
-      ALBANY_ASSERT(integrator_step_type == "Constant", msg2);
+      ALBANY_ASSERT(integrator_step_type == "Constant", msg);
+    } else if (problem_type == MECHANICAL) {
+      auto const is_tempus         = piro_params.isSublist("Tempus");
+      auto const is_trapezoid_rule = piro_params.isSublist("Trapezoid Rule");
+      if (is_tempus == true) {
+        Teuchos::ParameterList& tempus_params = piro_params.sublist("Tempus");
+        tempus_params.set("Abort on Failure", false);
+
+        Teuchos::ParameterList& time_step_control_params =
+            piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control");
+
+        std::string const integrator_step_type = time_step_control_params.get("Integrator Step Type", "Constant");
+
+        std::string const msg{
+            "Non-constant time-stepping through Tempus not supported "
+            "with ACE sequential thermo-mechanical coupling; \n"
+            "In this case, variable time-stepping is "
+            "handled within the coupling loop.\n"
+            "Please rerun with 'Integrator Step Type: "
+            "Constant' in 'Time Step Control' sublist.\n"};
+        ALBANY_ASSERT(integrator_step_type == "Constant", msg);
+      } else {
+        ALBANY_ASSERT(
+            is_trapezoid_rule == true,
+            "ACE Thermomechanical Coupling requires Tempus or Trapezoid Rule for mechanical solve.");
+      }
+    } else {
+      ALBANY_ABORT("ACE Thermomechanical Coupling only supports coupling of ACE Thermal and Mechanical problems.");
     }
   }
 
@@ -409,14 +417,7 @@ void
 ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&)
     const
 {
-  if (is_dynamic_ == true) {
-    ThermoMechanicalLoopDynamics();
-  }
-  // IKT 6/4/2020: for now, throw error if trying to run quasi-statically.
-  // Not sure if we want to ultimately support that case or not.
-  ALBANY_ASSERT(is_static_ == false, "ACE Sequential Thermo-Mechanical solver currently supports dynamics only!");
-  // if (is_static_ == true) { ThermoMechanicalLoopQuasistatics(); }
-  return;
+  ThermoMechanicalLoopDynamics();
 }
 
 namespace {

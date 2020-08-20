@@ -113,7 +113,7 @@ J2ErosionKernel<EvalT, Traits>::init(
   hardening_modulus_ = *dep_fields["Hardening Modulus"];
   delta_time_        = *dep_fields["Delta Time"];
 #if defined(ICE_SATURATION)
-  ice_saturation_    = *dep_fields["ACE_Ice_Saturation"];
+  ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
 #endif
 
   // extract evaluated MDFields
@@ -247,17 +247,17 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
 
-  ScalarT const E              = elastic_modulus_(cell, pt);
-  ScalarT const nu             = poissons_ratio_(cell, pt);
-  ScalarT const kappa          = E / (3.0 * (1.0 - 2.0 * nu));
-  ScalarT const mu             = E / (2.0 * (1.0 + nu));
-  ScalarT const K              = hardening_modulus_(cell, pt);
-  ScalarT const J1             = J_(cell, pt);
-  ScalarT const Jm23           = 1.0 / std::cbrt(J1 * J1);
+  ScalarT const E     = elastic_modulus_(cell, pt);
+  ScalarT const nu    = poissons_ratio_(cell, pt);
+  ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
+  ScalarT const mu    = E / (2.0 * (1.0 + nu));
+  ScalarT const K     = hardening_modulus_(cell, pt);
+  ScalarT const J1    = J_(cell, pt);
+  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
 #endif
-  ScalarT       Y              = yield_strength_(cell, pt);
+  ScalarT Y = yield_strength_(cell, pt);
 
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);

@@ -266,16 +266,22 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<bool>             do_outputs_;
   mutable std::vector<bool>             do_outputs_init_;
 
-  // Used if solving with loca or tempus
-  mutable bool is_static_{false};
-  mutable bool is_dynamic_{false};
-  bool         std_init_guess_{false};
+  bool std_init_guess_{false};
 
   enum PROB_TYPE
   {
     THERMAL,
     MECHANICAL
   };
+
+  enum class MechanicalSolver
+  {
+    Tempus,
+    LOCA,
+    TrapezoidRule
+  };
+
+  mutable MechanicalSolver mechanical_solver_{MechanicalSolver::TrapezoidRule};
 
   // std::vector mapping subdomain number to PROB_TYPE;
   mutable std::vector<PROB_TYPE> prob_types_;

@@ -14,6 +14,7 @@
 #include "Piro_LOCASolver.hpp"
 #include "Piro_ObserverToLOCASaveDataStrategyAdapter.hpp"
 #include "Piro_TempusSolver.hpp"
+#include "Piro_TrapezoidRuleSolver.hpp"
 
 namespace {
 // In "Mechanics 3D", extract "Mechanics".
@@ -206,6 +207,7 @@ ACEThermoMechanical::ACEThermoMechanical(
       auto const is_tempus         = piro_params.isSublist("Tempus");
       auto const is_trapezoid_rule = piro_params.isSublist("Trapezoid Rule");
       if (is_tempus == true) {
+        mechanical_solver_                    = MechanicalSolver::Tempus;
         Teuchos::ParameterList& tempus_params = piro_params.sublist("Tempus");
         tempus_params.set("Abort on Failure", false);
 
@@ -223,6 +225,7 @@ ACEThermoMechanical::ACEThermoMechanical(
             "Constant' in 'Time Step Control' sublist.\n"};
         ALBANY_ASSERT(integrator_step_type == "Constant", msg);
       } else {
+        mechanical_solver_ = MechanicalSolver::TrapezoidRule;
         ALBANY_ASSERT(
             is_trapezoid_rule == true,
             "ACE Thermomechanical Coupling requires Tempus or Trapezoid Rule for mechanical solve.");
@@ -452,20 +455,20 @@ renameExodusFile(int const file_index, std::string& filename)
 // and model evaluators for the run.  It is a separate routine to easily allow
 // for recreation of these options from the coupling loops.
 void
-ACEThermoMechanical::createSolversAppsDiscsMEs(int const file_index, double const this_time) const
+ACEThermoMechanical::createSolversAppsDiscsMEs(int const file_index, double const current_time) const
 {
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     auto const prob_type = prob_types_[subdomain];
     if (prob_type == THERMAL) {
-      createThermalSolverAppDiscME(file_index, this_time);
+      createThermalSolverAppDiscME(file_index, current_time);
     } else if (prob_type == MECHANICAL) {
-      createMechanicalSolverAppDiscME(file_index, this_time);
+      createMechanicalSolverAppDiscME(file_index, current_time);
     }
   }
 }
 
 void
-ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double const this_time) const
+ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double const current_time) const
 {
   auto const              subdomain      = 0;
   Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
@@ -532,7 +535,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
 }
 
 void
-ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, double const this_time) const
+ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, double const current_time) const
 {
   auto const              subdomain      = 1;
   Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();

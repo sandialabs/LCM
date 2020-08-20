@@ -193,13 +193,14 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   continueSolve() const;
 
   void
-  createSolversAppsDiscsMEs(int const file_index, double const current_time = 0.0) const;
-
-  void
   createThermalSolverAppDiscME(int const file_index, double const current_time) const;
 
   void
-  createMechanicalSolverAppDiscME(int const file_index, double const current_time) const;
+  createMechanicalSolverAppDiscME(
+      int const    file_index,
+      double const current_time,
+      double const next_time,
+      double const time_step) const;
 
   void
   doQuasistaticOutput(ST const time) const;

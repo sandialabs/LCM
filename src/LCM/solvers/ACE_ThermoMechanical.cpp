@@ -451,22 +451,6 @@ renameExodusFile(int const file_index, std::string& filename)
 
 }  // anonymous namespace
 
-// The following routine creates the solvers, applications, discretizations
-// and model evaluators for the run.  It is a separate routine to easily allow
-// for recreation of these options from the coupling loops.
-void
-ACEThermoMechanical::createSolversAppsDiscsMEs(int const file_index, double const current_time) const
-{
-  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    auto const prob_type = prob_types_[subdomain];
-    if (prob_type == THERMAL) {
-      createThermalSolverAppDiscME(file_index, current_time);
-    } else if (prob_type == MECHANICAL) {
-      createMechanicalSolverAppDiscME(file_index, current_time);
-    }
-  }
-}
-
 void
 ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double const current_time) const
 {
@@ -535,7 +519,11 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
 }
 
 void
-ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, double const current_time) const
+ACEThermoMechanical::createMechanicalSolverAppDiscME(
+    int const    file_index,
+    double const current_time,
+    double const next_time,
+    double const time_step) const
 {
   auto const              subdomain      = 1;
   Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
@@ -658,7 +646,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         if (prob_type == THERMAL) {
           createThermalSolverAppDiscME(stop, current_time);
         } else if (prob_type == MECHANICAL) {
-          createMechanicalSolverAppDiscME(stop, current_time);
+          createMechanicalSolverAppDiscME(stop, current_time, next_time, time_step);
         }
         if (stop == 0) {
           setICVecs(initial_time_, subdomain);

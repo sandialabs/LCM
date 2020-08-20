@@ -1133,8 +1133,9 @@ ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain, 
   auto&                                       abs_disc = *discs_[subdomain];
   auto&                                       stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
   auto&                                       stk_mesh_struct = *stk_mesh_structs_[subdomain];
-  stk_mesh_struct.exoOutputInterval                           = 1;
-  stk_mesh_struct.exoOutput                                   = do_outputs_[subdomain];
+
+  stk_mesh_struct.exoOutputInterval = 1;
+  stk_mesh_struct.exoOutput         = do_outputs_[subdomain];
   stk_disc.writeSolutionMV(*xMV, time, true);
   stk_mesh_struct.exoOutput = false;
 }

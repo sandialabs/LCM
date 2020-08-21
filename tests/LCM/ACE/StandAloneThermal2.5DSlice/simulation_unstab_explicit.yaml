@@ -86,6 +86,7 @@ ALBANY:
     Tempus: 
       Integrator Name: Tempus Integrator
       Lump Mass Matrix: true
+      Constant Mass Matrix: false
       Tempus Integrator: 
         Integrator Type: Integrator Basic
         Screen Output Index List: '1'

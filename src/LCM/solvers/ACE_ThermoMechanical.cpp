@@ -571,7 +571,7 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
 
   if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
     Teuchos::ParameterList& piro_params = params.sublist("Piro", true);
-    Teuchos::ParameterList& tr_params   = params.sublist("Trapezoid Rule", true);
+    Teuchos::ParameterList& tr_params   = piro_params.sublist("Trapezoid Rule", true);
     tr_params.set<int>("Num Time Steps", 1);
     tr_params.set<double>("Initial Time", current_time);
     tr_params.set<double>("Final Time", next_time);
@@ -912,88 +912,126 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
-  Piro::TempusSolver<ST>& piro_tempus_solver = dynamic_cast<Piro::TempusSolver<ST>&>(solver);
+  if (mechanical_solver_ == MechanicalSolver::Tempus) {
+    auto& piro_tempus_solver = dynamic_cast<Piro::TempusSolver<ST>&>(solver);
+    piro_tempus_solver.setStartTime(current_time);
+    piro_tempus_solver.setFinalTime(next_time);
+    piro_tempus_solver.setInitTimeStep(time_step);
 
-  piro_tempus_solver.setStartTime(current_time);
-  piro_tempus_solver.setFinalTime(next_time);
-  piro_tempus_solver.setInitTimeStep(time_step);
+    std::string const delim(72, '=');
+    *fos_ << "Initial time       :" << current_time << '\n';
+    *fos_ << "Final time         :" << next_time << '\n';
+    *fos_ << "Time step          :" << time_step << '\n';
+    *fos_ << delim << std::endl;
 
-  std::string const delim(72, '=');
-  *fos_ << "Initial time       :" << current_time << '\n';
-  *fos_ << "Final time         :" << next_time << '\n';
-  *fos_ << "Time step          :" << time_step << '\n';
-  *fos_ << delim << std::endl;
+    Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
+    Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
 
-  Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
-  Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
+    auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
-  auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+    // Restore internal states
+    auto& app       = *apps_[subdomain];
+    auto& state_mgr = app.getStateMgr();
 
-  // Restore internal states
-  auto& app       = *apps_[subdomain];
-  auto& state_mgr = app.getStateMgr();
+    fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
-  fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+    Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
+    Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-  Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
-  Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
+    if (std_init_guess_ == false) {
+      piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
+    }
 
-  if (std_init_guess_ == false) {
-    piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
+    solver.evalModel(in_args, out_args);
+
+    // Allocate current solution vectors
+    this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
+    this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
+    this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
+
+    // Check whether solver did OK.
+    auto const status = piro_tempus_solver.getTempusIntegratorStatus();
+
+    if (status == Tempus::Status::FAILED) {
+      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
+      failed_ = true;
+      return;
+    }
+    // If solver is OK, extract solution
+
+    solution_history = piro_tempus_solver.getSolutionHistory();
+    current_state    = solution_history->getCurrentState();
+
+    Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
+    Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
+    Thyra::copy(*current_state->getXDotDot(), this_xdotdot_[subdomain].ptr());
+
+    Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
+    Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
+    Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
+
+    Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
+    Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
+    Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
+
+    Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
+    Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
+    Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
+
+  } else if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
+    auto&             piro_tr_solver = dynamic_cast<Piro::TrapezoidRuleSolver<ST>&>(solver);
+    std::string const delim(72, '=');
+    *fos_ << "Initial time       :" << current_time << '\n';
+    *fos_ << "Final time         :" << next_time << '\n';
+    *fos_ << "Time step          :" << time_step << '\n';
+    *fos_ << delim << std::endl;
+
+    Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
+    Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
+
+    auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
+    // Restore internal states
+    auto& app       = *apps_[subdomain];
+    auto& state_mgr = app.getStateMgr();
+
+    fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+
+    if (std_init_guess_ == false) {
+      Thyra::ModelEvaluatorBase::InArgsSetup<ST> nv;
+      nv.setModelEvalDescription(this->description());
+      nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x, true);
+      nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x_dot, true);
+      nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x_dot_dot, true);
+      auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+      nv.set_x(this_x_[subdomain]);
+      nv.set_x_dot(this_xdot_[subdomain]);
+      nv.set_x_dot_dot(this_xdotdot_[subdomain]);
+      me.setNominalValues(nv);
+      me.setCurrentTime(next_time);
+    }
+
+    solver.evalModel(in_args, out_args);
+
+    // Allocate current solution vectors
+    this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
+    this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
+    this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
+
+    // Check whether solver did OK.
+    auto&      nox_solver         = *(piro_tr_solver.getNOXSolver());
+    auto&      nox_generic_solver = dynamic_cast<NOX::Solver::Generic&>(nox_solver);
+    auto const status             = nox_generic_solver.getStatus();
+
+    if (status == NOX::StatusTest::Failed) {
+      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
+      failed_ = true;
+      return;
+    }
+
+  } else {
+    ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");
   }
-
-  solver.evalModel(in_args, out_args);
-
-  // Adapt mesh if needed.
-  auto& sol_mgr = *(app.getSolutionManager());
-  if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
-    //    auto lsb         = Stratimikos::DefaultLinearSolverBuilder();
-    //    auto lss         = createLinearSolveStrategy(lsb);
-    //    auto me_rcp      = model_evaluators_[subdomain];
-    //    auto mewsf       = rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(me_rcp, lss));
-    //    auto app_rcp     = apps_[subdomain];
-    //    auto po          = Teuchos::rcp(new Albany::PiroObserver(app_rcp, mewsf));
-    //    auto sds         = Teuchos::rcp(new Piro::ObserverToLOCASaveDataStrategyAdapter(po));
-    //    auto params      = solver_factories_[subdomain]->getParametersRCP();
-    //    auto pp          = Teuchos::sublist(params, "Piro");
-    //    auto sol_mgr_rcp = app.getSolutionManager();
-    //    Piro::LOCAAdaptiveSolver<ST>(pp, mewsf, sol_mgr_rcp, sds);
-    sol_mgr.adaptProblem();
-  }
-
-  // Allocate current solution vectors
-  this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
-  this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
-  this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
-
-  // Check whether solver did OK.
-  auto const status = piro_tempus_solver.getTempusIntegratorStatus();
-
-  if (status == Tempus::Status::FAILED) {
-    *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
-    failed_ = true;
-    return;
-  }
-  // If solver is OK, extract solution
-
-  solution_history = piro_tempus_solver.getSolutionHistory();
-  current_state    = solution_history->getCurrentState();
-
-  Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
-  Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
-  Thyra::copy(*current_state->getXDotDot(), this_xdotdot_[subdomain].ptr());
-
-  Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
-  Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
-
-  Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
-  Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
-
-  Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
-  Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
 
   failed_ = false;
 }

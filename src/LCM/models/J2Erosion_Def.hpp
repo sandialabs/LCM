@@ -5,7 +5,7 @@
 #include "Albany_STKDiscretization.hpp"
 #include "J2Erosion.hpp"
 
-#define ICE_SATURATION
+//#define ICE_SATURATION
 
 namespace LCM {
 

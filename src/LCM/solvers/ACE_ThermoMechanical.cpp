@@ -575,6 +575,11 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
     tr_params.set<int>("Num Time Steps", 1);
     tr_params.set<double>("Initial Time", current_time);
     tr_params.set<double>("Final Time", next_time);
+    tr_params.remove("Write Only Converged Solution", false);
+    tr_params.remove("Sensitivity Method", false);
+    tr_params.remove("Jacobian Operator", false);
+    tr_params.remove("Exit on Failed NOX Solve", false);
+    tr_params.remove("On Failure Solve With Zero Initial Guess", false);
   }
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
@@ -1004,30 +1009,46 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
       nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x_dot, true);
       nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x_dot_dot, true);
       auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-      nv.set_x(this_x_[subdomain]);
-      nv.set_x_dot(this_xdot_[subdomain]);
-      nv.set_x_dot_dot(this_xdotdot_[subdomain]);
+      nv.set_x(prev_x_[subdomain]);
+      nv.set_x_dot(prev_xdot_[subdomain]);
+      nv.set_x_dot_dot(prev_xdotdot_[subdomain]);
       me.setNominalValues(nv);
       me.setCurrentTime(next_time);
     }
 
     solver.evalModel(in_args, out_args);
 
-    // Allocate current solution vectors
-    this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
-    this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
-    this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
-
     // Check whether solver did OK.
-    auto&      nox_solver         = *(piro_tr_solver.getNOXSolver());
-    auto&      nox_generic_solver = dynamic_cast<NOX::Solver::Generic&>(nox_solver);
-    auto const status             = nox_generic_solver.getStatus();
+    auto&      nox_solver           = *(piro_tr_solver.getNOXSolver());
+    auto&      nox_nonlinear_solver = *(nox_solver.getSolver());
+    auto&      nox_generic_solver   = *(nox_nonlinear_solver.getNOXSolver());
+    auto const status               = nox_generic_solver.getStatus();
 
     if (status == NOX::StatusTest::Failed) {
       *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
       failed_ = true;
       return;
     }
+
+    auto& tr_decorator       = *(piro_tr_solver.getDecorator());
+    auto  x_rcp              = tr_decorator.get_x()->clone_v();
+    auto  xdot_rcp           = tr_decorator.get_x_dot()->clone_v();
+    auto  xdotdot_rcp        = tr_decorator.get_x_dotdot()->clone_v();
+    this_x_[subdomain]       = x_rcp;
+    this_xdot_[subdomain]    = xdot_rcp;
+    this_xdotdot_[subdomain] = xdotdot_rcp;
+
+    Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
+    Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
+    Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
+
+    Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
+    Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
+    Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
+
+    Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
+    Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
+    Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
 
   } else {
     ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");

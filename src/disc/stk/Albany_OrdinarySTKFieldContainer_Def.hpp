@@ -175,7 +175,7 @@ OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
 
   stk::mesh::put_field_on_mesh(*this->refine_field, this->metaData->universal_part(), nullptr);
 
-  // Fracture state used for adaptive insertion.
+  // Failure state used for mesh adaptation
   for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK; rank <= stk::topology::ELEMENT_RANK; ++rank) {
     this->failure_state[rank] = &this->metaData->template declare_field<ISFT>(rank, "failure_state");
 

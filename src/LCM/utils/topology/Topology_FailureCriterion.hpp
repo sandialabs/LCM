@@ -244,7 +244,7 @@ class FractureCriterionTraction : public AbstractFailureCriterion
 class BulkFailureCriterion : public AbstractFailureCriterion
 {
  public:
-  BulkFailureCriterion(Topology& topology, std::string const& failure_indicator_name);
+  BulkFailureCriterion(Topology& topology, std::string const& failure_state_name);
 
   bool
   check(stk::mesh::BulkData& bulk_data, stk::mesh::Entity element);

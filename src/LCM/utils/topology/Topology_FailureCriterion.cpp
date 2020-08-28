@@ -222,15 +222,15 @@ FractureCriterionTraction::computeNormals()
   }
 }
 
-BulkFailureCriterion::BulkFailureCriterion(Topology& topology, std::string const& failure_indicator_name)
+BulkFailureCriterion::BulkFailureCriterion(Topology& topology, std::string const& failure_state_name)
     : AbstractFailureCriterion(topology),
-      failure_state_(get_meta_data().get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, failure_indicator_name))
+      failure_state_(get_meta_data().get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, failure_state_name))
 {
   if (failure_state_ == nullptr) {
     std::cerr << "ERROR: " << __PRETTY_FUNCTION__;
     std::cerr << '\n';
     std::cerr << "Cannot find field for bulk failure criterion: ";
-    std::cerr << failure_indicator_name;
+    std::cerr << failure_state_name;
     std::cerr << '\n';
     exit(1);
   }

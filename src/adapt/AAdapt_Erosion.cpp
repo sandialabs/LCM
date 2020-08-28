@@ -43,8 +43,8 @@ AAdapt::Erosion::Erosion(
   auto const bluff_width  = yp - ym;
   cross_section_          = bluff_height * bluff_width;
   topology_               = Teuchos::rcp(new LCM::Topology(discretization_, "", "", xm, ym, zm, xp, yp, zp));
-  std::string const failure_indicator_name = "Failure Indicator";
-  failure_criterion_ = Teuchos::rcp(new LCM::BulkFailureCriterion(*topology_, failure_indicator_name));
+  std::string const failure_state_name = "failure_state";
+  failure_criterion_                   = Teuchos::rcp(new LCM::BulkFailureCriterion(*topology_, failure_state_name));
   topology_->set_failure_criterion(failure_criterion_);
 }
 

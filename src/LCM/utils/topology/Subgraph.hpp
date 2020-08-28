@@ -270,7 +270,7 @@ class Subgraph : public Graph
   stk::mesh::EntityRank
   get_boundary_rank();
 
-  IntScalarFieldType&
+  ScalarFieldType&
   get_failure_state_field(stk::mesh::EntityRank rank);
 
   void

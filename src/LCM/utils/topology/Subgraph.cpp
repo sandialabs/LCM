@@ -120,7 +120,7 @@ Subgraph::get_boundary_rank()
   return get_topology().get_boundary_rank();
 }
 
-IntScalarFieldType&
+ScalarFieldType&
 Subgraph::get_failure_state_field(stk::mesh::EntityRank rank)
 {
   return get_topology().get_failure_state_field(rank);

@@ -726,14 +726,14 @@ class Topology
     return interface_block_name_;
   }
 
-  IntScalarFieldType&
+  ScalarFieldType&
   get_failure_state_field(stk::mesh::EntityRank rank)
   {
-    auto& asms  = get_stk_mesh_struct();
-    auto  asfc  = asms->getFieldContainer();
-    auto* pisft = asfc->getFailureState(rank);
-    assert(pisft != nullptr);
-    return *(pisft);
+    auto& asms = get_stk_mesh_struct();
+    auto  asfc = asms->getFieldContainer();
+    auto* psfs = asfc->getFailureState(rank);
+    assert(psfs != nullptr);
+    return *(psfs);
   }
 
   stk::mesh::FieldBase&

@@ -43,8 +43,8 @@ AAdapt::Erosion::Erosion(
   auto const bluff_width  = yp - ym;
   cross_section_          = bluff_height * bluff_width;
   topology_               = Teuchos::rcp(new LCM::Topology(discretization_, "", "", xm, ym, zm, xp, yp, zp));
-  std::string const failure_state_name = "failure_state";
-  failure_criterion_                   = Teuchos::rcp(new LCM::BulkFailureCriterion(*topology_, failure_state_name));
+  failure_state_name_     = "failure_state";
+  failure_criterion_      = Teuchos::rcp(new LCM::BulkFailureCriterion(*topology_, failure_state_name_));
   topology_->set_failure_criterion(failure_criterion_);
 }
 
@@ -236,20 +236,21 @@ AAdapt::Erosion::adaptMesh()
                   << "Adapting mesh using AAdapt::Erosion method      \n"
                   << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 
-  // Save the current results and close the exodus file
-  // Create a remeshed output file naming convention by
-  // adding the remesh_file_index_ ahead of the period
-  std::ostringstream ss;
-  std::string        str = base_exo_filename_;
-  ss << ".e-s." << remesh_file_index_;
-  str.replace(str.find('.'), std::string::npos, ss.str());
-  *output_stream_ << "Remeshing: renaming output file to - " << str << '\n';
-
   // Open the new exodus file for results
   if (rename_exodus_output_ == true) {
+    // Save the current results and close the exodus file
+    // Create a remeshed output file naming convention by
+    // adding the remesh_file_index_ ahead of the period
+    std::ostringstream ss;
+    std::string        str = base_exo_filename_;
+    ss << ".e-s." << remesh_file_index_;
+    str.replace(str.find(".e"), std::string::npos, ss.str());
+    *output_stream_ << "Remeshing: renaming output file to - " << str << '\n';
     stk_discretization_->reNameExodusOutput(str);
+    remesh_file_index_++;
+  } else {
+    stk_discretization_->reNameExodusOutput(tmp_adapt_filename_);
   }
-  remesh_file_index_++;
 
   // Start the mesh update process
   double const local_volume = topology_->erodeFailedElements();
@@ -279,6 +280,13 @@ AAdapt::Erosion::adaptMesh()
 void
 AAdapt::Erosion::postAdapt()
 {
+  if (rename_exodus_output_ == false) {
+    char const* const tmp_cstr = tmp_adapt_filename_.c_str();
+    char const* const exo_cstr = base_exo_filename_.c_str();
+    remove(exo_cstr);
+    rename(tmp_cstr, exo_cstr);
+    stk_discretization_->reNameExodusOutput(base_exo_filename_);
+  }
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

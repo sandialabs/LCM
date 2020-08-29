@@ -533,7 +533,6 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
   renameExodusFile(file_index, filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
-
   disc_params.set<std::string>("Exodus Solution Name", "disp");
   disc_params.set<std::string>("Exodus SolutionDot Name", "disp_dot");
   disc_params.set<std::string>("Exodus SolutionDotDot Name", "disp_dotdot");
@@ -1019,36 +1018,25 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     solver.evalModel(in_args, out_args);
 
     // Check whether solver did OK.
-    auto&      nox_solver           = *(piro_tr_solver.getNOXSolver());
-    auto&      nox_nonlinear_solver = *(nox_solver.getSolver());
-    auto&      nox_generic_solver   = *(nox_nonlinear_solver.getNOXSolver());
-    auto const status               = nox_generic_solver.getStatus();
+    //    auto&      nox_solver           = *(piro_tr_solver.getNOXSolver());
+    //    auto&      nox_nonlinear_solver = *(nox_solver.getSolver());
+    //    auto&      nox_generic_solver   = *(nox_nonlinear_solver.getNOXSolver());
+    //    auto const status               = nox_generic_solver.getStatus();
+    //
+    //    if (status == NOX::StatusTest::Failed) {
+    //      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
+    //      failed_ = true;
+    //      return;
+    //    }
 
-    if (status == NOX::StatusTest::Failed) {
-      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
-      failed_ = true;
-      return;
-    }
-
-    auto& tr_decorator       = *(piro_tr_solver.getDecorator());
-    auto  x_rcp              = tr_decorator.get_x()->clone_v();
-    auto  xdot_rcp           = tr_decorator.get_x_dot()->clone_v();
-    auto  xdotdot_rcp        = tr_decorator.get_x_dotdot()->clone_v();
+    auto& solution_manager   = *(piro_tr_solver.getSolutionManager());
+    auto  solution_rcp       = solution_manager.getCurrentSolution();
+    auto  x_rcp              = solution_rcp->col(0)->clone_v();
+    auto  xdot_rcp           = solution_rcp->col(1)->clone_v();
+    auto  xdotdot_rcp        = solution_rcp->col(2)->clone_v();
     this_x_[subdomain]       = x_rcp;
     this_xdot_[subdomain]    = xdot_rcp;
     this_xdotdot_[subdomain] = xdotdot_rcp;
-
-    Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
-    Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
-    Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
-
-    Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
-    Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
-    Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
-
-    Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
-    Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
-    Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
 
   } else {
     ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");
@@ -1187,14 +1175,14 @@ ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain, 
     return;
   }
   // Write solution at specified time to STK mesh
-  Teuchos::RCP<Thyra_MultiVector const> const xMV      = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
-  auto&                                       abs_disc = *discs_[subdomain];
-  auto&                                       stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
-  auto&                                       stk_mesh_struct = *stk_mesh_structs_[subdomain];
+  auto const xMV_rcp         = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
+  auto&      abs_disc        = *discs_[subdomain];
+  auto&      stk_disc        = static_cast<Albany::STKDiscretization&>(abs_disc);
+  auto&      stk_mesh_struct = *stk_mesh_structs_[subdomain];
 
   stk_mesh_struct.exoOutputInterval = 1;
   stk_mesh_struct.exoOutput         = do_outputs_[subdomain];
-  stk_disc.writeSolutionMV(*xMV, time, true);
+  stk_disc.writeSolutionMV(*xMV_rcp, time, true);
   stk_mesh_struct.exoOutput = false;
 }
 

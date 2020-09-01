@@ -814,21 +814,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(
     double const next_time,
     double const time_step) const
 {
-  // Restore solution from previous coupling iteration before solve
-  // IKT 6/20/2020: do we still need this stuff when we do restarts?
-  if (is_initial_state == true) {
-    auto&       me     = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-    auto const& nv     = me.getNominalValues();
-    prev_x_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x()), prev_x_[subdomain].ptr());
-    prev_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x_dot()), prev_xdot_[subdomain].ptr());
-  } else {
-    Thyra::put_scalar(0.0, prev_x_[subdomain].ptr());
-    Thyra::copy(*this_x_[subdomain], prev_x_[subdomain].ptr());
-    Thyra::put_scalar(0.0, prev_xdot_[subdomain].ptr());
-    Thyra::copy(*this_xdot_[subdomain], prev_xdot_[subdomain].ptr());
-  }
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
@@ -858,10 +843,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(
 
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
-
-  if (std_init_guess_ == false) {
-    piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
-  }
 
   solver.evalModel(in_args, out_args);
 
@@ -897,24 +878,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     double const next_time,
     double const time_step) const
 {
-  // Restore solution from previous coupling iteration before solve
-  if (is_initial_state == true) {
-    auto&       me     = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-    auto const& nv     = me.getNominalValues();
-    prev_x_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x()), prev_x_[subdomain].ptr());
-    prev_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x_dot()), prev_xdot_[subdomain].ptr());
-    prev_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x_dot_dot()), prev_xdotdot_[subdomain].ptr());
-  } else {
-    Thyra::put_scalar(0.0, prev_x_[subdomain].ptr());
-    Thyra::copy(*this_x_[subdomain], prev_x_[subdomain].ptr());
-    Thyra::put_scalar(0.0, prev_xdot_[subdomain].ptr());
-    Thyra::copy(*this_xdot_[subdomain], prev_xdot_[subdomain].ptr());
-    Thyra::put_scalar(0.0, prev_xdotdot_[subdomain].ptr());
-    Thyra::copy(*this_xdotdot_[subdomain], prev_xdotdot_[subdomain].ptr());
-  }
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
@@ -944,10 +907,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
     Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-    if (std_init_guess_ == false) {
-      piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
-    }
-
     solver.evalModel(in_args, out_args);
 
     // Allocate current solution vectors
@@ -972,18 +931,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
     Thyra::copy(*current_state->getXDotDot(), this_xdotdot_[subdomain].ptr());
 
-    Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
-    Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
-    Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
-
-    Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
-    Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
-    Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
-
-    Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
-    Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
-    Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
-
   } else if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
     auto&             piro_tr_solver = dynamic_cast<Piro::TrapezoidRuleSolver<ST>&>(solver);
     std::string const delim(72, '=');
@@ -1002,20 +949,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto& state_mgr = app.getStateMgr();
 
     fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-
-    if (std_init_guess_ == false) {
-      Thyra::ModelEvaluatorBase::InArgsSetup<ST> nv;
-      nv.setModelEvalDescription(this->description());
-      nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x, true);
-      nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x_dot, true);
-      nv.setSupports(Thyra_ModelEvaluator::IN_ARG_x_dot_dot, true);
-      auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-      nv.set_x(prev_x_[subdomain]);
-      nv.set_x_dot(prev_xdot_[subdomain]);
-      nv.set_x_dot_dot(prev_xdotdot_[subdomain]);
-      me.setNominalValues(nv);
-      me.setCurrentTime(next_time);
-    }
 
     // Make sure there are no leftover adapted mesh from before.
     std::string const tmp_adapt_filename{"ace_adapt_temporary.e"};

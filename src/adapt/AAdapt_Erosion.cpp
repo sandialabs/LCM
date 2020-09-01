@@ -270,6 +270,7 @@ AAdapt::Erosion::adaptMesh()
     stk_mesh_struct->rebalanceAdaptedMeshT(adapt_params_, teuchos_comm_);
   }
   stk_discretization_->updateMesh();
+  stk_discretization_->setOutputInterval(1);
 
   *output_stream_ << "*** ACE INFO: Eroded Volume : " << erosion_volume_ << '\n';
   *output_stream_ << "*** ACE INFO: Eroded Length : " << erosion_volume_ / cross_section_ << '\n';
@@ -280,13 +281,6 @@ AAdapt::Erosion::adaptMesh()
 void
 AAdapt::Erosion::postAdapt()
 {
-  if (rename_exodus_output_ == false) {
-    char const* const tmp_cstr = tmp_adapt_filename_.c_str();
-    char const* const exo_cstr = base_exo_filename_.c_str();
-    remove(exo_cstr);
-    rename(tmp_cstr, exo_cstr);
-    stk_discretization_->reNameExodusOutput(base_exo_filename_);
-  }
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

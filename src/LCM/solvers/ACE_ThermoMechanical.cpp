@@ -4,6 +4,8 @@
 
 #include "ACE_ThermoMechanical.hpp"
 
+#include <fstream>
+
 #include "AAdapt_Erosion.hpp"
 #include "Albany_PiroObserver.hpp"
 #include "Albany_STKDiscretization.hpp"
@@ -17,6 +19,14 @@
 #include "Piro_TrapezoidRuleSolver.hpp"
 
 namespace {
+
+bool
+fileExists(std::string const& filename)
+{
+  std::ifstream file(filename.c_str());
+  return (file.good());
+}
+
 // In "Mechanics 3D", extract "Mechanics".
 inline std::string
 getName(std::string const& method)
@@ -26,7 +36,7 @@ getName(std::string const& method)
 }
 
 void
-deletePrevWrittenExoFile(const std::string file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm)
+deletePrevWrittenExoFile(std::string const file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm)
 {
   Teuchos::RCP<Teuchos::FancyOStream> fos_      = Teuchos::VerboseObjectBase::getDefaultOStream();
   const int                           num_ranks = comm->getSize();
@@ -876,14 +886,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
   Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
 
-  Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
-  Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
-
-  Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
-  Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
-
   failed_ = false;
 }
 
@@ -1015,7 +1017,22 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
       me.setCurrentTime(next_time);
     }
 
+    // Make sure there are no leftover adapted mesh from before.
+    std::string const tmp_adapt_filename{"ace_adapt_temporary.e"};
+    if (fileExists(tmp_adapt_filename) == true) {
+      char const* const tmp_cstr = tmp_adapt_filename.c_str();
+      remove(tmp_cstr);
+    }
+
     solver.evalModel(in_args, out_args);
+
+    // Check whether there was adaptation by testing whether adapted mesh exists,
+    // and if so, rename it.
+    if (fileExists(tmp_adapt_filename) == true) {
+      char const* const tmp_cstr = tmp_adapt_filename.c_str();
+      char const* const exo_cstr = prev_mechanical_exo_outfile_name_.c_str();
+      rename(tmp_cstr, exo_cstr);
+    }
 
     // Check whether solver did OK.
     //    auto&      nox_solver           = *(piro_tr_solver.getNOXSolver());

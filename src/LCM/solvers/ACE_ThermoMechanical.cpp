@@ -959,16 +959,17 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     }
 
     // Check whether solver did OK.
-    //    auto&      nox_solver           = *(piro_tr_solver.getNOXSolver());
-    //    auto&      nox_nonlinear_solver = *(nox_solver.getSolver());
-    //    auto&      nox_generic_solver   = *(nox_nonlinear_solver.getNOXSolver());
-    //    auto const status               = nox_generic_solver.getStatus();
-    //
-    //    if (status == NOX::StatusTest::Failed) {
-    //      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
-    //      failed_ = true;
-    //      return;
-    //    }
+    auto&      tr_nox_solver              = *(piro_tr_solver.getNOXSolver());
+    auto&      thyra_nox_nonlinear_solver = *(tr_nox_solver.getSolver());
+    auto&      const_nox_generic_solver   = *(thyra_nox_nonlinear_solver.getNOXSolver());
+    auto&      nox_generic_solver         = const_cast<NOX::Solver::Generic&>(const_nox_generic_solver);
+    auto const status                     = nox_generic_solver.getStatus();
+
+    if (status == NOX::StatusTest::Failed) {
+      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
+      failed_ = true;
+      return;
+    }
 
     auto& solution_manager   = *(piro_tr_solver.getSolutionManager());
     auto  solution_rcp       = solution_manager.getCurrentSolution();

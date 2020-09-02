@@ -27,6 +27,20 @@ fileExists(std::string const& filename)
   return (file.good());
 }
 
+bool
+fileExistsParallel(std::string const& filename, Teuchos::RCP<Teuchos::Comm<int> const> comm)
+{
+  int const   num_ranks = comm->getSize();
+  int const   this_rank = comm->getRank();
+  std::string full_filename{""};
+  if (num_ranks > 1) {
+    full_filename = filename + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
+  } else {
+    full_filename = filename;
+  }
+  return fileExists(full_filename);
+}
+
 // In "Mechanics 3D", extract "Mechanics".
 inline std::string
 getName(std::string const& method)
@@ -36,58 +50,38 @@ getName(std::string const& method)
 }
 
 void
-deletePrevWrittenExoFile(std::string const file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm)
+deleteParallel(std::string const& filename, Teuchos::RCP<Teuchos::Comm<int> const> comm)
 {
-  Teuchos::RCP<Teuchos::FancyOStream> fos_      = Teuchos::VerboseObjectBase::getDefaultOStream();
-  const int                           num_ranks = comm->getSize();
-  int                                 file_removed;
+  int const num_ranks = comm->getSize();
+  int const this_rank = comm->getRank();
   if (num_ranks > 1) {
-    const int   this_rank      = comm->getRank();
-    std::string full_file_name = file_name + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
-    char        cstr[full_file_name.size() + 1];
-    strcpy(cstr, full_file_name.c_str());
-    file_removed = remove(cstr);
+    std::string const full_filename = filename + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
+    auto const        file_removed  = remove(full_filename.c_str());
+    ALBANY_ASSERT(file_removed == 0, "Could not remove file : " << full_filename);
   } else {
-    char cstr[file_name.size() + 1];
-    strcpy(cstr, file_name.c_str());
-    file_removed = remove(cstr);
-  }
-  if (file_removed == 0) {
-    *fos_ << "Exodus files based off of " << file_name << " deleted successfully!\n";
-  } else {
-    *fos_ << "Unable to delete Exodus files based off of " << file_name << "!\n";
+    auto const file_removed = remove(filename.c_str());
+    ALBANY_ASSERT(file_removed == 0, "Could not remove file : " << filename);
   }
 }
+
 void
-renamePrevWrittenExoFile(
-    const std::string                      old_file_name,
-    const std::string                      new_file_name,
+renameParallel(
+    std::string const&                     old_filename,
+    std::string const&                     new_filename,
     Teuchos::RCP<Teuchos::Comm<int> const> comm)
 {
-  Teuchos::RCP<Teuchos::FancyOStream> fos_      = Teuchos::VerboseObjectBase::getDefaultOStream();
-  const int                           num_ranks = comm->getSize();
-  int                                 file_renamed;
+  int const num_ranks = comm->getSize();
+  int const this_rank = comm->getRank();
   if (num_ranks > 1) {
-    const int   this_rank          = comm->getRank();
-    std::string full_old_file_name = old_file_name + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
-    std::string full_new_file_name = new_file_name + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
-    char        oldname[full_old_file_name.size() + 1];
-    char        newname[full_new_file_name.size() + 1];
-    strcpy(oldname, full_old_file_name.c_str());
-    strcpy(newname, full_new_file_name.c_str());
-    file_renamed = rename(oldname, newname);
+    std::string const full_old_filename =
+        old_filename + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
+    std::string const full_new_filename =
+        new_filename + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
+    auto const file_renamed = rename(full_old_filename.c_str(), full_new_filename.c_str());
+    ALBANY_ASSERT(file_renamed == 0, "Could not rename file : " << full_old_filename << " to " << full_new_filename);
   } else {
-    char oldname[old_file_name.size() + 1];
-    char newname[new_file_name.size() + 1];
-    strcpy(oldname, old_file_name.c_str());
-    strcpy(newname, new_file_name.c_str());
-    file_renamed = rename(oldname, newname);
-  }
-  if (file_renamed == 0) {
-    *fos_ << "Exodus files based off of " << old_file_name << " renamed successfully to"
-          << " files based off of " << new_file_name << "\n";
-  } else {
-    *fos_ << "Unable to rename Exodus files based off of " << old_file_name << "!\n";
+    auto const file_renamed = rename(old_filename.c_str(), new_filename.c_str());
+    ALBANY_ASSERT(file_renamed == 0, "Could not rename file : " << old_filename << " to " << new_filename);
   }
 }
 }  // namespace
@@ -524,7 +518,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   prev_thermal_exo_outfile_name_ = filename;
   // Delete previously-written Exodus files to not have inundation of output files
   if (((file_index - 1) % output_interval_) != 0) {
-    deletePrevWrittenExoFile(prev_mechanical_exo_outfile_name_, comm_);
+    deleteParallel(prev_mechanical_exo_outfile_name_, comm_);
   }
 }
 
@@ -617,7 +611,7 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
   prev_mechanical_exo_outfile_name_ = filename;
   // Delete previously-written Exodus files to not have inundation of output files
   if ((file_index % output_interval_) != 0) {
-    deletePrevWrittenExoFile(prev_thermal_exo_outfile_name_, comm_);
+    deleteParallel(prev_thermal_exo_outfile_name_, comm_);
   }
 }
 
@@ -950,21 +944,18 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
 
     fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
-    // Make sure there are no leftover adapted mesh from before.
+    // Make sure there is no leftover adapted mesh from before.
     std::string const tmp_adapt_filename{"ace_adapt_temporary.e"};
-    if (fileExists(tmp_adapt_filename) == true) {
-      char const* const tmp_cstr = tmp_adapt_filename.c_str();
-      remove(tmp_cstr);
+    if (fileExistsParallel(tmp_adapt_filename, comm_) == true) {
+      deleteParallel(tmp_adapt_filename, comm_);
     }
 
     solver.evalModel(in_args, out_args);
 
-    // Check whether there was adaptation by testing whether adapted mesh exists,
+    // Check whether there was adaptation by testing whether an adapted mesh exists,
     // and if so, rename it.
-    if (fileExists(tmp_adapt_filename) == true) {
-      char const* const tmp_cstr = tmp_adapt_filename.c_str();
-      char const* const exo_cstr = prev_mechanical_exo_outfile_name_.c_str();
-      rename(tmp_cstr, exo_cstr);
+    if (fileExistsParallel(tmp_adapt_filename, comm_) == true) {
+      renameParallel(tmp_adapt_filename, prev_mechanical_exo_outfile_name_, comm_);
     }
 
     // Check whether solver did OK.
@@ -1103,7 +1094,7 @@ ACEThermoMechanical::doQuasistaticOutput(ST const time) const
 }
 
 void
-ACEThermoMechanical::renamePrevWrittenExoFiles(const int subdomain, const int file_index) const
+ACEThermoMechanical::renamePrevWrittenExoFiles(int const subdomain, int const file_index) const
 {
   if (((file_index - 1) % output_interval_) == 0) {
     Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
@@ -1113,7 +1104,9 @@ ACEThermoMechanical::renamePrevWrittenExoFiles(const int subdomain, const int fi
     renameExodusFile(file_index - 1, filename_old);
     std::string filename_new = filename_old;
     renameExodusFile((file_index - 1) / output_interval_, filename_new);
-    renamePrevWrittenExoFile(filename_old, filename_new, comm_);
+    if (file_index > 0) {
+      renameParallel(filename_old, filename_new, comm_);
+    }
   }
 }
 

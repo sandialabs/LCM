@@ -48,8 +48,8 @@ LCM:
       Num Time Steps: 40
       Final Time: 0.40000000
       Initial Time: 0.00000000e+00
-      Invert Mass Matrix: true
       Lump Mass Matrix: true
+      Constant Mass Matrix: true
       Stratimikos:
         Linear Solver Type: Belos
         Linear Solver Types:

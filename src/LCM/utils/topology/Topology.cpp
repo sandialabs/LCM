@@ -1611,7 +1611,7 @@ Topology::set_failure_state(stk::mesh::Entity e, FailureState const fs)
   auto&                bulk_data             = get_bulk_data();
   auto const           rank                  = bulk_data.entity_rank(e);
   stk::mesh::MetaData& meta_data             = get_meta_data();
-  ScalarFieldType&     failure_field         = *meta_data.get_field<ScalarFieldType>(rank, "Failure Indicator");
+  ScalarFieldType&     failure_field         = *meta_data.get_field<ScalarFieldType>(rank, "failure_state");
   *(stk::mesh::field_data(failure_field, e)) = static_cast<int>(fs);
 }
 
@@ -1631,7 +1631,7 @@ Topology::get_failure_state(stk::mesh::Entity e)
   auto&                bulk_data     = get_bulk_data();
   auto const           rank          = bulk_data.entity_rank(e);
   stk::mesh::MetaData& meta_data     = get_meta_data();
-  ScalarFieldType&     failure_field = *meta_data.get_field<ScalarFieldType>(rank, "Failure Indicator");
+  ScalarFieldType&     failure_field = *meta_data.get_field<ScalarFieldType>(rank, "failure_state");
   return static_cast<FailureState>(*(stk::mesh::field_data(failure_field, e)));
 }
 

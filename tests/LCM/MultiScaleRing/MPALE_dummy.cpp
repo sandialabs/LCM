@@ -67,7 +67,9 @@ main(int argc, char* argv[])
 
     // TIme to die?
 
-    if (status.MPI_TAG == DIE) { return 0; }
+    if (status.MPI_TAG == DIE) {
+      return 0;
+    }
 
     // Do the calculations
 

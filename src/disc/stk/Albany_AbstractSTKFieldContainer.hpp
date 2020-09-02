@@ -102,7 +102,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   {
     return refine_field;
   }
-  IntScalarFieldType*
+  ScalarFieldType*
   getFailureState(stk::topology::rank_t rank)
   {
     return failure_state[rank];
@@ -295,7 +295,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   VectorFieldType*      coordinates_field;
   IntScalarFieldType*   proc_rank_field;
   IntScalarFieldType*   refine_field;
-  IntScalarFieldType*   failure_state[stk::topology::ELEMENT_RANK + 1];
+  ScalarFieldType*      failure_state[stk::topology::ELEMENT_RANK + 1];
   stk::mesh::FieldBase* cell_boundary_indicator;
   stk::mesh::FieldBase* face_boundary_indicator;
   stk::mesh::FieldBase* edge_boundary_indicator;

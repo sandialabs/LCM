@@ -527,6 +527,18 @@ class STKDiscretization : public AbstractDiscretization
     output_initial_soln_to_exo_file = output_initial_soln_to_exo_file_;
   };
 
+  void
+  setOutputInterval(int oi)
+  {
+    outputInterval = oi;
+  }
+
+  int
+  getOutputInterval()
+  {
+    return outputInterval;
+  }
+
   //! used when NetCDF output on a latitude-longitude grid is requested.
   // Each struct contains a latitude/longitude index and it's parametric
   // coordinates in an element.

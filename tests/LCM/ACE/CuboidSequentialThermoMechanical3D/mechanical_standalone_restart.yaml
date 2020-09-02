@@ -45,6 +45,7 @@ LCM:
     Tempus:
       Integrator Name: Tempus Integrator
       Lump Mass Matrix: true
+      Constant Mass Matrix: true
       Tempus Integrator:
         Integrator Type: Integrator Basic
         Stepper Name: Tempus Stepper

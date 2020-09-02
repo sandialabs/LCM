@@ -53,7 +53,7 @@ ALBANY:
   Piro: 
     Rythmos Solver: 
       Lump Mass Matrix: true
-      Invert Mass Matrix: true
+      Constant Mass Matrix: false
       NonLinear Solver: 
         VerboseObject: 
           Verbosity Level: low

@@ -96,6 +96,8 @@ class Erosion : public AbstractAdapter
   int         num_dim_{0};
   int         remesh_file_index_{0};
   std::string base_exo_filename_{""};
+  std::string failure_state_name_{""};
+  std::string tmp_adapt_filename_{"ace_adapt_temporary.e"};
   double      erosion_volume_{0.0};
   double      cross_section_{1.0};
   bool        rename_exodus_output_{false};

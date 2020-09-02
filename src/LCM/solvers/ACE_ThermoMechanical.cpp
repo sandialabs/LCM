@@ -4,6 +4,8 @@
 
 #include "ACE_ThermoMechanical.hpp"
 
+#include <fstream>
+
 #include "AAdapt_Erosion.hpp"
 #include "Albany_PiroObserver.hpp"
 #include "Albany_STKDiscretization.hpp"
@@ -17,6 +19,14 @@
 #include "Piro_TrapezoidRuleSolver.hpp"
 
 namespace {
+
+bool
+fileExists(std::string const& filename)
+{
+  std::ifstream file(filename.c_str());
+  return (file.good());
+}
+
 // In "Mechanics 3D", extract "Mechanics".
 inline std::string
 getName(std::string const& method)
@@ -26,7 +36,7 @@ getName(std::string const& method)
 }
 
 void
-deletePrevWrittenExoFile(const std::string file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm)
+deletePrevWrittenExoFile(std::string const file_name, Teuchos::RCP<Teuchos::Comm<int> const> comm)
 {
   Teuchos::RCP<Teuchos::FancyOStream> fos_      = Teuchos::VerboseObjectBase::getDefaultOStream();
   const int                           num_ranks = comm->getSize();
@@ -451,22 +461,6 @@ renameExodusFile(int const file_index, std::string& filename)
 
 }  // anonymous namespace
 
-// The following routine creates the solvers, applications, discretizations
-// and model evaluators for the run.  It is a separate routine to easily allow
-// for recreation of these options from the coupling loops.
-void
-ACEThermoMechanical::createSolversAppsDiscsMEs(int const file_index, double const current_time) const
-{
-  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    auto const prob_type = prob_types_[subdomain];
-    if (prob_type == THERMAL) {
-      createThermalSolverAppDiscME(file_index, current_time);
-    } else if (prob_type == MECHANICAL) {
-      createMechanicalSolverAppDiscME(file_index, current_time);
-    }
-  }
-}
-
 void
 ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double const current_time) const
 {
@@ -535,7 +529,11 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
 }
 
 void
-ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, double const current_time) const
+ACEThermoMechanical::createMechanicalSolverAppDiscME(
+    int const    file_index,
+    double const current_time,
+    double const next_time,
+    double const time_step) const
 {
   auto const              subdomain      = 1;
   Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
@@ -545,7 +543,6 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   renameExodusFile(file_index, filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
-
   disc_params.set<std::string>("Exodus Solution Name", "disp");
   disc_params.set<std::string>("Exodus SolutionDot Name", "disp_dot");
   disc_params.set<std::string>("Exodus SolutionDotDot Name", "disp_dotdot");
@@ -580,6 +577,19 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   problem_params.remove("Initial Condition", true);
   // Set flag to tell code that we have an ACE Sequential Thermomechanical Problem
   problem_params.set("ACE Sequential Thermomechanical", true, "ACE Sequential Thermomechanical Problem");
+
+  if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
+    Teuchos::ParameterList& piro_params = params.sublist("Piro", true);
+    Teuchos::ParameterList& tr_params   = piro_params.sublist("Trapezoid Rule", true);
+    tr_params.set<int>("Num Time Steps", 1);
+    tr_params.set<double>("Initial Time", current_time);
+    tr_params.set<double>("Final Time", next_time);
+    tr_params.remove("Write Only Converged Solution", false);
+    tr_params.remove("Sensitivity Method", false);
+    tr_params.remove("Jacobian Operator", false);
+    tr_params.remove("Exit on Failed NOX Solve", false);
+    tr_params.remove("On Failure Solve With Zero Initial Guess", false);
+  }
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
   Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
@@ -658,7 +668,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         if (prob_type == THERMAL) {
           createThermalSolverAppDiscME(stop, current_time);
         } else if (prob_type == MECHANICAL) {
-          createMechanicalSolverAppDiscME(stop, current_time);
+          createMechanicalSolverAppDiscME(stop, current_time, next_time, time_step);
         }
         if (stop == 0) {
           setICVecs(initial_time_, subdomain);
@@ -804,21 +814,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(
     double const next_time,
     double const time_step) const
 {
-  // Restore solution from previous coupling iteration before solve
-  // IKT 6/20/2020: do we still need this stuff when we do restarts?
-  if (is_initial_state == true) {
-    auto&       me     = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-    auto const& nv     = me.getNominalValues();
-    prev_x_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x()), prev_x_[subdomain].ptr());
-    prev_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x_dot()), prev_xdot_[subdomain].ptr());
-  } else {
-    Thyra::put_scalar(0.0, prev_x_[subdomain].ptr());
-    Thyra::copy(*this_x_[subdomain], prev_x_[subdomain].ptr());
-    Thyra::put_scalar(0.0, prev_xdot_[subdomain].ptr());
-    Thyra::copy(*this_xdot_[subdomain], prev_xdot_[subdomain].ptr());
-  }
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
@@ -849,10 +844,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-  if (std_init_guess_ == false) {
-    piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
-  }
-
   solver.evalModel(in_args, out_args);
 
   // Allocate current solution vectors
@@ -876,14 +867,6 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
   Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
 
-  Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
-  Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
-
-  Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
-  Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
-
   failed_ = false;
 }
 
@@ -895,109 +878,119 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     double const next_time,
     double const time_step) const
 {
-  // Restore solution from previous coupling iteration before solve
-  if (is_initial_state == true) {
-    auto&       me     = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-    auto const& nv     = me.getNominalValues();
-    prev_x_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x()), prev_x_[subdomain].ptr());
-    prev_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x_dot()), prev_xdot_[subdomain].ptr());
-    prev_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
-    Thyra::copy(*(nv.get_x_dot_dot()), prev_xdotdot_[subdomain].ptr());
-  } else {
-    Thyra::put_scalar(0.0, prev_x_[subdomain].ptr());
-    Thyra::copy(*this_x_[subdomain], prev_x_[subdomain].ptr());
-    Thyra::put_scalar(0.0, prev_xdot_[subdomain].ptr());
-    Thyra::copy(*this_xdot_[subdomain], prev_xdot_[subdomain].ptr());
-    Thyra::put_scalar(0.0, prev_xdotdot_[subdomain].ptr());
-    Thyra::copy(*this_xdotdot_[subdomain], prev_xdotdot_[subdomain].ptr());
-  }
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
-  Piro::TempusSolver<ST>& piro_tempus_solver = dynamic_cast<Piro::TempusSolver<ST>&>(solver);
+  if (mechanical_solver_ == MechanicalSolver::Tempus) {
+    auto& piro_tempus_solver = dynamic_cast<Piro::TempusSolver<ST>&>(solver);
+    piro_tempus_solver.setStartTime(current_time);
+    piro_tempus_solver.setFinalTime(next_time);
+    piro_tempus_solver.setInitTimeStep(time_step);
 
-  piro_tempus_solver.setStartTime(current_time);
-  piro_tempus_solver.setFinalTime(next_time);
-  piro_tempus_solver.setInitTimeStep(time_step);
+    std::string const delim(72, '=');
+    *fos_ << "Initial time       :" << current_time << '\n';
+    *fos_ << "Final time         :" << next_time << '\n';
+    *fos_ << "Time step          :" << time_step << '\n';
+    *fos_ << delim << std::endl;
 
-  std::string const delim(72, '=');
-  *fos_ << "Initial time       :" << current_time << '\n';
-  *fos_ << "Final time         :" << next_time << '\n';
-  *fos_ << "Time step          :" << time_step << '\n';
-  *fos_ << delim << std::endl;
+    Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
+    Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
 
-  Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
-  Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
+    auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
-  auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+    // Restore internal states
+    auto& app       = *apps_[subdomain];
+    auto& state_mgr = app.getStateMgr();
 
-  // Restore internal states
-  auto& app       = *apps_[subdomain];
-  auto& state_mgr = app.getStateMgr();
+    fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
-  fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+    Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
+    Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
-  Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
-  Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
+    solver.evalModel(in_args, out_args);
 
-  if (std_init_guess_ == false) {
-    piro_tempus_solver.setInitialGuess(prev_x_[subdomain]);
+    // Allocate current solution vectors
+    this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
+    this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
+    this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
+
+    // Check whether solver did OK.
+    auto const status = piro_tempus_solver.getTempusIntegratorStatus();
+
+    if (status == Tempus::Status::FAILED) {
+      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
+      failed_ = true;
+      return;
+    }
+    // If solver is OK, extract solution
+
+    solution_history = piro_tempus_solver.getSolutionHistory();
+    current_state    = solution_history->getCurrentState();
+
+    Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
+    Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
+    Thyra::copy(*current_state->getXDotDot(), this_xdotdot_[subdomain].ptr());
+
+  } else if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
+    auto&             piro_tr_solver = dynamic_cast<Piro::TrapezoidRuleSolver<ST>&>(solver);
+    std::string const delim(72, '=');
+    *fos_ << "Initial time       :" << current_time << '\n';
+    *fos_ << "Final time         :" << next_time << '\n';
+    *fos_ << "Time step          :" << time_step << '\n';
+    *fos_ << delim << std::endl;
+
+    Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
+    Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
+
+    auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
+    // Restore internal states
+    auto& app       = *apps_[subdomain];
+    auto& state_mgr = app.getStateMgr();
+
+    fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+
+    // Make sure there are no leftover adapted mesh from before.
+    std::string const tmp_adapt_filename{"ace_adapt_temporary.e"};
+    if (fileExists(tmp_adapt_filename) == true) {
+      char const* const tmp_cstr = tmp_adapt_filename.c_str();
+      remove(tmp_cstr);
+    }
+
+    solver.evalModel(in_args, out_args);
+
+    // Check whether there was adaptation by testing whether adapted mesh exists,
+    // and if so, rename it.
+    if (fileExists(tmp_adapt_filename) == true) {
+      char const* const tmp_cstr = tmp_adapt_filename.c_str();
+      char const* const exo_cstr = prev_mechanical_exo_outfile_name_.c_str();
+      rename(tmp_cstr, exo_cstr);
+    }
+
+    // Check whether solver did OK.
+    //    auto&      nox_solver           = *(piro_tr_solver.getNOXSolver());
+    //    auto&      nox_nonlinear_solver = *(nox_solver.getSolver());
+    //    auto&      nox_generic_solver   = *(nox_nonlinear_solver.getNOXSolver());
+    //    auto const status               = nox_generic_solver.getStatus();
+    //
+    //    if (status == NOX::StatusTest::Failed) {
+    //      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
+    //      failed_ = true;
+    //      return;
+    //    }
+
+    auto& solution_manager   = *(piro_tr_solver.getSolutionManager());
+    auto  solution_rcp       = solution_manager.getCurrentSolution();
+    auto  x_rcp              = solution_rcp->col(0)->clone_v();
+    auto  xdot_rcp           = solution_rcp->col(1)->clone_v();
+    auto  xdotdot_rcp        = solution_rcp->col(2)->clone_v();
+    this_x_[subdomain]       = x_rcp;
+    this_xdot_[subdomain]    = xdot_rcp;
+    this_xdotdot_[subdomain] = xdotdot_rcp;
+
+  } else {
+    ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");
   }
-
-  solver.evalModel(in_args, out_args);
-
-  // Adapt mesh if needed.
-  auto& sol_mgr = *(app.getSolutionManager());
-  if (sol_mgr.isAdaptive() == true && sol_mgr.queryAdaptationCriteria() == true) {
-    //    auto lsb         = Stratimikos::DefaultLinearSolverBuilder();
-    //    auto lss         = createLinearSolveStrategy(lsb);
-    //    auto me_rcp      = model_evaluators_[subdomain];
-    //    auto mewsf       = rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(me_rcp, lss));
-    //    auto app_rcp     = apps_[subdomain];
-    //    auto po          = Teuchos::rcp(new Albany::PiroObserver(app_rcp, mewsf));
-    //    auto sds         = Teuchos::rcp(new Piro::ObserverToLOCASaveDataStrategyAdapter(po));
-    //    auto params      = solver_factories_[subdomain]->getParametersRCP();
-    //    auto pp          = Teuchos::sublist(params, "Piro");
-    //    auto sol_mgr_rcp = app.getSolutionManager();
-    //    Piro::LOCAAdaptiveSolver<ST>(pp, mewsf, sol_mgr_rcp, sds);
-    sol_mgr.adaptProblem();
-  }
-
-  // Allocate current solution vectors
-  this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
-  this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
-  this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
-
-  // Check whether solver did OK.
-  auto const status = piro_tempus_solver.getTempusIntegratorStatus();
-
-  if (status == Tempus::Status::FAILED) {
-    *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
-    failed_ = true;
-    return;
-  }
-  // If solver is OK, extract solution
-
-  solution_history = piro_tempus_solver.getSolutionHistory();
-  current_state    = solution_history->getCurrentState();
-
-  Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
-  Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
-  Thyra::copy(*current_state->getXDotDot(), this_xdotdot_[subdomain].ptr());
-
-  Teuchos::RCP<Thyra_Vector> x_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, x_diff_rcp.ptr());
-  Thyra::V_VpStV(x_diff_rcp.ptr(), *this_x_[subdomain], -1.0, *prev_x_[subdomain]);
-
-  Teuchos::RCP<Thyra_Vector> xdot_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, xdot_diff_rcp.ptr());
-  Thyra::V_VpStV(xdot_diff_rcp.ptr(), *this_xdot_[subdomain], -1.0, *prev_xdot_[subdomain]);
-
-  Teuchos::RCP<Thyra_Vector> xdotdot_diff_rcp = Thyra::createMember(me.get_x_space());
-  Thyra::put_scalar<ST>(0.0, xdotdot_diff_rcp.ptr());
-  Thyra::V_VpStV(xdotdot_diff_rcp.ptr(), *this_xdotdot_[subdomain], -1.0, *prev_xdotdot_[subdomain]);
 
   failed_ = false;
 }
@@ -1132,14 +1125,14 @@ ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain, 
     return;
   }
   // Write solution at specified time to STK mesh
-  Teuchos::RCP<Thyra_MultiVector const> const xMV      = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
-  auto&                                       abs_disc = *discs_[subdomain];
-  auto&                                       stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
-  auto&                                       stk_mesh_struct = *stk_mesh_structs_[subdomain];
+  auto const xMV_rcp         = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
+  auto&      abs_disc        = *discs_[subdomain];
+  auto&      stk_disc        = static_cast<Albany::STKDiscretization&>(abs_disc);
+  auto&      stk_mesh_struct = *stk_mesh_structs_[subdomain];
 
   stk_mesh_struct.exoOutputInterval = 1;
   stk_mesh_struct.exoOutput         = do_outputs_[subdomain];
-  stk_disc.writeSolutionMV(*xMV, time, true);
+  stk_disc.writeSolutionMV(*xMV_rcp, time, true);
   stk_mesh_struct.exoOutput = false;
 }
 

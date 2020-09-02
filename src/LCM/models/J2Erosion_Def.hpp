@@ -61,7 +61,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("Delta Time", dl->workset_scalar);
 
   // define the evaluated fields
-  setEvaluatedField("Failure Indicator", dl->cell_scalar);
+  setEvaluatedField("failure_state", dl->cell_scalar);
   setEvaluatedField(cauchy_string, dl->qp_tensor);
   setEvaluatedField(Fp_string, dl->qp_tensor);
   setEvaluatedField(eqps_string, dl->qp_scalar);
@@ -85,8 +85,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
         source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
-  addStateVariable(
-      "Failure Indicator", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output Failure Indicator", true));
+  addStateVariable("failure_state", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output failure_state", true));
 }
 
 template <typename EvalT, typename Traits>
@@ -121,7 +120,7 @@ J2ErosionKernel<EvalT, Traits>::init(
   Fp_         = *eval_fields[Fp_string];
   eqps_       = *eval_fields[eqps_string];
   yield_surf_ = *eval_fields[yieldSurface_string];
-  failed_     = *eval_fields["Failure Indicator"];
+  failed_     = *eval_fields["failure_state"];
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_string];

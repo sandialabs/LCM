@@ -366,7 +366,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.08 * peat_frac);
         // Rho values in [kg/m3]
         // Peat density from Emily Bristol
-        calc_soil_density = ((1.0 - peat_frac) * soil_density_eb) + (peat_frac * 250.0);
+        calc_soil_density = (2600.0 * sand_frac) + (2350.0 * clay_frac) + (2500.0 * silt_frac) + (250.0 * peat_frac);
         // Update the effective material density
         density_(cell, qp) = (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) +
                              ((1.0 - porosity_eb) * calc_soil_density);

@@ -517,7 +517,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   curr_x_[subdomain]             = Teuchos::null;
   prev_thermal_exo_outfile_name_ = filename;
   // Delete previously-written Exodus files to not have inundation of output files
-  if (((file_index - 1) % output_interval_) != 0) {
+  if (file_index > 0 && ((file_index - 1) % output_interval_) != 0) {
     deleteParallel(prev_mechanical_exo_outfile_name_, comm_);
   }
 }

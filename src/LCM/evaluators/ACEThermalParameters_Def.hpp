@@ -112,11 +112,12 @@ template <typename EvalT, typename Traits>
 void
 ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  std::string eb_name            = workset.EBName;
-  ScalarT     thermal_conduct_eb = this->queryElementBlockParameterMap(eb_name, const_thermal_conduct_map_);
-  ScalarT     thermal_inertia_eb = this->queryElementBlockParameterMap(eb_name, const_thermal_inertia_map_);
+  std::string const eb_name            = workset.EBName;
+  auto const        num_cells          = workset.numCells;
+  ScalarT           thermal_conduct_eb = this->queryElementBlockParameterMap(eb_name, const_thermal_conduct_map_);
+  ScalarT           thermal_inertia_eb = this->queryElementBlockParameterMap(eb_name, const_thermal_inertia_map_);
   // Initialize thermal_cond_grad_at_nodes to zero
-  for (std::size_t cell = 0; cell < workset_size_; ++cell) {
+  for (std::size_t cell = 0; cell < num_cells; ++cell) {
     for (std::size_t node = 0; node < num_nodes_; ++node) {
       for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
         thermal_cond_grad_at_nodes_(cell, node, ndim) = 0.0;
@@ -124,7 +125,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     }
   }
   // Initialize thermal_cond_grad_at_qps to zero
-  for (std::size_t cell = 0; cell < workset_size_; ++cell) {
+  for (std::size_t cell = 0; cell < num_cells; ++cell) {
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
       for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
         thermal_cond_grad_at_qps_(cell, qp, ndim) = 0.0;
@@ -134,7 +135,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
   // Set thermal conductivity, thermal inertia and other fields
   if ((thermal_conduct_eb >= 0) || (thermal_inertia_eb >= 0)) {
-    for (std::size_t cell = 0; cell < workset_size_; ++cell) {
+    for (std::size_t cell = 0; cell < num_cells; ++cell) {
       for (std::size_t qp = 0; qp < num_qps_; ++qp) {
         thermal_conductivity_(cell, qp) = thermal_conduct_eb;
         thermal_inertia_(cell, qp)      = thermal_inertia_eb;
@@ -157,7 +158,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
   }
 
-  for (std::size_t cell = 0; cell < workset_size_; ++cell) {
+  for (std::size_t cell = 0; cell < num_cells; ++cell) {
     double const cell_bi     = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
     bool const   is_erodible = cell_bi == 2.0;
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
@@ -411,7 +412,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     }
   }
   // Calculate thermal conductivity gradient at nodes using thermal conductivity and wgradbf
-  for (std::size_t cell = 0; cell < workset_size_; ++cell) {
+  for (std::size_t cell = 0; cell < num_cells; ++cell) {
     for (std::size_t node = 0; node < num_nodes_; ++node) {
       for (std::size_t qp = 0; qp < num_qps_; ++qp) {
         for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
@@ -423,7 +424,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
   }
   // Calculate thermal conductivity gradient at qps using thermal conductivity gradient at
   // nodes and bf_
-  for (std::size_t cell = 0; cell < workset_size_; ++cell) {
+  for (std::size_t cell = 0; cell < num_cells; ++cell) {
     for (int qp = 0; qp < num_qps_; ++qp) {
       for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
         for (std::size_t node = 0; node < num_nodes_; ++node) {

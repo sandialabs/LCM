@@ -182,7 +182,7 @@ MechanicsProblem::MechanicsProblem(
 
   rigidBodyModes->setParameters(num_PDEs, num_eq_mech, num_eq_aux, null_space_dim);
 
-  // Check whether we are doing adaptive insertion with topology modification.
+  // Check whether we are doing mesh adaptation
   bool const have_adaptation = params->isSublist("Adaptation");
   bool       have_erosion{false};
 

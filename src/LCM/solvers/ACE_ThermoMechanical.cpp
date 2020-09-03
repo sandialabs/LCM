@@ -659,14 +659,22 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
         // Create new solvers, apps, discs and model evaluators
         auto const prob_type = prob_types_[subdomain];
-        if (prob_type == THERMAL) {
+        if (prob_type == THERMAL && failed_reattempt_thermal_ == false && failed_reattempt_mechanical_ == false) {
           createThermalSolverAppDiscME(stop, current_time);
-        } else if (prob_type == MECHANICAL) {
+        }
+        if (prob_type == MECHANICAL && failed_reattempt_mechanical_ == false) {
           createMechanicalSolverAppDiscME(stop, current_time, next_time, time_step);
         }
+
         if (stop == 0) {
-          setICVecs(initial_time_, subdomain);
-          doDynamicInitialOutput(initial_time_, subdomain, stop);
+          if (prob_type == THERMAL && failed_reattempt_thermal_ == false && failed_reattempt_mechanical_ == false) {
+            setICVecs(initial_time_, subdomain);
+            doDynamicInitialOutput(initial_time_, subdomain, stop);
+          }
+          if (prob_type == MECHANICAL && failed_reattempt_mechanical_ == false) {
+            setICVecs(initial_time_, subdomain);
+            doDynamicInitialOutput(initial_time_, subdomain, stop);
+          }
         }
         // Before the coupling loop, get internal states, and figure out whether
         // output needs to be done or not.
@@ -685,34 +693,32 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         if (prob_type == MECHANICAL) {
           *fos_ << "Problem            :Mechanical\n";
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
-          if (!failed_) {  // If mechanical solve passed, output solution to Exodus file
+          if (failed_reattempt_mechanical_ == false) {
             doDynamicInitialOutput(next_time, subdomain, stop);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
         } else {
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
-          if (!failed_) {  // If thermal solve passed, output solution to Exodus file
+          if (failed_reattempt_thermal_ == false && failed_reattempt_mechanical_ == false) {
             doDynamicInitialOutput(next_time, subdomain, stop);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
         }
-        if (failed_ == true) {
+        if (failed_reattempt_thermal_ == true || failed_reattempt_mechanical_ == true) {
           // Break out of the subdomain loop
           break;
         }
       }  // Subdomains loop
 
-      if (failed_ == true) {
+      if (failed_reattempt_thermal_ == true || failed_reattempt_mechanical_ == true) {
         // Break out of the coupling loop.
         break;
       }
     } while (continueSolve() == true);
 
     // One of the subdomains failed to solve. Reduce step.
-    if (failed_ == true) {
-      failed_ = false;
-
+    if (failed_reattempt_thermal_ == true || failed_reattempt_mechanical_ == true) {
       auto const reduced_step = reduction_factor_ * time_step;
 
       if (time_step <= min_time_step_) {
@@ -849,7 +855,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(
 
   if (status == Tempus::Status::FAILED) {
     *fos_ << "\nINFO: Unable to solve Thermal problem for subdomain " << subdomain << '\n';
-    failed_ = true;
+    failed_reattempt_thermal_ = true;
     return;
   }
 
@@ -861,7 +867,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
   Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
 
-  failed_ = false;
+  failed_reattempt_thermal_ = false;
 }
 
 void
@@ -913,7 +919,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
 
     if (status == Tempus::Status::FAILED) {
       *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
-      failed_ = true;
+      failed_reattempt_mechanical_ = true;
       return;
     }
     // If solver is OK, extract solution
@@ -967,7 +973,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
 
     if (status == NOX::StatusTest::Failed) {
       *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
-      failed_ = true;
+      failed_reattempt_mechanical_ = true;
       return;
     }
 
@@ -984,7 +990,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");
   }
 
-  failed_ = false;
+  failed_reattempt_mechanical_ = false;
 }
 
 void

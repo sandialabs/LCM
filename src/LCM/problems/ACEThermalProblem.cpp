@@ -57,6 +57,8 @@ Albany::ACEThermalProblem::ACEThermalProblem(
     tau_type_   = "None";
     stab_value_ = 0.0;
   }
+  requirements.push_back("cell_boundary_indicator");
+  requirements.push_back("node_boundary_indicator");
 }
 
 Albany::ACEThermalProblem::~ACEThermalProblem() {}

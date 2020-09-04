@@ -697,7 +697,8 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             doDynamicInitialOutput(next_time, subdomain, stop);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
-        } else {
+        }
+        if (prob_type == THERMAL) {
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (failed_reattempt_thermal_ == false && failed_reattempt_mechanical_ == false) {
@@ -1060,10 +1061,9 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
 
   else {
     // subsequent time steps: update ic vecs based on fields in stk discretization
-
-    auto&                           abs_disc = *discs_[subdomain];
-    auto&                           stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
-    Teuchos::RCP<Thyra_MultiVector> x_mv     = stk_disc.getSolutionMV();
+    auto& abs_disc = *discs_[subdomain];
+    auto& stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
+    auto  x_mv     = stk_disc.getSolutionMV();
 
     // Update ics_x_ and its time-derivatives
     ics_x_[subdomain] = Thyra::createMember(x_mv->col(0)->space());

@@ -237,6 +237,18 @@ class Topology
   void
   computeExtrema();
 
+  minitensor::Vector<double, 3>
+  minimumCoordinates()
+  {
+    return minitensor::Vector<double, 3>(xm_, ym_, zm_);
+  }
+
+  minitensor::Vector<double, 3>
+  maximumCoordinates()
+  {
+    return minitensor::Vector<double, 3>(xp_, yp_, zp_);
+  }
+
   int
   numberCells();
 

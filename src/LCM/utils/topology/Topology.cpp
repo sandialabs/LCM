@@ -245,6 +245,20 @@ Topology::setNodeBoundaryIndicator()
   }
 }
 
+namespace {
+
+bool
+all_aligned(std::vector<minitensor::Vector<double, 3>> const& points, double const plane, int const component)
+{
+  double const eps = 1e-4;
+  for (auto&& point : points) {
+    if (std::abs(point(component) - plane) > eps) return false;
+  }
+  return true;
+}
+
+}  // anonymous namespace
+
 bool
 Topology::is_erodible(stk::mesh::Entity face)
 {
@@ -261,44 +275,17 @@ Topology::is_erodible(stk::mesh::Entity face)
   auto const               num_relations = bulk_data.num_connectivity(face, node_rank);
   ALBANY_ASSERT(num_relations > 0);
   std::vector<minitensor::Vector<double, 3>> points;
-  minitensor::Vector<double, 3>              avg(0.0, 0.0, 0.0);
   for (auto i = 0; i < num_relations; ++i) {
-    stk::mesh::Entity node = relations[i];
-    double*           pc   = stk::mesh::field_data(coord_field, node);
-
+    stk::mesh::Entity             node = relations[i];
+    double*                       pc   = stk::mesh::field_data(coord_field, node);
     minitensor::Vector<double, 3> point(pc[0], pc[1], pc[2]);
     points.emplace_back(point);
-    avg += point;
   }
-  avg /= num_relations;
-  minitensor::Vector<double, 3> norms(0.0, 0.0, 0.0);
-  for (auto i = 0; i < num_relations; ++i) {
-    auto const diff = points[i] - avg;
-    norms(0) += diff(0) * diff(0);
-    norms(1) += diff(1) * diff(1);
-    norms(2) += diff(2) * diff(2);
-  }
-  norms(0) = std::sqrt(norms(0));
-  norms(1) = std::sqrt(norms(1));
-  norms(2) = std::sqrt(norms(2));
-
-  double const eps = 0.001;
-
-  bool const is_x_minus = std::abs(avg(0) - xm_) <= eps && norms(0) <= eps;
-  if (is_x_minus == true) return false;
-
-  bool const is_y_minus = std::abs(avg(1) - ym_) <= eps && norms(1) <= eps;
-  if (is_y_minus == true) return false;
-
-  bool const is_y_plus = std::abs(avg(1) - yp_) <= eps && norms(1) <= eps;
-  if (is_y_plus == true) return false;
-
-  bool const is_z_minus = std::abs(avg(2) - zm_) <= eps && norms(2) <= eps;
-  if (is_z_minus == true) return false;
-
-  bool const is_z_plus = std::abs(avg(2) - zp_) <= eps && norms(2) <= eps;
-  if (is_z_plus == true) return false;
-
+  if (all_aligned(points, xm_, 0) == true) return false;
+  if (all_aligned(points, ym_, 1) == true) return false;
+  if (all_aligned(points, yp_, 1) == true) return false;
+  if (all_aligned(points, zm_, 2) == true) return false;
+  if (all_aligned(points, zp_, 2) == true) return false;
   return true;
 }
 

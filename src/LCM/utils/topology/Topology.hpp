@@ -42,13 +42,7 @@ class Topology
   Topology(
       Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc,
       std::string const&                            bulk_block_name      = "",
-      std::string const&                            interface_block_name = "",
-      double const                                  xm                   = 0.0,
-      double const                                  ym                   = 0.0,
-      double const                                  zm                   = 0.0,
-      double const                                  xp                   = 0.0,
-      double const                                  yp                   = 0.0,
-      double const                                  zp                   = 0.0);
+      std::string const&                            interface_block_name = "");
 
   ///
   /// \brief Iterates over the boundary entities of the mesh of (all
@@ -239,6 +233,9 @@ class Topology
   ///
   double
   erodeFailedElements();
+
+  void
+  computeExtrema();
 
   int
   numberCells();

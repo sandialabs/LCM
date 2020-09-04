@@ -81,27 +81,53 @@ Topology::Topology(std::string const& input_file, std::string const& output_file
   Topology::graphInitialization();
 }
 
+void
+Topology::computeExtrema()
+{
+  auto                    stk_mesh_struct = get_stk_mesh_struct();
+  auto&                   coord_field     = *(stk_mesh_struct->getCoordinatesField());
+  auto&                   bulk_data       = get_bulk_data();
+  auto const              node_rank       = stk::topology::NODE_RANK;
+  stk::mesh::EntityVector nodes;
+  stk::mesh::get_entities(bulk_data, node_rank, nodes);
+  auto  first_node = nodes[0];
+  auto* pcfn       = stk::mesh::field_data(coord_field, first_node);
+  auto  xmin       = pcfn[0];
+  auto  ymin       = pcfn[1];
+  auto  zmin       = pcfn[2];
+  auto  xmax       = xmin;
+  auto  ymax       = ymin;
+  auto  zmax       = zmin;
+
+  for (auto node : nodes) {
+    auto*      pc = stk::mesh::field_data(coord_field, node);
+    auto const x  = pc[0];
+    auto const y  = pc[1];
+    auto const z  = pc[2];
+    xmin          = std::min(x, xmin);
+    ymin          = std::min(y, ymin);
+    zmin          = std::min(z, zmin);
+    xmax          = std::max(x, xmax);
+    ymax          = std::max(y, ymax);
+    zmax          = std::max(z, zmax);
+  }
+  xm_ = xmin;
+  ym_ = ymin;
+  zm_ = zmin;
+  xp_ = xmax;
+  yp_ = ymax;
+  zp_ = zmax;
+}
+
 // Construct by using given discretization.
 Topology::Topology(
     Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc,
     std::string const&                            bulk_block_name,
-    std::string const&                            interface_block_name,
-    double const                                  xm,
-    double const                                  ym,
-    double const                                  zm,
-    double const                                  xp,
-    double const                                  yp,
-    double const                                  zp)
+    std::string const&                            interface_block_name)
     : discretization_(Teuchos::null),
       stk_mesh_struct_(Teuchos::null),
       failure_criterion_(Teuchos::null),
-      output_type_(UNIDIRECTIONAL_UNILEVEL),
-      xm_(xm),
-      ym_(ym),
-      zm_(zm),
-      xp_(xp),
-      yp_(yp),
-      zp_(zp)
+      output_type_(UNIDIRECTIONAL_UNILEVEL)
 {
   auto& stk_disc        = static_cast<Albany::STKDiscretization&>(*abstract_disc);
   auto  stk_mesh_struct = stk_disc.getSTKMeshStruct();
@@ -110,6 +136,7 @@ Topology::Topology(
   set_bulk_block_name(bulk_block_name);
   set_interface_block_name(interface_block_name);
   graphInitialization();
+  computeExtrema();
 }
 
 stk::mesh::EntityId

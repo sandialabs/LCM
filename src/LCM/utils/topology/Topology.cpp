@@ -135,8 +135,8 @@ Topology::Topology(
   set_stk_mesh_struct(stk_mesh_struct);
   set_bulk_block_name(bulk_block_name);
   set_interface_block_name(interface_block_name);
-  graphInitialization();
   computeExtrema();
+  graphInitialization();
 }
 
 stk::mesh::EntityId
@@ -239,9 +239,25 @@ Topology::setNodeBoundaryIndicator()
   stk::mesh::EntityVector nodes;
   stk::mesh::get_entities(bulk_data, node_rank, nodes);
 
+#if defined (DEBUG)
+  auto& stk_mesh_struct = *(get_stk_mesh_struct());
+  auto& coord_field     = *(stk_mesh_struct.getCoordinatesField());
+  std::cout << "*** BUILD BOUNDARY INDICATOR ***\n";
+#endif
+
   for (auto node : nodes) {
     auto const bi = is_erodible_node(node) == true ? ERODIBLE : (is_boundary_node(node) == true ? EXTERIOR : INTERIOR);
     set_node_boundary_indicator(node, bi);
+#if defined (DEBUG)
+    double*    pc = stk::mesh::field_data(coord_field, node);
+    auto const x  = pc[0];
+    auto const y  = pc[1];
+    auto const z  = pc[2];
+    std::cout << "NODE : " << std::setw(4) << node << ", BI : " << std::setw(2) << bi << ", ";
+    std::cout << "X : " << std::setw(24) << std::setprecision(16) << x << ", ";
+    std::cout << "Y : " << std::setw(24) << std::setprecision(16) << y << ", ";
+    std::cout << "Z : " << std::setw(24) << std::setprecision(16) << z << "\n";
+#endif
   }
 }
 
@@ -264,21 +280,21 @@ Topology::is_erodible(stk::mesh::Entity face)
 {
   if (is_internal(face) == true) return false;
 
-  stk::mesh::EntityRank const face_rank       = stk::topology::FACE_RANK;
-  stk::mesh::EntityRank const node_rank       = stk::topology::NODE_RANK;
-  auto&                       bulk_data       = get_bulk_data();
-  auto&                       stk_mesh_struct = *(get_stk_mesh_struct());
-  auto&                       coord_field     = *(stk_mesh_struct.getCoordinatesField());
+  auto const face_rank       = stk::topology::FACE_RANK;
+  auto const node_rank       = stk::topology::NODE_RANK;
+  auto&      bulk_data       = get_bulk_data();
+  auto&      stk_mesh_struct = *(get_stk_mesh_struct());
+  auto&      coord_field     = *(stk_mesh_struct.getCoordinatesField());
 
   ALBANY_ASSERT(bulk_data.entity_rank(face) == face_rank);
-  stk::mesh::Entity const* relations     = bulk_data.begin(face, node_rank);
-  auto const               num_relations = bulk_data.num_connectivity(face, node_rank);
+  auto const* relations     = bulk_data.begin(face, node_rank);
+  auto const  num_relations = bulk_data.num_connectivity(face, node_rank);
   ALBANY_ASSERT(num_relations > 0);
   std::vector<minitensor::Vector<double, 3>> points;
   for (auto i = 0; i < num_relations; ++i) {
-    stk::mesh::Entity             node = relations[i];
-    double*                       pc   = stk::mesh::field_data(coord_field, node);
-    minitensor::Vector<double, 3> point(pc[0], pc[1], pc[2]);
+    auto  node  = relations[i];
+    auto* pc    = stk::mesh::field_data(coord_field, node);
+    auto  point = minitensor::Vector<double, 3>(pc[0], pc[1], pc[2]);
     points.emplace_back(point);
   }
   if (all_aligned(points, xm_, 0) == true) return false;
@@ -286,6 +302,14 @@ Topology::is_erodible(stk::mesh::Entity face)
   if (all_aligned(points, yp_, 1) == true) return false;
   if (all_aligned(points, zm_, 2) == true) return false;
   if (all_aligned(points, zp_, 2) == true) return false;
+#if defined(DEBUG)
+  std::cout << "ERODIBLE FACE : " << face << ", NODES :\n";
+  for (auto i = 0; i < num_relations; ++i) {
+    auto node  = relations[i];
+    auto point = points[i];
+    std::cout << node << ", " << point << "\n";
+  }
+#endif
   return true;
 }
 

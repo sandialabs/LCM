@@ -697,7 +697,8 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             doDynamicInitialOutput(next_time, subdomain, stop);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
-        } else {
+        }
+        if (prob_type == THERMAL) {
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (failed_reattempt_thermal_ == false && failed_reattempt_mechanical_ == false) {
@@ -740,36 +741,45 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
       // Restore previous solutions
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-        auto& me           = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-        this_x_[subdomain] = Thyra::createMember(me.get_x_space());
-        Thyra::copy(*ics_x_[subdomain], this_x_[subdomain].ptr());
-        this_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
-        Thyra::copy(*ics_xdot_[subdomain], this_xdot_[subdomain].ptr());
         auto const prob_type = prob_types_[subdomain];
-        if (prob_type == MECHANICAL) {
+        if (prob_type == THERMAL && (failed_reattempt_thermal_ == true || failed_reattempt_mechanical_ == true)) {
+          auto& me           = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+          this_x_[subdomain] = Thyra::createMember(me.get_x_space());
+          Thyra::copy(*ics_x_[subdomain], this_x_[subdomain].ptr());
+          this_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
+          Thyra::copy(*ics_xdot_[subdomain], this_xdot_[subdomain].ptr());
+
+          auto& app       = *apps_[subdomain];
+          auto& state_mgr = app.getStateMgr();
+          fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+
+          Teuchos::RCP<Thyra_Vector const> x_rcp_thyra    = ics_x_[subdomain];
+          Teuchos::RCP<Thyra_Vector const> xdot_rcp_thyra = ics_xdot_[subdomain];
+          Teuchos::RCP<Thyra_Vector const> xdotdot_rcp_thyra = Teuchos::null;
+          Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = app.getDiscretization();
+
+          app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, current_time);
+        }
+        if (prob_type == MECHANICAL && failed_reattempt_mechanical_ == true) {
+          auto& me           = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+          this_x_[subdomain] = Thyra::createMember(me.get_x_space());
+          Thyra::copy(*ics_x_[subdomain], this_x_[subdomain].ptr());
+          this_xdot_[subdomain] = Thyra::createMember(me.get_x_space());
+          Thyra::copy(*ics_xdot_[subdomain], this_xdot_[subdomain].ptr());
+          auto const prob_type = prob_types_[subdomain];
           this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
           Thyra::copy(*ics_xdotdot_[subdomain], this_xdotdot_[subdomain].ptr());
-        }
 
-        // restore the state manager with the state variables from the previous
-        // loadstep.
-        auto& app       = *apps_[subdomain];
-        auto& state_mgr = app.getStateMgr();
-        fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+          auto& app       = *apps_[subdomain];
+          auto& state_mgr = app.getStateMgr();
+          fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
-        // restore the solution in the discretization so the schwarz solver gets
-        // the right boundary conditions!
-        Teuchos::RCP<Thyra_Vector const> x_rcp_thyra    = ics_x_[subdomain];
-        Teuchos::RCP<Thyra_Vector const> xdot_rcp_thyra = ics_xdot_[subdomain];
-        Teuchos::RCP<Thyra_Vector const> xdotdot_rcp_thyra =
-            (prob_type == MECHANICAL) ? ics_xdotdot_[subdomain] : Teuchos::null;
+          Teuchos::RCP<Thyra_Vector const> x_rcp_thyra    = ics_x_[subdomain];
+          Teuchos::RCP<Thyra_Vector const> xdot_rcp_thyra = ics_xdot_[subdomain];
+          Teuchos::RCP<Thyra_Vector const> xdotdot_rcp_thyra = ics_xdotdot_[subdomain];
+          Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = app.getDiscretization();
 
-        Teuchos::RCP<Albany::AbstractDiscretization> const& app_disc = app.getDiscretization();
-
-        if (prob_type == MECHANICAL) {
           app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, *xdotdot_rcp_thyra, current_time);
-        } else {
-          app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, current_time);
         }
       }
 
@@ -1060,10 +1070,9 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
 
   else {
     // subsequent time steps: update ic vecs based on fields in stk discretization
-
-    auto&                           abs_disc = *discs_[subdomain];
-    auto&                           stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
-    Teuchos::RCP<Thyra_MultiVector> x_mv     = stk_disc.getSolutionMV();
+    auto& abs_disc = *discs_[subdomain];
+    auto& stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
+    auto  x_mv     = stk_disc.getSolutionMV();
 
     // Update ics_x_ and its time-derivatives
     ics_x_[subdomain] = Thyra::createMember(x_mv->col(0)->space());

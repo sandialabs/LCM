@@ -28,21 +28,15 @@ AAdapt::Erosion::Erosion(
   num_dim_            = stk_mesh_struct_->numDim;
 
   // Save the initial output file name
-  base_exo_filename_      = stk_mesh_struct_->exoOutFile;
-  auto const lower_corner = params->get<Teuchos::Array<double>>("Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
-  auto const upper_corner = params->get<Teuchos::Array<double>>("Maximal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0));
-  rename_exodus_output_   = params->get<bool>("Rename Exodus Output", false);
+  base_exo_filename_    = stk_mesh_struct_->exoOutFile;
+  rename_exodus_output_ = params->get<bool>("Rename Exodus Output", false);
   params->validateParameters(*(getValidAdapterParameters()));
-  auto const xm           = lower_corner[0];
-  auto const ym           = lower_corner[1];
-  auto const zm           = lower_corner[2];
-  auto const xp           = upper_corner[0];
-  auto const yp           = upper_corner[1];
-  auto const zp           = upper_corner[2];
-  auto const bluff_height = zp - zm;
-  auto const bluff_width  = yp - ym;
+  topology_               = Teuchos::rcp(new LCM::Topology(discretization_, "", ""));
+  auto const lower_corner = topology_->minimumCoordinates();
+  auto const upper_corner = topology_->maximumCoordinates();
+  auto const bluff_height = upper_corner(2) - lower_corner(2);
+  auto const bluff_width  = upper_corner(1) - lower_corner(1);
   cross_section_          = bluff_height * bluff_width;
-  topology_               = Teuchos::rcp(new LCM::Topology(discretization_, "", "", xm, ym, zm, xp, yp, zp));
   failure_state_name_     = "failure_state";
   failure_criterion_      = Teuchos::rcp(new LCM::BulkFailureCriterion(*topology_, failure_state_name_));
   topology_->set_failure_criterion(failure_criterion_);
@@ -290,10 +284,6 @@ AAdapt::Erosion::getValidAdapterParameters() const
   valid_pl->set<bool>("Equilibrate", false, "Perform a steady solve after adaptation");
   valid_pl->set<bool>("Rebalance", true, "Rebalance mesh after adaptation in parallel runs");
   valid_pl->set<bool>("Rename Exodus Output", false, "Use different exodus file names for adapted meshes");
-  valid_pl->set<Teuchos::Array<double>>(
-      "Minimal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0), "Minimal coordinates defining erosion block");
-  valid_pl->set<Teuchos::Array<double>>(
-      "Maximal Point", Teuchos::tuple<double>(0.0, 0.0, 0.0), "Maximal coordinates defining erosion block");
   return valid_pl;
 }
 

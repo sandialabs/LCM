@@ -59,6 +59,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
 #endif
   setDependentField("Delta Time", dl->workset_scalar);
+  setDependentField("Displacement", dl->qp_vector);
 
   // define the evaluated fields
   setEvaluatedField("failure_state", dl->cell_scalar);
@@ -114,6 +115,7 @@ J2ErosionKernel<EvalT, Traits>::init(
 #if defined(ICE_SATURATION)
   ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
 #endif
+  displacement_ = *dep_fields["Displacement"];
 
   // extract evaluated MDFields
   stress_     = *eval_fields[cauchy_string];
@@ -238,9 +240,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 {
   constexpr minitensor::Index MAX_DIM{3};
   using Tensor = minitensor::Tensor<ScalarT, MAX_DIM>;
+  using Vector = minitensor::Vector<ScalarT, MAX_DIM>;
   Tensor       F(num_dims_);
   Tensor const I(minitensor::eye<ScalarT, MAX_DIM>(num_dims_));
   Tensor       sigma(num_dims_);
+  Vector       displacement(num_dims_);
 
   auto const coords       = this->model_.getCoordVecField();
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
@@ -272,6 +276,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);
+  displacement.fill(displacement_, cell, pt, 0);
 
   // Mechanical deformation gradient
   auto Fm = Tensor(F);
@@ -397,6 +402,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     if (std::abs(theta) >= critical_angle) {
       failed += 1.0;
     }
+  }
+  auto const maximum_displacement = 1.0;
+  auto const displacement_norm = minitensor::norm(displacement);
+  if (displacement_norm > maximum_displacement) {
+    failed += 1.0;
   }
 }
 }  // namespace LCM

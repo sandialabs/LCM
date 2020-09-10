@@ -1299,6 +1299,8 @@ MechanicsProblem::constructEvaluators(
       p->set<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
       p->set<std::string>("Gradient QP Variable Name", "Displacement Gradient");
       p->set<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout", dl_->qp_tensor);
+      p->set<std::string>("Displacement QP Variable Name", "Displacement");
+      p->set<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout", dl_->qp_vector);
 
       // Outputs: F, J
       p->set<std::string>("DefGrad Name", defgrad);  // dl_->qp_tensor also

@@ -17,8 +17,6 @@
 
 namespace PHAL {
 
-constexpr double pi = 3.1415926535897932385;
-
 //*****
 template <typename EvalT, typename Traits>
 NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList const& p)

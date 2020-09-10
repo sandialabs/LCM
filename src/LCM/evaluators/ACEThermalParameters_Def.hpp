@@ -215,6 +215,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         if (sal_trial < zero_sal) sal_trial = zero_sal;
         if (sal_trial > ocean_sal) sal_trial = ocean_sal;
         bluff_salinity_(cell, qp) = sal_trial;
+        // OVERRIDES EVERYTHING ABOVE:
+        bluff_salinity_(cell, qp) = ocean_sal;
       }
       ScalarT const sal = bluff_salinity_(cell, qp);
 

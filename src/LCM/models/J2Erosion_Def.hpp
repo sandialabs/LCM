@@ -23,7 +23,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   sat_exp_             = p->get<RealType>("Saturation Exponent", 0.0);
   bulk_porosity_       = p->get<RealType>("ACE Bulk Porosity", 0.0);
   critical_angle_      = p->get<RealType>("ACE Critical Angle", 0.0);
-  soil_yield_strength_ = p->get<RealType>("ACE Soil Yield Strength", 0.0);
+  soil_yield_strength_ = p->get<RealType>("ACE Soil Yield Strength", 0.55e+06);
 
   if (p->isParameter("ACE Z Depth File") == true) {
     auto const filename     = p->get<std::string>("ACE Z Depth File");

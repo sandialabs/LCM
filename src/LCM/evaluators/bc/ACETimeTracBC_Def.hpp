@@ -16,12 +16,6 @@ ACETimeTracBC_Base<EvalT, Traits>::ACETimeTracBC_Base(Teuchos::ParameterList& p)
   timeValues = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
   WaterHeightValues   = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
 
-  //IKT is the following needed?
-  /*if (this->bc_type == PHAL::NeumannBase<EvalT, Traits>::COORD)
-
-    ALBANY_PANIC(
-        !(this->cellDims == WaterHeightValues.getNumCols()), "Dimension of the current problem and \"BC Values\" do not match");
-  */
   ALBANY_PANIC(
       !(timeValues.size() == WaterHeightValues.size()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
@@ -45,30 +39,6 @@ ACETimeTracBC_Base<EvalT, Traits>::computeVal(RealType time)
     this->const_val = WaterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     std::cout << "IKT computeVal const_val = " << this->const_val << "\n"; 
   }
-
-  return;
-}
-
-template <typename EvalT, typename Traits>
-void
-ACETimeTracBC_Base<EvalT, Traits>::computeCoordVal(RealType time)
-{
-  //IKT FIXME - implement??
-  /*ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
-  ScalarT      Val;
-  RealType     slope;
-  unsigned int Index(0);
-
-  while (timeValues[Index] < time) Index++;
-
-  if (Index == 0)
-    for (int dim = 0; dim < this->cellDims; dim++) this->dudx[dim] = WaterHeightValues(dim, Index);
-  else {
-    for (size_t dim = 0; dim < this->cellDims; dim++) {
-      slope           = (WaterHeightValues(dim, Index) - WaterHeightValues(dim, Index - 1)) / (timeValues[Index] - timeValues[Index - 1]);
-      this->dudx[dim] = WaterHeightValues(dim, Index - 1) + slope * (time - timeValues[Index - 1]);
-    }
-  }*/
 
   return;
 }

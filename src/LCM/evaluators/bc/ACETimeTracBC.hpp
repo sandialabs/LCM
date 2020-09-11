@@ -24,8 +24,6 @@ class ACETimeTracBC_Base : public PHAL::Neumann<EvalT, Traits>
 
   void
   computeVal(RealType time);
-  void
-  computeCoordVal(RealType time);
 
  protected:
   std::vector<RealType>        timeValues;

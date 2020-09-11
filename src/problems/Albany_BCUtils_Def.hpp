@@ -1242,7 +1242,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           Teuchos::Array<RealType> timevals = sub_list.get<Teuchos::Array<RealType>>("Time Values");
           Teuchos::Array<RealType> hsvals = sub_list.get<Teuchos::Array<RealType>>("Water Height Values");
-
           // Check that hsvals and timevals have the same size.  If they do not,
           // throw an error.
           if (timevals.size() != hsvals.size()) {
@@ -1267,32 +1266,22 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<string>("Coordinate Vector Name", "Coord Vec");
 
-	  //IKT, FIXME - can remove the following likely
-          if (conditions[k] == "robin") {
-            p->set<string>("DOF Name", dof_names[j]);
-            p->set<bool>("Vector Field", isVectorField);
+	  //Get additional parameters 
+          double tm = sub_list.get<double>("Impact Duration", 0.04); 
+	  double Hb = sub_list.get<double>("Breaking Height of Wave", 1.5); 
+	  double g = sub_list.get<double>("Gravity", 9.806); 
+	  double rho = sub_list.get<double>("Water Density", 997.0); 
 
-            if (isVectorField)
-              p->set<RCP<DataLayout>>("DOF Data Layout", dl->node_vector);
-            else
-              p->set<RCP<DataLayout>>("DOF Data Layout", dl->node_scalar);
-          }
+	  //Put parameters into vector to create Teuchos::array 
+	  std::vector<double> param_vec(4); 
+	  param_vec[0] = tm; param_vec[1] = Hb; param_vec[2] = g; param_vec[3] = rho; 
+          Teuchos::Array<double> param_array(param_vec); 
 
           // Pass the input file line
           p->set<string>("Neumann Input String", ss);
-          p->set<Teuchos::Array<double>>("Neumann Input Value", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+          //p->set<Teuchos::Array<double>>("Neumann Input Value", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+          p->set<Teuchos::Array<double>>("Neumann Input Value", param_array);
           p->set<string>("Neumann Input Conditions", conditions[k]);
-
-          // If we are doing a Neumann internal boundary with a "scaled jump"
-          // (includes "robin" too)
-          // The material DB database needs to be passed to the BC object
-
-	  //IKT FIXME - can remove the following likely 
-          if (conditions[k] == "scaled jump" || conditions[k] == "robin") {
-            ALBANY_PANIC(materialDB == Teuchos::null, "This BC needs a material database specified");
-
-            p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", materialDB);
-          }
 
           evaluators_to_build[evaluatorsToBuildName(ss)] = p;
 

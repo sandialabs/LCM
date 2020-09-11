@@ -38,6 +38,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
     NORMAL,
     INTJUMP,
     PRESS,
+    ACEPRESS,
     ROBIN,
     TRACTION,
     CLOSED_FORM,
@@ -112,6 +113,14 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   // Pressure P
   void
   calc_press(
+      Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
+      const shards::CellTopology&                          celltopo,
+      int                                                  local_side_id) const;
+
+  // ACE Pressure P
+  void
+  calc_ace_press(
       Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
       const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
       const shards::CellTopology&                          celltopo,

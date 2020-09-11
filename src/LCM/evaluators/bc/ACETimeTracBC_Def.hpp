@@ -87,14 +87,14 @@ ACETimeTracBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   RealType time = workset.current_time;
 
   switch (this->bc_type) {
-    case PHAL::NeumannBase<EvalT, Traits>::PRESS:
+    case PHAL::NeumannBase<EvalT, Traits>::ACEPRESS:
       // calculate scalar value of BC based on current time
       this->computeVal(time);
       break;
 
     default:
 
-      ALBANY_ABORT("ACE Time dependent Neumann boundary condition of type - " << this->bc_type << " is not supported.  Only Pressure NBC is supported.");
+      ALBANY_ABORT("ACE Time dependent Neumann boundary condition of type - " << this->bc_type << " is not supported.  Only 'ACE P' NBC is supported.");
       break;
   }
 

@@ -120,6 +120,14 @@ NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList const& p)
     const_val = inputValues[0];
     this->registerSacadoParameter(name, paramLib);
 
+  } else if (inputConditions == "wave_pressure") {  // ACE Wave Pressure boundary condition
+
+    // User has specified a pressure condition
+    bc_type   = ACEPRESS;
+    const_val = inputValues[0];
+    std::cout << "IKT wave_pressure NBC const_val = " << const_val << "\n"; 
+    this->registerSacadoParameter(name, paramLib);
+  
   } else {
     // User has specified conditions on sideset normal
     bc_type   = NORMAL;
@@ -496,6 +504,8 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
         case NORMAL: calc_dudn_const(data); break;
 
         case PRESS: calc_press(data, jacobianSide, *cellType, side); break;
+        
+	case ACEPRESS: calc_ace_press(data, jacobianSide, *cellType, side); break;
 
         case TRACTION: calc_traction_components(data); break;
         case CLOSED_FORM: calc_closed_form(data, physPointsSide, jacobianSide, *cellType, side, workset); break;
@@ -695,6 +705,39 @@ NeumannBase<EvalT, Traits>::calc_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
+  std::cout << "IKT calc_press const_val = " << const_val << "\n"; 
+  for (int cell = 0; cell < numCells_; cell++)
+    for (int pt = 0; pt < numPoints; pt++)
+      for (int dim = 0; dim < numDOFsSet; dim++)
+        qp_data_returned(cell, pt, dim) = const_val * side_normals(cell, pt, dim);
+}
+
+template <typename EvalT, typename Traits>
+void
+NeumannBase<EvalT, Traits>::calc_ace_press(
+    Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+    const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
+    const shards::CellTopology&                          celltopo,
+    int                                                  local_side_id) const
+{
+  int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
+  int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
+
+  using DynRankViewMeshScalarT        = Kokkos::DynRankView<MeshScalarT, PHX::Device>;
+  DynRankViewMeshScalarT side_normals = Kokkos::createDynRankViewWithType<DynRankViewMeshScalarT>(
+      side_normals_buffer, side_normals_buffer.data(), numCells_, numPoints, cellDims);
+  DynRankViewMeshScalarT normal_lengths = Kokkos::createDynRankViewWithType<DynRankViewMeshScalarT>(
+      normal_lengths_buffer, normal_lengths_buffer.data(), numCells_, numPoints);
+
+  // for this side in the reference cell, get the components of the normal
+  // direction vector
+  ICT::getPhysicalSideNormals(side_normals, jacobian_side_refcell, local_side_id, celltopo);
+
+  // scale normals (unity)
+  IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
+  IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
+
+  std::cout << "IKT calc_ace_press const_val = " << const_val << "\n"; 
   for (int cell = 0; cell < numCells_; cell++)
     for (int pt = 0; pt < numPoints; pt++)
       for (int dim = 0; dim < numDOFsSet; dim++)

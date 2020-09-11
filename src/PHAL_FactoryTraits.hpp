@@ -11,7 +11,7 @@
 #include "LCM/evaluators/bc/SchwarzBC.hpp"
 #include "LCM/evaluators/bc/StrongSchwarzBC.hpp"
 #include "LCM/evaluators/bc/TimeTracBC.hpp"
-#include "LCM/evaluators/bc/ACETimeTracBC.hpp"
+#include "LCM/evaluators/bc/ACEWavePressureBC.hpp"
 #include "LCM/evaluators/bc/TorsionBC.hpp"
 #include "PHAL_Dirichlet.hpp"
 #include "PHAL_DirichletCoordinateFunction.hpp"
@@ -102,7 +102,7 @@ struct NeumannFactoryTraits
       PHAL::LoadStateField<_, Traits>,              //  4
       PHAL::GatherScalarNodalParameter<_, Traits>,  //  5
       LCM::TimeTracBC<_, Traits>,                   //  6
-      LCM::ACETimeTracBC<_, Traits>                 //  7
+      LCM::ACEWavePressureBC<_, Traits>                 //  7
       >
       EvaluatorTypes;
 };

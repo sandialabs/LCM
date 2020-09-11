@@ -503,7 +503,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
 
         case PRESS: calc_press(data, jacobianSide, *cellType, side); break;
         
-	case ACEPRESS: calc_ace_press(data, jacobianSide, *cellType, side); break;
+	case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side); break;
 
         case TRACTION: calc_traction_components(data); break;
         case CLOSED_FORM: calc_closed_form(data, physPointsSide, jacobianSide, *cellType, side, workset); break;
@@ -713,6 +713,7 @@ template <typename EvalT, typename Traits>
 void
 NeumannBase<EvalT, Traits>::calc_ace_press(
     Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+    const Kokkos::DynRankView<MeshScalarT, PHX::Device>& physPointsSide,
     const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
     const shards::CellTopology&                          celltopo,
     int                                                  local_side_id) const
@@ -735,17 +736,44 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
   const ScalarT hs = const_val; //wave height value interpolated in time 
-  std::cout << "IKT inputValues = " << inputValues[0] << ", " << inputValues[1] << 
-	  ", " << inputValues[2] << ", " << inputValues[3] << "\n";
   const double tm = inputValues[0]; 
   const double Hb = inputValues[1]; 
   const double g = inputValues[2];
-  const double rho = inputValues[3];  
-  std::cout << "IKT calc_ace_press hs = " << hs << "\n"; 
-  for (int cell = 0; cell < numCells_; cell++)
-    for (int pt = 0; pt < numPoints; pt++)
-      for (int dim = 0; dim < numDOFsSet; dim++)
-        qp_data_returned(cell, pt, dim) = hs * side_normals(cell, pt, dim);
+  const double rho = inputValues[3]; 
+  const double L = 8.0*Hb; 
+  const double k = 2.0*M_PI/L; 
+  const double hc = 0.7*Hb; 
+  auto p0 = M_PI*rho*Hb*Hb/tm/L*sqrt(g*hs);  
+  auto pc = rho*Hb/2.0/tm*sqrt(g*hs); 
+  auto ps = M_PI*rho*Hb*Hb/(tm*L*cosh(k*hs))*sqrt(g*hs);
+  //IKT, FIXME? do we want to throw error is hs == 0?
+  ScalarT m1 = 0.0; 
+  if (hs != 0.0) {
+    m1 = (p0 - ps) / hs;
+  }
+  const auto m2 = (pc - p0) / hc; 
+  const auto m3 = -2.0*pc/Hb;  
+  ScalarT val = 0.0;
+  for (int cell = 0; cell < numCells_; cell++) {
+    for (int pt = 0; pt < numPoints; pt++) {
+      for (int dim = 0; dim < numDOFsSet; dim++) {
+	MeshScalarT z = physPointsSide(cell,pt,2);
+	if ((z >= -hs) && (z <= 0)) {
+	  val = p0 + m1*z; 
+	}
+	else if ((z > 0) && (z <= hc)) {
+	  val = p0 + m2*z; 
+	}
+	else if ((z > hc) && (z <= hc + 0.5*Hb)) {
+	  val = m3*(z-hc-0.5*Hb); 
+	}
+	else {
+	  val = 0.0; 
+	}
+        qp_data_returned(cell, pt, dim) = val * side_normals(cell, pt, dim);
+      }
+    }
+  }
 }
 
 template <typename EvalT, typename Traits>

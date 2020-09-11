@@ -11,7 +11,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-ACETimeTracBC_Base<EvalT, Traits>::ACETimeTracBC_Base(Teuchos::ParameterList& p) : PHAL::Neumann<EvalT, Traits>(p)
+ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::ParameterList& p) : PHAL::Neumann<EvalT, Traits>(p)
 {
   timeValues = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
   WaterHeightValues   = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
@@ -23,7 +23,7 @@ ACETimeTracBC_Base<EvalT, Traits>::ACETimeTracBC_Base(Teuchos::ParameterList& p)
 //*****
 template <typename EvalT, typename Traits>
 void
-ACETimeTracBC_Base<EvalT, Traits>::computeVal(RealType time)
+ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
 {
   ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
   ScalarT      Val;
@@ -37,23 +37,21 @@ ACETimeTracBC_Base<EvalT, Traits>::computeVal(RealType time)
   else {
     slope           = (WaterHeightValues[Index] - WaterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->const_val = WaterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    std::cout << "IKT computeVal const_val = " << this->const_val << "\n"; 
+    //std::cout << "IKT computeVal const_val = " << this->const_val << "\n"; 
   }
 
   return;
 }
 
 template <typename EvalT, typename Traits>
-ACETimeTracBC<EvalT, Traits>::ACETimeTracBC(Teuchos::ParameterList& p) : ACETimeTracBC_Base<EvalT, Traits>(p)
+ACEWavePressureBC<EvalT, Traits>::ACEWavePressureBC(Teuchos::ParameterList& p) : ACEWavePressureBC_Base<EvalT, Traits>(p)
 {
 }
 
 template <typename EvalT, typename Traits>
 void
-ACETimeTracBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
+ACEWavePressureBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  std::cout << "IKT in ACETimeTracBC evaluateFields\n"; 
-
   RealType time = workset.current_time;
 
   switch (this->bc_type) {

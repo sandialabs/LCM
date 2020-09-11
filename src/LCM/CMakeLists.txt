@@ -86,7 +86,7 @@ set(bc-sources
     "${LCM_DIR}/evaluators/bc/KfieldBC.cpp"
     "${LCM_DIR}/evaluators/bc/RigidContactBC.cpp"
     "${LCM_DIR}/evaluators/bc/TimeTracBC.cpp"
-    "${LCM_DIR}/evaluators/bc/ACETimeTracBC.cpp"
+    "${LCM_DIR}/evaluators/bc/ACEWavePressureBC.cpp"
     "${LCM_DIR}/evaluators/bc/TorsionBC.cpp")
 set(bc-headers
     "${LCM_DIR}/evaluators/bc/EquilibriumConcentrationBC_Def.hpp"
@@ -97,8 +97,8 @@ set(bc-headers
     "${LCM_DIR}/evaluators/bc/RigidContactBC.hpp"
     "${LCM_DIR}/evaluators/bc/TimeTracBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/TimeTracBC.hpp"
-    "${LCM_DIR}/evaluators/bc/ACETimeTracBC_Def.hpp"
-    "${LCM_DIR}/evaluators/bc/ACETimeTracBC.hpp"
+    "${LCM_DIR}/evaluators/bc/ACEWavePressureBC_Def.hpp"
+    "${LCM_DIR}/evaluators/bc/ACEWavePressureBC.hpp"
     "${LCM_DIR}/evaluators/bc/TorsionBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/TorsionBC.hpp")
 

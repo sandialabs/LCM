@@ -14,13 +14,13 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class ACETimeTracBC_Base : public PHAL::Neumann<EvalT, Traits>
+class ACEWavePressureBC_Base : public PHAL::Neumann<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
   using MeshScalarT = typename EvalT::MeshScalarT;
 
-  ACETimeTracBC_Base(Teuchos::ParameterList& p);
+  ACEWavePressureBC_Base(Teuchos::ParameterList& p);
 
   void
   computeVal(RealType time);
@@ -31,10 +31,10 @@ class ACETimeTracBC_Base : public PHAL::Neumann<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class ACETimeTracBC : public ACETimeTracBC_Base<EvalT, Traits>
+class ACEWavePressureBC : public ACEWavePressureBC_Base<EvalT, Traits>
 {
  public:
-  ACETimeTracBC(Teuchos::ParameterList& p);
+  ACEWavePressureBC(Teuchos::ParameterList& p);
   void
   evaluateFields(typename Traits::EvalData d);
 

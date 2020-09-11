@@ -122,6 +122,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   void
   calc_ace_press(
       Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& physPointsSide,
       const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
       const shards::CellTopology&                          celltopo,
       int                                                  local_side_id) const;

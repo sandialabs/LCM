@@ -1269,8 +1269,23 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 	  //Get additional parameters 
           double tm = sub_list.get<double>("Impact Duration", 0.04); 
 	  double Hb = sub_list.get<double>("Breaking Height of Wave", 1.5); 
+	  //IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code? 
 	  double g = sub_list.get<double>("Gravity", 9.806); 
 	  double rho = sub_list.get<double>("Water Density", 997.0); 
+    
+	  //Check that parameters are physical 
+	  if (tm <= 0.0) {
+	    ALBANY_ABORT("Impact Duration parameter must be > 0!");
+	  }
+	  if (Hb <= 0.0) {
+	    ALBANY_ABORT("Breaking Height of Wave parameter must be > 0!");
+	  }
+	  if (g <= 0.0) {
+	    ALBANY_ABORT("Gravity parameter must be > 0!");
+	  }
+	  if (rho <= 0.0) {
+	    ALBANY_ABORT("Water Density parameter must be > 0!");
+	  }
 
 	  //Put parameters into vector to create Teuchos::array 
 	  std::vector<double> param_vec(4); 

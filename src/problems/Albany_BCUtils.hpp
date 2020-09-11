@@ -151,6 +151,10 @@ struct NeumannTraits
   };
   enum
   {
+    typeATd = PHAL::NeumannFactoryTraits<PHAL::AlbanyTraits>::id_acetimedep_bc
+  };
+  enum
+  {
     typeSF = PHAL::NeumannFactoryTraits<PHAL::AlbanyTraits>::id_load_stateField
   };
   enum
@@ -173,6 +177,9 @@ struct NeumannTraits
 
   static std::string
   constructTimeDepBCName(std::string const& ns, std::string const& dof, std::string const& condition);
+  
+  static std::string
+  constructACETimeDepBCName(std::string const& ns, std::string const& dof, std::string const& condition);
 };
 
 template <typename BCTraits>

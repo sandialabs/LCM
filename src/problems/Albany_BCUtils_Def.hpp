@@ -1212,6 +1212,136 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
       }
     }
   }
+  
+  ///
+  /// ACE time dependent BC specific
+  ///
+  for (std::size_t i = 0; i < meshSpecs->ssNames.size(); i++) {
+    for (std::size_t j = 0; j < bcNames.size(); j++) {
+      for (std::size_t k = 0; k < conditions.size(); k++) {
+        // construct input.xml string like:
+        // "ACE Time Dependent NBC on SS sidelist_12 for DOF T set dudn"
+        //  or
+        // "ACETime Dependent NBC on SS sidelist_12 for DOF T set (dudx, dudy)"
+        // or
+        // "ACE Time Dependent NBC on SS surface_1 for DOF all set P"
+
+        // Set logic for certain NBCs which allow array inputs
+        bool allowArrayNBC = false;
+        if ((conditions[k] == "robin") || (conditions[k] == "radiate") ||
+            (conditions[k].find("(") < conditions[k].length())) {
+          allowArrayNBC = true;
+        }
+
+        string ss = traits_type::constructACETimeDepBCName(meshSpecs->ssNames[i], bcNames[j], conditions[k]);
+
+        // Have a match of the line in input.xml
+
+        if (BCparams.isSublist(ss)) {
+          // grab the sublist
+          ParameterList& sub_list = BCparams.sublist(ss);
+
+          //           std::cout << "Constructing ACE Time Dependent NBC: " << ss <<
+          //           std::endl;
+
+          // These are read in the LCM::TimeTracBC constructor
+          // (LCM/evaluators/TimeTrac_Def.hpp)
+
+          RCP<ParameterList> p = rcp(new ParameterList);
+
+          p->set<int>("Type", traits_type::typeATd);
+
+          Teuchos::Array<RealType> timevals = sub_list.get<Teuchos::Array<RealType>>("Time Values");
+
+          // Note, we use a TwoDArray here to allow the user to specify
+          // multiple components of the traction vector at each "time" step.
+          // This is only allowed for certain BCs (see how allowArrayNBC) is
+          // set.
+          Teuchos::TwoDArray<RealType> bcvals = sub_list.get<Teuchos::TwoDArray<RealType>>("BC Values");
+
+          // Check that bcvals and timevals have the same size.  If they do not,
+          // throw an error.
+          if (timevals.size() != bcvals.getNumRows()) {
+            ALBANY_ABORT(
+                "'Time Values' array must have same length as 'BC Values' "
+                "array!");
+          }
+
+          // IKT, 2/15/2020: Currently, the code downstream of this
+          // assumes bcvals is a scalar for all but a few NBCs (see comment
+          // above). Throw an error if user attempts to specify array for NBCs
+          // where this is not allowed.
+          if (!allowArrayNBC) {
+            if (bcvals.getNumCols() != 1) {
+              ALBANY_ABORT(
+                  "Time Dependent NBC takes 1D array for 'BC Values'.  You "
+                  "attempted to provide a multi-D array!");
+            }
+          } else {
+            if ((conditions[k] == "robin") || (conditions[k] == "radiate")) {
+              if (bcvals.getNumCols() != 2) {
+                ALBANY_ABORT(
+                    "Time Dependent robin NBC takes a 2-array for 'BC Values' "
+                    "at each time!");
+              }
+            } else {
+              if (bcvals.getNumCols() != meshSpecs->numDim) {
+                ALBANY_ABORT(
+                    "Time Dependent traction NBC takes an array of size numDim "
+                    "for 'BC Values' at each time!");
+              }
+            }
+          }
+
+          p->set<Teuchos::Array<RealType>>("Time Values", timevals);
+
+          p->set<Teuchos::TwoDArray<RealType>>("BC Values", bcvals);
+
+          p->set<RCP<ParamLib>>("Parameter Library", paramLib);
+
+          p->set<string>("Side Set ID", meshSpecs->ssNames[i]);
+          p->set<Teuchos::Array<int>>("Equation Offset", offsets[j]);
+          p->set<RCP<Albany::Layouts>>("Layouts Struct", dl);
+          p->set<RCP<MeshSpecsStruct>>("Mesh Specs Struct", meshSpecs);
+          p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));  // if set to zero, the
+                                                                               // cubature degree of the
+                                                                               // side will be set to that
+                                                                               // of the element
+
+          p->set<string>("Coordinate Vector Name", "Coord Vec");
+
+          if (conditions[k] == "robin") {
+            p->set<string>("DOF Name", dof_names[j]);
+            p->set<bool>("Vector Field", isVectorField);
+
+            if (isVectorField)
+              p->set<RCP<DataLayout>>("DOF Data Layout", dl->node_vector);
+            else
+              p->set<RCP<DataLayout>>("DOF Data Layout", dl->node_scalar);
+          }
+
+          // Pass the input file line
+          p->set<string>("Neumann Input String", ss);
+          p->set<Teuchos::Array<double>>("Neumann Input Value", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+          p->set<string>("Neumann Input Conditions", conditions[k]);
+
+          // If we are doing a Neumann internal boundary with a "scaled jump"
+          // (includes "robin" too)
+          // The material DB database needs to be passed to the BC object
+
+          if (conditions[k] == "scaled jump" || conditions[k] == "robin") {
+            ALBANY_PANIC(materialDB == Teuchos::null, "This BC needs a material database specified");
+
+            p->set<RCP<Albany::MaterialDatabase>>("MaterialDB", materialDB);
+          }
+
+          evaluators_to_build[evaluatorsToBuildName(ss)] = p;
+
+          bcs->push_back(ss);
+        }
+      }
+    }
+  }
 
   // Build evaluator for Gather Coordinate Vector
   string NeuGCV = "Evaluator for Gather Coordinate Vector";
@@ -1367,12 +1497,14 @@ Albany::NeumannTraits::getValidBCParameters(
 
         std::string ss = Albany::NeumannTraits::constructBCName(sideSetIDs[i], bcNames[j], conditions[k]);
         std::string tt = Albany::NeumannTraits::constructTimeDepBCName(sideSetIDs[i], bcNames[j], conditions[k]);
+        std::string att = Albany::NeumannTraits::constructACETimeDepBCName(sideSetIDs[i], bcNames[j], conditions[k]);
 
         Teuchos::Array<double> defaultData;
         validPL->set<Teuchos::Array<double>>(
             ss, defaultData, "Value of BC corresponding to sideSetID and boundary condition");
 
         validPL->sublist(tt, false, "SubList of BC corresponding to sideSetID and boundary condition");
+        validPL->sublist(att, false, "SubList of BC corresponding to sideSetID and boundary condition");
       }
     }
   }
@@ -1502,5 +1634,16 @@ Albany::NeumannTraits::constructTimeDepBCName(
 {
   std::stringstream ss;
   ss << "Time Dependent " << Albany::NeumannTraits::constructBCName(ns, dof, condition);
+  return ss.str();
+}
+
+std::string
+Albany::NeumannTraits::constructACETimeDepBCName(
+    std::string const& ns,
+    std::string const& dof,
+    std::string const& condition)
+{
+  std::stringstream ss;
+  ss << "ACE Time Dependent " << Albany::NeumannTraits::constructBCName(ns, dof, condition);
   return ss.str();
 }

@@ -11,6 +11,7 @@
 #include "LCM/evaluators/bc/SchwarzBC.hpp"
 #include "LCM/evaluators/bc/StrongSchwarzBC.hpp"
 #include "LCM/evaluators/bc/TimeTracBC.hpp"
+#include "LCM/evaluators/bc/ACETimeTracBC.hpp"
 #include "LCM/evaluators/bc/TorsionBC.hpp"
 #include "PHAL_Dirichlet.hpp"
 #include "PHAL_DirichletCoordinateFunction.hpp"
@@ -91,6 +92,7 @@ struct NeumannFactoryTraits
   static int const id_load_stateField            = 4;
   static int const id_GatherScalarNodalParameter = 5;
   static int const id_timedep_bc                 = 6;
+  static int const id_acetimedep_bc              = 7;
 
   typedef Sacado::mpl::vector<
       PHAL::Neumann<_, Traits>,                     //  0
@@ -99,7 +101,8 @@ struct NeumannFactoryTraits
       PHAL::GatherSolution<_, Traits>,              //  3
       PHAL::LoadStateField<_, Traits>,              //  4
       PHAL::GatherScalarNodalParameter<_, Traits>,  //  5
-      LCM::TimeTracBC<_, Traits>                    //  6
+      LCM::TimeTracBC<_, Traits>,                   //  6
+      LCM::ACETimeTracBC<_, Traits>                 //  7
       >
       EvaluatorTypes;
 };

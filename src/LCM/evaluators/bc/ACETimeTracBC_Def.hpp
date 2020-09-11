@@ -14,15 +14,16 @@ template <typename EvalT, typename Traits>
 ACETimeTracBC_Base<EvalT, Traits>::ACETimeTracBC_Base(Teuchos::ParameterList& p) : PHAL::Neumann<EvalT, Traits>(p)
 {
   timeValues = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
-  BCValues   = p.get<Teuchos::TwoDArray<RealType>>("BC Values");
+  WaterHeightValues   = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
 
-  if (this->bc_type == PHAL::NeumannBase<EvalT, Traits>::COORD)
+  //IKT is the following needed?
+  /*if (this->bc_type == PHAL::NeumannBase<EvalT, Traits>::COORD)
 
     ALBANY_PANIC(
-        !(this->cellDims == BCValues.getNumCols()), "Dimension of the current problem and \"BC Values\" do not match");
-
+        !(this->cellDims == WaterHeightValues.getNumCols()), "Dimension of the current problem and \"BC Values\" do not match");
+  */
   ALBANY_PANIC(
-      !(timeValues.size() == BCValues.getNumRows()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
+      !(timeValues.size() == WaterHeightValues.size()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
 
 //*****
@@ -38,10 +39,10 @@ ACETimeTracBC_Base<EvalT, Traits>::computeVal(RealType time)
   while (timeValues[Index] < time) Index++;
 
   if (Index == 0)
-    this->const_val = BCValues(0, Index);
+    this->const_val = WaterHeightValues[Index];
   else {
-    slope           = (BCValues(0, Index) - BCValues(0, Index - 1)) / (timeValues[Index] - timeValues[Index - 1]);
-    this->const_val = BCValues(0, Index - 1) + slope * (time - timeValues[Index - 1]);
+    slope           = (WaterHeightValues[Index] - WaterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->const_val = WaterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     std::cout << "IKT computeVal const_val = " << this->const_val << "\n"; 
   }
 
@@ -52,7 +53,8 @@ template <typename EvalT, typename Traits>
 void
 ACETimeTracBC_Base<EvalT, Traits>::computeCoordVal(RealType time)
 {
-  ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
+  //IKT FIXME - implement??
+  /*ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
   ScalarT      Val;
   RealType     slope;
   unsigned int Index(0);
@@ -60,13 +62,13 @@ ACETimeTracBC_Base<EvalT, Traits>::computeCoordVal(RealType time)
   while (timeValues[Index] < time) Index++;
 
   if (Index == 0)
-    for (int dim = 0; dim < this->cellDims; dim++) this->dudx[dim] = BCValues(dim, Index);
+    for (int dim = 0; dim < this->cellDims; dim++) this->dudx[dim] = WaterHeightValues(dim, Index);
   else {
     for (size_t dim = 0; dim < this->cellDims; dim++) {
-      slope           = (BCValues(dim, Index) - BCValues(dim, Index - 1)) / (timeValues[Index] - timeValues[Index - 1]);
-      this->dudx[dim] = BCValues(dim, Index - 1) + slope * (time - timeValues[Index - 1]);
+      slope           = (WaterHeightValues(dim, Index) - WaterHeightValues(dim, Index - 1)) / (timeValues[Index] - timeValues[Index - 1]);
+      this->dudx[dim] = WaterHeightValues(dim, Index - 1) + slope * (time - timeValues[Index - 1]);
     }
-  }
+  }*/
 
   return;
 }
@@ -85,23 +87,14 @@ ACETimeTracBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   RealType time = workset.current_time;
 
   switch (this->bc_type) {
-    case PHAL::NeumannBase<EvalT, Traits>::INTJUMP:
     case PHAL::NeumannBase<EvalT, Traits>::PRESS:
-    case PHAL::NeumannBase<EvalT, Traits>::NORMAL:
       // calculate scalar value of BC based on current time
-
       this->computeVal(time);
-      break;
-
-    case PHAL::NeumannBase<EvalT, Traits>::COORD:
-      // calculate a value of BC for each coordinate based on current time
-
-      this->computeCoordVal(time);
       break;
 
     default:
 
-      ALBANY_ABORT("Time dependent Neumann boundary condition of type - " << this->bc_type << " is not supported");
+      ALBANY_ABORT("ACE Time dependent Neumann boundary condition of type - " << this->bc_type << " is not supported.  Only Pressure NBC is supported.");
       break;
   }
 

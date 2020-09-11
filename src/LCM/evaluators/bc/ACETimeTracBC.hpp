@@ -6,7 +6,6 @@
 #define ACETIMETRACBC_HPP
 
 #include "PHAL_Neumann.hpp"
-#include "Teuchos_TwoDArray.hpp"
 
 namespace LCM {
 
@@ -30,7 +29,7 @@ class ACETimeTracBC_Base : public PHAL::Neumann<EvalT, Traits>
 
  protected:
   std::vector<RealType>        timeValues;
-  Teuchos::TwoDArray<RealType> BCValues;
+  std::vector<RealType>        WaterHeightValues;
 };
 
 template <typename EvalT, typename Traits>

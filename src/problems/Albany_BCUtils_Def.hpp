@@ -1220,18 +1220,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
     for (std::size_t j = 0; j < bcNames.size(); j++) {
       for (std::size_t k = 0; k < conditions.size(); k++) {
         // construct input.xml string like:
-        // "ACE Time Dependent NBC on SS sidelist_12 for DOF T set dudn"
-        //  or
-        // "ACETime Dependent NBC on SS sidelist_12 for DOF T set (dudx, dudy)"
-        // or
         // "ACE Time Dependent NBC on SS surface_1 for DOF all set P"
-
-        // Set logic for certain NBCs which allow array inputs
-        bool allowArrayNBC = false;
-        if ((conditions[k] == "robin") || (conditions[k] == "radiate") ||
-            (conditions[k].find("(") < conditions[k].length())) {
-          allowArrayNBC = true;
-        }
 
         string ss = traits_type::constructACETimeDepBCName(meshSpecs->ssNames[i], bcNames[j], conditions[k]);
 
@@ -1252,50 +1241,18 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           p->set<int>("Type", traits_type::typeATd);
 
           Teuchos::Array<RealType> timevals = sub_list.get<Teuchos::Array<RealType>>("Time Values");
+          Teuchos::Array<RealType> hsvals = sub_list.get<Teuchos::Array<RealType>>("Water Height Values");
 
-          // Note, we use a TwoDArray here to allow the user to specify
-          // multiple components of the traction vector at each "time" step.
-          // This is only allowed for certain BCs (see how allowArrayNBC) is
-          // set.
-          Teuchos::TwoDArray<RealType> bcvals = sub_list.get<Teuchos::TwoDArray<RealType>>("BC Values");
-
-          // Check that bcvals and timevals have the same size.  If they do not,
+          // Check that hsvals and timevals have the same size.  If they do not,
           // throw an error.
-          if (timevals.size() != bcvals.getNumRows()) {
+          if (timevals.size() != hsvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array must have same length as 'BC Values' "
+                "'Time Values' array must have same length as 'Water Height Values' "
                 "array!");
           }
 
-          // IKT, 2/15/2020: Currently, the code downstream of this
-          // assumes bcvals is a scalar for all but a few NBCs (see comment
-          // above). Throw an error if user attempts to specify array for NBCs
-          // where this is not allowed.
-          if (!allowArrayNBC) {
-            if (bcvals.getNumCols() != 1) {
-              ALBANY_ABORT(
-                  "Time Dependent NBC takes 1D array for 'BC Values'.  You "
-                  "attempted to provide a multi-D array!");
-            }
-          } else {
-            if ((conditions[k] == "robin") || (conditions[k] == "radiate")) {
-              if (bcvals.getNumCols() != 2) {
-                ALBANY_ABORT(
-                    "Time Dependent robin NBC takes a 2-array for 'BC Values' "
-                    "at each time!");
-              }
-            } else {
-              if (bcvals.getNumCols() != meshSpecs->numDim) {
-                ALBANY_ABORT(
-                    "Time Dependent traction NBC takes an array of size numDim "
-                    "for 'BC Values' at each time!");
-              }
-            }
-          }
-
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);
-
-          p->set<Teuchos::TwoDArray<RealType>>("BC Values", bcvals);
+          p->set<Teuchos::Array<RealType>>("Water Height Values", hsvals);
 
           p->set<RCP<ParamLib>>("Parameter Library", paramLib);
 
@@ -1310,6 +1267,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<string>("Coordinate Vector Name", "Coord Vec");
 
+	  //IKT, FIXME - can remove the following likely
           if (conditions[k] == "robin") {
             p->set<string>("DOF Name", dof_names[j]);
             p->set<bool>("Vector Field", isVectorField);
@@ -1329,6 +1287,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           // (includes "robin" too)
           // The material DB database needs to be passed to the BC object
 
+	  //IKT FIXME - can remove the following likely 
           if (conditions[k] == "scaled jump" || conditions[k] == "robin") {
             ALBANY_PANIC(materialDB == Teuchos::null, "This BC needs a material database specified");
 

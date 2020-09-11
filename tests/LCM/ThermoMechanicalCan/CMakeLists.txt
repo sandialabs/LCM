@@ -7,6 +7,8 @@
 # Mechanics
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Mechanics.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/Mechanics.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MechanicsACE.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/MechanicsACE.yaml COPYONLY)
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MechanicsWithTemperature.yaml
   ${CMAKE_CURRENT_BINARY_DIR}/MechanicsWithTemperature.yaml COPYONLY)

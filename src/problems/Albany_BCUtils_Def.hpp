@@ -1212,6 +1212,99 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
       }
     }
   }
+  
+  ///
+  /// ACE time dependent BC specific
+  ///
+  for (std::size_t i = 0; i < meshSpecs->ssNames.size(); i++) {
+    for (std::size_t j = 0; j < bcNames.size(); j++) {
+      for (std::size_t k = 0; k < conditions.size(); k++) {
+        // construct input.xml string like:
+        // "ACE Time Dependent NBC on SS surface_1 for DOF all set P"
+
+        string ss = traits_type::constructACETimeDepBCName(meshSpecs->ssNames[i], bcNames[j], conditions[k]);
+
+        // Have a match of the line in input.xml
+
+        if (BCparams.isSublist(ss)) {
+          // grab the sublist
+          ParameterList& sub_list = BCparams.sublist(ss);
+
+          //           std::cout << "Constructing ACE Time Dependent NBC: " << ss <<
+          //           std::endl;
+
+          // These are read in the LCM::TimeTracBC constructor
+          // (LCM/evaluators/TimeTrac_Def.hpp)
+
+          RCP<ParameterList> p = rcp(new ParameterList);
+
+          p->set<int>("Type", traits_type::typeATd);
+
+          Teuchos::Array<RealType> timevals = sub_list.get<Teuchos::Array<RealType>>("Time Values");
+          Teuchos::Array<RealType> hsvals = sub_list.get<Teuchos::Array<RealType>>("Water Height Values");
+          // Check that hsvals and timevals have the same size.  If they do not,
+          // throw an error.
+          if (timevals.size() != hsvals.size()) {
+            ALBANY_ABORT(
+                "'Time Values' array must have same length as 'Water Height Values' "
+                "array!");
+          }
+
+          p->set<Teuchos::Array<RealType>>("Time Values", timevals);
+          p->set<Teuchos::Array<RealType>>("Water Height Values", hsvals);
+
+          p->set<RCP<ParamLib>>("Parameter Library", paramLib);
+
+          p->set<string>("Side Set ID", meshSpecs->ssNames[i]);
+          p->set<Teuchos::Array<int>>("Equation Offset", offsets[j]);
+          p->set<RCP<Albany::Layouts>>("Layouts Struct", dl);
+          p->set<RCP<MeshSpecsStruct>>("Mesh Specs Struct", meshSpecs);
+          p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));  // if set to zero, the
+                                                                               // cubature degree of the
+                                                                               // side will be set to that
+                                                                               // of the element
+
+          p->set<string>("Coordinate Vector Name", "Coord Vec");
+
+	  //Get additional parameters 
+          double tm = sub_list.get<double>("Impact Duration", 0.04); 
+	  double Hb = sub_list.get<double>("Breaking Height of Wave", 1.5); 
+	  //IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code? 
+	  double g = sub_list.get<double>("Gravity", 9.806); 
+	  double rho = sub_list.get<double>("Water Density", 997.0); 
+    
+	  //Check that parameters are physical 
+	  if (tm <= 0.0) {
+	    ALBANY_ABORT("Impact Duration parameter must be > 0!");
+	  }
+	  if (Hb <= 0.0) {
+	    ALBANY_ABORT("Breaking Height of Wave parameter must be > 0!");
+	  }
+	  if (g <= 0.0) {
+	    ALBANY_ABORT("Gravity parameter must be > 0!");
+	  }
+	  if (rho <= 0.0) {
+	    ALBANY_ABORT("Water Density parameter must be > 0!");
+	  }
+
+	  //Put parameters into vector to create Teuchos::array 
+	  std::vector<double> param_vec(4); 
+	  param_vec[0] = tm; param_vec[1] = Hb; param_vec[2] = g; param_vec[3] = rho; 
+          Teuchos::Array<double> param_array(param_vec); 
+
+          // Pass the input file line
+          p->set<string>("Neumann Input String", ss);
+          //p->set<Teuchos::Array<double>>("Neumann Input Value", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+          p->set<Teuchos::Array<double>>("Neumann Input Value", param_array);
+          p->set<string>("Neumann Input Conditions", conditions[k]);
+
+          evaluators_to_build[evaluatorsToBuildName(ss)] = p;
+
+          bcs->push_back(ss);
+        }
+      }
+    }
+  }
 
   // Build evaluator for Gather Coordinate Vector
   string NeuGCV = "Evaluator for Gather Coordinate Vector";
@@ -1367,12 +1460,14 @@ Albany::NeumannTraits::getValidBCParameters(
 
         std::string ss = Albany::NeumannTraits::constructBCName(sideSetIDs[i], bcNames[j], conditions[k]);
         std::string tt = Albany::NeumannTraits::constructTimeDepBCName(sideSetIDs[i], bcNames[j], conditions[k]);
+        std::string att = Albany::NeumannTraits::constructACETimeDepBCName(sideSetIDs[i], bcNames[j], conditions[k]);
 
         Teuchos::Array<double> defaultData;
         validPL->set<Teuchos::Array<double>>(
             ss, defaultData, "Value of BC corresponding to sideSetID and boundary condition");
 
         validPL->sublist(tt, false, "SubList of BC corresponding to sideSetID and boundary condition");
+        validPL->sublist(att, false, "SubList of BC corresponding to sideSetID and boundary condition");
       }
     }
   }
@@ -1502,5 +1597,16 @@ Albany::NeumannTraits::constructTimeDepBCName(
 {
   std::stringstream ss;
   ss << "Time Dependent " << Albany::NeumannTraits::constructBCName(ns, dof, condition);
+  return ss.str();
+}
+
+std::string
+Albany::NeumannTraits::constructACETimeDepBCName(
+    std::string const& ns,
+    std::string const& dof,
+    std::string const& condition)
+{
+  std::stringstream ss;
+  ss << "ACE Time Dependent " << Albany::NeumannTraits::constructBCName(ns, dof, condition);
   return ss.str();
 }

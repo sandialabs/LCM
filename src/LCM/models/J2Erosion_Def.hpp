@@ -405,7 +405,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
   }
   auto const maximum_displacement = 1.0;
-  auto const displacement_norm = minitensor::norm(displacement);
+  auto const displacement_norm    = minitensor::norm(displacement);
   if (displacement_norm > maximum_displacement) {
     failed += 1.0;
   }

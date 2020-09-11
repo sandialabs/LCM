@@ -135,19 +135,19 @@ Subgraph::set_failure_state(stk::mesh::Entity e, FailureState const fs)
 FailureState
 Subgraph::get_failure_state(stk::mesh::Entity e)
 {
-  return get_topology().get_failure_state(e);
+  return get_topology().get_entity_failure_state(e);
 }
 
 bool
 Subgraph::is_open(stk::mesh::Entity e)
 {
-  return get_topology().is_open(e);
+  return get_topology().is_open_entity(e);
 }
 
 bool
 Subgraph::is_internal_and_open(stk::mesh::Entity e)
 {
-  return get_topology().is_internal_and_open(e);
+  return get_topology().is_internal_and_open_face(e);
 }
 
 // Map a vertex in the subgraph to a entity in the stk mesh.

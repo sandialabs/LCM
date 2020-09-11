@@ -124,8 +124,6 @@ NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList const& p)
 
     // User has specified a pressure condition
     bc_type   = ACEPRESS;
-    const_val = inputValues[0];
-    std::cout << "IKT wave_pressure NBC const_val = " << const_val << "\n"; 
     this->registerSacadoParameter(name, paramLib);
   
   } else {
@@ -705,7 +703,6 @@ NeumannBase<EvalT, Traits>::calc_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  std::cout << "IKT calc_press const_val = " << const_val << "\n"; 
   for (int cell = 0; cell < numCells_; cell++)
     for (int pt = 0; pt < numPoints; pt++)
       for (int dim = 0; dim < numDOFsSet; dim++)
@@ -737,11 +734,12 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  std::cout << "IKT calc_ace_press const_val = " << const_val << "\n"; 
+  const ScalarT hs = const_val; //wave height value interpolated in time 
+  std::cout << "IKT calc_ace_press hs = " << hs << "\n"; 
   for (int cell = 0; cell < numCells_; cell++)
     for (int pt = 0; pt < numPoints; pt++)
       for (int dim = 0; dim < numDOFsSet; dim++)
-        qp_data_returned(cell, pt, dim) = const_val * side_normals(cell, pt, dim);
+        qp_data_returned(cell, pt, dim) = hs * side_normals(cell, pt, dim);
 }
 
 template <typename EvalT, typename Traits>

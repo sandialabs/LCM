@@ -888,7 +888,7 @@ class Topology
   get_failure_state_0(stk::mesh::Entity e);
 
   FailureState
-  get_failure_state(stk::mesh::Entity e);
+  get_entity_failure_state(stk::mesh::Entity e);
 
   // Set boundary indicators.
   void
@@ -911,37 +911,27 @@ class Topology
   get_node_boundary_indicator(stk::mesh::Entity e);
 
   bool
-  is_internal(stk::mesh::Entity e);
+  is_internal_face(stk::mesh::Entity e);
 
   bool
-  is_external(stk::mesh::Entity e);
+  is_external_face(stk::mesh::Entity e);
 
   bool
-  is_erodible(stk::mesh::Entity e);
-
-  bool
-  is_at_boundary(stk::mesh::Entity e)
+  is_open_entity(stk::mesh::Entity e)
   {
-    // return is_internal(e) == false;
-    return is_erodible(e) == true;
+    return get_entity_failure_state(e) == FAILED;
   }
 
   bool
-  is_open(stk::mesh::Entity e)
+  is_internal_and_open_face(stk::mesh::Entity e)
   {
-    return get_failure_state(e) == FAILED;
+    return is_internal_face(e) == true && is_open_entity(e) == true;
   }
 
   bool
-  is_internal_and_open(stk::mesh::Entity e)
+  is_external_and_open_face(stk::mesh::Entity e)
   {
-    return is_internal(e) == true && is_open(e) == true;
-  }
-
-  bool
-  is_at_boundary_and_open(stk::mesh::Entity e)
-  {
-    return is_at_boundary(e) == true && is_open(e) == true;
+    return is_external_face(e) == true && is_open_entity(e) == true;
   }
 
   bool
@@ -957,12 +947,21 @@ class Topology
   is_boundary_node(stk::mesh::Entity e);
 
   bool
+  is_erodible_cell(stk::mesh::Entity e);
+
+  bool
+  is_erodible_edge(stk::mesh::Entity e);
+
+  bool
+  is_erodible_face(stk::mesh::Entity e);
+
+  bool
   is_erodible_node(stk::mesh::Entity e);
 
   bool
   is_failed_boundary_cell(stk::mesh::Entity e)
   {
-    return is_boundary_cell(e) == true && is_open(e) == true;
+    return is_boundary_cell(e) == true && is_open_entity(e) == true;
   }
 
   int

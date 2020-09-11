@@ -198,7 +198,7 @@ Topology::setCellBoundaryIndicator()
   stk::mesh::get_entities(bulk_data, cell_rank, cells);
 
   for (auto cell : cells) {
-    auto const bi = is_boundary_cell(cell) == true ? EXTERIOR : INTERIOR;
+    auto const bi = is_erodible_cell(cell) == true ? ERODIBLE : (is_boundary_cell(cell) == true ? EXTERIOR : INTERIOR);
     set_cell_boundary_indicator(cell, bi);
   }
 }
@@ -212,7 +212,7 @@ Topology::setFaceBoundaryIndicator()
   stk::mesh::get_entities(bulk_data, face_rank, faces);
 
   for (auto face : faces) {
-    auto const bi = is_boundary_face(face) == true ? EXTERIOR : INTERIOR;
+    auto const bi = is_erodible_face(face) == true ? ERODIBLE : (is_boundary_face(face) == true ? EXTERIOR : INTERIOR);
     set_face_boundary_indicator(face, bi);
   }
 }
@@ -226,7 +226,7 @@ Topology::setEdgeBoundaryIndicator()
   stk::mesh::get_entities(bulk_data, edge_rank, edges);
 
   for (auto edge : edges) {
-    auto const bi = is_boundary_edge(edge) == true ? EXTERIOR : INTERIOR;
+    auto const bi = is_erodible_edge(edge) == true ? ERODIBLE : (is_boundary_edge(edge) == true ? EXTERIOR : INTERIOR);
     set_edge_boundary_indicator(edge, bi);
   }
 }
@@ -239,7 +239,7 @@ Topology::setNodeBoundaryIndicator()
   stk::mesh::EntityVector nodes;
   stk::mesh::get_entities(bulk_data, node_rank, nodes);
 
-#if defined (DEBUG)
+#if defined(DEBUG)
   auto& stk_mesh_struct = *(get_stk_mesh_struct());
   auto& coord_field     = *(stk_mesh_struct.getCoordinatesField());
   std::cout << "*** BUILD BOUNDARY INDICATOR ***\n";
@@ -248,7 +248,7 @@ Topology::setNodeBoundaryIndicator()
   for (auto node : nodes) {
     auto const bi = is_erodible_node(node) == true ? ERODIBLE : (is_boundary_node(node) == true ? EXTERIOR : INTERIOR);
     set_node_boundary_indicator(node, bi);
-#if defined (DEBUG)
+#if defined(DEBUG)
     double*    pc = stk::mesh::field_data(coord_field, node);
     auto const x  = pc[0];
     auto const y  = pc[1];
@@ -259,58 +259,6 @@ Topology::setNodeBoundaryIndicator()
     std::cout << "Z : " << std::setw(24) << std::setprecision(16) << z << "\n";
 #endif
   }
-}
-
-namespace {
-
-bool
-all_aligned(std::vector<minitensor::Vector<double, 3>> const& points, double const plane, int const component)
-{
-  double const eps = 1e-4;
-  for (auto&& point : points) {
-    if (std::abs(point(component) - plane) > eps) return false;
-  }
-  return true;
-}
-
-}  // anonymous namespace
-
-bool
-Topology::is_erodible(stk::mesh::Entity face)
-{
-  if (is_internal(face) == true) return false;
-
-  auto const face_rank       = stk::topology::FACE_RANK;
-  auto const node_rank       = stk::topology::NODE_RANK;
-  auto&      bulk_data       = get_bulk_data();
-  auto&      stk_mesh_struct = *(get_stk_mesh_struct());
-  auto&      coord_field     = *(stk_mesh_struct.getCoordinatesField());
-
-  ALBANY_ASSERT(bulk_data.entity_rank(face) == face_rank);
-  auto const* relations     = bulk_data.begin(face, node_rank);
-  auto const  num_relations = bulk_data.num_connectivity(face, node_rank);
-  ALBANY_ASSERT(num_relations > 0);
-  std::vector<minitensor::Vector<double, 3>> points;
-  for (auto i = 0; i < num_relations; ++i) {
-    auto  node  = relations[i];
-    auto* pc    = stk::mesh::field_data(coord_field, node);
-    auto  point = minitensor::Vector<double, 3>(pc[0], pc[1], pc[2]);
-    points.emplace_back(point);
-  }
-  if (all_aligned(points, xm_, 0) == true) return false;
-  if (all_aligned(points, ym_, 1) == true) return false;
-  if (all_aligned(points, yp_, 1) == true) return false;
-  if (all_aligned(points, zm_, 2) == true) return false;
-  if (all_aligned(points, zp_, 2) == true) return false;
-#if defined(DEBUG)
-  std::cout << "ERODIBLE FACE : " << face << ", NODES :\n";
-  for (auto i = 0; i < num_relations; ++i) {
-    auto node  = relations[i];
-    auto point = points[i];
-    std::cout << node << ", " << point << "\n";
-  }
-#endif
-  return true;
 }
 
 // Compute volume of given cell
@@ -1022,7 +970,7 @@ Topology::splitOpenFaces()
   for (stk::mesh::EntityVector::iterator i = points.begin(); i != points.end(); ++i) {
     stk::mesh::Entity point = *i;
 
-    if (get_failure_state(point) == FAILED) {
+    if (get_entity_failure_state(point) == FAILED) {
       open_points.push_back(point);
     }
   }
@@ -1045,7 +993,7 @@ Topology::splitOpenFaces()
 
       bool const is_local_segment = is_local_entity(segment) == true;
 
-      bool const is_open_segment = get_failure_state(segment) == FAILED;
+      bool const is_open_segment = get_entity_failure_state(segment) == FAILED;
 
       bool const is_local_and_open_segment = is_local_segment == true && is_open_segment == true;
 
@@ -1088,7 +1036,7 @@ Topology::splitOpenFaces()
 
         bool const is_local_face = is_local_entity(face);
 
-        bool const is_open_face = is_internal_and_open(face) == true;
+        bool const is_open_face = is_internal_and_open_face(face) == true;
 
         bool const is_local_and_open_face = is_local_face == true && is_open_face == true;
 
@@ -1181,7 +1129,7 @@ Topology::printFailureState()
   auto&                       fos = *Teuchos::VerboseObjectBase::getDefaultOStream();
   stk::mesh::get_entities(bulk_data, cell_rank, cells);
   for (auto cell : cells) {
-    auto const fs        = get_failure_state(cell);
+    auto const fs        = get_entity_failure_state(cell);
     auto       proc_rank = get_proc_rank();
     auto       gid       = get_gid(cell) - 1;
     std::cout << "**** DEBUG TOPO PROC GID FAILED: " << proc_rank << " " << std::setw(3) << std::setfill('0') << gid
@@ -1383,7 +1331,7 @@ Topology::setEntitiesOpen()
   for (EntityVectorIndex i = 0; i < boundary_entities.size(); ++i) {
     stk::mesh::Entity entity = boundary_entities[i];
 
-    if (is_internal(entity) == false) continue;
+    if (is_internal_face(entity) == false) continue;
 
     if (checkOpen(entity) == false) continue;
 
@@ -1476,7 +1424,7 @@ Topology::outputToGraphviz(std::string const& output_filename)
     for (EntityVectorIndex i = 0; i < entities.size(); ++i) {
       stk::mesh::Entity source_entity = entities[i];
 
-      FailureState const failure_state = get_failure_state(source_entity);
+      FailureState const failure_state = get_entity_failure_state(source_entity);
 
       stk::mesh::EntityId const source_id = get_entity_id(source_entity);
 
@@ -1664,7 +1612,7 @@ Topology::get_failure_state_0(stk::mesh::Entity e)
 }
 
 FailureState
-Topology::get_failure_state(stk::mesh::Entity e)
+Topology::get_entity_failure_state(stk::mesh::Entity e)
 {
   auto&                bulk_data     = get_bulk_data();
   auto const           rank          = bulk_data.entity_rank(e);
@@ -1764,7 +1712,7 @@ Topology::get_node_boundary_indicator(stk::mesh::Entity e)
 }
 
 bool
-Topology::is_internal(stk::mesh::Entity e)
+Topology::is_internal_face(stk::mesh::Entity e)
 {
   assert(get_bulk_data().entity_rank(e) == get_boundary_rank());
   auto iter = boundary_.find(e);
@@ -1772,9 +1720,9 @@ Topology::is_internal(stk::mesh::Entity e)
 }
 
 bool
-Topology::is_external(stk::mesh::Entity e)
+Topology::is_external_face(stk::mesh::Entity e)
 {
-  return is_internal(e) == false;
+  return is_internal_face(e) == false;
 }
 
 bool
@@ -1788,7 +1736,7 @@ Topology::is_boundary_cell(stk::mesh::Entity e)
   size_t const             num_relations = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
-    if (is_at_boundary(face_entity) == true) return true;
+    if (is_boundary_face(face_entity) == true) return true;
   }
   return false;
 }
@@ -1799,7 +1747,7 @@ Topology::is_boundary_face(stk::mesh::Entity e)
   stk::mesh::EntityRank const face_rank = stk::topology::FACE_RANK;
   auto&                       bulk_data = get_bulk_data();
   assert(bulk_data.entity_rank(e) == face_rank);
-  return is_external(e);
+  return is_external_face(e);
 }
 
 bool
@@ -1813,7 +1761,7 @@ Topology::is_boundary_edge(stk::mesh::Entity e)
   size_t const             num_relations = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
-    if (is_external(face_entity) == true) return true;
+    if (is_boundary_face(face_entity) == true) return true;
   }
   return false;
 }
@@ -1829,7 +1777,91 @@ Topology::is_boundary_node(stk::mesh::Entity e)
   size_t const             num_relations = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
-    if (is_external(face_entity) == true) return true;
+    if (is_boundary_face(face_entity) == true) return true;
+  }
+  return false;
+}
+
+bool
+Topology::is_erodible_cell(stk::mesh::Entity e)
+{
+  stk::mesh::EntityRank const cell_rank = stk::topology::ELEMENT_RANK;
+  stk::mesh::EntityRank const face_rank = get_boundary_rank();
+  auto&                       bulk_data = get_bulk_data();
+  assert(bulk_data.entity_rank(e) == cell_rank);
+  stk::mesh::Entity const* relations     = bulk_data.begin(e, face_rank);
+  size_t const             num_relations = bulk_data.num_connectivity(e, face_rank);
+  for (size_t i = 0; i < num_relations; ++i) {
+    stk::mesh::Entity face_entity = relations[i];
+    if (is_erodible_face(face_entity) == true) return true;
+  }
+  return false;
+}
+
+namespace {
+
+bool
+all_aligned(std::vector<minitensor::Vector<double, 3>> const& points, double const plane, int const component)
+{
+  double const eps = 1e-4;
+  for (auto&& point : points) {
+    if (std::abs(point(component) - plane) > eps) return false;
+  }
+  return true;
+}
+
+}  // anonymous namespace
+
+bool
+Topology::is_erodible_face(stk::mesh::Entity face)
+{
+  if (is_internal_face(face) == true) return false;
+
+  auto const face_rank       = stk::topology::FACE_RANK;
+  auto const node_rank       = stk::topology::NODE_RANK;
+  auto&      bulk_data       = get_bulk_data();
+  auto&      stk_mesh_struct = *(get_stk_mesh_struct());
+  auto&      coord_field     = *(stk_mesh_struct.getCoordinatesField());
+
+  ALBANY_ASSERT(bulk_data.entity_rank(face) == face_rank);
+  auto const* relations     = bulk_data.begin(face, node_rank);
+  auto const  num_relations = bulk_data.num_connectivity(face, node_rank);
+  ALBANY_ASSERT(num_relations > 0);
+  std::vector<minitensor::Vector<double, 3>> points;
+  for (auto i = 0; i < num_relations; ++i) {
+    auto  node  = relations[i];
+    auto* pc    = stk::mesh::field_data(coord_field, node);
+    auto  point = minitensor::Vector<double, 3>(pc[0], pc[1], pc[2]);
+    points.emplace_back(point);
+  }
+  if (all_aligned(points, xm_, 0) == true) return false;
+  if (all_aligned(points, ym_, 1) == true) return false;
+  if (all_aligned(points, yp_, 1) == true) return false;
+  if (all_aligned(points, zm_, 2) == true) return false;
+  if (all_aligned(points, zp_, 2) == true) return false;
+#if defined(DEBUG)
+  std::cout << "ERODIBLE FACE : " << face << ", NODES :\n";
+  for (auto i = 0; i < num_relations; ++i) {
+    auto node  = relations[i];
+    auto point = points[i];
+    std::cout << node << ", " << point << "\n";
+  }
+#endif
+  return true;
+}
+
+bool
+Topology::is_erodible_edge(stk::mesh::Entity e)
+{
+  stk::mesh::EntityRank const edge_rank = stk::topology::EDGE_RANK;
+  stk::mesh::EntityRank const face_rank = get_boundary_rank();
+  auto&                       bulk_data = get_bulk_data();
+  assert(bulk_data.entity_rank(e) == edge_rank);
+  stk::mesh::Entity const* relations     = bulk_data.begin(e, face_rank);
+  size_t const             num_relations = bulk_data.num_connectivity(e, face_rank);
+  for (size_t i = 0; i < num_relations; ++i) {
+    stk::mesh::Entity face_entity = relations[i];
+    if (is_erodible_face(face_entity) == true) return true;
   }
   return false;
 }
@@ -1845,7 +1877,7 @@ Topology::is_erodible_node(stk::mesh::Entity e)
   size_t const             num_relations = bulk_data.num_connectivity(e, face_rank);
   for (size_t i = 0; i < num_relations; ++i) {
     stk::mesh::Entity face_entity = relations[i];
-    if (is_erodible(face_entity) == true) return true;
+    if (is_erodible_face(face_entity) == true) return true;
   }
   return false;
 }

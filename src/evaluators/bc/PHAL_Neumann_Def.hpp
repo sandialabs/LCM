@@ -743,13 +743,20 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double L = 8.0*Hb; 
   const double k = 2.0*M_PI/L; 
   const double hc = 0.7*Hb; 
-  auto p0 = M_PI*rho*Hb*Hb/tm/L*sqrt(g*hs);  
-  auto pc = rho*Hb/2.0/tm*sqrt(g*hs); 
-  auto ps = M_PI*rho*Hb*Hb/(tm*L*cosh(k*hs))*sqrt(g*hs);
+  ScalarT p0, pc, ps; 
+  ScalarT m1; 
   //IKT, FIXME? do we want to throw error is hs == 0?
-  ScalarT m1 = 0.0; 
   if (hs != 0.0) {
+    p0 = M_PI*rho*Hb*Hb/tm/L*sqrt(g*hs);  
+    pc = rho*Hb/2.0/tm*sqrt(g*hs); 
+    ps = M_PI*rho*Hb*Hb/(tm*L*cosh(k*hs))*sqrt(g*hs);
     m1 = (p0 - ps) / hs;
+  }
+  else {
+    p0 = 0.0; 
+    pc = 0.0; 
+    ps = 0.0;
+    m1 = 0.0;  
   }
   const auto m2 = (pc - p0) / hc; 
   const auto m3 = -2.0*pc/Hb;  
@@ -770,6 +777,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 	else {
 	  val = 0.0; 
 	}
+	//Uncomment the following to print value of wave pressure BC applied
+	//std::cout << "IKT wave pressure bc val applied = " << val << "\n"; 
         qp_data_returned(cell, pt, dim) = val * side_normals(cell, pt, dim);
       }
     }

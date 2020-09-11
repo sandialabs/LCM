@@ -736,7 +736,11 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 
   const ScalarT hs = const_val; //wave height value interpolated in time 
   std::cout << "IKT inputValues = " << inputValues[0] << ", " << inputValues[1] << 
-	  ", " << inputValues[2] << ", " << inputValues[3] << "\n"; 
+	  ", " << inputValues[2] << ", " << inputValues[3] << "\n";
+  const double tm = inputValues[0]; 
+  const double Hb = inputValues[1]; 
+  const double g = inputValues[2];
+  const double rho = inputValues[3];  
   std::cout << "IKT calc_ace_press hs = " << hs << "\n"; 
   for (int cell = 0; cell < numCells_; cell++)
     for (int pt = 0; pt < numPoints; pt++)

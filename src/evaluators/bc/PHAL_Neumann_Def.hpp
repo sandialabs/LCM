@@ -17,8 +17,6 @@
 
 namespace PHAL {
 
-constexpr double pi = 3.1415926535897932385;
-
 //*****
 template <typename EvalT, typename Traits>
 NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList const& p)
@@ -122,6 +120,12 @@ NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList const& p)
     const_val = inputValues[0];
     this->registerSacadoParameter(name, paramLib);
 
+  } else if (inputConditions == "wave_pressure") {  // ACE Wave Pressure boundary condition
+
+    // User has specified a pressure condition
+    bc_type   = ACEPRESS;
+    this->registerSacadoParameter(name, paramLib);
+  
   } else {
     // User has specified conditions on sideset normal
     bc_type   = NORMAL;
@@ -498,6 +502,8 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
         case NORMAL: calc_dudn_const(data); break;
 
         case PRESS: calc_press(data, jacobianSide, *cellType, side); break;
+        
+	case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side); break;
 
         case TRACTION: calc_traction_components(data); break;
         case CLOSED_FORM: calc_closed_form(data, physPointsSide, jacobianSide, *cellType, side, workset); break;
@@ -701,6 +707,82 @@ NeumannBase<EvalT, Traits>::calc_press(
     for (int pt = 0; pt < numPoints; pt++)
       for (int dim = 0; dim < numDOFsSet; dim++)
         qp_data_returned(cell, pt, dim) = const_val * side_normals(cell, pt, dim);
+}
+
+template <typename EvalT, typename Traits>
+void
+NeumannBase<EvalT, Traits>::calc_ace_press(
+    Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+    const Kokkos::DynRankView<MeshScalarT, PHX::Device>& physPointsSide,
+    const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
+    const shards::CellTopology&                          celltopo,
+    int                                                  local_side_id) const
+{
+  int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
+  int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
+
+  using DynRankViewMeshScalarT        = Kokkos::DynRankView<MeshScalarT, PHX::Device>;
+  DynRankViewMeshScalarT side_normals = Kokkos::createDynRankViewWithType<DynRankViewMeshScalarT>(
+      side_normals_buffer, side_normals_buffer.data(), numCells_, numPoints, cellDims);
+  DynRankViewMeshScalarT normal_lengths = Kokkos::createDynRankViewWithType<DynRankViewMeshScalarT>(
+      normal_lengths_buffer, normal_lengths_buffer.data(), numCells_, numPoints);
+
+  // for this side in the reference cell, get the components of the normal
+  // direction vector
+  ICT::getPhysicalSideNormals(side_normals, jacobian_side_refcell, local_side_id, celltopo);
+
+  // scale normals (unity)
+  IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
+  IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
+
+  const ScalarT hs = const_val; //wave height value interpolated in time 
+  const double tm = inputValues[0]; 
+  const double Hb = inputValues[1]; 
+  const double g = inputValues[2];
+  const double rho = inputValues[3]; 
+  const double L = 8.0*Hb; 
+  const double k = 2.0*M_PI/L; 
+  const double hc = 0.7*Hb; 
+  ScalarT p0, pc, ps; 
+  ScalarT m1; 
+  //IKT, FIXME? do we want to throw error is hs == 0?
+  if (hs != 0.0) {
+    p0 = M_PI*rho*Hb*Hb/tm/L*sqrt(g*hs);  
+    pc = rho*Hb/2.0/tm*sqrt(g*hs); 
+    ps = M_PI*rho*Hb*Hb/(tm*L*cosh(k*hs))*sqrt(g*hs);
+    m1 = (p0 - ps) / hs;
+  }
+  else {
+    p0 = 0.0; 
+    pc = 0.0; 
+    ps = 0.0;
+    m1 = 0.0;  
+  }
+  const auto m2 = (pc - p0) / hc; 
+  const auto m3 = -2.0*pc/Hb;  
+  ScalarT val = 0.0;
+  for (int cell = 0; cell < numCells_; cell++) {
+    for (int pt = 0; pt < numPoints; pt++) {
+      for (int dim = 0; dim < numDOFsSet; dim++) {
+	MeshScalarT z = physPointsSide(cell,pt,2);
+	if ((z >= -hs) && (z <= 0)) {
+	  val = p0 + m1*z; 
+	}
+	else if ((z > 0) && (z <= hc)) {
+	  val = p0 + m2*z; 
+	}
+	else if ((z > hc) && (z <= hc + 0.5*Hb)) {
+	  val = m3*(z-hc-0.5*Hb); 
+	}
+	else {
+	  val = 0.0; 
+	}
+	//Uncomment the following to print value of wave pressure BC applied
+	//std::cout << "IKT wave pressure bc val applied = " << val << "\n"; 
+        qp_data_returned(cell, pt, dim) = val * side_normals(cell, pt, dim);
+      }
+    }
+  }
 }
 
 template <typename EvalT, typename Traits>

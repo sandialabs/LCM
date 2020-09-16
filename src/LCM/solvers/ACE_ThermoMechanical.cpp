@@ -739,6 +739,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         time_step = min_time_step_;
       }
 
+#if 0
       // Restore previous solutions
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
         auto const prob_type = prob_types_[subdomain];
@@ -782,6 +783,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           app_disc->writeSolutionToMeshDatabase(*x_rcp_thyra, *xdot_rcp_thyra, *xdotdot_rcp_thyra, current_time);
         }
       }
+#endif
 
       // Jump to the beginning of the time-step loop without advancing
       // time to try to use a reduced step.

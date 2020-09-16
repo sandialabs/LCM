@@ -6,6 +6,7 @@
 
 #include "Albany_BCUtils.hpp"
 #include "Albany_Macros.hpp"
+#include "ACEcommon.hpp"
 
 namespace {
 std::string const decorator = "Evaluator for ";
@@ -1240,9 +1241,17 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<int>("Type", traits_type::typeATd);
 
-          Teuchos::Array<RealType> timevals = sub_list.get<Teuchos::Array<RealType>>("Time Values");
-          Teuchos::Array<RealType> hsvals = sub_list.get<Teuchos::Array<RealType>>("Water Height Values");
-          // Check that hsvals and timevals have the same size.  If they do not,
+	  std::string const t_file = sub_list.get<std::string>("ACE Time Values File");
+          std::vector<double> timevals_vec = LCM::vectorFromFile(t_file);
+	  Teuchos::Array<double> timevals(timevals_vec); 
+	  std::string const hs_file = sub_list.get<std::string>("ACE Water Height Values File");
+	  std::vector<double> hsvals_vec = LCM::vectorFromFile(hs_file);
+	  Teuchos::Array<double> hsvals(hsvals_vec); 
+         
+	  for (int i=0; i<timevals.size(); i++) {
+	    std::cout << "IKT i, time, hs = " << i << ", " << timevals[i] << ", " << hsvals[i] << "\n"; 
+	  } 
+	  // Check that hsvals and timevals have the same size.  If they do not,
           // throw an error.
           if (timevals.size() != hsvals.size()) {
             ALBANY_ABORT(

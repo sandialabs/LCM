@@ -10,8 +10,8 @@ LCM:
       DBC on NS nodelist_3 for DOF X: 0.00000000e+00
     Neumann BCs:
       ACE Time Dependent NBC on SS surface_1 for DOF all set wave_pressure:
-        Time Values: [0.00000000e+00, 985.20000000, 3600.00000000]
-        Water Height Values: [0.00000000e+00, 7.15248332e+06, 2.61357490e+07]
+        ACE Time Values File: 'timevals.txt'
+        ACE Water Height Values File: 'hsvals.txt'
         Impact Duration: 0.04 
         Breaking Height of Wave: 1.5 
         #Gravity: 9.806

@@ -758,8 +758,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     ps = 0.0;
     m1 = 0.0;  
   }
-  const auto m2 = (pc - p0) / hc; 
-  const auto m3 = -2.0*pc/Hb;  
+  const ScalarT m2 = (pc - p0) / hc; 
+  const ScalarT m3 = -2.0*pc/Hb;  
   ScalarT val = 0.0;
   for (int cell = 0; cell < numCells_; cell++) {
     for (int pt = 0; pt < numPoints; pt++) {

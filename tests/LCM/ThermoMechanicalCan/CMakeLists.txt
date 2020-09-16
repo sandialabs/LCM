@@ -9,6 +9,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Mechanics.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/Mechanics.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MechanicsACE.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/MechanicsACE.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/timevals.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/timevals.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/hsvals.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/hsvals.txt COPYONLY)
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/MechanicsWithTemperature.yaml
   ${CMAKE_CURRENT_BINARY_DIR}/MechanicsWithTemperature.yaml COPYONLY)
@@ -34,6 +38,8 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 if(ALBANY_MUELU_EXAMPLES)
   add_test(${testName}_mech ${Albany.exe} Mechanics.yaml)
   set_tests_properties(${testName}_mech PROPERTIES LABELS "LCM;Tpetra;Forward")
+  add_test(${testName}_mech_ACE_PressureNBC ${Albany.exe} MechanicsACE.yaml)
+  set_tests_properties(${testName}_mech_ACE_PressureNBC PROPERTIES LABELS "LCM;Tpetra;Forward")
   add_test(${testName}_thermomech ${Albany.exe} MechanicsWithTemperature.yaml)
   set_tests_properties(${testName}_thermomech PROPERTIES LABELS
                                                          "LCM;Tpetra;Forward")

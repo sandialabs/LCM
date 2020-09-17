@@ -1248,9 +1248,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 	  std::vector<double> hsvals_vec = LCM::vectorFromFile(hs_file);
 	  Teuchos::Array<double> hsvals(hsvals_vec); 
          
-	  for (int i=0; i<timevals.size(); i++) {
-	    std::cout << "IKT i, time, hs = " << i << ", " << timevals[i] << ", " << hsvals[i] << "\n"; 
-	  } 
 	  // Check that hsvals and timevals have the same size.  If they do not,
           // throw an error.
           if (timevals.size() != hsvals.size()) {
@@ -1280,7 +1277,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 	  double Hb = sub_list.get<double>("Breaking Height of Wave", 1.5); 
 	  //IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code? 
 	  double g = sub_list.get<double>("Gravity", 9.806); 
-	  double rho = sub_list.get<double>("Water Density", 997.0); 
+	  double rho = sub_list.get<double>("Water Density", 1025.0); 
     
 	  //Check that parameters are physical 
 	  if (tm <= 0.0) {

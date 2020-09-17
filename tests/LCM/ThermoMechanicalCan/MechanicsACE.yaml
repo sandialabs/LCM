@@ -15,7 +15,7 @@ LCM:
         Impact Duration: 0.04 
         Breaking Height of Wave: 1.5 
         #Gravity: 9.806
-        Water Density: 997.0
+        Water Density: 1025.0
     Initial Condition:
       Function: Constant
       Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00]

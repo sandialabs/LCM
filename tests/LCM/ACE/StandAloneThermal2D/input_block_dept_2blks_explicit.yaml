@@ -44,6 +44,16 @@ ALBANY:
     Exodus Output File Name: square_2blocks_block_dept_explicit_out.exo
     Separate Evaluators by Element Block: true
     Workset Size: -1
+    Required Fields Info:
+      Number Of Fields: 2
+      Field 0:
+        Field Name: cell_boundary_indicator
+        Field Type: Elem Scalar
+        Field Origin: Mesh
+      Field 1:
+        Field Name: node_boundary_indicator
+        Field Type: Node Scalar
+        Field Origin: Mesh
   Regression Results: 
     Number of Comparisons: 3
     Test Values: [0.0, 0.0, 2.119057844140e+02]

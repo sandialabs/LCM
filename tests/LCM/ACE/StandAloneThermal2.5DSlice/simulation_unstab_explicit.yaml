@@ -82,6 +82,16 @@ ALBANY:
     Separate Evaluators by Element Block: true
     Workset Size: -1
     Exodus Write Interval: 1 
+    Required Fields Info:
+      Number Of Fields: 2
+      Field 0:
+        Field Name: cell_boundary_indicator
+        Field Type: Elem Scalar
+        Field Origin: Mesh
+      Field 1:
+        Field Name: node_boundary_indicator
+        Field Type: Node Scalar
+        Field Origin: Mesh
   Piro: 
     Tempus: 
       Integrator Name: Tempus Integrator

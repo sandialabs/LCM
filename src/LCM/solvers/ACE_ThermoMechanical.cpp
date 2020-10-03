@@ -498,7 +498,10 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
 
   solvers_[subdomain] = solver;
   apps_[subdomain]    = app;
-
+  auto num_dims = app->getSpatialDimension(); 
+  if (num_dims != 3) {
+    ALBANY_ABORT("ACE Thermo-Mechanical solver only works in 3D!  Thermal problem has " << num_dims << " dimensions.");
+  }
   // Get STK mesh structs to control Exodus output interval
   Teuchos::RCP<Albany::AbstractDiscretization> disc = app->getDiscretization();
   discs_[subdomain]                                 = disc;
@@ -591,6 +594,10 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
 
   solvers_[subdomain] = solver;
   apps_[subdomain]    = app;
+  auto num_dims = app->getSpatialDimension(); 
+  if (num_dims != 3) {
+    ALBANY_ABORT("ACE Thermo-Mechanical solver only works in 3D!  Mechanics problem has " << num_dims << " dimensions.");
+  }
 
   // Get STK mesh structs to control Exodus output interval
   Teuchos::RCP<Albany::AbstractDiscretization> disc = app->getDiscretization();

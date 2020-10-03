@@ -220,7 +220,7 @@ MechanicsProblem::MechanicsProblem(
   if (requireLatticeOrientationOnMesh == true) {
     requirements.push_back("Lattice_Orientation");
   }
-  if (have_erosion == true) {
+  if ((have_erosion == true) && (num_dims_ == 3)) {
     requirements.push_back("cell_boundary_indicator");
     // requirements.push_back("face_boundary_indicator");
     // TODO: Layout for edge does not exist yet

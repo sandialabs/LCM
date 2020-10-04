@@ -1,0 +1,7 @@
+group, site, buildname 
+Nightly, algol.ca.sandia.gov, algol.ca.sandia.gov-trilinos
+Nightly, algol.ca.sandia.gov, algol.ca.sandia.gov-lcm
+Nightly, ceerws1006, ceerws1006-trilinos
+Nightly, ceerws1006, ceerws1006-lcm
+Nightly, proxima.ca.sandia.gov, proxima.ca.sandia.gov-trilinos
+Nightly, proxima.ca.sandia.gov, proxima.ca.sandia.gov-lcm

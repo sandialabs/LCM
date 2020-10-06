@@ -8,7 +8,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/lcm_do_package.cmake")
 
 set(CTEST_TEST_TYPE Nightly)
 set(CTEST_CMAKE_GENERATOR  "Unix Makefiles")
-set(CTEST_PROJECT_NAME "LCM")
+set(CTEST_PROJECT_NAME "Albany_LCM")
 set (CTEST_COMMAND "ctest -D ${CTEST_TEST_TYPE}")
 
 message("SCRIPT_NAME ${SCRIPT_NAME}")

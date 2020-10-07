@@ -52,7 +52,7 @@
 #define ALBANY_DUMP_IMPL(msg, ...)                                \
   do {                                                            \
     auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream(); \
-    fos << "\n" << msg << '\n';                                   \
+    fos << msg;                                                   \
   } while (0)
 
 #define ALBANY_ASSERT(...) ALBANY_ASSERT_IMPL(__VA_ARGS__, "")

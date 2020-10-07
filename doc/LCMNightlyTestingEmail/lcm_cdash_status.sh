@@ -4,7 +4,7 @@
 #
 # Usage:
 #
-#    albany_cdash_status.sh [--date=<YYYY-MM-DD>] \
+#    lcm_cdash_status.sh [--date=<YYYY-MM-DD>] \
 #      --email-from-address=<email-from-address> \
 #      --send-email-to=<email-1>,<email-2>,...
 #
@@ -18,7 +18,7 @@
 # TriBITS (like in Trilinos 'develop') with:
 #
 #   env TRIBITS_DIR=<trilinos-src-dir>/cmake/tribits \
-#   albany_cdash_status.sh [--date=<YYYY-MM-DD>] \
+#   lcm_cdash_status.sh [--date=<YYYY-MM-DD>] \
 #      --email-from-address=<email-from-address> \
 #      --send-email-to=<email-1>,<email-2>,...
 #
@@ -40,8 +40,8 @@ fi
 
 ${TRIBITS_DIR}/ci_support/cdash_analyze_and_report.py \
 --cdash-project-testing-day-start-time="01:00" \
---cdash-project-name="Albany LCM" \
---build-set-name="Albany LCM Nightly Builds" \
+--cdash-project-name="Albany_LCM" \
+--build-set-name="Albany_LCM Nightly Builds" \
 --cdash-site-url="https://sems-cdash-son.sandia.gov/cdash/" \
 --cdash-builds-filters="filtercount=1&showfilters=1&field1=groupname&compare1=61&value1=Nightly" \
 --cdash-nonpassed-tests-filters="filtercount=2&showfilters=1&filtercombine=and&field1=groupname&compare1=61&value1=Nightly&field2=status&compare2=62&value2=passed" \

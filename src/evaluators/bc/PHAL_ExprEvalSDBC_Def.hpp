@@ -43,6 +43,23 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits:
   auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
   auto const& ns_coords   = workset.nodeSetCoords->find(ns_id)->second;
 
+#if 0
+  {
+    auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+    ALBANY_DUMP("BOUNDARY INDICATOR MAP :\n");
+    for (auto && kv : bi_field) {
+      ALBANY_DUMP("GID : " << kv.first << ", BI : " << *kv.second << "\n");
+    }
+    ALBANY_DUMP("NODESET : " << ns_id << "\n");
+    auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
+    for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
+      auto const  gid      = ns_gids[ns_node] + 1;
+      ALBANY_DUMP("GID : " << gid << "\n");
+    }
+    exit(0);
+  }
+#endif
+
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
     if (has_nbi == true) {
       auto const& bi_field = stk_disc->getNodeBoundaryIndicator();

@@ -14,6 +14,8 @@
 #include "Sacado_ParameterRegistration.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
+//#define ACE_WAVE_PRESS_DEBUG_OUTPUT
+
 
 namespace PHAL {
 
@@ -741,12 +743,18 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double g = inputValues[2];
   const double rho = inputValues[3];
   const double zmin = inputValues[4];
-  //std::cout << "IKT zmin = " << zmin << "\n";  
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+  std::cout << "IKT zmin = " << zmin << "\n";  
+#endif
   const double L = 8.0*Hb; 
   const double k = 2.0*M_PI/L; 
   const double hc = 0.7*Hb; 
   ScalarT p0, pc, ps; 
   ScalarT m1; 
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+  std::cout << "IKT hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g 
+	    << ", " << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n"; 
+#endif 
   if (hs > 0.0) {
     p0 = M_PI*rho*Hb*Hb/tm/L*sqrt(g*hs);  
     pc = rho*Hb/2.0/tm*sqrt(g*hs); 
@@ -766,22 +774,40 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     for (int pt = 0; pt < numPoints; pt++) {
       for (int dim = 0; dim < numDOFsSet; dim++) {
 	MeshScalarT z = physPointsSide(cell,pt,2);
-	MeshScalarT ztilde = z - zmin; 
+	MeshScalarT ztilde = z - zmin;
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+        std::cout << "IKT z, ztilde = " << z << ", " << ztilde << "\n"; 
+#endif	
 	if (hs < 0.0) { //if hs < 0, there is no pressure applied 
 		        //IKT FIXME: need to verify with Jenn that this is correct
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+	  std::cout << "IKT negative hs case!\n";
+#endif 
 	  val = 0.0; 
 	}
 	else {
 	  if ((ztilde >= 0) && (ztilde <= hs)) { 
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+	    std::cout << "IKT case 1!\n";
+#endif 
 	    val = p0 + m1*ztilde; 
 	  }
 	  else if ((ztilde > hs) && (ztilde <= hs + hc)) {
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+	    std::cout << "IKT case 2!\n";
+#endif 
 	    val = p0 + m2*ztilde; 
 	  }
 	  else if ((ztilde > hs + hc) && (ztilde <= hs + hc + 0.5*Hb)) {
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+	    std::cout << "IKT case 3!\n";
+#endif 
 	    val = m3*(ztilde - hc - 0.5*Hb); 
 	  }
 	  else {
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+	    std::cout << "IKT case 4!\n";
+#endif 
 	    val = 0.0; 
 	  }
 	}

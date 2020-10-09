@@ -747,8 +747,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double hc = 0.7*Hb; 
   ScalarT p0, pc, ps; 
   ScalarT m1; 
-  //IKT, FIXME? do we want to throw error is hs == 0?
-  if (hs != 0.0) {
+  if (hs > 0.0) {
     p0 = M_PI*rho*Hb*Hb/tm/L*sqrt(g*hs);  
     pc = rho*Hb/2.0/tm*sqrt(g*hs); 
     ps = M_PI*rho*Hb*Hb/(tm*L*cosh(k*hs))*sqrt(g*hs);
@@ -767,17 +766,24 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     for (int pt = 0; pt < numPoints; pt++) {
       for (int dim = 0; dim < numDOFsSet; dim++) {
 	MeshScalarT z = physPointsSide(cell,pt,2);
-	if ((z >= -hs) && (z <= 0)) {
-	  val = p0 + m1*z; 
-	}
-	else if ((z > 0) && (z <= hc)) {
-	  val = p0 + m2*z; 
-	}
-	else if ((z > hc) && (z <= hc + 0.5*Hb)) {
-	  val = m3*(z-hc-0.5*Hb); 
+	MeshScalarT ztilde = z - zmin; 
+	if (hs < 0.0) { //if hs < 0, there is no pressure applied 
+		        //IKT FIXME: need to verify with Jenn that this is correct
+	  val = 0.0; 
 	}
 	else {
-	  val = 0.0; 
+	  if ((ztilde >= 0) && (ztilde <= hs)) { 
+	    val = p0 + m1*ztilde; 
+	  }
+	  else if ((ztilde > hs) && (ztilde <= hs + hc)) {
+	    val = p0 + m2*ztilde; 
+	  }
+	  else if ((ztilde > hs + hc) && (ztilde <= hs + hc + 0.5*Hb)) {
+	    val = m3*(ztilde - hc - 0.5*Hb); 
+	  }
+	  else {
+	    val = 0.0; 
+	  }
 	}
 	//Uncomment the following to print value of wave pressure BC applied
 	//std::cout << "IKT wave pressure bc val applied = " << val << "\n"; 

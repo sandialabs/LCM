@@ -512,8 +512,8 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
     Teuchos::RCP<const Thyra_MultiVector> coord_mv = stk_disc.getCoordMV();
     //Since sequential ACE solver is only valid in 3D, the following will always be valid 
     Teuchos::RCP<const Thyra_Vector> z_coord = coord_mv->col(2);  
-    const double z_min = Thyra::min(*z_coord); 
-    std::cout << "IKTIKT z_min = " << z_min << "\n"; 
+    zmin_ = Thyra::min(*z_coord); 
+    std::cout << "IKTIKT zmin_ = " << zmin_ << "\n"; 
   }
 
   auto  abs_stk_mesh_struct_rcp  = stk_disc.getSTKMeshStruct();
@@ -543,14 +543,16 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
   Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
   if (problem_params.isSublist("Neumann BCs")) {
     Teuchos::ParameterList& nbc_params     = problem_params.sublist("Neumann BCs");
-    std::cout << "IKTIKT nbc_params = " << nbc_params << "\n";
-    Teuchos::ParameterList::ConstIterator iterator = nbc_params.begin();
-    const std::string nbc_sublist = nbc_params.name(iterator);
-    std::cout << "IKT nbc_sublist = " << nbc_sublist << "\n";
-    Teuchos::ParameterList& pnbc_sublist = nbc_params.sublist(nbc_sublist);  
-    std::cout << "IKT pnbc_sublist before = " << pnbc_sublist << "\n";
-    pnbc_sublist.set<double>("Min z-Value", 2.3); 
-    std::cout << "IKT pnbc_sublist after = " << pnbc_sublist << "\n";
+    Teuchos::ParameterList::ConstIterator it;
+    for (it = nbc_params.begin(); it != nbc_params.end(); it++) {
+      const std::string nbc_sublist = nbc_params.name(it);
+      const std::string wp = "wave_pressure"; 
+      std::size_t found = nbc_sublist.find(wp);
+      if (found != std::string::npos) {
+        Teuchos::ParameterList& pnbc_sublist = nbc_params.sublist(nbc_sublist);  
+        pnbc_sublist.set<double>("Min z-Value", zmin_); 
+      }
+    }
   }
   std::string filename = disc_params.get<std::string>("Exodus Output File Name");
   renameExodusFile(file_index, filename);

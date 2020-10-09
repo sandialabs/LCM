@@ -739,7 +739,9 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double tm = inputValues[0]; 
   const double Hb = inputValues[1]; 
   const double g = inputValues[2];
-  const double rho = inputValues[3]; 
+  const double rho = inputValues[3];
+  const double zmin = inputValues[4];
+  //std::cout << "IKT zmin = " << zmin << "\n";  
   const double L = 8.0*Hb; 
   const double k = 2.0*M_PI/L; 
   const double hc = 0.7*Hb; 

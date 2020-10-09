@@ -541,7 +541,18 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
   Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
   Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
   Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
-  std::string             filename       = disc_params.get<std::string>("Exodus Output File Name");
+  if (problem_params.isSublist("Neumann BCs")) {
+    Teuchos::ParameterList& nbc_params     = problem_params.sublist("Neumann BCs");
+    std::cout << "IKTIKT nbc_params = " << nbc_params << "\n";
+    Teuchos::ParameterList::ConstIterator iterator = nbc_params.begin();
+    const std::string nbc_sublist = nbc_params.name(iterator);
+    std::cout << "IKT nbc_sublist = " << nbc_sublist << "\n";
+    Teuchos::ParameterList& pnbc_sublist = nbc_params.sublist(nbc_sublist);  
+    std::cout << "IKT pnbc_sublist before = " << pnbc_sublist << "\n";
+    pnbc_sublist.set<double>("Min z-Value", 2.3); 
+    std::cout << "IKT pnbc_sublist after = " << pnbc_sublist << "\n";
+  }
+  std::string filename = disc_params.get<std::string>("Exodus Output File Name");
   renameExodusFile(file_index, filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);

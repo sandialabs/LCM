@@ -509,6 +509,11 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
   if (file_index == 0) {
     stk_disc.outputExodusSolutionInitialTime(true);
+    Teuchos::RCP<const Thyra_MultiVector> coord_mv = stk_disc.getCoordMV();
+    //Since sequential ACE solver is only valid in 3D, the following will always be valid 
+    Teuchos::RCP<const Thyra_Vector> z_coord = coord_mv->col(2);  
+    const double z_min = Thyra::min(*z_coord); 
+    std::cout << "IKTIKT z_min = " << z_min << "\n"; 
   }
 
   auto  abs_stk_mesh_struct_rcp  = stk_disc.getSTKMeshStruct();

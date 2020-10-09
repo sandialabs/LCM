@@ -788,13 +788,6 @@ STKDiscretization::transformMesh()
 void
 STKDiscretization::setupMLCoords()
 {
-  if (rigidBodyModes.is_null()) {
-    return;
-  }
-  if (!rigidBodyModes->isMueLuUsed() && !rigidBodyModes->isFROSchUsed()) {
-    return;
-  }
-
   int const                                   numDim            = stkMeshStruct->numDim;
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
   coordMV                                                       = Thyra::createMembers(m_node_vs, numDim);
@@ -808,6 +801,12 @@ STKDiscretization::setupMLCoords()
     for (int j = 0; j < numDim; j++) {
       coordMV_data[j][node_lid] = X[j];
     }
+  }
+  if (rigidBodyModes.is_null()) {
+    return;
+  }
+  if (!rigidBodyModes->isMueLuUsed() && !rigidBodyModes->isFROSchUsed()) {
+    return;
   }
 
   rigidBodyModes->setCoordinatesAndNullspace(coordMV, m_vs, m_overlap_vs);

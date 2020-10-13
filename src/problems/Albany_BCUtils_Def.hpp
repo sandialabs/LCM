@@ -1278,6 +1278,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 	  //IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code? 
 	  double g = sub_list.get<double>("Gravity", 9.806); 
 	  double rho = sub_list.get<double>("Water Density", 1025.0); 
+	  double zmin = sub_list.get<double>("Min z-Value", 0.0);
     
 	  //Check that parameters are physical 
 	  if (tm <= 0.0) {
@@ -1294,8 +1295,9 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 	  }
 
 	  //Put parameters into vector to create Teuchos::array 
-	  std::vector<double> param_vec(4); 
-	  param_vec[0] = tm; param_vec[1] = Hb; param_vec[2] = g; param_vec[3] = rho; 
+	  std::vector<double> param_vec(5); 
+	  param_vec[0] = tm; param_vec[1] = Hb; param_vec[2] = g; param_vec[3] = rho;
+	  param_vec[4] = zmin;  
           Teuchos::Array<double> param_array(param_vec); 
 
           // Pass the input file line

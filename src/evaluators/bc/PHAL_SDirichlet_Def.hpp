@@ -34,12 +34,17 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits::E
   auto const  ns_id       = this->nodeSetID;
   auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
   auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
+
 #if defined(DEBUG)
-  std::cout << "*** NODESET BOUNDARY INDICATOR : " << ns_id << " ***\n";
-#endif
-  for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-#if defined(DEBUG)
-    {
+  {
+    ALBANY_ASSERT(has_nbi == true);
+    auto const& bi_field        = stk_disc->getNodeBoundaryIndicator();
+    ALBANY_DUMP("**** GLOBAL BOUNDARY INDICATOR MAP :\n");
+    for (auto && kv : bi_field) {
+      ALBANY_DUMP("GID : " << kv.first << ", BI : " << *kv.second << "\n");
+    }
+    std::cout << "*** NODESET BOUNDARY INDICATOR : " << ns_id << " ***\n";
+    for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
       ALBANY_ASSERT(has_nbi == true);
       auto&       stk_mesh_struct = *(stk_disc->getSTKMeshStruct());
       auto&       coord_field     = *(stk_mesh_struct.getCoordinatesField());
@@ -57,12 +62,16 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits::E
       auto const    x                  = pc[0];
       auto const    y                  = pc[1];
       auto const    z                  = pc[2];
-      std::cout << "NODE : " << std::setw(4) << node << ", BI : " << std::setw(2) << bi << ", ";
+      std::cout << "NODE GID: " << std::setw(4) << node + 1 << ", BI : " << std::setw(2) << bi << ", ";
       std::cout << "X : " << std::setw(24) << std::setprecision(16) << x << ", ";
       std::cout << "Y : " << std::setw(24) << std::setprecision(16) << y << ", ";
       std::cout << "Z : " << std::setw(24) << std::setprecision(16) << z << "\n";
     }
-#endif
+    exit(0);
+  }
+#endif // DEBUG
+
+  for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
     if (has_nbi == true) {
       auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
       auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;

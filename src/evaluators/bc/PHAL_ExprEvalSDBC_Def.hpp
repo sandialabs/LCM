@@ -43,22 +43,41 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits:
   auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
   auto const& ns_coords   = workset.nodeSetCoords->find(ns_id)->second;
 
-#if 0
+#if defined(DEBUG)
   {
-    auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-    ALBANY_DUMP("BOUNDARY INDICATOR MAP :\n");
+    ALBANY_ASSERT(has_nbi == true);
+    auto const& bi_field        = stk_disc->getNodeBoundaryIndicator();
+    ALBANY_DUMP("**** GLOBAL BOUNDARY INDICATOR MAP :\n");
     for (auto && kv : bi_field) {
       ALBANY_DUMP("GID : " << kv.first << ", BI : " << *kv.second << "\n");
     }
-    ALBANY_DUMP("NODESET : " << ns_id << "\n");
-    auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
-    for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
-      auto const  gid      = ns_gids[ns_node] + 1;
-      ALBANY_DUMP("GID : " << gid << "\n");
+    std::cout << "*** NODESET BOUNDARY INDICATOR : " << ns_id << " ***\n";
+    for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
+      ALBANY_ASSERT(has_nbi == true);
+      auto&       stk_mesh_struct = *(stk_disc->getSTKMeshStruct());
+      auto&       coord_field     = *(stk_mesh_struct.getCoordinatesField());
+      auto const& bi_field        = stk_disc->getNodeBoundaryIndicator();
+      auto const  ns_gids         = workset.nodeSetGIDs->find(ns_id)->second;
+      auto const  node            = ns_gids[ns_node];
+      auto const  it              = bi_field.find(node + 1);
+      ALBANY_ASSERT(it != bi_field.end());
+      auto const    bi                 = *(it->second);
+      auto          overlap_node_vs    = stk_disc->getOverlapNodeVectorSpace();
+      auto          ov_node_vs_indexer = Albany::createGlobalLocalIndexer(overlap_node_vs);
+      auto const    local_node_id      = ov_node_vs_indexer->getLocalElement(node);
+      auto const&   coordinates        = stk_disc->getCoordinates();
+      double* const pc                 = &(coordinates[3 * local_node_id]);
+      auto const    x                  = pc[0];
+      auto const    y                  = pc[1];
+      auto const    z                  = pc[2];
+      std::cout << "NODE GID: " << std::setw(4) << node + 1 << ", BI : " << std::setw(2) << bi << ", ";
+      std::cout << "X : " << std::setw(24) << std::setprecision(16) << x << ", ";
+      std::cout << "Y : " << std::setw(24) << std::setprecision(16) << y << ", ";
+      std::cout << "Z : " << std::setw(24) << std::setprecision(16) << z << "\n";
     }
     exit(0);
   }
-#endif
+#endif // DEBUG
 
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
     if (has_nbi == true) {

@@ -46,16 +46,6 @@ ALBANY:
     Separate Evaluators by Element Block: true
     Exodus Solution Name: temperature
     Exodus SolutionDot Name: temperature_dot
-    Required Fields Info:
-      Number Of Fields: 2
-      Field 0:
-        Field Name: cell_boundary_indicator
-        Field Type: Elem Scalar
-        Field Origin: Mesh
-      Field 1:
-        Field Name: node_boundary_indicator
-        Field Type: Node Scalar
-        Field Origin: Mesh
   Regression Results: 
     Number of Comparisons: 4
     Test Values: [0.000000000000e+00, 0.000000000000e+00, 0.000000000000e+00, 2.632636121004e+02]

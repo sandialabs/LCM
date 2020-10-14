@@ -46,9 +46,9 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits:
 #if defined(DEBUG)
   {
     ALBANY_ASSERT(has_nbi == true);
-    auto const& bi_field        = stk_disc->getNodeBoundaryIndicator();
+    auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
     ALBANY_DUMP("**** GLOBAL BOUNDARY INDICATOR MAP :\n");
-    for (auto && kv : bi_field) {
+    for (auto&& kv : bi_field) {
       ALBANY_DUMP("GID : " << kv.first << ", BI : " << *kv.second << "\n");
     }
     std::cout << "*** NODESET BOUNDARY INDICATOR : " << ns_id << " ***\n";
@@ -77,7 +77,7 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits:
     }
     exit(0);
   }
-#endif // DEBUG
+#endif  // DEBUG
 
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ns_node++) {
     if (has_nbi == true) {

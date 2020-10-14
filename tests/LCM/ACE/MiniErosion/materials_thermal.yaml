@@ -1,0 +1,34 @@
+ALBANY:
+  ElementBlocks:
+    top_block:
+      material: Permafrost
+    bottom_block:
+      material: Permafrost
+      
+  Materials:
+    Permafrost:
+      #=======================================#
+      # This material describes permafrost    #
+      # soil within a permafrost polygon.     #
+      #=======================================#
+      ACE Ice Density: 920.0 #[kg/m3]
+      ACE Water Density: 1000.0 #[kg/m3]
+      ACE Sediment Density: 2650.0 #[kg/m3]
+      ACE Ice Thermal Conductivity: 1.60  #[W/K/m]
+      ACE Water Thermal Conductivity: 0.60 #[W/K/m]
+      ACE Sediment Thermal Conductivity: 5.0 #[W/K/m] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Ice Heat Capacity: 2.0e+03  #[J/kg/K]
+      ACE Water Heat Capacity: 4.0e+03  #[J/kg/K]
+      ACE Sediment Heat Capacity: 0.70e+03  #[J/kg/K] Used if 'sand/silt/clay_frac.txt' not given.
+      ACE Base Salinity: 1.0  # Used if 'bluff_salinity.txt' vector not given.
+      ACE Salt Enhanced D: 2.0e-07  # Like enhanced molecular diffusion coef.
+      ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
+      ACE Latent Heat: 334.0e+03 #[J/kg]
+      ACE Z Depth File: 'external_files/depth.txt'
+      ACE Time File: 'bcs/time.txt'
+      ACE Sea Level File: 'bcs/waterH.txt'
+      ACE Ocean Salinity File: 'bcs/ocean_sal.txt'
+      ACE Element Size: 0.25  # [m]
+
+
+

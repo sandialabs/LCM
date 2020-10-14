@@ -1,0 +1,37 @@
+LCM:
+
+  ElementBlocks:
+    top_block:
+      material: Permafrost
+    bottom_block:
+      material: Permafrost
+      
+  Materials:
+    Permafrost:
+      Material Model:
+        Model Name: J2 Erosion
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 0.1e+09
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.2
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 2.5e+04
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 2.5e+03
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
+      ACE Z Depth File: 'external_files/depth.txt'
+      ACE Soil Yield Strength: 1.5e+04
+      Density: 1900.0
+      Body Force:
+        Body Force Type: Constant
+        Value: [0.0, 0.0, -17.00e+03]
+      Output Cauchy Stress: true
+      Output eqps: true
+      ACE Critical Angle: 0.04
+...

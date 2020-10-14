@@ -177,7 +177,7 @@ struct NeumannTraits
 
   static std::string
   constructTimeDepBCName(std::string const& ns, std::string const& dof, std::string const& condition);
-  
+
   static std::string
   constructACETimeDepBCName(std::string const& ns, std::string const& dof, std::string const& condition);
 };

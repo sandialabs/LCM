@@ -498,7 +498,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
 
   solvers_[subdomain] = solver;
   apps_[subdomain]    = app;
-  auto num_dims = app->getSpatialDimension(); 
+  auto num_dims       = app->getSpatialDimension();
   if (num_dims != 3) {
     ALBANY_ABORT("ACE Thermo-Mechanical solver only works in 3D!  Thermal problem has " << num_dims << " dimensions.");
   }
@@ -509,13 +509,13 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   Albany::STKDiscretization& stk_disc = *static_cast<Albany::STKDiscretization*>(disc.get());
   if (file_index == 0) {
     stk_disc.outputExodusSolutionInitialTime(true);
-    //Calculate and store the min value of the z-coordinate in the initial mesh. 
-    //This is needed for the wave pressure NBC 
+    // Calculate and store the min value of the z-coordinate in the initial mesh.
+    // This is needed for the wave pressure NBC
     Teuchos::RCP<const Thyra_MultiVector> coord_mv = stk_disc.getCoordMV();
-    //Since sequential ACE solver is only valid in 3D, the following will always be valid 
-    Teuchos::RCP<const Thyra_Vector> z_coord = coord_mv->col(2);  
-    zmin_ = Thyra::min(*z_coord); 
-    //std::cout << "IKTIKT zmin_ = " << zmin_ << "\n"; 
+    // Since sequential ACE solver is only valid in 3D, the following will always be valid
+    Teuchos::RCP<const Thyra_Vector> z_coord = coord_mv->col(2);
+    zmin_                                    = Thyra::min(*z_coord);
+    // std::cout << "IKTIKT zmin_ = " << zmin_ << "\n";
   }
 
   auto  abs_stk_mesh_struct_rcp  = stk_disc.getSTKMeshStruct();
@@ -543,17 +543,17 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
   Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
   Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
   Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
-  //Check if using wave pressure NBC, and if so, inject zmin_ value into that PL 
+  // Check if using wave pressure NBC, and if so, inject zmin_ value into that PL
   if (problem_params.isSublist("Neumann BCs")) {
-    Teuchos::ParameterList& nbc_params     = problem_params.sublist("Neumann BCs");
+    Teuchos::ParameterList&               nbc_params = problem_params.sublist("Neumann BCs");
     Teuchos::ParameterList::ConstIterator it;
     for (it = nbc_params.begin(); it != nbc_params.end(); it++) {
       const std::string nbc_sublist = nbc_params.name(it);
-      const std::string wp = "wave_pressure"; 
-      std::size_t found = nbc_sublist.find(wp);
+      const std::string wp          = "wave_pressure";
+      std::size_t       found       = nbc_sublist.find(wp);
       if (found != std::string::npos) {
-        Teuchos::ParameterList& pnbc_sublist = nbc_params.sublist(nbc_sublist);  
-        pnbc_sublist.set<double>("Min z-Value", zmin_); 
+        Teuchos::ParameterList& pnbc_sublist = nbc_params.sublist(nbc_sublist);
+        pnbc_sublist.set<double>("Min z-Value", zmin_);
       }
     }
   }
@@ -615,9 +615,10 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
 
   solvers_[subdomain] = solver;
   apps_[subdomain]    = app;
-  auto num_dims = app->getSpatialDimension(); 
+  auto num_dims       = app->getSpatialDimension();
   if (num_dims != 3) {
-    ALBANY_ABORT("ACE Thermo-Mechanical solver only works in 3D!  Mechanics problem has " << num_dims << " dimensions.");
+    ALBANY_ABORT(
+        "ACE Thermo-Mechanical solver only works in 3D!  Mechanics problem has " << num_dims << " dimensions.");
   }
 
   // Get STK mesh structs to control Exodus output interval

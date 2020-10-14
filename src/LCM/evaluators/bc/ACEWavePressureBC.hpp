@@ -26,8 +26,8 @@ class ACEWavePressureBC_Base : public PHAL::Neumann<EvalT, Traits>
   computeVal(RealType time);
 
  protected:
-  std::vector<RealType>        timeValues;
-  std::vector<RealType>        WaterHeightValues;
+  std::vector<RealType> timeValues;
+  std::vector<RealType> WaterHeightValues;
 };
 
 template <typename EvalT, typename Traits>

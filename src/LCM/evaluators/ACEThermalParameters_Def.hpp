@@ -173,9 +173,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         sal_eb = interpolateVectors(z_above_mean_sea_level_eb, salinity_eb, height);
       }
       if (bluff_salinity_(cell, qp) < touched_by_ocean) {
-          bluff_salinity_(cell, qp) = sal_eb;
-      } 
-      //bluff_salinity_(cell, qp)                = sal_eb;
+        bluff_salinity_(cell, qp) = sal_eb;
+      }
+      // bluff_salinity_(cell, qp)                = sal_eb;
       std::vector<RealType> const time_eb      = this->queryElementBlockParameterMap(eb_name, time_map_);
       std::vector<RealType> const sea_level_eb = this->queryElementBlockParameterMap(eb_name, sea_level_map_);
       const ScalarT               sea_level =
@@ -210,7 +210,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         ScalarT const         zero_sal(0.0);
         std::vector<RealType> ocean_salinity_eb = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
         if (ocean_salinity_eb.size() > 0) {
-          //ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
+          // ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
           ocean_sal = touched_by_ocean;
         }
         ScalarT const sal_diff   = ocean_sal - sal_curr;
@@ -221,7 +221,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         if (sal_trial > ocean_sal) sal_trial = ocean_sal;
         bluff_salinity_(cell, qp) = sal_trial;
         // OVERRIDES EVERYTHING ABOVE:
-        //bluff_salinity_(cell, qp) = touched_by_ocean;
+        // bluff_salinity_(cell, qp) = touched_by_ocean;
       }
       ScalarT const sal = bluff_salinity_(cell, qp);
 

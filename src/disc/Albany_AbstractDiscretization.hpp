@@ -238,9 +238,9 @@ class AbstractDiscretization
   virtual Teuchos::RCP<LayeredMeshNumbering<LO>>
   getLayeredMeshNumbering() const = 0;
 
-  //! Get Thyra MV containing coordinates 
-  virtual Teuchos::RCP<Thyra_MultiVector> 
-  getCoordMV() = 0; 
+  //! Get Thyra MV containing coordinates
+  virtual Teuchos::RCP<Thyra_MultiVector>
+  getCoordMV() = 0;
 
   // --- Get/set solution/residual/field vectors to/from mesh --- //
 

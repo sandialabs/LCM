@@ -294,8 +294,8 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   Teuchos::RCP<Teuchos::ParameterList>   alt_system_params_;
   Teuchos::RCP<Teuchos::Comm<int> const> comm_;
   Teuchos::Array<std::string>            model_filenames_;
-  //Min value of z-coordinate in initial mesh - needed for wave pressure NBC
-  mutable double zmin_; 
+  // Min value of z-coordinate in initial mesh - needed for wave pressure NBC
+  mutable double zmin_{0.0};
 };
 
 }  // namespace LCM

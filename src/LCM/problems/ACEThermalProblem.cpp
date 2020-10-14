@@ -57,8 +57,8 @@ Albany::ACEThermalProblem::ACEThermalProblem(
     tau_type_   = "None";
     stab_value_ = 0.0;
   }
-  //Only add cell/node boundary indicator in 3D, as the erosion machinery
-  //does not work in 2D. 
+  // Only add cell/node boundary indicator in 3D, as the erosion machinery
+  // does not work in 2D.
   if (num_dim_ == 3) {
     requirements.push_back("cell_boundary_indicator");
     requirements.push_back("node_boundary_indicator");

@@ -16,7 +16,6 @@
 // uncomment the following line if you want debug output to be printed to screen
 //#define ACE_WAVE_PRESS_DEBUG_OUTPUT
 
-
 namespace PHAL {
 
 //*****
@@ -125,9 +124,9 @@ NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList const& p)
   } else if (inputConditions == "wave_pressure") {  // ACE Wave Pressure boundary condition
 
     // User has specified a pressure condition
-    bc_type   = ACEPRESS;
+    bc_type = ACEPRESS;
     this->registerSacadoParameter(name, paramLib);
-  
+
   } else {
     // User has specified conditions on sideset normal
     bc_type   = NORMAL;
@@ -504,8 +503,8 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
         case NORMAL: calc_dudn_const(data); break;
 
         case PRESS: calc_press(data, jacobianSide, *cellType, side); break;
-        
-	case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side); break;
+
+        case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side); break;
 
         case TRACTION: calc_traction_components(data); break;
         case CLOSED_FORM: calc_closed_form(data, physPointsSide, jacobianSide, *cellType, side, workset); break;
@@ -737,82 +736,77 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  const ScalarT hs = const_val; //wave height value interpolated in time 
-  const double tm = inputValues[0]; 
-  const double Hb = inputValues[1]; 
-  const double g = inputValues[2];
-  const double rho = inputValues[3];
-  const double zmin = inputValues[4];
+  const ScalarT hs   = const_val;  // wave height value interpolated in time
+  const double  tm   = inputValues[0];
+  const double  Hb   = inputValues[1];
+  const double  g    = inputValues[2];
+  const double  rho  = inputValues[3];
+  const double  zmin = inputValues[4];
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-  std::cout << "IKT zmin = " << zmin << "\n";  
+  std::cout << "IKT zmin = " << zmin << "\n";
 #endif
-  const double L = 8.0*Hb; 
-  const double k = 2.0*M_PI/L; 
-  const double hc = 0.7*Hb; 
-  ScalarT p0, pc, ps; 
-  ScalarT m1; 
+  const double L  = 8.0 * Hb;
+  const double k  = 2.0 * M_PI / L;
+  const double hc = 0.7 * Hb;
+  ScalarT      p0, pc, ps;
+  ScalarT      m1;
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-  std::cout << "IKT hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g 
-	    << ", " << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n"; 
-#endif 
+  std::cout << "IKT hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", " << rho
+            << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
+#endif
   if (hs > 0.0) {
-    p0 = M_PI*rho*Hb*Hb/tm/L*sqrt(g*hs);  
-    pc = rho*Hb/2.0/tm*sqrt(g*hs); 
-    ps = M_PI*rho*Hb*Hb/(tm*L*cosh(k*hs))*sqrt(g*hs);
+    p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
+    pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
+    ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
     m1 = (p0 - ps) / hs;
-  }
-  else {
-    p0 = 0.0; 
-    pc = 0.0; 
+  } else {
+    p0 = 0.0;
+    pc = 0.0;
     ps = 0.0;
-    m1 = 0.0;  
+    m1 = 0.0;
   }
-  const ScalarT m2 = (pc - p0) / hc; 
-  const ScalarT m3 = -2.0*pc/Hb;  
-  ScalarT val = 0.0;
+  const ScalarT m2  = (pc - p0) / hc;
+  const ScalarT m3  = -2.0 * pc / Hb;
+  ScalarT       val = 0.0;
   for (int cell = 0; cell < numCells_; cell++) {
     for (int pt = 0; pt < numPoints; pt++) {
       for (int dim = 0; dim < numDOFsSet; dim++) {
-	MeshScalarT z = physPointsSide(cell,pt,2);
-	MeshScalarT ztilde = z - zmin;
+        MeshScalarT z      = physPointsSide(cell, pt, 2);
+        MeshScalarT ztilde = z - zmin;
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        std::cout << "IKT z, ztilde = " << z << ", " << ztilde << "\n"; 
-#endif	
-	if (hs < 0.0) { //if hs < 0, there is no pressure applied 
-		        //IKT FIXME: need to verify with Jenn that this is correct
+        std::cout << "IKT z, ztilde = " << z << ", " << ztilde << "\n";
+#endif
+        if (hs < 0.0) {  // if hs < 0, there is no pressure applied
+                         // IKT FIXME: need to verify with Jenn that this is correct
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-	  std::cout << "IKT negative hs case!\n";
-#endif 
-	  val = 0.0; 
-	}
-	else {
-	  if ((ztilde >= 0) && (ztilde <= hs)) { 
+          std::cout << "IKT negative hs case!\n";
+#endif
+          val = 0.0;
+        } else {
+          if ((ztilde >= 0) && (ztilde <= hs)) {
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-	    std::cout << "IKT case 1!\n";
-#endif 
-	    val = p0 + m1*ztilde; 
-	  }
-	  else if ((ztilde > hs) && (ztilde <= hs + hc)) {
+            std::cout << "IKT case 1!\n";
+#endif
+            val = p0 + m1 * ztilde;
+          } else if ((ztilde > hs) && (ztilde <= hs + hc)) {
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-	    std::cout << "IKT case 2!\n";
-#endif 
-	    val = p0 + m2*ztilde; 
-	  }
-	  else if ((ztilde > hs + hc) && (ztilde <= hs + hc + 0.5*Hb)) {
+            std::cout << "IKT case 2!\n";
+#endif
+            val = p0 + m2 * ztilde;
+          } else if ((ztilde > hs + hc) && (ztilde <= hs + hc + 0.5 * Hb)) {
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-	    std::cout << "IKT case 3!\n";
-#endif 
-	    val = m3*(ztilde - hc - 0.5*Hb); 
-	  }
-	  else {
+            std::cout << "IKT case 3!\n";
+#endif
+            val = m3 * (ztilde - hc - 0.5 * Hb);
+          } else {
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-	    std::cout << "IKT case 4!\n";
-#endif 
-	    val = 0.0; 
-	  }
-	}
-	//Uncomment the following to print value of wave pressure BC applied
-	//std::cout << "IKT wave pressure bc val applied = " << val << "\n"; 
+            std::cout << "IKT case 4!\n";
+#endif
+            val = 0.0;
+          }
+        }
+        // Uncomment the following to print value of wave pressure BC applied
+        // std::cout << "IKT wave pressure bc val applied = " << val << "\n";
         qp_data_returned(cell, pt, dim) = val * side_normals(cell, pt, dim);
       }
     }

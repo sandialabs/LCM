@@ -4,9 +4,9 @@
 
 #include <Phalanx_Evaluator_Factory.hpp>
 
+#include "ACEcommon.hpp"
 #include "Albany_BCUtils.hpp"
 #include "Albany_Macros.hpp"
-#include "ACEcommon.hpp"
 
 namespace {
 std::string const decorator = "Evaluator for ";
@@ -1213,7 +1213,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
       }
     }
   }
-  
+
   ///
   /// ACE time dependent BC specific
   ///
@@ -1241,14 +1241,14 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<int>("Type", traits_type::typeATd);
 
-	  std::string const t_file = sub_list.get<std::string>("ACE Time Values File");
-          std::vector<double> timevals_vec = LCM::vectorFromFile(t_file);
-	  Teuchos::Array<double> timevals(timevals_vec); 
-	  std::string const hs_file = sub_list.get<std::string>("ACE Water Height Values File");
-	  std::vector<double> hsvals_vec = LCM::vectorFromFile(hs_file);
-	  Teuchos::Array<double> hsvals(hsvals_vec); 
-         
-	  // Check that hsvals and timevals have the same size.  If they do not,
+          std::string const      t_file       = sub_list.get<std::string>("ACE Time Values File");
+          std::vector<double>    timevals_vec = LCM::vectorFromFile(t_file);
+          Teuchos::Array<double> timevals(timevals_vec);
+          std::string const      hs_file    = sub_list.get<std::string>("ACE Water Height Values File");
+          std::vector<double>    hsvals_vec = LCM::vectorFromFile(hs_file);
+          Teuchos::Array<double> hsvals(hsvals_vec);
+
+          // Check that hsvals and timevals have the same size.  If they do not,
           // throw an error.
           if (timevals.size() != hsvals.size()) {
             ALBANY_ABORT(
@@ -1272,37 +1272,40 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<string>("Coordinate Vector Name", "Coord Vec");
 
-	  //Get additional parameters 
-          double tm = sub_list.get<double>("Impact Duration", 0.04); 
-	  double Hb = sub_list.get<double>("Breaking Height of Wave", 1.5); 
-	  //IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code? 
-	  double g = sub_list.get<double>("Gravity", 9.806); 
-	  double rho = sub_list.get<double>("Water Density", 1025.0); 
-	  double zmin = sub_list.get<double>("Min z-Value", 0.0);
-    
-	  //Check that parameters are physical 
-	  if (tm <= 0.0) {
-	    ALBANY_ABORT("Impact Duration parameter must be > 0!");
-	  }
-	  if (Hb <= 0.0) {
-	    ALBANY_ABORT("Breaking Height of Wave parameter must be > 0!");
-	  }
-	  if (g <= 0.0) {
-	    ALBANY_ABORT("Gravity parameter must be > 0!");
-	  }
-	  if (rho <= 0.0) {
-	    ALBANY_ABORT("Water Density parameter must be > 0!");
-	  }
+          // Get additional parameters
+          double tm = sub_list.get<double>("Impact Duration", 0.04);
+          double Hb = sub_list.get<double>("Breaking Height of Wave", 1.5);
+          // IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code?
+          double g    = sub_list.get<double>("Gravity", 9.806);
+          double rho  = sub_list.get<double>("Water Density", 1025.0);
+          double zmin = sub_list.get<double>("Min z-Value", 0.0);
 
-	  //Put parameters into vector to create Teuchos::array 
-	  std::vector<double> param_vec(5); 
-	  param_vec[0] = tm; param_vec[1] = Hb; param_vec[2] = g; param_vec[3] = rho;
-	  param_vec[4] = zmin;  
-          Teuchos::Array<double> param_array(param_vec); 
+          // Check that parameters are physical
+          if (tm <= 0.0) {
+            ALBANY_ABORT("Impact Duration parameter must be > 0!");
+          }
+          if (Hb <= 0.0) {
+            ALBANY_ABORT("Breaking Height of Wave parameter must be > 0!");
+          }
+          if (g <= 0.0) {
+            ALBANY_ABORT("Gravity parameter must be > 0!");
+          }
+          if (rho <= 0.0) {
+            ALBANY_ABORT("Water Density parameter must be > 0!");
+          }
+
+          // Put parameters into vector to create Teuchos::array
+          std::vector<double> param_vec(5);
+          param_vec[0] = tm;
+          param_vec[1] = Hb;
+          param_vec[2] = g;
+          param_vec[3] = rho;
+          param_vec[4] = zmin;
+          Teuchos::Array<double> param_array(param_vec);
 
           // Pass the input file line
           p->set<string>("Neumann Input String", ss);
-          //p->set<Teuchos::Array<double>>("Neumann Input Value", Teuchos::tuple<double>(0.0, 0.0, 0.0));
+          // p->set<Teuchos::Array<double>>("Neumann Input Value", Teuchos::tuple<double>(0.0, 0.0, 0.0));
           p->set<Teuchos::Array<double>>("Neumann Input Value", param_array);
           p->set<string>("Neumann Input Conditions", conditions[k]);
 
@@ -1466,8 +1469,8 @@ Albany::NeumannTraits::getValidBCParameters(
     for (std::size_t j = 0; j < bcNames.size(); j++) {       // loop over all possible types of condition
       for (std::size_t k = 0; k < conditions.size(); k++) {  // loop over all possible types of condition
 
-        std::string ss = Albany::NeumannTraits::constructBCName(sideSetIDs[i], bcNames[j], conditions[k]);
-        std::string tt = Albany::NeumannTraits::constructTimeDepBCName(sideSetIDs[i], bcNames[j], conditions[k]);
+        std::string ss  = Albany::NeumannTraits::constructBCName(sideSetIDs[i], bcNames[j], conditions[k]);
+        std::string tt  = Albany::NeumannTraits::constructTimeDepBCName(sideSetIDs[i], bcNames[j], conditions[k]);
         std::string att = Albany::NeumannTraits::constructACETimeDepBCName(sideSetIDs[i], bcNames[j], conditions[k]);
 
         Teuchos::Array<double> defaultData;

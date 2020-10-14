@@ -111,6 +111,19 @@ Topology::computeExtrema()
     ymax          = std::max(y, ymax);
     zmax          = std::max(z, zmax);
   }
+  auto global_xmin = xmin;
+  auto global_ymin = ymin;
+  auto global_zmin = zmin;
+  auto global_xmax = xmax;
+  auto global_ymax = ymax;
+  auto global_zmax = zmax;
+  auto comm        = static_cast<stk::ParallelMachine>(Albany_MPI_COMM_WORLD);
+  stk::all_reduce_min(comm, &xmin, &global_xmin, 1);
+  stk::all_reduce_min(comm, &ymin, &global_ymin, 1);
+  stk::all_reduce_min(comm, &zmin, &global_zmin, 1);
+  stk::all_reduce_max(comm, &xmax, &global_xmax, 1);
+  stk::all_reduce_max(comm, &ymax, &global_ymax, 1);
+  stk::all_reduce_max(comm, &zmax, &global_zmax, 1);
   xm_ = xmin;
   ym_ = ymin;
   zm_ = zmin;

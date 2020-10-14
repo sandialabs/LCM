@@ -11,10 +11,11 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::ParameterList& p) : PHAL::Neumann<EvalT, Traits>(p)
+ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::ParameterList& p)
+    : PHAL::Neumann<EvalT, Traits>(p)
 {
-  timeValues = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
-  WaterHeightValues   = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
+  timeValues        = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
+  WaterHeightValues = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
 
   ALBANY_PANIC(
       !(timeValues.size() == WaterHeightValues.size()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
@@ -35,16 +36,17 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
   if (Index == 0)
     this->const_val = WaterHeightValues[Index];
   else {
-    slope           = (WaterHeightValues[Index] - WaterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    slope = (WaterHeightValues[Index] - WaterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->const_val = WaterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    //std::cout << "IKT computeVal const_val = " << this->const_val << "\n"; 
+    // std::cout << "IKT computeVal const_val = " << this->const_val << "\n";
   }
 
   return;
 }
 
 template <typename EvalT, typename Traits>
-ACEWavePressureBC<EvalT, Traits>::ACEWavePressureBC(Teuchos::ParameterList& p) : ACEWavePressureBC_Base<EvalT, Traits>(p)
+ACEWavePressureBC<EvalT, Traits>::ACEWavePressureBC(Teuchos::ParameterList& p)
+    : ACEWavePressureBC_Base<EvalT, Traits>(p)
 {
 }
 
@@ -62,7 +64,9 @@ ACEWavePressureBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
 
     default:
 
-      ALBANY_ABORT("ACE Time dependent Neumann boundary condition of type - " << this->bc_type << " is not supported.  Only 'ACE P' NBC is supported.");
+      ALBANY_ABORT(
+          "ACE Time dependent Neumann boundary condition of type - "
+          << this->bc_type << " is not supported.  Only 'ACE P' NBC is supported.");
       break;
   }
 

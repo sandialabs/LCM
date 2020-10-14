@@ -473,8 +473,11 @@ class STKDiscretization : public AbstractDiscretization
   void
   setField(Thyra_Vector const& field_vector, std::string const& field_name, bool const overlapped = false);
 
-  Teuchos::RCP<Thyra_MultiVector> 
-  getCoordMV() {return coordMV;} 
+  Teuchos::RCP<Thyra_MultiVector>
+  getCoordMV()
+  {
+    return coordMV;
+  }
 
   // --- Methods to write solution in the output file --- //
 

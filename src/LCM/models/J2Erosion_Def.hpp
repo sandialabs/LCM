@@ -271,7 +271,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Compute effective yield strength
 #if defined(ICE_SATURATION)
-  //Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
+  // Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
   Y = soil_yield_strength_ + ice_saturation * Y;
 #endif
 

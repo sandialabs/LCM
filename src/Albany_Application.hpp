@@ -317,7 +317,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     return params_;
   }
 
-  bool is_adjoint;
+  bool is_adjoint{false};
 
  private:
   //! Utility function to set up ShapeParameters through Sacado

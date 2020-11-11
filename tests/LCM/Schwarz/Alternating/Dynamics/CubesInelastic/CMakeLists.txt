@@ -71,6 +71,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest_serial_exod
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
+IF (ALBANY_DTK) 
 # Add the tests
 set(OUTFILE0 "cuboid_00.e")
 set(REF_FILE0 "cuboid_00.gold.e")
@@ -86,7 +87,6 @@ add_test(NAME Schwarz_Alternating_Dynamics_${testName}
 set_tests_properties(Schwarz_Alternating_Dynamics_${testName}
                    PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-if(ALBANY_DTK)
   add_test(NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
     COMMAND
     ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=CubesInelasticParallel

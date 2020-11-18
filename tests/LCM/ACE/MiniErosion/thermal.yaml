@@ -100,7 +100,6 @@ ALBANY:
           Storage Limit: 20
         Time Step Control: 
           Initial Time Index: 0
-          Initial Order: 0
           Final Time Index: 10000000
           Maximum Absolute Error: 1.00000000000000002e-08
           Maximum Relative Error: 1.00000000000000002e-08

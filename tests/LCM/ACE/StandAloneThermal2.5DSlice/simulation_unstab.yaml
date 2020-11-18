@@ -98,7 +98,6 @@ ALBANY:
           Initial Time: 0.00000000000000000e+00
           Initial Time Index: 0
           Initial Time Step: 1200.0 
-          Initial Order: 0
           #Final Time: 13204800.0 # last time entry in TimeHis_ExSec3600_2011.txt [sec]
           Final Time: 8400.0 
           Final Time Index: 20000

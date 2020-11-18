@@ -28,7 +28,6 @@ LCM:
     Method: Ioss
     Exodus Input File Name: 'larger-cubes.g'
     Exodus Output File Name: 'larger-cubes-piro.e'
-    Use Serial Mesh: true
     Exodus Solution Name: disp
     Exodus Residual Name: resid
     Separate Evaluators by Element Block: true

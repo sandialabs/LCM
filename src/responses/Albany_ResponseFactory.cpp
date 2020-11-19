@@ -167,8 +167,8 @@ Albany::ResponseFactory::createResponseFunctions(Teuchos::ParameterList& respons
     if (num_responses > 0) {
       Array<RCP<AbstractResponseFunction>> responses;
       std::string                          method = responseList.isParameter("Collection Method") ?
-                               responseList.get<std::string>("Collection Method") :
-                               std::string("Aggregate Responses");
+                                                        responseList.get<std::string>("Collection Method") :
+                                                        std::string("Aggregate Responses");
       createResponseFunction(method, responseList, responses);
       return responses;
     }

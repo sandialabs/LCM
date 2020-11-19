@@ -291,11 +291,11 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
     double time = src_io_region->get_state_time(src_time_step_indices[index]);
     if (src_time_step_indices[index] == src_timestep_count) interpolation_intervals = 1;
 
-    int step_end = src_time_step_indices[index] < src_timestep_count ? src_time_step_indices[index] + 1 :
-                                                                       src_time_step_indices[index];
-    double tend  = src_io_region->get_state_time(step_end);
-    double tbeg  = time;
-    double delta = (tend - tbeg) / static_cast<double>(interpolation_intervals);
+    int    step_end = src_time_step_indices[index] < src_timestep_count ? src_time_step_indices[index] + 1 :
+                                                                          src_time_step_indices[index];
+    double tend     = src_io_region->get_state_time(step_end);
+    double tbeg     = time;
+    double delta    = (tend - tbeg) / static_cast<double>(interpolation_intervals);
 
     for (int interval = 0; interval < interpolation_intervals; interval++) {
       time = tbeg + delta * static_cast<double>(interval);
@@ -309,9 +309,9 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
     step_end = tgt_time_step_indices[index] < tgt_timestep_count ? tgt_time_step_indices[index] + 1 :
                                                                    tgt_time_step_indices[index];
-    tend  = tgt_io_region->get_state_time(step_end);
-    tbeg  = time;
-    delta = (tend - tbeg) / static_cast<double>(interpolation_intervals);
+    tend     = tgt_io_region->get_state_time(step_end);
+    tbeg     = time;
+    delta    = (tend - tbeg) / static_cast<double>(interpolation_intervals);
 
     for (int interval = 0; interval < interpolation_intervals; interval++) {
       time = tbeg + delta * static_cast<double>(interval);

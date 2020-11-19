@@ -695,16 +695,6 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           createMechanicalSolverAppDiscME(stop, current_time, next_time, time_step);
         }
 
-        if (stop == 0) {
-          if (prob_type == THERMAL && failed_reattempt_thermal_ == false && failed_reattempt_mechanical_ == false) {
-            setICVecs(initial_time_, subdomain);
-            doDynamicInitialOutput(initial_time_, subdomain, stop);
-          }
-          if (prob_type == MECHANICAL && failed_reattempt_mechanical_ == false) {
-            setICVecs(initial_time_, subdomain);
-            doDynamicInitialOutput(initial_time_, subdomain, stop);
-          }
-        }
         // Before the coupling loop, get internal states, and figure out whether
         // output needs to be done or not.
         if (num_iter_ == 0) {

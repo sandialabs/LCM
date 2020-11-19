@@ -177,12 +177,12 @@ class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Tag>           PHAL_GatherSolRank2_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Transient_Tag> PHAL_GatherSolRank2_Transient_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Acceleration_Tag>
-                                                                                 PHAL_GatherSolRank2_Acceleration_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Tag>           PHAL_GatherSolRank1_Policy;
+                                                                       PHAL_GatherSolRank2_Acceleration_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Tag> PHAL_GatherSolRank1_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Transient_Tag> PHAL_GatherSolRank1_Transient_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Acceleration_Tag>
-                                                                                 PHAL_GatherSolRank1_Acceleration_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Tag>           PHAL_GatherSolRank0_Policy;
+                                                                       PHAL_GatherSolRank1_Acceleration_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Tag> PHAL_GatherSolRank0_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Transient_Tag> PHAL_GatherSolRank0_Transient_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Acceleration_Tag>
       PHAL_GatherSolRank0_Acceleration_Policy;
@@ -286,12 +286,12 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Tag>           PHAL_GatherJacRank2_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Transient_Tag> PHAL_GatherJacRank2_Transient_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Acceleration_Tag>
-                                                                                 PHAL_GatherJacRank2_Acceleration_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Tag>           PHAL_GatherJacRank1_Policy;
+                                                                       PHAL_GatherJacRank2_Acceleration_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Tag> PHAL_GatherJacRank1_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Transient_Tag> PHAL_GatherJacRank1_Transient_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Acceleration_Tag>
-                                                                                 PHAL_GatherJacRank1_Acceleration_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Tag>           PHAL_GatherJacRank0_Policy;
+                                                                       PHAL_GatherJacRank1_Acceleration_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Tag> PHAL_GatherJacRank0_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Transient_Tag> PHAL_GatherJacRank0_Transient_Policy;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Acceleration_Tag>
       PHAL_GatherJacRank0_Acceleration_Policy;

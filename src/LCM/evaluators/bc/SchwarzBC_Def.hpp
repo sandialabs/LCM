@@ -426,7 +426,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData workset)
       f_view[z_dof] = x_const_view[z_dof] - schwarz_bcs_const_view_z[dof];
     }
   }
-#else   // ALBANY_DTK
+#else  // ALBANY_DTK
   for (auto ns_node = 0; ns_node < ns_number_nodes; ++ns_node) {
     ST x_val, y_val, z_val;
     sbc.computeBCs(ns_node, x_val, y_val, z_val);

@@ -543,7 +543,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
       }
     }
   }
-#else   // ALBANY_DTK
+#else  // ALBANY_DTK
   for (auto ns_node = 0; ns_node < ns_number_nodes; ++ns_node) {
     ST x_val, y_val, z_val;
     sbc.computeBCs(ns_node, x_val, y_val, z_val);

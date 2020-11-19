@@ -114,7 +114,7 @@ PopulateMesh::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> mesh
     if (is_vector) {
       int vec_dim = thisFieldList.get<int>("Vector Dim");
       layout      = is_nodal ? PHAL::ExtendLayout<Dim, Cell, Node>::apply(layout, vec_dim) :
-                          PHAL::ExtendLayout<Dim, Cell>::apply(layout, vec_dim);
+                               PHAL::ExtendLayout<Dim, Cell>::apply(layout, vec_dim);
     }
 
     // Layered fields
@@ -165,17 +165,17 @@ PopulateMesh::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> mesh
         if (is_vector) {
           int vec_dim = thisFieldList.get<int>("Vector Dim");
           layout      = is_nodal ? PHAL::ExtendLayout<Dim, Cell, Side, Node>::apply(layout, vec_dim) :
-                              PHAL::ExtendLayout<Dim, Cell, Side>::apply(layout, vec_dim);
+                                   PHAL::ExtendLayout<Dim, Cell, Side>::apply(layout, vec_dim);
         }
 
         // Layered fields
         if (is_layered) {
           int num_layers = thisFieldList.get<int>("Number Of Layers");
           layout         = is_vector ?
-                       (is_nodal ? PHAL::ExtendLayout<LayerDim, Cell, Side, Node, Dim>::apply(layout, num_layers) :
-                                   PHAL::ExtendLayout<LayerDim, Cell, Side, Dim>::apply(layout, num_layers)) :
-                       (is_nodal ? PHAL::ExtendLayout<LayerDim, Cell, Side, Node>::apply(layout, num_layers) :
-                                   PHAL::ExtendLayout<LayerDim, Cell, Side>::apply(layout, num_layers));
+                               (is_nodal ? PHAL::ExtendLayout<LayerDim, Cell, Side, Node, Dim>::apply(layout, num_layers) :
+                                           PHAL::ExtendLayout<LayerDim, Cell, Side, Dim>::apply(layout, num_layers)) :
+                               (is_nodal ? PHAL::ExtendLayout<LayerDim, Cell, Side, Node>::apply(layout, num_layers) :
+                                           PHAL::ExtendLayout<LayerDim, Cell, Side>::apply(layout, num_layers));
         }
 
         // Finally, register the state

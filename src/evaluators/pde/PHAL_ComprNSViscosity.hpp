@@ -38,7 +38,7 @@ class ComprNSViscosity : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::
   // Input:
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coordVec;
   PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>
-                                                            qFluct;  // vector q' containing fluid fluctuations in primitive variables
+      qFluct;  // vector q' containing fluid fluctuations in primitive variables
   PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim, Dim> qFluctGrad;
   // reference values for viscosities
   double muref;

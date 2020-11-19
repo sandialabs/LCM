@@ -39,7 +39,7 @@ class ComprNSResid : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::Eval
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wGradBF;
 
   PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>
-                                                            qFluct;  // vector q' containing fluid fluctuations in primitive variables
+      qFluct;  // vector q' containing fluid fluctuations in primitive variables
   PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim, Dim> qFluctGrad;
   PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>      qFluctDot;
   PHX::MDField<ScalarT const, Cell, QuadPoint, VecDim>      force;

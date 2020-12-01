@@ -572,6 +572,10 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
   if (supports_xdotdot == true) {
     if (use_tempus == true) omega = inArgs.get_W_x_dot_dot_coeff();
     // The following case is to support second order time-integrators in Piro
+    // IKT, 12/1/2020: the following is a hacky fix to FPEs in the DynamicsTempus 
+    // tests.  I am not sure why nans are comming out of Trilinos for omega for 
+    // these problems when evaluating the responses...
+    if (std::isnan(omega)) omega = 1e12;   
     if ((omega < 1.0e-14) && (omega > -1.0e-14)) {
       if (Teuchos::nonnull(this->get_x_dotdot())) {
         x_dotdot = this->get_x_dotdot();

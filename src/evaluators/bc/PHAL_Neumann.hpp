@@ -72,8 +72,9 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   using IRST = Intrepid2::RealSpaceTools<PHX::Device>;
   using IFST = Intrepid2::FunctionSpaceTools<PHX::Device>;
 
-  const Teuchos::RCP<Albany::Layouts>&         dl;
-  const Teuchos::RCP<Albany::MeshSpecsStruct>& meshSpecs;
+  Teuchos::RCP<Albany::Application>            app_{Teuchos::null};
+  Teuchos::RCP<Albany::Layouts> const&         dl;
+  Teuchos::RCP<Albany::MeshSpecsStruct> const& meshSpecs;
 
   int                 cellDims, numQPs, numNodes, numCells, maxSideDim, maxNumQpSide;
   Teuchos::Array<int> offset;
@@ -90,20 +91,20 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   void
   calc_dudn_robin(
       Kokkos::DynRankView<ScalarT, PHX::Device>&       qp_data_returned,
-      const Kokkos::DynRankView<ScalarT, PHX::Device>& dof_side) const;
+      Kokkos::DynRankView<ScalarT, PHX::Device> const& dof_side) const;
 
   // Stefan-Boltzmann (also uses flux scaling)
   void
   calc_dudn_radiate(
       Kokkos::DynRankView<ScalarT, PHX::Device>&       qp_data_returned,
-      const Kokkos::DynRankView<ScalarT, PHX::Device>& dof_side) const;
+      Kokkos::DynRankView<ScalarT, PHX::Device> const& dof_side) const;
 
   // (dudx, dudy, dudz)
   void
   calc_gradu_dotn_const(
       Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
-      const shards::CellTopology&                          celltopo,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& jacobian_side_refcell,
+      shards::CellTopology const&                          celltopo,
       int                                                  local_side_id) const;
 
   // (t_x, t_y, t_z)
@@ -114,26 +115,26 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   void
   calc_press(
       Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
-      const shards::CellTopology&                          celltopo,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& jacobian_side_refcell,
+      shards::CellTopology const&                          celltopo,
       int                                                  local_side_id) const;
 
   // ACE Pressure P
   void
   calc_ace_press(
       Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& physPointsSide,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
-      const shards::CellTopology&                          celltopo,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& physPointsSide,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& jacobian_side_refcell,
+      shards::CellTopology const&                          celltopo,
       int                                                  local_side_id) const;
 
   // closed_from bc assignment
   void
   calc_closed_form(
       Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& physPointsSide,
-      const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
-      const shards::CellTopology&                          celltopo,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& physPointsSide,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& jacobian_side_refcell,
+      shards::CellTopology const&                          celltopo,
       int                                                  local_side_id,
       typename Traits::EvalData                            workset) const;
 

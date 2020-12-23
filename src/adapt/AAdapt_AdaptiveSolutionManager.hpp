@@ -115,6 +115,12 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
     return adapter_ != Teuchos::null;
   }
 
+  Teuchos::RCP<AbstractAdapter>
+  getAdapter()
+  {
+    return adapter_;
+  }
+
  private:
   Teuchos::RCP<const Albany::CombineAndScatterManager> cas_manager;
 

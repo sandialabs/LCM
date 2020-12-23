@@ -74,6 +74,12 @@ class Erosion : public AbstractAdapter
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidAdapterParameters() const;
 
+  Teuchos::RCP<LCM::Topology>
+  getTopology() const
+  {
+    return topology_;
+  }
+
  private:
   void
   copyStateArrays(Albany::StateArrays const& sa);

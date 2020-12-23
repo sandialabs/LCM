@@ -311,7 +311,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
     ALBANY_DUMP("**** Side set name     : " << this->sideSetID << '\n');
     ALBANY_DUMP("**** Number of entries : " << num_ss << '\n');
     for (auto i = 0; i < num_ss; ++i) {
-      auto & ss = sideSet[i];
+      auto& ss = sideSet[i];
       ALBANY_DUMP("-----------------------------------------------\n");
       ALBANY_DUMP("* entry         : " << i << '\n');
       ALBANY_DUMP("* side_GID      : " << ss.side_GID << '\n');

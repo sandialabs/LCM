@@ -3,6 +3,7 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include "Albany_DistributedParameterLibrary.hpp"
+#include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_STKDiscretization.hpp"
@@ -302,6 +303,27 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
   Albany::SideSetList::const_iterator it     = ssList.find(this->sideSetID);
 
   std::vector<Albany::SideStruct> const& sideSet = it->second;
+
+#if defined(DEBUG)
+  {
+    auto const num_ss = sideSet.size();
+    ALBANY_DUMP("===============================================\n");
+    ALBANY_DUMP("**** Side set name     : " << this->sideSetID << '\n');
+    ALBANY_DUMP("**** Number of entries : " << num_ss << '\n');
+    for (auto i = 0; i < num_ss; ++i) {
+      auto & ss = sideSet[i];
+      ALBANY_DUMP("-----------------------------------------------\n");
+      ALBANY_DUMP("* entry         : " << i << '\n');
+      ALBANY_DUMP("* side_GID      : " << ss.side_GID << '\n');
+      ALBANY_DUMP("* elem_GID      : " << ss.elem_GID << '\n');
+      ALBANY_DUMP("* elem_LID      : " << ss.elem_LID << '\n');
+      ALBANY_DUMP("* elem_ebIndex  : " << ss.elem_ebIndex << '\n');
+      ALBANY_DUMP("* side_local_id : " << ss.side_local_id << '\n');
+    }
+    ALBANY_DUMP("===============================================\n");
+    exit(0);
+  }
+#endif
 
   if (it == ssList.end())
     return;  // This sideset does not exist in this workset (GAH - this can go
@@ -877,6 +899,46 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::E
   auto const has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const ss_id       = this->sideSetID;
   auto const is_erodible = ss_id.find("erodible") != std::string::npos;
+
+#if defined(DEBUG)
+  {
+    if (is_erodible == true) {
+      ALBANY_ASSERT(has_nbi == true);
+      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
+      ALBANY_DUMP("**** GLOBAL BOUNDARY INDICATOR MAP :\n");
+      for (auto&& kv : bi_field) {
+        ALBANY_DUMP("GID : " << kv.first << ", BI : " << *kv.second << "\n");
+      }
+      std::cout << "*** SIDESET BOUNDARY INDICATOR : " << ss_id << " ***\n";
+      for (auto cell = 0; cell < workset.numCells; ++cell) {
+        for (auto ss_node = 0; ss_node < this->numNodes; ++ss_node) {
+          ALBANY_ASSERT(has_nbi == true);
+          auto&       stk_mesh_struct = *(stk_disc->getSTKMeshStruct());
+          auto&       coord_field     = *(stk_mesh_struct.getCoordinatesField());
+          auto const& bi_field        = stk_disc->getNodeBoundaryIndicator();
+          auto const  gid             = node_gids[cell][ss_node] + 1;
+          auto const  it              = bi_field.find(gid);
+          ALBANY_ASSERT(it != bi_field.end());
+          auto const    bi                 = *(it->second);
+          auto          overlap_node_vs    = stk_disc->getOverlapNodeVectorSpace();
+          auto          ov_node_vs_indexer = Albany::createGlobalLocalIndexer(overlap_node_vs);
+          auto const    local_node_id      = ov_node_vs_indexer->getLocalElement(ss_node);
+          auto const&   coordinates        = stk_disc->getCoordinates();
+          double* const pc                 = &(coordinates[3 * local_node_id]);
+          auto const    x                  = pc[0];
+          auto const    y                  = pc[1];
+          auto const    z                  = pc[2];
+          std::cout << "CELL: " << std::setw(4) << cell << ", NODE GID: " << std::setw(4) << gid
+                    << ", BI : " << std::setw(2) << bi << ", ";
+          std::cout << "X : " << std::setw(24) << std::setprecision(16) << x << ", ";
+          std::cout << "Y : " << std::setw(24) << std::setprecision(16) << y << ", ";
+          std::cout << "Z : " << std::setw(24) << std::setprecision(16) << z << "\n";
+        }
+      }
+      exit(0);
+    }
+  }
+#endif  // DEBUG
 
   // Fill in "neumann" array
   this->evaluateNeumannContribution(workset);

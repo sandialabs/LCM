@@ -301,6 +301,9 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
 
   const Albany::SideSetList&          ssList = *(workset.sideSets);
   Albany::SideSetList::const_iterator it     = ssList.find(this->sideSetID);
+  // This sideset does not exist in this workset (GAH - this can go
+  // away once we move logic to BCUtils
+  if (it == ssList.end()) return;
 
   std::vector<Albany::SideStruct> const& sideSet = it->second;
 
@@ -324,10 +327,6 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
     exit(0);
   }
 #endif
-
-  if (it == ssList.end())
-    return;  // This sideset does not exist in this workset (GAH - this can go
-             // away once we move logic to BCUtils
 
   using DynRankViewRealT       = Kokkos::DynRankView<RealType, PHX::Device>;
   using DynRankViewMeshScalarT = Kokkos::DynRankView<MeshScalarT, PHX::Device>;

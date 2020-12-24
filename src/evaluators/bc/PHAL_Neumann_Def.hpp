@@ -248,9 +248,10 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
   // GAH: Note that this loosely follows from
   // $TRILINOS_DIR/packages/intrepid/test/Discretization/Basis/HGRAD_QUAD_C1_FEM/test_02.cpp
 
-  if (workset.sideSets == Teuchos::null || this->sideSetID.length() == 0)
-
+  if (workset.sideSets == Teuchos::null || this->sideSetID.length() == 0) {
     ALBANY_ABORT("Side sets defined in input file but not properly specified on the mesh" << std::endl);
+  }
+
 
   // neumann data type is always ScalarT, but the deriv dimension
   // actually needed depends on BC type. For many it just needs

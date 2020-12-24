@@ -24,9 +24,14 @@ namespace Albany {
 class AbstractDiscretization;
 class CombineAndScatterManager;
 class DistributedParameterLibrary;
-// Forward declaration needed for Schwarz coupling
+// Needed for Schwarz coupling
 class Application;
 }  // namespace Albany
+
+namespace LCM {
+// Needed for ACE erosion
+class Topology;
+}  // namespace LCM
 
 namespace PHAL {
 
@@ -115,6 +120,9 @@ struct Workset
   std::map<GO, double*>                                node_boundary_indicator;
   std::set<int>                                        fixed_dofs_;
   bool                                                 is_schwarz_bc_{false};
+
+  // Needed for ACE erosion
+  Teuchos::RCP<LCM::Topology> topology{Teuchos::null};
 
   int spatial_dimension_{0};
 

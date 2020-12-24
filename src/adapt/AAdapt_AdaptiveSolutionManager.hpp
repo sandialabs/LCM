@@ -121,6 +121,12 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
     return adapter_;
   }
 
+  std::string
+  getMethod()
+  {
+    return method_;
+  }
+
  private:
   Teuchos::RCP<const Albany::CombineAndScatterManager> cas_manager;
 
@@ -134,16 +140,15 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
   // Number of time derivative vectors that we need to support
   int const num_time_deriv;
 
-  const Teuchos::RCP<Teuchos::ParameterList>         appParams_;
-  const Teuchos::RCP<Albany::AbstractDiscretization> disc_;
-  const Teuchos::RCP<ParamLib>&                      paramLib_;
-  const Albany::StateManager&                        stateMgr_;
-  const Teuchos::RCP<Teuchos_Comm const>             comm_;
+  Teuchos::RCP<Teuchos::ParameterList> const         appParams_{Teuchos::null};
+  Teuchos::RCP<Albany::AbstractDiscretization> const disc_{Teuchos::null};
+  Teuchos::RCP<ParamLib> const&                      paramLib_{Teuchos::null};
+  Albany::StateManager const&                        stateMgr_;
+  Teuchos::RCP<Teuchos_Comm const>                   comm_{Teuchos::null};
 
-  //! Output stream, defaults to printing just Proc 0
-  Teuchos::RCP<Teuchos::FancyOStream> out;
-
-  Teuchos::RCP<AbstractAdapter> adapter_;
+  Teuchos::RCP<Teuchos::FancyOStream> out{Teuchos::null};
+  Teuchos::RCP<AbstractAdapter>       adapter_{Teuchos::null};
+  std::string                         method_{"Undefined"};
 
   void
   buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr);

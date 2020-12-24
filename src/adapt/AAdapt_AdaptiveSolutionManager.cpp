@@ -132,8 +132,8 @@ AdaptiveSolutionManager::AdaptiveSolutionManager(
 void
 AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
 {
-  std::string& method            = adaptParams_->get("Method", "");
-  std::string  first_three_chars = method.substr(0, 3);
+  std::string& method = adaptParams_->get("Method", "");
+  method_             = method;
 
   if (method == "Copy Remesh") {
     adapter_ = Teuchos::rcp(new CopyRemesh(adaptParams_, paramLib_, stateMgr_, comm_));

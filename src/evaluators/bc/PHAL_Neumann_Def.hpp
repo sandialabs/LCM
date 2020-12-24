@@ -252,7 +252,6 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
     ALBANY_ABORT("Side sets defined in input file but not properly specified on the mesh" << std::endl);
   }
 
-
   // neumann data type is always ScalarT, but the deriv dimension
   // actually needed depends on BC type. For many it just needs
   // deriv dimensions from MeshScalarT (cloned from coordVec).

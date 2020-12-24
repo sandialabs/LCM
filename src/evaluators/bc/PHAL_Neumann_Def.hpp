@@ -2,6 +2,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
+#include "Albany_Application.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_Macros.hpp"
@@ -21,9 +22,8 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits>
-NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList const& p)
-    :
-
+NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList& p)
+    : app_(p.get<Teuchos::RCP<Albany::Application>>("Application", Teuchos::null)),
       dl(p.get<Teuchos::RCP<Albany::Layouts>>("Layouts Struct")),
       meshSpecs(p.get<Teuchos::RCP<Albany::MeshSpecsStruct>>("Mesh Specs Struct")),
       offset(p.get<Teuchos::Array<int>>("Equation Offset")),

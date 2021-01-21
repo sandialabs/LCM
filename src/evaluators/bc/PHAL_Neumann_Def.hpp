@@ -326,14 +326,27 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
       ALBANY_DUMP("* side_local_id : " << ss.side_local_id << '\n');
     }
     ALBANY_DUMP("===============================================\n");
-    auto topo_rcp       = workset.topology;
-    auto erodible_cells = topo_rcp->getErodibleCells();
-    auto cell_gids      = topo_rcp->getEntityGIDs(erodible_cells);
+    auto  topo_rcp            = workset.topology;
+    auto  erodible_cells      = topo_rcp->getErodibleCells();
+    auto  cell_gids           = topo_rcp->getEntityGIDs(erodible_cells);
+    auto& stk_disc            = topo_rcp->get_stk_discretization();
+    auto  elem_gid_to_wslid   = stk_disc.getElemGIDws();
+    auto  stk_mesh_struct_rcp = stk_disc.getSTKMeshStruct();
+    auto  stk_mesh_specs_rcp  = stk_mesh_struct_rcp->getMeshSpecs()[0];
+    auto  ws_eb_names         = stk_disc.getWsEBNames();
+
     ALBANY_DUMP("-----------------------------------------------\n");
     ALBANY_DUMP("*** Number erodible cells : " << erodible_cells.size() << '\n');
-    ALBANY_DUMP("-----------------------------------------------\n");
     for (auto cell_gid : cell_gids) {
-      ALBANY_DUMP("* cell GID      : " << cell_gid << '\n');
+      auto const elem_gid      = cell_gid - 1;
+      auto const wslid         = elem_gid_to_wslid[elem_gid];
+      auto const ws            = wslid.ws;
+      auto const elem_lid      = wslid.LID;
+      auto const elem_eb_index = stk_mesh_specs_rcp->ebNameToIndex[ws_eb_names[ws]];
+      ALBANY_DUMP("-----------------------------------------------\n");
+      ALBANY_DUMP("* elem GID      : " << elem_gid << '\n');
+      ALBANY_DUMP("* cell LID      : " << elem_lid << '\n');
+      ALBANY_DUMP("* elem EB index : " << elem_eb_index << '\n');
     }
     ALBANY_DUMP("===============================================\n");
   }
@@ -550,7 +563,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
           for (std::size_t qp = 0; qp < numQPsSide; ++qp) {
             for (std::size_t dim = 0; dim < numDOFsSet; ++dim) {
               neumann(cell, node, dim) += data(iCell, qp, dim) * weighted_trans_basis_refPointsSide(iCell, node, qp);
-#if DEBUG
+#if 0
               {
                 ALBANY_DUMP("**** iCell : " << iCell << ", cell : " << cell << ", node : " << node);
                 ALBANY_DUMP(", qp : " << qp << ", dim : " << dim << ", data : " << data(iCell, qp, dim));

@@ -274,6 +274,31 @@ Topology::setNodeBoundaryIndicator()
   }
 }
 
+stk::mesh::EntityVector
+Topology::getErodibleCells()
+{
+  auto&                   bulk_data = get_bulk_data();
+  auto const              cell_rank = stk::topology::ELEMENT_RANK;
+  stk::mesh::EntityVector cells;
+  stk::mesh::EntityVector erodible_cells;
+  stk::mesh::get_entities(bulk_data, cell_rank, cells);
+
+  for (auto cell : cells) {
+    if (is_erodible_cell(cell) == true) erodible_cells.emplace_back(cell);
+  }
+  return erodible_cells;
+}
+
+std::vector<stk::mesh::EntityId>
+Topology::getEntityGIDs(stk::mesh::EntityVector const& entities)
+{
+  std::vector<stk::mesh::EntityId> gids;
+  for (auto entity : entities) {
+    gids.emplace_back(get_gid(entity));
+  }
+  return gids;
+}
+
 // Compute volume of given cell
 double
 Topology::getCellVolume(stk::mesh::Entity const cell)

@@ -14,6 +14,7 @@
 #include "PHAL_Neumann.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
+#include "Topology.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
 //#define ACE_WAVE_PRESS_DEBUG_OUTPUT
@@ -307,6 +308,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
 
   std::vector<Albany::SideStruct> const& sideSet = it->second;
 
+//#define DEBUG
 #if defined(DEBUG)
   {
     auto const num_ss = sideSet.size();
@@ -324,7 +326,16 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
       ALBANY_DUMP("* side_local_id : " << ss.side_local_id << '\n');
     }
     ALBANY_DUMP("===============================================\n");
-    exit(0);
+    auto topo_rcp       = workset.topology;
+    auto erodible_cells = topo_rcp->getErodibleCells();
+    auto cell_gids      = topo_rcp->getEntityGIDs(erodible_cells);
+    ALBANY_DUMP("-----------------------------------------------\n");
+    ALBANY_DUMP("*** Number erodible cells : " << erodible_cells.size() << '\n');
+    ALBANY_DUMP("-----------------------------------------------\n");
+    for (auto cell_gid : cell_gids) {
+      ALBANY_DUMP("* cell GID      : " << cell_gid << '\n');
+    }
+    ALBANY_DUMP("===============================================\n");
   }
 #endif
 
@@ -394,7 +405,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
   }
 
   // Loop over the sides that form the boundary condition
-  for (int iblock = 0; iblock < ordinalEbIndex.size(); ++iblock)
+  for (int iblock = 0; iblock < ordinalEbIndex.size(); ++iblock) {
     for (int side = 0; side < numSidesOnElem; ++side) {
       int numCells_ = numCellsOnSidesOnBlocks[iblock][side];
       if (numCells_ == 0) continue;
@@ -535,12 +546,23 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
       // Put this side's contribution into the vector
       for (std::size_t iCell = 0; iCell < numCells_; ++iCell) {
         int cell = cellVec(iCell);
-        for (std::size_t node = 0; node < numNodes; ++node)
-          for (std::size_t qp = 0; qp < numQPsSide; ++qp)
-            for (std::size_t dim = 0; dim < numDOFsSet; ++dim)
+        for (std::size_t node = 0; node < numNodes; ++node) {
+          for (std::size_t qp = 0; qp < numQPsSide; ++qp) {
+            for (std::size_t dim = 0; dim < numDOFsSet; ++dim) {
               neumann(cell, node, dim) += data(iCell, qp, dim) * weighted_trans_basis_refPointsSide(iCell, node, qp);
+#if DEBUG
+              {
+                ALBANY_DUMP("**** iCell : " << iCell << ", cell : " << cell << ", node : " << node);
+                ALBANY_DUMP(", qp : " << qp << ", dim : " << dim << ", data : " << data(iCell, qp, dim));
+                ALBANY_DUMP(", weight : " << weighted_trans_basis_refPointsSide(iCell, node, qp) << "\n");
+              }
+#endif
+            }
+          }
+        }
       }
     }
+  }
 }
 
 template <typename EvalT, typename Traits>

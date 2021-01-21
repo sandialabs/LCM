@@ -608,6 +608,12 @@ class Topology
   void
   setNodeBoundaryIndicator();
 
+  stk::mesh::EntityVector
+  getErodibleCells();
+
+  std::vector<stk::mesh::EntityId>
+  getEntityGIDs(stk::mesh::EntityVector const& entities);
+
   ///
   ///
   ///

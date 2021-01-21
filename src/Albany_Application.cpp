@@ -1674,15 +1674,6 @@ Application::loadBasicWorksetInfo(PHAL::Workset& workset, double current_time)
   workset.disc              = disc;
   workset.transientTerms    = Teuchos::nonnull(workset.xdot);
   workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot);
-
-  // Needed for ACE erosion
-  auto const is_erosion = solMgr->isAdaptive() == true && solMgr->getMethod() == "Erosion";
-  if (is_erosion == true) {
-    auto erosion_rcp = Teuchos::rcp_dynamic_cast<AAdapt::Erosion>(solMgr->getAdapter());
-    workset.topology = erosion_rcp->getTopology();
-  } else {
-    workset.topology = Teuchos::null;
-  }
 }
 
 void
@@ -1820,6 +1811,15 @@ void
 Application::loadWorksetSidesetInfo(PHAL::Workset& workset, int const ws)
 {
   workset.sideSets = Teuchos::rcpFromRef(disc->getSideSets(ws));
+
+  // Needed for ACE erosion
+  auto const is_erosion = solMgr->isAdaptive() == true && solMgr->getMethod() == "Erosion";
+  if (is_erosion == true) {
+    auto erosion_rcp = Teuchos::rcp_dynamic_cast<AAdapt::Erosion>(solMgr->getAdapter());
+    workset.topology = erosion_rcp->getTopology();
+  } else {
+    workset.topology = Teuchos::null;
+  }
 }
 
 void

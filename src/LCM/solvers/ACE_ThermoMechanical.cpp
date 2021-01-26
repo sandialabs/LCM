@@ -195,17 +195,17 @@ ACEThermoMechanical::ACEThermoMechanical(
       tempus_params.set("Abort on Failure", false);
 
       Teuchos::ParameterList& time_step_control_params =
-          piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control");
+          piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control").sublist("Time Step Control Strategy");
 
-      std::string const integrator_step_type = time_step_control_params.get("Integrator Step Type", "Constant");
+      std::string const integrator_step_type = time_step_control_params.get("Strategy Type", "Constant");
 
       std::string const msg{
           "Non-constant time-stepping through Tempus not supported "
           "with ACE sequential thermo-mechanical coupling; \n"
           "In this case, variable time-stepping is "
           "handled within the coupling loop.\n"
-          "Please rerun with 'Integrator Step Type: "
-          "Constant' in 'Time Step Control' sublist.\n"};
+          "Please rerun with 'Strategy Type: "
+          "Constant' in 'Time Step Control Strategy' sublist.\n"};
       ALBANY_ASSERT(integrator_step_type == "Constant", msg);
     } else if (problem_type == MECHANICAL) {
       auto const is_tempus         = piro_params.isSublist("Tempus");
@@ -216,17 +216,17 @@ ACEThermoMechanical::ACEThermoMechanical(
         tempus_params.set("Abort on Failure", false);
 
         Teuchos::ParameterList& time_step_control_params =
-            piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control");
+            piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control").sublist("Time Step Control Strategy");
 
-        std::string const integrator_step_type = time_step_control_params.get("Integrator Step Type", "Constant");
+        std::string const integrator_step_type = time_step_control_params.get("Strategy Type", "Constant");
 
         std::string const msg{
             "Non-constant time-stepping through Tempus not supported "
             "with ACE sequential thermo-mechanical coupling; \n"
             "In this case, variable time-stepping is "
             "handled within the coupling loop.\n"
-            "Please rerun with 'Integrator Step Type: "
-            "Constant' in 'Time Step Control' sublist.\n"};
+            "Please rerun with 'Strategy Type: "
+            "Constant' in 'Time Step Control Strategy' sublist.\n"};
         ALBANY_ASSERT(integrator_step_type == "Constant", msg);
       } else {
         mechanical_solver_ = MechanicalSolver::TrapezoidRule;

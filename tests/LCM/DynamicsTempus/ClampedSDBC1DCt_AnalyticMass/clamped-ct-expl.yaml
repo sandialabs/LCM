@@ -65,7 +65,6 @@ LCM:
           Final Time Index: 1000000
           Maximum Absolute Error: 1.0e-8
           Maximum Relative Error: 1.0e-8
-          Integrator Step Type: Constant
           Output Time List: ''
           Output Index List: ''
           #Output Time Interval: 1.0

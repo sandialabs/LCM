@@ -64,7 +64,6 @@ LCM:
           Initial Time Index: 0
           Final Time Index: 1000000
           Initial Time Step: 1.0
-          Integrator Step Type: Constant
           Output Time List: ''
           Output Index List: ''
       Tempus Stepper:

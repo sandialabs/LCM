@@ -62,7 +62,6 @@ ALBANY:
         Time Step Control: 
           Initial Time Index: 0
           Final Time Index: 1000000
-          Integrator Step Type: Constant
           Output Time List: ''
           Output Index List: ''
       Tempus Stepper: 

@@ -15,10 +15,19 @@ ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::Parameter
     : PHAL::Neumann<EvalT, Traits>(p)
 {
   timeValues        = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
-  WaterHeightValues = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
+  waterHeightValues = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
+  waveBreakingHeightValues = p.get<Teuchos::Array<RealType>>("Wave Breaking Height Values").toVector();
+  waveLengthValues = p.get<Teuchos::Array<RealType>>("Wave Length Values").toVector();
+  waveNumberValues = p.get<Teuchos::Array<RealType>>("Wave Number Values").toVector();
 
   ALBANY_PANIC(
-      !(timeValues.size() == WaterHeightValues.size()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
+      !(timeValues.size() == waterHeightValues.size()), "Dimension of \"Time Values\" and \"water Height Values\" do not match");
+  ALBANY_PANIC(
+      !(timeValues.size() == waveBreakingHeightValues.size()), "Dimension of \"Time Values\" and \"Wave Breaking Height Values\" do not match");
+  ALBANY_PANIC(
+      !(timeValues.size() == waveLengthValues.size()), "Dimension of \"Time Values\" and \"Wave Length Values\" do not match");
+  ALBANY_PANIC(
+      !(timeValues.size() == waveNumberValues.size()), "Dimension of \"Time Values\" and \"Wave Number Values\" do not match");
 }
 
 //*****
@@ -33,13 +42,28 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
 
   while (timeValues[Index] < time) Index++;
 
-  if (Index == 0)
-    this->water_height_val = WaterHeightValues[Index];
+  if (Index == 0) {
+    this->water_height_val = waterHeightValues[Index];
+    this->wave_breaking_height_val = waveBreakingHeightValues[Index]; 
+    this->wave_length_val = waveLengthValues[Index]; 
+    this->wave_number_val = waveNumberValues[Index]; 
+  }
   else {
-    slope = (WaterHeightValues[Index] - WaterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->water_height_val = WaterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    slope = (waterHeightValues[Index] - waterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->water_height_val = waterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    slope = (waveBreakingHeightValues[Index] - waveBreakingHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->wave_breaking_height_val = waveBreakingHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    slope = (waveLengthValues[Index] - waveLengthValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->wave_length_val = waveLengthValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    slope = (waveNumberValues[Index] - waveNumberValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->wave_number_val = waveNumberValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     // std::cout << "IKT computeVal water_height_val = " << this->water_height_val << "\n";
   }
+  
+  //IKT question: can water height be non-positive?  If not, add throw.
+  ALBANY_PANIC(this->wave_breaking_height_val <= 0, "Wave breaking height is non-positive!");
+  ALBANY_PANIC(this->wave_length_val <= 0, "Wave length is non-positive!");
+  ALBANY_PANIC(this->wave_number_val <= 0, "Wave number is non-positive!");
 
   return;
 }

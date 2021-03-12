@@ -34,11 +34,11 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
   while (timeValues[Index] < time) Index++;
 
   if (Index == 0)
-    this->const_val = WaterHeightValues[Index];
+    this->water_height_val = WaterHeightValues[Index];
   else {
     slope = (WaterHeightValues[Index] - WaterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->const_val = WaterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    // std::cout << "IKT computeVal const_val = " << this->const_val << "\n";
+    this->water_height_val = WaterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    // std::cout << "IKT computeVal water_height_val = " << this->water_height_val << "\n";
   }
 
   return;

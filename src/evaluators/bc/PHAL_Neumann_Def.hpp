@@ -792,7 +792,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  const ScalarT hs   = const_val;  // wave height value interpolated in time
+  const ScalarT hs   = water_height_val;  // wave height value interpolated in time
   const double  tm   = inputValues[0];
   const double  Hb   = inputValues[1];
   const double  g    = inputValues[2];

@@ -13,8 +13,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/timevals.txt
                ${CMAKE_CURRENT_BINARY_DIR}/timevals.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/hsvals.txt
                ${CMAKE_CURRENT_BINARY_DIR}/hsvals.txt COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Hbvals.txt
-               ${CMAKE_CURRENT_BINARY_DIR}/Hbvals.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/hcvals.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/hcvals.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Lvals.txt
 	       ${CMAKE_CURRENT_BINARY_DIR}/Lvals.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kvals.txt

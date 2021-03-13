@@ -12,7 +12,7 @@ LCM:
       ACE Time Dependent NBC on SS surface_1 for DOF all set wave_pressure:
         ACE Time Values File: 'timevals.txt'
         ACE Water Height Values File: 'hsvals.txt'
-        ACE Wave Breaking Height Values File: 'Hbvals.txt'
+        ACE Height Above Water of Max Pressure Values File: 'hcvals.txt'
         ACE Wave Length Values File: 'Lvals.txt'
         ACE Wave Number Values File: 'kvals.txt'
         Impact Duration: 0.04 

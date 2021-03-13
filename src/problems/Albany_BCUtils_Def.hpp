@@ -1247,9 +1247,9 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           std::string const      hs_file    = sub_list.get<std::string>("ACE Water Height Values File");
           std::vector<double>    hsvals_vec = LCM::vectorFromFile(hs_file);
           Teuchos::Array<double> hsvals(hsvals_vec);
-          std::string const      Hb_file    = sub_list.get<std::string>("ACE Wave Breaking Height Values File");
-          std::vector<double>    Hbvals_vec = LCM::vectorFromFile(Hb_file);
-          Teuchos::Array<double> Hbvals(Hbvals_vec);
+          std::string const      hc_file    = sub_list.get<std::string>("ACE Height Above Water of Max Pressure Values File");
+          std::vector<double>    hcvals_vec = LCM::vectorFromFile(hc_file);
+          Teuchos::Array<double> hcvals(hcvals_vec);
           std::string const      L_file    = sub_list.get<std::string>("ACE Wave Length Values File");
           std::vector<double>    Lvals_vec = LCM::vectorFromFile(L_file);
           Teuchos::Array<double> Lvals(Lvals_vec);
@@ -1264,11 +1264,11 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
                 "'Time Values' array must have same length as 'Water Height Values' "
                 "array!");
           }
-          // Check that Hbvals and timevals have the same size.  If they do not,
+          // Check that hcvals and timevals have the same size.  If they do not,
           // throw an error.
-          if (timevals.size() != Hbvals.size()) {
+          if (timevals.size() != hcvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array must have same length as 'Wave Breaking Height Values' "
+                "'Time Values' array must have same length as 'Height Above Water of Max Pressure' "
                 "array!");
 	  }
           // Check that Lvals and timevals have the same size.  If they do not,
@@ -1288,7 +1288,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);
           p->set<Teuchos::Array<RealType>>("Water Height Values", hsvals);
-          p->set<Teuchos::Array<RealType>>("Wave Breaking Height Values", Hbvals);
+          p->set<Teuchos::Array<RealType>>("Height Above Water of Max Pressure Values", hcvals);
           p->set<Teuchos::Array<RealType>>("Wave Length Values", Lvals);
           p->set<Teuchos::Array<RealType>>("Wave Number Values", kvals);
 

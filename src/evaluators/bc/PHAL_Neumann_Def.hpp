@@ -793,7 +793,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
   const ScalarT hs   = water_height_val;  // wave height value interpolated in time
-  const ScalarT Hb   = wave_breaking_height_val; //wave breaking height interpolated in time
+  const ScalarT hc   = height_above_water_of_max_pressure_val; //height above water of the max pressure value interpolated in time 
   const ScalarT L    = wave_length_val; //wave length interpolated in time
   const ScalarT k    = wave_number_val; //wave numver interpolated in time
   const double  tm   = inputValues[0];
@@ -803,7 +803,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
   std::cout << "IKT zmin = " << zmin << "\n";
 #endif
-  const ScalarT hc = 0.7 * Hb;
+  const ScalarT Hb = hc / 0.7;
   ScalarT      p0, pc, ps;
   ScalarT      m1;
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT

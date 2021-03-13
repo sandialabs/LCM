@@ -199,7 +199,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
                                             // dof_value), jump)
   //The following are specific to ACE wave pressure BC 
   ScalarT                   water_height_val;
-  ScalarT                   wave_breaking_height_val;
+  ScalarT                   height_above_water_of_max_pressure_val;
   ScalarT                   wave_length_val;
   ScalarT                   wave_number_val;
   

@@ -197,6 +197,12 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   ScalarT                   const_val;
   ScalarT                   robin_vals[5];  // (dof_value, coeff multiplying difference (dof -
                                             // dof_value), jump)
+  //The following are specific to ACE wave pressure BC 
+  ScalarT                   water_height_val;
+  ScalarT                   height_above_water_of_max_pressure_val;
+  ScalarT                   wave_length_val;
+  ScalarT                   wave_number_val;
+  
   std::vector<ScalarT> dudx;
 
   std::vector<ScalarT> matScaling;

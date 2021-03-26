@@ -26,7 +26,7 @@ ALBANY:
       ACE Latent Heat: 334.0e+03 #[J/kg]
       ACE Z Depth File: 'external_files/depth.txt'
       ACE Time File: 'bcs/time.txt'
-      ACE Sea Level File: 'bcs/waterH.txt'
+      ACE Sea Level File: 'bcs/hsvals.txt'
       ACE Ocean Salinity File: 'bcs/ocean_sal.txt'
       ACE Element Size: 0.25  # [m]
 

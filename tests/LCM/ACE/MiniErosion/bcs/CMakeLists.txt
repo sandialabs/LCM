@@ -11,6 +11,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ocean_sal.txt
                ${CMAKE_CURRENT_BINARY_DIR}/ocean_sal.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time.txt
                ${CMAKE_CURRENT_BINARY_DIR}/time.txt COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/waterH.txt
-        	${CMAKE_CURRENT_BINARY_DIR}/waterH.txt COPYONLY)
-
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/hsvals.txt
+        	${CMAKE_CURRENT_BINARY_DIR}/hsvals.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/hcvals.txt
+        	${CMAKE_CURRENT_BINARY_DIR}/hcvals.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Lvals.txt
+		${CMAKE_CURRENT_BINARY_DIR}/Lvals.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kvals.txt
+        	${CMAKE_CURRENT_BINARY_DIR}/kvals.txt COPYONLY)

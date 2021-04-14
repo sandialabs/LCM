@@ -18,6 +18,7 @@
 
 // uncomment the following line if you want debug output to be printed to screen
 //#define ACE_WAVE_PRESS_DEBUG_OUTPUT
+//#define ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
 
 namespace PHAL {
 
@@ -803,14 +804,14 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double  g    = inputValues[1];
   const double  rho  = inputValues[2];
   const double  zmin = inputValues[3];
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-  std::cout << "IKT zmin = " << zmin << "\n";
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+  std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
   const ScalarT Hb = hc / 0.7;
   ScalarT      p0, pc, ps;
   ScalarT      m1;
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-  std::cout << "IKT hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", " << rho
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+  std::cout << "DEBUG: hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", " << rho
             << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
 #endif
   if (hs > 0.0) {
@@ -832,40 +833,43 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
       for (int dim = 0; dim < numDOFsSet; dim++) {
         MeshScalarT z      = physPointsSide(cell, pt, 2);
         MeshScalarT ztilde = z - zmin;
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        std::cout << "IKT z, ztilde = " << z << ", " << ztilde << "\n";
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+        std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
         if (hs < 0.0) {  // if hs < 0, there is no pressure applied
                          // IKT FIXME: need to verify with Jenn that this is correct
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-          std::cout << "IKT negative hs case!\n";
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+          std::cout << "DEBUG: negative hs case!\n";
 #endif
           val = 0.0;
         } else {
           if ((ztilde >= 0) && (ztilde <= hs)) {
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-            std::cout << "IKT case 1!\n";
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+            std::cout << "DEBUG: case 1!\n";
 #endif
             val = p0 + m1 * ztilde;
           } else if ((ztilde > hs) && (ztilde <= hs + hc)) {
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-            std::cout << "IKT case 2!\n";
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+            std::cout << "DEBUG: case 2!\n";
 #endif
             val = p0 + m2 * ztilde;
           } else if ((ztilde > hs + hc) && (ztilde <= hs + hc + 0.5 * Hb)) {
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-            std::cout << "IKT case 3!\n";
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+            std::cout << "DEBUG: case 3!\n";
 #endif
             val = m3 * (ztilde - hc - 0.5 * Hb);
           } else {
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-            std::cout << "IKT case 4!\n";
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+            std::cout << "DEBUG: case 4!\n";
 #endif
             val = 0.0;
           }
         }
-        // Uncomment the following to print value of wave pressure BC applied
-        // std::cout << "IKT wave pressure bc val applied = " << val << "\n";
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+	if (dim == 0) {
+	  std::cout << "DEBUG: cell, pt, z, val = " << cell << ", " << pt << ", " << z << ", " << val << "\n"; 
+	}
+#endif
         qp_data_returned(cell, pt, dim) = val * side_normals(cell, pt, dim);
       }
     }

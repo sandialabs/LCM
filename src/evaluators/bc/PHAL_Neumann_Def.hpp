@@ -827,11 +827,22 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   }
   const ScalarT m2  = (pc - p0) / hc;
   const ScalarT m3  = -2.0 * pc / Hb;
+  const ScalarT b1  = ps;
+  const ScalarT b2  = m1*hs + b1 - m2*hs;
+  const ScalarT b3  = m3*(hs + hc + 0.5*Hb);
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+  std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n"; 
+  std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n"; 
+#endif
   ScalarT       val = 0.0;
   for (int cell = 0; cell < numCells_; cell++) {
     for (int pt = 0; pt < numPoints; pt++) {
       for (int dim = 0; dim < numDOFsSet; dim++) {
         MeshScalarT z      = physPointsSide(cell, pt, 2);
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+        MeshScalarT x      = physPointsSide(cell, pt, 0);
+        MeshScalarT y      = physPointsSide(cell, pt, 1);
+#endif
         MeshScalarT ztilde = z - zmin;
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
         std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
@@ -847,17 +858,17 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
             std::cout << "DEBUG: case 1!\n";
 #endif
-            val = p0 + m1 * ztilde;
+            val = m1*ztilde + b1;
           } else if ((ztilde > hs) && (ztilde <= hs + hc)) {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
             std::cout << "DEBUG: case 2!\n";
 #endif
-            val = p0 + m2 * ztilde;
+            val = m2*ztilde + b2;
           } else if ((ztilde > hs + hc) && (ztilde <= hs + hc + 0.5 * Hb)) {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
             std::cout << "DEBUG: case 3!\n";
 #endif
-            val = m3 * (ztilde - hc - 0.5 * Hb);
+            val = m3*z - b3;
           } else {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
             std::cout << "DEBUG: case 4!\n";
@@ -867,7 +878,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
         }
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
 	if (dim == 0) {
-	  std::cout << "DEBUG: cell, pt, z, val = " << cell << ", " << pt << ", " << z << ", " << val << "\n"; 
+	  std::cout << "DEBUG: cell, pt, x, y, z, val = " << cell << ", " << pt << ", " << x << ", " << y 
+		    << ", " <<  z << ", " << val << "\n"; 
 	}
 #endif
         qp_data_returned(cell, pt, dim) = val * side_normals(cell, pt, dim);

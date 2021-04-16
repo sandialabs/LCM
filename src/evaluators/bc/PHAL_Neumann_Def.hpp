@@ -804,6 +804,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double  g    = inputValues[1];
   const double  rho  = inputValues[2];
   const double  zmin = inputValues[3];
+  auto cv = coordVec(0, 0, 0);
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
   std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
@@ -834,7 +835,6 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n"; 
   std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n"; 
 #endif
-  ScalarT       val = 0.0;
   for (int cell = 0; cell < numCells_; cell++) {
     for (int pt = 0; pt < numPoints; pt++) {
       for (int dim = 0; dim < numDOFsSet; dim++) {
@@ -847,35 +847,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
         std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
-        if (hs < 0.0) {  // if hs < 0, there is no pressure applied
-                         // IKT FIXME: need to verify with Jenn that this is correct
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-          std::cout << "DEBUG: negative hs case!\n";
-#endif
-          val = 0.0;
-        } else {
-          if ((ztilde >= 0) && (ztilde <= hs)) {
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-            std::cout << "DEBUG: case 1!\n";
-#endif
-            val = m1*ztilde + b1;
-          } else if ((ztilde > hs) && (ztilde <= hs + hc)) {
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-            std::cout << "DEBUG: case 2!\n";
-#endif
-            val = m2*ztilde + b2;
-          } else if ((ztilde > hs + hc) && (ztilde <= hs + hc + 0.5 * Hb)) {
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-            std::cout << "DEBUG: case 3!\n";
-#endif
-            val = m3*z - b3;
-          } else {
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-            std::cout << "DEBUG: case 4!\n";
-#endif
-            val = 0.0;
-          }
-        }
+        const ScalarT val = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
 	if (dim == 0) {
 	  std::cout << "DEBUG: cell, pt, x, y, z, val = " << cell << ", " << pt << ", " << x << ", " << y 
@@ -886,6 +858,46 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
       }
     }
   }
+}
+
+template <typename EvalT, typename Traits>
+typename NeumannBase<EvalT, Traits>::ScalarT
+NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(const ScalarT hs, const ScalarT hc, const ScalarT Hb,
+                                                      const ScalarT m1, const ScalarT m2, const ScalarT m3, 
+                                                      const ScalarT b1, const ScalarT b2, const ScalarT b3, 
+                                                      const ScalarT zval) const
+{
+  ScalarT       pval = 0.0;
+  if (hs < 0.0) {  // if hs < 0, there is no pressure applied
+                   // IKT FIXME: need to verify with Jenn that this is correct
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+    std::cout << "DEBUG: negative hs case!\n";
+#endif
+    pval = 0.0;
+  } else {
+    if ((zval >= 0) && (zval <= hs)) {
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+      std::cout << "DEBUG: case 1!\n";
+#endif
+      pval = m1*zval + b1;
+    } else if ((zval > hs) && (zval <= hs + hc)) {
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+      std::cout << "DEBUG: case 2!\n";
+#endif
+      pval = m2*zval + b2;
+    } else if ((zval > hs + hc) && (zval <= hs + hc + 0.5 * Hb)) {
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+      std::cout << "DEBUG: case 3!\n";
+#endif
+      pval = m3*zval - b3;
+    } else {
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+      std::cout << "DEBUG: case 4!\n";
+#endif
+      pval = 0.0;
+    }
+  }
+  return pval; 
 }
 
 template <typename EvalT, typename Traits>

@@ -128,6 +128,12 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       shards::CellTopology const&                          celltopo,
       int                                                  local_side_id) const;
 
+  ScalarT
+  calc_ace_press_at_z_point(const ScalarT hs, const ScalarT hc, const ScalarT Hb,
+		            const ScalarT m1, const ScalarT m2, const ScalarT m3, 
+			    const ScalarT b1, const ScalarT b2, const ScalarT b3, 
+			    const ScalarT zval) const; 
+
   // closed_from bc assignment
   void
   calc_closed_form(

@@ -77,8 +77,10 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Albany::MeshSpecsStruct> const& meshSpecs;
 
   int                 cellDims, numQPs, numNodes, numCells, maxSideDim, maxNumQpSide;
+  mutable int         numBlocks; 
   Teuchos::Array<int> offset;
   int                 numDOFsSet;
+  mutable Teuchos::RCP<Teuchos_Comm const> commT; 
 
   // Should only specify flux vector components (dudx, dudy, dudz), dudn, or
   // pressure P
@@ -126,7 +128,8 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       Kokkos::DynRankView<MeshScalarT, PHX::Device> const& physPointsSide,
       Kokkos::DynRankView<MeshScalarT, PHX::Device> const& jacobian_side_refcell,
       shards::CellTopology const&                          celltopo,
-      int                                                  local_side_id) const;
+      int                                                  local_side_id,
+      const int                                            workset_num) const; 
 
   ScalarT
   calc_ace_press_at_z_point(const ScalarT hs, const ScalarT hc, const ScalarT Hb,

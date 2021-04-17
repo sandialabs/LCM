@@ -1292,6 +1292,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           p->set<Teuchos::Array<RealType>>("Wave Length Values", Lvals);
           p->set<Teuchos::Array<RealType>>("Wave Number Values", kvals);
 
+
           p->set<RCP<ParamLib>>("Parameter Library", paramLib);
 
           p->set<string>("Side Set ID", meshSpecs->ssNames[i]);
@@ -1311,6 +1312,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           double g    = sub_list.get<double>("Gravity", 9.806);
           double rho  = sub_list.get<double>("Water Density", 1025.0);
           double zmin = sub_list.get<double>("Min z-Value", 0.0);
+          bool dump_wave_press_nbc_data = sub_list.get<bool>("Dump Wave Press NBC Data Files", false);
 
           // Check that parameters are physical
           if (tm <= 0.0) {
@@ -1329,6 +1331,8 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           param_vec[1] = g;
           param_vec[2] = rho;
           param_vec[3] = zmin;
+          param_vec[4] = dump_wave_press_nbc_data; 
+
           Teuchos::Array<double> param_array(param_vec);
 
           // Pass the input file line

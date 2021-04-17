@@ -26,6 +26,7 @@ LCM:
         Impact Duration: 0.04 
         #Gravity: 9.806
         Water Density: 1022.0
+        Dump Wave Press NBC Data Files: true
     
     Adaptation:
       Method: Erosion

@@ -77,6 +77,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Albany::MeshSpecsStruct> const& meshSpecs;
 
   int                 cellDims, numQPs, numNodes, numCells, maxSideDim, maxNumQpSide;
+  mutable int         numBlocks; 
   Teuchos::Array<int> offset;
   int                 numDOFsSet;
 

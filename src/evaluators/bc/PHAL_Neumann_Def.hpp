@@ -425,8 +425,9 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
     cellsOnSidesOnBlocks[iBlock][elem_side](numCellsOnSidesOnBlocks[iBlock][elem_side]++) = elem_LID;
   }
 
+  numBlocks = ordinalEbIndex.size(); 
   // Loop over the sides that form the boundary condition
-  for (int iblock = 0; iblock < ordinalEbIndex.size(); ++iblock) {
+  for (int iblock = 0; iblock<numBlocks; ++iblock) {
     for (int side = 0; side < numSidesOnElem; ++side) {
       int numCells_ = numCellsOnSidesOnBlocks[iblock][side];
       if (numCells_ == 0) continue;
@@ -801,17 +802,19 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  const ScalarT hs   = water_height_val;  // wave height value interpolated in time
-  const ScalarT hc   = height_above_water_of_max_pressure_val; //height above water of the max pressure value interpolated in time 
-                                                               //In general, hc = 0.7*Hb, where Hb is the breaking wave height
-  const ScalarT L    = wave_length_val; //wave length interpolated in time
-                                        //In general, L = 8*Hb 
-  const ScalarT k    = wave_number_val; //wave number interpolated in time
-                                        //In general, L = 2 
-  const double  tm   = inputValues[0];
-  const double  g    = inputValues[1];
-  const double  rho  = inputValues[2];
-  const double  zmin = inputValues[3];
+  const ScalarT hs                    = water_height_val;  // wave height value interpolated in time
+  const ScalarT hc                    = height_above_water_of_max_pressure_val; //height above water of the max pressure value interpolated in time 
+                                                                                //In general, hc = 0.7*Hb, where Hb is the breaking wave height
+  const ScalarT L                     = wave_length_val; //wave length interpolated in time
+                                                         //In general, L = 8*Hb 
+  const ScalarT k                     = wave_number_val; //wave number interpolated in time
+                                                         //In general, L = 2 
+  const double  tm                    = inputValues[0];
+  const double  g                     = inputValues[1];
+  const double  rho                   = inputValues[2];
+  const double  zmin                  = inputValues[3];
+  const bool dump_wave_press_nbc_data = inputValues[4];  
+
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
   std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
@@ -866,28 +869,36 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     }
   }
 
-  std::ofstream outfile;  
-  char str[80]; 
-  strcpy(str,"ace_press_nbc_"); 
-  strcat(str, std::to_string(ace_press_index[workset_num]).c_str()); 
-  strcat(str, "-"); 
-  strcat(str, std::to_string(workset_num).c_str()); 
-  strcat(str, ".txt");  
-  outfile.open(str); 
-  for (int cell = 0; cell < numCells_; cell++) {
-    for (int node = 0; node < numNodes; node++) {
-      const auto x = coordVec(cell, node, 0);
-      const auto y = coordVec(cell, node, 1);
-      const auto z = coordVec(cell, node, 2);
-      const auto ztilde = z - zmin; 
-      const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
-      std::cout  << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", " << node << ", " << x << ", " << y 
-                 << ", " <<  z << ", " << pval_node << "\n"; 
-      outfile <<  cell << "  " << node << "  " << x << "  " << y << "  " <<  z << "  " << pval_node << "\n"; 
+  if (dump_wave_press_nbc_data == true) {
+    if (numBlocks > 1) { 
+      ALBANY_ABORT("PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for >1 element blocks!\n" 
+		    << "Please contact Irina Tezaur if this capability is of interest.\n"); 
+    } 
+    std::ofstream outfile;  
+    char str[80]; 
+    strcpy(str,"ace_press_nbc_"); 
+    strcat(str, std::to_string(ace_press_index[workset_num]).c_str()); 
+    strcat(str, "-"); 
+    strcat(str, std::to_string(workset_num).c_str()); 
+    strcat(str, ".txt");  
+    outfile.open(str); 
+    for (int cell = 0; cell < numCells_; cell++) {
+      for (int node = 0; node < numNodes; node++) {
+        const auto x = coordVec(cell, node, 0);
+        const auto y = coordVec(cell, node, 1);
+        const auto z = coordVec(cell, node, 2);
+        const auto ztilde = z - zmin; 
+        const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+        std::cout  << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", " << node << ", " << x << ", " << y 
+                   << ", " <<  z << ", " << pval_node << "\n";
+#endif 
+        outfile <<  cell << "  " << node << "  " << x << "  " << y << "  " <<  z << "  " << pval_node << "\n"; 
+      }
     }
+    outfile.close();
+    ace_press_index[workset_num]++;  
   }
-  outfile.close();
-  ace_press_index[workset_num]++;  
 }
 
 template <typename EvalT, typename Traits>

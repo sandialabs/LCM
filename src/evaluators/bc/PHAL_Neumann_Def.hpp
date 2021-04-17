@@ -789,9 +789,6 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     int                                                  local_side_id,
     const int                                            workset_num) const
 {
-  if (commT->getSize() > 1) {
-    ALBANY_ABORT("PHAL_Neumann: ACE Wave Pressure NBC does not currently work in parallel!\n");  
-  }
   int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
   int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
 

@@ -812,7 +812,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const ScalarT L                     = wave_length_val; //wave length interpolated in time
                                                          //In general, L = 8*Hb 
   const ScalarT k                     = wave_number_val; //wave number interpolated in time
-                                                         //In general, L = 2 
+                                                         //In general, k = 2*pi/L 
   const double  tm                    = inputValues[0];
   const double  g                     = inputValues[1];
   const double  rho                   = inputValues[2];

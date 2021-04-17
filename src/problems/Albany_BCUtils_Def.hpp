@@ -1310,7 +1310,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           double tm = sub_list.get<double>("Impact Duration", 0.04);
           // IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code?
           double g    = sub_list.get<double>("Gravity", 9.806);
-          double rho  = sub_list.get<double>("Water Density", 1025.0);
+          double rho  = sub_list.get<double>("Water Density", 1022.0);
           double zmin = sub_list.get<double>("Min z-Value", 0.0);
           bool dump_wave_press_nbc_data = sub_list.get<bool>("Dump Wave Press NBC Data Files", false);
 

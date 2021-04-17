@@ -20,6 +20,8 @@
 //#define ACE_WAVE_PRESS_DEBUG_OUTPUT
 //#define ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
 
+static std::vector<int> ace_press_index; 
+
 namespace PHAL {
 
 //*****
@@ -243,6 +245,11 @@ template <typename EvalT, typename Traits>
 void
 NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalData workset)
 {
+  const int numWorksets = workset.num_worksets;
+  const int worksetNum = workset.workset_num;  
+  if (ace_press_index.size() != numWorksets) {
+    ace_press_index.resize(numWorksets, 0.0); 
+  }
   // setJacobian only needs to be RealType since the data type is only
   //  used internally for Basis Fns on reference elements, which are
   //  not functions of coordinates. This save 18min of compile time!!!
@@ -550,7 +557,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
 
         case PRESS: calc_press(data, jacobianSide, *cellType, side); break;
 
-        case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side); break;
+        case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side, worksetNum); break;
 
         case TRACTION: calc_traction_components(data); break;
         case CLOSED_FORM: calc_closed_form(data, physPointsSide, jacobianSide, *cellType, side, workset); break;
@@ -774,7 +781,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     const Kokkos::DynRankView<MeshScalarT, PHX::Device>& physPointsSide,
     const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
     const shards::CellTopology&                          celltopo,
-    int                                                  local_side_id) const
+    int                                                  local_side_id,
+    const int                                            workset_num) const
 {
   int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
   int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
@@ -799,12 +807,11 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const ScalarT L    = wave_length_val; //wave length interpolated in time
                                         //In general, L = 8*Hb 
   const ScalarT k    = wave_number_val; //wave number interpolated in time
-                                        //In general, L = 2*pi/L 
+                                        //In general, L = 2 
   const double  tm   = inputValues[0];
   const double  g    = inputValues[1];
   const double  rho  = inputValues[2];
   const double  zmin = inputValues[3];
-  auto cv = coordVec(0, 0, 0);
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
   std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
@@ -836,28 +843,51 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n"; 
 #endif
   for (int cell = 0; cell < numCells_; cell++) {
-    for (int pt = 0; pt < numPoints; pt++) {
+    for (int qp = 0; qp < numPoints; qp++) {
       for (int dim = 0; dim < numDOFsSet; dim++) {
-        MeshScalarT z      = physPointsSide(cell, pt, 2);
+        MeshScalarT z      = physPointsSide(cell, qp, 2);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        MeshScalarT x      = physPointsSide(cell, pt, 0);
-        MeshScalarT y      = physPointsSide(cell, pt, 1);
+        MeshScalarT x      = physPointsSide(cell, qp, 0);
+        MeshScalarT y      = physPointsSide(cell, qp, 1);
 #endif
         MeshScalarT ztilde = z - zmin;
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
         std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
-        const ScalarT val = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
+        const ScalarT pval_qp = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
 	if (dim == 0) {
-	  std::cout << "DEBUG: cell, pt, x, y, z, val = " << cell << ", " << pt << ", " << x << ", " << y 
-		    << ", " <<  z << ", " << val << "\n"; 
+	  std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y 
+		    << ", " <<  z << ", " << pval_qp << "\n"; 
 	}
 #endif
-        qp_data_returned(cell, pt, dim) = val * side_normals(cell, pt, dim);
+        qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
       }
     }
   }
+
+  std::ofstream outfile;  
+  char str[80]; 
+  strcpy(str,"ace_press_nbc_"); 
+  strcat(str, std::to_string(ace_press_index[workset_num]).c_str()); 
+  strcat(str, "-"); 
+  strcat(str, std::to_string(workset_num).c_str()); 
+  strcat(str, ".txt");  
+  outfile.open(str); 
+  for (int cell = 0; cell < numCells_; cell++) {
+    for (int node = 0; node < numNodes; node++) {
+      const auto x = coordVec(cell, node, 0);
+      const auto y = coordVec(cell, node, 1);
+      const auto z = coordVec(cell, node, 2);
+      const auto ztilde = z - zmin; 
+      const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
+      std::cout  << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", " << node << ", " << x << ", " << y 
+                 << ", " <<  z << ", " << pval_node << "\n"; 
+      outfile <<  cell << "  " << node << "  " << x << "  " << y << "  " <<  z << "  " << pval_node << "\n"; 
+    }
+  }
+  outfile.close();
+  ace_press_index[workset_num]++;  
 }
 
 template <typename EvalT, typename Traits>

@@ -1084,7 +1084,6 @@ Application::computeGlobalResidualImpl(
   const auto& wsPhysIndex  = disc->getWsPhysIndex();
 
   int const numWorksets = wsElNodeEqID.size();
-
   Teuchos::RCP<Thyra_Vector> const overlapped_f = solMgr->get_overlapped_f();
 
   Teuchos::RCP<const CombineAndScatterManager> cas_manager = solMgr->get_cas_manager();
@@ -1148,6 +1147,8 @@ Application::computeGlobalResidualImpl(
 
     workset.f = overlapped_f;
 
+    workset.num_worksets = numWorksets; 
+
     for (int ws = 0; ws < numWorksets; ws++) {
       std::string const evalName = PHAL::evalName<EvalT>("FM", wsPhysIndex[ws]);
       loadWorksetBucketInfo<EvalT>(workset, ws, evalName);
@@ -1156,6 +1157,7 @@ Application::computeGlobalResidualImpl(
       fm[wsPhysIndex[ws]]->evaluateFields<EvalT>(workset);
 
       if (nfm != Teuchos::null) {
+        workset.workset_num = ws; 	
         deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
       }
     }
@@ -1350,12 +1352,14 @@ Application::computeGlobalJacobianImpl(
     if (!workset.Jac.is_null()) {
       workset.Jac_kokkos = getNonconstDeviceData(workset.Jac);
     }
+    workset.num_worksets = numWorksets; 
     for (int ws = 0; ws < numWorksets; ws++) {
       std::string const evalName = PHAL::evalName<EvalT>("FM", wsPhysIndex[ws]);
       loadWorksetBucketInfo<EvalT>(workset, ws, evalName);
 
       // FillType template argument used to specialize Sacado
       fm[wsPhysIndex[ws]]->evaluateFields<EvalT>(workset);
+      workset.workset_num = ws;       
       if (Teuchos::nonnull(nfm)) deref_nfm(nfm, wsPhysIndex, ws)->evaluateFields<EvalT>(workset);
     }
   }

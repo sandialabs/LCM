@@ -250,6 +250,10 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
   if (ace_press_index.size() != numWorksets) {
     ace_press_index.resize(numWorksets, 0.0); 
   }
+  auto       rcp_disc    = workset.disc;
+  auto       stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  commT = stk_disc->getComm(); 
+
   // setJacobian only needs to be RealType since the data type is only
   //  used internally for Basis Fns on reference elements, which are
   //  not functions of coordinates. This save 18min of compile time!!!
@@ -785,6 +789,9 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     int                                                  local_side_id,
     const int                                            workset_num) const
 {
+  if (commT->getSize() > 1) {
+    ALBANY_ABORT("PHAL_Neumann: ACE Wave Pressure NBC does not currently work in parallel!\n");  
+  }
   int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
   int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
 
@@ -870,6 +877,9 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   }
 
   if (dump_wave_press_nbc_data == true) {
+    if (commT->getSize() > 1) {
+      ALBANY_ABORT("PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for parallel runs!\n");  
+    }
     if (numBlocks > 1) { 
       ALBANY_ABORT("PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for >1 element blocks!\n" 
 		    << "Please contact Irina Tezaur if this capability is of interest.\n"); 

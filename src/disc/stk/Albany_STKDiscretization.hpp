@@ -553,6 +553,8 @@ class STKDiscretization : public AbstractDiscretization
     std::pair<double, double>     parametric_coords;
     std::pair<unsigned, unsigned> latitude_longitude;
   };
+  
+  Teuchos::RCP<Teuchos_Comm const> getComm() const {return comm;} 
 
  protected:
   void
@@ -622,6 +624,7 @@ class STKDiscretization : public AbstractDiscretization
 
   int
   nonzeroesPerRow(int const neq) const;
+
 
   // ==================== Members =================== //
 

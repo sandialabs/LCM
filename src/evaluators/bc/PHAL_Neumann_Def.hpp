@@ -20,7 +20,10 @@
 //#define ACE_WAVE_PRESS_DEBUG_OUTPUT
 //#define ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
 
+//The following vars are for the ACE Wave Pressure NBC 
 static std::vector<int> ace_press_index; 
+static std::vector<double> previous_times; 
+static std::vector<bool> is_initial_time; 
 
 namespace PHAL {
 
@@ -249,6 +252,12 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
   const int worksetNum = workset.workset_num;  
   if (ace_press_index.size() != numWorksets) {
     ace_press_index.resize(numWorksets, 0.0); 
+  }
+  if (previous_times.size() != numWorksets) {
+    previous_times.resize(numWorksets, 0.0); 
+  }
+  if (is_initial_time.size() != numWorksets) {
+    is_initial_time.resize(numWorksets, true); 
   }
   auto       rcp_disc    = workset.disc;
   auto       stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
@@ -562,7 +571,8 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
 
         case PRESS: calc_press(data, jacobianSide, *cellType, side); break;
 
-        case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side, worksetNum); break;
+        case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, 
+				      side, worksetNum, workset.current_time); break;
 
         case TRACTION: calc_traction_components(data); break;
         case CLOSED_FORM: calc_closed_form(data, physPointsSide, jacobianSide, *cellType, side, workset); break;
@@ -787,7 +797,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
     const shards::CellTopology&                          celltopo,
     int                                                  local_side_id,
-    const int                                            workset_num) const
+    const int                                            workset_num,
+    const double                                         current_time) const
 {
   int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
   int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
@@ -818,6 +829,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double  rho                   = inputValues[2];
   const double  zmin                  = inputValues[3];
   const bool dump_wave_press_nbc_data = inputValues[4];  
+
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
   std::cout << "DEBUG: zmin = " << zmin << "\n";
@@ -881,31 +893,41 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
       ALBANY_ABORT("PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for >1 element blocks!\n" 
 		    << "Please contact Irina Tezaur if this capability is of interest.\n"); 
     } 
-    std::ofstream outfile;  
-    char str[80]; 
-    strcpy(str,"ace_press_nbc_"); 
-    strcat(str, std::to_string(ace_press_index[workset_num]).c_str()); 
-    strcat(str, "-"); 
-    strcat(str, std::to_string(workset_num).c_str()); 
-    strcat(str, ".txt");  
-    outfile.open(str); 
-    for (int cell = 0; cell < numCells_; cell++) {
-      for (int node = 0; node < numNodes; node++) {
-        const auto x = coordVec(cell, node, 0);
-        const auto y = coordVec(cell, node, 1);
-        const auto z = coordVec(cell, node, 2);
-        const auto ztilde = z - zmin; 
-        const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
+    if ((current_time != previous_times[workset_num]) || (is_initial_time[workset_num] == true)) {
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        std::cout  << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", " << node << ", " << x << ", " << y 
-                   << ", " <<  z << ", " << pval_node << "\n";
+      std::cout << "DEBUG: workset_num, ace_press_index, time = " << workset_num << ", " 
+	        <<  ace_press_index[workset_num] 
+	        << ", " << current_time << "\n"; 
+#endif
+      std::ofstream outfile;  
+      char str[80]; 
+      strcpy(str,"ace_press_nbc_"); 
+      strcat(str, std::to_string(ace_press_index[workset_num]).c_str()); 
+      strcat(str, "-"); 
+      strcat(str, std::to_string(workset_num).c_str()); 
+      strcat(str, ".txt");  
+      outfile.open(str); 
+      for (int cell = 0; cell < numCells_; cell++) {
+        for (int node = 0; node < numNodes; node++) {
+          const auto x = coordVec(cell, node, 0);
+          const auto y = coordVec(cell, node, 1);
+          const auto z = coordVec(cell, node, 2);
+          const auto ztilde = z - zmin; 
+          const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+          std::cout  << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num 
+		     << ", " << cell << ", " << node << ", " << x << ", " << y 
+                     << ", " <<  z << ", " << pval_node << "\n";
 #endif 
-        outfile <<  cell << "  " << node << "  " << x << "  " << y << "  " <<  z << "  " << pval_node << "\n"; 
+          outfile <<  cell << "  " << node << "  " << x << "  " << y << "  " <<  z << "  " << pval_node << "\n"; 
+        }
       }
+      outfile.close();
+      ace_press_index[workset_num]++;  
     }
-    outfile.close();
-    ace_press_index[workset_num]++;  
   }
+  previous_times[workset_num] = current_time; 
+  is_initial_time[workset_num] = false; 
 }
 
 template <typename EvalT, typename Traits>

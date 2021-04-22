@@ -2,7 +2,7 @@ LCM:
   Alternating System:
     Model Input Files: ['thermal_wave_press_nbc.yaml', 'mechanical_wave_press_nbc.yaml']
     Initial Time: 0.0 #   [sec]
-    Final Time: 360000.0 #  [sec]
+    Final Time: 262800.0 #  [sec]
     Initial Time Step: 3600.0 # seconds
     Maximum Steps: 10000
     Minimum Time Step: 30.0

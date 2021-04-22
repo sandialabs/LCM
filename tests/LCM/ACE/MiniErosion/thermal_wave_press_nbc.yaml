@@ -8,7 +8,7 @@ ALBANY:
   Problem: 
     Name: ACE Thermal 3D
     Solution Method: Transient Tempus
-    MaterialDB Filename: './materials_thermal.yaml'
+    MaterialDB Filename: './materials_thermal_wave_press_nbc.yaml'
     
     Dirichlet BCs:
       Time Dependent SDBC on NS z+ for DOF T:

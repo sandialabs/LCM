@@ -23,10 +23,10 @@ LCM:
         ACE Height Above Water of Max Pressure Values File: 'bcs/hcvals.txt'
         ACE Wave Length Values File: 'bcs/Lvals.txt'
         ACE Wave Number Values File: 'bcs/kvals.txt'
-        Impact Duration: 0.04 
+        Dump Wave Press NBC Data Files: false
+        Impact Duration: 0.01 
         #Gravity: 9.806
-        Water Density: 1022.0
-        Dump Wave Press NBC Data Files: true
+        Water Density: 3000.0
     
     Adaptation:
       Method: Erosion

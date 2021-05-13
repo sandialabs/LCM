@@ -6,7 +6,7 @@
 #             Run on    2014/01/27   15:23:52 PST
 #  *****************************************************************
 
-#  FILE 1: /scratch/sandbox/SurfaceElementLocking/outNoVolJ.alg.gold.e
+#  FILE 1: /scratch/sandbox/SurfaceElementLocking/outNoVolJ.gold.e
 #   Title: Sierra Output Default Title
 #          Dim = 3, Blocks = 1, Nodes = 8, Elements = 1, Nodesets = 10, Sidesets = 1
 #          Vars: Global = 0, Nodal = 6, Element = 74, Nodeset = 0, Sideset = 0, Times = 2

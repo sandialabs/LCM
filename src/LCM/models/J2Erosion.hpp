@@ -75,6 +75,8 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField stress_;
   ScalarField yield_surf_;
   ScalarField failed_;
+  ScalarField elapsedT_;
+  
 
   // Workspace arrays
   Albany::MDArray Fp_old_;
@@ -90,9 +92,11 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType bulk_porosity_{0.0};
   RealType soil_yield_strength_{0.0};
 
-  // Params with depth:
+  // Params with depth or time:
   std::vector<RealType> z_above_mean_sea_level_;
   std::vector<RealType> porosity_from_file_;
+  std::vector<RealType> sea_level_;
+  std::vector<RealType> time_;
 
   // Sea level arrays
   RealType current_time_{0.0};

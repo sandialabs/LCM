@@ -844,8 +844,11 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   if (hs > 0.0) {
     p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
     pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
+    //pc = p0;
     ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
+    //ps = p0;
     m1 = (p0 - ps) / hs;
+    //m1 = 0.0;
   } else {
     p0 = 0.0;
     pc = 0.0;
@@ -853,6 +856,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     m1 = 0.0;
   }
   const ScalarT m2  = (pc - p0) / hc;
+  //const ScalarT m2  = 0.0;
   const ScalarT m3  = -2.0 * pc / Hb;
   const ScalarT b1  = ps;
   const ScalarT b2  = m1*hs + b1 - m2*hs;

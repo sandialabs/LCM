@@ -75,7 +75,6 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField stress_;
   ScalarField yield_surf_;
   ScalarField failed_;
-  ScalarField elapsedT_;
   
 
   // Workspace arrays
@@ -84,6 +83,8 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
 
   bool                       have_cell_boundary_indicator_{false};
   Teuchos::ArrayRCP<double*> cell_boundary_indicator_;
+  
+  PHX::MDField<bool> exposed_;
 
   // Baseline constants
   RealType sat_mod_{0.0};
@@ -94,6 +95,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
 
   // Params with depth or time:
   std::vector<RealType> z_above_mean_sea_level_;
+  std::vector<RealType> peat_from_file_;
   std::vector<RealType> porosity_from_file_;
   std::vector<RealType> sea_level_;
   std::vector<RealType> time_;

@@ -49,6 +49,14 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
         "*** ERROR: Number of z values and number of porosity values in "
         "ACE_Porosity File must match.");
   }
+  if (p->isParameter("ACE Peat File") == true) {
+    auto const filename = p->get<std::string>("ACE Peat File");
+    peat_from_file_ = vectorFromFile(filename);
+    ALBANY_ASSERT(
+        z_above_mean_sea_level_.size() == peat_from_file_.size(),
+        "*** ERROR: Number of z values and number of peat values in "
+        "ACE Peat File must match.");
+  }
 
   // retrieve appropriate field name strings
   std::string const cauchy_string       = field_name_map_["Cauchy_Stress"];
@@ -82,7 +90,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
     setDependentField("Temperature", dl->qp_scalar);
     setEvaluatedField(source_string, dl->qp_scalar);
   }
-  setEvaluatedField("ACE_Elapsed_Time", dl->qp_scalar);
 
   // define the state variables
 
@@ -97,7 +104,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
         source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
   addStateVariable("failure_state", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output failure_state", true));
-  addStateVariable("ACE_Elapsed_Time", dl->qp_scalar, "scalar", 1.0, false, p->get<bool>("Output Elapsed Time", false));
 }
 
 template <typename EvalT, typename Traits>
@@ -134,7 +140,6 @@ J2ErosionKernel<EvalT, Traits>::init(
   eqps_       = *eval_fields[eqps_string];
   yield_surf_ = *eval_fields[yieldSurface_string];
   failed_     = *eval_fields["failure_state"];
-  elapsedT_   = *eval_fields["ACE_Elapsed_Time"];
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_string];
@@ -272,6 +277,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
 #endif
+  
+  // Compute effective yield strength
   ScalarT Y = yield_strength_(cell, pt);
 
   auto&& delta_time = delta_time_(0);
@@ -280,25 +287,64 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const porosity = porosity_from_file_.size() > 0 ?
                             interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
                             bulk_porosity_;
-
-  // Compute effective yield strength
-  auto const sea_level = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;                           
+  auto const peat     = peat_from_file_.size() > 0 ?
+                            interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) :
+                            1.0; // need this so ice is strong when melted
+  
+  RealType height_AL     = 4.0;
+  RealType height_normal = ((height-height_AL) / (5.2-height_AL));  // warning! this assumes heights are positive values
+           height_normal = std::max(height_normal,0.0);
+  
+  RealType res_strength = (peat * peat * peat * soil_yield_strength_);
+                           //+ (height_normal * height_normal * soil_yield_strength_/3.0);
 #if defined(ICE_SATURATION)
+  Y = (ice_saturation * Y) + res_strength;
+#endif
+  
+  auto const sea_level      = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;  
+  auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
+  auto const is_at_boundary = cell_bi == 1.0;
+  auto const is_erodible    = cell_bi == 2.0;
+  
+  //RealType const height_max     = *std::max_element(z_above_mean_sea_level_.begin(), z_above_mean_sea_level_.end());
+  //RealType const height_max     = z_above_mean_sea_level_.back();  // warning! assumes last value is the highest height
+  //RealType const height_max = 5.2;
+  //RealType const height_normal  = 1.0 - ((height_max - height) / height_max);  // warning! this assumes heights are positive values
+  //height_normal = std::min(1.0, height_normal); 
+  //height_normal = std::max(0.0, height_normal);
+
   // Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
   //Y = soil_yield_strength_ + ice_saturation * Y;
-  if ((ice_saturation < 0.01) && (height < (3.0*sea_level))) {
-    elapsedT_(cell, pt) = elapsedT_(cell, pt) + delta_time_(0);
-    Y = (soil_yield_strength_ + ice_saturation * Y) - ((elapsedT_(cell,pt)/2.645502646e+05)*soil_yield_strength_);
-    //std::cout << "(" << cell << "," << pt << ") ELAPSEDT = " << elapsedT_(cell, pt) << "  ";
-  } else if ((ice_saturation < 0.01) && (height >= (3.0*sea_level))) {
-    elapsedT_(cell, pt) = elapsedT_(cell, pt) + delta_time_(0);
-    Y = (soil_yield_strength_ + ice_saturation * Y) - ((elapsedT_(cell,pt)/2.645502646e+06)*soil_yield_strength_);
-  } else {
-    elapsedT_(cell, pt) = 0.0;
-    Y = (soil_yield_strength_ + ice_saturation * Y);
-  }
-  Y = std::max(Y, 0.0);
-#endif
+  
+  //std::cout << "  (" << cell << "," << pt << ") - " << (exposed1_(cell, pt));
+  
+  //if ((is_erodible == true) && exposed1_(cell, pt) == 0.0) {
+  //  std::cout << "  (" << cell << "," << pt << ")  ";
+  //  std::cout << elapsedT_(cell, pt);
+  //  exposed1_(cell, pt) = 5.0;
+  //  elapsedT_(cell, pt) = current_time;
+  //  std::cout << elapsedT_(cell, pt);
+  //}
+  
+  //if (is_erodible == true) {
+  //  Y -= (current_time - elapsedT_(cell, pt))*peat*peat;
+  //  std::cout << "  (" << cell << "," << pt << ") - " << (current_time - elapsedT_(cell, pt));
+  //} 
+  Y = std::max(Y, 100.0);
+
+  //if ((ice_saturation < 0.25) && (height < (1.0*sea_level)) && is_erodible) {
+  //  elapsedT_(cell, pt) = elapsedT_(cell, pt) + delta_time_(0);
+  //  Y = (soil_yield_strength_ + ice_saturation * Y) - ((elapsedT_(cell,pt)/1.0e+04)*soil_yield_strength_); 
+  //} else if ((ice_saturation < 0.05) && (height >= (1.0*sea_level)) && is_erodible) {
+  //  elapsedT_(cell, pt) = elapsedT_(cell, pt) + delta_time_(0);
+  //  Y = (soil_yield_strength_ + ice_saturation * Y) - height_normal*((elapsedT_(cell,pt)/1.0e+06)*soil_yield_strength_);  // 2.6e+05
+  //  //std::cout << "  (" << cell << "," << pt << ") - " << elapsedT_(cell, pt);
+  //} else {
+  //  //elapsedT_(cell, pt) = 0.0;
+  //  Y = (soil_yield_strength_ + ice_saturation * Y);
+ ///}
+
+
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);
@@ -415,6 +461,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (yielded == true) {
     failed += 1.0;
   }
+  
+  // Make failure due to ocean exposure have "extra weight"
+  //if ((yielded == true) && (height <= sea_level)) {
+  //  failed += 1.0;
+  //}
 
   // Determine if kinematic failure occurred
   auto const critical_angle = critical_angle_;
@@ -429,11 +480,12 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
       failed += 1.0;
     }
   }
-  auto const maximum_displacement = 0.25;  // 1.0
+  auto const maximum_displacement = 0.50;  // 1.0
   auto const displacement_norm    = minitensor::norm(displacement);
   if (displacement_norm > maximum_displacement) {
     failed += 8.0;
   }
+  
   
   
 }

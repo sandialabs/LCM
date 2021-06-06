@@ -251,7 +251,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       // Use freezing curve to get icurr and dfdT
       ScalarT const tol   = 709.0;
-      ScalarT const Tdiff = Tcurr - Tmelt;
+      ScalarT const Tdiff = Tcurr - (Tmelt + 1.0);  // Jenn's hack so active layer acts stronger.
       ScalarT       icurr{1.0};
       ScalarT       dfdT{0.0};
 
@@ -408,6 +408,17 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
             (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) +
             ((1.0 - porosity_eb) * soil_thermal_cond_eb);
       }
+      
+      // Jenn's hack to calibrate niche formation:
+      ScalarT factor = 4.0 * sea_level;
+      if ((is_erodible == true) && (height <= sea_level)) {
+          factor = std::max(factor, 1.0);  // in case sea level is tiny or negative
+          factor = std::min(factor, 10.0);
+          thermal_conductivity_(cell, qp) = thermal_conductivity_(cell, qp) * factor;
+          heat_capacity_(cell, qp) = heat_capacity_(cell, qp) / factor;
+      }
+      // NOTE: A factor of 100.0 was way too fast. So was 10.0, and 5.0 was approaching better but still too fast.
+      // NOTE: Now trying to make the factor proportional to ocean power somehow. Starting with 8*sea_level.
 
       // Update the material thermal inertia term
       ScalarT latent_heat_eb = this->queryElementBlockParameterMap(eb_name, latent_heat_map_);

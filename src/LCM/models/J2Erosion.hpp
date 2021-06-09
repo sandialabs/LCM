@@ -74,6 +74,8 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField source_;
   ScalarField stress_;
   ScalarField yield_surf_;
+  ScalarField j2_stress_;
+  ScalarField tilt_angle_;
   ScalarField failed_;
 
   // Workspace arrays

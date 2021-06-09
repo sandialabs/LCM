@@ -822,10 +822,10 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const ScalarT hc =
       height_above_water_of_max_pressure_val;  // height above water of the max pressure value interpolated in time
                                                // In general, hc = 0.7*Hb, where Hb is the breaking wave height
-  const ScalarT L = wave_length_val;  // wave length interpolated in time
-                                      // In general, L = 8*Hb
-  const ScalarT k = wave_number_val;  // wave number interpolated in time
-                                      // In general, k = 2*pi/L
+  const ScalarT L = wave_length_val;           // wave length interpolated in time
+                                               // In general, L = 8*Hb
+  const ScalarT k = wave_number_val;           // wave number interpolated in time
+                                               // In general, k = 2*pi/L
   const double tm                       = inputValues[0];
   const double g                        = inputValues[1];
   const double rho                      = inputValues[2];

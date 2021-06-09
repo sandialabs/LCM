@@ -44,6 +44,8 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   std::string const Fp_str         = field_name_map_["Fp"];
   std::string const eqps_str       = field_name_map_["eqps"];
   std::string const yield_surf_str = field_name_map_["Yield_Surface"];
+  std::string const j2_stress_str  = field_name_map_["J2_Stress"];
+  std::string const tilt_angle_str = field_name_map_["Tilt_Angle"];
   std::string const source_str     = field_name_map_["Mechanical_Source"];
   std::string const F_str          = field_name_map_["F"];
   std::string const J_str          = field_name_map_["J"];
@@ -67,6 +69,8 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setEvaluatedField(Fp_str, dl->qp_tensor);
   setEvaluatedField(eqps_str, dl->qp_scalar);
   setEvaluatedField(yield_surf_str, dl->qp_scalar);
+  setEvaluatedField(j2_stress_str, dl->qp_scalar);
+  setEvaluatedField(tilt_angle_str, dl->qp_scalar);
   if (have_temperature_ == true) {
     setDependentField("Temperature", dl->qp_scalar);
     setEvaluatedField(source_str, dl->qp_scalar);
@@ -77,14 +81,16 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   addStateVariable(cauchy_str, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
   addStateVariable(Fp_str, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
   addStateVariable(eqps_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
-  addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", true));
+  addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
+  addStateVariable(j2_stress_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output J2 Stress", false));
+  addStateVariable(tilt_angle_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
     addStateVariable(source_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
-  addStateVariable("failure_state", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output failure_state", true));
+  addStateVariable("failure_state", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
 }
 
 template <typename EvalT, typename Traits>
@@ -98,6 +104,8 @@ J2ErosionKernel<EvalT, Traits>::init(
   std::string Fp_str         = field_name_map_["Fp"];
   std::string eqps_str       = field_name_map_["eqps"];
   std::string yield_surf_str = field_name_map_["Yield_Surface"];
+  std::string j2_stress_str  = field_name_map_["J2_Stress"];
+  std::string tilt_angle_str = field_name_map_["Tilt_Angle"];
   std::string source_str     = field_name_map_["Mechanical_Source"];
   std::string F_str          = field_name_map_["F"];
   std::string J_str          = field_name_map_["J"];
@@ -120,6 +128,8 @@ J2ErosionKernel<EvalT, Traits>::init(
   Fp_         = *eval_fields[Fp_str];
   eqps_       = *eval_fields[eqps_str];
   yield_surf_ = *eval_fields[yield_surf_str];
+  j2_stress_  = *eval_fields[j2_stress_str];
+  tilt_angle_ = *eval_fields[tilt_angle_str];
   failed_     = *eval_fields["failure_state"];
 
   if (have_temperature_ == true) {
@@ -302,8 +312,20 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // check yield condition
   ScalarT const smag = minitensor::norm(s);
-  ScalarT const f =
-      smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+  ScalarT const ys =
+      SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+  ScalarT const f = smag - ys;
+
+  // update for output
+  yield_surf_(cell, pt) = ys;
+  j2_stress_(cell, pt)  = smag;
+  auto const Fval       = Sacado::Value<decltype(F)>::eval(F);
+  auto const Q          = minitensor::polar_rotation(Fval);
+  auto       cosine     = 0.5 * (minitensor::trace(Q) - 1.0);
+  cosine                = cosine > 1.0 ? 1.0 : cosine;
+  cosine                = cosine < -1.0 ? -1.0 : cosine;
+  auto const theta      = std::acos(cosine);
+  tilt_angle_(cell, pt) = theta;
 
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;
@@ -369,9 +391,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
   }
 
-  // update yield surface
-  yield_surf_(cell, pt) = Y + K * eqps_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_(cell, pt)));
-
   // compute pressure
   ScalarT const p = 0.5 * kappa * (J_(cell, pt) - 1.0 / (J_(cell, pt)));
 
@@ -392,12 +411,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Determine if kinematic failure occurred
   auto const critical_angle = critical_angle_;
   if (critical_angle > 0.0) {
-    auto const Fval   = Sacado::Value<decltype(F)>::eval(F);
-    auto const Q      = minitensor::polar_rotation(Fval);
-    auto       cosine = 0.5 * (minitensor::trace(Q) - 1.0);
-    cosine            = cosine > 1.0 ? 1.0 : cosine;
-    cosine            = cosine < -1.0 ? -1.0 : cosine;
-    auto const theta  = std::acos(cosine);
     if (std::abs(theta) >= critical_angle) {
       failed += 1.0;
     }

@@ -40,17 +40,17 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   }
 
   // retrieve appropriate field name strings
-  std::string const cauchy_string       = field_name_map_["Cauchy_Stress"];
-  std::string const Fp_string           = field_name_map_["Fp"];
-  std::string const eqps_string         = field_name_map_["eqps"];
-  std::string const yieldSurface_string = field_name_map_["Yield_Surface"];
-  std::string const source_string       = field_name_map_["Mechanical_Source"];
-  std::string const F_string            = field_name_map_["F"];
-  std::string const J_string            = field_name_map_["J"];
+  std::string const cauchy_str     = field_name_map_["Cauchy_Stress"];
+  std::string const Fp_str         = field_name_map_["Fp"];
+  std::string const eqps_str       = field_name_map_["eqps"];
+  std::string const yield_surf_str = field_name_map_["Yield_Surface"];
+  std::string const source_str     = field_name_map_["Mechanical_Source"];
+  std::string const F_str          = field_name_map_["F"];
+  std::string const J_str          = field_name_map_["J"];
 
   // define the dependent fields
-  setDependentField(F_string, dl->qp_tensor);
-  setDependentField(J_string, dl->qp_scalar);
+  setDependentField(F_str, dl->qp_tensor);
+  setDependentField(J_str, dl->qp_scalar);
   setDependentField("Poissons Ratio", dl->qp_scalar);
   setDependentField("Elastic Modulus", dl->qp_scalar);
   setDependentField("Yield Strength", dl->qp_scalar);
@@ -63,27 +63,25 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
 
   // define the evaluated fields
   setEvaluatedField("failure_state", dl->cell_scalar);
-  setEvaluatedField(cauchy_string, dl->qp_tensor);
-  setEvaluatedField(Fp_string, dl->qp_tensor);
-  setEvaluatedField(eqps_string, dl->qp_scalar);
-  setEvaluatedField(yieldSurface_string, dl->qp_scalar);
+  setEvaluatedField(cauchy_str, dl->qp_tensor);
+  setEvaluatedField(Fp_str, dl->qp_tensor);
+  setEvaluatedField(eqps_str, dl->qp_scalar);
+  setEvaluatedField(yield_surf_str, dl->qp_scalar);
   if (have_temperature_ == true) {
     setDependentField("Temperature", dl->qp_scalar);
-    setEvaluatedField(source_string, dl->qp_scalar);
+    setEvaluatedField(source_str, dl->qp_scalar);
   }
 
   // define the state variables
 
-  addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
-  addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
-  addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
-  addStateVariable(
-      yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", true));
+  addStateVariable(cauchy_str, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
+  addStateVariable(Fp_str, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
+  addStateVariable(eqps_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
+  addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", true));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
-    addStateVariable(
-        source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
+    addStateVariable(source_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
   addStateVariable("failure_state", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output failure_state", true));
@@ -96,17 +94,17 @@ J2ErosionKernel<EvalT, Traits>::init(
     FieldMap<ScalarT const>& dep_fields,
     FieldMap<ScalarT>&       eval_fields)
 {
-  std::string cauchy_string       = field_name_map_["Cauchy_Stress"];
-  std::string Fp_string           = field_name_map_["Fp"];
-  std::string eqps_string         = field_name_map_["eqps"];
-  std::string yieldSurface_string = field_name_map_["Yield_Surface"];
-  std::string source_string       = field_name_map_["Mechanical_Source"];
-  std::string F_string            = field_name_map_["F"];
-  std::string J_string            = field_name_map_["J"];
+  std::string cauchy_str     = field_name_map_["Cauchy_Stress"];
+  std::string Fp_str         = field_name_map_["Fp"];
+  std::string eqps_str       = field_name_map_["eqps"];
+  std::string yield_surf_str = field_name_map_["Yield_Surface"];
+  std::string source_str     = field_name_map_["Mechanical_Source"];
+  std::string F_str          = field_name_map_["F"];
+  std::string J_str          = field_name_map_["J"];
 
   // extract dependent MDFields
-  def_grad_          = *dep_fields[F_string];
-  J_                 = *dep_fields[J_string];
+  def_grad_          = *dep_fields[F_str];
+  J_                 = *dep_fields[J_str];
   poissons_ratio_    = *dep_fields["Poissons Ratio"];
   elastic_modulus_   = *dep_fields["Elastic Modulus"];
   yield_strength_    = *dep_fields["Yield Strength"];
@@ -118,20 +116,20 @@ J2ErosionKernel<EvalT, Traits>::init(
   displacement_ = *dep_fields["Displacement"];
 
   // extract evaluated MDFields
-  stress_     = *eval_fields[cauchy_string];
-  Fp_         = *eval_fields[Fp_string];
-  eqps_       = *eval_fields[eqps_string];
-  yield_surf_ = *eval_fields[yieldSurface_string];
+  stress_     = *eval_fields[cauchy_str];
+  Fp_         = *eval_fields[Fp_str];
+  eqps_       = *eval_fields[eqps_str];
+  yield_surf_ = *eval_fields[yield_surf_str];
   failed_     = *eval_fields["failure_state"];
 
   if (have_temperature_ == true) {
-    source_      = *eval_fields[source_string];
+    source_      = *eval_fields[source_str];
     temperature_ = *dep_fields["Temperature"];
   }
 
   // get State Variables
-  Fp_old_   = (*workset.stateArrayPtr)[Fp_string + "_old"];
-  eqps_old_ = (*workset.stateArrayPtr)[eqps_string + "_old"];
+  Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
+  eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
 
   auto& disc                    = *workset.disc;
   auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
@@ -344,7 +342,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     eqps_(cell, pt) = alpha;
 
     // mechanical source
-    if (have_temperature_ == true && delta_time_(0) > 0) {
+    if (have_temperature_ == true && delta_time_(0) > 0.0) {
       source_(cell, pt) =
           (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
     }
@@ -372,10 +370,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // update yield surface
-  yield_surf_(cell, pt) = Y + K * eqps_(cell, pt) + sat_mod_ * (1. - std::exp(-sat_exp_ * eqps_(cell, pt)));
+  yield_surf_(cell, pt) = Y + K * eqps_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_(cell, pt)));
 
   // compute pressure
-  ScalarT const p = 0.5 * kappa * (J_(cell, pt) - 1. / (J_(cell, pt)));
+  ScalarT const p = 0.5 * kappa * (J_(cell, pt) - 1.0 / (J_(cell, pt)));
 
   // compute stress
   sigma = p * I + s / J_(cell, pt);

@@ -173,11 +173,12 @@ SchwarzAlternating::SchwarzAlternating(
 
       tempus_params.set("Abort on Failure", false);
 
-      Teuchos::ParameterList& time_step_control_params =
-            piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control").sublist("Time Step Control Strategy");
+      Teuchos::ParameterList& time_step_control_params = piro_params.sublist("Tempus")
+                                                             .sublist("Tempus Integrator")
+                                                             .sublist("Time Step Control")
+                                                             .sublist("Time Step Control Strategy");
 
       std::string const integrator_step_type = time_step_control_params.get("Strategy Type", "Constant");
-
 
       std::string const msg2{
           "Non-constant time-stepping through Tempus not supported "

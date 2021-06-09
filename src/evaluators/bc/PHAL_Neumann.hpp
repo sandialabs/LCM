@@ -76,11 +76,11 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Albany::Layouts> const&         dl;
   Teuchos::RCP<Albany::MeshSpecsStruct> const& meshSpecs;
 
-  int                 cellDims, numQPs, numNodes, numCells, maxSideDim, maxNumQpSide;
-  mutable int         numBlocks; 
-  Teuchos::Array<int> offset;
-  int                 numDOFsSet;
-  mutable Teuchos::RCP<Teuchos_Comm const> commT; 
+  int                                      cellDims, numQPs, numNodes, numCells, maxSideDim, maxNumQpSide;
+  mutable int                              numBlocks;
+  Teuchos::Array<int>                      offset;
+  int                                      numDOFsSet;
+  mutable Teuchos::RCP<Teuchos_Comm const> commT;
 
   // Should only specify flux vector components (dudx, dudy, dudz), dudn, or
   // pressure P
@@ -129,14 +129,21 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       Kokkos::DynRankView<MeshScalarT, PHX::Device> const& jacobian_side_refcell,
       shards::CellTopology const&                          celltopo,
       int                                                  local_side_id,
-      const int                                            workset_num, 
-      const double                                         current_time) const; 
+      const int                                            workset_num,
+      const double                                         current_time) const;
 
   ScalarT
-  calc_ace_press_at_z_point(const ScalarT hs, const ScalarT hc, const ScalarT Hb,
-		            const ScalarT m1, const ScalarT m2, const ScalarT m3, 
-			    const ScalarT b1, const ScalarT b2, const ScalarT b3, 
-			    const ScalarT zval) const; 
+  calc_ace_press_at_z_point(
+      const ScalarT hs,
+      const ScalarT hc,
+      const ScalarT Hb,
+      const ScalarT m1,
+      const ScalarT m2,
+      const ScalarT m3,
+      const ScalarT b1,
+      const ScalarT b2,
+      const ScalarT b3,
+      const ScalarT zval) const;
 
   // closed_from bc assignment
   void
@@ -207,12 +214,12 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   ScalarT                   const_val;
   ScalarT                   robin_vals[5];  // (dof_value, coeff multiplying difference (dof -
                                             // dof_value), jump)
-  //The following are specific to ACE wave pressure BC 
-  ScalarT                   water_height_val;
-  ScalarT                   height_above_water_of_max_pressure_val;
-  ScalarT                   wave_length_val;
-  ScalarT                   wave_number_val;
-  
+  // The following are specific to ACE wave pressure BC
+  ScalarT water_height_val;
+  ScalarT height_above_water_of_max_pressure_val;
+  ScalarT wave_length_val;
+  ScalarT wave_number_val;
+
   std::vector<ScalarT> dudx;
 
   std::vector<ScalarT> matScaling;

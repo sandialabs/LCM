@@ -66,9 +66,9 @@ struct Workset
   Teuchos::RCP<Thyra_MultiVector> fpV;
   Teuchos::RCP<Thyra_MultiVector> Vp_bc;
 
-  // Info about worksets, in case it's needed in evaluators  
+  // Info about worksets, in case it's needed in evaluators
   int workset_num;
-  int num_worksets;  
+  int num_worksets;
 
   Albany::DeviceView1d<ST>      f_kokkos;
   Albany::DeviceLocalMatrix<ST> Jac_kokkos;

@@ -5,6 +5,7 @@
 #
 
 add_subdirectory(bcs)
+add_subdirectory(bcs-orig)
 add_subdirectory(grid)
 add_subdirectory(external_files)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled.yaml
@@ -21,6 +22,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_wave_press_nbc.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/mechanical_wave_press_nbc.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/materials_thermal.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal_wave_press_nbc.yaml
+        	${CMAKE_CURRENT_BINARY_DIR}/materials_thermal_wave_press_nbc.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_mechanical.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/materials_mechanical.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_mechanical_wave_press_nbc.yaml
@@ -29,26 +32,26 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest_serial.cmake COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_wave_press_nbc_gold.e-s.99
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_wave_press_nbc_gold.e-s.99 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_gold.e-s.79.4.0
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_gold.e-s.79.4.0 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_gold.e-s.79.4.1
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_gold.e-s.79.4.1 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_gold.e-s.79.4.2
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_gold.e-s.79.4.2 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_gold.e-s.79.4.3
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_gold.e-s.79.4.3 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_wave_press_nbc_gold.e-s.99
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_wave_press_nbc_gold.e-s.99 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_gold.e-s.79.4.0
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_gold.e-s.79.4.0 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_gold.e-s.79.4.1
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_gold.e-s.79.4.1 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_gold.e-s.79.4.2
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_gold.e-s.79.4.2 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_gold.e-s.79.4.3
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_gold.e-s.79.4.3 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_wave_press_nbc_gold.e-s.72
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_wave_press_nbc_gold.e-s.72 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_gold.e-s.78.4.0
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_gold.e-s.78.4.0 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_gold.e-s.78.4.1
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_gold.e-s.78.4.1 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_gold.e-s.78.4.2
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_gold.e-s.78.4.2 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_gold.e-s.78.4.3
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_gold.e-s.78.4.3 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_wave_press_nbc_gold.e-s.72
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_wave_press_nbc_gold.e-s.72 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_gold.e-s.78.4.0
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_gold.e-s.78.4.0 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_gold.e-s.78.4.1
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_gold.e-s.78.4.1 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_gold.e-s.78.4.2
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_gold.e-s.78.4.2 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_gold.e-s.78.4.3
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_gold.e-s.78.4.3 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/thermal.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical.exodiff
@@ -59,10 +62,10 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
 
 #Serial test
-set(OUTFILE1 "thermal_wave_press_nbc.e-s.99")
-set(REF_FILE1 "thermal_wave_press_nbc_gold.e-s.99")
-set(OUTFILE2 "mechanical_wave_press_nbc.e-s.99")
-set(REF_FILE2 "mechanical_wave_press_nbc_gold.e-s.99")
+set(OUTFILE1 "thermal_wave_press_nbc.e-s.72")
+set(REF_FILE1 "thermal_wave_press_nbc_gold.e-s.72")
+set(OUTFILE2 "mechanical_wave_press_nbc.e-s.72")
+set(REF_FILE2 "mechanical_wave_press_nbc_gold.e-s.72")
 set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake)
 add_test(
   NAME ACE_${testName}_WavePressNBC_Serial
@@ -76,10 +79,10 @@ add_test(
 set_tests_properties(ACE_${testName}_WavePressNBC_Serial PROPERTIES LABELS "LCM;Tpetra;Forward")
   
 #Parallel test
-set(OUTFILE1 "thermal.e-s.79")
-set(REF_FILE1 "thermal_gold.e-s.79")
-set(OUTFILE2 "mechanical.e-s.79")
-set(REF_FILE2 "mechanical_gold.e-s.79")
+set(OUTFILE1 "thermal.e-s.78")
+set(REF_FILE1 "thermal_gold.e-s.78")
+set(OUTFILE2 "mechanical.e-s.78")
+set(REF_FILE2 "mechanical_gold.e-s.78")
 set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
 add_test(
   NAME ACE_${testName}_Parallel

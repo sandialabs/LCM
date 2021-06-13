@@ -61,6 +61,10 @@ configure_file(
   "${CTEST_BINARY_DIRECTORY}/CTestCustom.cmake"
   COPYONLY)
 
+#  Over-write default limit for output posted to CDash site
+set(CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE 5000000)
+set(CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE 5000000)
+
 ctest_start(${CTEST_TEST_TYPE})
 
 lcm_do_package(${PASS_ARGS})

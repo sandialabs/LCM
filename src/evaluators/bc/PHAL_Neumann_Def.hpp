@@ -20,10 +20,10 @@
 //#define ACE_WAVE_PRESS_DEBUG_OUTPUT
 //#define ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
 
-//The following vars are for the ACE Wave Pressure NBC 
-static std::vector<int> ace_press_index; 
-static std::vector<double> previous_times; 
-static std::vector<bool> is_initial_time; 
+// The following vars are for the ACE Wave Pressure NBC
+static std::vector<int>    ace_press_index;
+static std::vector<double> previous_times;
+static std::vector<bool>   is_initial_time;
 
 namespace PHAL {
 
@@ -249,19 +249,19 @@ void
 NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalData workset)
 {
   const int numWorksets = workset.num_worksets;
-  const int worksetNum = workset.workset_num;  
+  const int worksetNum  = workset.workset_num;
   if (ace_press_index.size() != numWorksets) {
-    ace_press_index.resize(numWorksets, 0.0); 
+    ace_press_index.resize(numWorksets, 0.0);
   }
   if (previous_times.size() != numWorksets) {
-    previous_times.resize(numWorksets, 0.0); 
+    previous_times.resize(numWorksets, 0.0);
   }
   if (is_initial_time.size() != numWorksets) {
-    is_initial_time.resize(numWorksets, true); 
+    is_initial_time.resize(numWorksets, true);
   }
-  auto       rcp_disc    = workset.disc;
-  auto       stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  commT = stk_disc->getComm(); 
+  auto rcp_disc = workset.disc;
+  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
+  commT         = stk_disc->getComm();
 
   // setJacobian only needs to be RealType since the data type is only
   //  used internally for Basis Fns on reference elements, which are
@@ -438,9 +438,9 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
     cellsOnSidesOnBlocks[iBlock][elem_side](numCellsOnSidesOnBlocks[iBlock][elem_side]++) = elem_LID;
   }
 
-  numBlocks = ordinalEbIndex.size(); 
+  numBlocks = ordinalEbIndex.size();
   // Loop over the sides that form the boundary condition
-  for (int iblock = 0; iblock<numBlocks; ++iblock) {
+  for (int iblock = 0; iblock < numBlocks; ++iblock) {
     for (int side = 0; side < numSidesOnElem; ++side) {
       int numCells_ = numCellsOnSidesOnBlocks[iblock][side];
       if (numCells_ == 0) continue;
@@ -571,8 +571,9 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
 
         case PRESS: calc_press(data, jacobianSide, *cellType, side); break;
 
-        case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, 
-				      side, worksetNum, workset.current_time); break;
+        case ACEPRESS:
+          calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side, worksetNum, workset.current_time);
+          break;
 
         case TRACTION: calc_traction_components(data); break;
         case CLOSED_FORM: calc_closed_form(data, physPointsSide, jacobianSide, *cellType, side, workset); break;
@@ -817,72 +818,70 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  const ScalarT hs                    = water_height_val;  // wave height value interpolated in time
-  const ScalarT hc                    = height_above_water_of_max_pressure_val; //height above water of the max pressure value interpolated in time 
-                                                                                //In general, hc = 0.7*Hb, where Hb is the breaking wave height
-  const ScalarT L                     = wave_length_val; //wave length interpolated in time
-                                                         //In general, L = 8*Hb 
-  const ScalarT k                     = wave_number_val; //wave number interpolated in time
-                                                         //In general, k = 2*pi/L 
-  const double  tm                    = inputValues[0];
-  const double  g                     = inputValues[1];
-  const double  rho                   = inputValues[2];
-  const double  zmin                  = inputValues[3];
-  const bool dump_wave_press_nbc_data = inputValues[4];  
-
+  const ScalarT hs = water_height_val;  // wave height value interpolated in time
+  const ScalarT hc =
+      height_above_water_of_max_pressure_val;  // height above water of the max pressure value interpolated in time
+                                               // In general, hc = 0.7*Hb, where Hb is the breaking wave height
+  const ScalarT L = wave_length_val;           // wave length interpolated in time
+                                               // In general, L = 8*Hb
+  const ScalarT k = wave_number_val;           // wave number interpolated in time
+                                               // In general, k = 2*pi/L
+  const double tm                       = inputValues[0];
+  const double g                        = inputValues[1];
+  const double rho                      = inputValues[2];
+  const double zmin                     = inputValues[3];
+  const bool   dump_wave_press_nbc_data = inputValues[4];
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
   std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
   const ScalarT Hb = hc / 0.7;
-  ScalarT      p0, pc, ps;
-  ScalarT      m1;
+  ScalarT       p0, pc, ps;
+  ScalarT       m1;
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", " << rho
-            << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
+  std::cout << "DEBUG: hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", "
+            << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
 #endif
   if (hs > 0.0) {
     p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
     pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
-    //pc = p0;
     ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
-    //ps = p0;
     m1 = (p0 - ps) / hs;
-    //m1 = 0.0;
   } else {
     p0 = 0.0;
     pc = 0.0;
     ps = 0.0;
     m1 = 0.0;
   }
-  const ScalarT m2  = (pc - p0) / hc;
-  //const ScalarT m2  = 0.0;
-  const ScalarT m3  = -2.0 * pc / Hb;
-  const ScalarT b1  = ps;
-  const ScalarT b2  = m1*hs + b1 - m2*hs;
-  const ScalarT b3  = m3*(hs + hc + 0.5*Hb);
+
+  const ScalarT m2 = (pc - p0) / hc;
+  const ScalarT m3 = -2.0 * pc / Hb;
+  const ScalarT b1 = ps;
+  const ScalarT b2 = m1 * hs + b1 - m2 * hs;
+  const ScalarT b3 = m3 * (hs + hc + 0.5 * Hb);
+
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n"; 
-  std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n"; 
+  std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
+  std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
 #endif
   for (int cell = 0; cell < numCells_; cell++) {
     for (int qp = 0; qp < numPoints; qp++) {
       for (int dim = 0; dim < numDOFsSet; dim++) {
-        MeshScalarT z      = physPointsSide(cell, qp, 2);
+        MeshScalarT z = physPointsSide(cell, qp, 2);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        MeshScalarT x      = physPointsSide(cell, qp, 0);
-        MeshScalarT y      = physPointsSide(cell, qp, 1);
+        MeshScalarT x = physPointsSide(cell, qp, 0);
+        MeshScalarT y = physPointsSide(cell, qp, 1);
 #endif
         MeshScalarT ztilde = z - zmin;
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
         std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
-        const ScalarT pval_qp = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
+        const ScalarT pval_qp = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-	if (dim == 0) {
-	  std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y 
-		    << ", " <<  z << ", " << pval_qp << "\n"; 
-	}
+        if (dim == 0) {
+          std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
+                    << z << ", " << pval_qp << "\n";
+        }
 #endif
         qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
       }
@@ -891,57 +890,64 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 
   if (dump_wave_press_nbc_data == true) {
     if (commT->getSize() > 1) {
-      ALBANY_ABORT("PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for parallel runs!\n");  
+      ALBANY_ABORT(
+          "PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for parallel runs!\n");
     }
-    if (numBlocks > 1) { 
-      ALBANY_ABORT("PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for >1 element blocks!\n" 
-		    << "Please contact Irina Tezaur if this capability is of interest.\n"); 
-    } 
+    if (numBlocks > 1) {
+      ALBANY_ABORT(
+          "PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for >1 element blocks!\n"
+          << "Please contact Irina Tezaur if this capability is of interest.\n");
+    }
     if ((current_time != previous_times[workset_num]) || (is_initial_time[workset_num] == true)) {
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-      std::cout << "DEBUG: workset_num, ace_press_index, time = " << workset_num << ", " 
-	        <<  ace_press_index[workset_num] 
-	        << ", " << current_time << "\n"; 
+      std::cout << "DEBUG: workset_num, ace_press_index, time = " << workset_num << ", " << ace_press_index[workset_num]
+                << ", " << current_time << "\n";
 #endif
-      std::ofstream outfile;  
-      char str[80]; 
-      strcpy(str,"ace_press_nbc_"); 
-      strcat(str, std::to_string(ace_press_index[workset_num]).c_str()); 
-      strcat(str, "-"); 
-      strcat(str, std::to_string(workset_num).c_str()); 
-      strcat(str, ".txt");  
-      outfile.open(str); 
+      std::ofstream outfile;
+      char          str[80];
+      strcpy(str, "ace_press_nbc_");
+      strcat(str, std::to_string(ace_press_index[workset_num]).c_str());
+      strcat(str, "-");
+      strcat(str, std::to_string(workset_num).c_str());
+      strcat(str, ".txt");
+      outfile.open(str);
       for (int cell = 0; cell < numCells_; cell++) {
         for (int node = 0; node < numNodes; node++) {
-          const auto x = coordVec(cell, node, 0);
-          const auto y = coordVec(cell, node, 1);
-          const auto z = coordVec(cell, node, 2);
-          const auto ztilde = z - zmin; 
-          const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde); 
+          const auto    x         = coordVec(cell, node, 0);
+          const auto    y         = coordVec(cell, node, 1);
+          const auto    z         = coordVec(cell, node, 2);
+          const auto    ztilde    = z - zmin;
+          const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-          std::cout  << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num 
-		     << ", " << cell << ", " << node << ", " << x << ", " << y 
-                     << ", " <<  z << ", " << pval_node << "\n";
-#endif 
-          outfile <<  cell << "  " << node << "  " << x << "  " << y << "  " <<  z << "  " << pval_node << "\n"; 
+          std::cout << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", "
+                    << node << ", " << x << ", " << y << ", " << z << ", " << pval_node << "\n";
+#endif
+          outfile << cell << "  " << node << "  " << x << "  " << y << "  " << z << "  " << pval_node << "\n";
         }
       }
       outfile.close();
-      ace_press_index[workset_num]++;  
+      ace_press_index[workset_num]++;
     }
   }
-  previous_times[workset_num] = current_time; 
-  is_initial_time[workset_num] = false; 
+  previous_times[workset_num]  = current_time;
+  is_initial_time[workset_num] = false;
 }
 
 template <typename EvalT, typename Traits>
 typename NeumannBase<EvalT, Traits>::ScalarT
-NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(const ScalarT hs, const ScalarT hc, const ScalarT Hb,
-                                                      const ScalarT m1, const ScalarT m2, const ScalarT m3, 
-                                                      const ScalarT b1, const ScalarT b2, const ScalarT b3, 
-                                                      const ScalarT zval) const
+NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
+    const ScalarT hs,
+    const ScalarT hc,
+    const ScalarT Hb,
+    const ScalarT m1,
+    const ScalarT m2,
+    const ScalarT m3,
+    const ScalarT b1,
+    const ScalarT b2,
+    const ScalarT b3,
+    const ScalarT zval) const
 {
-  ScalarT       pval = 0.0;
+  ScalarT pval = 0.0;
   if (hs < 0.0) {  // if hs < 0, there is no pressure applied
                    // IKT FIXME: need to verify with Jenn that this is correct
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
@@ -953,17 +959,17 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(const ScalarT hs, const Sc
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
       std::cout << "DEBUG: case 1!\n";
 #endif
-      pval = m1*zval + b1;
+      pval = m1 * zval + b1;
     } else if ((zval > hs) && (zval <= hs + hc)) {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
       std::cout << "DEBUG: case 2!\n";
 #endif
-      pval = m2*zval + b2;
+      pval = m2 * zval + b2;
     } else if ((zval > hs + hc) && (zval <= hs + hc + 0.5 * Hb)) {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
       std::cout << "DEBUG: case 3!\n";
 #endif
-      pval = m3*zval - b3;
+      pval = m3 * zval - b3;
     } else {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
       std::cout << "DEBUG: case 4!\n";
@@ -971,7 +977,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(const ScalarT hs, const Sc
       pval = 0.0;
     }
   }
-  return pval; 
+  return pval;
 }
 
 template <typename EvalT, typename Traits>

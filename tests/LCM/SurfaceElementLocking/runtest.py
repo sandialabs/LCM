@@ -24,19 +24,11 @@ return_code = p.wait()
 if return_code != 0:
     result = return_code
 
-# run algebra
-command = './algebra out'+name+'.e out'+name+'.alg.e < alg.i > '+log_file_name
-p = Popen(command, shell=True)
-return_code = p.wait()
-if return_code != 0:
-    result = return_code
-
-
 # run exodiff
 command = ["./exodiff", "-stat", "-f", \
            name + ".exodiff", \
-           "out" + name + ".alg.gold.e", \
-           "out" + name + ".alg.e"]
+           "out" + name + ".gold.e", \
+           "out" + name + ".e"]
 p = Popen(command, stdout=logfile, stderr=logfile)
 return_code = p.wait()
 if return_code != 0:
@@ -68,18 +60,11 @@ return_code = p.wait()
 if return_code != 0:
     result = return_code
 
-# run algebra
-command = './algebra out'+name+'.e out'+name+'.alg.e < alg.i > '+log_file_name
-p = Popen(command, shell=True)
-return_code = p.wait()
-if return_code != 0:
-    result = return_code
-
 # run exodiff
 command = ["./exodiff", "-stat", "-f", \
            name + ".exodiff", \
-           "out" + name + ".alg.gold.e", \
-           "out" + name + ".alg.e"]
+           "out" + name + ".gold.e", \
+           "out" + name + ".e"]
 p = Popen(command, stdout=logfile, stderr=logfile)
 return_code = p.wait()
 if return_code != 0:
@@ -109,18 +94,11 @@ return_code = p.wait()
 if return_code != 0:
     result = return_code
 
-# run algebra
-command = './algebra out'+name+'.e out'+name+'.alg.e < alg.i > '+log_file_name
-p = Popen(command, shell=True)
-return_code = p.wait()
-if return_code != 0:
-    result = return_code
-
 # run exodiff
 command = ["./exodiff", "-stat", "-f", \
            name + ".exodiff", \
-           "out" + name + ".alg.gold.e", \
-           "out" + name + ".alg.e"]
+           "out" + name + ".gold.e", \
+           "out" + name + ".e"]
 p = Popen(command, stdout=logfile, stderr=logfile)
 return_code = p.wait()
 if return_code != 0:

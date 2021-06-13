@@ -1247,8 +1247,8 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           std::string const      hs_file    = sub_list.get<std::string>("ACE Water Height Values File");
           std::vector<double>    hsvals_vec = LCM::vectorFromFile(hs_file);
           Teuchos::Array<double> hsvals(hsvals_vec);
-          std::string const      hc_file    = sub_list.get<std::string>("ACE Height Above Water of Max Pressure Values File");
-          std::vector<double>    hcvals_vec = LCM::vectorFromFile(hc_file);
+          std::string const   hc_file = sub_list.get<std::string>("ACE Height Above Water of Max Pressure Values File");
+          std::vector<double> hcvals_vec = LCM::vectorFromFile(hc_file);
           Teuchos::Array<double> hcvals(hcvals_vec);
           std::string const      L_file    = sub_list.get<std::string>("ACE Wave Length Values File");
           std::vector<double>    Lvals_vec = LCM::vectorFromFile(L_file);
@@ -1270,28 +1270,27 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
             ALBANY_ABORT(
                 "'Time Values' array must have same length as 'Height Above Water of Max Pressure' "
                 "array!");
-	  }
+          }
           // Check that Lvals and timevals have the same size.  If they do not,
           // throw an error.
           if (timevals.size() != Lvals.size()) {
             ALBANY_ABORT(
                 "'Time Values' array must have same length as 'Wave Length Values' "
                 "array!");
-	  }
+          }
           // Check that kvals and timevals have the same size.  If they do not,
           // throw an error.
           if (timevals.size() != kvals.size()) {
             ALBANY_ABORT(
                 "'Time Values' array must have same length as 'Wave Number Values' "
                 "array!");
-	  }
+          }
 
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);
           p->set<Teuchos::Array<RealType>>("Water Height Values", hsvals);
           p->set<Teuchos::Array<RealType>>("Height Above Water of Max Pressure Values", hcvals);
           p->set<Teuchos::Array<RealType>>("Wave Length Values", Lvals);
           p->set<Teuchos::Array<RealType>>("Wave Number Values", kvals);
-
 
           p->set<RCP<ParamLib>>("Parameter Library", paramLib);
 
@@ -1309,10 +1308,10 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           // Get additional parameters
           double tm = sub_list.get<double>("Impact Duration", 0.04);
           // IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code?
-          double g    = sub_list.get<double>("Gravity", 9.806);
-          double rho  = sub_list.get<double>("Water Density", 1022.0);
-          double zmin = sub_list.get<double>("Min z-Value", 0.0);
-          bool dump_wave_press_nbc_data = sub_list.get<bool>("Dump Wave Press NBC Data Files", false);
+          double g                        = sub_list.get<double>("Gravity", 9.806);
+          double rho                      = sub_list.get<double>("Water Density", 1022.0);
+          double zmin                     = sub_list.get<double>("Min z-Value", 0.0);
+          bool   dump_wave_press_nbc_data = sub_list.get<bool>("Dump Wave Press NBC Data Files", false);
 
           // Check that parameters are physical
           if (tm <= 0.0) {
@@ -1331,7 +1330,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           param_vec[1] = g;
           param_vec[2] = rho;
           param_vec[3] = zmin;
-          param_vec[4] = dump_wave_press_nbc_data; 
+          param_vec[4] = dump_wave_press_nbc_data;
 
           Teuchos::Array<double> param_array(param_vec);
 

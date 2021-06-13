@@ -4,7 +4,7 @@ LCM:
     Minimum Iterations: 1
     Maximum Iterations: 32
     Relative Tolerance: 1.0e-15
-    Absolute Tolerance: 1.0e-15
+    Absolute Tolerance: 1.2e-15
     Maximum Steps: 10
     Initial Time: 0.0
     Final Time: 1.0

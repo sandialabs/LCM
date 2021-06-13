@@ -27,7 +27,8 @@
 #endif /* ALBANY_MUELU */
 
 #if defined(ALBANY_FROSCH)
-#include <Stratimikos_FROSchXpetra.hpp>
+#include "Stratimikos_FROSch_decl.hpp"
+#include "Stratimikos_FROSch_def.hpp"
 #endif /* ALBANY_FROSCH */
 
 #include "Albany_Macros.hpp"

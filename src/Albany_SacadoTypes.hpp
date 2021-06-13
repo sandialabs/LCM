@@ -35,7 +35,7 @@
 #if defined(ALBANY_FAD_TYPE_SFAD)
 typedef Sacado::Fad::SFad<RealType, ALBANY_SFAD_SIZE> FadType;
 #elif defined(ALBANY_FAD_TYPE_SLFAD)
-typedef Sacado::Fad::SLFad<RealType, ALBANY_SLFAD_SIZE> FadType;
+typedef Sacado::Fad::SLFad<RealType, ALBANY_SLFAD_SIZE>     FadType;
 #else
 typedef Sacado::Fad::DFad<RealType> FadType;
 #endif

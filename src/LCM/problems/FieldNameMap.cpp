@@ -18,6 +18,8 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(std::make_pair("logFp", "logFp"));
   name_map->insert(std::make_pair("eqps", "eqps"));
   name_map->insert(std::make_pair("Yield_Surface", "Yield_Surface"));
+  name_map->insert(std::make_pair("J2_Stress", "J2_Stress"));
+  name_map->insert(std::make_pair("Tilt_Angle", "Tilt_Angle"));
   name_map->insert(std::make_pair("Matrix_Energy", "Matrix_Energy"));
   name_map->insert(std::make_pair("F1_Energy", "F1_Energy"));
   name_map->insert(std::make_pair("F2_Energy", "F2_Energy"));

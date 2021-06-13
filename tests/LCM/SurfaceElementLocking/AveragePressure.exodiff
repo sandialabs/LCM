@@ -6,7 +6,7 @@
 #             Run on    2014/01/29   16:05:25 PST
 #  *****************************************************************
 
-#  FILE 1: /scratch/sandbox/SurfaceElementLocking/outAveragePressure.alg.e
+#  FILE 1: /scratch/sandbox/SurfaceElementLocking/outAveragePressure.e
 #   Title: Sierra Output Default Title
 #          Dim = 3, Blocks = 1, Nodes = 8, Elements = 1, Nodesets = 10, Sidesets = 1
 #          Vars: Global = 0, Nodal = 6, Element = 74, Nodeset = 0, Sideset = 0, Times = 2

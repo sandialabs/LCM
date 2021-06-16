@@ -213,6 +213,7 @@ subtractCentroid(Teuchos::RCP<Thyra_MultiVector> const& coordMV)
     }
     Teuchos::reduceAll(*createTeuchosCommFromThyraComm(spmd_vs->getComm()), Teuchos::REDUCE_SUM, ndim, sum, centroid);
     int const numNodes = spmd_vs->localSubDim();  // length of each vector in the multivector
+    ALBANY_PANIC(numNodes == 0, "There are ZERO nodes in the mesh. Total erosion?");
     for (int i = 0; i < ndim; ++i) centroid[i] /= numNodes;
   }
 

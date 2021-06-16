@@ -25,7 +25,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   critical_angle_      = p->get<RealType>("ACE Critical Angle", 0.0);
   soil_yield_strength_ = p->get<RealType>("ACE Soil Yield Strength", 3.0e+06);
   // note: set default value to pure ice yield strength 3.0e+6
-  
+
   if (p->isParameter("ACE Sea Level File") == true) {
     auto const filename = p->get<std::string>("ACE Sea Level File");
     sea_level_          = vectorFromFile(filename);
@@ -34,9 +34,10 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
     auto const filename = p->get<std::string>("ACE Time File");
     time_               = vectorFromFile(filename);
   }
-  ALBANY_ASSERT(time_.size() == sea_level_.size(), 
-                "*** ERROR: Number of times and number of sea level values "
-                "must match.");
+  ALBANY_ASSERT(
+      time_.size() == sea_level_.size(),
+      "*** ERROR: Number of times and number of sea level values "
+      "must match.");
   if (p->isParameter("ACE Z Depth File") == true) {
     auto const filename     = p->get<std::string>("ACE Z Depth File");
     z_above_mean_sea_level_ = vectorFromFile(filename);
@@ -51,7 +52,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   }
   if (p->isParameter("ACE Peat File") == true) {
     auto const filename = p->get<std::string>("ACE Peat File");
-    peat_from_file_ = vectorFromFile(filename);
+    peat_from_file_     = vectorFromFile(filename);
     ALBANY_ASSERT(
         z_above_mean_sea_level_.size() == peat_from_file_.size(),
         "*** ERROR: Number of z values and number of peat values in "
@@ -173,9 +174,9 @@ J2ErosionKernel<EvalT, Traits>::init(
 
   current_time_ = workset.current_time;
 
-  auto const num_cells   = workset.numCells;
+  auto const num_cells = workset.numCells;
   for (auto cell = 0; cell < num_cells; ++cell) {
-    failed_(cell, 0) = 0.0; 
+    failed_(cell, 0) = 0.0;
   }
 }
 
@@ -287,7 +288,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
 #endif
-  
+
   // Compute effective yield strength
   ScalarT Y = yield_strength_(cell, pt);
 
@@ -297,37 +298,34 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const porosity = porosity_from_file_.size() > 0 ?
                             interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
                             bulk_porosity_;
-  auto const peat     = peat_from_file_.size() > 0 ?
-                            interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) :
-                            1.0; // need this so ice is strong when melted
-  
-  //RealType height_AL     = 4.0;
-  //RealType height_normal = ((height-height_AL) / (5.2-height_AL));  // warning! this assumes heights are positive values
+  auto const peat = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) :
+                                                 1.0;  // need this so ice is strong when melted
+
+  // RealType height_AL     = 4.0;
+  // RealType height_normal = ((height-height_AL) / (5.2-height_AL));  // warning! this assumes heights are positive
+  // values
   //         height_normal = std::max(height_normal,0.0);
-  
+
   RealType res_strength = (1.0 * soil_yield_strength_);
-  
+
 #if defined(ICE_SATURATION)
   Y = (ice_saturation * Y) + res_strength;
 #endif
-  
-  auto const sea_level      = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;  
+
+  auto const sea_level      = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
   auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
   auto const is_at_boundary = cell_bi == 1.0;
   auto const is_erodible    = cell_bi == 2.0;
-  
-  //RealType const height_max     = *std::max_element(z_above_mean_sea_level_.begin(), z_above_mean_sea_level_.end());
-  //RealType const height_max     = z_above_mean_sea_level_.back();  // warning! assumes last value is the highest height
-  //RealType const height_max = 5.2;
-  //RealType const height_normal  = 1.0 - ((height_max - height) / height_max);  // warning! this assumes heights are positive values
-  //height_normal = std::min(1.0, height_normal); 
-  //height_normal = std::max(0.0, height_normal);
+
+  // RealType const height_max     = *std::max_element(z_above_mean_sea_level_.begin(), z_above_mean_sea_level_.end());
+  // RealType const height_max     = z_above_mean_sea_level_.back();  // warning! assumes last value is the highest
+  // height RealType const height_max = 5.2; RealType const height_normal  = 1.0 - ((height_max - height) / height_max);
+  // // warning! this assumes heights are positive values height_normal = std::min(1.0, height_normal); height_normal =
+  // std::max(0.0, height_normal);
 
   // Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
 
-
   Y = std::max(Y, 100.0);
-
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);
@@ -466,8 +464,5 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (displacement_norm > maximum_displacement) {
     failed += 8.0;
   }
-  
-  
-  
 }
 }  // namespace LCM

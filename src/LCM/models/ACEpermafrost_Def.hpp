@@ -435,7 +435,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // BEGIN NEW CURVE //
-  ScalarT const Tdiff = (Tcurr-100.0) - (Tmelt+0.0);
+  ScalarT const Tdiff = (Tcurr - 100.0) - (Tmelt + 0.0);
 
   RealType const A = 0.0;
   RealType const G = 1.0;
@@ -445,24 +445,18 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   RealType       v = 25.0;
 
   if (sediment_given = true) {
-    auto sand_frac =
-        interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
-    auto clay_frac =
-        interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
-    auto silt_frac =
-        interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
-    auto peat_frac =
-        interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height);
-    v = (peat_frac * 5.0) + (sand_frac * 5.0) + (silt_frac * 25.0) +
-        (clay_frac * 70.0);
+    auto sand_frac = interpolateVectors(z_above_mean_sea_level_, sand_from_file_, height);
+    auto clay_frac = interpolateVectors(z_above_mean_sea_level_, clay_from_file_, height);
+    auto silt_frac = interpolateVectors(z_above_mean_sea_level_, silt_from_file_, height);
+    auto peat_frac = interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height);
+    v              = (peat_frac * 5.0) + (sand_frac * 5.0) + (silt_frac * 25.0) + (clay_frac * 70.0);
   }
 
   ScalarT const qebt = Q * std::exp(-B * Tdiff);
 
-  ScalarT icurr = A + ((G - A) / (pow(C + qebt, 1.0/v)));
-  ScalarT dfdT = ((B * Q * (G - A)) * pow(C + qebt, -1.0/v) + (qebt / Q)) / (v * (C + qebt));
+  ScalarT icurr = A + ((G - A) / (pow(C + qebt, 1.0 / v)));
+  ScalarT dfdT  = ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) + (qebt / Q)) / (v * (C + qebt));
   // END NEW CURVE //
-  
 
   // Update the water saturation
   ScalarT wcurr = 1.0 - icurr;
@@ -517,10 +511,10 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
     thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
                               pow(water_thermal_cond_, (wcurr * porosity)) * pow(soil_thermal_cond_, (1.0 - porosity));
   }
-  
+
   // HACK
   heat_capacity_(cell, pt) = heat_capacity_(cell, pt) * 5.0;
-  thermal_cond_(cell, pt) = thermal_cond_(cell, pt) / 5.0;
+  thermal_cond_(cell, pt)  = thermal_cond_(cell, pt) / 5.0;
 
   // Update the material thermal inertia term
   thermal_inertia_(cell, pt) = (density_(cell, pt) * heat_capacity_(cell, pt)) - (ice_density_ * latent_heat_ * dfdT);

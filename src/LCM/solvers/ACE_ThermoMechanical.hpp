@@ -236,8 +236,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   ST           increase_factor_{0.0};
   int          output_interval_{1};
   mutable bool failed_{false};
-  mutable bool failed_reattempt_thermal_{false};
-  mutable bool failed_reattempt_mechanical_{false};
   mutable bool converged_{false};
   mutable int  num_iter_{0};
 

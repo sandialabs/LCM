@@ -76,10 +76,10 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Albany::Layouts> const&         dl;
   Teuchos::RCP<Albany::MeshSpecsStruct> const& meshSpecs;
 
-  int                                      cellDims, numQPs, numNodes, numCells, maxSideDim, maxNumQpSide;
-  mutable int                              numBlocks;
-  Teuchos::Array<int>                      offset;
-  int                                      numDOFsSet;
+  int                 cellDims{0}, numQPs{0}, numNodes{0}, numCells{0}, maxSideDim{0}, maxNumQpSide{0};
+  mutable int         numBlocks{0};
+  Teuchos::Array<int> offset;
+  int                 numDOFsSet{0};
   mutable Teuchos::RCP<Teuchos_Comm const> commT;
 
   // Should only specify flux vector components (dudx, dudy, dudz), dudn, or

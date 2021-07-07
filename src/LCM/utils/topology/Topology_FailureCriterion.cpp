@@ -233,7 +233,7 @@ BulkFailureCriterion::check(stk::mesh::BulkData& /* bulk_data */, stk::mesh::Ent
   failure_state_ = get_meta_data().get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, failure_state_name_);
   ALBANY_ASSERT(failure_state_ != nullptr);
   auto const* const pfs = reinterpret_cast<double const* const>(stk::mesh::field_data(*failure_state_, element));
-  return pfs[0] > 6.0;  // # of integration points that must fail (max is 8 per element)
+  return pfs[0] >= 8.0;  // # of integration points that must fail (max is 8 per element)
 }
 
 }  // namespace LCM

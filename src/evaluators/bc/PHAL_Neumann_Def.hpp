@@ -853,11 +853,13 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     ps = 0.0;
     m1 = 0.0;
   }
+
   const ScalarT m2 = (pc - p0) / hc;
   const ScalarT m3 = -2.0 * pc / Hb;
   const ScalarT b1 = ps;
   const ScalarT b2 = m1 * hs + b1 - m2 * hs;
   const ScalarT b3 = m3 * (hs + hc + 0.5 * Hb);
+
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
   std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
   std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";

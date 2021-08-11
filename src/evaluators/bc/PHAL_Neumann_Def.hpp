@@ -834,7 +834,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double zmin                     = inputValues[3];
   const bool   dump_wave_press_nbc_data = inputValues[4];
   const bool   use_new_wave_press_nbc   = inputValues[5];
-  std::cout << "IKT: use_new_wave_press_nbc = " << use_new_wave_press_nbc << "\n"; 
+  //std::cout << "IKT: use_new_wave_press_nbc = " << use_new_wave_press_nbc << "\n"; 
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
     std::cout << "DEBUG: zmin = " << zmin << "\n";

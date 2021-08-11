@@ -85,8 +85,9 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
       this->height_above_water_of_max_pressure_val <= 0, "Height above water of max pressure is non-positive!");
   ALBANY_PANIC(this->wave_length_val <= 0, "Wave length is non-positive!");
   ALBANY_PANIC(this->wave_number_val <= 0, "Wave number is non-positive!");
-  ALBANY_PANIC(this->a_val <= 0, "Adjusted water difference is non-positive!");
-  ALBANY_PANIC(this->h_val <= 0, "Shifted still water level is non-positive!");
+  //IKT question: can a_val and h_val be negative?  If not, uncomment the following.
+  //ALBANY_PANIC(this->a_val <= 0, "Adjusted water difference is non-positive!");
+  //ALBANY_PANIC(this->h_val <= 0, "Shifted still water level is non-positive!");
 
   return;
 }

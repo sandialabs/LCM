@@ -1247,8 +1247,8 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           std::string const      hs_file    = sub_list.get<std::string>("ACE Water Height Values File");
           std::vector<double>    hsvals_vec = LCM::vectorFromFile(hs_file);
           Teuchos::Array<double> hsvals(hsvals_vec);
-          std::string const   hc_file = sub_list.get<std::string>("ACE Height Above Water of Max Pressure Values File");
-          std::vector<double> hcvals_vec = LCM::vectorFromFile(hc_file);
+          std::string const      hc_file = sub_list.get<std::string>("ACE Height Above Water of Max Pressure Values File");
+          std::vector<double>    hcvals_vec = LCM::vectorFromFile(hc_file);
           Teuchos::Array<double> hcvals(hcvals_vec);
           std::string const      L_file    = sub_list.get<std::string>("ACE Wave Length Values File");
           std::vector<double>    Lvals_vec = LCM::vectorFromFile(L_file);
@@ -1259,9 +1259,9 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           std::string const      a_file    = sub_list.get<std::string>("ACE Adjusted Water Difference Values File");
           std::vector<double>    avals_vec = LCM::vectorFromFile(a_file);
           Teuchos::Array<double> avals(avals_vec);
-          std::string const      swl_file    = sub_list.get<std::string>("ACE Still Water Level Values File");
-          std::vector<double>    swlvals_vec = LCM::vectorFromFile(swl_file);
-          Teuchos::Array<double> swlvals(swlvals_vec);
+          std::string const      h_file    = sub_list.get<std::string>("ACE Shifted Still Water Level Values File");
+          std::vector<double>    hvals_vec = LCM::vectorFromFile(h_file);
+          Teuchos::Array<double> hvals(hvals_vec);
 
           // Check that hsvals and timevals have the same size.  If they do not,
           // throw an error.
@@ -1291,9 +1291,9 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
                 "'Time Values' array must have same length as 'Wave Number Values' "
                 "array!");
           }
-          // Check that swlvals and timevals have the same size.  If they do not,
+          // Check that hvals and timevals have the same size.  If they do not,
           // throw an error.
-          if (timevals.size() != swlvals.size()) {
+          if (timevals.size() != hvals.size()) {
             ALBANY_ABORT(
                 "'Time Values' array must have same length as 'Still Water Level Values' "
                 "array!");
@@ -1311,7 +1311,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           p->set<Teuchos::Array<RealType>>("Height Above Water of Max Pressure Values", hcvals);
           p->set<Teuchos::Array<RealType>>("Wave Length Values", Lvals);
           p->set<Teuchos::Array<RealType>>("Wave Number Values", kvals);
-          p->set<Teuchos::Array<RealType>>("Still Water Level Values", swlvals);
+          p->set<Teuchos::Array<RealType>>("Shifted Still Water Level Values", hvals);
           p->set<Teuchos::Array<RealType>>("Adjusted Water Difference Values", avals);
 
           p->set<RCP<ParamLib>>("Parameter Library", paramLib);

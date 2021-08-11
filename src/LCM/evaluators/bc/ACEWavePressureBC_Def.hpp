@@ -20,7 +20,7 @@ ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::Parameter
       p.get<Teuchos::Array<RealType>>("Height Above Water of Max Pressure Values").toVector();
   waveLengthValues = p.get<Teuchos::Array<RealType>>("Wave Length Values").toVector();
   waveNumberValues = p.get<Teuchos::Array<RealType>>("Wave Number Values").toVector();
-  stillWaterLevelValues = p.get<Teuchos::Array<RealType>>("Still Water Level Values").toVector();
+  hValues = p.get<Teuchos::Array<RealType>>("Shifted Still Water Level Values").toVector();
   aValues = p.get<Teuchos::Array<RealType>>("Adjusted Water Difference Values").toVector();
 
   ALBANY_PANIC(
@@ -36,8 +36,8 @@ ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::Parameter
       !(timeValues.size() == waveNumberValues.size()),
       "Dimension of \"Time Values\" and \"Wave Number Values\" do not match");
   ALBANY_PANIC(
-      !(timeValues.size() == stillWaterLevelValues.size()),
-      "Dimension of \"Time Values\" and \"Still Water Level Values\" do not match");
+      !(timeValues.size() == hValues.size()),
+      "Dimension of \"Time Values\" and \"Shifted Still Water Level Values\" do not match");
   ALBANY_PANIC(
       !(timeValues.size() == aValues.size()),
       "Dimension of \"Time Values\" and \"Adjusted Water Difference Values\" do not match");
@@ -60,7 +60,7 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
     this->height_above_water_of_max_pressure_val = heightAboveWaterOfMaxPressure[Index];
     this->wave_length_val                        = waveLengthValues[Index];
     this->wave_number_val                        = waveNumberValues[Index];
-    this->still_water_level_val                  = stillWaterLevelValues[Index];
+    this->h_val                                  = hValues[Index];
     this->a_val                                  = aValues[Index];
   } else {
     slope = (waterHeightValues[Index] - waterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
@@ -73,8 +73,8 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
     this->wave_length_val = waveLengthValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     slope = (waveNumberValues[Index] - waveNumberValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->wave_number_val = waveNumberValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    slope = (stillWaterLevelValues[Index] - stillWaterLevelValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->still_water_level_val = stillWaterLevelValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    slope = (hValues[Index] - hValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->h_val = hValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     slope = (aValues[Index] - aValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->a_val = aValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     // std::cout << "IKT computeVal water_height_val = " << this->water_height_val << "\n";
@@ -85,8 +85,8 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
       this->height_above_water_of_max_pressure_val <= 0, "Height above water of max pressure is non-positive!");
   ALBANY_PANIC(this->wave_length_val <= 0, "Wave length is non-positive!");
   ALBANY_PANIC(this->wave_number_val <= 0, "Wave number is non-positive!");
-  ALBANY_PANIC(this->a_val <= 0, "a is non-positive!");
-  ALBANY_PANIC(this->still_water_level_val <= 0, "Still water level is non-positive!");
+  ALBANY_PANIC(this->a_val <= 0, "Adjusted water difference is non-positive!");
+  ALBANY_PANIC(this->h_val <= 0, "Shifted still water level is non-positive!");
 
   return;
 }

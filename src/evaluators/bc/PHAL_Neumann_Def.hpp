@@ -836,103 +836,108 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const bool   use_new_wave_press_nbc   = inputValues[5];
   std::cout << "IKT: use_new_wave_press_nbc = " << use_new_wave_press_nbc << "\n"; 
 
+  if (use_new_wave_press_nbc == false) { //old wave pressure NBC 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: zmin = " << zmin << "\n";
+    std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
-  const ScalarT Hb = hc / 0.7;
-  ScalarT       p0, pc, ps;
-  ScalarT       m1;
+    const ScalarT Hb = hc / 0.7;
+    ScalarT       p0, pc, ps;
+    ScalarT       m1;
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", "
-            << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
+    std::cout << "DEBUG: hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", "
+              << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
 #endif
-  if (hs > 0.0) {
-    p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
-    pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
-    ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
-    m1 = (p0 - ps) / hs;
-  } else {
-    p0 = 0.0;
-    pc = 0.0;
-    ps = 0.0;
-    m1 = 0.0;
-  }
+    if (hs > 0.0) {
+      p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
+      pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
+      ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
+      m1 = (p0 - ps) / hs;
+    } else {
+      p0 = 0.0;
+      pc = 0.0;
+      ps = 0.0;
+      m1 = 0.0;
+    }
 
-  const ScalarT m2 = (pc - p0) / hc;
-  const ScalarT m3 = -2.0 * pc / Hb;
-  const ScalarT b1 = ps;
-  const ScalarT b2 = m1 * hs + b1 - m2 * hs;
-  const ScalarT b3 = m3 * (hs + hc + 0.5 * Hb);
+    const ScalarT m2 = (pc - p0) / hc;
+    const ScalarT m3 = -2.0 * pc / Hb;
+    const ScalarT b1 = ps;
+    const ScalarT b2 = m1 * hs + b1 - m2 * hs;
+    const ScalarT b3 = m3 * (hs + hc + 0.5 * Hb);
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
-  std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
+    std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
+    std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
 #endif
-  for (int cell = 0; cell < numCells_; cell++) {
-    for (int qp = 0; qp < numPoints; qp++) {
-      for (int dim = 0; dim < numDOFsSet; dim++) {
-        MeshScalarT z = physPointsSide(cell, qp, 2);
+    for (int cell = 0; cell < numCells_; cell++) {
+      for (int qp = 0; qp < numPoints; qp++) {
+        for (int dim = 0; dim < numDOFsSet; dim++) {
+          MeshScalarT z = physPointsSide(cell, qp, 2);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        MeshScalarT x = physPointsSide(cell, qp, 0);
-        MeshScalarT y = physPointsSide(cell, qp, 1);
+          MeshScalarT x = physPointsSide(cell, qp, 0);
+          MeshScalarT y = physPointsSide(cell, qp, 1);
 #endif
-        MeshScalarT ztilde = z - zmin;
+          MeshScalarT ztilde = z - zmin;
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-        std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
+          std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
-        const ScalarT pval_qp = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
+          const ScalarT pval_qp = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        if (dim == 0) {
-          std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
-                    << z << ", " << pval_qp << "\n";
+          if (dim == 0) {
+            std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
+                      << z << ", " << pval_qp << "\n";
+          }
+#endif
+          qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
         }
+      }
+    }
+    if (dump_wave_press_nbc_data == true) {
+      if (commT->getSize() > 1) {
+        ALBANY_ABORT(
+            "PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for parallel runs!\n");
+      }
+      if (numBlocks > 1) {
+        ALBANY_ABORT(
+            "PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for >1 element blocks!\n"
+            << "Please contact Irina Tezaur if this capability is of interest.\n");
+      }
+      if ((current_time != previous_times[workset_num]) || (is_initial_time[workset_num] == true)) {
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+        std::cout << "DEBUG: workset_num, ace_press_index, time = " << workset_num << ", " << ace_press_index[workset_num]
+                  << ", " << current_time << "\n";
 #endif
-        qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
+        std::ofstream outfile;
+        char          str[80];
+        strcpy(str, "ace_press_nbc_");
+        strcat(str, std::to_string(ace_press_index[workset_num]).c_str());
+        strcat(str, "-");
+        strcat(str, std::to_string(workset_num).c_str());
+        strcat(str, ".txt");
+        outfile.open(str);
+        for (int cell = 0; cell < numCells_; cell++) {
+          for (int node = 0; node < numNodes; node++) {
+            const auto    x         = coordVec(cell, node, 0);
+            const auto    y         = coordVec(cell, node, 1);
+            const auto    z         = coordVec(cell, node, 2);
+            const auto    ztilde    = z - zmin;
+            const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+            std::cout << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", "
+                      << node << ", " << x << ", " << y << ", " << z << ", " << pval_node << "\n";
+#endif
+            outfile << cell << "  " << node << "  " << x << "  " << y << "  " << z << "  " << pval_node << "\n";
+          }
+        }
+        outfile.close();
+        ace_press_index[workset_num]++;
       }
     }
   }
-
-  if (dump_wave_press_nbc_data == true) {
-    if (commT->getSize() > 1) {
-      ALBANY_ABORT(
-          "PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for parallel runs!\n");
-    }
-    if (numBlocks > 1) {
-      ALBANY_ABORT(
-          "PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for >1 element blocks!\n"
-          << "Please contact Irina Tezaur if this capability is of interest.\n");
-    }
-    if ((current_time != previous_times[workset_num]) || (is_initial_time[workset_num] == true)) {
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-      std::cout << "DEBUG: workset_num, ace_press_index, time = " << workset_num << ", " << ace_press_index[workset_num]
-                << ", " << current_time << "\n";
-#endif
-      std::ofstream outfile;
-      char          str[80];
-      strcpy(str, "ace_press_nbc_");
-      strcat(str, std::to_string(ace_press_index[workset_num]).c_str());
-      strcat(str, "-");
-      strcat(str, std::to_string(workset_num).c_str());
-      strcat(str, ".txt");
-      outfile.open(str);
-      for (int cell = 0; cell < numCells_; cell++) {
-        for (int node = 0; node < numNodes; node++) {
-          const auto    x         = coordVec(cell, node, 0);
-          const auto    y         = coordVec(cell, node, 1);
-          const auto    z         = coordVec(cell, node, 2);
-          const auto    ztilde    = z - zmin;
-          const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
-#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-          std::cout << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", "
-                    << node << ", " << x << ", " << y << ", " << z << ", " << pval_node << "\n";
-#endif
-          outfile << cell << "  " << node << "  " << x << "  " << y << "  " << z << "  " << pval_node << "\n";
-        }
-      }
-      outfile.close();
-      ace_press_index[workset_num]++;
-    }
+  else { //new ACE wave pressure NBC 
+    ALBANY_ABORT("PHAL_Neumann: new ACE wave pressure NBC is not yet implemented!\n"); 
   }
+
   previous_times[workset_num]  = current_time;
   is_initial_time[workset_num] = false;
 }
@@ -983,6 +988,32 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
   }
   return pval;
 }
+
+//IKT 8/9/2021: overloaded version of above routine but for new formulation
+//of ACE Wave Pressure NBC
+template <typename EvalT, typename Traits>
+typename NeumannBase<EvalT, Traits>::ScalarT
+NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
+      const double rho,
+      const double g,
+      const ScalarT h,
+      const ScalarT a,
+      const ScalarT zval) const
+{
+  ScalarT pval = 0.0;
+  if (zval < h) {
+    pval = rho*g*(h + a - zval); 
+  }
+  else if ((zval >= h) && (zval < h + a)) {
+    pval = rho*g*a*(1.0 + (zval - h)/(h - a)); 
+  }
+  else {  //IKT: note we don't really need to implement this case b/c pval
+	  //is initialized to 0.0. 
+    pval = 0.0; 
+  }
+  return pval; 
+}
+
 
 template <typename EvalT, typename Traits>
 void

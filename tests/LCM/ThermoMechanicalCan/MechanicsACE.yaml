@@ -17,7 +17,7 @@ LCM:
         ACE Wave Number Values File: 'kvals.txt'
         #IKT 8/10/2021: the following 2 are just dummy files and are not used
         #as long as 'Use New Wave Press NBC = false'
-        ACE Still Water Level Values File: 'kvals.txt'
+        ACE Shifted Still Water Level Values File: 'kvals.txt'
         ACE Adjusted Water Difference Values File: 'kvals.txt'
         Impact Duration: 0.04 
         #Gravity: 9.806

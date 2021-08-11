@@ -219,6 +219,8 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   ScalarT height_above_water_of_max_pressure_val;
   ScalarT wave_length_val;
   ScalarT wave_number_val;
+  ScalarT still_water_level_val;
+  ScalarT a_val;
 
   std::vector<ScalarT> dudx;
 

@@ -1256,6 +1256,12 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           std::string const      k_file    = sub_list.get<std::string>("ACE Wave Number Values File");
           std::vector<double>    kvals_vec = LCM::vectorFromFile(k_file);
           Teuchos::Array<double> kvals(kvals_vec);
+          std::string const      a_file    = sub_list.get<std::string>("ACE Adjusted Water Difference Values File");
+          std::vector<double>    avals_vec = LCM::vectorFromFile(a_file);
+          Teuchos::Array<double> avals(avals_vec);
+          std::string const      swl_file    = sub_list.get<std::string>("ACE Still Water Level Values File");
+          std::vector<double>    swlvals_vec = LCM::vectorFromFile(swl_file);
+          Teuchos::Array<double> swlvals(swlvals_vec);
 
           // Check that hsvals and timevals have the same size.  If they do not,
           // throw an error.
@@ -1285,12 +1291,28 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
                 "'Time Values' array must have same length as 'Wave Number Values' "
                 "array!");
           }
+          // Check that swlvals and timevals have the same size.  If they do not,
+          // throw an error.
+          if (timevals.size() != swlvals.size()) {
+            ALBANY_ABORT(
+                "'Time Values' array must have same length as 'Still Water Level Values' "
+                "array!");
+          }
+          // Check that avals and timevals have the same size.  If they do not,
+          // throw an error.
+          if (timevals.size() != avals.size()) {
+            ALBANY_ABORT(
+                "'Time Values' array must have same length as 'Adjusted Water Difference Values' "
+                "array!");
+          }
 
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);
           p->set<Teuchos::Array<RealType>>("Water Height Values", hsvals);
           p->set<Teuchos::Array<RealType>>("Height Above Water of Max Pressure Values", hcvals);
           p->set<Teuchos::Array<RealType>>("Wave Length Values", Lvals);
           p->set<Teuchos::Array<RealType>>("Wave Number Values", kvals);
+          p->set<Teuchos::Array<RealType>>("Still Water Level Values", swlvals);
+          p->set<Teuchos::Array<RealType>>("Adjusted Water Difference Values", avals);
 
           p->set<RCP<ParamLib>>("Parameter Library", paramLib);
 
@@ -1312,6 +1334,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           double rho                      = sub_list.get<double>("Water Density", 1022.0);
           double zmin                     = sub_list.get<double>("Min z-Value", 0.0);
           bool   dump_wave_press_nbc_data = sub_list.get<bool>("Dump Wave Press NBC Data Files", false);
+          bool   use_new_wave_press_nbc   = sub_list.get<bool>("Use New Wave Press NBC", false);
 
           // Check that parameters are physical
           if (tm <= 0.0) {
@@ -1325,12 +1348,13 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           }
 
           // Put parameters into vector to create Teuchos::array
-          std::vector<double> param_vec(5);
+          std::vector<double> param_vec(6);
           param_vec[0] = tm;
           param_vec[1] = g;
           param_vec[2] = rho;
           param_vec[3] = zmin;
           param_vec[4] = dump_wave_press_nbc_data;
+          param_vec[5] = use_new_wave_press_nbc;
 
           Teuchos::Array<double> param_array(param_vec);
 

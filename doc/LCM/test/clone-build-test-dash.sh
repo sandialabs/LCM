@@ -14,7 +14,7 @@ for PACKAGE in $PACKAGES; do
 	    ;;
 	lcm)
 	    PACKAGE_NAME="LCM"
-	    REPO="git@github.com:SNLComputation/LCM.git"
+	    REPO="git@github.com:sandialabs/LCM.git"
             BRANCH="master"
 	    ;;
 	*)

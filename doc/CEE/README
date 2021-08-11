@@ -11,7 +11,7 @@ graphics/dedicated workstation).
 
 1.) Checkout the Albany LCM repo:
 
-git clone git@github.com:SNLComputation/LCM.git Albany-LCM
+git clone git@github.com:sandialabs/LCM.git Albany-LCM
 
 If you are reading this file, you have done so already.
 

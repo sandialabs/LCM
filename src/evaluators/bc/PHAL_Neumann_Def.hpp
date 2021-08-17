@@ -1030,10 +1030,10 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
 {
   ScalarT pval = 0.0;
   if (zval < h) {
-    pval = rho*g*(h + a - zval); 
+    pval = rho*g*h + rho*g*(a-h)*zval/h;  
   }
   else if ((zval >= h) && (zval < h + a)) {
-    pval = rho*g*a*(1.0 + (zval - h)/(h - a)); 
+    pval = rho*g*(h+a-zval); 
   }
   else {  //IKT: note we don't really need to implement this case b/c pval
 	  //is initialized to 0.0. 

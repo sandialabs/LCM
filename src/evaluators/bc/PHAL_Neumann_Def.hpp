@@ -1030,6 +1030,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
 {
   ScalarT pval = 0.0;
   if (zval < h) {
+    ALBANY_PANIC(std::abs(h) < 1e-12, "Shifted still water level is zero and ACE wave press NBC is undefined!");
     pval = rho*g*h + rho*g*(a-h)*zval/h;  
   }
   else if ((zval >= h) && (zval < h + a)) {

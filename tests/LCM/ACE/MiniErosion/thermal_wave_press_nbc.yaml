@@ -12,19 +12,19 @@ ALBANY:
     
     Dirichlet BCs:
       Time Dependent SDBC on NS z+ for DOF T:
-        Time File: 'bcs/time.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
         BC File: 'bcs/Ablufftemp.txt'
       Time Dependent SDBC on NS interval4-erodible for DOF T:
-        Time File: 'bcs/time.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
         BC File: 'bcs/Ablufftemp.txt'
       Time Dependent SDBC on NS interval3-erodible for DOF T:
-        Time File: 'bcs/time.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
         BC File: 'bcs/Ablufftemp.txt'
       Time Dependent SDBC on NS interval2-erodible for DOF T:
-        Time File: 'bcs/time.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
         BC File: 'bcs/Ablufftemp.txt'
       Time Dependent SDBC on NS interval1-erodible for DOF T:
-        Time File: 'bcs/time.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
         BC File: 'bcs/Ablufftemp.txt'
     
     Neumann BCs:

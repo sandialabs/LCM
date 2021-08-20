@@ -14,6 +14,7 @@ template <typename EvalT, typename Traits>
 ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::ParameterList& p)
     : PHAL::Neumann<EvalT, Traits>(p)
 {
+  use_new_wave_press_nbc  = p.get<bool>("Use New Wave Press NBC", false);
   timeValues        = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
   waterHeightValues = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
   heightAboveWaterOfMaxPressure =
@@ -23,24 +24,30 @@ ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::Parameter
   hValues = p.get<Teuchos::Array<RealType>>("Shifted Still Water Level Values").toVector();
   aValues = p.get<Teuchos::Array<RealType>>("Adjusted Water Difference Values").toVector();
 
-  ALBANY_PANIC(
-      !(timeValues.size() == waterHeightValues.size()),
-      "Dimension of \"Time Values\" and \"water Height Values\" do not match");
-  ALBANY_PANIC(
-      !(timeValues.size() == heightAboveWaterOfMaxPressure.size()),
-      "Dimension of \"Time Values\" and \"Height Above Water of Max Pressure Values\" do not match");
-  ALBANY_PANIC(
-      !(timeValues.size() == waveLengthValues.size()),
-      "Dimension of \"Time Values\" and \"Wave Length Values\" do not match");
-  ALBANY_PANIC(
-      !(timeValues.size() == waveNumberValues.size()),
-      "Dimension of \"Time Values\" and \"Wave Number Values\" do not match");
-  ALBANY_PANIC(
-      !(timeValues.size() == hValues.size()),
-      "Dimension of \"Time Values\" and \"Shifted Still Water Level Values\" do not match");
-  ALBANY_PANIC(
-      !(timeValues.size() == aValues.size()),
-      "Dimension of \"Time Values\" and \"Adjusted Water Difference Values\" do not match");
+  //IKT, 8/19/2021: the following checks are overkill, as we do the same checks
+  //in Albany::BCUtils
+  if (use_new_wave_press_nbc == false) {
+    ALBANY_PANIC(
+        !(timeValues.size() == waterHeightValues.size()),
+        "Dimension of \"Time Values\" and \"water Height Values\" do not match\n");
+    ALBANY_PANIC(
+        !(timeValues.size() == heightAboveWaterOfMaxPressure.size()),
+        "Dimension of \"Time Values\" and \"Height Above Water of Max Pressure Values\" do not match\n");
+    ALBANY_PANIC(
+        !(timeValues.size() == waveLengthValues.size()),
+        "Dimension of \"Time Values\" and \"Wave Length Values\" do not match\n");
+    ALBANY_PANIC(
+        !(timeValues.size() == waveNumberValues.size()),
+        "Dimension of \"Time Values\" and \"Wave Number Values\" do not match\n");
+  }
+  else {
+    ALBANY_PANIC(
+        !(timeValues.size() == hValues.size()),
+        "Dimension of \"Time Values\" and \"Shifted Still Water Level Values\" do not match\n");
+    ALBANY_PANIC(
+        !(timeValues.size() == aValues.size()),
+        "Dimension of \"Time Values\" and \"Adjusted Water Difference Values\" do not match\n");
+  }
 }
 
 //*****
@@ -56,38 +63,45 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
   while (timeValues[Index] < time) Index++;
 
   if (Index == 0) {
-    this->water_height_val                       = waterHeightValues[Index];
-    this->height_above_water_of_max_pressure_val = heightAboveWaterOfMaxPressure[Index];
-    this->wave_length_val                        = waveLengthValues[Index];
-    this->wave_number_val                        = waveNumberValues[Index];
-    this->h_val                                  = hValues[Index];
-    this->a_val                                  = aValues[Index];
+    if (use_new_wave_press_nbc == false) {
+      this->water_height_val                       = waterHeightValues[Index];
+      this->height_above_water_of_max_pressure_val = heightAboveWaterOfMaxPressure[Index];
+      this->wave_length_val                        = waveLengthValues[Index];
+      this->wave_number_val                        = waveNumberValues[Index];
+    }
+    else {
+      this->h_val                                  = hValues[Index];
+      this->a_val                                  = aValues[Index];
+    }
   } else {
-    slope = (waterHeightValues[Index] - waterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->water_height_val = waterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    slope                  = (heightAboveWaterOfMaxPressure[Index] - heightAboveWaterOfMaxPressure[Index - 1]) /
-            (timeValues[Index] - timeValues[Index - 1]);
-    this->height_above_water_of_max_pressure_val =
-        heightAboveWaterOfMaxPressure[Index - 1] + slope * (time - timeValues[Index - 1]);
-    slope = (waveLengthValues[Index] - waveLengthValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->wave_length_val = waveLengthValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    slope = (waveNumberValues[Index] - waveNumberValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->wave_number_val = waveNumberValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    slope = (hValues[Index] - hValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->h_val = hValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    slope = (aValues[Index] - aValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->a_val = aValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    if (use_new_wave_press_nbc == false) {
+      slope = (waterHeightValues[Index] - waterHeightValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+      this->water_height_val = waterHeightValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+      slope                  = (heightAboveWaterOfMaxPressure[Index] - heightAboveWaterOfMaxPressure[Index - 1]) /
+              (timeValues[Index] - timeValues[Index - 1]);
+      this->height_above_water_of_max_pressure_val =
+          heightAboveWaterOfMaxPressure[Index - 1] + slope * (time - timeValues[Index - 1]);
+      slope = (waveLengthValues[Index] - waveLengthValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+      this->wave_length_val = waveLengthValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+      slope = (waveNumberValues[Index] - waveNumberValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+      this->wave_number_val = waveNumberValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    }
+    else {
+      slope = (hValues[Index] - hValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+      this->h_val = hValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+      slope = (aValues[Index] - aValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+      this->a_val = aValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    }
     // std::cout << "IKT computeVal water_height_val = " << this->water_height_val << "\n";
   }
 
   // IKT question: can water height be non-positive?  If not, add throw.
-  ALBANY_PANIC(
-      this->height_above_water_of_max_pressure_val <= 0, "Height above water of max pressure is non-positive!");
-  ALBANY_PANIC(this->wave_length_val <= 0, "Wave length is non-positive!");
-  ALBANY_PANIC(this->wave_number_val <= 0, "Wave number is non-positive!");
-  //IKT question: can a_val and h_val be negative?  If not, uncomment the following.
-  //ALBANY_PANIC(this->a_val <= 0, "Adjusted water difference is non-positive!");
-  //ALBANY_PANIC(this->h_val <= 0, "Shifted still water level is non-positive!");
+  if (use_new_wave_press_nbc == false) {
+    ALBANY_PANIC(
+        this->height_above_water_of_max_pressure_val <= 0, "Height above water of max pressure is non-positive!");
+    ALBANY_PANIC(this->wave_length_val <= 0, "Wave length is non-positive!");
+    ALBANY_PANIC(this->wave_number_val <= 0, "Wave number is non-positive!");
+  }
 
   return;
 }

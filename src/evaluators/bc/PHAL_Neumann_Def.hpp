@@ -849,30 +849,33 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   std::cout << "DEBUG: hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", "
             << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
 #endif
-  if (hs > 0.0) {
-    p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
-    pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
-    ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
-    m1 = (p0 - ps) / hs;
-  } else {
-    p0 = 0.0;
-    pc = 0.0;
-    ps = 0.0;
-     m1 = 0.0;
-  }
+  ScalarT m2, m3; ;
+  ScalarT b1, b2, b3; 
 
-  const ScalarT m2 = (pc - p0) / hc;
-  const ScalarT m3 = -2.0 * pc / Hb;
-  const ScalarT b1 = ps;
-  const ScalarT b2 = m1 * hs + b1 - m2 * hs;
-  const ScalarT b3 = m3 * (hs + hc + 0.5 * Hb);
+  if (use_new_wave_press_nbc == false) {
+    if (hs > 0.0) {
+      p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
+      pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
+      ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
+      m1 = (p0 - ps) / hs;
+    } 
+    else {
+      p0 = 0.0;
+      pc = 0.0;
+      ps = 0.0;
+      m1 = 0.0;
+    }
+    m2 = (pc - p0) / hc;
+    m3 = -2.0 * pc / Hb;
+    b1 = ps;
+    b2 = m1 * hs + b1 - m2 * hs;
+    b3 = m3 * (hs + hc + 0.5 * Hb);
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
     std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
     std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
 #endif
 
-  if (use_new_wave_press_nbc == false) { //old wave pressure NBC 
     for (int cell = 0; cell < numCells_; cell++) {
       for (int qp = 0; qp < numPoints; qp++) {
         for (int dim = 0; dim < numDOFsSet; dim++) {

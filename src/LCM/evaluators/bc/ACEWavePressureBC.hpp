@@ -33,6 +33,7 @@ class ACEWavePressureBC_Base : public PHAL::Neumann<EvalT, Traits>
   std::vector<RealType> waveNumberValues;
   std::vector<RealType> hValues;
   std::vector<RealType> aValues;
+  bool use_new_wave_press_nbc;
 };
 
 template <typename EvalT, typename Traits>

@@ -9,8 +9,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Ablufftemp.txt
         	${CMAKE_CURRENT_BINARY_DIR}/Ablufftemp.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ocean_sal.txt
                ${CMAKE_CURRENT_BINARY_DIR}/ocean_sal.txt COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time.txt
-               ${CMAKE_CURRENT_BINARY_DIR}/time.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/TimeHis_ExSec3600_2018MINI.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/TimeHis_ExSec3600_2018MINI.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/hsvals.txt
         	${CMAKE_CURRENT_BINARY_DIR}/hsvals.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/hvals.txt
@@ -21,3 +21,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Lvals.txt
 		${CMAKE_CURRENT_BINARY_DIR}/Lvals.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kvals.txt
         	${CMAKE_CURRENT_BINARY_DIR}/kvals.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dynP_a3600_Grid0.1_2018MINI.txt
+        	${CMAKE_CURRENT_BINARY_DIR}/dynP_a3600_Grid0.1_2018MINI.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dynP_h3600_Grid0.1_2018MINI.txt
+        	${CMAKE_CURRENT_BINARY_DIR}/dynP_h3600_Grid0.1_2018MINI.txt COPYONLY)

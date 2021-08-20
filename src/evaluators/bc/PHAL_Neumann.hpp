@@ -145,6 +145,17 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       const ScalarT b3,
       const ScalarT zval) const;
 
+  //IKT, 8/11/2021: specialization of calc_ace_press_at_z_point
+  //for new formulation of ACE Wave Pressure NBC 
+  ScalarT
+  calc_ace_press_at_z_point(
+      const double rho,
+      const double g,
+      const ScalarT h,
+      const ScalarT a,
+      const ScalarT zval) const;
+
+  // closed_from bc assignment
   // closed_from bc assignment
   void
   calc_closed_form(
@@ -219,6 +230,8 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   ScalarT height_above_water_of_max_pressure_val;
   ScalarT wave_length_val;
   ScalarT wave_number_val;
+  ScalarT h_val;
+  ScalarT a_val;
 
   std::vector<ScalarT> dudx;
 

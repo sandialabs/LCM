@@ -819,22 +819,29 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
   const ScalarT hs = water_height_val;  // wave height value interpolated in time
-  const ScalarT hc =
-      height_above_water_of_max_pressure_val;  // height above water of the max pressure value interpolated in time
+  const ScalarT hc = height_above_water_of_max_pressure_val;  
+                                               // height above water of the max pressure value interpolated in time
                                                // In general, hc = 0.7*Hb, where Hb is the breaking wave height
   const ScalarT L = wave_length_val;           // wave length interpolated in time
                                                // In general, L = 8*Hb
   const ScalarT k = wave_number_val;           // wave number interpolated in time
                                                // In general, k = 2*pi/L
+  const ScalarT h = h_val; //shifted still water level interpolated in time
+  const ScalarT a = a_val; //adjusted water difference interpolated in time
   const double tm                       = inputValues[0];
   const double g                        = inputValues[1];
   const double rho                      = inputValues[2];
   const double zmin                     = inputValues[3];
   const bool   dump_wave_press_nbc_data = inputValues[4];
+  const bool   use_new_wave_press_nbc   = inputValues[5];
+  //std::cout << "IKT: use_new_wave_press_nbc = " << use_new_wave_press_nbc << "\n"; 
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: zmin = " << zmin << "\n";
+    std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
+
+  //IKT, 8/11/2021: the following are for the old ACE Wave Pressure NBC but putting it here, 
+  //as it's needed for debug output
   const ScalarT Hb = hc / 0.7;
   ScalarT       p0, pc, ps;
   ScalarT       m1;
@@ -842,48 +849,79 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   std::cout << "DEBUG: hs, tm, Hb, g, rho, zmin, L, k, hc = " << hs << ", " << tm << ", " << Hb << ", " << g << ", "
             << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
 #endif
-  if (hs > 0.0) {
-    p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
-    pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
-    ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
-    m1 = (p0 - ps) / hs;
-  } else {
-    p0 = 0.0;
-    pc = 0.0;
-    ps = 0.0;
-    m1 = 0.0;
-  }
+  ScalarT m2, m3; ;
+  ScalarT b1, b2, b3; 
 
-  const ScalarT m2 = (pc - p0) / hc;
-  const ScalarT m3 = -2.0 * pc / Hb;
-  const ScalarT b1 = ps;
-  const ScalarT b2 = m1 * hs + b1 - m2 * hs;
-  const ScalarT b3 = m3 * (hs + hc + 0.5 * Hb);
+  if (use_new_wave_press_nbc == false) {
+    if (hs > 0.0) {
+      p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
+      pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
+      ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
+      m1 = (p0 - ps) / hs;
+    } 
+    else {
+      p0 = 0.0;
+      pc = 0.0;
+      ps = 0.0;
+      m1 = 0.0;
+    }
+    m2 = (pc - p0) / hc;
+    m3 = -2.0 * pc / Hb;
+    b1 = ps;
+    b2 = m1 * hs + b1 - m2 * hs;
+    b3 = m3 * (hs + hc + 0.5 * Hb);
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
-  std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
+    std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
+    std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
 #endif
-  for (int cell = 0; cell < numCells_; cell++) {
-    for (int qp = 0; qp < numPoints; qp++) {
-      for (int dim = 0; dim < numDOFsSet; dim++) {
-        MeshScalarT z = physPointsSide(cell, qp, 2);
+
+    for (int cell = 0; cell < numCells_; cell++) {
+      for (int qp = 0; qp < numPoints; qp++) {
+        for (int dim = 0; dim < numDOFsSet; dim++) {
+          MeshScalarT z = physPointsSide(cell, qp, 2);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        MeshScalarT x = physPointsSide(cell, qp, 0);
-        MeshScalarT y = physPointsSide(cell, qp, 1);
+          MeshScalarT x = physPointsSide(cell, qp, 0);
+          MeshScalarT y = physPointsSide(cell, qp, 1);
 #endif
-        MeshScalarT ztilde = z - zmin;
+          MeshScalarT ztilde = z - zmin;
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-        std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
+          std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
-        const ScalarT pval_qp = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
+          const ScalarT pval_qp = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
-        if (dim == 0) {
-          std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
-                    << z << ", " << pval_qp << "\n";
+          if (dim == 0) {
+            std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
+                      << z << ", " << pval_qp << "\n";
+          }
+#endif
+          qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
         }
+      }
+    }
+  }
+  else { //new ACE wave pressure NBC 
+    for (int cell = 0; cell < numCells_; cell++) {
+      for (int qp = 0; qp < numPoints; qp++) {
+        for (int dim = 0; dim < numDOFsSet; dim++) {
+          MeshScalarT z = physPointsSide(cell, qp, 2);
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+          MeshScalarT x = physPointsSide(cell, qp, 0);
+          MeshScalarT y = physPointsSide(cell, qp, 1);
 #endif
-        qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
+          MeshScalarT ztilde = z - zmin;
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+          std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
+#endif
+          const ScalarT pval_qp = this->calc_ace_press_at_z_point(rho, g, h, a, ztilde);
+#ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
+          if (dim == 0) {
+            std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
+                      << z << ", " << pval_qp << "\n";
+          }
+#endif
+          qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
+        }
       }
     }
   }
@@ -917,7 +955,9 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
           const auto    y         = coordVec(cell, node, 1);
           const auto    z         = coordVec(cell, node, 2);
           const auto    ztilde    = z - zmin;
-          const ScalarT pval_node = this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
+          const ScalarT pval_node = (use_new_wave_press_nbc == false) ? 
+		  this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde) :
+		  this->calc_ace_press_at_z_point(rho, g, h, a, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
           std::cout << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", "
                     << node << ", " << x << ", " << y << ", " << z << ", " << pval_node << "\n";
@@ -979,6 +1019,33 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
   }
   return pval;
 }
+
+//IKT 8/9/2021: overloaded version of above routine but for new formulation
+//of ACE Wave Pressure NBC
+template <typename EvalT, typename Traits>
+typename NeumannBase<EvalT, Traits>::ScalarT
+NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
+      const double rho,
+      const double g,
+      const ScalarT h,
+      const ScalarT a,
+      const ScalarT zval) const
+{
+  ScalarT pval = 0.0;
+  if (zval < h) {
+    ALBANY_PANIC(std::abs(h) < 1e-12, "Shifted still water level is zero and ACE wave press NBC is undefined!");
+    pval = rho*g*h + rho*g*(a-h)*zval/h;  
+  }
+  else if ((zval >= h) && (zval < h + a)) {
+    pval = rho*g*(h+a-zval); 
+  }
+  else {  //IKT: note we don't really need to implement this case b/c pval
+	  //is initialized to 0.0. 
+    pval = 0.0; 
+  }
+  return pval; 
+}
+
 
 template <typename EvalT, typename Traits>
 void

@@ -18,6 +18,7 @@ LCM:
         Impact Duration: 0.04 
         #Gravity: 9.806
         Water Density: 1025.0
+        Use New Wave Press NBC: false
     Initial Condition:
       Function: Constant
       Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00]

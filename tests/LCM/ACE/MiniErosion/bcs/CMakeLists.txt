@@ -21,6 +21,12 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Lvals.txt
 		${CMAKE_CURRENT_BINARY_DIR}/Lvals.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kvals.txt
         	${CMAKE_CURRENT_BINARY_DIR}/kvals.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/waterHA.txt
+		${CMAKE_CURRENT_BINARY_DIR}/waterHA.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/waterA.txt
+		${CMAKE_CURRENT_BINARY_DIR}/waterA.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/waterH.txt
+		${CMAKE_CURRENT_BINARY_DIR}/waterH.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dynP_a3600_Grid0.1_2018MINI.txt
         	${CMAKE_CURRENT_BINARY_DIR}/dynP_a3600_Grid0.1_2018MINI.txt COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dynP_h3600_Grid0.1_2018MINI.txt

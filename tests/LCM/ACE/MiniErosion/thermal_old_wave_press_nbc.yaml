@@ -8,7 +8,7 @@ ALBANY:
   Problem: 
     Name: ACE Thermal 3D
     Solution Method: Transient Tempus
-    MaterialDB Filename: './materials_thermal_wave_press_nbc.yaml'
+    MaterialDB Filename: './materials_thermal_old_wave_press_nbc.yaml'
     
     Dirichlet BCs:
       Time Dependent SDBC on NS z+ for DOF T:
@@ -35,7 +35,7 @@ ALBANY:
     
     Initial Condition:
       Function: Constant
-      Function Data: [269.0]
+      Function Data: [267.0]
 
     Adaptation:
       Method: Erosion
@@ -69,8 +69,8 @@ ALBANY:
       
   Discretization: 
     Method: Ioss
-    Exodus Input File Name: 'grid/cuboid_wave_press_nbc.g'
-    Exodus Output File Name: './thermal_wave_press_nbc.e'
+    Exodus Input File Name: 'grid/cuboid.g'
+    Exodus Output File Name: './thermal_old_wave_press_nbc.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
     Disable Exodus Output Initial Time: true

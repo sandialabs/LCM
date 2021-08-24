@@ -8,24 +8,24 @@ ALBANY:
   Problem: 
     Name: ACE Thermal 3D
     Solution Method: Transient Tempus
-    MaterialDB Filename: './materials_thermal.yaml'
+    MaterialDB Filename: './materials_thermal_new_wave_press_nbc.yaml'
     
     Dirichlet BCs:
       Time Dependent SDBC on NS z+ for DOF T:
-        Time File: 'bcs-orig/time.txt'
-        BC File: 'bcs-orig/Ablufftemp.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp.txt'
       Time Dependent SDBC on NS interval4-erodible for DOF T:
-        Time File: 'bcs-orig/time.txt'
-        BC File: 'bcs-orig/Ablufftemp.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp.txt'
       Time Dependent SDBC on NS interval3-erodible for DOF T:
-        Time File: 'bcs-orig/time.txt'
-        BC File: 'bcs-orig/Ablufftemp.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp.txt'
       Time Dependent SDBC on NS interval2-erodible for DOF T:
-        Time File: 'bcs-orig/time.txt'
-        BC File: 'bcs-orig/Ablufftemp.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp.txt'
       Time Dependent SDBC on NS interval1-erodible for DOF T:
-        Time File: 'bcs-orig/time.txt'
-        BC File: 'bcs-orig/Ablufftemp.txt'
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp.txt'
     
     Neumann BCs:
       Time Dependent NBC on SS bottom for DOF T set dudn:
@@ -35,7 +35,7 @@ ALBANY:
     
     Initial Condition:
       Function: Constant
-      Function Data: [269.0]
+      Function Data: [265.0]
 
     Adaptation:
       Method: Erosion
@@ -69,8 +69,8 @@ ALBANY:
       
   Discretization: 
     Method: Ioss
-    Exodus Input File Name: 'grid/cuboid.g'
-    Exodus Output File Name: './thermal.e'
+    Exodus Input File Name: 'grid/cuboid_wave_press_nbc.g'
+    Exodus Output File Name: './thermal_new_wave_press_nbc.e'
     Separate Evaluators by Element Block: true
     Workset Size: -1
     Disable Exodus Output Initial Time: true

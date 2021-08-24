@@ -12,13 +12,13 @@ LCM:
         Model Name: J2 Erosion
       Elastic Modulus:
         Elastic Modulus Type: Constant
-        Value: 0.1e+09
+        Value: 1.0e8
       Poissons Ratio:
         Poissons Ratio Type: Constant
         Value: 0.2
       Yield Strength:
         Yield Strength Type: Constant
-        Value: 5.5e+04
+        Value: 4.4e+04
       Hardening Modulus:
         Hardening Modulus Type: Constant
         Value: 2.5e+03
@@ -26,7 +26,7 @@ LCM:
       Saturation Exponent: 0.0
       ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
       ACE Z Depth File: 'external_files/depth.txt'
-      ACE Soil Yield Strength: 5.0e+01
+      ACE Soil Yield Strength: 200.0
       Density: 1800.0
       Body Force:
         Body Force Type: Constant

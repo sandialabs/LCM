@@ -3,7 +3,7 @@ LCM:
     Name: Mechanics 3D
     Solution Method: Transient
     Phalanx Graph Visualization Detail: 0
-    MaterialDB Filename: 'materials_mechanical_wave_press_nbc.yaml'
+    MaterialDB Filename: 'materials_mechanical_old_wave_press_nbc.yaml'
     Second Order: Trapezoid Rule
     
     Initial Condition:
@@ -19,21 +19,15 @@ LCM:
     Neumann BCs: 
       ACE Time Dependent NBC on SS bluff_face-erodible for DOF all set wave_pressure:
         ACE Time Values File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
-        #Uncomment the following 4 lines if wantt to set
-        #'Use New Wave Press NBC: false'
-        #ACE Water Height Values File: 'bcs/hsvals.txt'
-        #ACE Height Above Water of Max Pressure Values File: 'bcs/hcvals.txt'
-        #ACE Wave Length Values File: 'bcs/Lvals.txt'
-        #ACE Wave Number Values File: 'bcs/kvals.txt'
-        ACE Shifted Still Water Level Values File: 'bcs/dynP_h3600_Grid0.1_2018MINI.txt'
-        ACE Adjusted Water Difference Values File: 'bcs/dynP_a3600_Grid0.1_2018MINI.txt'
+        Use New Wave Press NBC: false
+        ACE Water Height Values File: 'bcs/hsvals.txt'
+        ACE Height Above Water of Max Pressure Values File: 'bcs/hcvals.txt'
+        ACE Wave Length Values File: 'bcs/Lvals.txt'
+        ACE Wave Number Values File: 'bcs/kvals.txt'
         Dump Wave Press NBC Data Files: false
-        Use New Wave Press NBC: true
-        #Uncomment the following 3 lines if wantt to set
-        #'Use New Wave Press NBC: false'
-        #Impact Duration: 0.01 
+        Impact Duration: 0.01 
         #Gravity: 9.806
-        #Water Density: 3000.0
+        Water Density: 3800.0
     
     Adaptation:
       Method: Erosion
@@ -57,8 +51,8 @@ LCM:
   
   Discretization:
     Method: Ioss
-    Exodus Input File Name: 'grid/cuboid_wave_press_nbc.g'
-    Exodus Output File Name: './mechanical_wave_press_nbc.e'
+    Exodus Input File Name: 'grid/cuboid.g'
+    Exodus Output File Name: './mechanical_old_wave_press_nbc.e'
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 2
     Disable Exodus Output Initial Time: true

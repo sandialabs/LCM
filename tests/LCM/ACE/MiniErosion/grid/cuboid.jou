@@ -27,6 +27,7 @@ create brick x {L} y {L} z {L}
 move volume 2 x {-L/2} z {L/2 + L}
 
 #mesh
+set fullhex use on
 imprint all 
 merge all
 volume all size {h}
@@ -53,7 +54,9 @@ nodeset 6 name "z+"
 
 sideset 1 surface with (z_coord < {0 + eps})
 sideset 1 name "bottom"
-sideset 2 surface with (x_coord <= {0 + eps})
+#sideset 2 surface with (x_coord <= {0 + eps})
+#sideset 2 name "bluff_face-erodible"
+sideset 2 face with (x_coord <= {0 + eps}) and (y_coord > {-L/2 - eps}) and (y_coord < {L/2 + eps}) and (z_coord > {0 - eps}) and (z_coord < {2*L + eps})
 sideset 2 name "bluff_face-erodible"
 
 nodeset 7 node with (z_coord >= {0 - eps}) and (z_coord < {0 + 2*h + eps}) and (x_coord <= {0 + eps})

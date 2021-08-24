@@ -25,9 +25,9 @@ ALBANY:
       ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
       ACE Latent Heat: 334.0e+03 #[J/kg]
       ACE Z Depth File: 'external_files/depth.txt'
-      ACE Time File: 'bcs-orig/time.txt'
-      ACE Sea Level File: 'bcs-orig/waterH.txt'
-      ACE Ocean Salinity File: 'bcs-orig/ocean_sal.txt'
+      ACE Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+      ACE Sea Level File: 'bcs/waterHA.txt'
+      ACE Ocean Salinity File: 'bcs/ocean_sal.txt'
       ACE Element Size: 0.25  # [m]
 
 

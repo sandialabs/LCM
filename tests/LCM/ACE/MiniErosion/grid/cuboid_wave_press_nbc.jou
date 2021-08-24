@@ -14,8 +14,8 @@ undo off
 # Define parameters
 #
 
-#{side_length = 1.0}
-#{mesh_size = 0.25}
+#{side_length = 0.80}
+#{mesh_size = 0.20}
 #{eps = 0.001 * mesh_size}
 
 #{L = side_length}

@@ -321,23 +321,33 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
   // Needed?
   Kokkos::deep_copy(neumann, 0.0);
 
-  const Albany::SideSetList&          ssList = *(workset.sideSets);
-  Albany::SideSetList::const_iterator it     = ssList.find(this->sideSetID);
+  auto const  ss_id  = this->sideSetID;
+  auto const& ssList = *(workset.sideSets);
+  auto const  it     = ssList.find(ss_id);
+
   // This sideset does not exist in this workset (GAH - this can go
   // away once we move logic to BCUtils
   if (it == ssList.end()) return;
 
-  std::vector<Albany::SideStruct> const& sideSet = it->second;
+  std::vector<Albany::SideStruct> side_set = it->second;
+
+  auto const is_erodible = ss_id.find("erodible") != std::string::npos;
+  if (is_erodible == true) {
+    //side_set.clear();
+    auto topo_rcp       = workset.topology;
+    auto erodible_cells = topo_rcp->getErodibleCells();
+    auto cell_gids      = topo_rcp->getEntityGIDs(erodible_cells);
+  }
 
 //#define DEBUG
 #if defined(DEBUG)
   {
-    auto const num_ss = sideSet.size();
+    auto const num_ss = side_set.size();
     ALBANY_DUMP("===============================================\n");
-    ALBANY_DUMP("**** Side set name     : " << this->sideSetID << '\n');
+    ALBANY_DUMP("**** Side set name     : " << ss_id << '\n');
     ALBANY_DUMP("**** Number of entries : " << num_ss << '\n');
     for (auto i = 0; i < num_ss; ++i) {
-      auto& ss = sideSet[i];
+      auto& ss = side_set[i];
       ALBANY_DUMP("-----------------------------------------------\n");
       ALBANY_DUMP("* entry         : " << i << '\n');
       ALBANY_DUMP("* side_GID      : " << ss.side_GID << '\n');
@@ -409,7 +419,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
   std::vector<int>                                                ebIndexVec;
   std::vector<std::vector<int>>                                   numCellsOnSidesOnBlocks;
   std::vector<std::vector<Kokkos::DynRankView<int, PHX::Device>>> cellsOnSidesOnBlocks;
-  for (auto const& it_side : sideSet) {
+  for (auto const& it_side : side_set) {
     int const ebIndex   = it_side.elem_ebIndex;
     int const elem_side = it_side.side_local_id;
 
@@ -430,7 +440,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
     }
   }
 
-  for (auto const& it_side : sideSet) {
+  for (auto const& it_side : side_set) {
     int const iBlock    = ordinalEbIndex[it_side.elem_ebIndex];
     int const elem_LID  = it_side.elem_LID;
     int const elem_side = it_side.side_local_id;

@@ -14,18 +14,18 @@ template <typename EvalT, typename Traits>
 ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::ParameterList& p)
     : PHAL::Neumann<EvalT, Traits>(p)
 {
-  use_new_wave_press_nbc  = p.get<bool>("Use New Wave Press NBC", false);
-  timeValues        = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
-  waterHeightValues = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
+  use_new_wave_press_nbc = p.get<bool>("Use New Wave Press NBC", false);
+  timeValues             = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
+  waterHeightValues      = p.get<Teuchos::Array<RealType>>("Water Height Values").toVector();
   heightAboveWaterOfMaxPressure =
       p.get<Teuchos::Array<RealType>>("Height Above Water of Max Pressure Values").toVector();
   waveLengthValues = p.get<Teuchos::Array<RealType>>("Wave Length Values").toVector();
   waveNumberValues = p.get<Teuchos::Array<RealType>>("Wave Number Values").toVector();
-  hValues = p.get<Teuchos::Array<RealType>>("Shifted Still Water Level Values").toVector();
-  aValues = p.get<Teuchos::Array<RealType>>("Adjusted Water Difference Values").toVector();
+  hValues          = p.get<Teuchos::Array<RealType>>("Shifted Still Water Level Values").toVector();
+  aValues          = p.get<Teuchos::Array<RealType>>("Adjusted Water Difference Values").toVector();
 
-  //IKT, 8/19/2021: the following checks are overkill, as we do the same checks
-  //in Albany::BCUtils
+  // IKT, 8/19/2021: the following checks are overkill, as we do the same checks
+  // in Albany::BCUtils
   if (use_new_wave_press_nbc == false) {
     ALBANY_PANIC(
         !(timeValues.size() == waterHeightValues.size()),
@@ -39,8 +39,7 @@ ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::Parameter
     ALBANY_PANIC(
         !(timeValues.size() == waveNumberValues.size()),
         "Dimension of \"Time Values\" and \"Wave Number Values\" do not match\n");
-  }
-  else {
+  } else {
     ALBANY_PANIC(
         !(timeValues.size() == hValues.size()),
         "Dimension of \"Time Values\" and \"Shifted Still Water Level Values\" do not match\n");
@@ -68,10 +67,9 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
       this->height_above_water_of_max_pressure_val = heightAboveWaterOfMaxPressure[Index];
       this->wave_length_val                        = waveLengthValues[Index];
       this->wave_number_val                        = waveNumberValues[Index];
-    }
-    else {
-      this->h_val                                  = hValues[Index];
-      this->a_val                                  = aValues[Index];
+    } else {
+      this->h_val = hValues[Index];
+      this->a_val = aValues[Index];
     }
   } else {
     if (use_new_wave_press_nbc == false) {
@@ -85,11 +83,10 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
       this->wave_length_val = waveLengthValues[Index - 1] + slope * (time - timeValues[Index - 1]);
       slope = (waveNumberValues[Index] - waveNumberValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
       this->wave_number_val = waveNumberValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    }
-    else {
-      slope = (hValues[Index] - hValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    } else {
+      slope       = (hValues[Index] - hValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
       this->h_val = hValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-      slope = (aValues[Index] - aValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+      slope       = (aValues[Index] - aValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
       this->a_val = aValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     }
     // std::cout << "IKT computeVal water_height_val = " << this->water_height_val << "\n";

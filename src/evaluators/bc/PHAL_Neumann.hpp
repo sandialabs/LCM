@@ -145,15 +145,11 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       const ScalarT b3,
       const ScalarT zval) const;
 
-  //IKT, 8/11/2021: specialization of calc_ace_press_at_z_point
-  //for new formulation of ACE Wave Pressure NBC 
+  // IKT, 8/11/2021: specialization of calc_ace_press_at_z_point
+  // for new formulation of ACE Wave Pressure NBC
   ScalarT
-  calc_ace_press_at_z_point(
-      const double rho,
-      const double g,
-      const ScalarT h,
-      const ScalarT a,
-      const ScalarT zval) const;
+  calc_ace_press_at_z_point(const double rho, const double g, const ScalarT h, const ScalarT a, const ScalarT zval)
+      const;
 
   // closed_from bc assignment
   // closed_from bc assignment

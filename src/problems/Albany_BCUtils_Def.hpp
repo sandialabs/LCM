@@ -1241,58 +1241,58 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<int>("Type", traits_type::typeATd);
 
-	  //Get parameter that tells code whether to use new or old wave press NBC
-	  //New wave pressure NBC is on by default 
-          bool   use_new_wave_press_nbc   = sub_list.get<bool>("Use New Wave Press NBC", true);
-	  p->set<bool>("Use New Wave Press NBC", use_new_wave_press_nbc); 
+          // Get parameter that tells code whether to use new or old wave press NBC
+          // New wave pressure NBC is on by default
+          bool use_new_wave_press_nbc = sub_list.get<bool>("Use New Wave Press NBC", true);
+          p->set<bool>("Use New Wave Press NBC", use_new_wave_press_nbc);
 
           std::string const      t_file       = sub_list.get<std::string>("ACE Time Values File");
           std::vector<double>    timevals_vec = LCM::vectorFromFile(t_file);
           Teuchos::Array<double> timevals(timevals_vec);
-	  Teuchos::Array<double> hsvals; 
-	  Teuchos::Array<double> hcvals; 
-	  Teuchos::Array<double> Lvals; 
-	  Teuchos::Array<double> kvals; 
-	  Teuchos::Array<double> avals; 
-	  Teuchos::Array<double> hvals; 
-	  if (sub_list.isParameter("ACE Water Height Values File")) {
-            std::string const      hs_file    = sub_list.get<std::string>("ACE Water Height Values File");
-            std::vector<double>    hsvals_vec = LCM::vectorFromFile(hs_file);
-	    Teuchos::ArrayView<double> hsvals_av = Teuchos::arrayViewFromVector(hsvals_vec); 
-            hsvals = Teuchos::Array<double>(hsvals_av);
-	  }
-	  if (sub_list.isParameter("ACE Height Above Water of Max Pressure Values File")) {
-            std::string const      hc_file = sub_list.get<std::string>("ACE Height Above Water of Max Pressure Values File");
-            std::vector<double>    hcvals_vec = LCM::vectorFromFile(hc_file);
-	    Teuchos::ArrayView<double> hcvals_av = Teuchos::arrayViewFromVector(hcvals_vec); 
-            hcvals = Teuchos::Array<double>(hcvals_av);
-	  }
-	  if (sub_list.isParameter("ACE Wave Length Values File")) {
-            std::string const      L_file    = sub_list.get<std::string>("ACE Wave Length Values File");
-            std::vector<double>    Lvals_vec = LCM::vectorFromFile(L_file);
-	    Teuchos::ArrayView<double> Lvals_av = Teuchos::arrayViewFromVector(Lvals_vec); 
-            Lvals = Teuchos::Array<double>(Lvals_av);
-	  }
-	  if (sub_list.isParameter("ACE Wave Number Values File")) {
-            std::string const      k_file    = sub_list.get<std::string>("ACE Wave Number Values File");
-            std::vector<double>    kvals_vec = LCM::vectorFromFile(k_file);
-	    Teuchos::ArrayView<double> kvals_av = Teuchos::arrayViewFromVector(kvals_vec); 
-            kvals = Teuchos::Array<double>(kvals_av);
-	  }
-	  if (sub_list.isParameter("ACE Adjusted Water Difference Values File")) {
-            std::string const      a_file    = sub_list.get<std::string>("ACE Adjusted Water Difference Values File");
-            std::vector<double>    avals_vec = LCM::vectorFromFile(a_file);
-	    Teuchos::ArrayView<double> avals_av = Teuchos::arrayViewFromVector(avals_vec); 
-            avals = Teuchos::Array<double>(avals_av);
-	  }
-	  if (sub_list.isParameter("ACE Shifted Still Water Level Values File")) {
-            std::string const      h_file    = sub_list.get<std::string>("ACE Shifted Still Water Level Values File");
-            std::vector<double>    hvals_vec = LCM::vectorFromFile(h_file);
-	    Teuchos::ArrayView<double> hvals_av = Teuchos::arrayViewFromVector(hvals_vec); 
-            hvals = Teuchos::Array<double>(hvals_av);
-	  }
+          Teuchos::Array<double> hsvals;
+          Teuchos::Array<double> hcvals;
+          Teuchos::Array<double> Lvals;
+          Teuchos::Array<double> kvals;
+          Teuchos::Array<double> avals;
+          Teuchos::Array<double> hvals;
+          if (sub_list.isParameter("ACE Water Height Values File")) {
+            std::string const          hs_file    = sub_list.get<std::string>("ACE Water Height Values File");
+            std::vector<double>        hsvals_vec = LCM::vectorFromFile(hs_file);
+            Teuchos::ArrayView<double> hsvals_av  = Teuchos::arrayViewFromVector(hsvals_vec);
+            hsvals                                = Teuchos::Array<double>(hsvals_av);
+          }
+          if (sub_list.isParameter("ACE Height Above Water of Max Pressure Values File")) {
+            std::string const hc_file = sub_list.get<std::string>("ACE Height Above Water of Max Pressure Values File");
+            std::vector<double>        hcvals_vec = LCM::vectorFromFile(hc_file);
+            Teuchos::ArrayView<double> hcvals_av  = Teuchos::arrayViewFromVector(hcvals_vec);
+            hcvals                                = Teuchos::Array<double>(hcvals_av);
+          }
+          if (sub_list.isParameter("ACE Wave Length Values File")) {
+            std::string const          L_file    = sub_list.get<std::string>("ACE Wave Length Values File");
+            std::vector<double>        Lvals_vec = LCM::vectorFromFile(L_file);
+            Teuchos::ArrayView<double> Lvals_av  = Teuchos::arrayViewFromVector(Lvals_vec);
+            Lvals                                = Teuchos::Array<double>(Lvals_av);
+          }
+          if (sub_list.isParameter("ACE Wave Number Values File")) {
+            std::string const          k_file    = sub_list.get<std::string>("ACE Wave Number Values File");
+            std::vector<double>        kvals_vec = LCM::vectorFromFile(k_file);
+            Teuchos::ArrayView<double> kvals_av  = Teuchos::arrayViewFromVector(kvals_vec);
+            kvals                                = Teuchos::Array<double>(kvals_av);
+          }
+          if (sub_list.isParameter("ACE Adjusted Water Difference Values File")) {
+            std::string const          a_file = sub_list.get<std::string>("ACE Adjusted Water Difference Values File");
+            std::vector<double>        avals_vec = LCM::vectorFromFile(a_file);
+            Teuchos::ArrayView<double> avals_av  = Teuchos::arrayViewFromVector(avals_vec);
+            avals                                = Teuchos::Array<double>(avals_av);
+          }
+          if (sub_list.isParameter("ACE Shifted Still Water Level Values File")) {
+            std::string const          h_file = sub_list.get<std::string>("ACE Shifted Still Water Level Values File");
+            std::vector<double>        hvals_vec = LCM::vectorFromFile(h_file);
+            Teuchos::ArrayView<double> hvals_av  = Teuchos::arrayViewFromVector(hvals_vec);
+            hvals                                = Teuchos::Array<double>(hvals_av);
+          }
 
-	  if (use_new_wave_press_nbc == false) {
+          if (use_new_wave_press_nbc == false) {
             if (timevals.size() != hsvals.size()) {
               ALBANY_ABORT(
                   "'Time Values' array must have same length as 'Water Height Values' "
@@ -1313,8 +1313,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
                   "'Time Values' array must have same length as 'Wave Number Values' "
                   "array!\n");
             }
-	  }
-	  else {
+          } else {
             if (timevals.size() != hvals.size()) {
               ALBANY_ABORT(
                   "'Time Values' array must have same length as 'Shifted Still Water Level Values' "
@@ -1325,7 +1324,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
                   "'Time Values' array must have same length as 'Adjusted Water Difference Values' "
                   "array!\n");
             }
-	  }
+          }
 
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);
           p->set<Teuchos::Array<RealType>>("Water Height Values", hsvals);
@@ -1355,7 +1354,6 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           double rho                      = sub_list.get<double>("Water Density", 1022.0);
           double zmin                     = sub_list.get<double>("Min z-Value", 0.0);
           bool   dump_wave_press_nbc_data = sub_list.get<bool>("Dump Wave Press NBC Data Files", false);
-	  
 
           // Check that parameters are physical
           if (tm <= 0.0) {

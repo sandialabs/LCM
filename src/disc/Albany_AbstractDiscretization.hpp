@@ -78,9 +78,21 @@ class AbstractDiscretization
   virtual const NodeGID2LIDMap&
   getNodeGID2LIDMap() const = 0;
 
+  virtual NodeSetList&
+  getNodeSets() = 0;
+  virtual NodeSetGIDsList&
+  getNodeSetGIDs() = 0;
+  virtual NodeSetCoordList&
+  getNodeSetCoords() = 0;
+  virtual NodeGID2LIDMap&
+  getNodeGID2LIDMap() = 0;
+
   //! Get Side set lists
   virtual const SideSetList&
   getSideSets(int const ws) const = 0;
+
+  virtual SideSetList&
+  getSideSets(int const ws) = 0;
 
   //! Get map from (Ws, El, Local Node, Eq) -> unkLID
   virtual const Conn&

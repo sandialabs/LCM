@@ -173,9 +173,36 @@ class STKDiscretization : public AbstractDiscretization
     return node_GID_2_LID_map;
   }
 
+  NodeSetList&
+  getNodeSets()
+  {
+    return nodeSets;
+  }
+  NodeSetGIDsList&
+  getNodeSetGIDs()
+  {
+    return nodeSetGIDs;
+  }
+  NodeSetCoordList&
+  getNodeSetCoords()
+  {
+    return nodeSetCoords;
+  }
+  NodeGID2LIDMap&
+  getNodeGID2LIDMap()
+  {
+    return node_GID_2_LID_map;
+  }
+
   //! Get Side set lists (typedef in Albany_AbstractDiscretization.hpp)
   SideSetList const&
   getSideSets(int const workset) const
+  {
+    return sideSets[workset];
+  }
+
+  SideSetList&
+  getSideSets(int const workset)
   {
     return sideSets[workset];
   }
@@ -560,6 +587,10 @@ class STKDiscretization : public AbstractDiscretization
     return comm;
   }
 
+  //! Find the local side id number within parent element
+  unsigned
+  determine_local_side_id(const stk::mesh::Entity elem, stk::mesh::Entity side);
+
  protected:
   void
   getSolutionField(Thyra_Vector& result, bool overlapped) const;
@@ -609,10 +640,6 @@ class STKDiscretization : public AbstractDiscretization
   //! Call stk_io for creating exodus output file
   void
   setupExodusOutput();
-
-  //! Find the local side id number within parent element
-  unsigned
-  determine_local_side_id(const stk::mesh::Entity elem, stk::mesh::Entity side);
 
   //! Convert the stk mesh on this processor to a nodal graph using SEACAS
   void

@@ -1878,11 +1878,11 @@ Topology::is_erodible_face(stk::mesh::Entity face)
   if (all_aligned(points, zm_, 2) == true) return false;
   if (all_aligned(points, zp_, 2) == true) return false;
 #if defined(DEBUG)
-  std::cout << "ERODIBLE FACE : " << face << ", NODES :\n";
+  std::cout << "ERODIBLE FACE ENTITY ID: " << face << ", NODE ENTITY IDS, GIDS, COORDS :\n";
   for (auto i = 0; i < num_relations; ++i) {
     auto node  = relations[i];
     auto point = points[i];
-    std::cout << node << ", " << point << "\n";
+    std::cout << node << ", " << get_gid(node) << ", " << point << "\n";
   }
 #endif
   return true;

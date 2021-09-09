@@ -67,16 +67,16 @@ struct Workset
   Teuchos::RCP<Thyra_MultiVector> Vp_bc;
 
   // Info about worksets, in case it's needed in evaluators
-  int workset_num;
-  int num_worksets;
+  int workset_num{0};
+  int num_worksets{0};
 
   Albany::DeviceView1d<ST>      f_kokkos;
   Albany::DeviceLocalMatrix<ST> Jac_kokkos;
 
-  Teuchos::RCP<const Albany::NodeSetList>      nodeSets;
-  Teuchos::RCP<const Albany::NodeSetCoordList> nodeSetCoords;
-  Teuchos::RCP<const Albany::NodeSetGIDsList>  nodeSetGIDs;
-  Teuchos::RCP<const Albany::SideSetList>      sideSets;
+  Teuchos::RCP<Albany::NodeSetList>      nodeSets;
+  Teuchos::RCP<Albany::NodeSetCoordList> nodeSetCoords;
+  Teuchos::RCP<Albany::NodeSetGIDsList>  nodeSetGIDs;
+  Teuchos::RCP<Albany::SideSetList>      sideSets;
 
   // jacobian and mass matrix coefficients for matrix fill
   double j_coeff{0.0};

@@ -321,27 +321,66 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
   // Needed?
   Kokkos::deep_copy(neumann, 0.0);
 
-  auto const  ss_id  = this->sideSetID;
-  auto const& ssList = *(workset.sideSets);
-  auto const  it     = ssList.find(ss_id);
+  auto const ss_id   = this->sideSetID;
+  auto&      ss_list = *(workset.sideSets);
+  auto       it      = ss_list.find(ss_id);
 
-  // This sideset does not exist in this workset (GAH - this can go
-  // away once we move logic to BCUtils
-  if (it == ssList.end()) return;
+  if (it == ss_list.end()) return;
 
-  std::vector<Albany::SideStruct> side_set = it->second;
+  auto& side_set = it->second;
 
+  // If this is an ACE erodible side set, discard any information in it and
+  // rebuild it by querying the topology structure for erodible faces.
+  // This is because there is mesh adaptation, material may be removed, and
+  // the boundary changes, and so the NBC needs to propagate with the moving
+  // boundary.
   auto const is_erodible = ss_id.find("erodible") != std::string::npos;
-  if (is_erodible == true) {
-    // side_set.clear();
-    auto topo_rcp       = workset.topology;
-    auto erodible_cells = topo_rcp->getErodibleCells();
-    auto cell_gids      = topo_rcp->getEntityGIDs(erodible_cells);
+#if 0
+  {
+    if (is_erodible == true) {
+      side_set.clear();
+      auto               topo_rcp            = workset.topology;
+      auto&              bulk_data           = topo_rcp->get_bulk_data();
+      auto               erodible_cells      = topo_rcp->getErodibleCells();
+      auto               erodible_cell_gids  = topo_rcp->getEntityGIDs(erodible_cells);
+      auto&              stk_disc            = topo_rcp->get_stk_discretization();
+      auto               elem_gid_to_wslid   = stk_disc.getElemGIDws();
+      auto               stk_mesh_struct_rcp = stk_disc.getSTKMeshStruct();
+      auto               stk_mesh_specs_rcp  = stk_mesh_struct_rcp->getMeshSpecs()[0];
+      auto               ws_eb_names         = stk_disc.getWsEBNames();
+      auto const         elem_rank           = stk::topology::ELEM_RANK;
+      auto const         face_rank           = stk::topology::FACE_RANK;
+      Albany::SideStruct entry;
+      for (auto cell : erodible_cells) {
+        auto const* relations     = bulk_data.begin(cell, face_rank);
+        auto const  num_relations = bulk_data.num_connectivity(cell, face_rank);
+        ALBANY_ASSERT(num_relations > 0);
+        for (auto i = 0; i < num_relations; ++i) {
+          auto face = relations[i];
+          if (topo_rcp->is_erodible_face(face) == true) {
+            auto const elem_gid      = topo_rcp->get_gid(cell) - 1;
+            auto const wslid         = elem_gid_to_wslid[elem_gid];
+            auto const ws            = wslid.ws;
+            auto const elem_lid      = wslid.LID;
+            auto const elem_eb_index = stk_mesh_specs_rcp->ebNameToIndex[ws_eb_names[ws]];
+            auto const side_local_id = stk_disc.determine_local_side_id(cell, face);
+            auto const side_gid      = topo_rcp->get_gid(face) - 1;
+            entry.side_GID           = side_gid;
+            entry.elem_GID           = elem_gid;
+            entry.elem_LID           = elem_lid;
+            entry.elem_ebIndex       = elem_eb_index;
+            entry.side_local_id      = side_local_id;
+            side_set.emplace_back(entry);
+          }
+        }
+      }
+    }
   }
+#endif
 
 //#define DEBUG
 #if defined(DEBUG)
-  {
+  if (is_erodible == true) {
     auto const num_ss = side_set.size();
     ALBANY_DUMP("===============================================\n");
     ALBANY_DUMP("**** Side set name     : " << ss_id << '\n');
@@ -357,29 +396,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
       ALBANY_DUMP("* side_local_id : " << ss.side_local_id << '\n');
     }
     ALBANY_DUMP("===============================================\n");
-    auto  topo_rcp            = workset.topology;
-    auto  erodible_cells      = topo_rcp->getErodibleCells();
-    auto  cell_gids           = topo_rcp->getEntityGIDs(erodible_cells);
-    auto& stk_disc            = topo_rcp->get_stk_discretization();
-    auto  elem_gid_to_wslid   = stk_disc.getElemGIDws();
-    auto  stk_mesh_struct_rcp = stk_disc.getSTKMeshStruct();
-    auto  stk_mesh_specs_rcp  = stk_mesh_struct_rcp->getMeshSpecs()[0];
-    auto  ws_eb_names         = stk_disc.getWsEBNames();
-
-    ALBANY_DUMP("-----------------------------------------------\n");
-    ALBANY_DUMP("*** Number erodible cells : " << erodible_cells.size() << '\n');
-    for (auto cell_gid : cell_gids) {
-      auto const elem_gid      = cell_gid - 1;
-      auto const wslid         = elem_gid_to_wslid[elem_gid];
-      auto const ws            = wslid.ws;
-      auto const elem_lid      = wslid.LID;
-      auto const elem_eb_index = stk_mesh_specs_rcp->ebNameToIndex[ws_eb_names[ws]];
-      ALBANY_DUMP("-----------------------------------------------\n");
-      ALBANY_DUMP("* elem GID      : " << elem_gid << '\n');
-      ALBANY_DUMP("* cell LID      : " << elem_lid << '\n');
-      ALBANY_DUMP("* elem EB index : " << elem_eb_index << '\n');
-    }
-    ALBANY_DUMP("===============================================\n");
+    exit(0);
   }
 #endif
 
@@ -597,13 +614,6 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
           for (std::size_t qp = 0; qp < numQPsSide; ++qp) {
             for (std::size_t dim = 0; dim < numDOFsSet; ++dim) {
               neumann(cell, node, dim) += data(iCell, qp, dim) * weighted_trans_basis_refPointsSide(iCell, node, qp);
-#if 0
-              {
-                ALBANY_DUMP("**** iCell : " << iCell << ", cell : " << cell << ", node : " << node);
-                ALBANY_DUMP(", qp : " << qp << ", dim : " << dim << ", data : " << data(iCell, qp, dim));
-                ALBANY_DUMP(", weight : " << weighted_trans_basis_refPointsSide(iCell, node, qp) << "\n");
-              }
-#endif
             }
           }
         }
@@ -1125,14 +1135,13 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::E
       auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
       ALBANY_DUMP("**** GLOBAL BOUNDARY INDICATOR MAP :\n");
       for (auto&& kv : bi_field) {
-        ALBANY_DUMP("GID : " << kv.first << ", BI : " << *kv.second << "\n");
+        ALBANY_DUMP("NODE GID : " << kv.first << ", BI : " << *kv.second << "\n");
       }
       std::cout << "*** SIDESET BOUNDARY INDICATOR : " << ss_id << " ***\n";
       for (auto cell = 0; cell < workset.numCells; ++cell) {
         for (auto ss_node = 0; ss_node < this->numNodes; ++ss_node) {
           ALBANY_ASSERT(has_nbi == true);
           auto&       stk_mesh_struct = *(stk_disc->getSTKMeshStruct());
-          auto&       coord_field     = *(stk_mesh_struct.getCoordinatesField());
           auto const& bi_field        = stk_disc->getNodeBoundaryIndicator();
           auto const  gid             = node_gids[cell][ss_node] + 1;
           auto const  it              = bi_field.find(gid);
@@ -1140,20 +1149,19 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::E
           auto const    bi                 = *(it->second);
           auto          overlap_node_vs    = stk_disc->getOverlapNodeVectorSpace();
           auto          ov_node_vs_indexer = Albany::createGlobalLocalIndexer(overlap_node_vs);
-          auto const    local_node_id      = ov_node_vs_indexer->getLocalElement(ss_node);
+          auto const    local_node_id      = ov_node_vs_indexer->getLocalElement(gid - 1);
           auto const&   coordinates        = stk_disc->getCoordinates();
           double* const pc                 = &(coordinates[3 * local_node_id]);
           auto const    x                  = pc[0];
           auto const    y                  = pc[1];
           auto const    z                  = pc[2];
-          std::cout << "CELL: " << std::setw(4) << cell << ", NODE GID: " << std::setw(4) << gid
-                    << ", BI : " << std::setw(2) << bi << ", ";
+          std::cout << "CELL: " << std::setw(4) << cell << ", NODE GID: " << std::setw(4) << gid;
+          std::cout << ", BI : " << std::setw(2) << bi << ", ";
           std::cout << "X : " << std::setw(24) << std::setprecision(16) << x << ", ";
           std::cout << "Y : " << std::setw(24) << std::setprecision(16) << y << ", ";
           std::cout << "Z : " << std::setw(24) << std::setprecision(16) << z << "\n";
         }
       }
-      exit(0);
     }
   }
 #endif  // DEBUG

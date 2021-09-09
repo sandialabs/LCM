@@ -50,10 +50,26 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_old_wave_press_nbc_gold.e-s.5
                ${CMAKE_CURRENT_BINARY_DIR}/thermal_old_wave_press_nbc_gold.e-s.50 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_old_wave_press_nbc_gold.e-s.50
                ${CMAKE_CURRENT_BINARY_DIR}/mechanical_old_wave_press_nbc_gold.e-s.50 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.50
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.50 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.50
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.50 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.70
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.70 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.70.4.0
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.70.4.0 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.70.4.1
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.70.4.1 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.70.4.2
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.70.4.2 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.70.4.3
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.70.4.3 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.70
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.70 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.70.4.0
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.70.4.0 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.70.4.1
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.70.4.1 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.70.4.2
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.70.4.2 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.70.4.3
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.70.4.3 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/mechanical.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.exodiff
@@ -98,10 +114,10 @@ add_test(
 set_tests_properties(ACE_${testName}_OldWavePressNBC_Serial PROPERTIES LABELS "LCM;Tpetra;Forward")
   
 #Serial test - denudation with erosion
-set(OUTFILE1 "thermal_denudation.e-s.50")
-set(REF_FILE1 "thermal_denudation_gold.e-s.50")
-set(OUTFILE2 "mechanical_denudation.e-s.50")
-set(REF_FILE2 "mechanical_denudation_gold.e-s.50")
+set(OUTFILE1 "thermal_denudation.e-s.70")
+set(REF_FILE1 "thermal_denudation_gold.e-s.70")
+set(OUTFILE2 "mechanical_denudation.e-s.70")
+set(REF_FILE2 "mechanical_denudation_gold.e-s.70")
 set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake)
 add_test(
 NAME ACE_${testName}_Denudation_Serial
@@ -114,20 +130,20 @@ NAME ACE_${testName}_Denudation_Serial
     ${runtest.cmake})
 set_tests_properties(ACE_${testName}_Denudation_Serial PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-#Parallel test
-#set(OUTFILE1 "thermal.e-s.78")
-#set(REF_FILE1 "thermal_gold.e-s.78")
-#set(OUTFILE2 "mechanical.e-s.78")
-#set(REF_FILE2 "mechanical_gold.e-s.78")
-#set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
-#add_test(
-#  NAME ACE_${testName}_Parallel
-#  COMMAND
-#  ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME1=thermal
-#    -DTEST_NAME2=mechanical
-#    -DTEST_ARGS=coupled_old_wave_press_nbc.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-#    -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 
-#    -DREF_FILENAME2=${REF_FILE2} -DOUTPUT_FILENAME2=${OUTFILE2} -P
-#    ${runtest.cmake})
-#set_tests_properties(ACE_${testName}_Parallel PROPERTIES LABELS "LCM;Tpetra;Forward")
+#Parallel test - denudation with erosion
+set(OUTFILE1 "thermal_denudation.e-s.70")
+set(REF_FILE1 "thermal_denudation_gold.e-s.70")
+set(OUTFILE2 "mechanical_denudation.e-s.70")
+set(REF_FILE2 "mechanical_denudation_gold.e-s.70")
+set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
+add_test(
+NAME ACE_${testName}_Denudation_Parallel
+  COMMAND
+  ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME1=thermal
+    -DTEST_NAME2=mechanical
+    -DTEST_ARGS=coupled_denudation.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 
+    -DREF_FILENAME2=${REF_FILE2} -DOUTPUT_FILENAME2=${OUTFILE2} -P
+    ${runtest.cmake})
+set_tests_properties(ACE_${testName}_Denudation_Parallel PROPERTIES LABELS "LCM;Tpetra;Forward")
   

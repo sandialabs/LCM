@@ -1,0 +1,77 @@
+## /usr/local/cubit-14.1/bin/clarox
+## Cubit Version 14.1
+## Cubit Build 389326
+## Revised 2013-11-07 16:00:31 -0700 (Thu, 07 Nov 2013)
+## Running 03/13/2014 03:10:55 PM
+## Command Options:
+## -warning = On
+## -information = On
+reset
+logging off
+undo off
+
+#
+# Define parameters
+#
+
+#{side_length = 1.0}
+#{mesh_size = 0.25}
+#{eps = 0.001 * mesh_size}
+
+#{L = side_length}
+#{h = mesh_size}
+
+create brick x {L} y {L} z {L}
+move volume 1 x {-L/2} z {L/2}
+create brick x {L} y {L} z {L}
+move volume 2 x {-L/2} z {L/2 + L}
+
+#
+# mesh
+#
+#set fullhex use on
+#imprint all 
+#merge all
+volume all size {h}
+volume all scheme auto
+mesh volume all
+
+block 1 volume 1
+block 1 name "bottom_block"
+block 2 volume 2
+block 2 name "top_block"
+
+nodeset 1 surface with (x_coord < {-L + eps})
+nodeset 1 name "x-"
+nodeset 2 surface with (x_coord > {0 - eps})
+nodeset 2 name "x+"
+nodeset 3 surface with (y_coord < {-L/2 + eps})
+nodeset 3 name "y-"
+nodeset 4 surface with (y_coord > {+L/2 - eps})
+nodeset 4 name "y+"
+nodeset 5 surface with (z_coord < {0 + eps})
+nodeset 5 name "z-"
+nodeset 6 surface with (z_coord > {2*L - eps})
+nodeset 6 name "z+"
+
+sideset 1 surface with (z_coord < {0 + eps})
+sideset 1 name "bottom"
+#sideset 2 surface with (x_coord <= {0 + eps})
+#sideset 2 name "bluff_face-erodible"
+sideset 2 face with (x_coord <= {0 + eps}) and (y_coord > {-L/2 - eps}) and (y_coord < {L/2 + eps}) and (z_coord > {0 - eps}) and (z_coord < {2*L + eps})
+sideset 2 name "bluff_face-erodible"
+
+nodeset 7 node with (z_coord >= {0 - eps}) and (z_coord < {0 + 2*h + eps}) and (x_coord <= {0 + eps})
+nodeset 7 name "interval1-erodible"
+
+nodeset 8 node with (z_coord >= {2*h + eps}) and (z_coord < {4*h + eps}) and (x_coord <= {0 + eps})
+nodeset 8 name "interval2-erodible"
+
+nodeset 9 node with (z_coord >= {4*h + eps}) and (z_coord < {6*h + eps}) and (x_coord <= {0 + eps})
+nodeset 9 name "interval3-erodible"
+
+nodeset 10 node with (z_coord >= {6*h + eps}) and (z_coord < {8*h + eps}) and (x_coord <= {0 + eps})
+nodeset 10 name "interval4-erodible"
+
+set large exodus file off
+export mesh "cuboid_denudation.g" overwrite

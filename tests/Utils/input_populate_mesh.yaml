@@ -34,7 +34,19 @@ ALBANY:
         Field Origin: File
         Random Value: ['true']
   Piro: 
-    NOX: 
+    NOX:
+      Status Tests:
+        Test Type: Combo
+        Combo Type: OR
+        Number of Tests: 2
+        Test 0:
+          Test Type: NormF
+          Tolerance: 1.0e-8
+          Norm Type: Two Norm
+          Scale Type: Unscaled
+        Test 1:
+          Test Type: MaxIters
+          Maximum Iterations: 10 
       Printing: 
         Output Information: 
           Details: false

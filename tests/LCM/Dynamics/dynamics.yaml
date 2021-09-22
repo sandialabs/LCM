@@ -29,7 +29,7 @@ LCM:
     Number Of Time Derivatives: 2
   Regression Results:
     Number of Comparisons: 1
-    Test Values: [-0.00528625883099]
+    Test Values: [-0.00528632683561]
     Relative Tolerance: 1.00000000e-06
     Number of Sensitivity Comparisons: 0
     Sensitivity Test Values 0: [0.16666666, 0.16666666, 0.33333333, 0.33333333]

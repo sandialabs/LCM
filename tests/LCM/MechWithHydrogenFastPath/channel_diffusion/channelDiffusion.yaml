@@ -118,7 +118,7 @@ LCM:
       Status Tests:
         Test Type: Combo
         Combo Type: OR
-        Number of Tests: 3
+        Number of Tests: 4
         Test 0:
           Test Type: RelativeNormF
           Tolerance: 1.00000000e-10

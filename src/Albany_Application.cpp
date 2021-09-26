@@ -638,6 +638,7 @@ Application::finalSetUp(
     solveParams.get(sensitivityToken, *oldSensitivityFlag);
   }
 
+
   // MPerego: Preforming post registration setup here to make sure that the
   // discretization is already created, so that  derivative dimensions are
   // known.
@@ -1659,6 +1660,16 @@ Application::determinePiroSolver(const Teuchos::RCP<Teuchos::ParameterList>& top
       piroSolverToken = "Unsupported";
     }
     piroParams->set("Solver Type", piroSolverToken);
+    
+    const bool compute_sens = problemParams->get<bool>("Compute Sensitivities", false);
+    std::string sens_method = "None"; 
+    if (compute_sens == true) {
+      sens_method = piroParams->get<std::string>("Sensitivity Method", "Forward"); 
+    }
+    if ((sens_method == "Adjoint") && (piroSolverToken == "Tempus")) {
+      ALBANY_ABORT(
+          "Albany/LCM does not have support for adjoint transient sensitivities!\n");
+    }
   }
 }
 

@@ -226,7 +226,7 @@ SolverFactory::createAndGetAlbanyApp(
   Piro::SolverFactory piroFactory;
   observer_ = Teuchos::rcp(new PiroObserver(albanyApp, modelWithSolve));
   if (solMgr->isAdaptive()) {
-    return piroFactory.createSolver<ST>(piroParams, modelWithSolve, solMgr, observer_);
+    return piroFactory.createSolverAdaptive<ST>(piroParams, modelWithSolve, solMgr, observer_);
   } else {
     return piroFactory.createSolver<ST>(piroParams, modelWithSolve, Teuchos::null, observer_);
   }

@@ -301,31 +301,18 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const peat = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) :
                                                  1.0;  // need this so ice is strong when melted
 
-  // RealType height_AL     = 4.0;
-  // RealType height_normal = ((height-height_AL) / (5.2-height_AL));  // warning! this assumes heights are positive
-  // values
-  //         height_normal = std::max(height_normal,0.0);
-
   RealType res_strength = (1.0 * soil_yield_strength_);
 
 #if defined(ICE_SATURATION)
   Y = (ice_saturation * Y) + res_strength;
+  // Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
 #endif
+  Y = std::max(Y, 0.0);
 
   auto const sea_level      = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
   auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
   auto const is_at_boundary = cell_bi == 1.0;
   auto const is_erodible    = cell_bi == 2.0;
-
-  // RealType const height_max     = *std::max_element(z_above_mean_sea_level_.begin(), z_above_mean_sea_level_.end());
-  // RealType const height_max     = z_above_mean_sea_level_.back();  // warning! assumes last value is the highest
-  // height RealType const height_max = 5.2; RealType const height_normal  = 1.0 - ((height_max - height) / height_max);
-  // // warning! this assumes heights are positive values height_normal = std::min(1.0, height_normal); height_normal =
-  // std::max(0.0, height_normal);
-
-  // Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
-
-  Y = std::max(Y, 100.0);
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);

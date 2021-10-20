@@ -174,11 +174,11 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       // minitensor::Tensor<RealType> f = F*minitensor::inverse(Fn);
       // minitensor::Tensor<RealType> V;
       // minitensor::Tensor<RealType> R;
-      // boost::tie(V,R) = minitensor::polar_left(F);
+      // std::tie(V,R) = minitensor::polar_left(F);
       // minitensor::Tensor<RealType> Vinc;
       // minitensor::Tensor<RealType> Rinc;
       // minitensor::Tensor<RealType> logVinc;
-      // boost::tie(Vinc,Rinc,logVinc) = minitensor::polar_left_logV(f)
+      // std::tie(Vinc,Rinc,logVinc) = minitensor::polar_left_logV(f)
       // minitensor::Tensor<RealType> logRinc = minitensor::log_rotation(Rinc);
       // minitensor::Tensor<RealType> logf = Intrepid2::bch(logVinc,logRinc);
       // minitensor::Tensor<RealType> L = (1.0/deltaT)*logf;
@@ -208,15 +208,15 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       // left stretch V, and rotation R, from left polar decomposition of new
       // deformation gradient
       minitensor::Tensor<ScalarT> V(3), R(3), U(3);
-      boost::tie(V, R) = minitensor::polar_left(Fnew);
+      std::tie(V, R) = minitensor::polar_left(Fnew);
       // V = R * U * transpose(R);
 
       // incremental left stretch Vinc, incremental rotation Rinc, and log of
       // incremental left stretch, logVinc
 
       minitensor::Tensor<ScalarT> Uinc(3), Vinc(3), Rinc(3), logVinc(3);
-      // boost::tie(Vinc,Rinc,logVinc) = minitensor::polar_left_logV(Finc);
-      boost::tie(Vinc, Rinc) = minitensor::polar_left(Finc);
+      // std::tie(Vinc,Rinc,logVinc) = minitensor::polar_left_logV(Finc);
+      std::tie(Vinc, Rinc) = minitensor::polar_left(Finc);
       // Vinc = Rinc * Uinc * transpose(Rinc);
       logVinc = minitensor::log(Vinc);
 

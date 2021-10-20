@@ -342,11 +342,11 @@ LameStressBase<EvalT, Traits>::calcStressRealType(
       // minitensor::Tensor<RealType> f = F*minitensor::inverse(Fn);
       // minitensor::Tensor<RealType> V;
       // minitensor::Tensor<RealType> R;
-      // boost::tie(V,R) = minitensor::polar_left(F);
+      // std::tie(V,R) = minitensor::polar_left(F);
       // minitensor::Tensor<RealType> Vinc;
       // minitensor::Tensor<RealType> Rinc;
       // minitensor::Tensor<RealType> logVinc;
-      // boost::tie(Vinc,Rinc,logVinc) = minitensor::polar_left_logV(f)
+      // std::tie(Vinc,Rinc,logVinc) = minitensor::polar_left_logV(f)
       // minitensor::Tensor<RealType> logRinc = minitensor::log_rotation(Rinc);
       // minitensor::Tensor<RealType> logf = Intrepid2::bch(logVinc,logRinc);
       // minitensor::Tensor<RealType> L = (1.0/deltaT)*logf;
@@ -385,12 +385,12 @@ LameStressBase<EvalT, Traits>::calcStressRealType(
       // left stretch V, and rotation R, from left polar decomposition of new
       // deformation gradient
       minitensor::Tensor<RealType> V(3), R(3);
-      boost::tie(V, R) = minitensor::polar_left_eig(Fnew);
+      std::tie(V, R) = minitensor::polar_left_eig(Fnew);
 
       // incremental left stretch Vinc, incremental rotation Rinc, and log of
       // incremental left stretch, logVinc
       minitensor::Tensor<RealType> Vinc(3), Rinc(3), logVinc(3);
-      boost::tie(Vinc, Rinc, logVinc) = minitensor::polar_left_logV_lame(Finc);
+      std::tie(Vinc, Rinc, logVinc) = minitensor::polar_left_logV_lame(Finc);
 
       // log of incremental rotation
       minitensor::Tensor<RealType> logRinc = minitensor::log_rotation(Rinc);

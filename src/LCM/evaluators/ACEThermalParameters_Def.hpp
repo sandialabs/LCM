@@ -252,7 +252,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       // Use freezing curve to get icurr and dfdT
       ScalarT const tol = 709.0;
       ScalarT const Tdiff =
-          Tcurr - (Tmelt + 1.0);  // + 1.0 is Jenn's hack so active layer acts stronger. Need to change this.
+          Tcurr - (Tmelt + 0.0);  // + 1.0 is Jenn's hack so active layer acts stronger. Need to change this.
       ScalarT icurr{1.0};
       ScalarT dfdT{0.0};
 

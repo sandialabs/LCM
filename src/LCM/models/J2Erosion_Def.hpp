@@ -278,16 +278,21 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
 
+#if defined(ICE_SATURATION)
+  ScalarT const ice_saturation = ice_saturation_(cell, pt);
+  ScalarT                    E = elastic_modulus_(cell, pt);
+  ScalarT           E_residual = 0.01*E;
+
+  E = E_residual + (0.99*E*ice_saturation);  
+#else
   ScalarT const E     = elastic_modulus_(cell, pt);
+#endif
   ScalarT const nu    = poissons_ratio_(cell, pt);
   ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
   ScalarT const mu    = E / (2.0 * (1.0 + nu));
   ScalarT const K     = hardening_modulus_(cell, pt);
   ScalarT const J1    = J_(cell, pt);
   ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
-#if defined(ICE_SATURATION)
-  ScalarT const ice_saturation = ice_saturation_(cell, pt);
-#endif
 
   // Compute effective yield strength
   ScalarT Y = yield_strength_(cell, pt);

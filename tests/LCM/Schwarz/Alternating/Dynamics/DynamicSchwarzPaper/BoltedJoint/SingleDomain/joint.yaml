@@ -30,7 +30,7 @@ LCM:
         BC Values: [0.0, 0.04]
   Discretization:
     Method: Ioss
-    Exodus Input File Name: joint.g
+    Exodus Input File Name: ../joint.g
     Exodus Output File Name: joint.e
     Exodus Solution Name: disp
     Exodus Residual Name: resid
@@ -52,15 +52,12 @@ LCM:
           Initial Time Index: 0
           Final Time Index: 1000000
           Initial Time Step: 1.0e-5
-          Integrator Step Type: Variable
           Time Step Control Strategy:
-            Time Step Control Strategy List: basic_vs
-            basic_vs:
-              Name: 'Basic VS'
-              Reduction Factor: 0.5
-              Amplification Factor: 1.1
-              Minimum Value Monitoring Function: 1.0e-12
-              Maximum Value Monitoring Function: 1.0e20
+            Strategy Type: Basic VS
+            Reduction Factor: 5.00000000000000000e-01
+            Amplification Factor: 1.10000000000000000e+00
+            Minimum Value Monitoring Function: 1.00000000000000008e-12
+            Maximum Value Monitoring Function: 1.00000000000000027e20
           Output Time List: ''
           Output Index List: ''
       Tempus Stepper:

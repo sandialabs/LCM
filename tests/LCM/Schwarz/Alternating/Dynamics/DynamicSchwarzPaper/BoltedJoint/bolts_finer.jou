@@ -100,4 +100,4 @@ nodeset 5 surface 49 78 91 104
 body all scale 0.0254 0.0254 0.0254
 
 #export to genesis
-export mesh "bolts_finer.g"  overwrite
+export mesh "joint_bolts_finer.g"  overwrite

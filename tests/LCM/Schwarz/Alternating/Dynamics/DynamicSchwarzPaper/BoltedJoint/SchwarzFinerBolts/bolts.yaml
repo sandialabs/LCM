@@ -39,7 +39,7 @@ LCM:
         Coupled Application: 'part.yaml'
   Discretization:
     Method: Ioss
-    Exodus Input File Name: ../../bolts_finer.g
+    Exodus Input File Name: ../joint_bolts_finer.g
     Exodus Output File Name: bolts.e
     Exodus Solution Name: disp
     Exodus Residual Name: resid
@@ -57,7 +57,6 @@ LCM:
         Time Step Control:
           Initial Time Index: 0
           Final Time Index: 1000000
-          Integrator Step Type: Constant
           Output Time List: ''
           Output Index List: ''
       Tempus Stepper:

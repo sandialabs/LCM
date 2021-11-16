@@ -34,8 +34,10 @@ ANONYMOUS:
       Response 3: Solution Min Value
   Discretization: 
     Method: Exodus
-    Exodus Input File Name: 'clamped.g'
+    Exodus Input File Name: '../../clamped.g'
     Exodus Output File Name: 'clamped.e'
+    #Exodus Input File Name: '../../clamped_tet.g'
+    #Exodus Output File Name: 'clamped_tet.e'
     Exodus Solution Name: disp
     Exodus Residual Name: resid
     Separate Evaluators by Element Block: true
@@ -47,8 +49,7 @@ ANONYMOUS:
     Analysis:
       Compute Sensitivities: false
     Tempus: 
-      Invert Mass Matrix: false
-      Lump Mass Matrix: true
+      Lump Mass Matrix: false
       Integrator Name: Tempus Integrator
       Tempus Integrator:
         Integrator Type: Integrator Basic
@@ -62,7 +63,6 @@ ANONYMOUS:
           Initial Time Index: 0
           Final Time Index: 1000000
           Initial Time Step: 1.0e-06
-          Integrator Step Type: Constant
           Output Time List: ''
           Output Index List: ''
       Tempus Stepper:

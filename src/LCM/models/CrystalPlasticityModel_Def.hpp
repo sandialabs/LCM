@@ -612,7 +612,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
         minitensor::Tensor<RealType, CP::MAX_SLIP> S_svd(size_problem);
         minitensor::Tensor<RealType, CP::MAX_SLIP> V_svd(size_problem);
 
-        boost::tie(U_svd, S_svd, V_svd) = minitensor::svd(dyad_matrix);
+        std::tie(U_svd, S_svd, V_svd) = minitensor::svd(dyad_matrix);
 
         for (int s(0); s < num_slip_; ++s) {
           S_svd(s, s) = S_svd(s, s) > 1.0e-12 ? 1.0 / S_svd(s, s) : 0.0;

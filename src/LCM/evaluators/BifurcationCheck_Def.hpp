@@ -63,7 +63,7 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(typename Traits::EvalData workse
       double interval = parametrization_interval_;
 
       if (parametrization_type_ == "Oliver") {
-        boost::tie(ellipticity_flag, direction) = minitensor::check_strong_ellipticity(tangent);
+        std::tie(ellipticity_flag, direction) = minitensor::check_strong_ellipticity(tangent);
         min_detA = minitensor::det(minitensor::dot2(direction, minitensor::dot(tangent, direction)));
       } else if (parametrization_type_ == "PSO") {
         minitensor::Vector<ScalarT, 2> arg_minimum;

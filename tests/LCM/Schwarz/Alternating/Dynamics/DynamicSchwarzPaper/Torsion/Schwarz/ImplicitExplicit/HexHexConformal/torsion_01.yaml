@@ -25,7 +25,7 @@ ANONYMOUS:
     Dirichlet BCs: 
       SDBC on NS NodeSet4 for DOF StrongSchwarz:
         BC Function: StrongSchwarz
-        Coupled Application: nobcs_00_expl.yaml
+        Coupled Application: torsion_00_expl.yaml
         Coupled Block: Block0
   Discretization: 
     Method: STK3D
@@ -39,7 +39,7 @@ ANONYMOUS:
     x-shift: -0.025
     y-shift: -0.025
     z-shift: -0.25
-    Exodus Output File Name: 'nobcs_01.e'
+    Exodus Output File Name: 'torsion_01.e'
     Exodus Solution Name: disp
     Exodus Residual Name: resid
     Separate Evaluators by Element Block: true
@@ -57,7 +57,6 @@ ANONYMOUS:
         Time Step Control:
           Initial Time Index: 0
           Final Time Index: 10000
-          Integrator Step Type: Constant
           Output Time List: ''
           Output Index List: ''
       Tempus Stepper:

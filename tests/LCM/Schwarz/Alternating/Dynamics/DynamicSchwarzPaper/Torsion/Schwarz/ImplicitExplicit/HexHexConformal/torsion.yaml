@@ -1,6 +1,6 @@
 ANONYMOUS:
   Alternating System:
-    Model Input Files: [nobcs_00_expl.yaml, nobcs_01.yaml]
+    Model Input Files: [torsion_00_expl.yaml, torsion_01.yaml]
     Minimum Iterations: 1
     Maximum Iterations: 32
     Relative Tolerance: 1.0e-15

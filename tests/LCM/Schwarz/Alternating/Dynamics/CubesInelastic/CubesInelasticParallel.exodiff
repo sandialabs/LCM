@@ -28,7 +28,7 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 
 NODAL VARIABLES relative 1.0e-10 floor 1.0e-12
 
-ELEMENT VARIABLES relative 1.0e-5 floor 1.0e-12
+ELEMENT VARIABLES relative 1.0e-3 floor 1.0e-12
 
 
 

@@ -83,13 +83,13 @@ LCM:
                       Verbosity: 0
                       Maximum Iterations: 100
                       Num Blocks: 100
-              Preconditioner Type: MueLu
+              Preconditioner Type: Ifpack2
               Preconditioner Types:
                 Ifpack2:
                   Overlap: 1
                   Prec Type: ILUT
                   Ifpack2 Settings:
-                    'fact: ilut level-of-fill': 1.00000000
+                    'fact: ilut level-of-fill': 2.00000000
                     'fact: drop tolerance': 0.00000000e+00
                 MueLu:
                   verbosity: none

@@ -61,8 +61,8 @@ if(ALBANY_DTK)
   set_tests_properties(Schwarz_Alternating_Dynamics_${testName}_Parallel
                        PROPERTIES LABELS "LCM;Tpetra;Forward")
 
+else()
+  # Create the test with this name and standard executable
+  add_test(${testName}_Serial_Impl-Expl ${SerialAlbany.exe} clamped_impl-expl.yaml)
+  set_tests_properties(${testName}_Serial_Impl-Expl PROPERTIES LABELS "LCM;Tpetra;Forward")
 endif()
-
-# Create the test with this name and standard executable
-add_test(${testName}_Serial_Impl-Expl ${SerialAlbany.exe} clamped_impl-expl.yaml)
-set_tests_properties(${testName}_Serial_Impl-Expl PROPERTIES LABELS "LCM;Tpetra;Forward")

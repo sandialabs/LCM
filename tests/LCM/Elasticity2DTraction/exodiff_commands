@@ -6,4 +6,4 @@ GLOBAL VARIABLES relative 1.E-6 floor 1.E-12
 NODAL VARIABLES relative 1.E-6 floor 0
 	!residual_x
 	!residual_y
-ELEMENT VARIABLES relative 1.E-6 floor 0
+ELEMENT VARIABLES relative 2.E-3 floor 0

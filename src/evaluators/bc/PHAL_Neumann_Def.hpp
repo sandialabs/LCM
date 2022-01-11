@@ -851,6 +851,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double  tm                       = inputValues[0];
   const double  g                        = inputValues[1];
   const double  rho                      = inputValues[2];
+  //const double  rho                      = 1022.0;
   const double  zmin                     = inputValues[3];
   const bool    dump_wave_press_nbc_data = inputValues[4];
   const bool    use_new_wave_press_nbc   = inputValues[5];

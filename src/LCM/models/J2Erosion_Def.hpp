@@ -278,13 +278,17 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const coords       = this->model_.getCoordVecField();
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
+  auto const sea_level    = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
 
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
   ScalarT                    E = elastic_modulus_(cell, pt);
-  ScalarT           E_residual = 0.01*E;
-
-  E = E_residual + (0.99*E*ice_saturation);  
+  ScalarT           E_residual = 0.0001*E;
+  
+  E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
+  //if (height <= sea_level) {
+  //  E = 10.0 * E;  // Makes submerged material less compliant because the force of the water
+  //}                // deforms the cells so much that the solver has trouble.
 #else
   ScalarT const E     = elastic_modulus_(cell, pt);
 #endif
@@ -315,7 +319,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 #endif
   Y = std::max(Y, 0.0);
 
-  auto const sea_level      = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
   auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
   auto const is_at_boundary = cell_bi == 1.0;
   auto const is_erodible    = cell_bi == 2.0;
@@ -446,7 +449,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // Determine if kinematic failure occurred
-  auto const critical_angle = critical_angle_;
+  auto critical_angle = critical_angle_;
+  if (height <= sea_level) {
+    critical_angle = 1.0 * critical_angle_;
+  }
   if (critical_angle > 0.0) {
     if (std::abs(theta) >= critical_angle) {
       failed += 1.0;

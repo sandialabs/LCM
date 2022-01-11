@@ -250,72 +250,33 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
 
       // Use freezing curve to get icurr and dfdT
-      ScalarT const tol = 709.0;
-      ScalarT const Tdiff =
-          Tcurr - (Tmelt + 0.0);  // + 1.0 is Jenn's hack so active layer acts stronger. Need to change this.
       ScalarT icurr{1.0};
       ScalarT dfdT{0.0};
 
-      /*
-
-      // BEGIN OLD CURVE //
-      // Calculate the freezing curve function df/dTemp
-      // New curve, formulated by Siddharth, which shifts the
-      // freezing point to left or right:
-      // f(T) = 1 / (1 + e^(-(8/W)((T-T0) + (b*W))))
-      // W = true width of freezing curve (in Celsius)
-      // f_shift = shift to left or right (+ is left, - is right)
-
-      ScalarT W         = 10.0;
-      ScalarT f_shift   = 0.25;
-      ScalarT const arg = -(8.0 / W) * (Tdiff + (f_shift * W));
-
-      // Update freeze curve slope and ice saturation
-      if (arg < -tol) {
-        dfdT  = 0.0;
-        icurr = 0.0;
-      }
-      else if (arg > tol) {
-        dfdT  = 0.0;
-        icurr = 1.0;
-      }
-      else {
-        ScalarT const eps = minitensor::machine_epsilon<RealType>();
-        ScalarT const et  = std::exp(arg);
-        if (et < eps) {  // etp1 ~ 1.0
-          dfdT  = -(W / 8.0) * et;
-          icurr = 0.0;
-        }
-        else if (1.0 / et < eps) {  // etp1 ~ et
-          dfdT  = -(W / 8.0) / et;
-          icurr = 1.0 - 1.0 / et;
-        }
-        else {
-          ScalarT const etp1 = et + 1.0;
-          dfdT               = -(W / 8.0) * et / etp1 / etp1;
-          icurr              = 1.0 - 1.0 / etp1;
-        }
-      }
-      // END OLD CURVE //
-
-      */
-
-      // BEGIN NEW CURVE //
+      ScalarT const tol = 709.0;
 
       RealType const A = 0.0;
       RealType const G = 1.0;
       RealType const C = 1.0;
       RealType const Q = 0.001;
       RealType const B = 10.0;
-      RealType       v = 25.0;
+      RealType       v = 0.1;
+
+      ScalarT Tshift;
+      ScalarT Tdiff;
 
       if (sediment_given == true) {
         auto sand_frac = interpolateVectors(z_above_mean_sea_level_eb, sand_from_file_eb, height);
         auto clay_frac = interpolateVectors(z_above_mean_sea_level_eb, clay_from_file_eb, height);
         auto silt_frac = interpolateVectors(z_above_mean_sea_level_eb, silt_from_file_eb, height);
         auto peat_frac = interpolateVectors(z_above_mean_sea_level_eb, peat_from_file_eb, height);
-        v              = (peat_frac * 5.0) + (sand_frac * 5.0) + (silt_frac * 25.0) + (clay_frac * 70.0);
+        v              = (peat_frac * 0.1) + (sand_frac * 1.0) + (silt_frac * 15.0) + (clay_frac * 50.0);
+        Tshift         = (peat_frac * 0.1) + (sand_frac * 0.3) + (silt_frac * 0.6) + (clay_frac * 1.0);
       }
+      else {
+        Tshift = 0.1;
+      }
+      Tdiff = Tcurr - (Tmelt + Tshift);
       // IKT, 5/29/20: the following is needed to prevent overflow when taking exponent
       ScalarT const largest_value_exp = 650.0;
       ScalarT const arg1              = (-B * Tdiff < largest_value_exp) ? -B * Tdiff : largest_value_exp;
@@ -345,7 +306,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       std::min(icurr, 1.0);
       std::max(icurr, 0.0);
 
-      // END NEW CURVE //
 
       // Update the water saturation
       ScalarT wcurr = 1.0 - icurr;
@@ -411,10 +371,10 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
 
       // Jenn's hack to calibrate niche formation:
-      ScalarT factor = 1.0 + (3.0 * sea_level * sea_level);
+      ScalarT factor = 10.0; //1.0 + (3.0 * sea_level * sea_level);
       if ((is_erodible == true) && (height <= sea_level)) {
         factor                          = std::max(factor, 1.0);  // in case sea level is tiny or negative
-        factor                          = std::min(factor, 7.0);
+        //factor                          = std::min(factor, 10.0);
         thermal_conductivity_(cell, qp) = thermal_conductivity_(cell, qp) * factor;
         heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / factor;
       }

@@ -2,29 +2,38 @@
 
 module-whatis "LCM automatic determination of running Linux distribution"
 
+set kernel_version [uname release]
 set ubuntu_str generic
 set cluster_str chaos
-
-set kernel_version [uname release]
+set ubuntu_pos [string last $ubuntu_str $kernel_version]
+set cluster_pos [string last $cluster_str $kernel_version]
 
 if { [ file exists /etc/fedora-release ] } {
   module load lcm-fedora
+  continue
 }
 
 if { [ file exists /etc/sl-release ] } {
   module load lcm-scientific-linux
+  continue
 }
 
 if { [ file exists /projects/sems ] } {
   module load lcm-sems
+  continue
 }
 
-set ubuntu_pos [string last $ubuntu_str $kernel_version]
+if { [ file exists /etc/redhat-release ] } {
+  module load lcm-rhel
+  continue
+}
+
 if {$ubuntu_pos > 0} {
   module load lcm-ubuntu
+  continue
 }
 
-set cluster_pos [string last $cluster_str $kernel_version]
 if {$cluster_pos > 0} {
   module load lcm-cluster
+  continue
 }

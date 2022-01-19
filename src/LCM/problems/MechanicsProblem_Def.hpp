@@ -324,7 +324,7 @@ MechanicsProblem::constructEvaluators(
   if (find_cell_boundary_indicator != this->requirements.end()) {
     auto entity = StateStruct::ElemData;
 
-    stateMgr.registerStateVariable("cell_boundary_indicator", dl_->cell_scalar, meshSpecs.ebName, false, &entity);
+    stateMgr.registerStateVariable("cell_boundary_indicator", dl_->cell_scalar2, meshSpecs.ebName, false, &entity);
   }
   if (find_face_boundary_indicator != this->requirements.end()) {
     auto entity = StateStruct::ElemData;

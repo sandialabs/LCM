@@ -84,7 +84,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("Displacement", dl->qp_vector);
 
   // define the evaluated fields
-  setEvaluatedField("failure_state", dl->cell_scalar);
+  setEvaluatedField("failure_state", dl->cell_scalar2);
   setEvaluatedField(cauchy_str, dl->qp_tensor);
   setEvaluatedField(Fp_str, dl->qp_tensor);
   setEvaluatedField(eqps_str, dl->qp_scalar);
@@ -110,7 +110,8 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
     addStateVariable(source_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
-  addStateVariable("failure_state", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
+  addStateVariable(
+      "failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
 }
 
 template <typename EvalT, typename Traits>

@@ -143,7 +143,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   setEvaluatedField("ACE_Water_Saturation", dl->qp_scalar);
   setEvaluatedField("ACE_Porosity", dl->qp_scalar);
   setEvaluatedField("ACE Temperature Dot", dl->qp_scalar);
-  setEvaluatedField("failure_state", dl->cell_scalar);
+  setEvaluatedField("failure_state", dl->cell_scalar2);
   setEvaluatedField("ACE Exposure Time", dl->qp_scalar);
   setEvaluatedField(cauchy_string, dl->qp_tensor);
   setEvaluatedField(Fp_string, dl->qp_tensor);
@@ -212,7 +212,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
       "ACE Temperature Dot", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE Temperature Dot", false));
 
   // failed state
-  addStateVariable("failure_state", dl->cell_scalar, "scalar", 0.0, false, p->get<bool>("Output failure_state", true));
+  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output failure_state", true));
 
   // exposure time
   addStateVariable(

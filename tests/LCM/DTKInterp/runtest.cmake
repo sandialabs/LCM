@@ -14,7 +14,7 @@ if(HAD_ERROR)
 	message(FATAL_ERROR "DTK_Interp_and_Error didn't run: test failed")
 endif()
 
-EXECUTE_PROCESS(COMMAND python
+EXECUTE_PROCESS(COMMAND python3
                 INPUT_FILE ${PY_FILE}
                 RESULT_VARIABLE PY_ERROR)
 if(PY_ERROR)

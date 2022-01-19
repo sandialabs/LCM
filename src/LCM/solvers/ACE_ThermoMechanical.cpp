@@ -923,8 +923,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   } else if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
     auto&             piro_tr_solver = dynamic_cast<Piro::TrapezoidRuleSolver<ST>&>(solver);
     std::string const delim(72, '=');
-    *fos_ << "IKT initial_time_ = " << initial_time_ << "\n"; 
-    *fos_ << "IKT current_time = " << current_time << "\n"; 
     *fos_ << "Initial time       :" << current_time << '\n';
     *fos_ << "Final time         :" << next_time << '\n';
     *fos_ << "Time step          :" << time_step << '\n';
@@ -940,13 +938,9 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
     auto x_init = me.getNominalValues().get_x();
-    auto nrm = norm_2(*x_init);
-    std::cout << "IKT x_norm before in Albany = " << nrm << "\n";
     auto v_init = me.getNominalValues().get_x_dot();
-    nrm = norm_2(*v_init);
-    std::cout << "IKT v_norm before in Albany = " << nrm << "\n";
     auto a_init = me.get_x_dotdot();
-    nrm = norm_2(*a_init);
+    auto nrm = norm_2(*a_init);
     std::cout << "IKT a_norm before in Albany = " << nrm << "\n";
 
     // Restore internal states
@@ -988,7 +982,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto  xdot_rcp           = solution_rcp->col(1)->clone_v();
     auto  xdotdot_rcp        = solution_rcp->col(2)->clone_v();
     auto a_nrm = norm_2(*xdotdot_rcp);
-    std::cout << "IKT a_norm in Albany = " << a_nrm << "\n";
+    std::cout << "IKT a_norm in Albany after solve = " << a_nrm << "\n";
     this_x_[subdomain]       = x_rcp;
     this_xdot_[subdomain]    = xdot_rcp;
     this_xdotdot_[subdomain] = xdotdot_rcp;

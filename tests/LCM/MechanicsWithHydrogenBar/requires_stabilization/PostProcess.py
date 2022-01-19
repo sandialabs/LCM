@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script requires exodus.py
 # It can be tricky to get exodus.py to work because it requires libnetcdf.so and libexodus.so

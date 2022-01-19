@@ -189,7 +189,7 @@ Albany::ACEThermalProblem::constructEvaluators(
 
   if (find_cell_boundary_indicator != this->requirements.end()) {
     auto entity = StateStruct::ElemData;
-    state_mgr.registerStateVariable("cell_boundary_indicator", dl_->cell_scalar, mesh_specs.ebName, false, &entity);
+    state_mgr.registerStateVariable("cell_boundary_indicator", dl_->cell_scalar2, mesh_specs.ebName, false, &entity);
   }
   if (find_node_boundary_indicator != this->requirements.end()) {
     auto entity = StateStruct::ElemData;

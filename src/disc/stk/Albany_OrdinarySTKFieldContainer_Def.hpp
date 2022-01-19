@@ -204,9 +204,6 @@ OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
 
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
   stk::io::set_field_role(*this->refine_field, Ioss::Field::MESH);
-  for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK; rank <= stk::topology::ELEMENT_RANK; ++rank) {
-    stk::io::set_field_role(*this->failure_state[rank], Ioss::Field::TRANSIENT);
-  }
 }
 
 template <bool Interleaved>

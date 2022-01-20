@@ -927,10 +927,10 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     *fos_ << "Final time         :" << next_time << '\n';
     *fos_ << "Time step          :" << time_step << '\n';
     *fos_ << delim << std::endl;
-    /*if (current_time != initial_time_) {
+    if (current_time != initial_time_) {
       std::cout << "IKT disabling calc initial accel \n"; 
       piro_tr_solver.disableCalcInitAccel();
-    }*/
+    }
 
     Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
     Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();

@@ -56,9 +56,14 @@ ReplaceDiagonalEntries(const Teuchos::RCP<Tpetra_CrsMatrix>& matrix, const Teuch
   Teuchos::ArrayRCP<const ST> diag_constView = diag->get1dView();
   for (size_t i = 0; i < matrix->getNodeNumRows(); i++) {
     auto               NumEntries = matrix->getNumEntriesInLocalRow(i);
+    using indices_type = typename Tpetra_CrsMatrix::nonconst_local_inds_host_view_type;
+    using values_type  = typename Tpetra_CrsMatrix::nonconst_values_host_view_type;
     Teuchos::Array<LO> Indices(NumEntries);
     Teuchos::Array<ST> Values(NumEntries);
-    matrix->getLocalRowCopy(i, Indices(), Values(), NumEntries);
+    indices_type indices_view(Indices.getRawPtr(), NumEntries);
+    values_type  values_view(Values.getRawPtr(), NumEntries);
+    matrix->getLocalRowCopy(i,indices_view,values_view,NumEntries);
+    //matrix->getLocalRowCopy(i, Indices(), Values(), NumEntries);
     GO global_row = matrix->getRowMap()->getGlobalElement(i);
     for (size_t j = 0; j < NumEntries; j++) {
       GO global_col = matrix->getColMap()->getGlobalElement(Indices[j]);
@@ -86,9 +91,13 @@ InvAbsRowSum(Teuchos::RCP<Tpetra_Vector>& invAbsRowSumsTpetra, const Teuchos::RC
   Teuchos::ArrayRCP<double> invAbsRowSumsTpetra_nonconstView = invAbsRowSumsTpetra->get1dViewNonConst();
   for (size_t row = 0; row < invAbsRowSumsTpetra->getLocalLength(); row++) {
     auto               numEntriesRow = matrix->getNumEntriesInLocalRow(row);
+    using indices_type = typename Tpetra_CrsMatrix::nonconst_local_inds_host_view_type;
+    using values_type  = typename Tpetra_CrsMatrix::nonconst_values_host_view_type;
     Teuchos::Array<LO> indices(numEntriesRow);
     Teuchos::Array<ST> values(numEntriesRow);
-    matrix->getLocalRowCopy(row, indices(), values(), numEntriesRow);
+    indices_type indices_view(indices.getRawPtr(),numEntriesRow);
+    values_type  values_view(values.getRawPtr(),numEntriesRow);
+    matrix->getLocalRowCopy(row, indices_view, values_view, numEntriesRow);
     ST scale = 0.0;
     for (size_t j = 0; j < numEntriesRow; j++) {
       scale += std::abs(values[j]);
@@ -114,9 +123,13 @@ AbsRowSum(Teuchos::RCP<Tpetra_Vector>& absRowSumsTpetra, const Teuchos::RCP<Tpet
   Teuchos::ArrayRCP<double> absRowSumsTpetra_nonconstView = absRowSumsTpetra->get1dViewNonConst();
   for (size_t row = 0; row < absRowSumsTpetra->getLocalLength(); row++) {
     auto               numEntriesRow = matrix->getNumEntriesInLocalRow(row);
+    using indices_type = typename Tpetra_CrsMatrix::nonconst_local_inds_host_view_type;
+    using values_type  = typename Tpetra_CrsMatrix::nonconst_values_host_view_type;
     Teuchos::Array<LO> indices(numEntriesRow);
     Teuchos::Array<ST> values(numEntriesRow);
-    matrix->getLocalRowCopy(row, indices(), values(), numEntriesRow);
+    indices_type indices_view(indices.getRawPtr(),numEntriesRow);
+    values_type  values_view(values.getRawPtr(),numEntriesRow);
+    matrix->getLocalRowCopy(row, indices_view, values_view, numEntriesRow);
     ST scale = 0.0;
     for (size_t j = 0; j < numEntriesRow; j++) {
       scale += std::abs(values[j]);

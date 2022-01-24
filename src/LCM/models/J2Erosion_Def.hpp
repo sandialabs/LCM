@@ -285,9 +285,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT           E_residual = 0.0001*E;
   
   E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
-  //if (height <= sea_level) {
-  //  E = 10.0 * E;  // Makes submerged material less compliant because the force of the water
-  //}                // deforms the cells so much that the solver has trouble.
 #else
   ScalarT const E     = elastic_modulus_(cell, pt);
 #endif
@@ -311,6 +308,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
                                                  1.0;  // need this so ice is strong when melted
 
   RealType res_strength = (1.0 * soil_yield_strength_);
+           res_strength = (peat * soil_yield_strength_); 
 
 #if defined(ICE_SATURATION)
   Y = (ice_saturation * Y) + res_strength;
@@ -445,6 +443,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Determine if critical stress is exceeded
   if (yielded == true) {
     failed += 1.0;
+    std::cout << "Cell " << cell << " pt " << pt << " :: yielded \n";
   }
 
   // Determine if kinematic failure occurred
@@ -455,12 +454,14 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (critical_angle > 0.0) {
     if (std::abs(theta) >= critical_angle) {
       failed += 1.0;
+      std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
     }
   }
   auto const maximum_displacement = 0.50;  // 1.0
   auto const displacement_norm    = minitensor::norm(displacement);
   if (displacement_norm > maximum_displacement) {
     failed += 8.0;
+    std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
 }
 }  // namespace LCM

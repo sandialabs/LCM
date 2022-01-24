@@ -371,7 +371,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
 
       // Jenn's hack to calibrate niche formation:
-      ScalarT factor = 10.0; //1.0 + (3.0 * sea_level * sea_level);
+      ScalarT factor = 1.0; //1.0 + (3.0 * sea_level * sea_level);
       if ((is_erodible == true) && (height <= sea_level)) {
         factor                          = std::max(factor, 1.0);  // in case sea level is tiny or negative
         //factor                          = std::min(factor, 10.0);

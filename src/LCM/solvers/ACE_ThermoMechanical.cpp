@@ -927,8 +927,9 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     *fos_ << "Final time         :" << next_time << '\n';
     *fos_ << "Time step          :" << time_step << '\n';
     *fos_ << delim << std::endl;
+    //Disable initial acceleration solve unless in initial time-step.
+    //This should speed up code by ~2x.
     if (current_time != initial_time_) {
-      std::cout << "IKT disabling calc initial accel \n"; 
       piro_tr_solver.disableCalcInitAccel();
     }
 
@@ -941,7 +942,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto v_init = me.getNominalValues().get_x_dot();
     auto a_init = me.get_x_dotdot();
     auto nrm = norm_2(*a_init);
-    std::cout << "IKT a_norm before in Albany = " << nrm << "\n";
 
     // Restore internal states
     auto& app       = *apps_[subdomain];
@@ -982,7 +982,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto  xdot_rcp           = solution_rcp->col(1)->clone_v();
     auto  xdotdot_rcp        = solution_rcp->col(2)->clone_v();
     auto a_nrm = norm_2(*xdotdot_rcp);
-    std::cout << "IKT a_norm in Albany after solve = " << a_nrm << "\n";
     this_x_[subdomain]       = x_rcp;
     this_xdot_[subdomain]    = xdot_rcp;
     this_xdotdot_[subdomain] = xdotdot_rcp;
@@ -1055,11 +1054,9 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
     Thyra::copy(*(nv.get_x_dot()), ics_xdot_[subdomain].ptr());
 
     if (prob_type == MECHANICAL) {
-      std::cout << "IKT setICVecs Mechanical problem1\n"; 
       ics_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
       Thyra::copy(*(nv.get_x_dot_dot()), ics_xdotdot_[subdomain].ptr());
       auto nrm = norm_2(*ics_xdotdot_[subdomain]);
-      std::cout << "IKT a_norm setICVecs = " << nrm << "\n";
     }
   }
 
@@ -1077,11 +1074,9 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
     Thyra::copy(*x_mv->col(1), ics_xdot_[subdomain].ptr());
 
     if (prob_type == MECHANICAL) {
-      std::cout << "IKT setICVecs Mechanical problem2\n"; 
       ics_xdotdot_[subdomain] = Thyra::createMember(x_mv->col(2)->space());
       Thyra::copy(*x_mv->col(2), ics_xdotdot_[subdomain].ptr());
       auto nrm = norm_2(*ics_xdotdot_[subdomain]);
-      std::cout << "IKT a_norm setICVecs = " << nrm << "\n";
     }
   }
 }

@@ -927,11 +927,21 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     *fos_ << "Final time         :" << next_time << '\n';
     *fos_ << "Time step          :" << time_step << '\n';
     *fos_ << delim << std::endl;
+    //Disable initial acceleration solve unless in initial time-step.
+    //This should speed up code by ~2x.
+    if (current_time != initial_time_) {
+      piro_tr_solver.disableCalcInitAccel();
+    }
 
     Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
     Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
-
+  
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
+    auto x_init = me.getNominalValues().get_x();
+    auto v_init = me.getNominalValues().get_x_dot();
+    auto a_init = me.get_x_dotdot();
+    auto nrm = norm_2(*a_init);
 
     // Restore internal states
     auto& app       = *apps_[subdomain];
@@ -971,6 +981,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto  x_rcp              = solution_rcp->col(0)->clone_v();
     auto  xdot_rcp           = solution_rcp->col(1)->clone_v();
     auto  xdotdot_rcp        = solution_rcp->col(2)->clone_v();
+    auto a_nrm = norm_2(*xdotdot_rcp);
     this_x_[subdomain]       = x_rcp;
     this_xdot_[subdomain]    = xdot_rcp;
     this_xdotdot_[subdomain] = xdotdot_rcp;
@@ -1030,6 +1041,7 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
   auto const prob_type       = prob_types_[subdomain];
   auto const is_initial_time = time <= initial_time_ + initial_time_step_;
 
+
   if (is_initial_time == true) {
     // initial time-step: get initial solution from nominalValues in ME
     auto&       me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
@@ -1044,6 +1056,7 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
     if (prob_type == MECHANICAL) {
       ics_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
       Thyra::copy(*(nv.get_x_dot_dot()), ics_xdotdot_[subdomain].ptr());
+      auto nrm = norm_2(*ics_xdotdot_[subdomain]);
     }
   }
 
@@ -1063,6 +1076,7 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
     if (prob_type == MECHANICAL) {
       ics_xdotdot_[subdomain] = Thyra::createMember(x_mv->col(2)->space());
       Thyra::copy(*x_mv->col(2), ics_xdotdot_[subdomain].ptr());
+      auto nrm = norm_2(*ics_xdotdot_[subdomain]);
     }
   }
 }

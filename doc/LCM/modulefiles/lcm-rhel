@@ -1,0 +1,14 @@
+#%Module 1.0
+
+module-whatis "LCM RHEL base environment"
+
+setenv LCM_ENV_TYPE RHEL
+
+if { ![ file exists /etc/redhat-release ] } {
+  puts stderr "lcm-rhel can only be loaded on RHEL systems !"
+  exit 1
+}
+
+module load lcm-common
+
+conflict lcm-fedora lcm-sems lcm-cluster lcm-ubuntu lcm-scientific-linux

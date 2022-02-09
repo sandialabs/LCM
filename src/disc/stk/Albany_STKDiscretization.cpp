@@ -2318,19 +2318,6 @@ STKDiscretization::setupExodusOutput()
     mesh_data->property_add(Ioss::Property("FLUSH_INTERVAL", 1));
     outputFileIdx = mesh_data->create_output_mesh(str, stk::io::WRITE_RESULTS);
 
-    const auto& field_container = stkMeshStruct->getFieldContainer();
-    // Adding mesh global variables
-    for (auto& it : field_container->getMeshVectorStates()) {
-      const auto DV_Type = stk::util::ParameterType::DOUBLEVECTOR;
-      boost::any mvs     = it.second;
-      mesh_data->add_global(outputFileIdx, it.first, mvs, DV_Type);
-    }
-    for (auto& it : field_container->getMeshScalarIntegerStates()) {
-      const auto INT_Type = stk::util::ParameterType::INTEGER;
-      boost::any mvs      = it.second;
-      mesh_data->add_global(outputFileIdx, it.first, mvs, INT_Type);
-    }
-
     // STK and Ioss/Exodus only allow TRANSIENT fields to be exported.
     // *Some* fields with MESH role are also allowed, but only if they
     // have a predefined name (e.g., "coordinates", "ids", "connectivity",...).

@@ -4,7 +4,7 @@
 ## detailed in the file license.txt in the top-level Albany directory.
 ##
 
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import sys
 import os

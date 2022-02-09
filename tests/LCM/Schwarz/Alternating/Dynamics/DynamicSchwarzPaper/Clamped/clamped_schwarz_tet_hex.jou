@@ -1,0 +1,54 @@
+${side = 0.001}
+${length = 1.0}
+${overlap_vol_frac = 0.5}
+${h_left = side}
+${h_right = side}
+${area = side * side}
+${volume = area * length}
+${overlap_volume = overlap_vol_frac * volume}
+${overlap_length = overlap_volume / area}
+${domain_length = (length + overlap_length) / 2.0}
+${offset = abs(domain_length - overlap_length) / 2.0}
+
+undo on
+create brick x {side} y {side} z {domain_length}
+volume 1 size {h_left}
+mesh volume 1
+htet volume all 
+block 1 volume 1
+block 1 name "left"
+nodeset 1 surface 4
+nodeset 1 name "-X"
+nodeset 2 surface 6
+nodeset 2 name "+X"
+nodeset 3 surface 3
+nodeset 3 name "-Y"
+nodeset 4 surface 5
+nodeset 4 name "+Y"
+nodeset 5 surface 2
+nodeset 5 name "-Z"
+nodeset 6 surface 1
+nodeset 6 name "+Z"
+move volume 1 z {domain_length / 2.0}
+set large exodus file off
+export mesh "left_tet.g" overwrite
+delete mesh
+move volume 1 z {length - domain_length}
+volume 1 size {h_right}
+mesh volume 1
+block 1 volume 1
+block 1 name "right"
+nodeset 1 surface 4
+nodeset 1 name "-X"
+nodeset 2 surface 6
+nodeset 2 name "+X"
+nodeset 3 surface 3
+nodeset 3 name "-Y"
+nodeset 4 surface 5
+nodeset 4 name "+Y"
+nodeset 5 surface 2
+nodeset 5 name "-Z"
+nodeset 6 surface 1
+nodeset 6 name "+Z"
+set large exodus file off
+export mesh "right.g" overwrite

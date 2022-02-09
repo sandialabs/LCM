@@ -7,12 +7,18 @@
 # Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/clamped_00.yaml COPYONLY)
-       configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Clamped.exodiff
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00_impl.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_00_impl.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Clamped.exodiff
 	       ${CMAKE_CURRENT_BINARY_DIR}/Clamped.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_01.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/clamped_01.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_01_expl.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_01_expl.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/clamped.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_impl-expl.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_impl-expl.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material_00.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/material_00.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material_01.yaml
@@ -55,4 +61,8 @@ if(ALBANY_DTK)
   set_tests_properties(Schwarz_Alternating_Dynamics_${testName}_Parallel
                        PROPERTIES LABELS "LCM;Tpetra;Forward")
 
+else()
+  # Create the test with this name and standard executable
+  add_test(${testName}_Serial_Impl-Expl ${SerialAlbany.exe} clamped_impl-expl.yaml)
+  set_tests_properties(${testName}_Serial_Impl-Expl PROPERTIES LABELS "LCM;Tpetra;Forward")
 endif()

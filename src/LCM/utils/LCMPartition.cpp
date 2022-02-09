@@ -92,7 +92,7 @@ PrintPartitionInfo(
 // Given a vector of points and a set of indices to this vector:
 // 1) Find the bounding box of the indexed points.
 // 2) Compute the vector sum of the indexed points.
-boost::tuple<minitensor::Vector<double>, minitensor::Vector<double>, minitensor::Vector<double>>
+std::tuple<minitensor::Vector<double>, minitensor::Vector<double>, minitensor::Vector<double>>
 bounds_and_sum_subset(std::vector<minitensor::Vector<double>> const& points, std::set<minitensor::Index> const& indices)
 {
   ALBANY_EXPECT(points.size() > 0);
@@ -119,7 +119,7 @@ bounds_and_sum_subset(std::vector<minitensor::Vector<double>> const& points, std
     }
   }
 
-  return boost::make_tuple(lower_corner, upper_corner, sum);
+  return std::make_tuple(lower_corner, upper_corner, sum);
 }
 
 // Given point, a vector of centers and a set of indices into this vector:
@@ -315,14 +315,14 @@ createKDTreeNode(
     } break;
 
     default: {
-      boost::tie(node->lower_corner, node->upper_corner, node->weighted_centroid) =
+      std::tie(node->lower_corner, node->upper_corner, node->weighted_centroid) =
           bounds_and_sum_subset(points, points_indices);
 
       std::set<minitensor::Index> indices_left;
 
       std::set<minitensor::Index> indices_right;
 
-      boost::tie(indices_left, indices_right) = split_box(points, points_indices);
+      std::tie(indices_left, indices_right) = split_box(points, points_indices);
 
       std::string name_left = name + "0";
 
@@ -558,7 +558,7 @@ FilterVisitor<Node, Center>::operator()(Node const& node) const
 
     std::set<minitensor::Index> candidate_indices;
 
-    boost::tie(index_closest_midcell, candidate_indices) =
+    std::tie(index_closest_midcell, candidate_indices) =
         box_proximity_to_centers(node->lower_corner, node->upper_corner, centers, node->candidate_centers);
 
     node->candidate_centers = candidate_indices;
@@ -1118,7 +1118,7 @@ ConnectivityArray::boundingBox() const
 
 namespace {
 
-boost::tuple<minitensor::Index, double, double>
+std::tuple<minitensor::Index, double, double>
 parametric_limits(minitensor::ELEMENT::Type const element_type)
 {
   minitensor::Index parametric_dimension = 3;
@@ -1159,7 +1159,7 @@ parametric_limits(minitensor::ELEMENT::Type const element_type)
       break;
   }
 
-  return boost::make_tuple(parametric_dimension, parametric_size, lower_limit);
+  return std::make_tuple(parametric_dimension, parametric_size, lower_limit);
 }
 
 }  // namespace
@@ -1243,7 +1243,7 @@ ConnectivityArray::createGrid()
 
     minitensor::Vector<double> max;
 
-    boost::tie(min, max) = minitensor::bounding_box<double>(element_nodes.begin(), element_nodes.end());
+    std::tie(min, max) = minitensor::bounding_box<double>(element_nodes.begin(), element_nodes.end());
 
     minitensor::Vector<double> const element_span = max - min;
 
@@ -1270,7 +1270,7 @@ ConnectivityArray::createGrid()
 
     double lower_limit = 0.0;
 
-    boost::tie(parametric_dimension, parametric_size, lower_limit) = parametric_limits(element_type);
+    std::tie(parametric_dimension, parametric_size, lower_limit) = parametric_limits(element_type);
 
     minitensor::Vector<double> origin(parametric_dimension);
 
@@ -1902,7 +1902,7 @@ ConnectivityArray::partitionKMeans(double const length_scale)
 
   minitensor::Vector<double> upper_corner;
 
-  boost::tie(lower_corner, upper_corner) = boundingBox();
+  std::tie(lower_corner, upper_corner) = boundingBox();
 
   lower_corner_ = lower_corner;
   upper_corner_ = upper_corner;
@@ -2022,7 +2022,7 @@ ConnectivityArray::partitionKDTree(double const length_scale)
 
   minitensor::Vector<double> upper_corner;
 
-  boost::tie(lower_corner, upper_corner) = boundingBox();
+  std::tie(lower_corner, upper_corner) = boundingBox();
 
   lower_corner_ = lower_corner;
   upper_corner_ = upper_corner;
@@ -2113,7 +2113,7 @@ ConnectivityArray::partitionSequential(double const length_scale)
 
   minitensor::Vector<double> upper_corner;
 
-  boost::tie(lower_corner, upper_corner) = boundingBox();
+  std::tie(lower_corner, upper_corner) = boundingBox();
 
   lower_corner_ = lower_corner;
   upper_corner_ = upper_corner;
@@ -2213,7 +2213,7 @@ ConnectivityArray::partitionRandom(double const length_scale)
 
   minitensor::Vector<double> upper_corner;
 
-  boost::tie(lower_corner, upper_corner) = boundingBox();
+  std::tie(lower_corner, upper_corner) = boundingBox();
 
   lower_corner_ = lower_corner;
   upper_corner_ = upper_corner;

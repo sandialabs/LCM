@@ -102,7 +102,7 @@ LCM:
                       Verbosity: 0
                       Maximum Iterations: 100
                       Num Blocks: 100
-              Preconditioner Type: MueLu
+              Preconditioner Type: Ifpack2
               Preconditioner Types:
                 Ifpack2:
                   Overlap: 1

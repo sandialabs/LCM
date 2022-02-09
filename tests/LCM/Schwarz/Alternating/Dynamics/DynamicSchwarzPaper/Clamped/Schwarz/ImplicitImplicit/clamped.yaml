@@ -1,0 +1,21 @@
+ANONYMOUS:
+  Alternating System:
+    Model Input Files: [clamped_left.yaml, clamped_right.yaml]
+    Minimum Iterations: 1
+    Maximum Iterations: 32
+    Relative Tolerance: 1.0e-6
+    Absolute Tolerance: 1.0e-6
+    Maximum Steps: 1000000
+    Initial Time: 0.0
+    Final Time: 1.0e-03
+    Initial Time Step: 1.0e-06
+    Exodus Write Interval: 10
+    Use Velocity in Convergence Criterion: true
+    Use Acceleration in Convergence Criterion: true
+  # MODEL DECLARATION, Look in the Problem directory
+  Problem:
+    # Transient or Steady (Quasi-Static) or Continuation (load steps)
+    Solution Method: Schwarz Alternating
+    # Have Phalanx output a graph of the used evaluators
+    Phalanx Graph Visualization Detail: 0
+...

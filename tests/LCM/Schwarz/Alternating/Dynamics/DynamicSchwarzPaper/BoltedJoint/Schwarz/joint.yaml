@@ -1,0 +1,19 @@
+LCM:
+  Alternating System:
+    Model Input Files: ['parts.yaml', 'bolts.yaml']
+    Minimum Iterations: 1
+    Maximum Iterations: 96
+    Relative Tolerance: 1.0e-03
+    Absolute Tolerance: 1.0e-04
+    Maximum Steps: 10000
+    Initial Time: 0.0
+    Final Time: 1.0e-3
+    Initial Time Step: 1.25e-6
+    Minimum Time Step: 1.0e-10
+    Maximum Time Step: 1.25e-6
+    Reduction Factor: 0.5
+    Amplification Factor: 1.5
+    Exodus Write Interval: 8
+  Problem:
+    Solution Method: Schwarz Alternating
+...

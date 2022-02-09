@@ -7,7 +7,7 @@ setenv LCM_ENV_TYPE SEMS
 module load lcm-common
 
 module load sems-env
-module load sems-python/2.7.9
+module load sems-python
 module load sems-cmake
 module load sems-git
 

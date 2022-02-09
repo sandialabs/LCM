@@ -1,0 +1,51 @@
+LCM:
+  ElementBlocks:
+    component:
+      material: Steel FC0205
+      Weighted Volume Average J: true
+      Volume Average Pressure: true
+    plate:
+      material: Aluminum
+      Weighted Volume Average J: true
+      Volume Average Pressure: true
+  Materials:
+    Steel FC0205:
+      Material Model:
+        Model Name: J2 MiniSolver
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 200.0e+09
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.30
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 0.35e+09
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 8.0e+09
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      Density: 7800.0
+      Output Cauchy Stress: true
+      Output eqps: true
+    Aluminum:
+      Material Model:
+        Model Name: J2 MiniSolver
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 70.0e+09
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.36
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 250.0e+06
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 0.7e+09
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      Density: 2700.0
+      Output Cauchy Stress: true
+      Output eqps: true

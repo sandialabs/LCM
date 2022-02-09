@@ -19,6 +19,7 @@ if { [is-loaded lcm-fedora] } {
   prepend-path            LD_LIBRARY_PATH /usr/lib64/openmpi/lib
   prepend-path            LD_LIBRARY_PATH $netcdf_lib
   prepend-path            PATH            /usr/lib64/openmpi/bin
+  continue
 }
 
 if { [is-loaded lcm-scientific-linux] } {
@@ -37,6 +38,7 @@ if { [is-loaded lcm-scientific-linux] } {
   setenv                  NETCDF_LIB      $netcdf_lib
   prepend-path            LD_LIBRARY_PATH /usr/lib64/openmpi/lib
   prepend-path            PATH            /usr/lib64/openmpi/bin
+  continue
 }
 
 if { [is-loaded lcm-ubuntu] } {
@@ -54,14 +56,15 @@ if { [is-loaded lcm-ubuntu] } {
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
   prepend-path            LD_LIBRARY_PATH /usr/lib/openmpi/lib
+  continue
 }
 
 if { [is-loaded lcm-sems] } {
-  module load sems-openmpi/1.10.1
-  module load sems-boost/1.63.0/base
+  module load sems-openmpi/4.0.5
+  module load sems-boost/1.70.0/base
   module load sems-zlib/1.2.8/base
-  module load sems-hdf5/1.8.12/parallel
-  module load sems-netcdf/4.4.1/exo_parallel
+  module load sems-hdf5/1.10.6/parallel
+  module load sems-netcdf/4.7.3/parallel
   module load sems-parmetis/4.0.3/parallel
   module load sems-superlu/4.3/base
   set                     boost_inc       $env(SEMS_BOOST_INCLUDE_PATH)
@@ -84,6 +87,27 @@ if { [is-loaded lcm-sems] } {
   prepend-path            LD_LIBRARY_PATH $mpi_root/lib
   prepend-path            LD_LIBRARY_PATH $netcdf_lib
   prepend-path            PATH            $mpi_root/bin
+  continue
+}
+
+if { [is-loaded lcm-rhel] } {
+  set                     netcdf_root     /usr
+  set                     netcdf_inc      $netcdf_root/include
+  set                     netcdf_lib      $netcdf_root/lib64
+  setenv                  BOOST_INC       /usr/include/boost
+  setenv                  BOOST_LIB       /usr/lib64
+  setenv                  BOOSTLIB_INC    /usr/include/boost
+  setenv                  BOOSTLIB_LIB    /usr/lib64
+  setenv                  MPI_INC         /usr/include/openmpi-x86_64
+  setenv                  MPI_LIB         /usr/lib64/openmpi/lib
+  setenv                  MPI_BIN         /usr/lib64/openmpi/bin
+  setenv                  NETCDF          $netcdf_root
+  setenv                  NETCDF_INC      $netcdf_inc
+  setenv                  NETCDF_LIB      $netcdf_lib
+  prepend-path            LD_LIBRARY_PATH /usr/lib64/openmpi/lib
+  prepend-path            LD_LIBRARY_PATH $netcdf_lib
+  prepend-path            PATH            /usr/lib64/openmpi/bin
+  continue
 }
 
 if { [is-loaded lcm-cluster] } {
@@ -106,4 +130,5 @@ if { [is-loaded lcm-cluster] } {
   setenv                  NETCDF_LIB      $netcdf_lib
 # PATHs for MPI are set by the modules
   prepend-path            LD_LIBRARY_PATH $netcdf_lib
+  continue
 }

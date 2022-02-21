@@ -107,6 +107,7 @@ class Erosion : public AbstractAdapter
   double      erosion_volume_{0.0};
   double      cross_section_{1.0};
   bool        rename_exodus_output_{false};
+  bool        enable_erosion_{true};
 };
 
 }  // namespace AAdapt

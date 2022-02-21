@@ -30,6 +30,7 @@ AAdapt::Erosion::Erosion(
   // Save the initial output file name
   base_exo_filename_    = stk_mesh_struct_->exoOutFile;
   rename_exodus_output_ = params->get<bool>("Rename Exodus Output", false);
+  enable_erosion_       = params->get<bool>("Enable Erosion", true);
   params->validateParameters(*(getValidAdapterParameters()));
   topology_               = Teuchos::rcp(new LCM::Topology(discretization_, "", ""));
   auto const lower_corner = topology_->minimumCoordinates();
@@ -226,6 +227,8 @@ AAdapt::Erosion::transferStateArrays()
 bool
 AAdapt::Erosion::adaptMesh()
 {
+  if (enable_erosion_ == false) return true;
+
   *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
                   << "Adapting mesh using AAdapt::Erosion method      \n"
                   << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
@@ -284,6 +287,7 @@ AAdapt::Erosion::getValidAdapterParameters() const
   valid_pl->set<bool>("Equilibrate", false, "Perform a steady solve after adaptation");
   valid_pl->set<bool>("Rebalance", true, "Rebalance mesh after adaptation in parallel runs");
   valid_pl->set<bool>("Rename Exodus Output", false, "Use different exodus file names for adapted meshes");
+  valid_pl->set<bool>("Enable Erosion", true, "Allows disabling of erosion, mostly for testing");
   return valid_pl;
 }
 

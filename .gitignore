@@ -25,4 +25,5 @@ tags
 .project
 .cproject
 .settings
+.vscode
 *.pyc

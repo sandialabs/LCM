@@ -444,7 +444,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Determine if critical stress is exceeded
   if (yielded == true) {
     failed += 1.0;
-    std::cout << "Cell " << cell << " pt " << pt << " :: yielded \n";
+    //std::cout << "Cell " << cell << " pt " << pt << " :: yielded \n";
   }
 
   // Determine if kinematic failure occurred
@@ -455,14 +455,14 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (critical_angle > 0.0) {
     if (std::abs(theta) >= critical_angle) {
       failed += 1.0;
-      std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
+      //std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
     }
   }
   auto const maximum_displacement = 0.50;  // 1.0
   auto const displacement_norm    = minitensor::norm(displacement);
   if (displacement_norm > maximum_displacement) {
     failed += 8.0;
-    std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
+    //std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
 }
 }  // namespace LCM

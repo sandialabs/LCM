@@ -125,7 +125,7 @@ removeComponents(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos:
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmap = getTpetraMap(vs, false);
   if (!tmap.is_null()) {
-    const LO num_node_lids         = tmap->getNodeNumElements();
+    const LO num_node_lids         = tmap->getLocalNumElements();
     const LO num_reduced_node_lids = num_node_lids - local_components.size();
     ALBANY_PANIC(
         num_reduced_node_lids < 0,

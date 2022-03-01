@@ -54,7 +54,7 @@ void
 ReplaceDiagonalEntries(const Teuchos::RCP<Tpetra_CrsMatrix>& matrix, const Teuchos::RCP<Tpetra_Vector>& diag)
 {
   Teuchos::ArrayRCP<const ST> diag_constView = diag->get1dView();
-  for (size_t i = 0; i < matrix->getNodeNumRows(); i++) {
+  for (size_t i = 0; i < matrix->getLocalNumRows(); i++) {
     auto               NumEntries = matrix->getNumEntriesInLocalRow(i);
     using indices_type = typename Tpetra_CrsMatrix::nonconst_local_inds_host_view_type;
     using values_type  = typename Tpetra_CrsMatrix::nonconst_values_host_view_type;

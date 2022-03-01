@@ -30,7 +30,7 @@ class GlobalLocalIndexerTpetra : public GlobalLocalIndexer
   LO
   getNumLocalElements() const
   {
-    return m_tmap->getNodeNumElements();
+    return m_tmap->getLocalNumElements();
   }
   GO
   getNumGlobalElements() const

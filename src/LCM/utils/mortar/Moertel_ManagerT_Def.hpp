@@ -1370,13 +1370,13 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::BuildSaddleMap()
   // the saddle point problem rowmap is the problemmap_ + the constraintmap
   Tpetra::global_size_t numglobalelements =
       problemmap_->getGlobalNumElements() + constraintsmap_->getGlobalNumElements();
-  size_t          nummyelements = problemmap_->getNodeNumElements() + constraintsmap_->getNodeNumElements();
+  size_t          nummyelements = problemmap_->getLocalNumElements() + constraintsmap_->getLocalNumElements();
   std::vector<GO> myglobalelements(nummyelements);
   size_t          count                 = 0;
   auto            inputmyglobalelements = problemmap_->getMyGlobalIndices();
-  for (size_t i = 0; i < problemmap_->getNodeNumElements(); ++i) myglobalelements[count++] = inputmyglobalelements[i];
+  for (size_t i = 0; i < problemmap_->getLocalNumElements(); ++i) myglobalelements[count++] = inputmyglobalelements[i];
   auto constraintsmyglobalelements = constraintsmap_->getMyGlobalIndices();
-  for (size_t i = 0; i < constraintsmap_->getNodeNumElements(); ++i)
+  for (size_t i = 0; i < constraintsmap_->getLocalNumElements(); ++i)
     myglobalelements[count++] = constraintsmyglobalelements[i];
   if (count != nummyelements) {
     std::cout << "***ERR*** MoertelT::ManagerT::BuildSaddleMap:\n"

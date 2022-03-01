@@ -285,7 +285,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT                    E = elastic_modulus_(cell, pt);
   ScalarT           E_residual = 0.0001*E;
   
-  E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
+  //E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
 #else
   ScalarT const E     = elastic_modulus_(cell, pt);
 #endif

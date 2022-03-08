@@ -15,7 +15,7 @@ for PACKAGE in $PACKAGES; do
 	lcm)
 	    PACKAGE_NAME="LCM"
 	    REPO="git@github.com:sandialabs/LCM.git"
-            BRANCH="master"
+            BRANCH="main"
 	    ;;
 	dtk)
 	    PACKAGE_NAME="DataTransferKit"

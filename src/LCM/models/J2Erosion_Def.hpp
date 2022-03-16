@@ -282,17 +282,27 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
-  ScalarT                    E = elastic_modulus_(cell, pt);
-  ScalarT           E_residual = 0.0001*E;
-  
-  //E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
+  auto const              peat = peat_from_file_.size() > 0 ?
+                                 interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) :
+                                 0.0;
+  auto const          porosity = porosity_from_file_.size() > 0 ?
+                                 interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
+                                 bulk_porosity_;
+
+  ScalarT  E = elastic_modulus_(cell, pt);
+  ScalarT  K = hardening_modulus_(cell, pt);
+
+  E = 4.0 + (16.0 * ice_saturation) + (16.0 * peat) + (922.0 * ice_saturation * peat);
+  E = E * 1.0e6;  // converts units to MPa
+  K = -20.0 + (25.0 * ice_saturation) + (144.0 * peat) - (193.0 * ice_saturation * peat);
+  K = K * 1.0e6;  // converts units to MPa
 #else
-  ScalarT const E     = elastic_modulus_(cell, pt);
+  ScalarT const E = elastic_modulus_(cell, pt);
+  ScalarT const K = hardening_modulus_(cell, pt);
 #endif
   ScalarT const nu    = poissons_ratio_(cell, pt);
   ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
   ScalarT const mu    = E / (2.0 * (1.0 + nu));
-  ScalarT const K     = hardening_modulus_(cell, pt);
   ScalarT const J1    = J_(cell, pt);
   ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
 
@@ -302,18 +312,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 
-  auto const porosity = porosity_from_file_.size() > 0 ?
-                            interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
-                            bulk_porosity_;
-  auto const peat = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) :
-                                                 1.0;  // need this so ice is strong when melted
-
-  RealType res_strength = (1.0 * soil_yield_strength_);
-           res_strength = (peat * soil_yield_strength_); 
-
 #if defined(ICE_SATURATION)
-  Y = (ice_saturation * Y) + res_strength;
-  // Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
+  Y = 0.0 + (1.0 * ice_saturation) + (0.0 * peat) + (11.0 * ice_saturation * peat);
+  Y = Y * 1.0e6;  // converts units to MPa
 #endif
   Y = std::max(Y, 0.0);
 

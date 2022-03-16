@@ -288,14 +288,22 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const          porosity = porosity_from_file_.size() > 0 ?
                                  interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
                                  bulk_porosity_;
+  //std::cout << "Ice Saturation = " << ice_saturation << "\n";
+  //std::cout << "Peat = " << peat << "\n";
+  //std::cout << "Porosity = " << porosity << "\n";
 
   ScalarT  E = elastic_modulus_(cell, pt);
   ScalarT  K = hardening_modulus_(cell, pt);
-
-  E = 4.0 + (16.0 * ice_saturation) + (16.0 * peat) + (922.0 * ice_saturation * peat);
-  E = E * 1.0e6;  // converts units to MPa
-  K = -20.0 + (25.0 * ice_saturation) + (144.0 * peat) - (193.0 * ice_saturation * peat);
-  K = K * 1.0e6;  // converts units to MPa
+  
+  if (porosity > 0.999999999) {  // this means the material is an ice wedge
+    // do nothing. keep E and K from input deck.
+  }
+  else {
+    E = 4.0 + (16.0 * ice_saturation) + (16.0 * peat) + (922.0 * ice_saturation * peat);
+    E = E * 1.0e6;  // converts units to MPa
+    K = -20.0 + (25.0 * ice_saturation) + (144.0 * peat) - (193.0 * ice_saturation * peat);
+    K = K * 1.0e6;  // converts units to MPa
+  }
 #else
   ScalarT const E = elastic_modulus_(cell, pt);
   ScalarT const K = hardening_modulus_(cell, pt);
@@ -313,10 +321,19 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&& failed     = failed_(cell, 0);
 
 #if defined(ICE_SATURATION)
-  Y = 0.0 + (1.0 * ice_saturation) + (0.0 * peat) + (11.0 * ice_saturation * peat);
-  Y = Y * 1.0e6;  // converts units to MPa
+  if (porosity > 0.999999999) {  // this means the material is an ice wedge
+    // do nothing. keep Y from input deck.
+  }
+  else {
+    Y = 0.0 + (1.0 * ice_saturation) + (0.0 * peat) + (11.0 * ice_saturation * peat);
+    Y = Y * 1.0e6;  // converts units to MPa
+  }
 #endif
   Y = std::max(Y, 0.0);
+
+  //std::cout << "E modulus = " << E << " Pa\n";
+  //std::cout << "H modulus = " << K << " Pa\n";
+  //std::cout << "Yield Strength = " << Y << " Pa\n";
 
   auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
   auto const is_at_boundary = cell_bi == 1.0;

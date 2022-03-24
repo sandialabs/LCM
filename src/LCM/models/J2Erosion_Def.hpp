@@ -282,13 +282,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
-  ScalarT                    E = elastic_modulus_(cell, pt);
-  ScalarT           E_residual = 0.0001*E;
-  
-  //E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
-#else
-  ScalarT const E     = elastic_modulus_(cell, pt);
 #endif
+  ScalarT const E     = elastic_modulus_(cell, pt);
   ScalarT const nu    = poissons_ratio_(cell, pt);
   ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
   ScalarT const mu    = E / (2.0 * (1.0 + nu));
@@ -308,8 +303,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const peat = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) :
                                                  1.0;  // need this so ice is strong when melted
 
-  RealType res_strength = (1.0 * soil_yield_strength_);
-           res_strength = (peat * soil_yield_strength_); 
+  RealType const res_strength = (peat * soil_yield_strength_); 
 
 #if defined(ICE_SATURATION)
   Y = (ice_saturation * Y) + res_strength;

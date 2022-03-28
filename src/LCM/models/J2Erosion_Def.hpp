@@ -299,7 +299,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // do nothing. keep E and K from input deck.
   }
   else {
-    E = 4.0 + (16.0 * ice_saturation) + (16.0 * peat) + (922.0 * ice_saturation * peat);
+    //E = 4.0 + (16.0 * ice_saturation) + (16.0 * peat) + (922.0 * ice_saturation * peat);
+    E = 0.0 + (16.0 * ice_saturation) + (16.0 * peat) + (922.0 * ice_saturation * peat);
+    //E = 2.0 + (19.0 * ice_saturation) + (36.0 * peat) + (901.0 * ice_saturation * peat);
+    //E = 0.0 + (19.0 * ice_saturation) + (36.0 * peat) + (901.0 * ice_saturation * peat);
+    //E = 0.0 + (1.0 * ice_saturation) + (1.0 * peat) + (922.0 * ice_saturation * peat);
     E = E * 1.0e6;  // converts units to MPa
     K = -20.0 + (25.0 * ice_saturation) + (144.0 * peat) - (193.0 * ice_saturation * peat);
     K = K * 1.0e6;  // converts units to MPa
@@ -315,7 +319,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
 
   // Compute effective yield strength
-  ScalarT Y = yield_strength_(cell, pt);
+  ScalarT          Y = yield_strength_(cell, pt);
 
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
@@ -327,6 +331,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   else {
     Y = 0.0 + (1.0 * ice_saturation) + (0.0 * peat) + (11.0 * ice_saturation * peat);
     Y = Y * 1.0e6;  // converts units to MPa
+    Y = std::max(Y, (1.0e+03 + (peat * 1.7e4))); // residual yield strength
   }
 #endif
   Y = std::max(Y, 0.0);

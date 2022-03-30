@@ -481,7 +481,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
       //std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
     }
   }
-  auto const maximum_displacement = 0.50;  // 1.0
+  auto const maximum_displacement = 0.35; // [m]
   auto const displacement_norm    = minitensor::norm(displacement);
   if (displacement_norm > maximum_displacement) {
     failed += 8.0;

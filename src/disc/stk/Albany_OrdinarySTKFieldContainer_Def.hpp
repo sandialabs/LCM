@@ -127,7 +127,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   bool const has_node_boundary_indicator = (std::find(req.begin(), req.end(), "node_boundary_indicator") != req.end());
   if (has_cell_boundary_indicator) {
     this->cell_boundary_indicator =
-        metaData_->template get_field<stk::mesh::FieldBase>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
+        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
     if (this->cell_boundary_indicator != nullptr) {
       build_cell_boundary_indicator = true;
       stk::io::set_field_role(*this->cell_boundary_indicator, Ioss::Field::INFORMATION);
@@ -135,7 +135,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   }
   if (has_face_boundary_indicator) {
     this->face_boundary_indicator =
-        metaData_->template get_field<stk::mesh::FieldBase>(stk::topology::FACE_RANK, "face_boundary_indicator");
+        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::FACE_RANK, "face_boundary_indicator");
     if (this->face_boundary_indicator != nullptr) {
       build_face_boundary_indicator = true;
       stk::io::set_field_role(*this->face_boundary_indicator, Ioss::Field::INFORMATION);
@@ -143,7 +143,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   }
   if (has_edge_boundary_indicator) {
     this->edge_boundary_indicator =
-        metaData_->template get_field<stk::mesh::FieldBase>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
+        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
     if (this->edge_boundary_indicator != nullptr) {
       build_edge_boundary_indicator = true;
       stk::io::set_field_role(*this->edge_boundary_indicator, Ioss::Field::INFORMATION);
@@ -151,7 +151,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   }
   if (has_node_boundary_indicator) {
     this->node_boundary_indicator =
-        metaData_->template get_field<stk::mesh::FieldBase>(stk::topology::NODE_RANK, "node_boundary_indicator");
+        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "node_boundary_indicator");
     if (this->node_boundary_indicator != nullptr) {
       build_node_boundary_indicator = true;
       stk::io::set_field_role(*this->node_boundary_indicator, Ioss::Field::INFORMATION);

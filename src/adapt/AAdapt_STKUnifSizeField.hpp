@@ -16,7 +16,7 @@ class STKUnifRefineField : public stk::percept::ElementOp
   STKUnifRefineField(stk::percept::PerceptMesh& eMesh) : m_eMesh(eMesh) {}
 
   virtual bool
-  operator()(stk::mesh::Entity element, stk::mesh::FieldBase* field, const stk::mesh::BulkData& bulkData);
+  operator()(stk::mesh::Entity element, stk::mesh::Field<double>* field, const stk::mesh::BulkData& bulkData);
   virtual void
   init_elementOp()
   {
@@ -36,7 +36,7 @@ class STKUnifUnrefineField : public stk::percept::ElementOp
   STKUnifUnrefineField(stk::percept::PerceptMesh& eMesh) : m_eMesh(eMesh) {}
 
   virtual bool
-  operator()(stk::mesh::Entity element, stk::mesh::FieldBase* field, const stk::mesh::BulkData& bulkData);
+  operator()(stk::mesh::Entity element, stk::mesh::Field<double>* field, const stk::mesh::BulkData& bulkData);
   virtual void
   init_elementOp()
   {

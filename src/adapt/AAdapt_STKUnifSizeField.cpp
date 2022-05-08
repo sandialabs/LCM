@@ -73,7 +73,7 @@ namespace AAdapt {
 bool
 STKUnifRefineField::operator()(
     const stk::mesh::Entity    element,
-    stk::mesh::FieldBase*      field,
+    stk::mesh::Field<double>*      field,
     const stk::mesh::BulkData& bulkData)
 {
   double plane_point[3]  = {0, 0.7, 0};
@@ -119,7 +119,7 @@ STKUnifRefineField::operator()(
 bool
 STKUnifUnrefineField::operator()(
     const stk::mesh::Entity    element,
-    stk::mesh::FieldBase*      field,
+    stk::mesh::Field<double>*      field,
     const stk::mesh::BulkData& bulkData)
 {
   const stk::mesh::PairIterRelation elem_nodes = element.relations(stk::topology::NODE_RANK);

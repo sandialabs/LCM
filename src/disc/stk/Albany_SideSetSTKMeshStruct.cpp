@@ -10,9 +10,11 @@
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/GetBuckets.hpp>
 #include <stk_mesh/base/GetEntities.hpp>
+#include <stk_mesh/base/MeshBuilder.hpp>
 #include <stk_mesh/base/Selector.hpp>
 
 #include "Albany_Utils.hpp"
+#include "Teuchos_RCPStdSharedPtrConversions.hpp"
 
 namespace Albany {
 
@@ -86,8 +88,10 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
       ctd, this->numDim, cub, nsNames, ssNames, worksetSize, ebn, ebNameToIndex, this->interleavedOrdering));
 
   const Teuchos::MpiComm<int>* mpiComm = dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
-  bulkData                             = Teuchos::rcp(new stk::mesh::BulkData(
-      *metaData, *mpiComm->getRawMpiComm(), stk::mesh::BulkData::NO_AUTO_AURA, false, NULL, worksetSize));
+  stk::mesh::MeshBuilder builder(*mpiComm->getRawMpiComm());
+  builder.set_bucket_capacity(worksetSize);
+  std::unique_ptr<stk::mesh::BulkData> bulkUPtr = builder.create(Teuchos::get_shared_ptr(metaData));
+  bulkData = Teuchos::rcp(bulkUPtr.release());
 }
 
 SideSetSTKMeshStruct::~SideSetSTKMeshStruct()

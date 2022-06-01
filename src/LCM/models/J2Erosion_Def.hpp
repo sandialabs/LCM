@@ -292,9 +292,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
                                  interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
                                  bulk_porosity_;
 
-  ScalarT  E = elastic_modulus_(cell, pt);
-  ScalarT  K = hardening_modulus_(cell, pt);
-  ScalarT  Y = yield_strength_(cell, pt);
+  ScalarT E_residual = elastic_modulus_(cell, pt);
+  ScalarT          E = elastic_modulus_(cell, pt);
+  ScalarT          K = hardening_modulus_(cell, pt);
+  ScalarT          Y = yield_strength_(cell, pt);
   
   if (porosity > 0.999999999) {  // this means the material is an ice wedge
     // do nothing. keep E, Y, and K from input deck.
@@ -343,8 +344,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     E = E * 1.0e6;
     K = K * 1.0e6;
   }
-  Y = std::max(Y, (1.0e+03 + (peat * 1.7e4))); // residual yield strength
-  E = std::max(E, 1.0e+03); // residual elastic modulus
+  Y = std::max(Y, (1.0e+03 + (peat * 1.6e4))); // residual yield strength
+  Y = std::max(Y,1600.0); // absolute minimum residual yield strength
+  E = std::max(E, E_residual); // residual elastic modulus
 
 #else
   ScalarT const E = elastic_modulus_(cell, pt);

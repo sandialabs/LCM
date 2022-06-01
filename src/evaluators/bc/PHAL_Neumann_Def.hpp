@@ -846,8 +846,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
                                                    // In general, L = 8*Hb
   const ScalarT k = wave_number_val;               // wave number interpolated in time
                                                    // In general, k = 2*pi/L
-  const ScalarT h                        = h_val;  // shifted still water level interpolated in time
-  const ScalarT a                        = a_val;  // adjusted water difference interpolated in time
+  const ScalarT s                        = s_val;  // still water level interpolated in time
+  const ScalarT w                        = w_val;  // wave height interpolated in time
   const double  tm                       = inputValues[0];
   const double  g                        = inputValues[1];
   const double  rho                      = inputValues[2];
@@ -933,7 +933,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
           std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
-          const ScalarT pval_qp = this->calc_ace_press_at_z_point(rho, g, h, a, ztilde);
+          const ScalarT pval_qp = this->calc_ace_press_at_z_point(rho, g, s, w, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
           if (dim == 0) {
             std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
@@ -977,7 +977,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
           const auto    ztilde    = z - zmin;
           const ScalarT pval_node = (use_new_wave_press_nbc == false) ?
                                         this->calc_ace_press_at_z_point(hs, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde) :
-                                        this->calc_ace_press_at_z_point(rho, g, h, a, ztilde);
+                                        this->calc_ace_press_at_z_point(rho, g, s, w, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
           std::cout << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", "
                     << node << ", " << x << ", " << y << ", " << z << ", " << pval_node << "\n";
@@ -1047,16 +1047,16 @@ typename NeumannBase<EvalT, Traits>::ScalarT
 NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
     const double  rho,
     const double  g,
-    const ScalarT h,
-    const ScalarT a,
+    const ScalarT s, //s = still water level
+    const ScalarT w, //a = wave height
     const ScalarT zval) const
 {
   ScalarT pval = 0.0;
-  if (zval < h) {
-    ALBANY_PANIC(std::abs(h) < 1e-12, "Shifted still water level is zero and ACE wave press NBC is undefined!");
-    pval = rho * g * h + rho * g * (a - h) * zval / h;
-  } else if ((zval >= h) && (zval < h + a)) {
-    pval = rho * g * (h + a - zval);
+  if (zval < s) {
+    ALBANY_PANIC(std::abs(s) < 1e-12, "Still water level is zero and ACE wave press NBC is undefined!");
+    pval = rho * g * s + rho * g * (w - s) * zval / s;
+  } else if ((zval >= s) && (zval < s + w)) {
+    pval = rho * g * (s + w - zval);
   } else {  // IKT: note we don't really need to implement this case b/c pval
             // is initialized to 0.0.
     pval = 0.0;

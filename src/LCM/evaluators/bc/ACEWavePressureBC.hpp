@@ -31,8 +31,8 @@ class ACEWavePressureBC_Base : public PHAL::Neumann<EvalT, Traits>
   std::vector<RealType> heightAboveWaterOfMaxPressure;
   std::vector<RealType> waveLengthValues;
   std::vector<RealType> waveNumberValues;
-  std::vector<RealType> hValues;
-  std::vector<RealType> aValues;
+  std::vector<RealType> sValues;
+  std::vector<RealType> wValues;
   bool                  use_new_wave_press_nbc;
 };
 

@@ -344,8 +344,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     E = E * 1.0e6;
     K = K * 1.0e6;
   }
-  Y = std::max(Y, (1.0e+03 + (peat * 1.6e4))); // residual yield strength
-  Y = std::max(Y,1600.0); // absolute minimum residual yield strength
+  //Y = std::max(Y, (1.0e+03 + (peat * 1.6e4))); // residual yield strength
+  Y = std::max(Y, soil_yield_strength_);
+  //Y = std::max(Y, 1600.0); // absolute minimum residual yield strength
   E = std::max(E, E_residual); // residual elastic modulus
 
 #else

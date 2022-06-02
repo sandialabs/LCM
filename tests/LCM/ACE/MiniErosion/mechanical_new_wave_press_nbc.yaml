@@ -25,8 +25,8 @@ LCM:
         #ACE Height Above Water of Max Pressure Values File: 'bcs/hcvals.txt'
         #ACE Wave Length Values File: 'bcs/Lvals.txt'
         #ACE Wave Number Values File: 'bcs/kvals.txt'
-        ACE Shifted Still Water Level Values File: 'bcs/waterH.txt'
-        ACE Adjusted Water Difference Values File: 'bcs/waterA.txt'
+        ACE Still Water Level Values File: 'bcs/waterH.txt'
+        ACE Wave Height Values File: 'bcs/waterA.txt'
         Dump Wave Press NBC Data Files: false
         Use New Wave Press NBC: true
         #Uncomment the following 3 lines if wantt to set

@@ -1726,7 +1726,7 @@ STKDiscretization::computeWorksetInfo()
     sphereVolume_field = stkMeshStruct->getFieldContainer()->getSphereVolumeField();
   }
 
-  stk::mesh::FieldBase* latticeOrientation_field;
+  stk::mesh::Field<double> * latticeOrientation_field; 
   if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
     latticeOrientation_field = stkMeshStruct->getFieldContainer()->getLatticeOrientationField();
   }

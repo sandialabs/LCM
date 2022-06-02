@@ -15,7 +15,12 @@ for PACKAGE in $PACKAGES; do
 	lcm)
 	    PACKAGE_NAME="LCM"
 	    REPO="git@github.com:sandialabs/LCM.git"
-            BRANCH="master"
+            BRANCH="main"
+	    ;;
+	dtk)
+	    PACKAGE_NAME="DataTransferKit"
+	    REPO="git@github.com:ikalash/DataTransferKit"
+            BRANCH="dtk-2.0-tpetra-static-graph"
 	    ;;
 	*)
 	    echo "Unrecognized package option"

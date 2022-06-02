@@ -21,7 +21,7 @@ ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
     : m_graph(new Impl()), m_domain_vs(domain_vs), m_range_vs(range_vs), m_filled(false)
 {
   t_range = getTpetraMap(range_vs);
-  t_local_graph.resize(t_range->getNodeNumElements());
+  t_local_graph.resize(t_range->getLocalNumElements());
 }
 
 ThyraCrsMatrixFactory::ThyraCrsMatrixFactory(
@@ -75,7 +75,7 @@ ThyraCrsMatrixFactory::fillComplete()
   // We created the CrsGraph,
   // insert indices from the temporary local graph,
   // and call fill complete.
-  Teuchos::ArrayRCP<size_t> nonzeros_per_row_array(t_range->getNodeNumElements());
+  Teuchos::ArrayRCP<size_t> nonzeros_per_row_array(t_range->getLocalNumElements());
 
   for (int lrow = 0; lrow < nonzeros_per_row_array.size(); ++lrow) {
     nonzeros_per_row_array[lrow] = t_local_graph[lrow].size();

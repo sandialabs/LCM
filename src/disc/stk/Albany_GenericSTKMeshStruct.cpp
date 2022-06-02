@@ -12,6 +12,7 @@
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/CreateAdjacentEntities.hpp>
 #include <stk_mesh/base/GetEntities.hpp>
+#include <stk_mesh/base/MeshBuilder.hpp>
 
 #include "Albany_DiscretizationFactory.hpp"
 #include "Albany_Gather.hpp"
@@ -20,6 +21,7 @@
 #include "Albany_OrdinarySTKFieldContainer.hpp"
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "Albany_Utils.hpp"
+#include "Teuchos_RCPStdSharedPtrConversions.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 // Rebalance
@@ -155,14 +157,11 @@ GenericSTKMeshStruct::SetupFieldData(
     const Teuchos::MpiComm<int>*             mpiComm          = dynamic_cast<const Teuchos::MpiComm<int>*>(comm.get());
     stk::mesh::BulkData::AutomaticAuraOption auto_aura_option = stk::mesh::BulkData::NO_AUTO_AURA;
     if (requiresAutomaticAura) auto_aura_option = stk::mesh::BulkData::AUTO_AURA;
-    bulkData = Teuchos::rcp(new stk::mesh::BulkData(
-        *metaData,
-        *mpiComm->getRawMpiComm(),
-        auto_aura_option,
-        // worksetSize, // capability currently removed from STK_Mesh
-        false,  // add_fmwk_data
-        NULL,   // FieldDataManager
-        worksetSize));
+    stk::mesh::MeshBuilder builder(*mpiComm->getRawMpiComm());
+    builder.set_aura_option(auto_aura_option);
+    builder.set_bucket_capacity(worksetSize);
+    std::unique_ptr<stk::mesh::BulkData> bulkUPtr = builder.create(Teuchos::get_shared_ptr(metaData));
+    bulkData = Teuchos::rcp(bulkUPtr.release());
   }
 
   // Build the container for the STK fields

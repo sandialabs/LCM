@@ -396,7 +396,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   numDim             = 3;
   int cub            = params->get("Cubature Degree", 3);
   int worksetSizeMax = params->get<int>("Workset Size", DEFAULT_WORKSET_SIZE);
-  int worksetSize    = this->computeWorksetSize(worksetSizeMax, elem_mapT->getNodeNumElements());
+  int worksetSize    = this->computeWorksetSize(worksetSizeMax, elem_mapT->getLocalNumElements());
 
   stk::topology           stk_topo_data = metaData->get_topology(*partVec[0]);
   shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
@@ -458,7 +458,7 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
   if (!temperature_field) have_temp = false;
   if (!basal_friction_field) have_beta = false;
 
-  for (int i = 0; i < elem_mapT->getNodeNumElements(); i++) {
+  for (int i = 0; i < elem_mapT->getLocalNumElements(); i++) {
     const unsigned int elem_GID = elem_mapT->getGlobalElement(i);
     // std::cout << "elem_GID: " << elem_GID << std::endl;
     stk::mesh::EntityId elem_id = (stk::mesh::EntityId)elem_GID;
@@ -714,7 +714,7 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
   }
   if (have_bf == true) {
     *out << "Setting basal surface connectivity from bf file provided..." << std::endl;
-    for (unsigned int i = 0; i < basal_face_mapT->getNodeNumElements(); i++) {
+    for (unsigned int i = 0; i < basal_face_mapT->getLocalNumElements(); i++) {
       singlePartVec[0]            = ssPartVec["Basal"];
       sideID                      = basal_face_mapT->getGlobalElement(i);
       stk::mesh::EntityId side_id = (stk::mesh::EntityId)(sideID);

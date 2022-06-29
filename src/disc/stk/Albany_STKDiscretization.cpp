@@ -14,6 +14,7 @@
 #include "Albany_NodalGraphUtils.hpp"
 #include "Albany_STKNodeFieldContainer.hpp"
 #include "Albany_Utils.hpp"
+#include "Teuchos_RCPStdSharedPtrConversions.hpp"
 
 #if defined(ALBANY_CONTACT)
 #include "Albany_ContactManager.hpp"
@@ -2312,6 +2313,7 @@ STKDiscretization::setupExodusOutput()
 
     mesh_data = Teuchos::rcp(new stk::io::StkMeshIoBroker(getMpiCommFromTeuchosComm(comm)));
     mesh_data->set_bulk_data(bulkData);
+    //mesh_data->set_bulk_data(Teuchos::get_shared_ptr(bulkData));
     // IKT, 8/16/19: The following is needed to get correct output file for
     // Schwarz problems Please see:
     // https://github.com/trilinos/Trilinos/issues/5479

@@ -970,6 +970,23 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto&      nox_generic_solver         = const_cast<NOX::Solver::Generic&>(const_nox_generic_solver);
     auto const status                     = nox_generic_solver.getStatus();
 
+    // Hack: fix status test parameter list. For some reason a dummy test gets added.
+    // Extract the correct list and set it as the status test list.
+    {
+      //*fos_ << "\n***\n*** Status Tests parameter list\n***\n\n";
+      auto const app_params_rcp = app.getAppPL();
+      auto& piro_params = app_params_rcp->sublist("Piro");
+      auto& nox_params = piro_params.sublist("NOX");
+      auto& st_params = nox_params.sublist("Status Tests");
+      auto& old_params = st_params.sublist("Test 1");
+      auto new_params = old_params;
+      st_params.remove("Test 0");
+      st_params.remove("Test 1");
+      st_params.setParameters(new_params);
+      //app_params_rcp->print();
+      //exit(0);
+    }
+
     if (status == NOX::StatusTest::Failed) {
       *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
       failed_ = true;

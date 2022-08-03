@@ -372,17 +372,14 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
             ((1.0 - porosity_eb) * soil_thermal_cond_eb);
       }
 
-      // Jenn's hack to calibrate niche formation:
-      ScalarT factor = 1.0; //1.0 + (3.0 * sea_level * sea_level);
+      // Jenn's sub-grid scale model to calibrate niche formation:
+      ScalarT factor = 1.0;    //1.0 + (3.0 * sea_level * sea_level);
       if ((is_erodible == true) && (height <= sea_level)) {
         factor                          = std::max(factor, 1.0);  // in case sea level is tiny or negative
-        //factor                          = std::min(factor, 10.0);
+        factor                          = std::min(factor, 1.0);
         thermal_conductivity_(cell, qp) = thermal_conductivity_(cell, qp) * factor;
         heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / factor;
       }
-      // NOTE: A factor of 100.0 was way too fast. So was 10.0, and 5.0 was approaching better but still too fast.
-      // NOTE: Now trying to make the factor proportional to ocean power somehow. Starting with 8*sea_level. That was
-      // too fast. NOTE: Now trying 4.0*sea_level with a cap of 10.0. That was too much, trying a cap of 8.0.
 
       // Update the material thermal inertia term
       ScalarT latent_heat_eb = this->queryElementBlockParameterMap(eb_name, latent_heat_map_);

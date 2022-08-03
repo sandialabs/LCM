@@ -358,12 +358,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Y = std::max(Y, 0.0);
   E = std::max(E, 0.0);
 
-  ScalarT const nu    = poissons_ratio_(cell, pt);
-  ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
-  ScalarT const mu    = E / (2.0 * (1.0 + nu));
-  ScalarT const J1    = J_(cell, pt);
-  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
-
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 
@@ -371,6 +365,17 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const is_at_boundary = cell_bi == 1.0;
   auto const is_erodible    = cell_bi == 2.0;
 
+  // Make the elements exposed to ocean "weaker"
+  if ((is_erodible == true) && (height <= sea_level)) {
+    Y = Y / 1.0e+1;
+  }
+
+  ScalarT const nu    = poissons_ratio_(cell, pt);
+  ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
+  ScalarT const mu    = E / (2.0 * (1.0 + nu));
+  ScalarT const J1    = J_(cell, pt);
+  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);  
+ 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);
   displacement.fill(displacement_, cell, pt, 0);

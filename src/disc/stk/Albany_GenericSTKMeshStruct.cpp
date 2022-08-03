@@ -23,6 +23,7 @@
 #include "Albany_Utils.hpp"
 #include "Teuchos_RCPStdSharedPtrConversions.hpp"
 #include "Teuchos_VerboseObject.hpp"
+#include "Teuchos_RCPStdSharedPtrConversions.hpp"
 
 // Rebalance
 #if defined(ALBANY_ZOLTAN)
@@ -155,13 +156,16 @@ GenericSTKMeshStruct::SetupFieldData(
 
   if (bulkData.is_null()) {
     const Teuchos::MpiComm<int>*             mpiComm          = dynamic_cast<const Teuchos::MpiComm<int>*>(comm.get());
-    stk::mesh::BulkData::AutomaticAuraOption auto_aura_option = stk::mesh::BulkData::NO_AUTO_AURA;
-    if (requiresAutomaticAura) auto_aura_option = stk::mesh::BulkData::AUTO_AURA;
-    stk::mesh::MeshBuilder builder(*mpiComm->getRawMpiComm());
-    builder.set_aura_option(auto_aura_option);
-    builder.set_bucket_capacity(worksetSize);
-    std::unique_ptr<stk::mesh::BulkData> bulkUPtr = builder.create(Teuchos::get_shared_ptr(metaData));
-    bulkData = Teuchos::rcp(bulkUPtr.release());
+    stk::mesh::MeshBuilder meshBuilder = stk::mesh::MeshBuilder(*mpiComm->getRawMpiComm());
+    if(requiresAutomaticAura)
+      meshBuilder.set_aura_option(stk::mesh::BulkData::AUTO_AURA);
+    else
+      meshBuilder.set_aura_option(stk::mesh::BulkData::NO_AUTO_AURA);
+
+    meshBuilder.set_bucket_capacity(worksetSize);
+    meshBuilder.set_add_fmwk_data(false);
+    std::unique_ptr<stk::mesh::BulkData> bulkDataPtr = meshBuilder.create(Teuchos::get_shared_ptr(metaData));
+    bulkData = Teuchos::rcp(bulkDataPtr.release());
   }
 
   // Build the container for the STK fields

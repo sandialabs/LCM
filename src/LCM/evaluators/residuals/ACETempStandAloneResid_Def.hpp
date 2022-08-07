@@ -24,13 +24,13 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       residual_(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       thermal_conductivity_(
-          p.get<std::string>("ACE_Thermal_Conductivity QP Variable Name"),
+          p.get<std::string>("ACE_Therm_Cond QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       thermal_inertia_(
           p.get<std::string>("ACE_Thermal_Inertia QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       thermal_cond_grad_at_qps_(
-          p.get<std::string>("ACE_Thermal_Conductivity Gradient QP Variable Name"),
+          p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       tau_(p.get<std::string>("Tau Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       jacobian_det_(

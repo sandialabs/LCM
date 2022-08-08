@@ -229,7 +229,7 @@ Albany::ACEThermalProblem::constructEvaluators(
   {
     RCP<ParameterList> p = rcp(new ParameterList);
 
-    p->set<string>("ACE_Thermal_Conductivity QP Variable Name", "ACE_Thermal_Conductivity");
+    p->set<string>("ACE_Therm_Cond QP Variable Name", "ACE_Therm_Cond");
     p->set<string>("Weighted Gradient BF Name", "wGrad BF");
     p->set<string>("BF Name", "BF");
     p->set<string>("ACE_Thermal_Inertia QP Variable Name", "ACE_Thermal_Inertia");
@@ -240,8 +240,8 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("ACE_Water_Saturation QP Variable Name", "ACE_Water_Saturation");
     p->set<string>("ACE_Porosity QP Variable Name", "ACE_Porosity");
     p->set<string>("ACE Temperature QP Variable Name", "Temperature");
-    p->set<string>("ACE_Thermal_Conductivity Gradient Node Variable Name", "ACE_Thermal_Conductivity Gradient Node");
-    p->set<string>("ACE_Thermal_Conductivity Gradient QP Variable Name", "ACE_Thermal_Conductivity Gradient QP");
+    p->set<string>("ACE_Therm_Cond Gradient Node Variable Name", "ACE_Therm_Cond Gradient Node");
+    p->set<string>("ACE_Therm_Cond Gradient QP Variable Name", "ACE_Therm_Cond Gradient QP");
     p->set<string>("QP Coordinate Vector Name", "Coord Vec");
     p->set<RCP<DataLayout>>("Node Data Layout", dl_->node_scalar);
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
@@ -319,12 +319,12 @@ Albany::ACEThermalProblem::constructEvaluators(
       if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
         fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
-    // Save ACE_Thermal_Conductivity to the output Exodus file
+    // Save ACE_Therm_Cond to the output Exodus file
     {
       std::string stateName = "ACE_Thermal_Cond";
       entity                = Albany::StateStruct::QuadPoint;
       p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
-      p->set<std::string>("Field Name", "ACE_Thermal_Conductivity");
+      p->set<std::string>("Field Name", "ACE_Therm_Cond");
       p->set("Field Layout", dl_->qp_scalar);
       p->set<bool>("Nodal State", false);
 
@@ -391,7 +391,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
     p->set<double>("Stabilization Parameter Value", stab_value_);
     p->set<std::string>("Jacobian Det Name", "Jacobian Det");
-    p->set<string>("ACE_Thermal_Conductivity Gradient QP Variable Name", "ACE_Thermal_Conductivity Gradient QP");
+    p->set<string>("ACE_Therm_Cond Gradient QP Variable Name", "ACE_Therm_Cond Gradient QP");
     p->set<string>("Tau Type", tau_type_);
 
     // Output
@@ -416,10 +416,10 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<RCP<DataLayout>>("QP Vector Data Layout", dl_->qp_vector);
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl_->node_qp_vector);
 
-    p->set<string>("ACE_Thermal_Conductivity QP Variable Name", "ACE_Thermal_Conductivity");
+    p->set<string>("ACE_Therm_Cond QP Variable Name", "ACE_Therm_Cond");
     p->set<string>("ACE_Thermal_Inertia QP Variable Name", "ACE_Thermal_Inertia");
     p->set<RCP<DataLayout>>("QP Scalar Data Layout", dl_->qp_scalar);
-    p->set<string>("ACE_Thermal_Conductivity Gradient QP Variable Name", "ACE_Thermal_Conductivity Gradient QP");
+    p->set<string>("ACE_Therm_Cond Gradient QP Variable Name", "ACE_Therm_Cond Gradient QP");
     p->set<std::string>("Jacobian Det Name", "Jacobian Det");
     p->set<bool>("Use Stabilization", use_stab_);
     p->set<double>("Max Value of x-Coord", x_max_);

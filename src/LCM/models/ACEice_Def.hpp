@@ -103,7 +103,7 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
   setEvaluatedField("ACE_Ice_Saturation", dl->qp_scalar);
   setEvaluatedField("ACE_Density", dl->qp_scalar);
   setEvaluatedField("ACE_Heat_Capacity", dl->qp_scalar);
-  setEvaluatedField("ACE_Thermal_Conductivity", dl->qp_scalar);
+  setEvaluatedField("ACE_Therm_Cond", dl->qp_scalar);
   setEvaluatedField("ACE_Thermal_Inertia", dl->qp_scalar);
   setEvaluatedField("ACE_Water_Saturation", dl->qp_scalar);
   setEvaluatedField("ACE_Porosity", dl->qp_scalar);
@@ -150,14 +150,14 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
   addStateVariable(
       "ACE_Heat_Capacity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Heat_Capacity", false));
 
-  // ACE_Thermal_Conductivity
+  // ACE_Therm_Cond
   addStateVariable(
-      "ACE_Thermal_Conductivity",
+      "ACE_Therm_Cond",
       dl->qp_scalar,
       "scalar",
       0.0,
       false,
-      p->get<bool>("Output ACE_Thermal_Conductivity", false));
+      p->get<bool>("Output ACE_Therm_Cond", false));
 
   // ACE_Thermal_Inertia
   addStateVariable(
@@ -215,7 +215,7 @@ ACEiceMiniKernel<EvalT, Traits>::init(
   ice_saturation_   = *output_fields["ACE_Ice_Saturation"];
   density_          = *output_fields["ACE_Density"];
   heat_capacity_    = *output_fields["ACE_Heat_Capacity"];
-  thermal_cond_     = *output_fields["ACE_Thermal_Conductivity"];
+  thermal_cond_     = *output_fields["ACE_Therm_Cond"];
   thermal_inertia_  = *output_fields["ACE_Thermal_Inertia"];
   water_saturation_ = *output_fields["ACE_Water_Saturation"];
   porosity_         = *output_fields["ACE_Porosity"];

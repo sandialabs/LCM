@@ -19,12 +19,12 @@ template <typename EvalT, typename Traits>
 ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl)
-    : thermal_conductivity_(p.get<std::string>("ACE_Thermal_Conductivity QP Variable Name"), dl->qp_scalar),
+    : thermal_conductivity_(p.get<std::string>("ACE_Therm_Cond QP Variable Name"), dl->qp_scalar),
       thermal_cond_grad_at_nodes_(
-          p.get<std::string>("ACE_Thermal_Conductivity Gradient Node Variable Name"),
+          p.get<std::string>("ACE_Therm_Cond Gradient Node Variable Name"),
           dl->node_vector),
       thermal_cond_grad_at_qps_(
-          p.get<std::string>("ACE_Thermal_Conductivity Gradient QP Variable Name"),
+          p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"),
           dl->qp_vector),
       wgradbf_(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       bf_(p.get<std::string>("BF Name"), dl->node_qp_scalar),
@@ -422,7 +422,7 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> valid_pl = rcp(new Teuchos::ParameterList("Valid ACE Thermal Parameters"));
   valid_pl->set<double>(
-      "ACE_Thermal_Conductivity Value", 1.0, "Constant thermal conductivity value across element block");
+      "ACE_Therm_Cond Value", 1.0, "Constant thermal conductivity value across element block");
   valid_pl->set<double>("ACE_Thermal_Inertia Value", 1.0, "Constant thermal inertia value across element block");
   valid_pl->set<double>("ACE Ice Density", 920.0, "Constant value of ice density in element block");
   valid_pl->set<double>("ACE Water Density", 1000.0, "Constant value of water density in element block");
@@ -453,10 +453,10 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
   for (int i = 0; i < eb_names_.size(); i++) {
     std::string eb_name = eb_names_[i];
     const_thermal_conduct_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Thermal_Conductivity Value", -1.0);
+        material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Therm_Cond Value", -1.0);
     if (const_thermal_conduct_map_[eb_name] != -1.0) {
       ALBANY_ASSERT(
-          (const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE_Thermal_Conductivity Value must be positive!");
+          (const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE_Therm_Cond Value must be positive!");
     }
     const_thermal_inertia_map_[eb_name] =
         material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Thermal_Inertia Value", -1.0);

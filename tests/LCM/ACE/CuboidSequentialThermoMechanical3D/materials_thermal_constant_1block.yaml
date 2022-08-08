@@ -4,6 +4,6 @@ ALBANY:
       material: Ice
   Materials: 
     Ice:
-      ACE_Thermal_Conductivity Value: 1.6
+      ACE_Therm_Cond Value: 1.6
       ACE_Thermal_Inertia Value: 1.9228e6 #rho*C = 2.09e3*920.0
 ...

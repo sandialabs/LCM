@@ -206,7 +206,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   doQuasistaticOutput(ST const time) const;
 
   void
-  doDynamicInitialOutput(ST const time, int const subdomain, int const stop) const;
+  doDynamicInitialOutput(ST const time, int const subdomain) const;
 
   void
   renamePrevWrittenExoFiles(const int subdomain, const int file_index) const;

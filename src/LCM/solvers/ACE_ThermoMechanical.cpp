@@ -717,7 +717,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           *fos_ << "Problem            :Mechanical\n";
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (failed_ == false) {
-            doDynamicInitialOutput(next_time, subdomain, stop);
+            doDynamicInitialOutput(next_time, subdomain);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
         }
@@ -725,7 +725,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (failed_ == false) {
-            doDynamicInitialOutput(next_time, subdomain, stop);
+            doDynamicInitialOutput(next_time, subdomain);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
         }
@@ -1137,7 +1137,7 @@ ACEThermoMechanical::renamePrevWrittenExoFiles(int const subdomain, int const fi
 }
 
 void
-ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain, int const stop) const
+ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain) const
 {
   auto const is_initial_time = time <= initial_time_ + initial_time_step_;
   if (is_initial_time == false) {

@@ -111,6 +111,7 @@ ACEThermoMechanical::ACEThermoMechanical(
   increase_factor_  = alt_system_params_->get<ST>("Amplification Factor", 1.0);
   output_interval_  = alt_system_params_->get<int>("Exodus Write Interval", 1);
   std_init_guess_   = alt_system_params_->get<bool>("Standard Initial Guess", false);
+  init_file_index_  = alt_system_params_->get<int>("Exodus ACE Output File Initial Index", 0);
 
   // Firewalls
   ALBANY_ASSERT(maximum_steps_ >= 1, "");
@@ -177,6 +178,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     }
 
     auto const problem_type = prob_types_[subdomain];
+  
 
     // Error checks - only needs to be done once at the beginning
     bool const have_piro = params.isSublist("Piro");
@@ -467,7 +469,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
   Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
   std::string             filename       = disc_params.get<std::string>("Exodus Output File Name");
-  renameExodusFile(file_index, filename);
+  renameExodusFile(file_index + init_file_index_ , filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
   disc_params.set<std::string>("Exodus Solution Name", "temperature");
@@ -562,7 +564,7 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
     }
   }
   std::string filename = disc_params.get<std::string>("Exodus Output File Name");
-  renameExodusFile(file_index, filename);
+  renameExodusFile(file_index + init_file_index_, filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
   disc_params.set<std::string>("Exodus Solution Name", "disp");
@@ -1127,9 +1129,9 @@ ACEThermoMechanical::renamePrevWrittenExoFiles(int const subdomain, int const fi
     Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
     Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
     std::string             filename_old   = disc_params.get<std::string>("Exodus Output File Name");
-    renameExodusFile(file_index - 1, filename_old);
+    renameExodusFile(file_index - 1 + init_file_index_, filename_old);
     std::string filename_new = filename_old;
-    renameExodusFile((file_index - 1) / output_interval_, filename_new);
+    renameExodusFile((file_index - 1) / output_interval_ + init_file_index_, filename_new);
     if (file_index > 0) {
       renameParallel(filename_old, filename_new, comm_);
     }

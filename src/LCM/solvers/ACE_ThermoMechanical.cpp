@@ -111,6 +111,8 @@ ACEThermoMechanical::ACEThermoMechanical(
   increase_factor_  = alt_system_params_->get<ST>("Amplification Factor", 1.0);
   output_interval_  = alt_system_params_->get<int>("Exodus Write Interval", 1);
   std_init_guess_   = alt_system_params_->get<bool>("Standard Initial Guess", false);
+  //IKT, 8/19/2022: the following lets you start the output files created by the code 
+  //at an index other than zero.
   init_file_index_  = alt_system_params_->get<int>("Exodus ACE Output File Initial Index", 0);
 
   // Firewalls

@@ -131,7 +131,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(const MoertelT::MOERTEL_TEMPLATE_
  | pack data in this node into a vector                      mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double* MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Pack(int* size)
+double*
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Pack(int* size)
 {
   // *size = *size + Id_ + x_[3] + n_[3] + dof_.size() + ndof_*sizeof(double) +
   // seg_.size() + nseg_*sizeof(double) + iscorner_ + isonboundary_ + gap_
@@ -166,7 +167,8 @@ double* MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Pack(int* size)
  | unpack data from a vector in this class                   mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::UnPack(double* pack)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::UnPack(double* pack)
 {
   int count = 0;
   int size  = (int)pack[count++];
@@ -214,7 +216,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::~NodeT()
  | Clear internal state in preparation for re-integration                |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Reset()
+void
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Reset()
 {
   // Clear up any projected node info
   pnode_.clear();
@@ -242,7 +245,8 @@ operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & nod
  |  print node                                               mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Print() const
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Print() const
 {
   std::cout << "NodeT " << std::setw(6) << Id_ << "\tCoords ";
   for (int i = 0; i < 3; ++i) std::cout << std::setw(12) << x_[i] << " ";
@@ -274,7 +278,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::Print() const
  |  set lagrange multiplier dof id                           mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetLagrangeMultiplierId(int LMId)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetLagrangeMultiplierId(int LMId)
 {
   // first check whether this dof has been set before
   // if so, do nothing
@@ -295,7 +300,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetLagrangeMultiplierId(int LMId)
  | WRN: This is NOT a collective call!                                  |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddSegment(int sid)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddSegment(int sid)
 {
   if (seg_.size()) {
     // search whether sid already exists in seg_
@@ -320,8 +326,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddSegment(int sid)
  | construct ptrs to redundant segments from my segment id list         |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(
-    MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & interface)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & interface)
 {
   if (!interface.IsComplete()) return false;
   if (!interface.lComm()) return true;
@@ -344,7 +350,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(
 }
 
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & iface)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & iface)
 {
   if (!iface.IsComplete()) return false;
   if (iface.lComm() == Teuchos::null) return true;
@@ -370,7 +377,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetPtrstoSegments(MoertelT::MOERTE
  |  build nodal normal                                       mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::BuildAveragedNormal()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::BuildAveragedNormal()
 {
   // get segments adjacent to me
   int  nseg = Nseg();
@@ -427,7 +435,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::BuildAveragedNormal()
  |  set a projected node                                     mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetProjectedNode(MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) * pnode)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetProjectedNode(MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT) * pnode)
 {
   pnode_.resize(pnode_.size() + 1);
   pnode_[pnode_.size() - 1] = Teuchos::rcp(pnode);
@@ -438,8 +447,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::SetProjectedNode(MoertelT::MOERTEL
  |  get projected nodes                                      mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>* MoertelT::MOERTEL_TEMPLATE_CLASS(
-    NodeT)::GetProjectedNode(int& length)
+Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>*
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetProjectedNode(int& length)
 {
   length = pnode_.size();
   if (length)
@@ -452,8 +461,8 @@ Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>* MoertelT::MOERTE
  |  get projected node                                       mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)> MoertelT::MOERTEL_TEMPLATE_CLASS(
-    NodeT)::GetProjectedNode()
+Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::GetProjectedNode()
 {
   int length = pnode_.size();
   if (length)
@@ -466,7 +475,8 @@ Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)> MoertelT::MOERTEL
  |  add a value to the Drow_ map                             mwgee 11/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddDValue(double val, int col)
+void
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddDValue(double val, int col)
 {
   if (Drow_ == Teuchos::null) Drow_ = Teuchos::rcp(new std::map<int, double>());
 
@@ -481,7 +491,8 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddDValue(double val, int col)
  |  add a value to the Drow_ map                             mwgee 11/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddMValue(double val, int col)
+void
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddMValue(double val, int col)
 {
   if (Mrow_ == Teuchos::null) Mrow_ = Teuchos::rcp(new std::map<int, double>());
 
@@ -496,7 +507,8 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddMValue(double val, int col)
  |  add a value to the Drow_ map                             mwgee 02/06|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-void MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddMmodValue(int row, double val, int col)
+void
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::AddMmodValue(int row, double val, int col)
 {
   if (Mmodrow_ == Teuchos::null) Mmodrow_ = Teuchos::rcp(new std::vector<std::map<int, double>>(Ndof()));
 

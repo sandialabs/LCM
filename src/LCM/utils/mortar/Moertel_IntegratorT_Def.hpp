@@ -505,7 +505,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::~IntegratorT()
  *----------------------------------------------------------------------*/
 
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::SerialDenseMatrix<LO, ST>* MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
+Teuchos::SerialDenseMatrix<LO, ST>*
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     double sxia,
     double sxib,
@@ -566,7 +567,8 @@ Teuchos::SerialDenseMatrix<LO, ST>* MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT
   |  assemble the result -Mdense into M (public)              mwgee 08/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg,
@@ -636,7 +638,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
   |  assemble the result Ddense into D (public)               mwgee 08/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     Tpetra::CrsMatrix<ST, LO, GO, N>&   D,
@@ -708,7 +711,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
   | Teuchos::SerialDenseMatrix object                                    |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::SerialDenseMatrix<LO, ST>* MoertelT::MOERTEL_TEMPLATE_CLASS(
+Teuchos::SerialDenseMatrix<LO, ST>*
+MoertelT::MOERTEL_TEMPLATE_CLASS(
     IntegratorT)::Integrate(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, double sxia, double sxib)
 {
   int                                 nrow   = sseg.Nnode();
@@ -760,7 +764,8 @@ Teuchos::SerialDenseMatrix<LO, ST>* MoertelT::MOERTEL_TEMPLATE_CLASS(
   | integrate the modification of the master side                        |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::SerialDenseMatrix<LO, ST>* MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate_2D_Mmod(
+Teuchos::SerialDenseMatrix<LO, ST>*
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate_2D_Mmod(
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     double sxia,
     double sxib,
@@ -893,7 +898,8 @@ MoertelT::IntegratorT<LocalOrdinal, Scalar>::Assemble_2D_Mod(MoertelT::Interface
   |  Note that this is not scalar as the other assemble routines         |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
     MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg,
@@ -963,7 +969,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
   |  contribution from the master/slave side M/D                         |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
     Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> actseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg,
@@ -1200,7 +1207,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
  *----------------------------------------------------------------------*/
 
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     Teuchos::SerialDenseMatrix<LO, ST>& Ddense)
@@ -1266,7 +1274,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
  *----------------------------------------------------------------------*/
 
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg,

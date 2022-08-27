@@ -149,7 +149,8 @@ class PointT
   The Point takes ownership of the Node and will destroy it
 
   */
-  bool SetNode(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) * node)
+  bool
+  SetNode(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) * node)
   {
     node_ = Teuchos::rcp(node);
     return true;

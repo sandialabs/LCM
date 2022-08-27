@@ -442,13 +442,13 @@ getLocalRowValues(
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tmat = getConstTpetraMatrix(lop, false);
   if (!tmat.is_null()) {
-    auto numEntries = tmat->getNumEntriesInLocalRow(lrow);
+    auto numEntries    = tmat->getNumEntriesInLocalRow(lrow);
     using indices_type = typename Tpetra_CrsMatrix::nonconst_local_inds_host_view_type;
     using values_type  = typename Tpetra_CrsMatrix::nonconst_values_host_view_type;
     indices.resize(numEntries);
     values.resize(numEntries);
-    indices_type indices_view(indices.getRawPtr(),numEntries);
-    values_type  values_view(values.getRawPtr(),numEntries);
+    indices_type indices_view(indices.getRawPtr(), numEntries);
+    values_type  values_view(values.getRawPtr(), numEntries);
     tmat->getLocalRowCopy(lrow, indices_view, values_view, numEntries);
     return;
   }
@@ -595,7 +595,7 @@ void
 setLocalRowValues(const Teuchos::RCP<Thyra_LinearOp>& lop, const LO lrow, const Teuchos::ArrayView<const ST> values)
 {
   // Allow failure, since we don't know what the underlying linear algebra is
-  auto tmat = getTpetraMatrix(lop, false);
+  auto tmat          = getTpetraMatrix(lop, false);
   using indices_type = typename Tpetra_CrsMatrix::local_inds_host_view_type;
   using values_type  = typename Tpetra_CrsMatrix::values_host_view_type;
   if (!tmat.is_null()) {
@@ -606,7 +606,7 @@ setLocalRowValues(const Teuchos::RCP<Thyra_LinearOp>& lop, const LO lrow, const 
         "Error! This routine is meant for setting *all* values in a row, "
         "but the length of the input values array does not match the number of "
         "indices in the local row.\n");
-    values_type  values_view(values.getRawPtr(),values.size());
+    values_type values_view(values.getRawPtr(), values.size());
     tmat->replaceLocalValues(lrow, indices, values_view);
     return;
   }
@@ -970,8 +970,8 @@ getDeviceData(Teuchos::RCP<Thyra_Vector const> const& v)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tv = getConstTpetraVector(v, false);
   if (!tv.is_null()) {
-    auto data2d = tv->getLocalView<KokkosNode::execution_space>(Tpetra::Access::ReadOnly);
-    DeviceView1d<const ST> data = Kokkos::subview(data2d, Kokkos::ALL(), 0);
+    auto                   data2d = tv->getLocalView<KokkosNode::execution_space>(Tpetra::Access::ReadOnly);
+    DeviceView1d<const ST> data   = Kokkos::subview(data2d, Kokkos::ALL(), 0);
     return data;
   }
 
@@ -991,8 +991,8 @@ getNonconstDeviceData(Teuchos::RCP<Thyra_Vector> const& v)
   // Allow failure, since we don't know what the underlying linear algebra is
   auto tv = getTpetraVector(v, false);
   if (!tv.is_null()) {
-    auto data2d = tv->getLocalView<KokkosNode::execution_space>(Tpetra::Access::ReadWrite);
-    DeviceView1d<ST> data = Kokkos::subview(data2d, Kokkos::ALL(), 0);
+    auto             data2d = tv->getLocalView<KokkosNode::execution_space>(Tpetra::Access::ReadWrite);
+    DeviceView1d<ST> data   = Kokkos::subview(data2d, Kokkos::ALL(), 0);
     return data;
   }
 

@@ -64,7 +64,8 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
 
  protected:
   //! Overrides Thyra::LinearOpBase purely virtual method
-  bool opSupportedImpl(Thyra::EOpTransp /*M_trans*/) const
+  bool
+  opSupportedImpl(Thyra::EOpTransp /*M_trans*/) const
   {
     // The underlying scalar type is not complex, and we support transpose, so
     // we support everything.

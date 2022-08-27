@@ -12,7 +12,8 @@
  |  create a convexhull of a set of points (private)         mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p)
 {
   // # points
@@ -171,7 +172,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
  |  test whether three points make a right turn (private)    mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnUpper(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnUpper(
     int                                                                    i,
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
 {
@@ -215,7 +217,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnUpper(
  |  test whether three points make a right turn (private)    mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnLower(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnLower(
     int                                                                    i,
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
 {
@@ -259,7 +262,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnLower(
  |  test whether three points make a right turn (private)    mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointBefore(
+void
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointBefore(
     int                                                                    i,
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
 {
@@ -286,7 +290,8 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointBefore(
  |  test whether three points make a right turn (private)    mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointAfter(
+void
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointAfter(
     int                                                                    i,
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
 {
@@ -313,7 +318,8 @@ void MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointAfter(
  |  collapse points that are really close to one point       mwgee 11/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::CollapsePoints(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::CollapsePoints(
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
     double const                                                           eps)
 {

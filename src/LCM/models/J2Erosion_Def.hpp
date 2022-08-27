@@ -282,12 +282,12 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
-  ScalarT                    E = elastic_modulus_(cell, pt);
-  ScalarT           E_residual = 0.0001*E;
-  
-  //E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
+  ScalarT       E              = elastic_modulus_(cell, pt);
+  ScalarT       E_residual     = 0.0001 * E;
+
+  // E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
 #else
-  ScalarT const E     = elastic_modulus_(cell, pt);
+  ScalarT const E = elastic_modulus_(cell, pt);
 #endif
   ScalarT const nu    = poissons_ratio_(cell, pt);
   ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
@@ -309,7 +309,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
                                                  1.0;  // need this so ice is strong when melted
 
   RealType res_strength = (1.0 * soil_yield_strength_);
-           res_strength = (peat * soil_yield_strength_); 
+  res_strength          = (peat * soil_yield_strength_);
 
 #if defined(ICE_SATURATION)
   Y = (ice_saturation * Y) + res_strength;
@@ -444,7 +444,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Determine if critical stress is exceeded
   if (yielded == true) {
     failed += 1.0;
-    //std::cout << "Cell " << cell << " pt " << pt << " :: yielded \n";
+    // std::cout << "Cell " << cell << " pt " << pt << " :: yielded \n";
   }
 
   // Determine if kinematic failure occurred
@@ -455,14 +455,14 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (critical_angle > 0.0) {
     if (std::abs(theta) >= critical_angle) {
       failed += 1.0;
-      //std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
+      // std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
     }
   }
   auto const maximum_displacement = 0.50;  // 1.0
   auto const displacement_norm    = minitensor::norm(displacement);
   if (displacement_norm > maximum_displacement) {
     failed += 8.0;
-    //std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
+    // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
 }
 }  // namespace LCM

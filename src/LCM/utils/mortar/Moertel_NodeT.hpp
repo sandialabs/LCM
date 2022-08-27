@@ -491,7 +491,8 @@ class NodeT
   the map of nodes supporting this node
 
   */
-  void AddSupportedByNode(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) * suppnode)
+  void
+  AddSupportedByNode(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) * suppnode)
   {
     supportedby_[suppnode->Id()] = suppnode;
     return;

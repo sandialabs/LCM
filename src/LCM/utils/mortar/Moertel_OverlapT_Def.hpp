@@ -65,7 +65,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::~Overlap()
   |  build line info from triangles/quads (private)           mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_lines_s()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_lines_s()
 {
   if (!havemxi_) {
     std::cout << "***ERR*** Moertel::Overlap::build_lines:\n"
@@ -179,7 +180,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_lines_s()
   |  build line info from triangles (private)                 mwgee 11/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_lines_m()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_lines_m()
 {
   if (!havesxim_) {
     std::cout << "***ERR*** Moertel::Overlap::build_lines:\n"
@@ -271,7 +273,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_lines_m()
   |  project master nodes onto slave element (private)        mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_mxi()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_mxi()
 {
   // project the master segment's nodes onto the slave segment
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** mnode = mseg_.Nodes();
@@ -303,7 +306,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_mxi()
   |  project slave nodes onto master element (private)        mwgee 11/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_sxim()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_sxim()
 {
   // project the slave segment's nodes onto the master segment
   int nsnode                                      = sseg_.Nnode();
@@ -329,7 +333,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_sxim()
   |  get coords of slave nodes (private)                      mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_sxi()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_sxi()
 {
   // this makes coords of snodes on the sseg local coord system
   if (sseg_.Nnode() == 3) {
@@ -364,7 +369,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_sxi()
   |  outward normal to sseg's edges in local coords (private) mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_normal()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_normal()
 {
   if (sseg_.Nnode() == 3) {
     sn_[0][0] = 0.;
@@ -420,7 +426,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::build_normal()
   |  compute the overlap (public)                             mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ComputeOverlap()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ComputeOverlap()
 {
   // Returning false means there is no overlap between mseg and sseg
 
@@ -487,7 +494,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ComputeOverlap()
   |  perform clipping algorithm (private)                     mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Clipelements()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Clipelements()
 {
   if (!havemxi_ || !havesxi_ || !havelines_ || !havesxim_ || !havelinem_) {
     std::stringstream oss;
@@ -799,7 +807,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Clipelements()
  *---------------------------------------------------------------------------------*/
 
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::buildPoly(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::buildPoly(
     std::vector<double>& source_xi,
     std::vector<double>& source_eta,
     std::vector<double>& target_xi,
@@ -990,7 +999,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::buildPoly(
 }
 
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ClipelementsSH()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ClipelementsSH()
 {
   if (!havemxi_ || !havesxi_ || !havelines_ || !havesxim_ || !havelinem_) {
     std::stringstream oss;
@@ -1216,7 +1226,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ClipelementsSH()
   |  make a triangulization of a polygon (private)             mwgee 10/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
-bool MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
 {
   bool ok = false;
   // we have a polygon that is in clockwise order at this moment

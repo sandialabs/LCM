@@ -18,7 +18,8 @@
   |  assemble values from integration                                    |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(
     InterfaceT)::Mortar_Assemble(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M)
 {
   // interface needs to be complete
@@ -229,7 +230,8 @@ MoertelT::InterfaceT<2, ST, LO, GO, N>::Mortar_Integrate_2D(Teuchos::RCP<Teuchos
   |  make mortar integration of master/slave side in 2D (1D interface)   |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D()
 {
   if (!IsComplete()) {
     if (gcomm_->getRank() == 0)
@@ -360,7 +362,8 @@ bool MoertelT::Interface::Integrate_2D(Tpetra_CrsMatrix& M,
   | of 2 segments (2D version) IF there is an overlap                    |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D_Section(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D_Section(
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
 {
@@ -673,7 +676,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D_Section(
 }
 
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::QuickOverlapTest_2D(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::QuickOverlapTest_2D(
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
 {

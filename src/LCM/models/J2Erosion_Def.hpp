@@ -19,11 +19,12 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   this->setIntegrationPointLocationFlag(true);
 
   // Baseline constants
-  sat_mod_             = p->get<RealType>("Saturation Modulus", 0.0);
-  sat_exp_             = p->get<RealType>("Saturation Exponent", 0.0);
-  bulk_porosity_       = p->get<RealType>("ACE Bulk Porosity", 0.0);
-  critical_angle_      = p->get<RealType>("ACE Critical Angle", 0.0);
-  soil_yield_strength_ = p->get<RealType>("ACE Soil Yield Strength", 3.0e+06);
+  sat_mod_                  = p->get<RealType>("Saturation Modulus", 0.0);
+  sat_exp_                  = p->get<RealType>("Saturation Exponent", 0.0);
+  bulk_porosity_            = p->get<RealType>("ACE Bulk Porosity", 0.0);
+  critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
+  soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 3.0e+06);
+  residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
   // note: set default value to pure ice yield strength 3.0e+6
 
   if (p->isParameter("ACE Sea Level File") == true) {
@@ -264,52 +265,55 @@ class J2ErosionNLS : public minitensor::Function_Base<J2ErosionNLS<EvalT, M>, ty
 };
 
 namespace {
-RealType
-E_fit_max(RealType const x, RealType const y)
+template<typename T>  
+T
+E_fit_max(T x, RealType y)
 {
   return (210.0 - 528.0 * y - 209.0 * x + 936.0 * y * x) / 409.0;
 }
 
-RealType
-Y_fit_max(RealType const x, RealType const y)
+template<typename T>  
+T
+Y_fit_max(T const x, RealType const y)
 {
   return (3.0 - 11.0 * y - 3.0 * x + 20.0 * y * x) / 9.0;
 }
 
-RealType
-K_fit_min(RealType const x, RealType const y)
+template<typename T>
+T
+K_fit_min(T const x, RealType const y)
 {
-  // return negative of fit
   return (-12.0 + 26.0 * y + 12.0 * x - 36.0 * y * x) / 10.0;
 }
 
-std::tuple<RealType, RealType, RealType>
-unit_fit(RealType const ice_saturation, RealType const porosity)
+template<typename T>
+std::tuple<T, T, T>
+unit_fit(T ice_saturation, RealType porosity)
 {
   auto const critical_porosity       = 0.2;
   auto const critical_ice_saturation = 0.4;
-  RealType   E{1.0};
-  RealType   Y{1.0};
-  RealType   K{1.0};
   auto const x  = ice_saturation;
   auto const y  = porosity;
   auto const xc = critical_porosity;
   auto const yc = critical_ice_saturation;
-  if (x > xc && y > yc) {
+  T   E{1.0};
+  T   Y{1.0};
+  T   K{1.0};
+  if (xc < x && yc < y) {
     Y = Y_fit_max(x, y);
-    E - E_fit_max(x, y);
+    E = E_fit_max(x, y);
     K = K_fit_min(x, y);
   } else if (x <= xc) {
     Y = Y_fit_max(xc, y) * x / xc;
-    E - E_fit_max(xc, y) * x / xc;
+    E = E_fit_max(xc, y) * x / xc;
     K = K_fit_min(xc, y) * x / xc;
   } else if (y <= yc) {
     Y = Y_fit_max(x, yc) * y / yc;
-    E - E_fit_max(x, yc) * y / yc;
+    E = E_fit_max(x, yc) * y / yc;
     K = K_fit_min(x, yc) * y / yc;
-  } else if ((x <= xc) && (y <= yc)) {
+  } else if (x <= xc && y <= yc) {
     Y = Y_fit_max(xc, yc) * x * y / xc / yc;
-    E - E_fit_max(xc, yc) * x* y / xc / yc;
+    E = E_fit_max(xc, yc) * x * y / xc / yc;
     K = K_fit_min(xc, yc) * x * y / xc / yc;
   }
   return std::make_tuple(E, Y, K);
@@ -341,16 +345,18 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const porosity = porosity_from_file_.size() > 0 ?
                             interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
                             bulk_porosity_;
+  ScalarT ne{1.0};
+  ScalarT ny{1.0};
+  ScalarT nk{1.0};
 
-  ScalarT E_residual = elastic_modulus_(cell, pt);
-  ScalarT E          = elastic_modulus_(cell, pt);
-  ScalarT K          = hardening_modulus_(cell, pt);
-  ScalarT Y          = yield_strength_(cell, pt);
+  std::tie(ne, ny, nk) = unit_fit(ice_saturation, porosity);
 
-  // Y = std::max(Y, (1.0e+03 + (peat * 1.6e4))); // residual yield strength
+  ScalarT E          = elastic_modulus_(cell, pt) * ne;
+  ScalarT Y          = yield_strength_(cell, pt) * ny;
+  ScalarT K          = hardening_modulus_(cell, pt) * nk;
+
+  E = std::max(E, residual_elastic_modulus_);
   Y = std::max(Y, soil_yield_strength_);
-  // Y = std::max(Y, 1600.0); // absolute minimum residual yield strength
-  E = std::max(E, E_residual);  // residual elastic modulus
 
 #else
   ScalarT const E = elastic_modulus_(cell, pt);

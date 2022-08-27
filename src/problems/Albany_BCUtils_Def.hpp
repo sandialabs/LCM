@@ -1280,13 +1280,13 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
             kvals                                = Teuchos::Array<double>(kvals_av);
           }
           if (sub_list.isParameter("ACE Wave Height Values File")) {
-            std::string const          w_file = sub_list.get<std::string>("ACE Wave Height Values File");
+            std::string const          w_file    = sub_list.get<std::string>("ACE Wave Height Values File");
             std::vector<double>        wvals_vec = LCM::vectorFromFile(w_file);
             Teuchos::ArrayView<double> wvals_av  = Teuchos::arrayViewFromVector(wvals_vec);
             avals                                = Teuchos::Array<double>(wvals_av);
           }
           if (sub_list.isParameter("ACE Still Water Level Values File")) {
-            std::string const          s_file = sub_list.get<std::string>("ACE Still Water Level Values File");
+            std::string const          s_file    = sub_list.get<std::string>("ACE Still Water Level Values File");
             std::vector<double>        svals_vec = LCM::vectorFromFile(s_file);
             Teuchos::ArrayView<double> svals_av  = Teuchos::arrayViewFromVector(svals_vec);
             hvals                                = Teuchos::Array<double>(svals_av);

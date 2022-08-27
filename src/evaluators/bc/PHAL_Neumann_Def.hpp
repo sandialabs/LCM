@@ -839,22 +839,22 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
   const ScalarT h_water = water_height_val;  // wave height value interpolated in time
-  const ScalarT hc = height_above_water_of_max_pressure_val;
+  const ScalarT hc      = height_above_water_of_max_pressure_val;
   // height above water of the max pressure value interpolated in time
   // In general, hc = 0.7*Hb, where Hb is the breaking wave height
-  const ScalarT L = wave_length_val;               // wave length interpolated in time
-                                                   // In general, L = 8*Hb
-  const ScalarT k = wave_number_val;               // wave number interpolated in time
-                                                   // In general, k = 2*pi/L
-  const ScalarT s                        = s_val;  // still water level interpolated in time
-  const ScalarT w                        = w_val;  // wave height interpolated in time
-  const double  tm                       = inputValues[0];
-  const double  g                        = inputValues[1];
-  const double  rho                      = inputValues[2];
-  //const double  rho                      = 1022.0;
-  const double  zmin                     = inputValues[3];
-  const bool    dump_wave_press_nbc_data = inputValues[4];
-  const bool    use_new_wave_press_nbc   = inputValues[5];
+  const ScalarT L = wave_length_val;  // wave length interpolated in time
+                                      // In general, L = 8*Hb
+  const ScalarT k = wave_number_val;  // wave number interpolated in time
+                                      // In general, k = 2*pi/L
+  const ScalarT s   = s_val;          // still water level interpolated in time
+  const ScalarT w   = w_val;          // wave height interpolated in time
+  const double  tm  = inputValues[0];
+  const double  g   = inputValues[1];
+  const double  rho = inputValues[2];
+  // const double  rho                      = 1022.0;
+  const double zmin                     = inputValues[3];
+  const bool   dump_wave_press_nbc_data = inputValues[4];
+  const bool   use_new_wave_press_nbc   = inputValues[5];
   // std::cout << "IKT: use_new_wave_press_nbc = " << use_new_wave_press_nbc << "\n";
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
@@ -867,8 +867,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   ScalarT       p0, pc, ps;
   ScalarT       m1;
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: h_water, tm, Hb, g, rho, zmin, L, k, hc = " << h_water << ", " << tm << ", " << Hb << ", " << g << ", "
-            << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
+  std::cout << "DEBUG: h_water, tm, Hb, g, rho, zmin, L, k, hc = " << h_water << ", " << tm << ", " << Hb << ", " << g
+            << ", " << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
 #endif
   ScalarT m2, m3;
   ;
@@ -971,13 +971,14 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
       outfile.open(str);
       for (int cell = 0; cell < numCells_; cell++) {
         for (int node = 0; node < numNodes; node++) {
-          const auto    x         = coordVec(cell, node, 0);
-          const auto    y         = coordVec(cell, node, 1);
-          const auto    z         = coordVec(cell, node, 2);
-          const auto    ztilde    = z - zmin;
-          const ScalarT pval_node = (use_new_wave_press_nbc == false) ?
-                                        this->calc_ace_press_at_z_point(h_water, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde) :
-                                        this->calc_ace_press_at_z_point(rho, g, s, w, ztilde);
+          const auto    x      = coordVec(cell, node, 0);
+          const auto    y      = coordVec(cell, node, 1);
+          const auto    z      = coordVec(cell, node, 2);
+          const auto    ztilde = z - zmin;
+          const ScalarT pval_node =
+              (use_new_wave_press_nbc == false) ?
+                  this->calc_ace_press_at_z_point(h_water, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde) :
+                  this->calc_ace_press_at_z_point(rho, g, s, w, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
           std::cout << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", "
                     << node << ", " << x << ", " << y << ", " << z << ", " << pval_node << "\n";
@@ -1009,7 +1010,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
 {
   ScalarT pval = 0.0;
   if (h_water < 0.0) {  // if h_water < 0, there is no pressure applied
-                   // IKT FIXME: need to verify with Jenn that this is correct
+                        // IKT FIXME: need to verify with Jenn that this is correct
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
     std::cout << "DEBUG: negative h_water case!\n";
 #endif
@@ -1047,8 +1048,8 @@ typename NeumannBase<EvalT, Traits>::ScalarT
 NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
     const double  rho,
     const double  g,
-    const ScalarT s, //s = still water level
-    const ScalarT w, //a = wave height
+    const ScalarT s,  // s = still water level
+    const ScalarT w,  // a = wave height
     const ScalarT zval) const
 {
   ScalarT pval = 0.0;

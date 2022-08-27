@@ -110,7 +110,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::~InterfaceT()
  |  print segments of this interface to std::cout                  (public)  |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::PrintSegments() const
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::PrintSegments() const
 {
   if (lcomm_ == Teuchos::null) return true;
 
@@ -143,7 +144,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::PrintSegments() const
  |  print nodes of this interface to std::cout                     (public)  |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::PrintNodes() const
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::PrintNodes() const
 {
   if (lcomm_ == Teuchos::null) return true;
 
@@ -177,7 +179,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::PrintNodes() const
  |  print interface to std::cout                                   (public)  |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Print() const
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Print() const
 {
   if (!IsComplete()) {
     if (gcomm_->getRank() == 0) {
@@ -232,8 +235,8 @@ operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) 
  |  add a single segment to a specified side of the interface (public)  |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(
-    InterfaceT)::AddSegment(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, int side)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AddSegment(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, int side)
 {
   // check whether this interface has been finalized before
   if (IsComplete()) {
@@ -312,7 +315,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
  |  add a single node to a specified side of the interface (public)     |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AddNode(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, int side)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AddNode(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, int side)
 {
   // check whether this interface has been finalized before
   if (IsComplete()) {
@@ -355,7 +359,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AddNode(MoertelT::MOERTEL_TEM
  |  func      (in)    ptr to function class to set to segments          |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(
     InterfaceT)::SetFunctionAllSegmentsSide(int side, int id, MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT) * func)
 {
   if (side != 0 && side != 1) {
@@ -394,7 +399,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
  |        segments of a side over all procs                             |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetMortarSide(int side)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetMortarSide(int side)
 {
   if (side != 0 && side != 1 && side != -2) {
     std::cout << "***ERR*** MoertelT::InterfaceT::SetMortarSide:\n"
@@ -418,7 +424,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetMortarSide(int side)
  |        Complete() needs to be called before using this method        |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNsegment(int side)
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNsegment(int side)
 {
   if (!IsComplete()) {
     std::cout << "***WRN*** MoertelT::InterfaceT::GlobalNsegment:\n"
@@ -448,7 +455,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNsegment(int side)
  |        Complete() needs to be called before using this method        |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNsegment()
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNsegment()
 {
   if (!IsComplete()) {
     std::cout << "***WRN*** MoertelT::InterfaceT::GlobalNsegment:\n"
@@ -472,7 +480,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNsegment()
  |        Complete() needs to be called before using this method        |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNnode(int side)
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNnode(int side)
 {
   if (!IsComplete()) {
     std::cout << "***WRN*** MoertelT::InterfaceT::GlobalNnode:\n"
@@ -500,7 +509,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNnode(int side)
  |        Complete() needs to be called before using this method        |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNnode()
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNnode()
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::Interface::GlobalNnode:\n"
@@ -522,7 +532,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GlobalNnode()
  |  intra-communicator, the method returns -1                           |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::NodePID(int nid) const
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::NodePID(int nid) const
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::NodePID:\n"
@@ -555,7 +566,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::NodePID(int nid) const
  |  find PID (process id) for given segment id sid                      |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SegPID(int sid) const
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SegPID(int sid) const
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::SegPID:\n"
@@ -590,7 +602,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SegPID(int sid) const
  |  find PID (process id) for given segment id sid                      |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::OtherSide(int side) const
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::OtherSide(int side) const
 {
   if (side == 0)
     return 1;
@@ -609,8 +622,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::OtherSide(int side) const
  |  if sid is not a local node will return NULL                         |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetNodeViewLocal(
-    int nid)
+Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetNodeViewLocal(int nid)
 {
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator curr = node_[0].find(nid);
   if (curr != node_[0].end()) return (curr->second);
@@ -623,7 +636,8 @@ Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> MoertelT::MOERTEL_TEMPLATE
  |  get view of a node with node id nid                                 |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetNodeView(int nid)
+Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetNodeView(int nid)
 {
   if (!IsComplete()) {
     std::stringstream oss;
@@ -673,8 +687,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) * *MoertelT::MOERTEL_TEMPLATE_CLASS(Inte
  |  get view of ALL nodes on this interface                             |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetNodeView(
-    std::vector<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) *>& nodes)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetNodeView(std::vector<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) *>& nodes)
 {
   if (!IsComplete()) {
     std::cout << "***WRN*** MoertelT::InterfaceT::GetNodeView:\n"
@@ -699,8 +713,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetNodeView(
  |  get view of a local segment with id sid                             |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSegmentView(
-    int sid)
+Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSegmentView(int sid)
 {
   if (!IsComplete()) {
     std::stringstream oss;
@@ -750,7 +764,8 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) * *MoertelT::MOERTEL_TEMPLATE_CLASS(I
  | returns -1 if it can't find the segment on either side               |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) * seg)
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) * seg)
 {
   if (lcomm_ == Teuchos::null) return -1;
   if (!IsComplete()) {
@@ -777,7 +792,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(MoertelT::SEGMENT_TEMP
  | returns -1 if it can't find the node on either side                  |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) * node)
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) * node)
 {
   if (!IsComplete()) {
     std::cout << "***WRN*** MoertelT::InterfaceT::GetSide:\n"
@@ -803,7 +819,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(MoertelT::MOERTEL_TEMP
  | returns -1 if it can't find the node on either side                  |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(int nodeid)
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(int nodeid)
 {
   if (!IsComplete()) {
     std::cout << "***WRN*** MoertelT::InterfaceT::GetSide:\n"
@@ -833,7 +850,8 @@ int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::GetSide(int nodeid)
  |       the construction of redundant nodes/segments
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::RedundantSegments(int side)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::RedundantSegments(int side)
 {
   if (side != 0 && side != 1) {
     std::cout << "***ERR*** MoertelT::InterfaceT::RedundantSegments:\n"
@@ -930,7 +948,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::RedundantSegments(int side)
  |       the construction of redundant nodes/segments
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::RedundantNodes(int side)
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::RedundantNodes(int side)
 {
   if (side != 0 && side != 1) {
     std::cout << "***ERR*** MoertelT::InterfaceT::RedundantNodes:\n"
@@ -1019,7 +1038,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::RedundantNodes(int side)
  | (re)build the topology info between nodes and segments               |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNodeSegmentTopology()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNodeSegmentTopology()
 {
   if (!IsComplete()) {
     if (OutLevel() > 1)
@@ -1055,7 +1075,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNodeSegmentTopology()
  | Note that this is collective for ALL procs                           |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-int MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetLMDofs(int minLMGID)
+int
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetLMDofs(int minLMGID)
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::SetLMDofs:\n"
@@ -1268,7 +1289,8 @@ int MoertelT::Interface::SetLMDofs(int minLMGID)
  | The calling routine is responsible for destroying this list          |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-std::vector<GO>* MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::MyLMIds()
+std::vector<GO>*
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::MyLMIds()
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::MyLMIds:\n"
@@ -1312,7 +1334,8 @@ std::vector<GO>* MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::MyLMIds()
  | on these end segments                                                |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::DetectEndSegmentsandReduceOrder()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::DetectEndSegmentsandReduceOrder()
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::DetectEndSegmentsandReduceOrder:\n"
@@ -1417,7 +1440,8 @@ bool MoertelT::Interface::DetectEndSegmentsandReduceOrder_2D()
  | on these end segments                                                |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::DetectEndSegmentsandReduceOrder_2D()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::DetectEndSegmentsandReduceOrder_2D()
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::DetectEndSegmentsandReduceOrder:\n"
@@ -1475,7 +1499,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::DetectEndSegmentsandReduceOrd
   // is then arbitrary
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::DetectEndSegmentsandReduceOrder_3D()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::DetectEndSegmentsandReduceOrder_3D()
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** "
@@ -1599,7 +1624,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::DetectEndSegmentsandReduceOrd
  | dual:   type of shape function for the LM space                      |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetFunctionTypes(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetFunctionTypes(
     MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType primal,
     MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType dual)
 {
@@ -1613,7 +1639,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetFunctionTypes(
  | and dual_
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetFunctionsFromFunctionTypes()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetFunctionsFromFunctionTypes()
 {
   if (lcomm_ == Teuchos::null) return true;
   if (!IsComplete()) {

@@ -111,9 +111,9 @@ ACEThermoMechanical::ACEThermoMechanical(
   increase_factor_  = alt_system_params_->get<ST>("Amplification Factor", 1.0);
   output_interval_  = alt_system_params_->get<int>("Exodus Write Interval", 1);
   std_init_guess_   = alt_system_params_->get<bool>("Standard Initial Guess", false);
-  //IKT, 8/19/2022: the following lets you start the output files created by the code 
-  //at an index other than zero.
-  init_file_index_  = alt_system_params_->get<int>("Exodus ACE Output File Initial Index", 0);
+  // IKT, 8/19/2022: the following lets you start the output files created by the code
+  // at an index other than zero.
+  init_file_index_ = alt_system_params_->get<int>("Exodus ACE Output File Initial Index", 0);
 
   // Firewalls
   ALBANY_ASSERT(maximum_steps_ >= 1, "");
@@ -180,7 +180,6 @@ ACEThermoMechanical::ACEThermoMechanical(
     }
 
     auto const problem_type = prob_types_[subdomain];
-  
 
     // Error checks - only needs to be done once at the beginning
     bool const have_piro = params.isSublist("Piro");
@@ -471,7 +470,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
   Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
   std::string             filename       = disc_params.get<std::string>("Exodus Output File Name");
-  renameExodusFile(file_index + init_file_index_ , filename);
+  renameExodusFile(file_index + init_file_index_, filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
   disc_params.set<std::string>("Exodus Solution Name", "temperature");
@@ -931,21 +930,21 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     *fos_ << "Final time         :" << next_time << '\n';
     *fos_ << "Time step          :" << time_step << '\n';
     *fos_ << delim << std::endl;
-    //Disable initial acceleration solve unless in initial time-step.
-    //This should speed up code by ~2x.
+    // Disable initial acceleration solve unless in initial time-step.
+    // This should speed up code by ~2x.
     if (current_time != initial_time_) {
       piro_tr_solver.disableCalcInitAccel();
     }
 
     Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
     Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
-  
+
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
     auto x_init = me.getNominalValues().get_x();
     auto v_init = me.getNominalValues().get_x_dot();
     auto a_init = me.get_x_dotdot();
-    auto nrm = norm_2(*a_init);
+    auto nrm    = norm_2(*a_init);
 
     // Restore internal states
     auto& app       = *apps_[subdomain];
@@ -979,16 +978,16 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     {
       //*fos_ << "\n***\n*** Status Tests parameter list\n***\n\n";
       auto const app_params_rcp = app.getAppPL();
-      auto& piro_params = app_params_rcp->sublist("Piro");
-      auto& nox_params = piro_params.sublist("NOX");
-      auto& st_params = nox_params.sublist("Status Tests");
-      auto& old_params = st_params.sublist("Test 1");
-      auto new_params = old_params;
+      auto&      piro_params    = app_params_rcp->sublist("Piro");
+      auto&      nox_params     = piro_params.sublist("NOX");
+      auto&      st_params      = nox_params.sublist("Status Tests");
+      auto&      old_params     = st_params.sublist("Test 1");
+      auto       new_params     = old_params;
       st_params.remove("Test 0");
       st_params.remove("Test 1");
       st_params.setParameters(new_params);
-      //app_params_rcp->print();
-      //exit(0);
+      // app_params_rcp->print();
+      // exit(0);
     }
 
     if (status == NOX::StatusTest::Failed) {
@@ -1002,7 +1001,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto  x_rcp              = solution_rcp->col(0)->clone_v();
     auto  xdot_rcp           = solution_rcp->col(1)->clone_v();
     auto  xdotdot_rcp        = solution_rcp->col(2)->clone_v();
-    auto a_nrm = norm_2(*xdotdot_rcp);
+    auto  a_nrm              = norm_2(*xdotdot_rcp);
     this_x_[subdomain]       = x_rcp;
     this_xdot_[subdomain]    = xdot_rcp;
     this_xdotdot_[subdomain] = xdotdot_rcp;
@@ -1061,7 +1060,6 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
 {
   auto const prob_type       = prob_types_[subdomain];
   auto const is_initial_time = time <= initial_time_ + initial_time_step_;
-
 
   if (is_initial_time == true) {
     // initial time-step: get initial solution from nominalValues in ME

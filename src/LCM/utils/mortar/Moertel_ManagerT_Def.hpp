@@ -73,7 +73,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::~ManagerT() { interface_.clear(); }
  |  Add an interface (public)                                mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::ParameterList& MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Default_Parameters()
+Teuchos::ParameterList&
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Default_Parameters()
 {
   if (integrationparams_ == Teuchos::null) {
     integrationparams_ = rcp(new Teuchos::ParameterList());
@@ -102,7 +103,8 @@ operator<<(std::ostream& os, const MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT) & 
  |  print all data                                           mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Print() const
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Print() const
 {
   comm_->barrier();
 
@@ -164,7 +166,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Print() const
  |  Add an interface (public)                                mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AddInterface(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AddInterface(
     const Teuchos::RCP<const MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>& interface)
 {
   if (!interface->IsComplete()) {
@@ -186,7 +189,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AddInterface(
  | Note that this is collective for ALL procs                           |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-Teuchos::RCP<Tpetra::Map<LO, GO, N>> MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::LagrangeMultiplierDofs()
+Teuchos::RCP<Tpetra::Map<LO, GO, N>>
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::LagrangeMultiplierDofs()
 {
   if (problemmap_ == Teuchos::null) {
     std::cout << "***ERR*** MoertelT::ManagerT::LagrangeMultiplierDofs:\n"
@@ -270,7 +274,8 @@ Teuchos::RCP<Tpetra::Map<LO, GO, N>> MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT):
  |  Note: All processors have to go in here!                            |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Mortar_Integrate()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Mortar_Integrate()
 {
   bool status = Integrate_Interfaces();
 
@@ -789,7 +794,8 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
  | Assemble interface nodes times soln into JFNK residual vector
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AssembleInterfacesIntoResidual()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AssembleInterfacesIntoResidual()
 {
   // now that we have all maps and dofs we can assemble from the nodes
   {
@@ -813,7 +819,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AssembleInterfacesIntoResidual(
  |  choose the mortar side                                              |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::ChooseMortarSide()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::ChooseMortarSide()
 {
   // find all interfaces
   std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>                      inter(Ninterfaces());
@@ -1338,7 +1345,8 @@ bool MoertelT::Manager::ChooseMortarSide_2D(std::vector<Teuchos::RCP<MoertelT::I
 #endif
 
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::BuildSaddleMap()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::BuildSaddleMap()
 {
   // check whether all interfaces are complete and integrated
   typename std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>::iterator curr;

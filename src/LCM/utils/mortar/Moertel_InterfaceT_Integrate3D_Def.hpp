@@ -108,7 +108,8 @@ MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(Teuchos::RCP<Teuchos::P
   |  make mortar integration of master/slave side in 3D (2D interface)   |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D()
 {
   if (!IsComplete()) {
     if (gcomm_->getRank() == 0)
@@ -182,7 +183,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D()
   | of 2 segments (3D version) IF there is an overlap                    |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
 {
@@ -250,7 +252,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
   |  assemble integration of master/slave side in 3D (2D interface)      |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(
     InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M)
 {
   if (!IsComplete()) {
@@ -775,7 +778,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(
  *----------------------------------------------------------------------*/
 //#define PDANDM
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::AssembleJFNKVec:\n"

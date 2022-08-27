@@ -88,10 +88,10 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
       ctd, this->numDim, cub, nsNames, ssNames, worksetSize, ebn, ebNameToIndex, this->interleavedOrdering));
 
   const Teuchos::MpiComm<int>* mpiComm = dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
-  stk::mesh::MeshBuilder builder(*mpiComm->getRawMpiComm());
+  stk::mesh::MeshBuilder       builder(*mpiComm->getRawMpiComm());
   builder.set_bucket_capacity(worksetSize);
   std::unique_ptr<stk::mesh::BulkData> bulkUPtr = builder.create(Teuchos::get_shared_ptr(metaData));
-  bulkData = Teuchos::rcp(bulkUPtr.release());
+  bulkData                                      = Teuchos::rcp(bulkUPtr.release());
 }
 
 SideSetSTKMeshStruct::~SideSetSTKMeshStruct()

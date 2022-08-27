@@ -15,7 +15,8 @@
  |  finalize construction of this interface                             |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
 {
   if (IsComplete()) {
     if (OutLevel() > 0)

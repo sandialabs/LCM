@@ -27,7 +27,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::~Projector() {}
  |    modded by gah 07/2010                                             |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_NodalNormal(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_NodalNormal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  xi[],
@@ -136,7 +137,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_NodalNor
  |      ns  outward normal of node (slave side)                         |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_NodalNormal(
+double
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_NodalNormal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  eta,
@@ -214,7 +216,8 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_NodalNormal(
  |      nxs,nys outward normal of node (slave side)                     |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_NodalNormal(
+double
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_NodalNormal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double eta)
@@ -265,7 +268,8 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_NodalNorm
  |                                                           mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentNormal(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentNormal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  xi[],
@@ -380,7 +384,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentN
  |      njs nodal outward normal of nodes xs (slave side)               |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentNormal(
+double
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentNormal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  eta,
@@ -456,7 +461,8 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentNormal
  |      nxjs,nyjs outward normals of node j (slave side)                |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentNormal(
+double
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentNormal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double eta)
@@ -527,7 +533,8 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentNo
  |                                                           mwgee 08/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentOrthogonal(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentOrthogonal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  xi[],
@@ -586,7 +593,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentO
  |      njs nodal outward normal of nodes xs (slave side)               |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentOrthogonal(
+double
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentOrthogonal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  eta,
@@ -656,7 +664,8 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentOrthog
  |      xis nodal coords of segment's nodes i (slave side)              |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentOrthogonal(
+double
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentOrthogonal(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double eta)
@@ -709,7 +718,8 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentOr
  |                                                           mwgee 08/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_Orthogonal_to_Slave(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_Orthogonal_to_Slave(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & snode,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  xi[],
@@ -790,7 +800,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_Orthogon
  |      njs nodal outward normal of nodes xs (slave side)               |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentOrthogonal_to_g(
+double
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentOrthogonal_to_g(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  eta,
@@ -859,7 +870,8 @@ double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentOrthog
  |      xis nodal coords of segment's nodes i (slave side)              |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-double MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentOrthogonal_to_g(
+double
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentOrthogonal_to_g(
     MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
     MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
     double  eta,

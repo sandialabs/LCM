@@ -206,7 +206,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   doQuasistaticOutput(ST const time) const;
 
   void
-  doDynamicInitialOutput(ST const time, int const subdomain, int const stop) const;
+  doDynamicInitialOutput(ST const time, int const subdomain) const;
 
   void
   renamePrevWrittenExoFiles(const int subdomain, const int file_index) const;
@@ -294,6 +294,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   Teuchos::Array<std::string>            model_filenames_;
   // Min value of z-coordinate in initial mesh - needed for wave pressure NBC
   mutable double zmin_{0.0};
+  mutable int init_file_index_;
 };
 
 }  // namespace LCM

@@ -26,7 +26,7 @@ ALBANY:
         IP Field Layout 2: Scalar
         IP Field Name 3: ACE_Heat_Capacity
         IP Field Layout 3: Scalar
-        IP Field Name 4: ACE_Thermal_Conductivity
+        IP Field Name 4: ACE_Therm_Cond
         IP Field Layout 4: Scalar
         IP Field Name 5: ACE_Thermal_Inertia
         IP Field Layout 5: Scalar

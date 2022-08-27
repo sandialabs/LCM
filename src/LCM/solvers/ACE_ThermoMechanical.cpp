@@ -111,6 +111,9 @@ ACEThermoMechanical::ACEThermoMechanical(
   increase_factor_  = alt_system_params_->get<ST>("Amplification Factor", 1.0);
   output_interval_  = alt_system_params_->get<int>("Exodus Write Interval", 1);
   std_init_guess_   = alt_system_params_->get<bool>("Standard Initial Guess", false);
+  //IKT, 8/19/2022: the following lets you start the output files created by the code 
+  //at an index other than zero.
+  init_file_index_  = alt_system_params_->get<int>("Exodus ACE Output File Initial Index", 0);
 
   // Firewalls
   ALBANY_ASSERT(maximum_steps_ >= 1, "");
@@ -177,6 +180,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     }
 
     auto const problem_type = prob_types_[subdomain];
+  
 
     // Error checks - only needs to be done once at the beginning
     bool const have_piro = params.isSublist("Piro");
@@ -467,7 +471,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
   Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
   std::string             filename       = disc_params.get<std::string>("Exodus Output File Name");
-  renameExodusFile(file_index, filename);
+  renameExodusFile(file_index + init_file_index_ , filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
   disc_params.set<std::string>("Exodus Solution Name", "temperature");
@@ -562,7 +566,7 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
     }
   }
   std::string filename = disc_params.get<std::string>("Exodus Output File Name");
-  renameExodusFile(file_index, filename);
+  renameExodusFile(file_index + init_file_index_, filename);
   *fos_ << "Renaming output file to - " << filename << '\n';
   disc_params.set<std::string>("Exodus Output File Name", filename);
   disc_params.set<std::string>("Exodus Solution Name", "disp");
@@ -717,7 +721,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           *fos_ << "Problem            :Mechanical\n";
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (failed_ == false) {
-            doDynamicInitialOutput(next_time, subdomain, stop);
+            doDynamicInitialOutput(next_time, subdomain);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
         }
@@ -725,7 +729,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           *fos_ << "Problem            :Thermal\n";
           AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (failed_ == false) {
-            doDynamicInitialOutput(next_time, subdomain, stop);
+            doDynamicInitialOutput(next_time, subdomain);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
         }
@@ -1127,9 +1131,9 @@ ACEThermoMechanical::renamePrevWrittenExoFiles(int const subdomain, int const fi
     Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
     Teuchos::ParameterList& disc_params    = params.sublist("Discretization", true);
     std::string             filename_old   = disc_params.get<std::string>("Exodus Output File Name");
-    renameExodusFile(file_index - 1, filename_old);
+    renameExodusFile(file_index - 1 + init_file_index_, filename_old);
     std::string filename_new = filename_old;
-    renameExodusFile((file_index - 1) / output_interval_, filename_new);
+    renameExodusFile((file_index - 1) / output_interval_ + init_file_index_, filename_new);
     if (file_index > 0) {
       renameParallel(filename_old, filename_new, comm_);
     }
@@ -1137,7 +1141,7 @@ ACEThermoMechanical::renamePrevWrittenExoFiles(int const subdomain, int const fi
 }
 
 void
-ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain, int const stop) const
+ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain) const
 {
   auto const is_initial_time = time <= initial_time_ + initial_time_step_;
   if (is_initial_time == false) {

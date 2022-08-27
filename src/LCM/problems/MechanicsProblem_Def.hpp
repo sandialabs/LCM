@@ -1999,7 +1999,7 @@ MechanicsProblem::constructEvaluators(
     p->set<std::string>("ACE Temperature Name", "ACE Temperature");
     p->set<std::string>("ACE Temperature Dot Name", "ACE Temperature Dot");
     p->set<std::string>("ACE Temperature Gradient Name", "ACE Temperature Gradient");
-    p->set<std::string>("ACE_Thermal_Conductivity Name", "ACE_Thermal_Conductivity");
+    p->set<std::string>("ACE_Therm_Cond Name", "ACE_Therm_Cond");
     p->set<std::string>("ACE_Thermal_Inertia Name", "ACE_Thermal_Inertia");
     p->set<std::string>("ACE Residual Name", "ACE Temperature Residual");
     if (SolutionType == SolutionMethodType::Continuation) {

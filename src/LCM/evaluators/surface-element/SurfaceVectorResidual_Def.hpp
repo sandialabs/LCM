@@ -37,10 +37,10 @@ SurfaceVectorResidual<EvalT, Traits>::SurfaceVectorResidual(
 
       have_topmod_adaptation_(p.get<bool>("Use Adaptive Insertion", false))
 {
-  this->addDependentField(current_basis_);
-  this->addDependentField(ref_dual_basis_);
-  this->addDependentField(ref_normal_);
-  this->addDependentField(ref_area_);
+  this->addNonConstDependentField(current_basis_);
+  this->addNonConstDependentField(ref_dual_basis_);
+  this->addNonConstDependentField(ref_normal_);
+  this->addNonConstDependentField(ref_area_);
 
   this->addEvaluatedField(force_);
 
@@ -50,15 +50,15 @@ SurfaceVectorResidual<EvalT, Traits>::SurfaceVectorResidual(
   if (use_cohesive_traction_) {
     traction_ = decltype(traction_)(p.get<std::string>("Cohesive Traction Name"), dl->qp_vector);
 
-    this->addDependentField(traction_);
+    this->addNonConstDependentField(traction_);
   } else {
-    this->addDependentField(stress_);
+    this->addNonConstDependentField(stress_);
   }
 
   if (have_topmod_adaptation_ == true) {
     detF_ = decltype(detF_)(p.get<std::string>("Jacobian Name"), dl->qp_scalar);
 
-    this->addDependentField(detF_);
+    this->addNonConstDependentField(detF_);
 
     cauchy_stress_ = decltype(cauchy_stress_)(p.get<std::string>("Cauchy Stress Name"), dl->qp_tensor);
 

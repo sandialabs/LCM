@@ -31,11 +31,11 @@ SurfaceVectorGradient<EvalT, Traits>::SurfaceVectorGradient(
   // if ( p.isType<double>("Average J Stabilization Parameter Name") )
   //   alpha = p.get<double>("Average J Stabilization Parameter");
 
-  this->addDependentField(currentBasis);
-  this->addDependentField(refDualBasis);
-  this->addDependentField(refNormal);
-  this->addDependentField(jump);
-  this->addDependentField(weights);
+  this->addNonConstDependentField(currentBasis);
+  this->addNonConstDependentField(refDualBasis);
+  this->addNonConstDependentField(refNormal);
+  this->addNonConstDependentField(jump);
+  this->addNonConstDependentField(weights);
 
   this->addEvaluatedField(defGrad);
   this->addEvaluatedField(J);

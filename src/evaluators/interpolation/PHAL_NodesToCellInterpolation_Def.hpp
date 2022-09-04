@@ -29,9 +29,9 @@ NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::NodesToCellInterpolationBa
   numQPs   = dl->qp_scalar->extent(1);
   numNodes = dl->node_scalar->extent(1);
 
-  this->addDependentField(BF.fieldTag());
-  this->addDependentField(field_node.fieldTag());
-  this->addDependentField(w_measure.fieldTag());
+  this->addNonConstDependentField(BF.fieldTag());
+  this->addNonConstDependentField(field_node.fieldTag());
+  this->addNonConstDependentField(w_measure.fieldTag());
 
   this->addEvaluatedField(field_cell);
 

@@ -32,8 +32,8 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::SideQuadPointsToS
     ALBANY_ABORT("Error! Field dimension not supported.\n");
   }
 
-  this->addDependentField(field_qp.fieldTag());
-  this->addDependentField(w_measure.fieldTag());
+  this->addNonConstDependentField(field_qp.fieldTag());
+  this->addNonConstDependentField(w_measure.fieldTag());
   this->addEvaluatedField(field_side);
 
   this->setName("SideQuadPointsToSideInterpolation" + PHX::print<EvalT>());

@@ -27,10 +27,10 @@ ThermalResid<EvalT, Traits>::ThermalResid(Teuchos::ParameterList const& p)
       rho(p.get<double>("Density")),
       C(p.get<double>("Heat Capacity"))
 {
-  this->addDependentField(wBF);
-  this->addDependentField(Tdot);
-  this->addDependentField(TGrad);
-  this->addDependentField(wGradBF);
+  this->addNonConstDependentField(wBF);
+  this->addNonConstDependentField(Tdot);
+  this->addNonConstDependentField(TGrad);
+  this->addNonConstDependentField(wGradBF);
   this->addEvaluatedField(TResidual);
 
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");

@@ -23,8 +23,8 @@ DOFInterpolationSideBase<EvalT, Traits, ScalarT>::DOFInterpolationSideBase(
       "Error! The layouts structure does not appear to be that of a side "
       "set.\n");
 
-  this->addDependentField(val_node.fieldTag());
-  this->addDependentField(BF.fieldTag());
+  this->addNonConstDependentField(val_node.fieldTag());
+  this->addNonConstDependentField(BF.fieldTag());
   this->addEvaluatedField(val_qp);
 
   this->setName("DOFInterpolationSide" + PHX::print<EvalT>());

@@ -89,38 +89,38 @@ ThermoPoroPlasticityResidEnergy<EvalT, Traits>::ThermoPoroPlasticityResidEnergy(
   else
     enableTransient = true;
 
-  this->addDependentField(stabParameter);
-  this->addDependentField(deltaTime);
-  this->addDependentField(weights);
-  this->addDependentField(coordVec);
-  this->addDependentField(wBF);
-  this->addDependentField(refTemp);
-  this->addDependentField(alphaSkeleton);
-  this->addDependentField(gammaMixture);
-  this->addDependentField(gammaFluid);
-  this->addDependentField(porePressure);
-  this->addDependentField(ThermalCond);
-  this->addDependentField(kcPermeability);
-  this->addDependentField(porosity);
-  this->addDependentField(biotCoefficient);
-  this->addDependentField(biotModulus);
-  this->addDependentField(young_modulus_);
-  this->addDependentField(poissons_ratio_);
+  this->addNonConstDependentField(stabParameter);
+  this->addNonConstDependentField(deltaTime);
+  this->addNonConstDependentField(weights);
+  this->addNonConstDependentField(coordVec);
+  this->addNonConstDependentField(wBF);
+  this->addNonConstDependentField(refTemp);
+  this->addNonConstDependentField(alphaSkeleton);
+  this->addNonConstDependentField(gammaMixture);
+  this->addNonConstDependentField(gammaFluid);
+  this->addNonConstDependentField(porePressure);
+  this->addNonConstDependentField(ThermalCond);
+  this->addNonConstDependentField(kcPermeability);
+  this->addNonConstDependentField(porosity);
+  this->addNonConstDependentField(biotCoefficient);
+  this->addNonConstDependentField(biotModulus);
+  this->addNonConstDependentField(young_modulus_);
+  this->addNonConstDependentField(poissons_ratio_);
 
-  this->addDependentField(TGrad);
-  this->addDependentField(PGrad);
-  this->addDependentField(wGradBF);
-  if (haveSource) this->addDependentField(Source);
+  this->addNonConstDependentField(TGrad);
+  this->addNonConstDependentField(PGrad);
+  this->addNonConstDependentField(wGradBF);
+  if (haveSource) this->addNonConstDependentField(Source);
   if (haveAbsorption) {
     Absorption = decltype(Absorption)(
         p.get<std::string>("Absorption Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    this->addDependentField(Absorption);
+    this->addNonConstDependentField(Absorption);
   }
 
-  this->addDependentField(J);
-  this->addDependentField(defgrad);
-  this->addDependentField(alphaMixture);
-  this->addDependentField(bulk);
+  this->addNonConstDependentField(J);
+  this->addNonConstDependentField(defgrad);
+  this->addNonConstDependentField(alphaMixture);
+  this->addNonConstDependentField(bulk);
   this->addEvaluatedField(TResidual);
   this->addEvaluatedField(Temp);
 
@@ -163,7 +163,7 @@ ThermoPoroPlasticityResidEnergy<EvalT, Traits>::ThermoPoroPlasticityResidEnergy(
     if (haverhoCp) {
       rhoCp = decltype(rhoCp)(
           p.get<std::string>("Rho Cp Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-      this->addDependentField(rhoCp);
+      this->addNonConstDependentField(rhoCp);
     }
   }
 

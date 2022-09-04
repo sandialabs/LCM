@@ -99,10 +99,10 @@ IPtoNodalFieldBase<EvalT, Traits>::IPtoNodalFieldBase(
       ALBANY_ABORT("Field Layout unknown");
     }
 
-    this->addDependentField(ip_fields_[field].fieldTag());
+    this->addNonConstDependentField(ip_fields_[field].fieldTag());
   }
 
-  this->addDependentField(weights_);
+  this->addNonConstDependentField(weights_);
 
   // Create field tag
   field_tag_ = Teuchos::rcp(new PHX::Tag<ScalarT>("IP to Nodal Field", dl->dummy));

@@ -63,7 +63,7 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(
     ALBANY_ABORT("Error! Invalid field layout.\n");
   }
 
-  this->addDependentField(val_cell);
+  this->addNonConstDependentField(val_cell);
   this->addEvaluatedField(val_side);
 
   this->setName("DOFCellToSide(" + cell_field_name + " -> " + side_field_name + ")" + PHX::print<EvalT>());

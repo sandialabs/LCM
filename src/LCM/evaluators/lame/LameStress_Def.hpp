@@ -27,7 +27,7 @@ LameStressBase<EvalT, Traits>::LameStressBase(Teuchos::ParameterList& p)
   ALBANY_PANIC(this->numDims != 3, " LAME materials enabled only for three-dimensional analyses.");
 
   defGradName = p.get<std::string>("DefGrad Name") + "_old";
-  this->addDependentField(defGradField);
+  this->addNonConstDependentField(defGradField);
 
   stressName = p.get<std::string>("Stress Name") + "_old";
   this->addEvaluatedField(stressField);

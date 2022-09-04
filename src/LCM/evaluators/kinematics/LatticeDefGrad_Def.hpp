@@ -44,13 +44,13 @@ LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(Teuchos::ParameterList const& p)
   numQPs      = dims[1];
   numDims     = dims[2];
 
-  this->addDependentField(weights);
-  this->addDependentField(CtotalRef);
-  this->addDependentField(Ctotal);
-  this->addDependentField(VH);
-  this->addDependentField(VM);
-  this->addDependentField(defgrad);
-  this->addDependentField(J);
+  this->addNonConstDependentField(weights);
+  this->addNonConstDependentField(CtotalRef);
+  this->addNonConstDependentField(Ctotal);
+  this->addNonConstDependentField(VH);
+  this->addNonConstDependentField(VM);
+  this->addNonConstDependentField(defgrad);
+  this->addNonConstDependentField(J);
 
   this->addEvaluatedField(latticeDefGrad);
   this->addEvaluatedField(JH);

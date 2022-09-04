@@ -36,8 +36,8 @@ DefGrad<EvalT, Traits>::DefGrad(Teuchos::ParameterList const& p)
   numQPs      = dims[1];
   numDims     = dims[2];
 
-  this->addDependentField(GradU);
-  this->addDependentField(weights);
+  this->addNonConstDependentField(GradU);
+  this->addNonConstDependentField(weights);
 
   this->addEvaluatedField(defgrad);
   this->addEvaluatedField(J);

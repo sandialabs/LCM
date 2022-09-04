@@ -35,15 +35,15 @@ HelmholtzResid<EvalT, Traits>::HelmholtzResid(Teuchos::ParameterList const& p)
       UResidual(p.get<std::string>("U Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       VResidual(p.get<std::string>("V Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout"))
 {
-  this->addDependentField(wBF.fieldTag());
-  this->addDependentField(U.fieldTag());
-  this->addDependentField(V.fieldTag());
-  this->addDependentField(wGradBF.fieldTag());
-  this->addDependentField(UGrad.fieldTag());
-  this->addDependentField(VGrad.fieldTag());
+  this->addNonConstDependentField(wBF.fieldTag());
+  this->addNonConstDependentField(U.fieldTag());
+  this->addNonConstDependentField(V.fieldTag());
+  this->addNonConstDependentField(wGradBF.fieldTag());
+  this->addNonConstDependentField(UGrad.fieldTag());
+  this->addNonConstDependentField(VGrad.fieldTag());
   if (haveSource) {
-    this->addDependentField(USource.fieldTag());
-    this->addDependentField(VSource.fieldTag());
+    this->addNonConstDependentField(USource.fieldTag());
+    this->addNonConstDependentField(VSource.fieldTag());
   }
 
   this->addEvaluatedField(UResidual);

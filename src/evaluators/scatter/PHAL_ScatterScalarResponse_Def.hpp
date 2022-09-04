@@ -42,7 +42,7 @@ ScatterScalarResponseBase<EvalT, Traits>::setup(
   auto global_response_tag = p.get<PHX::Tag<ScalarT>>("Global Response Field Tag");
   global_response          = decltype(global_response)(global_response_tag);
   if (stand_alone) {
-    this->addDependentField(global_response);
+    this->addNonConstDependentField(global_response);
   } else {
     global_response_eval = decltype(global_response_eval)(global_response_tag);
     this->addEvaluatedField(global_response_eval);

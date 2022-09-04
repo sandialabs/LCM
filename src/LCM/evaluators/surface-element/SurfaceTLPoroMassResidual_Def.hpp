@@ -33,17 +33,17 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
       poroMassResidual(p.get<std::string>("Residual Name"), dl->node_scalar),
       haveMech(false)
 {
-  this->addDependentField(scalarGrad);
-  this->addDependentField(surface_Grad_BF);
-  this->addDependentField(refDualBasis);
-  this->addDependentField(refNormal);
-  this->addDependentField(refArea);
-  this->addDependentField(porePressure);
-  this->addDependentField(nodalPorePressure);
-  this->addDependentField(biotCoefficient);
-  this->addDependentField(biotModulus);
-  this->addDependentField(kcPermeability);
-  this->addDependentField(deltaTime);
+  this->addNonConstDependentField(scalarGrad);
+  this->addNonConstDependentField(surface_Grad_BF);
+  this->addNonConstDependentField(refDualBasis);
+  this->addNonConstDependentField(refNormal);
+  this->addNonConstDependentField(refArea);
+  this->addNonConstDependentField(porePressure);
+  this->addNonConstDependentField(nodalPorePressure);
+  this->addNonConstDependentField(biotCoefficient);
+  this->addNonConstDependentField(biotModulus);
+  this->addNonConstDependentField(kcPermeability);
+  this->addNonConstDependentField(deltaTime);
 
   this->addEvaluatedField(poroMassResidual);
 
@@ -53,10 +53,10 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
     haveMech = true;
 
     defGrad = decltype(defGrad)(p.get<std::string>("DefGrad Name"), dl->qp_tensor);
-    this->addDependentField(defGrad);
+    this->addNonConstDependentField(defGrad);
 
     J = decltype(J)(p.get<std::string>("DetDefGrad Name"), dl->qp_scalar);
-    this->addDependentField(J);
+    this->addNonConstDependentField(J);
   }
 
   std::vector<PHX::DataLayout::size_type> dims;

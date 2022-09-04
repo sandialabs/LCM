@@ -28,7 +28,7 @@ BifurcationCheck<EvalT, Traits>::BifurcationCheck(
   num_pts_  = dims[1];
   num_dims_ = dims[2];
 
-  this->addDependentField(tangent_);
+  this->addNonConstDependentField(tangent_);
   this->addEvaluatedField(ellipticity_flag_);
   this->addEvaluatedField(direction_);
   this->addEvaluatedField(min_detA_);

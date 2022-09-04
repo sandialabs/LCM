@@ -22,8 +22,8 @@ DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::DOFVecGradInterpolation
       "Error! The layouts structure does not appear to be that of a side "
       "set.\n");
 
-  this->addDependentField(val_node.fieldTag());
-  this->addDependentField(gradBF.fieldTag());
+  this->addNonConstDependentField(val_node.fieldTag());
+  this->addNonConstDependentField(gradBF.fieldTag());
   this->addEvaluatedField(grad_qp);
 
   this->setName("DOFVecGradInterpolationSideBase");

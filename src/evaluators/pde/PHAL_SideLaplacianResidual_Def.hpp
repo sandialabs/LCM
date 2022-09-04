@@ -37,7 +37,7 @@ SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(
     w_measure = PHX::MDField<MeshScalarT>(p.get<std::string>("Weighted Measure Variable Name"), dl_side->qp_scalar);
     metric    = PHX::MDField<MeshScalarT, Cell, Side, QuadPoint, Dim, Dim>(
         p.get<std::string>("Metric Name"), dl_side->qp_tensor);
-    this->addDependentField(metric.fieldTag());
+    this->addNonConstDependentField(metric.fieldTag());
 
     int numSides = dl_side->cell_gradient->extent(1);
     numNodes     = dl_side->node_scalar->extent(2);
@@ -70,10 +70,10 @@ SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(
   spaceDim = 3;
   gradDim  = 2;
 
-  this->addDependentField(u.fieldTag());
-  this->addDependentField(grad_u.fieldTag());
-  this->addDependentField(BF.fieldTag());
-  this->addDependentField(GradBF.fieldTag());
+  this->addNonConstDependentField(u.fieldTag());
+  this->addNonConstDependentField(grad_u.fieldTag());
+  this->addNonConstDependentField(BF.fieldTag());
+  this->addNonConstDependentField(GradBF.fieldTag());
 
   this->addEvaluatedField(residual);
 

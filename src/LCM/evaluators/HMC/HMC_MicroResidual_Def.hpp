@@ -23,10 +23,10 @@ MicroResidual<EvalT, Traits>::MicroResidual(Teuchos::ParameterList const& p)
       wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       ExResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Tensor Data Layout"))
 {
-  this->addDependentField(microStress);
-  this->addDependentField(doubleStress);
-  this->addDependentField(wGradBF);
-  this->addDependentField(wBF);
+  this->addNonConstDependentField(microStress);
+  this->addNonConstDependentField(doubleStress);
+  this->addNonConstDependentField(wGradBF);
+  this->addNonConstDependentField(wBF);
 
   this->addEvaluatedField(ExResidual);
 
@@ -39,7 +39,7 @@ MicroResidual<EvalT, Traits>::MicroResidual(Teuchos::ParameterList const& p)
     // One more field is required for transient capability
     Teuchos::RCP<PHX::DataLayout> tensor_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
     epsDotDot = decltype(epsDotDot)(p.get<std::string>("Time Dependent Variable Name"), tensor_dl);
-    this->addDependentField(epsDotDot);
+    this->addNonConstDependentField(epsDotDot);
   }
 
   this->setName("MicroResidual" + PHX::print<EvalT>());

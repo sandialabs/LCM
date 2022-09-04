@@ -16,7 +16,7 @@ UpdateField<EvalT, Traits>::UpdateField(Teuchos::ParameterList const& p)
     : field_Nplus1(p.get<std::string>("Updated Field Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout")),
       field_Inc(p.get<std::string>("Increment Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout"))
 {
-  this->addDependentField(field_Inc);
+  this->addNonConstDependentField(field_Inc);
   this->addEvaluatedField(field_Nplus1);
 
   this->name_N            = p.get<std::string>("Current State Name");

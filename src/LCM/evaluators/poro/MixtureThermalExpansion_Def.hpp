@@ -26,11 +26,11 @@ MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(Teuchos::Paramet
           p.get<std::string>("Mixture Thermal Expansion Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  this->addDependentField(biotCoefficient);
-  this->addDependentField(porosity);
-  this->addDependentField(J);
-  this->addDependentField(alphaPoreFluid);
-  this->addDependentField(alphaSkeleton);
+  this->addNonConstDependentField(biotCoefficient);
+  this->addNonConstDependentField(porosity);
+  this->addNonConstDependentField(J);
+  this->addNonConstDependentField(alphaPoreFluid);
+  this->addNonConstDependentField(alphaSkeleton);
 
   this->addEvaluatedField(mixtureThermalExpansion);
 

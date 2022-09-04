@@ -35,13 +35,13 @@ ScalarL2ProjectionResidual<EvalT, Traits>::ScalarL2ProjectionResidual(Teuchos::P
   else
     enableTransient = true;
 
-  this->addDependentField(wBF);
-  this->addDependentField(wGradBF);
-  this->addDependentField(projectedStress);
-  this->addDependentField(DefGrad);
-  this->addDependentField(Pstress);
-  //   if (haveSource) this->addDependentField(Source);
-  //   if (haveMechSource) this->addDependentField(MechSource);
+  this->addNonConstDependentField(wBF);
+  this->addNonConstDependentField(wGradBF);
+  this->addNonConstDependentField(projectedStress);
+  this->addNonConstDependentField(DefGrad);
+  this->addNonConstDependentField(Pstress);
+  //   if (haveSource) this->addNonConstDependentField(Source);
+  //   if (haveMechSource) this->addNonConstDependentField(MechSource);
 
   this->addEvaluatedField(TResidual);
 

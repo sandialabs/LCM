@@ -16,8 +16,8 @@ StrainDifference<EvalT, Traits>::StrainDifference(
       microStrain(p.get<std::string>("Micro Strain Name"), dl->qp_tensor),
       strainDifference(p.get<std::string>("Strain Difference Name"), dl->qp_tensor)
 {
-  this->addDependentField(microStrain);
-  this->addDependentField(macroStrain);
+  this->addNonConstDependentField(microStrain);
+  this->addNonConstDependentField(macroStrain);
 
   this->addEvaluatedField(strainDifference);
 

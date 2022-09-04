@@ -44,9 +44,9 @@ HeliumODEs<EvalT, Traits>::HeliumODEs(Teuchos::ParameterList& p, const Teuchos::
   omega_            = mat_params_3->get<RealType>("Value");
 
   // add dependent fields
-  this->addDependentField(total_concentration_);
-  this->addDependentField(diffusion_coefficient_);
-  this->addDependentField(delta_time_);
+  this->addNonConstDependentField(total_concentration_);
+  this->addNonConstDependentField(diffusion_coefficient_);
+  this->addNonConstDependentField(delta_time_);
 
   // add evaluated fields
   this->addEvaluatedField(he_concentration_);

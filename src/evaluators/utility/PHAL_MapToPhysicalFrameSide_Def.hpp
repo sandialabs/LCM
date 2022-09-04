@@ -28,7 +28,7 @@ MapToPhysicalFrameSide<EvalT, Traits>::MapToPhysicalFrameSide(
       decltype(coords_side_vertices)(p.get<std::string>("Coordinate Vector Vertex Name"), dl_side->vertices_vector);
   coords_side_qp = decltype(coords_side_qp)(p.get<std::string>("Coordinate Vector QP Name"), dl_side->qp_coords);
 
-  this->addDependentField(coords_side_vertices.fieldTag());
+  this->addNonConstDependentField(coords_side_vertices.fieldTag());
   this->addEvaluatedField(coords_side_qp);
 
   // Get Dimensions

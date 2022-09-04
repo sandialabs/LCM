@@ -29,7 +29,7 @@ MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(
   for (std::size_t eq = 0; eq < numFieldsBase; ++eq) {
     PHX::MDField<ScalarT const, Cell, Node> mdf(names[eq], dl->node_scalar);
     val[eq] = mdf;
-    this->addDependentField(val[eq]);
+    this->addNonConstDependentField(val[eq]);
   }
 
   val_kokkos.resize(numFieldsBase);

@@ -52,8 +52,8 @@ BodyForce<EvalT, Traits>::BodyForce(Teuchos::ParameterList& p, Teuchos::RCP<Alba
     ALBANY_ABORT("Invalid body force type " << type);
   }
 
-  this->addDependentField(coordinates_);
-  this->addDependentField(weights_);
+  this->addNonConstDependentField(coordinates_);
+  this->addNonConstDependentField(weights_);
   this->addEvaluatedField(body_force_);
   this->setName("Body Force" + PHX::print<EvalT>());
 }

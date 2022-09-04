@@ -30,7 +30,7 @@ AddNoiseBase<EvalT, Traits, ScalarT>::AddNoiseBase(Teuchos::ParameterList const&
     field_eval = decltype(field_eval)(fieldName, layout);
     this->addEvaluatedField(field_eval);
   } else {
-    this->addDependentField(field);
+    this->addNonConstDependentField(field);
   }
 
   this->addEvaluatedField(noisy_field);

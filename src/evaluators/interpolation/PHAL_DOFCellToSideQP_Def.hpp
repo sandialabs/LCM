@@ -62,7 +62,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(
 
   num_side_nodes = dl_side->node_scalar->extent(2);
 
-  this->addDependentField(val_cell);
+  this->addNonConstDependentField(val_cell);
   this->addEvaluatedField(val_side_qp);
 
   this->setName("DOFCellToSideQP");
@@ -85,7 +85,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(
     }
 
     BF = decltype(BF)(p.get<std::string>("BF Name"), dl_side->node_qp_scalar);
-    this->addDependentField(BF);
+    this->addNonConstDependentField(BF);
   }
 }
 

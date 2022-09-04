@@ -29,12 +29,12 @@ MixtureSpecificHeat<EvalT, Traits>::MixtureSpecificHeat(Teuchos::ParameterList c
           p.get<std::string>("Mixture Specific Heat Name"),
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
-  this->addDependentField(porosity);
-  this->addDependentField(J);
-  this->addDependentField(gammaPoreFluid);
-  this->addDependentField(gammaSkeleton);
-  this->addDependentField(densityPoreFluid);
-  this->addDependentField(densitySkeleton);
+  this->addNonConstDependentField(porosity);
+  this->addNonConstDependentField(J);
+  this->addNonConstDependentField(gammaPoreFluid);
+  this->addNonConstDependentField(gammaSkeleton);
+  this->addNonConstDependentField(densityPoreFluid);
+  this->addNonConstDependentField(densitySkeleton);
 
   this->addEvaluatedField(mixtureSpecificHeat);
 

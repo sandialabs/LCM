@@ -25,7 +25,7 @@ SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
   if (p.isType<std::string>("Nodal Pore Pressure Name")) {
     havePorePressure  = true;
     nodalPorePressure = decltype(nodalPorePressure)(p.get<std::string>("Nodal Pore Pressure Name"), dl->node_scalar);
-    this->addDependentField(nodalPorePressure);
+    this->addNonConstDependentField(nodalPorePressure);
 
     jumpPorePressure = decltype(jumpPorePressure)(p.get<std::string>("Jump of Pore Pressure Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpPorePressure);
@@ -38,7 +38,7 @@ SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
   if (p.isType<std::string>("Nodal Temperature Name")) {
     haveTemperature  = true;
     nodalTemperature = decltype(nodalTemperature)(p.get<std::string>("Nodal Temperature Name"), dl->node_scalar);
-    this->addDependentField(nodalTemperature);
+    this->addNonConstDependentField(nodalTemperature);
 
     jumpTemperature = decltype(jumpTemperature)(p.get<std::string>("Jump of Temperature Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpTemperature);
@@ -50,7 +50,7 @@ SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
   if (p.isType<std::string>("Nodal Transport Name")) {
     haveTransport  = true;
     nodalTransport = decltype(nodalTransport)(p.get<std::string>("Nodal Transport Name"), dl->node_scalar);
-    this->addDependentField(nodalTransport);
+    this->addNonConstDependentField(nodalTransport);
 
     jumpTransport = decltype(jumpTransport)(p.get<std::string>("Jump of Transport Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpTransport);
@@ -62,7 +62,7 @@ SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
   if (p.isType<std::string>("Nodal HydroStress Name")) {
     haveHydroStress  = true;
     nodalHydroStress = decltype(nodalHydroStress)(p.get<std::string>("Nodal HydroStress Name"), dl->node_scalar);
-    this->addDependentField(nodalHydroStress);
+    this->addNonConstDependentField(nodalHydroStress);
 
     jumpHydroStress = decltype(jumpHydroStress)(p.get<std::string>("Jump of HydroStress Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpHydroStress);

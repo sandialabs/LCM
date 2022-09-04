@@ -21,8 +21,8 @@ QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::QuadPointsToCellInter
   field_qp   = decltype(field_qp)(p.get<std::string>("Field QP Name"), qp_layout);
   field_cell = decltype(field_cell)(p.get<std::string>("Field Cell Name"), cell_layout);
 
-  this->addDependentField(field_qp.fieldTag());
-  this->addDependentField(w_measure.fieldTag());
+  this->addNonConstDependentField(field_qp.fieldTag());
+  this->addNonConstDependentField(w_measure.fieldTag());
   this->addEvaluatedField(field_cell);
 
   this->setName("QuadPointsToCellInterpolation" + PHX::print<EvalT>());

@@ -48,7 +48,7 @@ Porosity<EvalT, Traits>::Porosity(Teuchos::ParameterList& p, const Teuchos::RCP<
     hasStrain = true;
 
     strain = decltype(strain)(p.get<std::string>("Strain Name"), dl->qp_tensor);
-    this->addDependentField(strain);
+    this->addNonConstDependentField(strain);
 
     isCompressibleSolidPhase = true;
     isCompressibleFluidPhase = true;
@@ -58,7 +58,7 @@ Porosity<EvalT, Traits>::Porosity(Teuchos::ParameterList& p, const Teuchos::RCP<
   } else if (p.isType<std::string>("DetDefGrad Name")) {
     hasJ = true;
     J    = decltype(J)(p.get<std::string>("DetDefGrad Name"), dl->qp_scalar);
-    this->addDependentField(J);
+    this->addNonConstDependentField(J);
     isPoroElastic        = true;
     initialPorosityValue = porosity_list->get("Initial Porosity Value", 0.0);
     this->registerSacadoParameter("Initial Porosity Value", paramLib);
@@ -73,7 +73,7 @@ Porosity<EvalT, Traits>::Porosity(Teuchos::ParameterList& p, const Teuchos::RCP<
     isCompressibleSolidPhase = true;
     isCompressibleFluidPhase = true;
     isPoroElastic            = true;
-    this->addDependentField(biotCoefficient);
+    this->addNonConstDependentField(biotCoefficient);
   }
 
   if (p.isType<std::string>("QP Pore Pressure Name")) {
@@ -81,7 +81,7 @@ Porosity<EvalT, Traits>::Porosity(Teuchos::ParameterList& p, const Teuchos::RCP<
     isCompressibleSolidPhase = true;
     isCompressibleFluidPhase = true;
     isPoroElastic            = true;
-    this->addDependentField(porePressure);
+    this->addNonConstDependentField(porePressure);
 
     // typically Kgrain >> Kskeleton
     GrainBulkModulus = porosity_list->get("Grain Bulk Modulus Value", 10.0e12);
@@ -90,17 +90,17 @@ Porosity<EvalT, Traits>::Porosity(Teuchos::ParameterList& p, const Teuchos::RCP<
 
   if (p.isType<std::string>("QP Temperature Name")) {
     Temperature = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), dl->qp_scalar);
-    this->addDependentField(Temperature);
+    this->addNonConstDependentField(Temperature);
 
     if (p.isType<std::string>("Skeleton Thermal Expansion Name")) {
       skeletonThermalExpansion =
           decltype(skeletonThermalExpansion)(p.get<std::string>("Skeleton Thermal Expansion Name"), dl->qp_scalar);
-      this->addDependentField(skeletonThermalExpansion);
+      this->addNonConstDependentField(skeletonThermalExpansion);
 
       if (p.isType<std::string>("Reference Temperature Name")) {
         refTemperature = decltype(refTemperature)(p.get<std::string>("Reference Temperature Name"), dl->qp_scalar);
         hasTemp        = true;
-        this->addDependentField(refTemperature);
+        this->addNonConstDependentField(refTemperature);
       }
     }
   }

@@ -30,13 +30,13 @@ SurfaceL2ProjectionResidual<EvalT, Traits>::SurfaceL2ProjectionResidual(
       projected_tau_(p.get<std::string>("HydoStress Name"), dl->qp_scalar),
       projection_residual_(p.get<std::string>("Residual Name"), dl->node_scalar)
 {
-  this->addDependentField(surface_Grad_BF);
-  this->addDependentField(refDualBasis);
-  this->addDependentField(refNormal);
-  this->addDependentField(refArea);
-  this->addDependentField(detF_);
-  this->addDependentField(Cauchy_stress_);
-  this->addDependentField(projected_tau_);
+  this->addNonConstDependentField(surface_Grad_BF);
+  this->addNonConstDependentField(refDualBasis);
+  this->addNonConstDependentField(refNormal);
+  this->addNonConstDependentField(refArea);
+  this->addNonConstDependentField(detF_);
+  this->addNonConstDependentField(Cauchy_stress_);
+  this->addNonConstDependentField(projected_tau_);
 
   this->addEvaluatedField(projection_residual_);
 

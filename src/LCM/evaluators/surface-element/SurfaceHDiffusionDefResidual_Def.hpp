@@ -38,21 +38,21 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
       haveMech(false),
       stab_param_(p.get<RealType>("Stabilization Parameter"))
 {
-  this->addDependentField(scalarGrad);
-  this->addDependentField(surface_Grad_BF);
-  this->addDependentField(refDualBasis);
-  this->addDependentField(refNormal);
-  this->addDependentField(refArea);
-  this->addDependentField(transport_);
-  this->addDependentField(nodal_transport_);
-  this->addDependentField(dL_);
-  this->addDependentField(eff_diff_);
-  this->addDependentField(convection_coefficient_);
-  this->addDependentField(strain_rate_factor_);
-  this->addDependentField(eqps_);
-  this->addDependentField(hydro_stress_gradient_);
-  this->addDependentField(element_length_);
-  this->addDependentField(deltaTime);
+  this->addNonConstDependentField(scalarGrad);
+  this->addNonConstDependentField(surface_Grad_BF);
+  this->addNonConstDependentField(refDualBasis);
+  this->addNonConstDependentField(refNormal);
+  this->addNonConstDependentField(refArea);
+  this->addNonConstDependentField(transport_);
+  this->addNonConstDependentField(nodal_transport_);
+  this->addNonConstDependentField(dL_);
+  this->addNonConstDependentField(eff_diff_);
+  this->addNonConstDependentField(convection_coefficient_);
+  this->addNonConstDependentField(strain_rate_factor_);
+  this->addNonConstDependentField(eqps_);
+  this->addNonConstDependentField(hydro_stress_gradient_);
+  this->addNonConstDependentField(element_length_);
+  this->addNonConstDependentField(deltaTime);
 
   this->addEvaluatedField(transport_residual_);
   //  this->addEvaluatedField(transport_);
@@ -63,10 +63,10 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
     haveMech = true;
 
     defGrad = decltype(defGrad)(p.get<std::string>("DefGrad Name"), dl->qp_tensor);
-    this->addDependentField(defGrad);
+    this->addNonConstDependentField(defGrad);
 
     J = decltype(J)(p.get<std::string>("DetDefGrad Name"), dl->qp_scalar);
-    this->addDependentField(J);
+    this->addNonConstDependentField(J);
   }
 
   std::vector<PHX::DataLayout::size_type> dims;

@@ -36,14 +36,14 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
 
   if (fieldDim > 0) {
     metric = decltype(metric)("Metric " + sideSetName, dl_side->qp_tensor);
-    this->addDependentField(metric);
+    this->addNonConstDependentField(metric);
   }
 
   sourceField = decltype(sourceField)(fname, layout);
   w_measure   = decltype(w_measure)("Weighted Measure " + sideSetName, dl_side->qp_scalar);
   scaling     = plist->get("Scaling", 1.0);
 
-  this->addDependentField(sourceField);
+  this->addNonConstDependentField(sourceField);
   if (plist->isParameter("Target Field Name")) {
     ALBANY_PANIC(
         plist->isParameter("Target Value"),
@@ -52,7 +52,7 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
     std::string target_fname;
     target_fname = plist->get<std::string>("Target Field Name");
     targetField  = decltype(targetField)(target_fname, layout);
-    this->addDependentField(targetField);
+    this->addNonConstDependentField(targetField);
   } else {
     ALBANY_PANIC(
         !plist->isParameter("Target Value"),
@@ -61,7 +61,7 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
     target_value     = true;
     target_value_val = TargetScalarT(plist->get<double>("Target Value"));
   }
-  this->addDependentField(w_measure);
+  this->addNonConstDependentField(w_measure);
 
   this->setName("Response Squared L2 Error Side" + PHX::print<EvalT>());
 

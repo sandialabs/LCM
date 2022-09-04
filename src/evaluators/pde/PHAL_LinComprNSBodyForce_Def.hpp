@@ -31,7 +31,7 @@ LinComprNSBodyForce<EvalT, Traits>::LinComprNSBodyForce(Teuchos::ParameterList c
   if (bf_type != NONE) {
     coordVec = decltype(coordVec)(
         p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Gradient Data Layout"));
-    this->addDependentField(coordVec);
+    this->addNonConstDependentField(coordVec);
   }
 
   this->addEvaluatedField(force);

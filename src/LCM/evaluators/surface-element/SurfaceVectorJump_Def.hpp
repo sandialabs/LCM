@@ -18,7 +18,7 @@ SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(
       vector_(p.get<std::string>("Vector Name"), dl->node_vector),
       jump_(p.get<std::string>("Vector Jump Name"), dl->qp_vector)
 {
-  this->addDependentField(vector_);
+  this->addNonConstDependentField(vector_);
 
   this->addEvaluatedField(jump_);
 

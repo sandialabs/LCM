@@ -27,15 +27,15 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
       density_(p.get<RealType>("Density", 1.0))
 {
   Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
-  this->addDependentField(stress_);
-  this->addDependentField(w_grad_bf_);
-  this->addDependentField(w_bf_);
+  this->addNonConstDependentField(stress_);
+  this->addNonConstDependentField(w_grad_bf_);
+  this->addNonConstDependentField(w_bf_);
 
   is_ace_sequential_thermomechanical_ = p.isParameter("ACE_Ice_Saturation QP Variable Name");
   if (is_ace_sequential_thermomechanical_ == true) {
     ice_saturation_ =
         decltype(ice_saturation_)(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar);
-    this->addDependentField(ice_saturation_);
+    this->addNonConstDependentField(ice_saturation_);
   }
 
   this->addEvaluatedField(residual_);
@@ -48,15 +48,15 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
   use_analytic_mass_ = p.get<bool>("Use Analytic Mass");
   if (enable_dynamics_) {
     acceleration_ = decltype(acceleration_)(p.get<std::string>("Acceleration Name"), dl->qp_vector);
-    this->addDependentField(acceleration_);
-    if (use_analytic_mass_) this->addDependentField(mass_);
+    this->addNonConstDependentField(acceleration_);
+    if (use_analytic_mass_) this->addNonConstDependentField(mass_);
   }
 
   this->setName("MechanicsResidual" + PHX::print<EvalT>());
 
   if (have_body_force_) {
     body_force_ = decltype(body_force_)(p.get<std::string>("Body Force Name"), dl->qp_vector);
-    this->addDependentField(body_force_);
+    this->addNonConstDependentField(body_force_);
   }
 
   std::vector<PHX::DataLayout::size_type> dims;
@@ -67,7 +67,7 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
 
   Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library");
 
-  if (def_grad_rc_.init(p, "F")) this->addDependentField(def_grad_rc_());
+  if (def_grad_rc_.init(p, "F")) this->addNonConstDependentField(def_grad_rc_());
 }
 
 template <typename EvalT, typename Traits>

@@ -49,7 +49,7 @@ SeparableScatterScalarResponseBase<EvalT, Traits>::setup(
   auto local_response_tag = p.get<PHX::Tag<ScalarT>>("Local Response Field Tag");
   local_response          = decltype(local_response)(local_response_tag);
   if (this->stand_alone) {
-    this->addDependentField(local_response);
+    this->addNonConstDependentField(local_response);
   } else {
     local_response_eval = decltype(local_response_eval)(local_response_tag);
     this->addEvaluatedField(local_response_eval);

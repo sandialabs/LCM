@@ -449,12 +449,12 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::ProjectIPtoNodalFie
   // todo Some of this doesn't need to be done for all RFs in the case of
   // multiple EBs.
 
-  this->addDependentField(wBF);
-  this->addDependentField(BF);
+  this->addNonConstDependentField(wBF);
+  this->addNonConstDependentField(BF);
 #if defined(PROJ_INTERP_TEST)
-  this->addDependentField(coords_qp_);
+  this->addNonConstDependentField(coords_qp_);
 #endif
-  this->addDependentField(coords_verts_);
+  this->addNonConstDependentField(coords_verts_);
   this->setName("ProjectIPtoNodalField<Residual>");
 
   quad_mgr_ = initQuadMgr(p, dl, mesh_specs);
@@ -515,7 +515,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::ProjectIPtoNodalFie
     }
     ip_fields_[field] = PHX::MDField<ScalarT const>(ip_field_names_[field], qp_layout);
     // Incoming integration point field to transfer.
-    this->addDependentField(ip_fields_[field].fieldTag());
+    this->addNonConstDependentField(ip_fields_[field].fieldTag());
     this->p_state_mgr_->registerNodalVectorStateVariable(
         nodal_field_names_[field], node_node_layout, dl->dummy, "all", "scalar", 0.0, false, output_to_exodus_);
   }

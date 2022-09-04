@@ -24,11 +24,11 @@ NSTauT<EvalT, Traits>::NSTauT(Teuchos::ParameterList const& p)
       TauT(p.get<std::string>("Tau T Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 
 {
-  this->addDependentField(V.fieldTag());
-  this->addDependentField(ThermalCond.fieldTag());
-  this->addDependentField(Gc.fieldTag());
-  this->addDependentField(rho.fieldTag());
-  this->addDependentField(Cp.fieldTag());
+  this->addNonConstDependentField(V.fieldTag());
+  this->addNonConstDependentField(ThermalCond.fieldTag());
+  this->addNonConstDependentField(Gc.fieldTag());
+  this->addNonConstDependentField(rho.fieldTag());
+  this->addNonConstDependentField(Cp.fieldTag());
 
   this->addEvaluatedField(TauT);
 

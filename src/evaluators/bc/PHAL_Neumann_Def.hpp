@@ -96,7 +96,7 @@ NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList& p)
     vectorDOF = p.get<bool>("Vector Field");
 
     dof = decltype(dof)(p.get<std::string>("DOF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("DOF Data Layout"));
-    this->addDependentField(dof);
+    this->addNonConstDependentField(dof);
   } else if (inputConditions == "closed_form") {
     bc_type = CLOSED_FORM;
   }
@@ -142,7 +142,7 @@ NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList& p)
     this->registerSacadoParameter(name, paramLib);
   }
 
-  this->addDependentField(coordVec);
+  this->addNonConstDependentField(coordVec);
 
   PHX::Tag<ScalarT> fieldTag(name, dl->dummy);
 
@@ -1281,7 +1281,7 @@ NeumannAggregator<EvalT, Traits>::NeumannAggregator(Teuchos::ParameterList const
 
   for (unsigned int i = 0; i < nbcs.size(); i++) {
     PHX::Tag<ScalarT> fieldTag(nbcs[i], dl);
-    this->addDependentField(fieldTag);
+    this->addNonConstDependentField(fieldTag);
   }
 
   PHX::Tag<ScalarT> fieldTag(p.get<std::string>("NBC Aggregator Name"), dl);

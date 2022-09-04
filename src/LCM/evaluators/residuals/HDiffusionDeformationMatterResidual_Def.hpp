@@ -45,24 +45,24 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::HDiffusionDeformationMatterR
   else
     enableTransient = true;
 
-  this->addDependentField(elementLength);
-  this->addDependentField(wBF);
-  this->addDependentField(wGradBF);
-  this->addDependentField(GradBF);
-  this->addDependentField(Dstar);
-  this->addDependentField(DL);
-  this->addDependentField(Clattice);
-  // this->addDependentField(eqps);
-  // this->addDependentField(eqpsFactor);
-  this->addDependentField(Ctrapped);
-  this->addDependentField(Ntrapped);
-  this->addDependentField(CLGrad);
-  this->addDependentField(stressGrad);
-  this->addDependentField(DefGrad);
-  this->addDependentField(Pstress);
-  this->addDependentField(weights);
-  this->addDependentField(tauFactor);
-  this->addDependentField(deltaTime);
+  this->addNonConstDependentField(elementLength);
+  this->addNonConstDependentField(wBF);
+  this->addNonConstDependentField(wGradBF);
+  this->addNonConstDependentField(GradBF);
+  this->addNonConstDependentField(Dstar);
+  this->addNonConstDependentField(DL);
+  this->addNonConstDependentField(Clattice);
+  // this->addNonConstDependentField(eqps);
+  // this->addNonConstDependentField(eqpsFactor);
+  this->addNonConstDependentField(Ctrapped);
+  this->addNonConstDependentField(Ntrapped);
+  this->addNonConstDependentField(CLGrad);
+  this->addNonConstDependentField(stressGrad);
+  this->addNonConstDependentField(DefGrad);
+  this->addNonConstDependentField(Pstress);
+  this->addNonConstDependentField(weights);
+  this->addNonConstDependentField(tauFactor);
+  this->addNonConstDependentField(deltaTime);
 
   this->addEvaluatedField(TResidual);
 
@@ -70,9 +70,9 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::HDiffusionDeformationMatterR
   if (p.isType<std::string>("Equivalent Plastic Strain Name")) {
     have_eqps_ = true;
     eqps       = decltype(eqps)(p.get<std::string>("Equivalent Plastic Strain Name"), dl->qp_scalar);
-    this->addDependentField(eqps);
+    this->addNonConstDependentField(eqps);
     eqpsFactor = decltype(eqpsFactor)(p.get<std::string>("Strain Rate Factor Name"), dl->qp_scalar);
-    this->addDependentField(eqpsFactor);
+    this->addNonConstDependentField(eqpsFactor);
   }
 
   std::vector<PHX::DataLayout::size_type> dims;

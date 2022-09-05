@@ -35,7 +35,7 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
   if (is_ace_sequential_thermomechanical_ == true) {
     ice_saturation_ =
         decltype(ice_saturation_)(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar);
-    this->addDependentField(ice_saturation_);
+    this->addDependentField(ice_saturation_.fieldTag());
   }
 
   this->addEvaluatedField(residual_);

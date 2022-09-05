@@ -45,7 +45,7 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
   this->addDependentField(thermal_conductivity_);
   this->addDependentField(thermal_inertia_);
   this->addDependentField(thermal_cond_grad_at_qps_);
-  this->addDependentField(tau_);
+  this->addDependentField(tau_.fieldTag());
   this->addDependentField(jacobian_det_);
   this->addEvaluatedField(residual_);
 

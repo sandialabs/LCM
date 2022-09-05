@@ -32,7 +32,7 @@ ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(
   BF           = decltype(BF)(p.get<std::string>("BF Name"), dl_side->node_qp_scalar);
   GradBF       = decltype(GradBF)(p.get<std::string>("Gradient BF Name"), dl_side->node_qp_gradient);
 
-  this->addNonConstDependentField(sideCoordVec);
+  this->addDependentField(sideCoordVec);
   this->addEvaluatedField(tangents);
   this->addEvaluatedField(metric);
   this->addEvaluatedField(metric_det);
@@ -47,7 +47,7 @@ ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(
     coordVec = decltype(coordVec)(p.get<std::string>("Coordinate Vector Name"), dl->vertices_vector);
     numNodes = dl->node_gradient->extent(1);
     this->addEvaluatedField(normals);
-    this->addNonConstDependentField(coordVec);
+    this->addDependentField(coordVec);
   }
 
   cellType = p.get<Teuchos::RCP<shards::CellTopology>>("Cell Type");

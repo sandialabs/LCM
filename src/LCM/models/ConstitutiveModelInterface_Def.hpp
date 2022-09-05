@@ -69,27 +69,27 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
   // register dependent fields
   typename decltype(dep_fields_map_)::iterator it;
   for (it = dep_fields_map_.begin(); it != dep_fields_map_.end(); ++it) {
-    this->addNonConstDependentField(*(it->second));
+    this->addDependentField(*(it->second));
   }
 
   // optionally deal with integration point locations
   if (model_->getIntegrationPointLocationFlag()) {
     coord_vec_ = decltype(coord_vec_)("Coord Vec", dl->qp_vector);
-    this->addNonConstDependentField(coord_vec_);
+    this->addDependentField(coord_vec_);
   }
 
   // optionally deal with temperature
   if (p.isType<std::string>("Temperature Name")) {
     have_temperature_ = true;
     temperature_      = decltype(temperature_)(p.get<std::string>("Temperature Name"), dl->qp_scalar);
-    this->addNonConstDependentField(temperature_);
+    this->addDependentField(temperature_);
   }
 
   // optionally deal with damage
   if (p.isType<std::string>("Damage Name")) {
     have_damage_ = true;
     damage_      = decltype(damage_)(p.get<std::string>("Damage Name"), dl->qp_scalar);
-    this->addNonConstDependentField(damage_);
+    this->addDependentField(damage_);
   }
 
   // optionally deal with total concentration
@@ -97,7 +97,7 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
     have_total_concentration_ = true;
     total_concentration_ =
         decltype(total_concentration_)(p.get<std::string>("Total Concentration Name"), dl->qp_scalar);
-    this->addNonConstDependentField(total_concentration_);
+    this->addDependentField(total_concentration_);
   }
 
   // optionally deal with total bubble density
@@ -105,7 +105,7 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
     have_total_bubble_density_ = true;
     total_bubble_density_ =
         decltype(total_bubble_density_)(p.get<std::string>("Total Bubble Density Name"), dl->qp_scalar);
-    this->addNonConstDependentField(total_bubble_density_);
+    this->addDependentField(total_bubble_density_);
   }
 
   // optionally deal with bubble volume fraction
@@ -113,16 +113,16 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
     have_bubble_volume_fraction_ = true;
     bubble_volume_fraction_ =
         decltype(bubble_volume_fraction_)(p.get<std::string>("Bubble Volume Fraction Name"), dl->qp_scalar);
-    this->addNonConstDependentField(bubble_volume_fraction_);
+    this->addDependentField(bubble_volume_fraction_);
   }
 
   // optional volume averaging needs integration weights and J
   if (volume_average_pressure_) {
     weights_ = decltype(weights_)(p.get<std::string>("Weights Name"), dl->qp_scalar);
-    this->addNonConstDependentField(weights_);
+    this->addDependentField(weights_);
 
     j_ = decltype(j_)(p.get<std::string>("J Name"), dl->qp_scalar);
-    this->addNonConstDependentField(j_);
+    this->addDependentField(j_);
   }
 
   // construct the evaluated fields

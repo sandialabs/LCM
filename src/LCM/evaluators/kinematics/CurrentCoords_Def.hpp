@@ -15,8 +15,8 @@ CurrentCoords<EvalT, Traits>::CurrentCoords(Teuchos::ParameterList const& p, con
       displacement(p.get<std::string>("Displacement Name"), dl->node_vector),
       currentCoords(p.get<std::string>("Current Coordinates Name"), dl->node_vector)
 {
-  this->addNonConstDependentField(refCoords);
-  this->addNonConstDependentField(displacement);
+  this->addDependentField(refCoords);
+  this->addDependentField(displacement);
 
   this->addEvaluatedField(currentCoords);
 

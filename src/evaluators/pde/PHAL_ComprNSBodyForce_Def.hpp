@@ -26,7 +26,7 @@ ComprNSBodyForce<EvalT, Traits>::ComprNSBodyForce(Teuchos::ParameterList const& 
     bf_type  = TAYLOR_GREEN_VORTEX;
     coordVec = decltype(coordVec)(
         p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Gradient Data Layout"));
-    this->addNonConstDependentField(coordVec.fieldTag());
+    this->addDependentField(coordVec.fieldTag());
   }
 
   this->addEvaluatedField(force);

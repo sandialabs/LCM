@@ -25,8 +25,8 @@ ConstitutiveModelDriverPre<EvalT, Traits>::ConstitutiveModelDriverPre(
   final_time_                          = driver_params.get<double>("final time", 1.0);
   std::string component                = driver_params.get<std::string>("component", "00");
 
-  this->addNonConstDependentField(solution_);
-  this->addNonConstDependentField(time_);
+  this->addDependentField(solution_);
+  this->addDependentField(time_);
   this->addEvaluatedField(def_grad_);
   this->addEvaluatedField(j_);
   this->addEvaluatedField(prescribed_def_grad_);

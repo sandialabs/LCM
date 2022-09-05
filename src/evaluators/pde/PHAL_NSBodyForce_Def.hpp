@@ -23,7 +23,7 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
     bf_type = CONSTANT;
     rho     = decltype(rho)(
         p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    this->addNonConstDependentField(rho.fieldTag());
+    this->addDependentField(rho.fieldTag());
   } else if (type == "Boussinesq") {
     ALBANY_PANIC(
         haveHeat == false,
@@ -39,9 +39,9 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
     beta = decltype(beta)(
         p.get<std::string>("Volumetric Expansion Coefficient QP Variable Name"),
         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    this->addNonConstDependentField(rho.fieldTag());
-    this->addNonConstDependentField(beta.fieldTag());
-    this->addNonConstDependentField(T.fieldTag());
+    this->addDependentField(rho.fieldTag());
+    this->addDependentField(beta.fieldTag());
+    this->addDependentField(T.fieldTag());
   }
 
   this->addEvaluatedField(force);

@@ -13,7 +13,7 @@ Strain<EvalT, Traits>::Strain(Teuchos::ParameterList const& p, const Teuchos::RC
     : GradU(p.get<std::string>("Gradient QP Variable Name"), dl->qp_tensor),
       strain(p.get<std::string>("Strain Name"), dl->qp_tensor)
 {
-  this->addNonConstDependentField(GradU);
+  this->addDependentField(GradU);
 
   this->addEvaluatedField(strain);
 

@@ -38,8 +38,8 @@ Kinematics<EvalT, Traits>::Kinematics(Teuchos::ParameterList& p, const Teuchos::
   num_pts_  = dims[1];
   num_dims_ = dims[2];
 
-  this->addNonConstDependentField(grad_u_);
-  this->addNonConstDependentField(weights_);
+  this->addDependentField(grad_u_);
+  this->addDependentField(weights_);
 
   this->addEvaluatedField(def_grad_);
   this->addEvaluatedField(j_);
@@ -51,10 +51,10 @@ Kinematics<EvalT, Traits>::Kinematics(Teuchos::ParameterList& p, const Teuchos::
 
   this->setName("Kinematics" + PHX::print<EvalT>());
 
-  if (def_grad_rc_.init(p, p.get<std::string>("DefGrad Name"))) this->addNonConstDependentField(def_grad_rc_());
+  if (def_grad_rc_.init(p, p.get<std::string>("DefGrad Name"))) this->addDependentField(def_grad_rc_());
   if (def_grad_rc_) {
     u_ = decltype(u_)(p.get<std::string>("Displacement Name"), dl->node_vector);
-    this->addNonConstDependentField(u_);
+    this->addDependentField(u_);
   }
 }
 

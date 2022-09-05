@@ -53,19 +53,19 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
     for (std::size_t eq = 0; eq < numFieldsBase; ++eq) {
       PHX::MDField<ScalarT const, Cell, Node> mdf(names[eq], dl->node_scalar);
       val[eq] = mdf;
-      this->addNonConstDependentField(val[eq]);
+      this->addDependentField(val[eq]);
     }
   } else if (tensorRank == 1) {
     // vector
     PHX::MDField<ScalarT const, Cell, Node, Dim> mdf(names[0], dl->node_vector);
     valVec = mdf;
-    this->addNonConstDependentField(valVec);
+    this->addDependentField(valVec);
     numFieldsBase = dl->node_vector->extent(2);
   } else if (tensorRank == 2) {
     // tensor
     PHX::MDField<ScalarT const, Cell, Node, Dim, Dim> mdf(names[0], dl->node_tensor);
     valTensor = mdf;
-    this->addNonConstDependentField(valTensor);
+    this->addDependentField(valTensor);
     numFieldsBase = (dl->node_tensor->extent(2)) * (dl->node_tensor->extent(3));
   }
 

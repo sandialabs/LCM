@@ -23,12 +23,12 @@ SurfaceDiffusionResidual<EvalT, Traits>::SurfaceDiffusionResidual(
       refArea(p.get<std::string>("Reference Area Name"), dl->qp_scalar),
       scalarResidual(p.get<std::string>("Surface Scalar Residual Name"), dl->node_scalar)
 {
-  this->addNonConstDependentField(scalarGrad);
-  this->addNonConstDependentField(scalarJump);
-  this->addNonConstDependentField(currentBasis);
-  this->addNonConstDependentField(refDualBasis);
-  this->addNonConstDependentField(refNormal);
-  this->addNonConstDependentField(refArea);
+  this->addDependentField(scalarGrad);
+  this->addDependentField(scalarJump);
+  this->addDependentField(currentBasis);
+  this->addDependentField(refDualBasis);
+  this->addDependentField(refNormal);
+  this->addDependentField(refArea);
 
   this->addEvaluatedField(scalarResidual);
 

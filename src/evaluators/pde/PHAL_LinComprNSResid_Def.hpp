@@ -30,12 +30,12 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(Teuchos::ParameterList const& p)
   else
     enableTransient = true;
 
-  this->addNonConstDependentField(qFluct.fieldTag());
-  this->addNonConstDependentField(qFluctGrad.fieldTag());
-  if (enableTransient) this->addNonConstDependentField(qFluctDot.fieldTag());
-  this->addNonConstDependentField(force.fieldTag());
-  this->addNonConstDependentField(wBF.fieldTag());
-  this->addNonConstDependentField(wGradBF.fieldTag());
+  this->addDependentField(qFluct.fieldTag());
+  this->addDependentField(qFluctGrad.fieldTag());
+  if (enableTransient) this->addDependentField(qFluctDot.fieldTag());
+  this->addDependentField(force.fieldTag());
+  this->addDependentField(wBF.fieldTag());
+  this->addDependentField(wGradBF.fieldTag());
 
   this->addEvaluatedField(Residual);
 

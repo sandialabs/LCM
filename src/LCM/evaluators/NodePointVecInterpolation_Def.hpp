@@ -16,8 +16,8 @@ NodePointVecInterpolation<EvalT, Traits>::NodePointVecInterpolation(
       basis_fn_(p.get<std::string>("BF Name"), dl->cell_scalar),
       point_value_(p.get<std::string>("Variable Name"), dl->cell_vector)
 {
-  this->addNonConstDependentField(nodal_value_);
-  this->addNonConstDependentField(basis_fn_);
+  this->addDependentField(nodal_value_);
+  this->addDependentField(basis_fn_);
   this->addEvaluatedField(point_value_);
 
   this->setName("NodePointVecInterpolation" + PHX::print<EvalT>());
@@ -69,8 +69,8 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::NodePointVecInt
       basis_fn_(p.get<std::string>("BF Name"), dl->cell_scalar),
       point_value_(p.get<std::string>("Variable Name"), dl->cell_vector)
 {
-  this->addNonConstDependentField(nodal_value_);
-  this->addNonConstDependentField(basis_fn_);
+  this->addDependentField(nodal_value_);
+  this->addDependentField(basis_fn_);
   this->addEvaluatedField(point_value_);
 
   this->setName("NodePointVecInterpolation" + PHX::print<PHAL::AlbanyTraits::Jacobian>());

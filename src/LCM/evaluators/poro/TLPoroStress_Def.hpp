@@ -31,11 +31,11 @@ TLPoroStress<EvalT, Traits>::TLPoroStress(Teuchos::ParameterList const& p)
   numDims     = dims[2];
   worksetSize = dims[0];
 
-  this->addNonConstDependentField(stress);
-  this->addNonConstDependentField(defGrad);
-  this->addNonConstDependentField(J);
-  this->addNonConstDependentField(biotCoefficient);
-  // this->addNonConstDependentField(porePressure);
+  this->addDependentField(stress);
+  this->addDependentField(defGrad);
+  this->addDependentField(J);
+  this->addDependentField(biotCoefficient);
+  // this->addDependentField(porePressure);
 
   this->addEvaluatedField(porePressure);
   this->addEvaluatedField(totstress);

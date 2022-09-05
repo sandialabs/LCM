@@ -22,10 +22,10 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::TLPoroPlasticityResidMomentum(Teuc
           p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
       ExResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
-  this->addNonConstDependentField(TotalStress);
-  this->addNonConstDependentField(wGradBF);
-  this->addNonConstDependentField(J);
-  this->addNonConstDependentField(defgrad);
+  this->addDependentField(TotalStress);
+  this->addDependentField(wGradBF);
+  this->addDependentField(J);
+  this->addDependentField(defgrad);
   this->addEvaluatedField(ExResidual);
 
   if (p.isType<bool>("Disable Transient"))
@@ -42,8 +42,8 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::TLPoroPlasticityResidMomentum(Teuc
     wBF     = decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
     uDotDot = decltype(uDotDot)(p.get<std::string>("Time Dependent Variable Name"), vector_dl);
 
-    this->addNonConstDependentField(wBF);
-    this->addNonConstDependentField(uDotDot);
+    this->addDependentField(wBF);
+    this->addDependentField(uDotDot);
   }
 
   this->setName("TLPoroPlasticityResidMomentum" + PHX::print<EvalT>());

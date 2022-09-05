@@ -65,10 +65,10 @@ Stresses<EvalT, Traits>::Stresses(Teuchos::ParameterList const& p)
   numQPs  = dims[1];
   numDims = dims[2];
 
-  this->addNonConstDependentField(strain);
+  this->addDependentField(strain);
   for (int i = 0; i < numMicroScales; i++) {
-    this->addNonConstDependentField(*(strainDifference[i]));
-    this->addNonConstDependentField(*(microStrainGradient[i]));
+    this->addDependentField(*(strainDifference[i]));
+    this->addDependentField(*(microStrainGradient[i]));
   }
   this->addEvaluatedField(stress);
   for (int i = 0; i < numMicroScales; i++) {

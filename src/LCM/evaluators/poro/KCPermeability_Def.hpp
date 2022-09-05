@@ -44,7 +44,7 @@ KCPermeability<EvalT, Traits>::KCPermeability(Teuchos::ParameterList& p)
   if (p.isType<std::string>("Porosity Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
     porosity                                = decltype(porosity)(p.get<std::string>("Porosity Name"), scalar_dl);
-    this->addNonConstDependentField(porosity);
+    this->addDependentField(porosity);
     isPoroElastic = true;
 
   } else {

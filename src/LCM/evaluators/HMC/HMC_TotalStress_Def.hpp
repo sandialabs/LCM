@@ -15,7 +15,7 @@ TotalStress<EvalT, Traits>::TotalStress(Teuchos::ParameterList const& p, const T
       totalStress(p.get<std::string>("Total Stress Name"), dl->qp_tensor),
       numMicroScales(p.get<int>("Additional Scales"))
 {
-  this->addNonConstDependentField(macroStress);
+  this->addDependentField(macroStress);
 
   microStress.resize(numMicroScales);
   for (int i = 0; i < numMicroScales; i++) {
@@ -24,7 +24,7 @@ TotalStress<EvalT, Traits>::TotalStress(Teuchos::ParameterList const& p, const T
     msname += " Name";
     microStress[i] = Teuchos::rcp(
         new cHMC2Tensor(p.get<std::string>(msname), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
-    this->addNonConstDependentField(*(microStress[i]));
+    this->addDependentField(*(microStress[i]));
   }
 
   this->addEvaluatedField(totalStress);

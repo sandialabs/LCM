@@ -21,8 +21,8 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
       tau_(p.get<std::string>("Tau Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
-  this->addNonConstDependentField(thermal_cond_grad_at_qps_);
-  this->addNonConstDependentField(jacobian_det_);
+  this->addDependentField(thermal_cond_grad_at_qps_);
+  this->addDependentField(jacobian_det_);
   this->addEvaluatedField(tau_);
 
   stab_value_                 = p.get<double>("Stabilization Parameter Value");

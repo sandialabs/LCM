@@ -23,7 +23,7 @@ ComputeBasisFunctions<EvalT, Traits>::ComputeBasisFunctions(
       GradBF(p.get<std::string>("Gradient BF Name"), dl->node_qp_gradient),
       wGradBF(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_gradient)
 {
-  this->addNonConstDependentField(coordVec.fieldTag());
+  this->addDependentField(coordVec.fieldTag());
   this->addEvaluatedField(weighted_measure);
   this->addEvaluatedField(jacobian_det);
   this->addEvaluatedField(BF);

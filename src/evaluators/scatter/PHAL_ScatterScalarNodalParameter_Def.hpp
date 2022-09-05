@@ -22,7 +22,7 @@ ScatterScalarNodalParameterBase<EvalT, Traits>::ScatterScalarNodalParameterBase(
   val                    = decltype(val)(field_name, dl->node_scalar);
   numNodes               = 0;
 
-  this->addNonConstDependentField(val);
+  this->addDependentField(val);
 
   this->setName("Scatter Nodal Parameter");
 }

@@ -22,12 +22,12 @@ PHAL::PoissonResid<EvalT, Traits>::PoissonResid(
       haveSource(p.get<bool>("Have Source")),
       PhiResidual(p.get<std::string>("Residual Name"), dl->node_scalar)
 {
-  this->addNonConstDependentField(wBF);
-  // this->addNonConstDependentField(Potential);
-  this->addNonConstDependentField(Permittivity);
-  this->addNonConstDependentField(PhiGrad);
-  this->addNonConstDependentField(wGradBF);
-  if (haveSource) this->addNonConstDependentField(Source);
+  this->addDependentField(wBF);
+  // this->addDependentField(Potential);
+  this->addDependentField(Permittivity);
+  this->addDependentField(PhiGrad);
+  this->addDependentField(wGradBF);
+  if (haveSource) this->addDependentField(Source);
 
   this->addEvaluatedField(PhiResidual);
   this->addEvaluatedField(PhiFlux);

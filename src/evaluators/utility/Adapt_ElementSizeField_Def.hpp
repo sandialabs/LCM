@@ -52,9 +52,9 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
   numQPs                                       = vector_dl->extent(1);
   numDims                                      = vector_dl->extent(2);
   numVertices                                  = vert_vector_dl->extent(2);
-  this->addNonConstDependentField(qp_weights.fieldTag());
-  this->addNonConstDependentField(coordVec.fieldTag());
-  this->addNonConstDependentField(coordVec_vertices.fieldTag());
+  this->addDependentField(qp_weights.fieldTag());
+  this->addDependentField(coordVec.fieldTag());
+  this->addDependentField(coordVec_vertices.fieldTag());
 
   //! Register with state manager
   this->pStateMgr = p.get<Albany::StateManager*>("State Manager Ptr");

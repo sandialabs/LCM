@@ -17,8 +17,8 @@ ElectrostaticResidual<EvalT, Traits>::ElectrostaticResidual(
       w_grad_bf_(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       residual_(p.get<std::string>("Residual Name"), dl->node_scalar)
 {
-  this->addNonConstDependentField(edisp_);
-  this->addNonConstDependentField(w_grad_bf_);
+  this->addDependentField(edisp_);
+  this->addDependentField(w_grad_bf_);
 
   this->addEvaluatedField(residual_);
 

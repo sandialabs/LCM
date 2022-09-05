@@ -26,10 +26,10 @@ NSPermeabilityTerm<EvalT, Traits>::NSPermeabilityTerm(Teuchos::ParameterList con
   else
     enableTransient = true;
 
-  this->addNonConstDependentField(V.fieldTag());
-  this->addNonConstDependentField(mu.fieldTag());
-  this->addNonConstDependentField(phi.fieldTag());
-  this->addNonConstDependentField(K.fieldTag());
+  this->addDependentField(V.fieldTag());
+  this->addDependentField(mu.fieldTag());
+  this->addDependentField(phi.fieldTag());
+  this->addDependentField(K.fieldTag());
 
   this->addEvaluatedField(permTerm);
 

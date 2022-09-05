@@ -33,8 +33,8 @@ AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(
   use_analytic_mass_  = p.get<bool>("Use Analytic Mass");
   lump_analytic_mass_ = p.get<bool>("Lump Analytic Mass");
 
-  this->addNonConstDependentField(w_bf_);
-  this->addNonConstDependentField(weights_);
+  this->addDependentField(w_bf_);
+  this->addDependentField(weights_);
   this->addEvaluatedField(mass_);
 
   if (p.isType<bool>("Disable Dynamics"))
@@ -44,9 +44,9 @@ AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(
 
   if (enable_dynamics_) {
     accel_qps_ = decltype(accel_qps_)(p.get<std::string>("Acceleration Name"), dl->qp_vector);
-    this->addNonConstDependentField(accel_qps_);
+    this->addDependentField(accel_qps_);
     accel_nodes_ = decltype(accel_nodes_)(p.get<std::string>("Acceleration Name"), dl->node_vector);
-    this->addNonConstDependentField(accel_nodes_);
+    this->addDependentField(accel_nodes_);
   }
 
   this->setName("AnalyticMassResidual" + PHX::print<EvalT>());

@@ -56,7 +56,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveSideSetStateFie
 
   savestate_operation = Teuchos::rcp(new PHX::Tag<ScalarT>(fieldName, dl->dummy));
 
-  this->addNonConstDependentField(field.fieldTag());
+  this->addDependentField(field.fieldTag());
   this->addEvaluatedField(*savestate_operation);
 
   if (nodalState) {

@@ -45,8 +45,8 @@ Reader<PHAL::AlbanyTraits::Residual, Traits>::Reader(
   if (this->rc_mgr_->usingProjection()) {
     bf_  = PHX::MDField<const RealType, Cell, Node, QuadPoint>("BF", dl->node_qp_scalar);
     wbf_ = PHX::MDField<const RealType, Cell, Node, QuadPoint>("wBF", dl->node_qp_scalar);
-    this->addNonConstDependentField(bf_.fieldTag());
-    this->addNonConstDependentField(wbf_.fieldTag());
+    this->addDependentField(bf_.fieldTag());
+    this->addDependentField(wbf_.fieldTag());
   }
 }
 

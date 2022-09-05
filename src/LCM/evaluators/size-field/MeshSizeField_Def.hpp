@@ -34,7 +34,7 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::IsoMeshSizeField(
 
   adapt_PL->set<bool>("AdaptNow", false);
 
-  this->addNonConstDependentField(currentCoords);
+  this->addDependentField(currentCoords);
 
   this->addEvaluatedField(isoMeshSizeField);
 
@@ -142,7 +142,7 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::AnisoMeshSizeField(
 
   adapt_PL->set<bool>("AdaptNow", false);
 
-  this->addNonConstDependentField(currentCoords);
+  this->addDependentField(currentCoords);
 
   this->addEvaluatedField(anisoMeshSizeField);
 

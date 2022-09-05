@@ -23,10 +23,10 @@ SurfaceScalarGradient<EvalT, Traits>::SurfaceScalarGradient(
       nodalScalar(p.get<std::string>("Nodal Scalar Name"), dl->node_scalar),
       scalarGrad(p.get<std::string>("Surface Scalar Gradient Name"), dl->qp_vector)
 {
-  this->addNonConstDependentField(refDualBasis);
-  this->addNonConstDependentField(refNormal);
-  this->addNonConstDependentField(jump);
-  this->addNonConstDependentField(nodalScalar);
+  this->addDependentField(refDualBasis);
+  this->addDependentField(refNormal);
+  this->addDependentField(jump);
+  this->addDependentField(nodalScalar);
 
   this->addEvaluatedField(scalarGrad);
 

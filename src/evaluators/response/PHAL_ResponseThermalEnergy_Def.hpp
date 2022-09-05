@@ -54,11 +54,11 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
   numDims = coord_dims[2];
 
   // add dependent fields
-  this->addNonConstDependentField(field.fieldTag());
-  this->addNonConstDependentField(coordVec.fieldTag());
-  //  this->addNonConstDependentField(time.fieldTag());
-  //  this->addNonConstDependentField(deltaTime.fieldTag());
-  this->addNonConstDependentField(weights.fieldTag());
+  this->addDependentField(field.fieldTag());
+  this->addDependentField(coordVec.fieldTag());
+  //  this->addDependentField(time.fieldTag());
+  //  this->addDependentField(deltaTime.fieldTag());
+  this->addDependentField(weights.fieldTag());
   this->setName(field_name + " Response Field IntegralT" + PHX::print<EvalT>());
 
   // Setup scatter evaluator

@@ -41,7 +41,7 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
   if (p.isType<std::string>("Porosity Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
     porosity                                = decltype(porosity)(p.get<std::string>("Porosity Name"), scalar_dl);
-    this->addNonConstDependentField(porosity);
+    this->addDependentField(porosity);
     isPoroElastic    = true;
     FluidBulkModulus = elmd_list->get("Fluid Bulk Modulus Value", 10.0e9);
     this->registerSacadoParameter("Skeleton Bulk Modulus Parameter Value", paramLib);
@@ -56,7 +56,7 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
   if (p.isType<std::string>("Biot Coefficient Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
     biotCoefficient = decltype(biotCoefficient)(p.get<std::string>("Biot Coefficient Name"), scalar_dl);
-    this->addNonConstDependentField(biotCoefficient);
+    this->addDependentField(biotCoefficient);
   }
 
   this->addEvaluatedField(biotModulus);

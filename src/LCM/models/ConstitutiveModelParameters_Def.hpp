@@ -37,7 +37,7 @@ ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(
   if (p.isType<std::string>("Temperature Name")) {
     have_temperature_ = true;
     temperature_      = decltype(temperature_)(p.get<std::string>("Temperature Name"), dl_->qp_scalar);
-    this->addNonConstDependentField(temperature_);
+    this->addDependentField(temperature_);
   }
 
   // step through the possible parameters, registering as necessary

@@ -25,8 +25,8 @@ DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::DOFGradInterpolationSideBa
       "Error! The layouts structure does not appear to be that of a side "
       "set.\n");
 
-  this->addNonConstDependentField(val_node.fieldTag());
-  this->addNonConstDependentField(gradBF.fieldTag());
+  this->addDependentField(val_node.fieldTag());
+  this->addDependentField(gradBF.fieldTag());
   this->addEvaluatedField(grad_qp);
 
   this->setName("DOFGradInterpolationSide(" + p.get<std::string>("Variable Name") + ")" + PHX::print<EvalT>());

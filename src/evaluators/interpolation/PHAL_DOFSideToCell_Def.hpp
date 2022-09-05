@@ -82,7 +82,7 @@ DOFSideToCellBase<EvalT, Traits, ScalarT>::DOFSideToCellBase(
     }
   }
 
-  this->addNonConstDependentField(val_side.fieldTag());
+  this->addDependentField(val_side.fieldTag());
   this->addEvaluatedField(val_cell);
   this->setName("DOFSideToCell");
 }

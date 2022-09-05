@@ -32,7 +32,7 @@ LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(Teuchos::ParameterList const
 
   nd      = Teuchos::rcp(new boost::normal_distribution<double>(0.0, sd_val));
   var_nor = Teuchos::rcp(new boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>(rng, *nd));
-  this->addNonConstDependentField(rho.fieldTag());
+  this->addDependentField(rho.fieldTag());
   this->addEvaluatedField(noiseTerm);
   this->setName("LangevinNoiseTerm");
 }

@@ -349,7 +349,7 @@ Trigonometric<EvalT, Traits>::DependentFields(Source<EvalT, Traits>& source, Teu
   Teuchos::RCP<PHX::DataLayout> vector_qp = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
 
   coordVec = decltype(coordVec)(p.get<std::string>("QP Coordinate Vector Name"), vector_qp);
-  source.addNonConstDependentField(coordVec);
+  source.addDependentField(coordVec);
 }
 
 template <typename EvalT, typename Traits>
@@ -460,7 +460,7 @@ Quadratic<EvalT, Traits>::DependentFields(Source<EvalT, Traits>& source, Teuchos
 {
   Teuchos::RCP<PHX::DataLayout> dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
   m_baseField                      = decltype(m_baseField)(p.get<std::string>("Variable Name"), dl);
-  source.addNonConstDependentField(m_baseField);
+  source.addDependentField(m_baseField);
 }
 template <typename EvalT, typename Traits>
 void
@@ -527,9 +527,9 @@ class NeutronFission : public Source_Base<EvalT, Traits>
     m_phi                            = decltype(m_phi)(p.get<std::string>("Neutron Flux Name"), dl);
     m_sigma_f                        = decltype(m_sigma_f)(p.get<std::string>("Fission Cross Section Name"), dl);
     m_E_f                            = decltype(m_E_f)(p.get<std::string>("Energy Released per Fission Name"), dl);
-    source.addNonConstDependentField(m_phi);
-    source.addNonConstDependentField(m_sigma_f);
-    source.addNonConstDependentField(m_E_f);
+    source.addDependentField(m_phi);
+    source.addDependentField(m_sigma_f);
+    source.addDependentField(m_E_f);
   }
 
   virtual void
@@ -635,7 +635,7 @@ MVQuadratic<EvalT, Traits>::DependentFields(Source<EvalT, Traits>& source, Teuch
   // Quadratic");
   Teuchos::RCP<PHX::DataLayout> dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
   m_baseField                      = decltype(m_baseField)(p.get<std::string>("Variable Name"), dl);
-  source.addNonConstDependentField(m_baseField);
+  source.addDependentField(m_baseField);
 }
 template <typename EvalT, typename Traits>
 void
@@ -747,7 +747,7 @@ MVExponential<EvalT, Traits>::DependentFields(Source<EvalT, Traits>& source, Teu
   // Exponential");
   Teuchos::RCP<PHX::DataLayout> dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
   m_baseField                      = decltype(m_baseField)(p.get<std::string>("Variable Name"), dl);
-  source.addNonConstDependentField(m_baseField);
+  source.addDependentField(m_baseField);
 }
 template <typename EvalT, typename Traits>
 void
@@ -986,7 +986,7 @@ PointSource<EvalT, Traits>::DependentFields(Source<EvalT, Traits>& source, Teuch
   Teuchos::RCP<PHX::DataLayout> vector_qp = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
 
   coordVec = decltype(coordVec)(p.get<std::string>("QP Coordinate Vector Name"), vector_qp);
-  source.addNonConstDependentField(coordVec);
+  source.addDependentField(coordVec);
 }
 
 template <typename EvalT, typename Traits>

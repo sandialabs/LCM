@@ -36,12 +36,12 @@ Writer<PHAL::AlbanyTraits::Residual, Traits>::Writer(
   if (this->rc_mgr_->usingProjection()) {
     bf_  = decltype(bf_)("BF", dl->node_qp_scalar);
     wbf_ = decltype(wbf_)("wBF", dl->node_qp_scalar);
-    this->addNonConstDependentField(bf_);
-    this->addNonConstDependentField(wbf_);
+    this->addDependentField(bf_);
+    this->addDependentField(wbf_);
   }
   for (Manager::Field::iterator it = rc_mgr_->fieldsBegin(), end = rc_mgr_->fieldsEnd(); it != end; ++it) {
     fields_.push_back(PHX::MDField<const RealType>((*it)->name, (*it)->layout));
-    this->addNonConstDependentField(fields_.back());
+    this->addDependentField(fields_.back());
   }
 }
 

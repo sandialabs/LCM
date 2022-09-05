@@ -21,10 +21,10 @@ ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(Teuchos::ParameterList
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       Residual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
-  this->addNonConstDependentField(U.fieldTag());
-  this->addNonConstDependentField(UGrad.fieldTag());
-  this->addNonConstDependentField(wBF.fieldTag());
-  this->addNonConstDependentField(wGradBF.fieldTag());
+  this->addDependentField(U.fieldTag());
+  this->addDependentField(UGrad.fieldTag());
+  this->addDependentField(wBF.fieldTag());
+  this->addDependentField(wGradBF.fieldTag());
 
   this->addEvaluatedField(Residual);
 

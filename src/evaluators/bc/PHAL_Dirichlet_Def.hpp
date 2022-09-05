@@ -38,7 +38,7 @@ DirichletBase<EvalT, Traits>::DirichletBase(Teuchos::ParameterList& p)
     // we can use it.
     if (p.isType<std::string>("BCOrder Dependency")) {
       PHX::Tag<ScalarT> order_depends_on(p.get<std::string>("BCOrder Dependency"), dummy);
-      this->addNonConstDependentField(order_depends_on);
+      this->addDependentField(order_depends_on);
     }
     if (p.isType<std::string>("BCOrder Evaluates")) {
       PHX::Tag<ScalarT> order_evaluates(p.get<std::string>("BCOrder Evaluates"), dummy);
@@ -170,7 +170,7 @@ DirichletAggregator<EvalT, Traits>::DirichletAggregator(Teuchos::ParameterList& 
 
   for (auto i = 0; i < dbcs.size(); ++i) {
     PHX::Tag<ScalarT> fieldTag(dbcs[i], dl);
-    this->addNonConstDependentField(fieldTag);
+    this->addDependentField(fieldTag);
   }
 
   PHX::Tag<ScalarT> fieldTag(p.get<std::string>("DBC Aggregator Name"), dl);

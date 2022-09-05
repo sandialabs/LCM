@@ -32,11 +32,11 @@ ThermoMechanicalCoefficients<EvalT, Traits>::ThermoMechanicalCoefficients(
 
     delta_time_ = decltype(delta_time_)(p.get<std::string>("Delta Time Name"), dl->workset_scalar);
 
-    this->addNonConstDependentField(temperature_);
-    this->addNonConstDependentField(delta_time_);
+    this->addDependentField(temperature_);
+    this->addDependentField(delta_time_);
     this->addEvaluatedField(temperature_dot_);
   }
-  this->addNonConstDependentField(thermal_cond_);
+  this->addDependentField(thermal_cond_);
   this->addEvaluatedField(thermal_transient_coeff_);
   this->addEvaluatedField(thermal_diffusivity_);
 
@@ -51,7 +51,7 @@ ThermoMechanicalCoefficients<EvalT, Traits>::ThermoMechanicalCoefficients(
 
   if (have_mech_) {
     def_grad_ = decltype(def_grad_)(p.get<std::string>("Deformation Gradient Name"), dl->qp_tensor);
-    this->addNonConstDependentField(def_grad_);
+    this->addDependentField(def_grad_);
   }
 
   temperature_name_ = p.get<std::string>("Temperature Name") + "_old";

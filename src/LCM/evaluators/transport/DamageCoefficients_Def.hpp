@@ -25,8 +25,8 @@ DamageCoefficients<EvalT, Traits>::DamageCoefficients(
   transient_coeff_   = mat_params->get<RealType>("Damage Transient Coefficient");
   diffusivity_coeff_ = mat_params->get<RealType>("Damage Diffusivity Coefficient");
 
-  this->addNonConstDependentField(damage_);
-  this->addNonConstDependentField(delta_time_);
+  this->addDependentField(damage_);
+  this->addDependentField(delta_time_);
 
   this->addEvaluatedField(damage_transient_coeff_);
   this->addEvaluatedField(damage_diffusivity_);
@@ -41,7 +41,7 @@ DamageCoefficients<EvalT, Traits>::DamageCoefficients(
 
   if (have_mech_) {
     def_grad_ = decltype(def_grad_)(p.get<std::string>("Deformation Gradient Name"), dl->qp_tensor);
-    this->addNonConstDependentField(def_grad_);
+    this->addDependentField(def_grad_);
   }
   damage_name_ = p.get<std::string>("Damage Name") + "_old";
 }

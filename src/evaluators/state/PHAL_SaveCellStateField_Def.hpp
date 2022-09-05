@@ -58,8 +58,8 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveCellStateField(Teu
   savestate_operation =
       Teuchos::rcp(new PHX::Tag<ScalarT>(stateName, p.get<Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout")));
 
-  this->addNonConstDependentField(weights.fieldTag());
-  this->addNonConstDependentField(field.fieldTag());
+  this->addDependentField(weights.fieldTag());
+  this->addDependentField(field.fieldTag());
   this->addEvaluatedField(*savestate_operation);
 
   this->setName("Save Field " + fieldName + " to Cell State " + stateName + "Residual");

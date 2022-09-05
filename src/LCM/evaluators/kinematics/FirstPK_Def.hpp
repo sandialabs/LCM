@@ -21,8 +21,8 @@ FirstPK<EvalT, Traits>::FirstPK(Teuchos::ParameterList& p, const Teuchos::RCP<Al
       have_stab_pressure_(p.get<bool>("Have Stabilized Pressure", false)),
       small_strain_(p.get<bool>("Small Strain", false))
 {
-  this->addNonConstDependentField(stress_);
-  this->addNonConstDependentField(def_grad_);
+  this->addDependentField(stress_);
+  this->addDependentField(def_grad_);
 
   this->addEvaluatedField(first_pk_stress_);
 
@@ -34,14 +34,14 @@ FirstPK<EvalT, Traits>::FirstPK(Teuchos::ParameterList& p, const Teuchos::RCP<Al
     pore_pressure_ = decltype(pore_pressure_)(p.get<std::string>("Pore Pressure Name"), dl->qp_scalar);
     // grab Biot's coefficient
     biot_coeff_ = decltype(biot_coeff_)(p.get<std::string>("Biot Coefficient Name"), dl->qp_scalar);
-    this->addNonConstDependentField(pore_pressure_);
-    this->addNonConstDependentField(biot_coeff_);
+    this->addDependentField(pore_pressure_);
+    this->addDependentField(biot_coeff_);
   }
 
   // deal with stabilized pressure
   if (have_stab_pressure_) {
     stab_pressure_ = decltype(stab_pressure_)(p.get<std::string>("Pressure Name"), dl->qp_scalar);
-    this->addNonConstDependentField(stab_pressure_);
+    this->addDependentField(stab_pressure_);
   }
 
   std::vector<PHX::DataLayout::size_type> dims;

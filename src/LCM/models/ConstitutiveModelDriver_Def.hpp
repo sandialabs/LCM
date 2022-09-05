@@ -19,9 +19,9 @@ ConstitutiveModelDriver<EvalT, Traits>::ConstitutiveModelDriver(
       stress_(p.get<std::string>("Stress Name"), dl->qp_tensor),
       prescribed_def_grad_(p.get<std::string>("Prescribed F Name"), dl->qp_tensor)
 {
-  this->addNonConstDependentField(def_grad_);
-  this->addNonConstDependentField(prescribed_def_grad_);
-  this->addNonConstDependentField(stress_);
+  this->addDependentField(def_grad_);
+  this->addDependentField(prescribed_def_grad_);
+  this->addDependentField(stress_);
   this->addEvaluatedField(residual_);
 
   std::vector<PHX::DataLayout::size_type> dims;

@@ -44,7 +44,7 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
   if (p.isType<std::string>("QP Temperature Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
     Temperature = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), scalar_dl);
-    this->addNonConstDependentField(Temperature);
+    this->addDependentField(Temperature);
     isThermoElastic = true;
     dnudT_value     = pr_list->get("dnudT Value", 0.0);
     refTemp         = p.get<RealType>("Reference Temperature", 0.0);

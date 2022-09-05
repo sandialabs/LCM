@@ -36,13 +36,13 @@ ACETemperatureResidual<EvalT, Traits>::ACETemperatureResidual(
       scale_residual_factor(p.get<double>("ACE Residual Scale Factor"))
 {
   // List dependent fields
-  this->addNonConstDependentField(wbf_);
-  this->addNonConstDependentField(wgradbf_);
-  this->addNonConstDependentField(tdot_);
-  this->addNonConstDependentField(tgrad_);
+  this->addDependentField(wbf_);
+  this->addDependentField(wgradbf_);
+  this->addDependentField(tdot_);
+  this->addDependentField(tgrad_);
 
-  this->addNonConstDependentField(thermal_conductivity_);
-  this->addNonConstDependentField(thermal_inertia_);
+  this->addDependentField(thermal_conductivity_);
+  this->addDependentField(thermal_inertia_);
 
   // List evaluated field
   this->addEvaluatedField(residual_);

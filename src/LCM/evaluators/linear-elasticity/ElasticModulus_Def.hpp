@@ -53,7 +53,7 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
   if (p.isType<std::string>("QP Temperature Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
     Temperature = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), scalar_dl);
-    this->addNonConstDependentField(Temperature);
+    this->addDependentField(Temperature);
     isThermoElastic = true;
     dEdT_value      = elmd_list->get("dEdT Value", 0.0);
     refTemp         = p.get<RealType>("Reference Temperature", 0.0);
@@ -69,7 +69,7 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
   if (p.isType<std::string>("Porosity Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
     porosity                                = decltype(porosity)(p.get<std::string>("Porosity Name"), scalar_dl);
-    this->addNonConstDependentField(porosity);
+    this->addDependentField(porosity);
     isPoroElastic = true;
 
   } else {

@@ -57,10 +57,10 @@ TransportCoefficients<EvalT, Traits>::TransportCoefficients(
     this->addEvaluatedField(strain_rate_fac_);
   }
 
-  this->addNonConstDependentField(F_);
-  this->addNonConstDependentField(J_);
-  this->addNonConstDependentField(temperature_);
-  this->addNonConstDependentField(c_lattice_);
+  this->addDependentField(F_);
+  this->addDependentField(J_);
+  this->addDependentField(temperature_);
+  this->addDependentField(c_lattice_);
   this->addEvaluatedField(k_eq_);
   this->addEvaluatedField(n_trap_);
   this->addEvaluatedField(eff_diff_);

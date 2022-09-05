@@ -20,8 +20,8 @@ SurfaceCohesiveResidual<EvalT, Traits>::SurfaceCohesiveResidual(
       cohesive_traction_(p.get<std::string>("Cohesive Traction Name"), dl->qp_vector),
       force_(p.get<std::string>("Surface Cohesive Residual Name"), dl->node_vector)
 {
-  this->addNonConstDependentField(ref_area_);
-  this->addNonConstDependentField(cohesive_traction_);
+  this->addDependentField(ref_area_);
+  this->addDependentField(cohesive_traction_);
 
   this->addEvaluatedField(force_);
 

@@ -33,13 +33,13 @@ NSMomentumResid<EvalT, Traits>::NSMomentumResid(Teuchos::ParameterList const& p)
   else
     enableTransient = true;
 
-  this->addNonConstDependentField(wBF.fieldTag());
-  this->addNonConstDependentField(pGrad.fieldTag());
-  this->addNonConstDependentField(VGrad.fieldTag());
-  this->addNonConstDependentField(wGradBF.fieldTag());
-  this->addNonConstDependentField(P.fieldTag());
-  this->addNonConstDependentField(Rm.fieldTag());
-  this->addNonConstDependentField(mu.fieldTag());
+  this->addDependentField(wBF.fieldTag());
+  this->addDependentField(pGrad.fieldTag());
+  this->addDependentField(VGrad.fieldTag());
+  this->addDependentField(wGradBF.fieldTag());
+  this->addDependentField(P.fieldTag());
+  this->addDependentField(Rm.fieldTag());
+  this->addDependentField(mu.fieldTag());
   if (haveSUPG) {
     V = decltype(V)(
         p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"));
@@ -47,9 +47,9 @@ NSMomentumResid<EvalT, Traits>::NSMomentumResid(Teuchos::ParameterList const& p)
         p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     TauM =
         decltype(TauM)(p.get<std::string>("Tau M Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    this->addNonConstDependentField(V.fieldTag());
-    this->addNonConstDependentField(rho.fieldTag());
-    this->addNonConstDependentField(TauM.fieldTag());
+    this->addDependentField(V.fieldTag());
+    this->addDependentField(rho.fieldTag());
+    this->addDependentField(TauM.fieldTag());
   }
 
   this->addEvaluatedField(MResidual);

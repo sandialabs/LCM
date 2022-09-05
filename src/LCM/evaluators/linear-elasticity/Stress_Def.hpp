@@ -27,10 +27,10 @@ Stress<EvalT, Traits>::Stress(Teuchos::ParameterList const& p)
   numQPs  = dims[1];
   numDims = dims[2];
 
-  this->addNonConstDependentField(strain);
-  this->addNonConstDependentField(elasticModulus);
+  this->addDependentField(strain);
+  this->addDependentField(elasticModulus);
   // PoissonRatio not used in 1D stress calc
-  if (numDims > 1) this->addNonConstDependentField(poissonsRatio);
+  if (numDims > 1) this->addDependentField(poissonsRatio);
 
   this->addEvaluatedField(stress);
 

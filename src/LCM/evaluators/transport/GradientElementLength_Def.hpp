@@ -14,8 +14,8 @@ GradientElementLength<EvalT, Traits>::GradientElementLength(
       unit_grad_(p.get<std::string>("Unit Gradient QP Variable Name"), dl->qp_vector),
       element_length_(p.get<std::string>("Element Length Name"), dl->qp_scalar)
 {
-  this->addNonConstDependentField(unit_grad_);
-  this->addNonConstDependentField(grad_bf_);
+  this->addDependentField(unit_grad_);
+  this->addDependentField(grad_bf_);
   this->addEvaluatedField(element_length_);
 
   this->setName("Element Length" + PHX::print<EvalT>());

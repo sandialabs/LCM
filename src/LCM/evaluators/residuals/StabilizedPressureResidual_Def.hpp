@@ -26,15 +26,15 @@ StabilizedPressureResidual<EvalT, Traits>::StabilizedPressureResidual(
       small_strain_(p.get<bool>("Small Strain", false)),
       alpha_(p.get<RealType>("Stabilization Parameter"))
 {
-  this->addNonConstDependentField(shear_modulus_);
-  this->addNonConstDependentField(bulk_modulus_);
-  this->addNonConstDependentField(def_grad_);
-  this->addNonConstDependentField(stress_);
-  this->addNonConstDependentField(pressure_);
-  this->addNonConstDependentField(pressure_grad_);
-  this->addNonConstDependentField(w_grad_bf_);
-  this->addNonConstDependentField(w_bf_);
-  this->addNonConstDependentField(h_);
+  this->addDependentField(shear_modulus_);
+  this->addDependentField(bulk_modulus_);
+  this->addDependentField(def_grad_);
+  this->addDependentField(stress_);
+  this->addDependentField(pressure_);
+  this->addDependentField(pressure_grad_);
+  this->addDependentField(w_grad_bf_);
+  this->addDependentField(w_bf_);
+  this->addDependentField(h_);
 
   this->addEvaluatedField(residual_);
 

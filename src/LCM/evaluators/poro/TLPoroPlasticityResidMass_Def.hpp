@@ -66,26 +66,26 @@ TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(Teuchos::Par
 
   enableTransient = false;
 
-  // this->addNonConstDependentField(stabParameter);
-  this->addNonConstDependentField(elementLength);
-  this->addNonConstDependentField(deltaTime);
-  this->addNonConstDependentField(weights);
-  this->addNonConstDependentField(coordVec);
-  this->addNonConstDependentField(wBF);
-  this->addNonConstDependentField(porePressure);
-  this->addNonConstDependentField(ThermalCond);
-  this->addNonConstDependentField(kcPermeability);
-  this->addNonConstDependentField(porosity);
-  this->addNonConstDependentField(biotCoefficient);
-  this->addNonConstDependentField(biotModulus);
-  if (enableTransient) this->addNonConstDependentField(Tdot);
-  this->addNonConstDependentField(TGrad);
-  this->addNonConstDependentField(wGradBF);
-  if (haveSource) this->addNonConstDependentField(Source);
+  // this->addDependentField(stabParameter);
+  this->addDependentField(elementLength);
+  this->addDependentField(deltaTime);
+  this->addDependentField(weights);
+  this->addDependentField(coordVec);
+  this->addDependentField(wBF);
+  this->addDependentField(porePressure);
+  this->addDependentField(ThermalCond);
+  this->addDependentField(kcPermeability);
+  this->addDependentField(porosity);
+  this->addDependentField(biotCoefficient);
+  this->addDependentField(biotModulus);
+  if (enableTransient) this->addDependentField(Tdot);
+  this->addDependentField(TGrad);
+  this->addDependentField(wGradBF);
+  if (haveSource) this->addDependentField(Source);
   if (haveAbsorption) {
     Absorption = decltype(Absorption)(
         p.get<std::string>("Absorption Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    this->addNonConstDependentField(Absorption);
+    this->addDependentField(Absorption);
   }
 
   if (p.isType<std::string>("DefGrad Name")) {
@@ -95,10 +95,10 @@ TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(Teuchos::Par
     haveMechanics = true;
 
     defgrad = decltype(defgrad)(p.get<std::string>("DefGrad Name"), tensor_dl);
-    this->addNonConstDependentField(defgrad);
+    this->addDependentField(defgrad);
 
     J = decltype(J)(p.get<std::string>("DetDefGrad Name"), scalar_dl);
-    this->addNonConstDependentField(J);
+    this->addDependentField(J);
   }
 
   this->addEvaluatedField(TResidual);
@@ -126,7 +126,7 @@ TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(Teuchos::Par
     if (haverhoCp) {
       rhoCp = decltype(rhoCp)(
           p.get<std::string>("Rho Cp Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-      this->addNonConstDependentField(rhoCp);
+      this->addDependentField(rhoCp);
     }
   }
 

@@ -38,15 +38,15 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
           p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
-  this->addNonConstDependentField(wbf_);
-  this->addNonConstDependentField(tdot_);
-  this->addNonConstDependentField(tgrad_);
-  this->addNonConstDependentField(wgradbf_);
-  this->addNonConstDependentField(thermal_conductivity_);
-  this->addNonConstDependentField(thermal_inertia_);
-  this->addNonConstDependentField(thermal_cond_grad_at_qps_);
-  this->addNonConstDependentField(tau_);
-  this->addNonConstDependentField(jacobian_det_);
+  this->addDependentField(wbf_);
+  this->addDependentField(tdot_);
+  this->addDependentField(tgrad_);
+  this->addDependentField(wgradbf_);
+  this->addDependentField(thermal_conductivity_);
+  this->addDependentField(thermal_inertia_);
+  this->addDependentField(thermal_cond_grad_at_qps_);
+  this->addDependentField(tau_);
+  this->addDependentField(jacobian_det_);
   this->addEvaluatedField(residual_);
 
   use_stab_                               = p.get<bool>("Use Stabilization");
@@ -56,7 +56,7 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
   stab_type_                              = p.get<std::string>("Stabilization Type");
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
   coord_vec_ = decltype(coord_vec_)(p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
-  this->addNonConstDependentField(coord_vec_);
+  this->addDependentField(coord_vec_);
 
   Teuchos::RCP<PHX::DataLayout> node_qp_vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;

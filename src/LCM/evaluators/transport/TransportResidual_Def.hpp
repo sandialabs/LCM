@@ -31,56 +31,56 @@ TransportResidual<EvalT, Traits>::TransportResidual(Teuchos::ParameterList& p, c
       num_pts_(0),
       num_dims_(0)
 {
-  this->addNonConstDependentField(scalar_);
-  this->addNonConstDependentField(scalar_grad_);
-  this->addNonConstDependentField(weights_);
-  this->addNonConstDependentField(w_bf_);
-  this->addNonConstDependentField(w_grad_bf_);
+  this->addDependentField(scalar_);
+  this->addDependentField(scalar_grad_);
+  this->addDependentField(weights_);
+  this->addDependentField(w_bf_);
+  this->addDependentField(w_grad_bf_);
 
   if (have_source_) {
     source_ = decltype(source_)(p.get<std::string>("Source Name"), dl->qp_scalar);
-    this->addNonConstDependentField(source_);
+    this->addDependentField(source_);
   }
 
   if (have_second_source_) {
     second_source_ = decltype(second_source_)(p.get<std::string>("Second Source Name"), dl->qp_scalar);
-    this->addNonConstDependentField(second_source_);
+    this->addDependentField(second_source_);
   }
 
   if (have_transient_) {
     scalar_dot_ = decltype(scalar_dot_)(p.get<std::string>("Scalar Dot Name"), dl->qp_scalar);
-    this->addNonConstDependentField(scalar_dot_);
+    this->addDependentField(scalar_dot_);
 
     transient_coeff_ = decltype(transient_coeff_)(p.get<std::string>("Transient Coefficient Name"), dl->qp_scalar);
-    this->addNonConstDependentField(transient_coeff_);
+    this->addDependentField(transient_coeff_);
 
     delta_time_ = decltype(delta_time_)(p.get<std::string>("Delta Time Name"), dl->workset_scalar);
-    this->addNonConstDependentField(delta_time_);
+    this->addDependentField(delta_time_);
   }
 
   if (have_diffusion_) {
     diffusivity_ = decltype(diffusivity_)(p.get<std::string>("Diffusivity Name"), dl->qp_tensor);
-    this->addNonConstDependentField(diffusivity_);
+    this->addDependentField(diffusivity_);
   }
 
   if (have_convection_) {
     convection_vector_ = decltype(convection_vector_)(p.get<std::string>("Convection Vector Name"), dl->qp_vector);
-    this->addNonConstDependentField(convection_vector_);
+    this->addDependentField(convection_vector_);
   }
 
   if (have_species_coupling_) {
     species_coupling_ = decltype(species_coupling_)(p.get<std::string>("Species Coupling Name"), dl->qp_scalar);
-    this->addNonConstDependentField(species_coupling_);
+    this->addDependentField(species_coupling_);
   }
 
   if (have_stabilization_) {
     stabilization_ = decltype(stabilization_)(p.get<std::string>("Stabilization Name"), dl->qp_scalar);
-    this->addNonConstDependentField(stabilization_);
+    this->addDependentField(stabilization_);
   }
 
   if (have_contact_) {
     M_operator_ = decltype(M_operator_)(p.get<std::string>("M Name"), dl->qp_scalar);
-    this->addNonConstDependentField(M_operator_);
+    this->addDependentField(M_operator_);
   }
 
   if (have_transient_ && have_mechanics_ && (SolutionType_ != "Continuation")) {
@@ -88,8 +88,8 @@ TransportResidual<EvalT, Traits>::TransportResidual(Teuchos::ParameterList& p, c
 
     vel_grad_ = decltype(vel_grad_)(p.get<std::string>("Velocity Gradient Variable Name"), dl->qp_tensor);
 
-    this->addNonConstDependentField(stress_);
-    this->addNonConstDependentField(vel_grad_);
+    this->addDependentField(stress_);
+    this->addDependentField(vel_grad_);
   }
 
   this->addEvaluatedField(residual_);

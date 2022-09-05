@@ -22,9 +22,9 @@ SurfaceScalarGradientOperator<EvalT, Traits>::SurfaceScalarGradientOperator(
       surface_Grad_BF(p.get<std::string>("Surface Scalar Gradient Operator Name"), dl->node_qp_gradient),
       grad_val_qp(p.get<std::string>("Surface Scalar Gradient Name"), dl->qp_gradient)
 {
-  this->addNonConstDependentField(refDualBasis);
-  this->addNonConstDependentField(refNormal);
-  this->addNonConstDependentField(val_node);
+  this->addDependentField(refDualBasis);
+  this->addDependentField(refNormal);
+  this->addDependentField(val_node);
 
   // Output fields
   this->addEvaluatedField(surface_Grad_BF);

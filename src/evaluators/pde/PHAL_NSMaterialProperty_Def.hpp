@@ -78,7 +78,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     scalar_constant_value = mp_list->get("Reference Value", default_value);
     ref_temp              = mp_list->get("Reference Temperature", default_value);
     T                     = decltype(T)(p.get<std::string>("Temperature Variable Name"), layout);
-    this->addNonConstDependentField(T.fieldTag());
+    this->addDependentField(T.fieldTag());
 
     // Add property as a Sacado-ized parameter
     this->registerSacadoParameter(name_mp + " Reference Value", paramLib);
@@ -87,7 +87,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     scalar_constant_value = mp_list->get("Reference Value", default_value);
     ref_temp              = mp_list->get("Reference Temperature", default_value);
     T                     = decltype(T)(p.get<std::string>("Temperature Variable Name"), layout);
-    this->addNonConstDependentField(T.fieldTag());
+    this->addDependentField(T.fieldTag());
 
     // Add property as a Sacado-ized parameter
     this->registerSacadoParameter(name_mp + " Reference Value", paramLib);
@@ -96,9 +96,9 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     sigma_a     = decltype(sigma_a)(p.get<std::string>("Absorption Cross Section Name"), layout);
     sigma_s     = decltype(sigma_s)(p.get<std::string>("Scattering Cross Section Name"), layout);
     mu          = decltype(mu)(p.get<std::string>("Average Scattering Angle Name"), layout);
-    this->addNonConstDependentField(sigma_a.fieldTag());
-    this->addNonConstDependentField(sigma_s.fieldTag());
-    this->addNonConstDependentField(mu.fieldTag());
+    this->addDependentField(sigma_a.fieldTag());
+    this->addDependentField(sigma_s.fieldTag());
+    this->addDependentField(mu.fieldTag());
   } else if (type == "Time Dependent") {
     matPropType = TIME_DEP_SCALAR;
     timeValues  = mp_list->get<Teuchos::Array<RealType>>("Time Values").toVector();

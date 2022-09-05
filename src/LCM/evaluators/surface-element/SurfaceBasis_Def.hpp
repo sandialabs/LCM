@@ -19,7 +19,7 @@ SurfaceBasis<EvalT, Traits>::SurfaceBasis(Teuchos::ParameterList const& p, Teuch
       ref_dual_basis_(p.get<std::string>("Reference Dual Basis Name"), dl->qp_tensor),
       ref_normal_(p.get<std::string>("Reference Normal Name"), dl->qp_vector)
 {
-  this->addNonConstDependentField(reference_coords_);
+  this->addDependentField(reference_coords_);
   this->addEvaluatedField(ref_basis_);
   this->addEvaluatedField(ref_area_);
   this->addEvaluatedField(ref_dual_basis_);
@@ -37,7 +37,7 @@ SurfaceBasis<EvalT, Traits>::SurfaceBasis(Teuchos::ParameterList const& p, Teuch
     // set up the current basis
     current_basis_ = decltype(current_basis_)(p.get<std::string>("Current Basis Name"), dl->qp_tensor);
 
-    this->addNonConstDependentField(current_coords_);
+    this->addDependentField(current_coords_);
     this->addEvaluatedField(current_basis_);
   }
 

@@ -64,10 +64,10 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
 
   this->createElementBlockParameterMaps();
 
-  this->addNonConstDependentField(coord_vec_);
-  this->addNonConstDependentField(temperature_);
-  this->addNonConstDependentField(wgradbf_);
-  this->addNonConstDependentField(bf_);
+  this->addDependentField(coord_vec_);
+  this->addDependentField(temperature_);
+  this->addDependentField(wgradbf_);
+  this->addDependentField(bf_);
   this->addEvaluatedField(thermal_conductivity_);
   this->addEvaluatedField(thermal_inertia_);
   this->addEvaluatedField(bluff_salinity_);

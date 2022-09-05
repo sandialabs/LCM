@@ -19,7 +19,7 @@ NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(Teuchos:
       Gc(p.get<std::string>("Contravarient Metric Tensor Name"),
          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout"))
 {
-  this->addNonConstDependentField(coordVec.fieldTag());
+  this->addDependentField(coordVec.fieldTag());
   this->addEvaluatedField(Gc);
 
   // Get Dimensions

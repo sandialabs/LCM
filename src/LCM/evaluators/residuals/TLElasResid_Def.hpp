@@ -22,11 +22,11 @@ TLElasResid<EvalT, Traits>::TLElasResid(Teuchos::ParameterList const& p)
       wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       Residual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
-  this->addNonConstDependentField(stress);
-  this->addNonConstDependentField(J);
-  this->addNonConstDependentField(defgrad);
-  this->addNonConstDependentField(wGradBF);
-  this->addNonConstDependentField(wBF);
+  this->addDependentField(stress);
+  this->addDependentField(J);
+  this->addDependentField(defgrad);
+  this->addDependentField(wGradBF);
+  this->addDependentField(wBF);
 
   this->addEvaluatedField(Residual);
 

@@ -1317,7 +1317,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           double tm = sub_list.get<double>("Impact Duration", 0.04);
           double g                        = sub_list.get<double>("Gravity", 9.806);
           double rho                      = sub_list.get<double>("Water Density", 1022.0);
-          double delta                    = sub_list.get<double>("Critical Wave Ratio", 15);
+          double delta                    = sub_list.get<double>("Critical Wave Ratio", 15.0);
           double zmin                     = sub_list.get<double>("Min z-Value", 0.0);
           bool   dump_wave_press_nbc_data = sub_list.get<bool>("Dump Wave Press NBC Data Files", false);
 

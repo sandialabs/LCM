@@ -855,7 +855,12 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
 
-  if (2*M_PI/k/w < delta) { //case 1 
+  Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
+  if (2*M_PI/k/w >= delta) { //case 1: hydrostatic formulation
+    //IKT, 9/4/2022: FIXME - remove the following print statement once we 
+    //are confident new NBC is working properly.
+    *out << "ACE Wave Pressure NBC: hydrostatic pressure case, as 2*pi/k/w = "
+	 << 2*M_PI / k / w << " < delta = " << delta <<".\n"; 
     for (int cell = 0; cell < numCells_; cell++) {
       for (int qp = 0; qp < numPoints; qp++) {
         for (int dim = 0; dim < numDOFsSet; dim++) {
@@ -881,6 +886,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     }
   }
   else { //case 2: breaking wave formulation
+    *out << "WARNING: Resorting to breaking wave formulation of ACE wave pressure NBC, as 2*pi/k/w = "
+	 << 2*M_PI / k / w << " < delta = " << delta <<"!\n"; 
     for (int cell = 0; cell < numCells_; cell++) {
       for (int qp = 0; qp < numPoints; qp++) {
         for (int dim = 0; dim < numDOFsSet; dim++) {
@@ -906,7 +913,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
     }
   }
 
-  /*if (dump_wave_press_nbc_data == true) {
+  if (dump_wave_press_nbc_data == true) {
     if (commT->getSize() > 1) {
       ALBANY_ABORT(
           "PHAL_Neumann::calc_ace_press: dumping of ACE pressure BC data not implemented for parallel runs!\n");
@@ -935,9 +942,9 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
           const auto    y         = coordVec(cell, node, 1);
           const auto    z         = coordVec(cell, node, 2);
           const auto    ztilde    = z - zmin;
-          const ScalarT pval_node = (use_new_wave_press_nbc == false) ?
-                                        this->calc_ace_press_at_z_point(h_water, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde) :
-                                        this->calc_ace_press_at_z_point(rho, g, s, w, ztilde);
+          const ScalarT pval_node = (2*M_PI/k/w >= delta) ?
+                                        this->calc_ace_press_at_z_point(rho, g, s, w, k, ztilde) :
+                                        this->calc_ace_press_at_z_point(rho, g, tm, s, w, k, L, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
           std::cout << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", "
                     << node << ", " << x << ", " << y << ", " << z << ", " << pval_node << "\n";
@@ -948,7 +955,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
       outfile.close();
       ace_press_index[workset_num]++;
     }
-  }*/
+  }
   previous_times[workset_num]  = current_time;
   is_initial_time[workset_num] = false;
 }
@@ -966,8 +973,6 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
     const ScalarT L,
     const ScalarT zval) const
 {
-  Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
-  *out << "WARNING: Resorting to breaking wave formulation of ACE wae pressure NBC!\n"; 
   ScalarT pval = 0.0;
   const ScalarT hs = w + s;  //water height
   const ScalarT Hb = w;      //breaking height of wave
@@ -1024,6 +1029,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
   return pval;
 }
 
+//The following is for the hydrostatic pressure formulation of the ACE wave pressure NBC
 template <typename EvalT, typename Traits>
 typename NeumannBase<EvalT, Traits>::ScalarT
 NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(

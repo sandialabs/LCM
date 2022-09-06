@@ -365,7 +365,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Make the elements exposed to ocean "weaker"
   if ((is_erodible == true) && (height <= sea_level)) {
-    Y = Y / 1.0;  // This is off.
+    Y = Y / 1.0; // This is off.
   }
 
   ScalarT const nu    = poissons_ratio_(cell, pt);

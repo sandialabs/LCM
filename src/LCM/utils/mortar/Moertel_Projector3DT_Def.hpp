@@ -16,7 +16,8 @@
  | and its gradient                                                     |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_NodalNormal(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_NodalNormal(
     double* F,
     double  dF[][3],
     const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
@@ -103,7 +104,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_NodalNorma
  | and its gradient                                                     |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_SegmentNormal(
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_SegmentNormal(
     double* F,
     double  dF[][3],
     const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,

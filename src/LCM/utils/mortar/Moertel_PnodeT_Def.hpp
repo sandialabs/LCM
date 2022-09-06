@@ -72,7 +72,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::~ProjectedNodeT()
  |  print node                                               mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool NoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::Print() const
+bool
+NoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::Print() const
 {
   std::cout << "Projected ";
   const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)& basenode =

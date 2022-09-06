@@ -11,7 +11,8 @@
  |  build averaged normals                                              |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNormals()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNormals()
 {
   // interface needs to be complete
   if (!IsComplete()) {
@@ -61,7 +62,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::BuildNormals()
  |  build averaged normals and make projection of nodes                 |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Project()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Project()
 {
   bool ok = false;
 
@@ -129,7 +131,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Project()
  | do projection of nodes on master and slave side                      |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_NormalField()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_NormalField()
 {
   if (!IsComplete()) {
     std::stringstream oss;
@@ -154,7 +157,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_NormalField()
  | project the slave nodes onto master segments along slave normal field|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_NormalField()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_NormalField()
 {
   if (!IsComplete()) {
     std::stringstream oss;
@@ -428,7 +432,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_No
  | project nodes master to slave along slave cont. normal field         |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_NormalField()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_NormalField()
 {
   if (!IsComplete()) {
     std::stringstream oss;
@@ -675,7 +680,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_No
  | do projection of nodes on master and slave side                      |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_Orthogonal()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_Orthogonal()
 {
   if (!IsComplete()) {
     std::stringstream oss;
@@ -700,7 +706,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_Orthogonal()
  | project nodes master to slave along slave orthogonal         |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_Orthogonal()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_Orthogonal()
 {
   if (!IsComplete()) {
     std::stringstream oss;
@@ -894,7 +901,8 @@ bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_Or
  | project the slave nodes onto master segments orthogonal              |
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-bool MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_Orthogonal()
+bool
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_Orthogonal()
 {
   if (!IsComplete()) {
     std::stringstream oss;

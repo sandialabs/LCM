@@ -20,12 +20,8 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
     Teuchos::ParameterList&              p,
     const Teuchos::RCP<Albany::Layouts>& dl)
     : thermal_conductivity_(p.get<std::string>("ACE_Therm_Cond QP Variable Name"), dl->qp_scalar),
-      thermal_cond_grad_at_nodes_(
-          p.get<std::string>("ACE_Therm_Cond Gradient Node Variable Name"),
-          dl->node_vector),
-      thermal_cond_grad_at_qps_(
-          p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"),
-          dl->qp_vector),
+      thermal_cond_grad_at_nodes_(p.get<std::string>("ACE_Therm_Cond Gradient Node Variable Name"), dl->node_vector),
+      thermal_cond_grad_at_qps_(p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"), dl->qp_vector),
       wgradbf_(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       bf_(p.get<std::string>("BF Name"), dl->node_qp_scalar),
       thermal_inertia_(p.get<std::string>("ACE_Thermal_Inertia QP Variable Name"), dl->qp_scalar),
@@ -211,7 +207,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         std::vector<RealType> ocean_salinity_eb = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
         if (ocean_salinity_eb.size() > 0) {
           ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
-          //ocean_sal = touched_by_ocean;
+          // ocean_sal = touched_by_ocean;
         }
         ScalarT const sal_diff   = ocean_sal - sal_curr;
         ScalarT const sal_grad   = sal_diff / cell_half_width;
@@ -219,7 +215,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         ScalarT       sal_trial  = sal_curr + sal_update;
         if (sal_trial < zero_sal) sal_trial = zero_sal;
         if (sal_trial > ocean_sal) sal_trial = ocean_sal;
-        bluff_salinity_(cell, qp) = std::min(sal_trial, ocean_sal); // ensures the salinity doesn't exceed ocean salinity
+        bluff_salinity_(cell, qp) =
+            std::min(sal_trial, ocean_sal);  // ensures the salinity doesn't exceed ocean salinity
         // OVERRIDES EVERYTHING ABOVE:
         // bluff_salinity_(cell, qp) = touched_by_ocean;
       }
@@ -272,8 +269,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         auto peat_frac = interpolateVectors(z_above_mean_sea_level_eb, peat_from_file_eb, height);
         v              = (peat_frac * 0.1) + (sand_frac * 1.0) + (silt_frac * 15.0) + (clay_frac * 50.0);
         Tshift         = (peat_frac * 0.1) + (sand_frac * 0.3) + (silt_frac * 0.6) + (clay_frac * 1.0);
-      }
-      else {
+      } else {
         Tshift = 0.1;
       }
       Tdiff = Tcurr - (Tmelt + Tshift);
@@ -291,13 +287,13 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       } else {
         auto const eps = minitensor::machine_epsilon<RealType>();
         if (qebt < eps) {  // (C + et) ~ C :: occurs when totally melted
-          dfdT  = 0.0;
-          //icurr = 1.0 - (A + ((G - A) / (pow(C, 1.0 / v))));
+          dfdT = 0.0;
+          // icurr = 1.0 - (A + ((G - A) / (pow(C, 1.0 / v))));
           icurr = 1.0 - 1.0;
         } else if (1.0 / qebt < eps) {  // (C + et) ~ et :: occurs in deep
                                         // frozen state
-          dfdT  = -1.0 * B * pow(qebt, -1.0 / v) * (G - A) / v;
-          //icurr = 1.0 - (A + ((G - A) / (pow(qebt, 1.0 / v))));
+          dfdT = -1.0 * B * pow(qebt, -1.0 / v) * (G - A) / v;
+          // icurr = 1.0 - (A + ((G - A) / (pow(qebt, 1.0 / v))));
           icurr = 1.0 - 0.0;
         } else {  // occurs when near melting temperature
           icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
@@ -307,7 +303,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       std::min(icurr, 1.0);
       std::max(icurr, 0.0);
-
 
       // Update the water saturation
       ScalarT wcurr = 1.0 - icurr;
@@ -373,7 +368,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
 
       // Jenn's sub-grid scale model to calibrate niche formation:
-      ScalarT factor = 1.0;    //1.0 + (3.0 * sea_level * sea_level);
+      ScalarT factor = 1.0;  // 1.0 + (3.0 * sea_level * sea_level);
       if ((is_erodible == true) && (height <= sea_level)) {
         factor                          = std::max(factor, 1.0);  // in case sea level is tiny or negative
         factor                          = std::min(factor, 1.0);
@@ -421,8 +416,7 @@ Teuchos::RCP<Teuchos::ParameterList const>
 ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> valid_pl = rcp(new Teuchos::ParameterList("Valid ACE Thermal Parameters"));
-  valid_pl->set<double>(
-      "ACE_Therm_Cond Value", 1.0, "Constant thermal conductivity value across element block");
+  valid_pl->set<double>("ACE_Therm_Cond Value", 1.0, "Constant thermal conductivity value across element block");
   valid_pl->set<double>("ACE_Thermal_Inertia Value", 1.0, "Constant thermal inertia value across element block");
   valid_pl->set<double>("ACE Ice Density", 920.0, "Constant value of ice density in element block");
   valid_pl->set<double>("ACE Water Density", 1000.0, "Constant value of water density in element block");
@@ -455,8 +449,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     const_thermal_conduct_map_[eb_name] =
         material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Therm_Cond Value", -1.0);
     if (const_thermal_conduct_map_[eb_name] != -1.0) {
-      ALBANY_ASSERT(
-          (const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE_Therm_Cond Value must be positive!");
+      ALBANY_ASSERT((const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE_Therm_Cond Value must be positive!");
     }
     const_thermal_inertia_map_[eb_name] =
         material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Thermal_Inertia Value", -1.0);

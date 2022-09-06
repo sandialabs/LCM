@@ -33,7 +33,8 @@ template <>
 struct static_pow<0>
 {
   template <typename T>
-  static constexpr KOKKOS_INLINE_FUNCTION T value(T)
+  static constexpr KOKKOS_INLINE_FUNCTION T
+  value(T)
   {
     return T(1);
   }

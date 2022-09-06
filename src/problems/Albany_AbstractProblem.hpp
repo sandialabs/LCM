@@ -165,7 +165,10 @@ class AbstractProblem
 
   //! Allow the Problem to modify the solver settings, for example by adding a
   //! custom status test.
-  virtual void applyProblemSpecificSolverSettings(Teuchos::RCP<Teuchos::ParameterList>) {}
+  virtual void
+  applyProblemSpecificSolverSettings(Teuchos::RCP<Teuchos::ParameterList>)
+  {
+  }
 
  protected:
   Teuchos::Array<Teuchos::Array<int>> offsets_;
@@ -270,7 +273,8 @@ struct ConstructEvaluatorsOp
     tags = Teuchos::rcp(new Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>);
   }
   template <typename T>
-  void operator()(T /* x */) const
+  void
+  operator()(T /* x */) const
   {
     tags->push_back(prob.template constructEvaluators<T>(fm, meshSpecs, stateMgr, fmchoice, responseList));
   }

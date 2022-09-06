@@ -94,7 +94,8 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::~Segment()
  |  print segment                                            mwgee 06/05|
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Print() const
+bool
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Print() const
 {
   std::cout << "Segment " << std::setw(6) << Id_;
   if (stype_ == MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_Linear1D) std::cout << " Typ Linear1D   ";
@@ -116,7 +117,8 @@ bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::Print() const
  | the user can set func to several segments!                           |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::SetFunction(int id, MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT) * func)
+bool
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::SetFunction(int id, MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT) * func)
 {
   if (id < 0) {
     std::cout << "***ERR*** MOERTEL::Segment::SetFunction:\n"
@@ -189,7 +191,8 @@ bool MOERTEL::Segment::SetFunction(int id, Teuchos::RCP<MOERTEL::Function> func)
  |               no evaluation                                          |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(
+bool
+MoertelT::SEGMENT_TEMPLATE_CLASS(
     SegmentT)::EvaluateFunction(int id, const double* xi, double* val, int valdim, double* deriv)
 {
   std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)>>::iterator curr = functions_.find(id);
@@ -222,7 +225,8 @@ operator<<(std::ostream& os, const MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & 
  | return -1 of nid is not adjacent to this segment                     |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-int MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetLocalNodeId(int nid)
+int
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetLocalNodeId(int nid)
 {
   int lid = -1;
   for (int i = 0; i < Nnode(); ++i)
@@ -244,7 +248,8 @@ int MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetLocalNodeId(int nid)
  | build an outward normal at a node adjacent to this        mwgee 07/05|
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-double* MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::BuildNormalAtNode(int nid)
+double*
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::BuildNormalAtNode(int nid)
 {
   // find this node in my list of nodes and get local numbering for it
   int lid = GetLocalNodeId(nid);
@@ -262,8 +267,8 @@ double* MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::BuildNormalAtNode(int nid)
  | construct ptrs to redundant nodes from my node id list               |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
-    MoertelT::SEGMENT_TEMPLATE_CLASS(InterfaceT) & interface)
+bool
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(MoertelT::SEGMENT_TEMPLATE_CLASS(InterfaceT) & interface)
 {
   if (!interface.IsComplete()) return false;
   if (!interface.lComm()) return true;
@@ -287,7 +292,8 @@ bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
 }
 
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(MoertelT::InterfaceT<ST, LO, GO, N>& interface)
+bool
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(MoertelT::InterfaceT<ST, LO, GO, N>& interface)
 {
   if (!interface.IsComplete()) return false;
   if (interface.lComm() == Teuchos::null) return true;
@@ -315,7 +321,8 @@ bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(MoertelT::Interf
  | construct ptrs to nodes from vector                                  |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-bool MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
+bool
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
     std::vector<MoertelT::SEGMENT_TEMPLATE_CLASS(NodeT) *>& nodes)
 {
   if (!nodeId_.size()) return false;

@@ -1097,65 +1097,17 @@ Albany::HMCProblem::registerStateVariables(
 
     } else
 
-        // QUAD POINT TENSORS
-        if ((cmiEv->getLayout() == dl->qp_tensor) && (cmiEv->getOutputFlag() == true)) {
-      std::string cn[3] = {"x", "y", "z"};
+      // QUAD POINT TENSORS
+      if ((cmiEv->getLayout() == dl->qp_tensor) && (cmiEv->getOutputFlag() == true)) {
+        std::string cn[3] = {"x", "y", "z"};
 
-      // save cell average for output
-      for (int i = 0; i < numDim; i++)
-        for (int j = 0; j < numDim; j++) {
-          std::string varname(cmiEv->getName());
-          varname += " ";
-          varname += cn[i];
-          varname += cn[j];
-          varname += "_ave ";
-          p = stateMgr.registerStateVariable(
-              varname,
-              dl->cell_scalar,
-              dl->dummy,
-              eb_name,
-              cmiEv->getInitType(),
-              cmiEv->getInitValue(),
-              /* save state = */ false,
-              /* write output = */ true);
-          p->set("Field Layout", dl->qp_tensor);
-          p->set("Field Name", cmiEv->getName());
-          p->set("Weights Layout", dl->qp_scalar);
-          p->set("Weights Name", "Weights");
-          p->set("component i", i);
-          p->set("component j", j);
-          ev = Teuchos::rcp(new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
-          fm0.template registerEvaluator<EvalT>(ev);
-        }
-
-      // save state w/o output
-      p = stateMgr.registerStateVariable(
-          cmiEv->getName(),
-          cmiEv->getLayout(),
-          dl->dummy,
-          eb_name,
-          cmiEv->getInitType(),
-          cmiEv->getInitValue(),
-          cmiEv->getStateFlag(),
-          /* write output = */ false);
-      ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
-      fm0.template registerEvaluator<EvalT>(ev);
-
-    } else
-
-        // QUAD POINT THIRD RANK TENSORS
-        if ((cmiEv->getLayout() == dl->qp_tensor3) && (cmiEv->getOutputFlag() == true)) {
-      std::string cn[3] = {"x", "y", "z"};
-
-      // save cell average for output
-      for (int i = 0; i < numDim; i++)
-        for (int j = 0; j < numDim; j++)
-          for (int k = 0; k < numDim; k++) {
+        // save cell average for output
+        for (int i = 0; i < numDim; i++)
+          for (int j = 0; j < numDim; j++) {
             std::string varname(cmiEv->getName());
             varname += " ";
             varname += cn[i];
             varname += cn[j];
-            varname += cn[k];
             varname += "_ave ";
             p = stateMgr.registerStateVariable(
                 varname,
@@ -1166,43 +1118,91 @@ Albany::HMCProblem::registerStateVariables(
                 cmiEv->getInitValue(),
                 /* save state = */ false,
                 /* write output = */ true);
-            p->set("Field Layout", dl->qp_tensor3);
+            p->set("Field Layout", dl->qp_tensor);
             p->set("Field Name", cmiEv->getName());
             p->set("Weights Layout", dl->qp_scalar);
             p->set("Weights Name", "Weights");
             p->set("component i", i);
             p->set("component j", j);
-            p->set("component k", k);
             ev = Teuchos::rcp(new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
             fm0.template registerEvaluator<EvalT>(ev);
           }
 
-      // save state w/o output
-      p = stateMgr.registerStateVariable(
-          cmiEv->getName(),
-          cmiEv->getLayout(),
-          dl->dummy,
-          eb_name,
-          cmiEv->getInitType(),
-          cmiEv->getInitValue(),
-          cmiEv->getStateFlag(),
-          /* write output = */ false);
-      ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
-      fm0.template registerEvaluator<EvalT>(ev);
+        // save state w/o output
+        p = stateMgr.registerStateVariable(
+            cmiEv->getName(),
+            cmiEv->getLayout(),
+            dl->dummy,
+            eb_name,
+            cmiEv->getInitType(),
+            cmiEv->getInitValue(),
+            cmiEv->getStateFlag(),
+            /* write output = */ false);
+        ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+        fm0.template registerEvaluator<EvalT>(ev);
 
-    } else {
-      p = stateMgr.registerStateVariable(
-          cmiEv->getName(),
-          cmiEv->getLayout(),
-          dl->dummy,
-          eb_name,
-          cmiEv->getInitType(),
-          cmiEv->getInitValue(),
-          cmiEv->getStateFlag(),
-          cmiEv->getOutputFlag());
-      ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
-      fm0.template registerEvaluator<EvalT>(ev);
-    }
+      } else
+
+        // QUAD POINT THIRD RANK TENSORS
+        if ((cmiEv->getLayout() == dl->qp_tensor3) && (cmiEv->getOutputFlag() == true)) {
+          std::string cn[3] = {"x", "y", "z"};
+
+          // save cell average for output
+          for (int i = 0; i < numDim; i++)
+            for (int j = 0; j < numDim; j++)
+              for (int k = 0; k < numDim; k++) {
+                std::string varname(cmiEv->getName());
+                varname += " ";
+                varname += cn[i];
+                varname += cn[j];
+                varname += cn[k];
+                varname += "_ave ";
+                p = stateMgr.registerStateVariable(
+                    varname,
+                    dl->cell_scalar,
+                    dl->dummy,
+                    eb_name,
+                    cmiEv->getInitType(),
+                    cmiEv->getInitValue(),
+                    /* save state = */ false,
+                    /* write output = */ true);
+                p->set("Field Layout", dl->qp_tensor3);
+                p->set("Field Name", cmiEv->getName());
+                p->set("Weights Layout", dl->qp_scalar);
+                p->set("Weights Name", "Weights");
+                p->set("component i", i);
+                p->set("component j", j);
+                p->set("component k", k);
+                ev = Teuchos::rcp(new PHAL::SaveCellStateField<EvalT, PHAL::AlbanyTraits>(*p));
+                fm0.template registerEvaluator<EvalT>(ev);
+              }
+
+          // save state w/o output
+          p = stateMgr.registerStateVariable(
+              cmiEv->getName(),
+              cmiEv->getLayout(),
+              dl->dummy,
+              eb_name,
+              cmiEv->getInitType(),
+              cmiEv->getInitValue(),
+              cmiEv->getStateFlag(),
+              /* write output = */ false);
+          ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+          fm0.template registerEvaluator<EvalT>(ev);
+
+        } else {
+          p = stateMgr.registerStateVariable(
+              cmiEv->getName(),
+              cmiEv->getLayout(),
+              dl->dummy,
+              eb_name,
+              cmiEv->getInitType(),
+              cmiEv->getInitValue(),
+              cmiEv->getStateFlag(),
+              cmiEv->getOutputFlag());
+          ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+          fm0.template registerEvaluator<EvalT>(ev);
+        }
   }
 }
 #endif  // ALBANY_ELASTICITYPROBLEM_HPP

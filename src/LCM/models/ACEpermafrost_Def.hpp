@@ -186,13 +186,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
       "ACE_Heat_Capacity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Heat_Capacity", false));
 
   // ACE_Therm_Cond
-  addStateVariable(
-      "ACE_Therm_Cond",
-      dl->qp_scalar,
-      "scalar",
-      0.0,
-      false,
-      p->get<bool>("Output ACE_Therm_Cond", false));
+  addStateVariable("ACE_Therm_Cond", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Therm_Cond", false));
 
   // ACE_Thermal_Inertia
   addStateVariable(

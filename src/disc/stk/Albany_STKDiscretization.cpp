@@ -1727,7 +1727,7 @@ STKDiscretization::computeWorksetInfo()
     sphereVolume_field = stkMeshStruct->getFieldContainer()->getSphereVolumeField();
   }
 
-  stk::mesh::Field<double> * latticeOrientation_field; 
+  stk::mesh::Field<double>* latticeOrientation_field;
   if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
     latticeOrientation_field = stkMeshStruct->getFieldContainer()->getLatticeOrientationField();
   }
@@ -2313,10 +2313,10 @@ STKDiscretization::setupExodusOutput()
 
     mesh_data = Teuchos::rcp(new stk::io::StkMeshIoBroker(getMpiCommFromTeuchosComm(comm)));
     mesh_data->set_bulk_data(bulkData);
-    //mesh_data->set_bulk_data(Teuchos::get_shared_ptr(bulkData));
-    // IKT, 8/16/19: The following is needed to get correct output file for
-    // Schwarz problems Please see:
-    // https://github.com/trilinos/Trilinos/issues/5479
+    // mesh_data->set_bulk_data(Teuchos::get_shared_ptr(bulkData));
+    //  IKT, 8/16/19: The following is needed to get correct output file for
+    //  Schwarz problems Please see:
+    //  https://github.com/trilinos/Trilinos/issues/5479
     mesh_data->property_add(Ioss::Property("FLUSH_INTERVAL", 1));
     outputFileIdx = mesh_data->create_output_mesh(str, stk::io::WRITE_RESULTS);
 

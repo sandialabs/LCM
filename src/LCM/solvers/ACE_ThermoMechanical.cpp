@@ -180,6 +180,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     }
 
     auto const problem_type = prob_types_[subdomain];
+  
 
     // Error checks - only needs to be done once at the beginning
     bool const have_piro = params.isSublist("Piro");

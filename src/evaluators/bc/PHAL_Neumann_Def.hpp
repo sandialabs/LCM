@@ -856,7 +856,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 #endif
 
   Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
-  if (2*M_PI/k/w >= delta) { //case 1: hydrostatic formulation
+  if (std::abs(2*M_PI/k/w) >= delta) { //case 1: hydrostatic formulation
     //IKT, 9/4/2022: FIXME - remove the following print statement once we 
     //are confident new NBC is working properly.
     *out << "ACE Wave Pressure NBC: hydrostatic pressure case, as 2*pi/k/w = "

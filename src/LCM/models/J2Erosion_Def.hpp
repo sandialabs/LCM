@@ -23,7 +23,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   sat_exp_                  = p->get<RealType>("Saturation Exponent", 0.0);
   bulk_porosity_            = p->get<RealType>("ACE Bulk Porosity", 0.0);
   critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
-  soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 3.0e+06);
+  soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
   // note: set default value to pure ice yield strength 3.0e+6
 

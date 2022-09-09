@@ -132,23 +132,21 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       const int                                            workset_num,
       const double                                         current_time) const;
 
+  //The following is for the breaking wave formulation of the ACE wave pressure NBC
   ScalarT
   calc_ace_press_at_z_point(
-      const ScalarT hs,
-      const ScalarT hc,
-      const ScalarT Hb,
-      const ScalarT m1,
-      const ScalarT m2,
-      const ScalarT m3,
-      const ScalarT b1,
-      const ScalarT b2,
-      const ScalarT b3,
-      const ScalarT zval) const;
+    const double  rho,
+    const double  g,
+    const double  tm,  
+    const ScalarT s,
+    const ScalarT w,
+    const ScalarT k,
+    const ScalarT L,
+    const ScalarT zval) const; 
 
-  // IKT, 8/11/2021: specialization of calc_ace_press_at_z_point
-  // for new formulation of ACE Wave Pressure NBC
   ScalarT
-  calc_ace_press_at_z_point(const double rho, const double g, const ScalarT h, const ScalarT a, const ScalarT zval)
+  calc_ace_press_at_z_point(const double rho, const double g, const ScalarT s, const ScalarT w, 
+		            const ScalarT k, const ScalarT zval)
       const;
 
   // closed_from bc assignment

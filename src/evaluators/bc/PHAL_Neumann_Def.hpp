@@ -838,65 +838,29 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  const ScalarT h_water = water_height_val;  // wave height value interpolated in time
-  const ScalarT hc = height_above_water_of_max_pressure_val;
-  // height above water of the max pressure value interpolated in time
-  // In general, hc = 0.7*Hb, where Hb is the breaking wave height
-  const ScalarT L = wave_length_val;               // wave length interpolated in time
-                                                   // In general, L = 8*Hb
-  const ScalarT k = wave_number_val;               // wave number interpolated in time
-                                                   // In general, k = 2*pi/L
-  const ScalarT s                        = s_val;  // still water level interpolated in time
-  const ScalarT w                        = w_val;  // wave height interpolated in time
-  const double  tm                       = inputValues[0];
-  const double  g                        = inputValues[1];
-  const double  rho                      = inputValues[2];
-  //const double  rho                      = 1022.0;
-  const double  zmin                     = inputValues[3];
-  const bool    dump_wave_press_nbc_data = inputValues[4];
-  const bool    use_new_wave_press_nbc   = inputValues[5];
-  // std::cout << "IKT: use_new_wave_press_nbc = " << use_new_wave_press_nbc << "\n";
+  const ScalarT L                        = wave_length_val; // wave length interpolated in time
+  const ScalarT k                        = wave_number_val; // wave number interpolated in time
+  const ScalarT s                        = s_val;           // still water level interpolated in time
+  const ScalarT w                        = w_val;           // wave height interpolated in time
+  const double  tm                       = inputValues[0];  // impact duration
+  const double  g                        = inputValues[1];  // gravitational constant
+  const double  rho                      = inputValues[2];  // density
+  const double  zmin                     = inputValues[3];  // min value of z coord in mesh
+  const double  delta                    = inputValues[4];  //critical wave ratio - for 
+                                                            //determining when to switch b/w 
+							    //different forms of wave press NBC
+  const bool    dump_wave_press_nbc_data = inputValues[5];
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
   std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
 
-  // IKT, 8/11/2021: the following are for the old ACE Wave Pressure NBC but putting it here,
-  // as it's needed for debug output
-  const ScalarT Hb = hc / 0.7;
-  ScalarT       p0, pc, ps;
-  ScalarT       m1;
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-  std::cout << "DEBUG: h_water, tm, Hb, g, rho, zmin, L, k, hc = " << h_water << ", " << tm << ", " << Hb << ", " << g << ", "
-            << rho << ", " << zmin << ", " << L << ", " << k << ", " << hc << "\n";
-#endif
-  ScalarT m2, m3;
-  ;
-  ScalarT b1, b2, b3;
-
-  if (use_new_wave_press_nbc == false) {
-    if (h_water > 0.0) {
-      p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * h_water);
-      pc = rho * Hb / 2.0 / tm * sqrt(g * h_water);
-      ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * h_water)) * sqrt(g * h_water);
-      m1 = (p0 - ps) / h_water;
-    } else {
-      p0 = 0.0;
-      pc = 0.0;
-      ps = 0.0;
-      m1 = 0.0;
-    }
-    m2 = (pc - p0) / hc;
-    m3 = -2.0 * pc / Hb;
-    b1 = ps;
-    b2 = m1 * h_water + b1 - m2 * h_water;
-    b3 = m3 * (h_water + hc + 0.5 * Hb);
-
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-    std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
-    std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
-#endif
-
+  Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
+  if (std::abs(2*M_PI/k/w) >= delta) { //case 1: hydrostatic formulation
+    //IKT, 9/4/2022: FIXME - remove the following print statement once we 
+    //are confident new NBC is working properly.
+    *out << "ACE Wave Pressure NBC: hydrostatic pressure case, as 2*pi/k/w = "
+	 << 2*M_PI / k / w << " < delta = " << delta <<".\n"; 
     for (int cell = 0; cell < numCells_; cell++) {
       for (int qp = 0; qp < numPoints; qp++) {
         for (int dim = 0; dim < numDOFsSet; dim++) {
@@ -909,7 +873,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
           std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
-          const ScalarT pval_qp = this->calc_ace_press_at_z_point(h_water, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde);
+          const ScalarT pval_qp = this->calc_ace_press_at_z_point(rho, g, s, w, k, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
           if (dim == 0) {
             std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
@@ -920,7 +884,10 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
         }
       }
     }
-  } else {  // new ACE wave pressure NBC
+  }
+  else { //case 2: breaking wave formulation
+    *out << "WARNING: Resorting to breaking wave formulation of ACE wave pressure NBC, as 2*pi/k/w = "
+	 << 2*M_PI / k / w << " < delta = " << delta <<"!\n"; 
     for (int cell = 0; cell < numCells_; cell++) {
       for (int qp = 0; qp < numPoints; qp++) {
         for (int dim = 0; dim < numDOFsSet; dim++) {
@@ -933,7 +900,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
           std::cout << "DEBUG: z, ztilde = " << z << ", " << ztilde << "\n";
 #endif
-          const ScalarT pval_qp = this->calc_ace_press_at_z_point(rho, g, s, w, ztilde);
+          const ScalarT pval_qp = this->calc_ace_press_at_z_point(rho, g, tm, s, w, k, L, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
           if (dim == 0) {
             std::cout << "DEBUG: cell, qp, x, y, z, pval_qp = " << cell << ", " << qp << ", " << x << ", " << y << ", "
@@ -975,9 +942,9 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
           const auto    y         = coordVec(cell, node, 1);
           const auto    z         = coordVec(cell, node, 2);
           const auto    ztilde    = z - zmin;
-          const ScalarT pval_node = (use_new_wave_press_nbc == false) ?
-                                        this->calc_ace_press_at_z_point(h_water, hc, Hb, m1, m2, m3, b1, b2, b3, ztilde) :
-                                        this->calc_ace_press_at_z_point(rho, g, s, w, ztilde);
+          const ScalarT pval_node = (2*M_PI/k/w >= delta) ?
+                                        this->calc_ace_press_at_z_point(rho, g, s, w, k, ztilde) :
+                                        this->calc_ace_press_at_z_point(rho, g, tm, s, w, k, L, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
           std::cout << "DEBUG: workset_num, cell, node, x, y, z, pval_node = " << workset_num << ", " << cell << ", "
                     << node << ", " << x << ", " << y << ", " << z << ", " << pval_node << "\n";
@@ -993,73 +960,96 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   is_initial_time[workset_num] = false;
 }
 
+//The following is for the breaking wave formulation of the ACE wave pressure NBC
 template <typename EvalT, typename Traits>
 typename NeumannBase<EvalT, Traits>::ScalarT
 NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
-    const ScalarT h_water,
-    const ScalarT hc,
-    const ScalarT Hb,
-    const ScalarT m1,
-    const ScalarT m2,
-    const ScalarT m3,
-    const ScalarT b1,
-    const ScalarT b2,
-    const ScalarT b3,
+    const double  rho,
+    const double  g,
+    const double  tm,  
+    const ScalarT s,
+    const ScalarT w,
+    const ScalarT k,
+    const ScalarT L,
     const ScalarT zval) const
 {
   ScalarT pval = 0.0;
-  if (h_water < 0.0) {  // if h_water < 0, there is no pressure applied
-                   // IKT FIXME: need to verify with Jenn that this is correct
+  const ScalarT hs = s;      //water height
+  const ScalarT hc = w;      //height above water of the max pressure
+  const ScalarT Hb = hc/0.7; //breaking height of wave
+  ScalarT p0, pc, ps, m1, m2, m3, b1, b2, b3; //temporary variables
+  if (hs > 0.0) { 
+    p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
+    pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
+    ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
+    m1 = (p0 - ps) / hs;
+  } 
+  else { // no pressure applied if wave height <=0
+    pval = 0.0; 
+    return pval; 
+  }
+  m2 = (pc - p0) / hc;
+  m3 = -2.0 * pc / Hb;
+  b1 = ps;
+  b2 = m1 * hs + b1 - m2 * hs;
+  b3 = m3 * (hs + hc + 0.5 * Hb);
+
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-    std::cout << "DEBUG: negative h_water case!\n";
+  std::cout << "DEBUG: p0, pc, ps = " << p0 << ", " << pc << ", " << ps << "\n";
+  std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
+#endif
+  if (w + s <= 0.0) {
+    pval = 0.0; 
+    return pval; 
+  }
+  if ((zval >= 0) && (zval <= hs)) {
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+    std::cout << "DEBUG: case 1!\n";
+#endif
+    pval = m1 * zval + b1; 
+  }
+  else if ((zval > hs) && (zval <= hs + hc)) {
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+    std::cout << "DEBUG: case 2!\n";
+#endif
+    pval = m2 * zval + b2;
+  } 
+  else if ((zval > hs + hc) && (zval <= hs + hc + 0.5 * Hb)) {
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+    std::cout << "DEBUG: case 3!\n";
+#endif
+    pval = m3 * zval - b3;
+  } 
+  else {
+#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
+    std::cout << "DEBUG: case 4!\n";
 #endif
     pval = 0.0;
-  } else {
-    if ((zval >= 0) && (zval <= h_water)) {
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-      std::cout << "DEBUG: case 1!\n";
-#endif
-      pval = m1 * zval + b1;
-    } else if ((zval > h_water) && (zval <= h_water + hc)) {
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-      std::cout << "DEBUG: case 2!\n";
-#endif
-      pval = m2 * zval + b2;
-    } else if ((zval > h_water + hc) && (zval <= h_water + hc + 0.5 * Hb)) {
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-      std::cout << "DEBUG: case 3!\n";
-#endif
-      pval = m3 * zval - b3;
-    } else {
-#ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
-      std::cout << "DEBUG: case 4!\n";
-#endif
-      pval = 0.0;
-    }
   }
   return pval;
 }
 
-// IKT 8/9/2021: overloaded version of above routine but for new formulation
-// of ACE Wave Pressure NBC
+//The following is for the hydrostatic pressure formulation of the ACE wave pressure NBC
 template <typename EvalT, typename Traits>
 typename NeumannBase<EvalT, Traits>::ScalarT
 NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
     const double  rho,
     const double  g,
     const ScalarT s, //s = still water level
-    const ScalarT w, //a = wave height
+    const ScalarT w, //w = wave height
+    const ScalarT k, //k = wave number
     const ScalarT zval) const
 {
   ScalarT pval = 0.0;
-  if (zval < s) {
-    ALBANY_PANIC(std::abs(s) < 1e-12, "Still water level is zero and ACE wave press NBC is undefined!");
-    pval = rho * g * s + rho * g * (w - s) * zval / s;
-  } else if ((zval >= s) && (zval < s + w)) {
-    pval = rho * g * (s + w - zval);
-  } else {  // IKT: note we don't really need to implement this case b/c pval
-            // is initialized to 0.0.
-    pval = 0.0;
+  if (w + s <= 0.0) { 
+    pval = 0.0; 
+    return pval; 
+  }
+  if (zval <= w + s) {
+    pval = rho * g * (s - zval) + rho * g * w * cosh(k*zval) / cosh(k*s); 
+  }
+  else {
+    pval = 0.0; 
   }
   return pval;
 }

@@ -19,21 +19,16 @@ LCM:
     Neumann BCs: 
       ACE Time Dependent NBC on SS bluff_face-erodible for DOF all set wave_pressure:
         ACE Time Values File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
-        #Uncomment the following 4 lines if wantt to set
-        #'Use New Wave Press NBC: false'
-        #ACE Water Height Values File: 'bcs/hsvals.txt'
-        #ACE Height Above Water of Max Pressure Values File: 'bcs/hcvals.txt'
-        #ACE Wave Length Values File: 'bcs/Lvals.txt'
-        #ACE Wave Number Values File: 'bcs/kvals.txt'
+        ACE Wave Length Values File: 'bcs/Lvals.txt'
+        ACE Wave Number Values File: 'bcs/kvals.txt'
         ACE Still Water Level Values File: 'bcs/waterH.txt'
         ACE Wave Height Values File: 'bcs/waterA.txt'
         Dump Wave Press NBC Data Files: false
-        Use New Wave Press NBC: true
-        #Uncomment the following 3 lines if wantt to set
-        #'Use New Wave Press NBC: false'
+        #Uncomment the following 4 lines if want to set
         #Impact Duration: 0.01 
         #Gravity: 9.806
         #Water Density: 3000.0
+        Critical Wave Ratio: 15.0
     
     Adaptation:
       Method: Erosion

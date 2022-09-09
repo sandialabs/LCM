@@ -974,9 +974,9 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
     const ScalarT zval) const
 {
   ScalarT pval = 0.0;
-  const ScalarT hs = w + s;  //water height
-  const ScalarT Hb = w;      //breaking height of wave
-  const ScalarT hc = 0.7*Hb; //height above water of the max pressure
+  const ScalarT hs = s;      //water height
+  const ScalarT hc = w;      //height above water of the max pressure
+  const ScalarT Hb = hc/0.7; //breaking height of wave
   ScalarT p0, pc, ps, m1, m2, m3, b1, b2, b3; //temporary variables
   if (hs > 0.0) { 
     p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);

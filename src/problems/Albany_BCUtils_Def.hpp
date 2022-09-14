@@ -1275,23 +1275,27 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           if (timevals.size() != Lvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array must have same length as 'Wave Length Values' "
-                "array!\n");
+                "'Time Values' array (" << timevals.size() <<
+                ") must have same length as 'Wave Length Values' "
+                "array (" << Lvals.size() << ")!\n");
           }
           if (timevals.size() != kvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array must have same length as 'Wave Number Values' "
-                "array!\n");
+                "'Time Values' array (" << timevals.size() <<
+                ") must have same length as 'Wave Number Values' "
+                "array (" << kvals.size() << ")!\n");
           }
           if (timevals.size() != hvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array must have same length as 'Still Water Level Values' "
-                "array!\n");
+                "'Time Values' array (" << timevals.size() <<
+                ") must have same length as 'Still Water Level Values' "
+                "array (" << hvals.size() << ")!\n");
           }
           if (timevals.size() != wvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array must have same length as 'Wave Height Values' "
-                "array!\n");
+                "'Time Values' array (" << timevals.size() <<
+                ") must have same length as 'Wave Height Values' "
+                "array (" << wvals.size() << ")!\n");
           }
 
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);

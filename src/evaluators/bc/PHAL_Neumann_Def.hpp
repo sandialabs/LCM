@@ -859,8 +859,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   if (std::abs(2*M_PI/k/w) >= delta) { //case 1: hydrostatic formulation
     //IKT, 9/4/2022: FIXME - remove the following print statement once we 
     //are confident new NBC is working properly.
-    *out << "ACE Wave Pressure NBC: hydrostatic pressure case, as 2*pi/k/w = "
-	 << 2*M_PI / k / w << " < delta = " << delta <<".\n"; 
+    // *out << "ACE Wave Pressure NBC: hydrostatic pressure case, as 2*pi/k/w = "
+	  // << 2*M_PI / k / w << " < delta = " << delta <<".\n"; 
     for (int cell = 0; cell < numCells_; cell++) {
       for (int qp = 0; qp < numPoints; qp++) {
         for (int dim = 0; dim < numDOFsSet; dim++) {

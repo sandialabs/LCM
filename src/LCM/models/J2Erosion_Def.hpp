@@ -269,14 +269,14 @@ template <typename T>
 T
 E_fit_max(T x, RealType y)
 {
-  return (210.0 - 528.0 * y - 209.0 * x + 936.0 * y * x) / 409.0;
+  return (391.0 - 391.0 * y - 973.0 * x + 1378.0 * y * x) / 405.0;
 }
 
 template <typename T>
 T
 Y_fit_max(T const x, RealType const y)
 {
-  return (3.0 - 11.0 * y - 3.0 * x + 20.0 * y * x) / 9.0;
+  return (3.0 - 3.0 * y - 7.0 * x + 12.0 * y * x) / 5.0;
 }
 
 template <typename T>

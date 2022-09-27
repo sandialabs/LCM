@@ -94,6 +94,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType bulk_porosity_{0.0};
   RealType soil_yield_strength_{0.0};
   RealType residual_elastic_modulus_{0.0};
+  RealType Y_weakening_factor_{1.0};
 
   // Params with depth or time:
   std::vector<RealType> z_above_mean_sea_level_;

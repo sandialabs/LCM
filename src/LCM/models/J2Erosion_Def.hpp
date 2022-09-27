@@ -23,6 +23,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   sat_exp_                  = p->get<RealType>("Saturation Exponent", 0.0);
   bulk_porosity_            = p->get<RealType>("ACE Bulk Porosity", 0.0);
   critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
+  Y_weakening_factor_       = p->get<RealType>("ACE Y Weakening Factor", 1.0);
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
   // note: set default value to pure ice yield strength 3.0e+6
@@ -317,9 +318,6 @@ unit_fit(T ice_saturation, RealType porosity)
     K = K_fit_min(xc, yc) * x * y / xc / yc;
   }
   return std::make_tuple(E, Y, K);
-  // NOTE: These fits do not yet separate out the ice wedge, which is
-  //       marked by porosity > 0.9999. These fits do not yet cut off
-  //       the values of Y, E, and K at the residual values.
 }
 
 }  // anonymous namespace
@@ -380,7 +378,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Make the elements exposed to ocean "weaker"
   if ((is_erodible == true) && (height <= sea_level)) {
-    Y = Y / 1.0; // 
+    Y = Y / Y_weakening_factor_; 
   }
 
   ScalarT const nu    = poissons_ratio_(cell, pt);

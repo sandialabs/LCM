@@ -370,13 +370,12 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
             ((1.0 - porosity_eb) * soil_thermal_cond_eb);
       }
 
-      // Jenn's sub-grid scale model to calibrate niche formation:
-      ScalarT factor = 1.0;  // 1.0 + (3.0 * sea_level * sea_level);
+      // Jenn's sub-grid scale model to calibrate niche formation follows.
+      // By default, thermal_factor = 1.0, so that no scaling occurs.
+      ScalarT thermal_factor_eb = this->queryElementBlockParameterMap(eb_name, thermal_factor_map_);
       if ((is_erodible == true) && (height <= sea_level)) {
-        factor                          = std::max(factor, 1.0);  // in case sea level is tiny or negative
-        factor                          = std::min(factor, 1.0);
-        thermal_conductivity_(cell, qp) = thermal_conductivity_(cell, qp) * factor;
-        heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / factor;
+        thermal_conductivity_(cell, qp) = thermal_conductivity_(cell, qp) * thermal_factor_eb;
+        heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / thermal_factor_eb;
       }
 
       // Update the material thermal inertia term
@@ -499,6 +498,8 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((porosity_bulk_map_[eb_name] >= 0.0), "*** ERROR: ACE Bulk Porosity must be non-negative!");
     element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 1.0);
     ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), "*** ERROR: ACE Element Size must be non-negative!");
+    thermal_factor_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
+    ALBANY_ASSERT((thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
 
     if (material_db_->isElementBlockParam(eb_name, "ACE Time File") == true) {
       std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");

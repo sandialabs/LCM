@@ -270,29 +270,35 @@ template <typename T>
 T
 E_fit_max(T x, RealType y)
 {
-  return (391.0 - 391.0 * y - 973.0 * x + 1378.0 * y * x) / 405.0;
+  // Wed 09/21/2022 w/ BCs
+  // x = ice saturation;   y = porosity
+  return (343.0 - 343.0 * y - 913.0 * x + 1316.0 * y * x) / (403.0);
 }
 
 template <typename T>
 T
 Y_fit_max(T const x, RealType const y)
 {
-  return (3.0 - 3.0 * y - 7.0 * x + 12.0 * y * x) / 5.0;
+  // Wed 09/21/2022 w/ BCs
+  // x = ice saturation;   y = porosity
+  return (2.0 - 2.0 * y - 6.0 * x + 11.0 * y * x) / (5.0);
 }
 
 template <typename T>
 T
 K_fit_min(T const x, RealType const y)
 {
-  return (-12.0 + 26.0 * y + 12.0 * x - 36.0 * y * x) / 10.0;
+  // Wed 09/21/2022 w/ BCs
+  // x = ice saturation;   y = porosity
+  return (-12.0 + 12.0 * y + 33.0 * x - 43.0 * y * x) / (-10.0);
 }
 
 template <typename T>
 std::tuple<T, T, T>
 unit_fit(T ice_saturation, RealType porosity)
 {
-  auto const critical_porosity       = 0.2;
-  auto const critical_ice_saturation = 0.4;
+  auto const critical_porosity       = 0.30; // can't be zero
+  auto const critical_ice_saturation = 0.30;
   auto const x                       = ice_saturation;
   auto const y                       = porosity;
   auto const xc                      = critical_porosity;

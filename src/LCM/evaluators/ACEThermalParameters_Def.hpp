@@ -287,17 +287,15 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       } else {
         auto const eps = minitensor::machine_epsilon<RealType>();
         if (qebt < eps) {  // (C + et) ~ C :: occurs when totally melted
-          dfdT = 0.0;
           // icurr = 1.0 - (A + ((G - A) / (pow(C, 1.0 / v))));
+          dfdT = 0.0;
           icurr = 1.0 - 1.0;
-        // Is the following section really necessary? 09/13/2022 jmfrede
-        // The expression (1.0 / qebt) is not encountered in the equations.
         } else if (1.0 / qebt < eps) {  // (C + et) ~ et :: occurs in deep
                                         // frozen state
-          dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
-          icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
-          // dfdT = -1.0 * B * pow(qebt, -1.0 / v) * (G - A) / v;
-          //icurr = 1.0 - 0.0;
+          //dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
+          //icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
+          dfdT = -1.0 * B * pow(qebt, -1.0 / v) * (G - A) / v;
+          icurr = 1.0 - 0.0;
         } else {  // occurs when near melting temperature
           dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
           icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));

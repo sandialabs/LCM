@@ -288,13 +288,13 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         auto const eps = minitensor::machine_epsilon<RealType>();
         if (qebt < eps) {  // (C + et) ~ C :: occurs when totally melted
           // icurr = 1.0 - (A + ((G - A) / (pow(C, 1.0 / v))));
-          dfdT = 0.0;
+          dfdT  = 0.0;
           icurr = 1.0 - 1.0;
         } else if (1.0 / qebt < eps) {  // (C + et) ~ et :: occurs in deep
                                         // frozen state
-          //dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
-          //icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
-          dfdT = -1.0 * B * pow(qebt, -1.0 / v) * (G - A) / v;
+          // dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
+          // icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
+          dfdT  = -1.0 * B * pow(qebt, -1.0 / v) * (G - A) / v;
           icurr = 1.0 - 0.0;
         } else {  // occurs when near melting temperature
           dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
@@ -496,8 +496,10 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((porosity_bulk_map_[eb_name] >= 0.0), "*** ERROR: ACE Bulk Porosity must be non-negative!");
     element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 1.0);
     ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), "*** ERROR: ACE Element Size must be non-negative!");
-    thermal_factor_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
-    ALBANY_ASSERT((thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
+    thermal_factor_map_[eb_name] =
+        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
+    ALBANY_ASSERT(
+        (thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
 
     if (material_db_->isElementBlockParam(eb_name, "ACE Time File") == true) {
       std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");

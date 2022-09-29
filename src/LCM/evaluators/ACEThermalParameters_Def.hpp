@@ -246,21 +246,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         sediment_given = true;
       }
 
-      // Use freezing curve to get icurr and dfdT
-      ScalarT icurr{1.0};
-      ScalarT dfdT{0.0};
-
-      ScalarT const tol = 709.0;
-
-      RealType const A = 0.0;
-      RealType const G = 1.0;
-      RealType const C = 1.0;
-      RealType const Q = 0.001;
-      RealType const B = 10.0;
-      RealType       v = 0.1;
-
       ScalarT Tshift;
       ScalarT Tdiff;
+      RealType v = 0.1;
 
       if (sediment_given == true) {
         auto sand_frac = interpolateVectors(z_above_mean_sea_level_eb, sand_from_file_eb, height);
@@ -272,30 +260,37 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       } else {
         Tshift = 0.1;
       }
-      Tdiff = Tcurr - (Tmelt + Tshift);
-      // IKT, 5/29/20: the following is needed to prevent overflow when taking exponent
-      ScalarT const largest_value_exp = 650.0;
-      ScalarT const arg1              = (-B * Tdiff < largest_value_exp) ? -B * Tdiff : largest_value_exp;
-      ScalarT const qebt              = Q * std::exp(arg1);
+      // Use freezing curve to get icurr and dfdT
+      ScalarT icurr{1.0};
+      ScalarT dfdT{0.0};
 
-      if (arg1 < -tol) {
+      RealType const A = 0.0;
+      RealType const G = 1.0;
+      RealType const C = 1.0;
+      RealType const Q = 0.001;
+      RealType const B = 10.0;
+
+      Tdiff = Tcurr - (Tmelt + Tshift);
+
+      ScalarT const tol_bt = 709.0;
+      ScalarT const tol_qebt = 6.6e+30;
+      ScalarT const bt  = -B * Tdiff;
+
+      if (bt < -tol_bt) {
         dfdT  = 0.0;
         icurr = 0.0;
-      } else if (arg1 > tol) {
+      } else if (bt > tol_bt) {
         dfdT  = 0.0;
         icurr = 1.0;
       } else {
+        ScalarT const qebt = Q * std::exp(bt);
         auto const eps = minitensor::machine_epsilon<RealType>();
-        if (qebt < eps) {  // (C + et) ~ C :: occurs when totally melted
-          // icurr = 1.0 - (A + ((G - A) / (pow(C, 1.0 / v))));
+        if (qebt < eps) {  // (C + qebt) ~ C :: occurs when totally melted
           dfdT = 0.0;
-          icurr = 1.0 - 1.0;
-        } else if (1.0 / qebt < eps) {  // (C + et) ~ et :: occurs in deep
-                                        // frozen state
-          //dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
-          //icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
-          dfdT = -1.0 * B * pow(qebt, -1.0 / v) * (G - A) / v;
-          icurr = 1.0 - 0.0;
+          icurr = 0.0;
+        } else if (qebt > tol_qebt) {  // (C + qebt) ~ qebt :: occurs in deep frozen state
+          dfdT  = 0.0;
+          icurr = 1.0;
         } else {  // occurs when near melting temperature
           dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
           icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));

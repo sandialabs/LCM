@@ -26,6 +26,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   Y_weakening_factor_       = p->get<RealType>("ACE Y Weakening Factor", 1.0);
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
+  tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   // note: set default value to pure ice yield strength 3.0e+6
 
   if (p->isParameter("ACE Sea Level File") == true) {
@@ -510,6 +511,19 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   for (int i(0); i < num_dims_; ++i) {
     for (int j(0); j < num_dims_; ++j) {
       stress_(cell, pt, i, j) = sigma(i, j);
+    }
+  }
+
+  // Hack for tensile strength
+  auto const tensile_strength = tensile_strength_;
+  if (tensile_strength > 0) {
+    Tensor V(num_dims_);
+    Tensor S(num_dims_);
+    std::tie(V, S) = minitensor::eig_sym(sigma);
+    bool const tension_failure =
+        S(0, 0) >= tensile_strength || S(1, 1) >= tensile_strength || S(2, 2) >= tensile_strength;
+    if (tension_failure == true) {
+      failed += 1.0;
     }
   }
 

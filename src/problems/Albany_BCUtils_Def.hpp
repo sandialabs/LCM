@@ -1275,27 +1275,31 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           if (timevals.size() != Lvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array (" << timevals.size() <<
-                ") must have same length as 'Wave Length Values' "
-                "array (" << Lvals.size() << ")!\n");
+                "'Time Values' array (" << timevals.size()
+                                        << ") must have same length as 'Wave Length Values' "
+                                           "array ("
+                                        << Lvals.size() << ")!\n");
           }
           if (timevals.size() != kvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array (" << timevals.size() <<
-                ") must have same length as 'Wave Number Values' "
-                "array (" << kvals.size() << ")!\n");
+                "'Time Values' array (" << timevals.size()
+                                        << ") must have same length as 'Wave Number Values' "
+                                           "array ("
+                                        << kvals.size() << ")!\n");
           }
           if (timevals.size() != hvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array (" << timevals.size() <<
-                ") must have same length as 'Still Water Level Values' "
-                "array (" << hvals.size() << ")!\n");
+                "'Time Values' array (" << timevals.size()
+                                        << ") must have same length as 'Still Water Level Values' "
+                                           "array ("
+                                        << hvals.size() << ")!\n");
           }
           if (timevals.size() != wvals.size()) {
             ALBANY_ABORT(
-                "'Time Values' array (" << timevals.size() <<
-                ") must have same length as 'Wave Height Values' "
-                "array (" << wvals.size() << ")!\n");
+                "'Time Values' array (" << timevals.size()
+                                        << ") must have same length as 'Wave Height Values' "
+                                           "array ("
+                                        << wvals.size() << ")!\n");
           }
 
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);
@@ -1318,7 +1322,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           p->set<string>("Coordinate Vector Name", "Coord Vec");
 
           // Get additional parameters
-          double tm = sub_list.get<double>("Impact Duration", 0.04);
+          double tm                       = sub_list.get<double>("Impact Duration", 0.04);
           double g                        = sub_list.get<double>("Gravity", 9.806);
           double rho                      = sub_list.get<double>("Water Density", 1022.0);
           double delta                    = sub_list.get<double>("Critical Wave Ratio", 15.0);

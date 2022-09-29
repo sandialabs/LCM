@@ -838,29 +838,29 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  const ScalarT L                        = wave_length_val; // wave length interpolated in time
-  const ScalarT k                        = wave_number_val; // wave number interpolated in time
-  const ScalarT s                        = s_val;           // still water level interpolated in time
-  const ScalarT w                        = w_val;           // wave height interpolated in time
-  const double  tm                       = inputValues[0];  // impact duration
-  const double  g                        = inputValues[1];  // gravitational constant
-  const double  rho                      = inputValues[2];  // density
-  const double  zmin                     = inputValues[3];  // min value of z coord in mesh
-  const double  delta                    = inputValues[4];  //critical wave ratio - for 
-                                                            //determining when to switch b/w 
-							    //different forms of wave press NBC
-  const bool    dump_wave_press_nbc_data = inputValues[5];
+  const ScalarT L     = wave_length_val;  // wave length interpolated in time
+  const ScalarT k     = wave_number_val;  // wave number interpolated in time
+  const ScalarT s     = s_val;            // still water level interpolated in time
+  const ScalarT w     = w_val;            // wave height interpolated in time
+  const double  tm    = inputValues[0];   // impact duration
+  const double  g     = inputValues[1];   // gravitational constant
+  const double  rho   = inputValues[2];   // density
+  const double  zmin  = inputValues[3];   // min value of z coord in mesh
+  const double  delta = inputValues[4];   // critical wave ratio - for
+                                        // determining when to switch b/w
+                                        // different forms of wave press NBC
+  const bool dump_wave_press_nbc_data = inputValues[5];
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
   std::cout << "DEBUG: zmin = " << zmin << "\n";
 #endif
 
   Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
-  if (std::abs(2*M_PI/k/w) >= delta) { //case 1: hydrostatic formulation
-    //IKT, 9/4/2022: FIXME - remove the following print statement once we 
-    //are confident new NBC is working properly.
-    // *out << "ACE Wave Pressure NBC: hydrostatic pressure case, as 2*pi/k/w = "
-	  // << 2*M_PI / k / w << " < delta = " << delta <<".\n"; 
+  if (std::abs(2 * M_PI / k / w) >= delta) {  // case 1: hydrostatic formulation
+    // IKT, 9/4/2022: FIXME - remove the following print statement once we
+    // are confident new NBC is working properly.
+    //  *out << "ACE Wave Pressure NBC: hydrostatic pressure case, as 2*pi/k/w = "
+    //  << 2*M_PI / k / w << " < delta = " << delta <<".\n";
     for (int cell = 0; cell < numCells_; cell++) {
       for (int qp = 0; qp < numPoints; qp++) {
         for (int dim = 0; dim < numDOFsSet; dim++) {
@@ -884,10 +884,9 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
         }
       }
     }
-  }
-  else { //case 2: breaking wave formulation
+  } else {  // case 2: breaking wave formulation
     *out << "WARNING: Resorting to breaking wave formulation of ACE wave pressure NBC, as 2*pi/k/w = "
-	 << 2*M_PI / k / w << " < delta = " << delta <<"!\n"; 
+         << 2 * M_PI / k / w << " < delta = " << delta << "!\n";
     for (int cell = 0; cell < numCells_; cell++) {
       for (int qp = 0; qp < numPoints; qp++) {
         for (int dim = 0; dim < numDOFsSet; dim++) {
@@ -942,7 +941,7 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
           const auto    y         = coordVec(cell, node, 1);
           const auto    z         = coordVec(cell, node, 2);
           const auto    ztilde    = z - zmin;
-          const ScalarT pval_node = (2*M_PI/k/w >= delta) ?
+          const ScalarT pval_node = (2 * M_PI / k / w >= delta) ?
                                         this->calc_ace_press_at_z_point(rho, g, s, w, k, ztilde) :
                                         this->calc_ace_press_at_z_point(rho, g, tm, s, w, k, L, ztilde);
 #ifdef ACE_WAVE_PRESS_DEBUG_OUTPUT
@@ -960,33 +959,32 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   is_initial_time[workset_num] = false;
 }
 
-//The following is for the breaking wave formulation of the ACE wave pressure NBC
+// The following is for the breaking wave formulation of the ACE wave pressure NBC
 template <typename EvalT, typename Traits>
 typename NeumannBase<EvalT, Traits>::ScalarT
 NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
     const double  rho,
     const double  g,
-    const double  tm,  
+    const double  tm,
     const ScalarT s,
     const ScalarT w,
     const ScalarT k,
     const ScalarT L,
     const ScalarT zval) const
 {
-  ScalarT pval = 0.0;
-  const ScalarT hs = s;      //water height
-  const ScalarT hc = w;      //height above water of the max pressure
-  const ScalarT Hb = hc/0.7; //breaking height of wave
-  ScalarT p0, pc, ps, m1, m2, m3, b1, b2, b3; //temporary variables
-  if (hs > 0.0) { 
+  ScalarT       pval = 0.0;
+  const ScalarT hs   = s;                            // water height
+  const ScalarT hc   = w;                            // height above water of the max pressure
+  const ScalarT Hb   = hc / 0.7;                     // breaking height of wave
+  ScalarT       p0, pc, ps, m1, m2, m3, b1, b2, b3;  // temporary variables
+  if (hs > 0.0) {
     p0 = M_PI * rho * Hb * Hb / tm / L * sqrt(g * hs);
     pc = rho * Hb / 2.0 / tm * sqrt(g * hs);
     ps = M_PI * rho * Hb * Hb / (tm * L * cosh(k * hs)) * sqrt(g * hs);
     m1 = (p0 - ps) / hs;
-  } 
-  else { // no pressure applied if wave height <=0
-    pval = 0.0; 
-    return pval; 
+  } else {  // no pressure applied if wave height <=0
+    pval = 0.0;
+    return pval;
   }
   m2 = (pc - p0) / hc;
   m3 = -2.0 * pc / Hb;
@@ -999,28 +997,25 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
   std::cout << "DEBUG: m1, m2, m3 = " << m1 << ", " << m2 << ", " << m3 << "\n";
 #endif
   if (w + s <= 0.0) {
-    pval = 0.0; 
-    return pval; 
+    pval = 0.0;
+    return pval;
   }
   if ((zval >= 0) && (zval <= hs)) {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
     std::cout << "DEBUG: case 1!\n";
 #endif
-    pval = m1 * zval + b1; 
-  }
-  else if ((zval > hs) && (zval <= hs + hc)) {
+    pval = m1 * zval + b1;
+  } else if ((zval > hs) && (zval <= hs + hc)) {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
     std::cout << "DEBUG: case 2!\n";
 #endif
     pval = m2 * zval + b2;
-  } 
-  else if ((zval > hs + hc) && (zval <= hs + hc + 0.5 * Hb)) {
+  } else if ((zval > hs + hc) && (zval <= hs + hc + 0.5 * Hb)) {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
     std::cout << "DEBUG: case 3!\n";
 #endif
     pval = m3 * zval - b3;
-  } 
-  else {
+  } else {
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT
     std::cout << "DEBUG: case 4!\n";
 #endif
@@ -1029,27 +1024,26 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
   return pval;
 }
 
-//The following is for the hydrostatic pressure formulation of the ACE wave pressure NBC
+// The following is for the hydrostatic pressure formulation of the ACE wave pressure NBC
 template <typename EvalT, typename Traits>
 typename NeumannBase<EvalT, Traits>::ScalarT
 NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
     const double  rho,
     const double  g,
-    const ScalarT s, //s = still water level
-    const ScalarT w, //w = wave height
-    const ScalarT k, //k = wave number
+    const ScalarT s,  // s = still water level
+    const ScalarT w,  // w = wave height
+    const ScalarT k,  // k = wave number
     const ScalarT zval) const
 {
   ScalarT pval = 0.0;
-  if (w + s <= 0.0) { 
-    pval = 0.0; 
-    return pval; 
+  if (w + s <= 0.0) {
+    pval = 0.0;
+    return pval;
   }
   if (zval <= w + s) {
-    pval = rho * g * (s - zval) + rho * g * w * cosh(k*zval) / cosh(k*s); 
-  }
-  else {
-    pval = 0.0; 
+    pval = rho * g * (s - zval) + rho * g * w * cosh(k * zval) / cosh(k * s);
+  } else {
+    pval = 0.0;
   }
   return pval;
 }

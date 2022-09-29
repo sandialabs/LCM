@@ -298,7 +298,7 @@ template <typename T>
 std::tuple<T, T, T>
 unit_fit(T ice_saturation, RealType porosity)
 {
-  auto const critical_porosity       = 0.30; // can't be zero
+  auto const critical_porosity       = 0.30;  // can't be zero
   auto const critical_ice_saturation = 0.30;
   auto const x                       = ice_saturation;
   auto const y                       = porosity;
@@ -349,7 +349,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
 
-  auto const    peat =
+  auto const peat =
       peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) : 0.0;
   auto const porosity = porosity_from_file_.size() > 0 ?
                             interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
@@ -385,15 +385,15 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Make the elements exposed to ocean "weaker"
   if ((is_erodible == true) && (height <= sea_level)) {
-    Y = Y / Y_weakening_factor_; 
+    Y = Y / Y_weakening_factor_;
   }
 
   ScalarT const nu    = poissons_ratio_(cell, pt);
   ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
   ScalarT const mu    = E / (2.0 * (1.0 + nu));
   ScalarT const J1    = J_(cell, pt);
-  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);  
- 
+  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
+
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);
   displacement.fill(displacement_, cell, pt, 0);
@@ -520,7 +520,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     Tensor V(num_dims_);
     Tensor S(num_dims_);
     std::tie(V, S) = minitensor::eig_sym(sigma);
-    bool const tension_failure = S(0,0) >= tensile_strength || S(1,1) >= tensile_strength || S(2,2) >= tensile_strength;
+    bool const tension_failure =
+        S(0, 0) >= tensile_strength || S(1, 1) >= tensile_strength || S(2, 2) >= tensile_strength;
     if (tension_failure == true) {
       failed += 1.0;
     }

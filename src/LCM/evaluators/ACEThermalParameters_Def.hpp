@@ -246,8 +246,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         sediment_given = true;
       }
 
-      ScalarT Tshift;
-      ScalarT Tdiff;
+      ScalarT  Tshift;
+      ScalarT  Tdiff;
       RealType v = 0.1;
 
       if (sediment_given == true) {
@@ -272,9 +272,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       Tdiff = Tcurr - (Tmelt + Tshift);
 
-      ScalarT const tol_bt = 709.0;
+      ScalarT const tol_bt   = 709.0;
       ScalarT const tol_qebt = 6.6e+30;
-      ScalarT const bt  = -B * Tdiff;
+      ScalarT const bt       = -B * Tdiff;
 
       if (bt < -tol_bt) {
         dfdT  = 0.0;
@@ -284,9 +284,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         icurr = 1.0;
       } else {
         ScalarT const qebt = Q * std::exp(bt);
-        auto const eps = minitensor::machine_epsilon<RealType>();
+        auto const    eps  = minitensor::machine_epsilon<RealType>();
         if (qebt < eps) {  // (C + qebt) ~ C :: occurs when totally melted
-          dfdT = 0.0;
+          dfdT  = 0.0;
           icurr = 0.0;
         } else if (qebt > tol_qebt) {  // (C + qebt) ~ qebt :: occurs in deep frozen state
           dfdT  = 0.0;
@@ -491,8 +491,10 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((porosity_bulk_map_[eb_name] >= 0.0), "*** ERROR: ACE Bulk Porosity must be non-negative!");
     element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 1.0);
     ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), "*** ERROR: ACE Element Size must be non-negative!");
-    thermal_factor_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
-    ALBANY_ASSERT((thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
+    thermal_factor_map_[eb_name] =
+        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
+    ALBANY_ASSERT(
+        (thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
 
     if (material_db_->isElementBlockParam(eb_name, "ACE Time File") == true) {
       std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");

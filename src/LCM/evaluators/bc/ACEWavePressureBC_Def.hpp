@@ -14,7 +14,7 @@ template <typename EvalT, typename Traits>
 ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::ParameterList& p)
     : PHAL::Neumann<EvalT, Traits>(p)
 {
-  timeValues             = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
+  timeValues       = p.get<Teuchos::Array<RealType>>("Time Values").toVector();
   waveLengthValues = p.get<Teuchos::Array<RealType>>("Wave Length Values").toVector();
   waveNumberValues = p.get<Teuchos::Array<RealType>>("Wave Number Values").toVector();
   sValues          = p.get<Teuchos::Array<RealType>>("Still Water Level Values").toVector();
@@ -32,8 +32,7 @@ ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::Parameter
       !(timeValues.size() == sValues.size()),
       "Dimension of \"Time Values\" and \"Still Water Level Values\" do not match\n");
   ALBANY_PANIC(
-      !(timeValues.size() == wValues.size()),
-      "Dimension of \"Time Values\" and \"Wave Height Values\" do not match\n");
+      !(timeValues.size() == wValues.size()), "Dimension of \"Time Values\" and \"Wave Height Values\" do not match\n");
 }
 
 //*****
@@ -49,19 +48,19 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
   while (timeValues[Index] < time) Index++;
 
   if (Index == 0) {
-    this->wave_length_val                        = waveLengthValues[Index];
-    this->wave_number_val                        = waveNumberValues[Index];
-    this->s_val = sValues[Index];
-    this->w_val = wValues[Index];
+    this->wave_length_val = waveLengthValues[Index];
+    this->wave_number_val = waveNumberValues[Index];
+    this->s_val           = sValues[Index];
+    this->w_val           = wValues[Index];
   } else {
     slope = (waveLengthValues[Index] - waveLengthValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->wave_length_val = waveLengthValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     slope = (waveNumberValues[Index] - waveNumberValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->wave_number_val = waveNumberValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    slope       = (sValues[Index] - sValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->s_val = sValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    slope       = (wValues[Index] - wValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
-    this->w_val = wValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    slope                 = (sValues[Index] - sValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->s_val           = sValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    slope                 = (wValues[Index] - wValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->w_val           = wValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     // std::cout << "IKT computeVal water_height_val = " << this->water_height_val << "\n";
 
     ALBANY_PANIC(this->wave_length_val <= 0, "Wave length is non-positive!");

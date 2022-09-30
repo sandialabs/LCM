@@ -13,34 +13,34 @@ ALBANY:
     Dirichlet BCs:
       Time Dependent SDBC on NS z+ for DOF T:
         Number of points: 3
-        Time Values: [0.0, 183600.0, 1836000.0]
-        BC Values: [267.0, 290.0, 290.0]
-        Time Dependent SDBC on NS interval4-erodible for DOF T:
-          Number of points: 3
-          Time Values: [0.0, 183600.0, 1836000.0]
-          BC Values: [267.0, 280.0, 280.0]
-        Time Dependent SDBC on NS interval3-erodible for DOF T:
-          Number of points: 3
-          Time Values: [0.0, 183600.0, 1836000.0]
-          BC Values: [267.0, 280.0, 280.0]
-        Time Dependent SDBC on NS interval2-erodible for DOF T:
-          Number of points: 3
-          Time Values: [0.0, 183600.0, 1836000.0]
-          BC Values: [267.0, 278.0, 278.0]
-        Time Dependent SDBC on NS interval1-erodible for DOF T:
-          Number of points: 3
-          Time Values: [0.0, 183600.0, 1836000.0]
-          BC Values: [267.0, 275.0, 275.0]
+        Time Values: [0.0, 36000.0, 3600000.0]
+        BC Values: [270.0, 300.0, 290.0]
+      Time Dependent SDBC on NS interval4-erodible for DOF T:
+        Number of points: 3
+        Time Values: [0.0, 36000.0, 3600000.0]
+        BC Values: [270.0, 300.0, 290.0]
+      Time Dependent SDBC on NS interval3-erodible for DOF T:
+        Number of points: 3
+        Time Values: [0.0, 36000.0, 3600000.0]
+        BC Values: [270.0, 290.0, 290.0]
+      Time Dependent SDBC on NS interval2-erodible for DOF T:
+        Number of points: 3
+        Time Values: [0.0, 36000.0, 3600000.0]
+        BC Values: [270.0, 290.0, 280.0]
+      Time Dependent SDBC on NS interval1-erodible for DOF T:
+        Number of points: 3
+        Time Values: [0.0, 36000.0, 3600000.0]
+        BC Values: [270.0, 280.0, 280.0]
     
     Neumann BCs:
       Time Dependent NBC on SS bottom for DOF T set dudn:
         Number of points: 2
-        Time Values: [0.0, 360001.0]
-        BC Values: [[8.0e-02], [8.0e-02]] # [W/m2] geothermal heat flu
+        Time Values: [0.0, 3600000.0]
+        BC Values: [[8.0e-02], [8.0e-02]] # [W/m2] geothermal heat flux
     
     Initial Condition:
       Function: Constant
-      Function Data: [267.0]
+      Function Data: [270.0]
 
     Adaptation:
       Method: Erosion

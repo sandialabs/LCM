@@ -206,8 +206,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         ScalarT const         zero_sal(0.0);
         std::vector<RealType> ocean_salinity_eb = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
         if (ocean_salinity_eb.size() > 0) {
-          // ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
-          ocean_sal = touched_by_ocean;
+          ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
+          // ocean_sal = touched_by_ocean;
         }
         ScalarT const sal_diff   = ocean_sal - sal_curr;
         ScalarT const sal_grad   = sal_diff / cell_half_width;
@@ -215,7 +215,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         ScalarT       sal_trial  = sal_curr + sal_update;
         if (sal_trial < zero_sal) sal_trial = zero_sal;
         if (sal_trial > ocean_sal) sal_trial = ocean_sal;
-        bluff_salinity_(cell, qp) = sal_trial;
+        bluff_salinity_(cell, qp) =
+            std::min(sal_trial, ocean_sal);  // ensures the salinity doesn't exceed ocean salinity
         // OVERRIDES EVERYTHING ABOVE:
         // bluff_salinity_(cell, qp) = touched_by_ocean;
       }
@@ -245,21 +246,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         sediment_given = true;
       }
 
-      // Use freezing curve to get icurr and dfdT
-      ScalarT icurr{1.0};
-      ScalarT dfdT{0.0};
-
-      ScalarT const tol = 709.0;
-
-      RealType const A = 0.0;
-      RealType const G = 1.0;
-      RealType const C = 1.0;
-      RealType const Q = 0.001;
-      RealType const B = 10.0;
-      RealType       v = 0.1;
-
-      ScalarT Tshift;
-      ScalarT Tdiff;
+      ScalarT  Tshift;
+      ScalarT  Tdiff;
+      RealType v = 0.1;
 
       if (sediment_given == true) {
         auto sand_frac = interpolateVectors(z_above_mean_sea_level_eb, sand_from_file_eb, height);
@@ -271,32 +260,40 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       } else {
         Tshift = 0.1;
       }
-      Tdiff = Tcurr - (Tmelt + Tshift);
-      // IKT, 5/29/20: the following is needed to prevent overflow when taking exponent
-      ScalarT const largest_value_exp = 650.0;
-      ScalarT const arg1              = (-B * Tdiff < largest_value_exp) ? -B * Tdiff : largest_value_exp;
-      ScalarT const qebt              = Q * std::exp(arg1);
+      // Use freezing curve to get icurr and dfdT
+      ScalarT icurr{1.0};
+      ScalarT dfdT{0.0};
 
-      if (arg1 < -tol) {
+      RealType const A = 0.0;
+      RealType const G = 1.0;
+      RealType const C = 1.0;
+      RealType const Q = 0.001;
+      RealType const B = 10.0;
+
+      Tdiff = Tcurr - (Tmelt + Tshift);
+
+      ScalarT const tol_bt   = 709.0;
+      ScalarT const tol_qebt = 6.6e+30;
+      ScalarT const bt       = -B * Tdiff;
+
+      if (bt < -tol_bt) {
         dfdT  = 0.0;
         icurr = 0.0;
-      } else if (arg1 > tol) {
+      } else if (bt > tol_bt) {
         dfdT  = 0.0;
         icurr = 1.0;
       } else {
-        auto const eps = minitensor::machine_epsilon<RealType>();
-        if (qebt < eps) {  // (C + et) ~ C :: occurs when totally melted
-          dfdT = 0.0;
-          // icurr = 1.0 - (A + ((G - A) / (pow(C, 1.0 / v))));
-          icurr = 1.0 - 1.0;
-        } else if (1.0 / qebt < eps) {  // (C + et) ~ et :: occurs in deep
-                                        // frozen state
-          dfdT = -1.0 * B * pow(qebt, -1.0 / v) * (G - A) / v;
-          // icurr = 1.0 - (A + ((G - A) / (pow(qebt, 1.0 / v))));
-          icurr = 1.0 - 0.0;
+        ScalarT const qebt = Q * std::exp(bt);
+        auto const    eps  = minitensor::machine_epsilon<RealType>();
+        if (qebt < eps) {  // (C + qebt) ~ C :: occurs when totally melted
+          dfdT  = 0.0;
+          icurr = 0.0;
+        } else if (qebt > tol_qebt) {  // (C + qebt) ~ qebt :: occurs in deep frozen state
+          dfdT  = 0.0;
+          icurr = 1.0;
         } else {  // occurs when near melting temperature
-          icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
           dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
+          icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
         }
       }
 
@@ -366,17 +363,13 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
             ((1.0 - porosity_eb) * soil_thermal_cond_eb);
       }
 
-      // Jenn's hack to calibrate niche formation:
-      ScalarT factor = 1.0;  // 1.0 + (3.0 * sea_level * sea_level);
+      // Jenn's sub-grid scale model to calibrate niche formation follows.
+      // By default, thermal_factor = 1.0, so that no scaling occurs.
+      ScalarT thermal_factor_eb = this->queryElementBlockParameterMap(eb_name, thermal_factor_map_);
       if ((is_erodible == true) && (height <= sea_level)) {
-        factor = std::max(factor, 1.0);  // in case sea level is tiny or negative
-        // factor                          = std::min(factor, 10.0);
-        thermal_conductivity_(cell, qp) = thermal_conductivity_(cell, qp) * factor;
-        heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / factor;
+        thermal_conductivity_(cell, qp) = thermal_conductivity_(cell, qp) * thermal_factor_eb;
+        heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / thermal_factor_eb;
       }
-      // NOTE: A factor of 100.0 was way too fast. So was 10.0, and 5.0 was approaching better but still too fast.
-      // NOTE: Now trying to make the factor proportional to ocean power somehow. Starting with 8*sea_level. That was
-      // too fast. NOTE: Now trying 4.0*sea_level with a cap of 10.0. That was too much, trying a cap of 8.0.
 
       // Update the material thermal inertia term
       ScalarT latent_heat_eb = this->queryElementBlockParameterMap(eb_name, latent_heat_map_);
@@ -498,6 +491,10 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((porosity_bulk_map_[eb_name] >= 0.0), "*** ERROR: ACE Bulk Porosity must be non-negative!");
     element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 1.0);
     ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), "*** ERROR: ACE Element Size must be non-negative!");
+    thermal_factor_map_[eb_name] =
+        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
+    ALBANY_ASSERT(
+        (thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
 
     if (material_db_->isElementBlockParam(eb_name, "ACE Time File") == true) {
       std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");

@@ -19,11 +19,14 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   this->setIntegrationPointLocationFlag(true);
 
   // Baseline constants
-  sat_mod_             = p->get<RealType>("Saturation Modulus", 0.0);
-  sat_exp_             = p->get<RealType>("Saturation Exponent", 0.0);
-  bulk_porosity_       = p->get<RealType>("ACE Bulk Porosity", 0.0);
-  critical_angle_      = p->get<RealType>("ACE Critical Angle", 0.0);
-  soil_yield_strength_ = p->get<RealType>("ACE Soil Yield Strength", 3.0e+06);
+  sat_mod_                  = p->get<RealType>("Saturation Modulus", 0.0);
+  sat_exp_                  = p->get<RealType>("Saturation Exponent", 0.0);
+  bulk_porosity_            = p->get<RealType>("ACE Bulk Porosity", 0.0);
+  critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
+  Y_weakening_factor_       = p->get<RealType>("ACE Y Weakening Factor", 1.0);
+  soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
+  residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
+  tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   // note: set default value to pure ice yield strength 3.0e+6
 
   if (p->isParameter("ACE Sea Level File") == true) {
@@ -263,6 +266,69 @@ class J2ErosionNLS : public minitensor::Function_Base<J2ErosionNLS<EvalT, M>, ty
   S const& Y_;
 };
 
+namespace {
+template <typename T>
+T
+E_fit_max(T x, RealType y)
+{
+  // Wed 09/21/2022 w/ BCs
+  // x = ice saturation;   y = porosity
+  return (343.0 - 343.0 * y - 913.0 * x + 1316.0 * y * x) / (403.0);
+}
+
+template <typename T>
+T
+Y_fit_max(T const x, RealType const y)
+{
+  // Wed 09/21/2022 w/ BCs
+  // x = ice saturation;   y = porosity
+  return (2.0 - 2.0 * y - 6.0 * x + 11.0 * y * x) / (5.0);
+}
+
+template <typename T>
+T
+K_fit_min(T const x, RealType const y)
+{
+  // Wed 09/21/2022 w/ BCs
+  // x = ice saturation;   y = porosity
+  return (-12.0 + 12.0 * y + 33.0 * x - 43.0 * y * x) / (-10.0);
+}
+
+template <typename T>
+std::tuple<T, T, T>
+unit_fit(T ice_saturation, RealType porosity)
+{
+  auto const critical_porosity       = 0.30;  // can't be zero
+  auto const critical_ice_saturation = 0.30;
+  auto const x                       = ice_saturation;
+  auto const y                       = porosity;
+  auto const xc                      = critical_porosity;
+  auto const yc                      = critical_ice_saturation;
+  T          E{1.0};
+  T          Y{1.0};
+  T          K{1.0};
+  if (xc < x && yc < y) {
+    Y = Y_fit_max(x, y);
+    E = E_fit_max(x, y);
+    K = K_fit_min(x, y);
+  } else if (x <= xc) {
+    Y = Y_fit_max(xc, y) * x / xc;
+    E = E_fit_max(xc, y) * x / xc;
+    K = K_fit_min(xc, y) * x / xc;
+  } else if (y <= yc) {
+    Y = Y_fit_max(x, yc) * y / yc;
+    E = E_fit_max(x, yc) * y / yc;
+    K = K_fit_min(x, yc) * y / yc;
+  } else if (x <= xc && y <= yc) {
+    Y = Y_fit_max(xc, yc) * x * y / xc / yc;
+    E = E_fit_max(xc, yc) * x * y / xc / yc;
+    K = K_fit_min(xc, yc) * x * y / xc / yc;
+  }
+  return std::make_tuple(E, Y, K);
+}
+
+}  // anonymous namespace
+
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
 J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
@@ -282,44 +348,51 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
 #if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
-  ScalarT       E              = elastic_modulus_(cell, pt);
-  ScalarT       E_residual     = 0.0001 * E;
 
-  // E = E_residual + 0.9999 * (E * (1.0 + pow(ice_saturation - 1.0,7)));
+  auto const peat =
+      peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) : 0.0;
+  auto const porosity = porosity_from_file_.size() > 0 ?
+                            interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
+                            bulk_porosity_;
+  ScalarT    ne{1.0};
+  ScalarT    ny{1.0};
+  ScalarT    nk{1.0};
+
+  std::tie(ne, ny, nk) = unit_fit(ice_saturation, porosity);
+
+  ScalarT E = elastic_modulus_(cell, pt) * ne;
+  ScalarT Y = yield_strength_(cell, pt) * ny;
+  ScalarT K = hardening_modulus_(cell, pt) * nk;
+
+  E = std::max(E, residual_elastic_modulus_);
+  Y = std::max(Y, soil_yield_strength_);
+
 #else
   ScalarT const E = elastic_modulus_(cell, pt);
+  ScalarT const K = hardening_modulus_(cell, pt);
+  ScalarT       Y = yield_strength_(cell, pt);
 #endif
-  ScalarT const nu    = poissons_ratio_(cell, pt);
-  ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
-  ScalarT const mu    = E / (2.0 * (1.0 + nu));
-  ScalarT const K     = hardening_modulus_(cell, pt);
-  ScalarT const J1    = J_(cell, pt);
-  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
 
-  // Compute effective yield strength
-  ScalarT Y = yield_strength_(cell, pt);
+  Y = std::max(Y, 0.0);
+  E = std::max(E, 0.0);
 
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 
-  auto const porosity = porosity_from_file_.size() > 0 ?
-                            interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
-                            bulk_porosity_;
-  auto const peat = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) :
-                                                 1.0;  // need this so ice is strong when melted
-
-  RealType res_strength = (1.0 * soil_yield_strength_);
-  res_strength          = (peat * soil_yield_strength_);
-
-#if defined(ICE_SATURATION)
-  Y = (ice_saturation * Y) + res_strength;
-  // Y = (1.0 - porosity) * soil_yield_strength_ + porosity * ice_saturation * Y;
-#endif
-  Y = std::max(Y, 0.0);
-
   auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
   auto const is_at_boundary = cell_bi == 1.0;
   auto const is_erodible    = cell_bi == 2.0;
+
+  // Make the elements exposed to ocean "weaker"
+  if ((is_erodible == true) && (height <= sea_level)) {
+    Y = Y / Y_weakening_factor_;
+  }
+
+  ScalarT const nu    = poissons_ratio_(cell, pt);
+  ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
+  ScalarT const mu    = E / (2.0 * (1.0 + nu));
+  ScalarT const J1    = J_(cell, pt);
+  ScalarT const Jm23  = 1.0 / std::cbrt(J1 * J1);
 
   // fill local tensors
   F.fill(def_grad_, cell, pt, 0, 0);
@@ -441,6 +514,19 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
   }
 
+  // Hack for tensile strength
+  auto const tensile_strength = tensile_strength_;
+  if (tensile_strength > 0) {
+    Tensor V(num_dims_);
+    Tensor S(num_dims_);
+    std::tie(V, S) = minitensor::eig_sym(sigma);
+    bool const tension_failure =
+        S(0, 0) >= tensile_strength || S(1, 1) >= tensile_strength || S(2, 2) >= tensile_strength;
+    if (tension_failure == true) {
+      failed += 1.0;
+    }
+  }
+
   // Determine if critical stress is exceeded
   if (yielded == true) {
     failed += 1.0;
@@ -458,7 +544,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
       // std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
     }
   }
-  auto const maximum_displacement = 0.50;  // 1.0
+  auto const maximum_displacement = 0.35;  // [m]
   auto const displacement_norm    = minitensor::norm(displacement);
   if (displacement_norm > maximum_displacement) {
     failed += 8.0;

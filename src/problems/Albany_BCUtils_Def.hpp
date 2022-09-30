@@ -1241,32 +1241,13 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<int>("Type", traits_type::typeATd);
 
-          // Get parameter that tells code whether to use new or old wave press NBC
-          // New wave pressure NBC is on by default
-          bool use_new_wave_press_nbc = sub_list.get<bool>("Use New Wave Press NBC", true);
-          p->set<bool>("Use New Wave Press NBC", use_new_wave_press_nbc);
-
           std::string const      t_file       = sub_list.get<std::string>("ACE Time Values File");
           std::vector<double>    timevals_vec = LCM::vectorFromFile(t_file);
           Teuchos::Array<double> timevals(timevals_vec);
-          Teuchos::Array<double> hsvals;
-          Teuchos::Array<double> hcvals;
           Teuchos::Array<double> Lvals;
           Teuchos::Array<double> kvals;
-          Teuchos::Array<double> avals;
+          Teuchos::Array<double> wvals;
           Teuchos::Array<double> hvals;
-          if (sub_list.isParameter("ACE Water Height Values File")) {
-            std::string const          hs_file    = sub_list.get<std::string>("ACE Water Height Values File");
-            std::vector<double>        hsvals_vec = LCM::vectorFromFile(hs_file);
-            Teuchos::ArrayView<double> hsvals_av  = Teuchos::arrayViewFromVector(hsvals_vec);
-            hsvals                                = Teuchos::Array<double>(hsvals_av);
-          }
-          if (sub_list.isParameter("ACE Height Above Water of Max Pressure Values File")) {
-            std::string const hc_file = sub_list.get<std::string>("ACE Height Above Water of Max Pressure Values File");
-            std::vector<double>        hcvals_vec = LCM::vectorFromFile(hc_file);
-            Teuchos::ArrayView<double> hcvals_av  = Teuchos::arrayViewFromVector(hcvals_vec);
-            hcvals                                = Teuchos::Array<double>(hcvals_av);
-          }
           if (sub_list.isParameter("ACE Wave Length Values File")) {
             std::string const          L_file    = sub_list.get<std::string>("ACE Wave Length Values File");
             std::vector<double>        Lvals_vec = LCM::vectorFromFile(L_file);
@@ -1283,7 +1264,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
             std::string const          w_file    = sub_list.get<std::string>("ACE Wave Height Values File");
             std::vector<double>        wvals_vec = LCM::vectorFromFile(w_file);
             Teuchos::ArrayView<double> wvals_av  = Teuchos::arrayViewFromVector(wvals_vec);
-            avals                                = Teuchos::Array<double>(wvals_av);
+            wvals                                = Teuchos::Array<double>(wvals_av);
           }
           if (sub_list.isParameter("ACE Still Water Level Values File")) {
             std::string const          s_file    = sub_list.get<std::string>("ACE Still Water Level Values File");
@@ -1292,47 +1273,40 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
             hvals                                = Teuchos::Array<double>(svals_av);
           }
 
-          if (use_new_wave_press_nbc == false) {
-            if (timevals.size() != hsvals.size()) {
-              ALBANY_ABORT(
-                  "'Time Values' array must have same length as 'Water Height Values' "
-                  "array!\n");
-            }
-            if (timevals.size() != hcvals.size()) {
-              ALBANY_ABORT(
-                  "'Time Values' array must have same length as 'Height Above Water of Max Pressure' "
-                  "array!\n");
-            }
-            if (timevals.size() != Lvals.size()) {
-              ALBANY_ABORT(
-                  "'Time Values' array must have same length as 'Wave Length Values' "
-                  "array!\n");
-            }
-            if (timevals.size() != kvals.size()) {
-              ALBANY_ABORT(
-                  "'Time Values' array must have same length as 'Wave Number Values' "
-                  "array!\n");
-            }
-          } else {
-            if (timevals.size() != hvals.size()) {
-              ALBANY_ABORT(
-                  "'Time Values' array must have same length as 'Still Water Level Values' "
-                  "array!\n");
-            }
-            if (timevals.size() != avals.size()) {
-              ALBANY_ABORT(
-                  "'Time Values' array must have same length as 'Wave Height Values' "
-                  "array!\n");
-            }
+          if (timevals.size() != Lvals.size()) {
+            ALBANY_ABORT(
+                "'Time Values' array (" << timevals.size()
+                                        << ") must have same length as 'Wave Length Values' "
+                                           "array ("
+                                        << Lvals.size() << ")!\n");
+          }
+          if (timevals.size() != kvals.size()) {
+            ALBANY_ABORT(
+                "'Time Values' array (" << timevals.size()
+                                        << ") must have same length as 'Wave Number Values' "
+                                           "array ("
+                                        << kvals.size() << ")!\n");
+          }
+          if (timevals.size() != hvals.size()) {
+            ALBANY_ABORT(
+                "'Time Values' array (" << timevals.size()
+                                        << ") must have same length as 'Still Water Level Values' "
+                                           "array ("
+                                        << hvals.size() << ")!\n");
+          }
+          if (timevals.size() != wvals.size()) {
+            ALBANY_ABORT(
+                "'Time Values' array (" << timevals.size()
+                                        << ") must have same length as 'Wave Height Values' "
+                                           "array ("
+                                        << wvals.size() << ")!\n");
           }
 
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);
-          p->set<Teuchos::Array<RealType>>("Water Height Values", hsvals);
-          p->set<Teuchos::Array<RealType>>("Height Above Water of Max Pressure Values", hcvals);
           p->set<Teuchos::Array<RealType>>("Wave Length Values", Lvals);
           p->set<Teuchos::Array<RealType>>("Wave Number Values", kvals);
           p->set<Teuchos::Array<RealType>>("Still Water Level Values", hvals);
-          p->set<Teuchos::Array<RealType>>("Wave Height Values", avals);
+          p->set<Teuchos::Array<RealType>>("Wave Height Values", wvals);
 
           p->set<RCP<ParamLib>>("Parameter Library", paramLib);
 
@@ -1348,10 +1322,10 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           p->set<string>("Coordinate Vector Name", "Coord Vec");
 
           // Get additional parameters
-          double tm = sub_list.get<double>("Impact Duration", 0.04);
-          // IKT FIXME?  Do we want gravity as an input, or just hard-code it in the code?
+          double tm                       = sub_list.get<double>("Impact Duration", 0.04);
           double g                        = sub_list.get<double>("Gravity", 9.806);
           double rho                      = sub_list.get<double>("Water Density", 1022.0);
+          double delta                    = sub_list.get<double>("Critical Wave Ratio", 15.0);
           double zmin                     = sub_list.get<double>("Min z-Value", 0.0);
           bool   dump_wave_press_nbc_data = sub_list.get<bool>("Dump Wave Press NBC Data Files", false);
 
@@ -1372,8 +1346,8 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           param_vec[1] = g;
           param_vec[2] = rho;
           param_vec[3] = zmin;
-          param_vec[4] = dump_wave_press_nbc_data;
-          param_vec[5] = use_new_wave_press_nbc;
+          param_vec[4] = delta;
+          param_vec[5] = dump_wave_press_nbc_data;
 
           Teuchos::Array<double> param_array(param_vec);
 

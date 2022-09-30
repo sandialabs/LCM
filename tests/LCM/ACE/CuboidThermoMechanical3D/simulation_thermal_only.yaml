@@ -48,7 +48,7 @@ ALBANY:
     Exodus SolutionDot Name: temperature_dot
   Regression Results: 
     Number of Comparisons: 4
-    Test Values: [0.000000000000e+00, 0.000000000000e+00, 0.000000000000e+00, 2.640011154299e+02]
+    Test Values: [0.000000000000e+00, 0.000000000000e+00, 0.000000000000e+00, 2.646145460771e+02]
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
   Piro: 

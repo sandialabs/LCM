@@ -29,9 +29,9 @@ move volume 2 x {-L/2} z {L/2 + L}
 #
 # mesh
 #
-#set fullhex use on
-#imprint all 
-#merge all
+set fullhex use on
+imprint all 
+merge all
 volume all size {h}
 volume all scheme auto
 mesh volume all
@@ -75,3 +75,4 @@ nodeset 10 name "interval4-erodible"
 
 set large exodus file off
 export mesh "cuboid_denudation.g" overwrite
+

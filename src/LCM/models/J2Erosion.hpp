@@ -96,6 +96,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType residual_elastic_modulus_{0.0};
   RealType Y_weakening_factor_{1.0};
   RealType tensile_strength_{0.0};
+  RealType strain_limit_{0.0};
 
   // Params with depth or time:
   std::vector<RealType> z_above_mean_sea_level_;

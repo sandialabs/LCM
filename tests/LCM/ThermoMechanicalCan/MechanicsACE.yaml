@@ -11,14 +11,15 @@ LCM:
     Neumann BCs:
       ACE Time Dependent NBC on SS surface_1 for DOF all set wave_pressure:
         ACE Time Values File: 'timevals.txt'
-        ACE Water Height Values File: 'hsvals.txt'
-        ACE Height Above Water of Max Pressure Values File: 'hcvals.txt'
         ACE Wave Length Values File: 'Lvals.txt'
         ACE Wave Number Values File: 'kvals.txt'
+        ACE Still Water Level Values File: 'hsvals.txt'
+        ACE Wave Height Values File: 'hcvals.txt'
+        Dump Wave Press NBC Data Files: false
         Impact Duration: 0.04 
         #Gravity: 9.806
         Water Density: 1025.0
-        Use New Wave Press NBC: false
+        Critical Wave Ratio: 15.0
     Initial Condition:
       Function: Constant
       Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00]
@@ -44,7 +45,7 @@ LCM:
   Discretization:
     Method: Exodus
     Exodus Input File Name: brick_model_2.g
-    Exodus Output File Name: tm.exo
+    Exodus Output File Name: tm_ACE.exo
     Solution Vector Components: [disp, V]
     Residual Vector Components: [force, V]
     Separate Evaluators by Element Block: true

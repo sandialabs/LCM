@@ -27,7 +27,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
-  // note: set default value to pure ice yield strength 3.0e+6
+  strain_limit_             = p->get<RealType>("ACE Strain Limit", 0.0);
 
   if (p->isParameter("ACE Sea Level File") == true) {
     auto const filename = p->get<std::string>("ACE Sea Level File");
@@ -526,6 +526,20 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const tension_failure =
         S(0, 0) >= tensile_strength || S(1, 1) >= tensile_strength || S(2, 2) >= tensile_strength;
     if (tension_failure == true) {
+      failed += 1.0;
+    }
+  }
+
+  // Hack for strain limit
+  auto const strain_limit = strain_limit_;
+  if (strain_limit > 0.0) {
+    decltype(Fval) Cval = Fval * minitensor::transpose(Fval);
+    auto const Jval = minitensor::det(Fval);
+    auto const Jm23val = 1.0 / std::cbrt(Jval * Jval);
+    decltype(Fval) Cdevval = Jm23val * Cval;
+    auto const distortion =  minitensor::norm(Cdevval) / std::sqrt(3.0);
+    bool const strain_failure = distortion >= strain_limit;
+    if (strain_failure == true) {
       failed += 1.0;
     }
   }

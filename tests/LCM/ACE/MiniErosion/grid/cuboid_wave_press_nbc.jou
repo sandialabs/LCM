@@ -26,8 +26,10 @@ move volume 1 x {-L/2} z {L/2}
 create brick x {L} y {L} z {L}
 move volume 2 x {-L/2} z {L/2 + L}
 
-#mesh
-set fullhex use on
+#
+# mesh
+#
+#set fullhex use on
 imprint all 
 merge all
 volume all size {h}

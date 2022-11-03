@@ -517,9 +517,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Hack for tensile strength
   auto const tensile_strength = tensile_strength_;
   if (tensile_strength > 0) {
-    Tensor V(num_dims_);
-    Tensor S(num_dims_);
-    std::tie(V, S) = minitensor::eig_sym(sigma);
+    auto sig = Sacado::Value<decltype(sigma)>::eval(sigma);
+    decltype(sig) V(num_dims_);
+    decltype(sig) S(num_dims_);
+    std::tie(V, S) = minitensor::eig_sym(sig);
     bool const tension_failure =
         S(0, 0) >= tensile_strength || S(1, 1) >= tensile_strength || S(2, 2) >= tensile_strength;
     if (tension_failure == true) {

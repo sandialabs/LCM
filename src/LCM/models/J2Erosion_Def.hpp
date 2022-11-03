@@ -384,8 +384,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const is_erodible    = cell_bi == 2.0;
 
   // Make the elements exposed to ocean "weaker"
+  auto tensile_strength = tensile_strength_;
   if ((is_erodible == true) && (height <= sea_level)) {
-    Y = Y / Y_weakening_factor_;
+    Y = Y / (Y_weakening_factor_);
+    E = E / (Y_weakening_factor_);
+    //tensile_strength = tensile_strength / Y_weakening_factor_;
   }
 
   ScalarT const nu    = poissons_ratio_(cell, pt);
@@ -515,7 +518,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // Hack for tensile strength
-  auto const tensile_strength = tensile_strength_;
   if (tensile_strength > 0) {
     auto sig = Sacado::Value<decltype(sigma)>::eval(sigma);
     decltype(sig) V(num_dims_);

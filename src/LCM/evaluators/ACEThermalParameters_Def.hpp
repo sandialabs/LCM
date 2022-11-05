@@ -26,12 +26,14 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
       bf_(p.get<std::string>("BF Name"), dl->node_qp_scalar),
       thermal_inertia_(p.get<std::string>("ACE_Thermal_Inertia QP Variable Name"), dl->qp_scalar),
       bluff_salinity_(p.get<std::string>("ACE_Bluff_Salinity QP Variable Name"), dl->qp_scalar),
+      bluff_salinity_read_(p.get<std::string>("ACE_Bluff_SalinityRead QP Variable Name"), dl->qp_scalar),
       ice_saturation_(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar),
       density_(p.get<std::string>("ACE_Density QP Variable Name"), dl->qp_scalar),
       heat_capacity_(p.get<std::string>("ACE_Heat_Capacity QP Variable Name"), dl->qp_scalar),
       water_saturation_(p.get<std::string>("ACE_Water_Saturation QP Variable Name"), dl->qp_scalar),
       porosity_(p.get<std::string>("ACE_Porosity QP Variable Name"), dl->qp_scalar),
-      temperature_(p.get<std::string>("ACE Temperature QP Variable Name"), dl->qp_scalar)
+      temperature_(p.get<std::string>("ACE Temperature QP Variable Name"), dl->qp_scalar),
+      is_initial_timestep_(p.get<bool>("Is Initial Time Step"))
 {
   Teuchos::ParameterList* cond_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -68,6 +70,7 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
   this->addDependentField(temperature_.fieldTag());
   this->addDependentField(wgradbf_.fieldTag());
   this->addDependentField(bf_.fieldTag());
+  this->addDependentField(bluff_salinity_read_.fieldTag());
   this->addEvaluatedField(thermal_conductivity_);
   this->addEvaluatedField(thermal_inertia_);
   this->addEvaluatedField(bluff_salinity_);
@@ -90,6 +93,7 @@ ACEThermalParameters<EvalT, Traits>::postRegistrationSetup(typename Traits::Setu
   this->utils.setFieldData(thermal_conductivity_, fm);
   this->utils.setFieldData(thermal_inertia_, fm);
   this->utils.setFieldData(bluff_salinity_, fm);
+  this->utils.setFieldData(bluff_salinity_read_, fm);
   this->utils.setFieldData(ice_saturation_, fm);
   this->utils.setFieldData(density_, fm);
   this->utils.setFieldData(heat_capacity_, fm);
@@ -168,8 +172,17 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       if (salinity_eb.size() > 0) {
         sal_eb = interpolateVectors(z_above_mean_sea_level_eb, salinity_eb, height);
       }
+      std::cout << "IKTIKT is_initial_timestep = " << is_initial_timestep_ << "\n"; 
+      std::cout << "IKT cell, qp, sal_eb, bluff_salinity_read = " << cell << ", " << qp << ", " << sal_eb << ", " << bluff_salinity_read_(cell,qp) << "\n";
+      if (sal_eb != bluff_salinity_read_(cell,qp))
+	 std::cout << "IKT diff vals = " << sal_eb << ", " << bluff_salinity_read_(cell,qp) << "\n";  
       if (bluff_salinity_(cell, qp) < touched_by_ocean) {
-        bluff_salinity_(cell, qp) = sal_eb;
+	//IKT 11/4/2022: if we are in the initial timestep, set bluff_salinity from sal_eb
+	if (is_initial_timestep_ == true) 
+          bluff_salinity_(cell, qp) = sal_eb;
+	//IKT 11/4/2022: if we are not in the initial timestep, set bluff_salinity from bluff_salinity_read_ field
+	else 
+	  bluff_salinity_(cell, qp) = bluff_salinity_read_(cell,qp); 
       }
       // bluff_salinity_(cell, qp)                = sal_eb;
       std::vector<RealType> const time_eb      = this->queryElementBlockParameterMap(eb_name, time_map_);

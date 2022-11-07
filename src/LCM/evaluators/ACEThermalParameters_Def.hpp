@@ -146,6 +146,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
   double current_time = workset.current_time;
   double delta_time   = workset.time_step;
+  std::cout << "IKT current_time = " << current_time << "\n"; 
 
   Albany::AbstractDiscretization&    disc        = *workset.disc;
   Albany::STKDiscretization&         stk_disc    = dynamic_cast<Albany::STKDiscretization&>(disc);
@@ -233,6 +234,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         // OVERRIDES EVERYTHING ABOVE:
         // bluff_salinity_(cell, qp) = touched_by_ocean;
       }
+      std::cout << "IKT cell, qp, final bluff_salinity = " << cell << ", " << qp << ", " << bluff_salinity_(cell,qp) << "\n"; 
       ScalarT const sal = bluff_salinity_(cell, qp);
 
       // Calculate melting temperature

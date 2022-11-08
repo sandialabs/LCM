@@ -79,7 +79,9 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
 
 
   //! Boolean telling code whether or not we are in the initial time-step
-  bool is_initial_timestep_; 
+  bool is_initial_timestep_{false};
+  //! The following is related to determining if we're in the initial timestep
+  double time_; 
 
   //! Block-dependent saturation hardening constants read in from materials.yaml
   //! file

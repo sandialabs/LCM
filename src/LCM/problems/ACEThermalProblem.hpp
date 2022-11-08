@@ -241,17 +241,15 @@ Albany::ACEThermalProblem::constructEvaluators(
     ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
-  
-  //IKT 11/4/2022: the following boolean is needed to determine whether to use sal_eb or bluff
-  //salinity from input Exodus file in ACE::ThermalParameters, for defining the new bluff salinity
-  bool is_initial_timestep = true;  
-
-  //IKT 11/4/2022 WARNING: the following logic may go wrong if one is running 
-  //a thermal or thermo-mechanical problem without an initial condition block in the input file
-  //IKT TODO: fix the logic to have correct behavior for this case
-  if (params->isSublist("Initial Condition") == false)
-    is_initial_timestep = false; 
-  std::cout << "IKT is_initial_timestep = " << is_initial_timestep << "\n"; 
+ 
+  //IKT, 11/7/2022: the following logic is for determining whether we're in the initial
+  //timestep or not within ACE::ThermalParameters, which tells the code where to get 
+  //the bluff_salinity_ field from.
+  double current_time = 0.0; 
+  if (params->isParameter("ACE Sequential Thermomechanical")) { 
+    if (params->isParameter("ACE Thermomechanical Problem Current Time"))
+      current_time = params->get<double>("ACE Thermomechanical Problem Current Time"); 
+  }
 
   // ACE thermal parameters
   {
@@ -262,7 +260,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("BF Name", "BF");
     p->set<string>("ACE_Thermal_Inertia QP Variable Name", "ACE_Thermal_Inertia");
     p->set<string>("ACE_Bluff_Salinity QP Variable Name", "ACE_Bluff_Salinity");
-    p->set<bool>("Is Initial Time Step", is_initial_timestep); 
+    p->set<double>("Current Time", current_time);  
     p->set<string>("ACE_Bluff_SalinityRead QP Variable Name", "ACE_Bluff_SalinityRead");
     p->set<string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
     p->set<string>("ACE_Density QP Variable Name", "ACE_Density");

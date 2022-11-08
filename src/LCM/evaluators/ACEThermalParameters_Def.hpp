@@ -33,8 +33,11 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
       water_saturation_(p.get<std::string>("ACE_Water_Saturation QP Variable Name"), dl->qp_scalar),
       porosity_(p.get<std::string>("ACE_Porosity QP Variable Name"), dl->qp_scalar),
       temperature_(p.get<std::string>("ACE Temperature QP Variable Name"), dl->qp_scalar),
-      is_initial_timestep_(p.get<bool>("Is Initial Time Step"))
+      time_(p.get<double>("Current Time"))
 {
+  if (time_ == 0.0)
+    is_initial_timestep_ = true; 
+
   Teuchos::ParameterList* cond_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
   Teuchos::RCP<Teuchos::ParameterList const> reflist = this->getValidThermalCondParameters();
@@ -146,7 +149,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
   double current_time = workset.current_time;
   double delta_time   = workset.time_step;
-  std::cout << "IKT current_time = " << current_time << "\n"; 
+  std::cout << "IKT current_time, time passed in = " << current_time << ", " << time_ << "\n"; 
 
   Albany::AbstractDiscretization&    disc        = *workset.disc;
   Albany::STKDiscretization&         stk_disc    = dynamic_cast<Albany::STKDiscretization&>(disc);
@@ -234,6 +237,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         // OVERRIDES EVERYTHING ABOVE:
         // bluff_salinity_(cell, qp) = touched_by_ocean;
       }
+      //IKT, 11/7/2022: the following was used for testing.  Can be removed once code has been verified.
+      //if (is_initial_timestep_ == true)
+      //  bluff_salinity_(cell, qp) = 5*bluff_salinity_(cell,qp); 
       std::cout << "IKT cell, qp, final bluff_salinity = " << cell << ", " << qp << ", " << bluff_salinity_(cell,qp) << "\n"; 
       ScalarT const sal = bluff_salinity_(cell, qp);
 

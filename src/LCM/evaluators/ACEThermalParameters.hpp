@@ -76,6 +76,12 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   //! file
   Teuchos::ArrayRCP<std::string> eb_names_;
 
+  //! Boolean passed in to tell code whether problem is Thermo-mechanical
+  bool is_thermomech_; 
+  //! The following is related to determining if to set the right time in the case
+  //of thermo-mechanical problems in ACE
+  double time_;
+
   //! Block-dependent saturation hardening constants read in from materials.yaml
   //! file
   std::map<std::string, RealType> const_thermal_conduct_map_;

@@ -196,6 +196,7 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
       "and a NOX solver");
 
   validPL->set<bool>("ACE Sequential Thermomechanical", false, "ACE Sequential Thermomechanical Problem");
+  validPL->set<double>("ACE Thermomechanical Problem Current Time", 0.0, "Current Time in ACE Sequential Thermomechanical Problem");
 
   return validPL;
 }

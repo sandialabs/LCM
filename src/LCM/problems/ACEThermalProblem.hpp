@@ -225,10 +225,24 @@ Albany::ACEThermalProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
 
+  //IKT, 11/7/2022: the following logic is for determining whether we're in the initial
+  //timestep or not within ACE::ThermalParameters, which tells the code where to get 
+  //the bluff_salinity_ field from.
+  double current_time = 0.0;
+  bool is_thermomech = false; 
+  if (params->isParameter("ACE Sequential Thermomechanical")) {
+    is_thermomech = true; 
+    if (params->isParameter("ACE Thermomechanical Problem Current Time"))
+      current_time = params->get<double>("ACE Thermomechanical Problem Current Time");
+  }
+
+
   // ACE thermal parameters
   {
     RCP<ParameterList> p = rcp(new ParameterList);
 
+    p->set<double>("Current Time", current_time);
+    p->set<bool>("Is Thermomechanical", is_thermomech);
     p->set<string>("ACE_Therm_Cond QP Variable Name", "ACE_Therm_Cond");
     p->set<string>("Weighted Gradient BF Name", "wGrad BF");
     p->set<string>("BF Name", "BF");

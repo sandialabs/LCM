@@ -31,8 +31,11 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
       heat_capacity_(p.get<std::string>("ACE_Heat_Capacity QP Variable Name"), dl->qp_scalar),
       water_saturation_(p.get<std::string>("ACE_Water_Saturation QP Variable Name"), dl->qp_scalar),
       porosity_(p.get<std::string>("ACE_Porosity QP Variable Name"), dl->qp_scalar),
-      temperature_(p.get<std::string>("ACE Temperature QP Variable Name"), dl->qp_scalar)
+      temperature_(p.get<std::string>("ACE Temperature QP Variable Name"), dl->qp_scalar),
+      time_(p.get<double>("Current Time")),
+      is_thermomech_(p.get<bool>("Is Thermomechanical"))
 {
+  
   Teuchos::ParameterList* cond_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
   Teuchos::RCP<Teuchos::ParameterList const> reflist = this->getValidThermalCondParameters();
@@ -140,7 +143,11 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     return;
   }
 
-  double current_time = workset.current_time;
+
+  std::cout << "IKT is_thermomech = " << is_thermomech_ << "\n"; 
+  std::cout << "IKT current_time, time = " << workset.current_time << ", " << time_ << "\n"; 
+  double current_time = is_thermomech_ == true ? time_ : workset.current_time; 
+  //double current_time = workset.current_time;
   double delta_time   = workset.time_step;
 
   Albany::AbstractDiscretization&    disc        = *workset.disc;

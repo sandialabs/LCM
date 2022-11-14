@@ -224,6 +224,32 @@ Albany::ACEThermalProblem::constructEvaluators(
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
+  
+  // Register ACE_Bluff_Salinity
+  { 
+    std::cout << "IKT ace_bluff_salinity reading!\n"; 
+    Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList);
+    std::string                          stateName = "ACE_Bluff_Salinity";
+    Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
+    p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+    // Load parameter using its field name
+    std::string fieldName = "ACE_Bluff_SalinityRead";
+    p->set<std::string>("Field Name", fieldName);
+    p->set<std::string>("State Name", stateName);
+    p->set<Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl_->qp_scalar);
+    using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT, PHAL::AlbanyTraits, typename EvalT::ScalarT>;
+    ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+  }
+ 
+  //IKT, 11/7/2022: the following logic is for determining whether we're in the initial
+  //timestep or not within ACE::ThermalParameters, which tells the code where to get 
+  //the bluff_salinity_ field from.
+  double current_time = 0.0; 
+  if (params->isParameter("ACE Sequential Thermomechanical")) { 
+    if (params->isParameter("ACE Thermomechanical Problem Current Time"))
+      current_time = params->get<double>("ACE Thermomechanical Problem Current Time"); 
+  }
 
   // ACE thermal parameters
   {
@@ -234,6 +260,8 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("BF Name", "BF");
     p->set<string>("ACE_Thermal_Inertia QP Variable Name", "ACE_Thermal_Inertia");
     p->set<string>("ACE_Bluff_Salinity QP Variable Name", "ACE_Bluff_Salinity");
+    p->set<double>("Current Time", current_time);  
+    p->set<string>("ACE_Bluff_SalinityRead QP Variable Name", "ACE_Bluff_SalinityRead");
     p->set<string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
     p->set<string>("ACE_Density QP Variable Name", "ACE_Density");
     p->set<string>("ACE_Heat_Capacity QP Variable Name", "ACE_Heat_Capacity");

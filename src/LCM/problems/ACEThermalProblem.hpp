@@ -227,7 +227,6 @@ Albany::ACEThermalProblem::constructEvaluators(
   
   // Register ACE_Bluff_Salinity
   { 
-    std::cout << "IKT ace_bluff_salinity reading!\n"; 
     Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList);
     std::string                          stateName = "ACE_Bluff_Salinity";
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;

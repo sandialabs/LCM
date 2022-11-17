@@ -149,7 +149,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
   double current_time = workset.current_time;
   double delta_time   = workset.time_step;
-  std::cout << "IKT current_time, time passed in = " << current_time << ", " << time_ << "\n"; 
 
   Albany::AbstractDiscretization&    disc        = *workset.disc;
   Albany::STKDiscretization&         stk_disc    = dynamic_cast<Albany::STKDiscretization&>(disc);
@@ -176,10 +175,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       if (salinity_eb.size() > 0) {
         sal_eb = interpolateVectors(z_above_mean_sea_level_eb, salinity_eb, height);
       }
-      std::cout << "IKTIKT is_initial_timestep = " << is_initial_timestep_ << "\n"; 
-      std::cout << "IKT cell, qp, sal_eb, bluff_salinity_read = " << cell << ", " << qp << ", " << sal_eb << ", " << bluff_salinity_read_(cell,qp) << "\n";
-      if (sal_eb != bluff_salinity_read_(cell,qp))
-	 std::cout << "IKT diff vals = " << sal_eb << ", " << bluff_salinity_read_(cell,qp) << "\n";  
       if (bluff_salinity_(cell, qp) < touched_by_ocean) {
 	//IKT 11/4/2022: if we are in the initial timestep, set bluff_salinity from sal_eb
 	if (is_initial_timestep_ == true) 
@@ -188,7 +183,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 	else 
 	  bluff_salinity_(cell, qp) = bluff_salinity_read_(cell,qp); 
       }
-      // bluff_salinity_(cell, qp)                = sal_eb;
       std::vector<RealType> const time_eb      = this->queryElementBlockParameterMap(eb_name, time_map_);
       std::vector<RealType> const sea_level_eb = this->queryElementBlockParameterMap(eb_name, sea_level_map_);
       const ScalarT               sea_level =
@@ -237,10 +231,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         // OVERRIDES EVERYTHING ABOVE:
         // bluff_salinity_(cell, qp) = touched_by_ocean;
       }
-      //IKT, 11/7/2022: the following was used for testing.  Can be removed once code has been verified.
-      //if (is_initial_timestep_ == true)
-      //  bluff_salinity_(cell, qp) = 5*bluff_salinity_(cell,qp); 
-      std::cout << "IKT cell, qp, final bluff_salinity = " << cell << ", " << qp << ", " << bluff_salinity_(cell,qp) << "\n"; 
       ScalarT const sal = bluff_salinity_(cell, qp);
 
       // Calculate melting temperature

@@ -32,10 +32,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest_serial.cmake COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_new_wave_press_nbc_gold.e-s.22
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_new_wave_press_nbc_gold.e-s.22 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_new_wave_press_nbc_gold.e-s.22
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_new_wave_press_nbc_gold.e-s.22 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_new_wave_press_nbc_gold.e-s.32
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_new_wave_press_nbc_gold.e-s.32 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_new_wave_press_nbc_gold.e-s.32
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_new_wave_press_nbc_gold.e-s.32 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.71
                ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.71 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.71.4.0
@@ -66,10 +66,10 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # Add the tests
 
 #Serial test - new ACE wave pressure NBC
-set(OUTFILE1 "thermal_new_wave_press_nbc.e-s.22")
-set(REF_FILE1 "thermal_new_wave_press_nbc_gold.e-s.22")
-set(OUTFILE2 "mechanical_new_wave_press_nbc.e-s.22")
-set(REF_FILE2 "mechanical_new_wave_press_nbc_gold.e-s.22")
+set(OUTFILE1 "thermal_new_wave_press_nbc.e-s.32")
+set(REF_FILE1 "thermal_new_wave_press_nbc_gold.e-s.32")
+set(OUTFILE2 "mechanical_new_wave_press_nbc.e-s.32")
+set(REF_FILE2 "mechanical_new_wave_press_nbc_gold.e-s.32")
 set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake)
 add_test(
   NAME ACE_${testName}_NewWavePressNBC_Serial

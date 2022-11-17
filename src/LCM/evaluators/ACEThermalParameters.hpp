@@ -56,6 +56,7 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                bluff_salinity_;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>          bluff_salinity_read_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                ice_saturation_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                density_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                heat_capacity_;
@@ -75,6 +76,12 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   //! Array containing the names of the element blocks present in the materials
   //! file
   Teuchos::ArrayRCP<std::string> eb_names_;
+
+
+  //! Boolean telling code whether or not we are in the initial time-step
+  bool is_initial_timestep_{false};
+  //! The following is related to determining if we're in the initial timestep
+  double time_; 
 
   //! Block-dependent saturation hardening constants read in from materials.yaml
   //! file

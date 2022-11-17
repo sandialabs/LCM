@@ -42,9 +42,6 @@ template <typename EvalT, typename Traits, typename ScalarType>
 void
 LoadStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(typename Traits::EvalData workset)
 {
-  // cout << "LoadStateFieldBase importing state " << stateName << " to field "
-  //     << fieldName << " with size " << data.size() << endl;
-
   const Albany::MDArray&            stateToLoad = (*workset.stateArrayPtr)[stateName];
   PHAL::MDFieldIterator<ScalarType> d(data);
   for (int i = 0; !d.done() && i < stateToLoad.size(); ++d, ++i) *d = stateToLoad[i];

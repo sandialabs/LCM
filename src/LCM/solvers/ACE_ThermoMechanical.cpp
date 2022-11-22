@@ -499,7 +499,6 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
     // Remove Initial Condition sublist
     problem_params.remove("Initial Condition", true);
   }
-  std::cout << "IKT HERE current_time = " << current_time << "\n";
   problem_params.set<double>("ACE Thermomechanical Problem Current Time", current_time); 
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};

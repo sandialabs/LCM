@@ -235,12 +235,11 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         bluff_salinity_(cell, qp) =
             std::min(sal_trial, ocean_sal);  // ensures the salinity doesn't exceed ocean salinity
         // OVERRIDES EVERYTHING ABOVE:
-        // bluff_salinity_(cell, qp) = touched_by_ocean;
+        bluff_salinity_(cell, qp) = std::max(ocean_sal, bluff_salinity_(cell, qp));
       }
       //IKT, 11/7/2022: the following was used for testing.  Can be removed once code has been verified.
       //if (is_initial_timestep_ == true)
-      //  bluff_salinity_(cell, qp) = 5*bluff_salinity_(cell,qp); 
-      std::cout << "IKT cell, qp, final bluff_salinity = " << cell << ", " << qp << ", " << bluff_salinity_(cell,qp) << "\n"; 
+      //std::cout << "IKT cell, qp, final bluff_salinity = " << cell << ", " << qp << ", " << bluff_salinity_(cell,qp) << "\n"; 
       ScalarT const sal = bluff_salinity_(cell, qp);
 
       // Calculate melting temperature

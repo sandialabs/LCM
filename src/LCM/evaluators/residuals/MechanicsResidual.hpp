@@ -84,12 +84,17 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   PHX::MDField<ScalarT, Cell, QuadPoint> ice_saturation_;
 
   ///
+  /// Input: ACE_Cumulative_TimeRead field
+  ///
+  PHX::MDField<ScalarT, Cell, QuadPoint> cumulative_time_read_;
+
+  ///
   /// Output: Residual Forces
   ///
   PHX::MDField<ScalarT, Cell, Node, Dim> residual_;
 
   ///
-  /// Output: ACE Cumulative Time
+  /// Output: ACE_Cumulative_Time field
   ///
   PHX::MDField<ScalarT, Cell, QuadPoint> cumulative_time_;
 
@@ -132,7 +137,9 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   bool is_ace_ice_saturation_{false};
 
   /// Does problem have ACE_Cumulative_Time?
-  bool is_ace_cumulative_time_{false}; 
+  bool is_ace_cumulative_time_{false};
+  bool is_ace_cumulative_time_read_{false};
+
   ///
   /// Input, if RCU.
   ///

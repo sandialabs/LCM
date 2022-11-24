@@ -809,19 +809,19 @@ MechanicsProblem::constructEvaluators(
   }
   
   // Register ACE_Cumulative_Time
-  /*if (is_ace_sequential_thermomechanical_ == true) {
+  if (is_ace_sequential_thermomechanical_ == true) {
     std::string                          stateName = "ACE_Cumulative_Time";
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
     p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
     // Load parameter using its field name
-    std::string fieldName = "ACE_Cumulative_Time";
+    std::string fieldName = "ACE_Cumulative_TimeRead";
     p->set<std::string>("Field Name", fieldName);
     p->set<std::string>("State Name", stateName);
     p->set<Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl_->qp_scalar);
     using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT, PHAL::AlbanyTraits, typename EvalT::ScalarT>;
     ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
-  }*/
+  }
 
   if ((have_pore_pressure_eq_ == true) || (have_pore_pressure_ == true)) {
     Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save Pore Pressure"));
@@ -963,6 +963,7 @@ MechanicsProblem::constructEvaluators(
     if (is_ace_sequential_thermomechanical_ == true) {
       p->set<std::string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
       p->set<std::string>("ACE_Cumulative_Time QP Variable Name", "ACE_Cumulative_Time");
+      p->set<std::string>("ACE_Cumulative_TimeRead QP Variable Name", "ACE_Cumulative_TimeRead");
     }
 
     param_list.set<bool>("Have Total Concentration", false);
@@ -1456,6 +1457,7 @@ MechanicsProblem::constructEvaluators(
       if (is_ace_sequential_thermomechanical_ == true) {
         p->set<std::string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
         p->set<std::string>("ACE_Cumulative_Time QP Variable Name", "ACE_Cumulative_Time");
+        p->set<std::string>("ACE_Cumulative_TimeRead QP Variable Name", "ACE_Cumulative_TimeRead");
       }
       bool const use_analytic_mass = material_db_->getElementBlockParam<bool>(eb_name, "Use Analytic Mass", false);
       p->set<bool>("Use Analytic Mass", use_analytic_mass);

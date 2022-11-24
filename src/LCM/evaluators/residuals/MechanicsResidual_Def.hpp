@@ -38,15 +38,21 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
     this->addDependentField(ice_saturation_.fieldTag());
   }
 
-  //IKT, 11/23/2022: currently, cumulative_time_ is evaluated field only (not dependent field)
+  //ACE_Cumulative_Time: evaluated field
   is_ace_cumulative_time_ = p.isParameter("ACE_Cumulative_Time QP Variable Name");
-  std::cout << "IKT is_ace_cumulative_time_ = " << is_ace_cumulative_time_ << "\n"; 
   if (is_ace_cumulative_time_ == true) {
     cumulative_time_ =
         decltype(cumulative_time_)(p.get<std::string>("ACE_Cumulative_Time QP Variable Name"), dl->qp_scalar);
     this->addEvaluatedField(cumulative_time_);
   }
   
+  //ACE_Cumulative_TimeRead: dependent field
+  is_ace_cumulative_time_read_ = p.isParameter("ACE_Cumulative_TimeRead QP Variable Name");
+  if (is_ace_cumulative_time_read_ == true) {
+    cumulative_time_read_ =
+        decltype(cumulative_time_read_)(p.get<std::string>("ACE_Cumulative_TimeRead QP Variable Name"), dl->qp_scalar);
+    this->addDependentField(cumulative_time_read_.fieldTag());
+  }
   this->addEvaluatedField(residual_);
 
   if (p.isType<bool>("Disable Dynamics"))
@@ -92,6 +98,9 @@ MechanicsResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
   }
   if (is_ace_cumulative_time_ == true) {
     this->utils.setFieldData(cumulative_time_, fm);
+  }
+  if (is_ace_cumulative_time_read_ == true) {
+    this->utils.setFieldData(cumulative_time_read_, fm);
   }
   if (have_body_force_) {
     this->utils.setFieldData(body_force_, fm);
@@ -268,7 +277,10 @@ MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
   if (is_ace_cumulative_time_ == true) {
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int pt = 0; pt < num_pts_; ++pt) {
-        cumulative_time_(cell, pt) = 3.14159265;
+        cumulative_time_(cell, pt) = cumulative_time_read_(cell, pt) + 3.14159265;
+	/*std::cout << "IKT cell, pt, cum_time_read, cum_time = " << cell << ", " 
+		  << pt << ", " << cumulative_time_read_(cell,pt) << ", "  
+		  << cumulative_time_(cell,pt) << "\n"; */
       }
     }
   }

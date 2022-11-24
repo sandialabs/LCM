@@ -89,6 +89,11 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   PHX::MDField<ScalarT, Cell, Node, Dim> residual_;
 
   ///
+  /// Output: ACE Cumulative Time
+  ///
+  PHX::MDField<ScalarT, Cell, QuadPoint> cumulative_time_;
+
+  ///
   /// Number of element nodes
   ///
   int num_nodes_;
@@ -123,9 +128,11 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   ///
   bool use_analytic_mass_;
 
-  /// Is a coupled sequential ACE thermo-mechanical problem
-  bool is_ace_sequential_thermomechanical_{false};
+  /// Does problem have ACE_Ice_Saturation
+  bool is_ace_ice_saturation_{false};
 
+  /// Does problem have ACE_Cumulative_Time?
+  bool is_ace_cumulative_time_{false}; 
   ///
   /// Input, if RCU.
   ///

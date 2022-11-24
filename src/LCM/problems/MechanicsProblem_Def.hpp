@@ -809,7 +809,7 @@ MechanicsProblem::constructEvaluators(
   }
   
   // Register ACE_Cumulative_Time
-  if (is_ace_sequential_thermomechanical_ == true) {
+  /*if (is_ace_sequential_thermomechanical_ == true) {
     std::string                          stateName = "ACE_Cumulative_Time";
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
     p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
@@ -821,7 +821,7 @@ MechanicsProblem::constructEvaluators(
     using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT, PHAL::AlbanyTraits, typename EvalT::ScalarT>;
     ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
-  }
+  }*/
 
   if ((have_pore_pressure_eq_ == true) || (have_pore_pressure_ == true)) {
     Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save Pore Pressure"));
@@ -1491,6 +1491,22 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Residual Name", "Displacement Residual");
       ev = Teuchos::rcp(new LCM::MechanicsResidual<EvalT, PHAL::AlbanyTraits>(*p, dl_));
       fm0.template registerEvaluator<EvalT>(ev);
+    
+      // Save ACE_Cumulative_Time to the output Exodus file
+      if (is_ace_sequential_thermomechanical_ == true) {
+        std::string stateName = "ACE_Cumulative_Time";
+        Albany::StateStruct::MeshFieldEntity entity = Albany::StateStruct::QuadPoint;
+        p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, meshSpecs.ebName, true, &entity, "");
+        p->set<std::string>("Field Name", "ACE_Cumulative_Time");
+        p->set("Field Layout", dl_->qp_scalar);
+        p->set<bool>("Nodal State", false);
+
+        ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+        fm0.template registerEvaluator<EvalT>(ev);
+
+        if ((fieldManagerChoice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
+          fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+      }
     }  // end if (have_mech_eq_)
   }    // end if(surface_element)
 

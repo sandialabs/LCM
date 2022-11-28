@@ -807,6 +807,21 @@ MechanicsProblem::constructEvaluators(
     ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
+  
+  // Register ACE_Cumulative_Time
+  if (is_ace_sequential_thermomechanical_ == true) {
+    std::string                          stateName = "ACE_Cumulative_Time";
+    Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
+    p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
+    // Load parameter using its field name
+    std::string fieldName = "ACE_Cumulative_TimeRead";
+    p->set<std::string>("Field Name", fieldName);
+    p->set<std::string>("State Name", stateName);
+    p->set<Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl_->qp_scalar);
+    using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT, PHAL::AlbanyTraits, typename EvalT::ScalarT>;
+    ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+  }
 
   if ((have_pore_pressure_eq_ == true) || (have_pore_pressure_ == true)) {
     Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save Pore Pressure"));
@@ -945,10 +960,10 @@ MechanicsProblem::constructEvaluators(
       param_list.set<bool>("Have ACE Temperature", true);
     }
 
-    param_list.set<bool>("Have ACE_Ice_Saturation", false);
     if (is_ace_sequential_thermomechanical_ == true) {
       p->set<std::string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
-      param_list.set<bool>("Have ACE_Ice_Saturation", true);
+      p->set<std::string>("ACE_Cumulative_Time QP Variable Name", "ACE_Cumulative_Time");
+      p->set<std::string>("ACE_Cumulative_TimeRead QP Variable Name", "ACE_Cumulative_TimeRead");
     }
 
     param_list.set<bool>("Have Total Concentration", false);
@@ -1441,6 +1456,8 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Analytic Mass Name", "Analytic Mass Residual");
       if (is_ace_sequential_thermomechanical_ == true) {
         p->set<std::string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
+        p->set<std::string>("ACE_Cumulative_Time QP Variable Name", "ACE_Cumulative_Time");
+        p->set<std::string>("ACE_Cumulative_TimeRead QP Variable Name", "ACE_Cumulative_TimeRead");
       }
       bool const use_analytic_mass = material_db_->getElementBlockParam<bool>(eb_name, "Use Analytic Mass", false);
       p->set<bool>("Use Analytic Mass", use_analytic_mass);
@@ -1476,6 +1493,22 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Residual Name", "Displacement Residual");
       ev = Teuchos::rcp(new LCM::MechanicsResidual<EvalT, PHAL::AlbanyTraits>(*p, dl_));
       fm0.template registerEvaluator<EvalT>(ev);
+    
+      // Save ACE_Cumulative_Time to the output Exodus file
+      if (is_ace_sequential_thermomechanical_ == true) {
+        std::string stateName = "ACE_Cumulative_Time";
+        Albany::StateStruct::MeshFieldEntity entity = Albany::StateStruct::QuadPoint;
+        p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, meshSpecs.ebName, true, &entity, "");
+        p->set<std::string>("Field Name", "ACE_Cumulative_Time");
+        p->set("Field Layout", dl_->qp_scalar);
+        p->set<bool>("Nodal State", false);
+
+        ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+        fm0.template registerEvaluator<EvalT>(ev);
+
+        if ((fieldManagerChoice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0))
+          fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+      }
     }  // end if (have_mech_eq_)
   }    // end if(surface_element)
 

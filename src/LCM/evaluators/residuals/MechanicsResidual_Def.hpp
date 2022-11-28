@@ -31,13 +31,28 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
   this->addDependentField(w_grad_bf_);
   this->addDependentField(w_bf_);
 
-  is_ace_sequential_thermomechanical_ = p.isParameter("ACE_Ice_Saturation QP Variable Name");
-  if (is_ace_sequential_thermomechanical_ == true) {
+  is_ace_ice_saturation_ = p.isParameter("ACE_Ice_Saturation QP Variable Name");
+  if (is_ace_ice_saturation_ == true) {
     ice_saturation_ =
         decltype(ice_saturation_)(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar);
     this->addDependentField(ice_saturation_.fieldTag());
   }
 
+  //ACE_Cumulative_Time: evaluated field
+  is_ace_cumulative_time_ = p.isParameter("ACE_Cumulative_Time QP Variable Name");
+  if (is_ace_cumulative_time_ == true) {
+    cumulative_time_ =
+        decltype(cumulative_time_)(p.get<std::string>("ACE_Cumulative_Time QP Variable Name"), dl->qp_scalar);
+    this->addEvaluatedField(cumulative_time_);
+  }
+  
+  //ACE_Cumulative_TimeRead: dependent field
+  is_ace_cumulative_time_read_ = p.isParameter("ACE_Cumulative_TimeRead QP Variable Name");
+  if (is_ace_cumulative_time_read_ == true) {
+    cumulative_time_read_ =
+        decltype(cumulative_time_read_)(p.get<std::string>("ACE_Cumulative_TimeRead QP Variable Name"), dl->qp_scalar);
+    this->addDependentField(cumulative_time_read_.fieldTag());
+  }
   this->addEvaluatedField(residual_);
 
   if (p.isType<bool>("Disable Dynamics"))
@@ -78,8 +93,14 @@ MechanicsResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
   this->utils.setFieldData(w_grad_bf_, fm);
   this->utils.setFieldData(w_bf_, fm);
   this->utils.setFieldData(residual_, fm);
-  if (is_ace_sequential_thermomechanical_ == true) {
+  if (is_ace_ice_saturation_ == true) {
     this->utils.setFieldData(ice_saturation_, fm);
+  }
+  if (is_ace_cumulative_time_ == true) {
+    this->utils.setFieldData(cumulative_time_, fm);
+  }
+  if (is_ace_cumulative_time_read_ == true) {
+    this->utils.setFieldData(cumulative_time_read_, fm);
   }
   if (have_body_force_) {
     this->utils.setFieldData(body_force_, fm);
@@ -176,12 +197,13 @@ template <typename EvalT, typename Traits>
 void
 MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  // IKT: uncomment if wish to print ice_sat.  Note that if ice_sat is not present,
-  // trying to print it will cause seg fault.
-  /*for (int cell = 0; cell < workset.numCells; ++cell) {
-    for (int pt = 0; pt < num_pts_; ++pt) {
-      std::cout << "IKT cell, pt, ice_sat = " << cell << ", " << pt << ", "
-                << ice_saturation_(cell, pt) << "\n";
+  // IKT: uncomment if wish to print ice_sat.  
+  /*if (is_ace_ice_saturation_ == true) {
+    for (int cell = 0; cell < workset.numCells; ++cell) {
+      for (int pt = 0; pt < num_pts_; ++pt) {
+        std::cout << "IKT cell, pt, ice_sat = " << cell << ", " << pt << ", "
+                  << ice_saturation_(cell, pt) << "\n";
+      }
     }
   }*/
   for (int cell = 0; cell < workset.numCells; ++cell) {
@@ -247,6 +269,18 @@ MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
             residual_(cell, node, dim) += mass_(cell, node, dim);
           }
         }
+      }
+    }
+  }
+
+  // Populate cumulative_time_ field
+  if (is_ace_cumulative_time_ == true) {
+    for (int cell = 0; cell < workset.numCells; ++cell) {
+      for (int pt = 0; pt < num_pts_; ++pt) {
+        cumulative_time_(cell, pt) = cumulative_time_read_(cell, pt) + 3.14159265;
+	/*std::cout << "IKT cell, pt, cum_time_read, cum_time = " << cell << ", " 
+		  << pt << ", " << cumulative_time_read_(cell,pt) << ", "  
+		  << cumulative_time_(cell,pt) << "\n"; */
       }
     }
   }

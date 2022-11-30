@@ -449,10 +449,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const theta      = std::acos(cosine);
   tilt_angle_(cell, pt) = theta;
  
-
+#ifdef ICE_SATURATION
   //Jenn TODO: correctly fill in cumulative_time in the following lines_
   std::cout << "IKT cumulative_time_read_ = " << cumulative_time_read_(cell, pt) << "\n"; 
   cumulative_time_(cell, pt)  = 3.1415926 + cumulative_time_read_(cell,pt); 
+#endif
 
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;

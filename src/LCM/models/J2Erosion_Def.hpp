@@ -275,7 +275,7 @@ E_fit_max(T x, RealType y)
 {
   // Wed 09/21/2022 w/ BCs
   // x = ice saturation;   y = porosity
-  return (343.0 - 343.0 * y - 913.0 * x + 1316.0 * y * x) / (403.0);
+  return (-6.4724 - 6.50845 * y - 52.9043 * x + 345.809 * y * x) / (279.9238);
 }
 
 template <typename T>
@@ -284,7 +284,7 @@ Y_fit_max(T const x, RealType const y)
 {
   // Wed 09/21/2022 w/ BCs
   // x = ice saturation;   y = porosity
-  return (2.0 - 2.0 * y - 6.0 * x + 11.0 * y * x) / (5.0);
+  return (-4.374e-02 - 4.337e-02 * y - 3.610e-01 * x + 4.639 * y * x) / (4.19089);
 }
 
 template <typename T>
@@ -293,15 +293,15 @@ K_fit_min(T const x, RealType const y)
 {
   // Wed 09/21/2022 w/ BCs
   // x = ice saturation;   y = porosity
-  return (-12.0 + 12.0 * y + 33.0 * x - 43.0 * y * x) / (-10.0);
+  return (2.535e-01 + 2.575e-01 * y + 1.990 * x - 7.985 * y * x) / (-5.484);
 }
 
 template <typename T>
 std::tuple<T, T, T>
 unit_fit(T ice_saturation, RealType porosity)
 {
-  auto const critical_porosity       = 0.30;  // can't be zero
-  auto const critical_ice_saturation = 0.30;
+  auto const critical_porosity       = 0.10;  // can't be zero
+  auto const critical_ice_saturation = 0.10;
   auto const x                       = ice_saturation;
   auto const y                       = porosity;
   auto const xc                      = critical_porosity;
@@ -397,7 +397,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     Y = Y / (Y_weakening_factor_);
     E = E / (E_weakening_factor_);
     strain_limit = 1.0 + ((strain_limit - 1.0)/SL_weakening_factor_);
-    //tensile_strength = tensile_strength / Y_weakening_factor_;
   }
 
   ScalarT const nu    = poissons_ratio_(cell, pt);

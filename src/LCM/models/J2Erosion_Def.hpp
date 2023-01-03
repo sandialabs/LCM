@@ -24,6 +24,8 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   bulk_porosity_            = p->get<RealType>("ACE Bulk Porosity", 0.0);
   critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
   Y_weakening_factor_       = p->get<RealType>("ACE Y Weakening Factor", 1.0);
+  E_weakening_factor_       = p->get<RealType>("ACE E Weakening Factor", 1.0);
+  SL_weakening_factor_      = p->get<RealType>("ACE SL Weakening Factor", 1.0);
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
@@ -383,11 +385,18 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const is_at_boundary = cell_bi == 1.0;
   auto const is_erodible    = cell_bi == 2.0;
 
+  auto strain_limit = strain_limit_;
+  if (porosity < 0.99) {
+    strain_limit = 1.0 + peat;
+    strain_limit = std::max(strain_limit, 1.04);
+  }
+
   // Make the elements exposed to ocean "weaker"
   auto tensile_strength = tensile_strength_;
   if ((is_erodible == true) && (height <= sea_level)) {
     Y = Y / (Y_weakening_factor_);
-    E = E / (Y_weakening_factor_);
+    E = E / (E_weakening_factor_);
+    strain_limit = 1.0 + ((strain_limit - 1.0)/SL_weakening_factor_);
     //tensile_strength = tensile_strength / Y_weakening_factor_;
   }
 
@@ -531,7 +540,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // Hack for strain limit
-  auto const strain_limit = strain_limit_;
   if (strain_limit > 0.0) {
     decltype(Fval) Cval = Fval * minitensor::transpose(Fval);
     auto const Jval = minitensor::det(Fval);

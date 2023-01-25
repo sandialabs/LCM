@@ -63,7 +63,7 @@ NOX::StatusTest::ModelEvaluatorFlag::syncFlag()
     localVal[0] = 3;
   }
 
-  Teuchos::RCP<Teuchos_Comm const> teuchosComm = Albany::createTeuchosCommFromMpiComm(Albany_MPI_COMM_WORLD);
+  Teuchos::RCP<Teuchos_Comm const> teuchosComm = Albany::createTeuchosCommFromMpiComm(MPI_COMM_WORLD);
   Teuchos::reduceAll(*teuchosComm, Teuchos::REDUCE_MAX, 1, &localVal[0], &globalVal[0]);
 
   if (globalVal[0] == 0) {

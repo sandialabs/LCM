@@ -48,27 +48,22 @@ message("-- SEACAS_EXODIFF = ${SEACAS_EXODIFF}")
 # Paths to the actual executables
 set(AlbanyPath ${Albany_BINARY_DIR}/src/Albany)
 
-if(ALBANY_MPI)
-  set(SerialAlbany.exe ${SERIAL_CALL} ${AlbanyPath})
-  # Do not test on greater than Trilinos_MPI_EXEC_MAX_NUMPROCS configured in
-  # Trilinos build or explicity given at Albany configure time -D
-  # ALBANY_MPI_EXEC_MAX_NUMPROCS
-  if(DEFINED MPIMNP)
-    if(MPIMNP LESS 8)
-      set(MAX_MPI_RANKS ${MPIMNP})
-    else(MPIMNP LESS 8)
-      set(MAX_MPI_RANKS 8)
-    endif(MPIMNP LESS 8)
-  else(DEFINED MPIMNP)
-    set(MAX_MPI_RANKS 4)
-  endif(DEFINED MPIMNP)
-  set(Albany.exe ${PARALLEL_CALL} ${AlbanyPath})
-  set(Albany8.exe ${MPIEX} ${MPIPRE} ${MPINPF} ${MAX_MPI_RANKS} ${MPIPOST}
-                  ${AlbanyPath})
-else()
-  set(SerialAlbany.exe ${AlbanyPath})
-  set(Albany.exe ${AlbanyPath})
-endif()
+set(SerialAlbany.exe ${SERIAL_CALL} ${AlbanyPath})
+# Do not test on greater than Trilinos_MPI_EXEC_MAX_NUMPROCS configured in
+# Trilinos build or explicity given at Albany configure time -D
+# ALBANY_MPI_EXEC_MAX_NUMPROCS
+if(DEFINED MPIMNP)
+  if(MPIMNP LESS 8)
+    set(MAX_MPI_RANKS ${MPIMNP})
+  else(MPIMNP LESS 8)
+    set(MAX_MPI_RANKS 8)
+  endif(MPIMNP LESS 8)
+else(DEFINED MPIMNP)
+  set(MAX_MPI_RANKS 4)
+endif(DEFINED MPIMNP)
+set(Albany.exe ${PARALLEL_CALL} ${AlbanyPath})
+set(Albany8.exe ${MPIEX} ${MPIPRE} ${MPINPF} ${MAX_MPI_RANKS} ${MPIPOST}
+                ${AlbanyPath})
 
 set(PartitionTest.exe ${Albany_BINARY_DIR}/src/LCM/PartitionTest)
 set(Subdivision.exe ${Albany_BINARY_DIR}/src/LCM/Subdivision)
@@ -77,12 +72,10 @@ set(MPST.exe ${Albany_BINARY_DIR}/src/LCM/MaterialPointSimulatorT)
 set(DTK_Interp_and_Error.exe ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_and_Error)
 set(DTK_Interp_Volume_to_NS.exe
     ${Albany_BINARY_DIR}/src/LCM/DTK_Interp_Volume_to_NS)
-if(ALBANY_MPI)
-  set(Parallel_DTK_Interp_and_Error.exe ${PARALLEL_CALL}
-                                        ${DTK_Interp_and_Error.exe})
-  set(Parallel_DTK_Interp_Volume_to_NS.exe ${PARALLEL_CALL}
-                                           ${DTK_Interp_Volume_to_NS.exe})
-endif()
+set(Parallel_DTK_Interp_and_Error.exe ${PARALLEL_CALL}
+                                      ${DTK_Interp_and_Error.exe})
+set(Parallel_DTK_Interp_Volume_to_NS.exe ${PARALLEL_CALL}
+                                         ${DTK_Interp_Volume_to_NS.exe})
 
 #
 # The tests

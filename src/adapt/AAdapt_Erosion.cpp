@@ -255,7 +255,7 @@ AAdapt::Erosion::adaptMesh()
   auto const   rank         = topology_->get_proc_rank();
   // ALBANY_ASSERT(num_cells > 0, "Zero elements on processor #" << rank << '\n');
   double global_volume{0.0};
-  auto   comm = static_cast<stk::ParallelMachine>(Albany_MPI_COMM_WORLD);
+  auto   comm = static_cast<stk::ParallelMachine>(MPI_COMM_WORLD);
   stk::all_reduce_sum(comm, &local_volume, &global_volume, 1);
   erosion_volume_ += global_volume;
 

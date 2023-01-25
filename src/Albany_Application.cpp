@@ -1170,7 +1170,6 @@ Application::computeGlobalResidualImpl(
   }
 
   // Allocate scaleVec_
-#if defined(ALBANY_MPI)
   if (scale != 1.0) {
     if (scaleVec_ == Teuchos::null) {
       scaleVec_ = Thyra::createMember(f->space());
@@ -1184,9 +1183,6 @@ Application::computeGlobalResidualImpl(
       }
     }
   }
-#else
-  ALBANY_ASSERT(scale == 1.0, "non-unity scale implementation requires MPI!");
-#endif
 
   if (scaleBCdofs == false && scale != 1.0) {
     Thyra::ele_wise_scale<ST>(*scaleVec_, f.ptr());

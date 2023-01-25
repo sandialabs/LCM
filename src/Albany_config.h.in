@@ -25,9 +25,6 @@
 #cmakedefine ALBANY_CXX_COMPILER_ID "${ALBANY_CXX_COMPILER_ID}"
 #cmakedefine ALBANY_CXX_COMPILER_VERSION "${ALBANY_CXX_COMPILER_VERSION}"
 
-// Whether Albany was compiled with MPI enabled
-#cmakedefine ALBANY_MPI
-
 // Whether pde examples should be built
 #cmakedefine ALBANY_DEMO_PDES
 

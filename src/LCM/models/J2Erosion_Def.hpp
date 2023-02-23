@@ -300,8 +300,8 @@ template <typename T>
 std::tuple<T, T, T>
 unit_fit(T ice_saturation, RealType porosity)
 {
-  auto const critical_porosity       = 0.10;  // can't be zero
-  auto const critical_ice_saturation = 0.10;
+  auto const critical_porosity       = 0.01;  // can't be zero
+  auto const critical_ice_saturation = 0.01;
   auto const x                       = ice_saturation;
   auto const y                       = porosity;
   auto const xc                      = critical_porosity;

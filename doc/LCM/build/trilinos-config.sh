@@ -67,7 +67,6 @@ cmake \
  -D Phalanx_INDEX_SIZE_TYPE:STRING="lcm_phalanx_index_type" \
  -D Phalanx_KOKKOS_DEVICE_TYPE:STRING="lcm_kokkos_device" \
  -D Phalanx_SHOW_DEPRECATED_WARNINGS:BOOL=OFF \
- -D Tpetra_ENABLE_Kokkos_Refactor:BOOL=ON \
  -D Tpetra_INST_PTHREAD:BOOL=lcm_tpetra_inst_pthread \
 \
  -D TPL_ENABLE_HDF5:BOOL=OFF \

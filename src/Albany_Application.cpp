@@ -1228,7 +1228,9 @@ Application::computeGlobalResidual(
 
   if (write_sol_mm == true) {
     *out << "Writing global solution #" << countSol << " to MatrixMarket at time t = " << current_time << ".\n";
-    writeMatrixMarket(x, "sol", countSol);
+    writeMatrixMarket(x, "disp", countSol);
+    writeMatrixMarket(x_dot, "velo", countSol);
+    writeMatrixMarket(x_dotdot, "acce", countSol);
   }
   auto const write_sol_co = writeToCoutSol != 0 && (writeToCoutSol == -1 || countSol == writeToCoutSol);
   if (write_sol_co == true) {
@@ -1244,7 +1246,7 @@ Application::computeGlobalResidual(
 
   if (write_res_mm == true) {
     *out << "Writing global residual #" << countRes << " to MatrixMarket at time t = " << current_time << ".\n";
-    writeMatrixMarket(f, "rhs", countRes);
+    writeMatrixMarket(f, "resi", countRes);
   }
   auto const write_res_co = writeToCoutRes != 0 && (writeToCoutRes == -1 || countRes == writeToCoutRes);
   if (write_res_co == true) {

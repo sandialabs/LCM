@@ -38,15 +38,15 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
     this->addDependentField(ice_saturation_.fieldTag());
   }
 
-  //ACE_Cumulative_Time: evaluated field
+  // ACE_Cumulative_Time: evaluated field
   is_ace_cumulative_time_ = p.isParameter("ACE_Cumulative_Time QP Variable Name");
   if (is_ace_cumulative_time_ == true) {
     cumulative_time_ =
         decltype(cumulative_time_)(p.get<std::string>("ACE_Cumulative_Time QP Variable Name"), dl->qp_scalar);
     this->addEvaluatedField(cumulative_time_);
   }
-  
-  //ACE_Cumulative_TimeRead: dependent field
+
+  // ACE_Cumulative_TimeRead: dependent field
   is_ace_cumulative_time_read_ = p.isParameter("ACE_Cumulative_TimeRead QP Variable Name");
   if (is_ace_cumulative_time_read_ == true) {
     cumulative_time_read_ =
@@ -197,7 +197,7 @@ template <typename EvalT, typename Traits>
 void
 MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  // IKT: uncomment if wish to print ice_sat.  
+  // IKT: uncomment if wish to print ice_sat.
   /*if (is_ace_ice_saturation_ == true) {
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int pt = 0; pt < num_pts_; ++pt) {
@@ -278,9 +278,9 @@ MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int pt = 0; pt < num_pts_; ++pt) {
         cumulative_time_(cell, pt) = cumulative_time_read_(cell, pt) + 3.14159265;
-	/*std::cout << "IKT cell, pt, cum_time_read, cum_time = " << cell << ", " 
-		  << pt << ", " << cumulative_time_read_(cell,pt) << ", "  
-		  << cumulative_time_(cell,pt) << "\n"; */
+        /*std::cout << "IKT cell, pt, cum_time_read, cum_time = " << cell << ", "
+                  << pt << ", " << cumulative_time_read_(cell,pt) << ", "
+                  << cumulative_time_(cell,pt) << "\n"; */
       }
     }
   }

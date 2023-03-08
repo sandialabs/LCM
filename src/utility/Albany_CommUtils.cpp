@@ -25,7 +25,6 @@ createTeuchosCommFromMpiComm(const MPI_Comm& mc)
   return Teuchos::rcp(new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(mc), 1984));
 }
 
-
 Teuchos::RCP<Teuchos_Comm const>
 getDefaultComm()
 {

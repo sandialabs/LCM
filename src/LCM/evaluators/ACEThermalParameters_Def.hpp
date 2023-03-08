@@ -35,8 +35,7 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
       temperature_(p.get<std::string>("ACE Temperature QP Variable Name"), dl->qp_scalar),
       time_(p.get<double>("Current Time"))
 {
-  if (time_ == 0.0)
-    is_initial_timestep_ = true; 
+  if (time_ == 0.0) is_initial_timestep_ = true;
 
   Teuchos::ParameterList* cond_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -176,12 +175,11 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         sal_eb = interpolateVectors(z_above_mean_sea_level_eb, salinity_eb, height);
       }
       if (bluff_salinity_(cell, qp) < touched_by_ocean) {
-	//IKT 11/4/2022: if we are in the initial timestep, set bluff_salinity from sal_eb
-	if (is_initial_timestep_ == true) 
-          bluff_salinity_(cell, qp) = sal_eb;
-	//IKT 11/4/2022: if we are not in the initial timestep, set bluff_salinity from bluff_salinity_read_ field
-	else 
-	  bluff_salinity_(cell, qp) = bluff_salinity_read_(cell,qp); 
+        // IKT 11/4/2022: if we are in the initial timestep, set bluff_salinity from sal_eb
+        if (is_initial_timestep_ == true) bluff_salinity_(cell, qp) = sal_eb;
+        // IKT 11/4/2022: if we are not in the initial timestep, set bluff_salinity from bluff_salinity_read_ field
+        else
+          bluff_salinity_(cell, qp) = bluff_salinity_read_(cell, qp);
       }
       std::vector<RealType> const time_eb      = this->queryElementBlockParameterMap(eb_name, time_map_);
       std::vector<RealType> const sea_level_eb = this->queryElementBlockParameterMap(eb_name, sea_level_map_);

@@ -807,7 +807,7 @@ MechanicsProblem::constructEvaluators(
     ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
-  
+
   // Register ACE_Cumulative_Time
   if (is_ace_sequential_thermomechanical_ == true) {
     std::string                          stateName = "ACE_Cumulative_Time";
@@ -1493,11 +1493,11 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Residual Name", "Displacement Residual");
       ev = Teuchos::rcp(new LCM::MechanicsResidual<EvalT, PHAL::AlbanyTraits>(*p, dl_));
       fm0.template registerEvaluator<EvalT>(ev);
-    
+
       // Save ACE_Cumulative_Time to the output Exodus file
       if (is_ace_sequential_thermomechanical_ == true) {
-        std::string stateName = "ACE_Cumulative_Time";
-        Albany::StateStruct::MeshFieldEntity entity = Albany::StateStruct::QuadPoint;
+        std::string                          stateName = "ACE_Cumulative_Time";
+        Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
         p = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, meshSpecs.ebName, true, &entity, "");
         p->set<std::string>("Field Name", "ACE_Cumulative_Time");
         p->set("Field Layout", dl_->qp_scalar);

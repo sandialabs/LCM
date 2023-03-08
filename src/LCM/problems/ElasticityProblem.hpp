@@ -190,7 +190,7 @@ Albany::ElasticityProblem::constructEvaluators(
       supportsTransient = true;
     }
   }
-  std::cout << "IKT supportsTransient? " << supportsTransient << "\n"; 
+  std::cout << "IKT supportsTransient? " << supportsTransient << "\n";
 
   // Displacement Fields
 

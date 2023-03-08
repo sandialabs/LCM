@@ -1,16 +1,15 @@
 #include "Albany_Gather.hpp"
 
-#include "Albany_Macros.hpp"
-#include "Teuchos_Comm.hpp"
-#include "Teuchos_RCP.hpp"
-
 #include <mpi.h>
+
 #include <Teuchos_DefaultMpiComm.hpp>
 
 #include "Albany_Macros.hpp"
 #include "Teuchos_Array.hpp"
+#include "Teuchos_Comm.hpp"
 #include "Teuchos_DefaultSerialComm.hpp"
 #include "Teuchos_Details_MpiTypeTraits.hpp"
+#include "Teuchos_RCP.hpp"
 
 namespace Albany {
 
@@ -49,8 +48,7 @@ gatherAllV(
         allValDisps.getRawPtr(),
         GO_type,
         rawComm);
-  } else
-      if (dynamic_cast<const Teuchos::SerialComm<int>*>(comm.get())) {
+  } else if (dynamic_cast<const Teuchos::SerialComm<int>*>(comm.get())) {
     allVals.resize(myCount);
     std::copy(myVals.getRawPtr(), myVals.getRawPtr() + myCount, allVals.getRawPtr());
   } else {
@@ -101,8 +99,7 @@ gatherV(
         GO_type,
         root_rank,
         rawComm);
-  } else
-      if (dynamic_cast<const Teuchos::SerialComm<int>*>(comm.get())) {
+  } else if (dynamic_cast<const Teuchos::SerialComm<int>*>(comm.get())) {
     allVals.resize(myCount);
     std::copy(myVals.getRawPtr(), myVals.getRawPtr() + myCount, allVals.getRawPtr());
   } else {

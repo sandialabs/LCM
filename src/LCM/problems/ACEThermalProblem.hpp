@@ -224,10 +224,10 @@ Albany::ACEThermalProblem::constructEvaluators(
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
-  
+
   // Register ACE_Bluff_Salinity
-  { 
-    Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList);
+  {
+    Teuchos::RCP<Teuchos::ParameterList> p         = Teuchos::rcp(new Teuchos::ParameterList);
     std::string                          stateName = "ACE_Bluff_Salinity";
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
     p = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
@@ -240,14 +240,14 @@ Albany::ACEThermalProblem::constructEvaluators(
     ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
- 
-  //IKT, 11/7/2022: the following logic is for determining whether we're in the initial
-  //timestep or not within ACE::ThermalParameters, which tells the code where to get 
-  //the bluff_salinity_ field from.
-  double current_time = 0.0; 
-  if (params->isParameter("ACE Sequential Thermomechanical")) { 
+
+  // IKT, 11/7/2022: the following logic is for determining whether we're in the initial
+  // timestep or not within ACE::ThermalParameters, which tells the code where to get
+  // the bluff_salinity_ field from.
+  double current_time = 0.0;
+  if (params->isParameter("ACE Sequential Thermomechanical")) {
     if (params->isParameter("ACE Thermomechanical Problem Current Time"))
-      current_time = params->get<double>("ACE Thermomechanical Problem Current Time"); 
+      current_time = params->get<double>("ACE Thermomechanical Problem Current Time");
   }
 
   // ACE thermal parameters
@@ -259,7 +259,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<string>("BF Name", "BF");
     p->set<string>("ACE_Thermal_Inertia QP Variable Name", "ACE_Thermal_Inertia");
     p->set<string>("ACE_Bluff_Salinity QP Variable Name", "ACE_Bluff_Salinity");
-    p->set<double>("Current Time", current_time);  
+    p->set<double>("Current Time", current_time);
     p->set<string>("ACE_Bluff_SalinityRead QP Variable Name", "ACE_Bluff_SalinityRead");
     p->set<string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
     p->set<string>("ACE_Density QP Variable Name", "ACE_Density");

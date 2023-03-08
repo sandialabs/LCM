@@ -256,5 +256,4 @@ AAdapt::TopologyMod::getGlobalOpenList(
   delete[] result_array;
 }
 
-
 }  // namespace AAdapt

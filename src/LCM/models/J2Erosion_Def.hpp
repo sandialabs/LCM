@@ -394,9 +394,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Make the elements exposed to ocean "weaker"
   auto tensile_strength = tensile_strength_;
   if ((is_erodible == true) && (height <= sea_level)) {
-    Y = Y / (Y_weakening_factor_);
-    E = E / (E_weakening_factor_);
-    strain_limit = 1.0 + ((strain_limit - 1.0)/SL_weakening_factor_);
+    Y            = Y / (Y_weakening_factor_);
+    E            = E / (E_weakening_factor_);
+    strain_limit = 1.0 + ((strain_limit - 1.0) / SL_weakening_factor_);
   }
 
   ScalarT const nu    = poissons_ratio_(cell, pt);
@@ -527,7 +527,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Hack for tensile strength
   if (tensile_strength > 0) {
-    auto sig = Sacado::Value<decltype(sigma)>::eval(sigma);
+    auto          sig = Sacado::Value<decltype(sigma)>::eval(sigma);
     decltype(sig) V(num_dims_);
     decltype(sig) S(num_dims_);
     std::tie(V, S) = minitensor::eig_sym(sig);
@@ -540,12 +540,12 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Hack for strain limit
   if (strain_limit > 0.0) {
-    decltype(Fval) Cval = Fval * minitensor::transpose(Fval);
-    auto const Jval = minitensor::det(Fval);
-    auto const Jm23val = 1.0 / std::cbrt(Jval * Jval);
-    decltype(Fval) Cdevval = Jm23val * Cval;
-    auto const distortion =  minitensor::norm(Cdevval) / std::sqrt(3.0);
-    bool const strain_failure = distortion >= strain_limit;
+    decltype(Fval) Cval           = Fval * minitensor::transpose(Fval);
+    auto const     Jval           = minitensor::det(Fval);
+    auto const     Jm23val        = 1.0 / std::cbrt(Jval * Jval);
+    decltype(Fval) Cdevval        = Jm23val * Cval;
+    auto const     distortion     = minitensor::norm(Cdevval) / std::sqrt(3.0);
+    bool const     strain_failure = distortion >= strain_limit;
     if (strain_failure == true) {
       failed += 1.0;
     }

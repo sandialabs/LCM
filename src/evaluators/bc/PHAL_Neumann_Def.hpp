@@ -847,8 +847,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   const double  rho   = inputValues[2];   // density
   const double  zmin  = inputValues[3];   // min value of z coord in mesh
   const double  delta = inputValues[4];   // critical wave ratio - for
-                                        // determining when to switch b/w
-                                        // different forms of wave press NBC
+                                          // determining when to switch b/w
+                                          // different forms of wave press NBC
   const bool dump_wave_press_nbc_data = inputValues[5];
 
 #ifdef ACE_WAVE_PRESS_EXTREME_DEBUG_OUTPUT

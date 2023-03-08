@@ -168,7 +168,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     Teuchos::ParameterList& params = solver_factories_[subdomain]->getParameters();
 
     Teuchos::ParameterList& problem_params = params.sublist("Problem", true);
-    problem_params.set<bool>("ACE Sequential Thermomechanical", true); 
+    problem_params.set<bool>("ACE Sequential Thermomechanical", true);
 
     std::string const problem_name = getName(problem_params.get<std::string>("Name"));
     if (problem_name == "Mechanics") {
@@ -499,7 +499,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
     // Remove Initial Condition sublist
     problem_params.remove("Initial Condition", true);
   }
-  problem_params.set<double>("ACE Thermomechanical Problem Current Time", current_time); 
+  problem_params.set<double>("ACE Thermomechanical Problem Current Time", current_time);
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
   Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =

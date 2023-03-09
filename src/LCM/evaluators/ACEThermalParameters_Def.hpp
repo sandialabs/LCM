@@ -160,30 +160,60 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
   }
 
+  std::vector<RealType> const salinity_eb = this->queryElementBlockParameterMap(eb_name, salinity_map_);
+  std::vector<RealType> const z_above_mean_sea_level_eb =
+      this->queryElementBlockParameterMap(eb_name, z_above_mean_sea_level_map_);
+  std::vector<RealType> const time_eb      = this->queryElementBlockParameterMap(eb_name, time_map_);
+  std::vector<RealType> const sea_level_eb = this->queryElementBlockParameterMap(eb_name, sea_level_map_);
+
+  std::vector<RealType> porosity_from_file_eb = this->queryElementBlockParameterMap(eb_name, porosity_from_file_map_);
+  std::vector<RealType> ocean_salinity_eb     = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
+  std::vector<RealType> sand_from_file_eb     = this->queryElementBlockParameterMap(eb_name, sand_from_file_map_);
+  std::vector<RealType> clay_from_file_eb     = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_);
+  std::vector<RealType> silt_from_file_eb     = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_);
+  std::vector<RealType> peat_from_file_eb     = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_);
+
+  ScalarT ice_density_eb         = this->queryElementBlockParameterMap(eb_name, ice_density_map_);
+  ScalarT water_density_eb       = this->queryElementBlockParameterMap(eb_name, water_density_map_);
+  ScalarT soil_density_eb        = this->queryElementBlockParameterMap(eb_name, soil_density_map_);
+  ScalarT ice_heat_capacity_eb   = this->queryElementBlockParameterMap(eb_name, ice_heat_capacity_map_);
+  ScalarT water_heat_capacity_eb = this->queryElementBlockParameterMap(eb_name, water_heat_capacity_map_);
+  ScalarT soil_heat_capacity_eb  = this->queryElementBlockParameterMap(eb_name, soil_heat_capacity_map_);
+  ScalarT ice_thermal_cond_eb    = this->queryElementBlockParameterMap(eb_name, ice_thermal_cond_map_);
+  ScalarT water_thermal_cond_eb  = this->queryElementBlockParameterMap(eb_name, water_thermal_cond_map_);
+  ScalarT soil_thermal_cond_eb   = this->queryElementBlockParameterMap(eb_name, soil_thermal_cond_map_);
+  ScalarT thermal_factor_eb      = this->queryElementBlockParameterMap(eb_name, thermal_factor_map_);
+  ScalarT latent_heat_eb         = this->queryElementBlockParameterMap(eb_name, latent_heat_map_);
+
+  ScalarT const salinity_base_eb   = this->queryElementBlockParameterMap(eb_name, salinity_base_map_);
+  ScalarT const porosity_bulk_eb   = this->queryElementBlockParameterMap(eb_name, porosity_bulk_map_);
+  ScalarT const element_size_eb    = this->queryElementBlockParameterMap(eb_name, element_size_map_);
+  ScalarT const salt_enhanced_D_eb = this->queryElementBlockParameterMap(eb_name, salt_enhanced_D_map_);
+
+  ScalarT const cell_half_width    = 0.5 * element_size_eb;
+  ScalarT const cell_exposed_area  = element_size_eb * element_size_eb;
+  ScalarT const cell_volume        = cell_exposed_area * element_size_eb;
+  ScalarT const per_exposed_length = 1.0 / element_size_eb;
+  ScalarT const factor             = per_exposed_length * salt_enhanced_D_eb;
+
   for (std::size_t cell = 0; cell < num_cells; ++cell) {
     double const cell_bi     = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
     bool const   is_erodible = cell_bi == 2.0;
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
-      RealType const              height           = Sacado::Value<ScalarT>::eval(coord_vec_(cell, qp, 2));
-      ScalarT                     touched_by_ocean = 100.0;
-      ScalarT                     salinity_base_eb = this->queryElementBlockParameterMap(eb_name, salinity_base_map_);
-      ScalarT                     sal_eb           = salinity_base_eb;
-      std::vector<RealType> const salinity_eb      = this->queryElementBlockParameterMap(eb_name, salinity_map_);
-      std::vector<RealType> const z_above_mean_sea_level_eb =
-          this->queryElementBlockParameterMap(eb_name, z_above_mean_sea_level_map_);
+      RealType const height = Sacado::Value<ScalarT>::eval(coord_vec_(cell, qp, 2));
+      ScalarT        sal_eb = salinity_base_eb;
       if (salinity_eb.size() > 0) {
         sal_eb = interpolateVectors(z_above_mean_sea_level_eb, salinity_eb, height);
       }
-      if (bluff_salinity_(cell, qp) < touched_by_ocean) {
-        // IKT 11/4/2022: if we are in the initial timestep, set bluff_salinity from sal_eb
-        if (is_initial_timestep_ == true) bluff_salinity_(cell, qp) = sal_eb;
-        // IKT 11/4/2022: if we are not in the initial timestep, set bluff_salinity from bluff_salinity_read_ field
-        else
-          bluff_salinity_(cell, qp) = bluff_salinity_read_(cell, qp);
+      // IKT 11/4/2022: if we are in the initial timestep, set bluff_salinity from sal_eb
+      if (is_initial_timestep_ == true) {
+        bluff_salinity_(cell, qp) = sal_eb;
       }
-      std::vector<RealType> const time_eb      = this->queryElementBlockParameterMap(eb_name, time_map_);
-      std::vector<RealType> const sea_level_eb = this->queryElementBlockParameterMap(eb_name, sea_level_map_);
-      const ScalarT               sea_level =
+      // IKT 11/4/2022: if we are not in the initial timestep, set bluff_salinity from bluff_salinity_read_ field
+      else {
+        bluff_salinity_(cell, qp) = bluff_salinity_read_(cell, qp);
+      }
+      const ScalarT sea_level =
           sea_level_eb.size() > 0 ? interpolateVectors(time_eb, sea_level_eb, current_time) : -999.0;
 
       // Thermal calculation
@@ -191,9 +221,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       // NOTE: The porosity does not change in time so this calculation only
       // needs
       //       to be done once, at the beginning of the simulation.
-      ScalarT               porosity_eb = this->queryElementBlockParameterMap(eb_name, porosity_bulk_map_);
-      std::vector<RealType> porosity_from_file_eb =
-          this->queryElementBlockParameterMap(eb_name, porosity_from_file_map_);
+      ScalarT porosity_eb = porosity_bulk_eb;
       if (porosity_from_file_eb.size() > 0) {
         porosity_eb = interpolateVectors(z_above_mean_sea_level_eb, porosity_from_file_eb, height);
       }
@@ -201,22 +229,13 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       // Calculate the salinity of the grid cell
       if ((is_erodible == true) && (height <= sea_level)) {
-        ScalarT const element_size_eb    = this->queryElementBlockParameterMap(eb_name, element_size_map_);
-        ScalarT const salt_enhanced_D_eb = this->queryElementBlockParameterMap(eb_name, salt_enhanced_D_map_);
-        ScalarT const cell_half_width    = 0.5 * element_size_eb;
-        ScalarT const cell_exposed_area  = element_size_eb * element_size_eb;
-        ScalarT const cell_volume        = cell_exposed_area * element_size_eb;
-        ScalarT const per_exposed_length = 1.0 / element_size_eb;
-        ScalarT const factor             = per_exposed_length * salt_enhanced_D_eb;
-        ScalarT const sal_curr           = bluff_salinity_(cell, qp);
-        ScalarT       ocean_sal          = salinity_base_eb;
+        ScalarT       ocean_sal = salinity_base_eb;
+        ScalarT const sal_curr  = bluff_salinity_(cell, qp);
         // IKT, FIXME?: ocean_salinity is not block-dependent, so we may want to
         // make it just a std::vector, to avoid creating and querying a map.
-        ScalarT const         zero_sal(0.0);
-        std::vector<RealType> ocean_salinity_eb = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
+        ScalarT const zero_sal(0.0);
         if (ocean_salinity_eb.size() > 0) {
           ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
-          // ocean_sal = touched_by_ocean;
         }
         ScalarT const sal_diff   = ocean_sal - sal_curr;
         ScalarT const sal_grad   = sal_diff / cell_half_width;
@@ -246,11 +265,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       ScalarT const& Tcurr = temperature_(cell, qp);
 
       // Check if sediment fractions were provided
-      bool                  sediment_given{false};
-      std::vector<RealType> sand_from_file_eb = this->queryElementBlockParameterMap(eb_name, sand_from_file_map_);
-      std::vector<RealType> clay_from_file_eb = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_);
-      std::vector<RealType> silt_from_file_eb = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_);
-      std::vector<RealType> peat_from_file_eb = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_);
+      bool sediment_given{false};
       if ((sand_from_file_eb.size() > 0) && (clay_from_file_eb.size() > 0) && (silt_from_file_eb.size() > 0) &&
           (peat_from_file_eb.size() > 0)) {
         sediment_given = true;
@@ -316,9 +331,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       ScalarT calc_soil_heat_capacity;
       ScalarT calc_soil_thermal_cond;
       ScalarT calc_soil_density;
-      ScalarT ice_density_eb   = this->queryElementBlockParameterMap(eb_name, ice_density_map_);
-      ScalarT water_density_eb = this->queryElementBlockParameterMap(eb_name, water_density_map_);
-      ScalarT soil_density_eb  = this->queryElementBlockParameterMap(eb_name, soil_density_map_);
       if (sediment_given == true) {
         ScalarT sand_frac = interpolateVectors(z_above_mean_sea_level_eb, sand_from_file_eb, height);
         ScalarT clay_frac = interpolateVectors(z_above_mean_sea_level_eb, clay_from_file_eb, height);
@@ -348,9 +360,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
 
       // Update the effective material heat capacity
-      ScalarT ice_heat_capacity_eb   = this->queryElementBlockParameterMap(eb_name, ice_heat_capacity_map_);
-      ScalarT water_heat_capacity_eb = this->queryElementBlockParameterMap(eb_name, water_heat_capacity_map_);
-      ScalarT soil_heat_capacity_eb  = this->queryElementBlockParameterMap(eb_name, soil_heat_capacity_map_);
       if (sediment_given == true) {
         heat_capacity_(cell, qp) = (porosity_eb * ((ice_heat_capacity_eb * icurr) + (water_heat_capacity_eb * wcurr))) +
                                    ((1.0 - porosity_eb) * calc_soil_heat_capacity);
@@ -360,9 +369,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
 
       // Update the effective material thermal conductivity
-      ScalarT ice_thermal_cond_eb   = this->queryElementBlockParameterMap(eb_name, ice_thermal_cond_map_);
-      ScalarT water_thermal_cond_eb = this->queryElementBlockParameterMap(eb_name, water_thermal_cond_map_);
-      ScalarT soil_thermal_cond_eb  = this->queryElementBlockParameterMap(eb_name, soil_thermal_cond_map_);
       if (sediment_given == true) {
         thermal_conductivity_(cell, qp) =
             (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) +
@@ -375,14 +381,12 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       // Jenn's sub-grid scale model to calibrate niche formation follows.
       // By default, thermal_factor = 1.0, so that no scaling occurs.
-      ScalarT thermal_factor_eb = this->queryElementBlockParameterMap(eb_name, thermal_factor_map_);
       if ((is_erodible == true) && (height <= sea_level)) {
         thermal_conductivity_(cell, qp) = thermal_conductivity_(cell, qp) * thermal_factor_eb;
         heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / thermal_factor_eb;
       }
 
       // Update the material thermal inertia term
-      ScalarT latent_heat_eb = this->queryElementBlockParameterMap(eb_name, latent_heat_map_);
       thermal_inertia_(cell, qp) =
           (density_(cell, qp) * heat_capacity_(cell, qp)) - (ice_density_eb * latent_heat_eb * dfdT);
       // Return values

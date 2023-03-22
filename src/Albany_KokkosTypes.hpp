@@ -10,7 +10,7 @@
 #include "Albany_config.h"
 
 // Get Kokkos node wrapper
-#include "KokkosCompat_ClassicNodeAPI_Wrapper.hpp"
+#include "Tpetra_KokkosCompat_ClassicNodeAPI_Wrapper.hpp"
 
 // Get Kokkos graph and matrix
 #include "KokkosSparse_CrsMatrix.hpp"
@@ -20,7 +20,7 @@
 #include "Phalanx_KokkosDeviceTypes.hpp"
 
 // The Kokkos node is determined from the Phalanx Device
-typedef Kokkos::Compat::KokkosDeviceWrapperNode<PHX::Device> KokkosNode;
+typedef Tpetra::KokkosCompat::KokkosDeviceWrapperNode<PHX::Device>  KokkosNode;
 
 namespace Albany {
 // NOTE: Tpetra may use a different LO type (Albany uses int32, while tpetra

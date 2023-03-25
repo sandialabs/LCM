@@ -10,12 +10,10 @@ solid mechanics and thermo-mechanics.
 ## Features
 
 ### Analysis of complex multiphysics problems
-<div style="text-align:center">
+
 
 ![Notched Cylinder Multi-Scale Simulation](https://github.com/sandialabs/LCM/blob/main/wiki/lcm_image_notched_cylinder.png)
-
-Illustration of solid mechanics simulation of a notched cylinder, simulated using the <a href="<a href="https://onlinelibrary.wiley.com/doi/10.1002/nme.6982">alternating Schwarz-based multi-scale coupling capability</a> in Albany-LCM
-	</div>
+<center> Illustration of solid mechanics simulation of a notched cylinder, simulated using the <a href="https://onlinelibrary.wiley.com/doi/10.1002/nme.6982">alternating Schwarz-based multi-scale coupling capability</a> in Albany-LCM. </center>
 	
 
 ### Software architecture

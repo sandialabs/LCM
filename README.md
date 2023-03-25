@@ -65,7 +65,7 @@ The LaTeX Developer's Guide (also out-of-date) is located at:
 	/doc/developersGuide
 
 
-## Note on unsupported code
+## Note on Legacy and Unsupported Code
 
 When Albany-LCM was first created by forking from the <a href="https://github.com/sandialabs/Albany">main Albany code</a>, the idea
 was to use this code primarily for analyses involving mechanics and thermo-mechanics, 

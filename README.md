@@ -11,9 +11,9 @@ solid mechanics and thermo-mechanics.
 
 ### Analysis of complex multiphysics problems
 
-![von Karman Vortex Street](https://drive.google.com/file/d/1HThIIwik3xljfcKgrmwp8CxKlFa7hcur/view?usp=sharing)
+![Notched Cylinder Multi-Scale Simulation](https://github.com/sandialabs/LCM/blob/main/wiki/lcm_image_notched_cylinder.png)
 
-Illustration of a von Karman vortex street that forms around a heated tube bundle under certain conditions
+Illustration of solid mechanics simulation of a notched cylinder, simulated using the <a href="<a href="https://onlinelibrary.wiley.com/doi/10.1002/nme.6982">alternating Schwarz-based multi-scale coupling capability</a> in Albany-LCM
 
 ### Software architecture
 

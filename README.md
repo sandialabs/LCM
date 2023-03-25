@@ -22,11 +22,11 @@ Albany-LCM heavily leverages the [Trilinos](https://trilinos.org) Framework, ava
 	git clone https://github.com/trilinos/Trilinos.git
 
 Albany-LCM supports the solution of very large problems (those over 2.1 billion degrees of freedom) using MPI.
-It relies on automatic differentiation from the Sacado library of Trilinos, which makes it straightforward to add
+It relies on automatic differentiation from the <a href="https://trilinos.github.io/sacado.html">Sacado library</a> of Trilinos, which makes it straightforward to add
 new PDEs/physics to the code.  Albany-LCM contains a wide variety of constitutive models for solid mechanics, 
-ranging from simple linear elasticity to sophisticated nonlinear micro-structure models with plasticity (e.g., J2 plasticity, crystal plasticity), and the Schwarz alternating method for multi-scale coupling in solid mechanics.  It also houses the terrestrial component of the Arctic Coastal Erosion (ACE) model, a coupled thermo-mechanical model with 
+ranging from simple linear elasticity to sophisticated nonlinear micro-structure models with plasticity (e.g., J2 plasticity, crystal plasticity), and the </a href="https://onlinelibrary.wiley.com/doi/10.1002/nme.6982">Schwarz alternating method for multi-scale coupling in solid mechanics</a>.  It also houses the terrestrial component of the <a href="https://www.sciencedirect.com/science/article/pii/S0377042721001527?via%3Dihub">Arctic Coastal Erosion (ACE) model</a>, a coupled thermo-mechanical model with 
 some novel permafrost constitutive models currently under 
-development as part of the InterFACE project.
+development as part of the <a href="https://climatemodeling.science.energy.gov/projects/interface-interdisciplinary-research-arctic-coastal-environments">InterFACE project</a>.
 
 ## Building Albany
 
@@ -67,12 +67,12 @@ The LaTeX Developer's Guide (also out-of-date) is located at:
 
 ## Note on unsupported code
 
-When Albany-LCM was first created by forking from the main Albany branch, the idea
+When Albany-LCM was first created by forking from the <a href="https://github.com/sandialabs/Albany">main Albany code</a>, the idea
 was to use this code primarily for analyses involving mechanics and thermo-mechanics, 
 as the name of the code suggests.  To facilitate development of the code, a decision
 was made to remove PDEs and capabilities that were no longer funded, including 
-application-specific PDEs, Kokkos kernels and mesh adaptation.  Users interested in this capability
-should check out the main Albany repository, which houses a performance-portable land-ice model
-known as MPAS-Albany Land Ice (MALI) and the Albany-SCOREC repository, which focuses on 
+ PDEs not relevant for solid mechanics modeling, Kokkos kernels and mesh adaptation.  Users interested in these capability
+should check out the <a href="https://github.com/sandialabs/Albany">main Albany repository</a>, which houses a performance-portable land-ice model
+known as <a href="https://mpas-dev.github.io/land_ice/land_ice.html">MPAS-Albany Land Ice (MALI)</a> and the <a href="https://github.com/scorec/Albany">Albany-SCOREC repository</a>, which focuses on 
 developing capabilities for additive manufacturing and includes adaptive mesh refinement (AMR) via 
-the Parallel Unstructured Mesh Interface (PUMI).  
+the <a href="https://scorec.rpi.edu/pumi/">Parallel Unstructured Mesh Interface (PUMI)</a>.  

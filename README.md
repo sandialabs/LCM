@@ -15,7 +15,7 @@ The Albany web page is located at
 
 ### Analysis of complex multiphysics problems
 
-![von Karman Vortex Street](https://github.com/sandialabs/Albany/wiki/images/vonKarman.png)
+![von Karman Vortex Street](https://drive.google.com/file/d/1HThIIwik3xljfcKgrmwp8CxKlFa7hcur/view?usp=sharing)
 
 Illustration of a von Karman vortex street that forms around a heated tube bundle under certain conditions
 

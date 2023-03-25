@@ -24,7 +24,7 @@ Albany-LCM heavily leverages the [Trilinos](https://trilinos.org) Framework, ava
 Albany-LCM supports the solution of very large problems (those over 2.1 billion degrees of freedom) using MPI.
 It relies on automatic differentiation from the <a href="https://trilinos.github.io/sacado.html">Sacado library</a> of Trilinos, which makes it straightforward to add
 new PDEs/physics to the code.  Albany-LCM contains a wide variety of constitutive models for solid mechanics, 
-ranging from simple linear elasticity to sophisticated nonlinear micro-structure models with plasticity (e.g., J2 plasticity, crystal plasticity), and the </a href="https://onlinelibrary.wiley.com/doi/10.1002/nme.6982">Schwarz alternating method for multi-scale coupling in solid mechanics</a>.  It also houses the terrestrial component of the <a href="https://www.sciencedirect.com/science/article/pii/S0377042721001527?via%3Dihub">Arctic Coastal Erosion (ACE) model</a>, a coupled thermo-mechanical model with 
+ranging from simple linear elasticity to sophisticated nonlinear micro-structure models with plasticity (e.g., J2 plasticity, crystal plasticity), and the <a href="https://onlinelibrary.wiley.com/doi/10.1002/nme.6982">Schwarz alternating method for multi-scale coupling in solid mechanics</a>.  It also houses the terrestrial component of the <a href="https://www.sciencedirect.com/science/article/pii/S0377042721001527?via%3Dihub">Arctic Coastal Erosion (ACE) model</a>, a coupled thermo-mechanical model with 
 some novel permafrost constitutive models currently under 
 development as part of the <a href="https://climatemodeling.science.energy.gov/projects/interface-interdisciplinary-research-arctic-coastal-environments">InterFACE project</a>.
 

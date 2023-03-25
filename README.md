@@ -1,4 +1,4 @@
-<img src="https://github.com/sandialabs/Albany/wiki/images/albany5.png" width="300">
+<img src="https://github.com/sandialabs/LCM/blob/main/wiki/albany_lcm.png" width="300">
 
 # Albany
 

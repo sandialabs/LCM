@@ -46,8 +46,7 @@ struct KokkosGuard
 int
 main(int ac, char* av[])
 {
-
-  Kokkos::initialize(ac, av); 
+  Kokkos::initialize(ac, av);
   typedef PHX::MDField<PHAL::AlbanyTraits::Residual::ScalarT>::size_type size_type;
   typedef PHAL::AlbanyTraits::Residual                                   Residual;
   typedef PHAL::AlbanyTraits::Residual::ScalarT                          ScalarT;

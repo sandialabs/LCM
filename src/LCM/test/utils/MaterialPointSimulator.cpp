@@ -46,8 +46,8 @@ struct KokkosGuard
 int
 main(int ac, char* av[])
 {
-  KokkosGuard kokkos(ac, av);
 
+  Kokkos::initialize(ac, av); 
   typedef PHX::MDField<PHAL::AlbanyTraits::Residual::ScalarT>::size_type size_type;
   typedef PHAL::AlbanyTraits::Residual                                   Residual;
   typedef PHAL::AlbanyTraits::Residual::ScalarT                          ScalarT;
@@ -104,7 +104,7 @@ main(int ac, char* av[])
   // A mpi object must be instantiated before using the comm to read
   // material file
   Teuchos::GlobalMPISession        mpi_session(&ac, &av);
-  Teuchos::RCP<Teuchos_Comm const> commT = Albany::createTeuchosCommFromMpiComm(Albany_MPI_COMM_WORLD);
+  Teuchos::RCP<Teuchos_Comm const> commT = Albany::createTeuchosCommFromMpiComm(MPI_COMM_WORLD);
 
   Teuchos::RCP<Albany::MaterialDatabase> material_db;
   material_db = Teuchos::rcp(new Albany::MaterialDatabase(input_file, commT));

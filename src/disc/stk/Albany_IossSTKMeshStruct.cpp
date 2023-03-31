@@ -336,7 +336,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
    * mesh across the other processors. stk_rebalance is used, which requires
    * Zoltan
    *
-   * This code is only compiled if ALBANY_MPI and ALBANY_ZOLTAN are true
+   * This code is only compiled if ALBANY_ZOLTAN are true
    */
 
 #if defined(ALBANY_ZOLTAN)  // rebalance needs Zoltan
@@ -388,7 +388,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
 
   /*
    * The following code block reads a single mesh when Albany is compiled
-   * serially, or a Nemspread fileset if ALBANY_MPI is true.
+   * serially, or a Nemspread fileset.
    *
    */
   {  // running in Serial or Parallel read from Nemspread files

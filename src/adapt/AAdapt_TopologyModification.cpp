@@ -141,7 +141,6 @@ AAdapt::TopologyMod::showRelations()
   }
 }
 
-#if defined(ALBANY_MPI)
 int
 AAdapt::TopologyMod::accumulateFractured(int num_fractured)
 {
@@ -257,22 +256,5 @@ AAdapt::TopologyMod::getGlobalOpenList(
   delete[] result_array;
 }
 
-#else
-int
-AAdapt::TopologyMod::accumulateFractured(int num_fractured)
-{
-  return num_fractured;
-}
-
-// Parallel all-gatherv function. Communicates local open list to
-// all processors to form global open list.
-void
-AAdapt::TopologyMod::getGlobalOpenList(
-    std::map<EntityKey, bool>& local_entity_open,
-    std::map<EntityKey, bool>& global_entity_open)
-{
-  global_entity_open = local_entity_open;
-}
-#endif
 
 }  // namespace AAdapt

@@ -117,7 +117,7 @@ Topology::computeExtrema()
   auto global_xmax = xmax;
   auto global_ymax = ymax;
   auto global_zmax = zmax;
-  auto comm        = static_cast<stk::ParallelMachine>(Albany_MPI_COMM_WORLD);
+  auto comm        = static_cast<stk::ParallelMachine>(MPI_COMM_WORLD);
   stk::all_reduce_min(comm, &xmin, &global_xmin, 1);
   stk::all_reduce_min(comm, &ymin, &global_ymin, 1);
   stk::all_reduce_min(comm, &zmin, &global_zmin, 1);
@@ -1926,7 +1926,7 @@ Topology::there_are_failed_cells_global()
   int        global_count = 0;
   bool const failed_local = there_are_failed_cells_local() == true;
   int const  local_count  = failed_local == true ? 1 : 0;
-  auto       comm         = static_cast<stk::ParallelMachine>(Albany_MPI_COMM_WORLD);
+  auto       comm         = static_cast<stk::ParallelMachine>(MPI_COMM_WORLD);
   stk::all_reduce_sum(comm, &local_count, &global_count, 1);
   return global_count > 0;
 }
@@ -2013,7 +2013,7 @@ Topology::execute_entity_deletion_operations(stk::mesh::EntityVector& entities)
     auto rank   = bulk_data.entity_rank(entity);
     ++num_local_changes[rank];
   }
-  auto comm = static_cast<stk::ParallelMachine>(Albany_MPI_COMM_WORLD);
+  auto comm = static_cast<stk::ParallelMachine>(MPI_COMM_WORLD);
   stk::all_reduce_sum(comm, num_local_changes.data(), num_global_changes.data(), stk::topology::NUM_RANKS);
   // Must destroy upward relations before destory_entity() will remove
   // the entity.

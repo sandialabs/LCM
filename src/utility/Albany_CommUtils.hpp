@@ -16,11 +16,11 @@ namespace Albany {
 Teuchos::RCP<Teuchos_Comm const>
 getDefaultComm();
 
-Albany_MPI_Comm
+MPI_Comm
 getMpiCommFromTeuchosComm(Teuchos::RCP<Teuchos_Comm const>& tc);
 
 Teuchos::RCP<Teuchos_Comm const>
-createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc);
+createTeuchosCommFromMpiComm(const MPI_Comm& mc);
 
 Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromThyraComm(const Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>& tc_in);

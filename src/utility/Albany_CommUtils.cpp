@@ -8,8 +8,7 @@
 
 namespace Albany {
 
-#if defined(ALBANY_MPI)
-Albany_MPI_Comm
+MPI_Comm
 getMpiCommFromTeuchosComm(Teuchos::RCP<Teuchos_Comm const>& tc)
 {
   Teuchos::Ptr<const Teuchos::MpiComm<int>> mpiComm =
@@ -18,7 +17,7 @@ getMpiCommFromTeuchosComm(Teuchos::RCP<Teuchos_Comm const>& tc)
 }
 
 Teuchos::RCP<Teuchos_Comm const>
-createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc)
+createTeuchosCommFromMpiComm(const MPI_Comm& mc)
 {
   // The default tag in the MpiComm is used in Teuchos send/recv operations
   // *only if* the user does not specify a tag for the message. Here, I pick a
@@ -26,15 +25,6 @@ createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc)
   return Teuchos::rcp(new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(mc), 1984));
 }
 
-#else
-
-Teuchos::RCP<Teuchos_Comm const>
-createTeuchosCommFromMpiComm(const Albany_MPI_Comm& mc)
-{
-  return Teuchos::rcp(new Teuchos::SerialComm<int>());
-}
-
-#endif  // defined(ALBANY_MPI)
 
 Teuchos::RCP<Teuchos_Comm const>
 getDefaultComm()
@@ -45,13 +35,11 @@ getDefaultComm()
 Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromThyraComm(const Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>& tc_in)
 {
-#if defined(HAVE_MPI)
   const Teuchos::RCP<const Teuchos::MpiComm<Teuchos::Ordinal>> mpiCommIn =
       Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<Teuchos::Ordinal>>(tc_in);
   if (nonnull(mpiCommIn)) {
     return Teuchos::createMpiComm<int>(mpiCommIn->getRawMpiComm());
   }
-#endif  // HAVE_MPI
 
   // Assert conversion to Teuchos::SerialComm as a last resort (or throw)
   Teuchos::rcp_dynamic_cast<const Teuchos::SerialComm<Teuchos::Ordinal>>(tc_in, true);
@@ -62,13 +50,11 @@ createTeuchosCommFromThyraComm(const Teuchos::RCP<const Teuchos::Comm<Teuchos::O
 Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>
 createThyraCommFromTeuchosComm(const Teuchos::RCP<Teuchos_Comm const>& tc_in)
 {
-#if defined(HAVE_MPI)
   const Teuchos::RCP<const Teuchos::MpiComm<int>> mpiCommIn =
       Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(tc_in);
   if (nonnull(mpiCommIn)) {
     return Teuchos::createMpiComm<Teuchos::Ordinal>(mpiCommIn->getRawMpiComm());
   }
-#endif  // HAVE_MPI
 
   // Assert conversion to Teuchos::SerialComm as a last resort (or throw)
   Teuchos::rcp_dynamic_cast<const Teuchos::SerialComm<int>>(tc_in, true);

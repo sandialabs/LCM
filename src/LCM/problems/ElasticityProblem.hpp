@@ -186,10 +186,11 @@ Albany::ElasticityProblem::constructEvaluators(
   bool supportsTransient = false;
   if (params->isParameter("Solution Method")) {
     std::string solutionMethod = params->get<std::string>("Solution Method");
-    if (solutionMethod == "Transient") {
+    if ((solutionMethod == "Transient") || (solutionMethod == "Transient Tempus")) {
       supportsTransient = true;
     }
   }
+  std::cout << "IKT supportsTransient? " << supportsTransient << "\n"; 
 
   // Displacement Fields
 

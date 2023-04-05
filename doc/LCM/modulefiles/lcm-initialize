@@ -3,12 +3,6 @@
 set name lcm-initialize
 set description "LCM automatic determination of running Linux distribution"
 
-set kernel_version [system "uname release"]
-set ubuntu_str generic
-set cluster_str chaos
-set ubuntu_pos [system "string last $ubuntu_str $kernel_version"]
-set cluster_pos [system "string last $cluster_str $kernel_version"]
-
 if { [ file exists /etc/fedora-release ] } {
   module load lcm-fedora
   continue
@@ -26,15 +20,5 @@ if { [ file exists /projects/sems ] } {
 
 if { [ file exists /etc/redhat-release ] } {
   module load lcm-rhel
-  continue
-}
-
-if {$ubuntu_pos > 0} {
-  module load lcm-ubuntu
-  continue
-}
-
-if {$cluster_pos > 0} {
-  module load lcm-cluster
   continue
 }

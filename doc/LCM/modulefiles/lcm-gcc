@@ -5,11 +5,7 @@ module-whatis "LCM GCC compiler"
 set lcm_dir $env(LCM_DIR)
 
 if { [is-loaded lcm-sems] } {
-  module load sems-gcc/9.2.0
-}
-
-if { [is-loaded lcm-cluster] } {
-  module load gnu/7.2.1
+  module load sems-gcc
 }
 
 setenv TOOL_CHAIN gcc

@@ -8,7 +8,6 @@
 // #include "Albany_ProblemUtils.hpp"
 #include <Phalanx_DataLayout_MDALayout.hpp>
 #include <Teuchos_AbstractFactoryStd.hpp>
-#include <Thyra_Ifpack2PreconditionerFactory.hpp>
 
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_ThyraUtils.hpp"
@@ -538,14 +537,6 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::ProjectIPtoNodalFie
 #endif
 
   if (first) mgr_->ndb_numvecs = p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getVecsize() - mgr_->ndb_start;
-
-  // Set up linear solver.
-  {
-    typedef Thyra::PreconditionerFactoryBase<ST>                  Base;
-    typedef Thyra::Ifpack2PreconditionerFactory<Tpetra_CrsMatrix> Impl;
-
-    linearSolverBuilder_.setPreconditioningStrategyFactory(Teuchos::abstractFactoryStd<Base, Impl>(), "Ifpack2");
-  }
 
   Teuchos::ParameterList* upl = p.get<Teuchos::ParameterList*>("Parameter List");
   double const solver_tol     = upl->isType<double>("Solver Tolerance") ? upl->get<double>("Solver Tolerance") : 1e-12;

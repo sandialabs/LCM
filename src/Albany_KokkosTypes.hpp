@@ -20,7 +20,7 @@
 #include "Phalanx_KokkosDeviceTypes.hpp"
 
 // The Kokkos node is determined from the Phalanx Device
-typedef Tpetra::KokkosCompat::KokkosDeviceWrapperNode<PHX::Device>  KokkosNode;
+typedef Tpetra::KokkosCompat::KokkosDeviceWrapperNode<PHX::Device> KokkosNode;
 
 namespace Albany {
 // NOTE: Tpetra may use a different LO type (Albany uses int32, while tpetra

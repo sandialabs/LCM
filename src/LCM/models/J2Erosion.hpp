@@ -69,8 +69,9 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ConstScalarField displacement_;
 
   // Output MDFields
-  ScalarField eqps_;
   ScalarField Fp_;
+  ScalarField eqps_;
+  ScalarField cumulative_time_;
   ScalarField source_;
   ScalarField stress_;
   ScalarField yield_surf_;
@@ -81,6 +82,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   // Workspace arrays
   Albany::MDArray Fp_old_;
   Albany::MDArray eqps_old_;
+  Albany::MDArray cumulative_time_old_;
 
   bool                       have_cell_boundary_indicator_{false};
   Teuchos::ArrayRCP<double*> cell_boundary_indicator_;
@@ -109,6 +111,9 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
 
   // Sea level arrays
   RealType current_time_{0.0};
+
+  // For cumulative time
+  RealType time_step_{0.0};
 
   void
   init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields);

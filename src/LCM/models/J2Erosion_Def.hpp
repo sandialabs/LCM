@@ -4,9 +4,6 @@
 #include "ACEcommon.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "J2Erosion.hpp"
-
-#define ICE_SATURATION
-
 namespace LCM {
 
 template <typename EvalT, typename Traits>
@@ -68,6 +65,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   std::string const cauchy_str     = field_name_map_["Cauchy_Stress"];
   std::string const Fp_str         = field_name_map_["Fp"];
   std::string const eqps_str       = field_name_map_["eqps"];
+  std::string const ct_str         = field_name_map_["Cumulative_Time"];
   std::string const yield_surf_str = field_name_map_["Yield_Surface"];
   std::string const j2_stress_str  = field_name_map_["J2_Stress"];
   std::string const tilt_angle_str = field_name_map_["Tilt_Angle"];
@@ -82,9 +80,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("Elastic Modulus", dl->qp_scalar);
   setDependentField("Yield Strength", dl->qp_scalar);
   setDependentField("Hardening Modulus", dl->qp_scalar);
-#if defined(ICE_SATURATION)
   setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
-#endif
   setDependentField("Delta Time", dl->workset_scalar);
   setDependentField("Displacement", dl->qp_vector);
 
@@ -93,6 +89,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setEvaluatedField(cauchy_str, dl->qp_tensor);
   setEvaluatedField(Fp_str, dl->qp_tensor);
   setEvaluatedField(eqps_str, dl->qp_scalar);
+  setEvaluatedField(ct_str, dl->qp_scalar);
   setEvaluatedField(yield_surf_str, dl->qp_scalar);
   setEvaluatedField(j2_stress_str, dl->qp_scalar);
   setEvaluatedField(tilt_angle_str, dl->qp_scalar);
@@ -106,6 +103,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   addStateVariable(cauchy_str, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
   addStateVariable(Fp_str, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
   addStateVariable(eqps_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
+  addStateVariable(ct_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output cumulative time", false));
   addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   addStateVariable(j2_stress_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output J2 Stress", false));
   addStateVariable(tilt_angle_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
@@ -126,15 +124,16 @@ J2ErosionKernel<EvalT, Traits>::init(
     FieldMap<ScalarT const>& dep_fields,
     FieldMap<ScalarT>&       eval_fields)
 {
-  std::string cauchy_str     = field_name_map_["Cauchy_Stress"];
-  std::string Fp_str         = field_name_map_["Fp"];
-  std::string eqps_str       = field_name_map_["eqps"];
-  std::string yield_surf_str = field_name_map_["Yield_Surface"];
-  std::string j2_stress_str  = field_name_map_["J2_Stress"];
-  std::string tilt_angle_str = field_name_map_["Tilt_Angle"];
-  std::string source_str     = field_name_map_["Mechanical_Source"];
-  std::string F_str          = field_name_map_["F"];
-  std::string J_str          = field_name_map_["J"];
+  std::string const cauchy_str     = field_name_map_["Cauchy_Stress"];
+  std::string const Fp_str         = field_name_map_["Fp"];
+  std::string const eqps_str       = field_name_map_["eqps"];
+  std::string const ct_str         = field_name_map_["Cumulative_Time"];
+  std::string const yield_surf_str = field_name_map_["Yield_Surface"];
+  std::string const j2_stress_str  = field_name_map_["J2_Stress"];
+  std::string const tilt_angle_str = field_name_map_["Tilt_Angle"];
+  std::string const source_str     = field_name_map_["Mechanical_Source"];
+  std::string const F_str          = field_name_map_["F"];
+  std::string const J_str          = field_name_map_["J"];
 
   // extract dependent MDFields
   def_grad_          = *dep_fields[F_str];
@@ -144,19 +143,18 @@ J2ErosionKernel<EvalT, Traits>::init(
   yield_strength_    = *dep_fields["Yield Strength"];
   hardening_modulus_ = *dep_fields["Hardening Modulus"];
   delta_time_        = *dep_fields["Delta Time"];
-#if defined(ICE_SATURATION)
-  ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
-#endif
-  displacement_ = *dep_fields["Displacement"];
+  ice_saturation_    = *dep_fields["ACE_Ice_Saturation"];
+  displacement_      = *dep_fields["Displacement"];
 
   // extract evaluated MDFields
-  stress_     = *eval_fields[cauchy_str];
-  Fp_         = *eval_fields[Fp_str];
-  eqps_       = *eval_fields[eqps_str];
-  yield_surf_ = *eval_fields[yield_surf_str];
-  j2_stress_  = *eval_fields[j2_stress_str];
-  tilt_angle_ = *eval_fields[tilt_angle_str];
-  failed_     = *eval_fields["failure_state"];
+  stress_          = *eval_fields[cauchy_str];
+  Fp_              = *eval_fields[Fp_str];
+  eqps_            = *eval_fields[eqps_str];
+  cumulative_time_ = *eval_fields[ct_str];
+  yield_surf_      = *eval_fields[yield_surf_str];
+  j2_stress_       = *eval_fields[j2_stress_str];
+  tilt_angle_      = *eval_fields[tilt_angle_str];
+  failed_          = *eval_fields["failure_state"];
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_str];
@@ -164,8 +162,9 @@ J2ErosionKernel<EvalT, Traits>::init(
   }
 
   // get State Variables
-  Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
-  eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
+  Fp_old_              = (*workset.stateArrayPtr)[Fp_str + "_old"];
+  eqps_old_            = (*workset.stateArrayPtr)[eqps_str + "_old"];
+  cumulative_time_old_ = (*workset.stateArrayPtr)[ct_str + "_old"];
 
   auto& disc                    = *workset.disc;
   auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
@@ -179,6 +178,7 @@ J2ErosionKernel<EvalT, Traits>::init(
   }
 
   current_time_ = workset.current_time;
+  time_step_    = workset.time_step;
 
   auto const num_cells = workset.numCells;
   for (auto cell = 0; cell < num_cells; ++cell) {
@@ -346,9 +346,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const coords       = this->model_.getCoordVecField();
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
+  auto const time_step    = time_step_;
   auto const sea_level    = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
 
-#if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
 
   auto const peat =
@@ -369,12 +369,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   E = std::max(E, residual_elastic_modulus_);
   Y = std::max(Y, soil_yield_strength_);
 
-#else
-  ScalarT const E = elastic_modulus_(cell, pt);
-  ScalarT const K = hardening_modulus_(cell, pt);
-  ScalarT       Y = yield_strength_(cell, pt);
-#endif
-
   Y = std::max(Y, 0.0);
   E = std::max(E, 0.0);
 
@@ -389,6 +383,17 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (porosity < 0.99) {
     strain_limit = 1.0 + peat;
     strain_limit = std::max(strain_limit, 1.04);
+  }
+
+  // Update cumulative time, make up criterion for testing
+  auto const accumulate = ice_saturation <= 0.5;
+  auto const reset      = ice_saturation > 0.9;
+  if (reset == true) {
+    cumulative_time_(cell, pt) = 0.0;
+  } else if (accumulate == true) {
+    cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + time_step;
+  } else {
+    cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt);
   }
 
   // Make the elements exposed to ocean "weaker"

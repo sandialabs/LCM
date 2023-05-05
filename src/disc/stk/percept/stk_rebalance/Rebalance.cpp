@@ -176,7 +176,7 @@ stk::rebalance::rebalance(
   for (mesh::EntityVector::iterator iA = entities.begin(); iA != entities.end(); ++iA) {
     if (rebal_elem_weight_ref) {
       double* const w = mesh::field_data(*rebal_elem_weight_ref, *iA);
-      ThrowRequireMsg(
+      STK_ThrowRequireMsg(
           NULL != w,
           "Rebalance weight field is not defined on entities but should be "
           "defined on all entities.");

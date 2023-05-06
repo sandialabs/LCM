@@ -29,6 +29,10 @@ endif()
 # Advertise that we support shared libs
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
 
+# Disable Kokkos deprecation warnings
+set(CMAKE_CXX_EXTENSIONS OFF CACHE BOOL
+  "Disable C++ extensions (to avoid warnings from Kokkos)")
+
 # Get Trilinos as one entity
 if(DEFINED ALBANY_TRILINOS_DIR)
   set(CMAKE_PREFIX_PATH ${ALBANY_TRILINOS_DIR} ${CMAKE_PREFIX_PATH})

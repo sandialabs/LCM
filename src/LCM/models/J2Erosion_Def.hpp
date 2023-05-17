@@ -406,8 +406,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const              darcy_q = (mobility * hydrostatic_pressure);      // [m/s]
   auto const       infiltration_L = (darcy_q * cumulative_time);            // [m]
   
-  auto const   damage_L = std::min(grid_Lx, infiltration_L);  // limit L to Lx
-  auto const damage_var = pow(1.0 - (damage_L / grid_Lx), damage_exponent);
+  auto const      damage_L = std::min(grid_Lx, infiltration_L);  // limit L to Lx
+  ScalarT const damage_var = pow(1.0 - (damage_L / grid_Lx), damage_exponent);
 
   // Make the elements exposed to ocean "weaker"
   auto tensile_strength = tensile_strength_;

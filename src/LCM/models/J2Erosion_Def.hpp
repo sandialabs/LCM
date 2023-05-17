@@ -385,22 +385,38 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     strain_limit = std::max(strain_limit, 1.04);
   }
 
-  // Update cumulative time, make up criterion for testing
-  auto const accumulate = ice_saturation <= 0.5;
-  auto const reset      = ice_saturation > 0.9;
+  // Update cumulative time
+  auto const accumulate = ((is_erodible == true) && (height <= sea_level));
+  auto const reset      = ice_saturation > 0.98;
   if (reset == true) {
     cumulative_time_(cell, pt) = 0.0;
   } else if (accumulate == true) {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + time_step;
+    std::cout << "tick! ";
   } else {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt);
   }
 
+  auto const         grid_Lx = 0.10;                // [m]
+  auto const damage_exponent = 2.0;                 // [-]
+  auto const        mobility = (1.0e-11 / 1.05e-3); // [m2/Pa*s] (k/visc)
+
+  auto const      cumulative_time = cumulative_time_(cell, pt);             // [s]
+  auto const hydrostatic_pressure = ((sea_level - height) * 9.81 * 1022.0); // [Pa/m]
+  auto const              darcy_q = (mobility * hydrostatic_pressure);      // [m/s]
+  auto const       infiltration_L = (darcy_q * cumulative_time);            // [m]
+  
+  auto const   damage_L = std::min(grid_Lx, infiltration_L);  // limit L to Lx
+  auto const damage_var = pow(1.0 - (damage_L / grid_Lx), damage_exponent);
+
   // Make the elements exposed to ocean "weaker"
   auto tensile_strength = tensile_strength_;
   if ((is_erodible == true) && (height <= sea_level)) {
+    std::cout << "cumu_time = " << cumulative_time << ", ";
+    std::cout << "damage_var = " << damage_var << ". ";
     Y            = Y / (Y_weakening_factor_);
-    E            = E / (E_weakening_factor_);
+    //E            = E / (E_weakening_factor_);
+    E            = E * damage_var;
     strain_limit = 1.0 + ((strain_limit - 1.0) / SL_weakening_factor_);
   }
 

@@ -568,7 +568,7 @@ Albany::IossSTKMeshStruct::loadOrSetCoordinates3d(int index)
 {
   std::string const coords3d_name = "coordinates3d";
 
-  Teuchos::RCP<Ioss::Region>      region      = mesh_data->get_input_io_region();
+  auto      region      = mesh_data->get_input_io_region();
   const Ioss::NodeBlockContainer& node_blocks = region->get_node_blocks();
   Ioss::NodeBlock*                nb          = node_blocks[0];
 

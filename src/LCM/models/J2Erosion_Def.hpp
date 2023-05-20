@@ -178,7 +178,6 @@ J2ErosionKernel<EvalT, Traits>::init(
   }
 
   current_time_ = workset.current_time;
-  time_step_    = workset.time_step;
 
   auto const num_cells = workset.numCells;
   for (auto cell = 0; cell < num_cells; ++cell) {
@@ -346,7 +345,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const coords       = this->model_.getCoordVecField();
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
-  auto const time_step    = time_step_;
   auto const sea_level    = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
 
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
@@ -391,8 +389,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (reset == true) {
     cumulative_time_(cell, pt) = 0.0;
   } else if (accumulate == true) {
-    cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + time_step;
-    std::cout << "tick! ";
+    cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + delta_time;
   } else {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt);
   }

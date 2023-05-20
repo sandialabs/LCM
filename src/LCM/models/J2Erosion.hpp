@@ -112,9 +112,6 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   // Sea level arrays
   RealType current_time_{0.0};
 
-  // For cumulative time
-  RealType time_step_{0.0};
-
   void
   init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields);
 

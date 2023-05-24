@@ -80,9 +80,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   void
   createDiscretization();
   void
-  finalSetUp(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      Teuchos::RCP<Thyra_Vector const> const&     initial_guess = Teuchos::null);
+  finalSetUp(const Teuchos::RCP<Teuchos::ParameterList>& params, Teuchos::RCP<Thyra_Vector const> const& initial_guess = Teuchos::null);
 
   //! Get underlying abstract discretization
   Teuchos::RCP<Albany::AbstractDiscretization>
@@ -273,11 +271,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
   //! Evaluate state field manager
   void
-  evaluateStateFieldManager(
-      double const                     current_time,
-      Thyra_Vector const&              x,
-      Teuchos::Ptr<Thyra_Vector const> xdot,
-      Teuchos::Ptr<Thyra_Vector const> xdotdot);
+  evaluateStateFieldManager(double const current_time, Thyra_Vector const& x, Teuchos::Ptr<Thyra_Vector const> xdot, Teuchos::Ptr<Thyra_Vector const> xdotdot);
 
   void
   evaluateStateFieldManager(double const current_time, const Thyra_MultiVector& x);
@@ -337,10 +331,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   loadBasicWorksetInfo(PHAL::Workset& workset, double current_time);
 
   void
-  loadBasicWorksetInfoSDBCs(
-      PHAL::Workset&                          workset,
-      Teuchos::RCP<Thyra_Vector const> const& owned_sol,
-      double const                            current_time);
+  loadBasicWorksetInfoSDBCs(PHAL::Workset& workset, Teuchos::RCP<Thyra_Vector const> const& owned_sol, double const current_time);
 
   void
   loadWorksetJacobianInfo(PHAL::Workset& workset, double const alpha, double const beta, double const omega);
@@ -385,10 +376,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
   template <typename EvalT>
   void
-  writePhalanxGraph(
-      Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm,
-      std::string const&                                  evalName,
-      int const&                                          phxGraphVisDetail);
+  writePhalanxGraph(Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> fm, std::string const& evalName, int const& phxGraphVisDetail);
 
  public:
   double
@@ -398,8 +386,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     bool const   is_schwarz     = getSchwarzAlternating();
     bool const   is_transient   = solMethod == TransientTempus || solMethod == Transient;
     bool const   use_time_param = has_time == true && is_schwarz == false && is_transient == false;
-    double const this_time =
-        use_time_param == true ? paramLib->getRealValue<PHAL::AlbanyTraits::Residual>("Time") : current_time;
+    double const this_time      = use_time_param == true ? paramLib->getRealValue<PHAL::AlbanyTraits::Residual>("Time") : current_time;
     return this_time;
   }
 
@@ -445,10 +432,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   }
 
   void
-  setCoupledAppBlockNodeset(
-      std::string const& app_name,
-      std::string const& block_name,
-      std::string const& nodeset_name);
+  setCoupledAppBlockNodeset(std::string const& app_name, std::string const& block_name, std::string const& nodeset_name);
 
   std::string
   getCoupledBlockName(int const app_index) const
@@ -469,8 +453,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   bool
   isCoupled(int const app_index) const
   {
-    return coupled_app_index_block_nodeset_names_map_.find(app_index) !=
-           coupled_app_index_block_nodeset_names_map_.end();
+    return coupled_app_index_block_nodeset_names_map_.find(app_index) != coupled_app_index_block_nodeset_names_map_.end();
   }
 
   // Few coupled applications, so do this by brute force.

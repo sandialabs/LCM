@@ -159,11 +159,7 @@ apply_rotation(std::vector<double>& coor)
 //: Convert a mesh entity to a single point
 //: in cartesian coordinates (x,y,z)
 void
-GeomDecomp::entity_to_point(
-    stk::mesh::BulkData& bulk_data,
-    const mesh::Entity&  entity,
-    const VectorField&   nodeCoord,
-    std::vector<double>& coor)
+GeomDecomp::entity_to_point(stk::mesh::BulkData& bulk_data, const mesh::Entity& entity, const VectorField& nodeCoord, std::vector<double>& coor)
 {
   compute_entity_centroid(bulk_data, entity, nodeCoord, coor);
   apply_rotation(coor);

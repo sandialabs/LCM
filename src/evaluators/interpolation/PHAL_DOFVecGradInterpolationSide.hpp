@@ -22,8 +22,7 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class DOFVecGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                        public PHX::EvaluatorDerived<EvalT, Traits>
+class DOFVecGradInterpolationSideBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   DOFVecGradInterpolationSideBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl_side);

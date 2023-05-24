@@ -27,21 +27,13 @@ struct MiniSolver
 template <typename MIN, typename STEP, typename FN, minitensor::Index N>
 struct MiniSolver<MIN, STEP, FN, PHAL::AlbanyTraits::Residual, N>
 {
-  MiniSolver(
-      MIN&                                                          minimizer,
-      STEP&                                                         step_method,
-      FN&                                                           function,
-      minitensor::Vector<PHAL::AlbanyTraits::Residual::ScalarT, N>& soln);
+  MiniSolver(MIN& minimizer, STEP& step_method, FN& function, minitensor::Vector<PHAL::AlbanyTraits::Residual::ScalarT, N>& soln);
 };
 
 template <typename MIN, typename STEP, typename FN, minitensor::Index N>
 struct MiniSolver<MIN, STEP, FN, PHAL::AlbanyTraits::Jacobian, N>
 {
-  MiniSolver(
-      MIN&                                                          minimizer,
-      STEP&                                                         step_method,
-      FN&                                                           function,
-      minitensor::Vector<PHAL::AlbanyTraits::Jacobian::ScalarT, N>& soln);
+  MiniSolver(MIN& minimizer, STEP& step_method, FN& function, minitensor::Vector<PHAL::AlbanyTraits::Jacobian::ScalarT, N>& soln);
 };
 
 ///

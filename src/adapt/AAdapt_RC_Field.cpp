@@ -138,15 +138,13 @@ aadapt_rc_eti_class(Field)
 #define eti(ad_type, rank) template void Field<rank>::addTo<ad_type>(Tensor<ad_type, rank>::type&) const;
     aadapt_rc_apply_to_all_ad_types_all_ranks(eti)
 #undef eti
-#define eti(ad_type, rank) \
-  template void Field<rank>::addTo<ad_type>(Tensor<ad_type, rank>::type&, std::size_t const, std::size_t const) const;
+#define eti(ad_type, rank) template void Field<rank>::addTo<ad_type>(Tensor<ad_type, rank>::type&, std::size_t const, std::size_t const) const;
         aadapt_rc_apply_to_all_ad_types_all_ranks(eti)
 #undef eti
 #define eti(ad_type, arg2) template void Field<2>::multiplyInto<ad_type>(Tensor<ad_type, 2>::type&) const;
             aadapt_rc_apply_to_all_ad_types(eti, )
 #undef eti
-#define eti(ad_type, arg2) \
-  template void Field<2>::multiplyInto<ad_type>(Tensor<ad_type, 2>::type&, std::size_t const, std::size_t const) const;
+#define eti(ad_type, arg2) template void Field<2>::multiplyInto<ad_type>(Tensor<ad_type, 2>::type&, std::size_t const, std::size_t const) const;
                 aadapt_rc_apply_to_all_ad_types(eti, )
 #undef eti
 

@@ -25,15 +25,13 @@ main(int ac, char* av[])
 
   int const num_criteria = 3;
 
-  LCM::fracture::Criterion const criteria_values[] = {
-      LCM::fracture::ONE, LCM::fracture::RANDOM, LCM::fracture::TRACTION};
+  LCM::fracture::Criterion const criteria_values[] = {LCM::fracture::ONE, LCM::fracture::RANDOM, LCM::fracture::TRACTION};
 
   char const* criteria_names[] = {"one", "random", "traction"};
 
   LCM::fracture::Criterion failure_criterion = LCM::fracture::RANDOM;
 
-  command_line_processor.setOption(
-      "fracture-criterion", &failure_criterion, num_criteria, criteria_values, criteria_names, "Fracture Criterion");
+  command_line_processor.setOption("fracture-criterion", &failure_criterion, num_criteria, criteria_values, criteria_names, "Fracture Criterion");
 
   double probability = 1.0;
 
@@ -87,13 +85,9 @@ main(int ac, char* av[])
       exit(1);
       break;
 
-    case LCM::fracture::ONE:
-      abstract_failure_criterion = Teuchos::rcp(new LCM::FractureCriterionOnce(topology, probability));
-      break;
+    case LCM::fracture::ONE: abstract_failure_criterion = Teuchos::rcp(new LCM::FractureCriterionOnce(topology, probability)); break;
 
-    case LCM::fracture::RANDOM:
-      abstract_failure_criterion = Teuchos::rcp(new LCM::FractureCriterionRandom(topology, probability));
-      break;
+    case LCM::fracture::RANDOM: abstract_failure_criterion = Teuchos::rcp(new LCM::FractureCriterionRandom(topology, probability)); break;
   }
 
   topology.set_failure_criterion(abstract_failure_criterion);

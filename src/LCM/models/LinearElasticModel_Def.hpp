@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-LinearElasticModel<EvalT, Traits>::LinearElasticModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+LinearElasticModel<EvalT, Traits>::LinearElasticModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   // define the dependent fields
@@ -36,10 +34,7 @@ LinearElasticModel<EvalT, Traits>::LinearElasticModel(
 }
 template <typename EvalT, typename Traits>
 void
-LinearElasticModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+LinearElasticModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   bool print = false;
   // if (typeid(ScalarT) == typeid(RealType)) print = true;
@@ -64,9 +59,8 @@ LinearElasticModel<EvalT, Traits>::computeState(
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) /
-               ((1 + poissons_ratio(cell, pt)) * (1 - 2 * poissons_ratio(cell, pt)));
-      mu = elastic_modulus(cell, pt) / (2 * (1 + poissons_ratio(cell, pt)));
+      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) / ((1 + poissons_ratio(cell, pt)) * (1 - 2 * poissons_ratio(cell, pt)));
+      mu     = elastic_modulus(cell, pt) / (2 * (1 + poissons_ratio(cell, pt)));
 
       eps.fill(strain, cell, pt, 0, 0);
 

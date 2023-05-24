@@ -41,8 +41,7 @@ main(int ac, char* av[])
   }
 
   else {
-    std::cout << "Usage: MinsurfaceOutput Mesh.exo ResultsFile.txt"
-              << std::endl;  // USAGE OF THIS FILE FROM THE COMMAND LINE
+    std::cout << "Usage: MinsurfaceOutput Mesh.exo ResultsFile.txt" << std::endl;  // USAGE OF THIS FILE FROM THE COMMAND LINE
     return 1;
   }
 
@@ -81,7 +80,7 @@ main(int ac, char* av[])
     ss >> col1 >> col2;
     std::string Finalstring = col2.substr(1, col2.length());  // Get the appropriate string from text file
     i                       = atoi(Finalstring.c_str());      // Convert string to integer
-    resutsFromSolver.push_back(i);  // Push back the numbers from text file to resutsFromSolver vector
+    resutsFromSolver.push_back(i);                            // Push back the numbers from text file to resutsFromSolver vector
   }
 
   // Record ones (1s) at the corresponding positions specified by the solver
@@ -134,13 +133,12 @@ main(int ac, char* av[])
   // Iterate through the vector of Entities that build the minimum surface
   for (unsigned int i = 0; i < (EntitiesMinSurface.size()); i++) {
     // Compute the area
-    std::vector<stk::mesh::Entity> Nodes =
-        topology.getBoundaryEntities(EntitiesMinSurface[i], stk::topology::NODE_RANK);
-    double a    = topology.getDistanceBetweenNodes(Nodes[0], Nodes[1]);
-    double b    = topology.getDistanceBetweenNodes(Nodes[1], Nodes[2]);
-    double c    = topology.getDistanceBetweenNodes(Nodes[2], Nodes[0]);
-    double p    = (a + b + c) / 2;
-    double Area = sqrt(p * (p - a) * (p - b) * (p - c));
+    std::vector<stk::mesh::Entity> Nodes = topology.getBoundaryEntities(EntitiesMinSurface[i], stk::topology::NODE_RANK);
+    double                         a     = topology.getDistanceBetweenNodes(Nodes[0], Nodes[1]);
+    double                         b     = topology.getDistanceBetweenNodes(Nodes[1], Nodes[2]);
+    double                         c     = topology.getDistanceBetweenNodes(Nodes[2], Nodes[0]);
+    double                         p     = (a + b + c) / 2;
+    double                         Area  = sqrt(p * (p - a) * (p - b) * (p - c));
 
     // Put the area into the array the right index
     MinSurfaceAreas[i] = Area;
@@ -169,8 +167,8 @@ main(int ac, char* av[])
 
   // Create the msh output file
   // Extract the input file name
-  string      txtFile     = ".txt";                      // Define the string with the extension file of input mesh
-  std::size_t Position    = results_file.find(txtFile);  // Find the position where .txt starts
+  string      txtFile     = ".txt";                            // Define the string with the extension file of input mesh
+  std::size_t Position    = results_file.find(txtFile);        // Find the position where .txt starts
   std::string file_name_1 = results_file.substr(0, Position);  // sets part of the name of the output file
   std::string file_name_2 = "MinSurface_" + file_name_1 + ".msh";
 
@@ -190,8 +188,7 @@ main(int ac, char* av[])
     // Output a matrix with the coordinates of the nodes
     for (I_setOfNodes = boundaryNodes.begin(); I_setOfNodes != boundaryNodes.end(); ++I_setOfNodes) {
       std::vector<double> nodeCoordinates = topology.findCoordinates(*I_setOfNodes);
-      outputToVtk << nodeCoordinates[0] << " " << nodeCoordinates[1] << " " << nodeCoordinates[2]
-                  << endl;  // Coordinates list OUTPUT
+      outputToVtk << nodeCoordinates[0] << " " << nodeCoordinates[1] << " " << nodeCoordinates[2] << endl;  // Coordinates list OUTPUT
       node_map[*I_setOfNodes] = counter;
       counter++;
     }

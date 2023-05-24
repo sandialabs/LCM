@@ -21,10 +21,7 @@ class ComprNSProblem : public AbstractProblem
 {
  public:
   //! Default constructor
-  ComprNSProblem(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<ParamLib>&               paramLib,
-      int const                                   numDim_);
+  ComprNSProblem(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numDim_);
 
   //! Destructor
   ~ComprNSProblem();
@@ -140,14 +137,13 @@ Albany::ComprNSProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPts
+       << ", Dim= " << numDim << std::endl;
 
   int vecDim = neq;
 
@@ -167,8 +163,7 @@ Albany::ComprNSProblem::constructEvaluators(
   dof_names[0]     = "qFluct";
   dof_names_dot[0] = dof_names[0] + "_dot";
   resid_names[0]   = "ComprNS Residual";
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0], offset));
 
@@ -178,15 +173,13 @@ Albany::ComprNSProblem::constructEvaluators(
   //  (evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0],
   //  offset));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter ComprNS"));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter ComprNS"));
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   {  // Specialized DofVecGrad Interpolation for this problem
 

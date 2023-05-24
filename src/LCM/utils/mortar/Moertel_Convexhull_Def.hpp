@@ -13,8 +13,7 @@
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
-    std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p)
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p)
 {
   // # points
   int np = p.size();
@@ -153,8 +152,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
   if (finalp.size() != p.size()) {
     if (OutLevel() > 8)
       std::cout << "MOERTEL: ***WRN*** MOERTEL::Overlap::ConvexHull:\n"
-                << "MOERTEL: ***WRN*** size of convex hull " << finalp.size() << " not # nodes " << p.size()
-                << std::endl
+                << "MOERTEL: ***WRN*** size of convex hull " << finalp.size() << " not # nodes " << p.size() << std::endl
                 << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
   }
 
@@ -173,9 +171,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::ConvexHull(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnUpper(
-    int                                                                    i,
-    std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnUpper(int i, std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
 {
   // note:
   // point i for sure exists as it was added as last point
@@ -218,9 +214,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnUpper(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnLower(
-    int                                                                    i,
-    std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnLower(int i, std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
 {
   // note:
   // point i for sure exists as it was added as last point
@@ -263,9 +257,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::MakeRightTurnLower(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 void
-MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointBefore(
-    int                                                                    i,
-    std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointBefore(int i, std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
 {
   // note:
   // point i for sure exists as it was added as last point
@@ -291,9 +283,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointBefore(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 void
-MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointAfter(
-    int                                                                    i,
-    std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointAfter(int i, std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& hull)
 {
   // note:
   // point i for sure exists as it was added as last point
@@ -319,9 +309,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::RemovePointAfter(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT_1A(class IFace)
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::CollapsePoints(
-    std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
-    double const                                                           eps)
+MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::CollapsePoints(std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p, double const eps)
 {
   // we don't want to collapse on a polygon that has just three or less points
   if (p.size() <= 3) return true;

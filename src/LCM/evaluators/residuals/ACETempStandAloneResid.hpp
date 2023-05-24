@@ -46,7 +46,7 @@ class ACETempStandAloneResid : public PHX::EvaluatorWithBaseImpl<Traits>, public
                                                                                           // grad at qps
   PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
   PHX::MDField<ScalarT, Cell, Node>                     tau_;
-  PHX::MDField<const MeshScalarT, Cell, QuadPoint> jacobian_det_;  // jacobian determinant - for getting mesh size h
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint>      jacobian_det_;  // jacobian determinant - for getting mesh size h
 
   // Output:
   PHX::MDField<ScalarT, Cell, Node> residual_;

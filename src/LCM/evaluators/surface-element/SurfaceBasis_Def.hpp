@@ -89,11 +89,9 @@ SurfaceBasis<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d,
   ref_weights_ = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_qps_);
 
   // temp space for midplane coords
-  ref_midplane_coords_ =
-      Kokkos::createDynRankView(reference_coords_.get_view(), "XXX", container_size, num_surf_nodes_, num_dims_);
+  ref_midplane_coords_ = Kokkos::createDynRankView(reference_coords_.get_view(), "XXX", container_size, num_surf_nodes_, num_dims_);
   if (need_current_basis_ == true) {
-    current_midplane_coords_ =
-        Kokkos::createDynRankView(current_coords_.get_view(), "XXX", container_size, num_surf_nodes_, num_dims_);
+    current_midplane_coords_ = Kokkos::createDynRankView(current_coords_.get_view(), "XXX", container_size, num_surf_nodes_, num_dims_);
   }
 
   // Pre-Calculate reference element quantitites
@@ -153,9 +151,7 @@ SurfaceBasis<EvalT, Traits>::computeMidplaneCoords(
 template <typename EvalT, typename Traits>
 template <typename ST>
 void
-SurfaceBasis<EvalT, Traits>::computeBasisVectors(
-    Kokkos::DynRankView<ST, PHX::Device> const& midplane_coords,
-    PHX::MDField<ST, Cell, QuadPoint, Dim, Dim> basis)
+SurfaceBasis<EvalT, Traits>::computeBasisVectors(Kokkos::DynRankView<ST, PHX::Device> const& midplane_coords, PHX::MDField<ST, Cell, QuadPoint, Dim, Dim> basis)
 {
   for (int cell(0); cell < midplane_coords.extent(0); ++cell) {
     // get the midplane coordinates
@@ -254,10 +250,9 @@ SurfaceBasis<EvalT, Traits>::computeJacobian(
 
       minitensor::Vector<MeshScalarT> G_2(minitensor::Source::ARRAY, 3, basis, cell, pt, 2, 0);
 
-      MeshScalarT j0 = minitensor::det(dPhi);
-      MeshScalarT jacobian =
-          j0 * std::sqrt(minitensor::dot(minitensor::dot(G_2, minitensor::transpose(dPhiInv) * dPhiInv), G_2));
-      area(cell, pt) = jacobian * ref_weights_(pt);
+      MeshScalarT j0       = minitensor::det(dPhi);
+      MeshScalarT jacobian = j0 * std::sqrt(minitensor::dot(minitensor::dot(G_2, minitensor::transpose(dPhiInv) * dPhiInv), G_2));
+      area(cell, pt)       = jacobian * ref_weights_(pt);
     }
   }
 }

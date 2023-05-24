@@ -85,9 +85,7 @@ class ConstitutiveDriverProblem : public Albany::AbstractProblem
   /// Retrieve the state data
   ///
   void
-  getAllocatedStates(
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> old_state,
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> new_state) const;
+  getAllocatedStates(Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> old_state, Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> new_state) const;
 
  private:
   ///
@@ -208,15 +206,13 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
     const Teuchos::RCP<Teuchos::ParameterList>& responseList)
 {
   // Collect problem-specific response parameters
-  Teuchos::RCP<Teuchos::ParameterList> pFromProb =
-      Teuchos::rcp(new Teuchos::ParameterList("Response Parameters from Problem"));
+  Teuchos::RCP<Teuchos::ParameterList> pFromProb = Teuchos::rcp(new Teuchos::ParameterList("Response Parameters from Problem"));
 
   // get the name of the current element block
   std::string eb_name = meshSpecs.ebName;
 
   // get the name of the material model to be used (and make sure there is one)
-  std::string material_model_name =
-      material_db_->getElementBlockSublist(eb_name, "Material Model").get<std::string>("Model Name");
+  std::string material_model_name = material_db_->getElementBlockSublist(eb_name, "Material Model").get<std::string>("Model Name");
   ALBANY_PANIC(material_model_name.length() == 0, "A material model must be defined for block: " + eb_name);
 
   // Note that these are the volume element quantities
@@ -225,8 +221,8 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
   num_pts_               = 1;
   num_vertices_          = num_nodes_;
 
-  *out << "Field Dimensions: Workset=" << workset_size << ", Vertices= " << num_vertices_ << ", Nodes= " << num_nodes_
-       << ", QuadPts= " << num_pts_ << ", Dim= " << num_dims_ << std::endl;
+  *out << "Field Dimensions: Workset=" << workset_size << ", Vertices= " << num_vertices_ << ", Nodes= " << num_nodes_ << ", QuadPts= " << num_pts_
+       << ", Dim= " << num_dims_ << std::endl;
 
   // Construct standard FEM evaluators with standard field names
   dl_             = Teuchos::rcp(new Albany::Layouts(workset_size, num_vertices_, num_nodes_, num_pts_, num_dims_));
@@ -287,8 +283,7 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
   }
 
   {  // Constitutive Model Driver Preprocessor
-    Teuchos::RCP<Teuchos::ParameterList> p =
-        Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Driver Preprocessor"));
+    Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Driver Preprocessor"));
 
     p->set<Teuchos::ParameterList>("Driver Params", params->sublist("Constitutive Model Driver Parameters"));
     p->set<std::string>("Solution Name", dof_names[0]);
@@ -302,8 +297,8 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
   }
 
   {  // Constitutive Model Parameters
-    Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Parameters"));
-    std::string                          matName = material_db_->getElementBlockParam<std::string>(eb_name, "material");
+    Teuchos::RCP<Teuchos::ParameterList> p          = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Parameters"));
+    std::string                          matName    = material_db_->getElementBlockParam<std::string>(eb_name, "material");
     Teuchos::ParameterList&              param_list = material_db_->getElementBlockSublist(eb_name, matName);
     if (have_temperature_) {
       p->set<std::string>("Temperature Name", temperature);
@@ -319,8 +314,8 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
   }
 
   {  // Constitutive Model Interface
-    Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Interface"));
-    std::string                          matName = material_db_->getElementBlockParam<std::string>(eb_name, "material");
+    Teuchos::RCP<Teuchos::ParameterList> p          = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Interface"));
+    std::string                          matName    = material_db_->getElementBlockParam<std::string>(eb_name, "material");
     Teuchos::ParameterList&              param_list = material_db_->getElementBlockSublist(eb_name, matName);
 
     // FIXME: figure out how to do this better

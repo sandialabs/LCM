@@ -12,11 +12,8 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 NSContinuityResid<EvalT, Traits>::NSContinuityResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      VGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      rho(p.get<std::string>("Density QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      VGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      rho(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
 
       CResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       havePSPG(p.get<bool>("Have PSPG"))
@@ -25,12 +22,9 @@ NSContinuityResid<EvalT, Traits>::NSContinuityResid(Teuchos::ParameterList const
   this->addDependentField(VGrad.fieldTag());
   this->addDependentField(rho.fieldTag());
   if (havePSPG) {
-    wGradBF = decltype(wGradBF)(
-        p.get<std::string>("Weighted Gradient BF Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout"));
-    TauM =
-        decltype(TauM)(p.get<std::string>("Tau M Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    Rm = decltype(Rm)(p.get<std::string>("Rm Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"));
+    wGradBF = decltype(wGradBF)(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout"));
+    TauM    = decltype(TauM)(p.get<std::string>("Tau M Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    Rm      = decltype(Rm)(p.get<std::string>("Rm Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"));
     this->addDependentField(wGradBF.fieldTag());
     this->addDependentField(TauM.fieldTag());
     this->addDependentField(Rm.fieldTag());
@@ -38,7 +32,7 @@ NSContinuityResid<EvalT, Traits>::NSContinuityResid(Teuchos::ParameterList const
 
   this->addEvaluatedField(CResidual);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numCells = dims[0];

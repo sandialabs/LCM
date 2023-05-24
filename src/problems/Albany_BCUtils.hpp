@@ -167,10 +167,7 @@ struct NeumannTraits
   typedef PHAL::NeumannFactoryTraits<PHAL::AlbanyTraits> factory_type;
 
   static Teuchos::RCP<Teuchos::ParameterList const>
-  getValidBCParameters(
-      std::vector<std::string> const& sideSetIDs,
-      std::vector<std::string> const& bcNames,
-      std::vector<std::string> const& conditions);
+  getValidBCParameters(std::vector<std::string> const& sideSetIDs, std::vector<std::string> const& bcNames, std::vector<std::string> const& conditions);
 
   static std::string
   constructBCName(std::string const& ns, std::string const& dof, std::string const& condition);

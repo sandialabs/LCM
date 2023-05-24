@@ -18,9 +18,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : w_bf_(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       weights_("Weights", dl->qp_scalar),
       mass_(p.get<std::string>("Analytic Mass Name"), dl->node_vector),
@@ -95,9 +93,7 @@ AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-AnalyticMassResidualBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+AnalyticMassResidualBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(w_bf_, fm);
   this->utils.setFieldData(weights_, fm);
@@ -683,8 +679,7 @@ AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(typename Traits::E
       for (int node = 0; node < this->num_nodes_; ++node) {
         for (int pt = 0; pt < this->num_pts_; ++pt) {
           for (int dim = 0; dim < this->num_dims_; ++dim) {
-            (this->mass_)(cell, node, dim) +=
-                (this->density_) * (this->accel_qps_)(cell, pt, dim) * (this->w_bf_)(cell, node, pt);
+            (this->mass_)(cell, node, dim) += (this->density_) * (this->accel_qps_)(cell, pt, dim) * (this->w_bf_)(cell, node, pt);
           }
         }
       }
@@ -722,9 +717,7 @@ AnalyticMassResidualBase<EvalT, Traits>::computeResidualValue(typename Traits::E
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::AnalyticMassResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::AnalyticMassResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl)
 {
 }
@@ -752,9 +745,7 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typen
 // **********************************************************************
 
 template <typename Traits>
-AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::AnalyticMassResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::AnalyticMassResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl)
 {
 }
@@ -783,27 +774,15 @@ AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typen
     for (int node = 0; node < this->num_nodes_; ++node) {  // loop over Jacobian rows
       std::vector<RealType> mass_row;
       switch (this->elt_type) {
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::TET4:
-          mass_row = this->tet4LocalMassRow(cell, node);
-          break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_TET4:
-          mass_row = this->tet4LocalMassRowLumped(cell, node);
-          break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::HEX8:
-          mass_row = this->hex8LocalMassRow(cell, node);
-          break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_HEX8:
-          mass_row = this->hex8LocalMassRowLumped(cell, node);
-          break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::TET10:
-          mass_row = this->tet10LocalMassRow(cell, node);
-          break;
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::TET4: mass_row = this->tet4LocalMassRow(cell, node); break;
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_TET4: mass_row = this->tet4LocalMassRowLumped(cell, node); break;
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::HEX8: mass_row = this->hex8LocalMassRow(cell, node); break;
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_HEX8: mass_row = this->hex8LocalMassRowLumped(cell, node); break;
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::TET10: mass_row = this->tet10LocalMassRow(cell, node); break;
         case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_TET10:
           mass_row = this->tet10LocalMassRowLumped(cell, node);
           break;
-        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::CT10:
-          mass_row = this->compositeTet10LocalMassRow(cell, node);
-          break;
+        case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::CT10: mass_row = this->compositeTet10LocalMassRow(cell, node); break;
         case AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::ELT_TYPE::LUMPED_CT10:
           mass_row = this->compositeTet10LocalMassRowLumped(cell, node);
           break;

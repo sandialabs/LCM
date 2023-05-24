@@ -9,9 +9,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceDiffusionResidual<EvalT, Traits>::SurfaceDiffusionResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceDiffusionResidual<EvalT, Traits>::SurfaceDiffusionResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
@@ -49,9 +47,7 @@ SurfaceDiffusionResidual<EvalT, Traits>::SurfaceDiffusionResidual(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceDiffusionResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceDiffusionResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(scalarGrad, fm);
   this->utils.setFieldData(scalarJump, fm);

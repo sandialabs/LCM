@@ -63,14 +63,13 @@ class DOFGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, publ
   int const                                  work_size = 256;
   int                                        numCells;
   int                                        threads_per_team;  //=worksize/numQP
-  int                                        numTeams;          //#of elements/threads_per_team
+  int                                        numTeams;          // #of elements/threads_per_team
 
   void
   operator()(const team_member& thread) const;
 
 #else
-  typedef Kokkos::RangePolicy<ExecutionSpace, DOFGradInterpolationBase_Residual_Tag>
-      DOFGradInterpolationBase_Residual_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, DOFGradInterpolationBase_Residual_Tag> DOFGradInterpolationBase_Residual_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -113,20 +112,12 @@ class FastSolutionGradInterpolationBase : public DOFGradInterpolationBase<EvalT,
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION  // assumes that the bases gradients are
                                          // not FAD types
 template <typename Traits>
-class FastSolutionGradInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>
-    : public DOFGradInterpolationBase<
-          PHAL::AlbanyTraits::Jacobian,
-          Traits,
-          typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+class FastSolutionGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+    : public DOFGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
  public:
   FastSolutionGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : DOFGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>(
-            p,
-            dl)
+      : DOFGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
   {
     this->setName("FastSolutionGradInterpolationBase" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
@@ -135,8 +126,7 @@ class FastSolutionGradInterpolationBase<
   void
   postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-        postRegistrationSetup(d, vm);
+    DOFGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::postRegistrationSetup(d, vm);
   }
 
   void
@@ -152,8 +142,7 @@ class FastSolutionGradInterpolationBase<
   struct FastSolutionGradInterpolationBase_Jacobian_Tag
   {
   };
-  typedef Kokkos::RangePolicy<ExecutionSpace, FastSolutionGradInterpolationBase_Jacobian_Tag>
-      FastSolutionGradInterpolationBase_Jacobian_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, FastSolutionGradInterpolationBase_Jacobian_Tag> FastSolutionGradInterpolationBase_Jacobian_Policy;
 
   int num_dof;
   int neq;

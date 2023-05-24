@@ -31,9 +31,7 @@ CP::IntegrationScheme
 CP::ParameterReader<EvalT, Traits>::getIntegrationScheme() const
 {
   static utility::ParameterEnum<CP::IntegrationScheme> const imap(
-      "Integration Scheme",
-      CP::IntegrationScheme::EXPLICIT,
-      {{"Implicit", CP::IntegrationScheme::IMPLICIT}, {"Explicit", CP::IntegrationScheme::EXPLICIT}});
+      "Integration Scheme", CP::IntegrationScheme::EXPLICIT, {{"Implicit", CP::IntegrationScheme::IMPLICIT}, {"Explicit", CP::IntegrationScheme::EXPLICIT}});
 
   return imap.get(p_);
 }
@@ -57,9 +55,7 @@ CP::PredictorSlip
 CP::ParameterReader<EvalT, Traits>::getPredictorSlip() const
 {
   static utility::ParameterEnum<CP::PredictorSlip> const pmap(
-      "Slip Predictor",
-      CP::PredictorSlip::RATE,
-      {{"None", CP::PredictorSlip::NONE}, {"Rate", CP::PredictorSlip::RATE}, {"Solve", CP::PredictorSlip::SOLVE}});
+      "Slip Predictor", CP::PredictorSlip::RATE, {{"None", CP::PredictorSlip::NONE}, {"Rate", CP::PredictorSlip::RATE}, {"Solve", CP::PredictorSlip::SOLVE}});
 
   return pmap.get(p_);
 }

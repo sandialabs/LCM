@@ -168,16 +168,12 @@ class ConstitutiveModelParameters : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
 
-  typedef Kokkos::RangePolicy<ExecutionSpace, is_constant_map_Tag> is_const_map_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_Tag>    no_const_map_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, is_const_map_have_temperature_Linear_Tag>
-      is_const_map_have_temperature_Linear_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, is_const_map_have_temperature_Arrhenius_Tag>
-      is_const_map_have_temperature_Arrhenius_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_have_temperature_Linear_Tag>
-      no_const_map_have_temperature_Linear_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_have_temperature_Arrhenius_Tag>
-      no_const_map_have_temperature_Arrhenius_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, is_constant_map_Tag>                         is_const_map_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_Tag>                            no_const_map_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, is_const_map_have_temperature_Linear_Tag>    is_const_map_have_temperature_Linear_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, is_const_map_have_temperature_Arrhenius_Tag> is_const_map_have_temperature_Arrhenius_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_have_temperature_Linear_Tag>    no_const_map_have_temperature_Linear_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, no_const_map_have_temperature_Arrhenius_Tag> no_const_map_have_temperature_Arrhenius_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void

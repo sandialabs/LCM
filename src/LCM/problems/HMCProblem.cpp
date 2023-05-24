@@ -56,9 +56,7 @@ Albany::HMCProblem::HMCProblem(
 Albany::HMCProblem::~HMCProblem() {}
 
 void
-Albany::HMCProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::HMCProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
@@ -177,8 +175,7 @@ Albany::HMCProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSp
 
   nfm.resize(1);  // HMC problem only has one element block
 
-  nfm[0] = neuUtils.constructBCEvaluators(
-      meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
+  nfm[0] = neuUtils.constructBCEvaluators(meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
@@ -197,9 +194,7 @@ Albany::HMCProblem::getValidProblemParameters() const
 }
 
 void
-Albany::HMCProblem::parseMaterialModel(
-    Teuchos::RCP<Teuchos::ParameterList>&       p,
-    const Teuchos::RCP<Teuchos::ParameterList>& params) const
+Albany::HMCProblem::parseMaterialModel(Teuchos::RCP<Teuchos::ParameterList>& p, const Teuchos::RCP<Teuchos::ParameterList>& params) const
 {
   Teuchos::ParameterList& modelList = params->sublist("Hierarchical Elasticity Model");
   p->set("C11", modelList.get("C11", 0.0));

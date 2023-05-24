@@ -29,8 +29,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_NodalNormal(
   // check the type of function on the segment
   // Here, we need a blinear triangle shape function
   MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
-  if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_LinearTri &&
-      type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_BiLinearQuad) {
+  if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_LinearTri && type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_BiLinearQuad) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::Projector::evaluate_FgradF_3D_NodalNormal:\n"
         << "***ERR*** function is of wrong type\n"
@@ -89,8 +88,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_NodalNormal(
     dF[i][2] = n[i];
   }
 
-  gap = ((Nx[0] - X[0]) * n[0] + (Nx[1] - X[1]) * n[1] + (Nx[2] - X[2]) * n[2]) /
-        sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);  // ||gap|| cos theta
+  gap = ((Nx[0] - X[0]) * n[0] + (Nx[1] - X[1]) * n[1] + (Nx[2] - X[2]) * n[2]) / sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);  // ||gap|| cos theta
 
   return true;
 }
@@ -117,8 +115,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_SegmentNormal(
   // check the type of function on the segment
   // Here, we need a bilinear triangle shape function
   MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType type = seg.FunctionType(0);
-  if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_LinearTri &&
-      type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_BiLinearQuad) {
+  if (type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_LinearTri && type != MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::func_BiLinearQuad) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::Projector::evaluate_F_3D_NodalNormal:\n"
         << "***ERR*** function is of wrong type\n"
@@ -196,8 +193,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_FgradF_3D_SegmentNormal(
     dF[i][2] = Nn[i];
   }
 
-  gap = ((Nx[0] - X[0]) * Nn[0] + (Nx[1] - X[1]) * Nn[1] + (Nx[2] - X[2]) * Nn[2]) /
-        sqrt(Nn[0] * Nn[0] + Nn[1] * Nn[1] + Nn[2] * Nn[2]);  // ||gap|| cos theta
+  gap = ((Nx[0] - X[0]) * Nn[0] + (Nx[1] - X[1]) * Nn[1] + (Nx[2] - X[2]) * Nn[2]) / sqrt(Nn[0] * Nn[0] + Nn[1] * Nn[1] + Nn[2] * Nn[2]);  // ||gap|| cos theta
 
   return true;
 }

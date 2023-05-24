@@ -19,9 +19,7 @@ namespace PHAL {
  */
 
 template <typename EvalT, typename Traits>
-class Absorption : public PHX::EvaluatorWithBaseImpl<Traits>,
-                   public PHX::EvaluatorDerived<EvalT, Traits>,
-                   public Sacado::ParameterAccessor<EvalT, SPL_Traits>
+class Absorption : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>, public Sacado::ParameterAccessor<EvalT, SPL_Traits>
 {
  public:
   typedef typename EvalT::ScalarT     ScalarT;

@@ -90,9 +90,7 @@ MaterialDatabase::getMaterialParam(std::string const& material_name, std::string
 
   ALBANY_ASSERT(!material_name.empty(), "\nMaterialDB Error! Empty material name\n");
 
-  ALBANY_ASSERT(
-      p_materials_list_->isSublist(material_name),
-      "\nMaterialDB Error! Invalid material name " << material_name << '\n');
+  ALBANY_ASSERT(p_materials_list_->isSublist(material_name), "\nMaterialDB Error! Invalid material name " << material_name << '\n');
 
   auto& sublist = p_materials_list_->sublist(material_name);
   return sublist.get<T>(param_name);
@@ -106,9 +104,7 @@ MaterialDatabase::getMaterialParam(std::string const& material_name, std::string
 
   ALBANY_ASSERT(!material_name.empty(), "\nMaterialDB Error! Empty material name\n");
 
-  ALBANY_ASSERT(
-      p_materials_list_->isSublist(material_name),
-      "\nMaterialDB Error! Invalid material name " << material_name << '\n');
+  ALBANY_ASSERT(p_materials_list_->isSublist(material_name), "\nMaterialDB Error! Invalid material name " << material_name << '\n');
 
   Teuchos::ParameterList& sublist = p_materials_list_->sublist(material_name);
 
@@ -378,10 +374,7 @@ MaterialDatabase::getSideSetParam(std::string const& ss_name, std::string const&
 
 template <typename T>
 void
-MaterialDatabase::getAllMatchingParams_helper(
-    std::string const&      param_name,
-    std::vector<T>&         results,
-    Teuchos::ParameterList& list)
+MaterialDatabase::getAllMatchingParams_helper(std::string const& param_name, std::vector<T>& results, Teuchos::ParameterList& list)
 {
   Teuchos::ParameterList* list_type{nullptr};
   T*                      param_type{nullptr};
@@ -430,23 +423,17 @@ createMaterialDatabase(Teuchos::RCP<Teuchos::ParameterList> const& params, Teuch
 }  // namespace Albany
 
 // Explicit instantiation of functions above
-#define ALBANY_INST(T)                                                                                                \
-  template T Albany::MaterialDatabase::getParam<T>(std::string const& param_name);                                    \
-  template T Albany::MaterialDatabase::getParam<T>(std::string const& param_name, T def_val);                         \
-  template T Albany::MaterialDatabase::getMaterialParam<T>(                                                           \
-      std::string const& material_name, std::string const& param_name);                                               \
-  template T Albany::MaterialDatabase::getMaterialParam<T>(                                                           \
-      std::string const& material_name, std::string const& param_name, T def_val);                                    \
-  template T Albany::MaterialDatabase::getElementBlockParam<T>(                                                       \
-      std::string const& material_name, std::string const& param_name);                                               \
-  template T Albany::MaterialDatabase::getElementBlockParam<T>(                                                       \
-      std::string const& material_name, std::string const& param_name, T def_val);                                    \
-  template T Albany::MaterialDatabase::getNodeSetParam<T>(std::string const& ns_name, std::string const& param_name); \
-  template T Albany::MaterialDatabase::getNodeSetParam<T>(                                                            \
-      std::string const& ns_name, std::string const& param_name, T def_val);                                          \
-  template T Albany::MaterialDatabase::getSideSetParam<T>(std::string const& ss_name, std::string const& param_name); \
-  template T Albany::MaterialDatabase::getSideSetParam<T>(                                                            \
-      std::string const& ss_name, std::string const& param_name, T def_val);                                          \
+#define ALBANY_INST(T)                                                                                                                                   \
+  template T              Albany::MaterialDatabase::getParam<T>(std::string const& param_name);                                                          \
+  template T              Albany::MaterialDatabase::getParam<T>(std::string const& param_name, T def_val);                                               \
+  template T              Albany::MaterialDatabase::getMaterialParam<T>(std::string const& material_name, std::string const& param_name);                \
+  template T              Albany::MaterialDatabase::getMaterialParam<T>(std::string const& material_name, std::string const& param_name, T def_val);     \
+  template T              Albany::MaterialDatabase::getElementBlockParam<T>(std::string const& material_name, std::string const& param_name);            \
+  template T              Albany::MaterialDatabase::getElementBlockParam<T>(std::string const& material_name, std::string const& param_name, T def_val); \
+  template T              Albany::MaterialDatabase::getNodeSetParam<T>(std::string const& ns_name, std::string const& param_name);                       \
+  template T              Albany::MaterialDatabase::getNodeSetParam<T>(std::string const& ns_name, std::string const& param_name, T def_val);            \
+  template T              Albany::MaterialDatabase::getSideSetParam<T>(std::string const& ss_name, std::string const& param_name);                       \
+  template T              Albany::MaterialDatabase::getSideSetParam<T>(std::string const& ss_name, std::string const& param_name, T def_val);            \
   template std::vector<T> Albany::MaterialDatabase::getAllMatchingParams<T>(std::string const& param_name);
 
 ALBANY_INST(double)

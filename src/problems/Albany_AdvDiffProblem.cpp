@@ -13,10 +13,7 @@
 #include "PHAL_FactoryTraits.hpp"
 #include "Shards_CellTopology.hpp"
 
-Albany::AdvDiffProblem::AdvDiffProblem(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<ParamLib>&               paramLib_,
-    int const                                   numDim_)
+Albany::AdvDiffProblem::AdvDiffProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
     : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_), use_sdbcs_(false)
 {
   // Get number of species equations from Problem specifications
@@ -31,9 +28,7 @@ Albany::AdvDiffProblem::AdvDiffProblem(
 Albany::AdvDiffProblem::~AdvDiffProblem() {}
 
 void
-Albany::AdvDiffProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::AdvDiffProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   using Teuchos::rcp;
 

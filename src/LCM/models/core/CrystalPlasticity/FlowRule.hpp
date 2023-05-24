@@ -194,11 +194,7 @@ struct FlowRuleBase
   FlowRuleBase() {}
 
   virtual ArgT
-  computeRateSlip(
-      std::shared_ptr<FlowParameterBase> const& pflow_parameters,
-      ArgT const&                               shear,
-      ArgT const&                               slip_resistance,
-      bool&                                     failed) = 0;
+  computeRateSlip(std::shared_ptr<FlowParameterBase> const& pflow_parameters, ArgT const& shear, ArgT const& slip_resistance, bool& failed) = 0;
 
   virtual ~FlowRuleBase() {}
 };
@@ -228,11 +224,7 @@ template <typename ArgT>
 struct PowerLawFlowRule final : public FlowRuleBase<ArgT>
 {
   virtual ArgT
-  computeRateSlip(
-      std::shared_ptr<FlowParameterBase> const& pflow_parameters,
-      ArgT const&                               shear,
-      ArgT const&                               slip_resistance,
-      bool&                                     failed);
+  computeRateSlip(std::shared_ptr<FlowParameterBase> const& pflow_parameters, ArgT const& shear, ArgT const& slip_resistance, bool& failed);
 
   virtual ~PowerLawFlowRule() {}
 };
@@ -246,11 +238,7 @@ template <typename ArgT>
 struct ThermalActivationFlowRule final : public FlowRuleBase<ArgT>
 {
   virtual ArgT
-  computeRateSlip(
-      std::shared_ptr<FlowParameterBase> const& pflow_parameters,
-      ArgT const&                               shear,
-      ArgT const&                               slip_resistance,
-      bool&                                     failed);
+  computeRateSlip(std::shared_ptr<FlowParameterBase> const& pflow_parameters, ArgT const& shear, ArgT const& slip_resistance, bool& failed);
 
   virtual ~ThermalActivationFlowRule() {}
 };
@@ -264,11 +252,7 @@ template <typename ArgT>
 struct PowerLawDragFlowRule final : public FlowRuleBase<ArgT>
 {
   virtual ArgT
-  computeRateSlip(
-      std::shared_ptr<FlowParameterBase> const& pflow_parameters,
-      ArgT const&                               shear,
-      ArgT const&                               slip_resistance,
-      bool&                                     failed);
+  computeRateSlip(std::shared_ptr<FlowParameterBase> const& pflow_parameters, ArgT const& shear, ArgT const& slip_resistance, bool& failed);
 
   virtual ~PowerLawDragFlowRule() {}
 };
@@ -282,11 +266,7 @@ template <typename ArgT>
 struct NoFlowRule final : public FlowRuleBase<ArgT>
 {
   virtual ArgT
-  computeRateSlip(
-      std::shared_ptr<FlowParameterBase> const& pflow_parameters,
-      ArgT const&                               shear,
-      ArgT const&                               slip_resistance,
-      bool&                                     failed);
+  computeRateSlip(std::shared_ptr<FlowParameterBase> const& pflow_parameters, ArgT const& shear, ArgT const& slip_resistance, bool& failed);
 
   virtual ~NoFlowRule() {}
 };

@@ -27,9 +27,7 @@ class SchwarzAlternating : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 {
  public:
   /// Constructor
-  SchwarzAlternating(
-      Teuchos::RCP<Teuchos::ParameterList> const&   app_params,
-      Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
+  SchwarzAlternating(Teuchos::RCP<Teuchos::ParameterList> const& app_params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
 
   /// Destructor
   ~SchwarzAlternating();
@@ -119,9 +117,7 @@ class SchwarzAlternating : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   /// Evaluate model on InArgs
   void
-  evalModelImpl(
-      Thyra::ModelEvaluatorBase::InArgs<ST> const&  in_args,
-      Thyra::ModelEvaluatorBase::OutArgs<ST> const& out_args) const;
+  evalModelImpl(Thyra::ModelEvaluatorBase::InArgs<ST> const& in_args, Thyra::ModelEvaluatorBase::OutArgs<ST> const& out_args) const;
 
   Thyra::ModelEvaluatorBase::InArgs<ST>
   createInArgsImpl() const;

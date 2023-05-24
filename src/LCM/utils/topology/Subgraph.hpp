@@ -158,10 +158,7 @@ class Subgraph : public Graph
   /// vertex in the subgraph and the component number.
   ///
   void
-  testArticulationPoint(
-      Vertex const        articulation_vertex,
-      size_t&             number_components,
-      VertexComponentMap& vertex_component_map);
+  testArticulationPoint(Vertex const articulation_vertex, size_t& number_components, VertexComponentMap& vertex_component_map);
 
   ///
   /// \brief Clones a boundary entity from the subgraph and separates

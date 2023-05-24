@@ -209,8 +209,7 @@ struct Workset
           os << "\t\twsElNodeEqID(" << i << "," << j << "," << k << ") = " << wsElNodeEqID(i, j, k) << '\n';
     os << "\twsCoords : " << std::endl;
     for (int i = 0; i < wsCoords.size(); i++)
-      for (int j = 0; j < wsCoords[i].size(); j++)
-        os << "\t\tcoord0:" << wsCoords[i][j][0] << "][" << wsCoords[i][j][1] << std::endl;
+      for (int j = 0; j < wsCoords[i].size(); j++) os << "\t\tcoord0:" << wsCoords[i][j][0] << "][" << wsCoords[i][j][1] << std::endl;
   }
 };
 

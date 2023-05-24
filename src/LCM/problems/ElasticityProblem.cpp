@@ -12,12 +12,7 @@ Albany::ElasticityProblem::ElasticityProblem(
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_,
     const Teuchos::RCP<AAdapt::rc::Manager>&    rc_mgr_)
-    : Albany::AbstractProblem(params_, paramLib_, numDim_),
-      params(params_),
-      haveSource(false),
-      numDim(numDim_),
-      use_sdbcs_(false),
-      rc_mgr(rc_mgr_)
+    : Albany::AbstractProblem(params_, paramLib_, numDim_), params(params_), haveSource(false), numDim(numDim_), use_sdbcs_(false), rc_mgr(rc_mgr_)
 {
   std::string& method = params->get("Name", "Elasticity ");
   *out << "Problem Name = " << method << std::endl;
@@ -56,9 +51,7 @@ Albany::ElasticityProblem::ElasticityProblem(
 Albany::ElasticityProblem::~ElasticityProblem() {}
 
 void
-Albany::ElasticityProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::ElasticityProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
@@ -177,8 +170,7 @@ Albany::ElasticityProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany:
 
   nfm.resize(1);  // Elasticity problem only has one element block
 
-  nfm[0] = neuUtils.constructBCEvaluators(
-      meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
+  nfm[0] = neuUtils.constructBCEvaluators(meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

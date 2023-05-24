@@ -215,9 +215,8 @@ J2Model<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepField
           ALBANY_PANIC(
               count == num_max_iter,
               std::endl
-                  << "Error in return mapping, count = " << count << "\nres = " << res << "\nrelres  = " << res / f
-                  << "\nrelres2 = " << res / Y << "\ng = " << F[0] << "\ndg = " << dFdX[0] << "\nalpha = " << alpha
-                  << std::endl);
+                  << "Error in return mapping, count = " << count << "\nres = " << res << "\nrelres  = " << res / f << "\nrelres2 = " << res / Y
+                  << "\ng = " << F[0] << "\ndg = " << dFdX[0] << "\nalpha = " << alpha << std::endl);
         }
 
         solver.computeFadInfo(dFdX, X, F);
@@ -234,8 +233,7 @@ J2Model<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepField
 
         // mechanical source
         if (have_temperature_ && delta_time(0) > 0) {
-          source(cell, pt) =
-              (sq23 * dgam / delta_time(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
+          source(cell, pt) = (sq23 * dgam / delta_time(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
         }
 
         // exponential map to get Fpnew
@@ -276,10 +274,7 @@ J2Model<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepField
 // computeState parallel function, which calls Kokkos::parallel_for
 template <typename EvalT, typename Traits>
 void
-J2Model<EvalT, Traits>::computeStateParallel(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+J2Model<EvalT, Traits>::computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   return;
 }

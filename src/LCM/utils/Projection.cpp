@@ -8,16 +8,8 @@ namespace LCM {
 
 Projection::Projection() : is_projected_(false), rank_(0), number_components_(0), number_dimensions_(0) { return; }
 
-Projection::Projection(
-    std::string const& field_name,
-    int const          rank,
-    int const          number_components,
-    int const          number_dimensions)
-    : is_projected_(true),
-      rank_(rank),
-      number_components_(number_components),
-      number_dimensions_(number_dimensions),
-      field_name_(field_name)
+Projection::Projection(std::string const& field_name, int const rank, int const number_components, int const number_dimensions)
+    : is_projected_(true), rank_(rank), number_components_(number_components), number_dimensions_(number_dimensions), field_name_(field_name)
 {
   is_projected_ = !(field_name.empty());
   return;

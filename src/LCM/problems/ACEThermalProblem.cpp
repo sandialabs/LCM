@@ -15,11 +15,7 @@ Albany::ACEThermalProblem::ACEThermalProblem(
     const Teuchos::RCP<ParamLib>&               param_lib,
     int const                                   num_dim,
     Teuchos::RCP<Teuchos::Comm<int> const>&     comm)
-    : Albany::AbstractProblem(params, param_lib /*, distParamLib_*/),
-      params_(params),
-      num_dim_(num_dim),
-      comm_(comm),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params, param_lib /*, distParamLib_*/), params_(params), num_dim_(num_dim), comm_(comm), use_sdbcs_(false)
 {
   this->setNumEquations(1);
   // We just have 1 PDE/node
@@ -77,9 +73,7 @@ Albany::ACEThermalProblem::ACEThermalProblem(
 Albany::ACEThermalProblem::~ACEThermalProblem() {}
 
 void
-Albany::ACEThermalProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> mesh_specs,
-    Albany::StateManager&                                    state_mgr)
+Albany::ACEThermalProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> mesh_specs, Albany::StateManager& state_mgr)
 {
   /* Construct All Phalanx Evaluators */
   int                                 phys_sets = mesh_specs.size();  // number of blocks
@@ -191,8 +185,7 @@ Albany::ACEThermalProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany:
   cond_names[4] = "radiate";
 
   nfm.resize(1);  // Heat problem only has one physics set
-  nfm[0] = bc_utils.constructBCEvaluators(
-      mesh_specs, bc_names, dof_names, false, 0, cond_names, offsets, dl_, this->params, this->paramLib);
+  nfm[0] = bc_utils.constructBCEvaluators(mesh_specs, bc_names, dof_names, false, 0, cond_names, offsets, dl_, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

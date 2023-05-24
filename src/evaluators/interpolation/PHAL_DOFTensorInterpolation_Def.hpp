@@ -10,9 +10,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::DOFTensorInterpolationBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::DOFTensorInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : val_node(p.get<std::string>("Variable Name"), dl->node_tensor),
       BF(p.get<std::string>("BF Name"), dl->node_qp_scalar),
       val_qp(p.get<std::string>("Variable Name"), dl->qp_tensor)
@@ -34,9 +32,7 @@ DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::DOFTensorInterpolationBase(
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_node, fm);
   this->utils.setFieldData(BF, fm);
@@ -70,10 +66,8 @@ DOFTensorInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Trai
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 template <typename Traits>
 void
-FastSolutionTensorInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(typename Traits::EvalData workset)
+FastSolutionTensorInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(
+    typename Traits::EvalData workset)
 {
   int const  num_dof = this->val_node(0, 0, 0, 0).size();
   int const  neq     = workset.wsElNodeEqID.extent(2);
@@ -85,15 +79,13 @@ FastSolutionTensorInterpolationBase<
           // Zero out for node==0; then += for node = 1 to numNodes
           typename PHAL::Ref<ScalarT>::type vqp = this->val_qp(cell, qp, i, j);
 
-          vqp = this->val_node(cell, 0, i, j) * this->BF(cell, 0, qp);
-          vqp = ScalarT(num_dof, this->val_node(cell, 0, i, j).val() * this->BF(cell, 0, qp));
-          vqp.fastAccessDx(offset + i * vecDim + j) =
-              this->val_node(cell, 0, i, j).fastAccessDx(offset + i * vecDim + j) * this->BF(cell, 0, qp);
+          vqp                                       = this->val_node(cell, 0, i, j) * this->BF(cell, 0, qp);
+          vqp                                       = ScalarT(num_dof, this->val_node(cell, 0, i, j).val() * this->BF(cell, 0, qp));
+          vqp.fastAccessDx(offset + i * vecDim + j) = this->val_node(cell, 0, i, j).fastAccessDx(offset + i * vecDim + j) * this->BF(cell, 0, qp);
           for (std::size_t node = 1; node < this->numNodes; ++node) {
             vqp.val() += this->val_node(cell, node, i, j).val() * this->BF(cell, node, qp);
             vqp.fastAccessDx(neq * node + offset + i * this->vecDim + j) +=
-                this->val_node(cell, node, i, j).fastAccessDx(neq * node + offset + i * vecDim + j) *
-                this->BF(cell, node, qp);
+                this->val_node(cell, node, i, j).fastAccessDx(neq * node + offset + i * vecDim + j) * this->BF(cell, node, qp);
           }
         }
       }

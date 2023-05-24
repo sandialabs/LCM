@@ -33,9 +33,7 @@ Albany::ConstitutiveDriverProblem::ConstitutiveDriverProblem(
 }
 Albany::ConstitutiveDriverProblem::~ConstitutiveDriverProblem() {}
 void
-Albany::ConstitutiveDriverProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::ConstitutiveDriverProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   // Construct All Phalanx Evaluators
   int physSets = meshSpecs.size();

@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-AnisotropicHyperelasticDamageModel<EvalT, Traits>::AnisotropicHyperelasticDamageModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+AnisotropicHyperelasticDamageModel<EvalT, Traits>::AnisotropicHyperelasticDamageModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       k_f1_(p->get<RealType>("Fiber 1 k", 1.0)),
       q_f1_(p->get<RealType>("Fiber 1 q", 1.0)),
@@ -117,10 +115,7 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::AnisotropicHyperelasticDamage
 }
 template <typename EvalT, typename Traits>
 void
-AnisotropicHyperelasticDamageModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+AnisotropicHyperelasticDamageModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   bool print = false;
   // if (typeid(ScalarT) == typeid(RealType)) print = true;
@@ -187,8 +182,7 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::computeState(
       sigma_m = s + p * I;
 
       // compute energy for M
-      energy_m(cell, pt) = 0.5 * kappa * (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) +
-                           0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
+      energy_m(cell, pt) = 0.5 * kappa * (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) + 0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
 
       // damage term in M
       alpha_m = energy_m_old(cell, pt);

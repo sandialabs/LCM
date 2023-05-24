@@ -22,8 +22,7 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class QuadPointsToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                          public PHX::EvaluatorDerived<EvalT, Traits>
+class QuadPointsToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   QuadPointsToCellInterpolationBase(
@@ -60,8 +59,7 @@ template <typename EvalT, typename Traits>
 using QuadPointsToCellInterpolationMesh = QuadPointsToCellInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using QuadPointsToCellInterpolationParam =
-    QuadPointsToCellInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using QuadPointsToCellInterpolationParam = QuadPointsToCellInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

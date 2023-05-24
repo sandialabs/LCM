@@ -73,10 +73,7 @@ getFileExtension(std::string const& filename);
 void
 printThyraVector(std::ostream& os, Teuchos::RCP<Thyra_Vector const> const& vec);
 void
-printThyraVector(
-    std::ostream&                           os,
-    const Teuchos::Array<std::string>&      names,
-    Teuchos::RCP<Thyra_Vector const> const& vec);
+printThyraVector(std::ostream& os, const Teuchos::Array<std::string>& names, Teuchos::RCP<Thyra_Vector const> const& vec);
 
 //! Inlined product version
 inline void
@@ -112,10 +109,7 @@ writeMatrixMarket(const Teuchos::RCP<LinearAlgebraObjectType>& A, std::string co
 
 template <typename LinearAlgebraObjectType>
 void
-writeMatrixMarket(
-    const Teuchos::Array<Teuchos::RCP<LinearAlgebraObjectType>>& x,
-    std::string const&                                           prefix,
-    int const                                                    counter = -1)
+writeMatrixMarket(const Teuchos::Array<Teuchos::RCP<LinearAlgebraObjectType>>& x, std::string const& prefix, int const counter = -1)
 {
   for (auto i = 0; i < x.size(); ++i) {
     std::ostringstream oss;

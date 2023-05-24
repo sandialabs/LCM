@@ -15,7 +15,7 @@
 // IK, 4/24/15: adding option to write the mass matrix to matrix market file,
 // which is needed
 // for some applications.  Uncomment the following line to turn on.
-//#define WRITE_MASS_MATRIX_TO_MM_FILE
+// #define WRITE_MASS_MATRIX_TO_MM_FILE
 
 namespace {
 void
@@ -29,14 +29,8 @@ sanitize_nans(const Thyra_Derivative& v)
 
 namespace Albany {
 
-ModelEvaluator::ModelEvaluator(
-    const Teuchos::RCP<Albany::Application>&    app_,
-    const Teuchos::RCP<Teuchos::ParameterList>& appParams_)
-    : app(app_),
-      appParams(appParams_),
-      supplies_prec(app_->suppliesPreconditioner()),
-      supports_xdot(false),
-      supports_xdotdot(false)
+ModelEvaluator::ModelEvaluator(const Teuchos::RCP<Albany::Application>& app_, const Teuchos::RCP<Teuchos::ParameterList>& appParams_)
+    : app(app_), appParams(appParams_), supplies_prec(app_->suppliesPreconditioner()), supports_xdot(false), supports_xdotdot(false)
 {
   Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
 
@@ -77,8 +71,7 @@ ModelEvaluator::ModelEvaluator(
   param_lower_bds.resize(num_param_vecs);
   param_upper_bds.resize(num_param_vecs);
   for (int l = 0; l < num_param_vecs; ++l) {
-    Teuchos::ParameterList const* pList =
-        using_old_parameter_list ? &parameterParams : &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
+    Teuchos::ParameterList const* pList = using_old_parameter_list ? &parameterParams : &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
 
     int const numParameters = pList->get<int>("Number");
     ALBANY_PANIC(
@@ -98,8 +91,7 @@ ModelEvaluator::ModelEvaluator(
   Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>> response_names;
   response_names.resize(num_response_vecs);
   for (int l = 0; l < num_response_vecs; ++l) {
-    Teuchos::ParameterList const* pList =
-        using_old_response_list ? &responseParams : &(responseParams.sublist(Albany::strint("Response Vector", l)));
+    Teuchos::ParameterList const* pList = using_old_response_list ? &responseParams : &(responseParams.sublist(Albany::strint("Response Vector", l)));
 
     bool number_exists = pList->getEntryPtr("Number");
 
@@ -135,8 +127,7 @@ ModelEvaluator::ModelEvaluator(
       // in the input file. Give the user a hint about what might be happening
       app->getParamLib()->fillVector<PHAL::AlbanyTraits::Residual>(*(param_names[l]), sacado_param_vec[l]);
     } catch (const std::logic_error& le) {
-      *out << "Error: exception thrown from ParamLib fillVector in file " << __FILE__ << " line " << __LINE__
-           << std::endl;
+      *out << "Error: exception thrown from ParamLib fillVector in file " << __FILE__ << " line " << __LINE__ << std::endl;
       *out << "This is probably due to something incorrect in the "
               "\"Parameters\" list in the input file, one of the lines:"
            << std::endl;
@@ -211,7 +202,7 @@ ModelEvaluator::ModelEvaluator(
   std::string const  emptyString("");
   for (int i = 0; i < num_dist_param_vecs; i++) {
     std::string const& p_sublist_name = strint("Distributed Parameter", i);
-    param_list = distParameterParams.isSublist(p_sublist_name) ? &distParameterParams.sublist(p_sublist_name) : NULL;
+    param_list                        = distParameterParams.isSublist(p_sublist_name) ? &distParameterParams.sublist(p_sublist_name) : NULL;
 
     p_name_ptr = &distParameterParams.get<std::string>(strint("Parameter", i), emptyString);
 
@@ -476,8 +467,8 @@ ModelEvaluator::createOutArgsImpl() const
   if (supplies_prec) result.setSupports(Thyra_ModelEvaluator::OUT_ARG_W_prec, true);
 
   result.setSupports(Thyra_ModelEvaluator::OUT_ARG_W_op, true);
-  result.set_W_properties(Thyra_ModelEvaluator::DerivativeProperties(
-      Thyra_ModelEvaluator::DERIV_LINEARITY_UNKNOWN, Thyra_ModelEvaluator::DERIV_RANK_FULL, true));
+  result.set_W_properties(
+      Thyra_ModelEvaluator::DerivativeProperties(Thyra_ModelEvaluator::DERIV_LINEARITY_UNKNOWN, Thyra_ModelEvaluator::DERIV_RANK_FULL, true));
 
   for (int l = 0; l < num_param_vecs; ++l) {
     result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DfDp, l, Thyra_ModelEvaluator::DERIV_MV_BY_COL);
@@ -502,17 +493,14 @@ ModelEvaluator::createOutArgsImpl() const
     // result.setSupports(
     //    Thyra_ModelEvaluator::OUT_ARG_DgDx_dotdot, i, dgdx_support);
 
-    for (int l = 0; l < num_param_vecs; l++)
-      result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DgDp, i, l, Thyra_ModelEvaluator::DERIV_MV_BY_COL);
+    for (int l = 0; l < num_param_vecs; l++) result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DgDp, i, l, Thyra_ModelEvaluator::DERIV_MV_BY_COL);
 
     if (app->getResponse(i)->isScalarResponse()) {
       for (int j = 0; j < num_dist_param_vecs; j++)
-        result.setSupports(
-            Thyra_ModelEvaluator::OUT_ARG_DgDp, i, j + num_param_vecs, Thyra_ModelEvaluator::DERIV_TRANS_MV_BY_ROW);
+        result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DgDp, i, j + num_param_vecs, Thyra_ModelEvaluator::DERIV_TRANS_MV_BY_ROW);
     } else {
       for (int j = 0; j < num_dist_param_vecs; j++)
-        result.setSupports(
-            Thyra_ModelEvaluator::OUT_ARG_DgDp, i, j + num_param_vecs, Thyra_ModelEvaluator::DERIV_LINEAR_OP);
+        result.setSupports(Thyra_ModelEvaluator::OUT_ARG_DgDp, i, j + num_param_vecs, Thyra_ModelEvaluator::DERIV_LINEAR_OP);
     }
   }
 
@@ -530,8 +518,7 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
   auto analysisParams = appParams->sublist("Piro").sublist("Analysis");
   if (analysisParams.isSublist("Optimization Status")) {
     auto& opt_paramList = analysisParams.sublist("Optimization Status");
-    if (opt_paramList.isParameter("Optimization Variables Changed") &&
-        opt_paramList.get<bool>("Optimization Variables Changed")) {
+    if (opt_paramList.isParameter("Optimization Variables Changed") && opt_paramList.get<bool>("Optimization Variables Changed")) {
       if (opt_paramList.isParameter("Parameter Names")) {
         auto& param_names = *opt_paramList.get<Teuchos::RCP<std::vector<std::string>>>("Parameter Names");
         for (int k = 0; k < param_names.size(); ++k) {
@@ -544,16 +531,14 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
 
     // When using the Old Reduced Space ROL Interface, the solution printing is
     // handled in Piro using observers. Otherwise we take care of printing here.
-    if (analysisParams.isSublist("ROL") &&
-        !analysisParams.sublist("ROL").get("Use Old Reduced Space Interface", false)) {
+    if (analysisParams.isSublist("ROL") && !analysisParams.sublist("ROL").get("Use Old Reduced Space Interface", false)) {
       int        iter           = opt_paramList.get("Optimizer Iteration Number", -1);
       static int iteration      = -1;
       int        write_interval = analysisParams.get("Write Interval", 1);
       if ((iter >= 0) && (iter != iteration) && (iteration % write_interval == 0)) {
         Teuchos::TimeMonitor                   timer(*Teuchos::TimeMonitor::getNewTimer("Albany: Output to File"));
-        Teuchos::RCP<Thyra_Vector const> const x = inArgs.get_x();
-        Teuchos::RCP<Thyra_Vector const> const overlappedSolution =
-            app->getAdaptSolMgr()->updateAndReturnOverlapSolution(*x);
+        Teuchos::RCP<Thyra_Vector const> const x                  = inArgs.get_x();
+        Teuchos::RCP<Thyra_Vector const> const overlappedSolution = app->getAdaptSolMgr()->updateAndReturnOverlapSolution(*x);
         app->getDiscretization()->writeSolution(*overlappedSolution, iter, /*overlapped =*/true);
         iteration = iter;
       }
@@ -668,8 +653,7 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
 
   // W matrix
   if (Teuchos::nonnull(W_op_out)) {
-    app->computeGlobalJacobian(
-        alpha, beta, omega, curr_time, x, x_dot, x_dotdot, sacado_param_vec, f_out, W_op_out, dt);
+    app->computeGlobalJacobian(alpha, beta, omega, curr_time, x, x_dot, x_dotdot, sacado_param_vec, f_out, W_op_out, dt);
     f_already_computed = true;
   }
 

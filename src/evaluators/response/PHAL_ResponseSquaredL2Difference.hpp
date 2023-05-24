@@ -54,42 +54,33 @@ class ResponseSquaredL2DifferenceBase : public PHAL::SeparableScatterScalarRespo
 
 //-- SourceScalarT = ScalarT
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSST_TST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ScalarT, typename EvalT::ScalarT>;
+using ResponseSquaredL2DifferenceSST_TST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ScalarT, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSST_TMST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ScalarT, typename EvalT::MeshScalarT>;
+using ResponseSquaredL2DifferenceSST_TMST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ScalarT, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSST_TPST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ScalarT, typename EvalT::ParamScalarT>;
+using ResponseSquaredL2DifferenceSST_TPST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ScalarT, typename EvalT::ParamScalarT>;
 
 //-- SourceScalarT = ParamScalarT
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSPST_TST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ParamScalarT, typename EvalT::ScalarT>;
+using ResponseSquaredL2DifferenceSPST_TST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ParamScalarT, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSPST_TMST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ParamScalarT, typename EvalT::MeshScalarT>;
+using ResponseSquaredL2DifferenceSPST_TMST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ParamScalarT, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSPST_TPST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ParamScalarT, typename EvalT::ParamScalarT>;
+using ResponseSquaredL2DifferenceSPST_TPST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::ParamScalarT, typename EvalT::ParamScalarT>;
 
 //-- SourceScalarT = MeshScalarT
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSMST_TST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ScalarT>;
+using ResponseSquaredL2DifferenceSMST_TST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSMST_TMST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::MeshScalarT>;
+using ResponseSquaredL2DifferenceSMST_TMST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using ResponseSquaredL2DifferenceSMST_TPST =
-    ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ParamScalarT>;
+using ResponseSquaredL2DifferenceSMST_TPST = ResponseSquaredL2DifferenceBase<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

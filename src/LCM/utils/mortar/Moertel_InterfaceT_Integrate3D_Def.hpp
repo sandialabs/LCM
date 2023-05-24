@@ -96,8 +96,7 @@ MoertelT::InterfaceT<3, ST, LO, GO, N>::Mortar_Integrate(Teuchos::RCP<Teuchos::P
 
   // time this process
   if (OutLevel() > 5) {
-    std::cout << "MoertelT::Interface " << Id() << ": Integration on proc " << gcomm_->getRank() << " finished in "
-              << time.totalElapsedTime(true) << " sec\n";
+    std::cout << "MoertelT::Interface " << Id() << ": Integration on proc " << gcomm_->getRank() << " finished in " << time.totalElapsedTime(true) << " sec\n";
     fflush(stdout);
   }
 
@@ -184,9 +183,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D()
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
+MoertelT::MOERTEL_TEMPLATE_CLASS(
+    InterfaceT)::Integrate_3D_Section(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
 {
   if ((sseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearTri &&
        sseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_BiLinearQuad) ||
@@ -230,7 +228,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
     // integrate master and slave part of this segment
     Teuchos::SerialDenseMatrix<LO, ST>* Ddense = NULL;
     Teuchos::SerialDenseMatrix<LO, ST>* Mdense = NULL;
-    bool ok = integrator.Integrate(actseg, sseg, mseg, &Ddense, &Mdense, overlap, 1.0e-04, exactvalues);
+    bool                                ok     = integrator.Integrate(actseg, sseg, mseg, &Ddense, &Mdense, overlap, 1.0e-04, exactvalues);
     if (!ok) continue;
 
     // assemble temporarily into the nodes
@@ -253,8 +251,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_3D_Section(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS(
-    InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M)
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M)
 {
   if (!IsComplete()) {
     std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
@@ -333,16 +330,14 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
 
           if (err < 0) {
             std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
-                      << "\n"
+                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
                       << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
             return false;
           }
 
           if (err && OutLevel() > 0) {
             std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
-                      << err << "\n"
+                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
                       << "MoertelT: ***WRN*** indicating that initial guess for "
                          "memory of D too small\n"
                       << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
@@ -393,16 +388,14 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
 
           if (err < 0) {
             std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
-                      << "\n"
+                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
                       << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
             return false;
           }
 
           if (err && OutLevel() > 0) {
             std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
-                      << err << "\n"
+                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
                       << "MoertelT: ***WRN*** indicating that initial guess for "
                          "memory of M too small\n"
                       << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
@@ -434,16 +427,14 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
 
           if (err < 0) {
             std::cout << "***ERR*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err
-                      << "\n"
+                      << "***ERR*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
                       << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
             return false;
           }
 
           if (err && OutLevel() > 0) {
             std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::Assemble_3D:\n"
-                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned "
-                      << err << "\n"
+                      << "MoertelT: ***WRN*** interface " << Id_ << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
                       << "MoertelT: ***WRN*** indicating that initial guess for "
                          "memory of M too small\n"
                       << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
@@ -647,8 +638,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
                 if (err && OutLevel() > 0) {
                   std::cout << "MoertelT: ***WRN*** "
                                "MoertelT::InterfaceT::Assemble_3D:\n"
-                            << "MoertelT: ***WRN*** interface " << Id()
-                            << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
+                            << "MoertelT: ***WRN*** interface " << Id() << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
                             << "MoertelT: ***WRN*** indicating that initial guess "
                                "for memory of D too small\n"
                             << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
@@ -737,8 +727,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
                 if (err && OutLevel() > 0) {
                   std::cout << "MoertelT: ***WRN*** "
                                "MoertelT::InterfaceT::Assemble_3D:\n"
-                            << "MoertelT: ***WRN*** interface " << Id()
-                            << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
+                            << "MoertelT: ***WRN*** interface " << Id() << ": Tpetra_CrsMatrix::InsertGlobalValues returned " << err << "\n"
                             << "MoertelT: ***WRN*** indicating that initial guess "
                                "for memory of M too small\n"
                             << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
@@ -776,7 +765,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
   | Here, each global node (rnode_) is visited on the slave interface side.
   | Each node stores a local D, M, and Mmod.
  *----------------------------------------------------------------------*/
-//#define PDANDM
+// #define PDANDM
 MOERTEL_TEMPLATE_STATEMENT
 bool
 MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
@@ -804,7 +793,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 
   for (curr = rnode_[sside].begin(); curr != rnode_[sside].end(); ++curr) dtable[cnt++] = curr->second->Id();
 
-  Tpetra::Map<LO, GO, N> Dmap(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(), &dtable[0], size, 0, lcomm_);
+  Tpetra::Map<LO, GO, N>           Dmap(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(), &dtable[0], size, 0, lcomm_);
   Tpetra::CrsMatrix<ST, LO, GO, N> Dmat(Dmap, 4);
   Tpetra::CrsMatrix<ST, LO, GO, N> Mmat(Dmap, 4);
 

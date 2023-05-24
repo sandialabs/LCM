@@ -19,10 +19,7 @@ struct NeohookeanKernel : public ParallelKernel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  NeohookeanKernel(
-      ConstitutiveModel<EvalT, Traits>&    model,
-      Teuchos::ParameterList*              p,
-      const Teuchos::RCP<Albany::Layouts>& dl);
+  NeohookeanKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   NeohookeanKernel(const NeohookeanKernel&) = delete;
   NeohookeanKernel&

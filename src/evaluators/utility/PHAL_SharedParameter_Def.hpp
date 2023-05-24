@@ -24,9 +24,8 @@ SharedParameter<EvalT, Traits>::SharedParameter(Teuchos::ParameterList const& p)
   paramAsField = f;
 
   // Sacado-ized parameter
-  Teuchos::RCP<ParamLib> paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library");  //, Teuchos::null ANDY - why a compiler error with
-                                                           // this?
+  Teuchos::RCP<ParamLib> paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library");  //, Teuchos::null ANDY - why a compiler error with
+                                                                                         // this?
   this->registerSacadoParameter(paramName, paramLib);
 
   this->addEvaluatedField(paramAsField);
@@ -63,10 +62,9 @@ SharedParameter<EvalT, Traits>::getValue(std::string const& n)
 template <typename EvalT, typename Traits>
 SharedParameterVec<EvalT, Traits>::SharedParameterVec(Teuchos::ParameterList const& p)
 {
-  Teuchos::RCP<PHX::DataLayout> layout = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
-  Teuchos::RCP<ParamLib>        paramLib =
-      p.get<Teuchos::RCP<ParamLib>>("Parameter Library");  //, Teuchos::null ANDY - why a compiler error with
-                                                           // this?
+  Teuchos::RCP<PHX::DataLayout> layout   = p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout");
+  Teuchos::RCP<ParamLib>        paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library");  //, Teuchos::null ANDY - why a compiler error with
+                                                                                                // this?
 
   numParams = layout->extent(1);
 

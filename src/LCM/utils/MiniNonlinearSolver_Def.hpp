@@ -6,11 +6,7 @@ namespace LCM {
 
 // Native MiniSolver
 template <typename MIN, typename STEP, typename FN, typename EvalT, minitensor::Index N>
-MiniSolver<MIN, STEP, FN, EvalT, N>::MiniSolver(
-    MIN&                                            minimizer,
-    STEP&                                           step_method,
-    FN&                                             function,
-    minitensor::Vector<typename EvalT::ScalarT, N>& soln)
+MiniSolver<MIN, STEP, FN, EvalT, N>::MiniSolver(MIN& minimizer, STEP& step_method, FN& function, minitensor::Vector<typename EvalT::ScalarT, N>& soln)
 {
   MT_ERROR_EXIT("Missing specialization for MiniSolver class.");
   return;

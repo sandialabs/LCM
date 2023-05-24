@@ -5,10 +5,7 @@
 
 namespace LCM {
 
-ObserverImpl::ObserverImpl(Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps) : StatelessObserverImpl(apps)
-{
-  return;
-}
+ObserverImpl::ObserverImpl(Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps) : StatelessObserverImpl(apps) { return; }
 
 ObserverImpl::~ObserverImpl() { return; }
 
@@ -19,8 +16,7 @@ ObserverImpl::observeSolution(
     Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> non_overlapped_solution_dot)
 {
   for (int m = 0; m < this->n_models_; m++) {
-    this->apps_[m]->evaluateStateFieldManager(
-        stamp, *non_overlapped_solution[m], non_overlapped_solution_dot[m].ptr(), Teuchos::null);
+    this->apps_[m]->evaluateStateFieldManager(stamp, *non_overlapped_solution[m], non_overlapped_solution_dot[m].ptr(), Teuchos::null);
 
     this->apps_[m]->getStateMgr().updateStates();
   }

@@ -39,9 +39,7 @@ DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::DOFGradInterpolationSideBa
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFGradInterpolationSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_node, fm);
   this->utils.setFieldData(gradBF, fm);

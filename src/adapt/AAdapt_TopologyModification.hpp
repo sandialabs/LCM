@@ -91,9 +91,7 @@ class TopologyMod : public AbstractAdapter
   /// Parallel all-gatherv function. Communicates local open list to
   /// all processors to form global open list.
   void
-  getGlobalOpenList(
-      std::map<stk::mesh::EntityKey, bool>& local_entity_open,
-      std::map<stk::mesh::EntityKey, bool>& global_entity_open);
+  getGlobalOpenList(std::map<stk::mesh::EntityKey, bool>& local_entity_open, std::map<stk::mesh::EntityKey, bool>& global_entity_open);
 
   ///
   /// stk_mesh Bulk Data

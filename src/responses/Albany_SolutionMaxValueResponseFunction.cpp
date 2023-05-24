@@ -12,16 +12,8 @@
 
 namespace Albany {
 
-SolutionMaxValueResponseFunction::SolutionMaxValueResponseFunction(
-    const Teuchos::RCP<Teuchos_Comm const>& comm,
-    int                                     neq_,
-    int                                     eq_,
-    bool                                    interleavedOrdering_)
-    : SamplingBasedScalarResponseFunction(comm),
-      neq(neq_),
-      eq(eq_),
-      comm_(comm),
-      interleavedOrdering(interleavedOrdering_)
+SolutionMaxValueResponseFunction::SolutionMaxValueResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm, int neq_, int eq_, bool interleavedOrdering_)
+    : SamplingBasedScalarResponseFunction(comm), neq(neq_), eq(eq_), comm_(comm), interleavedOrdering(interleavedOrdering_)
 {
   // Nothing to be done here
 }

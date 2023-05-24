@@ -48,9 +48,7 @@ Albany::ElectroMechanicsProblem::ElectroMechanicsProblem(
 }
 Albany::ElectroMechanicsProblem::~ElectroMechanicsProblem() {}
 void
-Albany::ElectroMechanicsProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::ElectroMechanicsProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   // Construct All Phalanx Evaluators
   int physSets = meshSpecs.size();
@@ -168,8 +166,7 @@ Albany::ElectroMechanicsProblem::constructNeumannEvaluators(const Teuchos::RCP<A
 
   nfm.resize(1);  // Elasticity problem only has one element block
 
-  nfm[0] = neuUtils.constructBCEvaluators(
-      meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl_, this->params, this->paramLib);
+  nfm[0] = neuUtils.constructBCEvaluators(meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl_, this->params, this->paramLib);
 }
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ElectroMechanicsProblem::getValidProblemParameters() const

@@ -22,8 +22,7 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class SideQuadPointsToSideInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                              public PHX::EvaluatorDerived<EvalT, Traits>
+class SideQuadPointsToSideInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   SideQuadPointsToSideInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl_side);
@@ -56,12 +55,10 @@ template <typename EvalT, typename Traits>
 using SideQuadPointsToSideInterpolation = SideQuadPointsToSideInterpolationBase<EvalT, Traits, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using SideQuadPointsToSideInterpolationMesh =
-    SideQuadPointsToSideInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
+using SideQuadPointsToSideInterpolationMesh = SideQuadPointsToSideInterpolationBase<EvalT, Traits, typename EvalT::MeshScalarT>;
 
 template <typename EvalT, typename Traits>
-using SideQuadPointsToSideInterpolationParam =
-    SideQuadPointsToSideInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
+using SideQuadPointsToSideInterpolationParam = SideQuadPointsToSideInterpolationBase<EvalT, Traits, typename EvalT::ParamScalarT>;
 
 }  // Namespace PHAL
 

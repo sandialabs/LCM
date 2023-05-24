@@ -151,8 +151,7 @@ Albany::HeatProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cellCubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cellCubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPtsCell = cellCubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
@@ -163,8 +162,8 @@ Albany::HeatProblem::constructEvaluators(
       "Albany_HeatProblem must be defined as a steady or transient "
       "calculation.");
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPtsCell << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPtsCell
+       << ", Dim= " << numDim << std::endl;
 
   dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPtsCell, numDim));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
@@ -190,14 +189,12 @@ Albany::HeatProblem::constructEvaluators(
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cellCubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cellCubature));
 
   for (unsigned int i = 0; i < neq; i++) {
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[i]));
 
-    if (number_of_time_deriv == 1)
-      fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i]));
+    if (number_of_time_deriv == 1) fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[i]));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[i]));
   }
@@ -256,7 +253,7 @@ Albany::HeatProblem::constructEvaluators(
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::NodalDistParameter;
     std::string                          stateName = "thermal_conductivity";
     std::string                          fieldName = "ThermalConductivity";
-    p = stateMgr.registerStateVariable(stateName, dl->node_scalar, meshSpecs.ebName, true, &entity, "");
+    p                                              = stateMgr.registerStateVariable(stateName, dl->node_scalar, meshSpecs.ebName, true, &entity, "");
 
     // Gather parameter (similarly to what done with the solution)
     ev = evalUtils.constructGatherScalarNodalParameter(stateName, fieldName);
@@ -349,8 +346,7 @@ Albany::HeatProblem::constructEvaluators(
 
     p->set<string>("Weighted Gradient BF Name", "wGrad BF");
     p->set<RCP<DataLayout>>("Node QP Vector Data Layout", dl->node_qp_vector);
-    if (params->isType<string>("Convection Velocity"))
-      p->set<string>("Convection Velocity", params->get<string>("Convection Velocity"));
+    if (params->isType<string>("Convection Velocity")) p->set<string>("Convection Velocity", params->get<string>("Convection Velocity"));
     if (params->isType<bool>("Have Rho Cp")) p->set<bool>("Have Rho Cp", params->get<bool>("Have Rho Cp"));
 
     // Output

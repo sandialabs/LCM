@@ -47,7 +47,7 @@ class ScatterResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PH
   PHX::MDField<ScalarT const, Cell, Node, Dim, Dim>    valTensor;
   std::size_t                                          numNodes;
   std::size_t                                          numFieldsBase;  // Number of fields gathered in this call
-  std::size_t                                          offset;  // Offset of first DOF being gathered when numFields<neq
+  std::size_t                                          offset;         // Offset of first DOF being gathered when numFields<neq
 
   unsigned short int tensorRank;
 
@@ -64,8 +64,7 @@ template <typename EvalT, typename Traits>
 class ScatterResidualWithExtrudedParams : public ScatterResidual<EvalT, Traits>
 {
  public:
-  ScatterResidualWithExtrudedParams(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : ScatterResidual<EvalT, Traits>(p, dl)
+  ScatterResidualWithExtrudedParams(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl) : ScatterResidual<EvalT, Traits>(p, dl)
   {
     extruded_params_levels = p.get<Teuchos::RCP<std::map<std::string, int>>>("Extruded Params Levels");
   };
@@ -97,8 +96,7 @@ class ScatterResidualWithExtrudedParams : public ScatterResidual<EvalT, Traits>
 // Residual
 // **************************************************************
 template <typename Traits>
-class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>
-    : public ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>
+class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits> : public ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ScatterResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -150,8 +148,7 @@ class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits> : public ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   ScatterResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

@@ -14,9 +14,7 @@
 
 namespace LCM {
 
-SchwarzAlternating::SchwarzAlternating(
-    Teuchos::RCP<Teuchos::ParameterList> const&   app_params,
-    Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
+SchwarzAlternating::SchwarzAlternating(Teuchos::RCP<Teuchos::ParameterList> const& app_params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
 {
   Teuchos::ParameterList& alt_system_params = app_params->sublist("Alternating System");
 
@@ -173,10 +171,8 @@ SchwarzAlternating::SchwarzAlternating(
 
       tempus_params.set("Abort on Failure", false);
 
-      Teuchos::ParameterList& time_step_control_params = piro_params.sublist("Tempus")
-                                                             .sublist("Tempus Integrator")
-                                                             .sublist("Time Step Control")
-                                                             .sublist("Time Step Control Strategy");
+      Teuchos::ParameterList& time_step_control_params =
+          piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control").sublist("Time Step Control Strategy");
 
       std::string const integrator_step_type = time_step_control_params.get("Strategy Type", "Constant");
 
@@ -192,8 +188,7 @@ SchwarzAlternating::SchwarzAlternating(
 
     Teuchos::RCP<Albany::Application> app{Teuchos::null};
 
-    Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
-        solver_factory.createAndGetAlbanyApp(app, comm, comm);
+    Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver = solver_factory.createAndGetAlbanyApp(app, comm, comm);
 
     solvers_[subdomain] = solver;
 
@@ -388,16 +383,14 @@ SchwarzAlternating::createOutArgsImpl() const
   oas.setSupports(Thyra_ModelEvaluator::OUT_ARG_W_op, true);
   oas.setSupports(Thyra_ModelEvaluator::OUT_ARG_W_prec, false);
 
-  oas.set_W_properties(Thyra_ModelEvaluator::DerivativeProperties(
-      Thyra_ModelEvaluator::DERIV_LINEARITY_UNKNOWN, Thyra_ModelEvaluator::DERIV_RANK_FULL, true));
+  oas.set_W_properties(Thyra_ModelEvaluator::DerivativeProperties(Thyra_ModelEvaluator::DERIV_LINEARITY_UNKNOWN, Thyra_ModelEvaluator::DERIV_RANK_FULL, true));
 
   return static_cast<Thyra_OutArgs>(oas);
 }
 
 // Evaluate model on InArgs
 void
-SchwarzAlternating::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&)
-    const
+SchwarzAlternating::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&) const
 {
   if (is_dynamic_ == true) {
     SchwarzLoopDynamics();

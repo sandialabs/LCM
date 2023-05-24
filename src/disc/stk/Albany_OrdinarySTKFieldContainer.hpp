@@ -102,10 +102,7 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager);
   void
-  fillSolnMultiVector(
-      Thyra_MultiVector&                           soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
+  fillSolnMultiVector(Thyra_MultiVector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
   saveVector(
       Thyra_Vector const&                          field_vector,
@@ -114,16 +111,9 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager);
   void
-  saveSolnVector(
-      Thyra_Vector const&                          soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
+  saveSolnVector(Thyra_Vector const& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
-  saveSolnVector(
-      Thyra_Vector const&                          soln,
-      Thyra_Vector const&                          soln_dot,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
+  saveSolnVector(Thyra_Vector const& soln, Thyra_Vector const& soln_dot, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
   saveSolnVector(
       Thyra_Vector const&                          soln,
@@ -132,15 +122,9 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
-  saveResVector(
-      Thyra_Vector const&                          res,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
+  saveResVector(Thyra_Vector const& res, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
-  saveSolnMultiVector(
-      const Thyra_MultiVector&                     soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
+  saveSolnMultiVector(const Thyra_MultiVector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
 
   void
   transferSolutionToCoords();

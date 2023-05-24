@@ -29,10 +29,7 @@ Schwarz_PiroObserver::observeSolution(Thyra::VectorBase<ST> const& solution, ST 
 }
 
 void
-Schwarz_PiroObserver::observeSolution(
-    Thyra::VectorBase<ST> const& solution,
-    Thyra::VectorBase<ST> const& solution_dot,
-    ST const                     stamp)
+Schwarz_PiroObserver::observeSolution(Thyra::VectorBase<ST> const& solution, Thyra::VectorBase<ST> const& solution_dot, ST const stamp)
 {
   this->observeSolutionImpl(solution, solution_dot, stamp);
 }
@@ -72,10 +69,7 @@ Schwarz_PiroObserver::observeSolutionImpl(Thyra::VectorBase<ST> const& solution,
 }
 
 void
-Schwarz_PiroObserver::observeSolutionImpl(
-    Thyra::VectorBase<ST> const& solution,
-    Thyra::VectorBase<ST> const& solution_dot,
-    ST const                     default_stamp)
+Schwarz_PiroObserver::observeSolutionImpl(Thyra::VectorBase<ST> const& solution, Thyra::VectorBase<ST> const& solution_dot, ST const default_stamp)
 {
   Teuchos::Array<Teuchos::RCP<Thyra_Vector const>> solutions = arrayVecsFromVec(solution, n_models_);
 

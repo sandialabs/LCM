@@ -83,11 +83,7 @@ class CapImplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
 
   // unknow variable value list
   std::vector<ScalarT>
-  initialize(
-      minitensor::Tensor<ScalarT>& sigmaVal,
-      minitensor::Tensor<ScalarT>& alphaVal,
-      ScalarT&                     kappaVal,
-      ScalarT&                     dgammaVal);
+  initialize(minitensor::Tensor<ScalarT>& sigmaVal, minitensor::Tensor<ScalarT>& alphaVal, ScalarT& kappaVal, ScalarT& dgammaVal);
 
   // local iteration jacobian
   void
@@ -138,19 +134,9 @@ class CapImplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
 
   // elasto-plastic tangent modulus
   minitensor::Tensor4<ScalarT>
-  compute_Cep(
-      minitensor::Tensor4<ScalarT>& Celastic,
-      minitensor::Tensor<ScalarT>&  sigma,
-      minitensor::Tensor<ScalarT>&  alpha,
-      ScalarT&                      kappa,
-      ScalarT&                      dgamma);
+  compute_Cep(minitensor::Tensor4<ScalarT>& Celastic, minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa, ScalarT& dgamma);
   minitensor::Tensor4<ScalarT>
-  compute_Cepp(
-      minitensor::Tensor4<ScalarT>& Celastic,
-      minitensor::Tensor<ScalarT>&  sigma,
-      minitensor::Tensor<ScalarT>&  alpha,
-      ScalarT&                      kappa,
-      ScalarT&                      dgamma);
+  compute_Cepp(minitensor::Tensor4<ScalarT>& Celastic, minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa, ScalarT& dgamma);
 
   // local temp variables
   RealType A;

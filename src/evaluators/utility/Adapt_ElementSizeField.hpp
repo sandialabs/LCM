@@ -90,10 +90,7 @@ template <typename EvalT, typename Traits>
 class ElementSizeField : public ElementSizeFieldBase<EvalT, Traits>
 {
  public:
-  ElementSizeField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : ElementSizeFieldBase<EvalT, Traits>(p, dl)
-  {
-  }
+  ElementSizeField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl) : ElementSizeFieldBase<EvalT, Traits>(p, dl) {}
 
   void preEvaluate(typename Traits::PreEvalData /* d */) {}
   void postEvaluate(typename Traits::PostEvalData /* d */) {}
@@ -110,8 +107,7 @@ class ElementSizeField : public ElementSizeFieldBase<EvalT, Traits>
 // Residual
 // **************************************************************
 template <typename Traits>
-class ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>
-    : public ElementSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>
+class ElementSizeField<PHAL::AlbanyTraits::Residual, Traits> : public ElementSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ElementSizeField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);

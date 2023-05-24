@@ -21,10 +21,7 @@ class ODEProblem : public AbstractProblem
 {
  public:
   //! Default constructor
-  ODEProblem(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<ParamLib>&               paramLib,
-      int const                                   numDim_);
+  ODEProblem(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numDim_);
 
   //! Destructor
   ~ODEProblem();
@@ -122,10 +119,9 @@ Albany::ODEProblem::constructEvaluators(
   int const numVertices = 1;
   int const worksetSize = meshSpecs.worksetSize;
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", Dim= " << numDim << std::endl;
 
-  RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, 1, numDim));
+  RCP<Albany::Layouts>                              dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, 1, numDim));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
   bool                                              supportsTransient = true;
 

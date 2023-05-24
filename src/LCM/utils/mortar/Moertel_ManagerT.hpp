@@ -611,8 +611,8 @@ class ManagerT
   Teuchos::RCP<Tpetra::Map<LO, GO, N>>           saddlemap_;       // the rowmap of the saddlepointproblem
   Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> saddlematrix_;    // the matrix of the saddle problem;
   Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> spdmatrix_;       // the spd matrix of the problem;
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> spdrhs_;  // the matrix to left-multiply the rhs vector with for the
-                                                           // spd problem
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> spdrhs_;          // the matrix to left-multiply the rhs vector with for the
+                                                                   // spd problem
 
   Teuchos::RCP<std::map<int, int>> lm_to_dof_;  // maps lagrange multiplier dofs
                                                 // to primary dofs (slave side))
@@ -651,13 +651,11 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Build_MD();
 
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::ManagerT<2, ST, LO, GO, N>::ChooseMortarSideInterface(
-    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter);
+MoertelT::ManagerT<2, ST, LO, GO, N>::ChooseMortarSideInterface(std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter);
 
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::ManagerT<3, ST, LO, GO, N>::ChooseMortarSideInterface(
-    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter);
+MoertelT::ManagerT<3, ST, LO, GO, N>::ChooseMortarSideInterface(std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter);
 
 }  // namespace MoertelT
 

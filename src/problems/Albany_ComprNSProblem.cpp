@@ -13,10 +13,7 @@
 #include "PHAL_FactoryTraits.hpp"
 #include "Shards_CellTopology.hpp"
 
-Albany::ComprNSProblem::ComprNSProblem(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<ParamLib>&               paramLib_,
-    int const                                   numDim_)
+Albany::ComprNSProblem::ComprNSProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
     : Albany::AbstractProblem(params_, paramLib_), params(params_), numDim(numDim_), use_sdbcs_(false)
 {
   // Get number of species equations from Problem specifications
@@ -26,9 +23,7 @@ Albany::ComprNSProblem::ComprNSProblem(
 Albany::ComprNSProblem::~ComprNSProblem() {}
 
 void
-Albany::ComprNSProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::ComprNSProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   using Teuchos::rcp;
 
@@ -162,8 +157,7 @@ Albany::ComprNSProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::Me
 
   nfm.resize(1);  // ComprNS problem only has one element block
 
-  nfm[0] = nbcUtils.constructBCEvaluators(
-      meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
+  nfm[0] = nbcUtils.constructBCEvaluators(meshSpecs, neumannNames, dof_names, true, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

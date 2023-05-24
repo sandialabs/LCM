@@ -21,8 +21,7 @@ namespace LCM {
 /// for the equal order pressure stabilization
 ///
 template <typename EvalT, typename Traits>
-class StabilizedPressureResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                   public PHX::EvaluatorDerived<EvalT, Traits>
+class StabilizedPressureResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;

@@ -8,8 +8,7 @@
 
 namespace Albany {
 
-SolutionAverageResponseFunction::SolutionAverageResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm)
-    : ScalarResponseFunction(comm)
+SolutionAverageResponseFunction::SolutionAverageResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm) : ScalarResponseFunction(comm)
 {
   // Nothing to be done here
 }

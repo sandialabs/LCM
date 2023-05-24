@@ -25,10 +25,7 @@ class ThermoElasticityProblem : public Albany::AbstractProblem
 {
  public:
   //! Default constructor
-  ThermoElasticityProblem(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<ParamLib>&               paramLib,
-      int const                                   numEq);
+  ThermoElasticityProblem(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numEq);
 
   //! Destructor
   virtual ~ThermoElasticityProblem();
@@ -156,20 +153,17 @@ Albany::ThermoElasticityProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPts
+       << ", Dim= " << numDim << std::endl;
 
   // Construct standard FEM evaluators with standard field names
   RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
-  ALBANY_PANIC(
-      dl->vectorAndGradientLayoutsAreEquivalent == false,
-      "Data Layout Usage in Mechanics problems assume vecDim = numDim");
+  ALBANY_PANIC(dl->vectorAndGradientLayoutsAreEquivalent == false, "Data Layout Usage in Mechanics problems assume vecDim = numDim");
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
   std::string                                       scatterName = "Scatter Heat";
 
@@ -183,8 +177,7 @@ Albany::ThermoElasticityProblem::constructEvaluators(
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0], X_offset));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, X_offset));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, X_offset));
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, resid_names, X_offset));
 
@@ -202,19 +195,16 @@ Albany::ThermoElasticityProblem::constructEvaluators(
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(tdof_names[0], T_offset));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructGatherSolutionEvaluator(false, tdof_names, tdof_names_dot, T_offset));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, tdof_names, tdof_names_dot, T_offset));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(false, tresid_names, T_offset, scatterName));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, tresid_names, T_offset, scatterName));
 
   // General FEM stuff
   fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   // Temporary variable used numerous times below
   Teuchos::RCP<PHX::Evaluator<AlbanyTraits>> ev;

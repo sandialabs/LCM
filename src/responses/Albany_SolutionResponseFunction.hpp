@@ -21,9 +21,7 @@ class SolutionResponseFunction : public DistributedResponseFunction
 {
  public:
   //! Default constructor
-  SolutionResponseFunction(
-      const Teuchos::RCP<Albany::Application>& application,
-      Teuchos::ParameterList const&            responseParams);
+  SolutionResponseFunction(const Teuchos::RCP<Albany::Application>& application, Teuchos::ParameterList const& responseParams);
 
   //! Destructor
   virtual ~SolutionResponseFunction() = default;

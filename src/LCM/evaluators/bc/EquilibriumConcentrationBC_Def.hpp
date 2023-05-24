@@ -31,8 +31,7 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::EquilibriumCon
 }
 template <typename Traits>
 void
-EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+EquilibriumConcentrationBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
@@ -64,8 +63,7 @@ EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::EquilibriumCon
 }
 template <typename Traits>
 void
-EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+EquilibriumConcentrationBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;

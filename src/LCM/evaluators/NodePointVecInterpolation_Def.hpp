@@ -9,9 +9,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-NodePointVecInterpolation<EvalT, Traits>::NodePointVecInterpolation(
-    Teuchos::ParameterList const&        p,
-    Teuchos::RCP<Albany::Layouts> const& dl)
+NodePointVecInterpolation<EvalT, Traits>::NodePointVecInterpolation(Teuchos::ParameterList const& p, Teuchos::RCP<Albany::Layouts> const& dl)
     : nodal_value_(p.get<std::string>("Variable Name"), dl->node_vector),
       basis_fn_(p.get<std::string>("BF Name"), dl->cell_scalar),
       point_value_(p.get<std::string>("Variable Name"), dl->cell_vector)
@@ -33,9 +31,7 @@ NodePointVecInterpolation<EvalT, Traits>::NodePointVecInterpolation(
 
 template <typename EvalT, typename Traits>
 void
-NodePointVecInterpolation<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+NodePointVecInterpolation<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(nodal_value_, fm);
   this->utils.setFieldData(basis_fn_, fm);
@@ -88,9 +84,7 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::NodePointVecInt
 
 template <typename Traits>
 void
-NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(nodal_value_, fm);
   this->utils.setFieldData(basis_fn_, fm);
@@ -113,8 +107,7 @@ NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(
 
       point_value_(cell, i) = FadType(num_dof, nodal_value_(cell, 0, i).val() * basis_fn_(cell, 0));
 
-      (point_value_(cell, i)).fastAccessDx(offset_ + i) =
-          nodal_value_(cell, 0, i).fastAccessDx(offset_ + i) * basis_fn_(cell, 0);
+      (point_value_(cell, i)).fastAccessDx(offset_ + i) = nodal_value_(cell, 0, i).fastAccessDx(offset_ + i) * basis_fn_(cell, 0);
 
       for (int node = 1; node < number_nodes_; ++node) {
         (point_value_(cell, i)).val() += nodal_value_(cell, node, i).val() * basis_fn_(cell, node);

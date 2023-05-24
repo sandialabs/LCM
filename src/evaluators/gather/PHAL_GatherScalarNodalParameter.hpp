@@ -30,8 +30,7 @@ namespace PHAL {
 // **************************************************************
 
 template <typename EvalT, typename Traits>
-class GatherScalarNodalParameterBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                       public PHX::EvaluatorDerived<EvalT, Traits>
+class GatherScalarNodalParameterBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   GatherScalarNodalParameterBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

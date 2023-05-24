@@ -55,8 +55,7 @@ class BadParameterEnumException : std::exception
 }  // namespace utility
 
 template <typename T>
-utility::ParameterEnum<T>::ParameterEnum(std::string const& name, T def, std::initializer_list<ValueType> init)
-    : m_map(init), m_default(def), m_name(name)
+utility::ParameterEnum<T>::ParameterEnum(std::string const& name, T def, std::initializer_list<ValueType> init) : m_map(init), m_default(def), m_name(name)
 {
 }
 
@@ -84,8 +83,7 @@ template <typename T>
 utility::BadParameterEnumException<T>::BadParameterEnumException(std::string const& key, ParameterEnum<T> const& e)
 {
   std::stringstream ss;
-  ss << "\n**** Bad Parameter Enum: invalid value \"" << key << "\" for enum \"" << e.m_name
-     << "\". Must be one of the following:\n";
+  ss << "\n**** Bad Parameter Enum: invalid value \"" << key << "\" for enum \"" << e.m_name << "\". Must be one of the following:\n";
 
   for (auto&& iter : e.m_map) ss << "\t" << iter.first << "\n";
 

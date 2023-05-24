@@ -44,7 +44,7 @@ class MortarContactResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>, pub
   PHX::MDField<ScalarT const, Cell, Node, Dim, Dim>    valTensor;
   std::size_t                                          numNodes;
   std::size_t                                          numFieldsBase;  // Number of fields gathered in this call
-  std::size_t                                          offset;  // Offset of first DOF being gathered when numFields<neq
+  std::size_t                                          offset;         // Offset of first DOF being gathered when numFields<neq
 
  protected:
   Albany::AbstractDiscretization::WorksetConn                                  nodeID;
@@ -65,8 +65,7 @@ class MortarContactResidual;
 // Residual
 // **************************************************************
 template <typename Traits>
-class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>
-    : public MortarContactResidualBase<PHAL::AlbanyTraits::Residual, Traits>
+class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits> : public MortarContactResidualBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   MortarContactResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -118,8 +117,7 @@ class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public MortarContactResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits> : public MortarContactResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   MortarContactResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -200,19 +198,16 @@ class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>
   using Base::nodeID;
   using Base::val_kokkos;
 
-  typedef typename PHX::Device::execution_space                               ExecutionSpace;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank0_Tag> PHAL_MortarContactResRank0_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank0_Adjoint_Tag>
-                                                                              PHAL_MortarContactJacRank0_Adjoint_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank0_Tag> PHAL_MortarContactJacRank0_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank1_Tag> PHAL_MortarContactResRank1_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank1_Adjoint_Tag>
-                                                                              PHAL_MortarContactJacRank1_Adjoint_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank1_Tag> PHAL_MortarContactJacRank1_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank2_Tag> PHAL_MortarContactResRank2_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank2_Adjoint_Tag>
-                                                                              PHAL_MortarContactJacRank2_Adjoint_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank2_Tag> PHAL_MortarContactJacRank2_Policy;
+  typedef typename PHX::Device::execution_space                                       ExecutionSpace;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank0_Tag>         PHAL_MortarContactResRank0_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank0_Adjoint_Tag> PHAL_MortarContactJacRank0_Adjoint_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank0_Tag>         PHAL_MortarContactJacRank0_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank1_Tag>         PHAL_MortarContactResRank1_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank1_Adjoint_Tag> PHAL_MortarContactJacRank1_Adjoint_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank1_Tag>         PHAL_MortarContactJacRank1_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank2_Tag>         PHAL_MortarContactResRank2_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank2_Adjoint_Tag> PHAL_MortarContactJacRank2_Adjoint_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactJacRank2_Tag>         PHAL_MortarContactJacRank2_Policy;
 };
 
 }  // namespace PHAL

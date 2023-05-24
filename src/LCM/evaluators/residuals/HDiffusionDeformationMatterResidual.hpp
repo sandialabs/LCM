@@ -24,8 +24,7 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class HDiffusionDeformationMatterResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                            public PHX::EvaluatorDerived<EvalT, Traits>
+class HDiffusionDeformationMatterResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   HDiffusionDeformationMatterResidual(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);

@@ -274,10 +274,7 @@ class IntegratorT
   \param Ddense : local dense matrix from integration of overlap
   */
   bool
-  Assemble(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-      Teuchos::SerialDenseMatrix<LO, ST>& Ddense);
+  Assemble(MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT) & inter, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, Teuchos::SerialDenseMatrix<LO, ST>& Ddense);
 
   /*!
   \brief Assemble integration result 'M' into Node (2D interfaces only)

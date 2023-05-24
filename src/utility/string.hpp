@@ -58,8 +58,7 @@ string_convert(typename std::enable_if<has_tostring<T>::value, T>::type&& val)
 
 template <typename T>
 string
-string_convert(
-    typename std::enable_if<!std::is_convertible<T, string>::value && !has_tostring<T>::value, T>::type&& val)
+string_convert(typename std::enable_if<!std::is_convertible<T, string>::value && !has_tostring<T>::value, T>::type&& val)
 {
   return std::to_string(std::forward<T>(val));
 }

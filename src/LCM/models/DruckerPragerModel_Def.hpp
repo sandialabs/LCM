@@ -14,9 +14,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-DruckerPragerModel<EvalT, Traits>::DruckerPragerModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+DruckerPragerModel<EvalT, Traits>::DruckerPragerModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       a0_(p->get<RealType>("Initial Friction Parameter a0", 0.0)),
       a1_(p->get<RealType>("Hardening Parameter a1", 0.0)),
@@ -79,10 +77,7 @@ DruckerPragerModel<EvalT, Traits>::DruckerPragerModel(
 }
 template <typename EvalT, typename Traits>
 void
-DruckerPragerModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+DruckerPragerModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto strain          = *dep_fields["Strain"];
@@ -132,10 +127,9 @@ DruckerPragerModel<EvalT, Traits>::computeState(
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) /
-               ((1 + poissons_ratio(cell, pt)) * (1 - 2 * poissons_ratio(cell, pt)));
-      mu    = elastic_modulus(cell, pt) / (2 * (1 + poissons_ratio(cell, pt)));
-      kappa = lambda + 2.0 * mu / 3.0;
+      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) / ((1 + poissons_ratio(cell, pt)) * (1 - 2 * poissons_ratio(cell, pt)));
+      mu     = elastic_modulus(cell, pt) / (2 * (1 + poissons_ratio(cell, pt)));
+      kappa  = lambda + 2.0 * mu / 3.0;
 
       // 4-th order elasticity tensor
       Celastic = lambda * id3 + mu * (id1 + id2);

@@ -15,10 +15,7 @@ struct ACEpermafrostMiniKernel : public ParallelKernel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  ACEpermafrostMiniKernel(
-      ConstitutiveModel<EvalT, Traits>&    model,
-      Teuchos::ParameterList*              p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  ACEpermafrostMiniKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// No copy constructor

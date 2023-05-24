@@ -11,18 +11,10 @@
 template <typename EvalT, typename Traits>
 PHAL::TEProp<EvalT, Traits>::TEProp(Teuchos::ParameterList& p)
     : rhoCp(p.get<std::string>("QP Variable Name 3"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      permittivity(
-          p.get<std::string>("QP Variable Name 2"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      thermalCond(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Temp(
-          p.get<std::string>("Temperature Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      coordVec(
-          p.get<std::string>("Coordinate Vector Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"))
+      permittivity(p.get<std::string>("QP Variable Name 2"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      thermalCond(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Temp(p.get<std::string>("Temperature Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      coordVec(p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"))
 {
   Teuchos::ParameterList* teprop_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -36,8 +28,7 @@ PHAL::TEProp<EvalT, Traits>::TEProp(Teuchos::ParameterList& p)
   mats = teprop_list->get<int>("Number of Materials");
   ;
 
-  Teuchos::Array<double> dbl_elecCs =
-      Teuchos::getArrayFromStringParameter<double>(*teprop_list, "Electrical Conductivity", mats, true);
+  Teuchos::Array<double> dbl_elecCs = Teuchos::getArrayFromStringParameter<double>(*teprop_list, "Electrical Conductivity", mats, true);
   elecCs.resize(dbl_elecCs.size());
   for (int i = 0; i < dbl_elecCs.size(); i++) elecCs[i] = dbl_elecCs[i];
 

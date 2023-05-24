@@ -11,15 +11,11 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   // Get side set name and side set layouts
   sideSetName = p.get<std::string>("Side Set Name");
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! Layouts for side set '" << sideSetName << "' not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! Layouts for side set '" << sideSetName << "' not found.\n");
   Teuchos::RCP<Albany::Layouts> dl_side = dl->side_layouts.at(sideSetName);
 
   // Build output fields
@@ -69,9 +65,7 @@ ComputeBasisFunctionsSide<EvalT, Traits>::ComputeBasisFunctionsSide(
 //**********************************************************************
 template <typename EvalT, typename Traits>
 void
-ComputeBasisFunctionsSide<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ComputeBasisFunctionsSide<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(sideCoordVec, fm);
   this->utils.setFieldData(tangents, fm);
@@ -144,8 +138,7 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
         for (int qp = 0; qp < numSideQPs; ++qp) {
           tangents(cell, side, qp, icoor, itan) = 0.;
           for (int node = 0; node < numSideNodes; ++node) {
-            tangents(cell, side, qp, icoor, itan) +=
-                sideCoordVec(cell, side, node, icoor) * grad_at_cub_points(node, qp, itan);
+            tangents(cell, side, qp, icoor, itan) += sideCoordVec(cell, side, node, icoor) * grad_at_cub_points(node, qp, itan);
           }
         }
       }
@@ -156,16 +149,14 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
         // Diagonal
         metric(cell, side, qp, idim, idim) = 0.;
         for (int coor = 0; coor < numCellDims; ++coor) {
-          metric(cell, side, qp, idim, idim) +=
-              tangents(cell, side, qp, coor, idim) * tangents(cell, side, qp, coor, idim);  // g = J'*J
+          metric(cell, side, qp, idim, idim) += tangents(cell, side, qp, coor, idim) * tangents(cell, side, qp, coor, idim);  // g = J'*J
         }
 
         // Extra-diagonal
         for (int jdim = idim + 1; jdim < numSideDims; ++jdim) {
           metric(cell, side, qp, idim, jdim) = 0.;
           for (int coor = 0; coor < numCellDims; ++coor) {
-            metric(cell, side, qp, idim, jdim) +=
-                tangents(cell, side, qp, coor, idim) * tangents(cell, side, qp, coor, jdim);  // g = J'*J
+            metric(cell, side, qp, idim, jdim) += tangents(cell, side, qp, coor, idim) * tangents(cell, side, qp, coor, jdim);  // g = J'*J
           }
           metric(cell, side, qp, jdim, idim) = metric(cell, side, qp, idim, jdim);
         }
@@ -184,13 +175,12 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
         break;
       case 2:
         for (int qp = 0; qp < numSideQPs; ++qp) {
-          metric_det(cell, side, qp) = metric(cell, side, qp, 0, 0) * metric(cell, side, qp, 1, 1) -
-                                       metric(cell, side, qp, 0, 1) * metric(cell, side, qp, 1, 0);
+          metric_det(cell, side, qp) =
+              metric(cell, side, qp, 0, 0) * metric(cell, side, qp, 1, 1) - metric(cell, side, qp, 0, 1) * metric(cell, side, qp, 1, 0);
           w_measure(cell, side, qp)        = cub_weights(qp) * std::sqrt(metric_det(cell, side, qp));
           inv_metric(cell, side, qp, 0, 0) = metric(cell, side, qp, 1, 1) / metric_det(cell, side, qp);
           inv_metric(cell, side, qp, 1, 1) = metric(cell, side, qp, 0, 0) / metric_det(cell, side, qp);
-          inv_metric(cell, side, qp, 0, 1) = inv_metric(cell, side, qp, 1, 0) =
-              -metric(cell, side, qp, 0, 1) / metric_det(cell, side, qp);
+          inv_metric(cell, side, qp, 0, 1) = inv_metric(cell, side, qp, 1, 0) = -metric(cell, side, qp, 0, 1) / metric_det(cell, side, qp);
         }
         break;
       default: ALBANY_ABORT("Error! The dimension of the side should be 1 or 2.\n");
@@ -201,8 +191,7 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
         for (int ider = 0; ider < numSideDims; ++ider) {
           GradBF(cell, side, node, qp, ider) = 0;
           for (int jder = 0; jder < numSideDims; ++jder)
-            GradBF(cell, side, node, qp, ider) +=
-                inv_metric(cell, side, qp, ider, jder) * grad_at_cub_points(node, qp, jder);
+            GradBF(cell, side, node, qp, ider) += inv_metric(cell, side, qp, ider, jder) * grad_at_cub_points(node, qp, jder);
         }
       }
     }
@@ -217,19 +206,17 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
           Kokkos::createDynRankView(sideCoordVec.get_view(), "normal_lengths", numCells_, numSideQPs);
       Kokkos::DynRankView<MeshScalarT, PHX::Device> normals_view =
           Kokkos::createDynRankView(sideCoordVec.get_view(), "normals", numCells_, numSideQPs, numCellDims);
-      Kokkos::DynRankView<MeshScalarT, PHX::Device> jacobian_side = Kokkos::createDynRankView(
-          sideCoordVec.get_view(), "jacobian_side", numCells_, numSideQPs, numCellDims, numCellDims);
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> jacobian_side =
+          Kokkos::createDynRankView(sideCoordVec.get_view(), "jacobian_side", numCells_, numSideQPs, numCellDims, numCellDims);
       Kokkos::DynRankView<MeshScalarT, PHX::Device> physPointsSide =
           Kokkos::createDynRankView(sideCoordVec.get_view(), "physPointsSide", numCells_, numSideQPs, numCellDims);
       Kokkos::DynRankView<RealType, PHX::Device>    refPointsSide("refPointsSide", numSideQPs, numCellDims);
-      Kokkos::DynRankView<MeshScalarT, PHX::Device> physPointsCell =
-          Kokkos::createDynRankView(coordVec.get_view(), "XXX", numCells_, numNodes, numCellDims);
-      Kokkos::DynRankView<int, PHX::Device> cellVec = cellsOnSides[side];
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> physPointsCell = Kokkos::createDynRankView(coordVec.get_view(), "XXX", numCells_, numNodes, numCellDims);
+      Kokkos::DynRankView<int, PHX::Device>         cellVec        = cellsOnSides[side];
 
       for (std::size_t node = 0; node < numNodes; ++node)
         for (std::size_t dim = 0; dim < numCellDims; ++dim)
-          for (std::size_t iCell = 0; iCell < numCells_; ++iCell)
-            physPointsCell(iCell, node, dim) = coordVec(cellVec(iCell), node, dim);
+          for (std::size_t iCell = 0; iCell < numCells_; ++iCell) physPointsCell(iCell, node, dim) = coordVec(cellVec(iCell), node, dim);
 
       // Map side cubature points to the reference parent cell based on the
       // appropriate side (elem_side)
@@ -244,13 +231,11 @@ ComputeBasisFunctionsSide<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
 
       // scale normals (unity)
       Intrepid2::RealSpaceTools<PHX::Device>::vectorNorm(normal_lengths, normals_view, Intrepid2::NORM_TWO);
-      Intrepid2::FunctionSpaceTools<PHX::Device>::scalarMultiplyDataData(
-          normals_view, normal_lengths, normals_view, true);
+      Intrepid2::FunctionSpaceTools<PHX::Device>::scalarMultiplyDataData(normals_view, normal_lengths, normals_view, true);
 
       for (int icoor = 0; icoor < numCellDims; ++icoor)
         for (int qp = 0; qp < numSideQPs; ++qp)
-          for (std::size_t iCell = 0; iCell < numCells_; ++iCell)
-            normals(cellVec(iCell), side, qp, icoor) = normals_view(iCell, qp, icoor);
+          for (std::size_t iCell = 0; iCell < numCells_; ++iCell) normals(cellVec(iCell), side, qp, icoor) = normals_view(iCell, qp, icoor);
     }
   }
 }

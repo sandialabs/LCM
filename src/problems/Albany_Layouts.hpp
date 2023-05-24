@@ -17,23 +17,8 @@ namespace Albany {
  */
 struct Layouts
 {
-  Layouts(
-      int worksetSize,
-      int numVertices,
-      int numNodes,
-      int numQPts,
-      int numCellDim,
-      int vecDim  = -1,
-      int numFace = 0);
-  Layouts(
-      int worksetSize,
-      int numVertices,
-      int numNodes,
-      int numQPts,
-      int numSideDim,
-      int numSpaceDim,
-      int numSides,
-      int vecDim);
+  Layouts(int worksetSize, int numVertices, int numNodes, int numQPts, int numCellDim, int vecDim = -1, int numFace = 0);
+  Layouts(int worksetSize, int numVertices, int numNodes, int numQPts, int numSideDim, int numSpaceDim, int numSides, int vecDim);
 
   //! Data Layout for scalar quantity that lives at nodes
   Teuchos::RCP<PHX::DataLayout> node_scalar;

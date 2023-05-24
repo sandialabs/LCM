@@ -12,14 +12,10 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 NSForchheimerTerm<EvalT, Traits>::NSForchheimerTerm(Teuchos::ParameterList const& p)
     : V(p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      rho(p.get<std::string>("Density QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      phi(p.get<std::string>("Porosity QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      K(p.get<std::string>("Permeability QP Variable Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      F(p.get<std::string>("Forchheimer QP Variable Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      rho(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      phi(p.get<std::string>("Porosity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      K(p.get<std::string>("Permeability QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      F(p.get<std::string>("Forchheimer QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       ForchTerm(p.get<std::string>("Forchheimer Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"))
 
 {
@@ -36,7 +32,7 @@ NSForchheimerTerm<EvalT, Traits>::NSForchheimerTerm(Teuchos::ParameterList const
 
   this->addEvaluatedField(ForchTerm);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numCells = dims[0];
@@ -80,8 +76,7 @@ NSForchheimerTerm<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
       else
         normV(cell, qp) = 0.0;
       for (std::size_t i = 0; i < numDims; ++i) {
-        ForchTerm(cell, qp, i) =
-            phi(cell, qp) * rho(cell, qp) * F(cell, qp) * normV(cell, qp) * V(cell, qp, i) / std::sqrt(K(cell, qp));
+        ForchTerm(cell, qp, i) = phi(cell, qp) * rho(cell, qp) * F(cell, qp) * normV(cell, qp) * V(cell, qp, i) / std::sqrt(K(cell, qp));
       }
     }
   }

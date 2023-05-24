@@ -28,8 +28,7 @@ Albany::ContactManager::ContactManager(
 
   probDim = meshSpecs[0]->numDim;
 
-  moertelManager =
-      Teuchos::rcp(new MoertelT::ManagerT<ST, LO, Tpetra_GO, KokkosNode>(disc.getMapT()->getComm(), printLevel));
+  moertelManager = Teuchos::rcp(new MoertelT::ManagerT<ST, LO, Tpetra_GO, KokkosNode>(disc.getMapT()->getComm(), printLevel));
 
   if (probDim == 2) {
     oneD = true;
@@ -89,8 +88,7 @@ Albany::ContactManager::ContactManager(
   int const nonmortarside(0);
 
   int const number_of_mortar_pairs = masterSideNames.size();
-  ALBANY_ASSERT(
-      number_of_mortar_pairs == slaveSideNames.size(), "Input error: number of master and slave interfaces differ.");
+  ALBANY_ASSERT(number_of_mortar_pairs == slaveSideNames.size(), "Input error: number of master and slave interfaces differ.");
 
   int interface_ctr = 0;
 
@@ -147,8 +145,8 @@ Albany::ContactManager::processSS(
     std::ofstream&       stream)
 {
   // one interface per side set name
-  Teuchos::RCP<MoertelT::InterfaceT<ST, LO, Tpetra_GO, KokkosNode>> moertelInterface = Teuchos::rcp(
-      new MoertelT::InterfaceT<ST, LO, Tpetra_GO, KokkosNode>(ctr, oneD, disc.getMapT()->getComm(), printLevel));
+  Teuchos::RCP<MoertelT::InterfaceT<ST, LO, Tpetra_GO, KokkosNode>> moertelInterface =
+      Teuchos::rcp(new MoertelT::InterfaceT<ST, LO, Tpetra_GO, KokkosNode>(ctr, oneD, disc.getMapT()->getComm(), printLevel));
 
   const MOERTEL::Function::FunctionType primal = MOERTEL::Function::func_Linear1D;
   const MOERTEL::Function::FunctionType dual   = MOERTEL::Function::func_Linear1D /*func_Constant1D*/;
@@ -181,14 +179,14 @@ Albany::ContactManager::processSS(
 
       for (std::size_t side = 0; side < theSideSet.size(); ++side) {
         // Get the data that corresponds to the side.
-        int const elem_GID = theSideSet[side].elem_GID;        // GID of the element that contains the
-                                                               // master segment
-        int const elem_LID = theSideSet[side].elem_LID;        // LID (numbered from zero) id of the element
-                                                               // containing the master segment on this processor
-        int const elem_side = theSideSet[side].side_local_id;  // which edge of the element the
-                                                               // side is (cf. exodus manual)?
-        int const side_GID   = theSideSet[side].side_GID;      // Need a global id for each contact "edge / face"
-        int const elem_block = theSideSet[side].elem_ebIndex;  // which  element block is the element in?
+        int const elem_GID = theSideSet[side].elem_GID;                                // GID of the element that contains the
+                                                                                       // master segment
+        int const elem_LID = theSideSet[side].elem_LID;                                // LID (numbered from zero) id of the element
+                                                                                       // containing the master segment on this processor
+        int const elem_side = theSideSet[side].side_local_id;                          // which edge of the element the
+                                                                                       // side is (cf. exodus manual)?
+        int const                       side_GID     = theSideSet[side].side_GID;      // Need a global id for each contact "edge / face"
+        int const                       elem_block   = theSideSet[side].elem_ebIndex;  // which  element block is the element in?
         const CellTopologyData_Subcell& subcell_side = meshSpecs[elem_block]->ctd.side[elem_side];
         int                             numSideNodes = subcell_side.topology->node_count;
 
@@ -223,10 +221,8 @@ Albany::ContactManager::processSS(
           //          double const coords[] = { coordArray[3 * lnodeId],
           //               coordArray[3 * lnodeId + 1], coordArray[3 * lnodeid +
           //               2] }; // Moertel node is 3 coords
-          stream << "         node_LID = " << lnodeId << "   node_GID = " << gnodeId << "    node = " << node
-                 << std::endl;
-          stream << "         coords = " << coords[0] << ", " << coords[1] << ", " << coords[2] << " - " << std::endl
-                 << std::endl;
+          stream << "         node_LID = " << lnodeId << "   node_GID = " << gnodeId << "    node = " << node << std::endl;
+          stream << "         coords = " << coords[0] << ", " << coords[1] << ", " << coords[2] << " - " << std::endl << std::endl;
 
           // Build the Moertel node list corresponding to unique nodes along the
           // interface
@@ -246,8 +242,7 @@ Albany::ContactManager::processSS(
               list_of_dofgid.push_back(global_eq_id);
             }
 
-            MOERTEL::Node moertel_node(
-                gnodeId, coords, list_of_dofgid.size(), &list_of_dofgid[0], on_boundary, printLevel, 2);
+            MOERTEL::Node moertel_node(gnodeId, coords, list_of_dofgid.size(), &list_of_dofgid[0], on_boundary, printLevel, 2);
 
             std::cout << "Adding node: " << gnodeId << "  to interface: " << ctr << std::endl;
             moertelInterface->AddNode(moertel_node, contact_pair_id);

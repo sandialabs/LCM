@@ -46,9 +46,7 @@ field manager, and different evaluators are used in each element block.
  */
 
 template <typename EvalT, typename Traits>
-class Permittivity : public PHX::EvaluatorWithBaseImpl<Traits>,
-                     public PHX::EvaluatorDerived<EvalT, Traits>,
-                     public Sacado::ParameterAccessor<EvalT, SPL_Traits>
+class Permittivity : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>, public Sacado::ParameterAccessor<EvalT, SPL_Traits>
 {
  public:
   typedef typename EvalT::ScalarT     ScalarT;

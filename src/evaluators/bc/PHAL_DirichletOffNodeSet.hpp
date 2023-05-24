@@ -35,8 +35,7 @@ class DirichletOffNodeSet;
 // Residual
 // **************************************************************
 template <typename Traits>
-class DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>
-    : public DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
+class DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits> : public DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   DirichletOffNodeSet(Teuchos::ParameterList& p);
@@ -51,8 +50,7 @@ class DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits> : public DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   DirichletOffNodeSet(Teuchos::ParameterList& p);

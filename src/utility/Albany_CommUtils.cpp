@@ -11,8 +11,7 @@ namespace Albany {
 MPI_Comm
 getMpiCommFromTeuchosComm(Teuchos::RCP<Teuchos_Comm const>& tc)
 {
-  Teuchos::Ptr<const Teuchos::MpiComm<int>> mpiComm =
-      Teuchos::ptr_dynamic_cast<const Teuchos::MpiComm<int>>(Teuchos::ptrFromRef(*tc));
+  Teuchos::Ptr<const Teuchos::MpiComm<int>> mpiComm = Teuchos::ptr_dynamic_cast<const Teuchos::MpiComm<int>>(Teuchos::ptrFromRef(*tc));
   return *mpiComm->getRawMpiComm();
 }
 
@@ -34,8 +33,7 @@ getDefaultComm()
 Teuchos::RCP<Teuchos_Comm const>
 createTeuchosCommFromThyraComm(const Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>& tc_in)
 {
-  const Teuchos::RCP<const Teuchos::MpiComm<Teuchos::Ordinal>> mpiCommIn =
-      Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<Teuchos::Ordinal>>(tc_in);
+  const Teuchos::RCP<const Teuchos::MpiComm<Teuchos::Ordinal>> mpiCommIn = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<Teuchos::Ordinal>>(tc_in);
   if (nonnull(mpiCommIn)) {
     return Teuchos::createMpiComm<int>(mpiCommIn->getRawMpiComm());
   }
@@ -49,8 +47,7 @@ createTeuchosCommFromThyraComm(const Teuchos::RCP<const Teuchos::Comm<Teuchos::O
 Teuchos::RCP<const Teuchos::Comm<Teuchos::Ordinal>>
 createThyraCommFromTeuchosComm(const Teuchos::RCP<Teuchos_Comm const>& tc_in)
 {
-  const Teuchos::RCP<const Teuchos::MpiComm<int>> mpiCommIn =
-      Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(tc_in);
+  const Teuchos::RCP<const Teuchos::MpiComm<int>> mpiCommIn = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(tc_in);
   if (nonnull(mpiCommIn)) {
     return Teuchos::createMpiComm<Teuchos::Ordinal>(mpiCommIn->getRawMpiComm());
   }

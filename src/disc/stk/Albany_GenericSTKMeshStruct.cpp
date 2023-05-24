@@ -41,11 +41,7 @@
 namespace {
 
 void
-only_keep_connectivity_to_specified_ranks(
-    stk::mesh::BulkData&  mesh,
-    stk::mesh::Entity     entity,
-    stk::mesh::EntityRank keeper1,
-    stk::mesh::EntityRank keeper2)
+only_keep_connectivity_to_specified_ranks(stk::mesh::BulkData& mesh, stk::mesh::Entity entity, stk::mesh::EntityRank keeper1, stk::mesh::EntityRank keeper2)
 {
   size_t num_ranks = mesh.mesh_meta_data().entity_rank_count();
 
@@ -172,45 +168,40 @@ GenericSTKMeshStruct::SetupFieldData(
   Teuchos::Array<Teuchos::Array<std::string>> solution_vector;
   solution_vector.resize(num_time_deriv + 1);
   bool user_specified_solution_components = false;
-  solution_vector[0] = params->get<Teuchos::Array<std::string>>("Solution Vector Components", default_solution_vector);
+  solution_vector[0]                      = params->get<Teuchos::Array<std::string>>("Solution Vector Components", default_solution_vector);
 
   if (solution_vector[0].length() > 0) user_specified_solution_components = true;
 
   if (num_time_deriv >= 1) {
-    solution_vector[1] =
-        params->get<Teuchos::Array<std::string>>("SolutionDot Vector Components", default_solution_vector);
+    solution_vector[1] = params->get<Teuchos::Array<std::string>>("SolutionDot Vector Components", default_solution_vector);
     if (solution_vector[1].length() > 0) user_specified_solution_components = true;
   }
 
   if (num_time_deriv >= 2) {
-    solution_vector[2] =
-        params->get<Teuchos::Array<std::string>>("SolutionDotDot Vector Components", default_solution_vector);
+    solution_vector[2] = params->get<Teuchos::Array<std::string>>("SolutionDotDot Vector Components", default_solution_vector);
     if (solution_vector[2].length() > 0) user_specified_solution_components = true;
   }
 
   Teuchos::Array<std::string> default_residual_vector;  // Empty
-  Teuchos::Array<std::string> residual_vector =
-      params->get<Teuchos::Array<std::string>>("Residual Vector Components", default_residual_vector);
+  Teuchos::Array<std::string> residual_vector = params->get<Teuchos::Array<std::string>>("Residual Vector Components", default_residual_vector);
 
   // Build the usual Albany fields unless the user explicitly specifies the
   // residual or solution vector layout
   if (user_specified_solution_components && (residual_vector.length() > 0)) {
     if (interleavedOrdering)
-      this->fieldContainer = Teuchos::rcp(new MultiSTKFieldContainer<true>(
-          params, metaData, bulkData, neq, req, numDim, sis, solution_vector, residual_vector));
+      this->fieldContainer =
+          Teuchos::rcp(new MultiSTKFieldContainer<true>(params, metaData, bulkData, neq, req, numDim, sis, solution_vector, residual_vector));
     else
-      this->fieldContainer = Teuchos::rcp(new MultiSTKFieldContainer<false>(
-          params, metaData, bulkData, neq, req, numDim, sis, solution_vector, residual_vector));
+      this->fieldContainer =
+          Teuchos::rcp(new MultiSTKFieldContainer<false>(params, metaData, bulkData, neq, req, numDim, sis, solution_vector, residual_vector));
 
   }
 
   else {
     if (interleavedOrdering)
-      this->fieldContainer =
-          Teuchos::rcp(new OrdinarySTKFieldContainer<true>(params, metaData, bulkData, neq, req, numDim, sis));
+      this->fieldContainer = Teuchos::rcp(new OrdinarySTKFieldContainer<true>(params, metaData, bulkData, neq, req, numDim, sis));
     else
-      this->fieldContainer =
-          Teuchos::rcp(new OrdinarySTKFieldContainer<false>(params, metaData, bulkData, neq, req, numDim, sis));
+      this->fieldContainer = Teuchos::rcp(new OrdinarySTKFieldContainer<false>(params, metaData, bulkData, neq, req, numDim, sis));
   }
 
   // Exodus is only for 2D and 3D. Have 1D version as well
@@ -329,7 +320,7 @@ GenericSTKMeshStruct::buildUniformRefiner()
 
   if (enrich.length()) checkInput("enrich", enrich, enrich_options);
 
-  refinerPattern = stk::adapt::UniformRefinerPatternBase::createPattern(refine, enrich, convert, *eMesh, block_names);
+  refinerPattern               = stk::adapt::UniformRefinerPatternBase::createPattern(refine, enrich, convert, *eMesh, block_names);
   uniformRefinementInitialized = true;
 
   return true;
@@ -378,9 +369,7 @@ GenericSTKMeshStruct::buildLocalRefiner()
 }
 
 void
-GenericSTKMeshStruct::cullSubsetParts(
-    std::vector<std::string>&                ssNames,
-    std::map<std::string, stk::mesh::Part*>& partVec)
+GenericSTKMeshStruct::cullSubsetParts(std::vector<std::string>& ssNames, std::map<std::string, stk::mesh::Part*>& partVec)
 {
   /*
   When dealing with sideset lists, it is common to have parts that are subsets
@@ -463,8 +452,8 @@ GenericSTKMeshStruct::computeAddlConnectivity()
     stk::mesh::create_adjacent_entities(*bulkData, add_parts);
     stk::mesh::EntityRank          sideRank = metaData->side_rank();
     std::vector<stk::mesh::Entity> element_lst;
-    stk::mesh::Selector select_owned_or_shared = metaData->locally_owned_part() | metaData->globally_shared_part();
-    stk::mesh::Selector select_owned           = metaData->locally_owned_part();
+    stk::mesh::Selector            select_owned_or_shared = metaData->locally_owned_part() | metaData->globally_shared_part();
+    stk::mesh::Selector            select_owned           = metaData->locally_owned_part();
 
     // Loop through only on-processor elements as we are just deleting entities
     // inside the element
@@ -489,8 +478,7 @@ GenericSTKMeshStruct::computeAddlConnectivity()
       for (unsigned int i = 0; i < face_lst.size(); ++i) {
         stk::mesh::Entity face = face_lst[i];
 
-        only_keep_connectivity_to_specified_ranks(
-            *bulkData, face, stk::topology::ELEMENT_RANK, stk::topology::EDGE_RANK);
+        only_keep_connectivity_to_specified_ranks(*bulkData, face, stk::topology::ELEMENT_RANK, stk::topology::EDGE_RANK);
       }
     }
 
@@ -576,9 +564,7 @@ GenericSTKMeshStruct::rebalanceInitialMeshT(Teuchos::RCP<Teuchos::Comm<int> cons
 }
 
 void
-GenericSTKMeshStruct::rebalanceAdaptedMeshT(
-    const Teuchos::RCP<Teuchos::ParameterList>&   params_,
-    Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
+GenericSTKMeshStruct::rebalanceAdaptedMeshT(const Teuchos::RCP<Teuchos::ParameterList>& params_, Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
 {
 // Zoltan is required here
 #if defined(ALBANY_ZOLTAN)
@@ -597,11 +583,9 @@ GenericSTKMeshStruct::rebalanceAdaptedMeshT(
 
   if (comm->getRank() == 0) {
     std::cout << "Before rebal nelements " << comm->getRank() << "  "
-              << stk::mesh::count_selected_entities(owned_selector, bulkData->buckets(stk::topology::ELEMENT_RANK))
-              << endl;
+              << stk::mesh::count_selected_entities(owned_selector, bulkData->buckets(stk::topology::ELEMENT_RANK)) << endl;
 
-    std::cout << "Before rebal " << comm->getRank() << "  "
-              << stk::mesh::count_selected_entities(owned_selector, bulkData->buckets(stk::topology::NODE_RANK))
+    std::cout << "Before rebal " << comm->getRank() << "  " << stk::mesh::count_selected_entities(owned_selector, bulkData->buckets(stk::topology::NODE_RANK))
               << endl;
   }
 
@@ -675,13 +659,11 @@ GenericSTKMeshStruct::checkNodeSetsFromSideSetsIntegrity()
   for (auto ssn : m_nodesets_from_sidesets) {
     // Fetch the part
     auto it = ssPartVec.find(ssn);
-    ALBANY_PANIC(
-        it == ssPartVec.end(),
-        "Error! Side set " << ssn << " not found. This error should NEVER occurr though. Bug?\n");
+    ALBANY_PANIC(it == ssPartVec.end(), "Error! Side set " << ssn << " not found. This error should NEVER occurr though. Bug?\n");
     stk::mesh::Part* ssPart = it->second;
 
     // Extract sides
-    stk::mesh::Selector selector(*ssPart & (metaData->locally_owned_part() | metaData->globally_shared_part()));
+    stk::mesh::Selector            selector(*ssPart & (metaData->locally_owned_part() | metaData->globally_shared_part()));
     std::vector<stk::mesh::Entity> sides;
     stk::mesh::get_selected_entities(selector, bulkData->buckets(metaData->side_rank()), sides);
 
@@ -705,10 +687,7 @@ GenericSTKMeshStruct::initializeSideSetMeshSpecs(const Teuchos::RCP<Teuchos_Comm
     for (auto ssName : ms->ssNames) {
       // Get the part
       stk::mesh::Part* part = metaData->get_part(ssName);
-      ALBANY_PANIC(
-          part == nullptr,
-          "Error! One of the stored meshSpecs claims to have sideset " + ssName +
-              " which, however, is not a part of the mesh.\n");
+      ALBANY_PANIC(part == nullptr, "Error! One of the stored meshSpecs claims to have sideset " + ssName + " which, however, is not a part of the mesh.\n");
       stk::topology        stk_topo_data = metaData->get_topology(*part);
       shards::CellTopology shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
       const auto*          ctd           = shards_ctd.getCellTopologyData();
@@ -761,8 +740,7 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(const Teuchos::RCP<Teuchos_Co
       Teuchos::RCP<AbstractMeshStruct> ss_mesh;
       std::string const&               ss_name = sideSets[i];
       params_ss                                = Teuchos::rcp(new Teuchos::ParameterList(ssd_list.sublist(ss_name)));
-      if (!params_ss->isParameter("Number Of Time Derivatives"))
-        params_ss->set<int>("Number Of Time Derivatives", num_time_deriv);
+      if (!params_ss->isParameter("Number Of Time Derivatives")) params_ss->set<int>("Number Of Time Derivatives", num_time_deriv);
 
       std::string method = params_ss->get<std::string>("Method");
       if (method == "SideSetSTK") {
@@ -772,8 +750,7 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(const Teuchos::RCP<Teuchos_Co
             "Error! So far, side set mesh extraction is allowed only from STK "
             "meshes with 1 element block.\n");
 
-        this->sideSetMeshStructs[ss_name] =
-            Teuchos::rcp(new SideSetSTKMeshStruct(*this->meshSpecs[0], params_ss, comm));
+        this->sideSetMeshStructs[ss_name] = Teuchos::rcp(new SideSetSTKMeshStruct(*this->meshSpecs[0], params_ss, comm));
       } else {
         // We must check whether a side mesh was already created elsewhere.
         // If the mesh already exists, we do nothing, and we ASSUME it is a
@@ -782,18 +759,14 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(const Teuchos::RCP<Teuchos_Co
         if (this->sideSetMeshStructs.find(ss_name) == this->sideSetMeshStructs.end()) {
           ss_mesh                           = DiscretizationFactory::createMeshStruct(params_ss, adaptParams, comm);
           this->sideSetMeshStructs[ss_name] = Teuchos::rcp_dynamic_cast<AbstractSTKMeshStruct>(ss_mesh, false);
-          ALBANY_PANIC(
-              this->sideSetMeshStructs[ss_name] == Teuchos::null,
-              "Error! Could not cast side mesh to AbstractSTKMeshStruct.\n");
+          ALBANY_PANIC(this->sideSetMeshStructs[ss_name] == Teuchos::null, "Error! Could not cast side mesh to AbstractSTKMeshStruct.\n");
         }
       }
 
       // Checking that the side meshes have the correct dimension (in case they
       // were loaded from file, and the user mistakenly gave the wrong file
       // name)
-      ALBANY_PANIC(
-          sideDim != this->sideSetMeshStructs[ss_name]->numDim,
-          "Error! Mesh on side " << ss_name << " has the wrong dimension.\n");
+      ALBANY_PANIC(sideDim != this->sideSetMeshStructs[ss_name]->numDim, "Error! Mesh on side " << ss_name << " has the wrong dimension.\n");
 
       // Update the side set mesh specs pointer in the mesh specs of this mesh
       this->meshSpecs[0]->sideSetMeshSpecs[ss_name] = this->sideSetMeshStructs[ss_name]->getMeshSpecs();
@@ -802,19 +775,15 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(const Teuchos::RCP<Teuchos_Co
       // We need to create the 2D cell -> (3D cell, side_node_ids) map in the
       // side mesh now
       typedef AbstractSTKFieldContainer::IntScalarFieldType ISFT;
-      ISFT* side_to_cell_map = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<ISFT>(
-          stk::topology::ELEM_RANK, "side_to_cell_map");
-      stk::mesh::put_field_on_mesh(
-          *side_to_cell_map, this->sideSetMeshStructs[ss_name]->metaData->universal_part(), 1, nullptr);
+      ISFT* side_to_cell_map = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<ISFT>(stk::topology::ELEM_RANK, "side_to_cell_map");
+      stk::mesh::put_field_on_mesh(*side_to_cell_map, this->sideSetMeshStructs[ss_name]->metaData->universal_part(), 1, nullptr);
       stk::io::set_field_role(*side_to_cell_map, Ioss::Field::TRANSIENT);
       // We need to create the 2D cell -> (3D cell, side_node_ids) map in the
       // side mesh now
-      int const num_nodes = sideSetMeshStructs[ss_name]->getMeshSpecs()[0]->ctd.node_count;
+      int const                                             num_nodes = sideSetMeshStructs[ss_name]->getMeshSpecs()[0]->ctd.node_count;
       typedef AbstractSTKFieldContainer::IntVectorFieldType IVFT;
-      IVFT*                                                 side_nodes_ids =
-          &this->sideSetMeshStructs[ss_name]->metaData->declare_field<IVFT>(stk::topology::ELEM_RANK, "side_nodes_ids");
-      stk::mesh::put_field_on_mesh(
-          *side_nodes_ids, this->sideSetMeshStructs[ss_name]->metaData->universal_part(), num_nodes, nullptr);
+      IVFT* side_nodes_ids = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<IVFT>(stk::topology::ELEM_RANK, "side_nodes_ids");
+      stk::mesh::put_field_on_mesh(*side_nodes_ids, this->sideSetMeshStructs[ss_name]->metaData->universal_part(), num_nodes, nullptr);
       stk::io::set_field_role(*side_nodes_ids, Ioss::Field::TRANSIENT);
 
       // If requested, we ignore the side maps already stored in the imported
@@ -877,10 +846,7 @@ GenericSTKMeshStruct::finalizeSideSetMeshStructs(
 }
 
 void
-GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
-    std::string const&              sideSetName,
-    std::map<GO, GO>&               sideMap,
-    std::map<GO, std::vector<int>>& sideNodeMap)
+GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetName, std::map<GO, GO>& sideMap, std::map<GO, std::vector<int>>& sideNodeMap)
 {
   ALBANY_PANIC(
       sideSetMeshStructs.find(sideSetName) == sideSetMeshStructs.end(),
@@ -922,10 +888,8 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
   int                                                   num_sides;
   typedef AbstractSTKFieldContainer::IntScalarFieldType ISFT;
   typedef AbstractSTKFieldContainer::IntVectorFieldType IVFT;
-  ISFT*                                                 side_to_cell_map =
-      this->sideSetMeshStructs[sideSetName]->metaData->get_field<ISFT>(stk::topology::ELEM_RANK, "side_to_cell_map");
-  IVFT* side_nodes_ids_map =
-      this->sideSetMeshStructs[sideSetName]->metaData->get_field<IVFT>(stk::topology::ELEM_RANK, "side_nodes_ids");
+  ISFT* side_to_cell_map   = this->sideSetMeshStructs[sideSetName]->metaData->get_field<ISFT>(stk::topology::ELEM_RANK, "side_to_cell_map");
+  IVFT* side_nodes_ids_map = this->sideSetMeshStructs[sideSetName]->metaData->get_field<IVFT>(stk::topology::ELEM_RANK, "side_nodes_ids");
   std::vector<stk::mesh::EntityId> cell2D_nodes_ids(num_nodes), side3D_nodes_ids(num_nodes);
   const stk::mesh::Entity*         side3D_nodes;
   const stk::mesh::Entity*         cell2D_nodes;
@@ -965,7 +929,7 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
       sideNodeMap[side3D_GID].resize(num_nodes);
       cell2D_nodes = side_mesh->bulkData->begin_nodes(cell2D);
       for (int i(0); i < num_nodes; ++i) {
-        auto it = std::find(side3D_nodes_ids.begin(), side3D_nodes_ids.end(), side_nodes_ids[i]);
+        auto it                                                              = std::find(side3D_nodes_ids.begin(), side3D_nodes_ids.end(), side_nodes_ids[i]);
         sideNodeMap[side3D_GID][std::distance(side3D_nodes_ids.begin(), it)] = i;
       }
     }
@@ -984,9 +948,7 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
     stk::mesh::Entity side3D = bulkData->get_entity(SIDE_RANK, side3D_GID + 1);
 
     // Safety check
-    ALBANY_PANIC(
-        bulkData->num_elements(side3D) != 1,
-        "Error! Side " << side3D_GID << " has more/less than 1 adjacent element.\n");
+    ALBANY_PANIC(bulkData->num_elements(side3D) != 1, "Error! Side " << side3D_GID << " has more/less than 1 adjacent element.\n");
 
     side_cells               = bulkData->begin_elements(side3D);
     stk::mesh::Entity cell3D = side_cells[0];
@@ -1006,8 +968,8 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(
     }
 
     for (int i(0); i < num_nodes; ++i) {
-      auto it                    = std::find(cell2D_nodes_ids.begin(), cell2D_nodes_ids.end(), side3D_nodes_ids[i]);
-      sideNodeMap[side3D_GID][i] = std::distance(cell2D_nodes_ids.begin(), it);
+      auto it                                                     = std::find(cell2D_nodes_ids.begin(), cell2D_nodes_ids.end(), side3D_nodes_ids[i]);
+      sideNodeMap[side3D_GID][i]                                  = std::distance(cell2D_nodes_ids.begin(), it);
       side_nodes_ids[std::distance(cell2D_nodes_ids.begin(), it)] = side3D_nodes_ids[i];
     }
   }
@@ -1029,9 +991,7 @@ GenericSTKMeshStruct::printParts(stk::mesh::MetaData* metaData)
 }
 
 void
-GenericSTKMeshStruct::loadRequiredInputFields(
-    const AbstractFieldContainer::FieldContainerRequirements& req,
-    const Teuchos::RCP<Teuchos_Comm const>&                   comm)
+GenericSTKMeshStruct::loadRequiredInputFields(const AbstractFieldContainer::FieldContainerRequirements& req, const Teuchos::RCP<Teuchos_Comm const>& comm)
 {
   Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
   out->setProcRankAndSize(comm->getRank(), comm->getSize());
@@ -1040,12 +1000,10 @@ GenericSTKMeshStruct::loadRequiredInputFields(
   *out << "[GenericSTKMeshStruct] Processing field requirements...\n";
 
   // Load required fields
-  stk::mesh::Selector select_owned_in_part =
-      stk::mesh::Selector(metaData->universal_part()) & stk::mesh::Selector(metaData->locally_owned_part());
+  stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData->universal_part()) & stk::mesh::Selector(metaData->locally_owned_part());
 
-  stk::mesh::Selector select_overlap_in_part =
-      stk::mesh::Selector(metaData->universal_part()) &
-      (stk::mesh::Selector(metaData->locally_owned_part()) | stk::mesh::Selector(metaData->globally_shared_part()));
+  stk::mesh::Selector select_overlap_in_part = stk::mesh::Selector(metaData->universal_part()) &
+                                               (stk::mesh::Selector(metaData->locally_owned_part()) | stk::mesh::Selector(metaData->globally_shared_part()));
 
   std::vector<stk::mesh::Entity> nodes, elems;
   stk::mesh::get_selected_entities(select_overlap_in_part, bulkData->buckets(stk::topology::NODE_RANK), nodes);
@@ -1172,8 +1130,7 @@ GenericSTKMeshStruct::loadRequiredInputFields(
       *out << "  - Skipping field '" << fname << "' since it's listed as present in the mesh.\n";
       continue;
     } else {
-      ALBANY_PANIC(
-          forigin != "File", "Error! 'Field Origin' for field '" << fname << "' must be one of 'File' or 'Mesh'.\n");
+      ALBANY_PANIC(forigin != "File", "Error! 'Field Origin' for field '" << fname << "' must be one of 'File' or 'Mesh'.\n");
     }
 
     // The field is not already present (with updated values) in the mesh, and
@@ -1296,8 +1253,7 @@ GenericSTKMeshStruct::loadRequiredInputFields(
     }
 
     ALBANY_PANIC(
-        scalar_field == 0 && vector_field == 0 && tensor_field == 0,
-        "Error! Field " << fname << " not present (perhaps is not '" << ftype << "'?).\n");
+        scalar_field == 0 && vector_field == 0 && tensor_field == 0, "Error! Field " << fname << " not present (perhaps is not '" << ftype << "'?).\n");
 
     stk::mesh::EntityId gid;
     LO                  lid;
@@ -1477,8 +1433,7 @@ GenericSTKMeshStruct::fillField(
 
     for (int iv = 0; iv < randomize.size(); ++iv) {
       if (randomize[iv] == "false" || randomize[iv] == "no") {
-        *out << "    - Using constant value " << values[iv] << " for component " << iv
-             << ", which was marked as not random.\n";
+        *out << "    - Using constant value " << values[iv] << " for component " << iv << ", which was marked as not random.\n";
         field_mv->col(iv)->assign(values[iv]);
       }
     }
@@ -1586,8 +1541,7 @@ GenericSTKMeshStruct::readScalarFileSerial(
   ALBANY_PANIC(
       numNodes != nonConstView.size(),
       "Error in GenericSTKMeshStruct: Number of nodes in file " << fname << " (" << numNodes << ") "
-                                                                << "is different from the number expected ("
-                                                                << nonConstView.size() << ").\n");
+                                                                << "is different from the number expected (" << nonConstView.size() << ").\n");
 
   for (GO i = 0; i < numNodes; i++) {
     ifile >> nonConstView[i];
@@ -1621,8 +1575,7 @@ GenericSTKMeshStruct::readVectorFileSerial(
     ALBANY_PANIC(
         numNodes != nonConstView[0].size(),
         "Error in GenericSTKMeshStruct: Number of nodes in file " << fname << " (" << numNodes << ") "
-                                                                  << "is different from the number expected ("
-                                                                  << nonConstView[0].size() << ").\n");
+                                                                  << "is different from the number expected (" << nonConstView[0].size() << ").\n");
 
     for (int icomp = 0; icomp < numComponents; ++icomp) {
       auto comp_view = nonConstView[icomp];
@@ -1658,15 +1611,13 @@ GenericSTKMeshStruct::readLayeredScalarFileSerial(
     ALBANY_PANIC(
         numNodes != nonConstView[0].size(),
         "Error in GenericSTKMeshStruct: Number of nodes in file " << fname << " (" << numNodes << ") "
-                                                                  << "is different from the number expected ("
-                                                                  << nonConstView[0].size() << ").\n");
+                                                                  << "is different from the number expected (" << nonConstView[0].size() << ").\n");
     ALBANY_PANIC(
         numLayers != normalizedLayersCoords.size(),
-        "Error in GenericSTKMeshStruct: Number of layers in file "
-            << fname << " (" << numLayers << ") "
-            << "is different from the number expected (" << normalizedLayersCoords.size() << ")."
-            << " To fix this, please specify the correct layered data "
-               "dimension when you register the state.\n");
+        "Error in GenericSTKMeshStruct: Number of layers in file " << fname << " (" << numLayers << ") "
+                                                                   << "is different from the number expected (" << normalizedLayersCoords.size() << ")."
+                                                                   << " To fix this, please specify the correct layered data "
+                                                                      "dimension when you register the state.\n");
 
     for (size_t il = 0; il < numLayers; ++il) {
       ifile >> normalizedLayersCoords[il];
@@ -1710,8 +1661,7 @@ GenericSTKMeshStruct::readLayeredVectorFileSerial(
     ALBANY_PANIC(
         numNodes != nonConstView[0].size(),
         "Error in GenericSTKMeshStruct: Number of nodes in file " << fname << " (" << numNodes << ") "
-                                                                  << "is different from the number expected ("
-                                                                  << nonConstView[0].size() << ").\n");
+                                                                  << "is different from the number expected (" << nonConstView[0].size() << ").\n");
 
     normalizedLayersCoords.resize(numLayers);
     for (int il = 0; il < numLayers; ++il) {
@@ -1778,10 +1728,8 @@ GenericSTKMeshStruct::checkFieldIsInMesh(std::string const& fname, std::string c
           "Error! The field '" << fname
                                << "' in the mesh has different rank or dimensions than the ones "
                                   "specified\n"
-                               << " Rank required: " << entity_rank
-                               << ", rank of field in mesh: " << (*f)->entity_rank() << "\n"
-                               << " Dimension required: " << dim
-                               << ", dimension of field in mesh: " << (*f)->field_array_rank() + 1 << "\n");
+                               << " Rank required: " << entity_rank << ", rank of field in mesh: " << (*f)->entity_rank() << "\n"
+                               << " Dimension required: " << dim << ", dimension of field in mesh: " << (*f)->field_array_rank() + 1 << "\n");
     } else
       ALBANY_ABORT(
           "Error! The field '" << fname << "' was not found in the mesh.\n"
@@ -1818,8 +1766,7 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
   ;
   validPL->set<std::string>("Cell Topology", "Quad", "Quad or Tri Cell Topology");
   validPL->set<int>("Number Of Time Derivatives", 1, "Number of time derivatives in use in the problem");
-  validPL->set<std::string>(
-      "Exodus Output File Name", "", "Request exodus output to given file name. Requires SEACAS build");
+  validPL->set<std::string>("Exodus Output File Name", "", "Request exodus output to given file name. Requires SEACAS build");
   validPL->set<std::string>(
       "Exodus Solution Name",
       "",
@@ -1841,21 +1788,17 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
       "Name of residual output vector written to Exodus file. Requires SEACAS "
       "build");
 #if defined(ALBANY_DTK)
-  validPL->set<std::string>(
-      "Exodus Solution DTK Name", "", "Name of solution dtk written to Exodus file. Requires SEACAS build");
-  validPL->set<std::string>(
-      "Exodus SolutionDot DTK Name", "", "Name of solution_dot dtk written to Exodus file. Requires SEACAS build");
+  validPL->set<std::string>("Exodus Solution DTK Name", "", "Name of solution dtk written to Exodus file. Requires SEACAS build");
+  validPL->set<std::string>("Exodus SolutionDot DTK Name", "", "Name of solution_dot dtk written to Exodus file. Requires SEACAS build");
   validPL->set<std::string>(
       "Exodus SolutionDotDot DTK Name",
       "",
       "Name of solution_dotdot dtk written to Exodus file. Requires SEACAS "
       "build");
 #endif
-  validPL->set<bool>(
-      "Output DTK Field to Exodus", true, "Boolean indicating whether to write dtk field to exodus file");
+  validPL->set<bool>("Output DTK Field to Exodus", true, "Boolean indicating whether to write dtk field to exodus file");
   validPL->set<int>("Exodus Write Interval", 3, "Step interval to write solution data to Exodus file");
-  validPL->set<std::string>(
-      "NetCDF Output File Name", "", "Request NetCDF output to given file name. Requires SEACAS build");
+  validPL->set<std::string>("NetCDF Output File Name", "", "Request NetCDF output to given file name. Requires SEACAS build");
   validPL->set<int>("NetCDF Write Interval", 1, "Step interval to write solution data to NetCDF file");
   validPL->set<int>(
       "NetCDF Output Number of Latitudes",
@@ -1877,8 +1820,7 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
   validPL->set<int>("Workset Size", DEFAULT_WORKSET_SIZE, "Upper bound on workset (bucket) size");
   validPL->set<bool>("Use Automatic Aura", false, "Use automatic aura with BulkData");
   validPL->set<bool>("Interleaved Ordering", true, "Flag for interleaved or blocked unknown ordering");
-  validPL->set<bool>(
-      "Separate Evaluators by Element Block", false, "Flag for different evaluation trees for each Element Block");
+  validPL->set<bool>("Separate Evaluators by Element Block", false, "Flag for different evaluation trees for each Element Block");
   validPL->set<std::string>(
       "Transform Type",
       "None",
@@ -1912,10 +1854,7 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
   validPL->set<double>("x-shift", 0.0, "Value by which to shift domain in positive x-direction");
   validPL->set<double>("y-shift", 0.0, "Value by which to shift domain in positive y-direction");
   validPL->set<double>("z-shift", 0.0, "Value by which to shift domain in positive z-direction");
-  validPL->set<Teuchos::Array<double>>(
-      "Betas BL Transform",
-      Teuchos::tuple<double>(0.0, 0.0, 0.0),
-      "Beta parameters for Tanh Boundary Layer transform type");
+  validPL->set<Teuchos::Array<double>>("Betas BL Transform", Teuchos::tuple<double>(0.0, 0.0, 0.0), "Beta parameters for Tanh Boundary Layer transform type");
 
   validPL->set<bool>(
       "Contiguous IDs",
@@ -1925,8 +1864,7 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
                       // mesh
 
   Teuchos::Array<std::string> defaultFields;
-  validPL->set<Teuchos::Array<std::string>>(
-      "Restart Fields", defaultFields, "Fields to pick up from the restart file when restarting");
+  validPL->set<Teuchos::Array<std::string>>("Restart Fields", defaultFields, "Fields to pick up from the restart file when restarting");
   validPL->set<Teuchos::Array<std::string>>(
       "Solution Vector Components",
       defaultFields,
@@ -1950,8 +1888,7 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
 
   validPL->set<bool>("Use Serial Mesh", false, "Read in a single mesh on PE 0 and rebalance");
   validPL->set<bool>("Disable Exodus Output Initial Time", false, "Flag to disable Exodus output at initial time");
-  validPL->set<bool>(
-      "Transfer Solution to Coordinates", false, "Copies the solution vector to the coordinates for output");
+  validPL->set<bool>("Transfer Solution to Coordinates", false, "Copies the solution vector to the coordinates for output");
 
   validPL->set<bool>("Set All Parts IO", false, "If true, all parts are marked as io parts");
   validPL->set<bool>("Use Serial Mesh", false, "Read in a single mesh on PE 0 and rebalance");
@@ -1974,12 +1911,9 @@ GenericSTKMeshStruct::getValidGenericSTKParameters(std::string listname) const
 
   // Uniform percept adaptation of input mesh prior to simulation
 
-  validPL->set<std::string>(
-      "STK Initial Refine", "", "stk::percept refinement option to apply after the mesh is input");
-  validPL->set<std::string>(
-      "STK Initial Enrich", "", "stk::percept enrichment option to apply after the mesh is input");
-  validPL->set<std::string>(
-      "STK Initial Convert", "", "stk::percept conversion option to apply after the mesh is input");
+  validPL->set<std::string>("STK Initial Refine", "", "stk::percept refinement option to apply after the mesh is input");
+  validPL->set<std::string>("STK Initial Enrich", "", "stk::percept enrichment option to apply after the mesh is input");
+  validPL->set<std::string>("STK Initial Convert", "", "stk::percept conversion option to apply after the mesh is input");
   validPL->set<bool>("Rebalance Mesh", false, "Parallel re-load balance initial mesh after generation");
   validPL->set<int>("Number of Refinement Passes", 1, "Number of times to apply the refinement process");
 

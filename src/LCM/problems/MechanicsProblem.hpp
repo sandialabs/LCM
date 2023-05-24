@@ -89,9 +89,7 @@ class MechanicsProblem : public AbstractProblem
   /// Retrieve the state data
   ///
   void
-  getAllocatedStates(
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> old_state,
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> new_state) const;
+  getAllocatedStates(Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> old_state, Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> new_state) const;
 
   ///
   /// Add a custom NOX Status Test (for example, to trigger a global load step
@@ -161,12 +159,7 @@ class MechanicsProblem : public AbstractProblem
   /// Accessor for variable type
   ///
   void
-  getVariableType(
-      Teuchos::ParameterList& param_list,
-      std::string const&      default_type,
-      MECH_VAR_TYPE&          variable_type,
-      bool&                   have_variable,
-      bool&                   have_equation);
+  getVariableType(Teuchos::ParameterList& param_list, std::string const& default_type, MECH_VAR_TYPE& variable_type, bool& have_variable, bool& have_equation);
 
   ///
   /// Conversion from enum to string
@@ -316,15 +309,8 @@ class MechanicsProblem : public AbstractProblem
 
   std::vector<std::string> variables_problem_ = {"Displacement"};
 
-  std::vector<std::string> variables_auxiliary_ = {
-      "Temperature",
-      "ACE Temperature",
-      "DislocationDensity",
-      "Pore Pressure",
-      "Transport",
-      "HydroStress",
-      "Damage",
-      "Stabilized Pressure"};
+  std::vector<std::string> variables_auxiliary_ =
+      {"Temperature", "ACE Temperature", "DislocationDensity", "Pore Pressure", "Transport", "HydroStress", "Damage", "Stabilized Pressure"};
 
 };  // class MechanicsProblem
 

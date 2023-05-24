@@ -557,15 +557,7 @@ class ConnectivityArray
   /// \param ierr Error code to be set by function.
   ///
   static void
-  getObjectList(
-      void*         data,
-      int           sizeGID,
-      int           sizeLID,
-      ZOLTAN_ID_PTR globalID,
-      ZOLTAN_ID_PTR localID,
-      int           wgt_dim,
-      float*        obj_wgts,
-      int*          ierr);
+  getObjectList(void* data, int sizeGID, int sizeLID, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID, int wgt_dim, float* obj_wgts, int* ierr);
 
   ///
   /// Zoltan interface query function that returns a vector of geometry
@@ -606,16 +598,7 @@ class ConnectivityArray
   /// \param ierr Error code to be set by function.
   ///
   static void
-  getGeometry(
-      void*         data,
-      int           sizeGID,
-      int           sizeLID,
-      int           num_obj,
-      ZOLTAN_ID_PTR globalID,
-      ZOLTAN_ID_PTR localID,
-      int           num_dim,
-      double*       geom_vec,
-      int*          ierr);
+  getGeometry(void* data, int sizeGID, int sizeLID, int num_obj, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID, int num_dim, double* geom_vec, int* ierr);
 
  private:
   // The type of elements in the mesh (assumed that all are of same type)
@@ -893,15 +876,7 @@ class ZoltanHyperGraph
   /// \param ierr Error code to be set by function.
   ///
   static void
-  getObjectList(
-      void*         data,
-      int           sizeGID,
-      int           sizeLID,
-      ZOLTAN_ID_PTR globalID,
-      ZOLTAN_ID_PTR localID,
-      int           wgt_dim,
-      float*        obj_wgts,
-      int*          ierr);
+  getObjectList(void* data, int sizeGID, int sizeLID, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID, int wgt_dim, float* obj_wgts, int* ierr);
 
   ///
   /// Zoltan interface query function to tell Zoltan in which format

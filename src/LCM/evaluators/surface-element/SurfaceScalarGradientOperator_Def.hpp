@@ -10,9 +10,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceScalarGradientOperator<EvalT, Traits>::SurfaceScalarGradientOperator(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceScalarGradientOperator<EvalT, Traits>::SurfaceScalarGradientOperator(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
@@ -56,9 +54,7 @@ SurfaceScalarGradientOperator<EvalT, Traits>::SurfaceScalarGradientOperator(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceScalarGradientOperator<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceScalarGradientOperator<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(refDualBasis, fm);
   this->utils.setFieldData(refNormal, fm);

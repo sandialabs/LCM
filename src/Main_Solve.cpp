@@ -102,9 +102,8 @@ main(int argc, char* argv[])
 
     setupTimer = Teuchos::null;
 
-    std::string solnMethod = slvrfctry.getParameters().sublist("Problem").get<std::string>("Solution Method");
-    Teuchos::ParameterList& solveParams =
-        slvrfctry.getAnalysisParameters().sublist("Solve", /*mustAlreadyExist =*/false);
+    std::string             solnMethod  = slvrfctry.getParameters().sublist("Problem").get<std::string>("Solution Method");
+    Teuchos::ParameterList& solveParams = slvrfctry.getAnalysisParameters().sublist("Solve", /*mustAlreadyExist =*/false);
 
     Teuchos::Array<Teuchos::RCP<Thyra_Vector const>>                      thyraResponses;
     Teuchos::Array<Teuchos::Array<Teuchos::RCP<const Thyra_MultiVector>>> thyraSensitivities;
@@ -113,9 +112,7 @@ main(int argc, char* argv[])
     // Check if thyraResponses are product vectors or regular vectors
     Teuchos::RCP<const Thyra_ProductVector> r_prod;
     if (thyraResponses.size() > 0) {
-      r_prod = Teuchos::nonnull(thyraResponses[0]) ?
-                   Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(thyraResponses[0], false) :
-                   Teuchos::null;
+      r_prod = Teuchos::nonnull(thyraResponses[0]) ? Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(thyraResponses[0], false) : Teuchos::null;
     }
 
     int const num_p = solver->Np();  // Number of *vectors* of parameters
@@ -130,7 +127,7 @@ main(int argc, char* argv[])
     *out << "Finished eval of first model: Params, Responses " << std::setprecision(12) << std::endl;
 
     Teuchos::ParameterList& parameterParams = slvrfctry.getParameters().sublist("Problem").sublist("Parameters");
-    Teuchos::ParameterList& responseParams = slvrfctry.getParameters().sublist("Problem").sublist("Response Functions");
+    Teuchos::ParameterList& responseParams  = slvrfctry.getParameters().sublist("Problem").sublist("Response Functions");
 
     int  num_param_vecs           = parameterParams.get("Number of Parameter Vectors", 0);
     bool using_old_parameter_list = false;
@@ -155,9 +152,7 @@ main(int argc, char* argv[])
     Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>> param_names;
     param_names.resize(num_param_vecs);
     for (int l = 0; l < num_param_vecs; ++l) {
-      Teuchos::ParameterList const* pList = using_old_parameter_list ?
-                                                &parameterParams :
-                                                &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
+      Teuchos::ParameterList const* pList = using_old_parameter_list ? &parameterParams : &(parameterParams.sublist(Albany::strint("Parameter Vector", l)));
 
       int const numParameters = pList->get<int>("Number");
       ALBANY_PANIC(
@@ -175,8 +170,7 @@ main(int argc, char* argv[])
     Teuchos::Array<Teuchos::RCP<Teuchos::Array<std::string>>> response_names;
     response_names.resize(num_response_vecs);
     for (int l = 0; l < num_response_vecs; ++l) {
-      Teuchos::ParameterList const* pList =
-          using_old_response_list ? &responseParams : &(responseParams.sublist(Albany::strint("Response Vector", l)));
+      Teuchos::ParameterList const* pList = using_old_response_list ? &responseParams : &(responseParams.sublist(Albany::strint("Response Vector", l)));
 
       bool number_exists = pList->getEntryPtr("Number");
 
@@ -202,9 +196,7 @@ main(int argc, char* argv[])
     // Check if parameters are product vectors or regular vectors
     Teuchos::RCP<const Thyra_ProductVector> p_prod;
     if (num_p > 0) {
-      p_prod = Teuchos::nonnull(nominal.get_p(0)) ?
-                   Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(nominal.get_p(0), false) :
-                   Teuchos::null;
+      p_prod = Teuchos::nonnull(nominal.get_p(0)) ? Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(nominal.get_p(0), false) : Teuchos::null;
       if (p_prod == Teuchos::null) {
         // Thyra vector case (default -- for
         // everything except CoupledSchwarz right now
@@ -219,8 +211,7 @@ main(int argc, char* argv[])
       } else {
         // Thyra product vector case
         for (int i = 0; i < num_p; i++) {
-          Teuchos::RCP<const Thyra_ProductVector> pT =
-              Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(nominal.get_p(i), true);
+          Teuchos::RCP<const Thyra_ProductVector> pT = Teuchos::rcp_dynamic_cast<const Thyra_ProductVector>(nominal.get_p(i), true);
           // IKT: note that we are assuming the parameters are all the same for
           // all the models
           // that are being coupled (in CoupledSchwarz) so we print the
@@ -274,9 +265,8 @@ main(int argc, char* argv[])
 
     // Create debug output object
     if (thyraResponses.size() > 0) {
-      Teuchos::ParameterList& debugParams = slvrfctry.getParameters().sublist("Debug Output", true);
-      bool                    writeToMatrixMarketDistrSolnMap =
-          debugParams.get("Write Distributed Solution and Map to MatrixMarket", false);
+      Teuchos::ParameterList& debugParams                     = slvrfctry.getParameters().sublist("Debug Output", true);
+      bool                    writeToMatrixMarketDistrSolnMap = debugParams.get("Write Distributed Solution and Map to MatrixMarket", false);
 
       RCP<Thyra_Vector const> const xfinal = thyraResponses.back();
       auto                          mnv    = Albany::mean(xfinal);

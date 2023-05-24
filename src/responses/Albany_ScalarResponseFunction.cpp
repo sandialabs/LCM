@@ -40,17 +40,7 @@ ScalarResponseFunction::evaluateDerivative(
     const Thyra::ModelEvaluatorBase::Derivative<ST>& dg_dp)
 {
   this->evaluateGradient(
-      current_time,
-      x,
-      xdot,
-      xdotdot,
-      p,
-      deriv_p,
-      g,
-      dg_dx.getMultiVector(),
-      dg_dxdot.getMultiVector(),
-      dg_dxdotdot.getMultiVector(),
-      dg_dp.getMultiVector());
+      current_time, x, xdot, xdotdot, p, deriv_p, g, dg_dx.getMultiVector(), dg_dxdot.getMultiVector(), dg_dxdotdot.getMultiVector(), dg_dp.getMultiVector());
 }
 
 }  // namespace Albany

@@ -46,8 +46,7 @@ CurrentCoords<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   for (int cell = 0; cell < workset.numCells; ++cell)
     for (int node = 0; node < numNodes; ++node)
-      for (int dim = 0; dim < numDims; ++dim)
-        currentCoords(cell, node, dim) = refCoords(cell, node, dim) + displacement(cell, node, dim);
+      for (int dim = 0; dim < numDims; ++dim) currentCoords(cell, node, dim) = refCoords(cell, node, dim) + displacement(cell, node, dim);
 }
 
 //*****

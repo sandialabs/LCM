@@ -44,9 +44,8 @@ Topology::getClosestNodes(std::vector<std::vector<double>> points)
   std::vector<double>            pointA, pointB, pointC;
   double                         minDA, minDB, minDC;
 
-  std::vector<stk::mesh::Entity> entities_D0 = get_rank_entities(
-      get_bulk_data(),
-      stk::topology::NODE_RANK);  // get all the nodes
+  std::vector<stk::mesh::Entity> entities_D0 = get_rank_entities(get_bulk_data(),
+                                                                 stk::topology::NODE_RANK);  // get all the nodes
 
   // iterator for the nodes
   std::vector<stk::mesh::Entity>::const_iterator i_entities_d0;
@@ -122,8 +121,7 @@ Topology::getClosestNodesOnSurface(std::vector<std::vector<double>> points)
   std::vector<stk::mesh::Entity>::const_iterator I_BoundaryFaces;
   std::vector<stk::mesh::Entity>::const_iterator I_Edges;
   for (I_BoundaryFaces = BoundaryFaces.begin(); I_BoundaryFaces != BoundaryFaces.end(); I_BoundaryFaces++) {
-    std::vector<stk::mesh::Entity> boundaryEdges =
-        getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
+    std::vector<stk::mesh::Entity> boundaryEdges = getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
     for (I_Edges = boundaryEdges.begin(); I_Edges != boundaryEdges.end(); I_Edges++) {
       if (findEntityInVector(MeshEdges, *I_Edges) == false) {
         MeshEdges.push_back(*I_Edges);
@@ -417,9 +415,8 @@ Topology::getDistanceBetweenNodes(stk::mesh::Entity node1, stk::mesh::Entity nod
 std::vector<double>
 Topology::getCoordinatesOfMaxAndMin()
 {
-  std::vector<stk::mesh::Entity> entities_D0 = get_rank_entities(
-      get_bulk_data(),
-      stk::topology::NODE_RANK);  // get all the nodes
+  std::vector<stk::mesh::Entity> entities_D0 = get_rank_entities(get_bulk_data(),
+                                                                 stk::topology::NODE_RANK);  // get all the nodes
 
   // iterator for the nodes
   std::vector<stk::mesh::Entity>::const_iterator i_entities_d0;
@@ -510,8 +507,7 @@ Topology::meshEdgesShortestPath()
   std::vector<stk::mesh::Entity>::const_iterator I_BoundaryFaces;
   std::vector<stk::mesh::Entity>::const_iterator I_Edges;
   for (I_BoundaryFaces = BoundaryFaces.begin(); I_BoundaryFaces != BoundaryFaces.end(); I_BoundaryFaces++) {
-    std::vector<stk::mesh::Entity> boundaryEdges =
-        getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
+    std::vector<stk::mesh::Entity> boundaryEdges = getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
     for (I_Edges = boundaryEdges.begin(); I_Edges != boundaryEdges.end(); I_Edges++) {
       if (findEntityInVector(MeshEdges, *I_Edges) == false) {
         MeshEdges.push_back(*I_Edges);
@@ -526,9 +522,7 @@ Topology::meshEdgesShortestPath()
 //        three input nodes and the edges that belong to the outer
 //        surface
 std::vector<std::vector<int>>
-Topology::shortestpathOnBoundaryFaces(
-    std::vector<stk::mesh::Entity> const& nodes,
-    std::vector<stk::mesh::Entity> const& MeshEdgesShortestPath)
+Topology::shortestpathOnBoundaryFaces(std::vector<stk::mesh::Entity> const& nodes, std::vector<stk::mesh::Entity> const& MeshEdgesShortestPath)
 {
   typedef float                                              Weight;
   typedef boost::property<boost::edge_weight_t, Weight>      WeightProperty;
@@ -711,8 +705,7 @@ Topology::shortestpath(std::vector<stk::mesh::Entity> const& nodes)
   std::vector<stk::mesh::Entity>::const_iterator I_BoundaryFaces;
   std::vector<stk::mesh::Entity>::const_iterator I_Edges;
   for (I_BoundaryFaces = BoundaryFaces.begin(); I_BoundaryFaces != BoundaryFaces.end(); I_BoundaryFaces++) {
-    std::vector<stk::mesh::Entity> boundaryEdges =
-        getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
+    std::vector<stk::mesh::Entity> boundaryEdges = getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
     for (I_Edges = boundaryEdges.begin(); I_Edges != boundaryEdges.end(); I_Edges++) {
       if (findEntityInVector(MeshEdges, *I_Edges) == false) {
         MeshEdges.push_back(*I_Edges);
@@ -863,10 +856,9 @@ Topology::edgesDirections()
   // Iterate through the map, at each row of edgesDirec save the
   // integers that identify the directions of the edges
   for (mapIter = edge_map.begin(); mapIter != edge_map.end(); ++mapIter) {
-    int                            index = mapIter->second;
-    std::vector<stk::mesh::Entity> connectedNodes =
-        getDirectlyConnectedEntities(mapIter->first, stk::topology::NODE_RANK);
-    std::vector<int> tempInt;
+    int                            index          = mapIter->second;
+    std::vector<stk::mesh::Entity> connectedNodes = getDirectlyConnectedEntities(mapIter->first, stk::topology::NODE_RANK);
+    std::vector<int>               tempInt;
     tempInt.push_back(get_entity_id(connectedNodes[0]));
     tempInt.push_back(get_entity_id(connectedNodes[1]));
     edgesDirec[index] = tempInt;
@@ -902,8 +894,7 @@ Topology::edgesDirectionsOuterSurface()
   std::vector<stk::mesh::Entity>::const_iterator I_BoundaryFaces;
   std::vector<stk::mesh::Entity>::const_iterator I_Edges;
   for (I_BoundaryFaces = BoundaryFaces.begin(); I_BoundaryFaces != BoundaryFaces.end(); I_BoundaryFaces++) {
-    std::vector<stk::mesh::Entity> boundaryEdges =
-        getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
+    std::vector<stk::mesh::Entity> boundaryEdges = getDirectlyConnectedEntities(*I_BoundaryFaces, stk::topology::EDGE_RANK);
     for (I_Edges = boundaryEdges.begin(); I_Edges != boundaryEdges.end(); I_Edges++) {
       if (findEntityInVector(setOfEdges, *I_Edges) == false) {
         setOfEdges.push_back(*I_Edges);
@@ -928,10 +919,9 @@ Topology::edgesDirectionsOuterSurface()
   // Iterate through the map, at each row of edgesDirec save the
   // integers that identify the directions of the edges
   for (mapIter = edge_map.begin(); mapIter != edge_map.end(); ++mapIter) {
-    int                            index = mapIter->second;
-    std::vector<stk::mesh::Entity> connectedNodes =
-        getDirectlyConnectedEntities(mapIter->first, stk::topology::NODE_RANK);
-    std::vector<int> tempInt;
+    int                            index          = mapIter->second;
+    std::vector<stk::mesh::Entity> connectedNodes = getDirectlyConnectedEntities(mapIter->first, stk::topology::NODE_RANK);
+    std::vector<int>               tempInt;
     tempInt.push_back(get_entity_id(connectedNodes[0]));
     tempInt.push_back(get_entity_id(connectedNodes[1]));
     edgesDirec[index] = tempInt;
@@ -1297,9 +1287,8 @@ Topology::numberOfRepetitions(std::vector<stk::mesh::Entity>& entities, stk::mes
 std::vector<double>
 Topology::findCoordinates(unsigned int nodeIdentifier)
 {
-  std::vector<stk::mesh::Entity> MeshNodes = get_rank_entities(
-      get_bulk_data(),
-      stk::topology::NODE_RANK);  // Get all the nodes
+  std::vector<stk::mesh::Entity> MeshNodes = get_rank_entities(get_bulk_data(),
+                                                               stk::topology::NODE_RANK);  // Get all the nodes
   // of the mesh
   std::vector<stk::mesh::Entity>::const_iterator Ientities_D0;
 

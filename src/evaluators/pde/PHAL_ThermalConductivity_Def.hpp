@@ -133,9 +133,7 @@ ThermalConductivity<EvalT, Traits>::getValue(std::string const& n)
   if (is_constant) {
     return constant_value;
   }
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in ThermalConductivity::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in ThermalConductivity::getValue()" << std::endl);
   return constant_value;
 }
 
@@ -147,8 +145,7 @@ ThermalConductivity<EvalT, Traits>::getValidThermalCondParameters() const
   Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("Valid ThermalConductivity Params"));
   ;
 
-  validPL->set<std::string>(
-      "ThermalConductivity Type", "Constant", "Constant thermal conductivity across the entire domain");
+  validPL->set<std::string>("ThermalConductivity Type", "Constant", "Constant thermal conductivity across the entire domain");
   validPL->set<double>("Value", 1.0, "Constant thermal conductivity value");
 
   // Truncated KL parameters

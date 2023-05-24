@@ -268,9 +268,7 @@ scale(ArrayT& a, const T& val)
 }
 
 template <class T, class... P>
-inline typename std::enable_if<
-    !Kokkos::is_dynrankview_fad<Kokkos::DynRankView<T, P...>>::value,
-    typename Kokkos::DynRankView<T, P...>::non_const_type>::type
+inline typename std::enable_if<!Kokkos::is_dynrankview_fad<Kokkos::DynRankView<T, P...>>::value, typename Kokkos::DynRankView<T, P...>::non_const_type>::type
 create_copy(std::string const& name, const Kokkos::DynRankView<T, P...>& src)
 {
   using dst_type = typename Kokkos::DynRankView<T, P...>::non_const_type;
@@ -279,9 +277,7 @@ create_copy(std::string const& name, const Kokkos::DynRankView<T, P...>& src)
 }
 
 template <class T, class... P>
-inline typename std::enable_if<
-    Kokkos::is_dynrankview_fad<Kokkos::DynRankView<T, P...>>::value,
-    typename Kokkos::DynRankView<T, P...>::non_const_type>::type
+inline typename std::enable_if<Kokkos::is_dynrankview_fad<Kokkos::DynRankView<T, P...>>::value, typename Kokkos::DynRankView<T, P...>::non_const_type>::type
 create_copy(std::string const& /* name */, const Kokkos::DynRankView<T, P...>& src)
 {
   using Src              = Kokkos::DynRankView<T, P...>;

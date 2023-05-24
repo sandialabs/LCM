@@ -39,10 +39,7 @@ class Topology
   ///
   /// Use if already have an Albany mesh object
   ///
-  Topology(
-      Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc,
-      std::string const&                            bulk_block_name      = "",
-      std::string const&                            interface_block_name = "");
+  Topology(Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc, std::string const& bulk_block_name = "", std::string const& interface_block_name = "");
 
   ///
   /// \brief Iterates over the boundary entities of the mesh of (all
@@ -203,10 +200,7 @@ class Topology
   ///   \attention Valid for entities of all ranks
   ///
   void
-  createStar(
-      stk::mesh::Entity                entity,
-      std::set<stk::mesh::Entity>&     subgraph_entities,
-      std::set<STKEdge, EdgeLessThan>& subgraph_edges);
+  createStar(stk::mesh::Entity entity, std::set<stk::mesh::Entity>& subgraph_entities, std::set<STKEdge, EdgeLessThan>& subgraph_edges);
 
   ///
   /// \brief Fractures all open boundary entities of the mesh.
@@ -398,10 +392,7 @@ class Topology
   /// \brief returns the adjacent segments from a given face
   ///
   stk::mesh::EntityVector
-  findAdjacentSegmentsFromFace(
-      std::vector<stk::mesh::EntityVector> const& faces_inside_element,
-      stk::mesh::Entity                           face,
-      int                                         element_number);
+  findAdjacentSegmentsFromFace(std::vector<stk::mesh::EntityVector> const& faces_inside_element, stk::mesh::Entity face, int element_number);
 
   ///
   /// \brief Returns a pointer with the coordinates of a given entity
@@ -491,9 +482,7 @@ class Topology
   ///        surface
   ///
   std::vector<std::vector<int>>
-  shortestpathOnBoundaryFaces(
-      std::vector<stk::mesh::Entity> const& nodes,
-      std::vector<stk::mesh::Entity> const& MeshEdgesShortestPath);
+  shortestpathOnBoundaryFaces(std::vector<stk::mesh::Entity> const& nodes, std::vector<stk::mesh::Entity> const& MeshEdgesShortestPath);
 
   ///
   /// \brief Returns the shortest path between three input nodes

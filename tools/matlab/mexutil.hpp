@@ -124,14 +124,7 @@ daxpy_(const blas_int*, double*, const double*, const blas_int*, double*, const 
 }
 
 inline void
-gemv(
-    const double*  A,
-    const blas_int m,
-    const blas_int n,
-    const double*  x,
-    const double   alpha,
-    const double   beta,
-    double*        y)
+gemv(const double* A, const blas_int m, const blas_int n, const double* x, const double alpha, const double beta, double* y)
 {
   const blas_int inc   = 1;
   const char     trans = 'n';

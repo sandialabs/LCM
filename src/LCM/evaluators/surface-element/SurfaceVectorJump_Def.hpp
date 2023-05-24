@@ -10,9 +10,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceVectorJump<EvalT, Traits>::SurfaceVectorJump(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : cubature_(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepid_basis_(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
       vector_(p.get<std::string>("Vector Name"), dl->node_vector),
@@ -81,9 +79,7 @@ SurfaceVectorJump<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
       for (int node = 0; node < num_plane_nodes_; ++node) {
         int topNode = node + num_plane_nodes_;
         vecA += minitensor::Vector<ScalarT>(
-            ref_values_(node, pt) * vector_(cell, node, 0),
-            ref_values_(node, pt) * vector_(cell, node, 1),
-            ref_values_(node, pt) * vector_(cell, node, 2));
+            ref_values_(node, pt) * vector_(cell, node, 0), ref_values_(node, pt) * vector_(cell, node, 1), ref_values_(node, pt) * vector_(cell, node, 2));
         vecB += minitensor::Vector<ScalarT>(
             ref_values_(node, pt) * vector_(cell, topNode, 0),
             ref_values_(node, pt) * vector_(cell, topNode, 1),

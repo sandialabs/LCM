@@ -106,10 +106,7 @@ class MaterialDatabase
  private:
   template <typename T>
   void
-  getAllMatchingParams_helper(
-      std::string const&      param_name,
-      std::vector<T>&         results,
-      Teuchos::ParameterList& param_list);
+  getAllMatchingParams_helper(std::string const& param_name, std::vector<T>& results, Teuchos::ParameterList& param_list);
 
   std::string
   translateDBSublistName(Teuchos::ParameterList* param_list, std::string const& list_name);
@@ -129,25 +126,17 @@ createMaterialDatabase(Teuchos::RCP<Teuchos::ParameterList> const& params, Teuch
 }  // namespace Albany
 
 // Explicit instantiation declarations of functions above
-#define ALBANY_INST_DECL(T)                                                                          \
-  extern template T Albany::MaterialDatabase::getParam<T>(std::string const& param_name);            \
-  extern template T Albany::MaterialDatabase::getParam<T>(std::string const& param_name, T def_val); \
-  extern template T Albany::MaterialDatabase::getMaterialParam<T>(                                   \
-      std::string const& material_name, std::string const& param_name);                              \
-  extern template T Albany::MaterialDatabase::getMaterialParam<T>(                                   \
-      std::string const& material_name, std::string const& param_name, T def_val);                   \
-  extern template T Albany::MaterialDatabase::getElementBlockParam<T>(                               \
-      std::string const& material_name, std::string const& param_name);                              \
-  extern template T Albany::MaterialDatabase::getElementBlockParam<T>(                               \
-      std::string const& material_name, std::string const& param_name, T def_val);                   \
-  extern template T Albany::MaterialDatabase::getNodeSetParam<T>(                                    \
-      std::string const& ns_name, std::string const& param_name);                                    \
-  extern template T Albany::MaterialDatabase::getNodeSetParam<T>(                                    \
-      std::string const& ns_name, std::string const& param_name, T def_val);                         \
-  extern template T Albany::MaterialDatabase::getSideSetParam<T>(                                    \
-      std::string const& ss_name, std::string const& param_name);                                    \
-  extern template T Albany::MaterialDatabase::getSideSetParam<T>(                                    \
-      std::string const& ss_name, std::string const& param_name, T def_val);                         \
+#define ALBANY_INST_DECL(T)                                                                                                                                     \
+  extern template T              Albany::MaterialDatabase::getParam<T>(std::string const& param_name);                                                          \
+  extern template T              Albany::MaterialDatabase::getParam<T>(std::string const& param_name, T def_val);                                               \
+  extern template T              Albany::MaterialDatabase::getMaterialParam<T>(std::string const& material_name, std::string const& param_name);                \
+  extern template T              Albany::MaterialDatabase::getMaterialParam<T>(std::string const& material_name, std::string const& param_name, T def_val);     \
+  extern template T              Albany::MaterialDatabase::getElementBlockParam<T>(std::string const& material_name, std::string const& param_name);            \
+  extern template T              Albany::MaterialDatabase::getElementBlockParam<T>(std::string const& material_name, std::string const& param_name, T def_val); \
+  extern template T              Albany::MaterialDatabase::getNodeSetParam<T>(std::string const& ns_name, std::string const& param_name);                       \
+  extern template T              Albany::MaterialDatabase::getNodeSetParam<T>(std::string const& ns_name, std::string const& param_name, T def_val);            \
+  extern template T              Albany::MaterialDatabase::getSideSetParam<T>(std::string const& ss_name, std::string const& param_name);                       \
+  extern template T              Albany::MaterialDatabase::getSideSetParam<T>(std::string const& ss_name, std::string const& param_name, T def_val);            \
   extern template std::vector<T> Albany::MaterialDatabase::getAllMatchingParams<T>(std::string const& param_name);
 
 ALBANY_INST_DECL(double)

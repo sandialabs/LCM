@@ -128,11 +128,7 @@ class ProjectorT
   projection vector.
   */
   bool
-  ProjectNodetoSegment_NodalNormal(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-      double  xi[],
-      double& gap);
+  ProjectNodetoSegment_NodalNormal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double xi[], double& gap);
 
   /*!
   \brief Project a Node onto a Segment along the interpolated outward normal
@@ -230,46 +226,25 @@ class ProjectorT
 
   // evaluate F and gradF functions for ProjectNodetoSegment_NodalNormal in 2D
   double
-  evaluate_F_2D_NodalNormal(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-      double  eta,
-      double& gap);
+  evaluate_F_2D_NodalNormal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double eta, double& gap);
 
   double
-  evaluate_gradF_2D_NodalNormal(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-      double eta);
+  evaluate_gradF_2D_NodalNormal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double eta);
 
   // evaluate F and gradF functions for ProjectNodetoSegment_SegmentNormal in 2D
   double
-  evaluate_F_2D_SegmentNormal(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-      double  eta,
-      double& gap);
+  evaluate_F_2D_SegmentNormal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double eta, double& gap);
 
   double
-  evaluate_gradF_2D_SegmentNormal(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-      double eta);
+  evaluate_gradF_2D_SegmentNormal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double eta);
 
   // evaluate F and gradF functions for ProjectNodetoSegment_SegmentOrthogonal
   // in 2D
   double
-  evaluate_F_2D_SegmentOrthogonal(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-      double  eta,
-      double& gap);
+  evaluate_F_2D_SegmentOrthogonal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double eta, double& gap);
 
   double
-  evaluate_gradF_2D_SegmentOrthogonal(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-      double eta);
+  evaluate_gradF_2D_SegmentOrthogonal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double eta);
 
   // evalauate F and gradF functions for
   // ProjectNodetoSegment_Orthogonal_to_Slave in 2D

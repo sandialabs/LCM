@@ -117,11 +117,7 @@ display_relation(Topology& topology, stk::mesh::Entity entity, stk::mesh::Entity
 // needed in STK to maintain connectivity information.
 // These are relations that connect cells to points.
 bool
-is_needed_for_stk(
-    stk::mesh::BulkData&        bulk_data,
-    stk::mesh::Entity           source_entity,
-    stk::mesh::EntityRank       target_rank,
-    stk::mesh::EntityRank const cell_rank)
+is_needed_for_stk(stk::mesh::BulkData& bulk_data, stk::mesh::Entity source_entity, stk::mesh::EntityRank target_rank, stk::mesh::EntityRank const cell_rank)
 {
   stk::mesh::EntityRank const source_rank = bulk_data.entity_rank(source_entity);
 
@@ -352,8 +348,7 @@ new_id_from_old_id(
     stk::mesh::EntityId const   old_id,
     bool const                  is_low_from_high)
 {
-  stk::mesh::EntityId const start_id =
-      256 * parallel_rank + (static_cast<stk::mesh::EntityId>(parallel_rank + 1) << 32) - 1;
+  stk::mesh::EntityId const start_id = 256 * parallel_rank + (static_cast<stk::mesh::EntityId>(parallel_rank + 1) << 32) - 1;
 
   bool const needs_mapping = is_low_from_high == true ? old_id >= start_id : old_id < start_id;
 
@@ -392,11 +387,7 @@ new_id_from_old_id(
 }
 
 stk::mesh::EntityId
-low_id_from_high_id(
-    size_t const                dimension,
-    int const                   parallel_rank,
-    stk::mesh::EntityRank const rank,
-    stk::mesh::EntityId const   high_id)
+low_id_from_high_id(size_t const dimension, int const parallel_rank, stk::mesh::EntityRank const rank, stk::mesh::EntityId const high_id)
 {
   bool const is_lo_from_hi = true;
 
@@ -404,11 +395,7 @@ low_id_from_high_id(
 }
 
 stk::mesh::EntityId
-high_id_from_low_id(
-    size_t const                dimension,
-    int const                   parallel_rank,
-    stk::mesh::EntityRank const rank,
-    stk::mesh::EntityId const   low_id)
+high_id_from_low_id(size_t const dimension, int const parallel_rank, stk::mesh::EntityRank const rank, stk::mesh::EntityId const low_id)
 {
   bool const is_lo_from_hi = false;
 

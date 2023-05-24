@@ -67,7 +67,7 @@ struct NodalDOFsStructContainer
   printFieldToMap() const
   {
     typedef std::map<std::string, MapOfDOFsStructs::const_iterator>::const_iterator MapIterator;
-    Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
+    Teuchos::RCP<Teuchos::FancyOStream>                                             out = Teuchos::VerboseObjectBase::getDefaultOStream();
     for (MapIterator iter = fieldToMap.begin(); iter != fieldToMap.end(); iter++) {
       std::string key = iter->first;
       *out << "IKT Key: " << key << "\n";
@@ -511,11 +511,7 @@ class STKDiscretization : public AbstractDiscretization
   void
   writeSolution(Thyra_Vector const& solution, double const time, bool const overlapped = false);
   void
-  writeSolution(
-      Thyra_Vector const& solution,
-      Thyra_Vector const& solution_dot,
-      double const        time,
-      bool const          overlapped = false);
+  writeSolution(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, double const time, bool const overlapped = false);
   void
   writeSolution(
       Thyra_Vector const& solution,
@@ -530,11 +526,7 @@ class STKDiscretization : public AbstractDiscretization
   void
   writeSolutionToMeshDatabase(Thyra_Vector const& solution, double const /* time */, bool const overlapped = false);
   void
-  writeSolutionToMeshDatabase(
-      Thyra_Vector const& solution,
-      Thyra_Vector const& solution_dot,
-      double const /* time */,
-      bool const overlapped = false);
+  writeSolutionToMeshDatabase(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, double const /* time */, bool const overlapped = false);
   void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
@@ -543,10 +535,7 @@ class STKDiscretization : public AbstractDiscretization
       double const /* time */,
       bool const overlapped = false);
   void
-  writeSolutionMVToMeshDatabase(
-      const Thyra_MultiVector& solution,
-      double const /* time */,
-      bool const overlapped = false);
+  writeSolutionMVToMeshDatabase(const Thyra_MultiVector& solution, double const /* time */, bool const overlapped = false);
 
   //! Write the solution to file. Must call writeSolution first.
   void
@@ -602,11 +591,7 @@ class STKDiscretization : public AbstractDiscretization
   void
   setSolutionField(Thyra_Vector const& soln, Thyra_Vector const& soln_dot, bool const overlapped);
   void
-  setSolutionField(
-      Thyra_Vector const& soln,
-      Thyra_Vector const& soln_dot,
-      Thyra_Vector const& soln_dotdot,
-      bool const          overlapped);
+  setSolutionField(Thyra_Vector const& soln, Thyra_Vector const& soln_dot, Thyra_Vector const& soln_dotdot, bool const overlapped);
   void
   setSolutionFieldMV(const Thyra_MultiVector& solnT, bool const overlapped);
 

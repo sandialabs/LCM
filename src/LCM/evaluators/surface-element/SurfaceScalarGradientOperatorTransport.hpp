@@ -22,8 +22,7 @@ namespace LCM {
 **/
 
 template <typename EvalT, typename Traits>
-class SurfaceScalarGradientOperatorTransport : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                               public PHX::EvaluatorDerived<EvalT, Traits>
+class SurfaceScalarGradientOperatorTransport : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   SurfaceScalarGradientOperatorTransport(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

@@ -50,7 +50,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   int const                  numDim      = 3;
   int const                  numVertices = 8;
   int const                  numNodes    = 8;
-  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  const RCP<Albany::Layouts> dl          = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
   // reference coordinates
   ArrayRCP<ScalarT> referenceCoords(24);
@@ -141,7 +141,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
 
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
-  intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
+  intrepidBasis                                  = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
   RCP<CT>                               cellType = rcp(new CT(shards::getCellTopologyData<shards::Quadrilateral<4>>()));
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
@@ -168,9 +168,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   fieldManager.registerEvaluator<Residual>(sb);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = sb->evaluatedFields().begin();
-       it != sb->evaluatedFields().end();
-       it++)
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = sb->evaluatedFields().begin(); it != sb->evaluatedFields().end(); it++)
     fieldManager.requireField<Residual>(**it);
 
   // Call postRegistrationSetup on the evaluators
@@ -196,8 +194,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
       for (size_type i = 0; i < numDim; ++i)
-        for (size_type j = 0; j < numDim; ++j)
-          TEST_COMPARE(fabs(curBasis(cell, pt, i, j) - expectedCurBasis(i, j)), <=, tolerance);
+        for (size_type j = 0; j < numDim; ++j) TEST_COMPARE(fabs(curBasis(cell, pt, i, j) - expectedCurBasis(i, j)), <=, tolerance);
 
   // Pull the reference basis from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim> refBasis("Reference Basis", dl->qp_tensor);
@@ -209,8 +206,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
       for (size_type i = 0; i < numDim; ++i)
-        for (size_type j = 0; j < numDim; ++j)
-          TEST_COMPARE(fabs(refBasis(cell, pt, i, j) - expectedRefBasis(i, j)), <=, tolerance);
+        for (size_type j = 0; j < numDim; ++j) TEST_COMPARE(fabs(refBasis(cell, pt, i, j) - expectedRefBasis(i, j)), <=, tolerance);
 
   // Pull the reference dual basis from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim> refDualBasis("Reference Dual Basis", dl->qp_tensor);
@@ -222,8 +218,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
       for (size_type i = 0; i < numDim; ++i)
-        for (size_type j = 0; j < numDim; ++j)
-          TEST_COMPARE(fabs(refDualBasis(cell, pt, i, j) - expectedRefDualBasis(i, j)), <=, tolerance);
+        for (size_type j = 0; j < numDim; ++j) TEST_COMPARE(fabs(refDualBasis(cell, pt, i, j) - expectedRefDualBasis(i, j)), <=, tolerance);
 
   // Pull the reference normal from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint, Dim> refNormal("Reference Normal", dl->qp_vector);
@@ -234,8 +229,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Basis)
 
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
-      for (size_type i = 0; i < numDim; ++i)
-        TEST_COMPARE(fabs(refNormal(cell, pt, i) - expectedRefNormal(i)), <=, tolerance);
+      for (size_type i = 0; i < numDim; ++i) TEST_COMPARE(fabs(refNormal(cell, pt, i) - expectedRefNormal(i)), <=, tolerance);
 
   // Pull the reference area from the FieldManager
   PHX::MDField<ScalarT, Cell, QuadPoint> refArea("Reference Area", dl->qp_scalar);
@@ -330,7 +324,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
   int const                  numDim      = 3;
   int const                  numVertices = 8;
   int const                  numNodes    = 8;
-  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  const RCP<Albany::Layouts> dl          = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
   // nodal value of the scalar (usually a scalar solution field such as
   // pressure, temperature..etc)
@@ -356,7 +350,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
 
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
-  intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
+  intrepidBasis                                  = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
   RCP<CT>                               cellType = rcp(new CT(shards::getCellTopologyData<shards::Quadrilateral<4>>()));
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
@@ -378,9 +372,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarJump)
   fieldManager.registerEvaluator<Residual>(sj);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = sj->evaluatedFields().begin();
-       it != sj->evaluatedFields().end();
-       it++)
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = sj->evaluatedFields().begin(); it != sj->evaluatedFields().end(); it++)
     fieldManager.requireField<Residual>(**it);
 
   // Call postRegistrationSetup on the evaluators
@@ -477,7 +469,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorJump)
   int const                  numDim      = 3;
   int const                  numVertices = 8;
   int const                  numNodes    = 8;
-  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  const RCP<Albany::Layouts> dl          = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
   // nodal displacement jump
   ArrayRCP<ScalarT> referenceCoords(24);
@@ -557,7 +549,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorJump)
 
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
-  intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
+  intrepidBasis                                  = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
   RCP<CT>                               cellType = rcp(new CT(shards::getCellTopologyData<shards::Quadrilateral<4>>()));
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
@@ -578,9 +570,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorJump)
   fieldManager.registerEvaluator<Residual>(svj);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = svj->evaluatedFields().begin();
-       it != svj->evaluatedFields().end();
-       it++)
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = svj->evaluatedFields().begin(); it != svj->evaluatedFields().end(); it++)
     fieldManager.requireField<Residual>(**it);
 
   // Call postRegistrationSetup on the evaluators
@@ -638,7 +628,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   int const                  numDim      = 3;
   int const                  numVertices = 8;
   int const                  numNodes    = 8;
-  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  const RCP<Albany::Layouts> dl          = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
   // reference basis
   ArrayRCP<ScalarT> referenceDualBasis(numQPts * numDim * numDim);
@@ -705,7 +695,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
 
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
-  intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
+  intrepidBasis                                  = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
   RCP<CT>                               cellType = rcp(new CT(shards::getCellTopologyData<shards::Quadrilateral<4>>()));
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
@@ -720,8 +710,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   ssgPL.set<RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature", cubature);
   ssgPL.set<RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis", intrepidBasis);
   ssgPL.set<double>("thickness", 0.1);
-  RCP<LCM::SurfaceScalarGradient<Residual, Traits>> ssg =
-      rcp(new LCM::SurfaceScalarGradient<Residual, Traits>(ssgPL, dl));
+  RCP<LCM::SurfaceScalarGradient<Residual, Traits>> ssg = rcp(new LCM::SurfaceScalarGradient<Residual, Traits>(ssgPL, dl));
 
   // instantiate a field manager.
   PHX::FieldManager<Traits> fieldManager;
@@ -734,9 +723,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
   fieldManager.registerEvaluator<Residual>(ssg);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = ssg->evaluatedFields().begin();
-       it != ssg->evaluatedFields().end();
-       it++)
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = ssg->evaluatedFields().begin(); it != ssg->evaluatedFields().end(); it++)
     fieldManager.requireField<Residual>(**it);
 
   // Call postRegistrationSetup on the evaluators
@@ -768,8 +755,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
 
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
-      for (size_type i = 0; i < numDim; ++i)
-        TEST_COMPARE(fabs(scalarGrad(cell, pt, i) - expectedScalarGrad(i)), <=, tolerance);
+      for (size_type i = 0; i < numDim; ++i) TEST_COMPARE(fabs(scalarGrad(cell, pt, i) - expectedScalarGrad(i)), <=, tolerance);
 
   // Now test  gradient in parallel direction
 
@@ -801,8 +787,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, ScalarGradient)
 
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
-      for (size_type i = 0; i < numDim; ++i)
-        TEST_COMPARE(fabs(scalarGrad(cell, pt, i) - expectedScalarGrad2(i)), <=, tolerance);
+      for (size_type i = 0; i < numDim; ++i) TEST_COMPARE(fabs(scalarGrad(cell, pt, i) - expectedScalarGrad2(i)), <=, tolerance);
 
 }  // end of scalar gradient test
 
@@ -816,7 +801,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   int const                  numDim      = 3;
   int const                  numVertices = 8;
   int const                  numNodes    = 8;
-  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  const RCP<Albany::Layouts> dl          = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
   // current basis
   ArrayRCP<ScalarT> currentBasis(numQPts * numDim * numDim);
@@ -908,7 +893,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
 
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
-  intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
+  intrepidBasis                                  = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
   RCP<CT>                               cellType = rcp(new CT(shards::getCellTopologyData<shards::Quadrilateral<4>>()));
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
@@ -924,8 +909,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   svgPL.set<std::string>("Surface Vector Gradient Determinant Name", "J");
   svgPL.set<RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature", cubature);
   svgPL.set<double>("thickness", 0.1);
-  RCP<LCM::SurfaceVectorGradient<Residual, Traits>> svg =
-      rcp(new LCM::SurfaceVectorGradient<Residual, Traits>(svgPL, dl));
+  RCP<LCM::SurfaceVectorGradient<Residual, Traits>> svg = rcp(new LCM::SurfaceVectorGradient<Residual, Traits>(svgPL, dl));
 
   // Instantiate a field manager.
   PHX::FieldManager<Traits> fieldManager;
@@ -939,9 +923,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   fieldManager.registerEvaluator<Residual>(svg);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = svg->evaluatedFields().begin();
-       it != svg->evaluatedFields().end();
-       it++)
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = svg->evaluatedFields().begin(); it != svg->evaluatedFields().end(); it++)
     fieldManager.requireField<Residual>(**it);
 
   // Call postRegistrationSetup on the evaluators
@@ -973,8 +955,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, VectorGradient)
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
       for (size_type i = 0; i < numDim; ++i)
-        for (size_type j = 0; j < numDim; ++j)
-          TEST_COMPARE(fabs(defGrad(cell, pt, i, j) - expectedDefGrad(i, j)), <=, tolerance);
+        for (size_type j = 0; j < numDim; ++j) TEST_COMPARE(fabs(defGrad(cell, pt, i, j) - expectedDefGrad(i, j)), <=, tolerance);
 }
 
 TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
@@ -986,7 +967,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
   int const                  numVertices   = 8;
   int const                  numNodes      = 8;
   int const                  numPlaneNodes = numNodes / 2;
-  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  const RCP<Albany::Layouts> dl            = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
   // manually create evaluator field for cohesive traction
   ArrayRCP<ScalarT> cohesiveTraction(numQPts * numDim);
@@ -1021,7 +1002,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
 
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
-  intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
+  intrepidBasis                                  = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
   RCP<CT>                               cellType = rcp(new CT(shards::getCellTopologyData<shards::Quadrilateral<4>>()));
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
@@ -1033,8 +1014,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
   scrPL.set<std::string>("Surface Cohesive Residual Name", "Force");
   scrPL.set<RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature", cubature);
   scrPL.set<RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis", intrepidBasis);
-  RCP<LCM::SurfaceCohesiveResidual<Residual, Traits>> scr =
-      rcp(new LCM::SurfaceCohesiveResidual<Residual, Traits>(scrPL, dl));
+  RCP<LCM::SurfaceCohesiveResidual<Residual, Traits>> scr = rcp(new LCM::SurfaceCohesiveResidual<Residual, Traits>(scrPL, dl));
 
   // Instantiate a field manager.
   PHX::FieldManager<Traits> fieldManager;
@@ -1045,9 +1025,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, CohesiveForce)
   fieldManager.registerEvaluator<Residual>(scr);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = scr->evaluatedFields().begin();
-       it != scr->evaluatedFields().end();
-       it++)
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = scr->evaluatedFields().begin(); it != scr->evaluatedFields().end(); it++)
     fieldManager.requireField<Residual>(**it);
 
   // Call postRegistrationSetup on the evaluators
@@ -1103,7 +1081,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   int const                  numDim      = 3;
   int const                  numVertices = 8;
   int const                  numNodes    = 8;
-  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
+  const RCP<Albany::Layouts> dl          = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
 
   double const thickness = 0.01;
 
@@ -1195,7 +1173,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
 
   // intrepid basis and cubature
   RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>> intrepidBasis;
-  intrepidBasis = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
+  intrepidBasis                                  = rcp(new Intrepid2::Basis_HGRAD_QUAD_C1_FEM<PHX::Device, RealType, RealType>());
   RCP<CT>                               cellType = rcp(new CT(shards::getCellTopologyData<shards::Quadrilateral<4>>()));
   Intrepid2::DefaultCubatureFactory     cubFactory;
   RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, 3);
@@ -1236,8 +1214,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   svgPL.set<std::string>("Surface Vector Gradient Determinant Name", "J");
   svgPL.set<RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature", cubature);
   svgPL.set<double>("thickness", thickness);
-  RCP<LCM::SurfaceVectorGradient<Residual, Traits>> svg =
-      rcp(new LCM::SurfaceVectorGradient<Residual, Traits>(svgPL, dl));
+  RCP<LCM::SurfaceVectorGradient<Residual, Traits>> svg = rcp(new LCM::SurfaceVectorGradient<Residual, Traits>(svgPL, dl));
 
   // create field name strings
   LCM::FieldNameMap                                field_name_map(false);
@@ -1257,14 +1234,12 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   paramList.set<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map", fnm);
   cmpPL.set<Teuchos::ParameterList*>("Material Parameters", &paramList);
   std::cout << paramList;
-  RCP<LCM::ConstitutiveModelParameters<Residual, Traits>> CMP =
-      rcp(new LCM::ConstitutiveModelParameters<Residual, Traits>(cmpPL, dl));
+  RCP<LCM::ConstitutiveModelParameters<Residual, Traits>> CMP = rcp(new LCM::ConstitutiveModelParameters<Residual, Traits>(cmpPL, dl));
 
   // Constitutive Model Interface Evaluator
   Teuchos::ParameterList cmiPL;
   cmiPL.set<Teuchos::ParameterList*>("Material Parameters", &paramList);
-  Teuchos::RCP<LCM::ConstitutiveModelInterface<Residual, Traits>> CMI =
-      Teuchos::rcp(new LCM::ConstitutiveModelInterface<Residual, Traits>(cmiPL, dl));
+  Teuchos::RCP<LCM::ConstitutiveModelInterface<Residual, Traits>> CMI = Teuchos::rcp(new LCM::ConstitutiveModelInterface<Residual, Traits>(cmiPL, dl));
 
   // SurfaceVectorResidual evaluator
   Teuchos::ParameterList svrPL;
@@ -1278,8 +1253,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   svrPL.set<std::string>("Surface Vector Residual Name", "Force");
   svrPL.set<RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature", cubature);
   svrPL.set<RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis", intrepidBasis);
-  RCP<LCM::SurfaceVectorResidual<Residual, Traits>> svr =
-      rcp(new LCM::SurfaceVectorResidual<Residual, Traits>(svrPL, dl));
+  RCP<LCM::SurfaceVectorResidual<Residual, Traits>> svr = rcp(new LCM::SurfaceVectorResidual<Residual, Traits>(svrPL, dl));
 
   // Instantiate a field manager.
   PHX::FieldManager<Traits> fieldManager;
@@ -1295,9 +1269,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   fieldManager.registerEvaluator<Residual>(svr);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = svr->evaluatedFields().begin();
-       it != svr->evaluatedFields().end();
-       it++)
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = svr->evaluatedFields().begin(); it != svr->evaluatedFields().end(); it++)
     fieldManager.requireField<Residual>(**it);
 
   // Call postRegistrationSetup on the evaluators
@@ -1397,8 +1369,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
       for (size_type i = 0; i < numDim; ++i)
-        for (size_type j = 0; j < numDim; ++j)
-          TEST_COMPARE(fabs(curBasisField(cell, pt, i, j) - expectedg[0](i, j)), <=, tolerance);
+        for (size_type j = 0; j < numDim; ++j) TEST_COMPARE(fabs(curBasisField(cell, pt, i, j) - expectedg[0](i, j)), <=, tolerance);
 
   // Record the expected ref dual basis vectors
   std::vector<Tensor<ScalarT>> expectedDG(numQPts);
@@ -1407,8 +1378,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
       for (size_type i = 0; i < numDim; ++i)
-        for (size_type j = 0; j < numDim; ++j)
-          TEST_COMPARE(fabs(refDualBasisField(cell, pt, i, j) - expectedDG[0](i, j)), <=, tolerance);
+        for (size_type j = 0; j < numDim; ++j) TEST_COMPARE(fabs(refDualBasisField(cell, pt, i, j) - expectedDG[0](i, j)), <=, tolerance);
 
   // Record the expected reference Normal
   std::vector<Vector<ScalarT>> expectedN(numQPts);
@@ -1417,8 +1387,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   // Check the reference normal
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
-      for (size_type i = 0; i < numDim; ++i)
-        TEST_COMPARE(fabs(refNormalField(cell, pt, i) - expectedN[0](i)), <=, tolerance);
+      for (size_type i = 0; i < numDim; ++i) TEST_COMPARE(fabs(refNormalField(cell, pt, i) - expectedN[0](i)), <=, tolerance);
 
   // Record the expected reference area
   std::vector<ScalarT> expectedA(numQPts);
@@ -1435,8 +1404,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
       for (size_type i = 0; i < numDim; ++i)
-        for (size_type j = 0; j < numDim; ++j)
-          TEST_COMPARE(fabs(defGradField(cell, pt, i, j) - expectedF[0](i, j)), <=, tolerance);
+        for (size_type j = 0; j < numDim; ++j) TEST_COMPARE(fabs(defGradField(cell, pt, i, j) - expectedF[0](i, j)), <=, tolerance);
 
   // Record the expected stress
   std::vector<Tensor<ScalarT>> expectedStress(numQPts);
@@ -1445,8 +1413,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   for (size_type cell = 0; cell < worksetSize; ++cell)
     for (size_type pt = 0; pt < numQPts; ++pt)
       for (size_type i = 0; i < numDim; ++i)
-        for (size_type j = 0; j < numDim; ++j)
-          TEST_COMPARE(fabs(stressField(cell, pt, i, j) - expectedStress[0](i, j)), <=, tolerance);
+        for (size_type j = 0; j < numDim; ++j) TEST_COMPARE(fabs(stressField(cell, pt, i, j) - expectedStress[0](i, j)), <=, tolerance);
 
   // Record the expected nodal forces, which will be used to check the
   // computed force

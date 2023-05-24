@@ -9,9 +9,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ThermoMechanicalCoefficients<EvalT, Traits>::ThermoMechanicalCoefficients(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ThermoMechanicalCoefficients<EvalT, Traits>::ThermoMechanicalCoefficients(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thermal_cond_(p.get<std::string>("Thermal Conductivity Name"), dl->qp_scalar),
       thermal_transient_coeff_(p.get<std::string>("Thermal Transient Coefficient Name"), dl->qp_scalar),
       thermal_diffusivity_(p.get<std::string>("Thermal Diffusivity Name"), dl->qp_tensor),
@@ -59,9 +57,7 @@ ThermoMechanicalCoefficients<EvalT, Traits>::ThermoMechanicalCoefficients(
 
 template <typename EvalT, typename Traits>
 void
-ThermoMechanicalCoefficients<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ThermoMechanicalCoefficients<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   if (SolutionType_ == "Continuation") {
     this->utils.setFieldData(temperature_, fm);

@@ -56,7 +56,7 @@ class GatherSolutionBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX
   PHX::MDField<ScalarT, Cell, Node, VecDim, VecDim> valTensor_dotdot;
   std::size_t                                       numNodes;
   std::size_t                                       numFieldsBase;  // Number of fields gathered in this call
-  std::size_t                                       offset;  // Offset of first DOF being gathered when numFields<neq
+  std::size_t                                       offset;         // Offset of first DOF being gathered when numFields<neq
   unsigned short int                                tensorRank;
   bool                                              enableTransient;
   bool                                              enableAcceleration;
@@ -66,8 +66,8 @@ class GatherSolutionBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX
   Albany::DeviceView1d<const ST> x_constView, xdot_constView, xdotdot_constView;
 
   typedef Kokkos::vector<Kokkos::DynRankView<ScalarT, PHX::Device>, PHX::Device> KV;
-  KV                 val_kokkos, val_dot_kokkos, val_dotdot_kokkos;
-  typename KV::t_dev d_val, d_val_dot, d_val_dotdot;
+  KV                                                                             val_kokkos, val_dot_kokkos, val_dotdot_kokkos;
+  typename KV::t_dev                                                             d_val, d_val_dot, d_val_dotdot;
 };
 
 template <typename EvalT, typename Traits>
@@ -83,8 +83,7 @@ class GatherSolution;
 // Residual
 // **************************************************************
 template <typename Traits>
-class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
-    : public GatherSolutionBase<PHAL::AlbanyTraits::Residual, Traits>
+class GatherSolution<PHAL::AlbanyTraits::Residual, Traits> : public GatherSolutionBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   GatherSolution(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -173,27 +172,23 @@ class GatherSolution<PHAL::AlbanyTraits::Residual, Traits>
   using Base::xdot_constView;
   using Base::xdotdot_constView;
 
-  typedef typename PHX::Device::execution_space                                  ExecutionSpace;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Tag>           PHAL_GatherSolRank2_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Transient_Tag> PHAL_GatherSolRank2_Transient_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Acceleration_Tag>
-                                                                       PHAL_GatherSolRank2_Acceleration_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Tag> PHAL_GatherSolRank1_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Transient_Tag> PHAL_GatherSolRank1_Transient_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Acceleration_Tag>
-                                                                       PHAL_GatherSolRank1_Acceleration_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Tag> PHAL_GatherSolRank0_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Transient_Tag> PHAL_GatherSolRank0_Transient_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Acceleration_Tag>
-      PHAL_GatherSolRank0_Acceleration_Policy;
+  typedef typename PHX::Device::execution_space                                     ExecutionSpace;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Tag>              PHAL_GatherSolRank2_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Transient_Tag>    PHAL_GatherSolRank2_Transient_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank2_Acceleration_Tag> PHAL_GatherSolRank2_Acceleration_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Tag>              PHAL_GatherSolRank1_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Transient_Tag>    PHAL_GatherSolRank1_Transient_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank1_Acceleration_Tag> PHAL_GatherSolRank1_Acceleration_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Tag>              PHAL_GatherSolRank0_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Transient_Tag>    PHAL_GatherSolRank0_Transient_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherSolRank0_Acceleration_Tag> PHAL_GatherSolRank0_Acceleration_Policy;
 };
 
 // **************************************************************
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public GatherSolutionBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits> : public GatherSolutionBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   GatherSolution(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -282,19 +277,16 @@ class GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>
   using Base::xdot_constView;
   using Base::xdotdot_constView;
 
-  typedef typename PHX::Device::execution_space                                  ExecutionSpace;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Tag>           PHAL_GatherJacRank2_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Transient_Tag> PHAL_GatherJacRank2_Transient_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Acceleration_Tag>
-                                                                       PHAL_GatherJacRank2_Acceleration_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Tag> PHAL_GatherJacRank1_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Transient_Tag> PHAL_GatherJacRank1_Transient_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Acceleration_Tag>
-                                                                       PHAL_GatherJacRank1_Acceleration_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Tag> PHAL_GatherJacRank0_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Transient_Tag> PHAL_GatherJacRank0_Transient_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Acceleration_Tag>
-      PHAL_GatherJacRank0_Acceleration_Policy;
+  typedef typename PHX::Device::execution_space                                     ExecutionSpace;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Tag>              PHAL_GatherJacRank2_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Transient_Tag>    PHAL_GatherJacRank2_Transient_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank2_Acceleration_Tag> PHAL_GatherJacRank2_Acceleration_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Tag>              PHAL_GatherJacRank1_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Transient_Tag>    PHAL_GatherJacRank1_Transient_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank1_Acceleration_Tag> PHAL_GatherJacRank1_Acceleration_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Tag>              PHAL_GatherJacRank0_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Transient_Tag>    PHAL_GatherJacRank0_Transient_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_GatherJacRank0_Acceleration_Tag> PHAL_GatherJacRank0_Acceleration_Policy;
 };
 
 }  // namespace PHAL

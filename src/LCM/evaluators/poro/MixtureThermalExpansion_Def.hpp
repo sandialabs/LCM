@@ -11,20 +11,12 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(Teuchos::ParameterList const& p)
-    : biotCoefficient(
-          p.get<std::string>("Biot Coefficient Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+    : biotCoefficient(p.get<std::string>("Biot Coefficient Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       porosity(p.get<std::string>("Porosity Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      alphaSkeleton(
-          p.get<std::string>("Skeleton Thermal Expansion Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      alphaPoreFluid(
-          p.get<std::string>("Pore-Fluid Thermal Expansion Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      alphaSkeleton(p.get<std::string>("Skeleton Thermal Expansion Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      alphaPoreFluid(p.get<std::string>("Pore-Fluid Thermal Expansion Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      mixtureThermalExpansion(
-          p.get<std::string>("Mixture Thermal Expansion Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+      mixtureThermalExpansion(p.get<std::string>("Mixture Thermal Expansion Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   this->addDependentField(biotCoefficient);
   this->addDependentField(porosity);
@@ -45,9 +37,7 @@ MixtureThermalExpansion<EvalT, Traits>::MixtureThermalExpansion(Teuchos::Paramet
 //*****
 template <typename EvalT, typename Traits>
 void
-MixtureThermalExpansion<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+MixtureThermalExpansion<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(mixtureThermalExpansion, fm);
   this->utils.setFieldData(biotCoefficient, fm);
@@ -66,8 +56,7 @@ MixtureThermalExpansion<EvalT, Traits>::evaluateFields(typename Traits::EvalData
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
       mixtureThermalExpansion(cell, qp) =
-          (biotCoefficient(cell, qp) * J(cell, qp) - porosity(cell, qp)) * alphaSkeleton(cell, qp) +
-          porosity(cell, qp) * alphaPoreFluid(cell, qp);
+          (biotCoefficient(cell, qp) * J(cell, qp) - porosity(cell, qp)) * alphaSkeleton(cell, qp) + porosity(cell, qp) * alphaPoreFluid(cell, qp);
     }
   }
 }

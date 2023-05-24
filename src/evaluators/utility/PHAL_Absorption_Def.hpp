@@ -82,9 +82,7 @@ Absorption<EvalT, Traits>::getValue(std::string const& n)
     if (n == Albany::strint("Thermal Conductivity KL Random Variable",i))
       return rv[i];
   }*/
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in Absorption::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in Absorption::getValue()" << std::endl);
   return constant_value;
 }
 

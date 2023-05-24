@@ -33,8 +33,7 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
 
   is_ace_ice_saturation_ = p.isParameter("ACE_Ice_Saturation QP Variable Name");
   if (is_ace_ice_saturation_ == true) {
-    ice_saturation_ =
-        decltype(ice_saturation_)(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar);
+    ice_saturation_ = decltype(ice_saturation_)(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar);
     this->addDependentField(ice_saturation_.fieldTag());
   }
 
@@ -204,8 +203,7 @@ MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
       for (int pt = 0; pt < num_pts_; ++pt) {
         for (int node = 0; node < num_nodes_; ++node) {
           for (int i = 0; i < num_dims_; ++i)
-            for (int j = 0; j < num_dims_; ++j)
-              residual_(cell, node, i) += stress_(cell, pt, i, j) * w_grad_bf_(cell, node, pt, j);
+            for (int j = 0; j < num_dims_; ++j) residual_(cell, node, i) += stress_(cell, pt, i, j) * w_grad_bf_(cell, node, pt, j);
         }
       }
     }

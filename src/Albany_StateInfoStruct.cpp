@@ -83,8 +83,7 @@ printElementStates(StateArrays const& sa)
                 for (int j = 0; j < dims[3]; ++j) {
                   for (int k = 0; k < dims[4]; ++k) {
                     double& value = mda(cell, qp, i, j, k);
-                    fos << "**** # INDEX 5, " << state_name << "(" << cell << "," << qp << "," << i << "," << j << ","
-                        << k << ")"
+                    fos << "**** # INDEX 5, " << state_name << "(" << cell << "," << qp << "," << i << "," << j << "," << k << ")"
                         << " = " << value << '\n';
                   }
                 }

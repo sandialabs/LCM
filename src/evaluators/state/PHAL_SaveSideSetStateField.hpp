@@ -34,8 +34,8 @@ class SaveSideSetStateField : public PHX::EvaluatorWithBaseImpl<Traits>, public 
 // =========================== SPECIALIZATION ========================= //
 
 template <typename Traits>
-class SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>
-    : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
+class SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits> : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                                                    public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   SaveSideSetStateField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

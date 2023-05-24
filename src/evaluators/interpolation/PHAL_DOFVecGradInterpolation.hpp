@@ -21,8 +21,7 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                    public PHX::EvaluatorDerived<EvalT, Traits>
+class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   DOFVecGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -57,8 +56,7 @@ class DOFVecGradInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   struct DOFVecGradInterpolationBase_Residual_Tag
   {
   };
-  typedef Kokkos::RangePolicy<ExecutionSpace, DOFVecGradInterpolationBase_Residual_Tag>
-      DOFVecGradInterpolationBase_Residual_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, DOFVecGradInterpolationBase_Residual_Tag> DOFVecGradInterpolationBase_Residual_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void
@@ -100,21 +98,12 @@ class FastSolutionVecGradInterpolationBase : public DOFVecGradInterpolationBase<
 //! Specialization for Jacobian evaluation taking advantage of known sparsity
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 template <typename Traits>
-class FastSolutionVecGradInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>
-    : public DOFVecGradInterpolationBase<
-          PHAL::AlbanyTraits::Jacobian,
-          Traits,
-          typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+class FastSolutionVecGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+    : public DOFVecGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
  public:
   FastSolutionVecGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : DOFVecGradInterpolationBase<
-            PHAL::AlbanyTraits::Jacobian,
-            Traits,
-            typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
+      : DOFVecGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
   {
     this->setName("FastSolutionVecGradInterpolationBase" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
@@ -123,8 +112,7 @@ class FastSolutionVecGradInterpolationBase<
   void
   postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFVecGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-        postRegistrationSetup(d, vm);
+    DOFVecGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::postRegistrationSetup(d, vm);
   }
 
   void
@@ -142,8 +130,7 @@ class FastSolutionVecGradInterpolationBase<
   struct FastSolutionVecGradInterpolationBase_Jacobian_Tag
   {
   };
-  typedef Kokkos::RangePolicy<ExecutionSpace, FastSolutionVecGradInterpolationBase_Jacobian_Tag>
-      FastSolutionVecGradInterpolationBase_Jacobian_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, FastSolutionVecGradInterpolationBase_Jacobian_Tag> FastSolutionVecGradInterpolationBase_Jacobian_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void

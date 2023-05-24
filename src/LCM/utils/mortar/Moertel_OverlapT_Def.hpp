@@ -1303,8 +1303,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
     double const length = MoertelT::length(n, 3);
     for (int j = 0; j < 3; ++j) n[j] /= length;
     // create a node with this coords and normal;
-    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)* node =
-        new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(points[i]->Id(), x, 3, dof, false, OutLevel());
+    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)* node = new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(points[i]->Id(), x, 3, dof, false, OutLevel());
     node->SetN(n);
     // set node in point
     points[i]->SetNode(node);
@@ -1344,8 +1343,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
 
       projector.ProjectNodetoSegment_NodalNormal(*node, mseg_, mxi, gap);
       // create a projected node and set it in node
-      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-          new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*node, mxi, &mseg_);
+      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*node, mxi, &mseg_);
       node->SetProjectedNode(pnode);
       node->SetGap(gap);
 #if 0

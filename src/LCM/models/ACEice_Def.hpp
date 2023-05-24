@@ -9,10 +9,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
-    ConstitutiveModel<EvalT, Traits>&    model,
-    Teuchos::ParameterList*              p,
-    Teuchos::RCP<Albany::Layouts> const& dl)
+ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl)
     : BaseKernel(model)
 {
   this->setIntegrationPointLocationFlag(true);
@@ -77,8 +74,7 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
         "ACE_Porosity File must match.");
   }
 
-  ALBANY_ASSERT(
-      time_.size() == sea_level_.size(), "*** ERROR: Number of times and number of sea level values must match");
+  ALBANY_ASSERT(time_.size() == sea_level_.size(), "*** ERROR: Number of times and number of sea level values must match");
 
   // retrieve appropriate field name strings
   auto const cauchy_string       = field_name_map_["Cauchy_Stress"];
@@ -127,39 +123,28 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
 
   // yield surface
-  addStateVariable(
-      yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
+  addStateVariable(yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
 
   // ACE Bluff salinity
-  addStateVariable(
-      "ACE_Bluff_Salinity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Bluff_Salinity", false));
+  addStateVariable("ACE_Bluff_Salinity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Bluff_Salinity", false));
 
   // ACE Ice saturation
-  addStateVariable(
-      "ACE_Ice_Saturation",
-      dl->qp_scalar,
-      "scalar",
-      ice_saturation_init_,
-      true,
-      p->get<bool>("Output ACE_Ice_Saturation", false));
+  addStateVariable("ACE_Ice_Saturation", dl->qp_scalar, "scalar", ice_saturation_init_, true, p->get<bool>("Output ACE_Ice_Saturation", false));
 
   // ACE_Density
   addStateVariable("ACE_Density", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Density", false));
 
   // ACE_Heat_Capacity
-  addStateVariable(
-      "ACE_Heat_Capacity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Heat_Capacity", false));
+  addStateVariable("ACE_Heat_Capacity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Heat_Capacity", false));
 
   // ACE_Therm_Cond
   addStateVariable("ACE_Therm_Cond", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Therm_Cond", false));
 
   // ACE_Thermal_Inertia
-  addStateVariable(
-      "ACE_Thermal_Inertia", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Thermal_Inertia", false));
+  addStateVariable("ACE_Thermal_Inertia", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Thermal_Inertia", false));
 
   // ACE_Water_Saturation
-  addStateVariable(
-      "ACE_Water_Saturation", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE_Water_Saturation", false));
+  addStateVariable("ACE_Water_Saturation", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE_Water_Saturation", false));
 
   // ACE_Porosity
   addStateVariable("ACE_Porosity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE_Porosity", false));
@@ -167,23 +152,18 @@ ACEiceMiniKernel<EvalT, Traits>::ACEiceMiniKernel(
   // ACE Temperature is already registered in Mechanics Problem.
 
   // ACE Temperature Dot
-  addStateVariable(
-      "ACE Temperature Dot", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE Temperature Dot", false));
+  addStateVariable("ACE Temperature Dot", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE Temperature Dot", false));
 
   // failed state
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output failure_state", true));
 
   // exposure time
-  addStateVariable(
-      "ACE Exposure Time", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Exposure Time", true));
+  addStateVariable("ACE Exposure Time", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Exposure Time", true));
 }
 
 template <typename EvalT, typename Traits>
 void
-ACEiceMiniKernel<EvalT, Traits>::init(
-    Workset&                 workset,
-    FieldMap<ScalarT const>& input_fields,
-    FieldMap<ScalarT>&       output_fields)
+ACEiceMiniKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& input_fields, FieldMap<ScalarT>& output_fields)
 {
   auto const cauchy_string       = field_name_map_["Cauchy_Stress"];
   auto const Fp_string           = field_name_map_["Fp"];
@@ -329,8 +309,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   auto const pressure_fixed = 1.0;
   // Tmelt is in Kelvin
-  ScalarT const Tmelt =
-      -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal - 0.000753 / 10000.0 * pressure_fixed + 273.15;
+  ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal - 0.000753 / 10000.0 * pressure_fixed + 273.15;
 
   // Calculate temperature change
   auto dTemp = Tcurr - Told;
@@ -454,8 +433,7 @@ ACEiceMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // check yield condition
   ScalarT const smag = minitensor::norm(s);
-  ScalarT const f =
-      smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+  ScalarT const f    = smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
 
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;

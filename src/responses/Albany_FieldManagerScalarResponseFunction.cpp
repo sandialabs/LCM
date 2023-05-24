@@ -78,9 +78,8 @@ FieldManagerScalarResponseFunction::setup(Teuchos::ParameterList& responseParams
 
   // Restrict to the element block?
   char const* reb_parm         = "Restrict to Element Block";
-  bool const  reb_parm_present = responseParams.isType<bool>(reb_parm),
-             reb               = reb_parm_present && responseParams.get<bool>(reb_parm, false);
-  element_block_index          = reb ? meshSpecs->ebNameToIndex[meshSpecs->ebName] : -1;
+  bool const  reb_parm_present = responseParams.isType<bool>(reb_parm), reb = reb_parm_present && responseParams.get<bool>(reb_parm, false);
+  element_block_index = reb ? meshSpecs->ebNameToIndex[meshSpecs->ebName] : -1;
   if (reb_parm_present) {
     responseParams.remove(reb_parm, false);
   }
@@ -156,8 +155,7 @@ FieldManagerScalarResponseFunction::writePhalanxGraph(std::string const& evalNam
   if (vis_response_graph > 0) {
     bool const                          detail = (vis_response_graph > 1) ? true : false;
     Teuchos::RCP<Teuchos::FancyOStream> out    = Teuchos::VerboseObjectBase::getDefaultOStream();
-    *out << "Phalanx writing graphviz file for graph of " << evalName << " (detail = " << vis_response_graph << ")"
-         << std::endl;
+    *out << "Phalanx writing graphviz file for graph of " << evalName << " (detail = " << vis_response_graph << ")" << std::endl;
     std::string const graphName = "phalanxGraph" + evalName;
     *out << "Process using 'dot -Tpng -O " << graphName << std::endl;
     rfm->writeGraphvizFile<EvalT>(graphName, detail, detail);
@@ -246,12 +244,11 @@ FieldManagerScalarResponseFunction::evaluateGradient(
 
   // Perform fill via field manager (dg/dx)
   if (!dg_dx.is_null()) {
-    workset.m_coeff = 0.0;
-    workset.j_coeff = 1.0;
-    workset.n_coeff = 0.0;
-    workset.dgdx    = dg_dx;
-    workset.overlapped_dgdx =
-        Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dx->domain()->dim());
+    workset.m_coeff         = 0.0;
+    workset.j_coeff         = 1.0;
+    workset.n_coeff         = 0.0;
+    workset.dgdx            = dg_dx;
+    workset.overlapped_dgdx = Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dx->domain()->dim());
     evaluate<PHAL::AlbanyTraits::Jacobian>(workset);
   }
 
@@ -261,10 +258,9 @@ FieldManagerScalarResponseFunction::evaluateGradient(
     workset.j_coeff = 0.0;
     workset.n_coeff = 0.0;
     // LB: WHY?!?!
-    workset.dgdx    = Teuchos::null;
-    workset.dgdxdot = dg_dxdot;
-    workset.overlapped_dgdxdot =
-        Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dxdot->domain()->dim());
+    workset.dgdx               = Teuchos::null;
+    workset.dgdxdot            = dg_dxdot;
+    workset.overlapped_dgdxdot = Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dxdot->domain()->dim());
     evaluate<PHAL::AlbanyTraits::Jacobian>(workset);
   }
   // Perform fill via field manager (dg/dxdotdot)
@@ -273,11 +269,10 @@ FieldManagerScalarResponseFunction::evaluateGradient(
     workset.j_coeff = 0.0;
     workset.n_coeff = 1.0;
     // LB: WHY?!?!
-    workset.dgdx       = Teuchos::null;
-    workset.dgdxdot    = Teuchos::null;
-    workset.dgdxdotdot = dg_dxdotdot;
-    workset.overlapped_dgdxdotdot =
-        Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dxdotdot->domain()->dim());
+    workset.dgdx                  = Teuchos::null;
+    workset.dgdxdot               = Teuchos::null;
+    workset.dgdxdotdot            = dg_dxdotdot;
+    workset.overlapped_dgdxdotdot = Thyra::createMembers(workset.x_cas_manager->getOverlappedVectorSpace(), dg_dxdotdot->domain()->dim());
     evaluate<PHAL::AlbanyTraits::Jacobian>(workset);
   }
 }

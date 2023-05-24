@@ -15,11 +15,7 @@ namespace AAdapt {
 namespace rc {
 
 Teuchos::RCP<Thyra_MultiVector>
-solve(
-    const Teuchos::RCP<const Thyra_LinearOp>&    A,
-    Teuchos::RCP<Thyra_LinearOp>&                P,
-    const Teuchos::RCP<const Thyra_MultiVector>& b,
-    Teuchos::ParameterList&                      pl)
+solve(const Teuchos::RCP<const Thyra_LinearOp>& A, Teuchos::RCP<Thyra_LinearOp>& P, const Teuchos::RCP<const Thyra_MultiVector>& b, Teuchos::ParameterList& pl)
 {
   int const                       nrhs = b->domain()->dim();
   Teuchos::RCP<Thyra_MultiVector> x    = Thyra::createMembers(A->domain(), nrhs);

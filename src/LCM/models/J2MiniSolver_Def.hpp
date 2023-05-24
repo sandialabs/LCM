@@ -8,13 +8,8 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-J2MiniKernel<EvalT, Traits>::J2MiniKernel(
-    ConstitutiveModel<EvalT, Traits>&    model,
-    Teuchos::ParameterList*              p,
-    Teuchos::RCP<Albany::Layouts> const& dl)
-    : BaseKernel(model),
-      sat_mod_(p->get<RealType>("Saturation Modulus", 0.0)),
-      sat_exp_(p->get<RealType>("Saturation Exponent", 0.0))
+J2MiniKernel<EvalT, Traits>::J2MiniKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl)
+    : BaseKernel(model), sat_mod_(p->get<RealType>("Saturation Modulus", 0.0)), sat_exp_(p->get<RealType>("Saturation Exponent", 0.0))
 {
   // retrieve appropriate field name strings
   std::string const cauchy_string       = field_name_map_["Cauchy_Stress"];
@@ -56,14 +51,12 @@ J2MiniKernel<EvalT, Traits>::J2MiniKernel(
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
 
   // yield surface
-  addStateVariable(
-      yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
+  addStateVariable(yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   // mechanical source
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
 
-    addStateVariable(
-        source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
+    addStateVariable(source_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 }
 
@@ -240,8 +233,7 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // check yield condition
   ScalarT const smag = minitensor::norm(s);
-  ScalarT const f =
-      smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+  ScalarT const f    = smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
 
   RealType constexpr yield_tolerance = 1.0e-12;
 
@@ -280,8 +272,7 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
     // mechanical source
     if (have_temperature_ == true && delta_time_(0) > 0) {
-      source_(cell, pt) =
-          (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
+      source_(cell, pt) = (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
     }
 
     // exponential map to get Fpnew

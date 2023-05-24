@@ -262,8 +262,7 @@ AAdapt::Erosion::adaptMesh()
   // Throw away all the Albany data structures and re-build them from the mesh
   auto const rebalance = adapt_params_->get<bool>("Rebalance", false);
   if (rebalance == true) {
-    auto stk_mesh_struct =
-        Teuchos::rcp_dynamic_cast<Albany::GenericSTKMeshStruct>(stk_discretization_->getSTKMeshStruct());
+    auto stk_mesh_struct = Teuchos::rcp_dynamic_cast<Albany::GenericSTKMeshStruct>(stk_discretization_->getSTKMeshStruct());
     stk_mesh_struct->rebalanceAdaptedMeshT(adapt_params_, teuchos_comm_);
   }
   stk_discretization_->updateMesh();

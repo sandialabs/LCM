@@ -34,9 +34,7 @@ plName(std::string const& name)
 // corners, and so order of evaluation can matter. Establish an order here. The
 // order is the order the BC is listed in the input file.
 void
-imposeOrder(
-    Teuchos::ParameterList const&                                      bc_pl,
-    std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>> const& evname2pl)
+imposeOrder(Teuchos::ParameterList const& bc_pl, std::map<std::string, Teuchos::RCP<Teuchos::ParameterList>> const& evname2pl)
 {
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -85,8 +83,7 @@ imposeOrder(
             std::string dof_name = name.substr(dof_pos + 4, dof_size);
 
             // Check that NS and DOF name are inside this evaluator name
-            if (order_it->first.find(ns_name) != std::string::npos &&
-                order_it->first.find(dof_name) != std::string::npos) {
+            if (order_it->first.find(ns_name) != std::string::npos && order_it->first.find(dof_name) != std::string::npos) {
               found_off_ns = true;
               break;
             }
@@ -129,8 +126,7 @@ imposeOrder(
         << " were detected and ordered. The parameter list gives:\n";
     for (S2int::const_iterator it = order.begin(); it != order.end(); ++it) msg << "  " << it->first << "\n";
     msg << "But BCUtils provided:\n";
-    for (S2PL::const_iterator it = evname2pl.begin(); it != evname2pl.end(); ++it)
-      msg << "  " << plName(it->first) << "\n";
+    for (S2PL::const_iterator it = evname2pl.begin(); it != evname2pl.end(); ++it) msg << "  " << plName(it->first) << "\n";
     ALBANY_ABORT(msg.str());
   }
 }
@@ -219,18 +215,7 @@ Albany::BCUtils<Albany::NeumannTraits>::constructBCEvaluators(
   // Build the list of evaluators to build, with all the needed parameters
   std::map<std::string, RCP<Teuchos::ParameterList>> evaluators_to_build;
   buildEvaluatorsList(
-      evaluators_to_build,
-      meshSpecs,
-      bcNames,
-      dof_names,
-      isVectorField,
-      offsetToFirstDOF,
-      conditions,
-      offsets,
-      dl,
-      params,
-      paramLib,
-      materialDB);
+      evaluators_to_build, meshSpecs, bcNames, dof_names, isVectorField, offsetToFirstDOF, conditions, offsets, dl, params, paramLib, materialDB);
 
   // Build Field Evaluators for each evaluation type
   PHX::EvaluatorFactory<AlbanyTraits, Albany::NeumannTraits::factory_type> factory;
@@ -278,18 +263,7 @@ Albany::BCUtils<Albany::NeumannTraits>::constructBCEvaluators(
   // Build the list of evaluators to build, with all the needed parameters
   std::map<std::string, RCP<Teuchos::ParameterList>> evaluators_to_build;
   buildEvaluatorsList(
-      evaluators_to_build,
-      meshSpecs,
-      bcNames,
-      dof_names,
-      isVectorField,
-      offsetToFirstDOF,
-      conditions,
-      offsets,
-      dl,
-      params,
-      paramLib,
-      materialDB);
+      evaluators_to_build, meshSpecs, bcNames, dof_names, isVectorField, offsetToFirstDOF, conditions, offsets, dl, params, paramLib, materialDB);
 
   // Build Field Evaluators for each evaluation type
   PHX::EvaluatorFactory<AlbanyTraits, Albany::NeumannTraits::factory_type> factory;
@@ -745,8 +719,7 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
 
         // Get the application from the main parameters list above
         // and pass it to the Schwarz BC evaluator.
-        Teuchos::RCP<Albany::Application> const& application =
-            params->get<Teuchos::RCP<Albany::Application>>("Application");
+        Teuchos::RCP<Albany::Application> const& application = params->get<Teuchos::RCP<Albany::Application>>("Application");
 
         p->set<Teuchos::RCP<Albany::Application>>("Application", application);
 
@@ -795,8 +768,7 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
 
         // Get the application from the main parameters list above
         // and pass it to the Schwarz BC evaluator.
-        Teuchos::RCP<Albany::Application> const& application =
-            params->get<Teuchos::RCP<Albany::Application>>("Application");
+        Teuchos::RCP<Albany::Application> const& application = params->get<Teuchos::RCP<Albany::Application>>("Application");
 
         p->set<Teuchos::RCP<Albany::Application>>("Application", application);
 
@@ -984,8 +956,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
         // Set logic for certain NBCs which allow array inputs
         bool allowArrayNBC = false;
-        if ((conditions[k] == "robin") || (conditions[k] == "radiate") ||
-            (conditions[k].find("(") < conditions[k].length())) {
+        if ((conditions[k] == "robin") || (conditions[k] == "radiate") || (conditions[k].find("(") < conditions[k].length())) {
           allowArrayNBC = true;
         }
 
@@ -1099,8 +1070,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
         // Set logic for certain NBCs which allow array inputs
         bool allowArrayNBC = false;
-        if ((conditions[k] == "robin") || (conditions[k] == "radiate") ||
-            (conditions[k].find("(") < conditions[k].length())) {
+        if ((conditions[k] == "robin") || (conditions[k] == "radiate") || (conditions[k].find("(") < conditions[k].length())) {
           allowArrayNBC = true;
         }
 
@@ -1446,9 +1416,7 @@ Albany::BCUtils<BCTraits>::buildFieldManager(
 // Various specializations
 
 Teuchos::RCP<Teuchos::ParameterList const>
-Albany::DirichletTraits::getValidBCParameters(
-    std::vector<std::string> const& nodeSetIDs,
-    std::vector<std::string> const& bcNames)
+Albany::DirichletTraits::getValidBCParameters(std::vector<std::string> const& nodeSetIDs, std::vector<std::string> const& bcNames)
 {
   Teuchos::RCP<Teuchos::ParameterList> validPL = Teuchos::rcp(new Teuchos::ParameterList("Valid Dirichlet BC List"));
 
@@ -1522,8 +1490,7 @@ Albany::NeumannTraits::getValidBCParameters(
         std::string att = Albany::NeumannTraits::constructACETimeDepBCName(sideSetIDs[i], bcNames[j], conditions[k]);
 
         Teuchos::Array<double> defaultData;
-        validPL->set<Teuchos::Array<double>>(
-            ss, defaultData, "Value of BC corresponding to sideSetID and boundary condition");
+        validPL->set<Teuchos::Array<double>>(ss, defaultData, "Value of BC corresponding to sideSetID and boundary condition");
 
         validPL->sublist(tt, false, "SubList of BC corresponding to sideSetID and boundary condition");
         validPL->sublist(att, false, "SubList of BC corresponding to sideSetID and boundary condition");
@@ -1649,10 +1616,7 @@ Albany::DirichletTraits::constructPressureDepBCName(std::string const& ns, std::
 }
 
 std::string
-Albany::NeumannTraits::constructTimeDepBCName(
-    std::string const& ns,
-    std::string const& dof,
-    std::string const& condition)
+Albany::NeumannTraits::constructTimeDepBCName(std::string const& ns, std::string const& dof, std::string const& condition)
 {
   std::stringstream ss;
   ss << "Time Dependent " << Albany::NeumannTraits::constructBCName(ns, dof, condition);
@@ -1660,10 +1624,7 @@ Albany::NeumannTraits::constructTimeDepBCName(
 }
 
 std::string
-Albany::NeumannTraits::constructACETimeDepBCName(
-    std::string const& ns,
-    std::string const& dof,
-    std::string const& condition)
+Albany::NeumannTraits::constructACETimeDepBCName(std::string const& ns, std::string const& dof, std::string const& condition)
 {
   std::stringstream ss;
   ss << "ACE Time Dependent " << Albany::NeumannTraits::constructBCName(ns, dof, condition);

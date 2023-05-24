@@ -56,9 +56,7 @@ SurfaceScalarGradientOperatorTransport<EvalT, Traits>::SurfaceScalarGradientOper
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceScalarGradientOperatorTransport<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceScalarGradientOperatorTransport<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(refDualBasis, fm);
   this->utils.setFieldData(refNormal, fm);

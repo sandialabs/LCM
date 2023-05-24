@@ -19,8 +19,7 @@ namespace PHAL {
 
 // Specialization: Residual
 template <typename Traits>
-ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(Teuchos::ParameterList& p)
-    : PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
+ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::ExprEvalSDBC(Teuchos::ParameterList& p) : PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
   expression = p.get<std::string>("Dirichlet Expression");
 }
@@ -130,8 +129,7 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Trai
 
 // Specialization: Jacobian
 template <typename Traits>
-ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::ExprEvalSDBC(Teuchos::ParameterList& p)
-    : PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
+ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::ExprEvalSDBC(Teuchos::ParameterList& p) : PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 

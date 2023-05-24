@@ -13,10 +13,7 @@
 #include "PHAL_FactoryTraits.hpp"
 #include "Shards_CellTopology.hpp"
 
-Albany::LinComprNSProblem::LinComprNSProblem(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<ParamLib>&               paramLib_,
-    int const                                   numDim_)
+Albany::LinComprNSProblem::LinComprNSProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
     : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_), use_sdbcs_(false)
 {
   // Get number of species equations from Problem specifications
@@ -26,9 +23,7 @@ Albany::LinComprNSProblem::LinComprNSProblem(
 Albany::LinComprNSProblem::~LinComprNSProblem() {}
 
 void
-Albany::LinComprNSProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::LinComprNSProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   using Teuchos::rcp;
 

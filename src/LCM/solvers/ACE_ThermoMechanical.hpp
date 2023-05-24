@@ -67,9 +67,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 {
  public:
   /// Constructor
-  ACEThermoMechanical(
-      Teuchos::RCP<Teuchos::ParameterList> const&   app_params,
-      Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
+  ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> const& app_params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
 
   /// Destructor
   ~ACEThermoMechanical();
@@ -159,9 +157,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   /// Evaluate model on InArgs
   void
-  evalModelImpl(
-      Thyra::ModelEvaluatorBase::InArgs<ST> const&  in_args,
-      Thyra::ModelEvaluatorBase::OutArgs<ST> const& out_args) const;
+  evalModelImpl(Thyra::ModelEvaluatorBase::InArgs<ST> const& in_args, Thyra::ModelEvaluatorBase::OutArgs<ST> const& out_args) const;
 
   Thyra::ModelEvaluatorBase::InArgs<ST>
   createInArgsImpl() const;
@@ -174,20 +170,10 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   ThermoMechanicalLoopDynamics() const;
 
   void
-  AdvanceThermalDynamics(
-      int const    subdomain,
-      bool const   is_initial_state,
-      double const current_time,
-      double const next_time,
-      double const time_step) const;
+  AdvanceThermalDynamics(int const subdomain, bool const is_initial_state, double const current_time, double const next_time, double const time_step) const;
 
   void
-  AdvanceMechanicalDynamics(
-      int const    subdomain,
-      bool const   is_initial_state,
-      double const current_time,
-      double const next_time,
-      double const time_step) const;
+  AdvanceMechanicalDynamics(int const subdomain, bool const is_initial_state, double const current_time, double const next_time, double const time_step) const;
 
   bool
   continueSolve() const;
@@ -196,11 +182,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   createThermalSolverAppDiscME(int const file_index, double const current_time) const;
 
   void
-  createMechanicalSolverAppDiscME(
-      int const    file_index,
-      double const current_time,
-      double const next_time,
-      double const time_step) const;
+  createMechanicalSolverAppDiscME(int const file_index, double const current_time, double const next_time, double const time_step) const;
 
   void
   doQuasistaticOutput(ST const time) const;

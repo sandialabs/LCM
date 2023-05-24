@@ -23,10 +23,7 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
 {
  public:
   // Constructor
-  DistributedParameterDerivativeOp(const Teuchos::RCP<Application>& app_, std::string const& param_name_)
-      : app(app_), param_name(param_name_)
-  {
-  }
+  DistributedParameterDerivativeOp(const Teuchos::RCP<Application>& app_, std::string const& param_name_) : app(app_), param_name(param_name_) {}
 
   //! Destructor
   virtual ~DistributedParameterDerivativeOp() {}
@@ -74,24 +71,11 @@ class DistributedParameterDerivativeOp : public Thyra_LinearOp
 
   //! Overrides Thyra::LinearOpBase purely virtual method
   void
-  applyImpl(
-      const Thyra::EOpTransp                 M_trans,
-      const Thyra_MultiVector&               X,
-      const Teuchos::Ptr<Thyra_MultiVector>& Y,
-      const ST /* alpha */,
-      const ST /* beta */) const
+  applyImpl(const Thyra::EOpTransp M_trans, const Thyra_MultiVector& X, const Teuchos::Ptr<Thyra_MultiVector>& Y, const ST /* alpha */, const ST /* beta */)
+      const
   {
     bool use_transpose = (Thyra::real_trans(M_trans) == Thyra::TRANS);
-    app->applyGlobalDistParamDerivImpl(
-        time,
-        x,
-        xdot,
-        xdotdot,
-        *scalar_params,
-        param_name,
-        use_transpose,
-        Teuchos::rcpFromRef(X),
-        Teuchos::rcpFromPtr(Y));
+    app->applyGlobalDistParamDerivImpl(time, x, xdot, xdotdot, *scalar_params, param_name, use_transpose, Teuchos::rcpFromRef(X), Teuchos::rcpFromPtr(Y));
   }
 
   //! Albany applications

@@ -9,11 +9,7 @@
 
 namespace LCM {
 
-FractureCriterionTraction::FractureCriterionTraction(
-    Topology&          topology,
-    std::string const& stress_name,
-    double const       critical_traction,
-    double const       beta)
+FractureCriterionTraction::FractureCriterionTraction(Topology& topology, std::string const& stress_name, double const critical_traction, double const beta)
     : AbstractFailureCriterion(topology),
       stress_field_(get_meta_data().get_field<TensorFieldType>(stk::topology::NODE_RANK, stress_name)),
       critical_traction_(critical_traction),

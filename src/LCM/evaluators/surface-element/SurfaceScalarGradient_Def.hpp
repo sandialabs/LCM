@@ -11,9 +11,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceScalarGradient<EvalT, Traits>::SurfaceScalarGradient(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceScalarGradient<EvalT, Traits>::SurfaceScalarGradient(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
@@ -115,8 +113,7 @@ SurfaceScalarGradient<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
         int topNode = node + numPlaneNodes;
         midPlaneAvg = 0.5 * (nodalScalar(cell, node) + nodalScalar(cell, topNode));
         for (int i(0); i < numDims; ++i) {
-          scalarGradParallel(i) +=
-              refGrads(node, pt, 0) * midPlaneAvg * invG_0(i) + refGrads(node, pt, 1) * midPlaneAvg * invG_1(i);
+          scalarGradParallel(i) += refGrads(node, pt, 0) * midPlaneAvg * invG_0(i) + refGrads(node, pt, 1) * midPlaneAvg * invG_1(i);
         }
       }
 

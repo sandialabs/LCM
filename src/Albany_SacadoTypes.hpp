@@ -81,8 +81,7 @@ struct StrongestScalarType
   static constexpr bool st1_from_st2 = std::is_constructible<ST1, ST2>::value;
 
  public:
-  using type =
-      typename std::conditional<st2_from_st1, ST2, typename std::conditional<st1_from_st2, ST1, void>::type>::type;
+  using type = typename std::conditional<st2_from_st1, ST2, typename std::conditional<st1_from_st2, ST1, void>::type>::type;
 };
 
 }  // namespace Albany

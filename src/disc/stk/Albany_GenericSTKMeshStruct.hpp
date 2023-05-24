@@ -42,9 +42,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
 
   //! Re-load balance adapted mesh
   void
-  rebalanceAdaptedMeshT(
-      const Teuchos::RCP<Teuchos::ParameterList>&   params,
-      Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
+  rebalanceAdaptedMeshT(const Teuchos::RCP<Teuchos::ParameterList>& params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
 
   bool
   useCompositeTet()
@@ -58,16 +56,10 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
   // same as in the corresponding 3D side. The second map works as follows:
   // map[3DsideGID][3Dside_local_node] = 2Dcell_local_node
   void
-  buildCellSideNodeNumerationMap(
-      std::string const&              sideSetName,
-      std::map<GO, GO>&               sideMap,
-      std::map<GO, std::vector<int>>& sideNodeMap);
+  buildCellSideNodeNumerationMap(std::string const& sideSetName, std::map<GO, GO>& sideMap, std::map<GO, std::vector<int>>& sideNodeMap);
 
  protected:
-  GenericSTKMeshStruct(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<Teuchos::ParameterList>& adaptParams,
-      int const                                   numDim = -1);
+  GenericSTKMeshStruct(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<Teuchos::ParameterList>& adaptParams, int const numDim = -1);
 
   virtual ~GenericSTKMeshStruct() = default;
 
@@ -140,9 +132,7 @@ class GenericSTKMeshStruct : public AbstractSTKMeshStruct
 
   //! Loads from file input required fields not found in the mesh
   void
-  loadRequiredInputFields(
-      const AbstractFieldContainer::FieldContainerRequirements& req,
-      const Teuchos::RCP<Teuchos_Comm const>&                   commT);
+  loadRequiredInputFields(const AbstractFieldContainer::FieldContainerRequirements& req, const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   // Routines to load, fill, or compute a field
   void

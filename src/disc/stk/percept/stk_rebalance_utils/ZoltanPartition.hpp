@@ -110,10 +110,7 @@ class Zoltan : public GeomDecomp
    */
 
   virtual void
-  set_mesh_info(
-      std::vector<mesh::Entity> const& mesh_entities,
-      const VectorField*               nodal_coord_ref,
-      const ScalarField*               elem_weight_ref = NULL);
+  set_mesh_info(std::vector<mesh::Entity> const& mesh_entities, const VectorField* nodal_coord_ref, const ScalarField* elem_weight_ref = NULL);
 
   /** \brief Reset owning processor.
    *

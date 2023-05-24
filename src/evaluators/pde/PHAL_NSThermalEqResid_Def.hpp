@@ -12,25 +12,13 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 NSThermalEqResid<EvalT, Traits>::NSThermalEqResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      Temperature(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Tdot(
-          p.get<std::string>("QP Time Derivative Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      ThermalCond(
-          p.get<std::string>("ThermalConductivity Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      TGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      rho(p.get<std::string>("Density QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Cp(p.get<std::string>("Specific Heat QP Variable Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Temperature(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Tdot(p.get<std::string>("QP Time Derivative Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      ThermalCond(p.get<std::string>("ThermalConductivity Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      TGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      rho(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Cp(p.get<std::string>("Specific Heat QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
 
       TResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       haveSource(p.get<bool>("Have Source")),
@@ -52,20 +40,17 @@ NSThermalEqResid<EvalT, Traits>::NSThermalEqResid(Teuchos::ParameterList const& 
   this->addDependentField(Cp.fieldTag());
 
   if (haveSource) {
-    Source = decltype(Source)(
-        p.get<std::string>("Source Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    Source = decltype(Source)(p.get<std::string>("Source Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(Source.fieldTag());
   }
 
   if (haveFlow) {
-    V = decltype(V)(
-        p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"));
+    V = decltype(V)(p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"));
     this->addDependentField(V.fieldTag());
   }
 
   if (haveSUPG) {
-    TauT =
-        decltype(TauT)(p.get<std::string>("Tau T Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    TauT = decltype(TauT)(p.get<std::string>("Tau T Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(TauT.fieldTag());
   }
 
@@ -126,8 +111,7 @@ NSThermalEqResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workse
     for (std::size_t qp = 0; qp < numQPs; ++qp) {
       convection(cell, qp) = 0.0;
       if (haveSource) convection(cell, qp) -= Source(cell, qp);
-      if (workset.transientTerms && enableTransient)
-        convection(cell, qp) += rho(cell, qp) * Cp(cell, qp) * Tdot(cell, qp);
+      if (workset.transientTerms && enableTransient) convection(cell, qp) += rho(cell, qp) * Cp(cell, qp) * Tdot(cell, qp);
       if (haveFlow) {
         for (std::size_t i = 0; i < numDims; ++i) {
           convection(cell, qp) += rho(cell, qp) * Cp(cell, qp) * V(cell, qp, i) * TGrad(cell, qp, i);
@@ -144,8 +128,7 @@ NSThermalEqResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workse
       for (std::size_t node = 0; node < numNodes; ++node) {
         for (std::size_t qp = 0; qp < numQPs; ++qp) {
           for (std::size_t j = 0; j < numDims; ++j) {
-            TResidual(cell, node) += rho(cell, qp) * Cp(cell, qp) * TauT(cell, qp) * convection(cell, qp) *
-                                     V(cell, qp, j) * wGradBF(cell, node, qp, j);
+            TResidual(cell, node) += rho(cell, qp) * Cp(cell, qp) * TauT(cell, qp) * convection(cell, qp) * V(cell, qp, j) * wGradBF(cell, node, qp, j);
           }
         }
       }

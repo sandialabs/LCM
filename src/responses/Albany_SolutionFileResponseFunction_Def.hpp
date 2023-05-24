@@ -36,10 +36,7 @@ SolutionFileResponseFunction<Norm>::evaluateResponse(
     RefSoln      = Thyra::createMember(x->space());
     MMFileStatus = MatrixMarketFile("reference_solution.dat", RefSoln);
 
-    ALBANY_PANIC(
-        MMFileStatus != 0,
-        std::endl
-            << "MatrixMarketFile, file " __FILE__ " line " << __LINE__ << " returned " << MMFileStatus << std::endl);
+    ALBANY_PANIC(MMFileStatus != 0, std::endl << "MatrixMarketFile, file " __FILE__ " line " << __LINE__ << " returned " << MMFileStatus << std::endl);
 
     solutionLoaded = true;
   }
@@ -85,10 +82,7 @@ SolutionFileResponseFunction<Norm>::evaluateGradient(
     RefSoln      = Thyra::createMember(x->space());
     MMFileStatus = MatrixMarketFile("reference_solution.dat", RefSoln);
 
-    ALBANY_PANIC(
-        MMFileStatus != 0,
-        std::endl
-            << "MatrixMarketFile, file " __FILE__ " line " << __LINE__ << " returned " << MMFileStatus << std::endl);
+    ALBANY_PANIC(MMFileStatus != 0, std::endl << "MatrixMarketFile, file " __FILE__ " line " << __LINE__ << " returned " << MMFileStatus << std::endl);
 
     solutionLoaded = true;
   }
@@ -176,8 +170,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(char const* filename, Teuch
            "solution file."
         << std::endl);
 
-  if (strcmp(token1, "%%MatrixMarket") || strcmp(token2, "matrix") || strcmp(token3, "array") ||
-      strcmp(token4, "real") || strcmp(token5, "general"))
+  if (strcmp(token1, "%%MatrixMarket") || strcmp(token2, "matrix") || strcmp(token3, "array") || strcmp(token4, "real") || strcmp(token5, "general"))
 
     ALBANY_ABORT(
         std::endl
@@ -187,14 +180,11 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(char const* filename, Teuch
 
   // Next, strip off header lines (which start with "%")
   do {
-    if (fgets(line, lineLength, handle) == 0)
-      ALBANY_ABORT(std::endl << "Reference solution file: invalid comment line." << std::endl);
+    if (fgets(line, lineLength, handle) == 0) ALBANY_ABORT(std::endl << "Reference solution file: invalid comment line." << std::endl);
   } while (line[0] == '%');
 
   // Next get problem dimensions: M, N
-  if (sscanf(line, "%d %d", &M, &N) == 0)
-
-    ALBANY_ABORT(std::endl << "Reference solution file: cannot compute problem dimensions" << std::endl);
+  if (sscanf(line, "%d %d", &M, &N) == 0) ALBANY_ABORT(std::endl << "Reference solution file: cannot compute problem dimensions" << std::endl);
 
   // Compute the offset for each processor for when it should start storing
   // values
@@ -230,9 +220,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(char const* filename, Teuch
     for (int i = 0; i < M; i++) {                // i is rownumber in file, or the GID
       if (fgets(line, lineLength, handle) == 0)  // Can't read the line
 
-        ALBANY_ABORT(
-            std::endl
-            << "Reference solution file: cannot read line number " << i + offset << " in file." << std::endl);
+        ALBANY_ABORT(std::endl << "Reference solution file: cannot read line number " << i + offset << " in file." << std::endl);
 
       const LO lid = indexer->getLocalElement(i);
       if (lid >= 0) {  // we own this data value

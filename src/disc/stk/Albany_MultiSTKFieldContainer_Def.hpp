@@ -34,13 +34,12 @@ static char const* res_id_name = {
 
 template <bool Interleaved>
 MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<stk::mesh::MetaData>&    metaData_,
-    const Teuchos::RCP<stk::mesh::BulkData>&    bulkData_,
-    int const                                   neq_,
-    const AbstractFieldContainer::FieldContainerRequirements&
-        req,  // TODO: remove this altogether?
-              // AM: No, used in LCM for crystal plasticity and ACE
+    const Teuchos::RCP<Teuchos::ParameterList>&               params_,
+    const Teuchos::RCP<stk::mesh::MetaData>&                  metaData_,
+    const Teuchos::RCP<stk::mesh::BulkData>&                  bulkData_,
+    int const                                                 neq_,
+    const AbstractFieldContainer::FieldContainerRequirements& req,  // TODO: remove this altogether?
+                                                                    // AM: No, used in LCM for crystal plasticity and ACE
     int const                                          numDim_,
     const Teuchos::RCP<StateInfoStruct>&               sis,
     const Teuchos::Array<Teuchos::Array<std::string>>& solution_vector,
@@ -228,13 +227,11 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
   }
   // lattice orientation is mesh attributes read from a genesis mesh file use
   // with certain solid mechanics material models
-  bool hasLatticeOrientationFieldContainerRequirement =
-      (std::find(req.begin(), req.end(), "Lattice_Orientation") != req.end());
+  bool hasLatticeOrientationFieldContainerRequirement = (std::find(req.begin(), req.end(), "Lattice_Orientation") != req.end());
   if (hasLatticeOrientationFieldContainerRequirement) {
     // STK says that attributes are of type Field<double,anonymous>[ name:
     // "extra_attribute_3" , #states: 1 ]
-    this->latticeOrientation_field =
-        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::ELEMENT_RANK, "extra_attribute_9");
+    this->latticeOrientation_field = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::ELEMENT_RANK, "extra_attribute_9");
     if (this->latticeOrientation_field != 0) {
       buildLatticeOrientation = true;
       stk::io::set_field_role(*this->latticeOrientation_field, Ioss::Field::ATTRIBUTE);
@@ -250,32 +247,28 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
   bool const has_edge_boundary_indicator = (std::find(req.begin(), req.end(), "edge_boundary_indicator") != req.end());
   bool const has_node_boundary_indicator = (std::find(req.begin(), req.end(), "node_boundary_indicator") != req.end());
   if (has_cell_boundary_indicator) {
-    this->cell_boundary_indicator =
-        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
+    this->cell_boundary_indicator = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
     if (this->cell_boundary_indicator != nullptr) {
       build_cell_boundary_indicator = true;
       stk::io::set_field_role(*this->cell_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
   if (has_face_boundary_indicator) {
-    this->face_boundary_indicator =
-        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::FACE_RANK, "face_boundary_indicator");
+    this->face_boundary_indicator = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::FACE_RANK, "face_boundary_indicator");
     if (this->face_boundary_indicator != nullptr) {
       build_face_boundary_indicator = true;
       stk::io::set_field_role(*this->face_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
   if (has_edge_boundary_indicator) {
-    this->edge_boundary_indicator =
-        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
+    this->edge_boundary_indicator = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
     if (this->edge_boundary_indicator != nullptr) {
       build_edge_boundary_indicator = true;
       stk::io::set_field_role(*this->edge_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
   if (has_node_boundary_indicator) {
-    this->node_boundary_indicator =
-        metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "node_boundary_indicator");
+    this->node_boundary_indicator = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "node_boundary_indicator");
     if (this->node_boundary_indicator != nullptr) {
       build_node_boundary_indicator = true;
       stk::io::set_field_role(*this->node_boundary_indicator, Ioss::Field::INFORMATION);
@@ -306,23 +299,19 @@ MultiSTKFieldContainer<Interleaved>::initializeSTKAdaptation()
   }
 
   // Cell boundary indicator
-  this->cell_boundary_indicator =
-      &this->metaData->template declare_field<SFT>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
+  this->cell_boundary_indicator = &this->metaData->template declare_field<SFT>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
   stk::mesh::put_field_on_mesh(*this->cell_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   // Face boundary indicator
-  this->face_boundary_indicator =
-      &this->metaData->template declare_field<SFT>(stk::topology::FACE_RANK, "face_boundary_indicator");
+  this->face_boundary_indicator = &this->metaData->template declare_field<SFT>(stk::topology::FACE_RANK, "face_boundary_indicator");
   stk::mesh::put_field_on_mesh(*this->face_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   // Edge boundary indicator
-  this->edge_boundary_indicator =
-      &this->metaData->template declare_field<SFT>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
+  this->edge_boundary_indicator = &this->metaData->template declare_field<SFT>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
   stk::mesh::put_field_on_mesh(*this->edge_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   // Node boundary indicator
-  this->node_boundary_indicator =
-      &this->metaData->template declare_field<SFT>(stk::topology::NODE_RANK, "node_boundary_indicator");
+  this->node_boundary_indicator = &this->metaData->template declare_field<SFT>(stk::topology::NODE_RANK, "node_boundary_indicator");
   stk::mesh::put_field_on_mesh(*this->node_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
@@ -343,10 +332,7 @@ MultiSTKFieldContainer<Interleaved>::fillVector(
 
 template <bool Interleaved>
 void
-MultiSTKFieldContainer<Interleaved>::fillSolnVector(
-    Thyra_Vector&                                solution,
-    stk::mesh::Selector&                         sel,
-    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
+MultiSTKFieldContainer<Interleaved>::fillSolnVector(Thyra_Vector& solution, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   const LO        numLocalNodes = getSpmdVectorSpace(node_vs)->localSubDim();
   NodalDOFManager nodalDofManager;
@@ -487,10 +473,7 @@ MultiSTKFieldContainer<Interleaved>::saveSolnMultiVector(
 
 template <bool Interleaved>
 void
-MultiSTKFieldContainer<Interleaved>::saveResVector(
-    Thyra_Vector const&                          res,
-    stk::mesh::Selector&                         sel,
-    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
+MultiSTKFieldContainer<Interleaved>::saveResVector(Thyra_Vector const& res, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
   // Setup a dof manger on the fly (it's cheap anyways).
   // We don't care about global dofs (hence, the -1), since it's used only

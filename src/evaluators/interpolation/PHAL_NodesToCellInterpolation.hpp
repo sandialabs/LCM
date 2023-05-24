@@ -22,8 +22,7 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class NodesToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                     public PHX::EvaluatorDerived<EvalT, Traits>
+class NodesToCellInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   NodesToCellInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

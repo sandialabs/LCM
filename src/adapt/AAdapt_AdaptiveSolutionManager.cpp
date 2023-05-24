@@ -89,41 +89,20 @@ AdaptiveSolutionManager::AdaptiveSolutionManager(
   } else {
     cas_manager->scatter(current_soln->col(0), overlapped_soln->col(0), Albany::CombineMode::INSERT);
     InitialConditions(
-        overlapped_soln->col(0),
-        wsElNodeEqID,
-        wsEBNames,
-        coords,
-        neq,
-        numDim,
-        pbParams->sublist("Initial Condition"),
-        disc_->hasRestartSolution());
+        overlapped_soln->col(0), wsElNodeEqID, wsEBNames, coords, neq, numDim, pbParams->sublist("Initial Condition"), disc_->hasRestartSolution());
     cas_manager->combine(overlapped_soln->col(0), current_soln->col(0), Albany::CombineMode::INSERT);
 
     if (num_time_deriv > 0) {
       cas_manager->scatter(current_soln->col(1), overlapped_soln->col(1), Albany::CombineMode::INSERT);
       InitialConditions(
-          overlapped_soln->col(1),
-          wsElNodeEqID,
-          wsEBNames,
-          coords,
-          neq,
-          numDim,
-          pbParams->sublist("Initial Condition Dot"),
-          disc_->hasRestartSolution());
+          overlapped_soln->col(1), wsElNodeEqID, wsEBNames, coords, neq, numDim, pbParams->sublist("Initial Condition Dot"), disc_->hasRestartSolution());
       cas_manager->combine(overlapped_soln->col(1), current_soln->col(1), Albany::CombineMode::INSERT);
     }
 
     if (num_time_deriv > 1) {
       cas_manager->scatter(current_soln->col(2), overlapped_soln->col(2), Albany::CombineMode::INSERT);
       InitialConditions(
-          overlapped_soln->col(2),
-          wsElNodeEqID,
-          wsEBNames,
-          coords,
-          neq,
-          numDim,
-          pbParams->sublist("Initial Condition DotDot"),
-          disc_->hasRestartSolution());
+          overlapped_soln->col(2), wsElNodeEqID, wsEBNames, coords, neq, numDim, pbParams->sublist("Initial Condition DotDot"), disc_->hasRestartSolution());
       cas_manager->combine(overlapped_soln->col(1), current_soln->col(1), Albany::CombineMode::INSERT);
     }
   }
@@ -178,14 +157,10 @@ AdaptiveSolutionManager::adaptProblem()
   if (adapter_->adaptMesh()) {
     resizeMeshDataArrays(disc_);
 
-    Teuchos::RCP<Thyra::ModelEvaluatorDelegatorBase<ST>> base =
-        Teuchos::rcp_dynamic_cast<Thyra::ModelEvaluatorDelegatorBase<ST>>(model);
+    Teuchos::RCP<Thyra::ModelEvaluatorDelegatorBase<ST>> base = Teuchos::rcp_dynamic_cast<Thyra::ModelEvaluatorDelegatorBase<ST>>(model);
 
     // If dynamic cast fails
-    ALBANY_PANIC(
-        base == Teuchos::null,
-        std::endl
-            << "Error! : Cast to Thyra::ModelEvaluatorDelegatorBase failed!" << std::endl);
+    ALBANY_PANIC(base == Teuchos::null, std::endl << "Error! : Cast to Thyra::ModelEvaluatorDelegatorBase failed!" << std::endl);
 
     auto me = Teuchos::rcp_dynamic_cast<Albany::ModelEvaluator>(base->getNonconstUnderlyingModel());
 
@@ -274,10 +249,7 @@ AdaptiveSolutionManager::scatterX(const Thyra_MultiVector& solution) /* not over
 }
 
 void
-AdaptiveSolutionManager::scatterX(
-    Thyra_Vector const&                    x,
-    const Teuchos::Ptr<Thyra_Vector const> x_dot,
-    const Teuchos::Ptr<Thyra_Vector const> x_dotdot)
+AdaptiveSolutionManager::scatterX(Thyra_Vector const& x, const Teuchos::Ptr<Thyra_Vector const> x_dot, const Teuchos::Ptr<Thyra_Vector const> x_dotdot)
 {
   cas_manager->scatter(x, *overlapped_soln->col(0), Albany::CombineMode::INSERT);
 

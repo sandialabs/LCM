@@ -18,11 +18,10 @@ namespace {
 static void
 normalize(double input_normal[3], double normal[3])
 {
-  double sum = std::sqrt(
-      input_normal[0] * input_normal[0] + input_normal[1] * input_normal[1] + input_normal[2] * input_normal[2]);
-  normal[0] = input_normal[0] / sum;
-  normal[1] = input_normal[1] / sum;
-  normal[2] = input_normal[2] / sum;
+  double sum = std::sqrt(input_normal[0] * input_normal[0] + input_normal[1] * input_normal[1] + input_normal[2] * input_normal[2]);
+  normal[0]  = input_normal[0] / sum;
+  normal[1]  = input_normal[1] / sum;
+  normal[2]  = input_normal[2] / sum;
 }
 
 static void
@@ -34,8 +33,7 @@ normalize(double input_output_normal[3])
 static double
 distance(double c0[3], double c1[3])
 {
-  return std::sqrt(
-      (c0[0] - c1[0]) * (c0[0] - c1[0]) + (c0[1] - c1[1]) * (c0[1] - c1[1]) + (c0[2] - c1[2]) * (c0[2] - c1[2]));
+  return std::sqrt((c0[0] - c1[0]) * (c0[0] - c1[0]) + (c0[1] - c1[1]) * (c0[1] - c1[1]) + (c0[2] - c1[2]) * (c0[2] - c1[2]));
 }
 
 static void
@@ -71,17 +69,14 @@ plane_dot_product(double plane_point[3], double plane_normal[3], double point[3]
 namespace AAdapt {
 
 bool
-STKUnifRefineField::operator()(
-    const stk::mesh::Entity    element,
-    stk::mesh::Field<double>*  field,
-    const stk::mesh::BulkData& bulkData)
+STKUnifRefineField::operator()(const stk::mesh::Entity element, stk::mesh::Field<double>* field, const stk::mesh::BulkData& bulkData)
 {
   double plane_point[3]  = {0, 0.7, 0};
   double plane_normal[3] = {0, 1, 0};
 
-  const stk::mesh::PairIterRelation elem_nodes = element.relations(stk::topology::NODE_RANK);
-  unsigned                          num_node   = elem_nodes.size();
-  double*                           f_data     = stk::percept::PerceptMesh::field_data_entity(field, element);
+  const stk::mesh::PairIterRelation                   elem_nodes = element.relations(stk::topology::NODE_RANK);
+  unsigned                                            num_node   = elem_nodes.size();
+  double*                                             f_data     = stk::percept::PerceptMesh::field_data_entity(field, element);
   Albany::AbstractSTKFieldContainer::VectorFieldType* coordField = m_eMesh.get_coordinates_field();
 
   bool found = false;
@@ -117,14 +112,11 @@ STKUnifRefineField::operator()(
 }  // namespace AAdapt
 
 bool
-STKUnifUnrefineField::operator()(
-    const stk::mesh::Entity    element,
-    stk::mesh::Field<double>*  field,
-    const stk::mesh::BulkData& bulkData)
+STKUnifUnrefineField::operator()(const stk::mesh::Entity element, stk::mesh::Field<double>* field, const stk::mesh::BulkData& bulkData)
 {
-  const stk::mesh::PairIterRelation elem_nodes = element.relations(stk::topology::NODE_RANK);
-  unsigned                          num_node   = elem_nodes.size();
-  double*                           f_data     = stk::percept::PerceptMesh::field_data_entity(field, element);
+  const stk::mesh::PairIterRelation                   elem_nodes = element.relations(stk::topology::NODE_RANK);
+  unsigned                                            num_node   = elem_nodes.size();
+  double*                                             f_data     = stk::percept::PerceptMesh::field_data_entity(field, element);
   Albany::AbstractSTKFieldContainer::VectorFieldType* coordField = m_eMesh.get_coordinates_field();
 
   bool found = true;

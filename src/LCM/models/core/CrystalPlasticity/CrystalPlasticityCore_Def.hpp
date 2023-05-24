@@ -117,8 +117,7 @@ CP::updateHardness(
 
     auto phardening = hardening_law_factory.template createHardeningLaw<ArgT>(type_hardening_law);
 
-    phardening->harden(
-        slip_family, slip_systems, dt, rate_slip, state_hardening_n, state_hardening_np1, slip_resistance, failed);
+    phardening->harden(slip_family, slip_systems, dt, rate_slip, state_hardening_n, state_hardening_np1, slip_resistance, failed);
   }
 
   return;
@@ -148,8 +147,7 @@ CP::updateSlip(
 
     auto pflow = flow_rule_factory.template createFlowRule<ArgT>(type_flow_rule);
 
-    ArgT rate_slip =
-        pflow->computeRateSlip(slip_family.pflow_parameters_, shear[ss_index], slip_resistance[ss_index], failed);
+    ArgT rate_slip = pflow->computeRateSlip(slip_family.pflow_parameters_, shear[ss_index], slip_resistance[ss_index], failed);
 
     // return with failed immediately if slip increment is too large
     if (std::abs(rate_slip) > slip_family.pflow_parameters_->max_incr_) {
@@ -261,14 +259,7 @@ CP::computeStress(
 //! Construct elasticity tensor
 template <minitensor::Index NumDimT, typename DataT, typename ArgT>
 void
-CP::computeElasticityTensor(
-    DataT                               c11,
-    DataT                               c12,
-    DataT                               c13,
-    DataT                               c33,
-    DataT                               c44,
-    DataT                               c66,
-    minitensor::Tensor4<ArgT, NumDimT>& C)
+CP::computeElasticityTensor(DataT c11, DataT c12, DataT c13, DataT c33, DataT c44, DataT c66, minitensor::Tensor4<ArgT, NumDimT>& C)
 {
   C.fill(minitensor::Filler::ZEROS);
 

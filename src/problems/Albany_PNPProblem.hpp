@@ -21,10 +21,7 @@ class PNPProblem : public Albany::AbstractProblem
 {
  public:
   //! Default constructor
-  PNPProblem(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<ParamLib>&               paramLib,
-      int const                                   numDim_);
+  PNPProblem(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numDim_);
 
   //! Destructor
   ~PNPProblem();
@@ -137,14 +134,13 @@ Albany::PNPProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPts
+       << ", Dim= " << numDim << std::endl;
 
   dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim, numSpecies));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
@@ -171,18 +167,15 @@ Albany::PNPProblem::constructEvaluators(
     dof_names[0]   = "Potential";
     resid_names[0] = "Potential Residual";
     if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot, offset));
     else
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[0], offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[0], offset));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Potential"));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Potential"));
     offset++;
   }
 
@@ -194,21 +187,17 @@ Albany::PNPProblem::constructEvaluators(
     if (number_of_time_deriv > 0) dof_names_dot[0] = dof_names[0] + "_dot";
     resid_names[0] = "Concentration Residual";
     if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
     else
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0], offset));
 
-    if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dot[0], offset));
+    if (number_of_time_deriv > 0) fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dot[0], offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0], offset));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter Concentration"));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter Concentration"));
     offset += numSpecies;
   }
 
@@ -216,8 +205,7 @@ Albany::PNPProblem::constructEvaluators(
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   {  // Permittivity
     RCP<ParameterList> p = rcp(new ParameterList);

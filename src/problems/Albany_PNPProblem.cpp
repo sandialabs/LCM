@@ -11,10 +11,7 @@
 #include "PHAL_FactoryTraits.hpp"
 #include "Shards_CellTopology.hpp"
 
-Albany::PNPProblem::PNPProblem(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<ParamLib>&               paramLib_,
-    int const                                   numDim_)
+Albany::PNPProblem::PNPProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
     : Albany::AbstractProblem(params_, paramLib_), params(params_), numDim(numDim_), use_sdbcs_(false)
 {
   // Compute number of equations
@@ -29,9 +26,7 @@ Albany::PNPProblem::PNPProblem(
 Albany::PNPProblem::~PNPProblem() {}
 
 void
-Albany::PNPProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::PNPProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   using Teuchos::rcp;
   /* Construct All Phalanx Evaluators */
@@ -139,8 +134,7 @@ Albany::PNPProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshSp
   // both
   std::vector<std::string> condNames;  // dudx, dudy, dudz, dudn, basal
 
-  nfm[0] = nbcUtils.constructBCEvaluators(
-      meshSpecs, nbcNames, Teuchos::arcp(dof_names), true, 0, condNames, offsets, dl, this->params, this->paramLib);
+  nfm[0] = nbcUtils.constructBCEvaluators(meshSpecs, nbcNames, Teuchos::arcp(dof_names), true, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

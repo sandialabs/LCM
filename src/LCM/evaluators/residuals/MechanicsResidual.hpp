@@ -147,11 +147,10 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
 
   typedef Kokkos::View<int***, PHX::Device>::execution_space ExecutionSpace;
 
-  typedef Kokkos::RangePolicy<ExecutionSpace, residual_Tag>               residual_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, residual_haveBodyForce_Tag> residual_haveBodyForce_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, residual_haveBodyForce_and_dynamic_Tag>
-                                                                         residual_haveBodyForce_and_dynamic_Policy;
-  typedef Kokkos::RangePolicy<ExecutionSpace, residual_have_dynamic_Tag> residual_have_dynamic_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, residual_Tag>                           residual_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, residual_haveBodyForce_Tag>             residual_haveBodyForce_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, residual_haveBodyForce_and_dynamic_Tag> residual_haveBodyForce_and_dynamic_Policy;
+  typedef Kokkos::RangePolicy<ExecutionSpace, residual_have_dynamic_Tag>              residual_have_dynamic_Policy;
 
   KOKKOS_INLINE_FUNCTION
   void

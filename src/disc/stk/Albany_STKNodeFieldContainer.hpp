@@ -88,10 +88,7 @@ struct NodeData_Traits<T, 1>
   };  // One array dimension tag (Node), store type T values
   typedef stk::mesh::Field<T> field_type;
   static field_type*
-  createField(
-      std::string const& name,
-      std::vector<PHX::DataLayout::size_type> const& /* dim */,
-      stk::mesh::MetaData* metaData)
+  createField(std::string const& name, std::vector<PHX::DataLayout::size_type> const& /* dim */, stk::mesh::MetaData* metaData)
   {
     field_type* fld = &metaData->declare_field<field_type>(stk::topology::NODE_RANK, name);
     // Multi-dim order is Fortran Ordering, so reversed here
@@ -101,11 +98,7 @@ struct NodeData_Traits<T, 1>
   }
 
   static void
-  saveFieldData(
-      const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec,
-      const stk::mesh::BucketVector&               all_elements,
-      field_type*                                  fld,
-      int                                          offset)
+  saveFieldData(const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec, const stk::mesh::BucketVector& all_elements, field_type* fld, int offset)
   {
     Teuchos::ArrayRCP<const ST> const_overlap_node_view = getLocalData(overlap_node_vec->col(offset));
 
@@ -137,10 +130,7 @@ struct NodeData_Traits<T, 2>
   };  // Two array dimension tags (Node, Dim), store type T values
   typedef stk::mesh::Field<T, stk::mesh::Cartesian> field_type;
   static field_type*
-  createField(
-      std::string const&                             name,
-      std::vector<PHX::DataLayout::size_type> const& dim,
-      stk::mesh::MetaData*                           metaData)
+  createField(std::string const& name, std::vector<PHX::DataLayout::size_type> const& dim, stk::mesh::MetaData* metaData)
   {
     field_type* fld = &metaData->declare_field<field_type>(stk::topology::NODE_RANK, name);
     // Multi-dim order is Fortran Ordering, so reversed here
@@ -150,11 +140,7 @@ struct NodeData_Traits<T, 2>
   }
 
   static void
-  saveFieldData(
-      const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec,
-      const stk::mesh::BucketVector&               all_elements,
-      field_type*                                  fld,
-      int                                          offset)
+  saveFieldData(const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec, const stk::mesh::BucketVector& all_elements, field_type* fld, int offset)
   {
     auto indexer = createGlobalLocalIndexer(overlap_node_vec->range());
     for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
@@ -190,10 +176,7 @@ struct NodeData_Traits<T, 3>
   };  // Three array dimension tags (Node, Dim, Dim), store type T values
   typedef stk::mesh::Field<T, stk::mesh::Cartesian, stk::mesh::Cartesian> field_type;
   static field_type*
-  createField(
-      std::string const&                             name,
-      std::vector<PHX::DataLayout::size_type> const& dim,
-      stk::mesh::MetaData*                           metaData)
+  createField(std::string const& name, std::vector<PHX::DataLayout::size_type> const& dim, stk::mesh::MetaData* metaData)
   {
     field_type* fld = &metaData->declare_field<field_type>(stk::topology::NODE_RANK, name);
     // Multi-dim order is Fortran Ordering, so reversed here
@@ -203,11 +186,7 @@ struct NodeData_Traits<T, 3>
   }
 
   static void
-  saveFieldData(
-      const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec,
-      const stk::mesh::BucketVector&               all_elements,
-      field_type*                                  fld,
-      int                                          offset)
+  saveFieldData(const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec, const stk::mesh::BucketVector& all_elements, field_type* fld, int offset)
   {
     auto indexer = createGlobalLocalIndexer(overlap_node_vec->range());
     for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
@@ -222,8 +201,7 @@ struct NodeData_Traits<T, 3>
 
       for (int j = 0; j < num_j_components; ++j) {
         for (int k = 0; k < num_i_components; ++k) {
-          Teuchos::ArrayRCP<const ST> const_overlap_node_view =
-              getLocalData(overlap_node_vec->col(offset + j * num_i_components + k));
+          Teuchos::ArrayRCP<const ST> const_overlap_node_view = getLocalData(overlap_node_vec->col(offset + j * num_i_components + k));
 
           for (int i = 0; i < num_nodes_in_bucket; ++i) {
             const GO global_id      = bulkData.identifier(bucket[i]) - 1;  // global node in mesh

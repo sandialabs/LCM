@@ -18,8 +18,7 @@ namespace LCM {
 /// This evaluator computes quantities needed for heat conduction problems.
 ///
 template <typename EvalT, typename Traits>
-class ThermoMechanicalCoefficients : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                     public PHX::EvaluatorDerived<EvalT, Traits>
+class ThermoMechanicalCoefficients : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ///

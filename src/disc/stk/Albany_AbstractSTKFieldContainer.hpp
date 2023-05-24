@@ -231,10 +231,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   }
 
   virtual void
-  fillSolnVector(
-      Thyra_Vector&                                soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
+  fillSolnVector(Thyra_Vector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
   fillVector(
       Thyra_Vector&                                field_vector,
@@ -243,10 +240,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager) = 0;
   virtual void
-  fillSolnMultiVector(
-      Thyra_MultiVector&                           soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
+  fillSolnMultiVector(Thyra_MultiVector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
   saveVector(
       Thyra_Vector const&                          field_vector,
@@ -255,16 +249,9 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
       Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
       const NodalDOFManager&                       nodalDofManager) = 0;
   virtual void
-  saveSolnVector(
-      Thyra_Vector const&                          soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
+  saveSolnVector(Thyra_Vector const& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
-  saveSolnVector(
-      Thyra_Vector const&                          soln,
-      Thyra_Vector const&                          soln_dot,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
+  saveSolnVector(Thyra_Vector const& soln, Thyra_Vector const& soln_dot, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
   saveSolnVector(
       Thyra_Vector const&                          soln,
@@ -273,15 +260,9 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
       stk::mesh::Selector&                         sel,
       Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
-  saveResVector(
-      Thyra_Vector const&                          res,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
+  saveResVector(Thyra_Vector const& res, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
   virtual void
-  saveSolnMultiVector(
-      const Thyra_MultiVector&                     soln,
-      stk::mesh::Selector&                         sel,
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
+  saveSolnMultiVector(const Thyra_MultiVector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs) = 0;
 
   virtual void
   transferSolutionToCoords() = 0;

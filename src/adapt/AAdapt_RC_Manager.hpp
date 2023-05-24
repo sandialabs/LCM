@@ -179,9 +179,7 @@ class Manager
   //  keeping an RCP<AbstractDiscretization>, and then this call would be
   //  unnecessary.
   void
-  initProjector(
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
+  initProjector(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
 
   /* Methods to inform Manager of what is happening. */
 
@@ -202,9 +200,7 @@ class Manager
   beginAdapt();
   //! The mesh was just adapted. The maps are needed only if usingProjection().
   void
-  endAdapt(
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
+  endAdapt(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs);
 
   /* Methods to inform others of what is happening. */
   bool

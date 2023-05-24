@@ -13,9 +13,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-GatherScalarNodalParameterBase<EvalT, Traits>::GatherScalarNodalParameterBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+GatherScalarNodalParameterBase<EvalT, Traits>::GatherScalarNodalParameterBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : numNodes(dl->node_scalar->extent(1)), param_name(p.get<std::string>("Parameter Name"))
 {
   std::string field_name = p.isParameter("Field Name") ? p.get<std::string>("Field Name") : param_name;
@@ -27,9 +25,7 @@ GatherScalarNodalParameterBase<EvalT, Traits>::GatherScalarNodalParameterBase(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-GatherScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+GatherScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val, fm);
   d.fill_field_dependencies(this->dependentFields(), this->evaluatedFields(), d.memoizer_for_params_active());
@@ -37,9 +33,7 @@ GatherScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(
 
 // **********************************************************************
 template <typename EvalT, typename Traits>
-GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+GatherScalarNodalParameter<EvalT, Traits>::GatherScalarNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : GatherScalarNodalParameterBase<EvalT, Traits>(p, dl)
 {
   this->setName("GatherNodalParameter(" + this->param_name + ")" + PHX::print<EvalT>());

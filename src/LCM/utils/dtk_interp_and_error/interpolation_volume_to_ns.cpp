@@ -78,14 +78,14 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   std::string tgt_interp_field_name   = source_field_name + "Ref";
 
   // Get the raw mpi communicator (basic typedef in STK).
-  Teuchos::RCP<const Teuchos::MpiComm<int>> mpi_comm = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(comm);
+  Teuchos::RCP<const Teuchos::MpiComm<int>>            mpi_comm         = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(comm);
   Teuchos::RCP<const Teuchos::OpaqueWrapper<MPI_Comm>> opaque_comm      = mpi_comm->getRawMpiComm();
   stk::ParallelMachine                                 parallel_machine = (*opaque_comm)();
 
   // SOURCE MESH READ
   // ----------------
   stk::io::StkMeshIoBroker src_broker(parallel_machine);
-  std::size_t src_input_index = src_broker.add_mesh_database(source_mesh_input_file, "exodus", stk::io::READ_MESH);
+  std::size_t              src_input_index = src_broker.add_mesh_database(source_mesh_input_file, "exodus", stk::io::READ_MESH);
   src_broker.set_active_mesh(src_input_index);
   src_broker.create_input_mesh();
 
@@ -108,12 +108,9 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   if (step > timestep_count)
     ALBANY_ABORT(
         std::endl
-        << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no << " > total number of snapshots in "
-        << source_mesh_input_file << " = " << timestep_count << "." << std::endl);
-  if (step <= 0)
-    ALBANY_ABORT(
-        std::endl
-        << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no << "; value must be > 0." << std::endl);
+        << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no << " > total number of snapshots in " << source_mesh_input_file << " = "
+        << timestep_count << "." << std::endl);
+  if (step <= 0) ALBANY_ABORT(std::endl << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no << "; value must be > 0." << std::endl);
 
   if (timestep_count > 0) {
     double time = io_region->get_state_time(step);
@@ -137,15 +134,15 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   stk::mesh::BucketVector        src_part_buckets = src_stk_selector.get_buckets(stk::topology::NODE_RANK);
   std::vector<stk::mesh::Entity> src_part_nodes;
   stk::mesh::get_selected_entities(src_stk_selector, src_part_buckets, src_part_nodes);
-  Intrepid::FieldContainer<double> src_node_coords = DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(
-      Teuchos::Array<stk::mesh::Entity>(src_part_nodes), *src_bulk_data);
+  Intrepid::FieldContainer<double> src_node_coords =
+      DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(Teuchos::Array<stk::mesh::Entity>(src_part_nodes), *src_bulk_data);
 
   // TARGET MESH READ
   // ----------------
 
   // Load the target mesh.
   stk::io::StkMeshIoBroker tgt_broker(parallel_machine);
-  std::size_t tgt_input_index = tgt_broker.add_mesh_database(target_mesh_input_file, "exodus", stk::io::READ_MESH);
+  std::size_t              tgt_input_index = tgt_broker.add_mesh_database(target_mesh_input_file, "exodus", stk::io::READ_MESH);
   tgt_broker.set_active_mesh(tgt_input_index);
   tgt_broker.create_input_mesh();
   tgt_broker.add_all_mesh_fields_as_input_fields(tmo);
@@ -155,19 +152,15 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   if (source_field != 0)
     *out << "   Field with name " << source_field_name << " found in source mesh file!" << std::endl;
   else
-    ALBANY_ABORT(
-        std::endl
-        << "   Field with name " << source_field_name << " NOT found in source mesh file!" << std::endl);
+    ALBANY_ABORT(std::endl << "   Field with name " << source_field_name << " NOT found in source mesh file!" << std::endl);
 
   int neq = source_field->max_size(stk::topology::NODE_RANK);
 
   // Put fields on target mesh
   // Add a nodal field to the interpolated target part.
-  FieldType& target_interp_field =
-      tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, tgt_interp_field_name);
+  FieldType& target_interp_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, tgt_interp_field_name);
   stk::mesh::put_field_on_mesh(target_interp_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
-  FieldType& dirichlet_field =
-      tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, "dirichlet_field");
+  FieldType& dirichlet_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, "dirichlet_field");
   stk::mesh::put_field_on_mesh(dirichlet_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
 
   // Create the target bulk data.
@@ -180,9 +173,7 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   if (target_field != 0)
     *out << "   Field with name " << target_field_name << " found in target mesh file!" << std::endl;
   else
-    ALBANY_ABORT(
-        std::endl
-        << "   Field with name " << target_field_name << " NOT found in target mesh file!" << std::endl);
+    ALBANY_ABORT(std::endl << "   Field with name " << target_field_name << " NOT found in target mesh file!" << std::endl);
 
   io_region = tgt_broker.get_input_io_region();
   STKIORequire(!Teuchos::is_null(io_region));
@@ -193,12 +184,9 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   if (step > timestep_count)
     ALBANY_ABORT(
         std::endl
-        << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no << " > total number of snapshots in "
-        << target_mesh_input_file << " = " << timestep_count << "." << std::endl);
-  if (step <= 0)
-    ALBANY_ABORT(
-        std::endl
-        << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no << "; value must be > 0." << std::endl);
+        << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no << " > total number of snapshots in " << target_mesh_input_file << " = "
+        << timestep_count << "." << std::endl);
+  if (step <= 0) ALBANY_ABORT(std::endl << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no << "; value must be > 0." << std::endl);
   if (timestep_count > 0) {
     double time = io_region->get_state_time(step);
     if (step == timestep_count) interpolation_intervals = 1;
@@ -240,8 +228,7 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   // "DataTransferKit" parameter list.
   Teuchos::ParameterList&                    dtk_list = plist->sublist("DataTransferKit");
   DataTransferKit::MapOperatorFactory        op_factory;
-  Teuchos::RCP<DataTransferKit::MapOperator> map_op =
-      op_factory.create(src_vector->getMap(), tgt_vector->getMap(), dtk_list);
+  Teuchos::RCP<DataTransferKit::MapOperator> map_op = op_factory.create(src_vector->getMap(), tgt_vector->getMap(), dtk_list);
 
   // Setup the map operator. This creates the underlying linear operators.
   map_op->setup(src_manager.functionSpace(), tgt_manager.functionSpace());

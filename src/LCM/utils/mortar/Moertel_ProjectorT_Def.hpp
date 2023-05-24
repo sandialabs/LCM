@@ -12,9 +12,7 @@
  |  ctor (public)                                            mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::Projector(bool twoD, int outlevel) : twoD_(twoD), outputlevel_(outlevel)
-{
-}
+MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::Projector(bool twoD, int outlevel) : twoD_(twoD), outputlevel_(outlevel) {}
 
 /*----------------------------------------------------------------------*
  |  dtor (public)                                            mwgee 07/05|
@@ -63,8 +61,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_NodalNormal(
                      "MoertelT::Projector::ProjectNodetoSegment_NodalNormal:\n"
                   << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
                   << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta
-                  << " delta(eta) = " << deta << "\n"
+                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta << " delta(eta) = " << deta << "\n"
                   << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
@@ -111,8 +108,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_NodalNormal(
                      "MoertelT::Projector::ProjectNodetoSegment_NodalNormal:\n"
                   << "MOERTEL: ***WRN*** 3D Newton iteration failed to converge\n"
                   << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-                  << "MOERTEL: ***WRN*** eps = " << eps << " eta[3] = " << eta[0] << "/" << eta[1] << "/" << alpha
-                  << "\n"
+                  << "MOERTEL: ***WRN*** eps = " << eps << " eta[3] = " << eta[0] << "/" << eta[1] << "/" << alpha << "\n"
                   << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
@@ -217,10 +213,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_NodalNormal(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 double
-MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_NodalNormal(
-    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-    double eta)
+MoertelT::MOERTEL_TEMPLATE_CLASS(
+    ProjectorT)::evaluate_gradF_2D_NodalNormal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double eta)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
@@ -300,8 +294,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentNormal
                      "MoertelT::Projector::ProjectNodetoSegment_SegmentNormal:\n"
                   << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
                   << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta
-                  << " delta(eta) = " << deta << "\n"
+                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta << " delta(eta) = " << deta << "\n"
                   << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
@@ -355,8 +348,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentNormal
                      "MoertelT::Projector::ProjectNodetoSegment_SegmentNormal:\n"
                   << "MOERTEL: ***WRN*** 3D Newton iteration failed to converge\n"
                   << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-                  << "MOERTEL: ***WRN*** eps = " << eps << " eta[3] = " << eta[0] << "/" << eta[1] << "/" << alpha
-                  << "\n"
+                  << "MOERTEL: ***WRN*** eps = " << eps << " eta[3] = " << eta[0] << "/" << eta[1] << "/" << alpha << "\n"
                   << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
@@ -462,10 +454,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_F_2D_SegmentNormal(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 double
-MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::evaluate_gradF_2D_SegmentNormal(
-    MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node,
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg,
-    double eta)
+MoertelT::MOERTEL_TEMPLATE_CLASS(
+    ProjectorT)::evaluate_gradF_2D_SegmentNormal(MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & node, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & seg, double eta)
 {
   // check the type of function on the segment
   // Here, we need 1D functions set as function id 0
@@ -562,8 +552,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_SegmentOrthog
                      "MoertelT::Projector::ProjectNodetoSegment_SegmentOrthogonal:\n"
                   << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
                   << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta
-                  << " delta(eta) = " << deta << "\n"
+                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta << " delta(eta) = " << deta << "\n"
                   << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0
@@ -769,8 +758,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectorT)::ProjectNodetoSegment_Orthogonal_to
                      "Slave:\n"
                   << "MOERTEL: ***WRN*** Newton iteration failed to converge\n"
                   << "MOERTEL: ***WRN*** #iterations = " << i << std::endl
-                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta
-                  << " delta(eta) = " << deta << "\n"
+                  << "MOERTEL: ***WRN*** F(eta) = " << F << " gradF(eta) = " << dF << " eta = " << eta << " delta(eta) = " << deta << "\n"
                   << "MOERTEL: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     }
 #if 0

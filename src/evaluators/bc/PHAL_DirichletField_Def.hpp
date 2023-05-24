@@ -19,8 +19,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-DirichletField_Base<EvalT, Traits>::DirichletField_Base(Teuchos::ParameterList& p)
-    : PHAL::DirichletBase<EvalT, Traits>(p)
+DirichletField_Base<EvalT, Traits>::DirichletField_Base(Teuchos::ParameterList& p) : PHAL::DirichletBase<EvalT, Traits>(p)
 {
   // Get field type and corresponding layouts
   field_name = p.get<std::string>("Field Name");
@@ -30,8 +29,7 @@ DirichletField_Base<EvalT, Traits>::DirichletField_Base(Teuchos::ParameterList& 
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-DirichletField<PHAL::AlbanyTraits::Residual, Traits>::DirichletField(Teuchos::ParameterList& p)
-    : DirichletField_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
+DirichletField<PHAL::AlbanyTraits::Residual, Traits>::DirichletField(Teuchos::ParameterList& p) : DirichletField_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
 
@@ -72,8 +70,7 @@ DirichletField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits>
-DirichletField<PHAL::AlbanyTraits::Jacobian, Traits>::DirichletField(Teuchos::ParameterList& p)
-    : DirichletField_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
+DirichletField<PHAL::AlbanyTraits::Jacobian, Traits>::DirichletField(Teuchos::ParameterList& p) : DirichletField_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 
@@ -87,7 +84,7 @@ DirichletField<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Tr
   auto                           fieldVs         = dirichletWorkset.disc->getVectorSpace(this->field_name);
   bool                           isFieldScalar   = (fieldNodeVs->dim() == fieldVs->dim());
   int                            fieldOffset     = isFieldScalar ? 0 : this->offset;
-  std::vector<GO> const&         nsNodesGIDs = dirichletWorkset.disc->getNodeSetGIDs().find(this->nodeSetID)->second;
+  std::vector<GO> const&         nsNodesGIDs     = dirichletWorkset.disc->getNodeSetGIDs().find(this->nodeSetID)->second;
 
   Teuchos::RCP<Thyra_Vector const> pvec        = dirichletWorkset.distParamLib->get(this->field_name)->vector();
   Teuchos::ArrayRCP<const ST>      p_constView = Albany::getLocalData(pvec);

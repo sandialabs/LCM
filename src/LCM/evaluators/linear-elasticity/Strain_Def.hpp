@@ -10,8 +10,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 Strain<EvalT, Traits>::Strain(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-    : GradU(p.get<std::string>("Gradient QP Variable Name"), dl->qp_tensor),
-      strain(p.get<std::string>("Strain Name"), dl->qp_tensor)
+    : GradU(p.get<std::string>("Gradient QP Variable Name"), dl->qp_tensor), strain(p.get<std::string>("Strain Name"), dl->qp_tensor)
 {
   this->addDependentField(GradU);
 

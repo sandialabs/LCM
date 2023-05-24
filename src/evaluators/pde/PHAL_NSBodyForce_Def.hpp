@@ -11,8 +11,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
-    : force(p.get<std::string>("Body Force Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      haveHeat(p.get<bool>("Have Heat"))
+    : force(p.get<std::string>("Body Force Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")), haveHeat(p.get<bool>("Have Heat"))
 {
   Teuchos::ParameterList* bf_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -21,8 +20,7 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
     bf_type = NONE;
   } else if (type == "Constant") {
     bf_type = CONSTANT;
-    rho     = decltype(rho)(
-        p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    rho     = decltype(rho)(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(rho.fieldTag());
   } else if (type == "Boussinesq") {
     ALBANY_PANIC(
@@ -31,14 +29,10 @@ NSBodyForce<EvalT, Traits>::NSBodyForce(Teuchos::ParameterList const& p)
             << "Error!  Must enable heat equation for Boussinesq "
             << "body force term!");
     bf_type = BOUSSINESQ;
-    T       = decltype(T)(
-        p.get<std::string>("Temperature QP Variable Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    rho = decltype(rho)(
-        p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    beta = decltype(beta)(
-        p.get<std::string>("Volumetric Expansion Coefficient QP Variable Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    T       = decltype(T)(p.get<std::string>("Temperature QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    rho     = decltype(rho)(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    beta =
+        decltype(beta)(p.get<std::string>("Volumetric Expansion Coefficient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(rho.fieldTag());
     this->addDependentField(beta.fieldTag());
     this->addDependentField(T.fieldTag());

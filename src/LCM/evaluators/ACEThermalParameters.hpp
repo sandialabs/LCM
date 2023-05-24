@@ -51,20 +51,20 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidThermalCondParameters() const;
 
-  unsigned int                                          num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
-  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim> coord_vec_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_conductivity_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                thermal_inertia_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                bluff_salinity_;
-  PHX::MDField<const ScalarT, Cell, QuadPoint>          bluff_salinity_read_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                ice_saturation_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                density_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                heat_capacity_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                water_saturation_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                porosity_;
-  PHX::MDField<ScalarT, Cell, QuadPoint>                temperature_;
-  PHX::MDField<ScalarT, Cell, Node, Dim>                thermal_cond_grad_at_nodes_;
-  PHX::MDField<ScalarT, Cell, QuadPoint, Dim>           thermal_cond_grad_at_qps_;
+  unsigned int                                                num_qps_{0}, num_dims_{0}, num_nodes_{0}, workset_size_{0};
+  PHX::MDField<const MeshScalarT, Cell, QuadPoint, Dim>       coord_vec_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      thermal_conductivity_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      thermal_inertia_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      bluff_salinity_;
+  PHX::MDField<const ScalarT, Cell, QuadPoint>                bluff_salinity_read_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      ice_saturation_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      density_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      heat_capacity_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      water_saturation_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      porosity_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      temperature_;
+  PHX::MDField<ScalarT, Cell, Node, Dim>                      thermal_cond_grad_at_nodes_;
+  PHX::MDField<ScalarT, Cell, QuadPoint, Dim>                 thermal_cond_grad_at_qps_;
   PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint, Dim> wgradbf_;
   //! Basis Functions
   PHX::MDField<const RealType, Cell, Node, QuadPoint> bf_;

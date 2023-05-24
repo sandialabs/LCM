@@ -229,11 +229,9 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
           F[0] = X[0] - delta_time(0) * temp_adj_relaxation_para_ * std::pow(mu, strain_rate_expo_) *
                             std::pow((a0 - 2. / 3. * X[0] * a1) * (a0 - 2. / 3. * X[0] * a1), strain_rate_expo_ / 2.);
 
-          dFdX[0] =
-              1. - delta_time(0) * temp_adj_relaxation_para_ * std::pow(mu, strain_rate_expo_) *
-                       (strain_rate_expo_ / 2.) *
-                       std::pow((a0 - 2. / 3. * X[0] * a1) * (a0 - 2. / 3. * X[0] * a1), strain_rate_expo_ / 2. - 1.) *
-                       (8. / 9. * X[0] * a1 * a1 - 4. / 3. * a0 * a1);
+          dFdX[0] = 1. - delta_time(0) * temp_adj_relaxation_para_ * std::pow(mu, strain_rate_expo_) * (strain_rate_expo_ / 2.) *
+                             std::pow((a0 - 2. / 3. * X[0] * a1) * (a0 - 2. / 3. * X[0] * a1), strain_rate_expo_ / 2. - 1.) *
+                             (8. / 9. * X[0] * a1 * a1 - 4. / 3. * a0 * a1);
 
           if ((typeid(ScalarT) == typeid(double)) && (F[0] != F[0])) {
             std::cerr << "F[0] is NaN, here are some contributing values:n";
@@ -260,11 +258,9 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
             F[0] = X[0] - delta_time(0) * temp_adj_relaxation_para_ * std::pow(mu, strain_rate_expo_) *
                               std::pow((a0 - 2. / 3. * X[0] * a1) * (a0 - 2. / 3. * X[0] * a1), strain_rate_expo_ / 2.);
 
-            dFdX[0] =
-                1. -
-                delta_time(0) * temp_adj_relaxation_para_ * std::pow(mu, strain_rate_expo_) * (strain_rate_expo_ / 2.) *
-                    std::pow((a0 - 2. / 3. * X[0] * a1) * (a0 - 2. / 3. * X[0] * a1), strain_rate_expo_ / 2. - 1.) *
-                    (8. / 9. * X[0] * a1 * a1 - 4. / 3. * a0 * a1);
+            dFdX[0] = 1. - delta_time(0) * temp_adj_relaxation_para_ * std::pow(mu, strain_rate_expo_) * (strain_rate_expo_ / 2.) *
+                               std::pow((a0 - 2. / 3. * X[0] * a1) * (a0 - 2. / 3. * X[0] * a1), strain_rate_expo_ / 2. - 1.) *
+                               (8. / 9. * X[0] * a1 * a1 - 4. / 3. * a0 * a1);
 
             if (debug_output_counter % DEBUG_FREQ == 0) std::cout << "Creep Solver count = " << count << std::endl;
             if (debug_output_counter % DEBUG_FREQ == 0) std::cout << "X[0] = " << X[0] << std::endl;
@@ -297,8 +293,8 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
             ALBANY_PANIC(
                 count == max_count,
                 std::endl
-                    << "Error in return mapping, count = " << count << "\nres = " << res << "\ng = " << F[0]
-                    << "\ndg = " << dFdX[0] << "\nalpha = " << alpha << std::endl);
+                    << "Error in return mapping, count = " << count << "\nres = " << res << "\ng = " << F[0] << "\ndg = " << dFdX[0] << "\nalpha = " << alpha
+                    << std::endl);
           }
           solver.computeFadInfo(dFdX, X, F);
 
@@ -367,10 +363,8 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
           solver.solve(dFdX, X, F);
           H = 2. * mubar * delta_time(0) * temp_adj_relaxation_para_ *
               std::pow((smag + 2. / 3. * (K * X[0]) - f) * (smag + 2. / 3. * (K * X[0]) - f), strain_rate_expo_ / 2.);
-          dH =
-              strain_rate_expo_ * 2. * mubar * delta_time(0) * temp_adj_relaxation_para_ * (2. * K) / 3. *
-              std::pow(
-                  (smag + 2. / 3. * (K * X[0]) - f) * (smag + 2. / 3. * (K * X[0]) - f), (strain_rate_expo_ - 1.) / 2.);
+          dH = strain_rate_expo_ * 2. * mubar * delta_time(0) * temp_adj_relaxation_para_ * (2. * K) / 3. *
+               std::pow((smag + 2. / 3. * (K * X[0]) - f) * (smag + 2. / 3. * (K * X[0]) - f), (strain_rate_expo_ - 1.) / 2.);
           F[0]    = f - 2. * mubar * (1. + K / (3. * mubar)) * X[0] - H;
           dFdX[0] = -2. * mubar * (1. + K / (3. * mubar)) - dH;
 
@@ -380,8 +374,8 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
           ALBANY_PANIC(
               count > 30,
               std::endl
-                  << "Error in return mapping, count = " << count << "\nres = " << res << "\nrelres = " << res / f
-                  << "\ng = " << F[0] << "\ndg = " << dFdX[0] << std::endl);
+                  << "Error in return mapping, count = " << count << "\nres = " << res << "\nrelres = " << res / f << "\ng = " << F[0] << "\ndg = " << dFdX[0]
+                  << std::endl);
         }
         solver.computeFadInfo(dFdX, X, F);
 
@@ -394,8 +388,7 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
 
         s -= 2.0 * mubar * dgam_plastic * N + f * N - 2. * mubar * (1. + K / (3. * mubar)) * dgam_plastic * N;
 
-        dgam =
-            dgam_plastic + delta_time(0) * temp_adj_relaxation_para_ * std::pow(minitensor::norm(s), strain_rate_expo_);
+        dgam = dgam_plastic + delta_time(0) * temp_adj_relaxation_para_ * std::pow(minitensor::norm(s), strain_rate_expo_);
 
         alpha = eqpsold(cell, pt) + sq23 * dgam_plastic;
 
@@ -407,8 +400,7 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
 
         // mechanical source
         if (have_temperature_ && delta_time(0) > 0) {
-          source(cell, pt) =
-              0.0 * (sq23 * dgam / delta_time(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
+          source(cell, pt) = 0.0 * (sq23 * dgam / delta_time(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
         }
 
         // exponential map to get Fpnew
@@ -441,8 +433,7 @@ CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
         F.fill(def_grad, cell, pt, 0, 0);
         ScalarT J = minitensor::det(F);
         sigma.fill(stress, cell, pt, 0, 0);
-        sigma -=
-            three_kappa * expansion_coeff_ * (1.0 + 1.0 / (J * J)) * (temperature_(cell, pt) - ref_temperature_) * I;
+        sigma -= three_kappa * expansion_coeff_ * (1.0 + 1.0 / (J * J)) * (temperature_(cell, pt) - ref_temperature_) * I;
         for (int i = 0; i < num_dims_; ++i) {
           for (int j = 0; j < num_dims_; ++j) {
             stress(cell, pt, i, j) = sigma(i, j);

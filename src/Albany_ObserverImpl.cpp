@@ -32,8 +32,7 @@ ObserverImpl::observeSolution(
         /*overlapped*/ true);
   }
 
-  StatelessObserverImpl::observeSolution(
-      stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
+  StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
 }
 
 void

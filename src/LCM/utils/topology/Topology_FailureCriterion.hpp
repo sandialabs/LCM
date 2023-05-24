@@ -129,10 +129,7 @@ class AbstractFailureCriterion
 class FractureCriterionRandom : public AbstractFailureCriterion
 {
  public:
-  FractureCriterionRandom(Topology& topology, double const probability)
-      : AbstractFailureCriterion(topology), probability_(probability)
-  {
-  }
+  FractureCriterionRandom(Topology& topology, double const probability) : AbstractFailureCriterion(topology), probability_(probability) {}
 
   bool
   check(stk::mesh::BulkData& bulk_data, stk::mesh::Entity interface)
@@ -165,10 +162,7 @@ class FractureCriterionRandom : public AbstractFailureCriterion
 class FractureCriterionOnce : public AbstractFailureCriterion
 {
  public:
-  FractureCriterionOnce(Topology& topology, double const probability)
-      : AbstractFailureCriterion(topology), probability_(probability), open_(true)
-  {
-  }
+  FractureCriterionOnce(Topology& topology, double const probability) : AbstractFailureCriterion(topology), probability_(probability), open_(true) {}
 
   bool
   check(stk::mesh::BulkData& bulk_data, stk::mesh::Entity interface)
@@ -207,11 +201,7 @@ class FractureCriterionOnce : public AbstractFailureCriterion
 class FractureCriterionTraction : public AbstractFailureCriterion
 {
  public:
-  FractureCriterionTraction(
-      Topology&          topology,
-      std::string const& stress_name,
-      double const       critical_traction,
-      double const       beta);
+  FractureCriterionTraction(Topology& topology, std::string const& stress_name, double const critical_traction, double const beta);
 
   bool
   check(stk::mesh::BulkData& bulk_data, stk::mesh::Entity interface);

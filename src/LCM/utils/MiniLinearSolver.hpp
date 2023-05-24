@@ -23,10 +23,7 @@ class MiniLinearSolver_Base
   virtual ~MiniLinearSolver_Base() {}
 
   virtual void
-  solve(
-      minitensor::Tensor<ScalarT, N> const& A,
-      minitensor::Vector<ScalarT, N> const& b,
-      minitensor::Vector<ScalarT, N>&       x)
+  solve(minitensor::Tensor<ScalarT, N> const& A, minitensor::Vector<ScalarT, N> const& b, minitensor::Vector<ScalarT, N>& x)
   {
   }
 };
@@ -44,10 +41,7 @@ class MiniLinearSolver<PHAL::AlbanyTraits::Residual, N> : public MiniLinearSolve
   using ValueT  = typename Sacado::ValueType<ScalarT>::type;
 
   void
-  solve(
-      minitensor::Tensor<ScalarT, N> const& A,
-      minitensor::Vector<ScalarT, N> const& b,
-      minitensor::Vector<ScalarT, N>&       x) override;
+  solve(minitensor::Tensor<ScalarT, N> const& A, minitensor::Vector<ScalarT, N> const& b, minitensor::Vector<ScalarT, N>& x) override;
 };
 
 // Jacobian
@@ -59,10 +53,7 @@ class MiniLinearSolver<PHAL::AlbanyTraits::Jacobian, N> : public MiniLinearSolve
   using ValueT  = typename Sacado::ValueType<ScalarT>::type;
 
   void
-  solve(
-      minitensor::Tensor<ScalarT, N> const& A,
-      minitensor::Vector<ScalarT, N> const& b,
-      minitensor::Vector<ScalarT, N>&       x) override;
+  solve(minitensor::Tensor<ScalarT, N> const& A, minitensor::Vector<ScalarT, N> const& b, minitensor::Vector<ScalarT, N>& x) override;
 };
 
 }  // namespace LCM

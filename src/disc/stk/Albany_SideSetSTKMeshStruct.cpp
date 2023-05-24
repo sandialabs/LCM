@@ -84,8 +84,8 @@ SideSetSTKMeshStruct::SideSetSTKMeshStruct(
   shards::CellTopology     shards_ctd     = stk::mesh::get_cell_topology(stk_topo_data);
   const CellTopologyData&  ctd            = *shards_ctd.getCellTopologyData();
 
-  this->meshSpecs[0] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-      ctd, this->numDim, cub, nsNames, ssNames, worksetSize, ebn, ebNameToIndex, this->interleavedOrdering));
+  this->meshSpecs[0] =
+      Teuchos::rcp(new Albany::MeshSpecsStruct(ctd, this->numDim, cub, nsNames, ssNames, worksetSize, ebn, ebNameToIndex, this->interleavedOrdering));
 
   const Teuchos::MpiComm<int>* mpiComm = dynamic_cast<const Teuchos::MpiComm<int>*>(commT.get());
   stk::mesh::MeshBuilder       builder(*mpiComm->getRawMpiComm());
@@ -131,10 +131,10 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
   const stk::mesh::BulkData& inputBulkData = *parentMeshStruct->bulkData;
 
   typedef AbstractSTKFieldContainer::VectorFieldType VectorFieldType;
-  const VectorFieldType& parent_coordinates_field   = *parentMeshStruct->getCoordinatesField();
-  const VectorFieldType& parent_coordinates_field3d = *parentMeshStruct->getCoordinatesField3d();
-  VectorFieldType&       coordinates_field          = *fieldContainer->getCoordinatesField();
-  VectorFieldType&       coordinates_field3d        = *fieldContainer->getCoordinatesField3d();
+  const VectorFieldType&                             parent_coordinates_field   = *parentMeshStruct->getCoordinatesField();
+  const VectorFieldType&                             parent_coordinates_field3d = *parentMeshStruct->getCoordinatesField3d();
+  VectorFieldType&                                   coordinates_field          = *fieldContainer->getCoordinatesField();
+  VectorFieldType&                                   coordinates_field3d        = *fieldContainer->getCoordinatesField3d();
 
   // Now we can extract the entities
   std::vector<stk::mesh::Entity> sides, nodes;

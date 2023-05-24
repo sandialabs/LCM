@@ -21,7 +21,7 @@ Albany::ThermoElasticityProblem::ThermoElasticityProblem(
   haveSource = params->isSublist("Source Functions");
 
 // Changing this ifdef changes ordering from  (X,Y,T) to (T,X,Y)
-//#define NUMBER_T_FIRST
+// #define NUMBER_T_FIRST
 #if defined(NUMBER_T_FIRST)
   T_offset = 0;
   X_offset = 1;
@@ -53,9 +53,7 @@ Albany::ThermoElasticityProblem::ThermoElasticityProblem(
 Albany::ThermoElasticityProblem::~ThermoElasticityProblem() {}
 
 void
-Albany::ThermoElasticityProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::ThermoElasticityProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");

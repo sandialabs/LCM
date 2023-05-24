@@ -41,9 +41,7 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::SideQuadPointsToS
 
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& fm)
+SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field_qp, fm);
   this->utils.setFieldData(w_measure, fm);
@@ -81,8 +79,7 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(ty
       case 1:
         for (int i(0); i < dims[3]; ++i) {
           field_side(cell, side, i) = 0;
-          for (int qp(0); qp < dims[2]; ++qp)
-            field_side(cell, side, i) += field_qp(cell, side, qp, i) * w_measure(cell, side, qp);
+          for (int qp(0); qp < dims[2]; ++qp) field_side(cell, side, i) += field_qp(cell, side, qp, i) * w_measure(cell, side, qp);
           field_side(cell, side, i) /= meas;
         }
         break;
@@ -91,8 +88,7 @@ SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(ty
         for (int i(0); i < dims[3]; ++i) {
           for (int j(0); j < dims[4]; ++j) {
             field_side(cell, side, i, j) = 0;
-            for (int qp(0); qp < dims[2]; ++qp)
-              field_side(cell, side, i, j) += field_qp(cell, side, qp, i, j) * w_measure(cell, side, qp);
+            for (int qp(0); qp < dims[2]; ++qp) field_side(cell, side, i, j) += field_qp(cell, side, qp, i, j) * w_measure(cell, side, qp);
             field_side(cell, side, i, j) /= meas;
           }
         }

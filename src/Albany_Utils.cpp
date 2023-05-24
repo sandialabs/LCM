@@ -177,8 +177,7 @@ doubleToInitString(double val)
 double
 initStringToDouble(std::string const& initString)
 {
-  ALBANY_ASSERT(
-      isValidInitString(initString), " initStringToDouble() called with invalid initialization string: " << initString);
+  ALBANY_ASSERT(isValidInitString(initString), " initStringToDouble() called with invalid initialization string: " << initString);
   std::string verbiage("initial value ");
   std::string valueString = initString.substr(verbiage.size(), initString.size() - verbiage.size());
   return std::atof(valueString.c_str());
@@ -215,10 +214,7 @@ printThyraVector(std::ostream& os, Teuchos::RCP<Thyra_Vector const> const& vec)
 }
 
 void
-printThyraVector(
-    std::ostream&                           os,
-    const Teuchos::Array<std::string>&      names,
-    Teuchos::RCP<Thyra_Vector const> const& vec)
+printThyraVector(std::ostream& os, const Teuchos::Array<std::string>& names, Teuchos::RCP<Thyra_Vector const> const& vec)
 {
   Teuchos::ArrayRCP<const ST> vv          = Albany::getLocalData(vec);
   int const                   localLength = vv.size();
@@ -272,10 +268,7 @@ printThyraMultiVector(std::ostream& os, const Teuchos::RCP<const Thyra_MultiVect
 
 template <>
 void
-writeMatrixMarket<const Tpetra_Map>(
-    const Teuchos::RCP<const Tpetra_Map>& map,
-    std::string const&                    prefix,
-    int const                             counter)
+writeMatrixMarket<const Tpetra_Map>(const Teuchos::RCP<const Tpetra_Map>& map, std::string const& prefix, int const counter)
 {
   if (map.is_null()) {
     return;
@@ -295,10 +288,7 @@ writeMatrixMarket<const Tpetra_Map>(
 
 template <>
 void
-writeMatrixMarket<const Tpetra_Vector>(
-    const Teuchos::RCP<const Tpetra_Vector>& v,
-    std::string const&                       prefix,
-    int const                                counter)
+writeMatrixMarket<const Tpetra_Vector>(const Teuchos::RCP<const Tpetra_Vector>& v, std::string const& prefix, int const counter)
 {
   if (v.is_null()) {
     return;
@@ -319,10 +309,7 @@ writeMatrixMarket<const Tpetra_Vector>(
 
 template <>
 void
-writeMatrixMarket<const Tpetra_MultiVector>(
-    const Teuchos::RCP<const Tpetra_MultiVector>& mv,
-    std::string const&                            prefix,
-    int const                                     counter)
+writeMatrixMarket<const Tpetra_MultiVector>(const Teuchos::RCP<const Tpetra_MultiVector>& mv, std::string const& prefix, int const counter)
 {
   if (mv.is_null()) {
     return;
@@ -343,10 +330,7 @@ writeMatrixMarket<const Tpetra_MultiVector>(
 
 template <>
 void
-writeMatrixMarket<const Tpetra_CrsMatrix>(
-    const Teuchos::RCP<const Tpetra_CrsMatrix>& A,
-    std::string const&                          prefix,
-    int const                                   counter)
+writeMatrixMarket<const Tpetra_CrsMatrix>(const Teuchos::RCP<const Tpetra_CrsMatrix>& A, std::string const& prefix, int const counter)
 {
   if (A.is_null()) {
     return;
@@ -365,10 +349,7 @@ writeMatrixMarket<const Tpetra_CrsMatrix>(
   Tpetra::MatrixMarket::Writer<Tpetra_CrsMatrix>::writeSparseFile(filename, A);
 }
 
-CmdLineArgs::CmdLineArgs(
-    std::string const& default_yaml_filename,
-    std::string const& default_yaml_filename2,
-    std::string const& default_yaml_filename3)
+CmdLineArgs::CmdLineArgs(std::string const& default_yaml_filename, std::string const& default_yaml_filename2, std::string const& default_yaml_filename3)
     : yaml_filename(default_yaml_filename),
       yaml_filename2(default_yaml_filename2),
       yaml_filename3(default_yaml_filename3),

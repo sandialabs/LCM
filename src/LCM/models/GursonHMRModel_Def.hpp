@@ -103,10 +103,7 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(Teuchos::ParameterList* p, const T
 }
 template <typename EvalT, typename Traits>
 void
-GursonHMRModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+GursonHMRModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto def_grad          = *dep_fields["F"];
@@ -272,9 +269,8 @@ GursonHMRModel<EvalT, Traits>::computeState(
 
         // dPhi w.r.t. dKirchhoff_stress
         ScalarT tmp = 1.5 * q2_ * p / Ybar;
-        ScalarT deq =
-            dgam / Ybar / (1.0 - fvoid) * (minitensor::dotdot(s, s) + q1_ * q2_ * p * Ybar * fvoid * std::sinh(tmp));
-        eq = eq + deq;
+        ScalarT deq = dgam / Ybar / (1.0 - fvoid) * (minitensor::dotdot(s, s) + q1_ * q2_ * p * Ybar * fvoid * std::sinh(tmp));
+        eq          = eq + deq;
 
         dPhi = s + 1.0 / 3.0 * q1_ * q2_ * Ybar * fvoid * std::sinh(tmp) * I;
 
@@ -484,8 +480,7 @@ GursonHMRModel<EvalT, Traits>::ResidualJacobian(
   // fvoidFad or fvoidFad_star
   DFadType dfg(0.0);
   if (taue > 0.0) {
-    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad * Ybar * std::sinh(tmp) +
-          sq23 * dgam * kw_ * fvoidFad * omega * smag;
+    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad * Ybar * std::sinh(tmp) + sq23 * dgam * kw_ * fvoidFad * omega * smag;
   } else {
     dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad * Ybar * std::sinh(tmp);
   }

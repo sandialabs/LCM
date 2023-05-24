@@ -43,10 +43,7 @@ Albany::NavierStokes::variableTypeToString(Albany::NavierStokes::NS_VAR_TYPE var
   return "DOF";
 }
 
-Albany::NavierStokes::NavierStokes(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<ParamLib>&               paramLib_,
-    int const                                   numDim_)
+Albany::NavierStokes::NavierStokes(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
     : Albany::AbstractProblem(params_, paramLib_),
       params(params_),
       haveFlow(false),
@@ -105,9 +102,7 @@ Albany::NavierStokes::NavierStokes(
 Albany::NavierStokes::~NavierStokes() {}
 
 void
-Albany::NavierStokes::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::NavierStokes::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   using Teuchos::rcp;
 
@@ -244,8 +239,7 @@ Albany::NavierStokes::constructNeumannEvaluators(const Teuchos::RCP<Albany::Mesh
 
   nfm.resize(1);
 
-  nfm[0] = nbcUtils.constructBCEvaluators(
-      meshSpecs, nbcNames, Teuchos::arcp(dof_names), false, 0, condNames, offsets, dl, this->params, this->paramLib);
+  nfm[0] = nbcUtils.constructBCEvaluators(meshSpecs, nbcNames, Teuchos::arcp(dof_names), false, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

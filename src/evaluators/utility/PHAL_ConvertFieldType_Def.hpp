@@ -33,9 +33,7 @@ ConvertFieldType<EvalT, Traits, InputType, OutputType>::ConvertFieldType(Teuchos
 //*****
 template <typename EvalT, typename Traits, typename InputType, typename OutputType>
 void
-ConvertFieldType<EvalT, Traits, InputType, OutputType>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ConvertFieldType<EvalT, Traits, InputType, OutputType>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(in_field, fm);
   this->utils.setFieldData(out_field, fm);

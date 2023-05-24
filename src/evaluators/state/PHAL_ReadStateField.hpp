@@ -30,8 +30,8 @@ class ReadStateField : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::Ev
 };
 
 template <typename Traits>
-class ReadStateField<PHAL::AlbanyTraits::Residual, Traits>
-    : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
+class ReadStateField<PHAL::AlbanyTraits::Residual, Traits> : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                                             public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ReadStateField(Teuchos::ParameterList const& p);

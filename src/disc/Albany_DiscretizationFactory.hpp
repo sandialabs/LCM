@@ -23,18 +23,13 @@ class DiscretizationFactory
 {
  public:
   //! Default constructor
-  DiscretizationFactory(
-      const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
-      const Teuchos::RCP<Teuchos_Comm const>&     commT);
+  DiscretizationFactory(const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams, const Teuchos::RCP<Teuchos_Comm const>& commT);
 
   //! Destructor
   ~DiscretizationFactory() {}
 
   static Teuchos::RCP<Albany::AbstractMeshStruct>
-  createMeshStruct(
-      Teuchos::RCP<Teuchos::ParameterList> disc_params,
-      Teuchos::RCP<Teuchos::ParameterList> adapt_params,
-      Teuchos::RCP<Teuchos_Comm const>     comm);
+  createMeshStruct(Teuchos::RCP<Teuchos::ParameterList> disc_params, Teuchos::RCP<Teuchos::ParameterList> adapt_params, Teuchos::RCP<Teuchos_Comm const> comm);
 
   Teuchos::RCP<Albany::AbstractMeshStruct>
   getMeshStruct()
@@ -66,10 +61,7 @@ class DiscretizationFactory
       const Teuchos::RCP<Albany::RigidBodyModes>&                                      rigidBodyModes = Teuchos::null);
 
   void
-  setupInternalMeshStruct(
-      unsigned int                                              neq,
-      const Teuchos::RCP<Albany::StateInfoStruct>&              sis,
-      const AbstractFieldContainer::FieldContainerRequirements& req);
+  setupInternalMeshStruct(unsigned int neq, const Teuchos::RCP<Albany::StateInfoStruct>& sis, const AbstractFieldContainer::FieldContainerRequirements& req);
 
   void
   setupInternalMeshStruct(

@@ -23,9 +23,7 @@
 #include "Teuchos_VerboseObject.hpp"
 #include "Teuchos_oblackholestream.hpp"
 
-Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
-    const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<Teuchos_Comm const>&     commT)
+Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<Teuchos_Comm const>& commT)
     : GenericSTKMeshStruct(params, Teuchos::null, 2), periodic(false)
 {
   NumElemNodes = NumNodes = NumElems = NumBdEdges = 0;
@@ -229,8 +227,8 @@ Albany::AsciiSTKMesh2D::AsciiSTKMesh2D(
   const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
 
   cullSubsetParts(ssNames, ssPartVec);
-  this->meshSpecs[0] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-      ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
+  this->meshSpecs[0] =
+      Teuchos::rcp(new Albany::MeshSpecsStruct(ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
 
   // Create a mesh specs object for EACH side set
   this->initializeSideSetMeshSpecs(commT);
@@ -331,7 +329,7 @@ Albany::AsciiSTKMesh2D::setFieldAndBulkData(
     multiPartVec[0] = ssPartVec["boundary_side_set"];
     for (int i = 0; i < NumElems; i++) {
       for (int j = 0; j < NumElemNodes; j++) {
-        auto node1 = coord_Ids[elems[i][j] - 1], node2 = coord_Ids[elems[i][(j + 1) % NumElemNodes] - 1];
+        auto                                         node1 = coord_Ids[elems[i][j] - 1], node2 = coord_Ids[elems[i][(j + 1) % NumElemNodes] - 1];
         std::map<std::pair<int, int>, int>::iterator it = edgeMap.find(std::make_pair(node1, node2));
 
         if (it == edgeMap.end()) it = edgeMap.find(std::make_pair(node2, node1));

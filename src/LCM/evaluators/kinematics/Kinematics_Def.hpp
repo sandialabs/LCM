@@ -82,8 +82,7 @@ Kinematics<EvalT, Traits>::check_det(typename Traits::EvalData workset, int cell
   bool neg_det = false;
   if (pt == 0 && j_(cell, pt) < 1e-16) {
     neg_det = true;
-    std::cout << "amb: (neg det) rcu Kinematics check_det " << j_(cell, pt) << " " << cell << " " << pt
-              << "\nF_incr = [" << F << "];\n";
+    std::cout << "amb: (neg det) rcu Kinematics check_det " << j_(cell, pt) << " " << cell << " " << pt << "\nF_incr = [" << F << "];\n";
     const Teuchos::ArrayRCP<GO>& gid = workset.wsElNodeID[cell];
     std::cout << "gid_matlab = [";
     for (int i = 0; i < gid.size(); ++i) std::cout << " " << gid[i] + 1;

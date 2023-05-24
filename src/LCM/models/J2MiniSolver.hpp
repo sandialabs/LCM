@@ -15,10 +15,7 @@ struct J2MiniKernel : public ParallelKernel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  J2MiniKernel(
-      ConstitutiveModel<EvalT, Traits>&    model,
-      Teuchos::ParameterList*              p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  J2MiniKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// No copy constructor

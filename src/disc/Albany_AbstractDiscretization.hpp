@@ -273,11 +273,7 @@ class AbstractDiscretization
   virtual void
   writeSolution(Thyra_Vector const& solution, double const time, bool const overlapped = false) = 0;
   virtual void
-  writeSolution(
-      Thyra_Vector const& solution,
-      Thyra_Vector const& solution_dot,
-      double const        time,
-      bool const          overlapped = false) = 0;
+  writeSolution(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, double const time, bool const overlapped = false) = 0;
   virtual void
   writeSolution(
       Thyra_Vector const& solution,
@@ -291,11 +287,7 @@ class AbstractDiscretization
   virtual void
   writeSolutionToMeshDatabase(Thyra_Vector const& solution, double const time, bool const overlapped = false) = 0;
   virtual void
-  writeSolutionToMeshDatabase(
-      Thyra_Vector const& solution,
-      Thyra_Vector const& solution_dot,
-      double const        time,
-      bool const          overlapped = false) = 0;
+  writeSolutionToMeshDatabase(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, double const time, bool const overlapped = false) = 0;
   virtual void
   writeSolutionToMeshDatabase(
       Thyra_Vector const& solution,
@@ -304,10 +296,7 @@ class AbstractDiscretization
       double const        time,
       bool const          overlapped = false) = 0;
   virtual void
-  writeSolutionMVToMeshDatabase(
-      const Thyra_MultiVector& solution,
-      double const             time,
-      bool const               overlapped = false) = 0;
+  writeSolutionMVToMeshDatabase(const Thyra_MultiVector& solution, double const time, bool const overlapped = false) = 0;
 
   //! Write the solution to file. Must call writeSolution first.
   virtual void

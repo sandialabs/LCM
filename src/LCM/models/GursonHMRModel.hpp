@@ -101,13 +101,7 @@ class GursonHMRModel : public LCM::ConstitutiveModel<EvalT, Traits>
   /// Compute Yield Function
   ///
   ScalarT
-  YieldFunction(
-      minitensor::Tensor<ScalarT> const& s,
-      ScalarT const&                     p,
-      ScalarT const&                     fvoid,
-      ScalarT const&                     Y,
-      ScalarT const&                     isoH,
-      ScalarT const&                     jacobian);
+  YieldFunction(minitensor::Tensor<ScalarT> const& s, ScalarT const& p, ScalarT const& fvoid, ScalarT const& Y, ScalarT const& isoH, ScalarT const& jacobian);
 
   ///
   /// Compute Residual and Local Jacobian

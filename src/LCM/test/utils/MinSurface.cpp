@@ -95,14 +95,11 @@ main(int ac, char* av[])
   // Definition of the graph
   graph_t Graph(EdgesArray, EdgesArray + ArraySize, EdgesWeights, TotalNumberNodes);
 
-  std::vector<vertex_descriptor> predecessor(
-      num_vertices(Graph));  // The vertex descriptor associates a single vertex in the graph
-  std::vector<int>  dis(num_vertices(Graph));
-  vertex_descriptor source = vertex(3, Graph);  // Source from where the distance and path are calculated
-  dijkstra_shortest_paths(
-      Graph,
-      source,
-      predecessor_map(&predecessor[0]).distance_map(&dis[0]));  // Compute the shortest path
+  std::vector<vertex_descriptor> predecessor(num_vertices(Graph));  // The vertex descriptor associates a single vertex in the graph
+  std::vector<int>               dis(num_vertices(Graph));
+  vertex_descriptor              source = vertex(3, Graph);  // Source from where the distance and path are calculated
+  dijkstra_shortest_paths(Graph, source,
+                          predecessor_map(&predecessor[0]).distance_map(&dis[0]));  // Compute the shortest path
 
   delete[] EdgesArray;    // Deallocate memory
   delete[] EdgesWeights;  // Deallocate memory

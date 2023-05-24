@@ -13,9 +13,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
@@ -96,9 +94,7 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::SurfaceHDiffusionDefResidual(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceHDiffusionDefResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceHDiffusionDefResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(scalarGrad, fm);
   this->utils.setFieldData(surface_Grad_BF, fm);
@@ -218,11 +214,11 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
       for (int pt = 0; pt < numQPs; ++pt) {
         temp = (dL_(cell, pt) + artificalDL(cell, pt));  // GB changed 08/14/2015
         for (std::size_t dim = 0; dim < numDims; ++dim) {
-          transport_residual_(cell, node) += flux(cell, pt, dim) * dt * surface_Grad_BF(cell, node, pt, dim) *
-                                             refArea(cell, pt) * thickness * temp;  // GB changed 08/14/2015
+          transport_residual_(cell, node) +=
+              flux(cell, pt, dim) * dt * surface_Grad_BF(cell, node, pt, dim) * refArea(cell, pt) * thickness * temp;  // GB changed 08/14/2015
 
-          transport_residual_(cell, topNode) += flux(cell, pt, dim) * dt * surface_Grad_BF(cell, topNode, pt, dim) *
-                                                refArea(cell, pt) * thickness * temp;  // GB changed 08/14/2015
+          transport_residual_(cell, topNode) +=
+              flux(cell, pt, dim) * dt * surface_Grad_BF(cell, topNode, pt, dim) * refArea(cell, pt) * thickness * temp;  // GB changed 08/14/2015
         }
       }
     }
@@ -241,8 +237,8 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
         // 08/14/2015
 
         // Local rate of change volumetric constraint term
-        transientTerm = refValues(node, pt) * (eff_diff_(cell, pt) * (transport_(cell, pt) - transportold(cell, pt))) *
-                        refArea(cell, pt) * thickness;  //*temp; GB changed 08/14/2015
+        transientTerm = refValues(node, pt) * (eff_diff_(cell, pt) * (transport_(cell, pt) - transportold(cell, pt))) * refArea(cell, pt) *
+                        thickness;  //*temp; GB changed 08/14/2015
 
         transport_residual_(cell, node) += transientTerm;
 
@@ -250,8 +246,8 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
 
         if (haveMech) {
           // Strain rate source term
-          transientTerm = refValues(node, pt) * strain_rate_factor_(cell, pt) * (eqps_(cell, pt) - eqps_old(cell, pt)) *
-                          refArea(cell, pt) * thickness;  //*temp; GB changed 08/14/2015
+          transientTerm = refValues(node, pt) * strain_rate_factor_(cell, pt) * (eqps_(cell, pt) - eqps_old(cell, pt)) * refArea(cell, pt) *
+                          thickness;  //*temp; GB changed 08/14/2015
 
           transport_residual_(cell, node) += transientTerm;
 
@@ -267,19 +263,15 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
 
             minitensor::Tensor<ScalarT> C_inv_tensor = minitensor::inverse(C_tensor);
 
-            minitensor::Vector<ScalarT> hydro_stress_grad(
-                minitensor::Source::ARRAY, numDims, hydro_stress_gradient_, cell, pt, 0);
+            minitensor::Vector<ScalarT> hydro_stress_grad(minitensor::Source::ARRAY, numDims, hydro_stress_gradient_, cell, pt, 0);
 
             minitensor::Vector<ScalarT> C_inv_hydro_stress_grad = minitensor::dot(C_inv_tensor, hydro_stress_grad);
 
-            transport_residual_(cell, node) -= surface_Grad_BF(cell, node, pt, dim) *
-                                               convection_coefficient_(cell, pt) * transport_(cell, pt) *
-                                               hydro_stress_gradient_(cell, pt, dim) * dt * refArea(cell, pt) *
-                                               thickness;  //*temp; GB changed 08/14/2015
+            transport_residual_(cell, node) -= surface_Grad_BF(cell, node, pt, dim) * convection_coefficient_(cell, pt) * transport_(cell, pt) *
+                                               hydro_stress_gradient_(cell, pt, dim) * dt * refArea(cell, pt) * thickness;  //*temp; GB changed 08/14/2015
 
-            transport_residual_(cell, topNode) -=
-                surface_Grad_BF(cell, topNode, pt, dim) * convection_coefficient_(cell, pt) * transport_(cell, pt) *
-                C_inv_hydro_stress_grad(dim) * dt * refArea(cell, pt) * thickness;  //*temp; GB changed 08/14/2015
+            transport_residual_(cell, topNode) -= surface_Grad_BF(cell, topNode, pt, dim) * convection_coefficient_(cell, pt) * transport_(cell, pt) *
+                                                  C_inv_hydro_stress_grad(dim) * dt * refArea(cell, pt) * thickness;  //*temp; GB changed 08/14/2015
           }
         }
       }  // end integrartion point loop
@@ -311,8 +303,7 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
       for (int qp = 0; qp < numQPs; ++qp) {
         temp = 1.0 / dL_(cell, qp) + artificalDL(cell, qp);
 
-        stabilizationTerm = stab_param_ * eff_diff_(cell, qp) *
-                            (-transport_(cell, qp) + transportold(cell, qp) + pterm(cell, qp)) * refValues(node, qp) *
+        stabilizationTerm = stab_param_ * eff_diff_(cell, qp) * (-transport_(cell, qp) + transportold(cell, qp) + pterm(cell, qp)) * refValues(node, qp) *
                             refArea(cell, qp) * thickness;  //*temp;  GB changed 08/14/2015
 
         transport_residual_(cell, node) -= stabilizationTerm;

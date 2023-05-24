@@ -161,10 +161,7 @@ struct AbstractSTKMeshStruct : public AbstractMeshStruct
   bool fieldAndBulkDataSet;
 
   virtual void
-  buildCellSideNodeNumerationMap(
-      std::string const&              sideSetName,
-      std::map<GO, GO>&               sideMap,
-      std::map<GO, std::vector<int>>& sideNodeMap) = 0;
+  buildCellSideNodeNumerationMap(std::string const& sideSetName, std::map<GO, GO>& sideMap, std::map<GO, std::vector<int>>& sideNodeMap) = 0;
 
   // Useful for loading side meshes from file
   bool side_maps_present;

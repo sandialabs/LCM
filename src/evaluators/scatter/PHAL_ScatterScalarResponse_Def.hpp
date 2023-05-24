@@ -13,18 +13,14 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-ScatterScalarResponseBase<EvalT, Traits>::ScatterScalarResponseBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ScatterScalarResponseBase<EvalT, Traits>::ScatterScalarResponseBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   setup(p, dl);
 }
 
 template <typename EvalT, typename Traits>
 void
-ScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(global_response, fm);
   if (!stand_alone) this->utils.setFieldData(global_response_eval, fm);
@@ -32,9 +28,7 @@ ScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-ScatterScalarResponseBase<EvalT, Traits>::setup(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ScatterScalarResponseBase<EvalT, Traits>::setup(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   stand_alone = p.get<bool>("Stand-alone Evaluator");
 
@@ -75,9 +69,7 @@ ScatterScalarResponseBase<EvalT, Traits>::getValidResponseParameters() const
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>::ScatterScalarResponse(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>::ScatterScalarResponse(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   this->setup(p, dl);
 }

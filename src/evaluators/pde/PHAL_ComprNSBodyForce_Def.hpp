@@ -24,8 +24,7 @@ ComprNSBodyForce<EvalT, Traits>::ComprNSBodyForce(Teuchos::ParameterList const& 
   } else if (type == "Taylor-Green Vortex") {
     std::cout << "Taylor-Green Vortex source" << std::endl;
     bf_type  = TAYLOR_GREEN_VORTEX;
-    coordVec = decltype(coordVec)(
-        p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Gradient Data Layout"));
+    coordVec = decltype(coordVec)(p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Gradient Data Layout"));
     this->addDependentField(coordVec.fieldTag());
   }
 
@@ -82,20 +81,16 @@ ComprNSBodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workse
         MeshScalarT x2pi   = 2.0 * pi * coordVec(cell, qp, 0);
         MeshScalarT y2pi   = 2.0 * pi * coordVec(cell, qp, 1);
         force(cell, qp, 0) = 0.0;
-        force(cell, qp, 1) = 2.0 * exp(-2.0 * time) * cos(x2pi) *
-                                 (-sin(y2pi) + exp(-2.0 * time) * sin(x2pi) * pi + 4.0 * mu * pi * pi * sin(y2pi)) +
+        force(cell, qp, 1) = 2.0 * exp(-2.0 * time) * cos(x2pi) * (-sin(y2pi) + exp(-2.0 * time) * sin(x2pi) * pi + 4.0 * mu * pi * pi * sin(y2pi)) +
                              2.0 * Rgas * pi * exp(-4.0 * time) * sin(x2pi);
-        force(cell, qp, 2) = 2.0 * exp(-2.0 * time) * cos(y2pi) *
-                                 (sin(x2pi) + exp(-2.0 * time) * sin(y2pi) * pi - 4.0 * mu * pi * pi * sin(x2pi)) +
+        force(cell, qp, 2) = 2.0 * exp(-2.0 * time) * cos(y2pi) * (sin(x2pi) + exp(-2.0 * time) * sin(y2pi) * pi - 4.0 * mu * pi * pi * sin(x2pi)) +
                              2.0 * Rgas * pi * exp(-4.0 * time) * sin(y2pi);
         force(cell, qp, 3) =
             -2.0 * exp(-4.0 * time) *
                 (-2.0 * cos(x2pi) - 2.0 * cos(y2pi) + exp(-2.0 * time) * cos(x2pi) * sin(y2pi) * sin(x2pi) * pi -
                  exp(-2.0 * time) * sin(x2pi) * cos(y2pi) * sin(y2pi) * pi) +
-            (gamma_gas - 1.0) / Rgas * 4.0 * mu * exp(-2.0 * time) * sin(x2pi) * sin(y2pi) * pi * 2.0 *
-                exp(-2.0 * time) * sin(x2pi) * pi * sin(y2pi) +
-            (gamma_gas - 1.0) / Rgas * 4.0 * mu * exp(-2.0 * time) * sin(x2pi) * pi * sin(y2pi) * 2.0 *
-                exp(-2.0 * time) * sin(x2pi) * pi * sin(y2pi) -
+            (gamma_gas - 1.0) / Rgas * 4.0 * mu * exp(-2.0 * time) * sin(x2pi) * sin(y2pi) * pi * 2.0 * exp(-2.0 * time) * sin(x2pi) * pi * sin(y2pi) +
+            (gamma_gas - 1.0) / Rgas * 4.0 * mu * exp(-2.0 * time) * sin(x2pi) * pi * sin(y2pi) * 2.0 * exp(-2.0 * time) * sin(x2pi) * pi * sin(y2pi) -
             gamma_gas * kappa / (Pr * Re) * 4.0 * exp(-4.0 * time) * pi * pi * (cos(x2pi) + cos(y2pi));
       }
     }

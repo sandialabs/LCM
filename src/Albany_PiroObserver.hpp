@@ -18,9 +18,7 @@ namespace Albany {
 class PiroObserver : public Piro::ObserverBase<ST>
 {
  public:
-  explicit PiroObserver(
-      const Teuchos::RCP<Albany::Application>& app,
-      Teuchos::RCP<const Thyra_ModelEvaluator> model = Teuchos::null);
+  explicit PiroObserver(const Teuchos::RCP<Albany::Application>& app, Teuchos::RCP<const Thyra_ModelEvaluator> model = Teuchos::null);
 
   virtual void
   observeSolution(Thyra_Vector const& solution);
@@ -32,11 +30,7 @@ class PiroObserver : public Piro::ObserverBase<ST>
   observeSolution(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, const ST stamp);
 
   virtual void
-  observeSolution(
-      Thyra_Vector const& solution,
-      Thyra_Vector const& solution_dot,
-      Thyra_Vector const& solution_dotdot,
-      const ST            stamp);
+  observeSolution(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, Thyra_Vector const& solution_dotdot, const ST stamp);
 
   virtual void
   observeSolution(const Thyra_MultiVector& solution, const ST stamp);
@@ -52,11 +46,7 @@ class PiroObserver : public Piro::ObserverBase<ST>
   observeSolutionImpl(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, const ST defaultStamp);
 
   void
-  observeSolutionImpl(
-      Thyra_Vector const& solution,
-      Thyra_Vector const& solution_dot,
-      Thyra_Vector const& solution_dotdot,
-      const ST            defaultStamp);
+  observeSolutionImpl(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, Thyra_Vector const& solution_dotdot, const ST defaultStamp);
 
   void
   observeSolutionImpl(const Thyra_MultiVector& solution, const ST defaultStamp);

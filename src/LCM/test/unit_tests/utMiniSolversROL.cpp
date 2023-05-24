@@ -316,8 +316,7 @@ paraboloidEquality()
   // Set constraint vector
   minitensor::Vector<ScalarT, NUM_CONSTR> c(minitensor::Filler::ZEROS);
 
-  LCM::MiniSolverEqIneqROL<MIN, FN, EIC, EvalT, NUM_VAR, NUM_CONSTR> mini_solver(
-      minimizer, algoname, params, fn, eq_constr, x, c);
+  LCM::MiniSolverEqIneqROL<MIN, FN, EIC, EvalT, NUM_VAR, NUM_CONSTR> mini_solver(minimizer, algoname, params, fn, eq_constr, x, c);
 
   minimizer.printReport(os);
 

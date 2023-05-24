@@ -87,11 +87,7 @@ class GeomDecomp : public Partition
    *
    */
   static void
-  entity_to_point(
-      stk::mesh::BulkData& bulk_data,
-      const mesh::Entity&  entity,
-      const VectorField&   ref,
-      std::vector<double>& coor);
+  entity_to_point(stk::mesh::BulkData& bulk_data, const mesh::Entity& entity, const VectorField& ref, std::vector<double>& coor);
 
   /** \brief Used to return the nodal entities that \a compute_entity_centroid
    * averages.
@@ -108,11 +104,7 @@ class GeomDecomp : public Partition
    */
 
   static std::vector<mesh::Entity>
-  entity_coordinates(
-      stk::mesh::BulkData&              bulk_data,
-      const mesh::Entity&               entity,
-      const VectorField&                ref,
-      std::vector<std::vector<double>>& coordinates);
+  entity_coordinates(stk::mesh::BulkData& bulk_data, const mesh::Entity& entity, const VectorField& ref, std::vector<std::vector<double>>& coordinates);
 
   /** \brief  Returns a vector of vectors containing the coordinates of the
    * nodes that were used to compute the centroid.
@@ -130,11 +122,7 @@ class GeomDecomp : public Partition
    *
    */
   static std::vector<std::vector<double>>
-  compute_entity_centroid(
-      stk::mesh::BulkData& bulk_data,
-      const mesh::Entity&  entity,
-      const VectorField&   ref,
-      std::vector<double>& coor);
+  compute_entity_centroid(stk::mesh::BulkData& bulk_data, const mesh::Entity& entity, const VectorField& ref, std::vector<double>& coor);
   /** \brief Check existence of library entry name on domain library.
    * This is a simple one line convenience function
    */

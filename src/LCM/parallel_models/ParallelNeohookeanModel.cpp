@@ -9,9 +9,7 @@
 #include "ParallelNeohookeanModel_Def.hpp"
 
 template <typename EvalT, typename Traits>
-LCM::ParallelNeohookeanModel<EvalT, Traits>::ParallelNeohookeanModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+LCM::ParallelNeohookeanModel<EvalT, Traits>::ParallelNeohookeanModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ParallelConstitutiveModel<EvalT, Traits, NeohookeanKernel<EvalT, Traits>>(p, dl)
 {
 }

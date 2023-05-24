@@ -13,23 +13,12 @@ template <typename EvalT, typename Traits>
 NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       Neutron(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      NeutronDiff(
-          p.get<std::string>("Neutron Diffusion Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      NGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      Absorp(
-          p.get<std::string>("Neutron Absorption Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Fission(
-          p.get<std::string>("Neutron Fission Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      nu(p.get<std::string>("Neutrons per Fission Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      NeutronDiff(p.get<std::string>("Neutron Diffusion Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      NGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      Absorp(p.get<std::string>("Neutron Absorption Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Fission(p.get<std::string>("Neutron Fission Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      nu(p.get<std::string>("Neutrons per Fission Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       NResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       haveNeutSource(p.get<bool>("Have Neutron Source"))
 {
@@ -43,8 +32,7 @@ NSNeutronEqResid<EvalT, Traits>::NSNeutronEqResid(Teuchos::ParameterList const& 
   this->addDependentField(nu.fieldTag());
 
   if (haveNeutSource) {
-    Source = decltype(Source)(
-        p.get<std::string>("Source Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    Source = decltype(Source)(p.get<std::string>("Source Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(Source.fieldTag());
   }
 

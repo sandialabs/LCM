@@ -18,21 +18,14 @@
 namespace LCM {
 
 // Default constructor
-Topology::Topology()
-    : discretization_(Teuchos::null),
-      stk_mesh_struct_(Teuchos::null),
-      failure_criterion_(Teuchos::null),
-      output_type_(UNIDIRECTIONAL_UNILEVEL)
+Topology::Topology() : discretization_(Teuchos::null), stk_mesh_struct_(Teuchos::null), failure_criterion_(Teuchos::null), output_type_(UNIDIRECTIONAL_UNILEVEL)
 {
   return;
 }
 
 // Constructor with input and output files.
 Topology::Topology(std::string const& input_file, std::string const& output_file)
-    : discretization_(Teuchos::null),
-      stk_mesh_struct_(Teuchos::null),
-      failure_criterion_(Teuchos::null),
-      output_type_(UNIDIRECTIONAL_UNILEVEL)
+    : discretization_(Teuchos::null), stk_mesh_struct_(Teuchos::null), failure_criterion_(Teuchos::null), output_type_(UNIDIRECTIONAL_UNILEVEL)
 {
   Teuchos::RCP<Teuchos::ParameterList> params = Teuchos::rcp(new Teuchos::ParameterList("params"));
 
@@ -68,8 +61,7 @@ Topology::Topology(std::string const& input_file, std::string const& output_file
   // The default fields
   Albany::AbstractFieldContainer::FieldContainerRequirements req;
 
-  Teuchos::RCP<Albany::AbstractDiscretization> const& abstract_disc =
-      disc_factory.createDiscretization(3, state_info, req);
+  Teuchos::RCP<Albany::AbstractDiscretization> const& abstract_disc = disc_factory.createDiscretization(3, state_info, req);
 
   set_discretization(abstract_disc);
 
@@ -133,14 +125,8 @@ Topology::computeExtrema()
 }
 
 // Construct by using given discretization.
-Topology::Topology(
-    Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc,
-    std::string const&                            bulk_block_name,
-    std::string const&                            interface_block_name)
-    : discretization_(Teuchos::null),
-      stk_mesh_struct_(Teuchos::null),
-      failure_criterion_(Teuchos::null),
-      output_type_(UNIDIRECTIONAL_UNILEVEL)
+Topology::Topology(Teuchos::RCP<Albany::AbstractDiscretization>& abstract_disc, std::string const& bulk_block_name, std::string const& interface_block_name)
+    : discretization_(Teuchos::null), stk_mesh_struct_(Teuchos::null), failure_criterion_(Teuchos::null), output_type_(UNIDIRECTIONAL_UNILEVEL)
 {
   auto& stk_disc        = static_cast<Albany::STKDiscretization&>(*abstract_disc);
   auto  stk_mesh_struct = stk_disc.getSTKMeshStruct();
@@ -325,10 +311,7 @@ Topology::getCellVolume(stk::mesh::Entity const cell)
   switch (num_relations) {
     default: ALBANY_ASSERT(num_relations == 4 || num_relations == 8); break;
     case 4: volume = minitensor::volume(points[0], points[1], points[2], points[3]); break;
-    case 8:
-      volume =
-          minitensor::volume(points[0], points[1], points[2], points[3], points[4], points[5], points[6], points[7]);
-      break;
+    case 8: volume = minitensor::volume(points[0], points[1], points[2], points[3], points[4], points[5], points[6], points[7]); break;
   }
 
   return volume;
@@ -946,10 +929,7 @@ Topology::createSurfaceElementConnectivity(stk::mesh::Entity face_top, stk::mesh
 // Create vectors describing the vertices and edges of the star of
 // an entity in the stk mesh.
 void
-Topology::createStar(
-    stk::mesh::Entity                entity,
-    std::set<stk::mesh::Entity>&     subgraph_entities,
-    std::set<STKEdge, EdgeLessThan>& subgraph_edges)
+Topology::createStar(stk::mesh::Entity entity, std::set<stk::mesh::Entity>& subgraph_entities, std::set<STKEdge, EdgeLessThan>& subgraph_edges)
 {
   subgraph_entities.insert(entity);
 
@@ -1170,8 +1150,7 @@ Topology::printFailureState()
     auto const fs        = get_entity_failure_state(cell);
     auto       proc_rank = get_proc_rank();
     auto       gid       = get_gid(cell) - 1;
-    std::cout << "**** DEBUG TOPO PROC GID FAILED: " << proc_rank << " " << std::setw(3) << std::setfill('0') << gid
-              << " " << fs << "\n";
+    std::cout << "**** DEBUG TOPO PROC GID FAILED: " << proc_rank << " " << std::setw(3) << std::setfill('0') << gid << " " << fs << "\n";
   }
 }
 
@@ -1468,9 +1447,7 @@ Topology::outputToGraphviz(std::string const& output_filename)
 
       gviz_out << dot_entity(get_space_dimension(), get_parallel_rank(), source_entity, source_id, rank, failure_state);
 
-      for (stk::mesh::EntityRank target_rank = stk::topology::NODE_RANK;
-           target_rank < get_meta_data().entity_rank_count();
-           ++target_rank) {
+      for (stk::mesh::EntityRank target_rank = stk::topology::NODE_RANK; target_rank < get_meta_data().entity_rank_count(); ++target_rank) {
         unsigned const num_valid_conn = get_bulk_data().count_valid_connectivity(source_entity, target_rank);
 
         if (num_valid_conn > 0) {
@@ -1501,9 +1478,7 @@ Topology::outputToGraphviz(std::string const& output_filename)
 
               case UNIDIRECTIONAL_MULTILEVEL: is_valid_target_rank = target_rank < rank; break;
 
-              case BIDIRECTIONAL_UNILEVEL:
-                is_valid_target_rank = (target_rank == rank + 1) || (target_rank + 1 == rank);
-                break;
+              case BIDIRECTIONAL_UNILEVEL: is_valid_target_rank = (target_rank == rank + 1) || (target_rank + 1 == rank); break;
 
               case BIDIRECTIONAL_MULTILEVEL: is_valid_target_rank = target_rank != rank; break;
             }
@@ -1531,11 +1506,7 @@ Topology::outputToGraphviz(std::string const& output_filename)
     stk::mesh::Entity target = entity_pair.second;
 
     gviz_out << dot_relation(
-        get_entity_id(source),
-        get_bulk_data().entity_rank(source),
-        get_entity_id(target),
-        get_bulk_data().entity_rank(target),
-        relation_local_id[i]);
+        get_entity_id(source), get_bulk_data().entity_rank(source), get_entity_id(target), get_bulk_data().entity_rank(target), relation_local_id[i]);
   }
 
   // File end
@@ -2025,9 +1996,9 @@ Topology::execute_entity_deletion_operations(stk::mesh::EntityVector& entities)
     std::vector<stk::mesh::ConnectivityOrdinal> temp_ordinals;
     stk::mesh::Entity const*                    rel_entities = nullptr;
     stk::mesh::ConnectivityOrdinal const*       rel_ordinals;
-    int                                         num_conn = 0;
-    auto const end_rank   = static_cast<stk::mesh::EntityRank>(meta_data.entity_rank_count() - 1);
-    auto const begin_rank = static_cast<stk::mesh::EntityRank>(entity_rank);
+    int                                         num_conn   = 0;
+    auto const                                  end_rank   = static_cast<stk::mesh::EntityRank>(meta_data.entity_rank_count() - 1);
+    auto const                                  begin_rank = static_cast<stk::mesh::EntityRank>(entity_rank);
     for (stk::mesh::EntityRank irank = end_rank; irank != begin_rank; --irank) {
       num_conn     = bulk_data.num_connectivity(entity, irank);
       rel_entities = bulk_data.begin(entity, irank);

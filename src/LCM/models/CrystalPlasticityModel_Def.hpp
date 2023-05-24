@@ -55,9 +55,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
     ConstitutiveModel<EvalT, Traits>&    model,
     Teuchos::ParameterList*              p,
     Teuchos::RCP<Albany::Layouts> const& dl)
-    : BaseKernel(model),
-      num_family_(p->get<int>("Number of Slip Families", 1)),
-      num_slip_(p->get<int>("Number of Slip Systems", 0))
+    : BaseKernel(model), num_family_(p->get<int>("Number of Slip Families", 1)), num_slip_(p->get<int>("Number of Slip Systems", 0))
 {
   CP::ParameterReader<EvalT, Traits> preader(p);
 
@@ -81,8 +79,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
     // NOTE default to coordinate axes; construct 3rd direction if only 2 given
     element_block_orientation_.set_dimension(CP::MAX_DIM);
     for (int i = 0; i < CP::MAX_DIM; ++i) {
-      std::vector<RealType> const b_temp =
-          e_list.get<Teuchos::Array<RealType>>(Albany::strint("Basis Vector", i + 1)).toVector();
+      std::vector<RealType> const b_temp = e_list.get<Teuchos::Array<RealType>>(Albany::strint("Basis Vector", i + 1)).toVector();
 
       minitensor::Vector<RealType, CP::MAX_DIM> basis(CP::MAX_DIM);
 
@@ -281,8 +278,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
   // mechanical source
   if (have_temperature_) {
-    addStateVariable(
-        source_string_, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
+    addStateVariable(source_string_, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
   // gammas for each slip system
@@ -307,8 +303,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
     std::string const output_gamma_dot_string = "Output " + gamma_dot_string;
 
-    addStateVariable(
-        gamma_dot_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>(output_gamma_dot_string, false));
+    addStateVariable(gamma_dot_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>(output_gamma_dot_string, false));
   }
 
   // tau_hard - state variable for hardening on each slip system
@@ -323,8 +318,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
     std::string const output_tau_hard_string = "Output " + tau_hard_string;
 
-    addStateVariable(
-        tau_hard_string, dl->qp_scalar, "scalar", initial, true, p->get<bool>(output_tau_hard_string, false));
+    addStateVariable(tau_hard_string, dl->qp_scalar, "scalar", initial, true, p->get<bool>(output_tau_hard_string, false));
   }
 
   // taus - output resolved shear stress for debugging - not stated
@@ -344,17 +338,13 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
   addStateVariable(residual_string_, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output CP_Residual", false));
 
   // residual iterations
-  addStateVariable(
-      residual_iter_string_, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output CP_Residual_Iter", false));
+  addStateVariable(residual_iter_string_, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output CP_Residual_Iter", false));
 }
 
 // Initialize state for computing the constitutive response of the material
 template <typename EvalT, typename Traits>
 void
-CrystalPlasticityKernel<EvalT, Traits>::init(
-    Workset&                 workset,
-    FieldMap<ScalarT const>& dep_fields,
-    FieldMap<ScalarT>&       eval_fields)
+CrystalPlasticityKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields)
 {
   if (verbosity_ == CP::Verbosity::EXTREME) {
     index_element_ = workset.wsIndex;
@@ -571,14 +561,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
         }
 
         CP::updateHardness<CP::MAX_DIM, CP::MAX_SLIP, ScalarT>(
-            slip_systems_,
-            slip_families_,
-            dt_,
-            rates_slip,
-            state_hardening_n,
-            state_hardening_np1,
-            slip_resistance,
-            failed);
+            slip_systems_, slip_families_, dt_, rates_slip, state_hardening_n, state_hardening_np1, slip_resistance, failed);
 
       } break;
 
@@ -587,8 +570,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
         minitensor::Tensor<RealType, CP::MAX_DIM> const eye = minitensor::identity<RealType, CP::MAX_DIM>(num_dims_);
 
-        minitensor::Tensor<RealType, CP::MAX_DIM> const F_np1_peeled =
-            LCM::peel_tensor<EvalT, RealType, CP::MAX_DIM, CP::MAX_DIM>()(F_np1);
+        minitensor::Tensor<RealType, CP::MAX_DIM> const F_np1_peeled = LCM::peel_tensor<EvalT, RealType, CP::MAX_DIM, CP::MAX_DIM>()(F_np1);
 
         minitensor::Tensor<RealType, CP::MAX_DIM> const L = 1.0 / dt_ * (F_np1_peeled * inv_F - eye);
 
@@ -701,8 +683,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
           minitensor::Tensor<RealType, CP::MAX_DIM> Fp_np1_trial(num_dims_, minitensor::Filler::ZEROS);
 
           // Compute Lp_trial, and Fp_np1_trial
-          CP::applySlipIncrement<CP::MAX_DIM, CP::MAX_SLIP, RealType>(
-              element_slip_systems, dt_, slip_n, slip_np1_trial, Fp_n, Lp_trial, Fp_np1_trial);
+          CP::applySlipIncrement<CP::MAX_DIM, CP::MAX_SLIP, RealType>(element_slip_systems, dt_, slip_n, slip_np1_trial, Fp_n, Lp_trial, Fp_np1_trial);
 
           if (verbosity_ == CP::Verbosity::DEBUG) {
             std::cout << "Lp_trial" << std::endl;
@@ -713,14 +694,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
           // rates_hardening(num_slip_, minitensor::Filler::ZEROS);
 
           CP::updateHardness<CP::MAX_DIM, CP::MAX_SLIP, RealType>(
-              slip_systems_,
-              slip_families_,
-              dt_,
-              rates_slip_trial,
-              state_hardening_n,
-              hardening_np1_trial,
-              slip_resistance_trial,
-              failed);
+              slip_systems_, slip_families_, dt_, rates_slip_trial, state_hardening_n, hardening_np1_trial, slip_resistance_trial, failed);
 
           minitensor::Vector<RealType, CP::MAX_SLIP> shear_np1_trial_2(num_slip_);
 
@@ -764,13 +738,12 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
             RealType const g0               = pflow_parameters->getParameter(Params::RATE_SLIP_REFERENCE);
             RealType const ratio_rate       = rates_slip_trial[s] / g0;
             RealType const sign_rate        = ratio_rate > 0.0 ? 1.0 : -1.0;
-            shear_np1_trial_2[s] = hardening_np1_trial[s] * std::pow(std::abs(ratio_rate), 1.0 / m) * sign_rate;
+            shear_np1_trial_2[s]            = hardening_np1_trial[s] * std::pow(std::abs(ratio_rate), 1.0 / m) * sign_rate;
           }
 
           bool failed{false};
 
-          minitensor::Tensor4<RealType, CP::MAX_DIM> const C_peeled =
-              LCM::peel_tensor4<EvalT, RealType, CP::MAX_DIM, CP::MAX_DIM>()(C);
+          minitensor::Tensor4<RealType, CP::MAX_DIM> const C_peeled = LCM::peel_tensor4<EvalT, RealType, CP::MAX_DIM, CP::MAX_DIM>()(C);
 
           minitensor::Tensor<RealType, CP::MAX_DIM> sigma_np1(num_dims_);
 
@@ -826,9 +799,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
             dissipation += shear_np1_trial[s] * rates_slip_trial[s] * correction_hardening[s];
           }
 
-          RealType const diff = std::abs(
-              minitensor::dot(rates_slip_trial, shear_np1_trial) -
-              minitensor::dot(rates_slip_trial, shear_np1_trial_2));
+          RealType const diff = std::abs(minitensor::dot(rates_slip_trial, shear_np1_trial) - minitensor::dot(rates_slip_trial, shear_np1_trial_2));
 
           if (diff < min_diff) {
             min_diff = diff;
@@ -909,8 +880,7 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
       dt_,
       verbosity_);
 
-  utility::StaticPointer<CP::Integrator<EvalT, CP::MAX_DIM, CP::MAX_SLIP>> integrator =
-      integratorFactory(integration_scheme_, residual_type_);
+  utility::StaticPointer<CP::Integrator<EvalT, CP::MAX_DIM, CP::MAX_SLIP>> integrator = integratorFactory(integration_scheme_, residual_type_);
 
   integrator->update();
 

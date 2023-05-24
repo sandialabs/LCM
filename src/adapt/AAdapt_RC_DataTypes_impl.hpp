@@ -42,9 +42,8 @@ namespace rc {
 /*! Apply \code aadapt_rc_apply_to_all_ad_types(eti, rank) \endcode to each \c
  *  rank.
  */
-#define aadapt_rc_apply_to_all_ad_types_all_ranks(macro)                              \
-  aadapt_rc_apply_to_all_ad_types(macro, 0) aadapt_rc_apply_to_all_ad_types(macro, 1) \
-      aadapt_rc_apply_to_all_ad_types(macro, 2)
+#define aadapt_rc_apply_to_all_ad_types_all_ranks(macro) \
+  aadapt_rc_apply_to_all_ad_types(macro, 0) aadapt_rc_apply_to_all_ad_types(macro, 1) aadapt_rc_apply_to_all_ad_types(macro, 2)
 
 }  // namespace rc
 }  // namespace AAdapt

@@ -19,8 +19,7 @@
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS(
-    InterfaceT)::Mortar_Assemble(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M)
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Mortar_Assemble(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M)
 {
   // interface needs to be complete
   if (!IsComplete()) {
@@ -219,8 +218,7 @@ MoertelT::InterfaceT<2, ST, LO, GO, N>::Mortar_Integrate_2D(Teuchos::RCP<Teuchos
 
   // time this process
   if (OutLevel() > 5) {
-    std::cout << "MoertelT::Interface " << Id() << ": Integration on proc " << gcomm_->getRank() << " finished in "
-              << time.totalElapsedTime() << " sec\n";
+    std::cout << "MoertelT::Interface " << Id() << ": Integration on proc " << gcomm_->getRank() << " finished in " << time.totalElapsedTime() << " sec\n";
     fflush(stdout);
   }
   return true;
@@ -363,13 +361,11 @@ bool MoertelT::Interface::Integrate_2D(Tpetra_CrsMatrix& M,
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D_Section(
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
+MoertelT::MOERTEL_TEMPLATE_CLASS(
+    InterfaceT)::Integrate_2D_Section(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
 {
   // if one of the segments is quadratic, we have to do something here
-  if (sseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_Linear1D ||
-      mseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_Linear1D) {
+  if (sseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_Linear1D || mseg.Type() != MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::seg_Linear1D) {
     std::stringstream oss;
     oss << "***ERR*** MoertelT::Interface::Integrate_2D_Section:\n"
         << "***ERR*** Integration of other than linear segments not yet "
@@ -677,9 +673,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D_Section(
 
 MOERTEL_TEMPLATE_STATEMENT
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::QuickOverlapTest_2D(
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-    MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
+MoertelT::MOERTEL_TEMPLATE_CLASS(
+    InterfaceT)::QuickOverlapTest_2D(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg)
 {
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** snode = sseg.Nodes();
   MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** mnode = mseg.Nodes();

@@ -55,8 +55,7 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveCellStateField(Teu
   stateName = p.get<std::string>("State Name");
   field     = decltype(field)(fieldName, p.get<Teuchos::RCP<PHX::DataLayout>>("Field Layout"));
 
-  savestate_operation =
-      Teuchos::rcp(new PHX::Tag<ScalarT>(stateName, p.get<Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout")));
+  savestate_operation = Teuchos::rcp(new PHX::Tag<ScalarT>(stateName, p.get<Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout")));
 
   this->addDependentField(weights.fieldTag());
   this->addDependentField(field.fieldTag());
@@ -68,9 +67,7 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveCellStateField(Teu
 // **********************************************************************
 template <typename Traits>
 void
-SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field, fm);
   this->utils.setFieldData(weights, fm);
@@ -85,10 +82,7 @@ SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typenam
   Albany::StateArray::const_iterator it;
   it = workset.stateArrayPtr->find(stateName);
 
-  ALBANY_PANIC(
-      (it == workset.stateArrayPtr->end()),
-      std::endl
-          << "Error: cannot locate " << stateName << " in PHAL_SaveCellStateField_Def" << std::endl);
+  ALBANY_PANIC((it == workset.stateArrayPtr->end()), std::endl << "Error: cannot locate " << stateName << " in PHAL_SaveCellStateField_Def" << std::endl);
 
   Albany::MDArray sta = it->second;
 

@@ -15,10 +15,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 KfieldBC_Base<EvalT, Traits>::KfieldBC_Base(Teuchos::ParameterList& p)
-    : offset(p.get<int>("Equation Offset")),
-      PHAL::DirichletBase<EvalT, Traits>(p),
-      mu(p.get<RealType>("Shear Modulus")),
-      nu(p.get<RealType>("Poissons Ratio"))
+    : offset(p.get<int>("Equation Offset")), PHAL::DirichletBase<EvalT, Traits>(p), mu(p.get<RealType>("Shear Modulus")), nu(p.get<RealType>("Poissons Ratio"))
 {
   KIval  = p.get<RealType>("KI Value");
   KIIval = p.get<RealType>("KII Value");
@@ -41,8 +38,7 @@ KfieldBC_Base<EvalT, Traits>::KfieldBC_Base(Teuchos::ParameterList& p)
 
   ALBANY_PANIC(!(timeValues.size() == KIValues.size()), "Dimension of \"Time Values\" and \"KI Values\" do not match");
 
-  ALBANY_PANIC(
-      !(timeValues.size() == KIIValues.size()), "Dimension of \"Time Values\" and \"KII Values\" do not match");
+  ALBANY_PANIC(!(timeValues.size() == KIIValues.size()), "Dimension of \"Time Values\" and \"KII Values\" do not match");
 }
 
 // **********************************************************************
@@ -108,8 +104,7 @@ KfieldBC_Base<EvalT, Traits>::computeBCs(double* coord, ScalarT& Xval, ScalarT& 
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::KfieldBC(Teuchos::ParameterList& p)
-    : KfieldBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
+KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::KfieldBC(Teuchos::ParameterList& p) : KfieldBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
 
@@ -154,8 +149,7 @@ KfieldBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits>
-KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::KfieldBC(Teuchos::ParameterList& p)
-    : KfieldBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
+KfieldBC<PHAL::AlbanyTraits::Jacobian, Traits>::KfieldBC(Teuchos::ParameterList& p) : KfieldBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 // **********************************************************************

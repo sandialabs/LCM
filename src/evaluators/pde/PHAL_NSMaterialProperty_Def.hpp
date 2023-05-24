@@ -43,14 +43,12 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
       vector_constant_value.resize(numDims);
       ALBANY_PANIC(
           vector_constant_value.size() != numDims,
-          "Vector constant value for material property " << name_mp << " has size " << vector_constant_value.size()
-                                                         << " but expected size " << numDims);
+          "Vector constant value for material property " << name_mp << " has size " << vector_constant_value.size() << " but expected size " << numDims);
 
       for (PHX::index_size_type i = 0; i < numDims; i++) vector_constant_value[i] = tmp[i];
 
       // Add property as a Sacado-ized parameter
-      for (PHX::DataLayout::size_type i = 0; i < numDims; i++)
-        this->registerSacadoParameter(Albany::strint(name_mp, i), paramLib);
+      for (PHX::DataLayout::size_type i = 0; i < numDims; i++) this->registerSacadoParameter(Albany::strint(name_mp, i), paramLib);
     } else if (rank == 4) {
       matPropType                        = TENSOR_CONSTANT;
       PHX::index_size_type       numRows = dims[2];
@@ -58,17 +56,15 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
       Teuchos::TwoDArray<double> tmp     = mp_list->get<Teuchos::TwoDArray<double>>("Value");
       ALBANY_PANIC(
           tensor_constant_value.getNumRows() != numRows || tensor_constant_value.getNumCols() != numCols,
-          "Tensor constant value for material property "
-              << name_mp << " has dimensions " << tensor_constant_value.getNumRows() << "x"
-              << tensor_constant_value.getNumCols() << " but expected dimensions " << numRows << "x" << numCols);
+          "Tensor constant value for material property " << name_mp << " has dimensions " << tensor_constant_value.getNumRows() << "x"
+                                                         << tensor_constant_value.getNumCols() << " but expected dimensions " << numRows << "x" << numCols);
       tensor_constant_value = Teuchos::TwoDArray<ScalarT>(numRows, numCols);
       for (PHX::index_size_type i = 0; i < numRows; i++)
         for (PHX::index_size_type j = 0; j < numCols; j++) tensor_constant_value(i, j) = tmp(i, j);
 
       // Add property as a Sacado-ized parameter
       for (PHX::DataLayout::size_type i = 0; i < numRows; i++)
-        for (PHX::DataLayout::size_type j = 0; j < numCols; j++)
-          this->registerSacadoParameter(Albany::strint(Albany::strint(name_mp, i), j), paramLib);
+        for (PHX::DataLayout::size_type j = 0; j < numCols; j++) this->registerSacadoParameter(Albany::strint(Albany::strint(name_mp, i), j), paramLib);
     } else
       ALBANY_ABORT(
           "Invalid material property rank " << rank << ".  Acceptable values are 2 (scalar), "
@@ -104,8 +100,7 @@ NSMaterialProperty<EvalT, Traits>::NSMaterialProperty(Teuchos::ParameterList& p)
     timeValues  = mp_list->get<Teuchos::Array<RealType>>("Time Values").toVector();
     depValues   = mp_list->get<Teuchos::Array<RealType>>("Dependent Values").toVector();
 
-    ALBANY_PANIC(
-        !(timeValues.size() == depValues.size()), "Dimension of \"Time Values\" and \"Dependent Values\" do not match");
+    ALBANY_PANIC(!(timeValues.size() == depValues.size()), "Dimension of \"Time Values\" and \"Dependent Values\" do not match");
 
     // Add property as a Sacado-ized parameter
     this->registerSacadoParameter(name_mp, paramLib);
@@ -207,8 +202,7 @@ template <typename EvalT, typename Traits>
 typename NSMaterialProperty<EvalT, Traits>::ScalarT&
 NSMaterialProperty<EvalT, Traits>::getValue(std::string const& n)
 {
-  if (matPropType == SCALAR_CONSTANT || matPropType == SQRT_TEMP || matPropType == INV_SQRT_TEMP ||
-      matPropType == TIME_DEP_SCALAR) {
+  if (matPropType == SCALAR_CONSTANT || matPropType == SQRT_TEMP || matPropType == INV_SQRT_TEMP || matPropType == TIME_DEP_SCALAR) {
     return scalar_constant_value;
   } else if (matPropType == VECTOR_CONSTANT) {
     for (std::size_t dim = 0; dim < vector_constant_value.size(); ++dim)
@@ -218,9 +212,7 @@ NSMaterialProperty<EvalT, Traits>::getValue(std::string const& n)
       for (std::size_t dim2 = 0; dim2 < tensor_constant_value.getNumCols(); ++dim2)
         if (n == Albany::strint(Albany::strint(name_mp, dim1), dim2)) return tensor_constant_value(dim1, dim2);
   }
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in NSMaterialProperty::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in NSMaterialProperty::getValue()" << std::endl);
   return scalar_constant_value;
 }
 

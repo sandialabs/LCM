@@ -100,7 +100,7 @@ main(int ac, char* av[])
   std::cout << "topology.barycentricSubdivision() takes " << cpu_time_used << " seconds" << std::endl;
 
   Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr = topology.get_discretization();
-  Albany::STKDiscretization& stk_discretization = static_cast<Albany::STKDiscretization&>(*discretization_ptr);
+  Albany::STKDiscretization&                   stk_discretization = static_cast<Albany::STKDiscretization&>(*discretization_ptr);
 
   Teuchos::RCP<Thyra_Vector> solution_field = stk_discretization.getSolutionField();
 

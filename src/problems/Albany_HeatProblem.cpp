@@ -44,8 +44,7 @@ Albany::HeatProblem::HeatProblem(
   if (params->isSublist("Distributed Parameters")) {
     int numDistParams = params->sublist("Distributed Parameters").get<int>("Number of Parameter Vectors", 0);
     for (int i = 0; i < numDistParams; ++i) {
-      Teuchos::ParameterList p =
-          params->sublist("Distributed Parameters").sublist(Albany::strint("Distributed Parameter", i));
+      Teuchos::ParameterList p = params->sublist("Distributed Parameters").sublist(Albany::strint("Distributed Parameter", i));
       if (p.get<std::string>("Name", "") == "thermal_conductivity") conductivityIsDistParam = true;
       break;
     }
@@ -54,8 +53,7 @@ Albany::HeatProblem::HeatProblem(
   if (params->isSublist("Distributed Parameters")) {
     int numDistParams = params->sublist("Distributed Parameters").get<int>("Number of Parameter Vectors", 0);
     for (int i = 0; i < numDistParams; ++i) {
-      Teuchos::ParameterList p =
-          params->sublist("Distributed Parameters").sublist(Albany::strint("Distributed Parameter", i));
+      Teuchos::ParameterList p = params->sublist("Distributed Parameters").sublist(Albany::strint("Distributed Parameter", i));
       if (p.get<std::string>("Name", "") == "dirichlet_field") dirichletIsDistParam = true;
       meshPartDirichlet = p.get<std::string>("Mesh Part", "");
       break;
@@ -66,9 +64,7 @@ Albany::HeatProblem::HeatProblem(
 Albany::HeatProblem::~HeatProblem() {}
 
 void
-Albany::HeatProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::HeatProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   int physSets = meshSpecs.size();
@@ -172,8 +168,7 @@ Albany::HeatProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::MeshS
   condNames[4] = "radiate";
 
   nfm.resize(1);  // Heat problem only has one physics set
-  nfm[0] = bcUtils.constructBCEvaluators(
-      meshSpecs, bcNames, dof_names, false, 0, condNames, offsets, dl, this->params, this->paramLib, materialDB);
+  nfm[0] = bcUtils.constructBCEvaluators(meshSpecs, bcNames, dof_names, false, 0, condNames, offsets, dl, this->params, this->paramLib, materialDB);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

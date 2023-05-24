@@ -16,11 +16,7 @@ class SolutionMinValueResponseFunction : public SamplingBasedScalarResponseFunct
 {
  public:
   //! Default constructor
-  SolutionMinValueResponseFunction(
-      const Teuchos::RCP<Teuchos_Comm const>& comm,
-      int                                     neq                 = 1,
-      int                                     eq                  = 0,
-      bool                                    interleavedOrdering = true);
+  SolutionMinValueResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm, int neq = 1, int eq = 0, bool interleavedOrdering = true);
 
   //! Destructor
   ~SolutionMinValueResponseFunction() = default;

@@ -20,8 +20,7 @@ namespace PHAL {
 // **********************************************************************
 template <typename Traits>
 DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::DirichletOffNodeSet(Teuchos::ParameterList& p)
-    : DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p),
-      nodeSets(*p.get<Teuchos::RCP<std::vector<std::string>>>("Node Sets"))
+    : DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p), nodeSets(*p.get<Teuchos::RCP<std::vector<std::string>>>("Node Sets"))
 {
 }
 
@@ -59,8 +58,7 @@ DirichletOffNodeSet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typena
 // **********************************************************************
 template <typename Traits>
 DirichletOffNodeSet<PHAL::AlbanyTraits::Jacobian, Traits>::DirichletOffNodeSet(Teuchos::ParameterList& p)
-    : DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p),
-      nodeSets(*p.get<Teuchos::RCP<std::vector<std::string>>>("Node Sets"))
+    : DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p), nodeSets(*p.get<Teuchos::RCP<std::vector<std::string>>>("Node Sets"))
 {
 }
 

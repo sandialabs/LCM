@@ -21,11 +21,10 @@ namespace {
 TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
 {
   // Set up the data layout
-  int const                                     worksetSize = 1;
-  int const                                     numQPts     = 1;
-  int const                                     numDim      = 3;
-  Teuchos::RCP<PHX::MDALayout<Cell, QuadPoint>> qp_scalar =
-      Teuchos::rcp(new PHX::MDALayout<Cell, QuadPoint>(worksetSize, numQPts));
+  int const                                               worksetSize = 1;
+  int const                                               numQPts     = 1;
+  int const                                               numDim      = 3;
+  Teuchos::RCP<PHX::MDALayout<Cell, QuadPoint>>           qp_scalar   = Teuchos::rcp(new PHX::MDALayout<Cell, QuadPoint>(worksetSize, numQPts));
   Teuchos::RCP<PHX::MDALayout<Cell, QuadPoint, Dim, Dim>> qp_tensor =
       Teuchos::rcp(new PHX::MDALayout<Cell, QuadPoint, Dim, Dim>(worksetSize, numQPts, numDim, numDim));
 
@@ -75,9 +74,7 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
   fieldManager.registerEvaluator<PHAL::AlbanyTraits::Residual>(lameStress);
 
   // Set the LameStress evaluated fields as required fields
-  for (std::vector<Teuchos::RCP<PHX::FieldTag>>::const_iterator it = lameStress->evaluatedFields().begin();
-       it != lameStress->evaluatedFields().end();
-       it++)
+  for (std::vector<Teuchos::RCP<PHX::FieldTag>>::const_iterator it = lameStress->evaluatedFields().begin(); it != lameStress->evaluatedFields().end(); it++)
     fieldManager.requireField<PHAL::AlbanyTraits::Residual>(**it);
 
   // Call postRegistrationSetup on the evaluators
@@ -90,43 +87,30 @@ TEUCHOS_UNIT_TEST(LameStress_elastic, Instantiation)
   stateMgr.registerStateVariable("Stress", qp_tensor, "dummy", "scalar", 0.0, true);
   stateMgr.registerStateVariable("Deformation Gradient", qp_tensor, "dummy", "identity", 1.0, true);
   // Add material-model specific state variables
-  std::string              lameMaterialModelName = lameStressParameterList->get<std::string>("Lame Material Model");
-  std::vector<std::string> lameMaterialModelStateVariableNames =
-      LameUtils::getStateVariableNames(lameMaterialModelName, materialModelParametersList);
-  std::vector<double> lameMaterialModelStateVariableInitialValues =
+  std::string              lameMaterialModelName               = lameStressParameterList->get<std::string>("Lame Material Model");
+  std::vector<std::string> lameMaterialModelStateVariableNames = LameUtils::getStateVariableNames(lameMaterialModelName, materialModelParametersList);
+  std::vector<double>      lameMaterialModelStateVariableInitialValues =
       LameUtils::getStateVariableInitialValues(lameMaterialModelName, materialModelParametersList);
   for (unsigned int i = 0; i < lameMaterialModelStateVariableNames.size(); ++i) {
     stateMgr.registerStateVariable(
-        lameMaterialModelStateVariableNames[i],
-        qp_scalar,
-        "dummy",
-        Albany::doubleToInitString(lameMaterialModelStateVariableInitialValues[i]),
-        true);
+        lameMaterialModelStateVariableNames[i], qp_scalar, "dummy", Albany::doubleToInitString(lameMaterialModelStateVariableInitialValues[i]), true);
   }
 
   // Create a discretization, as required by the StateManager
-  Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList =
-      Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
+  Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList = Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
   discretizationParameterList->set<int>("1D Elements", worksetSize);
   discretizationParameterList->set<int>("2D Elements", 1);
   discretizationParameterList->set<int>("3D Elements", 1);
   discretizationParameterList->set<std::string>("Method", "STK3D");
   discretizationParameterList->set<int>("Number Of Time Derivatives", 0);
   discretizationParameterList->set<std::string>("Exodus Output File Name", "unitTestOutput.exo");  // Is this required?
-  Teuchos::RCP<Teuchos_Comm const> commT             = Albany::createTeuchosCommFromMpiComm(MPI_COMM_WORLD);
-  int                              numberOfEquations = 3;
+  Teuchos::RCP<Teuchos_Comm const>                           commT             = Albany::createTeuchosCommFromMpiComm(MPI_COMM_WORLD);
+  int                                                        numberOfEquations = 3;
   Albany::AbstractFieldContainer::FieldContainerRequirements req;  // The default fields
-  Teuchos::RCP<Albany::GenericSTKMeshStruct>                 stkMeshStruct =
-      Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(discretizationParameterList, Teuchos::null, commT));
+  Teuchos::RCP<Albany::GenericSTKMeshStruct> stkMeshStruct = Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(discretizationParameterList, Teuchos::null, commT));
   stkMeshStruct->setFieldAndBulkData(
-      commT,
-      discretizationParameterList,
-      numberOfEquations,
-      req,
-      stateMgr.getStateInfoStruct(),
-      stkMeshStruct->getMeshSpecs()[0]->worksetSize);
-  Teuchos::RCP<Albany::AbstractDiscretization> discretization =
-      Teuchos::rcp(new Albany::STKDiscretization(stkMeshStruct, commT));
+      commT, discretizationParameterList, numberOfEquations, req, stateMgr.getStateInfoStruct(), stkMeshStruct->getMeshSpecs()[0]->worksetSize);
+  Teuchos::RCP<Albany::AbstractDiscretization> discretization = Teuchos::rcp(new Albany::STKDiscretization(stkMeshStruct, commT));
 
   // Associate the discretization with the StateManager
   stateMgr.setupStateArrays(discretization);

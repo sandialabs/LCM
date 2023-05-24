@@ -13,9 +13,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-SaveSideSetStateField<EvalT, Traits>::SaveSideSetStateField(
-    Teuchos::ParameterList const& /* p */,
-    const Teuchos::RCP<Albany::Layouts>& /* dl */)
+SaveSideSetStateField<EvalT, Traits>::SaveSideSetStateField(Teuchos::ParameterList const& /* p */, const Teuchos::RCP<Albany::Layouts>& /* dl */)
 {
   // States Not Saved for Generic Type, only Specializations
   this->setName("Save Side Set State Field" + PHX::print<EvalT>());
@@ -24,9 +22,7 @@ SaveSideSetStateField<EvalT, Traits>::SaveSideSetStateField(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SaveSideSetStateField<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& /* fm */)
+SaveSideSetStateField<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& /* fm */)
 {
   // States Not Saved for Generic Type, only Specializations
 }
@@ -41,9 +37,7 @@ void SaveSideSetStateField<EvalT, Traits>::evaluateFields(typename Traits::EvalD
 
 // **********************************************************************
 template <typename Traits>
-SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveSideSetStateField(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveSideSetStateField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   sideSetName = p.get<std::string>("Side Set Name");
 
@@ -92,9 +86,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveSideSetStateFie
 // **********************************************************************
 template <typename Traits>
 void
-SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& fm)
+SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field, fm);
 }
@@ -123,9 +115,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(typen
 
   ALBANY_PANIC(ssDiscs.size() == 0, "Error! The discretization must store side set discretizations.\n");
 
-  ALBANY_PANIC(
-      ssDiscs.find(sideSetName) == ssDiscs.end(),
-      "Error! No discretization found for side set " << sideSetName << ".\n");
+  ALBANY_PANIC(ssDiscs.find(sideSetName) == ssDiscs.end(), "Error! No discretization found for side set " << sideSetName << ".\n");
 
   Teuchos::RCP<Albany::AbstractDiscretization> ss_disc = ssDiscs.at(sideSetName);
 
@@ -150,16 +140,13 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(typen
   ALBANY_PANIC(
       workset.disc->getSideNodeNumerationMap().find(sideSetName) == workset.disc->getSideNodeNumerationMap().end(),
       "Error! Sideset " << sideSetName << " has no sideNodeNumeration map.\n");
-  std::map<GO, std::vector<int>> const& sideNodeNumerationMap =
-      workset.disc->getSideNodeNumerationMap().at(sideSetName);
+  std::map<GO, std::vector<int>> const& sideNodeNumerationMap = workset.disc->getSideNodeNumerationMap().at(sideSetName);
 
   // Establishing the kind of field layout
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
   std::string const& tag2 = dims.size() > 2 ? field.fieldTag().dataLayout().name(2) : "";
-  ALBANY_PANIC(
-      dims.size() > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim",
-      "Error! Invalid field layout in SaveSideSetStateField.\n");
+  ALBANY_PANIC(dims.size() > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim", "Error! Invalid field layout in SaveSideSetStateField.\n");
 
   // Loop on the sides of this sideSet that are in this workset
   std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
@@ -190,9 +177,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(typen
 
     // Then, after a safety check, we extract the StateArray of the desired
     // state in the right 2D-ws
-    ALBANY_PANIC(
-        esa[wsIndex2D].find(stateName) == esa[wsIndex2D].end(),
-        "Error! Cannot locate " << stateName << " in PHAL_SaveSideSetStateField_Def.\n");
+    ALBANY_PANIC(esa[wsIndex2D].find(stateName) == esa[wsIndex2D].end(), "Error! Cannot locate " << stateName << " in PHAL_SaveSideSetStateField_Def.\n");
     Albany::MDArray state = esa[wsIndex2D].at(stateName);
 
     std::vector<int> const& nodeMap = sideNodeNumerationMap.at(side_GID);
@@ -267,9 +252,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
 
   ALBANY_PANIC(ssDiscs.size() == 0, "Error! The discretization must store side set discretizations.\n");
 
-  ALBANY_PANIC(
-      ssDiscs.find(sideSetName) == ssDiscs.end(),
-      "Error! No discretization found for side set " << sideSetName << ".\n");
+  ALBANY_PANIC(ssDiscs.find(sideSetName) == ssDiscs.end(), "Error! No discretization found for side set " << sideSetName << ".\n");
 
   Teuchos::RCP<Albany::AbstractDiscretization> ss_disc = ssDiscs.at(sideSetName);
 
@@ -285,8 +268,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
       disc->getSideNodeNumerationMap().find(sideSetName) == disc->getSideNodeNumerationMap().end(),
       "Error! Sideset " << sideSetName << " has no sideNodeNumeration map.\n");
 
-  Teuchos::RCP<Albany::AbstractSTKMeshStruct> mesh =
-      Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(ss_disc->getMeshStruct());
+  Teuchos::RCP<Albany::AbstractSTKMeshStruct> mesh = Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(ss_disc->getMeshStruct());
   ALBANY_PANIC(mesh == Teuchos::null, "Error! Save nodal states available only for stk meshes.\n");
 
   stk::mesh::MetaData& metaData = *mesh->metaData;
@@ -320,8 +302,8 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
   //         LayeredMeshNumbering structure to determine the id of the 2d node
   //         given that of the 3d node.
 
-  if (Teuchos::rcp_dynamic_cast<Albany::SideSetSTKMeshStruct>(mesh) != Teuchos::null ||
-      layeredMeshNumbering == Teuchos::null || layeredMeshNumbering->ordering == Albany::LayeredMeshOrdering::LAYER) {
+  if (Teuchos::rcp_dynamic_cast<Albany::SideSetSTKMeshStruct>(mesh) != Teuchos::null || layeredMeshNumbering == Teuchos::null ||
+      layeredMeshNumbering->ordering == Albany::LayeredMeshOrdering::LAYER) {
     // Either not a layered mesh or layered but not column-wise. Either way, the
     // GID of the side-set's nodes will coincide with the GID of the 3D mesh
     // nodes.

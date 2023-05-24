@@ -16,9 +16,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thermal_conductivity_(p.get<std::string>("ACE_Therm_Cond QP Variable Name"), dl->qp_scalar),
       thermal_cond_grad_at_nodes_(p.get<std::string>("ACE_Therm_Cond Gradient Node Variable Name"), dl->node_vector),
       thermal_cond_grad_at_qps_(p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"), dl->qp_vector),
@@ -45,9 +43,9 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(
   // set programmatically
   cond_list->validateParameters(*reflist, 0, Teuchos::VALIDATE_USED_ENABLED, Teuchos::VALIDATE_DEFAULTS_DISABLED);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
-  coord_vec_ = decltype(coord_vec_)(p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
-  Teuchos::RCP<PHX::DataLayout> node_qp_vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout> vector_dl                   = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+  coord_vec_                                                = decltype(coord_vec_)(p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
+  Teuchos::RCP<PHX::DataLayout>           node_qp_vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   node_qp_vector_dl->dimensions(dims);
   workset_size_ = dims[0];
@@ -160,11 +158,10 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
   }
 
-  std::vector<RealType> const salinity_eb = this->queryElementBlockParameterMap(eb_name, salinity_map_);
-  std::vector<RealType> const z_above_mean_sea_level_eb =
-      this->queryElementBlockParameterMap(eb_name, z_above_mean_sea_level_map_);
-  std::vector<RealType> const time_eb      = this->queryElementBlockParameterMap(eb_name, time_map_);
-  std::vector<RealType> const sea_level_eb = this->queryElementBlockParameterMap(eb_name, sea_level_map_);
+  std::vector<RealType> const salinity_eb               = this->queryElementBlockParameterMap(eb_name, salinity_map_);
+  std::vector<RealType> const z_above_mean_sea_level_eb = this->queryElementBlockParameterMap(eb_name, z_above_mean_sea_level_map_);
+  std::vector<RealType> const time_eb                   = this->queryElementBlockParameterMap(eb_name, time_map_);
+  std::vector<RealType> const sea_level_eb              = this->queryElementBlockParameterMap(eb_name, sea_level_map_);
 
   std::vector<RealType> porosity_from_file_eb = this->queryElementBlockParameterMap(eb_name, porosity_from_file_map_);
   std::vector<RealType> ocean_salinity_eb     = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
@@ -213,8 +210,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       else {
         bluff_salinity_(cell, qp) = bluff_salinity_read_(cell, qp);
       }
-      const ScalarT sea_level =
-          sea_level_eb.size() > 0 ? interpolateVectors(time_eb, sea_level_eb, current_time) : -999.0;
+      const ScalarT sea_level = sea_level_eb.size() > 0 ? interpolateVectors(time_eb, sea_level_eb, current_time) : -999.0;
 
       // Thermal calculation
       // Calculate the depth-dependent porosity
@@ -243,8 +239,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         ScalarT       sal_trial  = sal_curr + sal_update;
         if (sal_trial < zero_sal) sal_trial = zero_sal;
         if (sal_trial > ocean_sal) sal_trial = ocean_sal;
-        bluff_salinity_(cell, qp) =
-            std::min(sal_trial, ocean_sal);  // ensures the salinity doesn't exceed ocean salinity
+        bluff_salinity_(cell, qp) = std::min(sal_trial, ocean_sal);  // ensures the salinity doesn't exceed ocean salinity
         // OVERRIDES EVERYTHING ABOVE:
         bluff_salinity_(cell, qp) = std::max(ocean_sal, bluff_salinity_(cell, qp));
       }
@@ -258,16 +253,14 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
       ScalarT const pressure_fixed = 1.0;
       // Tmelt is in Kelvin
-      ScalarT const Tmelt =
-          -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal - 0.000753 / 10000.0 * pressure_fixed + 273.15;
+      ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal - 0.000753 / 10000.0 * pressure_fixed + 273.15;
 
       // Set current temperature
       ScalarT const& Tcurr = temperature_(cell, qp);
 
       // Check if sediment fractions were provided
       bool sediment_given{false};
-      if ((sand_from_file_eb.size() > 0) && (clay_from_file_eb.size() > 0) && (silt_from_file_eb.size() > 0) &&
-          (peat_from_file_eb.size() > 0)) {
+      if ((sand_from_file_eb.size() > 0) && (clay_from_file_eb.size() > 0) && (silt_from_file_eb.size() > 0) && (peat_from_file_eb.size() > 0)) {
         sediment_given = true;
       }
 
@@ -344,39 +337,34 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         // peat-moorsh soils, EGU General Assembly 2016, held 17-22 April, 2016
         // in Vienna Austria, id. EPSC2016-8105 --> peat Cp value Cp values in
         // [J/kg/K]
-        calc_soil_heat_capacity =
-            (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac) + (1.93e3 * peat_frac);
+        calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac) + (1.93e3 * peat_frac);
         // K values in [W/K/m]
         calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.08 * peat_frac);
         // Rho values in [kg/m3]
         // Peat density from Emily Bristol
         calc_soil_density = (2600.0 * sand_frac) + (2350.0 * clay_frac) + (2500.0 * silt_frac) + (250.0 * peat_frac);
         // Update the effective material density
-        density_(cell, qp) = (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) +
-                             ((1.0 - porosity_eb) * calc_soil_density);
+        density_(cell, qp) = (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) + ((1.0 - porosity_eb) * calc_soil_density);
       } else {
-        density_(cell, qp) = (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) +
-                             ((1.0 - porosity_eb) * soil_density_eb);
+        density_(cell, qp) = (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) + ((1.0 - porosity_eb) * soil_density_eb);
       }
 
       // Update the effective material heat capacity
       if (sediment_given == true) {
-        heat_capacity_(cell, qp) = (porosity_eb * ((ice_heat_capacity_eb * icurr) + (water_heat_capacity_eb * wcurr))) +
-                                   ((1.0 - porosity_eb) * calc_soil_heat_capacity);
+        heat_capacity_(cell, qp) =
+            (porosity_eb * ((ice_heat_capacity_eb * icurr) + (water_heat_capacity_eb * wcurr))) + ((1.0 - porosity_eb) * calc_soil_heat_capacity);
       } else {
-        heat_capacity_(cell, qp) = (porosity_eb * ((ice_heat_capacity_eb * icurr) + (water_heat_capacity_eb * wcurr))) +
-                                   ((1.0 - porosity_eb) * soil_heat_capacity_eb);
+        heat_capacity_(cell, qp) =
+            (porosity_eb * ((ice_heat_capacity_eb * icurr) + (water_heat_capacity_eb * wcurr))) + ((1.0 - porosity_eb) * soil_heat_capacity_eb);
       }
 
       // Update the effective material thermal conductivity
       if (sediment_given == true) {
         thermal_conductivity_(cell, qp) =
-            (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) +
-            ((1.0 - porosity_eb) * calc_soil_thermal_cond);
+            (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) + ((1.0 - porosity_eb) * calc_soil_thermal_cond);
       } else {
         thermal_conductivity_(cell, qp) =
-            (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) +
-            ((1.0 - porosity_eb) * soil_thermal_cond_eb);
+            (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) + ((1.0 - porosity_eb) * soil_thermal_cond_eb);
       }
 
       // Jenn's sub-grid scale model to calibrate niche formation follows.
@@ -387,8 +375,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
 
       // Update the material thermal inertia term
-      thermal_inertia_(cell, qp) =
-          (density_(cell, qp) * heat_capacity_(cell, qp)) - (ice_density_eb * latent_heat_eb * dfdT);
+      thermal_inertia_(cell, qp) = (density_(cell, qp) * heat_capacity_(cell, qp)) - (ice_density_eb * latent_heat_eb * dfdT);
       // Return values
       ice_saturation_(cell, qp)   = icurr;
       water_saturation_(cell, qp) = wcurr;
@@ -399,8 +386,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     for (std::size_t node = 0; node < num_nodes_; ++node) {
       for (std::size_t qp = 0; qp < num_qps_; ++qp) {
         for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
-          thermal_cond_grad_at_nodes_(cell, node, ndim) +=
-              thermal_conductivity_(cell, qp) * wgradbf_(cell, node, qp, ndim);
+          thermal_cond_grad_at_nodes_(cell, node, ndim) += thermal_conductivity_(cell, qp) * wgradbf_(cell, node, qp, ndim);
         }
       }
     }
@@ -411,8 +397,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
     for (int qp = 0; qp < num_qps_; ++qp) {
       for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
         for (std::size_t node = 0; node < num_nodes_; ++node) {
-          thermal_cond_grad_at_qps_(cell, qp, ndim) +=
-              thermal_cond_grad_at_nodes_(cell, node, ndim) * bf_(cell, node, qp);
+          thermal_cond_grad_at_qps_(cell, qp, ndim) += thermal_cond_grad_at_nodes_(cell, node, ndim) * bf_(cell, node, qp);
         }
       }
     }
@@ -430,16 +415,12 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
   valid_pl->set<double>("ACE Ice Density", 920.0, "Constant value of ice density in element block");
   valid_pl->set<double>("ACE Water Density", 1000.0, "Constant value of water density in element block");
   valid_pl->set<double>("ACE Sediment Density", 2650.0, "Constant value of sediment density in element block");
-  valid_pl->set<double>(
-      "ACE Ice Thermal Conductivity", 2.1, "Constant value of ice thermal conductivity in element block");
-  valid_pl->set<double>(
-      "ACE Water Thermal Conductivity", 0.6, "Constant value of water thermal conductivity in element block");
-  valid_pl->set<double>(
-      "ACE Sediment Thermal Conductivity", 4.3, "Constant value of sediment thermal conductivity in element block");
+  valid_pl->set<double>("ACE Ice Thermal Conductivity", 2.1, "Constant value of ice thermal conductivity in element block");
+  valid_pl->set<double>("ACE Water Thermal Conductivity", 0.6, "Constant value of water thermal conductivity in element block");
+  valid_pl->set<double>("ACE Sediment Thermal Conductivity", 4.3, "Constant value of sediment thermal conductivity in element block");
   valid_pl->set<double>("ACE Ice Heat Capacity", 2.0e+03, "Constant value of ice heat capacity in element block");
   valid_pl->set<double>("ACE Water Heat Capacity", 4.0e+03, "Constant value of water heat capacity in element block");
-  valid_pl->set<double>(
-      "ACE Sediment Heat Capacity", 0.7e+03, "Constant value of sediment heat capacity in element block");
+  valid_pl->set<double>("ACE Sediment Heat Capacity", 0.7e+03, "Constant value of sediment heat capacity in element block");
   valid_pl->set<double>("ACE Base Salinity", 0.0, "Constant value of base salinity in element block");
   valid_pl->set<double>("ACE Salt Enhanced D", 0.0, "Constant value of salt enhanced D in element block");
   valid_pl->set<double>("ACE Latent Heat", 334.0, "Constant value latent heat in element block");
@@ -454,17 +435,14 @@ void
 ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
 {
   for (int i = 0; i < eb_names_.size(); i++) {
-    std::string eb_name = eb_names_[i];
-    const_thermal_conduct_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Therm_Cond Value", -1.0);
+    std::string eb_name                 = eb_names_[i];
+    const_thermal_conduct_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Therm_Cond Value", -1.0);
     if (const_thermal_conduct_map_[eb_name] != -1.0) {
       ALBANY_ASSERT((const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE_Therm_Cond Value must be positive!");
     }
-    const_thermal_inertia_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Thermal_Inertia Value", -1.0);
+    const_thermal_inertia_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Thermal_Inertia Value", -1.0);
     if (const_thermal_inertia_map_[eb_name] != -1.0) {
-      ALBANY_ASSERT(
-          (const_thermal_inertia_map_[eb_name] > 0.0), "*** ERROR: ACE_Thermal_Inertia Value must be positive!");
+      ALBANY_ASSERT((const_thermal_inertia_map_[eb_name] > 0.0), "*** ERROR: ACE_Thermal_Inertia Value must be positive!");
     }
     ice_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Density", 920.0);
     ALBANY_ASSERT((ice_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Density must be non-negative!");
@@ -472,29 +450,18 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((water_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Density must be non-negative!");
     soil_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Density", 2650.0);
     ALBANY_ASSERT((soil_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Soil Density must be non-negative!");
-    ice_thermal_cond_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 2.1);
-    ALBANY_ASSERT(
-        (ice_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!");
-    water_thermal_cond_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.6);
-    ALBANY_ASSERT(
-        (water_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Thermal Conductivity must be non-negative!");
-    soil_thermal_cond_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity", 4.3);
-    ALBANY_ASSERT(
-        (soil_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!");
-    ice_heat_capacity_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Heat Capacity", 2.0e+03);
+    ice_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 2.1);
+    ALBANY_ASSERT((ice_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!");
+    water_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.6);
+    ALBANY_ASSERT((water_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Thermal Conductivity must be non-negative!");
+    soil_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity", 4.3);
+    ALBANY_ASSERT((soil_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!");
+    ice_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Heat Capacity", 2.0e+03);
     ALBANY_ASSERT((ice_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Heat Capacity must be non-negative!");
-    water_heat_capacity_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Heat Capacity", 4.0e+03);
-    ALBANY_ASSERT(
-        (water_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Heat Capacity must be non-negative!");
-    soil_heat_capacity_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Heat Capacity", 0.7e+03);
-    ALBANY_ASSERT(
-        (soil_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Heat Capacity must be non-negative!");
+    water_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Heat Capacity", 4.0e+03);
+    ALBANY_ASSERT((water_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Heat Capacity must be non-negative!");
+    soil_heat_capacity_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Heat Capacity", 0.7e+03);
+    ALBANY_ASSERT((soil_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Heat Capacity must be non-negative!");
     salinity_base_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Base Salinity", 0.0);
     ALBANY_ASSERT((salinity_base_map_[eb_name] >= 0.0), "*** ERROR: ACE Base Salinity must be non-negative!");
     salt_enhanced_D_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Salt Enhanced D", 0.0);
@@ -505,10 +472,8 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((porosity_bulk_map_[eb_name] >= 0.0), "*** ERROR: ACE Bulk Porosity must be non-negative!");
     element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 1.0);
     ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), "*** ERROR: ACE Element Size must be non-negative!");
-    thermal_factor_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
-    ALBANY_ASSERT(
-        (thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
+    thermal_factor_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
+    ALBANY_ASSERT((thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
 
     if (material_db_->isElementBlockParam(eb_name, "ACE Time File") == true) {
       std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");
@@ -519,7 +484,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
       sea_level_map_[eb_name]    = vectorFromFile(filename);
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Z Depth File") == true) {
-      std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Z Depth File");
+      std::string const filename           = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Z Depth File");
       z_above_mean_sea_level_map_[eb_name] = vectorFromFile(filename);
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Salinity File") == true) {
@@ -532,7 +497,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Ocean Salinity File") == true) {
-      std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Ocean Salinity File");
+      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Ocean Salinity File");
       ocean_salinity_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           time_map_[eb_name].size() == ocean_salinity_map_[eb_name].size(),
@@ -596,9 +561,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
 // **********************************************************************
 template <typename EvalT, typename Traits>
 typename EvalT::ScalarT
-ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(
-    std::string const                     eb_name,
-    const std::map<std::string, RealType> map)
+ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(std::string const eb_name, const std::map<std::string, RealType> map)
 {
   typename std::map<std::string, RealType>::const_iterator it;
   it = map.find(eb_name);
@@ -611,9 +574,7 @@ ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(
 
 template <typename EvalT, typename Traits>
 std::vector<RealType>
-ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(
-    std::string const                                  eb_name,
-    const std::map<std::string, std::vector<RealType>> map)
+ACEThermalParameters<EvalT, Traits>::queryElementBlockParameterMap(std::string const eb_name, const std::map<std::string, std::vector<RealType>> map)
 {
   typename std::map<std::string, std::vector<RealType>>::const_iterator it;
   it = map.find(eb_name);

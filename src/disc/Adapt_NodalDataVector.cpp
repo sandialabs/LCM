@@ -38,9 +38,7 @@ NodalDataVector::replaceOverlapVectorSpace(Teuchos::RCP<Thyra_VectorSpace const>
 }
 
 void
-NodalDataVector::replaceOverlapVectorSpace(
-    const Teuchos::Array<GO>&               overlap_nodeGIDs,
-    const Teuchos::RCP<Teuchos_Comm const>& comm_)
+NodalDataVector::replaceOverlapVectorSpace(const Teuchos::Array<GO>& overlap_nodeGIDs, const Teuchos::RCP<Teuchos_Comm const>& comm_)
 {
   auto vs = Albany::createVectorSpace(comm_, overlap_nodeGIDs());
   replaceOverlapVectorSpace(vs);
@@ -58,9 +56,7 @@ NodalDataVector::replaceOwnedVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> c
 }
 
 void
-NodalDataVector::replaceOwnedVectorSpace(
-    const Teuchos::Array<GO>&               owned_nodeGIDs,
-    const Teuchos::RCP<Teuchos_Comm const>& comm_)
+NodalDataVector::replaceOwnedVectorSpace(const Teuchos::Array<GO>& owned_nodeGIDs, const Teuchos::RCP<Teuchos_Comm const>& comm_)
 {
   auto vs = Albany::createVectorSpace(comm_, owned_nodeGIDs());
   replaceOwnedVectorSpace(vs);
@@ -88,10 +84,7 @@ NodalDataVector::getNDofsAndOffset(std::string const& stateName, int& offset, in
   NodeFieldSizeMap::const_iterator it;
   it = nodeVectorMap.find(stateName);
 
-  ALBANY_PANIC(
-      (it == nodeVectorMap.end()),
-      std::endl
-          << "Error: cannot find state " << stateName << " in NodalDataVector" << std::endl);
+  ALBANY_PANIC((it == nodeVectorMap.end()), std::endl << "Error: cannot find state " << stateName << " in NodalDataVector" << std::endl);
 
   std::size_t value = it->second;
 
@@ -122,10 +115,7 @@ NodalDataVector::saveNodalDataState(const Teuchos::RCP<const Thyra_MultiVector>&
 }
 
 void
-NodalDataVector::saveNodalDataVector(
-    std::string const&                           name,
-    const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vector,
-    int const                                    offset) const
+NodalDataVector::saveNodalDataVector(std::string const& name, const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vector, int const offset) const
 {
   Albany::NodeFieldContainer::const_iterator it = nodeContainer->find(name);
   ALBANY_PANIC(it == nodeContainer->end(), "Error: Cannot locate nodal field " << name << " in NodalDataVector");

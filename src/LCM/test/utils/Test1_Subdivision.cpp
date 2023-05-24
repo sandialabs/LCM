@@ -114,8 +114,7 @@ return_number_entities(LCM::Topology& topology_)
   std::vector<stk::mesh::Entity> initial_entities_D2 = topology_.get_rank_entities(bulkData_, stk::topology::FACE_RANK);
   output_vector.push_back(initial_entities_D2.size());
   // Push back number of elements
-  std::vector<stk::mesh::Entity> initial_entities_D3 =
-      topology_.get_rank_entities(bulkData_, stk::topology::ELEMENT_RANK);
+  std::vector<stk::mesh::Entity> initial_entities_D3 = topology_.get_rank_entities(bulkData_, stk::topology::ELEMENT_RANK);
   output_vector.push_back(initial_entities_D3.size());
 
   return output_vector;
@@ -125,8 +124,7 @@ std::string
 verify_subdivision(std::vector<int> const& former_num_entities, std::vector<int> const& final_num_entities)
 {
   // Verify the number of nodes
-  int final_number_nodes =
-      former_num_entities[0] + former_num_entities[1] + former_num_entities[2] + former_num_entities[3];
+  int final_number_nodes = former_num_entities[0] + former_num_entities[1] + former_num_entities[2] + former_num_entities[3];
   ALBANY_PANIC(final_number_nodes != final_num_entities[0], "The number of nodes after subdivision is incorrect\n");
   // Verify the number of edges
   int final_number_edges = (former_num_entities[1] * 2) + (former_num_entities[2] * 6) + (14 * former_num_entities[3]);
@@ -136,8 +134,7 @@ verify_subdivision(std::vector<int> const& former_num_entities, std::vector<int>
   ALBANY_PANIC(final_number_faces != final_num_entities[2], "The number of faces after subdivision is incorrect\n");
   // Verify the number of elements
   int final_number_elements = 24 * former_num_entities[3];
-  ALBANY_PANIC(
-      final_number_elements != final_num_entities[3], "The number of elements after subdivision is incorrect\n");
+  ALBANY_PANIC(final_number_elements != final_num_entities[3], "The number of elements after subdivision is incorrect\n");
   // If all the subdivision is done correctly, the following message will be
   // displayed
   return std::string("SUBDIVISION TEST 1: PASSED");

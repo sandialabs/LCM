@@ -13,9 +13,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-BifurcationCheck<EvalT, Traits>::BifurcationCheck(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+BifurcationCheck<EvalT, Traits>::BifurcationCheck(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : parametrization_type_(p.get<std::string>("Parametrization Type Name")),
       parametrization_interval_(p.get<double>("Parametrization Interval Name")),
       tangent_(p.get<std::string>("Material Tangent Name"), dl->qp_tensor4),
@@ -64,7 +62,7 @@ BifurcationCheck<EvalT, Traits>::evaluateFields(typename Traits::EvalData workse
 
       if (parametrization_type_ == "Oliver") {
         std::tie(ellipticity_flag, direction) = minitensor::check_strong_ellipticity(tangent);
-        min_detA = minitensor::det(minitensor::dot2(direction, minitensor::dot(tangent, direction)));
+        min_detA                              = minitensor::det(minitensor::dot2(direction, minitensor::dot(tangent, direction)));
       } else if (parametrization_type_ == "PSO") {
         minitensor::Vector<ScalarT, 2> arg_minimum;
 
@@ -267,8 +265,7 @@ BifurcationCheck<EvalT, Traits>::stereographic_sweep(
   minitensor::Vector<minitensor::Index, 2> const stereographic_num_points(x_num_points, y_num_points);
 
   // Build the parametric grid with the specified parameters.
-  minitensor::ParametricGrid<ScalarT, 2> stereographic_grid(
-      stereographic_min, stereographic_max, stereographic_num_points);
+  minitensor::ParametricGrid<ScalarT, 2> stereographic_grid(stereographic_min, stereographic_max, stereographic_num_points);
 
   // Build a stereographic parametrization for this elasticity.
   minitensor::StereographicParametrization<ScalarT, 3> stereographic_param(tangent);
@@ -485,8 +482,7 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
 
     minitensor::Vector<ScalarT, 3> const cartesian1_max(p_surface, p_max, p_max);
 
-    minitensor::Vector<minitensor::Index, 3> const cartesian1_num_points(
-        p_surface_num_points, p_num_points, p_num_points);
+    minitensor::Vector<minitensor::Index, 3> const cartesian1_num_points(p_surface_num_points, p_num_points, p_num_points);
 
     // Build the parametric grid with the specified parameters.
     minitensor::ParametricGrid<ScalarT, 3> cartesian1_grid(cartesian1_min, cartesian1_max, cartesian1_num_points);
@@ -517,8 +513,7 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
 
     minitensor::Vector<ScalarT, 3> const cartesian2_max(p_max, p_surface, p_max);
 
-    minitensor::Vector<minitensor::Index, 3> const cartesian2_num_points(
-        p_num_points, p_surface_num_points, p_num_points);
+    minitensor::Vector<minitensor::Index, 3> const cartesian2_num_points(p_num_points, p_surface_num_points, p_num_points);
 
     // Build the parametric grid with the specified parameters.
     minitensor::ParametricGrid<ScalarT, 3> cartesian2_grid(cartesian2_min, cartesian2_max, cartesian2_num_points);
@@ -549,8 +544,7 @@ BifurcationCheck<EvalT, Traits>::cartesian_sweep(
 
     minitensor::Vector<ScalarT, 3> const cartesian3_max(p_max, p_max, p_surface);
 
-    minitensor::Vector<minitensor::Index, 3> const cartesian3_num_points(
-        p_num_points, p_num_points, p_surface_num_points);
+    minitensor::Vector<minitensor::Index, 3> const cartesian3_num_points(p_num_points, p_num_points, p_surface_num_points);
 
     // Build the parametric grid with the specified parameters.
     minitensor::ParametricGrid<ScalarT, 3> cartesian3_grid(cartesian3_min, cartesian3_max, cartesian3_num_points);
@@ -838,8 +832,7 @@ BifurcationCheck<EvalT, Traits>::projective_newton_raphson(
     }
     n = projective_get_normal(Xfad2_sub);
 
-    detA = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n))) +
-           Xfad2[3] * (Xfad2[0] * Xfad2[0] + Xfad2[1] * Xfad2[1] + Xfad2[2] * Xfad2[2] - 1);
+    detA = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n))) + Xfad2[3] * (Xfad2[0] * Xfad2[0] + Xfad2[1] * Xfad2[1] + Xfad2[2] * Xfad2[2] - 1);
 
     // std::cout << "parameters: " << parameters << std::endl;
     // std::cout << "determinant: " << (detA.val()).val() << std::endl;
@@ -1176,8 +1169,8 @@ BifurcationCheck<EvalT, Traits>::stereographic_pso(
     ScalarT error = 0.0;
 
     for (int i = 0; i < group_size; i++) {
-      arg_velocity_group[i] = w * arg_velocity_group[i] + c1 * real_dist(mt_eng) * (arg_ibest[i] - arg_group[i]) +
-                              c2 * real_dist(mt_eng) * (arg_gbest - arg_group[i]);
+      arg_velocity_group[i] =
+          w * arg_velocity_group[i] + c1 * real_dist(mt_eng) * (arg_ibest[i] - arg_group[i]) + c2 * real_dist(mt_eng) * (arg_gbest - arg_group[i]);
       arg_group[i] += r * arg_velocity_group[i];
 
       minitensor::Vector<ScalarT, 2> arg_tmp = arg_group[i];
@@ -1233,8 +1226,7 @@ template <typename EvalT, typename Traits>
 minitensor::Vector<typename BifurcationCheck<EvalT, Traits>::D2FadType, 3>
 BifurcationCheck<EvalT, Traits>::spherical_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
-  minitensor::Vector<D2FadType, 3> normal(
-      sin(parameters[0]) * cos(parameters[1]), sin(parameters[0]) * sin(parameters[1]), cos(parameters[0]));
+  minitensor::Vector<D2FadType, 3> normal(sin(parameters[0]) * cos(parameters[1]), sin(parameters[0]) * sin(parameters[1]), cos(parameters[0]));
 
   return normal;
 }

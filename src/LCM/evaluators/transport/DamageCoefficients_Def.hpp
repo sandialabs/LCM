@@ -9,9 +9,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-DamageCoefficients<EvalT, Traits>::DamageCoefficients(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+DamageCoefficients<EvalT, Traits>::DamageCoefficients(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : damage_(p.get<std::string>("Damage Name"), dl->qp_scalar),
       delta_time_(p.get<std::string>("Delta Time Name"), dl->workset_scalar),
       damage_transient_coeff_(p.get<std::string>("Damage Transient Coefficient Name"), dl->qp_scalar),

@@ -16,9 +16,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : have_temperature_(false), dl_(dl)
 {
   // get number of integration points and spatial dimensions
@@ -155,9 +153,7 @@ ConstitutiveModelParameters<EvalT, Traits>::ConstitutiveModelParameters(
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelParameters<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ConstitutiveModelParameters<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   for (auto& pair : field_map_) {
     this->utils.setFieldData(pair.second, fm);
@@ -232,10 +228,7 @@ ConstitutiveModelParameters<EvalT, Traits>::getValue(std::string const& n)
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelParameters<EvalT, Traits>::parseParameters(
-    std::string const&      n,
-    Teuchos::ParameterList& p,
-    Teuchos::RCP<ParamLib>  paramLib)
+ConstitutiveModelParameters<EvalT, Traits>::parseParameters(std::string const& n, Teuchos::ParameterList& p, Teuchos::RCP<ParamLib> paramLib)
 {
   Teuchos::ParameterList pl = p.get<Teuchos::ParameterList*>("Material Parameters")->sublist(n);
   std::string            type_name(n + " Type");

@@ -10,14 +10,10 @@ namespace PHAL {
 
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : sideSetName(p.get<std::string>("Side Set Name"))
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! Layout for side set " << sideSetName << " not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! Layout for side set " << sideSetName << " not found.\n");
 
   Teuchos::RCP<Albany::Layouts> dl_side    = dl->side_layouts.at(sideSetName);
   std::string                   layout_str = p.get<std::string>("Data Layout");
@@ -90,9 +86,7 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::DOFCellToSideBase(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFCellToSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFCellToSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_cell, fm);
   this->utils.setFieldData(val_side, fm);
@@ -139,8 +133,7 @@ DOFCellToSideBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalD
       case NODE_TENSOR:
         for (int node = 0; node < dims[2]; ++node)
           for (int i = 0; i < dims[3]; ++i)
-            for (int j = 0; j < dims[4]; ++j)
-              val_side(cell, side, node, i, j) = val_cell(cell, sideNodes[side][node], i, j);
+            for (int j = 0; j < dims[4]; ++j) val_side(cell, side, node, i, j) = val_cell(cell, sideNodes[side][node], i, j);
         break;
       default:
         ALBANY_ABORT(

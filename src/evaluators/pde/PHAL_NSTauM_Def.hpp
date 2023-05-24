@@ -12,12 +12,9 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 NSTauM<EvalT, Traits>::NSTauM(Teuchos::ParameterList const& p)
     : V(p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      Gc(p.get<std::string>("Contravarient Metric Tensor Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      rho(p.get<std::string>("Density QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      mu(p.get<std::string>("Viscosity QP Variable Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Gc(p.get<std::string>("Contravarient Metric Tensor Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      rho(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      mu(p.get<std::string>("Viscosity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       TauM(p.get<std::string>("Tau M Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 
 {

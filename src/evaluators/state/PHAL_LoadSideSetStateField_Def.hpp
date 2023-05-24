@@ -29,9 +29,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::LoadSideSetStateFieldBase(
 // **********************************************************************
 template <typename EvalT, typename Traits, typename ScalarType>
 void
-LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field, fm);
 
@@ -52,9 +50,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(typename Tr
 
   ALBANY_PANIC(ssDiscs.size() == 0, "Error! The discretization must store side set discretizations.\n");
 
-  ALBANY_PANIC(
-      ssDiscs.find(sideSetName) == ssDiscs.end(),
-      "Error! No discretization found for side set " << sideSetName << ".\n");
+  ALBANY_PANIC(ssDiscs.find(sideSetName) == ssDiscs.end(), "Error! No discretization found for side set " << sideSetName << ".\n");
 
   Teuchos::RCP<Albany::AbstractDiscretization> ss_disc = ssDiscs.at(sideSetName);
 
@@ -79,17 +75,14 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(typename Tr
   ALBANY_PANIC(
       workset.disc->getSideNodeNumerationMap().find(sideSetName) == workset.disc->getSideNodeNumerationMap().end(),
       "Error! Sideset " << sideSetName << " has no sideNodeNumeration map.\n");
-  std::map<GO, std::vector<int>> const& sideNodeNumerationMap =
-      workset.disc->getSideNodeNumerationMap().at(sideSetName);
+  std::map<GO, std::vector<int>> const& sideNodeNumerationMap = workset.disc->getSideNodeNumerationMap().at(sideSetName);
 
   // Establishing the kind of field layout
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
   int                size = dims.size();
   std::string const& tag2 = size > 2 ? field.fieldTag().dataLayout().name(2) : "";
-  ALBANY_PANIC(
-      size > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim",
-      "Error! Invalid field layout in LoadSideSetStateField.\n");
+  ALBANY_PANIC(size > 2 && tag2 != "Node" && tag2 != "Dim" && tag2 != "VecDim", "Error! Invalid field layout in LoadSideSetStateField.\n");
 
   // Loop on the sides of this sideSet that are in this workset
   std::vector<Albany::SideStruct> const& sideSet = workset.sideSets->at(sideSetName);
@@ -120,9 +113,7 @@ LoadSideSetStateFieldBase<EvalT, Traits, ScalarType>::evaluateFields(typename Tr
 
     // Then, after a safety check, we extract the StateArray of the desired
     // state in the right 2D-ws
-    ALBANY_PANIC(
-        esa[wsIndex2D].find(stateName) == esa[wsIndex2D].end(),
-        "Error! Cannot locate " << stateName << " in PHAL_LoadSideSetStateField_Def.\n");
+    ALBANY_PANIC(esa[wsIndex2D].find(stateName) == esa[wsIndex2D].end(), "Error! Cannot locate " << stateName << " in PHAL_LoadSideSetStateField_Def.\n");
     Albany::MDArray state = esa[wsIndex2D].at(stateName);
 
     std::vector<int> const& nodeMap = sideNodeNumerationMap.at(side_GID);

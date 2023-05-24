@@ -103,12 +103,10 @@ AddNoiseBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::EvalData w
 
   switch (pdf_type) {
     case UNIFORM:
-      for (; !in.done(); ++in, ++out)
-        *out = abs_noise * (*pdf_uniform)(generator) + (*in) * (1 + rel_noise * (*pdf_uniform)(generator));
+      for (; !in.done(); ++in, ++out) *out = abs_noise * (*pdf_uniform)(generator) + (*in) * (1 + rel_noise * (*pdf_uniform)(generator));
 
     case NORMAL:
-      for (; !in.done(); ++in, ++out)
-        *out = abs_noise * (*pdf_normal)(generator) + (*in) * (1 + rel_noise * (*pdf_normal)(generator));
+      for (; !in.done(); ++in, ++out) *out = abs_noise * (*pdf_normal)(generator) + (*in) * (1 + rel_noise * (*pdf_normal)(generator));
 
     default: ALBANY_ABORT("Error! [PHAL::AddNoiseBase] This exception should never throw.\n");
   }

@@ -53,9 +53,7 @@ Albany::LameProblem::LameProblem(
 Albany::LameProblem::~LameProblem() {}
 
 void
-Albany::LameProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::LameProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   int physSets = meshSpecs.size();

@@ -40,8 +40,7 @@ Albany::StateManager::registerStateVariable(
   registerStateVariable(stateName, dl, ebName, init_type, init_val, registerOldState, bOutputToExodus, fieldName);
 
   // Create param list for SaveStateField evaluator
-  Teuchos::RCP<Teuchos::ParameterList> p =
-      Teuchos::rcp(new Teuchos::ParameterList("Save or Load State " + stateName + " to/from field " + fieldName));
+  Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save or Load State " + stateName + " to/from field " + fieldName));
   p->set<std::string const>("State Name", stateName);
   p->set<std::string const>("Field Name", fieldName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl);
@@ -63,8 +62,7 @@ Albany::StateManager::registerStateVariable(
   registerStateVariable(stateName, dl, ebName, init_type, init_val, registerOldState, outputToExodus, stateName);
 
   // Create param list for SaveStateField evaluator
-  Teuchos::RCP<Teuchos::ParameterList> p =
-      Teuchos::rcp(new Teuchos::ParameterList("Save or Load State " + stateName + " to/from field " + stateName));
+  Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save or Load State " + stateName + " to/from field " + stateName));
   p->set<std::string const>("State Name", stateName);
   p->set<std::string const>("Field Name", stateName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl);
@@ -83,12 +81,10 @@ Albany::StateManager::registerNodalVectorStateVariable(
     bool const                           registerOldState,
     bool const                           outputToExodus)
 {
-  registerNodalVectorStateVariable(
-      stateName, dl, ebName, init_type, init_val, registerOldState, outputToExodus, stateName);
+  registerNodalVectorStateVariable(stateName, dl, ebName, init_type, init_val, registerOldState, outputToExodus, stateName);
 
   // Create param list for SaveStateField evaluator
-  Teuchos::RCP<Teuchos::ParameterList> p =
-      Teuchos::rcp(new Teuchos::ParameterList("Save or Load State " + stateName + " to/from field " + stateName));
+  Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save or Load State " + stateName + " to/from field " + stateName));
   p->set<std::string const>("State Name", stateName);
   p->set<std::string const>("Field Name", stateName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl);
@@ -108,8 +104,7 @@ Albany::StateManager::registerStateVariable(
   registerStateVariable(stateName, dl, ebName, "", 0., false, outputToExodus, "", fieldEntity, meshPartName);
 
   // Create param list for SaveStateField evaluator
-  Teuchos::RCP<Teuchos::ParameterList> p =
-      Teuchos::rcp(new Teuchos::ParameterList("Save or Load State " + stateName + " to/from field " + stateName));
+  Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save or Load State " + stateName + " to/from field " + stateName));
   p->set<std::string const>("State Name", stateName);
   p->set<std::string const>("Field Name", stateName);
   p->set<const Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl);
@@ -117,10 +112,7 @@ Albany::StateManager::registerStateVariable(
 }
 
 void
-Albany::StateManager::registerStateVariable(
-    std::string const&                   stateName,
-    const Teuchos::RCP<PHX::DataLayout>& dl,
-    std::string const&                   init_type)
+Albany::StateManager::registerStateVariable(std::string const& stateName, const Teuchos::RCP<PHX::DataLayout>& dl, std::string const& init_type)
 {
   // Grab the ebName
   std::string                             ebName;
@@ -200,9 +192,7 @@ Albany::StateManager::registerStateVariable(
       nodalDataBase->registerVectorState(stateName, stateRef.dim[1]);
     else if (dl->rank() == 3)  // node tensor
       nodalDataBase->registerVectorState(stateName, stateRef.dim[1] * stateRef.dim[2]);
-  } else if (
-      stateRef.entity == StateStruct::NodalDataToElemNode ||
-      stateRef.entity == Albany::StateStruct::NodalDistParameter) {
+  } else if (stateRef.entity == StateStruct::NodalDataToElemNode || stateRef.entity == Albany::StateStruct::NodalDistParameter) {
     // Register the state with the nodalDataVector also.
     Teuchos::RCP<Adapt::NodalDataBase> nodalDataBase = getNodalDataBase();
 
@@ -295,9 +285,7 @@ Albany::StateManager::registerNodalVectorStateVariable(
       nodalDataBase->registerVectorState(stateName, stateRef.dim[1]);
     else if (dl->rank() == 3)  // node tensor
       nodalDataBase->registerVectorState(stateName, stateRef.dim[1] * stateRef.dim[2]);
-  } else if (
-      stateRef.entity == StateStruct::NodalDataToElemNode ||
-      stateRef.entity == Albany::StateStruct::NodalDistParameter) {
+  } else if (stateRef.entity == StateStruct::NodalDataToElemNode || stateRef.entity == Albany::StateStruct::NodalDistParameter) {
     // These entities store data as <Cell,Node,...>, so the dl has one more rank
     if (dl->rank() == 2)  // node scalar
       nodalDataBase->registerVectorState(stateName, 1);
@@ -335,9 +323,7 @@ Albany::StateManager::registerNodalVectorStateVariable(
         nodalDataBase->registerVectorState(stateName_old, pstateRef.dim[1]);
       else if (dl->rank() == 3)  // node tensor
         nodalDataBase->registerVectorState(stateName_old, pstateRef.dim[1] * pstateRef.dim[2]);
-    } else if (
-        stateRef.entity == StateStruct::NodalDataToElemNode ||
-        stateRef.entity == Albany::StateStruct::NodalDistParameter) {
+    } else if (stateRef.entity == StateStruct::NodalDataToElemNode || stateRef.entity == Albany::StateStruct::NodalDistParameter) {
       // These entities store data as <Cell,Node,...>, so the dl has rank =
       // fieldDim + 1
       if (dl->rank() == 2)  // node scalar
@@ -365,8 +351,7 @@ Albany::StateManager::registerSideSetStateVariable(
     std::string const&                   meshPartName)
 
 {
-  return registerSideSetStateVariable(
-      sideSetName, stateName, fieldName, dl, ebName, "", 0.0, false, outputToExodus, "", fieldEntity, meshPartName);
+  return registerSideSetStateVariable(sideSetName, stateName, fieldName, dl, ebName, "", 0.0, false, outputToExodus, "", fieldEntity, meshPartName);
 }
 
 Teuchos::RCP<Teuchos::ParameterList>
@@ -388,8 +373,8 @@ Albany::StateManager::registerSideSetStateVariable(
   using Albany::StateStruct;
 
   // Create param list for SaveSideSetStateField evaluator
-  Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(
-      new Teuchos::ParameterList("Save Side Set State " + stateName + " to/from Side Set Field " + fieldName));
+  Teuchos::RCP<Teuchos::ParameterList> p =
+      Teuchos::rcp(new Teuchos::ParameterList("Save Side Set State " + stateName + " to/from Side Set Field " + fieldName));
   p->set<std::string const>("State Name", stateName);
   p->set<std::string const>("Field Name", fieldName);
   p->set<std::string const>("Side Set Name", sideSetName);
@@ -455,9 +440,7 @@ Albany::StateManager::registerSideSetStateVariable(
       nodalDataBase->registerVectorState(stateName, stateRef.dim[1]);
     else if (dl->rank() == 3)  // node tensor
       nodalDataBase->registerVectorState(stateName, stateRef.dim[1] * stateRef.dim[2]);
-  } else if (
-      stateRef.entity == StateStruct::NodalDataToElemNode ||
-      stateRef.entity == Albany::StateStruct::NodalDistParameter) {
+  } else if (stateRef.entity == StateStruct::NodalDataToElemNode || stateRef.entity == Albany::StateStruct::NodalDistParameter) {
     // Strip one dimension out cause it's Side
     ALBANY_PANIC(
         dl->rank() < 2,
@@ -493,9 +476,7 @@ Albany::StateManager::registerSideSetStateVariable(
   stateRef.output              = outputToExodus;
   stateRef.responseIDtoRequire = responseIDtoRequire;
   stateRef.layered             = (dl->name(dl->rank() - 1) == "LayerDim");
-  ALBANY_PANIC(
-      stateRef.layered && (dl->extent(dl->rank() - 1) <= 0),
-      "Error! Invalid number of layers for layered state " << stateName << ".\n");
+  ALBANY_PANIC(stateRef.layered && (dl->extent(dl->rank() - 1) <= 0), "Error! Invalid number of layers for layered state " << stateName << ".\n");
 
   // If space is needed for old state
   if (registerOldState) {
@@ -543,9 +524,7 @@ Albany::StateManager::setupStateArrays(const Teuchos::RCP<Albany::AbstractDiscre
   // First, we check the explicitly required side discretizations exist...
   const auto& ss_discs = disc->getSideSetDiscretizations();
   for (auto const& it : sideSetStateInfo) {
-    ALBANY_PANIC(
-        ss_discs.find(it.first) == ss_discs.end(),
-        "Error! Side Set " << it.first << "has sideSet states registered but no discretizations.\n");
+    ALBANY_PANIC(ss_discs.find(it.first) == ss_discs.end(), "Error! Side Set " << it.first << "has sideSet states registered but no discretizations.\n");
   }
 
   // Then we make sure that for every side discretization there is a
@@ -616,26 +595,22 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
 
           switch (size) {
             case 1:
-              for (int cell = 0; cell < dims[0]; ++cell)
-                esa[ws][stateName](cell) = elemStatesToCopyFrom[ws][stateName](cell);
+              for (int cell = 0; cell < dims[0]; ++cell) esa[ws][stateName](cell) = elemStatesToCopyFrom[ws][stateName](cell);
               break;
             case 2:
               for (int cell = 0; cell < dims[0]; ++cell)
-                for (int qp = 0; qp < dims[1]; ++qp)
-                  esa[ws][stateName](cell, qp) = elemStatesToCopyFrom[ws][stateName](cell, qp);
+                for (int qp = 0; qp < dims[1]; ++qp) esa[ws][stateName](cell, qp) = elemStatesToCopyFrom[ws][stateName](cell, qp);
               break;
             case 3:
               for (int cell = 0; cell < dims[0]; ++cell)
                 for (int qp = 0; qp < dims[1]; ++qp)
-                  for (int i = 0; i < dims[2]; ++i)
-                    esa[ws][stateName](cell, qp, i) = elemStatesToCopyFrom[ws][stateName](cell, qp, i);
+                  for (int i = 0; i < dims[2]; ++i) esa[ws][stateName](cell, qp, i) = elemStatesToCopyFrom[ws][stateName](cell, qp, i);
               break;
             case 4:
               for (int cell = 0; cell < dims[0]; ++cell)
                 for (int qp = 0; qp < dims[1]; ++qp)
                   for (int i = 0; i < dims[2]; ++i)
-                    for (int j = 0; j < dims[3]; ++j)
-                      esa[ws][stateName](cell, qp, i, j) = elemStatesToCopyFrom[ws][stateName](cell, qp, i, j);
+                    for (int j = 0; j < dims[3]; ++j) esa[ws][stateName](cell, qp, i, j) = elemStatesToCopyFrom[ws][stateName](cell, qp, i, j);
               break;
             default: ALBANY_PANIC(size < 2 || size > 4, "Something is wrong during zero state variable fill: " << size);
           }
@@ -660,19 +635,16 @@ Albany::StateManager::importStateData(Albany::StateArrays& states_from)
 
           switch (size) {
             case 1:  // node scalar
-              for (int node = 0; node < dims[0]; ++node)
-                nsa[ws][stateName](node) = nodeStatesToCopyFrom[ws][stateName](node);
+              for (int node = 0; node < dims[0]; ++node) nsa[ws][stateName](node) = nodeStatesToCopyFrom[ws][stateName](node);
               break;
             case 2:  // node vector
               for (int node = 0; node < dims[0]; ++node)
-                for (int dim = 0; dim < dims[1]; ++dim)
-                  nsa[ws][stateName](node, dim) = nodeStatesToCopyFrom[ws][stateName](node, dim);
+                for (int dim = 0; dim < dims[1]; ++dim) nsa[ws][stateName](node, dim) = nodeStatesToCopyFrom[ws][stateName](node, dim);
               break;
             case 3:  // node tensor
               for (int node = 0; node < dims[0]; ++node)
                 for (int dim = 0; dim < dims[1]; ++dim)
-                  for (int i = 0; i < dims[2]; ++i)
-                    nsa[ws][stateName](node, dim, i) = nodeStatesToCopyFrom[ws][stateName](node, dim, i);
+                  for (int i = 0; i < dims[2]; ++i) nsa[ws][stateName](node, dim, i) = nodeStatesToCopyFrom[ws][stateName](node, dim, i);
               break;
             default: ALBANY_ABORT("Something is wrong during node zero state variable fill: " << size);
           }
@@ -758,10 +730,7 @@ Albany::StateManager::updateStates()
 
           break;
 
-        default:
-          ALBANY_ABORT(
-              "Error: Cannot match state entity : " << (*stateInfo)[i]->entity << " in state manager. " << std::endl);
-          break;
+        default: ALBANY_ABORT("Error: Cannot match state entity : " << (*stateInfo)[i]->entity << " in state manager. " << std::endl); break;
       }
     }
   }
@@ -816,9 +785,7 @@ Albany::StateManager::printStates(std::string const& where) const
 // =============================================== //
 
 void
-Albany::StateManager::doSetStateArrays(
-    const Teuchos::RCP<Albany::AbstractDiscretization>& disc,
-    const Teuchos::RCP<StateInfoStruct>&                stateInfoPtr)
+Albany::StateManager::doSetStateArrays(const Teuchos::RCP<Albany::AbstractDiscretization>& disc, const Teuchos::RCP<StateInfoStruct>& stateInfoPtr)
 {
 #if defined(VERBOSE_OUTPUT)
   auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream();

@@ -18,8 +18,7 @@ Subgraph::Subgraph(
     : topology_(topology)
 {
   // Insert vertices and create the vertex map
-  for (std::set<stk::mesh::Entity>::iterator entity_iterator = first_entity; entity_iterator != last_entity;
-       ++entity_iterator) {
+  for (std::set<stk::mesh::Entity>::iterator entity_iterator = first_entity; entity_iterator != last_entity; ++entity_iterator) {
     // get global vertex
     stk::mesh::Entity entity = *entity_iterator;
 
@@ -209,8 +208,7 @@ Subgraph::addVertex(stk::mesh::EntityRank vertex_rank, stk::mesh::Entity entity)
 
       std::vector<stk::mesh::Entity> ns_nodes;
 
-      stk::mesh::get_selected_entities(
-          select_local_in_nodeset, get_bulk_data().buckets(stk::topology::NODE_RANK), ns_nodes);
+      stk::mesh::get_selected_entities(select_local_in_nodeset, get_bulk_data().buckets(stk::topology::NODE_RANK), ns_nodes);
 
       bool const is_local_and_in_nodeset = std::find(ns_nodes.begin(), ns_nodes.end(), entity) != ns_nodes.end();
 
@@ -374,10 +372,7 @@ writeGraphviz(std::string const& output_filename, UGraph const& graph)
 // Function determines whether the input vertex is an articulation
 // point of the subgraph.
 void
-Subgraph::testArticulationPoint(
-    Vertex const        articulation_vertex,
-    size_t&             number_components,
-    VertexComponentMap& vertex_component_map)
+Subgraph::testArticulationPoint(Vertex const articulation_vertex, size_t& number_components, VertexComponentMap& vertex_component_map)
 {
   // Map to and from undirected graph and subgraph
   std::map<UVertex, Vertex> u_sub_vertex_map;
@@ -789,8 +784,7 @@ Subgraph::outputToGraphviz(std::string const& output_filename)
 
     stk::mesh::EntityId const entity_id = get_entity_id(entity);
 
-    gviz_out << dot_entity(
-        get_space_dimension(), get_topology().get_parallel_rank(), entity, entity_id, rank, failure_state);
+    gviz_out << dot_entity(get_space_dimension(), get_topology().get_parallel_rank(), entity, entity_id, rank, failure_state);
 
     // write the edges in the subgraph
     OutEdgeIterator out_edge_begin;

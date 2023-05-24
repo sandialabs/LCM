@@ -109,10 +109,7 @@ ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(Teuchos::ParameterList* p, c
 
 template <typename EvalT, typename Traits>
 void
-ViscoElasticModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+ViscoElasticModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // Get names
   std::string F_string  = (*field_name_map_)["F"];

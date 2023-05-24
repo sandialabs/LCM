@@ -215,9 +215,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructGatherSolutionEv
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructGatherScalarNodalParameter(
-    std::string const& param_name,
-    std::string const& field_name) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructGatherScalarNodalParameter(std::string const& param_name, std::string const& field_name) const
 {
   using std::string;
   using Teuchos::ParameterList;
@@ -236,9 +234,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructGatherScalarNoda
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructScatterScalarNodalParameter(
-    std::string const& param_name,
-    std::string const& field_name) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructScatterScalarNodalParameter(std::string const& param_name, std::string const& field_name) const
 {
   using std::string;
   using Teuchos::ParameterList;
@@ -384,9 +380,8 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructScatterResidualE
 #if defined(ALBANY_CONTACT)
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructMortarContactResidualEvaluator(
-    Teuchos::ArrayRCP<std::string> resid_names,
-    int                            offsetToFirstDOF) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructMortarContactResidualEvaluator(Teuchos::ArrayRCP<std::string> resid_names, int offsetToFirstDOF)
+    const
 {
   using std::string;
   using Teuchos::ParameterList;
@@ -404,8 +399,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructMortarContactRes
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructGatherCoordinateVectorEvaluator(
-    std::string strCurrentDisp) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructGatherCoordinateVectorEvaluator(std::string strCurrentDisp) const
 {
   using std::string;
   using Teuchos::ParameterList;
@@ -457,9 +451,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructMapToPhysicalFra
     const Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature,
     std::string const&                                   sideSetName) const
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! The layout structure for side set " << sideSetName << " was not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! The layout structure for side set " << sideSetName << " was not found.\n");
 
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -521,9 +513,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructComputeBasisFunc
     std::string const&                                                    sideSetName,
     bool const                                                            buildNormals) const
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! The layout structure for side set " << sideSetName << " was not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! The layout structure for side set " << sideSetName << " was not found.\n");
 
   using std::string;
   using Teuchos::ParameterList;
@@ -648,9 +638,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFSideToCellEva
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFGradInterpolationEvaluator(
-    std::string const& dof_name,
-    int                offsetToFirstDOF) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFGradInterpolationEvaluator(std::string const& dof_name, int offsetToFirstDOF) const
 {
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -673,13 +661,10 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFGradInterpola
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFGradInterpolationSideEvaluator(
-    std::string const& dof_name,
-    std::string const& sideSetName) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFGradInterpolationSideEvaluator(std::string const& dof_name, std::string const& sideSetName)
+    const
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! The layout structure for side set " << sideSetName << " was not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! The layout structure for side set " << sideSetName << " was not found.\n");
 
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -700,9 +685,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFGradInterpola
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFInterpolationEvaluator(
-    std::string const& dof_name,
-    int                offsetToFirstDOF) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFInterpolationEvaluator(std::string const& dof_name, int offsetToFirstDOF) const
 {
   using std::string;
   using Teuchos::ParameterList;
@@ -722,13 +705,9 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFInterpolation
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFInterpolationSideEvaluator(
-    std::string const& dof_name,
-    std::string const& sideSetName) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFInterpolationSideEvaluator(std::string const& dof_name, std::string const& sideSetName) const
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! The layout structure for side set " << sideSetName << " was not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! The layout structure for side set " << sideSetName << " was not found.\n");
 
   using std::string;
   using Teuchos::ParameterList;
@@ -748,9 +727,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFInterpolation
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFTensorInterpolationEvaluator(
-    std::string const& dof_name,
-    int                offsetToFirstDOF) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFTensorInterpolationEvaluator(std::string const& dof_name, int offsetToFirstDOF) const
 {
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -771,9 +748,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFTensorInterpo
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFTensorGradInterpolationEvaluator(
-    std::string const& dof_name,
-    int                offsetToFirstDOF) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFTensorGradInterpolationEvaluator(std::string const& dof_name, int offsetToFirstDOF) const
 {
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -796,9 +771,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFTensorGradInt
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecGradInterpolationEvaluator(
-    std::string const& dof_name,
-    int                offsetToFirstDOF) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecGradInterpolationEvaluator(std::string const& dof_name, int offsetToFirstDOF) const
 {
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -825,9 +798,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecGradInterp
     std::string const& dof_name,
     std::string const& sideSetName) const
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! The layout structure for side set " << sideSetName << " was not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! The layout structure for side set " << sideSetName << " was not found.\n");
 
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -843,15 +814,12 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecGradInterp
   // Output (assumes same Name as input)
   p->set<std::string>("Gradient Variable Name", dof_name + " Gradient");
 
-  return rcp(
-      new PHAL::DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarType>(*p, dl->side_layouts.at(sideSetName)));
+  return rcp(new PHAL::DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarType>(*p, dl->side_layouts.at(sideSetName)));
 }
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecInterpolationEvaluator(
-    std::string const& dof_name,
-    int                offsetToFirstDOF) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecInterpolationEvaluator(std::string const& dof_name, int offsetToFirstDOF) const
 {
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -872,13 +840,10 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecInterpolat
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecInterpolationSideEvaluator(
-    std::string const& dof_name,
-    std::string const& sideSetName) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecInterpolationSideEvaluator(std::string const& dof_name, std::string const& sideSetName)
+    const
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! The layout structure for side set " << sideSetName << " was not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! The layout structure for side set " << sideSetName << " was not found.\n");
 
   using Teuchos::ParameterList;
   using Teuchos::RCP;
@@ -898,9 +863,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructDOFVecInterpolat
 
 template <typename EvalT, typename Traits, typename ScalarType>
 Teuchos::RCP<PHX::Evaluator<Traits>>
-Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructNodesToCellInterpolationEvaluator(
-    std::string const& dof_name,
-    bool               isVectorField) const
+Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructNodesToCellInterpolationEvaluator(std::string const& dof_name, bool isVectorField) const
 {
   Teuchos::RCP<Teuchos::ParameterList> p;
   p = Teuchos::rcp(new Teuchos::ParameterList("DOF Nodes to Cell Interpolation " + dof_name));
@@ -935,11 +898,9 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructQuadPointsToCell
   p->set<std::string>("Field Cell Name", dof_name);
 
   if ((qp_layout == Teuchos::null) && (cell_layout == Teuchos::null))
-    return Teuchos::rcp(new PHAL::QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarType>(
-        *p, dl, dl->qp_scalar, dl->cell_scalar2));
+    return Teuchos::rcp(new PHAL::QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarType>(*p, dl, dl->qp_scalar, dl->cell_scalar2));
   else
-    return Teuchos::rcp(
-        new PHAL::QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarType>(*p, dl, qp_layout, cell_layout));
+    return Teuchos::rcp(new PHAL::QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarType>(*p, dl, qp_layout, cell_layout));
 }
 
 template <typename EvalT, typename Traits, typename ScalarType>
@@ -949,9 +910,7 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructSideQuadPointsTo
     std::string const& sideSetName,
     int const          fieldDim) const
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! The layout structure for side set " << sideSetName << " was not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! The layout structure for side set " << sideSetName << " was not found.\n");
 
   Teuchos::RCP<Teuchos::ParameterList> p;
   p = Teuchos::rcp(new Teuchos::ParameterList("DOF Side QuadPoint to Side Interpolation " + dof_name));
@@ -965,6 +924,5 @@ Albany::EvaluatorUtilsImpl<EvalT, Traits, ScalarType>::constructSideQuadPointsTo
   // Output
   p->set<std::string>("Field Side Name", dof_name);
 
-  return Teuchos::rcp(
-      new PHAL::SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarType>(*p, dl->side_layouts.at(sideSetName)));
+  return Teuchos::rcp(new PHAL::SideQuadPointsToSideInterpolationBase<EvalT, Traits, ScalarType>(*p, dl->side_layouts.at(sideSetName)));
 }

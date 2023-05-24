@@ -29,8 +29,7 @@ class ExprEvalSDBC
 
 // Residual
 template <typename Traits>
-class ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>
-    : public PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
+class ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits> : public PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   using ScalarT = typename PHAL::AlbanyTraits::Residual::ScalarT;
@@ -49,8 +48,7 @@ class ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>
 
 // Jacobian
 template <typename Traits>
-class ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits> : public PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   using ScalarT = typename PHAL::AlbanyTraits::Jacobian::ScalarT;

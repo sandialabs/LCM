@@ -15,10 +15,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  J2ErosionKernel(
-      ConstitutiveModel<EvalT, Traits>&    model,
-      Teuchos::ParameterList*              p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  J2ErosionKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// No copy constructor
@@ -78,6 +75,13 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField j2_stress_;
   ScalarField tilt_angle_;
   ScalarField failed_;
+
+  // Failure indicators
+  ScalarField yield_indicator_;
+  ScalarField tensile_indicator_;
+  ScalarField strain_indicator_;
+  ScalarField angle_indicator_;
+  ScalarField displacement_indicator_;
 
   // Workspace arrays
   Albany::MDArray Fp_old_;

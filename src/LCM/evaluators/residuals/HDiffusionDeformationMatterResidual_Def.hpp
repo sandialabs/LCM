@@ -12,9 +12,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-HDiffusionDeformationMatterResidual<EvalT, Traits>::HDiffusionDeformationMatterResidual(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+HDiffusionDeformationMatterResidual<EvalT, Traits>::HDiffusionDeformationMatterResidual(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       wGradBF(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       GradBF(p.get<std::string>("Gradient BF Name"), dl->node_qp_vector),
@@ -108,9 +106,7 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::HDiffusionDeformationMatterR
 //*****
 template <typename EvalT, typename Traits>
 void
-HDiffusionDeformationMatterResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+HDiffusionDeformationMatterResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   // std::cout << "Hdiff PostRegistrationSetup" << std::endl;
   this->utils.setFieldData(elementLength, fm);
@@ -230,18 +226,15 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(typename Trai
         // 08/14/2015
 
         // Transient Term
-        TResidual(cell, node) += Dstar(cell, qp) * (Clattice(cell, qp) - Clattice_old(cell, qp)) *
-                                 wBF(cell, node, qp);  //*temp; GB changed 08/14/2015
+        TResidual(cell, node) += Dstar(cell, qp) * (Clattice(cell, qp) - Clattice_old(cell, qp)) * wBF(cell, node, qp);  //*temp; GB changed 08/14/2015
 
         // Strain Rate Term
         if (have_eqps_) {
-          TResidual(cell, node) += eqpsFactor(cell, qp) * (eqps(cell, qp) - eqps_old(cell, qp)) *
-                                   wBF(cell, node, qp);  //*temp; GB changed 08/14/2015
+          TResidual(cell, node) += eqpsFactor(cell, qp) * (eqps(cell, qp) - eqps_old(cell, qp)) * wBF(cell, node, qp);  //*temp; GB changed 08/14/2015
         }
 
         // Isotope decay term
-        TResidual(cell, node) += t_decay_constant_ * (Clattice(cell, qp) + Ctrapped(cell, qp)) * wBF(cell, node, qp) *
-                                 dt;  //*temp; GB changed 08/14/2015
+        TResidual(cell, node) += t_decay_constant_ * (Clattice(cell, qp) + Ctrapped(cell, qp)) * wBF(cell, node, qp) * dt;  //*temp; GB changed 08/14/2015
 
         // hydrostatic stress term
         // Need to be done: Add C_inverse term into hydrostatic residual
@@ -254,8 +247,8 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::evaluateFields(typename Trai
         minitensor::Vector<ScalarT> C_inv_stress_grad = minitensor::dot(C_inv_tensor, stress_grad);
 
         for (int dim = 0; dim < numDims; ++dim) {
-          TResidual(cell, node) -= tauFactor(cell, qp) * Clattice(cell, qp) * wGradBF(cell, node, qp, dim) *
-                                   C_inv_stress_grad(dim) * dt;  //*temp; GB changed 08/14/2015
+          TResidual(cell, node) -=
+              tauFactor(cell, qp) * Clattice(cell, qp) * wGradBF(cell, node, qp, dim) * C_inv_stress_grad(dim) * dt;  //*temp; GB changed 08/14/2015
         }
       }
     }

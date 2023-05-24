@@ -9,8 +9,7 @@ namespace Albany {
 class GlobalLocalIndexerTpetra : public GlobalLocalIndexer
 {
  public:
-  GlobalLocalIndexerTpetra(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::RCP<const Tpetra_Map>& tmap)
-      : GlobalLocalIndexer(vs), m_tmap(tmap)
+  GlobalLocalIndexerTpetra(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::RCP<const Tpetra_Map>& tmap) : GlobalLocalIndexer(vs), m_tmap(tmap)
   {
     ALBANY_PANIC(tmap.is_null(), "Error! Input tpetra map pointer is null.\n");
   }

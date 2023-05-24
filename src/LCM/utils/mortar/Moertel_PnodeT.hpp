@@ -52,10 +52,7 @@ class ProjectedNodeT : public MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)
   \param xi : local coordinates of the projection in the segment its projected
   onto \param pseg : Segment this projection is located in
   */
-  explicit ProjectedNodeT(
-      const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & basenode,
-      const double* xi,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) * pseg);
+  explicit ProjectedNodeT(const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & basenode, const double* xi, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) * pseg);
 
   /*!
   \brief Constructor (case of orthogonal projection only)

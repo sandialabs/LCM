@@ -132,10 +132,7 @@ class StateManager
 
   /// Very basic
   void
-  registerStateVariable(
-      std::string const&                   stateName,
-      const Teuchos::RCP<PHX::DataLayout>& dl,
-      std::string const&                   init_type);
+  registerStateVariable(std::string const& stateName, const Teuchos::RCP<PHX::DataLayout>& dl, std::string const& init_type);
 
   Teuchos::RCP<Teuchos::ParameterList>
   registerSideSetStateVariable(
@@ -264,9 +261,7 @@ class StateManager
   /// Sets states arrays from a given StateInfoStruct into a given
   /// discretization
   void
-  doSetStateArrays(
-      const Teuchos::RCP<Albany::AbstractDiscretization>& disc,
-      const Teuchos::RCP<StateInfoStruct>&                stateInfoPtr);
+  doSetStateArrays(const Teuchos::RCP<Albany::AbstractDiscretization>& disc, const Teuchos::RCP<StateInfoStruct>& stateInfoPtr);
 
   /// boolean to enforce that allocate gets called once, and after registration
   /// and befor gets

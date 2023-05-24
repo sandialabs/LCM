@@ -20,9 +20,7 @@ namespace LCM {
  */
 
 template <typename EvalT, typename Traits>
-class Density : public PHX::EvaluatorWithBaseImpl<Traits>,
-                public PHX::EvaluatorDerived<EvalT, Traits>,
-                public Sacado::ParameterAccessor<EvalT, SPL_Traits>
+class Density : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>, public Sacado::ParameterAccessor<EvalT, SPL_Traits>
 {
  public:
   using ScalarT = typename EvalT::ScalarT;

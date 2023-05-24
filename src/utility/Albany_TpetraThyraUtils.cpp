@@ -278,8 +278,7 @@ getTpetraMultiVector(Thyra_MultiVector& mv, bool const throw_if_not_tpetra)
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    ALBANY_PANIC(
-        tmv->getTpetraMultiVector().is_null(), "Error! The Thyra_TpetraMultiVector object stores a null pointer.\n");
+    ALBANY_PANIC(tmv->getTpetraMultiVector().is_null(), "Error! The Thyra_TpetraMultiVector object stores a null pointer.\n");
     return tmv->getTpetraMultiVector();
   }
 }
@@ -298,9 +297,7 @@ getConstTpetraMultiVector(const Thyra_MultiVector& mv, bool const throw_if_not_t
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    ALBANY_PANIC(
-        tmv->getConstTpetraMultiVector().is_null(),
-        "Error! The Thyra_TpetraMultiVector object stores a null pointer.\n");
+    ALBANY_PANIC(tmv->getConstTpetraMultiVector().is_null(), "Error! The Thyra_TpetraMultiVector object stores a null pointer.\n");
     return tmv->getConstTpetraMultiVector();
   }
 }
@@ -338,8 +335,7 @@ getConstTpetraOperator(const Thyra_LinearOp& lop, bool const throw_if_not_tpetra
   } else {
     // We allow bad cast, but once cast goes through, we *expect* pointers to be
     // valid
-    ALBANY_PANIC(
-        top->getConstTpetraOperator().is_null(), "Error! The Thyra_TpetraLinearOp object stores a null pointer.\n");
+    ALBANY_PANIC(top->getConstTpetraOperator().is_null(), "Error! The Thyra_TpetraLinearOp object stores a null pointer.\n");
     return top->getConstTpetraOperator();
   }
 }

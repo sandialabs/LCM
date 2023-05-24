@@ -39,8 +39,7 @@ class SolutionValuesResponseFunction::SolutionPrinter
   static Teuchos::RCP<SolutionPrinter>
   create(const Teuchos::RCP<const Application>& app, Teuchos::ParameterList& response_parms)
   {
-    if (response_parms.isType<std::string>("Output File"))
-      return Teuchos::rcp(new SolutionPrinter(app, response_parms));
+    if (response_parms.isType<std::string>("Output File")) return Teuchos::rcp(new SolutionPrinter(app, response_parms));
     return Teuchos::null;
   }
 
@@ -90,12 +89,7 @@ class SolutionValuesResponseFunction::SolutionPrinter
 
   // gids is global equation ids.
   void
-  getCoordsOnRank(
-      const Teuchos::Array<GO>& eq_gids,
-      std::vector<GO>&          node_gids,
-      std::vector<Point>&       coords,
-      int&                      ndim,
-      std::vector<std::size_t>& idxs)
+  getCoordsOnRank(const Teuchos::Array<GO>& eq_gids, std::vector<GO>& node_gids, std::vector<Point>& coords, int& ndim, std::vector<std::size_t>& idxs)
   {
     Teuchos::RCP<AbstractDiscretization>      disc            = app_->getDiscretization();
     const Teuchos::ArrayRCP<double>&          ov_coords       = disc->getCoordinates();
@@ -122,12 +116,8 @@ class SolutionValuesResponseFunction::SolutionPrinter
   }
 };
 
-SolutionValuesResponseFunction::SolutionValuesResponseFunction(
-    const Teuchos::RCP<const Application>& app,
-    Teuchos::ParameterList&                responseParams)
-    : SamplingBasedScalarResponseFunction(app->getComm()),
-      app_(app),
-      cullingStrategy_(createSolutionCullingStrategy(app, responseParams))
+SolutionValuesResponseFunction::SolutionValuesResponseFunction(const Teuchos::RCP<const Application>& app, Teuchos::ParameterList& responseParams)
+    : SamplingBasedScalarResponseFunction(app->getComm()), app_(app), cullingStrategy_(createSolutionCullingStrategy(app, responseParams))
 {
   sol_printer_ = SolutionPrinter::create(app_, responseParams);
 }

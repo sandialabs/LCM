@@ -45,8 +45,7 @@ CombineAndScatterManagerTpetra::combine(Thyra_Vector const& src, Thyra_Vector& d
 }
 
 void
-CombineAndScatterManagerTpetra::combine(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM)
-    const
+CombineAndScatterManagerTpetra::combine(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM) const
 {
   // There's a catch here!
   // Legend: V = Vector, MV = MultiVector, TV = Tpetra_Vector, TMV =
@@ -103,10 +102,7 @@ CombineAndScatterManagerTpetra::combine(const Thyra_LinearOp& src, Thyra_LinearO
 }
 
 void
-CombineAndScatterManagerTpetra::combine(
-    Teuchos::RCP<Thyra_Vector const> const& src,
-    Teuchos::RCP<Thyra_Vector> const&       dst,
-    const CombineMode                       CM) const
+CombineAndScatterManagerTpetra::combine(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM) const
 {
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraVector(src);
@@ -116,10 +112,8 @@ CombineAndScatterManagerTpetra::combine(
 }
 
 void
-CombineAndScatterManagerTpetra::combine(
-    const Teuchos::RCP<const Thyra_MultiVector>& src,
-    Teuchos::RCP<Thyra_MultiVector> const&       dst,
-    const CombineMode                            CM) const
+CombineAndScatterManagerTpetra::combine(const Teuchos::RCP<const Thyra_MultiVector>& src, Teuchos::RCP<Thyra_MultiVector> const& dst, const CombineMode CM)
+    const
 {
   // There's a catch here!
   // Legend: V = Vector, MV = MultiVector, TV = Tpetra_Vector, TMV =
@@ -166,10 +160,7 @@ CombineAndScatterManagerTpetra::combine(
 }
 
 void
-CombineAndScatterManagerTpetra::combine(
-    const Teuchos::RCP<const Thyra_LinearOp>& src,
-    const Teuchos::RCP<Thyra_LinearOp>&       dst,
-    const CombineMode                         CM) const
+CombineAndScatterManagerTpetra::combine(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM) const
 {
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraMatrix(src);
@@ -190,8 +181,7 @@ CombineAndScatterManagerTpetra::scatter(Thyra_Vector const& src, Thyra_Vector& d
 }
 
 void
-CombineAndScatterManagerTpetra::scatter(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM)
-    const
+CombineAndScatterManagerTpetra::scatter(const Thyra_MultiVector& src, Thyra_MultiVector& dst, const CombineMode CM) const
 {
   // There's a catch here!
   // Legend: V = Vector, MV = MultiVector, TV = Tpetra_Vector, TMV =
@@ -248,10 +238,7 @@ CombineAndScatterManagerTpetra::scatter(const Thyra_LinearOp& src, Thyra_LinearO
 }
 
 void
-CombineAndScatterManagerTpetra::scatter(
-    Teuchos::RCP<Thyra_Vector const> const& src,
-    Teuchos::RCP<Thyra_Vector> const&       dst,
-    const CombineMode                       CM) const
+CombineAndScatterManagerTpetra::scatter(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM) const
 {
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraVector(src);
@@ -261,10 +248,8 @@ CombineAndScatterManagerTpetra::scatter(
 }
 
 void
-CombineAndScatterManagerTpetra::scatter(
-    const Teuchos::RCP<const Thyra_MultiVector>& src,
-    Teuchos::RCP<Thyra_MultiVector> const&       dst,
-    const CombineMode                            CM) const
+CombineAndScatterManagerTpetra::scatter(const Teuchos::RCP<const Thyra_MultiVector>& src, Teuchos::RCP<Thyra_MultiVector> const& dst, const CombineMode CM)
+    const
 {
   // There's a catch here!
   // Legend: V = Vector, MV = MultiVector, TV = Tpetra_Vector, TMV =
@@ -311,10 +296,7 @@ CombineAndScatterManagerTpetra::scatter(
 }
 
 void
-CombineAndScatterManagerTpetra::scatter(
-    const Teuchos::RCP<const Thyra_LinearOp>& src,
-    const Teuchos::RCP<Thyra_LinearOp>&       dst,
-    const CombineMode                         CM) const
+CombineAndScatterManagerTpetra::scatter(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM) const
 {
   auto cmT  = combineModeT(CM);
   auto srcT = Albany::getConstTpetraMatrix(src);

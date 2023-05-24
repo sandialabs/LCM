@@ -12,9 +12,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-TransportCoefficients<EvalT, Traits>::TransportCoefficients(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+TransportCoefficients<EvalT, Traits>::TransportCoefficients(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : c_lattice_(p.get<std::string>("Lattice Concentration Name"), dl->qp_scalar),
       temperature_(p.get<std::string>("Temperature Name"), dl->qp_scalar),
       k_eq_(p.get<std::string>("Concentration Equilibrium Parameter Name"), dl->qp_scalar),
@@ -116,16 +114,14 @@ TransportCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
   // Diffusion Coefficient
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int pt = 0; pt < num_pts_; ++pt) {
-      diffusion_coefficient_(cell, pt) =
-          pre_exponential_factor_ * std::exp(-1.0 * Q_ / (ideal_gas_constant_ * temperature_(cell, pt)));
+      diffusion_coefficient_(cell, pt) = pre_exponential_factor_ * std::exp(-1.0 * Q_ / (ideal_gas_constant_ * temperature_(cell, pt)));
     }
   }
 
   // Convection Coefficient
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int pt = 0; pt < num_pts_; ++pt) {
-      convection_coefficient_(cell, pt) =
-          partial_molar_volume_ * diffusion_coefficient_(cell, pt) / (ideal_gas_constant_ * temperature_(cell, pt));
+      convection_coefficient_(cell, pt) = partial_molar_volume_ * diffusion_coefficient_(cell, pt) / (ideal_gas_constant_ * temperature_(cell, pt));
     }
   }
 
@@ -169,8 +165,7 @@ TransportCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
       for (std::size_t pt(0); pt < num_pts_; ++pt) {
         theta_term = k_eq_(cell, pt) * c_lattice_(cell, pt) / (k_eq_(cell, pt) * c_lattice_(cell, pt) + n_lattice_);
 
-        strain_rate_fac_(cell, pt) =
-            theta_term * n_trap_(cell, pt) * std::log(10.0) * b_ * c_ * std::exp(-c_ * eqps(cell, pt));
+        strain_rate_fac_(cell, pt) = theta_term * n_trap_(cell, pt) * std::log(10.0) * b_ * c_ * std::exp(-c_ * eqps(cell, pt));
       }
     }
   }
@@ -206,10 +201,9 @@ TransportCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
   // effective diffusivity
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      eff_diff_(cell, pt) = 1.0 + n_trap_(cell, pt) * n_lattice_ /
-                                      (k_eq_(cell, pt) * c_lattice_(cell, pt) * c_lattice_(cell, pt)) /
-                                      ((1.0 + n_lattice_ / k_eq_(cell, pt) / c_lattice_(cell, pt)) *
-                                       (1.0 + n_lattice_ / k_eq_(cell, pt) / c_lattice_(cell, pt)));
+      eff_diff_(cell, pt) =
+          1.0 + n_trap_(cell, pt) * n_lattice_ / (k_eq_(cell, pt) * c_lattice_(cell, pt) * c_lattice_(cell, pt)) /
+                    ((1.0 + n_lattice_ / k_eq_(cell, pt) / c_lattice_(cell, pt)) * (1.0 + n_lattice_ / k_eq_(cell, pt) / c_lattice_(cell, pt)));
     }
   }
 

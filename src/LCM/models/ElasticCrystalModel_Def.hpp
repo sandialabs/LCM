@@ -14,9 +14,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ElasticCrystalModel<EvalT, Traits>::ElasticCrystalModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ElasticCrystalModel<EvalT, Traits>::ElasticCrystalModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   // Read elastic coefficients
@@ -161,10 +159,7 @@ ElasticCrystalModel<EvalT, Traits>::ElasticCrystalModel(
 
 template <typename EvalT, typename Traits>
 void
-ElasticCrystalModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+ElasticCrystalModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   std::string F_string = (*field_name_map_)["F"];
   std::string J_string = (*field_name_map_)["J"];

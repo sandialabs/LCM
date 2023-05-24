@@ -21,10 +21,7 @@ class LinComprNSProblem : public AbstractProblem
 {
  public:
   //! Default constructor
-  LinComprNSProblem(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<ParamLib>&               paramLib,
-      int const                                   numDim_);
+  LinComprNSProblem(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numDim_);
 
   //! Destructor
   ~LinComprNSProblem();
@@ -129,18 +126,17 @@ Albany::LinComprNSProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPts
+       << ", Dim= " << numDim << std::endl;
 
   int vecDim = neq;
 
-  RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim, vecDim));
+  RCP<Albany::Layouts>                              dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim, vecDim));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
   bool                                              supportsTransient = true;
   int                                               offset            = 0;
@@ -163,30 +159,25 @@ Albany::LinComprNSProblem::constructEvaluators(
   if (number_of_time_deriv == 1) dof_names_dot[0] = dof_names[0] + "_dot";
   resid_names[0] = "LinComprNS Residual";
   if (number_of_time_deriv == 1)
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
   else
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, offset));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, offset));
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0], offset));
 
-  if (number_of_time_deriv == 1)
-    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dot[0], offset));
+  if (number_of_time_deriv == 1) fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dot[0], offset));
 
   //     fm0.template registerEvaluator<EvalT>
   //  (evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0],
   //  offset));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter LinComprNS"));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter LinComprNS"));
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   {  // Specialized DofVecGrad Interpolation for this problem
 

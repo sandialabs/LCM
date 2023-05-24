@@ -113,18 +113,14 @@ STKAdapt<SizeField>::printElementData()
 
 template <class SizeField>
 bool
-STKAdapt<SizeField>::adaptMesh(
-    const Teuchos::RCP<const Tpetra_Vector>& /* solution_ */,
-    const Teuchos::RCP<const Tpetra_Vector>& /* ovlp_solution_ */)
+STKAdapt<SizeField>::adaptMesh(const Teuchos::RCP<const Tpetra_Vector>& /* solution_ */, const Teuchos::RCP<const Tpetra_Vector>& /* ovlp_solution_ */)
 {
   *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
   *output_stream_ << "Adapting mesh using STKAdapt method        " << std::endl;
   *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
-  Albany::AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field =
-      genericMeshStruct->getFieldContainer()->getProcRankField();
-  Albany::AbstractSTKFieldContainer::IntScalarFieldType* refine_field =
-      genericMeshStruct->getFieldContainer()->getRefineField();
+  Albany::AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field = genericMeshStruct->getFieldContainer()->getProcRankField();
+  Albany::AbstractSTKFieldContainer::IntScalarFieldType* refine_field    = genericMeshStruct->getFieldContainer()->getRefineField();
 
   // Save the current results and close the exodus file
 
@@ -154,8 +150,7 @@ STKAdapt<SizeField>::adaptMesh(
 
   stk::adapt::ElementRefinePredicate erp(0, refine_field, 0.0);
 
-  stk::adapt::PredicateBasedElementAdapter<stk::adapt::ElementRefinePredicate> breaker(
-      erp, *eMesh, *refinerPattern, proc_rank_field);
+  stk::adapt::PredicateBasedElementAdapter<stk::adapt::ElementRefinePredicate> breaker(erp, *eMesh, *refinerPattern, proc_rank_field);
 
   breaker.setRemoveOldElements(false);
   breaker.setAlwaysInitializeNodeRegistry(false);
@@ -195,9 +190,7 @@ STKAdapt<SizeField>::adaptMesh(
 
   // Throw away all the Albany data structures and re-build them from the mesh
 
-  if (adapt_params_->get<bool>("Rebalance", false))
-
-    genericMeshStruct->rebalanceAdaptedMeshT(adapt_params_, teuchos_comm_);
+  if (adapt_params_->get<bool>("Rebalance", false)) genericMeshStruct->rebalanceAdaptedMeshT(adapt_params_, teuchos_comm_);
 
   stk_discretization->updateMesh();
   //  printElementData();

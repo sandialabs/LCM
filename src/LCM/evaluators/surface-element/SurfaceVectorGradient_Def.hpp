@@ -11,9 +11,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceVectorGradient<EvalT, Traits>::SurfaceVectorGradient(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceVectorGradient<EvalT, Traits>::SurfaceVectorGradient(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       currentBasis(p.get<std::string>("Current Basis Name"), dl->qp_tensor),

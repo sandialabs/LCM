@@ -9,9 +9,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-ComputeBasisFunctions<EvalT, Traits>::ComputeBasisFunctions(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ComputeBasisFunctions<EvalT, Traits>::ComputeBasisFunctions(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : coordVec(p.get<std::string>("Coordinate Vector Name"), dl->vertices_vector),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
@@ -97,8 +95,7 @@ ComputeBasisFunctions<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
   ICT::setJacobianInv(jacobian_inv, jacobian);
   ICT::setJacobianDet(jacobian_det.get_view(), jacobian);
 
-  bool isJacobianDetNegative =
-      IFST::computeCellMeasure(weighted_measure.get_view(), jacobian_det.get_view(), refWeights);
+  bool isJacobianDetNegative = IFST::computeCellMeasure(weighted_measure.get_view(), jacobian_det.get_view(), refWeights);
   IFST::HGRADtransformVALUE(BF.get_view(), val_at_cub_points);
   IFST::multiplyMeasure(wBF.get_view(), weighted_measure.get_view(), BF.get_view());
   IFST::HGRADtransformGRAD(GradBF.get_view(), jacobian_inv, grad_at_cub_points);

@@ -13,9 +13,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
-    : poissonsRatio(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+    : poissonsRatio(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   Teuchos::ParameterList* pr_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -43,7 +41,7 @@ PoissonsRatio<EvalT, Traits>::PoissonsRatio(Teuchos::ParameterList& p)
 
   if (p.isType<std::string>("QP Temperature Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-    Temperature = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), scalar_dl);
+    Temperature                             = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), scalar_dl);
     this->addDependentField(Temperature);
     isThermoElastic = true;
     dnudT_value     = pr_list->get("dnudT Value", 0.0);
@@ -100,9 +98,7 @@ PoissonsRatio<EvalT, Traits>::getValue(std::string const& n)
     return constant_value;
   else if (n == "dnudT Value")
     return dnudT_value;
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in PoissonsRatio::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in PoissonsRatio::getValue()" << std::endl);
   return constant_value;
 }
 

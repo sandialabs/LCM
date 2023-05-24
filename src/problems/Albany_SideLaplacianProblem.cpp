@@ -14,10 +14,7 @@
 
 namespace Albany {
 
-SideLaplacian::SideLaplacian(
-    const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<ParamLib>&               paramLib,
-    int const                                   numEq)
+SideLaplacian::SideLaplacian(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numEq)
     : Albany::AbstractProblem(params, paramLib, numEq), use_sdbcs_(false)
 {
   bool solve_as_ss_eqn = params->get<bool>("Solve As Side Set Equation");
@@ -41,9 +38,7 @@ SideLaplacian::~SideLaplacian()
 }
 
 void
-SideLaplacian::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+SideLaplacian::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
 
@@ -90,8 +85,7 @@ SideLaplacian::buildProblem(
     numSideNodes    = sideBasis->getCardinality();
     numSideQPs      = sideCubature->getNumPoints();
 
-    dl_side                       = Teuchos::rcp(new Albany::Layouts(
-        worksetSize, numSideVertices, numSideNodes, numSideQPs, numDim - 1, numDim, numCellSides, 2));
+    dl_side = Teuchos::rcp(new Albany::Layouts(worksetSize, numSideVertices, numSideNodes, numSideQPs, numDim - 1, numDim, numCellSides, 2));
     dl->side_layouts[sideSetName] = dl_side;
   }
 

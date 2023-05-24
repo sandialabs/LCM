@@ -52,8 +52,8 @@ class NodePointVecInterpolation : public PHX::EvaluatorWithBaseImpl<Traits>, pub
 
 //! Specialization for Jacobian evaluation taking advantage of known sparsity
 template <typename Traits>
-class NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Jacobian, Traits>
+class NodePointVecInterpolation<PHAL::AlbanyTraits::Jacobian, Traits> : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                                                        public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   NodePointVecInterpolation(Teuchos::ParameterList const& p, Teuchos::RCP<Albany::Layouts> const& dl);

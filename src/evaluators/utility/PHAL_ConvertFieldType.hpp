@@ -48,8 +48,7 @@ template <typename EvalT, typename Traits>
 using ConvertFieldTypeRTtoST = ConvertFieldType<EvalT, Traits, RealType, typename EvalT::ScalarT>;
 
 template <typename EvalT, typename Traits>
-using ConvertFieldTypeMSTtoPST =
-    ConvertFieldType<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ParamScalarT>;
+using ConvertFieldTypeMSTtoPST = ConvertFieldType<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ParamScalarT>;
 
 template <typename EvalT, typename Traits>
 using ConvertFieldTypeMSTtoST = ConvertFieldType<EvalT, Traits, typename EvalT::MeshScalarT, typename EvalT::ScalarT>;

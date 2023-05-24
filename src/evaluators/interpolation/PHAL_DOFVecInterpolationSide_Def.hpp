@@ -10,9 +10,7 @@ namespace PHAL {
 
 //**********************************************************************
 template <typename EvalT, typename Traits, typename Type>
-DOFVecInterpolationSideBase<EvalT, Traits, Type>::DOFVecInterpolationSideBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl_side)
+DOFVecInterpolationSideBase<EvalT, Traits, Type>::DOFVecInterpolationSideBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl_side)
     : sideSetName(p.get<std::string>("Side Set Name")),
       val_node(p.get<std::string>("Variable Name"), dl_side->node_vector),
       BF(p.get<std::string>("BF Name"), dl_side->node_qp_scalar),
@@ -37,9 +35,7 @@ DOFVecInterpolationSideBase<EvalT, Traits, Type>::DOFVecInterpolationSideBase(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename Type>
 void
-DOFVecInterpolationSideBase<EvalT, Traits, Type>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFVecInterpolationSideBase<EvalT, Traits, Type>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_node, fm);
   this->utils.setFieldData(BF, fm);

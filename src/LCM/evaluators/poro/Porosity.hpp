@@ -28,9 +28,7 @@ namespace LCM {
 /// Coussy's poromechanics p.85.
 ///
 template <typename EvalT, typename Traits>
-class Porosity : public PHX::EvaluatorWithBaseImpl<Traits>,
-                 public PHX::EvaluatorDerived<EvalT, Traits>,
-                 public Sacado::ParameterAccessor<EvalT, SPL_Traits>
+class Porosity : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>, public Sacado::ParameterAccessor<EvalT, SPL_Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;

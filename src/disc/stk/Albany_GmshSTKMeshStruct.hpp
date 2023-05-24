@@ -51,10 +51,7 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
   // Set boundary information.
   // Includes sideset and nodeset names and counts.
   void
-  set_boundaries(
-      const Teuchos::RCP<Teuchos_Comm const>& commT,
-      std::vector<std::string>&               ssNames,
-      std::vector<std::string>&               nsNames);
+  set_boundaries(const Teuchos::RCP<Teuchos_Comm const>& commT, std::vector<std::string>& ssNames, std::vector<std::string>& nsNames);
 
   // Check the version of the input msh file
   void
@@ -184,10 +181,7 @@ class GmshSTKMeshStruct : public GenericSTKMeshStruct
   // Reads ifile to map surface tags to physical tags.
   // Reports error if any surface is associted with more than one tag.
   void
-  get_physical_tag_to_surface_tag_map(
-      std::ifstream&      ifile,
-      std::map<int, int>& physical_surface_tags,
-      int                 num_surfaces);
+  get_physical_tag_to_surface_tag_map(std::ifstream& ifile, std::map<int, int>& physical_surface_tags, int num_surfaces);
 
   // Adds a sideset with name sideset_name and side tag number tag.
   void

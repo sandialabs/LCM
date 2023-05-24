@@ -35,8 +35,8 @@ class SaveCellStateField : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX
 };
 
 template <typename Traits>
-class SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits>
-    : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
+class SaveCellStateField<PHAL::AlbanyTraits::Residual, Traits> : public PHX::EvaluatorWithBaseImpl<Traits>,
+                                                                 public PHX::EvaluatorDerived<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   SaveCellStateField(Teuchos::ParameterList const& p);

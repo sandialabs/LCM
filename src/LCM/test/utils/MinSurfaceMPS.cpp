@@ -49,8 +49,7 @@ main(int ac, char* av[])
       throw(0);
     }
   } else {
-    std::cout << "Usage: MinsurfaceMPS Mesh.exo or MinsurfaceMPS Mesh.exo Normals.txt"
-              << std::endl;  // USAGE OF THIS FILE FROM THE COMMAND LINE
+    std::cout << "Usage: MinsurfaceMPS Mesh.exo or MinsurfaceMPS Mesh.exo Normals.txt" << std::endl;  // USAGE OF THIS FILE FROM THE COMMAND LINE
     return 1;
   }
 
@@ -161,8 +160,7 @@ main(int ac, char* av[])
     // Extract the numbers from the matrix that contains the normals
     std::vector<std::vector<int>> BoundaryVector;
     for (int i = 0; i < numberNormals_; i++) {
-      std::string file_name = "MPS_" + file_name2 + "_rhs_" + itoa(i + 1) +
-                              ".txt";  // file_name2 comes from the second input in the command line
+      std::string file_name = "MPS_" + file_name2 + "_rhs_" + itoa(i + 1) + ".txt";  // file_name2 comes from the second input in the command line
 
       ofstream mpsFile(file_name.c_str(), std::ofstream::out);
       if (mpsFile.is_open()) {
@@ -186,7 +184,7 @@ main(int ac, char* av[])
         // Finds the identifiers of the nodes (entity rank 0) along the shortest
         // path connecting the three points
         std::vector<std::vector<int>> ShortestPathFinal = topology.shortestpath(closestNodes);
-        BoundaryVector = topology.boundaryVector(ShortestPathFinal);  //.boundaryVectorOuterSurface
+        BoundaryVector                                  = topology.boundaryVector(ShortestPathFinal);  //.boundaryVectorOuterSurface
         for (unsigned int i = 0; i < BoundaryVector.size(); i++) {
           mpsFile << " "
                   << "RHS1"

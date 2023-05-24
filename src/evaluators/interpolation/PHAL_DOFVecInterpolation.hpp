@@ -82,20 +82,12 @@ class FastSolutionVecInterpolationBase : public DOFVecInterpolationBase<EvalT, T
 //! Specialization for Jacobian evaluation taking advantage of known sparsity
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 template <typename Traits>
-class FastSolutionVecInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>
-    : public DOFVecInterpolationBase<
-          PHAL::AlbanyTraits::Jacobian,
-          Traits,
-          typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+class FastSolutionVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+    : public DOFVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
  public:
   FastSolutionVecInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : DOFVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>(
-            p,
-            dl)
+      : DOFVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
   {
     this->setName("FastSolutionVecInterpolationBase" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
@@ -104,8 +96,7 @@ class FastSolutionVecInterpolationBase<
   void
   postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-        postRegistrationSetup(d, vm);
+    DOFVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::postRegistrationSetup(d, vm);
   }
 
   void

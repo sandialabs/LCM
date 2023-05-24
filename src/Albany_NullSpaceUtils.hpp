@@ -27,12 +27,7 @@ class RigidBodyModes
 
   //! Set sizes of nullspace etc.
   void
-  setParameters(
-      int const  numPDEs,
-      int const  numElasticityDim,
-      int const  numScalar,
-      int const  nullSpaceDim,
-      bool const setNonElastRBM = false);
+  setParameters(int const numPDEs, int const numElasticityDim, int const numScalar, int const nullSpaceDim, bool const setNonElastRBM = false);
 
   //! Set Piro solver parameter list.
   void

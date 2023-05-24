@@ -92,34 +92,26 @@ Albany::ResponseFactory::createResponseFunction(
   }
 
   else if (
-      name == "Field Integral" || name == "Field Value" || name == "Field Average" ||
-      name == "Squared L2 Difference Source ST Target ST" || name == "Squared L2 Difference Source ST Target MST" ||
-      name == "Squared L2 Difference Source ST Target PST" || name == "Squared L2 Difference Source PST Target ST" ||
-      name == "Squared L2 Difference Source PST Target MST" || name == "Squared L2 Difference Source PST Target PST" ||
-      name == "Squared L2 Difference Source MST Target ST" || name == "Squared L2 Difference Source MST Target MST" ||
-      name == "Squared L2 Difference Source MST Target PST" ||
-      name == "Squared L2 Difference Side Source ST Target ST" ||
-      name == "Squared L2 Difference Side Source ST Target MST" ||
-      name == "Squared L2 Difference Side Source ST Target PST" ||
-      name == "Squared L2 Difference Side Source PST Target ST" ||
-      name == "Squared L2 Difference Side Source PST Target MST" ||
-      name == "Squared L2 Difference Side Source PST Target PST" ||
-      name == "Squared L2 Difference Side Source MST Target ST" ||
-      name == "Squared L2 Difference Side Source MST Target MST" ||
-      name == "Squared L2 Difference Side Source MST Target PST" || name == "Surface Velocity Mismatch" ||
-      name == "Surface Mass Balance Mismatch" || name == "Grounding Line Flux" || name == "Boundary Squared L2 Norm" ||
-      name == "Center Of Mass" || name == "Save Field" || name == "Region Boundary" || name == "Element Size Field" ||
-      name == "Save Nodal Fields" || name == "Stiffness Objective" || name == "Interface Energy" ||
+      name == "Field Integral" || name == "Field Value" || name == "Field Average" || name == "Squared L2 Difference Source ST Target ST" ||
+      name == "Squared L2 Difference Source ST Target MST" || name == "Squared L2 Difference Source ST Target PST" ||
+      name == "Squared L2 Difference Source PST Target ST" || name == "Squared L2 Difference Source PST Target MST" ||
+      name == "Squared L2 Difference Source PST Target PST" || name == "Squared L2 Difference Source MST Target ST" ||
+      name == "Squared L2 Difference Source MST Target MST" || name == "Squared L2 Difference Source MST Target PST" ||
+      name == "Squared L2 Difference Side Source ST Target ST" || name == "Squared L2 Difference Side Source ST Target MST" ||
+      name == "Squared L2 Difference Side Source ST Target PST" || name == "Squared L2 Difference Side Source PST Target ST" ||
+      name == "Squared L2 Difference Side Source PST Target MST" || name == "Squared L2 Difference Side Source PST Target PST" ||
+      name == "Squared L2 Difference Side Source MST Target ST" || name == "Squared L2 Difference Side Source MST Target MST" ||
+      name == "Squared L2 Difference Side Source MST Target PST" || name == "Surface Velocity Mismatch" || name == "Surface Mass Balance Mismatch" ||
+      name == "Grounding Line Flux" || name == "Boundary Squared L2 Norm" || name == "Center Of Mass" || name == "Save Field" || name == "Region Boundary" ||
+      name == "Element Size Field" || name == "Save Nodal Fields" || name == "Stiffness Objective" || name == "Interface Energy" ||
       name == "Internal Energy Objective" || name == "Tensor PNorm Objective" || name == "Tensor Average Response" ||
-      name == "Homogenized Constants Response" || name == "Modal Objective" || name == "PHAL Field Integral" ||
-      name == "PHAL Field IntegralT" || name == "PHAL Thermal Energy" || name == "PHAL Thermal EnergyT" ||
-      name == "AMP Energy") {
+      name == "Homogenized Constants Response" || name == "Modal Objective" || name == "PHAL Field Integral" || name == "PHAL Field IntegralT" ||
+      name == "PHAL Thermal Energy" || name == "PHAL Thermal EnergyT" || name == "AMP Energy") {
     responseParams.set("Name", name);
     for (int i = 0; i < meshSpecs.size(); i++) {
       // Skip if dealing with interface block
       // if (meshSpecs[i]->ebName == "Surface Element") continue;
-      responses.push_back(
-          rcp(new Albany::FieldManagerScalarResponseFunction(app, prob, meshSpecs[i], stateMgr, responseParams)));
+      responses.push_back(rcp(new Albany::FieldManagerScalarResponseFunction(app, prob, meshSpecs[i], stateMgr, responseParams)));
     }
   }
 
@@ -130,11 +122,9 @@ Albany::ResponseFactory::createResponseFunction(
       // if (meshSpecs[i]->ebName == "Surface Element") continue;
       // For these RFs, default to true for this parm.
       char const* reb_parm = "Restrict to Element Block";
-      if (!responseParams.isType<bool>(reb_parm) &&
-          (name == "IP to Nodal Field" || name == "Project IP to Nodal Field"))
+      if (!responseParams.isType<bool>(reb_parm) && (name == "IP to Nodal Field" || name == "Project IP to Nodal Field"))
         responseParams.set<bool>(reb_parm, true);
-      responses.push_back(
-          rcp(new Albany::FieldManagerResidualOnlyResponseFunction(app, prob, meshSpecs[i], stateMgr, responseParams)));
+      responses.push_back(rcp(new Albany::FieldManagerResidualOnlyResponseFunction(app, prob, meshSpecs[i], stateMgr, responseParams)));
     }
   } else if (name == "Solution") {
     responses.push_back(rcp(new Albany::SolutionResponseFunction(app, responseParams)));
@@ -142,14 +132,9 @@ Albany::ResponseFactory::createResponseFunction(
     Array<RCP<AbstractResponseFunction>> base_responses;
     std::string                          name = responseParams.get<std::string>("Response");
     createResponseFunction(name, responseParams.sublist("ResponseParams"), base_responses);
-    for (int i = 0; i < base_responses.size(); i++)
-      responses.push_back(rcp(new Albany::KLResponseFunction(base_responses[i], responseParams)));
+    for (int i = 0; i < base_responses.size(); i++) responses.push_back(rcp(new Albany::KLResponseFunction(base_responses[i], responseParams)));
   } else {
-    ALBANY_ABORT(
-        std::endl
-        << "Error!  Unknown response function " << name << "!" << std::endl
-        << "Supplied parameter list is " << std::endl
-        << responseParams);
+    ALBANY_ABORT(std::endl << "Error!  Unknown response function " << name << "!" << std::endl << "Supplied parameter list is " << std::endl << responseParams);
   }
 }
 
@@ -166,9 +151,8 @@ Albany::ResponseFactory::createResponseFunctions(Teuchos::ParameterList& respons
     int num_responses = responseList.get<int>("Number");
     if (num_responses > 0) {
       Array<RCP<AbstractResponseFunction>> responses;
-      std::string                          method = responseList.isParameter("Collection Method") ?
-                                                        responseList.get<std::string>("Collection Method") :
-                                                        std::string("Aggregate Responses");
+      std::string                          method =
+          responseList.isParameter("Collection Method") ? responseList.get<std::string>("Collection Method") : std::string("Aggregate Responses");
       createResponseFunction(method, responseList, responses);
       return responses;
     }

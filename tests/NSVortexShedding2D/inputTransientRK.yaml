@@ -1,9 +1,10 @@
 %YAML 1.1
 ---
 ANONYMOUS:
+  Build Type: Epetra
   Problem:
     Name: NavierStokes 2D
-    Solution Method: Transient Tempus
+    Solution Method: Transient
     Dirichlet BCs:
       Time Dependent DBC on NS inlet for DOF ux:
         Time Values: [0.00000000000000000e+00, 1.00000000000000000e+00, 1.20000000000000000e+01]
@@ -14,11 +15,12 @@ ANONYMOUS:
       DBC on NS sides for DOF uy: 0.00000000000000000e+00
     Parameters:
       Number Of Parameters: 0
-    Response Functions: 
-      Number: 1
-      Response 0: Solution Max Value
-      ResponseParams 0: 
+    Response Functions:
+      Number Of Responses: 1
+      Response 0:
         Equation: 0
+        Type: Scalar Response
+        Name: Solution Max Value
   Discretization:
     Method: Exodus
     Exodus Input File Name: vortex.exo
@@ -94,10 +96,19 @@ ANONYMOUS:
       Stratimikos:
         Linear Solver Type: Belos
         Linear Solver Types:
+          AztecOO:
+            Forward Solve:
+              AztecOO Settings:
+                Aztec Solver: GMRES
+                Convergence Test: r0
+                Size of Krylov Subspace: 200
+                Output Frequency: 1
+              Max Iterations: 100
+              Tolerance: 9.99999999999999954e-07
           Belos:
             VerboseObject:
               Verbosity Level: high
-              Output File: BelosSolverT.out
+              Output File: BelosSolver.out
             Solver Type: Block GMRES
             Solver Types:
               Block GMRES:
@@ -109,16 +120,24 @@ ANONYMOUS:
                 Block Size: 1
                 Num Blocks: 200
                 Flexible Gmres: false
-        Preconditioner Type: Ifpack2
+        Preconditioner Type: Ifpack
         Preconditioner Types:
-          Ifpack2:
+          Ifpack:
+            Prec Type: ILU
             Overlap: 0
-            Prec Type: ILUT
-            Ifpack2 Settings:
+            Ifpack Settings:
               'fact: drop tolerance': 0.00000000000000000e+00
-              'fact: ilut level-of-fill': 1.0
-  Regression Results: 
-    Number of Comparisons: 1
-    Test Values: [7.26888316626999966e+01]
+              'fact: ilut level-of-fill': 0.00000000000000000e+00
+              'fact: level-of-fill': 0
+          ML:
+            Base Method Defaults: none
+            ML Settings:
+              default values: SA
+              'smoother: type': ML symmetric Gauss-Seidel
+              'smoother: pre or post': both
+              'coarse: type': Amesos-KLU
+              PDE equations: 2
+  Regression For Response 0:
+    Test Value: 7.26888316626999966e+01
     Relative Tolerance: 1.00000000000000002e-03
 ...

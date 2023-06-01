@@ -59,19 +59,6 @@ LCM:
     Relative Tolerance: 0.00010000
     Absolute Tolerance: 0.00010000
   Piro:
-    Rythmos:
-      Num Time Steps: 100
-      Final Time: 1.00000000
-      Max State Error: 0.00010000
-      Alpha: 0.00000000e+00
-      Rythmos Stepper:
-        VerboseObject:
-          Verbosity Level: low
-      Rythmos Integration Control: { }
-      Rythmos Integrator:
-        VerboseObject:
-          Verbosity Level: none
-      Stratimikos: { }
     LOCA:
       Bifurcation: { }
       Constraints: { }

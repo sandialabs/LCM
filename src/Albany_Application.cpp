@@ -261,34 +261,10 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   }
 
   std::string stepperType;
-  if (solMethod == Transient) {
+  if (solMethod == TransientTempus) {
     // Get Piro PL
     Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(params, "Piro", true);
-    // Check if there is Rythmos Solver sublist, and get the stepper type
-    if (piroParams->isSublist("Rythmos Solver")) {
-      Teuchos::RCP<Teuchos::ParameterList> rythmosSolverParams = Teuchos::sublist(piroParams, "Rythmos Solver", true);
-      if (rythmosSolverParams->isSublist("Rythmos")) {
-        Teuchos::RCP<Teuchos::ParameterList> rythmosParams = Teuchos::sublist(rythmosSolverParams, "Rythmos", true);
-        if (rythmosParams->isSublist("Stepper Settings")) {
-          Teuchos::RCP<Teuchos::ParameterList> stepperSettingsParams =
-              Teuchos::sublist(rythmosParams, "Stepper Settings", true);
-          if (stepperSettingsParams->isSublist("Stepper Selection")) {
-            Teuchos::RCP<Teuchos::ParameterList> stepperSelectionParams =
-                Teuchos::sublist(stepperSettingsParams, "Stepper Selection", true);
-            stepperType = stepperSelectionParams->get("Stepper Type", "Backward Euler");
-          }
-        }
-      }
-    }
-    // Check if there is Rythmos sublist, and get the stepper type
-    else if (piroParams->isSublist("Rythmos")) {
-      Teuchos::RCP<Teuchos::ParameterList> rythmosParams = Teuchos::sublist(piroParams, "Rythmos", true);
-      stepperType                                        = rythmosParams->get("Stepper Type", "Backward Euler");
-    }
-  } else if (solMethod == TransientTempus) {
-    // Get Piro PL
-    Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(params, "Piro", true);
-    // Check if there is Rythmos Solver sublist, and get the stepper type
+    // Check if there is Tempus Solver sublist, and get the stepper type
     if (piroParams->isSublist("Tempus")) {
       Teuchos::RCP<Teuchos::ParameterList> rythmosSolverParams = Teuchos::sublist(piroParams, "Tempus", true);
     }
@@ -1649,7 +1625,11 @@ Application::determinePiroSolver(const Teuchos::RCP<Teuchos::ParameterList>& top
     } else if (solMethod == Continuation) {
       piroSolverToken = "LOCA";
     } else if (solMethod == Transient) {
-      piroSolverToken = (secondOrder == "No") ? "Rythmos" : secondOrder;
+        ALBANY_PANIC(secondOrder == "No", 
+	            "Transient solution method only works for second order in time problem!\n"   
+		     << "For first order in time problems, please use 'Transient Tempus'.\n");
+        if (secondOrder != "No") 
+          piroSolverToken = secondOrder;
     } else if (solMethod == TransientTempus) {
       piroSolverToken = (secondOrder == "No") ? "Tempus" : secondOrder;
     } else {

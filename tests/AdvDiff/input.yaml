@@ -2,7 +2,7 @@ ALBANY:
   Problem: 
     Phalanx Graph Visualization Detail: 1
     Name: AdvDiff 2D
-    Solution Method: Transient
+    Solution Method: Transient Tempus
     Number of PDE Equations: 1
     Dirichlet BCs: { }
     Initial Condition: 
@@ -40,18 +40,72 @@ ALBANY:
     Test Values: [9.99973644855999960e-02, 2.83707252836000012e-01, 2.81800790799999998e-09]
     Relative Tolerance: 1.00000000000000005e-04
   Piro: 
-    Rythmos: 
-      Nonlinear Solver Type: Rythmos
-      Final Time: 5.00000000000000000e-01
-      Rythmos Stepper: 
-        VerboseObject: 
-          Verbosity Level: low
-      Rythmos Integration Control: 
-        Take Variable Steps: false
-        Number of Time Steps: 20
-      Rythmos Integrator: 
-        VerboseObject: 
-          Verbosity Level: none
+    Tempus:
+      Integrator Name: Tempus Integrator
+      Tempus Integrator:
+        Integrator Type: Integrator Basic
+        Screen Output Index List: '1'
+        Screen Output Index Interval: 100
+        Stepper Name: Tempus Stepper
+        Solution History:
+          Storage Type: Unlimited
+          Storage Limit: 20
+        Time Step Control:
+          Initial Time: 0.0
+          Initial Time Index: 0
+          Initial Time Step: 0.025
+          Final Time: 0.5
+          Final Time Index: 10000
+          Maximum Absolute Error: 1.0e-08
+          Maximum Relative Error: 1.0e-08
+          Output Time List: ''
+          Output Index List: ''
+          #Output Time Interval: 1.00000000000000000e+01
+          Output Index Interval: 1000
+          Maximum Number of Stepper Failures: 10
+          Maximum Number of Consecutive Stepper Failures: 5
+      Tempus Stepper:
+        Stepper Type: Backward Euler
+        Solver Name: Demo Solver
+        Demo Solver:
+          NOX:
+            Direction:
+              Method: Newton
+              Newton:
+                Forcing Term Method: Constant
+                Rescue Bad Newton Solve: true
+                Linear Solver:
+                  Tolerance: 1.0e-05
+            Line Search:
+              Full Step:
+                Full Step: 1.0
+              Method: Full Step
+            Nonlinear Solver: Line Search Based
+            Printing:
+              Output Precision: 3
+              Output Processor: 0
+              Output Information:
+                Error: true
+                Warning: true
+                Outer Iteration: false
+                Parameters: true
+                Details: false
+                Linear Solver Details: true
+                Stepper Iteration: true
+                Stepper Details: true
+                Stepper Parameters: true
+            Solver Options:
+              Status Test Check Type: Minimal
+            Status Tests:
+              Test Type: Combo
+              Combo Type: OR
+              Number of Tests: 2
+              Test 0:
+                Test Type: NormF
+                Tolerance: 1.0e-08
+              Test 1:
+                Test Type: MaxIters
+                Maximum Iterations: 10
       Stratimikos: 
         Linear Solver Type: Belos
         Linear Solver Types: 

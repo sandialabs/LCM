@@ -111,7 +111,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(cauchy_str, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
   addStateVariable(Fp_str, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
   addStateVariable(eqps_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
-  addStateVariable(ct_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output cumulative time", false));
+  addStateVariable(ct_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Cumulative Time", false));
   addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   addStateVariable(j2_stress_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output J2 Stress", false));
   addStateVariable(tilt_angle_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
@@ -196,6 +196,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   }
 
   current_time_ = workset.current_time;
+  time_step_    = workset.time_step;
 
   auto const num_cells = workset.numCells;
   for (auto cell = 0; cell < num_cells; ++cell) {
@@ -364,6 +365,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const coords       = this->model_.getCoordVecField();
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
+  auto const time_step    = time_step_;
   auto const sea_level    = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
 
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
@@ -400,16 +402,37 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // Update cumulative time
-  auto const accumulate = ((is_erodible == true) && (height <= sea_level));
-  auto const reset      = ice_saturation > 0.98;
-  if (reset == true) {
-    cumulative_time_(cell, pt) = 0.0;
-  } else if (accumulate == true) {
-    cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + delta_time;
+  // auto const accumulate = ((is_erodible == true) && (height <= sea_level));
+  auto const t          = Sacado::Value<decltype(current_time_)>::eval(current_time_);
+  auto const dt         = Sacado::Value<decltype(delta_time_(0))>::eval(delta_time_(0));
+  auto const ts         = Sacado::Value<decltype(time_step)>::eval(time_step);
+  auto const accumulate = true;
+  auto const good_time_step = ts >= 0.0;
+  auto const exceeds = cumulative_time_(cell, pt) > 4000.0;
+  // ALBANY_ASSERT(dt < 1000.0);
+  if (accumulate == true) {
+    cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + dt;
   } else {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt);
   }
-
+  auto const reset = good_time_step && exceeds;
+  //if (reset == true) {
+  //  cumulative_time_(cell, pt) = 0.0;
+  //  cumulative_time_old_(cell, pt) = 0.0;
+  //}
+  if (cell == 0 && pt == 0) {
+    auto const ct_val     = Sacado::Value<decltype(cumulative_time_(cell, pt))>::eval(cumulative_time_(cell, pt));
+    auto const ct_val_old = Sacado::Value<decltype(cumulative_time_old_(cell, pt))>::eval(cumulative_time_old_(cell, pt));
+    std::cout << "TICK! ";
+    std::cout << "good step : " << good_time_step << ", ";
+    std::cout << "exceeds : " << exceeds << ", ";
+    std::cout << "time : " << t << ", ";
+    std::cout << "dt : " << dt << ", ";
+    std::cout << "ts : " << ts << ", ";
+    std::cout << "ct : " << ct_val << ", ";
+    std::cout << "ct_old : " << ct_val_old << "\n";
+    //ALBANY_ASSERT(ct_val > ct_val_old);
+  }
   auto const grid_Lx         = 0.10;                 // [m]
   auto const damage_exponent = 2.0;                  // [-]
   auto const mobility        = (1.0e-11 / 1.05e-3);  // [m2/Pa*s] (k/visc)
@@ -425,8 +448,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Make the elements exposed to ocean "weaker"
   auto tensile_strength = tensile_strength_;
   if ((is_erodible == true) && (height <= sea_level)) {
-    //std::cout << "cumu_time = " << cumulative_time << ", ";
-    //std::cout << "damage_var = " << damage_var << ". ";
+    // std::cout << "cumu_time = " << cumulative_time << ", ";
+    // std::cout << "damage_var = " << damage_var << ". ";
     Y = Y / (Y_weakening_factor_);
     // E            = E / (E_weakening_factor_);
     E            = E * damage_var;

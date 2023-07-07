@@ -127,8 +127,9 @@ MechanicsProblem::constructEvaluators(
     MeshSpecsStruct const&                      meshSpecs,
     StateManager&                               stateMgr,
     FieldManagerChoice                          fieldManagerChoice,
-    Teuchos::RCP<Teuchos::ParameterList> const& responseList)
+    Teuchos::RCP<Teuchos::ParameterList> const& responseList) 
 {
+  std::cout << "IKT in MechanicsProblem::constructEvaluators\n";
   // IKT: uncomment the following if wish to run stand-alone mechanics problem
   // with ACE_Ice_Saturation field.
   // is_ace_sequential_thermomechanical_ = true;
@@ -678,7 +679,7 @@ MechanicsProblem::constructEvaluators(
   p->set<bool>("Disable Transient", true);
   ev = Teuchos::rcp(new LCM::Time<EvalT, PHAL::AlbanyTraits>(*p));
   fm0.template registerEvaluator<EvalT>(ev);
-  p  = stateMgr.registerStateVariable("Time", dl_->workset_scalar, dl_->dummy, eb_name, "scalar", 0.0, true);
+  p  = stateMgr.registerStateVariable("Time", dl_->workset_scalar, dl_->dummy, eb_name, "scalar", init_time_, true);
   ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
   fm0.template registerEvaluator<EvalT>(ev);
 

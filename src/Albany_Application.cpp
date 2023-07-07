@@ -66,7 +66,8 @@ Application::Application(
     const RCP<Teuchos_Comm const>&     comm_,
     const RCP<Teuchos::ParameterList>& params,
     RCP<Thyra_Vector const> const&     initial_guess,
-    bool const                         schwarz)
+    bool const                         schwarz,
+    double const                       init_time)
     : is_schwarz_{schwarz},
       no_dir_bcs_(false),
       requires_sdbcs_(false),
@@ -79,8 +80,10 @@ Application::Application(
       phxGraphVisDetail(0),
       stateGraphVisDetail(0),
       morphFromInit(true),
-      perturbBetaForDirichlets(0.0)
+      perturbBetaForDirichlets(0.0), 
+      init_time_(init_time)
 {
+  std::cout << "IKT in Albany::Application constructor, init_time = " << init_time << "!\n"; 
   initialSetUp(params);
   createMeshSpecs();
   buildProblem();
@@ -119,7 +122,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   if (Teuchos::nonnull(rc_mgr)) {
     problemFactory.setReferenceConfigurationManager(rc_mgr);
   }
-  problem = problemFactory.create();
+  problem = problemFactory.create(init_time_);
 
   // Validate Problem parameters against list for this specific problem
   problemParams->validateParameters(*(problem->getValidProblemParameters()), 0);

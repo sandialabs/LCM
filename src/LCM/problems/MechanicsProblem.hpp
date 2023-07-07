@@ -38,7 +38,8 @@ class MechanicsProblem : public AbstractProblem
       Teuchos::RCP<ParamLib> const&               param_lib,
       int const                                   num_dims,
       Teuchos::RCP<AAdapt::rc::Manager> const&    rc_mgr,
-      Teuchos::RCP<Teuchos::Comm<int> const>&     commT);
+      Teuchos::RCP<Teuchos::Comm<int> const>&     commT,
+      double const                                init_time = 0.0);
   ///
   /// Destructor
   ///
@@ -311,6 +312,8 @@ class MechanicsProblem : public AbstractProblem
 
   std::vector<std::string> variables_auxiliary_ =
       {"Temperature", "ACE Temperature", "DislocationDensity", "Pore Pressure", "Transport", "HydroStress", "Damage", "Stabilized Pressure"};
+
+  double init_time_; 
 
 };  // class MechanicsProblem
 

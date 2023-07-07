@@ -55,7 +55,8 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       const Teuchos::RCP<Teuchos_Comm const>&     comm,
       const Teuchos::RCP<Teuchos::ParameterList>& params,
       Teuchos::RCP<Thyra_Vector const> const&     initial_guess = Teuchos::null,
-      bool const                                  schwarz       = false);
+      bool const                                  schwarz       = false,
+      double const                                init_time     = 0.0);
 
   Application(const Teuchos::RCP<Teuchos_Comm const>& comm);
 
@@ -669,6 +670,9 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
   // local responses
   Teuchos::Array<unsigned int> relative_responses;
+
+  //initial time
+  double init_time_; 
 };
 
 template <typename EvalT>

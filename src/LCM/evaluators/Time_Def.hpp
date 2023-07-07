@@ -49,8 +49,11 @@ Time<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   time(0) = workset.current_time;
 
+  std::cout << "IKT timeName = " << timeName << "\n"; 
   Albany::MDArray timeOld = (*workset.stateArrayPtr)[timeName];
   deltaTime(0)            = time(0) - timeOld(0);
+  std::cout << "IKT setting Delta Time!  time, timeOld, deltaTime = " << time(0) << ", " << 
+	    timeOld(0) << ", " << deltaTime(0) << "!\n";  
 }
 
 // **********************************************************************

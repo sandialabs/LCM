@@ -135,7 +135,8 @@ SolverFactory::createAndGetAlbanyApp(
     const Teuchos::RCP<Teuchos_Comm const>& appComm,
     const Teuchos::RCP<Teuchos_Comm const>& solverComm,
     Teuchos::RCP<Thyra_Vector const> const& initial_guess,
-    bool                                    createAlbanyApp)
+    bool                                    createAlbanyApp,
+    double const                            init_time)
 {
   const Teuchos::RCP<Teuchos::ParameterList> problemParams  = Teuchos::sublist(appParams, "Problem");
   std::string const                          solutionMethod = problemParams->get("Solution Method", "Steady");
@@ -184,7 +185,7 @@ SolverFactory::createAndGetAlbanyApp(
     return Teuchos::rcp(new LCM::ACEThermoMechanical(appParams, solverComm));
   }
 
-  model_ = createAlbanyAppAndModel(albanyApp, appComm, initial_guess, createAlbanyApp);
+  model_ = createAlbanyAppAndModel(albanyApp, appComm, initial_guess, createAlbanyApp, init_time);
 
   const Teuchos::RCP<Teuchos::ParameterList> piroParams = Teuchos::sublist(appParams, "Piro");
   const Teuchos::RCP<Teuchos::ParameterList> stratList  = Piro::extractStratimikosParams(piroParams);
@@ -241,11 +242,13 @@ SolverFactory::createAlbanyAppAndModel(
     Teuchos::RCP<Application>&              albanyApp,
     const Teuchos::RCP<Teuchos_Comm const>& appComm,
     Teuchos::RCP<Thyra_Vector const> const& initial_guess,
-    bool const                              createAlbanyApp)
+    bool const                              createAlbanyApp, 
+    const double                            init_time)
 {
   if (createAlbanyApp) {
+    std::cout << "IKT creating AlbanyApp\n"; 
     // Create application
-    albanyApp = Teuchos::rcp(new Application(appComm, appParams, initial_guess, is_schwarz_));
+    albanyApp = Teuchos::rcp(new Application(appComm, appParams, initial_guess, is_schwarz_, init_time));
     //  albanyApp = rcp(new ApplicationT(appComm, appParams,
     //  initial_guess));
   }

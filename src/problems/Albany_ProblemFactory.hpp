@@ -34,7 +34,7 @@ class ProblemFactory
   virtual ~ProblemFactory() {}
 
   virtual Teuchos::RCP<Albany::AbstractProblem>
-  create();
+  create(const double init_time = 0.0);
 
   //! Set the ref config manager for use in certain problems.
   void

@@ -598,8 +598,12 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   }
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
-  Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
-
+  std::cout << "IKT ACE mechanical problem before createAndGetAlbanyApp!\n";
+  std::cout << "IKT previous_time, current_time, next_time = " << previous_time_ << ", " << 
+	  current_time << ", " << next_time << "\n";  
+  Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_, Teuchos::null, true, previous_time_);
+  std::cout << "IKT ACE mechanical problem after createAndGetAlbanyApp!\n"; 
+  
   solvers_[subdomain] = solver;
   apps_[subdomain]    = app;
   auto num_dims       = app->getSpatialDimension();
@@ -701,6 +705,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           if (failed_ == false) {
             doDynamicInitialOutput(next_time, subdomain);
             renamePrevWrittenExoFiles(subdomain, stop);
+	    previous_time_ = current_time; 
           }
         }
         if (prob_type == THERMAL) {

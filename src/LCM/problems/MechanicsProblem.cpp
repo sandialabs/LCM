@@ -15,7 +15,8 @@ MechanicsProblem::MechanicsProblem(
     Teuchos::RCP<ParamLib> const&               param_lib,
     int const                                   num_dims,
     Teuchos::RCP<AAdapt::rc::Manager> const&    rc_mgr,
-    Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
+    Teuchos::RCP<Teuchos::Comm<int> const>&     commT,
+    double const                                init_time)
     : AbstractProblem(params, param_lib),
       params_(params),
       have_source_(false),
@@ -38,8 +39,10 @@ MechanicsProblem::MechanicsProblem(
       have_topmod_adaptation_(false),
       have_sizefield_adaptation_(false),
       use_sdbcs_(false),
-      rc_mgr_(rc_mgr)
+      rc_mgr_(rc_mgr), 
+      init_time_(init_time)
 {
+  std::cout << "IKT Mechanics Problem constructor, init_time = " << init_time << "\n"; 
   std::string& method = params->get("Name", "Mechanics ");
   *out << "Problem Name = " << method << '\n';
   std::string& sol_method = params->get("Solution Method", "Steady");

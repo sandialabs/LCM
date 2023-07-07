@@ -212,6 +212,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   ST           initial_time_{0.0};
   ST           final_time_{0.0};
   ST           initial_time_step_{0.0};
+  mutable ST   previous_time_{0.0}; 
   ST           min_time_step_{0.0};
   ST           max_time_step_{0.0};
   ST           reduction_factor_{0.0};

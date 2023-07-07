@@ -62,7 +62,7 @@ getNumDim(std::string const& method)
 }  // namespace
 
 Teuchos::RCP<Albany::AbstractProblem>
-Albany::ProblemFactory::create()
+Albany::ProblemFactory::create(const double init_time)
 {
   Teuchos::RCP<Albany::AbstractProblem> strategy;
   using Teuchos::rcp;
@@ -130,7 +130,9 @@ Albany::ProblemFactory::create()
   }
 #endif
   else if (getName(method) == "Mechanics") {
-    strategy = rcp(new Albany::MechanicsProblem(problemParams, paramLib, getNumDim(method), rc_mgr, commT));
+    std::cout << "IKT before mechanics problem construction!\n"; 
+    strategy = rcp(new Albany::MechanicsProblem(problemParams, paramLib, getNumDim(method), rc_mgr, commT, init_time));
+    std::cout << "IKT after mechanics problem construction!\n"; 
   } else if (getName(method) == "ACE Thermal") {
     strategy = rcp(new ACEThermalProblem(problemParams, paramLib, getNumDim(method), commT));
   } else if (getName(method) == "Elasticity") {

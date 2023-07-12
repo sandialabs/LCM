@@ -774,6 +774,21 @@ MechanicsProblem::constructEvaluators(
     ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
+  
+  // Register Cumultive_Time_old
+  if (is_ace_sequential_thermomechanical_ == true) {
+    std::string                          stateName = "Cumulative_Time_old";
+    Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
+    p                                              = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
+    // Load parameter using its field name
+    std::string fieldName = "Cumulative_Time_old";
+    p->set<std::string>("Field Name", fieldName);
+    p->set<std::string>("State Name", stateName);
+    p->set<Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl_->qp_scalar);
+    using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT, PHAL::AlbanyTraits, typename EvalT::ScalarT>;
+    ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+  }
 
   if ((have_pore_pressure_eq_ == true) || (have_pore_pressure_ == true)) {
     Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save Pore Pressure"));
@@ -804,6 +819,23 @@ MechanicsProblem::constructEvaluators(
     ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
+
+  // Save Cumulative_Time_old to the output Exodus file
+  // IKT 7/11: may need reworking
+  {
+    std::string stateName = "Cumulative_Time_old";
+    auto entity           = Albany::StateStruct::QuadPoint;
+    p                     = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, meshSpecs.ebName, true, &entity, "");
+    p->set<std::string>("Field Name", "Cumulative_Time_old");
+    p->set("Field Layout", dl_->qp_scalar);
+    p->set<bool>("Nodal State", false);
+
+    ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+
+    if ((fieldManagerChoice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0)) fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+  }
+
 
   // Source list exists and the mechanical source params are defined
   if ((have_source_ == true) && params->sublist("Source Functions").isSublist("Mechanical Source")) {

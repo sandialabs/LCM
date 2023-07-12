@@ -10,6 +10,7 @@ template <typename EvalT, typename Traits>
 J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl)
     : BaseKernel(model)
 {
+
   this->setIntegrationPointLocationFlag(true);
 
   // Baseline constants
@@ -86,6 +87,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
   setDependentField("Delta Time", dl->workset_scalar);
   setDependentField("Displacement", dl->qp_vector);
+  setDependentField("Cumulative_Time_old", dl->qp_scalar);
 
   // define the evaluated fields
   setEvaluatedField("failure_state", dl->cell_scalar2);
@@ -111,7 +113,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(cauchy_str, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
   addStateVariable(Fp_str, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
   addStateVariable(eqps_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
-  addStateVariable(ct_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Cumulative Time", false));
+  addStateVariable(ct_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Cumulative Time", false));
   addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   addStateVariable(j2_stress_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output J2 Stress", false));
   addStateVariable(tilt_angle_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
@@ -158,6 +160,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   delta_time_        = *dep_fields["Delta Time"];
   ice_saturation_    = *dep_fields["ACE_Ice_Saturation"];
   displacement_      = *dep_fields["Displacement"];
+  cumulative_time_old_ = *dep_fields["Cumulative_Time_old"];
 
   // extract evaluated MDFields
   stress_                 = *eval_fields[cauchy_str];
@@ -182,7 +185,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // get State Variables
   Fp_old_              = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_            = (*workset.stateArrayPtr)[eqps_str + "_old"];
-  cumulative_time_old_ = (*workset.stateArrayPtr)[ct_str + "_old"];
+  //cumulative_time_old_ = (*workset.stateArrayPtr)[ct_str + "_old"];
 
   auto& disc                    = *workset.disc;
   auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
@@ -433,6 +436,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     std::cout << "ct_old : " << ct_val_old << "\n";
     //ALBANY_ASSERT(ct_val > ct_val_old);
   }
+
+
   auto const grid_Lx         = 0.10;                 // [m]
   auto const damage_exponent = 2.0;                  // [-]
   auto const mobility        = (1.0e-11 / 1.05e-3);  // [m2/Pa*s] (k/visc)

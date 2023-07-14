@@ -775,10 +775,9 @@ MechanicsProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
   
-  // Read in Cumultive_Time field in Exodus file into state known 
-  // as Cumulative_Time_old within the code
+  // Register Cumultive_Time_old
   if (is_ace_sequential_thermomechanical_ == true) {
-    std::string                          stateName = "Cumulative_Time";
+    std::string                          stateName = "Cumulative_Time_old";
     Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
     p                                              = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
     // Load parameter using its field name
@@ -821,13 +820,13 @@ MechanicsProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
-  // Save new cumulative time, called Cumulative_Time, to the output Exodus file
+  // Save Cumulative_Time_old to the output Exodus file
   // IKT 7/11: may need reworking
   {
-    std::string stateName = "Cumulative_Time";
+    std::string stateName = "Cumulative_Time_old";
     auto entity           = Albany::StateStruct::QuadPoint;
     p                     = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, meshSpecs.ebName, true, &entity, "");
-    p->set<std::string>("Field Name", "Cumulative_Time");
+    p->set<std::string>("Field Name", "Cumulative_Time_old");
     p->set("Field Layout", dl_->qp_scalar);
     p->set<bool>("Nodal State", false);
 

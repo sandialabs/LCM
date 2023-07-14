@@ -64,7 +64,6 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ConstScalarField temperature_;
   ConstScalarField ice_saturation_;
   ConstScalarField displacement_;
-  ConstScalarField cumulative_time_old_;
 
   // Output MDFields
   ScalarField Fp_;
@@ -87,7 +86,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   // Workspace arrays
   Albany::MDArray Fp_old_;
   Albany::MDArray eqps_old_;
-  //Albany::MDArray cumulative_time_old_;
+  Albany::MDArray cumulative_time_old_;
 
   bool                       have_cell_boundary_indicator_{false};
   Teuchos::ArrayRCP<double*> cell_boundary_indicator_;

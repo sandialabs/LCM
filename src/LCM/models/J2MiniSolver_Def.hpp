@@ -296,6 +296,17 @@ J2MiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
       }
     }
   }
+  
+  //if (cell == 0 && pt == 0) {
+    auto const eqps_val     = Sacado::Value<decltype(eqps_(cell, pt))>::eval(eqps_(cell, pt));
+    auto const eqps_val_old = Sacado::Value<decltype(eqps_old_(cell, pt))>::eval(eqps_old_(cell, pt));
+    //std::cout << "TICK! ";
+    //std::cout << "eqps : " << eqps_val << "\n";
+    if (eqps_val_old != 0.0) 
+      std::cout << "IKT cell, pt, eqps_old = " << cell << ", " << pt << ", " << eqps_val_old << "\n"; 
+    //std::cout << "eqps_old : " << eqps_val_old << "\n";
+    //ALBANY_ASSERT(ct_val > ct_val_old);
+  //}
 
   // update yield surface
   yield_surf_(cell, pt) = Y + K * eqps_(cell, pt) + sat_mod_ * (1. - std::exp(-sat_exp_ * eqps_(cell, pt)));

@@ -78,7 +78,6 @@
 #include "PHAL_MortarContactResidual.hpp"
 #endif
 
-
 namespace Albany {
 
 ///
@@ -824,7 +823,7 @@ MechanicsProblem::constructEvaluators(
 
   // Save new cumulative time, called Cumulative_Time, to the output Exodus file
   // IKT 7/11: may need reworking
-  if (is_ace_sequential_thermomechanical_ == true) {
+  {
     std::string stateName = "Cumulative_Time";
     auto entity           = Albany::StateStruct::QuadPoint;
     p                     = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, meshSpecs.ebName, true, &entity, "");
@@ -835,10 +834,9 @@ MechanicsProblem::constructEvaluators(
     ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
 
-    if (fieldManagerChoice == Albany::BUILD_RESID_FM) 
-      if (ev->evaluatedFields().size() > 0) 
-	fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    if ((fieldManagerChoice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0)) fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
   }
+
 
   // Source list exists and the mechanical source params are defined
   if ((have_source_ == true) && params->sublist("Source Functions").isSublist("Mechanical Source")) {

@@ -7,6 +7,8 @@
 #include "Albany_Utils.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
+#define VERBOSE_OUTPUT
+
 Albany::StateManager::StateManager() : stateVarsAreAllocated(false), stateInfo(Teuchos::rcp(new StateInfoStruct))
 {
   // Nothing to be done here
@@ -787,6 +789,7 @@ Albany::StateManager::printStates(std::string const& where) const
 void
 Albany::StateManager::doSetStateArrays(const Teuchos::RCP<Albany::AbstractDiscretization>& disc, const Teuchos::RCP<StateInfoStruct>& stateInfoPtr)
 {
+  std::cout << "IKT doSetStateArrays!\n"; 
 #if defined(VERBOSE_OUTPUT)
   auto& fos = *Teuchos::VerboseObjectBase::getDefaultOStream();
 #else
@@ -810,6 +813,10 @@ Albany::StateManager::doSetStateArrays(const Teuchos::RCP<Albany::AbstractDiscre
     double const         init_val      = (*stateInfoPtr)[i]->initValue;
     bool                 have_restart  = (*stateInfoPtr)[i]->restartDataAvailable;
     Albany::StateStruct* pParentStruct = (*stateInfoPtr)[i]->pParentStateStruct;
+
+    std::cout << "IKT stateName = " << stateName << ", initType = " << init_type
+	      << ", ebName = " << ebName << ", initValue = " << init_val
+	      << ", restartDataAvailable = " << have_restart << "\n"; 
 
     // JTO: specifying zero recovers previous behavior
     // if (stateName == "zero")

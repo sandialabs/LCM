@@ -129,9 +129,8 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
   Teuchos::RCP<stk::mesh::BulkData> src_bulk_data = Teuchos::rcpFromRef(src_broker.bulk_data());
 
-  Teuchos::RCP<Ioss::Region> src_io_region = src_broker.get_input_io_region();
-
-  STKIORequire(!Teuchos::is_null(src_io_region));
+  auto src_io_region = src_broker.get_input_ioss_region();
+  STKIORequire(!(src_io_region == nullptr));
 
   // Get number of time steps in source mesh
   int src_timestep_count = src_io_region->get_property("state_count").get_int();
@@ -147,7 +146,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
         << "   Field with name " << source_field_name << " NOT found in source mesh file!" << std::endl);
   }
 
-  int neq = source_field->max_size(stk::topology::NODE_RANK);
+  auto neq = source_field->max_size();
 
   // TARGET MESH READ
   // ----------------
@@ -196,8 +195,8 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
         << "   Field with name " << target_field_name << " NOT found in target mesh file!" << std::endl);
   }
 
-  Teuchos::RCP<Ioss::Region> tgt_io_region = tgt_broker.get_input_io_region();
-  STKIORequire(!Teuchos::is_null(tgt_io_region));
+  auto tgt_io_region = tgt_broker.get_input_ioss_region();
+  STKIORequire(!(tgt_io_region == nullptr));
 
   // Get number of time steps in source mesh
   int tgt_timestep_count = tgt_io_region->get_property("state_count").get_int();

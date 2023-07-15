@@ -115,8 +115,9 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
         qptensor_states.push_back(&metaData->declare_field<QPTFT>(stk::topology::ELEMENT_RANK, st.name));
         // Multi-dim order is Fortran Ordering, so reversed here
         if (dim[1] == 4) {
-          stk::mesh::put_field_on_mesh(
-              *qptensor_states.back(), metaData->universal_part(), dim[3], dim[2], dim[1], nullptr);
+          //stk::mesh::put_field_on_mesh(
+          //    *qptensor_states.back(), metaData->universal_part(), dim[3], dim[2], dim[1], nullptr);
+          ALBANY_ABORT("Error: GenericSTKFieldContainer - dim[1] == 4 put_field_on_mesh case not imp'd.");
         } else {
           // IKT, 12/20/18: this changes the way the qp_tensor field
           // for 1D and 3D problems appears in the output exodus field.
@@ -125,8 +126,11 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
           // more clear which entry corresponds to which component/quad point.
           // I believe for 2D problems the original layout is correct, hence
           // the if statement above here.
-          stk::mesh::put_field_on_mesh(
-              *qptensor_states.back(), metaData->universal_part(), dim[2] * dim[3], dim[1], nullptr);
+          //stk::mesh::put_field_on_mesh(
+          //    *qptensor_states.back(), metaData->universal_part(), dim[2] * dim[3], dim[1], nullptr);
+	  auto num_tens_entries = dim[3]*dim[2];
+          stk::mesh::put_field_on_mesh(*qptensor_states.back() ,
+                         metaData->universal_part(), num_tens_entries, dim[1], nullptr);
         }
         stk::io::set_field_role(*qptensor_states.back(), role_type(st.output));
       }

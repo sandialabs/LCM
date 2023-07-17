@@ -114,11 +114,11 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
       } else if (dim.size() == 4) {  // Tensor at QPs
         qptensor_states.push_back(&metaData->declare_field<QPTFT>(stk::topology::ELEMENT_RANK, st.name));
         // Multi-dim order is Fortran Ordering, so reversed here
-        if (dim[1] == 4) {
+        /*if (dim[1] == 4) {
           //stk::mesh::put_field_on_mesh(
           //    *qptensor_states.back(), metaData->universal_part(), dim[3], dim[2], dim[1], nullptr);
           ALBANY_ABORT("Error: GenericSTKFieldContainer - dim[1] == 4 put_field_on_mesh case not imp'd.");
-        } else {
+        } else {*/
           // IKT, 12/20/18: this changes the way the qp_tensor field
           // for 1D and 3D problems appears in the output exodus field.
           // Fields appear like: Cauchy_Stress_1_1, ...  Cauchy_Stress_8_9,
@@ -131,7 +131,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
 	  auto num_tens_entries = dim[3]*dim[2];
           stk::mesh::put_field_on_mesh(*qptensor_states.back() ,
                          metaData->universal_part(), num_tens_entries, dim[1], nullptr);
-        }
+        //}
         stk::io::set_field_role(*qptensor_states.back(), role_type(st.output));
       }
       // Something other than a scalar, vector, or tensor

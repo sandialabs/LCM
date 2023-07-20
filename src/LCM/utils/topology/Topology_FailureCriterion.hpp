@@ -244,6 +244,14 @@ class BulkFailureCriterion : public AbstractFailureCriterion
   BulkFailureCriterion&
   operator=(BulkFailureCriterion const&) = delete;
 
+  bool      accumulate{false};
+  int const failed_threshold{8};
+  int       count_displacement{0};
+  int       count_angle{0};
+  int       count_yield{0};
+  int       count_strain{0};
+  int       count_tension{0};
+
  private:
   ScalarFieldType const* failure_state_{nullptr};
   std::string            failure_state_name_{""};

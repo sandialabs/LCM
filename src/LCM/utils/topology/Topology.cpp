@@ -1211,6 +1211,8 @@ Topology::erodeFailedElements()
   auto const&             cell_buckets = bulk_data.buckets(cell_rank);
   stk::mesh::EntityVector cells;
   stk::mesh::get_selected_entities(locally_owned, cell_buckets, cells);
+  auto& bulk_failure_criterion      = static_cast<BulkFailureCriterion&>(*failure_criterion_);
+  bulk_failure_criterion.accumulate = true;
   for (auto cell : cells) {
     if (failure_criterion_->check(bulk_data, cell) == true) {
       auto cell_volume = getCellVolume(cell);
@@ -1219,6 +1221,8 @@ Topology::erodeFailedElements()
       remove_entity_and_up_relations(cell);
     }
   }
+  bulk_failure_criterion.accumulate = false;
+
   auto const&             face_buckets = bulk_data.buckets(face_rank);
   stk::mesh::EntityVector faces;
   stk::mesh::get_selected_entities(locally_owned, face_buckets, faces);

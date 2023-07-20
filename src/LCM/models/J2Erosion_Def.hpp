@@ -406,37 +406,18 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Update cumulative time
   // auto const accumulate = ((is_erodible == true) && (height <= sea_level));
-  auto const t          = Sacado::Value<decltype(current_time_)>::eval(current_time_);
-  auto const dt         = Sacado::Value<decltype(delta_time_(0))>::eval(delta_time_(0));
-  auto const ts         = Sacado::Value<decltype(time_step)>::eval(time_step);
-  auto const accumulate = true;
+  auto const t              = Sacado::Value<decltype(current_time_)>::eval(current_time_);
+  auto const dt             = Sacado::Value<decltype(delta_time_(0))>::eval(delta_time_(0));
+  auto const ts             = Sacado::Value<decltype(time_step)>::eval(time_step);
+  auto const accumulate     = true;
   auto const good_time_step = ts >= 0.0;
-  auto const exceeds = cumulative_time_(cell, pt) > 4000.0;
+  auto const exceeds        = cumulative_time_(cell, pt) > 4000.0;
   // ALBANY_ASSERT(dt < 1000.0);
   if (accumulate == true) {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + dt;
   } else {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt);
   }
-  auto const reset = good_time_step && exceeds;
-  //if (reset == true) {
-  //  cumulative_time_(cell, pt) = 0.0;
-  //  cumulative_time_old_(cell, pt) = 0.0;
-  //}
-  if (cell == 0 && pt == 0) {
-    auto const ct_val     = Sacado::Value<decltype(cumulative_time_(cell, pt))>::eval(cumulative_time_(cell, pt));
-    auto const ct_val_old = Sacado::Value<decltype(cumulative_time_old_(cell, pt))>::eval(cumulative_time_old_(cell, pt));
-    std::cout << "TICK! ";
-    std::cout << "good step : " << good_time_step << ", ";
-    std::cout << "exceeds : " << exceeds << ", ";
-    std::cout << "time : " << t << ", ";
-    std::cout << "dt : " << dt << ", ";
-    std::cout << "ts : " << ts << ", ";
-    std::cout << "ct : " << ct_val << ", ";
-    std::cout << "ct_old : " << ct_val_old << "\n";
-    //ALBANY_ASSERT(ct_val > ct_val_old);
-  }
-
 
   auto const grid_Lx         = 0.10;                 // [m]
   auto const damage_exponent = 2.0;                  // [-]
@@ -610,13 +591,13 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const     strain_failure = distortion >= strain_limit;
     strain_indicator_(cell, pt)   = safe_quotient(distortion, strain_limit);
     if (strain_failure == true) {
-      failed += 1.0;
+      failed += 10.0;
     }
   }
 
   // Determine if critical stress is exceeded
   if (yielded == true) {
-    failed += 1.0;
+    failed += 100.0;
   }
 
   // Determine if kinematic failure occurred
@@ -627,7 +608,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (critical_angle > 0.0) {
     auto const theta_abs = std::abs(theta);
     if (theta_abs >= critical_angle) {
-      failed += 1.0;
+      failed += 1000.0;
     }
     angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
   }
@@ -636,7 +617,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const displacement_norm      = minitensor::norm(disp_val);
   displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement);
   if (displacement_norm > maximum_displacement) {
-    failed += 1.0;
+    failed += 10000.0;
   }
 }
 }  // namespace LCM

@@ -365,6 +365,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
   auto const sea_level    = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
+  //auto const sea_level    = sea_level_.size() > 0 ? (interpolateVectors(time_, sea_level_, current_time) * 2.0) : -999.0;
 
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
 
@@ -401,11 +402,16 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Update cumulative time
   auto const accumulate = ((is_erodible == true) && (height <= sea_level));
-  auto const reset      = ice_saturation > 0.98;
+  auto const reset      = false; //ice_saturation > 1.00;
   if (reset == true) {
     cumulative_time_(cell, pt) = 0.0;
+    //std::cout << "reset! ";
   } else if (accumulate == true) {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + delta_time;
+    //std::cout << "tick! ";
+    //std::cout << "cumu_time_OLD = " << cumulative_time_old_(cell, pt) << ", ";
+    //std::cout << "delta_time = " << delta_time << ", ";
+    //std::cout << "cumu_time = " << cumulative_time_(cell, pt) << "\n ";
   } else {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt);
   }
@@ -425,11 +431,12 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Make the elements exposed to ocean "weaker"
   auto tensile_strength = tensile_strength_;
   if ((is_erodible == true) && (height <= sea_level)) {
+    //std::cout << "delta_time = " << delta_time << ", ";
     //std::cout << "cumu_time = " << cumulative_time << ", ";
     //std::cout << "damage_var = " << damage_var << ". ";
     Y = Y / (Y_weakening_factor_);
-    // E            = E / (E_weakening_factor_);
-    E            = E * damage_var;
+    E            = E / (E_weakening_factor_);
+    //E            = E * damage_var;
     strain_limit = 1.0 + ((strain_limit - 1.0) / SL_weakening_factor_);
   }
 

@@ -211,6 +211,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         bluff_salinity_(cell, qp) = bluff_salinity_read_(cell, qp);
       }
       const ScalarT sea_level = sea_level_eb.size() > 0 ? interpolateVectors(time_eb, sea_level_eb, current_time) : -999.0;
+      //const ScalarT sea_level = sea_level_eb.size() > 0 ? (interpolateVectors(time_eb, sea_level_eb, current_time) * 2.0) : -999.0;
 
       // Thermal calculation
       // Calculate the depth-dependent porosity
@@ -340,6 +341,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac) + (1.93e3 * peat_frac);
         // K values in [W/K/m]
         calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.08 * peat_frac);
+        //calc_soil_thermal_cond = (16.0 * sand_frac) + (0.8 * clay_frac) + (9.8 * silt_frac) + (0.16 * peat_frac);
         // Rho values in [kg/m3]
         // Peat density from Emily Bristol
         calc_soil_density = (2600.0 * sand_frac) + (2350.0 * clay_frac) + (2500.0 * silt_frac) + (250.0 * peat_frac);

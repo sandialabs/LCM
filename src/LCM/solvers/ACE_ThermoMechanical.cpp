@@ -17,6 +17,8 @@
 #include "Piro_ObserverToLOCASaveDataStrategyAdapter.hpp"
 #include "Piro_TempusSolver.hpp"
 #include "Piro_TrapezoidRuleSolver.hpp"
+#include "Topology.hpp"
+#include "Topology_FailureCriterion.hpp"
 
 namespace {
 
@@ -598,8 +600,12 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, doubl
   }
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
-  Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
-
+  std::cout << "IKT ACE mechanical problem before createAndGetAlbanyApp!\n";
+  std::cout << "IKT previous_time, current_time, next_time = " << previous_time_ << ", " << 
+	  current_time << ", " << next_time << "\n";  
+  Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_, Teuchos::null, true, previous_time_);
+  std::cout << "IKT ACE mechanical problem after createAndGetAlbanyApp!\n"; 
+  
   solvers_[subdomain] = solver;
   apps_[subdomain]    = app;
   auto num_dims       = app->getSpatialDimension();
@@ -686,7 +692,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         if (num_iter_ == 0) {
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
-          fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+          // fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
           do_outputs_[subdomain] = true;  // We always want output in the initial step
         } else {
           if (do_outputs_init_[subdomain] == true) {
@@ -701,6 +707,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           if (failed_ == false) {
             doDynamicInitialOutput(next_time, subdomain);
             renamePrevWrittenExoFiles(subdomain, stop);
+	    previous_time_ = current_time; 
           }
         }
         if (prob_type == THERMAL) {
@@ -808,9 +815,9 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   // IKT FIXME 6/5/2020: need to check if this does the right thing for thermal problem
   // The only relevant internal state here would be the ice saturation
   // Restore internal states
-  auto& app       = *apps_[subdomain];
-  auto& state_mgr = app.getStateMgr();
-  fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+  // auto& app       = *apps_[subdomain];
+  // auto& state_mgr = app.getStateMgr();
+  // fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
@@ -870,10 +877,9 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
     // Restore internal states
-    auto& app       = *apps_[subdomain];
-    auto& state_mgr = app.getStateMgr();
-
-    fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+    // auto& app       = *apps_[subdomain];
+    // auto& state_mgr = app.getStateMgr();
+    // fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
     Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
     Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
@@ -909,27 +915,26 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     *fos_ << "Final time         :" << next_time << '\n';
     *fos_ << "Time step          :" << time_step << '\n';
     *fos_ << delim << std::endl;
-    // Disable initial acceleration solve unless in initial time-step.
-    // This should speed up code by ~2x.
-    if (current_time != initial_time_) {
-      piro_tr_solver.disableCalcInitAccel();
-    }
+    // Disable initial acceleration solve
+    piro_tr_solver.disableCalcInitAccel();
 
     Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
     Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
 
-    auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+    auto& me         = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+    auto  me_in_args = me.getNominalValues();
+    me_in_args.set_step_size(time_step);
+    me.setNominalValues(me_in_args);
 
-    auto x_init = me.getNominalValues().get_x();
-    auto v_init = me.getNominalValues().get_x_dot();
-    auto a_init = me.get_x_dotdot();
-    auto nrm    = norm_2(*a_init);
+    auto const& nv     = me.getNominalValues();
+    auto        x_init = nv.get_x();
+    auto        v_init = nv.get_x_dot();
+    auto        a_init = me.get_x_dotdot();
 
     // Restore internal states
-    auto& app       = *apps_[subdomain];
-    auto& state_mgr = app.getStateMgr();
-
-    fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+    auto& app = *apps_[subdomain];
+    // auto& state_mgr = app.getStateMgr();
+    // fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
     // Make sure there is no leftover adapted mesh from before.
     std::string const tmp_adapt_filename{"ace_adapt_temporary.e"};
@@ -984,6 +989,35 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     this_x_[subdomain]       = x_rcp;
     this_xdot_[subdomain]    = xdot_rcp;
     this_xdotdot_[subdomain] = xdotdot_rcp;
+
+    // Acummulate values of failed cells and report.
+    auto& thyra_solution_manager    = *(piro_tr_solver.getSolutionManager());
+    auto& adaptive_solution_manager = static_cast<AAdapt::AdaptiveSolutionManager&>(thyra_solution_manager);
+    auto& adapter                   = *(adaptive_solution_manager.getAdapter());
+    auto& erosion_adapter           = static_cast<AAdapt::Erosion&>(adapter);
+    auto& topology                  = *(erosion_adapter.getTopology());
+    auto& failure_criterion         = *(topology.get_failure_criterion());
+    auto& bulk_failure_criterion    = static_cast<BulkFailureCriterion&>(failure_criterion);
+
+    count_displacement += bulk_failure_criterion.count_displacement;
+    count_angle += bulk_failure_criterion.count_angle;
+    count_yield += bulk_failure_criterion.count_yield;
+    count_strain += bulk_failure_criterion.count_strain;
+    count_tension += bulk_failure_criterion.count_tension;
+
+    auto&      fos                 = *Teuchos::VerboseObjectBase::getDefaultOStream();
+    auto const failed_displacement = count_displacement / bulk_failure_criterion.failed_threshold;
+    auto const failed_angle        = count_angle / bulk_failure_criterion.failed_threshold;
+    auto const failed_yield        = count_yield / bulk_failure_criterion.failed_threshold;
+    auto const failed_strain       = count_strain / bulk_failure_criterion.failed_threshold;
+    auto const failed_tension      = count_tension / bulk_failure_criterion.failed_threshold;
+    fos << "INFO: Failed element count";
+    fos << ": displacement:" << failed_displacement;
+    fos << ", angle:" << failed_angle;
+    fos << ", yield:" << failed_yield;
+    fos << ", strain:" << failed_strain;
+    fos << ", tension:" << failed_tension;
+    fos << '\n';
 
   } else {
     ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");

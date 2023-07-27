@@ -45,7 +45,8 @@ class SolverFactory
       const Teuchos::RCP<Teuchos_Comm const>& appComm,
       const Teuchos::RCP<Teuchos_Comm const>& solverComm,
       Teuchos::RCP<Thyra_Vector const> const& initial_guess   = Teuchos::null,
-      bool                                    createAlbanyApp = true);
+      bool                                    createAlbanyApp = true,
+      const double                            init_time = 0.0);
 
   // Thyra version of above
   Teuchos::RCP<Thyra::ModelEvaluator<ST>>
@@ -53,7 +54,8 @@ class SolverFactory
       Teuchos::RCP<Application>&              albanyApp,
       const Teuchos::RCP<Teuchos_Comm const>& appComm,
       Teuchos::RCP<Thyra_Vector const> const& initial_guess   = Teuchos::null,
-      bool const                              createAlbanyApp = true);
+      bool const                              createAlbanyApp = true,
+      const double                            init_time = 0.0);
 
   Teuchos::ParameterList&
   getAnalysisParameters() const

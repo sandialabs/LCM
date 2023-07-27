@@ -78,6 +78,7 @@
 #include "PHAL_MortarContactResidual.hpp"
 #endif
 
+
 namespace Albany {
 
 ///
@@ -127,8 +128,9 @@ MechanicsProblem::constructEvaluators(
     MeshSpecsStruct const&                      meshSpecs,
     StateManager&                               stateMgr,
     FieldManagerChoice                          fieldManagerChoice,
-    Teuchos::RCP<Teuchos::ParameterList> const& responseList)
+    Teuchos::RCP<Teuchos::ParameterList> const& responseList) 
 {
+  std::cout << "IKT in MechanicsProblem::constructEvaluators\n";
   // IKT: uncomment the following if wish to run stand-alone mechanics problem
   // with ACE_Ice_Saturation field.
   // is_ace_sequential_thermomechanical_ = true;
@@ -678,7 +680,7 @@ MechanicsProblem::constructEvaluators(
   p->set<bool>("Disable Transient", true);
   ev = Teuchos::rcp(new LCM::Time<EvalT, PHAL::AlbanyTraits>(*p));
   fm0.template registerEvaluator<EvalT>(ev);
-  p  = stateMgr.registerStateVariable("Time", dl_->workset_scalar, dl_->dummy, eb_name, "scalar", 0.0, true);
+  p  = stateMgr.registerStateVariable("Time", dl_->workset_scalar, dl_->dummy, eb_name, "scalar", init_time_, true);
   ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
   fm0.template registerEvaluator<EvalT>(ev);
 
@@ -773,6 +775,22 @@ MechanicsProblem::constructEvaluators(
     ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
+  
+  // Read in Cumultive_Time field in Exodus file into state known 
+  // as Cumulative_Time_old within the code
+  if (is_ace_sequential_thermomechanical_ == true) {
+    std::string                          stateName = "Cumulative_Time";
+    Albany::StateStruct::MeshFieldEntity entity    = Albany::StateStruct::QuadPoint;
+    p                                              = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, eb_name, true, &entity, "");
+    // Load parameter using its field name
+    std::string fieldName = "Cumulative_Time_old";
+    p->set<std::string>("Field Name", fieldName);
+    p->set<std::string>("State Name", stateName);
+    p->set<Teuchos::RCP<PHX::DataLayout>>("State Field Layout", dl_->qp_scalar);
+    using LoadStateFieldST = PHAL::LoadStateFieldBase<EvalT, PHAL::AlbanyTraits, typename EvalT::ScalarT>;
+    ev                     = Teuchos::rcp(new LoadStateFieldST(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+  }
 
   if ((have_pore_pressure_eq_ == true) || (have_pore_pressure_ == true)) {
     Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save Pore Pressure"));
@@ -802,6 +820,24 @@ MechanicsProblem::constructEvaluators(
 
     ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
+  }
+
+  // Save new cumulative time, called Cumulative_Time, to the output Exodus file
+  // IKT 7/11: may need reworking
+  if (is_ace_sequential_thermomechanical_ == true) {
+    std::string stateName = "Cumulative_Time";
+    auto entity           = Albany::StateStruct::QuadPoint;
+    p                     = stateMgr.registerStateVariable(stateName, dl_->qp_scalar, meshSpecs.ebName, true, &entity, "");
+    p->set<std::string>("Field Name", "Cumulative_Time");
+    p->set("Field Layout", dl_->qp_scalar);
+    p->set<bool>("Nodal State", false);
+
+    ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+    fm0.template registerEvaluator<EvalT>(ev);
+
+    if (fieldManagerChoice == Albany::BUILD_RESID_FM) 
+      if (ev->evaluatedFields().size() > 0) 
+	fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
   }
 
   // Source list exists and the mechanical source params are defined

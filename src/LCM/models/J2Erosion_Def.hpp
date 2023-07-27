@@ -10,6 +10,7 @@ template <typename EvalT, typename Traits>
 J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl)
     : BaseKernel(model)
 {
+
   this->setIntegrationPointLocationFlag(true);
 
   // Baseline constants
@@ -86,6 +87,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
   setDependentField("Delta Time", dl->workset_scalar);
   setDependentField("Displacement", dl->qp_vector);
+  setDependentField("Cumulative_Time_old", dl->qp_scalar);
 
   // define the evaluated fields
   setEvaluatedField("failure_state", dl->cell_scalar2);
@@ -111,7 +113,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(cauchy_str, dl->qp_tensor, "scalar", 0.0, false, p->get<bool>("Output Cauchy Stress", false));
   addStateVariable(Fp_str, dl->qp_tensor, "identity", 0.0, true, p->get<bool>("Output Fp", false));
   addStateVariable(eqps_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
-  addStateVariable(ct_str, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output cumulative time", false));
+  addStateVariable(ct_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Cumulative Time", false));
   addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   addStateVariable(j2_stress_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output J2 Stress", false));
   addStateVariable(tilt_angle_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
@@ -158,6 +160,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   delta_time_        = *dep_fields["Delta Time"];
   ice_saturation_    = *dep_fields["ACE_Ice_Saturation"];
   displacement_      = *dep_fields["Displacement"];
+  cumulative_time_old_ = *dep_fields["Cumulative_Time_old"];
 
   // extract evaluated MDFields
   stress_                 = *eval_fields[cauchy_str];
@@ -182,7 +185,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // get State Variables
   Fp_old_              = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_            = (*workset.stateArrayPtr)[eqps_str + "_old"];
-  cumulative_time_old_ = (*workset.stateArrayPtr)[ct_str + "_old"];
+  //cumulative_time_old_ = (*workset.stateArrayPtr)[ct_str + "_old"];
 
   auto& disc                    = *workset.disc;
   auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
@@ -196,6 +199,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   }
 
   current_time_ = workset.current_time;
+  time_step_    = workset.time_step;
 
   auto const num_cells = workset.numCells;
   for (auto cell = 0; cell < num_cells; ++cell) {
@@ -364,6 +368,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const coords       = this->model_.getCoordVecField();
   auto const height       = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
   auto const current_time = current_time_;
+  auto const time_step    = time_step_;
   auto const sea_level    = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
   //auto const sea_level    = sea_level_.size() > 0 ? (interpolateVectors(time_, sea_level_, current_time) * 2.0) : -999.0;
 
@@ -401,17 +406,16 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // Update cumulative time
-  auto const accumulate = ((is_erodible == true) && (height <= sea_level));
-  auto const reset      = false; //ice_saturation > 1.00;
-  if (reset == true) {
-    cumulative_time_(cell, pt) = 0.0;
-    //std::cout << "reset! ";
-  } else if (accumulate == true) {
-    cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + delta_time;
-    //std::cout << "tick! ";
-    //std::cout << "cumu_time_OLD = " << cumulative_time_old_(cell, pt) << ", ";
-    //std::cout << "delta_time = " << delta_time << ", ";
-    //std::cout << "cumu_time = " << cumulative_time_(cell, pt) << "\n ";
+  // auto const accumulate = ((is_erodible == true) && (height <= sea_level));
+  auto const t              = Sacado::Value<decltype(current_time_)>::eval(current_time_);
+  auto const dt             = Sacado::Value<decltype(delta_time_(0))>::eval(delta_time_(0));
+  auto const ts             = Sacado::Value<decltype(time_step)>::eval(time_step);
+  auto const accumulate     = true;
+  auto const good_time_step = ts >= 0.0;
+  auto const exceeds        = cumulative_time_(cell, pt) > 4000.0;
+  // ALBANY_ASSERT(dt < 1000.0);
+  if (accumulate == true) {
+    cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt) + dt;
   } else {
     cumulative_time_(cell, pt) = cumulative_time_old_(cell, pt);
   }
@@ -431,9 +435,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Make the elements exposed to ocean "weaker"
   auto tensile_strength = tensile_strength_;
   if ((is_erodible == true) && (height <= sea_level)) {
-    //std::cout << "delta_time = " << delta_time << ", ";
-    //std::cout << "cumu_time = " << cumulative_time << ", ";
-    //std::cout << "damage_var = " << damage_var << ". ";
+    // std::cout << "cumu_time = " << cumulative_time << ", ";
+    // std::cout << "damage_var = " << damage_var << ". ";
     Y = Y / (Y_weakening_factor_);
     E            = E / (E_weakening_factor_);
     //E            = E * damage_var;
@@ -589,13 +592,13 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const     strain_failure = distortion >= strain_limit;
     strain_indicator_(cell, pt)   = safe_quotient(distortion, strain_limit);
     if (strain_failure == true) {
-      failed += 1.0;
+      failed += 10.0;
     }
   }
 
   // Determine if critical stress is exceeded
   if (yielded == true) {
-    failed += 1.0;
+    failed += 100.0;
   }
 
   // Determine if kinematic failure occurred
@@ -606,7 +609,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (critical_angle > 0.0) {
     auto const theta_abs = std::abs(theta);
     if (theta_abs >= critical_angle) {
-      failed += 1.0;
+      failed += 1000.0;
     }
     angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
   }
@@ -615,7 +618,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const displacement_norm      = minitensor::norm(disp_val);
   displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement);
   if (displacement_norm > maximum_displacement) {
-    failed += 1.0;
+    failed += 10000.0;
   }
 }
 }  // namespace LCM

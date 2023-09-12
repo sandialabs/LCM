@@ -27,7 +27,6 @@
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_StandardCatchMacros.hpp>
 #include <Teuchos_TimeMonitor.hpp>
-#include <Teuchos_TypeTraits.hpp>
 #include <Teuchos_VerboseObject.hpp>
 #include <Tpetra_MultiVector.hpp>
 #include <algorithm>

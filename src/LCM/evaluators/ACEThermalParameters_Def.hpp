@@ -425,26 +425,6 @@ Teuchos::RCP<Teuchos::ParameterList const>
 ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
 {
   Teuchos::RCP<Teuchos::ParameterList> valid_pl = rcp(new Teuchos::ParameterList("Valid ACE Thermal Parameters"));
-  valid_pl->set<double>("ACE_Therm_Cond Value", 1.0, "Constant thermal conductivity value across element block");
-  valid_pl->set<double>("ACE_Thermal_Inertia Value", 1.0, "Constant thermal inertia value across element block");
-  valid_pl->set<double>("ACE Ice Density", 920.0, "Constant value of ice density in element block");
-  valid_pl->set<double>("ACE Water Density", 1000.0, "Constant value of water density in element block");
-  valid_pl->set<double>("ACE Sediment Density", 2650.0, "Constant value of sediment density in element block");
-  valid_pl->set<double>(
-      "ACE Ice Thermal Conductivity", 2.1, "Constant value of ice thermal conductivity in element block");
-  valid_pl->set<double>(
-      "ACE Water Thermal Conductivity", 0.6, "Constant value of water thermal conductivity in element block");
-  valid_pl->set<double>(
-      "ACE Sediment Thermal Conductivity", 4.3, "Constant value of sediment thermal conductivity in element block");
-  valid_pl->set<double>("ACE Ice Heat Capacity", 2.0e+03, "Constant value of ice heat capacity in element block");
-  valid_pl->set<double>("ACE Water Heat Capacity", 4.0e+03, "Constant value of water heat capacity in element block");
-  valid_pl->set<double>(
-      "ACE Sediment Heat Capacity", 0.7e+03, "Constant value of sediment heat capacity in element block");
-  valid_pl->set<double>("ACE Base Salinity", 0.0, "Constant value of base salinity in element block");
-  valid_pl->set<double>("ACE Salt Enhanced D", 0.0, "Constant value of salt enhanced D in element block");
-  valid_pl->set<double>("ACE Latent Heat", 334.0, "Constant value latent heat in element block");
-  valid_pl->set<double>("ACE Bulk Porosity", 0.60, "Constant value bulk porosity in element block");
-  valid_pl->set<double>("ACE Element Size", 1.0, "Constant value of element size in element block");
   return valid_pl;
 }
 
@@ -456,60 +436,168 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
   for (int i = 0; i < eb_names_.size(); i++) {
     std::string eb_name = eb_names_[i];
     const_thermal_conduct_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Therm_Cond Value", -1.0);
-    if (const_thermal_conduct_map_[eb_name] != -1.0) {
-      ALBANY_ASSERT((const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE_Therm_Cond Value must be positive!");
+        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Bulk Thermal Conductivity", -1.0);
+    if (const_thermal_conduct_map_[eb_name] != -1.0) { 
+      ALBANY_ASSERT((const_thermal_conduct_map_[eb_name] > 0.0), "*** ERROR: ACE Bulk Thermal Conductivity must be positive!");
     }
+
     const_thermal_inertia_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE_Thermal_Inertia Value", -1.0);
+        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Bulk Thermal Inertia", -1.0);
     if (const_thermal_inertia_map_[eb_name] != -1.0) {
       ALBANY_ASSERT(
-          (const_thermal_inertia_map_[eb_name] > 0.0), "*** ERROR: ACE_Thermal_Inertia Value must be positive!");
+          (const_thermal_inertia_map_[eb_name] > 0.0), "*** ERROR: ACE Bulk Thermal Inertia must be positive!");
     }
-    ice_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Density", 920.0);
-    ALBANY_ASSERT((ice_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Density must be non-negative!");
-    water_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Density", 1000.0);
-    ALBANY_ASSERT((water_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Density must be non-negative!");
-    soil_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Density", 2650.0);
-    ALBANY_ASSERT((soil_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Soil Density must be non-negative!");
-    ice_thermal_cond_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 2.1);
-    ALBANY_ASSERT(
-        (ice_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!");
-    water_thermal_cond_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.6);
-    ALBANY_ASSERT(
-        (water_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Thermal Conductivity must be non-negative!");
-    soil_thermal_cond_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity", 4.3);
-    ALBANY_ASSERT(
-        (soil_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!");
-    ice_heat_capacity_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Heat Capacity", 2.0e+03);
-    ALBANY_ASSERT((ice_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Heat Capacity must be non-negative!");
-    water_heat_capacity_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Heat Capacity", 4.0e+03);
-    ALBANY_ASSERT(
-        (water_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Heat Capacity must be non-negative!");
-    soil_heat_capacity_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Heat Capacity", 0.7e+03);
-    ALBANY_ASSERT(
-        (soil_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Heat Capacity must be non-negative!");
-    salinity_base_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Base Salinity", 0.0);
-    ALBANY_ASSERT((salinity_base_map_[eb_name] >= 0.0), "*** ERROR: ACE Base Salinity must be non-negative!");
-    salt_enhanced_D_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Salt Enhanced D", 0.0);
-    ALBANY_ASSERT((salt_enhanced_D_map_[eb_name] >= 0.0), "*** ERROR: ACE Salt Enhanced D must be non-negative!");
-    latent_heat_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Latent Heat", 334.0);
-    ALBANY_ASSERT((latent_heat_map_[eb_name] >= 0.0), "*** ERROR: ACE Latent Heat must be non-negative!");
-    porosity_bulk_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Bulk Porosity", 0.60);
-    ALBANY_ASSERT((porosity_bulk_map_[eb_name] >= 0.0), "*** ERROR: ACE Bulk Porosity must be non-negative!");
-    element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size", 1.0);
-    ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), "*** ERROR: ACE Element Size must be non-negative!");
-    thermal_factor_map_[eb_name] =
-        material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor", 1.0);
-    ALBANY_ASSERT(
-        (thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
 
+    //If ACE Bulk Thermal Inertial and ACE Bulk Thermal Conductivity are not specified, get the 
+    //material/block-specific parameters to calculate these.
+    if ((const_thermal_conduct_map_[eb_name] == -1.0) && (const_thermal_inertia_map_[eb_name] == -1.0)) {
+      if (material_db_->isElementBlockParam(eb_name, "ACE Ice Density")) {
+        ice_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Density");
+        ALBANY_ASSERT((ice_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Density must be non-negative!");
+      }
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Ice Density not specified in materials file for element block " << eb_name << "! \n" << 
+  		          "If you wish to use default value, please set this parameter to 920.0.\n");
+      }
+      if (material_db_->isElementBlockParam(eb_name, "ACE Water Density")) {
+        water_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Density");
+        ALBANY_ASSERT((water_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Density must be non-negative!");
+      }
+      else {
+          ALBANY_ASSERT(false, "*** ERROR: ACE Water Density not specified in materials file for element block " << eb_name << "! \n" << 
+		          "If you wish to use default value, please set this parameter to 1000.0.\n");
+      } 
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Sediment Density")) { 
+        soil_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Density");
+        ALBANY_ASSERT((soil_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Soil Density must be non-negative!");
+      }
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Sediment Density not specified in materials file for element block " << eb_name << "! \n" <<
+	  	          "If you wish to use default value, please set this parameter to 2650.0.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Ice Thermal Conductivity")) {
+        ice_thermal_cond_map_[eb_name] =
+            material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity");
+        ALBANY_ASSERT(
+            (ice_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Ice Thermal Conductivity not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 2.1. \n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Water Thermal Conductivity")) {
+        water_thermal_cond_map_[eb_name] =
+            material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity");
+        ALBANY_ASSERT(
+            (water_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Thermal Conductivity must be non-negative!");
+      }
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Water Thermal Conductivity not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 0.6. \n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Sediment Thermal Conductivity")) {
+        soil_thermal_cond_map_[eb_name] =
+            material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity");
+        ALBANY_ASSERT(
+            (soil_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Sediment Thermal Conductivity not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 4.3.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Ice Heat Capacity")) {
+        ice_heat_capacity_map_[eb_name] =
+            material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Heat Capacity");
+        ALBANY_ASSERT((ice_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Heat Capacity must be non-negative!");
+      }
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Ice Heat Capacity not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 2.0e+03.\n");
+      } 
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Water Heat Capacity")) {
+        water_heat_capacity_map_[eb_name] =
+            material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Heat Capacity");
+        ALBANY_ASSERT(
+            (water_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Heat Capacity must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Water Heat Capacity not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 4.0e+03.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Sediment Heat Capacity")) {
+        soil_heat_capacity_map_[eb_name] =
+            material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Heat Capacity");
+        ALBANY_ASSERT(
+            (soil_heat_capacity_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Heat Capacity must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Sediment Heat Capacity not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 0.7e+03.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Base Salinity")) {
+        salinity_base_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Base Salinity");
+        ALBANY_ASSERT((salinity_base_map_[eb_name] >= 0.0), "*** ERROR: ACE Base Salinity must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Base Salinity not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 0.0.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Salt Enhanced D")) {
+        salt_enhanced_D_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Salt Enhanced D");
+        ALBANY_ASSERT((salt_enhanced_D_map_[eb_name] >= 0.0), "*** ERROR: ACE Salt Enhanced D must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Salt Enhanced D not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 0.0.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Latent Heat")) {
+        latent_heat_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Latent Heat");
+        ALBANY_ASSERT((latent_heat_map_[eb_name] >= 0.0), "*** ERROR: ACE Latent Heat must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Latent Heat not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 334.0.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Bulk Porosity")) {
+        porosity_bulk_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Bulk Porosity");
+        ALBANY_ASSERT((porosity_bulk_map_[eb_name] >= 0.0), "*** ERROR: ACE Bulk Porosity must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Bulk Porosity not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 0.6.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Element Size")) {
+        element_size_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Element Size");
+        ALBANY_ASSERT((element_size_map_[eb_name] >= 0.0), "*** ERROR: ACE Element Size must be non-negative!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Element Size not specified in materials file for element block " << eb_name << "! \n" <<
+		          "If you wish to use default value, please set this parameter to 1.0.\n");
+      }
+
+      if (material_db_->isElementBlockParam(eb_name, "ACE Thermal Erosion Factor")) {
+        thermal_factor_map_[eb_name] =
+            material_db_->getElementBlockParam<RealType>(eb_name, "ACE Thermal Erosion Factor");
+        ALBANY_ASSERT(
+            (thermal_factor_map_[eb_name] >= 1.0), "*** ERROR: ACE Salt Enhanced D must be greater than or equal to 1!");
+      } 
+      else {
+        ALBANY_ASSERT(false, "*** ERROR: ACE Thermal Erosion Factor not specified in materials file! \n" << 
+  		          "If you wish to use default value, please set this parameter to 1.0.\n");
+      }
+    }
     if (material_db_->isElementBlockParam(eb_name, "ACE Time File") == true) {
       std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Time File");
       time_map_[eb_name]         = vectorFromFile(filename);

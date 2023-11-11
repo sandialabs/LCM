@@ -1,0 +1,25 @@
+%YAML 1.1
+---
+ANONYMOUS:
+  ElementBlocks: 
+    #clamped: 
+    Block0: 
+      material: Clamped
+      Use Composite Tet 10: false
+      Use Analytic Mass: true
+      Lump Analytic Mass: true
+      Residual Computed Using Cubature: false
+  Materials: 
+    Clamped: 
+      Material Model: 
+        Model Name: Neohookean
+        #Model Name: Saint Venant Kirchhoff
+      Elastic Modulus: 
+        Elastic Modulus Type: Constant
+        Value: 1.0e+09
+      Poissons Ratio: 
+        Poissons Ratio Type: Constant
+        Value: 0.0
+      Density: 1.0e+03
+      Output Cauchy Stress: true
+...

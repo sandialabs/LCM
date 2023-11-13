@@ -6,6 +6,7 @@
 add_subdirectory(ACE)
 add_subdirectory(BoreDemo)
 add_subdirectory(CapModelPlasticity3D)
+add_subdirectory(Clamped)
 add_subdirectory(CohesiveElement)
 add_subdirectory(CrystalPlasticity)
 add_subdirectory(DTKInterp)

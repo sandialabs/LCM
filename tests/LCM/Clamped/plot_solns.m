@@ -2,15 +2,15 @@
 close all;
 clear all;
 
-[x,y,z,dispz] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab.e', 3);
+[x,y,z,dispz] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab_dt1em7_svk.e', 3);
 [Nx, Nt] = size(dispz);
 ind = find((x == 0.0) & (y == 0.0));
-[x,y,z,veloz] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab.e', 19);
-[x,y,z,accez] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab.e', 22);
+[x,y,z,veloz] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab_dt1em7_svk.e', 19);
+[x,y,z,accez] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab_dt1em7_svk.e', 22);
 
-[x,y,z,dispzStab] = extract_fields_from_exo('clamped_nonlinear_implicit_stab.e', 3);
-[x,y,z,velozStab] = extract_fields_from_exo('clamped_nonlinear_implicit_stab.e', 19);
-[x,y,z,accezStab] = extract_fields_from_exo('clamped_nonlinear_implicit_stab.e', 22);
+[x,y,z,dispzStab] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_dt1em7_svk.e', 3);
+[x,y,z,velozStab] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_dt1em7_svk.e', 19);
+[x,y,z,accezStab] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_dt1em7_svk.e', 22);
 
 c = sqrt(1e9/1e3);
 a = 0.001;
@@ -68,6 +68,15 @@ for i=1:Nt
   xlabel('z');
   ylabel('z-acce');
   axis([0 1.0 -4e6, 8e6]);
+  if (j < 11)
+    figname = strcat('soln_00', num2str(j-1), '.png'); 
+  elseif ( j < 101)
+    figname = strcat('soln_0', num2str(j-1), '.png'); 
+  else
+    figname = strcat('soln_', num2str(j-1), '.png'); 
+  end
+  legend('Unstabilized','Stabilized','Location','NorthEast'); 
+  exportgraphics(fig1, figname); 
   pause(0.1)
   Movie(:,j)=getframe(fig1);
   mov(j) = getframe(gcf);

@@ -3,13 +3,13 @@ close all;
 clear all;
 
 %[x,y,z,dispz] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_svk.e', 3);
-[x,y,z,dispz] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab_dt1em7.e', 3);
+[x,y,z,dispz] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_dt1em7.e', 3);
 [Nx, Nt] = size(dispz);
 ind = find((x == 0.0) & (y == 0.0));
 %[x,y,z,veloz] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_svk.e', 19);
 %[x,y,z,accez] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_svk.e', 22);
-[x,y,z,veloz] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab_dt1em7.e', 19);
-[x,y,z,accez] = extract_fields_from_exo('clamped_nonlinear_implicit_unstab_dt1em7.e', 22);
+[x,y,z,veloz] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_dt1em7.e', 19);
+[x,y,z,accez] = extract_fields_from_exo('clamped_nonlinear_implicit_stab_dt1em7.e', 22);
 
 
 load('1sd_nonlin_neohookean_dt1em7.mat'); 
@@ -72,7 +72,15 @@ for i=1:Nt
   xlabel('z');
   ylabel('z-acce');
   axis([0 1.0 -4e6, 8e6]);
+  if (j < 11)
+    figname = strcat('soln_00', num2str(j-1), '.png'); 
+  elseif ( j < 101)
+    figname = strcat('soln_0', num2str(j-1), '.png'); 
+  else
+    figname = strcat('soln_', num2str(j-1), '.png'); 
+  end
   legend('Albany','MATLAB','Location','NorthEast'); 
+  exportgraphics(fig1, figname); 
   pause(0.1)
   Movie(:,j)=getframe(fig1);
   mov(j) = getframe(gcf);

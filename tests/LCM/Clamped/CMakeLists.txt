@@ -30,8 +30,5 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plot_solns.m
 # 1. Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # 1. Create the test with this name and standard executable
-#add_test(${testName}_LinearElastic_Implicit ${Albany.exe} clamped_linear_implicit.yaml)
-#set_tests_properties(${testName}_LinearElastic_Implicit PROPERTIES LABELS "LCM;Tpetra;Forward")
-# 2. Create the test with this name and standard executable
-#add_test(${testName}_LinearElastic_Explicit ${Albany.exe} clamped_linear_explicit.yaml)
-#set_tests_properties(${testName}_LinearElastic_Explicit PROPERTIES LABELS "LCM;Tpetra;Forward")
+add_test(${testName}_StVenantKirchhoff_Implicit_Stabilized ${Albany.exe} clamped_linear_implicit.yaml)
+set_tests_properties(${testName}_StVenantKirchhoff_Implicit_Stabilized PROPERTIES LABELS "LCM;Tpetra;Forward")

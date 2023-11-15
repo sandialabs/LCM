@@ -12,8 +12,8 @@ ANONYMOUS:
   Materials: 
     Clamped: 
       Material Model: 
-        Model Name: Neohookean
-        #Model Name: Saint Venant Kirchhoff
+        #Model Name: Neohookean
+        Model Name: Saint Venant Kirchhoff
       Elastic Modulus: 
         Elastic Modulus Type: Constant
         Value: 1.0e+09

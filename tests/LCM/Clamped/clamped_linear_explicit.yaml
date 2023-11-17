@@ -6,7 +6,7 @@ ANONYMOUS:
   Problem: 
     Name: Mechanics 3D
     Phalanx Graph Visualization Detail: 0
-    MaterialDB Filename: 'material_linear_explicit.yaml'
+    MaterialDB Filename: 'material_linear.yaml'
     Solution Method: Transient Tempus
     #Initial Condition: 
     #  Function: Gaussian Z

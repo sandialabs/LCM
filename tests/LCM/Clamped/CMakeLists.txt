@@ -7,8 +7,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_nonlinear_implicit.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/clamped_nonlinear_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material_linear.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/material_linear.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material_nonlinear_implicit.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/material_nonlinear_implicit.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material_nonlinear.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/material_nonlinear.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped.g
                ${CMAKE_CURRENT_BINARY_DIR}/clamped.g COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_tet.g

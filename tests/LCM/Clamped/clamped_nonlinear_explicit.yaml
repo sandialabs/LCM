@@ -2,7 +2,9 @@
 ---
 ANONYMOUS:
   Scaling: 
-    Scale: 1.0e0
+    Scale: 1.0000000
+  #Debug Output: 
+    #Write Jacobian to MatrixMarket: -1
   Problem: 
     Name: Mechanics 3D
     Phalanx Graph Visualization Detail: 0
@@ -31,8 +33,10 @@ ANONYMOUS:
       SDBC on NS NodeSet3 for DOF Y: 0.00000000e+00
       SDBC on NS NodeSet4 for DOF Z: 0.00000000e+00
       SDBC on NS NodeSet5 for DOF Z: 0.00000000e+00
-    Response Functions: 
-      Number: 5
+    Response Functions:
+      Observe Responses: true
+      Responses Observation Frequency: 100
+      Number: 4
       Response 0: Project IP to Nodal Field
       ResponseParams 0: 
         Number of Fields: 1
@@ -42,13 +46,12 @@ ANONYMOUS:
       Response 1: Solution Average
       Response 2: Solution Max Value
       Response 3: Solution Min Value
-      Response 4: Solution Two Norm
   Discretization: 
     #Method: Exodus
     #Exodus Input File Name: 'clamped.g'
-    #Exodus Output File Name: 'clamped_linear_implicit.e'
+    #Exodus Output File Name: 'clamped_linear_explicit.e'
     #Exodus Input File Name: 'clamped_tet.g'
-    #Exodus Output File Name: 'clamped_tet_linear_implicit.e'
+    #Exodus Output File Name: 'clamped_tet_linear_explicit.e'
     Method: STK3D
     1D Scale: 1.0e-3
     2D Scale: 1.0e-3
@@ -56,19 +59,19 @@ ANONYMOUS:
     1D Elements: 1
     2D Elements: 1
     3D Elements: 1000
-    Exodus Output File Name: 'clamped_nonlinear_implicit.e'
+    Exodus Output File Name: 'clamped_nonlinear_explicit.e'
     Exodus Solution Name: disp
     Exodus Residual Name: resid
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 2
-    Exodus Write Interval: 1
+    Exodus Write Interval: 100
   Regression Results: 
-    Number of Comparisons: 5
-    Test Values: [0.000000000000e+00, -1.671841781505e-05, 0.000000000000e+00, 0.000000000000e+00, 6.535238097187e-03]
+    Number of Comparisons: 0
   Piro:
     Analysis:
       Compute Sensitivities: false
     Tempus: 
+      Invert Mass Matrix: true
       Lump Mass Matrix: false
       Integrator Name: Tempus Integrator
       Tempus Integrator:
@@ -79,74 +82,37 @@ ANONYMOUS:
           Storage Limit: 2000
         Time Step Control:
           Initial Time: 0.0
-          Final Time: 1.0e-03
+          Final Time: 1.0e-3
           Initial Time Index: 0
+          Initial Time Step: 1.0e-07
           Final Time Index: 1000000
-          Initial Time Step: 1.0e-05
+          Maximum Absolute Error: 1.0e-8
+          Maximum Relative Error: 1.0e-8
           Output Time List: ''
           Output Index List: ''
+          #Output Time Interval: 1.0
+          #Output Index Interval: 1000
+          #Maximum Number of Stepper Failures: 10
+          #Maximum Number of Consecutive Stepper Failures: 5
       Tempus Stepper:
-        Stepper Type: 'Newmark Implicit d-Form'
-        Newmark Parameters:
-                #Beta: 0.25
-                #Gamma: 0.50
-          Beta: 0.49
-          Gamma: 0.90
-        Solver Name: Demo Solver
-        Demo Solver:
-          NOX:
-            Direction:
-              Method: Newton
-              Newton:
-                Forcing Term Method: Constant
-                Rescue Bad Newton Solve: true
-                Linear Solver:
-                  Tolerance: 1.0e-5
-            Line Search:
-              Method: Full Step
-              Full Step:
-                Full Step: 1.0
-            Nonlinear Solver: Line Search Based
-            Printing:
-              Output Precision: 3
-              Output Processor: 0
-              Output Information:
-                Error: true
-                Warning: true
-                Outer Iteration: true
-                Parameters: true
-                Details: true
-                Linear Solver Details: true
-                Stepper Iteration: true
-                Stepper Details: true
-                Stepper Parameters: true
-            Solver Options:
-              Status Test Check Type: Minimal
-            Status Tests:
-              Test Type: Combo
-              Combo Type: OR
-              Number of Tests: 2
-              Test 0:
-                Test Type: NormF
-                Norm Type: Two Norm
-                Scale Type: Scaled
-                Tolerance: 1.00000000e-7
-              Test 1:
-                Test Type: MaxIters
-                Maximum Iterations: 128
+        Stepper Type: 'Newmark Explicit a-Form'
+        Newmark Explicit Parameters:
+          Gamma: 0.50
       Stratimikos:
         Linear Solver Type: Belos
         Linear Solver Types:
           Belos:
             Solver Type: Block GMRES
             Solver Types:
-              Block GMRES: 
-                Convergence Tolerance: 1.00000000e-14
-                Output Frequency: 1
+              Block GMRES:
+                Convergence Tolerance: 1e-5
+                Output Frequency: 10
                 Output Style: 1
                 Verbosity: 33
-                Maximum Iterations: 100
+                Maximum Iterations: 3
+                Block Size: 1
                 Num Blocks: 100
+                Flexible Gmres: false
         Preconditioner Type: Ifpack2
         Preconditioner Types:
           Ifpack2:

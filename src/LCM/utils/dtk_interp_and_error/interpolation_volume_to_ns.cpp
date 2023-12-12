@@ -27,7 +27,6 @@
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_StandardCatchMacros.hpp>
 #include <Teuchos_TimeMonitor.hpp>
-#include <Teuchos_TypeTraits.hpp>
 #include <Teuchos_VerboseObject.hpp>
 #include <Tpetra_MultiVector.hpp>
 #include <algorithm>
@@ -99,8 +98,8 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   Teuchos::RCP<stk::mesh::BulkData> src_bulk_data = Teuchos::rcpFromRef(src_broker.bulk_data());
 
   stk::util::ParameterList   parameters;
-  Teuchos::RCP<Ioss::Region> io_region = src_broker.get_input_io_region();
-  STKIORequire(!Teuchos::is_null(io_region));
+  auto io_region = src_broker.get_input_ioss_region();
+  STKIORequire(!(io_region == nullptr));
 
   // Get number of time steps in source mesh
   int timestep_count = io_region->get_property("state_count").get_int();
@@ -159,7 +158,7 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
         std::endl
         << "   Field with name " << source_field_name << " NOT found in source mesh file!" << std::endl);
 
-  int neq = source_field->max_size(stk::topology::NODE_RANK);
+  auto neq = source_field->max_size();
 
   // Put fields on target mesh
   // Add a nodal field to the interpolated target part.
@@ -184,8 +183,8 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
         std::endl
         << "   Field with name " << target_field_name << " NOT found in target mesh file!" << std::endl);
 
-  io_region = tgt_broker.get_input_io_region();
-  STKIORequire(!Teuchos::is_null(io_region));
+  io_region = tgt_broker.get_input_ioss_region();
+  STKIORequire(!(io_region == nullptr));
 
   // Get number of time steps in source mesh
   timestep_count = io_region->get_property("state_count").get_int();

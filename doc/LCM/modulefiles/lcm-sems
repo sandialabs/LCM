@@ -5,10 +5,10 @@ module-whatis "LCM SEMS base environment"
 setenv LCM_ENV_TYPE SEMS
 
 module load lcm-common
-
-module load sems-env
+exec /projects/sems/modulefiles/utils/sems-modules-init.sh
+module load 
 module load sems-python
-module load sparc-cmake
+module load sems-cmake
 module load sems-git
 
 conflict lcm-fedora lcm-cluster lcm-ubuntu lcm-scientific-linux

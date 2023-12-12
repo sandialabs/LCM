@@ -1,0 +1,30 @@
+${side = 0.001}
+${length = 1.0}
+${hx = side}
+${hy = side}
+${hz = side}
+${eps = 0.1 * side}
+create brick x {side} y {side} z {length}
+curve with x_coord >= {-eps} and x_coord <= {eps} size {hx}
+curve with y_coord >= {-eps} and y_coord <= {eps} size {hy}
+curve with z_coord >= {-eps} and z_coord <= {eps} size {hz}
+mesh volume 1
+htet volume all 
+block 1 volume 1
+block 1 name "clamped"
+block 1 element type tetra4
+nodeset 1 surface 4
+nodeset 1 name "-X"
+nodeset 2 surface 6
+nodeset 2 name "+X"
+nodeset 3 surface 3
+nodeset 3 name "-Y"
+nodeset 4 surface 5
+nodeset 4 name "+Y"
+nodeset 5 surface 2
+nodeset 5 name "-Z"
+nodeset 6 surface 1
+nodeset 6 name "+Z"
+set large exodus file off
+move volume 1 z {length / 2.0}
+export mesh "clamped_tet.g" overwrite

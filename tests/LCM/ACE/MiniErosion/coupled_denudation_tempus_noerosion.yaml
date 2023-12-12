@@ -1,0 +1,20 @@
+LCM:
+  Alternating System:
+    Model Input Files: ['thermal_denudation_tempus_noerosion.yaml', 'mechanical_denudation_tempus_noerosion.yaml']
+    Initial Time: 0.0 #   [sec]
+    Final Time: 64800.0 #  [sec]
+    #Final Time: 900.0 #  [sec]
+    Initial Time Step: 900.0 # [sec]
+    Maximum Steps: 10000
+    Minimum Time Step: 1.0e-04 # [sec]
+    Maximum Time Step: 900.0 # [sec]
+    Reduction Factor: 0.5
+    Amplification Factor: 1.1
+    Exodus Write Interval: 1
+    #Change the following if you want your output Exo files to start with 
+    #an index other than 0.  This is useful when doing restarts.
+    Exodus ACE Output File Initial Index: 0
+  Problem:
+    Solution Method: ACE Sequential Thermo-Mechanical
+    Phalanx Graph Visualization Detail: 0
+...

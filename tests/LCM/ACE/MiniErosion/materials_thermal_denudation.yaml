@@ -22,9 +22,10 @@ ALBANY:
       ACE Sediment Heat Capacity: 0.70e+03  #[J/kg/K] Used if 'sand/silt/clay_frac.txt' not given.
       ACE Base Salinity: 1.0  # Used if 'bluff_salinity.txt' vector not given.
       ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.
-      ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
       ACE Latent Heat: 334.0e+03 #[J/kg]
+      ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
       ACE Element Size: 0.25  # [m]
+      ACE Thermal Erosion Factor: 1.0   
 
 
 

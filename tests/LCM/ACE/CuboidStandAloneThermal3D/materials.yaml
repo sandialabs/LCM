@@ -35,6 +35,7 @@ ALBANY:
       ACE Time File: './time_fake.txt'  # {0.0, 10368000.0}
       ACE Sea Level File: './waterH_fake.txt'  # {-999.0, -999.0}
       ACE Element Size: 0.25  # [m]
+      ACE Thermal Erosion Factor: 1.0
     Ice:
       #=======================================#
       # This material describes an ice wedge  #
@@ -56,3 +57,4 @@ ALBANY:
       ACE Time File: './time_fake.txt'  # {0.0, 10368000.0}
       ACE Sea Level File: './waterH_fake.txt'  # {-999.0, -999.0}
       ACE Element Size: 0.25  # [m]
+      ACE Thermal Erosion Factor: 1.0

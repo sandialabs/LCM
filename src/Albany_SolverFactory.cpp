@@ -20,7 +20,6 @@
 #include "Schwarz_PiroObserver.hpp"
 #include "Stratimikos_DefaultLinearSolverBuilder.hpp"
 #include "Teuchos_AbstractFactoryStd.hpp"
-#include "Thyra_Ifpack2PreconditionerFactory.hpp"
 
 #if defined(ALBANY_MUELU)
 #include "Stratimikos_MueLuHelpers.hpp"
@@ -39,13 +38,6 @@
 
 namespace {
 
-void
-enableIfpack2(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
-{
-  typedef Thyra::PreconditionerFactoryBase<ST>                  Base;
-  typedef Thyra::Ifpack2PreconditionerFactory<Tpetra_CrsMatrix> Impl;
-  linearSolverBuilder.setPreconditioningStrategyFactory(Teuchos::abstractFactoryStd<Base, Impl>(), "Ifpack2");
-}
 
 void
 enableMueLu(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
@@ -163,7 +155,6 @@ SolverFactory::createAndGetAlbanyApp(
     Piro::SolverFactory piroFactory;
     // Setup linear solver
     Stratimikos::DefaultLinearSolverBuilder linearSolverBuilder;
-    enableIfpack2(linearSolverBuilder);
     enableMueLu(linearSolverBuilder);
 
     linearSolverBuilder.setParameterList(stratList);
@@ -211,7 +202,6 @@ SolverFactory::createAndGetAlbanyApp(
   } else {
     // Setup linear solver
     Stratimikos::DefaultLinearSolverBuilder linearSolverBuilder;
-    enableIfpack2(linearSolverBuilder);
     enableMueLu(linearSolverBuilder);
     enableFROSch(linearSolverBuilder);
     linearSolverBuilder.setParameterList(stratList);

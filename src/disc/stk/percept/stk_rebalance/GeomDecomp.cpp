@@ -43,15 +43,15 @@ GeomDecomp::entity_coordinates(
     // Loop over node relations in mesh entities
     const percept::MyPairIterRelation nr(bulk_data, entity, NODE_RANK);
 
+    const unsigned ndim = stk::mesh::field_scalars_per_entity(nodal_coor,entity);
+    std::vector<double> temp(ndim);
+
     for (unsigned inr = 0; inr < nr.size(); ++inr) {
       const percept::MyPairIterRelation::MyRelation& rel = nr[inr];
       // if (rel.entity_rank() ==  NODE_RANK) { // %fixme: need to check for
       // USES relation
       if (bulk_data.entity_rank(rel.entity()) == NODE_RANK) {  // %fixme: need to check for USES relation
         const mesh::Entity nent = rel.entity();
-        // const unsigned ndim(nodal_coor.max_size(NODE_RANK)/sizeof(double));
-        // // TODO - is there a better way to get this info?
-        const unsigned ndim(nodal_coor.max_size(NODE_RANK));  // TODO - is there a better way to get this info?
         double*        coor = mesh::field_data(nodal_coor, nent);
         if (!coor) {
           throw std::runtime_error(
@@ -144,7 +144,7 @@ apply_rotation(std::vector<double>& coor)
   } else if (nd == 1) {
     coor[0] = temp[0];
   } else {
-    ThrowRequireMsg(
+    STK_ThrowRequireMsg(
         false,
         "Spatial Dimention not 1, 2, or 3, can not apply rotation.");  // Should
                                                                        // never

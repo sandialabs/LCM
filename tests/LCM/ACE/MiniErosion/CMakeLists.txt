@@ -14,18 +14,24 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation_tempus_noerosion.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation_tempus_noerosion.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation_tempus_noerosion_all_implicit.yaml
+        	${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation_tempus_noerosion_all_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_new_wave_press_nbc.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/thermal_new_wave_press_nbc.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_implicit.yaml
+        	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_new_wave_press_nbc.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/mechanical_new_wave_press_nbc.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion_implicit.yaml
+        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal_new_wave_press_nbc.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/materials_thermal_new_wave_press_nbc.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal_denudation.yaml
@@ -82,6 +88,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/mechanical.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/thermal.exodiff COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_implicit.exodiff
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_implicit.exodiff COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -138,14 +146,14 @@ NAME ACE_${testName}_Denudation_Parallel
     ${runtest.cmake})
 set_tests_properties(ACE_${testName}_Denudation_Parallel PROPERTIES LABELS "LCM;Tpetra;Forward")
   
-#Parallel test - denudation using Tempus w/o erosion
+#Parallel test - denudation using Tempus w/o erosion w/ explicit thermal time-stepper
 set(OUTFILE1 "thermal_denudation_tempus_noerosion.e-s.71")
 set(REF_FILE1 "thermal_denudation_tempus_noerosion_gold.e-s.71")
 set(OUTFILE2 "mechanical_denudation_tempus_noerosion.e-s.71")
 set(REF_FILE2 "mechanical_denudation_tempus_noerosion_gold.e-s.71")
 set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
 add_test(
-NAME ACE_${testName}_Denudation_Tempus_NoErosion_Parallel
+  NAME ACE_${testName}_Denudation_Tempus_NoErosion_ExplicitThermal_Parallel
   COMMAND
   ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME1=thermal
     -DTEST_NAME2=mechanical
@@ -153,5 +161,22 @@ NAME ACE_${testName}_Denudation_Tempus_NoErosion_Parallel
     -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 
     -DREF_FILENAME2=${REF_FILE2} -DOUTPUT_FILENAME2=${OUTFILE2} -P
     ${runtest.cmake})
-set_tests_properties(ACE_${testName}_Denudation_Tempus_NoErosion_Parallel PROPERTIES LABELS "LCM;Tpetra;Forward")
+set_tests_properties(ACE_${testName}_Denudation_Tempus_NoErosion_ExplicitThermal_Parallel PROPERTIES LABELS "LCM;Tpetra;Forward")
+  
+#Parallel test - denudation using Tempus w/o erosion with implicit thermal time-stepper
+set(OUTFILE1 "thermal_denudation_tempus_noerosion_implicitThermal.e-s.71")
+set(REF_FILE1 "thermal_denudation_tempus_noerosion_gold.e-s.71")
+set(OUTFILE2 "mechanical_denudation_tempus_noerosion_implicitThermal.e-s.71")
+set(REF_FILE2 "mechanical_denudation_tempus_noerosion_gold.e-s.71")
+set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
+add_test(
+  NAME ACE_${testName}_Denudation_Tempus_NoErosion_ImplicitThermal_Parallel
+  COMMAND
+  ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME1=thermal_implicit
+    -DTEST_NAME2=mechanical
+    -DTEST_ARGS=coupled_denudation_tempus_noerosion_all_implicit.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 
+    -DREF_FILENAME2=${REF_FILE2} -DOUTPUT_FILENAME2=${OUTFILE2} -P
+    ${runtest.cmake})
+set_tests_properties(ACE_${testName}_Denudation_Tempus_NoErosion_ImplicitThermal_Parallel PROPERTIES LABELS "LCM;Tpetra;Forward")
   

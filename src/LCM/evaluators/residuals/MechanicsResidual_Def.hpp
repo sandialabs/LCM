@@ -274,16 +274,16 @@ MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
   }
 
   // Populate cumulative_time_ field
-  if (is_ace_cumulative_time_ == true) {
+  /*if (is_ace_cumulative_time_ == true) {
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int pt = 0; pt < num_pts_; ++pt) {
         cumulative_time_(cell, pt) = cumulative_time_read_(cell, pt) + 3.14159265;
-        /*std::cout << "IKT cell, pt, cum_time_read, cum_time = " << cell << ", "
-                  << pt << ", " << cumulative_time_read_(cell,pt) << ", "
-                  << cumulative_time_(cell,pt) << "\n"; */
+	//std::cout << "IKT cell, pt, cum_time_read, cum_time = " << cell << ", " 
+	//	  << pt << ", " << cumulative_time_read_(cell,pt) << ", "  
+	//	  << cumulative_time_(cell,pt) << "\n"; 
       }
     }
-  }
+  }*/
 }
 
 }  // namespace LCM

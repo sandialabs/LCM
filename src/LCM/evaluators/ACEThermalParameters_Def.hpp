@@ -340,8 +340,9 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         // [J/kg/K]
         calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac) + (1.93e3 * peat_frac);
         // K values in [W/K/m]
-        calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.08 * peat_frac);
-        //calc_soil_thermal_cond = (16.0 * sand_frac) + (0.8 * clay_frac) + (9.8 * silt_frac) + (0.16 * peat_frac);
+        calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.40 * peat_frac);
+        //calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.08 * peat_frac);
+        //calc_soil_thermal_cond = pow(8.0,sand_frac) * pow(0.4,clay_frac) * pow(4.9,silt_frac) * pow(0.08,peat_frac);
         // Rho values in [kg/m3]
         // Peat density from Emily Bristol
         calc_soil_density = (2600.0 * sand_frac) + (2350.0 * clay_frac) + (2500.0 * silt_frac) + (250.0 * peat_frac);
@@ -359,15 +360,23 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         heat_capacity_(cell, qp) =
             (porosity_eb * ((ice_heat_capacity_eb * icurr) + (water_heat_capacity_eb * wcurr))) + ((1.0 - porosity_eb) * soil_heat_capacity_eb);
       }
+      // HACK!! HACK!! HACK!!
+      // HACK!! HACK!! HACK!!
+      heat_capacity_(cell, qp) = (1.0) * heat_capacity_(cell, qp);
 
       // Update the effective material thermal conductivity
       if (sediment_given == true) {
         thermal_conductivity_(cell, qp) =
             (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) + ((1.0 - porosity_eb) * calc_soil_thermal_cond);
+        //thermal_conductivity_(cell, qp) =
+        //    pow(ice_thermal_cond_eb,(icurr*porosity_eb)) * pow(water_thermal_cond_eb,(wcurr*porosity_eb)) * pow(calc_soil_thermal_cond,(1.0 - porosity_eb));
       } else {
         thermal_conductivity_(cell, qp) =
             (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) + ((1.0 - porosity_eb) * soil_thermal_cond_eb);
       }
+      // HACK!! HACK!! HACK!!
+      // HACK!! HACK!! HACK!!
+      thermal_conductivity_(cell, qp) = (1.0) * thermal_conductivity_(cell, qp);
 
       // Jenn's sub-grid scale model to calibrate niche formation follows.
       // By default, thermal_factor = 1.0, so that no scaling occurs.
@@ -417,7 +426,7 @@ ACEThermalParameters<EvalT, Traits>::getValidThermalCondParameters() const
   valid_pl->set<double>("ACE Ice Density", 920.0, "Constant value of ice density in element block");
   valid_pl->set<double>("ACE Water Density", 1000.0, "Constant value of water density in element block");
   valid_pl->set<double>("ACE Sediment Density", 2650.0, "Constant value of sediment density in element block");
-  valid_pl->set<double>("ACE Ice Thermal Conductivity", 2.1, "Constant value of ice thermal conductivity in element block");
+  valid_pl->set<double>("ACE Ice Thermal Conductivity", 2.3, "Constant value of ice thermal conductivity in element block");
   valid_pl->set<double>("ACE Water Thermal Conductivity", 0.6, "Constant value of water thermal conductivity in element block");
   valid_pl->set<double>("ACE Sediment Thermal Conductivity", 4.3, "Constant value of sediment thermal conductivity in element block");
   valid_pl->set<double>("ACE Ice Heat Capacity", 2.0e+03, "Constant value of ice heat capacity in element block");
@@ -452,9 +461,9 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((water_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Density must be non-negative!");
     soil_density_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Density", 2650.0);
     ALBANY_ASSERT((soil_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Soil Density must be non-negative!");
-    ice_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 2.1);
+    ice_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 2.3);
     ALBANY_ASSERT((ice_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!");
-    water_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.6);
+    water_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.6); 
     ALBANY_ASSERT((water_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Thermal Conductivity must be non-negative!");
     soil_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity", 4.3);
     ALBANY_ASSERT((soil_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!");

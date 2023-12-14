@@ -66,7 +66,6 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ConstScalarField yield_strength_;
   ConstScalarField temperature_;
   ConstScalarField ice_saturation_;
-  ConstScalarField cumulative_time_read_;
   ConstScalarField displacement_;
 
   // Output MDFields
@@ -78,7 +77,6 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField j2_stress_;
   ScalarField tilt_angle_;
   ScalarField failed_;
-  ScalarField cumulative_time_;
 
   // Workspace arrays
   Albany::MDArray Fp_old_;

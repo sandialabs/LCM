@@ -5,8 +5,6 @@
 #include "Albany_STKDiscretization.hpp"
 #include "J2Erosion.hpp"
 
-#define ICE_SATURATION
-
 namespace LCM {
 
 template <typename EvalT, typename Traits>
@@ -82,10 +80,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setDependentField("Elastic Modulus", dl->qp_scalar);
   setDependentField("Yield Strength", dl->qp_scalar);
   setDependentField("Hardening Modulus", dl->qp_scalar);
-#if defined(ICE_SATURATION)
   setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
-  setDependentField("ACE_Cumulative_TimeRead", dl->qp_scalar);
-#endif
   setDependentField("Delta Time", dl->workset_scalar);
   setDependentField("Displacement", dl->qp_vector);
 
@@ -97,9 +92,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   setEvaluatedField(yield_surf_str, dl->qp_scalar);
   setEvaluatedField(j2_stress_str, dl->qp_scalar);
   setEvaluatedField(tilt_angle_str, dl->qp_scalar);
-#if defined(ICE_SATURATION)
-  setEvaluatedField("ACE_Cumulative_Time", dl->qp_scalar);
-#endif
   if (have_temperature_ == true) {
     setDependentField("Temperature", dl->qp_scalar);
     setEvaluatedField(source_str, dl->qp_scalar);
@@ -113,7 +105,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
   addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   addStateVariable(j2_stress_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output J2 Stress", false));
   addStateVariable(tilt_angle_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
-  addStateVariable("ACE_Cumulative_Time", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Cumulative_Time", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
@@ -149,11 +140,8 @@ J2ErosionKernel<EvalT, Traits>::init(
   yield_strength_    = *dep_fields["Yield Strength"];
   hardening_modulus_ = *dep_fields["Hardening Modulus"];
   delta_time_        = *dep_fields["Delta Time"];
-#if defined(ICE_SATURATION)
-  ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
-  cumulative_time_read_ = *dep_fields["ACE_Cumulative_TimeRead"];
-#endif
-  displacement_ = *dep_fields["Displacement"];
+  ice_saturation_    = *dep_fields["ACE_Ice_Saturation"];
+  displacement_      = *dep_fields["Displacement"];
 
   // extract evaluated MDFields
   stress_     = *eval_fields[cauchy_str];
@@ -163,11 +151,6 @@ J2ErosionKernel<EvalT, Traits>::init(
   j2_stress_  = *eval_fields[j2_stress_str];
   tilt_angle_ = *eval_fields[tilt_angle_str];
   failed_     = *eval_fields["failure_state"];
-//IKT 11/28/2022: I am using ICE_SATURATION ifdef for ACE_Cumulative_Time,
-//since both will only be present for ACE problems, so under the same conditions
-#if defined(ICE_SATURATION)
-  cumulative_time_ = *eval_fields["ACE_Cumulative_Time"];
-#endif
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_str];
@@ -359,7 +342,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const current_time = current_time_;
   auto const sea_level    = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time) : -999.0;
 
-#if defined(ICE_SATURATION)
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
 
   auto const peat =
@@ -379,12 +361,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   E = std::max(E, residual_elastic_modulus_);
   Y = std::max(Y, soil_yield_strength_);
-
-#else
-  ScalarT const E = elastic_modulus_(cell, pt);
-  ScalarT const K = hardening_modulus_(cell, pt);
-  ScalarT       Y = yield_strength_(cell, pt);
-#endif
 
   Y = std::max(Y, 0.0);
   E = std::max(E, 0.0);
@@ -460,12 +436,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const theta      = std::acos(cosine);
   tilt_angle_(cell, pt) = theta;
  
-#ifdef ICE_SATURATION
-  //Jenn TODO: correctly fill in cumulative_time in the following lines_
-  std::cout << "IKT cumulative_time_read_ = " << cumulative_time_read_(cell, pt) << "\n"; 
-  cumulative_time_(cell, pt)  = 3.1415926 + cumulative_time_read_(cell,pt); 
-#endif
-
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;
 

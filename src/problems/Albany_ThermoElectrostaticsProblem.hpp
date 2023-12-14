@@ -39,6 +39,16 @@ class ThermoElectrostaticsProblem : public AbstractProblem
   {
     return use_sdbcs_;
   }
+  
+  ///
+  /// Get boolean telling code if Adaptation is utilized
+  ///
+  virtual bool
+  haveAdaptation() const
+  {
+    return false;
+  }
+
 
   //! Destructor
   ~ThermoElectrostaticsProblem();

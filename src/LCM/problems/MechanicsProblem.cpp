@@ -183,10 +183,10 @@ MechanicsProblem::MechanicsProblem(
   rigidBodyModes->setParameters(num_PDEs, num_eq_mech, num_eq_aux, null_space_dim);
 
   // Check whether we are doing mesh adaptation
-  bool const have_adaptation = params->isSublist("Adaptation");
+  have_adaptation_ = params->isSublist("Adaptation");
   bool       have_erosion{false};
 
-  if (have_adaptation == true) {
+  if (have_adaptation_ == true) {
     Teuchos::ParameterList const& adapt_params = params->sublist("Adaptation");
 
     std::string const& adaptation_method_name = adapt_params.get<std::string>("Method");

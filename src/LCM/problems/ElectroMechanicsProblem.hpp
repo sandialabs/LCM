@@ -60,6 +60,15 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
   }
 
   ///
+  /// Get boolean telling code if Adaptation is utilized
+  ///
+  virtual bool
+  haveAdaptation() const
+  {
+    return false;
+  }
+
+  ///
   /// Build the PDE instantiations, boundary conditions, initial solution
   ///
   virtual void

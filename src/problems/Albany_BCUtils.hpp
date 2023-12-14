@@ -221,6 +221,16 @@ class BCUtils
   {
     return use_sdbcs_;
   }
+  
+  ///
+  /// Get boolean telling code if Adaptation is utilized
+  ///
+  virtual bool
+  haveAdaptation() const
+  {
+    return false;
+  }
+
 
   //! Specific implementation for Dirichlet BC Evaluator below
 

@@ -58,10 +58,10 @@ Albany::ACEThermalProblem::ACEThermalProblem(
     stab_value_ = 0.0;
   }
   // Check whether we are doing mesh adaptation
-  bool const have_adaptation = params->isSublist("Adaptation");
+  have_adaptation_ = params->isSublist("Adaptation");
   bool       have_erosion{false};
 
-  if (have_adaptation == true) {
+  if (have_adaptation_ == true) {
     Teuchos::ParameterList const& adapt_params           = params->sublist("Adaptation");
     std::string const&            adaptation_method_name = adapt_params.get<std::string>("Method");
     have_erosion                                         = adaptation_method_name == "Erosion";

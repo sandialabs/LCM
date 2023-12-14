@@ -97,6 +97,10 @@ class AbstractProblem
   virtual bool
   useSDBCs() const = 0;
 
+  //! Get boolean telling code if Adaptation is utilized
+  virtual bool
+  haveAdaptation() const = 0;
+
   //! Build the PDE instantiations, boundary conditions, and initial solution
   //! And construct the evaluators and field managers
   virtual void

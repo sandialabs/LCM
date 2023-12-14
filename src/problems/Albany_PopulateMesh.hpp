@@ -70,6 +70,16 @@ class PopulateMesh : public Albany::AbstractProblem
   {
     return use_sdbcs_;
   }
+  
+  ///
+  /// Get boolean telling code if Adaptation is utilized
+  ///
+  virtual bool
+  haveAdaptation() const
+  {
+    return false;
+  }
+
 
  private:
   //! Private to prohibit copying

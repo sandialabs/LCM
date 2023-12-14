@@ -183,6 +183,11 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   } else if (solutionMethod == "Transient Tempus" || "Transient Tempus No Piro") {
     solMethod = TransientTempus;
 
+   if ((solMethod == TransientTempus) && (problem->haveAdaptation() == true)) { 
+     ALBANY_ASSERT(false, "Error! You are attempting to run with Tempus and Adaptation, which does not currently work in the code!\n");
+   }
+
+
     // Add NOX pre-post-operator for debugging.
     bool const have_piro = params->isSublist("Piro");
     ALBANY_ASSERT(have_piro == true, "Error! Piro sublist not found.\n");

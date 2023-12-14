@@ -48,6 +48,15 @@ class ACEThermalProblem : public AbstractProblem
     return use_sdbcs_;
   }
 
+  ///
+  /// Get boolean telling code if Adaptation is utilized
+  ///
+  virtual bool
+  haveAdaptation() const
+  {
+    return false;
+  }
+
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
   buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> mesh_specs, StateManager& state_mgr);
@@ -105,6 +114,9 @@ class ACEThermalProblem : public AbstractProblem
 
   /// Boolean marking whether SDBCs are used
   bool use_sdbcs_;
+
+  /// Boolean marking whether adaptation is used
+  bool have_adaptation_;
 
   // Stabilization-related parameters
   bool        use_stab_{false};

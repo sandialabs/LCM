@@ -63,6 +63,15 @@ class MechanicsProblem : public AbstractProblem
   }
 
   ///
+  /// Get boolean telling code if Adaptation is utilized
+  ///
+  virtual bool
+  haveAdaptation() const
+  {
+    return have_adaptation_;
+  }
+
+  ///
   /// Build the PDE instantiations, boundary conditions, initial solution
   ///
   virtual void
@@ -184,6 +193,9 @@ class MechanicsProblem : public AbstractProblem
 
   /// Boolean marking whether SDBCs are used
   bool use_sdbcs_;
+  
+  /// Boolean marking whether adaptation is used
+  bool have_adaptation_; 
 
   /// Type of thermal source that is in effect
   SOURCE_TYPE
